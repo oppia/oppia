@@ -86,5 +86,37 @@ describe('CodeRepl prediction service', function() {
 
       expect(CVTokens).toEqual(expectedTokens);
     });
+
+    it('should predict correct answer group for the answers', function() {
+      jasmine.getJSONFixtures().fixturesPath = 'base/core/tests/data';
+      var classifierData = getJSONFixture('code_classifier_data.json');
+
+      // Test algorithm agains first test set. This test set contains
+      // example which can be successfully classified by KNN classifier.
+      var testData = getJSONFixture('code_classifier_test_set_1.json');
+      var predictedAnswerGroup = null;
+
+      for (var i = 0; i < testData.length; i++) {
+        for (var j = 0; j < testData[i].answers.length; j++) {
+          predictedAnswerGroup = service.predict(
+            classifierData, testData[i].answers[j]);
+          expect(predictedAnswerGroup).toEqual(
+            testData[i].answer_group_index.toString());
+        }
+      }
+
+      // Test algorithm against second test set. This test set contains
+      // example which will cause code classifier fail on KNN prediction
+      // and force it to use SVM for prediction.
+      testData = getJSONFixture('code_classifier_test_set_2.json');
+      for (var i = 0; i < testData.length; i++) {
+        for (var j = 0; j < testData[i].answers.length; j++) {
+          predictedAnswerGroup = service.predict(
+            classifierData, testData[i].answers[j]);
+          expect(predictedAnswerGroup).toEqual(
+            testData[i].answer_group_index.toString());
+        }
+      }
+    })
   });
 });

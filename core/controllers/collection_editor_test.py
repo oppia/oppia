@@ -144,7 +144,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
             self.json_dict, expect_errors=True,
             csrf_token=csrf_token, expected_status_int=401)
 
-        self.assertEqual(json_response['code'], 401)
+        self.assertEqual(json_response['status_code'], 401)
         self.logout()
 
     def test_editable_collection_handler_put_can_access(self):

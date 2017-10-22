@@ -1,5 +1,5 @@
 {
-	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "Rnu asnirem-ik",
+	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "Rnu taremt",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT": "ɣef usentel i tḥemleḍ.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK": "Mudd azal i tikti",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK_TEXT": "I wusnarni n taremt-ik",
@@ -8,7 +8,7 @@
 	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_2": "S tmerna n tagrumma n timsirin tilelliyin n tɣara meqqren, i nezmer ad d-nessebgen, s tallelt n imsegmiyen n umaḍal, Oppia tettnadi ad d-mudd i yinelmaden assegmi n tɣara &mdash; di yal amdiq anida llan akked tiɣbula tinsayanin anida zemren ad kecmen.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_3": "Akka tura, imsegmiyen rnan ugar n <[numberOfExplorations]> n timsirin, imumi nessawal <em>isnirmen</em>. Timsirin ttwaseqdacent sɣur <[numberofStudentsServed]> n inelmaden deg umaḍal.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_4": "Isnirmen ttmuddun afus i yinelmaden ad lemden s wudem n zhu d usnulfu, s useqdec n tvidyutin, tugniwinakked isteqsiyen yeldin. Imiinelmaden ɣur-sen yal tikelt tuccḍiwin di tiktiwin, Oppia tettmuddu-d daɣen i yimsegmiyen  tagnitt akken ad seɣtin srid deg isnirmen, s umuddu n tiktiwin ibanen i ddeqs n inelmaden deg iwen n wakud.",
-	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_5": "Ma d anelmad i telliḍ udiq tebɣiḍ ad tlemdeḍ s Oppia, tzemreḍ  <a href=\"/library\">ad tegreḍ aḍaṛ deg ulmad s usnirem deg timsirin-nneɣ</a>.",
+	"I18N_ABOUT_PAGE_ABOUT_TAB_PARAGRAPH_5": "Ma d anelmad i telliḍ udiɣ tebɣiḍ ad tlemdeḍ s Oppia, tzemreḍ  <a href=\"/library\">ad tegreḍ aḍaṛ deg ulmad s usnirem deg timsirin-nneɣ</a>.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE": "Suffeɣ-d &amp; Bḍu",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE_TEXT": "asnulfu-ik d tmezdagnut",
 	"I18N_ABOUT_PAGE_CREDITS_TAB_HEADING": "Ismaden",
@@ -377,6 +377,7 @@
 	"I18N_TOPNAV_LIBRARY": "Tanedlist",
 	"I18N_TOPNAV_LOGOUT": "Tuffɣa",
 	"I18N_TOPNAV_NOTIFICATIONS": "Ilɣa",
+	"I18N_TOPNAV_OPPIA_FOUNDATION": "Tasbeddit Oppia",
 	"I18N_TOPNAV_PREFERENCES": "Ismenyifen",
 	"I18N_TOPNAV_SIGN_IN": "Qqen",
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Qqen s Google",

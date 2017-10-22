@@ -84,283 +84,103 @@ oppia.controller('StateEditor', [
   }
 ]);
 
-// A service that, given an exploration ID and state name, determines all of the
-// answers which do not have certain classification and are not currently used
-// as part of any classifier training models.
-oppia.factory('trainingDataService', [
-  '$rootScope', '$http', 'responsesService', 'RULE_TYPE_CLASSIFIER',
-  'RuleObjectFactory',
-  function(
-      $rootScope, $http, responsesService, RULE_TYPE_CLASSIFIER,
-      RuleObjectFactory) {
-    var _trainingDataAnswers = [];
-    var _trainingDataFrequencies = [];
-
-    var _getIndexOfTrainingData = function(answer, trainingData) {
-      var index = -1;
-      for (var i = 0; i < trainingData.length; i++) {
-        if (angular.equals(trainingData[i], answer)) {
-          index = i;
-          break;
-        }
-      }
-      return index;
-    };
-
-    // Attempts to remove a given answer from a list of trained answers. This
-    // function returns the index of the answer that was removed if it was
-    // successfully removed from the training data, or -1 otherwise.
-    var _removeAnswerFromTrainingData = function(answer, trainingData) {
-      var index = _getIndexOfTrainingData(answer, trainingData);
-      if (index !== -1) {
-        trainingData.splice(index, 1);
-      }
-      return index;
-    };
-
-    // This removes any occurrences of the answer from any training data inputs
-    // or the confirmed unclassified answer list. It also removes the answer
-    // from the training data being presented to the user so that it does not
-    // show up again.
-    var _removeAnswer = function(answer) {
-      var answerGroups = responsesService.getAnswerGroups();
-      var confirmedUnclassifiedAnswers = (
-        responsesService.getConfirmedUnclassifiedAnswers());
-      var updatedAnswerGroups = false;
-      var updatedConfirmedUnclassifiedAnswers = false;
-
-      // Remove the answer from all answer groups.
-      for (var i = 0; i < answerGroups.length; i++) {
-        var answerGroup = answerGroups[i];
-        var rules = answerGroup.rules;
-        var trainingData = null;
-        var classifierIndex = -1;
-        for (var j = 0; j < rules.length; j++) {
-          var rule = rules[j];
-          if (rule.type === RULE_TYPE_CLASSIFIER) {
-            trainingData = rule.inputs.training_data;
-            classifierIndex = j;
-            break;
-          }
-        }
-        if (trainingData &&
-            _removeAnswerFromTrainingData(answer, trainingData) !== -1) {
-          if (trainingData.length === 0 && rules.length > 1) {
-            // If the last of the training data for a classifier has been
-            // removed and the classifier is not the only rule in the group,
-            // remove the rule since it is no longer doing anything.
-            rules.splice(classifierIndex, 1);
-          }
-          updatedAnswerGroups = true;
-        }
-      }
-
-      // Remove the answer from the confirmed unclassified answers.
-      updatedConfirmedUnclassifiedAnswers = (_removeAnswerFromTrainingData(
-        answer, confirmedUnclassifiedAnswers) !== -1);
-
-      if (updatedAnswerGroups) {
-        responsesService.save(
-          answerGroups, responsesService.getDefaultOutcome());
-      }
-
-      if (updatedConfirmedUnclassifiedAnswers) {
-        responsesService.updateConfirmedUnclassifiedAnswers(
-          confirmedUnclassifiedAnswers);
-      }
-
-      var index = _removeAnswerFromTrainingData(answer, _trainingDataAnswers);
-      if (index !== -1) {
-        _trainingDataFrequencies.splice(index, 1);
-        $rootScope.$broadcast('updatedTrainingData');
-      }
-    };
-
+oppia.directive('trainingPanel', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      initializeTrainingData: function(explorationId, stateName) {
-        var trainingDataUrl = '/createhandler/training_data/' + explorationId +
-          '/' + encodeURIComponent(stateName);
-        $http.get(trainingDataUrl).then(function(response) {
-          var unhandledAnswers = response.data.unhandled_answers;
-          _trainingDataAnswers = [];
-          _trainingDataFrequencies = [];
-          for (var i = 0; i < unhandledAnswers.length; i++) {
-            var unhandledAnswer = unhandledAnswers[i];
-            _trainingDataAnswers.push(unhandledAnswer.answer);
-            _trainingDataFrequencies.push(unhandledAnswer.frequency);
-          }
-          $rootScope.$broadcast('updatedTrainingData');
-        });
+      restrict: 'E',
+      scope: {
+        answer: '=',
+        answerFeedback: '=',
+        answerOutcomeDest: '=',
+        // The classification input is an object with two keys:
+        //   -answerGroupIndex: This refers to which answer group the answer
+        //      being trained has been classified to (for displaying feedback
+        //      to the creator). If answerGroupIndex is equal to the number of
+        //      of answer groups, then it represents the default outcome
+        //      feedback. This index is changed by the panel when the creator
+        //      specifies which feedback should be associated with the answer.
+        //   -newOutcome: This refers to an outcome structure (containing a list
+        //      of feedback and a destination state name) which is non-null if,
+        //      and only if, the creator has specified that a new response
+        //      should be created for the trained answer.
+        classification: '=',
+        onFinishTraining: '&'
       },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_editor/editor_tab/' +
+        'training_answer_modal_directive.html'),
+      controller: [
+        '$scope', 'oppiaExplorationHtmlFormatterService',
+        'editorContextService', 'explorationStatesService',
+        'TrainingDataService', 'responsesService', 'stateInteractionIdService',
+        'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
+        'OutcomeObjectFactory',
+        function($scope, oppiaExplorationHtmlFormatterService,
+            editorContextService, explorationStatesService,
+            TrainingDataService, responsesService, stateInteractionIdService,
+            stateCustomizationArgsService, AnswerGroupObjectFactory,
+            OutcomeObjectFactory) {
+          $scope.changingAnswerGroupIndex = false;
+          $scope.addingNewResponse = false;
 
-      getTrainingDataAnswers: function() {
-        return _trainingDataAnswers;
-      },
+          var _stateName = editorContextService.getActiveStateName();
+          var _state = explorationStatesService.getState(_stateName);
+          $scope.allOutcomes = TrainingDataService.getAllPotentialOutcomes(
+            _state);
 
-      getTrainingDataFrequencies: function() {
-        return _trainingDataFrequencies;
-      },
+          var _updateAnswerTemplate = function() {
+            $scope.answerTemplate = (
+              oppiaExplorationHtmlFormatterService.getAnswerHtml(
+                $scope.answer, stateInteractionIdService.savedMemento,
+                stateCustomizationArgsService.savedMemento));
+          };
 
-      getAllPotentialOutcomes: function(state) {
-        var potentialOutcomes = [];
-        var interaction = state.interaction;
+          $scope.$watch('answer', _updateAnswerTemplate);
+          _updateAnswerTemplate();
 
-        for (var i = 0; i < interaction.answerGroups.length; i++) {
-          potentialOutcomes.push(interaction.answerGroups[i].outcome);
+          $scope.getCurrentStateName = function() {
+            return editorContextService.getActiveStateName();
+          };
+
+          $scope.beginChangingAnswerGroupIndex = function() {
+            $scope.changingAnswerGroupIndex = true;
+          };
+
+          $scope.beginAddingNewResponse = function() {
+            $scope.classification.newOutcome = OutcomeObjectFactory.createNew(
+              editorContextService.getActiveStateName(), [''], []);
+            $scope.addingNewResponse = true;
+          };
+
+          $scope.confirmAnswerGroupIndex = function(index) {
+            $scope.classification.answerGroupIndex = index;
+
+            if (index === responsesService.getAnswerGroupCount()) {
+              TrainingDataService.trainDefaultResponse($scope.answer);
+            } else {
+              TrainingDataService.trainAnswerGroup(index, $scope.answer);
+            }
+
+            $scope.onFinishTraining();
+          };
+          $scope.confirmNewFeedback = function() {
+            if ($scope.classification.newOutcome) {
+              // Create a new answer group with the given feedback.
+              var answerGroups = responsesService.getAnswerGroups();
+              answerGroups.push(AnswerGroupObjectFactory.createNew(
+                [], angular.copy($scope.classification.newOutcome), false));
+              responsesService.save(
+                answerGroups, responsesService.getDefaultOutcome());
+
+              // Train the group with the answer.
+              var index = responsesService.getAnswerGroupCount() - 1;
+              TainingDataService.trainAnswerGroup(index, $scope.answer);
+            }
+
+            $scope.onFinishTraining();
+          };
         }
-
-        if (interaction.defaultOutcome) {
-          var outcome = interaction.defaultOutcome;
-          potentialOutcomes.push(interaction.defaultOutcome);
-        }
-
-        return potentialOutcomes;
-      },
-
-      trainAnswerGroup: function(answerGroupIndex, answer) {
-        _removeAnswer(answer);
-
-        var answerGroup = responsesService.getAnswerGroup(answerGroupIndex);
-        var rules = answerGroup.rules;
-
-        // Ensure the answer group has a classifier rule.
-        var classifierRule = null;
-        for (var i = 0; i < rules.length; i++) {
-          var rule = rules[i];
-          if (rule.type === RULE_TYPE_CLASSIFIER) {
-            classifierRule = rule;
-            break;
-          }
-        }
-        if (!classifierRule) {
-          // Create new classifier rule for classification.
-          classifierRule = RuleObjectFactory.createNewClassifierRule();
-          rules.push(classifierRule);
-        }
-
-        // Train the rule to include this answer, but only if it's not already
-        // in the training data.
-        if (_getIndexOfTrainingData(
-            answer, classifierRule.inputs.training_data) === -1) {
-          classifierRule.inputs.training_data.push(answer);
-        }
-
-        responsesService.updateAnswerGroup(answerGroupIndex, {
-          rules: rules
-        });
-      },
-
-      trainDefaultResponse: function(answer) {
-        _removeAnswer(answer);
-
-        var confirmedUnclassifiedAnswers = (
-          responsesService.getConfirmedUnclassifiedAnswers());
-
-        if (_getIndexOfTrainingData(
-              answer, confirmedUnclassifiedAnswers) === -1) {
-          confirmedUnclassifiedAnswers.push(answer);
-        }
-
-        responsesService.updateConfirmedUnclassifiedAnswers(
-          confirmedUnclassifiedAnswers);
-      }
+      ]
     };
   }
 ]);
-
-oppia.directive('trainingPanel', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      answer: '=',
-      answerFeedback: '=',
-      answerOutcomeDest: '=',
-      // The classification input is an object with two keys:
-      //   -answerGroupIndex: This refers to which answer group the answer being
-      //      trained has been classified to (for displaying feedback to the
-      //      creator). If answerGroupIndex is equal to the number of answer
-      //      groups, then it represents the default outcome feedback. This
-      //      index is changed by the panel when the creator specifies which
-      //      feedback should be associated with the answer.
-      //   -newOutcome: This refers to an outcome structure (containing a list
-      //      of feedback and a destination state name) which is non-null if,
-      //      and only if, the creator has specified that a new response should
-      //      be created for the trained answer.
-      classification: '=',
-      onFinishTraining: '&'
-    },
-    templateUrl: 'teaching/trainingPanel',
-    controller: [
-      '$scope', 'oppiaExplorationHtmlFormatterService',
-      'editorContextService', 'explorationStatesService',
-      'trainingDataService', 'responsesService', 'stateInteractionIdService',
-      'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
-      'OutcomeObjectFactory',
-      function($scope, oppiaExplorationHtmlFormatterService,
-          editorContextService, explorationStatesService,
-          trainingDataService, responsesService, stateInteractionIdService,
-          stateCustomizationArgsService, AnswerGroupObjectFactory,
-          OutcomeObjectFactory) {
-        $scope.changingAnswerGroupIndex = false;
-        $scope.addingNewResponse = false;
-
-        var _stateName = editorContextService.getActiveStateName();
-        var _state = explorationStatesService.getState(_stateName);
-        $scope.allOutcomes = trainingDataService.getAllPotentialOutcomes(
-          _state);
-
-        var _updateAnswerTemplate = function() {
-          $scope.answerTemplate = (
-            oppiaExplorationHtmlFormatterService.getAnswerHtml(
-              $scope.answer, stateInteractionIdService.savedMemento,
-              stateCustomizationArgsService.savedMemento));
-        };
-
-        $scope.$watch('answer', _updateAnswerTemplate);
-        _updateAnswerTemplate();
-
-        $scope.getCurrentStateName = function() {
-          return editorContextService.getActiveStateName();
-        };
-
-        $scope.beginChangingAnswerGroupIndex = function() {
-          $scope.changingAnswerGroupIndex = true;
-        };
-
-        $scope.beginAddingNewResponse = function() {
-          $scope.classification.newOutcome = OutcomeObjectFactory.createNew(
-            editorContextService.getActiveStateName(), [''], []);
-          $scope.addingNewResponse = true;
-        };
-
-        $scope.confirmAnswerGroupIndex = function(index) {
-          $scope.classification.answerGroupIndex = index;
-
-          if (index === responsesService.getAnswerGroupCount()) {
-            trainingDataService.trainDefaultResponse($scope.answer);
-          } else {
-            trainingDataService.trainAnswerGroup(index, $scope.answer);
-          }
-
-          $scope.onFinishTraining();
-        };
-        $scope.confirmNewFeedback = function() {
-          if ($scope.classification.newOutcome) {
-            // Create a new answer group with the given feedback.
-            var answerGroups = responsesService.getAnswerGroups();
-            answerGroups.push(AnswerGroupObjectFactory.createNew(
-              [], angular.copy($scope.classification.newOutcome), false));
-            responsesService.save(
-              answerGroups, responsesService.getDefaultOutcome());
-
-            // Train the group with the answer.
-            var index = responsesService.getAnswerGroupCount() - 1;
-            trainingDataService.trainAnswerGroup(index, $scope.answer);
-          }
-
-          $scope.onFinishTraining();
-        };
-      }
-    ]
-  };
-}]);

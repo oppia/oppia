@@ -65,7 +65,7 @@ oppia.controller('Teach', [
     $scope.onApplyToTeachWithOppia = function() {
       siteAnalyticsService.registerApplyToTeachWithOppiaEvent();
       $timeout(function() {
-        $window.location = 'https://goo.gl/forms/ljmQ9R3AZRkT2kU23';
+        $window.location = 'https://goo.gl/forms/tDUx4TS6B8Apkqhq2';
       }, 150);
       return false;
     };

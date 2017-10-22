@@ -21,7 +21,7 @@ describe('Player transcript service', function() {
 
   var pts;
   beforeEach(inject(function($injector) {
-    pts = $injector.get('playerTranscriptService');
+    pts = $injector.get('PlayerTranscriptService');
   }));
 
   it('should reset the transcript correctly', function() {

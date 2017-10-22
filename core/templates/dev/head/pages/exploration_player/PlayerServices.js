@@ -24,11 +24,11 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // The URL determines which of these it is. Some methods may need to be
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
-oppia.factory('oppiaPlayerService', [
+oppia.factory('ExplorationPlayerService', [
   '$http', '$rootScope', '$q', 'LearnerParamsService',
   'alertsService', 'AnswerClassificationService', 'explorationContextService',
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
-  'playerTranscriptService', 'ExplorationObjectFactory',
+  'PlayerTranscriptService', 'ExplorationObjectFactory',
   'ExpressionInterpolationService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
@@ -38,7 +38,7 @@ oppia.factory('oppiaPlayerService', [
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
-      playerTranscriptService, ExplorationObjectFactory,
+      PlayerTranscriptService, ExplorationObjectFactory,
       ExpressionInterpolationService, StateClassifierMappingService,
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
@@ -51,6 +51,12 @@ oppia.factory('oppiaPlayerService', [
     var answerIsBeingProcessed = false;
 
     var exploration = null;
+
+    // This list may contain duplicates. A state name is added to it each time
+    // the learner moves to a new card.
+    var visitedStateNames = [];
+
+    var explorationActuallyStarted = false;
 
     // Param changes to be used ONLY in editor preview mode.
     var manualParamChanges = null;
@@ -122,6 +128,7 @@ oppia.factory('oppiaPlayerService', [
       if (!_editorPreviewMode) {
         StatsReportingService.recordExplorationStarted(
           exploration.initStateName, newParams);
+        visitedStateNames.push(exploration.initStateName);
       }
 
       $rootScope.$broadcast('playerStateChange', initialState.name);
@@ -183,7 +190,7 @@ oppia.factory('oppiaPlayerService', [
        */
       init: function(successCallback) {
         answerIsBeingProcessed = false;
-        playerTranscriptService.init();
+        PlayerTranscriptService.init();
 
         if (_editorPreviewMode) {
           EditableExplorationBackendApiService.fetchApplyDraftExploration(
@@ -219,8 +226,8 @@ oppia.factory('oppiaPlayerService', [
             StateClassifierMappingService.init(data.state_classifier_mapping);
 
             StatsReportingService.initSession(
-              _explorationId, version, data.session_id,
-              GLOBALS.collectionId);
+              _explorationId, exploration.title,
+              version, data.session_id, GLOBALS.collectionId);
             AudioTranslationManagerService.init(
               exploration.getAllAudioLanguageCodes(),
               data.preferred_audio_language_code,
@@ -303,7 +310,7 @@ oppia.factory('oppiaPlayerService', [
         }
 
         answerIsBeingProcessed = true;
-        var oldStateName = playerTranscriptService.getLastStateName();
+        var oldStateName = PlayerTranscriptService.getLastStateName();
         var oldState = exploration.getState(oldStateName);
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
@@ -361,15 +368,26 @@ oppia.factory('oppiaPlayerService', [
 
         answerIsBeingProcessed = false;
 
-        oldStateName = playerTranscriptService.getLastStateName();
+        oldStateName = PlayerTranscriptService.getLastStateName();
         var refreshInteraction = (
           oldStateName !== newStateName ||
           exploration.isInteractionInline(oldStateName));
 
         if (!_editorPreviewMode) {
+          var isFirstHit = Boolean(visitedStateNames.indexOf(
+            newStateName) === -1);
           StatsReportingService.recordStateTransition(
             oldStateName, newStateName, answer,
-            LearnerParamsService.getAllParams());
+            LearnerParamsService.getAllParams(), isFirstHit);
+          StatsReportingService.recordStateCompleted(oldStateName);
+          visitedStateNames.push(newStateName);
+
+          if (oldStateName === exploration.initStateName && (
+              !explorationActuallyStarted)) {
+            StatsReportingService.recordExplorationActuallyStarted(
+              oldStateName);
+            explorationActuallyStarted = true;
+          }
         }
 
         $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
@@ -405,6 +423,9 @@ oppia.factory('oppiaPlayerService', [
           deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
         }
         return deferred.promise;
+      },
+      recordSolutionHit: function(stateName) {
+        StatsReportingService.recordSolutionHit(stateName);
       }
     };
   }

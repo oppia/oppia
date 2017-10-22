@@ -18,12 +18,12 @@
 
 oppia.controller('HistoryTab', [
   '$scope', '$http', '$rootScope', '$log', '$modal', 'explorationData',
-  'versionsTreeService', 'compareVersionsService', 'graphDataService',
-  'oppiaDatetimeFormatter',
+  'VersionTreeService', 'CompareVersionsService', 'graphDataService',
+  'oppiaDatetimeFormatter', 'UrlInterpolationService',
   function(
       $scope, $http, $rootScope, $log, $modal, explorationData,
-      versionsTreeService, compareVersionsService, graphDataService,
-      oppiaDatetimeFormatter) {
+      VersionTreeService, CompareVersionsService, graphDataService,
+      oppiaDatetimeFormatter, UrlInterpolationService) {
     $scope.explorationId = explorationData.explorationId;
     $scope.explorationAllSnapshotsUrl =
         '/createhandler/snapshots/' + $scope.explorationId;
@@ -127,7 +127,7 @@ oppia.controller('HistoryTab', [
 
         $http.get($scope.explorationAllSnapshotsUrl).then(function(response) {
           explorationSnapshots = response.data.snapshots;
-          versionsTreeService.init(explorationSnapshots);
+          VersionTreeService.init(explorationSnapshots);
 
           // Re-populate versionCheckboxArray and explorationVersionMetadata
           // when history is refreshed.
@@ -179,7 +179,7 @@ oppia.controller('HistoryTab', [
       $scope.compareVersionMetadata.laterVersion =
         $scope.explorationVersionMetadata[laterComparedVersion];
 
-      compareVersionsService.getDiffGraphData(earlierComparedVersion,
+      CompareVersionsService.getDiffGraphData(earlierComparedVersion,
           laterComparedVersion).then(
         function(response) {
           $log.info('Retrieved version comparison data');
@@ -219,7 +219,9 @@ oppia.controller('HistoryTab', [
 
     $scope.showRevertExplorationModal = function(version) {
       $modal.open({
-        templateUrl: 'modals/revertExploration',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/history_tab/' +
+          'revert_exploration_modal_directive.html'),
         backdrop: true,
         resolve: {
           version: function() {
