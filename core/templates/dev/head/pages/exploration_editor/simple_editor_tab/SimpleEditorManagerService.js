@@ -56,7 +56,26 @@ oppia.factory('SimpleEditorManagerService', [
             x: 0
           }
         }
-      }
+      },
+      ItemSelectionInput: {
+        CUSTOMIZATION_ARGS:  {
+          choices: {
+            value: ['<p>Choice 1</p>', '<p>Choice 2</p>']
+          },
+          minAllowableSelectionCount: {
+            value: 2
+          },
+          maxAllowableSelectionCount: {
+            value: 2
+          }
+        },
+        FIRST_ANSWER_GROUP_RULE: {
+          type: 'Equals',
+          value: {
+            x: []
+          }
+        }
+      },
     };
 
     var END_EXPLORATION_INTERACTION = {

@@ -13,7 +13,7 @@
                        placeholder="Type an introduction.">
     </editor-html-field>
 
-    <div ng-repeat="question in data.questionList.getQuestions() track by $index">
+    <div ng-repeat="question in data.questionList.getQuestions() track by $index" class="interaction-container">
       <anchor-header header-id="question.getId()" header-text="Question <[$index +1]>"></anchor-header>
       <div class="dropdown">
         <anchor-header header-id="getSubfieldId(question, getHumanReadableQuestionType(question.getInteractionId()))"
@@ -23,6 +23,7 @@
         <ul class="dropdown-menu oppia-question-list-menu" >
           <li ng-click="changeQuestionType('MultipleChoiceInput', $index)">Multiple Choice Input</li>
           <li ng-click="changeQuestionType('NumericInput', $index)">Numeric Input</li>
+          <li ng-click="changeQuestionType('ItemSelectionInput', $index)">Checkbox Input</li>
         </ul>
       </div>
 
@@ -37,7 +38,6 @@
                               add-state="addState()">
       </multiple-choice-editor>
 
-
       <numeric-editor ng-if="question.getInteractionId() === 'NumericInput'"
                       unique-id="question.getId()"
                       customization-args="question.getInteractionCustomizationArgs()"
@@ -48,6 +48,18 @@
                       save-default-outcome="saveDefaultOutcome(question.getStateName(), newValue)"
                       add-state="addState()">
       </numeric-editor>
+    
+      <checkbox-editor ng-if="question.getInteractionId() === 'ItemSelectionInput'"
+                       unique-id="question.getId()"
+                       customization-args="question.getInteractionCustomizationArgs()"
+                       answer-groups="question.getAnswerGroups()"
+                       default-outcome="question.getDefaultOutcome()"
+                       save-customization-args="saveCustomizationArgs(question.getStateName(), newValue)"
+                       save-answer-groups="saveAnswerGroups(question.getStateName(), newValue)"
+                       save-default-outcome="saveDefaultOutcome(question.getStateName(), newValue)"
+                       add-state="addState()">
+      </checkbox-editor>
+
       <!-- TODO(sll): Update this condition when control of individual field visibility is added. -->
       <div ng-if="!$last" id="<[getSubfieldId(question, 'Bridge text')]>">
         <anchor-header header-id="getSubfieldId(question, 'Bridge text')"
@@ -153,7 +165,9 @@
     text-align: center;
     text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
   }
-
+  simple-editor-body .content [class~='interaction-container']:last-of-type {
+    margin-bottom: 420px;
+  }
   .oppia-choose-question-dropdown {
     background: transparent;
     padding: 0;
