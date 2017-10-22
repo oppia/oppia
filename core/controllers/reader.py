@@ -59,10 +59,34 @@ def _get_exploration_player_data(
     """Returns a dict of exploration player data.
 
     Args:
-        exploration_id: str. The id of the exploration.
+        exploration_id: str. The ID of the exploration.
         version: int or None. The version of the exploration.
         collection_id: str. ID of the collection.
         can_edit: bool. Whether the given user can edit this activity.
+
+    Returns:
+        dict. A dict of exploration player data.
+        The keys and values of the dict are as follows:
+        - 'INTERACTION_SPECS': dict. A dict containing the full specs of each
+            interaction. Contains interaction ID and a list of instances of
+            all interactions.
+        - 'DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER': str. Text for the Twitter
+            share message.
+        - 'additional_angular_modules': list. A de-duplicated list of strings,
+            each representing an additional angular module that should be
+            loaded.
+        - 'can_edit': bool. Whether the given user can edit this activity.
+        - 'dependencies_html': The additional HTML to insert on the page.
+        - 'exploration_title': str. Title of exploration.
+        - 'exploration_version': int. The version of the exploration.
+        - 'collection_id': str. ID of the collection.
+        - 'collection_title': str. Title of collection.
+        - 'interaction_templates': The HTML bodies for the given list of
+            interaction IDs.
+        - 'is_private': bool. Whether the exploration is private or not.
+        - 'meta_name': str. Title of exploration.
+        - 'meta_description': str. Objective of exploration.
+        - 'nav_mode': str. 'explore'.
     """
     try:
         exploration = exp_services.get_exploration_by_id(
@@ -126,7 +150,7 @@ class ExplorationPageEmbed(base.BaseHandler):
         """Handles GET requests.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: str. The ID of the exploration.
         """
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
@@ -168,7 +192,7 @@ class ExplorationPage(base.BaseHandler):
         """Handles GET requests.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: str. The ID of the exploration.
         """
         version_str = self.request.get('v')
         version = int(version_str) if version_str else None
@@ -211,7 +235,7 @@ class ExplorationHandler(base.BaseHandler):
         """Populates the data on the individual exploration page.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: str. The ID of the exploration.
         """
         version = self.request.get('v')
         version = int(version) if version else None
@@ -274,7 +298,7 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         """Handles POST requests.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: str. The ID of the exploration.
         """
         old_state_name = self.payload.get('old_state_name')
         # The reader's answer.
@@ -322,7 +346,7 @@ class StateHitEventHandler(base.BaseHandler):
         """Handles POST requests.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: str. The ID of the exploration.
         """
         new_state_name = self.payload.get('new_state_name')
         exploration_version = self.payload.get('exploration_version')
@@ -381,7 +405,7 @@ class ReaderFeedbackHandler(base.BaseHandler):
         """Handles POST requests.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: str. The ID of the exploration.
         """
         state_name = self.payload.get('state_name')
         subject = self.payload.get('subject', 'Feedback from a learner')
@@ -407,7 +431,7 @@ class ExplorationStartEventHandler(base.BaseHandler):
         """Handles POST requests.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: str. The ID of the exploration.
         """
         event_services.StartExplorationEventHandler.record(
             exploration_id, self.payload.get('version'),
@@ -430,7 +454,7 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
         """Handles POST requests.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: str. The ID of the exploration.
         """
 
         # This will be None if the exploration is not being played within the
@@ -481,7 +505,7 @@ class ExplorationMaybeLeaveHandler(base.BaseHandler):
         """Handles POST requests.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: str. The ID of the exploration.
         """
         version = self.payload.get('version')
         state_name = self.payload.get('state_name')
@@ -516,8 +540,9 @@ class LearnerIncompleteActivityHandler(base.BaseHandler):
         """Removes exploration or collection from incomplete list.
 
         Args:
-            activity_type: str. The activity type.
-            activity_id: str. The exploration id which is to be deleted.
+            activity_type: str. The activity type. Currently, it can take values
+            "exploration" or "collection".
+            activity_id: str. The ID of the activity to be deleted.
         """
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
             learner_progress_services.remove_exp_from_incomplete_list(
@@ -631,7 +656,7 @@ class FlagExplorationHandler(base.BaseHandler):
         """Handles POST requests.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            exploration_id: str. The ID of the exploration.
         """
         moderator_services.enqueue_flag_exploration_email_task(
             exploration_id,
