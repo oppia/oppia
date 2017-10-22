@@ -106,19 +106,6 @@ class TeachPage(base.BaseHandler):
         self.render_template('pages/teach/teach.html')
 
 
-class BlogPage(base.BaseHandler):
-    """Page embedding the Oppia blog."""
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.BLOG_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_BLOG,
-        })
-        self.render_template('pages/blog/blog.html')
-
-
 class ContactPage(base.BaseHandler):
     """Page with information about how to contact Oppia."""
 

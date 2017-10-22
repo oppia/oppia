@@ -247,22 +247,22 @@ oppia.directive('conversationSkin', [
       template: '<div ng-include="directiveTemplate"></div>',
       controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
-        'messengerService', 'ExplorationPlayerService', 'urlService',
-        'focusService', 'LearnerViewRatingService', 'windowDimensionsService',
-        'PlayerTranscriptService', 'LearnerParamsService',
-        'PlayerPositionService', 'ExplorationRecommendationsService',
-        'StatsReportingService',
+        'MessengerService', 'ExplorationPlayerService', 'urlService',
+        'FocusManagerService', 'LearnerViewRatingService',
+        'windowDimensionsService', 'PlayerTranscriptService',
+        'LearnerParamsService', 'PlayerPositionService',
+        'ExplorationRecommendationsService', 'StatsReportingService',
         'siteAnalyticsService', 'ExplorationPlayerStateService',
         'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'FatigueDetectionService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
-            messengerService, ExplorationPlayerService, urlService,
-            focusService, LearnerViewRatingService, windowDimensionsService,
-            PlayerTranscriptService, LearnerParamsService,
-            PlayerPositionService, ExplorationRecommendationsService,
-            StatsReportingService,
+            MessengerService, ExplorationPlayerService, urlService,
+            FocusManagerService, LearnerViewRatingService,
+            windowDimensionsService, PlayerTranscriptService,
+            LearnerParamsService, PlayerPositionService,
+            ExplorationRecommendationsService, StatsReportingService,
             siteAnalyticsService, ExplorationPlayerStateService,
             TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
@@ -320,7 +320,7 @@ oppia.directive('conversationSkin', [
                 // Sometimes setting iframe height to the exact content height
                 // still produces scrollbar, so adding 50 extra px.
                 newHeight += 50;
-                messengerService.sendMessage(messengerService.HEIGHT_CHANGE, {
+                MessengerService.sendMessage(MessengerService.HEIGHT_CHANGE, {
                   height: newHeight,
                   scroll: scroll
                 });
@@ -363,9 +363,9 @@ oppia.directive('conversationSkin', [
             $scope.activeCard = PlayerTranscriptService.getCard(index);
             tutorCardIsDisplayedIfNarrow = true;
             if (_nextFocusLabel && PlayerTranscriptService.isLastCard(index)) {
-              focusService.setFocusIfOnDesktop(_nextFocusLabel);
+              FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
             } else {
-              focusService.setFocusIfOnDesktop(
+              FocusManagerService.setFocusIfOnDesktop(
                 $scope.getContentFocusLabel(index));
             }
           };
@@ -453,7 +453,7 @@ oppia.directive('conversationSkin', [
               exploration, initHtml, newParams) {
               ExplorationPlayerStateService.setExploration(exploration);
               $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
-              _nextFocusLabel = focusService.generateFocusLabel();
+              _nextFocusLabel = FocusManagerService.generateFocusLabel();
 
               _addNewCard(
                 exploration.initStateName,
@@ -482,7 +482,7 @@ oppia.directive('conversationSkin', [
               }
               $scope.adjustPageHeight(false, null);
               $window.scrollTo(0, 0);
-              focusService.setFocusIfOnDesktop(_nextFocusLabel);
+              FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
             });
           };
 
@@ -545,13 +545,14 @@ oppia.directive('conversationSkin', [
                     if (refreshInteraction) {
                       // Replace the previous interaction with another of the
                       // same type.
-                      _nextFocusLabel = focusService.generateFocusLabel();
+                      _nextFocusLabel =
+                        FocusManagerService.generateFocusLabel();
                       PlayerTranscriptService.updateLatestInteractionHtml(
                         ExplorationPlayerService.getInteractionHtml(
                           newStateName, _nextFocusLabel) +
                         ExplorationPlayerService.getRandomSuffix());
                     }
-                    focusService.setFocusIfOnDesktop(_nextFocusLabel);
+                    FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
                     scrollToBottom();
                   } else {
                     // There is a new card. If there is no feedback, move on
@@ -559,7 +560,7 @@ oppia.directive('conversationSkin', [
                     // the feedback, and display a 'Continue' button.
                     FatigueDetectionService.reset();
 
-                    _nextFocusLabel = focusService.generateFocusLabel();
+                    _nextFocusLabel = FocusManagerService.generateFocusLabel();
 
                     PlayerTranscriptService.setDestination(newStateName);
 
@@ -594,7 +595,7 @@ oppia.directive('conversationSkin', [
                       }
 
                       _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
-                      focusService.setFocusIfOnDesktop(_nextFocusLabel);
+                      FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
                       scrollToBottom();
                     } else {
                       PlayerTranscriptService.addNewResponse(feedbackHtml);
@@ -637,7 +638,7 @@ oppia.directive('conversationSkin', [
             }, TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC);
 
             $timeout(function() {
-              focusService.setFocusIfOnDesktop(_nextFocusLabel);
+              FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
               scrollToTop();
             },
             TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
@@ -743,29 +744,6 @@ oppia.directive('conversationSkin', [
 
           $scope.isViewportNarrow = function() {
             return $scope.windowWidth < TWO_CARD_THRESHOLD_PX;
-          };
-
-          $scope.isScreenNarrowAndShowingTutorCard = function() {
-            if (!$scope.isCurrentSupplementalCardNonempty()) {
-              return $scope.isViewportNarrow();
-            }
-            return $scope.isViewportNarrow() && tutorCardIsDisplayedIfNarrow;
-          };
-
-          $scope.isScreenNarrowAndShowingSupplementalCard = function() {
-            return $scope.isViewportNarrow() && !tutorCardIsDisplayedIfNarrow;
-          };
-
-          $scope.showTutorCardIfScreenIsNarrow = function() {
-            if ($scope.isViewportNarrow()) {
-              tutorCardIsDisplayedIfNarrow = true;
-            }
-          };
-
-          $scope.showSupplementalCardIfScreenIsNarrow = function() {
-            if ($scope.isViewportNarrow()) {
-              tutorCardIsDisplayedIfNarrow = false;
-            }
           };
 
           $scope.initializePage();

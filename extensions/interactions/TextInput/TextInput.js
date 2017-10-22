@@ -28,8 +28,8 @@ oppia.directive('oppiaInteractiveTextInput', [
       },
       templateUrl: 'interaction/TextInput',
       controller: [
-        '$scope', '$attrs', 'focusService', 'textInputRulesService',
-        function($scope, $attrs, focusService, textInputRulesService) {
+        '$scope', '$attrs', 'FocusManagerService', 'textInputRulesService',
+        function($scope, $attrs, FocusManagerService, textInputRulesService) {
           $scope.placeholder = HtmlEscaperService.escapedJsonToObj(
             $attrs.placeholderWithValue);
           $scope.rows = (

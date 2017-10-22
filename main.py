@@ -170,7 +170,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/console_errors', pages.ConsoleErrorPage),
     get_redirect_route(r'/contact', pages.ContactPage),
 
-    get_redirect_route(r'/blog', pages.BlogPage),
     get_redirect_route(r'/forum', pages.ForumPage),
     get_redirect_route(r'/donate', pages.DonatePage),
     get_redirect_route(r'/thanks', pages.ThanksPage),
@@ -303,8 +302,17 @@ URLS = MAPREDUCE_HANDLERS + [
         '/explorehandler/exploration_start_event/<exploration_id>',
         reader.ExplorationStartEventHandler),
     get_redirect_route(
+        '/explorehandler/exploration_actual_start_event/<exploration_id>',
+        reader.ExplorationActualStartEventHandler),
+    get_redirect_route(
+        '/explorehandler/solution_hit_event/<exploration_id>',
+        reader.SolutionHitEventHandler),
+    get_redirect_route(
         r'/explorehandler/state_hit_event/<exploration_id>',
         reader.StateHitEventHandler),
+    get_redirect_route(
+        r'/explorehandler/state_complete_event/<exploration_id>',
+        reader.StateCompleteEventHandler),
     get_redirect_route(
         r'/explorehandler/answer_submitted_event/<exploration_id>',
         reader.AnswerSubmittedEventHandler),

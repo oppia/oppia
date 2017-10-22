@@ -12,15 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Deployment script for Oppia.
+"""This is a deployment script for Oppia that should only be used by release
+coordinators.
 
-USE THIS SCRIPT AT YOUR OWN RISK! A safe option is to modify app.yaml manually
-and run the 'appcfg.py update' command.
-
-This script performs a deployment of Oppia to a Google App Engine appspot
-instance. It creates a build with unnecessary files removed, and saves a copy
-of the uploaded files to a deployment folder in the parent directory of the
-oppia/ folder. It then pushes this build to the production server.
+The script creates a build with unnecessary files removed, and saves a copy of
+the uploaded files to a deployment folder in the parent directory of the oppia/
+folder. It then pushes this build to the production server.
 
 IMPORTANT NOTES:
 1.  You will need to first create a folder called ../deploy_data/[APP_NAME],
@@ -67,16 +64,24 @@ _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--app_name', help='name of the app to deploy to', type=str)
 
+APP_NAME_OPPIASERVER = 'oppiaserver'
+APP_NAME_OPPIATESTSERVER = 'oppiatestserver'
+
 PARSED_ARGS = _PARSER.parse_args()
 if PARSED_ARGS.app_name:
     APP_NAME = PARSED_ARGS.app_name
+    if APP_NAME not in [APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER]:
+        raise Exception('Invalid app name: %s' % APP_NAME)
 else:
     raise Exception('No app name specified.')
 
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
-RELEASE_DIR_NAME = 'deploy-%s-%s' % (
+CURRENT_BRANCH_NAME = common.get_current_branch_name()
+
+RELEASE_DIR_NAME = 'deploy-%s-%s-%s' % (
     '-'.join('-'.join(APP_NAME.split('.')).split(':')),
+    CURRENT_BRANCH_NAME,
     CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
 RELEASE_DIR_PATH = os.path.join(os.getcwd(), '..', RELEASE_DIR_NAME)
 
@@ -86,7 +91,8 @@ APPCFG_PATH = os.path.join(
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
-DEPLOY_DATA_PATH = os.path.join(os.getcwd(), '..', 'deploy_data', APP_NAME)
+DEPLOY_DATA_PATH = os.path.join(
+    os.getcwd(), os.pardir, 'release-scripts', 'deploy_data', APP_NAME)
 
 FILES_AT_ROOT_IN_COMMON = ['favicon.ico', 'robots.txt']
 IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
@@ -96,6 +102,41 @@ IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
 CACHE_SLUG_PROD_LENGTH = 6
 
 
+def _ensure_release_scripts_folder_exists_and_is_up_to_date():
+    """Checks that the release-scripts folder exists and is up-to-date."""
+    parent_dirpath = os.path.join(os.getcwd(), os.pardir)
+    release_scripts_dirpath = os.path.join(parent_dirpath, 'release-scripts')
+
+    # If the release-scripts folder does not exist, set it up.
+    if not os.path.isdir(release_scripts_dirpath):
+        with common.CD(parent_dirpath):
+            # Taken from the "Check your SSH section" at
+            # https://help.github.com/articles/error-repository-not-found/
+            _, stderr = subprocess.Popen(
+                ['ssh', '-T', 'git@github.com'],
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE).communicate()
+            if 'You\'ve successfully authenticated' not in stderr:
+                raise Exception(
+                    'You need SSH access to GitHub. See the '
+                    '"Check your SSH access" section here and follow the '
+                    'instructions: '
+                    'https://help.github.com/articles/'
+                    'error-repository-not-found/#check-your-ssh-access')
+            subprocess.call([
+                'git', 'clone',
+                'git@github.com:oppia/release-scripts.git'])
+
+    with common.CD(release_scripts_dirpath):
+        common.verify_local_repo_is_clean()
+        common.verify_current_branch_name('master')
+
+        # Update the local repo.
+        remote_alias = common.get_remote_alias(
+            'git@github.com:oppia/release-scripts.git')
+        subprocess.call(['git', 'pull', remote_alias])
+
+
 def preprocess_release():
     """Pre-processes release files.
 
@@ -103,7 +144,7 @@ def preprocess_release():
     does the following:
 
     (1) Changes the app name in app.yaml to APP_NAME.
-    (2) Substitutes image files in the images/ directory.
+    (2) Substitutes files from the per-app deployment data.
     """
     # Change the app name in app.yaml.
     f = open('app.yaml', 'r')
@@ -149,8 +190,9 @@ def preprocess_release():
 
 
 def _execute_deployment():
-    # Check that the current directory is correct.
+    # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
+    _ensure_release_scripts_folder_exists_and_is_up_to_date()
 
     current_git_revision = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD']).strip()
@@ -200,6 +242,16 @@ def _execute_deployment():
                     current_git_revision))
 
         print 'Returning to oppia/ root directory.'
+
+    # If this is a test server deployment, open the library page (for sanity
+    # checking) and the GAE error logs.
+    if APP_NAME == APP_NAME_OPPIATESTSERVER:
+        common.open_new_tab_in_browser_if_possible(
+            'https://console.cloud.google.com/logs/viewer?'
+            'project=%s&key1=default&minLogLevel=500'
+            % APP_NAME_OPPIATESTSERVER)
+        common.open_new_tab_in_browser_if_possible(
+            'https://%s.appspot.com/library' % APP_NAME_OPPIATESTSERVER)
 
     print 'Done!'
 
