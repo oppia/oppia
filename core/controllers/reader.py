@@ -76,12 +76,12 @@ def _get_exploration_player_data(
             each representing an additional angular module that should be
             loaded.
         - 'can_edit': bool. Whether the given user can edit this activity.
-        - 'dependencies_html': The additional HTML to insert on the page.
+        - 'dependencies_html': str. The additional HTML to insert on the page.
         - 'exploration_title': str. Title of exploration.
         - 'exploration_version': int. The version of the exploration.
         - 'collection_id': str. ID of the collection.
         - 'collection_title': str. Title of collection.
-        - 'interaction_templates': The HTML bodies for the given list of
+        - 'interaction_templates': str. The HTML bodies for the given list of
             interaction IDs.
         - 'is_private': bool. Whether the exploration is private or not.
         - 'meta_name': str. Title of exploration.
