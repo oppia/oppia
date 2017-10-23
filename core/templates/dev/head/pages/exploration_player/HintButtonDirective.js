@@ -18,7 +18,6 @@
 
 oppia.directive('hintButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
-
     var SHOW_NEED_HINT_MESSAGE_DELAY = 1000;
     var NUM_ATTEMPTS_BEFORE_SHOWING_NEED_HINT_MESSAGE = 2;
 
@@ -32,7 +31,8 @@ oppia.directive('hintButton', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
         'hint_button_directive.html'),
-      controller: ['$scope', '$timeout', 'NumberAttemptsService',
+      controller: [
+        '$scope', '$timeout', 'NumberAttemptsService',
         function($scope, $timeout, NumberAttemptsService) {
           $scope.isShowingNeedHintMessage = false;
           var showNeedHintIfNecessary = function() {
@@ -51,6 +51,6 @@ oppia.directive('hintButton', [
           };
 
           $scope.$on('oppiaFeedbackAvailable', showNeedHintIfNecessary());
-       }]
+        }]
     };
   }]);

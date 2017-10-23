@@ -528,7 +528,6 @@ oppia.directive('conversationSkin', [
 
                 $timeout(function() {
                   $scope.$broadcast('oppiaFeedbackAvailable');
-                  console.log("broadcast");
                   var pairs = (
                     PlayerTranscriptService.getLastCard().inputResponsePairs);
                   var lastAnswerFeedbackPair = pairs[pairs.length - 1];
