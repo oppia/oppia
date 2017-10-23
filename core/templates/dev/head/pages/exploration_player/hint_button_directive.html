@@ -8,7 +8,7 @@
   </md-button>
 </span>
 <span ng-if="!allHintsAreExhausted()">
-  <span ng-if="currentHintIsAvailable()" tooltip="<['I18N_PLAYER_HINT_IS_AVAILABLE' | translate]>" tooltip-placement="left">
+  <span ng-if="currentHintIsAvailable()" tooltip-is-open="isShowingNeedHintMessage" tooltip="<[isShowingNeedHintMessageText ? 'Need a hint?' : ('I18N_PLAYER_HINT_IS_AVAILABLE' | translate)]>" tooltip-placement="left" ng-mouseover="hideNeedHintMessage()">
     <md-button class="hint-button"
                ng-click="onClickHintButton()"
                ng-disabled="!currentHintIsAvailable()"

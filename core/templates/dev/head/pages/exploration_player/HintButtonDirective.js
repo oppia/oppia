@@ -18,15 +18,39 @@
 
 oppia.directive('hintButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
+
+    var SHOW_NEED_HINT_MESSAGE_DELAY = 1000;
+    var NUM_ATTEMPTS_BEFORE_SHOWING_NEED_HINT_MESSAGE = 2;
+
     return {
       restrict: 'E',
       scope: {
         onClickHintButton: '&',
         allHintsAreExhausted: '&',
-        currentHintIsAvailable: '&'
+        currentHintIsAvailable: '&',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
-        'hint_button_directive.html')
+        'hint_button_directive.html'),
+      controller: ['$scope', '$timeout', 'NumberAttemptsService',
+        function($scope, $timeout, NumberAttemptsService) {
+          $scope.isShowingNeedHintMessage = false;
+          var showNeedHintIfNecessary = function() {
+            if (NumberAttemptsService.getNumberAttempts() >=
+                NUM_ATTEMPTS_BEFORE_SHOWING_NEED_HINT_MESSAGE) {
+              $timeout(function() {
+                $scope.isShowingNeedHintMessage = true;
+                $scope.isShowingNeedHintMessageText = true;
+              }, SHOW_NEED_HINT_MESSAGE_DELAY);
+            }
+          };
+
+          $scope.hideNeedHintMessage = function() {
+            $scope.isShowingNeedHintMessage = false;
+            $scope.isShowingNeedHintMessageText = false;
+          };
+
+          $scope.$on('oppiaFeedbackAvailable', showNeedHintIfNecessary());
+       }]
     };
   }]);

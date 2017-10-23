@@ -255,7 +255,7 @@ oppia.directive('conversationSkin', [
         'siteAnalyticsService', 'ExplorationPlayerStateService',
         'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
-        'FatigueDetectionService',
+        'FatigueDetectionService', 'NumberAttemptsService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             MessengerService, ExplorationPlayerService, urlService,
@@ -266,7 +266,7 @@ oppia.directive('conversationSkin', [
             siteAnalyticsService, ExplorationPlayerStateService,
             TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-            FatigueDetectionService) {
+            FatigueDetectionService, NumberAttemptsService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -503,6 +503,7 @@ oppia.directive('conversationSkin', [
                 return;
               }
             }
+            NumberAttemptsService.submitAttempt();
 
             _answerIsBeingProcessed = true;
             hasInteractedAtLeastOnce = true;
@@ -527,6 +528,7 @@ oppia.directive('conversationSkin', [
 
                 $timeout(function() {
                   $scope.$broadcast('oppiaFeedbackAvailable');
+                  console.log("broadcast");
                   var pairs = (
                     PlayerTranscriptService.getLastCard().inputResponsePairs);
                   var lastAnswerFeedbackPair = pairs[pairs.length - 1];
@@ -559,6 +561,7 @@ oppia.directive('conversationSkin', [
                     // immediately. Otherwise, give the learner a chance to read
                     // the feedback, and display a 'Continue' button.
                     FatigueDetectionService.reset();
+                    NumberAttemptsService.reset();
 
                     _nextFocusLabel = FocusManagerService.generateFocusLabel();
 
