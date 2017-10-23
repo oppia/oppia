@@ -138,7 +138,8 @@ describe('Normalizer tests', function() {
 });
 
 describe('RTE helper service', function() {
-  var _DATA_URI = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///';
+  var _IMAGE_URL = '/rich_text_components/Some/Some.png';
+  var _INTERPOLATED_IMAGE_URL = '/extensions' + _IMAGE_URL;
   var rhs;
 
   beforeEach(module('oppia'));
@@ -149,8 +150,8 @@ describe('RTE helper service', function() {
         frontend_name: 'image',
         backend_name: 'Image',
         tooltip: 'Insert image',
-        icon_data_url: _DATA_URI,
-        preview_url_template: _DATA_URI
+        icon_data_url: _IMAGE_URL,
+        preview_url_template: _IMAGE_URL
       }]);
     });
   });
@@ -171,12 +172,13 @@ describe('RTE helper service', function() {
       '<div>abc<span>def</span></div><b>ghi</b>'
     ], [
       '<oppia-noninteractive-image></oppia-noninteractive-image>',
-      '<img src="' + _DATA_URI + '" class="oppia-noninteractive-image">'
+      '<img src="' + _INTERPOLATED_IMAGE_URL + '" ' +
+           'class="oppia-noninteractive-image">'
     ], [
       '<oppia-noninteractive-image ' +
         'image_id-with-value="&amp;quot;T&amp;quot;">' +
       '</oppia-noninteractive-image>',
-      '<img src="' + _DATA_URI + '" ' +
+      '<img src="' + _INTERPOLATED_IMAGE_URL + '" ' +
            'class="oppia-noninteractive-image" ' +
            'image_id-with-value="&amp;quot;T&amp;quot;">'
     ]];

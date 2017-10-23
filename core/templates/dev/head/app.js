@@ -72,8 +72,7 @@ oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
 // The conditioning on window.GLOBALS.RTE_COMPONENT_SPECS is because, in the
 // Karma tests, this value is undefined.
 oppia.constant(
-  'RTE_COMPONENT_SPECS',
-  window.GLOBALS.RTE_COMPONENT_SPECS ? window.GLOBALS.RTE_COMPONENT_SPECS : {});
+  'RTE_COMPONENT_SPECS', richTextComponents ? richTextComponents : {});
 
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
@@ -470,9 +469,10 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
 
 oppia.factory('rteHelperService', [
   '$filter', '$log', '$interpolate', 'explorationContextService',
-  'RTE_COMPONENT_SPECS', 'HtmlEscaperService',
-  function($filter, $log, $interpolate, explorationContextService,
-           RTE_COMPONENT_SPECS, HtmlEscaperService) {
+  'RTE_COMPONENT_SPECS', 'HtmlEscaperService', 'UrlInterpolationService',
+  function(
+      $filter, $log, $interpolate, explorationContextService,
+      RTE_COMPONENT_SPECS, HtmlEscaperService, UrlInterpolationService) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -517,7 +517,9 @@ oppia.factory('rteHelperService', [
       },
       createToolbarIcon: function(componentDefn) {
         var el = $('<img/>');
-        el.attr('src', componentDefn.iconDataUrl);
+        el.attr('src',
+          UrlInterpolationService.getExtensionResourceUrl(
+            componentDefn.iconDataUrl));
         el.addClass('oppia-rte-toolbar-image');
         return el.get(0);
       },
@@ -536,9 +538,16 @@ oppia.factory('rteHelperService', [
             explorationId: explorationContextService.getExplorationId()
           });
         }
-        var interpolatedUrl = $interpolate(
-          componentDefn.previewUrlTemplate, false, null, true)(
-          customizationArgsDict);
+        var componentPreviewUrl = componentDefn.previewUrlTemplate;
+        if (componentDefn.previewUrlTemplate.startsWith(
+            '/rich_text_components')) {
+          var interpolatedUrl = UrlInterpolationService.getExtensionResourceUrl(
+            componentPreviewUrl);
+        } else {
+          var interpolatedUrl = ($interpolate(
+            componentPreviewUrl, false, null, true)(customizationArgsDict));
+        }
+
         if (!interpolatedUrl) {
           $log.error(
             'Error interpolating url : ' + componentDefn.previewUrlTemplate);

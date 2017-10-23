@@ -34,8 +34,12 @@ RTE_THUMBNAIL_HEIGHT_PX = 16
 RTE_THUMBNAIL_WIDTH_PX = 16
 
 _COMPONENT_CONFIG_SCHEMA = [
-    ('name', basestring), ('category', basestring),
-    ('description', basestring), ('_customization_arg_specs', list)]
+    ('backend_name', basestring), ('category', basestring),
+    ('description', basestring), ('frontend_name', basestring),
+    ('tooltip', basestring), ('icon_data_url', basestring),
+    ('preview_url_template', basestring), ('is_complex', bool),
+    ('requires_fs', bool), ('is_block_element', bool),
+    ('customization_arg_specs', list)]
 
 
 class RteComponentUnitTests(test_utils.GenericTestBase):
@@ -87,94 +91,85 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             names = [name for name in names if not name.endswith(suffix)]
         return names
 
-    def test_allowed_rich_text_components_and_counts(self):
-        """Do sanity checks on the ALLOWED_RTE_EXTENSIONS dict in feconf.py."""
-        self.assertEqual(
-            len(rte_component_registry.Registry.get_all_rte_components()),
-            len(feconf.ALLOWED_RTE_EXTENSIONS))
-
-        for (component_name, component_definition) in (
-                feconf.ALLOWED_RTE_EXTENSIONS.iteritems()):
-            contents = os.listdir(
-                os.path.join(os.getcwd(), component_definition['dir']))
-            self.assertIn('%s.py' % component_name, contents)
-
     def test_image_thumbnails_for_rte_components(self):
         """Test the thumbnails for the RTE component icons."""
-        for (cpt_name, cpt_spec) in feconf.ALLOWED_RTE_EXTENSIONS.iteritems():
-            image_filepath = os.path.join(
-                os.getcwd(), cpt_spec['dir'], '%s.png' % cpt_name)
+        rte_components = (
+            rte_component_registry.Registry.get_all_rte_components())
+        for (component_name, component_specs) in rte_components.iteritems():
+            generated_image_filepath = os.path.join(
+                os.getcwd(), feconf.RTE_EXTENSIONS_DIR,
+                component_name, '%s.png' % component_name)
+            relative_icon_data_url = component_specs['icon_data_url'][1:]
+            defined_image_filepath = os.path.join(
+                os.getcwd(), feconf.EXTENSIONS_DIR_PREFIX,
+                'extensions', relative_icon_data_url)
+            self.assertEqual(generated_image_filepath, defined_image_filepath)
 
-            with open(image_filepath, 'rb') as f:
+            with open(generated_image_filepath, 'rb') as f:
                 img_data = f.read()
                 width, height = struct.unpack('>LL', img_data[16:24])
                 self.assertEqual(int(width), RTE_THUMBNAIL_WIDTH_PX)
                 self.assertEqual(int(height), RTE_THUMBNAIL_HEIGHT_PX)
 
-    def test_default_rte_components_are_valid(self):
+    def test_rte_components_are_valid(self):
         """Test that the default RTE components are valid."""
 
-        for component_id in feconf.ALLOWED_RTE_EXTENSIONS:
+        rte_components = (
+            rte_component_registry.Registry.get_all_rte_components())
+
+        for (component_name, component_specs) in rte_components.iteritems():
             # Check that the component id is valid.
-            self.assertTrue(self._is_camel_cased(component_id))
+            self.assertTrue(self._is_camel_cased(component_name))
 
             # Check that the component directory exists.
             component_dir = os.path.join(
-                feconf.RTE_EXTENSIONS_DIR, component_id)
+                feconf.RTE_EXTENSIONS_DIR, component_name)
             self.assertTrue(os.path.isdir(component_dir))
 
             # In this directory there should be a config .py file, an
             # html file, a JS file, an icon .png file and a protractor.js file,
             # and an optional preview .png file.
             dir_contents = self._listdir_omit_ignored(component_dir)
-            self.assertLessEqual(len(dir_contents), 5)
+            self.assertLessEqual(len(dir_contents), 4)
 
             directives_dir = os.path.join(component_dir, 'directives')
-            py_file = os.path.join(component_dir, '%s.py' % component_id)
-            png_file = os.path.join(component_dir, '%s.png' % component_id)
+            png_file = os.path.join(component_dir, '%s.png' % component_name)
             preview_file = os.path.join(
-                component_dir, '%sPreview.png' % component_id)
+                component_dir, '%sPreview.png' % component_name)
             protractor_file = os.path.join(component_dir, 'protractor.js')
 
             self.assertTrue(os.path.isdir(directives_dir))
-            self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(png_file))
             self.assertTrue(os.path.isfile(protractor_file))
             if len(dir_contents) == 5:
                 self.assertTrue(os.path.isfile(preview_file))
 
             main_js_file = os.path.join(
-                directives_dir, '%sDirective.js' % component_id)
+                directives_dir, '%sDirective.js' % component_name)
             main_html_file = os.path.join(
-                directives_dir, '%s_directive.html' % component_id.lower())
+                directives_dir, '%s_directive.html' % component_name.lower())
 
             self.assertTrue(os.path.isfile(main_js_file))
             self.assertTrue(os.path.isfile(main_html_file))
 
             js_file_content = utils.get_file_contents(main_js_file)
             self.assertIn(
-                'oppiaNoninteractive%s' % component_id, js_file_content)
+                'oppiaNoninteractive%s' % component_name, js_file_content)
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
 
-            component = rte_component_registry.Registry.get_rte_component(
-                component_id)
-
-            # Check that the specified component id is the same as the class
-            # name.
-            self.assertTrue(component_id, component.__class__.__name__)
 
             # Check that the configuration file contains the correct
             # top-level keys, and that these keys have the correct types.
             for item, item_type in _COMPONENT_CONFIG_SCHEMA:
                 self.assertTrue(isinstance(
-                    getattr(component, item), item_type))
+                    component_specs[item], item_type))
                 # The string attributes should be non-empty.
                 if item_type == basestring:
-                    self.assertTrue(getattr(component, item))
+                    self.assertTrue(component_specs[item])
 
             self._validate_customization_arg_specs(
-                component._customization_arg_specs)  # pylint: disable=protected-access
+                component_specs['customization_arg_specs'])  # pylint: disable=protected-access
 
     def test_html_contains_all_imports(self):
         """Test that the rich_text_components.html file contains script-imports
