@@ -123,6 +123,8 @@ oppia.factory('StatsReportingService', [
             exploration_version: explorationVersion,
             is_first_hit: true
           });
+
+          postEventsToBackend();
         }
 
         $http.post(getFullStatsUrl('EXPLORATION_STARTED'), {
@@ -314,6 +316,10 @@ oppia.factory('StatsReportingService', [
           state_name: stateName,
           version: explorationVersion
         });
+
+        if (ENABLE_NEW_STATS_FRAMEWORK) {
+          postEventsToBackend();
+        }
       }
     };
   }
