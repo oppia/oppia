@@ -20,7 +20,8 @@ oppia.factory('UserEmailPreferencesService', [
   '$http', '$q', 'ExplorationDataService', 'alertsService',
   'UrlInterpolationService',
   function(
-      $http, $q, ExplorationDataService, alertsService, UrlInterpolationService) {
+      $http, $q, ExplorationDataService, 
+      alertsService, UrlInterpolationService) {
     var MESSAGE_TYPE_SUGGESTION = 'suggestion';
     var MESSAGE_TYPE_FEEDBACK = 'feedback';
     return {

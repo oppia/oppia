@@ -17,7 +17,8 @@
  */
 
 oppia.controller('HistoryTab', [
-  '$scope', '$http', '$rootScope', '$log', '$modal', 'ExplorationDataService',
+  '$scope', '$http', '$rootScope', '$log', 
+  '$modal', 'ExplorationDataService',
   'VersionTreeService', 'CompareVersionsService', 'graphDataService',
   'oppiaDatetimeFormatter', 'UrlInterpolationService',
   function(
@@ -235,7 +236,8 @@ oppia.controller('HistoryTab', [
 
             $scope.getExplorationUrl = function(version) {
               return (
-                '/explore/' + ExplorationDataService.explorationId + '?v=' + version);
+                '/explore/' + ExplorationDataService.explorationId + 
+                '?v=' + version);
             };
 
             $scope.revert = function() {

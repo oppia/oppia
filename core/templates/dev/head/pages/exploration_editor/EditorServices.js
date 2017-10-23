@@ -381,7 +381,8 @@ oppia.factory('explorationRightsService', [
         var that = this;
 
         var explorationModeratorRightsUrl = (
-          '/createhandler/moderatorrights/' + ExplorationDataService.explorationId);
+          '/createhandler/moderatorrights/' + 
+            ExplorationDataService.explorationId);
         $http.put(explorationModeratorRightsUrl, {
           action: action,
           email_body: emailBody,

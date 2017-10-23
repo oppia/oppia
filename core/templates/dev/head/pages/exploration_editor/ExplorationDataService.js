@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- *  @fileoverview Service for handling all interactions with the exploration editor backend.
+ *  @fileoverview Service for handling all interactions 
+ *  with the exploration editor backend.
  */
 
 oppia.factory('ExplorationDataService', [
@@ -35,7 +36,8 @@ oppia.factory('ExplorationDataService', [
     }
     if (!explorationId) {
       $log.error(
-        'Unexpected call to ExplorationDataService for pathname ', pathnameArray[i]);
+        'Unexpected call to ExplorationDataService for pathname ', 
+        pathnameArray[i]);
       // Note: if we do not return anything, Karma unit tests fail.
       return {};
     }

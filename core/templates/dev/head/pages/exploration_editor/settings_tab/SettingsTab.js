@@ -17,8 +17,9 @@
  */
 
 oppia.controller('SettingsTab', [
-  '$scope', '$http', '$window', '$modal', '$rootScope',
-  'ExplorationDataService', 'explorationTitleService', 'explorationCategoryService',
+  '$scope', '$http', '$window', '$modal', 
+  '$rootScope', 'ExplorationDataService', 
+  'explorationTitleService', 'explorationCategoryService',
   'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationTagsService', 'explorationRightsService',
   'explorationInitStateNameService', 'explorationParamSpecsService',
@@ -28,8 +29,9 @@ oppia.controller('SettingsTab', [
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
   'EditableExplorationBackendApiService', 'UrlInterpolationService',
   function(
-      $scope, $http, $window, $modal, $rootScope,
-      ExplorationDataService, explorationTitleService, explorationCategoryService,
+      $scope, $http, $window, $modal, 
+      $rootScope, ExplorationDataService, 
+      explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService,
       explorationTagsService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService,

@@ -50,7 +50,8 @@ oppia.controller('StatisticsTab', [
     $scope.$on('refreshStatisticsTab', function() {
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
       $scope.explorationVersionUrl = (
-        '/createhandler/statisticsversion/' + ExplorationDataService.explorationId);
+        '/createhandler/statisticsversion/' + 
+        ExplorationDataService.explorationId);
       $http.get($scope.explorationVersionUrl).then(function(response) {
         $scope.versions = response.data.versions;
         $scope.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
