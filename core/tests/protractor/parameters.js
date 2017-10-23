@@ -18,15 +18,17 @@
 
 var general = require('../protractor_utils/general.js');
 var forms = require('../protractor_utils/forms.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
 
+var usersPage = new UsersPage.UsersPage()
+
 describe('Parameters', function() {
   it('should navigate multiple states correctly, with parameters', function() {
-    users.createUser('user4@parameters.com', 'user4parameters');
-    users.login('user4@parameters.com');
+    usersPage.createUser('user4@parameters.com', 'user4parameters');
+    usersPage.login('user4@parameters.com');
 
     workflow.createExploration();
     editor.enableParameters();
@@ -89,7 +91,7 @@ describe('Parameters', function() {
       'sum of 2 and 4 is 6, sum of 5 and 4 is 9'));
     player.submitAnswer('MultipleChoiceInput', 'complete');
     player.expectExplorationToBeOver();
-    users.logout();
+    usersPage.logout();
   });
 
   afterEach(function() {

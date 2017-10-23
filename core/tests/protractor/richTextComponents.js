@@ -18,15 +18,17 @@
 
 var general = require('../protractor_utils/general.js');
 var forms = require('../protractor_utils/forms.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
 
+var usersPage = new UsersPage.UsersPage()
+
 describe('rich-text components', function() {
   it('should display correctly', function() {
-    users.createUser('user@richTextComponents.com', 'userRichTextComponents');
-    users.login('user@richTextComponents.com');
+    usersPage.createUser('user@richTextComponents.com', 'userRichTextComponents');
+    usersPage.login('user@richTextComponents.com');
 
     workflow.createExploration();
 
@@ -71,7 +73,7 @@ describe('rich-text components', function() {
     });
 
     editor.discardChanges();
-    users.logout();
+    usersPage.logout();
   });
 
   // TODO (Jacob): Add in a test for the use of rich text inside collapsibles

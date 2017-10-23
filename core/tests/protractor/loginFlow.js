@@ -18,11 +18,13 @@
  */
 
 var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
+
+var usersPage = new UsersPage.UsersPage()
 
 describe('Login Flow', function() {
   beforeEach(function() {
-    users.createAndLoginUser('randomuser@gmail.com', 'r4nd0m');
+    usersPage.createAndLoginUser('randomuser@gmail.com', 'r4nd0m');
   });
 
   it('visits the links in the dropdown', function() {
@@ -42,6 +44,6 @@ describe('Login Flow', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
-    users.logout();
+    usersPage.logout();
   });
 });

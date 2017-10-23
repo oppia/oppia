@@ -18,15 +18,17 @@
 
 var general = require('../protractor_utils/general.js');
 var forms = require('../protractor_utils/forms.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
 
+var usersPage = new UsersPage.UsersPage()
+
 describe('Exploration history', function() {
   it('should display the history', function() {
-    users.createUser('user@historyTab.com', 'userHistoryTab');
-    users.login('user@historyTab.com');
+    usersPage.createUser('user@historyTab.com', 'userHistoryTab');
+    usersPage.login('user@historyTab.com');
     workflow.createExploration();
 
     // Constants for colors of nodes in history graph
@@ -355,7 +357,7 @@ describe('Exploration history', function() {
       color: COLOR_UNCHANGED
     }], [3, 2, 1]);
 
-    users.logout();
+    usersPage.logout();
   });
 
   afterEach(function() {

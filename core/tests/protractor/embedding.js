@@ -18,10 +18,12 @@
 
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
+
+var usersPage = new UsersPage.UsersPage()
 
 describe('Embedding', function() {
   var adminPage = null;
@@ -66,8 +68,8 @@ describe('Embedding', function() {
       'Exploration completed'
     ];
 
-    users.createUser('user1@embedding.com', 'user1Embedding');
-    users.login('user1@embedding.com', true);
+    usersPage.createUser('user1@embedding.com', 'user1Embedding');
+    usersPage.login('user1@embedding.com', true);
     adminPage.reloadExploration('protractor_test_1.yaml');
 
     general.openEditor('12');
@@ -146,7 +148,7 @@ describe('Embedding', function() {
       expect(embeddingLogs).toEqual(expectedLogs);
     });
 
-    users.logout();
+    usersPage.logout();
     general.checkForConsoleErrors([]);
   });
 
@@ -167,8 +169,8 @@ describe('Embedding', function() {
       browser.switchTo().defaultContent();
     };
 
-    users.createUser('embedder2@example.com', 'Embedder2');
-    users.login('embedder2@example.com', true);
+    usersPage.createUser('embedder2@example.com', 'Embedder2');
+    usersPage.login('embedder2@example.com', true);
     adminPage.reloadExploration('protractor_test_1.yaml');
 
     // Change language to Thai, which is not a supported site language.
@@ -184,7 +186,7 @@ describe('Embedding', function() {
     editor.saveChanges('Changing the language to a supported one.');
     checkPlaceholder('Ingresa un número');
 
-    users.logout();
+    usersPage.logout();
     general.checkForConsoleErrors([]);
   });
 });

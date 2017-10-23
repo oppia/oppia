@@ -24,7 +24,9 @@ var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var player = require('../protractor_utils/player.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
+
+var usersPage = new UsersPage.UsersPage()
 
 describe('Learner dashboard functionality', function() {
   var creatorDashboardPage = null;
@@ -39,14 +41,14 @@ describe('Learner dashboard functionality', function() {
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     // Create a new learner.
-    users.createUser('learner@learnerDashboard.com', 'learnerlearnerDashboard');
-    users.createUser(
+    usersPage.createUser('learner@learnerDashboard.com', 'learnerlearnerDashboard');
+    usersPage.createUser(
       'creator2@learnerDashboard.com', 'creator2learnerDashboard');
-    users.createModerator(
+    usersPage.createModerator(
       'creator3@learnerDashboard.com', 'creator3learnerDashboard');
 
     var USERNAME = 'creator1learnerDashboard';
-    users.createAndLoginAdminUser('creator1@learnerDashboard.com', USERNAME);
+    usersPage.createAndLoginAdminUser('creator1@learnerDashboard.com', USERNAME);
     adminPage.reloadAllExplorations();
     adminPage.updateRole(USERNAME, 'collection editor');
     browser.get(general.SERVER_URL_PREFIX);
@@ -67,11 +69,11 @@ describe('Learner dashboard functionality', function() {
     collectionEditor.setCategory('Algebra');
     collectionEditor.saveChanges();
     browser.waitForAngular();
-    users.logout();
+    usersPage.logout();
   });
 
   it('displays incomplete and completed explorations', function() {
-    users.login('learner@learnerDashboard.com');
+    usersPage.login('learner@learnerDashboard.com');
 
     // Play an exploration and leave it in between. It should be added to the
     // 'In Progress' section.
@@ -96,26 +98,30 @@ describe('Learner dashboard functionality', function() {
     element(by.css('.protractor-test-completed-section')).click();
     browser.waitForAngular();
     libraryPage.expectExplorationToBeVisible('About Oppia');
-    users.logout();
+    usersPage.logout();
+    library.expectExplorationToBeVisible('About Oppia');
+    usersPage.logout();
 
-    users.login('creator3@learnerDashboard.com');
+    usersPage.login('creator3@learnerDashboard.com');
     general.openEditor('3');
     editor.navigateToSettingsTab();
     element(by.css('.protractor-test-delete-exploration-button')).click();
     element(by.css(
       '.protractor-test-really-delete-exploration-button')).click();
     browser.waitForAngular();
-    users.logout();
+    usersPage.logout();
 
-    users.login('learner@learnerDashboard.com');
+    usersPage.login('learner@learnerDashboard.com');
     browser.get(general.LEARNER_DASHBOARD_URL);
     browser.waitForAngular();
     libraryPage.expectExplorationToBeHidden('Root Linear Coefficient Theorem');
-    users.logout();
+    usersPage.logout();
+    library.expectExplorationToBeHidden('Root Linear Coefficient Theorem');
+    usersPage.logout();
   });
 
   it('displays incomplete and completed collections', function() {
-    users.login('learner@learnerDashboard.com');
+    usersPage.login('learner@learnerDashboard.com');
 
     // Go to the test collection.
     browser.get('/search/find?q=');
@@ -169,9 +175,9 @@ describe('Learner dashboard functionality', function() {
     expect(element.all(by.css(
       '.protractor-test-collection-summary-tile-title')).first(
     ).getText()).toMatch('Test Collection');
-    users.logout();
+    usersPage.logout();
 
-    users.login('creator1@learnerDashboard.com');
+    usersPage.login('creator1@learnerDashboard.com');
     creatorDashboardPage.get();
     browser.waitForAngular();
     general.waitForSystem();
@@ -189,9 +195,9 @@ describe('Learner dashboard functionality', function() {
     collectionEditor.closeSaveModal();
     general.waitForSystem();
     browser.driver.sleep(300);
-    users.logout();
+    usersPage.logout();
 
-    users.login('learner@learnerDashboard.com');
+    usersPage.login('learner@learnerDashboard.com');
     browser.get(general.LEARNER_DASHBOARD_URL);
     browser.waitForAngular();
     general.waitForSystem();
@@ -201,11 +207,11 @@ describe('Learner dashboard functionality', function() {
     expect(element.all(by.css(
       '.protractor-test-collection-summary-tile-title')).first(
     ).getText()).toMatch('Test Collection');
-    users.logout();
+    usersPage.logout();
   });
 
   it('displays learners subscriptions', function() {
-    users.login('learner@learnerDashboard.com');
+    usersPage.login('learner@learnerDashboard.com');
 
     // Subscribe to both the creators.
     browser.get('/profile/creator1learnerDashboard');
@@ -228,11 +234,11 @@ describe('Learner dashboard functionality', function() {
     expect(element.all(by.css(
       '.protractor-test-subscription-name')).last().getText()).toMatch(
       'creator...');
-    users.logout();
+    usersPage.logout();
   });
 
   it('displays learner feedback threads', function() {
-    users.login('learner@learnerDashboard.com');
+    usersPage.login('learner@learnerDashboard.com');
     var feedback = 'A good exploration. Would love to see a few more questions';
 
     libraryPage.get();
@@ -254,7 +260,7 @@ describe('Learner dashboard functionality', function() {
     expect(element.all(by.css(
       '.protractor-test-feedback-message')).first().getText()).toMatch(
       feedback);
-    users.logout();
+    usersPage.logout();
   });
 
   afterEach(function() {
