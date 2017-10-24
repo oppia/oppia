@@ -239,7 +239,8 @@ class ExplorationHandler(base.BaseHandler):
             'session_id': utils.generate_new_session_id(),
             'version': exploration.version,
             'preferred_audio_language_code': preferred_audio_language_code,
-            'state_classifier_mapping': state_classifier_mapping
+            'state_classifier_mapping': state_classifier_mapping,
+            'auto_tts_enabled': exploration.auto_tts_enabled
         })
         self.render_json(self.values)
 

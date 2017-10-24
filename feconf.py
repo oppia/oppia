@@ -193,6 +193,10 @@ DEFAULT_INIT_STATE_NAME = 'Introduction'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
+# Whether new explorations should have automatic text-to-speech enabled
+# by default.
+DEFAULT_AUTO_TTS_ENABLED = True
+
 # Default title for a newly-minted collection.
 DEFAULT_COLLECTION_TITLE = ''
 # Default category for a newly-minted collection.
