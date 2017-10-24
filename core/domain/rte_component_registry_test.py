@@ -34,8 +34,8 @@ RTE_THUMBNAIL_HEIGHT_PX = 16
 RTE_THUMBNAIL_WIDTH_PX = 16
 
 _COMPONENT_CONFIG_SCHEMA = [
-    ('backend_name', basestring), ('category', basestring),
-    ('description', basestring), ('frontend_name', basestring),
+    ('backend_id', basestring), ('category', basestring),
+    ('description', basestring), ('frontend_id', basestring),
     ('tooltip', basestring), ('icon_data_url', basestring),
     ('preview_url_template', basestring), ('is_complex', bool),
     ('requires_fs', bool), ('is_block_element', bool),
@@ -117,25 +117,27 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
         rte_components = (
             rte_component_registry.Registry.get_all_rte_components())
 
-        for (component_name, component_specs) in rte_components.iteritems():
+        for (component_id, component_specs) in rte_components.iteritems():
             # Check that the component id is valid.
-            self.assertTrue(self._is_camel_cased(component_name))
+            self.assertTrue(self._is_camel_cased(component_id))
 
             # Check that the component directory exists.
             component_dir = os.path.join(
-                feconf.RTE_EXTENSIONS_DIR, component_name)
+                feconf.RTE_EXTENSIONS_DIR, component_id)
             self.assertTrue(os.path.isdir(component_dir))
 
-            # In this directory there should be a config .py file, an
-            # html file, a JS file, an icon .png file and a protractor.js file,
-            # and an optional preview .png file.
+            # In this directory there should be a /directives directory, an
+            # an icon .png file and a protractor.js file, and an optional
+            # preview .png file.
+            # In /directives directory should be HTML file, a JS file,
+            # there could be multiple JS and HTML files
             dir_contents = self._listdir_omit_ignored(component_dir)
             self.assertLessEqual(len(dir_contents), 4)
 
             directives_dir = os.path.join(component_dir, 'directives')
-            png_file = os.path.join(component_dir, '%s.png' % component_name)
+            png_file = os.path.join(component_dir, '%s.png' % component_id)
             preview_file = os.path.join(
-                component_dir, '%sPreview.png' % component_name)
+                component_dir, '%sPreview.png' % component_id)
             protractor_file = os.path.join(component_dir, 'protractor.js')
 
             self.assertTrue(os.path.isdir(directives_dir))
@@ -145,16 +147,16 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(os.path.isfile(preview_file))
 
             main_js_file = os.path.join(
-                directives_dir, '%sDirective.js' % component_name)
+                directives_dir, '%sDirective.js' % component_id)
             main_html_file = os.path.join(
-                directives_dir, '%s_directive.html' % component_name.lower())
+                directives_dir, '%s_directive.html' % component_id.lower())
 
             self.assertTrue(os.path.isfile(main_js_file))
             self.assertTrue(os.path.isfile(main_html_file))
 
             js_file_content = utils.get_file_contents(main_js_file)
             self.assertIn(
-                'oppiaNoninteractive%s' % component_name, js_file_content)
+                'oppiaNoninteractive%s' % component_id, js_file_content)
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
 

@@ -147,8 +147,8 @@ describe('RTE helper service', function() {
   beforeEach(function() {
     module(function($provide) {
       $provide.constant('RTE_COMPONENT_SPECS', [{
-        frontend_name: 'image',
-        backend_name: 'Image',
+        frontend_id: 'image',
+        backend_id: 'Image',
         tooltip: 'Insert image',
         icon_data_url: _IMAGE_URL,
         preview_url_template: _IMAGE_URL

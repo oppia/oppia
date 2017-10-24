@@ -1,18 +1,18 @@
 /* eslint-disable */
 /* Don't modify anything outside the {} brackets.
- * Insides of the {} brackets should be formatted as a JSON object.
+ * The contents of the {} brackets should be formatted as a JSON object.
  * JSON rules:
  * 1. All keys and string values must be enclosed in double quotes.
  * 2. Each key/value pair should be on a new line.
- * 3. All values and keys must be constant, you can't use any Javascript
+ * 3. All values and keys must be constant, you can't use any JavaScript
  *    functions.
  */
 var richTextComponents = {
   "Collapsible": {
-    "backend_name": "Collapsible",
+    "backend_id": "Collapsible",
     "category": "Basic Input",
     "description": "A collapsible block of HTML.",
-    "frontend_name": "collapsible",
+    "frontend_id": "collapsible",
     "tooltip": "Insert collapsible block",
     "icon_data_url": "/rich_text_components/Collapsible/Collapsible.png",
     "preview_url_template": "/rich_text_components/Collapsible/CollapsiblePreview.png",
@@ -36,13 +36,13 @@ var richTextComponents = {
         }
       },
       "default_value": "You have opened the collapsible block."
-      }]
+    }]
   },
   "Image": {
-    "backend_name": "Image",
+    "backend_id": "Image",
     "category": "Basic Input",
     "description": "An image.",
-    "frontend_name": "image",
+    "frontend_id": "image",
     "tooltip": "Insert image",
     "icon_data_url": "/rich_text_components/Image/Image.png",
     "preview_url_template": "/imagehandler/<[explorationId]>/<[filepath]>",
@@ -80,10 +80,10 @@ var richTextComponents = {
     }]
   },
   "Link": {
-    "backend_name": "Link",
+    "backend_id": "Link",
     "category": "Basic Input",
     "description": "A link to a URL.",
-    "frontend_name": "link",
+    "frontend_id": "link",
     "tooltip": "Insert link",
     "icon_data_url": "/rich_text_components/Link/Link.png",
     "preview_url_template": "/rich_text_components/Link/LinkPreview.png",
@@ -108,10 +108,10 @@ var richTextComponents = {
     }]
   },
   "Math": {
-    "backend_name": "Math",
+    "backend_id": "Math",
     "category": "Basic Input",
     "description": "A math formula.",
-    "frontend_name": "math",
+    "frontend_id": "math",
     "tooltip": "Insert mathematical formula",
     "icon_data_url": "/rich_text_components/Math/Math.png",
     "preview_url_template": "/rich_text_components/Math/MathPreview.png",
@@ -129,10 +129,10 @@ var richTextComponents = {
     }]
   },
   "Tabs": {
-    "backend_name": "Tabs",
+    "backend_id": "Tabs",
     "category": "Basic Input",
     "description": "A series of tabs.",
-    "frontend_name": "tabs",
+    "frontend_id": "tabs",
     "tooltip": "Insert tabs (e.g. for hints)",
     "icon_data_url": "/rich_text_components/Tabs/Tabs.png",
     "preview_url_template": "/rich_text_components/Tabs/TabsPreview.png",
@@ -180,10 +180,10 @@ var richTextComponents = {
     }]
   },
   "Video": {
-    "backend_name": "Video",
+    "backend_id": "Video",
     "category": "Basic Input",
     "description": "A YouTube video.",
-    "frontend_name": "video",
+    "frontend_id": "video",
     "tooltip": "Insert video",
     "icon_data_url": "/rich_text_components/Video/Video.png",
     "preview_url_template": "https://img.youtube.com/vi/<[video_id]>/hqdefault.jpg",

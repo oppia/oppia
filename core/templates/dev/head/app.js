@@ -69,10 +69,7 @@ oppia.constant('FATAL_ERROR_CODES', [400, 401, 404, 500]);
 
 oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
 
-// The conditioning on window.GLOBALS.RTE_COMPONENT_SPECS is because, in the
-// Karma tests, this value is undefined.
-oppia.constant(
-  'RTE_COMPONENT_SPECS', richTextComponents ? richTextComponents : {});
+oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
 
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
@@ -167,7 +164,7 @@ oppia.config(['$provide', function($provide) {
         var canUseFs = explorationContextService.getPageContext() ===
           PAGE_CONTEXT.EDITOR;
 
-        taRegisterTool(componentDefn.name, {
+        taRegisterTool(componentDefn.id, {
           display: buttonDisplay.outerHTML,
           tooltiptext: componentDefn.tooltip,
           disabled: function() {
@@ -177,7 +174,7 @@ oppia.config(['$provide', function($provide) {
           onElementSelect: {
             element: 'img',
             filter: function(elt) {
-              return elt.hasClass('oppia-noninteractive-' + componentDefn.name);
+              return elt.hasClass('oppia-noninteractive-' + componentDefn.id);
             },
             action: function(event, $element) {
               event.preventDefault();
@@ -477,10 +474,10 @@ oppia.factory('rteHelperService', [
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
       _RICH_TEXT_COMPONENTS.push({
-        backendName: RTE_COMPONENT_SPECS[componentId].backend_name,
+        backendId: RTE_COMPONENT_SPECS[componentId].backend_id,
         customizationArgSpecs: angular.copy(
           RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
-        name: RTE_COMPONENT_SPECS[componentId].frontend_name,
+        id: RTE_COMPONENT_SPECS[componentId].frontend_id,
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
         previewUrlTemplate:
         RTE_COMPONENT_SPECS[componentId].preview_url_template,
@@ -517,8 +514,8 @@ oppia.factory('rteHelperService', [
       },
       createToolbarIcon: function(componentDefn) {
         var el = $('<img/>');
-        el.attr('src',
-          UrlInterpolationService.getExtensionResourceUrl(
+        el.attr(
+          'src', UrlInterpolationService.getExtensionResourceUrl(
             componentDefn.iconDataUrl));
         el.addClass('oppia-rte-toolbar-image');
         return el.get(0);
@@ -538,14 +535,15 @@ oppia.factory('rteHelperService', [
             explorationId: explorationContextService.getExplorationId()
           });
         }
-        var componentPreviewUrl = componentDefn.previewUrlTemplate;
+        var componentPreviewUrlTemplate = componentDefn.previewUrlTemplate;
         if (componentDefn.previewUrlTemplate.startsWith(
             '/rich_text_components')) {
           var interpolatedUrl = UrlInterpolationService.getExtensionResourceUrl(
-            componentPreviewUrl);
+            componentPreviewUrlTemplate);
         } else {
           var interpolatedUrl = ($interpolate(
-            componentPreviewUrl, false, null, true)(customizationArgsDict));
+            componentPreviewUrlTemplate, false, null, true)(
+              customizationArgsDict));
         }
 
         if (!interpolatedUrl) {
@@ -554,7 +552,7 @@ oppia.factory('rteHelperService', [
         } else {
           el.attr('src', interpolatedUrl);
         }
-        el.addClass('oppia-noninteractive-' + componentDefn.name);
+        el.addClass('oppia-noninteractive-' + componentDefn.id);
         if (componentDefn.isBlockElement) {
           el.addClass('block-element');
         }
@@ -581,7 +579,7 @@ oppia.factory('rteHelperService', [
         var that = this;
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-          elt.find('oppia-noninteractive-' + componentDefn.name).replaceWith(
+          elt.find('oppia-noninteractive-' + componentDefn.id).replaceWith(
             function() {
               return that.createRteElement(
                 componentDefn,
@@ -606,7 +604,7 @@ oppia.factory('rteHelperService', [
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           elt.find(
-            'img.oppia-noninteractive-' + componentDefn.name
+            'img.oppia-noninteractive-' + componentDefn.id
           ).replaceWith(function() {
             // Look for a class name starting with oppia-noninteractive-*.
             var tagNameMatch = /(^|\s)(oppia-noninteractive-[a-z0-9\-]+)/.exec(
