@@ -92,13 +92,15 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         """
         if isinstance(item, stats_models.StartExplorationEventLogEntryModel):
             yield (item.exploration_id, {
-                'event_type': feconf.EVENT_TYPE_START_EXPLORATION
+                'event_type': feconf.EVENT_TYPE_START_EXPLORATION,
+                'version': item.exploration_version
             })
 
         elif isinstance(
                 item, stats_models.CompleteExplorationEventLogEntryModel):
             yield (item.exploration_id, {
                 'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+                'version': item.exploration_version,
                 'session_id': item.session_id
             })
 
@@ -125,10 +127,15 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(exp_id, stringified_values):
         num_starts = 0
         num_completions = 0
+        num_actual_starts = 0
 
         exploration = exp_services.get_exploration_by_id(exp_id)
         latest_exp_version = exploration.version
 
+        # The list of exploration start events in stringified_values.
+        start_exploration_event_dicts = []
+        # The list of exploration complete events in stringified_values.
+        complete_exploration_event_dicts = []
         # The list of state hit events in stringified_values.
         state_hit_event_dicts = []
         # The list of state answers instances in stringified_values.
@@ -139,9 +146,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             value = ast.literal_eval(value_str)
 
             if value['event_type'] == feconf.EVENT_TYPE_START_EXPLORATION:
-                num_starts += 1
+                start_exploration_event_dicts.append(value)
             elif value['event_type'] == feconf.EVENT_TYPE_COMPLETE_EXPLORATION:
-                num_completions += 1
+                complete_exploration_event_dicts.append(value)
                 completed_session_ids.append(value['session_id'])
             elif value['event_type'] == feconf.EVENT_TYPE_STATE_HIT:
                 state_hit_event_dicts.append(value)
@@ -156,6 +163,12 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         state_hit_event_dicts = sorted(state_hit_event_dicts, key=lambda e: e[
             'created_on'])
         for version in range(1, latest_exp_version+1):
+            start_exploration_events_for_this_version = [
+                val for val in start_exploration_event_dicts if val[
+                    'version'] == version]
+            complete_exploration_events_for_this_version = [
+                val for val in complete_exploration_event_dicts if val[
+                    'version'] == version]
             state_hit_events_for_this_version = [
                 val for val in state_hit_event_dicts if val[
                     'version'] == version]
@@ -165,10 +178,10 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             versioned_exploration = exp_services.get_exploration_by_id(
                 exp_id, version=version)
 
+            is_revert = False
             if version == 1:
                 # Create default state stats mapping for the first version.
                 for state_name in versioned_exploration.states:
-                    print state_name
                     state_stats_mapping[state_name] = (
                         stats_domain.StateStats.create_default())
             else:
@@ -187,7 +200,13 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         state_stats_mapping[change_dict['new_state_name']] = (
                             state_stats_mapping.pop(
                                 change_dict['old_state_name']))
+                    elif change_dict['cmd'] == 'AUTO_revert_version_number':
+                        revert_to_version = change_dict['version_number']
+                        is_revert = True
 
+            # Computing num_starts and num_completions.
+            num_starts += len(start_exploration_events_for_this_version)
+            num_completions += len(complete_exploration_events_for_this_version)
             # Dict mapping each session ID to the list of state hit events for
             # that session.
             state_hit_events_session_id_mapping = {}
@@ -242,43 +261,54 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         state_stats_mapping[value[
                             'state_name']].useful_feedback_count_v1 += 1
 
-        # Now that the stats for the complete exploration are computed,
-        # calculate num_actual_starts. To compute this, we take the max of the
-        # first hit counts of all states that the initial state leads to. The
-        # max is taken instead of sum because the sum of first_hit_counts
-        # will sometimes end up counting a single learner twice. The max of both
-        # first hit counts ensures that we are counting only unique learners
-        # who traversed past the initial state.
-        max_first_hit_from_init_state = 0
-        for answer_group in exploration.states[
-                exploration.init_state_name].interaction.answer_groups:
-            if answer_group.outcome.dest != exploration.init_state_name:
-                if state_stats_mapping[
-                        answer_group.outcome.dest].first_hit_count_v1 > (
-                            max_first_hit_from_init_state):
-                    max_first_hit_from_init_state = state_stats_mapping[
-                        answer_group.outcome.dest].first_hit_count_v1
-        if max_first_hit_from_init_state == 0:
-            num_actual_starts = num_starts
-        else:
-            num_actual_starts = max_first_hit_from_init_state
+            # Now that the stats for the exploration's version are computed,
+            # calculate num_actual_starts. To compute this, we take the max of
+            # the first hit counts of all states that the initial state leads
+            # to. The max is taken instead of sum because the sum of
+            # first_hit_counts will sometimes end up counting a single learner
+            # twice. The max of both first hit counts ensures that we are
+            # counting only unique learners who traversed past the initial
+            # state.
+            max_first_hit_from_init_state = 0
+            for answer_group in versioned_exploration.states[versioned_exploration.init_state_name].interaction.answer_groups: # pylint: disable=line-too-long
+                if answer_group.outcome.dest != (
+                        versioned_exploration.init_state_name):
+                    if state_stats_mapping[
+                            answer_group.outcome.dest].first_hit_count_v1 > (
+                                max_first_hit_from_init_state):
+                        max_first_hit_from_init_state = state_stats_mapping[
+                            answer_group.outcome.dest].first_hit_count_v1
+            if max_first_hit_from_init_state == 0:
+                num_actual_starts = num_starts
+            else:
+                num_actual_starts = max_first_hit_from_init_state
 
-        # Check if model already exists. If it does, update it, otherwise
-        # create a fresh ExplorationStatsModel instance.
-        exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
-            exp_id, latest_exp_version)
-        if exploration_stats_model is not None:
-            exploration_stats = stats_domain.ExplorationStats(
-                exp_id, latest_exp_version, num_starts,
-                exploration_stats_model.num_starts_v2, num_actual_starts,
-                exploration_stats_model.num_actual_starts_v2, num_completions,
-                exploration_stats_model.num_completions_v2, state_stats_mapping)
-            stats_services.save_stats_model(exploration_stats_model)
-        else:
-            exploration_stats = stats_domain.ExplorationStats(
-                exp_id, latest_exp_version, num_starts, 0, num_actual_starts, 0,
-                num_completions, 0, state_stats_mapping)
-            stats_services.create_stats_model(exploration_stats)
+            # Check if model already exists. If it does, update it, otherwise
+            # create a fresh ExplorationStatsModel instance.
+            exploration_stats_model = (
+                stats_models.ExplorationStatsModel.get_model(exp_id, version))
+            # Handling exploration reverts.
+            if is_revert:
+                old_exploration_stats = (
+                    stats_services.get_exploration_stats_by_id(
+                        exp_id, revert_to_version))
+                num_starts = old_exploration_stats.num_starts_v1
+                num_completions = old_exploration_stats.num_completions_v1
+                num_actual_starts = old_exploration_stats.num_actual_starts_v1
+                state_stats_mapping = old_exploration_stats.state_stats_mapping
+            if exploration_stats_model is not None:
+                exploration_stats = stats_domain.ExplorationStats(
+                    exp_id, version, num_starts,
+                    exploration_stats_model.num_starts_v2, num_actual_starts,
+                    exploration_stats_model.num_actual_starts_v2,
+                    num_completions, exploration_stats_model.num_completions_v2,
+                    state_stats_mapping)
+                stats_services.save_stats_model(exploration_stats_model)
+            else:
+                exploration_stats = stats_domain.ExplorationStats(
+                    exp_id, version, num_starts, 0, num_actual_starts, 0,
+                    num_completions, 0, state_stats_mapping)
+                stats_services.create_stats_model(exploration_stats)
 
 
 class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):

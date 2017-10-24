@@ -28,7 +28,8 @@ from core.tests import test_utils
 import feconf
 import utils
 
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(stats_models, exp_models) = models.Registry.import_models(
+    [models.NAMES.statistics, models.NAMES.exploration])
 
 
 class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
@@ -229,6 +230,7 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
 
         self.exploration = exp_services.get_exploration_by_id(self.exp_id)
 
+
         job_id = stats_jobs_one_off.GenerateV1StatisticsJob.create_new()
         stats_jobs_one_off.GenerateV1StatisticsJob.enqueue(job_id)
 
@@ -262,3 +264,70 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 'Home'].useful_feedback_count_v1, 1)
+
+    def test_exploration_revert_updates_stats_to_old_values(self):
+        # Update exploration to version 2.
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state',
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        self.exploration = exp_services.get_exploration_by_id(self.exp_id)
+
+        # Create event models for version 2 of the exploration.
+        stats_models.StartExplorationEventLogEntryModel.create(
+            self.exp_id, self.exploration.version, 'Home', 'session_id3',
+            {}, feconf.PLAY_TYPE_NORMAL)
+        stats_models.StateHitEventLogEntryModel.create(
+            self.exp_id, self.exploration.version, 'Home', 'session_id3',
+            {}, feconf.PLAY_TYPE_NORMAL)
+
+        # Revert exploration to version 1.
+        exp_services.revert_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_id, 2, 1)
+
+        self.exploration = exp_services.get_exploration_by_id(self.exp_id)
+
+        job_id = stats_jobs_one_off.GenerateV1StatisticsJob.create_new()
+        stats_jobs_one_off.GenerateV1StatisticsJob.enqueue(job_id)
+
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exploration.version)
+        self.assertEqual(exploration_stats.num_starts_v1, 2)
+        self.assertEqual(exploration_stats.num_completions_v1, 1)
+        self.assertEqual(exploration_stats.num_actual_starts_v1, 1)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].first_hit_count_v1, 2)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['End'].first_hit_count_v1, 1)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].total_hit_count_v1, 3)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['End'].total_hit_count_v1, 1)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].num_completions_v1, 2)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['End'].num_completions_v1, 1)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Home'].total_answers_count_v1, 2)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['End'].total_answers_count_v1,
+            0)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Home'].useful_feedback_count_v1, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'End'].useful_feedback_count_v1, 0)
