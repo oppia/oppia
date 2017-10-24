@@ -29,6 +29,7 @@ oppia.controller('Preferences', [
     $scope.profilePictureDataUrl = '';
     $scope.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
     $scope.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
+    $scope.username = GLOBALS.username;
 
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 

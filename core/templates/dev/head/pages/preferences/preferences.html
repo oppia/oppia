@@ -33,11 +33,8 @@
           <div class="form-group">
             <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_USERNAME"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
-              {% if username %}
-                <a href="/profile/{{username}}">{{username}}</a>
-              {% else %}
-                <em translate="I18N_PREFERENCES_USERNAME_NOT_SELECTED"></em>
-              {% endif %}
+              <a ng-if="username" href="/profile/{{username}}">{{username}}</a>
+              <em ng-if="!username" translate="I18N_PREFERENCES_USERNAME_NOT_SELECTED"></em>
             </div>
           </div>
         </div>
