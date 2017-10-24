@@ -81,8 +81,8 @@ def _get_exploration_player_data(
         - 'exploration_version': int. The version of the exploration.
         - 'collection_id': str. ID of the collection.
         - 'collection_title': str. Title of collection.
-        - 'interaction_templates': str. The HTML bodies for the given list of
-            interaction IDs.
+        - 'interaction_templates': str. The HTML bodies of the interactions
+            required by the given exploration ID.
         - 'is_private': bool. Whether the exploration is private or not.
         - 'meta_name': str. Title of exploration.
         - 'meta_description': str. Objective of exploration.
@@ -541,7 +541,7 @@ class LearnerIncompleteActivityHandler(base.BaseHandler):
 
         Args:
             activity_type: str. The activity type. Currently, it can take values
-            "exploration" or "collection".
+                "exploration" or "collection".
             activity_id: str. The ID of the activity to be deleted.
         """
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
