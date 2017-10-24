@@ -129,7 +129,9 @@ class StatsEventsHandler(BaseEventHandler):
                     'update_params': {}
                 })
 
-        stats_services.update_stats(exploration_id, exp_version, event_params)
+        taskqueue_services.defer(
+            stats_services.update_stats, taskqueue_services.QUEUE_NAME_STATS,
+            exploration_id, exp_version, event_params)
 
 
 class AnswerSubmissionEventHandler(BaseEventHandler):

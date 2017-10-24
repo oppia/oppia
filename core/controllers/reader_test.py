@@ -29,6 +29,7 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
@@ -881,6 +882,10 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
                 self.exp_id), {
                     'event_dicts': self.event_dicts,
                     'exp_version': self.exp_version})
+
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_STATS), 1)
+        self.process_and_flush_pending_tasks()
 
         # Check that the models are updated.
         exploration_stats = stats_services.get_exploration_stats_by_id(
