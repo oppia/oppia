@@ -219,6 +219,7 @@ class ExplorationHandler(EditorHandler):
             user_services.get_email_preferences_for_exploration(
                 self.user_id, exploration_id))
         editor_dict = {
+            'auto_tts_enabled': exploration.auto_tts_enabled,
             'category': exploration.category,
             'draft_change_list_id': draft_change_list_id,
             'exploration_id': exploration_id,
