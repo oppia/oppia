@@ -85,7 +85,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         invalid_vals = ['a', '', {'a': 3}, [3], None, -1, '-1', 0, '0']
 
         self.check_normalization(
-            objects.NonnegativeInt, mappings, invalid_vals)
+            objects.PositiveInt, mappings, invalid_vals)
 
     def test_code_evaluation_validation(self):
         """Tests objects of type codeEvaluation."""
@@ -401,8 +401,8 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     def test_fraction(self):
         """Tests objects of type Fraction."""
         mappings = [(
-            self._create_fraction_dict(True, 0, 0, 0),
-            self._create_fraction_dict(True, 0, 0, 0)
+            self._create_fraction_dict(True, 0, 0, 1),
+            self._create_fraction_dict(True, 0, 0, 1)
         ), (
             self._create_fraction_dict(False, 1, 2, 3),
             self._create_fraction_dict(False, 1, 2, 3)
