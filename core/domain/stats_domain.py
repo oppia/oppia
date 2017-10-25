@@ -78,6 +78,10 @@ class ExplorationStats(object):
 
     def to_dict(self):
         """Returns a dict representation of the domain object."""
+        state_stats_mapping = {
+            state_name: self.state_stats_mapping[state_name].to_dict()
+            for state_name in self.state_stats_mapping
+        }
         exploration_stats_dict = {
             'exp_id': self.exp_id,
             'exp_version': self.exp_version,
@@ -87,7 +91,7 @@ class ExplorationStats(object):
             'num_actual_starts_v2': self.num_actual_starts_v2,
             'num_completions_v1': self.num_completions_v1,
             'num_completions_v2': self.num_completions_v2,
-            'state_stats_mapping': self.state_stats_mapping
+            'state_stats_mapping': state_stats_mapping
         }
         return exploration_stats_dict
 
