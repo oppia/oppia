@@ -25,8 +25,8 @@ oppia.constant('FractionParsingErrors', {
   DivideByZero: 'Please do not put 0 in the denominator'
 });
 
-oppia.factory('FractionObjectFactory', ['FractionParsingErrors',
-  function(FractionParsingErrors) {
+oppia.factory('FractionObjectFactory', [
+  'FractionParsingErrors', function(FractionParsingErrors) {
     var Fraction = function(isNegative, wholeNumber, numerator, denominator) {
       this.isNegative = isNegative;
       this.wholeNumber = wholeNumber;
