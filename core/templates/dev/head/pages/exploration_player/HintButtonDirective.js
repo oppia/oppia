@@ -32,22 +32,22 @@ oppia.directive('hintButton', [
         '/pages/exploration_player/' +
         'hint_button_directive.html'),
       controller: [
-        '$scope', '$timeout', 'NumberAttemptsService',
-        function($scope, $timeout, NumberAttemptsService) {
-          $scope.isShowingNeedHintMessage = false;
+        '$scope', '$rootScope', '$timeout', 'NumberAttemptsService',
+        function($scope, $rootScope, $timeout, NumberAttemptsService) {
+          $scope.isShowingHintTooltip = false;
           var showNeedHintIfNecessary = function() {
             if (NumberAttemptsService.getNumberAttempts() >=
                 NUM_ATTEMPTS_BEFORE_SHOWING_NEED_HINT_MESSAGE) {
               $timeout(function() {
+                $scope.isShowingHintTooltip = true;
                 $scope.isShowingNeedHintMessage = true;
-                $scope.isShowingNeedHintMessageText = true;
               }, SHOW_NEED_HINT_MESSAGE_DELAY);
             }
           };
 
           $scope.hideNeedHintMessage = function() {
+            $scope.isShowingHintTooltip = false;
             $scope.isShowingNeedHintMessage = false;
-            $scope.isShowingNeedHintMessageText = false;
           };
 
           $scope.$on('oppiaFeedbackAvailable', showNeedHintIfNecessary());
