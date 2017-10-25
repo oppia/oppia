@@ -206,7 +206,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(objects.SanitizedUrl, mappings, invalid_vals)
 
     def test_checked_proof_validation(self):
-        """Tests objects of type CheckedProof"""
+        """Tests objects of type CheckedProof."""
         valid_example_1 = {
             'assumptions_string': 'p',
             'target_string': 'q',
@@ -239,7 +239,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.CheckedProof, mappings, invalid_values)
 
     def test_logic_question_validation(self):
-        """Tests objects of type LogicQuestion"""
+        """Tests objects of type LogicQuestion."""
         p_expression = {
             'top_kind_name': 'variable',
             'top_operator_name': 'p',
@@ -267,7 +267,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.LogicQuestion, mappings, invalid_values)
 
     def test_logic_error_category_validation(self):
-        """Tests objects of type LogicErrorCategory"""
+        """Tests objects of type LogicErrorCategory."""
 
         mappings = [
             ('parsing', 'parsing'), ('typing', 'typing'),
@@ -279,7 +279,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.LogicErrorCategory, mappings, invalid_values)
 
     def test_graph(self):
-        """Tests objects of type Graph"""
+        """Tests objects of type Graph."""
         empty_graph = {
             'vertices': [],
             'edges': [],
@@ -369,7 +369,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.Graph, mappings, invalid_values)
 
     def test_graph_property_validation(self):
-        """Tests objects of type GraphProperty"""
+        """Tests objects of type GraphProperty."""
 
         mappings = [
             ('acyclic', 'acyclic'), ('regular', 'regular'),
@@ -382,7 +382,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.GraphProperty, mappings, invalid_values)
 
     def test_set_of_html_string(self):
-        """Tests objects of the type StringList"""
+        """Tests objects of the type StringList."""
 
         mappings = [(['abc', 'abb'], [u'abc', u'abb']), ([], [])]
         invalid_values = ['123', {'a': 1}, 3.0, None, [3, 'a'], [1, 2, 1]]
@@ -390,7 +390,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             objects.SetOfHtmlString, mappings, invalid_values)
 
     def test_fraction(self):
-        """Tests objects of type Fraction"""
+        """Tests objects of type Fraction."""
         mappings = [(
             self._create_fraction_dict(True, 0, 0, 0),
             self._create_fraction_dict(True, 0, 0, 0)
@@ -402,6 +402,10 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         invalid_values = [self._create_fraction_dict('non-boolean', 1, 2, 3),
                           self._create_fraction_dict(True, 'non-int', 2, 3),
                           self._create_fraction_dict(None, None, None, None),
+                          self._create_fraction_dict(False, 10, 1, -3),
+                          self._create_fraction_dict(False, -10, 11, 3),
+                          self._create_fraction_dict(False, 10, -11, 3),
+                          self._create_fraction_dict(False, -10, -11, -3),
                           {},
                           '1/3',
                           1]

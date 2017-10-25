@@ -784,7 +784,7 @@ class Fraction(BaseObject):
     """Fraction class."""
 
     description = 'A fraction type'
-    edit_html_filename = 'unicode_string_editor'
+    edit_html_filename = 'fraction_editor'
     edit_js_filename = 'FractionEditor'
     default_value = {
         'isNegative': False,

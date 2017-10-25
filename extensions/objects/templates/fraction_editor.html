@@ -1,0 +1,15 @@
+<span ng-if="!active && !alwaysEditable">
+  <[localValue.label]>
+  (<a href="#" onclick="return false;" ng-click="openEditor()">Edit</a>)
+</span>
+
+<span ng-if="active || alwaysEditable">
+  <input type="text" ng-model="localValue.label" class="form-control">
+  <button type="button" class="btn btn-default" ng-if="!alwaysEditable" ng-click="replaceValue(localValue.label)">
+    Close
+  </button>
+</span>
+
+<div class="oppia-form-error">
+  <[getWarningText()]>
+</div>

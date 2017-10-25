@@ -42,7 +42,7 @@ oppia.directive('fractionEditor', [
 
         $scope.$watch('localValue.label', function(newValue) {
           try {
-            var fraction = FractionObjectFactory.parse(newValue);
+            var fraction = FractionObjectFactory.fromRawInputString(newValue);
             $scope.$parent.value = fraction;
             errorMessage = '';
           } catch (parsingError) {

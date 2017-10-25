@@ -16,17 +16,16 @@
  * @fileoverview Factory for creating instances of Fraction
  * domain objects.
  */
+oppia.constant('FractionParsingErrors', {
+  InvalidChars:
+    'Please only use numerical digits, spaces or forward slashes (/)',
+  InvalidFormat:
+    'Please enter answer in fraction format (e.g. 5/3 or 1 2/3)',
+  DivideByZero: 'Please do not put 0 in the denominator'
+});
 
-oppia.factory('FractionObjectFactory', [
- function() {
-   var errors = {
-     InvalidChars:
-       'Please only use numerical digits, spaces or forward slashes (/)',
-     InvalidFormat:
-       'Please enter answer in fraction format (e.g. 5/3 or 1 2/3)',
-     DivideByZero: 'Please do not put 0 in the denominator'
-   };
-
+oppia.factory('FractionObjectFactory', ['FractionParsingErrors',
+ function(FractionParsingErrors) {
    var Fraction = function(isNegative, wholeNumber, numerator, denominator) {
      this.isNegative = isNegative;
      this.wholeNumber = wholeNumber;
@@ -35,19 +34,20 @@ oppia.factory('FractionObjectFactory', [
    };
 
    Fraction.prototype.toString = function () {
-     var fractionstring = '';
+     var fractionString = '';
      if (this.numerator !== 0) {
-       fractionstring += this.numerator + '/' + this.denominator;
+       fractionString += this.numerator + '/' + this.denominator;
      }
      if (this.wholeNumber !== 0) {
-       fractionstring = this.wholeNumber + ' ' + fractionstring;
-       // if fractional part was empty then there will be a trailing whitespace.
-       fractionstring = fractionstring.trim();
+       fractionString = this.wholeNumber + ' ' + fractionString;
+       // If the fractional part was empty then there will be a trailing
+       // whitespace.
+       fractionString = fractionString.trim();
      }
-     if (this.isNegative && fractionstring !== '') {
-       fractionstring = '-' + fractionstring;
+     if (this.isNegative && fractionString !== '') {
+       fractionString = '-' + fractionString;
      }
-     return fractionstring === '' ? '0' : fractionstring;
+     return fractionString === '' ? '0' : fractionString;
    };
 
    Fraction.prototype.toDict = function() {
@@ -59,20 +59,20 @@ oppia.factory('FractionObjectFactory', [
      };
    };
 
-   Fraction.parse = function(rawInput) {
+   Fraction.fromRawInputString = function(rawInput) {
     // TODO(aa): Perform error checking on the input using regexes.
-     var invalidChars = /[^\d\s\/-]/g;
-     if (invalidChars.test(rawInput)) {
-       throw new Error(errors.InvalidChars);
+     var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
+     if (INVALID_CHARS_REGEX.test(rawInput)) {
+       throw new Error(FractionParsingErrors.InvalidChars);
      }
-     var validFormat = /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
-     if (!validFormat.test(rawInput)) {
-       throw new Error(errors.InvalidFormat);
+     var FRACTION_REGEX = /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
+     if (!FRACTION_REGEX.test(rawInput)) {
+       throw new Error(FractionParsingErrors.InvalidFormat);
      }
      var isNegative = false;
      var wholeNumber = 0;
      var numerator = 0;
-     var denominator = 0;
+     var denominator = 1;
      rawInput = rawInput.trim();
      if (rawInput.charAt(0) === '-') {
        isNegative = true;
@@ -82,25 +82,22 @@ oppia.factory('FractionObjectFactory', [
      // Filter result from split to remove empty strings.
      var numbers = rawInput.split(/\/|\s/g).filter(function(token) {
        // The empty string will evaluate to false.
-       return token;
+       return Boolean(token);
      });
 
-     if (numbers.length == 1) {
+     if (numbers.length === 1) {
        wholeNumber = parseInt(numbers[0]);
-     } else if (numbers.length == 2) {
+     } else if (numbers.length === 2) {
        numerator = parseInt(numbers[0]);
        denominator = parseInt(numbers[1]);
-       if (denominator === 0) {
-         throw new Error(errors.DivideByZero);
-       }
      } else {
        // numbers.length == 3
        wholeNumber = parseInt(numbers[0]);
        numerator = parseInt(numbers[1]);
        denominator = parseInt(numbers[2]);
-       if (denominator === 0) {
-         throw new Error(errors.DivideByZero);
-       }
+     }
+     if (denominator === 0) {
+       throw new Error(FractionParsingErrors.DivideByZero);
      }
      return new Fraction(isNegative, wholeNumber, numerator, denominator);
    };
