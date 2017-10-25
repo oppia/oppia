@@ -2631,9 +2631,14 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         super(StateIdMappingTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.enable_state_id_mapping_model = self.swap(
+            feconf, 'ENABLE_STATE_ID_MAPPING', True)
+
         # Create a default exploration.
-        self.exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
+            self.exploration = self.save_new_valid_exploration(
+                self.EXP_ID, self.owner_id)
+
         self.mapping = exp_services.get_state_id_mapping(
             self.EXP_ID, self.exploration.version)
 
@@ -2652,12 +2657,14 @@ class StateIdMappingTests(test_utils.GenericTestBase):
     def test_that_mapping_remains_same_when_exp_params_changes(self):
         """Test that state id mapping is unchanged when exploration params are
         changed."""
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [{
-                'cmd': 'edit_exploration_property',
-                'property_name': 'title',
-                'new_value': 'New title'
-            }], 'Changes.')
+        with self.enable_state_id_mapping_model:
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'title',
+                    'new_value': 'New title'
+                }], 'Changes.')
+
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
             self.EXP_ID, new_exploration.version)
@@ -2673,11 +2680,13 @@ class StateIdMappingTests(test_utils.GenericTestBase):
     def test_that_mapping_is_correct_when_new_state_is_added(self):
         """Test that new state id is added in state id mapping when new state is
         added in exploration."""
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [{
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            }], 'Add state name')
+        with self.enable_state_id_mapping_model:
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'new state',
+                }], 'Add state name')
+
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
             self.EXP_ID, new_exploration.version)
@@ -2694,16 +2703,17 @@ class StateIdMappingTests(test_utils.GenericTestBase):
     def test_that_mapping_is_correct_when_old_state_is_deleted(self):
         """Test that state id is removed from state id mapping when the
         state is removed from exploration."""
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [{
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            }], 'Add state name')
+        with self.enable_state_id_mapping_model:
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'new state',
+                }], 'Add state name')
 
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_DELETE_STATE,
-            'state_name': 'new state',
-            }], 'delete state')
+            exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_DELETE_STATE,
+                'state_name': 'new state',
+                }], 'delete state')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -2720,17 +2730,18 @@ class StateIdMappingTests(test_utils.GenericTestBase):
     def test_that_mapping_remains_when_state_is_renamed(self):
         """Test that state id mapping is changed accordingly when a state
         is renamed in exploration."""
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [{
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            }], 'Add state name')
+        with self.enable_state_id_mapping_model:
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'new state',
+                }], 'Add state name')
 
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_RENAME_STATE,
-            'old_state_name': 'new state',
-            'new_state_name': 'state',
-        }], 'Change state name')
+            exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'new state',
+                'new_state_name': 'state',
+            }], 'Change state name')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -2748,13 +2759,14 @@ class StateIdMappingTests(test_utils.GenericTestBase):
     def test_that_mapping_is_changed_when_interaction_id_is_changed(self):
         """Test that state id mapping is changed accordingly when interaction
         id of state is changed."""
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [{
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': self.exploration.init_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'MultipleChoiceInput'
-            }], 'Update interaction.')
+        with self.enable_state_id_mapping_model:
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': self.exploration.init_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'MultipleChoiceInput'
+                }], 'Update interaction.')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -2772,36 +2784,37 @@ class StateIdMappingTests(test_utils.GenericTestBase):
     def test_that_mapping_is_correct_for_series_of_changes(self):
         """Test that state id mapping is changed accordingly for series
         of add, rename, remove and update state changes."""
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [{
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            }, {
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'new state',
-                'new_state_name': 'state'
-            }, {
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'extra state'
-            }, {
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'state',
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'MultipleChoiceInput'
-            }, {
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'extra state',
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'TextInput'
-            }, {
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            }, {
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'new state',
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'TextInput'
-            }], 'Heavy changes')
+        with self.enable_state_id_mapping_model:
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'new state',
+                }, {
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'new state',
+                    'new_state_name': 'state'
+                }, {
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'extra state'
+                }, {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'state',
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'MultipleChoiceInput'
+                }, {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'extra state',
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'TextInput'
+                }, {
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'new state',
+                }, {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'new state',
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'TextInput'
+                }], 'Heavy changes')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -2818,32 +2831,33 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 3)
 
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [{
-                'cmd': exp_domain.CMD_DELETE_STATE,
-                'state_name': 'state',
-            }, {
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'extra state',
-                'new_state_name': 'state'
-            }, {
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'state',
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'MultipleChoiceInput'
-            }, {
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'extra state'
-            }, {
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'extra state',
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'TextInput'
-            }, {
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'new state',
-                'new_state_name': 'other state'
-            }], 'Heavy changes 2')
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_DELETE_STATE,
+                    'state_name': 'state',
+                }, {
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'extra state',
+                    'new_state_name': 'state'
+                }, {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'state',
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'MultipleChoiceInput'
+                }, {
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'extra state'
+                }, {
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': 'extra state',
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'TextInput'
+                }, {
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'new state',
+                    'new_state_name': 'other state'
+                }], 'Heavy changes 2')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -2859,26 +2873,3 @@ class StateIdMappingTests(test_utils.GenericTestBase):
             new_mapping.exploration_version, new_exploration.version)
         self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 5)
-
-    def test_that_mapping_is_correct_when_exploration_is_reverted(self):
-        """Test that state id mapping is correct when exploration is reverted
-        to old version."""
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [{
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            }], 'Add state name')
-
-        # Revert exploration to version 1.
-        exp_services.revert_exploration(self.owner_id, self.EXP_ID, 2, 1)
-
-        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping(
-            self.EXP_ID, new_exploration.version)
-
-        # Expected mapping is same as initial version's mapping.
-        expected_mapping = self.mapping.state_names_to_ids
-        self.assertEqual(
-            new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.largest_state_id_used, 1)

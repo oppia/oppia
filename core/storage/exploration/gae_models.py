@@ -540,7 +540,7 @@ class StateIdMappingModel(base_models.BaseModel):
     # Latest state id that has been assigned to any of the states in any of
     # of the versions of given exploration. New state IDs should be assigned
     # from this value + 1.
-    largest_state_id_used = ndb.IntegerProperty(required=True)
+    largest_state_id_used = ndb.IntegerProperty(indexed=True, required=True)
 
     @classmethod
     def _generate_instance_id(cls, exp_id, exp_version):
