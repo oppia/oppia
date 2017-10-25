@@ -35,8 +35,8 @@ class Registry(object):
 
     @classmethod
     def get_all_rte_components(cls):
-        """Get a list of instances of all custom RTE components."""
-        if len(cls._rte_components) == 0:
+        """Get a dictionary mapping RTE component IDs to their definitions."""
+        if not cls._rte_components:
             cls._refresh()
         return cls._rte_components
 

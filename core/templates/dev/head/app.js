@@ -536,8 +536,8 @@ oppia.factory('rteHelperService', [
           });
         }
         var componentPreviewUrlTemplate = componentDefn.previewUrlTemplate;
-        if (componentDefn.previewUrlTemplate.startsWith(
-            '/rich_text_components')) {
+        if (componentDefn.previewUrlTemplate.indexOf(
+            '/rich_text_components') === 0) {
           var interpolatedUrl = UrlInterpolationService.getExtensionResourceUrl(
             componentPreviewUrlTemplate);
         } else {
