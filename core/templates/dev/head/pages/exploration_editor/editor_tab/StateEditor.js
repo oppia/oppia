@@ -110,12 +110,12 @@ oppia.directive('trainingPanel', [
         '/pages/exploration_editor/editor_tab/' +
         'training_answer_modal_directive.html'),
       controller: [
-        '$scope', 'oppiaExplorationHtmlFormatterService',
+        '$scope', 'ExplorationHtmlFormatterService',
         'editorContextService', 'explorationStatesService',
         'TrainingDataService', 'responsesService', 'stateInteractionIdService',
         'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
         'OutcomeObjectFactory',
-        function($scope, oppiaExplorationHtmlFormatterService,
+        function($scope, ExplorationHtmlFormatterService,
             editorContextService, explorationStatesService,
             TrainingDataService, responsesService, stateInteractionIdService,
             stateCustomizationArgsService, AnswerGroupObjectFactory,
@@ -130,7 +130,7 @@ oppia.directive('trainingPanel', [
 
           var _updateAnswerTemplate = function() {
             $scope.answerTemplate = (
-              oppiaExplorationHtmlFormatterService.getAnswerHtml(
+              ExplorationHtmlFormatterService.getAnswerHtml(
                 $scope.answer, stateInteractionIdService.savedMemento,
                 stateCustomizationArgsService.savedMemento));
           };

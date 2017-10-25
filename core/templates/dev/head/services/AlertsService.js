@@ -16,8 +16,8 @@
  * @fileoverview Factory for handling warnings and info messages.
  */
 
-oppia.factory('alertsService', ['$log', function($log) {
-  var alertsService = {
+oppia.factory('AlertsService', ['$log', function($log) {
+  var AlertsService = {
     /**
      * Each element in each of the arrays here is an object with two keys:
      *   - type:  a string specifying the type of message or warning.
@@ -43,12 +43,12 @@ oppia.factory('alertsService', ['$log', function($log) {
    * Adds a warning message.
    * @param {string} warning - The warning message to display.
    */
-  alertsService.addWarning = function(warning) {
+  AlertsService.addWarning = function(warning) {
     $log.error(warning);
-    if (alertsService.warnings.length >= MAX_TOTAL_WARNINGS) {
+    if (AlertsService.warnings.length >= MAX_TOTAL_WARNINGS) {
       return;
     }
-    alertsService.warnings.push({
+    AlertsService.warnings.push({
       type: 'warning',
       content: warning
     });
@@ -59,8 +59,8 @@ oppia.factory('alertsService', ['$log', function($log) {
    * exception to cause a hard failure in the frontend.
    * @param {string} warning - The warning message to display.
    */
-  alertsService.fatalWarning = function(warning) {
-    alertsService.addWarning(warning);
+  AlertsService.fatalWarning = function(warning) {
+    AlertsService.addWarning(warning);
     throw new Error(warning);
   };
 
@@ -68,22 +68,22 @@ oppia.factory('alertsService', ['$log', function($log) {
    * Deletes the warning from the warnings list.
    * @param {Object} warningObject - The warning message to be deleted.
    */
-  alertsService.deleteWarning = function(warningObject) {
-    var warnings = alertsService.warnings;
+  AlertsService.deleteWarning = function(warningObject) {
+    var warnings = AlertsService.warnings;
     var newWarnings = [];
     for (var i = 0; i < warnings.length; i++) {
       if (warnings[i].content !== warningObject.content) {
         newWarnings.push(warnings[i]);
       }
     }
-    alertsService.warnings = newWarnings;
+    AlertsService.warnings = newWarnings;
   };
 
   /**
    * Clears all warnings.
    */
-  alertsService.clearWarnings = function() {
-    alertsService.warnings = [];
+  AlertsService.clearWarnings = function() {
+    AlertsService.warnings = [];
   };
 
   /**
@@ -91,11 +91,11 @@ oppia.factory('alertsService', ['$log', function($log) {
    * @param {string} type - Type of message
    * @param {string} message - Message content
    */
-  alertsService.addMessage = function(type, message) {
-    if (alertsService.messages.length >= MAX_TOTAL_MESSAGES) {
+  AlertsService.addMessage = function(type, message) {
+    if (AlertsService.messages.length >= MAX_TOTAL_MESSAGES) {
       return;
     }
-    alertsService.messages.push({
+    AlertsService.messages.push({
       type: type,
       content: message
     });
@@ -105,8 +105,8 @@ oppia.factory('alertsService', ['$log', function($log) {
    * Deletes the message from the messages list.
    * @param {Object} messageObject - Message to be deleted.
    */
-  alertsService.deleteMessage = function(messageObject) {
-    var messages = alertsService.messages;
+  AlertsService.deleteMessage = function(messageObject) {
+    var messages = AlertsService.messages;
     var newMessages = [];
     for (var i = 0; i < messages.length; i++) {
       if (messages[i].type !== messageObject.type ||
@@ -114,31 +114,31 @@ oppia.factory('alertsService', ['$log', function($log) {
         newMessages.push(messages[i]);
       }
     }
-    alertsService.messages = newMessages;
+    AlertsService.messages = newMessages;
   };
 
   /**
    * Adds an info message.
    * @param {string} message - Info message to display.
    */
-  alertsService.addInfoMessage = function(message) {
-    alertsService.addMessage('info', message);
+  AlertsService.addInfoMessage = function(message) {
+    AlertsService.addMessage('info', message);
   };
 
   /**
    * Adds a success message.
    * @param {string} message - Success message to display
    */
-  alertsService.addSuccessMessage = function(message) {
-    alertsService.addMessage('success', message);
+  AlertsService.addSuccessMessage = function(message) {
+    AlertsService.addMessage('success', message);
   };
 
   /**
    * Clears all messages.
    */
-  alertsService.clearMessages = function() {
-    alertsService.messages = [];
+  AlertsService.clearMessages = function() {
+    AlertsService.messages = [];
   };
 
-  return alertsService;
+  return AlertsService;
 }]);

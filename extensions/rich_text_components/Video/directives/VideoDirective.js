@@ -28,9 +28,9 @@ oppia.directive('oppiaNoninteractiveVideo', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/rich_text_components/Video/directives/video_directive.html'),
       controller: [
-        '$scope', '$attrs', 'explorationContextService', '$element',
+        '$scope', '$attrs', 'ExplorationContextService', '$element',
         'autoplayedVideosService', 'PAGE_CONTEXT', '$timeout', '$window',
-        function($scope, $attrs, explorationContextService, $element,
+        function($scope, $attrs, ExplorationContextService, $element,
           autoplayedVideosService, PAGE_CONTEXT, $timeout, $window) {
           var start = (
             HtmlEscaperService.escapedJsonToObj($attrs.startWithValue));
@@ -57,7 +57,7 @@ oppia.directive('oppiaNoninteractiveVideo', [
 
             // Autoplay if user is in learner view and creator has specified
             // to autoplay given video.
-            if (explorationContextService.getPageContext() ===
+            if (ExplorationContextService.getPageContext() ===
               PAGE_CONTEXT.LEARNER && autoplayVal) {
               // If it has been autoplayed then do not autoplay again.
               if (
@@ -79,7 +79,7 @@ oppia.directive('oppiaNoninteractiveVideo', [
 
           // This following check disables the video in Editor being caught
           // by tabbing while in Exploration Editor mode.
-          if (explorationContextService.isInExplorationEditorMode()) {
+          if (ExplorationContextService.isInExplorationEditorMode()) {
             $scope.tabIndexVal = -1;
           }
         }]
