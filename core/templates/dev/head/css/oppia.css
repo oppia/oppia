@@ -3826,6 +3826,16 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 250px;
 }
 
+.oppia-activity-summary-tile-mobile:after {
+  content: ' ';
+  width: 150vw;
+  height: 150vh;
+  background: rgba(0,0,0,0.25);
+  z-index: -1;
+  position: absolute;
+  transform: translate(-50vw, -100vh);
+}
+
 @media only screen and (max-width: 500px) {
   .oppia-activity-summary-tile {
     display: block;
