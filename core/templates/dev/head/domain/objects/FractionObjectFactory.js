@@ -16,6 +16,7 @@
  * @fileoverview Factory for creating instances of Fraction
  * domain objects.
  */
+
 oppia.constant('FractionParsingErrors', {
   InvalidChars:
     'Please only use numerical digits, spaces or forward slashes (/)',
