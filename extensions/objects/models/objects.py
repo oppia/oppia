@@ -171,6 +171,20 @@ class NonnegativeInt(BaseObject):
         }]
     }
 
+class PositiveInt(BaseObject):
+    """Nonnegative integer class."""
+
+    description = 'A positive integer.'
+    default_value = 1
+
+    SCHEMA = {
+        'type': 'int',
+        'validators': [{
+            'id': 'is_at_least',
+            'min_value': 1
+        }]
+    }
+
 
 class CodeString(BaseObject):
     """Code string class. This is like a normal string, but it should not
@@ -808,6 +822,6 @@ class Fraction(BaseObject):
             'schema': NonnegativeInt.SCHEMA
         }, {
             'name': 'denominator',
-            'schema': NonnegativeInt.SCHEMA
+            'schema': PositiveInt.SCHEMA
         }]
     }

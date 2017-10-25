@@ -78,6 +78,15 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.NonnegativeInt, mappings, invalid_vals)
 
+    def test_positive_int_validation(self):
+        """Tests objects of type PositiveInt."""
+        mappings = [(20, 20), ('20', 20), ('02', 2), (3.00, 3),
+                    (3.05, 3), ]
+        invalid_vals = ['a', '', {'a': 3}, [3], None, -1, '-1', 0, '0']
+
+        self.check_normalization(
+            objects.NonnegativeInt, mappings, invalid_vals)
+
     def test_code_evaluation_validation(self):
         """Tests objects of type codeEvaluation."""
         mappings = [(
@@ -406,6 +415,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
                           self._create_fraction_dict(False, -10, 11, 3),
                           self._create_fraction_dict(False, 10, -11, 3),
                           self._create_fraction_dict(False, -10, -11, -3),
+                          self._create_fraction_dict(False, 1, 1, 0),
                           {},
                           '1/3',
                           1]
@@ -431,7 +441,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEquals(count, 31)
+        self.assertEquals(count, 32)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
