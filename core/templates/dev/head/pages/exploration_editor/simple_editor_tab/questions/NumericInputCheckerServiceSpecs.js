@@ -82,5 +82,4 @@
      }];
      expect(nics.isValid('', answerGroupsFalse)).toBe(false);
    });
-
  });
