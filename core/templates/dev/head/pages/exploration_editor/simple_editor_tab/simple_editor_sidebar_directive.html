@@ -13,17 +13,24 @@
         ng-click="scrollToHeader('intro')" class="sidebar-item sidebar-header">
       <strong>Introduction</strong>
     </li>
-
-    <li class="sidebar-item" ng-repeat="question in questionList.getQuestions() track by $index">
-      <div id="<[ID_PREFIX + question.getId()]>" class="sidebar-item-header">
-        <i ng-click="question.toggleCollapse()" class="collapse-icon material-icons" ng-hide="sidebarModeService.isSidebarInEditMode()">
+  </ul>
+  <div id="sidebar-question-container">
+    <ul ui-sortable="SIDEBAR_SORTABLE_OPTIONS" ng-model="_questions">
+      <li class="sidebar-item" ng-repeat="question in questionList.getQuestions() track by $index" class="oppia-rule-block oppia-sortable-rule-block oppia-prevent-selection">
+        <div id="<[ID_PREFIX + question.getId()]>" class="sidebar-item-header">
+          <i ng-click="question.toggleCollapse()" class="collapse-icon material-icons" ng-hide="sidebarModeService.isSidebarInEditMode()">
           <[isCollapsed(question) ? '&#xE5C7;' : '&#xE5C5;']>
-        </i>
-        <i ng-click="deleteQuestion(question)" class="delete-icon material-icons" ng-hide="sidebarModeService.isSidebarInReadonlyMode()">
+          </i>
+          <i ng-click="deleteQuestion(question)" class="delete-icon material-icons" ng-hide="sidebarModeService.isSidebarInReadonlyMode()">
           <['&#xE872;']>
-        </i>
-        <strong ng-click="scrollToQuestion(question)">Question <[$index + 1]></strong>
-      </div>
+          </i>
+          <strong ng-click="scrollToQuestion(question)">Question <[$index + 1]></strong>
+          <span class="right-edge"><a>
+          <i class="oppia-rule-sort-handle drag-handle material-icons" ng-hide="sidebarModeService.isSidebarInReadonlyMode()"></a>
+          <['&#xE25D;']>
+          </i>
+          </span>
+        </div>
 
       <ul ng-show="question.isCollapsed() && sidebarModeService.isSidebarInReadonlyMode()">
         <li class="sidebar-item sidebar-item-indented"
@@ -152,5 +159,25 @@
   simple-editor-sidebar .edit-mode-button {
     position: absolute;
     right: 0;
+  }
+
+  simple-editor-sidebar .right-edge{
+    vertical-align: middle;
+  }
+
+  simple-editor-sidebar .selected{
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  }
+
+  simple-editor-sidebar .oppia-rule-sort-handle{
+    cursor: move;
+    right: 5px;
+    left: auto;
+    margin-left: 5px;
+    opacity: 0.3;
+    position: absolute;
+    top: 8px;
+    width: 25px;
+    z-index: 1;
   }
 </style>

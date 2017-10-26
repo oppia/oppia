@@ -94,6 +94,10 @@ oppia.factory('QuestionListObjectFactory', [function() {
       'Cannot find question corresponding to state named: ' + stateName);
   };
 
+  QuestionList.prototype.getBindableQuestions = function() {
+    return this._questions;
+  };
+
   // Returns a copy of the last question in the list.
   QuestionList.prototype.getLastQuestion = function() {
     return angular.copy(this._questions[this._questions.length - 1]);

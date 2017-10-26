@@ -22,12 +22,14 @@
 
 oppia.factory('SimpleEditorManagerService', [
   'AnswerGroupObjectFactory', 'explorationInitStateNameService',
-  'OutcomeObjectFactory', 'QuestionObjectFactory', 'QuestionListObjectFactory',
-  'RuleObjectFactory', 'StatesToQuestionsService', 'SimpleEditorShimService',
+  'OutcomeObjectFactory', 'QuestionListObjectFactory',
+  'QuestionObjectFactory', 'RuleObjectFactory', 'SimpleEditorShimService',
+  'StatesToQuestionsService',
   function(
-      AnswerGroupObjectFactory, explorationInitStateNameService,
-      OutcomeObjectFactory, QuestionObjectFactory, QuestionListObjectFactory,
-      RuleObjectFactory, StatesToQuestionsService, SimpleEditorShimService) {
+    AnswerGroupObjectFactory, explorationInitStateNameService,
+    OutcomeObjectFactory, QuestionListObjectFactory,
+    QuestionObjectFactory, RuleObjectFactory, SimpleEditorShimService,
+    StatesToQuestionsService) {
     var data = {
       title: null,
       introductionHtml: null,
@@ -77,6 +79,38 @@ oppia.factory('SimpleEditorManagerService', [
       SimpleEditorShimService.saveCustomizationArgs(
         stateName, END_EXPLORATION_INTERACTION.CUSTOMIZATION_ARGS);
       SimpleEditorShimService.saveDefaultOutcome(stateName, null);
+    };
+
+    // Changes both states and the present questionList to reflect the changes.
+    var redirectAllIncomingNodes = function(stateName, newStateName) {
+      var allStateNames = SimpleEditorShimService.getAllStateNames();
+      for (var i = 0; i < allStateNames.length; i++) {
+        var currentState = SimpleEditorShimService.getState(allStateNames[i]);
+        var newAnswerGroups = currentState.interaction.answerGroups;
+        var answerGroupsHaveChanged = false;
+        currentState.interaction.answerGroups.forEach(
+          function(answerGroup, idx) {
+            if (answerGroup.outcome.dest === stateName) {
+              newAnswerGroups[idx].outcome.dest = newStateName;
+              answerGroupsHaveChanged = true;
+            }
+          });
+        if (answerGroupsHaveChanged) {
+          SimpleEditorShimService.saveAnswerGroups(
+            allStateNames[i], newAnswerGroups);
+          data.questionList.getBindableQuestion(allStateNames[i])
+            .setAnswerGroups(newAnswerGroups);
+        }
+      }
+    };
+
+    var directAtoB = function(stateNameA, stateNameB) {
+      var answerGroupsA = SimpleEditorShimService.getState(stateNameA)
+        .interaction.answerGroups;
+      answerGroupsA[0].outcome.dest = stateNameB;
+      SimpleEditorShimService.saveAnswerGroups(stateNameA, answerGroupsA);
+      data.questionList.getBindableQuestion(stateNameA)
+        .setAnswerGroups(answerGroupsA);
     };
 
     return {
@@ -207,37 +241,72 @@ oppia.factory('SimpleEditorManagerService', [
           return;
         }
         var nextStateName = state.interaction.answerGroups[0].outcome.dest;
-        var allStateNames = SimpleEditorShimService.getAllStateNames();
         // Change init state name, if init_state is being deleted.
         if (SimpleEditorShimService.getInitStateName() === stateName) {
           explorationInitStateNameService.displayed = nextStateName;
           explorationInitStateNameService.saveDisplayedValue(nextStateName);
         }
-
-        for (var i = 0; i < allStateNames.length; i++) {
-          var currentState = SimpleEditorShimService
-            .getState(allStateNames[i]);
-          var newAnswerGroups = currentState.interaction.answerGroups;
-          var answerGroupsHaveChanged = false;
-          currentState.interaction.answerGroups.forEach(function(answerGroup,
-            idx) {
-            if (answerGroup.outcome.dest === stateName) {
-              newAnswerGroups[idx].outcome.dest = nextStateName;
-              answerGroupsHaveChanged = true;
-            }
-          });
-          if (answerGroupsHaveChanged) {
-            SimpleEditorShimService
-              .saveAnswerGroups(allStateNames[i], newAnswerGroups);
-            data.questionList.getBindableQuestion(allStateNames[i])
-              .setAnswerGroups(newAnswerGroups);
-          }
-        }
-
+        redirectAllIncomingNodes(stateName, nextStateName);
         SimpleEditorShimService.saveStateContent(nextStateName, state.content);
         SimpleEditorShimService.deleteState(stateName);
         data.questionList.removeQuestion(question);
       },
+
+      sortQuestions: function(sIndex, dIndex) {
+        var stateNamesInOrder = data.questionList.getAllStateNames();
+        var sStateName = stateNamesInOrder[sIndex];
+        var sState = SimpleEditorShimService.getState(sStateName);
+        var dStateName = stateNamesInOrder[dIndex];
+        var dState = SimpleEditorShimService.getState(dStateName);
+        if (dState.interaction.answerGroups.length === 0 ||
+          sState.interaction.answerGroups.length === 0) {
+          var newStateName = this.addState();
+          var newAnswerGroups = [];
+          newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+            RuleObjectFactory.createNew('Equals', {
+              x: 0
+            })
+          ], OutcomeObjectFactory.createEmpty(newStateName), false));
+          if (dState.interaction.answerGroups.length === 0) {
+            SimpleEditorShimService.saveAnswerGroups(dStateName,
+              newAnswerGroups);
+            dState.interaction.answerGroups = newAnswerGroups;
+          } else {
+            SimpleEditorShimService.saveAnswerGroups(sStateName,
+              newAnswerGroups);
+            sState.interaction.answerGroups = newAnswerGroups;
+          }
+        }
+        var sDestName = sState.interaction.answerGroups[0].outcome.dest;
+        var dDestName = dState.interaction.answerGroups[0].outcome.dest;
+
+        redirectAllIncomingNodes(sStateName, sDestName);
+        if (sIndex < dIndex) {
+          directAtoB(dStateName, sStateName);
+          directAtoB(sStateName, dDestName);
+          var tmp = SimpleEditorShimService.getState(dDestName).content;
+          SimpleEditorShimService.saveStateContent(
+            dDestName, SimpleEditorShimService.getState(sDestName).content);
+          SimpleEditorShimService.saveStateContent(sDestName, sState.content);
+          SimpleEditorShimService.saveStateContent(sStateName, tmp);
+          if (sStateName === SimpleEditorShimService.getInitStateName()) {
+            explorationInitStateNameService.displayed = sDestName;
+            explorationInitStateNameService.saveDisplayedValue(sDestName);
+          }
+        } else {
+          redirectAllIncomingNodes(dStateName, sStateName);
+          directAtoB(sStateName, dStateName);
+          var tmp = SimpleEditorShimService.getState(sDestName).content;
+          SimpleEditorShimService.saveStateContent(sDestName, sState.content);
+          SimpleEditorShimService.saveStateContent(sStateName, dState.content);
+          SimpleEditorShimService.saveStateContent(dStateName, tmp);
+          if (dStateName === SimpleEditorShimService.getInitStateName()) {
+            explorationInitStateNameService.displayed = sStateName;
+            explorationInitStateNameService.saveDisplayedValue(sStateName);
+          }
+        }
+      },
+
       canAddNewQuestion: function() {
         // Requirements:
         // - If this is the first question, there must already be an
