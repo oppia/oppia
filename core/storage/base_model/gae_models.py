@@ -530,6 +530,28 @@ class VersionedModel(BaseModel):
         # pylint: enable=protected-access
 
     @classmethod
+    def get_multi_versions(cls, entity_id, version_numbers):
+        """Gets model instances for each version specified in version_numbers.
+
+        Args:
+            entity_id: str. ID of the entity.
+            version_numbers: list(int). List of version numbers.
+
+        Returns:
+            list(VersionedModel|None). Model instances representing the given
+                versions.
+        """
+        instances = []
+        # pylint: disable=protected-access
+        for version in version_numbers:
+            cls.get(entity_id)._require_not_marked_deleted()
+            snapshot_id = cls._get_snapshot_id(entity_id, version)
+            instances.append(cls(id=entity_id)._reconstitute_from_snapshot_id(
+                snapshot_id))
+        # pylint: enable=protected-access
+        return instances
+
+    @classmethod
     def get(cls, entity_id, strict=True, version=None):
         """Gets model instance.
 
