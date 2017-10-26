@@ -27,8 +27,6 @@ oppia.directive('fractionEditor', [
       scope: true,
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: ['$scope', function($scope) {
-        $scope.alwaysEditable = true;
-        $scope.largeInput = false;
         var errorMessage = '';
         var fractionString = '0';
         if ($scope.$parent.value != null) {

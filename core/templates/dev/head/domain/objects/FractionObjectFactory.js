@@ -17,16 +17,16 @@
  * domain objects.
  */
 
-oppia.constant('FractionParsingErrors', {
-  InvalidChars:
+oppia.constant('FRACTION_PARSING_ERRORS', {
+  INVALID_CHARS:
     'Please only use numerical digits, spaces or forward slashes (/)',
-  InvalidFormat:
+  INVALID_FORMAT:
     'Please enter answer in fraction format (e.g. 5/3 or 1 2/3)',
-  DivideByZero: 'Please do not put 0 in the denominator'
+  DIVISION_BY_ZERO: 'Please do not put 0 in the denominator'
 });
 
 oppia.factory('FractionObjectFactory', [
-  'FractionParsingErrors', function(FractionParsingErrors) {
+  'FRACTION_PARSING_ERRORS', function(FRACTION_PARSING_ERRORS) {
     var Fraction = function(isNegative, wholeNumber, numerator, denominator) {
       this.isNegative = isNegative;
       this.wholeNumber = wholeNumber;
@@ -63,11 +63,11 @@ oppia.factory('FractionObjectFactory', [
     Fraction.fromRawInputString = function(rawInput) {
       var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
       if (INVALID_CHARS_REGEX.test(rawInput)) {
-        throw new Error(FractionParsingErrors.InvalidChars);
+        throw new Error(FRACTION_PARSING_ERRORS.INVALID_CHARS);
       }
       var FRACTION_REGEX = /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
       if (!FRACTION_REGEX.test(rawInput)) {
-        throw new Error(FractionParsingErrors.InvalidFormat);
+        throw new Error(FRACTION_PARSING_ERRORS.INVALID_FORMAT);
       }
       var isNegative = false;
       var wholeNumber = 0;
@@ -97,7 +97,7 @@ oppia.factory('FractionObjectFactory', [
         denominator = parseInt(numbers[2]);
       }
       if (denominator === 0) {
-        throw new Error(FractionParsingErrors.DivideByZero);
+        throw new Error(FRACTION_PARSING_ERRORS.DIVISION_BY_ZERO);
       }
       return new Fraction(isNegative, wholeNumber, numerator, denominator);
     };
