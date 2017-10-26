@@ -50,15 +50,15 @@
         </li>
       </ul>
     </li>
-    <li ng-click="addNewQuestion();" ng-hide="sidebarModeService.isSidebarInReadonlyMode()" class="sidebar-item">
-      <div class="sidebar-item-header" ng-class="canAddNewQuestion() ? 'sidebar-item' : 'sidebar-item-disabled'">
-        <i class="add-icon material-icons">
-          &#xe145;
-        </i>
-        <strong>Add new question</strong>
-      </div>
-    </li>
   </ul>
+  <div ng-click="addNewQuestion();" ng-hide="sidebarModeService.isSidebarInReadonlyMode()" >
+    <div class="add-question" ng-class="canAddNewQuestion() ? 'sidebar-item' : 'sidebar-item-disabled'">
+      <i class="add-icon material-icons">
+        &#xe145;
+      </i>
+      <strong>Add new question</strong>
+    </div>
+  </div>
 
 </div>
 
@@ -166,7 +166,15 @@
   }
 
   simple-editor-sidebar .selected{
-    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    background: #c6e2c9;
+    position: absolute;
+  }
+
+  simple-editor-sidebar .add-question{
+    color: #487349;
+    left: -30px;
+    position: relative;
+    width: 220px;
   }
 
   simple-editor-sidebar .oppia-rule-sort-handle{
