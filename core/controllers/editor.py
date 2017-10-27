@@ -723,7 +723,7 @@ class ExplorationStatisticsHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json(stats_services.get_exploration_stats(
-            exploration_id, current_exploration.version))
+            exploration_id, current_exploration.version).to_frontend_dict())
 
 
 class ExplorationStatsVersionsHandler(EditorHandler):

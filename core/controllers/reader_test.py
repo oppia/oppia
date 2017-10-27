@@ -812,7 +812,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         exploration = exp_services.get_exploration_by_id(self.exp_id)
 
         self.exp_version = exploration.version
-        self.state_name = 'text'
+        self.state_name = 'Home'
         self.session_id = 'session_id1'
         state_stats_mapping = {
             self.state_name: stats_domain.StateStats.create_default()
@@ -822,65 +822,28 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
             state_stats_mapping)
         stats_services.create_stats_model(exploration_stats)
 
-        self.event_dicts = [{
-            'event_type': feconf.EVENT_TYPE_ANSWER_SUBMITTED,
-            'old_state_name': self.state_name,
-            'answer': 'answer1',
-            'params': {},
-            'version': self.exp_version,
-            'session_id': self.session_id,
-            'client_time_spent_in_secs': 0,
-            'answer_group_index': 1,
-            'rule_spec_index': 1,
-            'classification_categorization': (
-                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
-        }, {
-            'event_type': feconf.EVENT_TYPE_STATE_HIT,
-            'new_state_name': self.state_name,
-            'old_params': {},
-            'exploration_version': self.exp_version,
-            'session_id': self.session_id,
-            'client_time_spent_in_secs': 0,
-            'is_first_hit': True
-        }, {
-            'event_type': feconf.EVENT_TYPE_STATE_COMPLETED,
-            'state_name': self.state_name,
-            'exp_version': self.exp_version,
-            'session_id': self.session_id,
-            'time_spent_in_state_secs': 0,
-        }, {
-            'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
-            'state_name': self.state_name,
-            'exploration_version': self.exp_version,
-            'session_id': self.session_id,
-        }, {
-            'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
-            'state_name': self.state_name,
-            'exploration_version': self.exp_version,
-            'session_id': self.session_id,
-            'time_spent_in_state_secs': 0,
-        }, {
-            'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
-            'state_name': self.state_name,
-            'collection_id': None,
-            'params': {},
-            'version': self.exp_version,
-            'session_id': self.session_id,
-            'client_time_spent_in_secs': 0,
-        }, {
-            'event_type': feconf.EVENT_TYPE_START_EXPLORATION,
-            'state_name': self.state_name,
-            'params': {},
-            'version': self.exp_version,
-            'session_id': self.session_id,
-        }]
+        self.aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
 
     def test_stats_events_handler(self):
         """Test the handler for handling batched events."""
         with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
             self.post_json('/explorehandler/stats_events/%s' % (
                 self.exp_id), {
-                    'event_dicts': self.event_dicts,
+                    'aggregated_stats': self.aggregated_stats,
                     'exp_version': self.exp_version})
 
         self.assertEqual(self.count_jobs_in_taskqueue(
@@ -904,10 +867,25 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
                 self.state_name].total_answers_count_v2, 1)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                self.state_name].useful_feedback_count_v2, 0)
+                self.state_name].useful_feedback_count_v2, 1)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 self.state_name].num_completions_v2, 1)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 self.state_name].num_times_solution_viewed_v2, 1)
+
+    def test_error_on_invalid_stats_dict(self):
+        """Test that exception is raised if the aggregated stats dict is
+        invalid.
+        """
+        self.aggregated_stats.pop('num_starts')
+        with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
+            self.post_json(
+                '/explorehandler/stats_events/%s' % (
+                    self.exp_id),
+                {
+                    'aggregated_stats': self.aggregated_stats,
+                    'exp_version': self.exp_version
+                },
+                expect_errors=True, expected_status_int=400)

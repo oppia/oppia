@@ -249,12 +249,53 @@ class StatsEventsHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
+    def validate_aggregated_stats(self, aggregated_stats):
+        """Checks whether the aggregated stats dict has the correct keys.
+
+        Args:
+            aggregated_stats: dict. Dict comprising of aggregated stats.
+
+        Returns:
+            Bool. True if the dict is valid.
+        """
+        valid_stats = True
+        if 'num_starts' not in aggregated_stats:
+            valid_stats = False
+        if 'num_completions' not in aggregated_stats:
+            valid_stats = False
+        if 'num_actual_starts' not in aggregated_stats:
+            valid_stats = False
+
+        for state_name in aggregated_stats['state_stats_mapping']:
+            if 'total_answers_count' not in aggregated_stats[
+                    'state_stats_mapping'][state_name]:
+                valid_stats = False
+            if 'useful_feedback_count' not in aggregated_stats[
+                    'state_stats_mapping'][state_name]:
+                valid_stats = False
+            if 'total_hit_count' not in aggregated_stats[
+                    'state_stats_mapping'][state_name]:
+                valid_stats = False
+            if 'first_hit_count' not in aggregated_stats[
+                    'state_stats_mapping'][state_name]:
+                valid_stats = False
+            if 'num_times_solution_viewed' not in aggregated_stats[
+                    'state_stats_mapping'][state_name]:
+                valid_stats = False
+            if 'num_completions' not in aggregated_stats[
+                    'state_stats_mapping'][state_name]:
+                valid_stats = False
+
+        return valid_stats
+
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
-        event_dicts = self.payload.get('event_dicts')
+        aggregated_stats = self.payload.get('aggregated_stats')
         exp_version = self.payload.get('exp_version')
+        if not self.validate_aggregated_stats(aggregated_stats):
+            raise self.InvalidInputException
         event_services.StatsEventsHandler.record(
-            exploration_id, exp_version, event_dicts)
+            exploration_id, exp_version, aggregated_stats)
         self.render_json({})
 
 

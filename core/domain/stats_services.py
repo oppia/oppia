@@ -22,22 +22,23 @@ from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.domain import stats_domain
 from core.platform import models
-import feconf
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+transaction_services = models.Registry.import_transaction_services()
+
 
 # Counts contributions from all versions.
 VERSION_ALL = 'all'
 
 def get_exploration_stats(exp_id, exp_version):
-    """Retrieves the ExplorationStatsModel and returns it in dict format.
+    """Retrieves the ExplorationStats domain instance.
 
     Args:
         exp_id: str. ID of the exploration.
         exp_version: int. Version of the exploration.
 
     Returns:
-        dict. The ExplorationStatsModel's dict format.
+        ExplorationStats. The exploration stats domain object.
     """
     exploration_stats = get_exploration_stats_by_id(exp_id, exp_version)
 
@@ -45,52 +46,48 @@ def get_exploration_stats(exp_id, exp_version):
         exploration_stats = stats_domain.ExplorationStats.create_default(
             exp_id, exp_version, {})
 
-    return exploration_stats.to_frontend_dict()
+    return exploration_stats
 
-def update_stats(exp_id, exp_version, event_params):
-    """Updates ExplorationStatsModel according to the incoming events.
+def update_stats(exp_id, exp_version, aggregated_stats):
+    """Updates ExplorationStatsModel according to the dict containing aggregated
+    stats.
 
     Args:
         exp_id: str. ID of the exploration.
         exp_version: int. Version of the exploration.
-        event_params: list(dict). List of params of all events.
+        aggregated_stats: dict. Dict representing an ExplorationStatsModel
+            instance with stats aggregated in the frontend.
     """
     exploration_stats = get_exploration_stats_by_id(
         exp_id, exp_version)
 
-    for event_param in event_params:
-        event_type = event_param['event_type']
-        update_params = event_param['update_params']
-        if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
-            exploration_stats.num_starts_v2 += 1
-        elif event_type == feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION:
-            exploration_stats.num_actual_starts_v2 += 1
-        elif event_type == feconf.EVENT_TYPE_COMPLETE_EXPLORATION:
-            exploration_stats.num_completions_v2 += 1
-        elif event_type == feconf.EVENT_TYPE_ANSWER_SUBMITTED:
-            state_name = event_param['state_name']
-            exploration_stats.state_stats_mapping[
-                state_name].total_answers_count_v2 += 1
-            if update_params['feedback_is_useful']:
-                exploration_stats.state_stats_mapping[
-                    state_name].useful_feedback_count_v2 += 1
-        elif event_type == feconf.EVENT_TYPE_STATE_HIT:
-            state_name = event_param['state_name']
-            exploration_stats.state_stats_mapping[
-                state_name].total_hit_count_v2 += 1
-            if update_params['is_first_hit']:
-                exploration_stats.state_stats_mapping[
-                    state_name].first_hit_count_v2 += 1
-        elif event_type == feconf.EVENT_TYPE_STATE_COMPLETED:
-            state_name = event_param['state_name']
-            exploration_stats.state_stats_mapping[
-                state_name].num_completions_v2 += 1
-        elif event_type == feconf.EVENT_TYPE_SOLUTION_HIT:
-            state_name = event_param['state_name']
-            exploration_stats.state_stats_mapping[
-                state_name].num_times_solution_viewed_v2 += 1
+    exploration_stats.num_starts_v2 += aggregated_stats['num_starts']
+    exploration_stats.num_completions_v2 += aggregated_stats['num_completions']
+    exploration_stats.num_actual_starts_v2 += aggregated_stats[
+        'num_actual_starts']
 
-    save_stats_model(exploration_stats)
+    for state_name in aggregated_stats['state_stats_mapping']:
+        exploration_stats.state_stats_mapping[
+            state_name].total_answers_count_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['total_answers_count']
+        exploration_stats.state_stats_mapping[
+            state_name].useful_feedback_count_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['useful_feedback_count']
+        exploration_stats.state_stats_mapping[
+            state_name].total_hit_count_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['total_hit_count']
+        exploration_stats.state_stats_mapping[
+            state_name].first_hit_count_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['first_hit_count']
+        exploration_stats.state_stats_mapping[
+            state_name].num_times_solution_viewed_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['num_times_solution_viewed']
+        exploration_stats.state_stats_mapping[
+            state_name].num_completions_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['num_completions']
+
+    transaction_services.run_in_transaction(
+        save_stats_model, exploration_stats)
 
 
 def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):

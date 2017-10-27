@@ -66,72 +66,17 @@ class BaseEventHandler(object):
 
 
 class StatsEventsHandler(BaseEventHandler):
-    """Event handler for incremental update of analytics model using batched
-    event models.
+    """Event handler for incremental update of analytics model using aggregated
+    stats data.
     """
 
     EVENT_TYPE = feconf.EVENT_TYPE_ALL_STATS
 
     @classmethod
-    def _handle_event(cls, exploration_id, exp_version, event_dicts):
-        event_params = []
-
-        for event_dict in event_dicts:
-            if event_dict['event_type'] == feconf.EVENT_TYPE_START_EXPLORATION:
-                event_params.append({
-                    'event_type': event_dict['event_type'],
-                    'update_params': {}
-                })
-            elif event_dict[
-                    'event_type'] == feconf.EVENT_TYPE_COMPLETE_EXPLORATION:
-                event_params.append({
-                    'event_type': event_dict['event_type'],
-                    'update_params': {}
-                })
-            elif event_dict[
-                    'event_type'] == feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION:
-                event_params.append({
-                    'event_type': event_dict['event_type'],
-                    'update_params': {}
-                })
-            elif event_dict['event_type'] == feconf.EVENT_TYPE_ANSWER_SUBMITTED:
-                feedback_is_useful = (
-                    event_dict['classification_categorization'] != (
-                        exp_domain.DEFAULT_OUTCOME_CLASSIFICATION))
-                update_params = {
-                    'feedback_is_useful': feedback_is_useful
-                }
-                event_params.append({
-                    'event_type': event_dict['event_type'],
-                    'state_name': event_dict['old_state_name'],
-                    'update_params': update_params
-                })
-            elif event_dict['event_type'] == feconf.EVENT_TYPE_STATE_HIT:
-                is_first_hit = event_dict['is_first_hit']
-                update_params = {
-                    'is_first_hit': is_first_hit
-                }
-                event_params.append({
-                    'event_type': event_dict['event_type'],
-                    'state_name': event_dict['new_state_name'],
-                    'update_params': update_params
-                })
-            elif event_dict['event_type'] == feconf.EVENT_TYPE_SOLUTION_HIT:
-                event_params.append({
-                    'event_type': event_dict['event_type'],
-                    'state_name': event_dict['state_name'],
-                    'update_params': {}
-                })
-            elif event_dict['event_type'] == feconf.EVENT_TYPE_STATE_COMPLETED:
-                event_params.append({
-                    'event_type': event_dict['event_type'],
-                    'state_name': event_dict['state_name'],
-                    'update_params': {}
-                })
-
+    def _handle_event(cls, exploration_id, exp_version, aggregated_stats):
         taskqueue_services.defer(
             stats_services.update_stats, taskqueue_services.QUEUE_NAME_STATS,
-            exploration_id, exp_version, event_params)
+            exploration_id, exp_version, aggregated_stats)
 
 
 class AnswerSubmissionEventHandler(BaseEventHandler):

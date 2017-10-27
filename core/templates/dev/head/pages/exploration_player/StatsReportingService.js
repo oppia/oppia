@@ -46,12 +46,12 @@ oppia.factory('StatsReportingService', [
   '$http', '$interval', 'StopwatchObjectFactory', 'MessengerService',
   'UrlInterpolationService', 'STATS_REPORTING_URLS', 'siteAnalyticsService',
   'ENABLE_NEW_STATS_FRAMEWORK', 'STATS_EVENT_TYPES',
-  'explorationContextService', 'PAGE_CONTEXT',
+  'explorationContextService', 'PAGE_CONTEXT', 'DEFAULT_OUTCOME_CLASSIFICATION',
   function(
       $http, $interval, StopwatchObjectFactory, MessengerService,
       UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService,
       ENABLE_NEW_STATS_FRAMEWORK, STATS_EVENT_TYPES,
-      explorationContextService, PAGE_CONTEXT) {
+      explorationContextService, PAGE_CONTEXT, DEFAULT_OUTCOME_CLASSIFICATION) {
     var explorationId = null;
     var explorationTitle = null;
     var explorationVersion = null;
@@ -65,10 +65,30 @@ oppia.factory('StatsReportingService', [
     var _editorPreviewMode = (
       explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
 
-    // The following list of dicts will contain all events accumulated over the
-    // interval time and will be reset when events are sent to backend for
+    // The following dict will contain all stats data accumulated over the
+    // interval time and will be reset when the dict is sent to backend for
     // recording.
-    var eventDicts = [];
+    var aggregatedStats = {};
+
+    var refreshAggregatedStats = function() {
+      aggregatedStats = {
+        num_starts: 0,
+        num_completions: 0,
+        num_actual_starts: 0,
+        state_stats_mapping: {}
+      };
+    };
+
+    var createDefaultStateStatsMapping = function(stateName) {
+      aggregatedStats.state_stats_mapping[stateName] = {
+        total_answers_count: 0,
+        useful_feedback_count: 0,
+        total_hit_count: 0,
+        first_hit_count: 0,
+        num_times_solution_viewed: 0,
+        num_completions: 0
+      }
+    };
 
     var getFullStatsUrl = function(urlIdentifier) {
       return UrlInterpolationService.interpolateUrl(
@@ -77,19 +97,18 @@ oppia.factory('StatsReportingService', [
         });
     };
 
-    if (ENABLE_NEW_STATS_FRAMEWORK && !_editorPreviewMode && (
-        !explorationIsComplete)) {
+    if (ENABLE_NEW_STATS_FRAMEWORK && !_editorPreviewMode) {
       $interval(function() {
-        postEventsToBackend();
+        postStatsToBackend();
       }, 10000);
     }
 
-    var postEventsToBackend = function() {
+    var postStatsToBackend = function() {
       $http.post(getFullStatsUrl('STATS_EVENTS'), {
-        event_dicts: eventDicts,
+        aggregated_stats: aggregatedStats,
         exp_version: explorationVersion
       });
-      eventDicts = [];
+      refreshAggregatedStats();
     };
 
     return {
@@ -102,29 +121,18 @@ oppia.factory('StatsReportingService', [
         sessionId = newSessionId;
         stateStopwatch = StopwatchObjectFactory.create();
         optionalCollectionId = collectionId;
+        refreshAggregatedStats();
       },
       // Note that this also resets the stateStopwatch.
       recordExplorationStarted: function(stateName, params) {
         if (ENABLE_NEW_STATS_FRAMEWORK) {
-          eventDicts.push({
-            event_type: STATS_EVENT_TYPES.EVENT_TYPE_START_EXPLORATION,
-            params: params,
-            session_id: sessionId,
-            state_name: stateName,
-            version: explorationVersion
-          });
+          aggregatedStats.num_starts += 1
 
-          eventDicts.push({
-            event_type: STATS_EVENT_TYPES.EVENT_TYPE_STATE_HIT,
-            client_time_spent_in_secs: 0.0,
-            old_params: params,
-            session_id: sessionId,
-            new_state_name: stateName,
-            exploration_version: explorationVersion,
-            is_first_hit: true
-          });
+          createDefaultStateStatsMapping(stateName);
+          aggregatedStats.state_stats_mapping[stateName].total_hit_count += 1
+          aggregatedStats.state_stats_mapping[stateName].first_hit_count += 1
 
-          postEventsToBackend();
+          postStatsToBackend();
         }
 
         $http.post(getFullStatsUrl('EXPLORATION_STARTED'), {
@@ -155,12 +163,7 @@ oppia.factory('StatsReportingService', [
       },
       recordExplorationActuallyStarted: function(stateName) {
         if (ENABLE_NEW_STATS_FRAMEWORK) {
-          eventDicts.push({
-            event_type: STATS_EVENT_TYPES.EVENT_TYPE_ACTUAL_START_EXPLORATION,
-            exploration_version: explorationVersion,
-            state_name: stateName,
-            session_id: sessionId
-          });
+          aggregatedStats.num_actual_starts += 1
         }
 
         $http.post(getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
@@ -171,13 +174,11 @@ oppia.factory('StatsReportingService', [
       },
       recordSolutionHit: function(stateName) {
         if (ENABLE_NEW_STATS_FRAMEWORK) {
-          eventDicts.push({
-            event_type: STATS_EVENT_TYPES.EVENT_TYPE_SOLUTION_HIT,
-            exploration_version: explorationVersion,
-            state_name: stateName,
-            session_id: sessionId,
-            time_spent_in_state_secs: stateStopwatch.getTimeInSecs()
-          });
+          if (!aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
+            createDefaultStateStatsMapping(stateName);
+          }
+          aggregatedStats.state_stats_mapping[
+            stateName].num_times_solution_viewed += 1
         }
 
         $http.post(getFullStatsUrl('SOLUTION_HIT'), {
@@ -191,15 +192,15 @@ oppia.factory('StatsReportingService', [
       recordStateTransition: function(
           oldStateName, newStateName, answer, oldParams, isFirstHit) {
         if (ENABLE_NEW_STATS_FRAMEWORK) {
-          eventDicts.push({
-            event_type: STATS_EVENT_TYPES.EVENT_TYPE_STATE_HIT,
-            client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
-            exploration_version: explorationVersion,
-            new_state_name: newStateName,
-            old_params: oldParams,
-            session_id: sessionId,
-            is_first_hit: isFirstHit
-          });
+          if (!aggregatedStats.state_stats_mapping.hasOwnProperty(
+              newStateName)) {
+            createDefaultStateStatsMapping(newStateName);
+          }
+          aggregatedStats.state_stats_mapping[newStateName].total_hit_count += 1
+          if (isFirstHit) {
+            aggregatedStats.state_stats_mapping[
+              newStateName].first_hit_count += 1
+          }
         }
 
         $http.post(getFullStatsUrl('STATE_HIT'), {
@@ -230,13 +231,10 @@ oppia.factory('StatsReportingService', [
       },
       recordStateCompleted: function(stateName) {
         if (ENABLE_NEW_STATS_FRAMEWORK) {
-          eventDicts.push({
-            event_type: STATS_EVENT_TYPES.EVENT_TYPE_STATE_COMPLETED,
-            exp_version: explorationVersion,
-            state_name: stateName,
-            session_id: sessionId,
-            time_spent_in_state_secs: stateStopwatch.getTimeInSecs()
-          });
+          if (!aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
+            createDefaultStateStatsMapping(stateName);
+          }
+          aggregatedStats.state_stats_mapping[stateName].num_completions += 1
         }
 
         $http.post(getFullStatsUrl('STATE_COMPLETED'), {
@@ -248,15 +246,7 @@ oppia.factory('StatsReportingService', [
       },
       recordExplorationCompleted: function(stateName, params) {
         if (ENABLE_NEW_STATS_FRAMEWORK) {
-          eventDicts.push({
-            event_type: STATS_EVENT_TYPES.EVENT_TYPE_COMPLETE_EXPLORATION,
-            version: explorationVersion,
-            state_name: stateName,
-            session_id: sessionId,
-            client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
-            params: params,
-            collection_id: optionalCollectionId
-          });
+          aggregatedStats.num_completions += 1
         }
         $http.post(getFullStatsUrl('EXPLORATION_COMPLETED'), {
           client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
@@ -275,25 +265,22 @@ oppia.factory('StatsReportingService', [
         siteAnalyticsService.registerFinishExploration();
         explorationIsComplete = true;
         if (ENABLE_NEW_STATS_FRAMEWORK) {
-          postEventsToBackend();
+          postStatsToBackend();
         }
       },
       recordAnswerSubmitted: function(
           stateName, params, answer, answerGroupIndex, ruleIndex,
           classificationCategorization) {
         if (ENABLE_NEW_STATS_FRAMEWORK) {
-          eventDicts.push({
-            event_type: STATS_EVENT_TYPES.EVENT_TYPE_ANSWER_SUBMITTED,
-            answer: answer,
-            params: params,
-            version: explorationVersion,
-            session_id: sessionId,
-            client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
-            old_state_name: stateName,
-            answer_group_index: answerGroupIndex,
-            rule_spec_index: ruleIndex,
-            classification_categorization: classificationCategorization
-          });
+          if (!aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
+            createDefaultStateStatsMapping(stateName);
+          }
+          aggregatedStats.state_stats_mapping[
+            stateName].total_answers_count += 1
+          if (classificationCategorization !== DEFAULT_OUTCOME_CLASSIFICATION) {
+            aggregatedStats.state_stats_mapping[
+              stateName].useful_feedback_count += 1
+          }
         }
         $http.post(getFullStatsUrl('ANSWER_SUBMITTED'), {
           answer: answer,
@@ -318,7 +305,7 @@ oppia.factory('StatsReportingService', [
         });
 
         if (ENABLE_NEW_STATS_FRAMEWORK) {
-          postEventsToBackend();
+          postStatsToBackend();
         }
       }
     };
