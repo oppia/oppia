@@ -9,7 +9,7 @@
 </span>
 <span ng-if="!allHintsAreExhausted()">
   <span ng-if="currentHintIsAvailable()" tooltip-is-open="isShowingHintTooltip" tooltip="<[isShowingNeedHintMessage ? ('I18N_PLAYER_HINT_NEED_A_HINT' | translate) : ('I18N_PLAYER_HINT_IS_AVAILABLE' | translate)]>" tooltip-placement="<[getTooltipPlacement()]>" ng-mouseover="hideNeedHintMessage()">
-    <md-button class="hint-button"
+    <md-button class="hint-button protractor-test-view-hint"
                ng-click="onClickHintButton()"
                ng-disabled="!currentHintIsAvailable()"
                aria-label="Hint">
