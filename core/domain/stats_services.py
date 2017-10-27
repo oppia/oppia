@@ -151,6 +151,31 @@ def get_exploration_stats_by_id(exp_id, exp_version):
     return exploration_stats
 
 
+def get_multiple_exploration_stats_by_version(exp_id, version_numbers):
+    """Returns a list of ExplorationStats domain objects corresponding to the
+    specified versions.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        version_numbers: list(int). List of version numbers.
+
+    Returns:
+        list(ExplorationStats|None). List of ExplorationStats domain class
+            instances.
+    """
+    exploration_stats = []
+    exploration_stats_models = (
+        stats_models.ExplorationStatsModel.get_multi_versions(
+            exp_id, version_numbers))
+    for exploration_stats_model in exploration_stats_models:
+        if exploration_stats_model is None:
+            exploration_stats.append(None)
+        else:
+            exploration_stats.append(get_exploration_stats_from_model(
+                exploration_stats_model))
+    return exploration_stats
+
+
 def get_exploration_stats_from_model(exploration_stats_model):
     """Gets an ExplorationStats domain object from an ExplorationStatsModel
     instance.

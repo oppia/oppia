@@ -16,12 +16,14 @@
 
 import ast
 import collections
+import logging
 
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
+from core.domain import stats_services
 from core.platform import models
 
 import feconf
@@ -137,88 +139,66 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         num_completions = 0
         num_actual_starts = 0
 
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        try:
+            exploration = exp_services.get_exploration_by_id(exp_id)
+        except Exception as e:
+            logging.error(e)
+            return
+
         latest_exp_version = exploration.version
 
         version_numbers = range(1, latest_exp_version + 1)
         explorations_by_version = (
             exp_services.get_multiple_explorations_by_version(
                 exp_id, version_numbers))
+        exploration_stats_by_version = (
+            stats_services.get_multiple_exploration_stats_by_version(
+                exp_id, version_numbers))
 
         # The list of exploration start counts mapped by version.
-        start_exploration_counts_by_version = {}
+        start_exploration_counts_by_version = collections.defaultdict(lambda: 0)
         # The list of exploration complete counts mapped by version.
-        complete_exploration_counts_by_version = {}
+        complete_exploration_counts_by_version = collections.defaultdict(
+            lambda: 0)
         # The dict of state hit counts mapped by version.
-        state_hit_counts_by_version = {}
+        state_hit_counts_by_version = collections.defaultdict(
+            lambda: collections.defaultdict(lambda: {
+                'total_hit_count': 0,
+                'first_hit_count': 0
+            }))
         # The dict of state answer counts mapped by version.
-        state_answer_counts_by_version = {}
-        # The list of session_ids of learners completing an exploration.
-        completed_session_ids = []
+        state_answer_counts_by_version = collections.defaultdict(lambda: {})
+        # The set of session_ids of learners completing an exploration.
+        completed_session_ids = set()
         # Dict mapping versions -> sessionID -> StateHitEvents.
-        session_id_state_hit_event_mapping = {}
-        # Dict mapping each state name of the exploration and the list of
-        # unique session IDs that have entered that state.
-        state_session_ids_by_version = {}
+        session_id_state_hit_event_mapping = collections.defaultdict(
+            lambda: collections.defaultdict(list))
+        # Dict mapping versions -> state_names -> set(sessionIDs)
+        state_session_ids_by_version = collections.defaultdict(
+            lambda: collections.defaultdict(set))
 
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
+            version_str = str(value['version'])
 
             if value['event_type'] == feconf.EVENT_TYPE_START_EXPLORATION:
-                if str(value['version']) not in (
-                        start_exploration_counts_by_version):
-                    start_exploration_counts_by_version[
-                        str(value['version'])] = 0
-                start_exploration_counts_by_version[str(value['version'])] += 1
+                start_exploration_counts_by_version[version_str] += 1
             elif value['event_type'] == feconf.EVENT_TYPE_COMPLETE_EXPLORATION:
-                if str(value['version']) not in (
-                        complete_exploration_counts_by_version):
-                    complete_exploration_counts_by_version[
-                        str(value['version'])] = 0
-                complete_exploration_counts_by_version[
-                    str(value['version'])] += 1
-                completed_session_ids.append(value['session_id'])
+                complete_exploration_counts_by_version[version_str] += 1
+                completed_session_ids.add(value['session_id'])
             elif value['event_type'] == feconf.EVENT_TYPE_STATE_HIT:
-                if str(value['version']) not in state_hit_counts_by_version:
-                    state_hit_counts_by_version[str(value['version'])] = {}
-                if str(value['version']) not in state_session_ids_by_version:
-                    state_session_ids_by_version[str(value['version'])] = {}
-                if value['state_name'] not in state_hit_counts_by_version[
-                        str(value['version'])]:
-                    state_hit_counts_by_version[str(value['version'])][value[
-                        'state_name']] = {
-                            'total_hit_count': 0,
-                            'first_hit_count': 0
-                        }
-                if value['state_name'] not in state_session_ids_by_version[
-                        str(value['version'])]:
-                    state_session_ids_by_version[str(value['version'])][
-                        value['state_name']] = set()
-                state_hit_counts_by_version[str(value['version'])][value[
-                    'state_name']]['total_hit_count'] += 1
-                if value['session_id'] not in state_session_ids_by_version[
-                        str(value['version'])][value['state_name']]:
-                    state_hit_counts_by_version[str(value['version'])][value[
-                        'state_name']]['first_hit_count'] += 1
-                    state_session_ids_by_version[str(value['version'])][value[
-                        'state_name']].add(value['session_id'])
+                state_name = value['state_name']
+                session_id = value['session_id']
+                state_hit_counts_by_version[version_str][state_name][
+                    'total_hit_count'] += 1
+                state_session_ids_by_version[version_str][state_name].add(
+                    session_id)
 
-                if str(value['version']) not in (
-                        session_id_state_hit_event_mapping):
-                    session_id_state_hit_event_mapping[
-                        str(value['version'])] = {}
-                if value['session_id'] not in (
-                        session_id_state_hit_event_mapping[str(value[
-                            'version'])]):
-                    session_id_state_hit_event_mapping[str(value['version'])][
-                        value['session_id']] = []
-                session_id_state_hit_event_mapping[str(value['version'])][
-                    value['session_id']].append(value)
+                session_id_state_hit_event_mapping[version_str][
+                    session_id].append(value)
             elif value['event_type'] == (
                     GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS):
-                if str(value['version']) not in state_answer_counts_by_version:
-                    state_answer_counts_by_version[str(value['version'])] = {}
-                state_answer_counts_by_version[str(value['version'])][
+                state_answer_counts_by_version[version_str][
                     value['state_name']] = {
                         'total_answers_count': value['total_answers_count'],
                         'useful_feedback_count': value['useful_feedback_count']
@@ -232,17 +212,13 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         exploration_stats_list = []
         for version in version_numbers:
             state_hit_counts_for_this_version = {}
-            if str(version) in state_hit_counts_by_version:
-                state_hit_counts_for_this_version = (
-                    state_hit_counts_by_version[str(version)])
-            state_answer_counts_for_this_version = {}
-            if str(version) in state_answer_counts_by_version:
-                state_answer_counts_for_this_version = (
-                    state_answer_counts_by_version[str(version)])
+            state_hit_counts_for_this_version = (
+                state_hit_counts_by_version[str(version)])
+            state_answer_counts_for_this_version = (
+                state_answer_counts_by_version[str(version)])
             session_id_state_hit_event_mapping_for_this_version = {}
-            if str(version) in session_id_state_hit_event_mapping:
-                session_id_state_hit_event_mapping_for_this_version = (
-                    session_id_state_hit_event_mapping[str(version)])
+            session_id_state_hit_event_mapping_for_this_version = (
+                session_id_state_hit_event_mapping[str(version)])
 
             versioned_exploration = explorations_by_version[version - 1]
 
@@ -288,11 +264,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 }
 
             # Computing num_starts and num_completions.
-            if str(version) in start_exploration_counts_by_version:
-                num_starts += start_exploration_counts_by_version[str(version)]
-            if str(version) in complete_exploration_counts_by_version:
-                num_completions += complete_exploration_counts_by_version[
-                    str(version)]
+            num_starts += start_exploration_counts_by_version[str(version)]
+            num_completions += complete_exploration_counts_by_version[
+                str(version)]
 
             # Compute total_hit_count and first_hit_count for the states.
             for state_name in state_hit_counts_for_this_version:
@@ -300,8 +274,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     state_hit_counts_for_this_version[state_name][
                         'total_hit_count'])
                 state_stats_mapping[state_name].first_hit_count_v1 += (
-                    state_hit_counts_for_this_version[state_name][
-                        'first_hit_count'])
+                    len(state_session_ids_by_version[str(version)][state_name]))
 
             # Compute num_completions for the states.
             for session_id in (
@@ -337,39 +310,38 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     state_answer_counts_for_this_version[state_name][
                         'useful_feedback_count'])
 
-            # Now that the stats for the exploration's version are computed,
-            # calculate num_actual_starts. To compute this, we take the max of
-            # the first hit counts of all states that the initial state leads
-            # to. The max is taken instead of sum because the sum of
-            # first_hit_counts will sometimes end up counting a single learner
-            # twice. The max of both first hit counts ensures that we are
-            # counting only unique learners who traversed past the initial
-            # state.
-            init_state = versioned_exploration.states[
-                versioned_exploration.init_state_name]
-            max_first_hit_from_init_state = max([
-                state_stats_mapping[
-                    answer_group.outcome.dest].first_hit_count_v1
-                for answer_group in init_state.interaction.answer_groups if (
-                    answer_group.outcome.dest != (
-                        versioned_exploration.init_state_name))] or [0])
             # If the exploration has only one state, then the number of actual
             # starts will be equal to the number of starts.
             if len(versioned_exploration.states) == 1:
                 num_actual_starts = num_starts
             else:
+                # Now that the stats for the exploration's version are computed,
+                # calculate num_actual_starts. To compute this, we take the max
+                # of the first hit counts of all states that the initial state
+                # leads to. The max is taken instead of sum because the sum of
+                # first_hit_counts will sometimes end up counting a single
+                # learner twice. The max of both first hit counts ensures that
+                # we arecounting only unique learners who traversed past the
+                # initial state.
+                init_state = versioned_exploration.states[
+                    versioned_exploration.init_state_name]
+                max_first_hit_from_init_state = max([
+                    state_stats_mapping[
+                        answer_group.outcome.dest].first_hit_count_v1
+                    for answer_group in init_state.interaction.answer_groups
+                    if answer_group.outcome.dest != (
+                        versioned_exploration.init_state_name)] or [0])
                 num_actual_starts = max_first_hit_from_init_state
 
             # Check if model already exists. If it does, update it, otherwise
             # create a fresh ExplorationStatsModel instance.
-            exploration_stats_model = (
-                stats_models.ExplorationStatsModel.get_model(exp_id, version))
-            if exploration_stats_model is not None:
+            exploration_stats = exploration_stats_by_version[version - 1]
+            if exploration_stats is not None:
                 exploration_stats = stats_domain.ExplorationStats(
                     exp_id, version, num_starts,
-                    exploration_stats_model.num_starts_v2, num_actual_starts,
-                    exploration_stats_model.num_actual_starts_v2,
-                    num_completions, exploration_stats_model.num_completions_v2,
+                    exploration_stats.num_starts_v2, num_actual_starts,
+                    exploration_stats.num_actual_starts_v2,
+                    num_completions, exploration_stats.num_completions_v2,
                     state_stats_mapping)
             else:
                 exploration_stats = stats_domain.ExplorationStats(
@@ -378,7 +350,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             exploration_stats_list.append(exploration_stats.to_dict())
 
         # Save all the ExplorationStats models to storage.
-        stats_models.ExplorationStatsModel.create_multi(exploration_stats_list)
+        stats_models.ExplorationStatsModel.save_multi(exploration_stats_list)
 
 
 class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):

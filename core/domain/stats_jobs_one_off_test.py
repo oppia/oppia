@@ -331,3 +331,20 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 'End'].useful_feedback_count_v1, 0)
+
+    def test_exploration_deletion_is_handled(self):
+        exp_services.delete_exploration(feconf.SYSTEM_COMMITTER_ID, self.exp_id)
+
+        job_id = stats_jobs_one_off.GenerateV1StatisticsJob.create_new()
+        stats_jobs_one_off.GenerateV1StatisticsJob.enqueue(job_id)
+
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exploration.version)
+
+        # Since exploration is deleted, ExplorationStatsModel instance is not
+        # created.
+        self.assertEqual(exploration_stats, None)

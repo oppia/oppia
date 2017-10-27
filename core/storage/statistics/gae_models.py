@@ -806,8 +806,26 @@ class ExplorationStatsModel(base_models.BaseModel):
         return instance_id
 
     @classmethod
-    def create_multi(cls, exploration_stats_dicts):
-        """Creates multiple new ExplorationStatsModel entries.
+    def get_multi_versions(cls, exp_id, version_numbers):
+        """Gets stats model instances for each version specified in
+        version_numbers.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            version_numbers: list(int). List of version numbers.
+
+        Returns:
+            list(ExplorationStatsModel|None). Model instances representing the
+                given versions.
+        """
+        entity_ids = [cls.get_entity_id(
+            exp_id, version) for version in version_numbers]
+        exploration_stats_models = cls.get_multi(entity_ids)
+        return exploration_stats_models
+
+    @classmethod
+    def save_multi(cls, exploration_stats_dicts):
+        """Creates/Updates multiple ExplorationStatsModel entries.
 
         Args:
             exploration_stats_dicts: list(dict). The list of dicts where each

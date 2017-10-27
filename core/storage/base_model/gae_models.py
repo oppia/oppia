@@ -544,7 +544,6 @@ class VersionedModel(BaseModel):
         instances = []
         # pylint: disable=protected-access
         for version in version_numbers:
-            cls.get(entity_id)._require_not_marked_deleted()
             snapshot_id = cls._get_snapshot_id(entity_id, version)
             instances.append(cls(id=entity_id)._reconstitute_from_snapshot_id(
                 snapshot_id))
