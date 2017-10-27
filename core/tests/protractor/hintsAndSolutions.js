@@ -27,14 +27,12 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('HintsAndSolutions', function() {
-
   beforeEach(function() {
     users.createUser('user1@hintsAndSolutions.com',
                      'hintsAndSolutions');
   });
 
   it('uses hints and solutions in an exploration', function() {
-
     // Creator creates and publishes an exploration
     users.login('user1@hintsAndSolutions.com');
     workflow.createExploration();
