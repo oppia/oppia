@@ -2166,8 +2166,8 @@ oppia.factory('autosaveInfoModalsService', [
 // only logged when they happen after the editor is opened for the first time
 // for an exploration.
 oppia.factory('editorFirstTimeEventsService', [
-  'siteAnalyticsService',
-  function(siteAnalyticsService) {
+  'SiteAnalyticsService',
+  function(SiteAnalyticsService) {
     var explorationId = null;
     var shouldRegisterEvents = false;
     var alreadyRegisteredEvents = {};
@@ -2179,7 +2179,7 @@ oppia.factory('editorFirstTimeEventsService', [
       registerEditorFirstEntryEvent: function() {
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty('EditorFirstEntryEvent')) {
-          siteAnalyticsService.registerEditorFirstEntryEvent(explorationId);
+          SiteAnalyticsService.registerEditorFirstEntryEvent(explorationId);
           alreadyRegisteredEvents.EditorFirstEntryEvent = true;
         }
       },
@@ -2187,14 +2187,14 @@ oppia.factory('editorFirstTimeEventsService', [
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty(
               'FirstOpenContentBoxEvent')) {
-          siteAnalyticsService.registerFirstOpenContentBoxEvent(explorationId);
+          SiteAnalyticsService.registerFirstOpenContentBoxEvent(explorationId);
           alreadyRegisteredEvents.FirstOpenContentBoxEvent = true;
         }
       },
       registerFirstSaveContentEvent: function() {
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty('FirstSaveContentEvent')) {
-          siteAnalyticsService.registerFirstSaveContentEvent(explorationId);
+          SiteAnalyticsService.registerFirstSaveContentEvent(explorationId);
           alreadyRegisteredEvents.FirstSaveContentEvent = true;
         }
       },
@@ -2202,7 +2202,7 @@ oppia.factory('editorFirstTimeEventsService', [
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty(
               'FirstClickAddInteractionEvent')) {
-          siteAnalyticsService.registerFirstClickAddInteractionEvent(
+          SiteAnalyticsService.registerFirstClickAddInteractionEvent(
             explorationId);
           alreadyRegisteredEvents.FirstClickAddInteractionEvent = true;
         }
@@ -2211,7 +2211,7 @@ oppia.factory('editorFirstTimeEventsService', [
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty(
               'FirstSelectInteractionTypeEvent')) {
-          siteAnalyticsService.registerFirstSelectInteractionTypeEvent(
+          SiteAnalyticsService.registerFirstSelectInteractionTypeEvent(
             explorationId);
           alreadyRegisteredEvents.FirstSelectInteractionTypeEvent = true;
         }
@@ -2220,14 +2220,14 @@ oppia.factory('editorFirstTimeEventsService', [
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty(
               'FirstSaveInteractionEvent')) {
-          siteAnalyticsService.registerFirstSaveInteractionEvent(explorationId);
+          SiteAnalyticsService.registerFirstSaveInteractionEvent(explorationId);
           alreadyRegisteredEvents.FirstSaveInteractionEvent = true;
         }
       },
       registerFirstSaveRuleEvent: function() {
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty('FirstSaveRuleEvent')) {
-          siteAnalyticsService.registerFirstSaveRuleEvent(explorationId);
+          SiteAnalyticsService.registerFirstSaveRuleEvent(explorationId);
           alreadyRegisteredEvents.FirstSaveRuleEvent = true;
         }
       },
@@ -2235,7 +2235,7 @@ oppia.factory('editorFirstTimeEventsService', [
         if (shouldRegisterEvents &&
             !alreadyRegisteredEvents.hasOwnProperty(
               'FirstCreateSecondStateEvent')) {
-          siteAnalyticsService.registerFirstCreateSecondStateEvent(
+          SiteAnalyticsService.registerFirstCreateSecondStateEvent(
             explorationId);
           alreadyRegisteredEvents.FirstCreateSecondStateEvent = true;
         }

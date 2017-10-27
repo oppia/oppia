@@ -29,11 +29,11 @@ oppia.directive('topNavigationBar', [
       controller: [
         '$scope', '$http', '$window', '$timeout',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS',
-        'siteAnalyticsService', 'windowDimensionsService', 'DebouncerService',
+        'SiteAnalyticsService', 'windowDimensionsService', 'DebouncerService',
         function(
             $scope, $http, $window, $timeout,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS,
-            siteAnalyticsService, windowDimensionsService, DebouncerService) {
+            SiteAnalyticsService, windowDimensionsService, DebouncerService) {
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection'];
@@ -58,7 +58,7 @@ oppia.directive('topNavigationBar', [
             NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.NAV_MODE) === -1);
 
           $scope.onLoginButtonClicked = function() {
-            siteAnalyticsService.registerStartLoginEvent('loginButton');
+            SiteAnalyticsService.registerStartLoginEvent('loginButton');
             $timeout(function() {
               $window.location = GLOBALS.loginUrl;
             }, 150);

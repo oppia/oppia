@@ -28,14 +28,14 @@ oppia.directive('editorNavigation', [
         'RouterService', 'explorationRightsService',
         'explorationWarningsService',
         'stateEditorTutorialFirstTimeService',
-        'ThreadDataService', 'siteAnalyticsService',
+        'ThreadDataService', 'SiteAnalyticsService',
         'explorationContextService', 'windowDimensionsService',
         function(
             $scope, $rootScope, $timeout, $modal,
             RouterService, explorationRightsService,
             explorationWarningsService,
             stateEditorTutorialFirstTimeService,
-            ThreadDataService, siteAnalyticsService,
+            ThreadDataService, SiteAnalyticsService,
             explorationContextService, windowDimensionsService) {
           $scope.postTutorialHelpPopoverIsShown = false;
           $scope.isLargeScreen = (windowDimensionsService.getWidth() >= 1024);
@@ -55,7 +55,7 @@ oppia.directive('editorNavigation', [
 
           $scope.showUserHelpModal = function() {
             var explorationId = explorationContextService.getExplorationId();
-            siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
+            SiteAnalyticsService.registerClickHelpButtonEvent(explorationId);
             var modalInstance = $modal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/' +
@@ -63,22 +63,22 @@ oppia.directive('editorNavigation', [
               backdrop: true,
               controller: [
                 '$scope', '$modalInstance',
-                'siteAnalyticsService', 'explorationContextService',
+                'SiteAnalyticsService', 'explorationContextService',
                 function(
                   $scope, $modalInstance,
-                  siteAnalyticsService, explorationContextService) {
+                  SiteAnalyticsService, explorationContextService) {
                   var explorationId = (
                     explorationContextService.getExplorationId());
 
                   $scope.beginTutorial = function() {
-                    siteAnalyticsService
+                    SiteAnalyticsService
                       .registerOpenTutorialFromHelpCenterEvent(
                         explorationId);
                     $modalInstance.close();
                   };
 
                   $scope.goToHelpCenter = function() {
-                    siteAnalyticsService.registerVisitHelpCenterEvent(
+                    SiteAnalyticsService.registerVisitHelpCenterEvent(
                       explorationId);
                     $modalInstance.dismiss('cancel');
                   };

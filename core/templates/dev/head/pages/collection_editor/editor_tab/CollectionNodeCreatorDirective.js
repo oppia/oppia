@@ -28,13 +28,13 @@ oppia.directive('collectionNodeCreator', [
         'ValidatorsService', 'CollectionEditorStateService',
         'CollectionLinearizerService', 'CollectionUpdateService',
         'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
-        'SearchExplorationsBackendApiService', 'siteAnalyticsService',
+        'SearchExplorationsBackendApiService', 'SiteAnalyticsService',
         function(
             $scope, $http, $window, $filter, alertsService,
             ValidatorsService, CollectionEditorStateService,
             CollectionLinearizerService, CollectionUpdateService,
             CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
-            SearchExplorationsBackendApiService, siteAnalyticsService) {
+            SearchExplorationsBackendApiService, SiteAnalyticsService) {
           $scope.collection = CollectionEditorStateService.getCollection();
           $scope.newExplorationId = '';
           $scope.newExplorationTitle = '';
@@ -63,7 +63,7 @@ oppia.directive('collectionNodeCreator', [
                 return options;
               }, function() {
                 alertsService.addWarning(
-                  'There was an error when searching for matching ' + 
+                  'There was an error when searching for matching ' +
                   'explorations.');
               });
             } else {
@@ -138,7 +138,7 @@ oppia.directive('collectionNodeCreator', [
               $scope.newExplorationTitle = '';
               var newExplorationId = response.data.explorationId;
 
-              siteAnalyticsService
+              SiteAnalyticsService
                 .registerCreateNewExplorationInCollectionEvent(
                   newExplorationId);
               addExplorationToCollection(newExplorationId);

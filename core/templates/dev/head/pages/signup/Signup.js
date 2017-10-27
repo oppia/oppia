@@ -18,10 +18,10 @@
 
 oppia.controller('Signup', [
   '$scope', '$http', '$rootScope', '$modal', 'alertsService', 'urlService',
-  'FocusManagerService', 'siteAnalyticsService', 'UrlInterpolationService',
+  'FocusManagerService', 'SiteAnalyticsService', 'UrlInterpolationService',
   function(
       $scope, $http, $rootScope, $modal, alertsService, urlService,
-      FocusManagerService, siteAnalyticsService, UrlInterpolationService) {
+      FocusManagerService, SiteAnalyticsService, UrlInterpolationService) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
     $scope.warningI18nCode = '';
@@ -162,7 +162,7 @@ oppia.controller('Signup', [
         }
       }
 
-      siteAnalyticsService.registerNewSignupEvent();
+      SiteAnalyticsService.registerNewSignupEvent();
 
       $scope.submissionInProcess = true;
       $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {

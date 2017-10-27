@@ -33,7 +33,7 @@ oppia.constant('STATS_REPORTING_URLS', {
 
 oppia.factory('StatsReportingService', [
   '$http', 'StopwatchObjectFactory', 'MessengerService',
-  'UrlInterpolationService', 'STATS_REPORTING_URLS', 'siteAnalyticsService',
+  'UrlInterpolationService', 'STATS_REPORTING_URLS', 'SiteAnalyticsService',
   function(
       $http, StopwatchObjectFactory, MessengerService,
       UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService) {
@@ -88,7 +88,7 @@ oppia.factory('StatsReportingService', [
 
         statesVisited[stateName] = true;
         numStatesVisited = 1;
-        siteAnalyticsService.registerNewCard(1);
+        SiteAnalyticsService.registerNewCard(1);
 
         stateStopwatch.reset();
       },
@@ -132,7 +132,7 @@ oppia.factory('StatsReportingService', [
         if (!statesVisited.hasOwnProperty(newStateName)) {
           statesVisited[newStateName] = true;
           numStatesVisited++;
-          siteAnalyticsService.registerNewCard(numStatesVisited);
+          SiteAnalyticsService.registerNewCard(numStatesVisited);
         }
 
         stateStopwatch.reset();
@@ -160,7 +160,7 @@ oppia.factory('StatsReportingService', [
           paramValues: params
         });
 
-        siteAnalyticsService.registerFinishExploration();
+        SiteAnalyticsService.registerFinishExploration();
       },
       recordAnswerSubmitted: function(
           stateName, params, answer, answerGroupIndex, ruleIndex,
