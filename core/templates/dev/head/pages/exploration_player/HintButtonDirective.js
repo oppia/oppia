@@ -26,7 +26,7 @@ oppia.directive('hintButton', [
       scope: {
         onClickHintButton: '&',
         allHintsAreExhausted: '&',
-        currentHintIsAvailable: '&',
+        currentHintIsAvailable: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
