@@ -33,8 +33,18 @@ oppia.directive('hintButton', [
         'hint_button_directive.html'),
       controller: [
         '$scope', '$rootScope', '$timeout', 'NumberAttemptsService',
-        function($scope, $rootScope, $timeout, NumberAttemptsService) {
+        'windowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
+        function($scope, $rootScope, $timeout, NumberAttemptsService,
+            windowDimensionsService, TWO_CARD_THRESHOLD_PX) {
           $scope.isShowingHintTooltip = false;
+
+          var viewportIsNarrow = 
+            windowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
+
+          $scope.getTooltipPlacement = function() {
+            return viewportIsNarrow ? 'right' : 'left';
+          };
+
           var showNeedHintIfNecessary = function() {
             if (NumberAttemptsService.getNumberAttempts() >=
                 NUM_ATTEMPTS_BEFORE_SHOWING_NEED_HINT_MESSAGE) {
@@ -50,7 +60,7 @@ oppia.directive('hintButton', [
             $scope.isShowingNeedHintMessage = false;
           };
 
-          $scope.$on('oppiaFeedbackAvailable', showNeedHintIfNecessary());
+          $scope.$on('oppiaFeedbackAvailable', showNeedHintIfNecessary);
         }]
     };
   }]);
