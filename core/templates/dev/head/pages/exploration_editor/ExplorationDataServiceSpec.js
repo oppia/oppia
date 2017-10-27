@@ -114,4 +114,3 @@ describe('Exploration data service', function() {
     });
   });
 });
-
