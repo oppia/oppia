@@ -472,7 +472,7 @@ class StateAnswersCalcOutput(object):
     """
 
     def __init__(self, exploration_id, exploration_version, state_name,
-                 calculation_id, calculation_output):
+                 interaction_id, calculation_id, calculation_output):
         """Initialize domain object for state answers calculation output.
 
         calculation_output is a list of dicts containing the results of the
@@ -482,6 +482,7 @@ class StateAnswersCalcOutput(object):
         self.exploration_version = exploration_version
         self.state_name = state_name
         self.calculation_id = calculation_id
+        self.interaction_id = interaction_id
         self.calculation_output = calculation_output
 
     def save(self):
@@ -489,7 +490,7 @@ class StateAnswersCalcOutput(object):
         self.validate()
         stats_models.StateAnswersCalcOutputModel.create_or_update(
             self.exploration_id, self.exploration_version, self.state_name,
-            self.calculation_id, self.calculation_output)
+            self.interaction_id, self.calculation_id, self.calculation_output)
 
     def validate(self):
         """Validates StateAnswersCalcOutputModel domain object entity before

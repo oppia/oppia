@@ -1402,6 +1402,9 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             self.assertEqual(visualizations, [])
 
+    # TODO(bhenning): Fix these tests. These fail because we're accessing stale
+    # aggregation data that isn't updated since a different calculation ID is
+    # being referenced.
     def test_no_vis_info_for_exp_with_new_interaction_before_calculations(self):
         with self._get_swap_context():
             self._record_answer('Answer A')

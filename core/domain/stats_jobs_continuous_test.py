@@ -710,28 +710,23 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             calc_id = 'Top10AnswerFrequencies'
 
             # Check the output of the job.
-            calc_output_latest_version_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, init_state_name, calc_id,
-                    exploration_version='2'))
-            calc_output_first_version_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, init_state_name, calc_id,
-                    exploration_version='1'))
-            calc_output_all_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, init_state_name, calc_id))
+            calc_output_model_latest_version = self._get_calc_output_model(
+                exp_id, init_state_name, calc_id, exploration_version='2')
+            calc_output_model_first_version = self._get_calc_output_model(
+                exp_id, init_state_name, calc_id, exploration_version='1')
+            calc_output_model_all = self._get_calc_output_model(
+                exp_id, init_state_name, calc_id)
 
             # Since no answers were submitted to the latest version of the
             # exploration, there should be no calculated output for it.
-            self.assertIsNone(calc_output_latest_version_domain_object)
+            self.assertIsNone(calc_output_model_latest_version)
 
             # Top answers will still be computed for the first version.
             self.assertEqual(
                 'Top10AnswerFrequencies',
-                calc_output_first_version_domain_object.calculation_id)
+                calc_output_model_first_version.calculation_id)
             calculation_output_first = (
-                calc_output_first_version_domain_object.calculation_output)
+                calc_output_model_first_version.calculation_output)
             expected_calculation_output_first_answer = [{
                 'answer': 'verb',
                 'frequency': 2
@@ -744,13 +739,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 expected_calculation_output_first_answer)
 
             self.assertEqual(
-                'Top10AnswerFrequencies',
-                calc_output_all_domain_object.calculation_id)
+                'Top10AnswerFrequencies', calc_output_model_all.calculation_id)
 
             # No answers should be aggregated since all past answers do not
             # match the newly submitted interaction ID.
-            calculation_output_all = (
-                calc_output_all_domain_object.calculation_output)
+            calculation_output_all = calc_output_model_all.calculation_output
             self.assertEqual(calculation_output_all, [])
 
     def test_uses_old_answers_if_updated_exploration_has_same_interaction(self):
@@ -813,23 +806,18 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             calc_id = 'Top10AnswerFrequencies'
 
             # Extract the output from the job.
-            calc_output_latest_version_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, init_state_name, calc_id,
-                    exploration_version='2'))
-            calc_output_all_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, init_state_name, calc_id))
+            calc_output_model_latest_version = self._get_calc_output_model(
+                exp_id, init_state_name, calc_id, exploration_version='2')
+            calc_output_model_all = self._get_calc_output_model(
+                exp_id, init_state_name, calc_id)
 
             # Since no answers were submitted to the latest version of the
             # exploration, there should be no calculated output for it.
-            self.assertIsNone(calc_output_latest_version_domain_object)
+            self.assertIsNone(calc_output_model_latest_version)
 
             self.assertEqual(
-                'Top10AnswerFrequencies',
-                calc_output_all_domain_object.calculation_id)
-            calculation_output_all = (
-                calc_output_all_domain_object.calculation_output)
+                'Top10AnswerFrequencies', calc_output_model_all.calculation_id)
+            calculation_output_all = calc_output_model_all.calculation_output
             expected_calculation_output_all_answers = [{
                 'answer': 'verb',
                 'frequency': 2

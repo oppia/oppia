@@ -279,6 +279,12 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
         if calc_output_domain_object is None:
             continue
 
+        # If the output was associated with a different interaction ID, skip the
+        # results. This filtering step is needed since the same calculation_id
+        # can be shared across multiple interaction types.
+        if calc_output_domain_object.interaction_id != interaction_id:
+            continue
+
         calculation_ids_to_outputs[calculation_id] = (
             calc_output_domain_object.calculation_output)
     return [{
@@ -414,6 +420,7 @@ def _get_calc_output(exploration_id, state_name, calculation_id):
     if calc_output_model:
         return stats_domain.StateAnswersCalcOutput(
             exploration_id, VERSION_ALL, state_name,
-            calculation_id, calc_output_model.calculation_output)
+            calc_output_model.interaction_id, calculation_id,
+            calc_output_model.calculation_output)
     else:
         return None

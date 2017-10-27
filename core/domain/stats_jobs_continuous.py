@@ -507,8 +507,7 @@ class StatisticsMRJobManager(
 class InteractionAnswerSummariesMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):
     """Job to calculate interaction view statistics, e.g. most frequent answers
-    of multiple-choice interactions. Iterate over StateAnswer objects and
-    create StateAnswersCalcOutput objects.
+    of multiple-choice interactions.
     """
     @classmethod
     def _get_continuous_computation_class(cls):
