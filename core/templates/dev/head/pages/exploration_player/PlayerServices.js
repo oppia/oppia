@@ -33,7 +33,7 @@ oppia.factory('ExplorationPlayerService', [
   'StatsReportingService', 'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
-  'LanguageUtilService',
+  'LanguageUtilService', 'NumberAttemptsService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
@@ -43,7 +43,7 @@ oppia.factory('ExplorationPlayerService', [
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService,
-      LanguageUtilService) {
+      LanguageUtilService, NumberAttemptsService) {
     var _explorationId = explorationContextService.getExplorationId();
     var _editorPreviewMode = (
       explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -205,6 +205,7 @@ oppia.factory('ExplorationPlayerService', [
                 exploration.getLanguageCode(),
                 data.auto_tts_enabled);
               _loadInitialState(successCallback);
+              NumberAttemptsService.reset();
             });
         } else {
           var loadedExploration = null;
