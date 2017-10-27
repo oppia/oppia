@@ -17,8 +17,10 @@
  */
 
 oppia.directive('schemaBasedDictViewer', [
-  'recursionHelper', 'UrlInterpolationService',
-  function(recursionHelper, UrlInterpolationService) {
+  'NestedDirectivesRecursionTimeoutPreventionService',
+  'UrlInterpolationService', function(
+    NestedDirectivesRecursionTimeoutPreventionService,
+    UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
@@ -30,7 +32,7 @@ oppia.directive('schemaBasedDictViewer', [
         '/components/forms/schema_viewers/' +
         'schema_based_dict_viewer.html'),
       restrict: 'E',
-      compile: recursionHelper.compile,
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {
         $scope.getHumanReadablePropertyDescription = function(property) {
           return property.description || '[' + property.name + ']';

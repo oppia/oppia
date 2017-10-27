@@ -17,8 +17,10 @@
  */
 
 oppia.directive('schemaBasedCustomEditor', [
-  'recursionHelper', 'UrlInterpolationService',
-  function(recursionHelper, UrlInterpolationService) {
+  'NestedDirectivesRecursionTimeoutPreventionService',
+  'UrlInterpolationService', function(
+    NestedDirectivesRecursionTimeoutPreventionService,
+    UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
@@ -29,7 +31,7 @@ oppia.directive('schemaBasedCustomEditor', [
         '/components/forms/schema_editors/' +
         'schema_based_custom_editor_directive.html'),
       restrict: 'E',
-      compile: recursionHelper.compile
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile
     };
   }
 ]);
