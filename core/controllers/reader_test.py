@@ -874,18 +874,3 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 self.state_name].num_times_solution_viewed_v2, 1)
-
-    def test_error_on_invalid_stats_dict(self):
-        """Test that exception is raised if the aggregated stats dict is
-        invalid.
-        """
-        self.aggregated_stats.pop('num_starts')
-        with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-            self.post_json(
-                '/explorehandler/stats_events/%s' % (
-                    self.exp_id),
-                {
-                    'aggregated_stats': self.aggregated_stats,
-                    'exp_version': self.exp_version
-                },
-                expect_errors=True, expected_status_int=400)

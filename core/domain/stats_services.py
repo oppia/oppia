@@ -86,8 +86,7 @@ def update_stats(exp_id, exp_version, aggregated_stats):
             state_name].num_completions_v2 += aggregated_stats[
                 'state_stats_mapping'][state_name]['num_completions']
 
-    transaction_services.run_in_transaction(
-        save_stats_model, exploration_stats)
+    save_stats_model_transactional(exploration_stats)
 
 
 def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
@@ -228,7 +227,7 @@ def create_stats_model(exploration_stats):
     return instance_id
 
 
-def save_stats_model(exploration_stats):
+def _save_stats_model(exploration_stats):
     """Updates the ExplorationStatsModel datastore instance with the passed
     ExplorationStats domain object.
 
@@ -257,6 +256,19 @@ def save_stats_model(exploration_stats):
     exploration_stats_model.state_stats_mapping = new_state_stats_mapping
 
     exploration_stats_model.put()
+
+
+def save_stats_model_transactional(exploration_stats):
+    """Updates the ExplorationStatsModel datastore instance with the passed
+    ExplorationStats domain object in a transaction.
+
+    Args:
+        exploration_stats. ExplorationStats. The exploration statistics domain
+            object.
+    """
+    transaction_services.run_in_transaction(
+        _save_stats_model, exploration_stats)
+
 
 # TODO(bhenning): Test.
 def get_visualizations_info(exp_id, state_name, interaction_id):

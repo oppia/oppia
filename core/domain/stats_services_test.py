@@ -50,7 +50,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         exploration_stats.state_stats_mapping = {
             'Home': stats_domain.StateStats.create_default()
         }
-        stats_services.save_stats_model(exploration_stats)
+        stats_services.save_stats_model_transactional(exploration_stats)
 
         # Pass in exploration start event to stats model created in setup
         # function.
@@ -449,14 +449,14 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
                 }
             })
 
-    def test_save_stats_model(self):
-        """Test the save_stats_model method."""
+    def test_save_stats_model_transactional(self):
+        """Test the save_stats_model_transactional method."""
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)
         exploration_stats.num_starts_v2 += 15
         exploration_stats.num_actual_starts_v2 += 5
         exploration_stats.num_completions_v2 += 2
-        stats_services.save_stats_model(exploration_stats)
+        stats_services.save_stats_model_transactional(exploration_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exp_version)

@@ -249,51 +249,46 @@ class StatsEventsHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    def validate_aggregated_stats(self, aggregated_stats):
+    def require_aggregated_stats_are_valid(self, aggregated_stats):
         """Checks whether the aggregated stats dict has the correct keys.
 
         Args:
             aggregated_stats: dict. Dict comprising of aggregated stats.
-
-        Returns:
-            Bool. True if the dict is valid.
         """
-        valid_stats = True
-        if 'num_starts' not in aggregated_stats:
-            valid_stats = False
-        if 'num_completions' not in aggregated_stats:
-            valid_stats = False
-        if 'num_actual_starts' not in aggregated_stats:
-            valid_stats = False
+        exploration_stats_properties = [
+            'num_starts',
+            'num_actual_starts',
+            'num_completions'
+        ]
+        state_stats_properties = [
+            'total_answers_count',
+            'useful_feedback_count',
+            'total_hit_count',
+            'first_hit_count',
+            'num_times_solution_viewed',
+            'num_completions'
+        ]
 
+        for exp_stats_property in exploration_stats_properties:
+            if exp_stats_property not in aggregated_stats:
+                raise self.InvalidInputException(
+                    '%s not in aggregated stats dict.' % (exp_stats_property))
         for state_name in aggregated_stats['state_stats_mapping']:
-            if 'total_answers_count' not in aggregated_stats[
-                    'state_stats_mapping'][state_name]:
-                valid_stats = False
-            if 'useful_feedback_count' not in aggregated_stats[
-                    'state_stats_mapping'][state_name]:
-                valid_stats = False
-            if 'total_hit_count' not in aggregated_stats[
-                    'state_stats_mapping'][state_name]:
-                valid_stats = False
-            if 'first_hit_count' not in aggregated_stats[
-                    'state_stats_mapping'][state_name]:
-                valid_stats = False
-            if 'num_times_solution_viewed' not in aggregated_stats[
-                    'state_stats_mapping'][state_name]:
-                valid_stats = False
-            if 'num_completions' not in aggregated_stats[
-                    'state_stats_mapping'][state_name]:
-                valid_stats = False
-
-        return valid_stats
+            for state_stats_property in state_stats_properties:
+                if state_stats_property not in aggregated_stats[
+                        'state_stats_mapping'][state_name]:
+                    raise self.InvalidInputException(
+                        '%s not in state stats mapping of %s in aggregated '
+                        'stats dict.' % (state_stats_property, state_name))
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         aggregated_stats = self.payload.get('aggregated_stats')
         exp_version = self.payload.get('exp_version')
-        if not self.validate_aggregated_stats(aggregated_stats):
-            raise self.InvalidInputException
+        try:
+            self.require_aggregated_stats_are_valid(aggregated_stats)
+        except self.InvalidInputException as e:
+            logging.error(e)
         event_services.StatsEventsHandler.record(
             exploration_id, exp_version, aggregated_stats)
         self.render_json({})
