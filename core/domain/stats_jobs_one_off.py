@@ -156,7 +156,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 exp_id, version_numbers))
 
         # The list of exploration start counts mapped by version.
-        start_exploration_counts_by_version = collections.defaultdict(lambda: 0)
+        start_exploration_counts_by_version = collections.defaultdict(int)
         # The list of exploration complete counts mapped by version.
         complete_exploration_counts_by_version = collections.defaultdict(
             lambda: 0)
@@ -167,7 +167,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 'first_hit_count': 0
             }))
         # The dict of state answer counts mapped by version.
-        state_answer_counts_by_version = collections.defaultdict(lambda: {})
+        state_answer_counts_by_version = collections.defaultdict(
+            lambda: collections.defaultdict(lambda: {}))
         # The set of session_ids of learners completing an exploration.
         completed_session_ids = set()
         # Dict mapping versions -> sessionID -> StateHitEvents.
@@ -211,12 +212,10 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         # each version.
         exploration_stats_list = []
         for version in version_numbers:
-            state_hit_counts_for_this_version = {}
             state_hit_counts_for_this_version = (
                 state_hit_counts_by_version[str(version)])
             state_answer_counts_for_this_version = (
                 state_answer_counts_by_version[str(version)])
-            session_id_state_hit_event_mapping_for_this_version = {}
             session_id_state_hit_event_mapping_for_this_version = (
                 session_id_state_hit_event_mapping[str(version)])
 
