@@ -637,7 +637,8 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     def setUp(self):
         super(StateAnswersCalcOutputValidationTests, self).setUp()
         self.state_answers_calc_output = stats_domain.StateAnswersCalcOutput(
-            'exp_id', 1, 'initial_state', 'AnswerFrequencies', {})
+            'exp_id', 1, 'initial_state', 'AnswerFrequencies',
+            stats_domain.CALC_OUTPUT_ANSWER_FREQUENCY_LIST, [])
 
         # The canonical object should have no validation problems
         self.state_answers_calc_output.validate()
@@ -661,8 +662,11 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
             'Expected calculation_id to be a string')
 
     def test_calculation_output_must_be_less_than_one_million_bytes(self):
+        occurred_answer = stats_domain.AnswerOccurrence(
+            'This is not a long sentence.', 1)
         self.state_answers_calc_output.calculation_output = (
-            ['This is not a long sentence.'] * 200000)
+            stats_domain.AnswerFrequencyList(
+                [occurred_answer] * 200000))
         self._assert_validation_error(
             self.state_answers_calc_output,
             'calculation_output is too big to be stored')

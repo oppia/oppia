@@ -1226,12 +1226,16 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     exploration_version = ndb.StringProperty(indexed=True, required=True)
     state_name = ndb.StringProperty(indexed=True, required=True)
     calculation_id = ndb.StringProperty(indexed=True, required=True)
+    # Calculation output type (for deserialization). See
+    # stats_domain.StateAnswersCalcOutput for an enumeration of valid types.
+    calculation_output_type = ndb.StringProperty(indexed=True)
     # Calculation output dict stored as JSON blob
     calculation_output = ndb.JsonProperty(indexed=False)
 
     @classmethod
-    def create_or_update(cls, exploration_id, exploration_version, state_name,
-                         calculation_id, calculation_output):
+    def create_or_update(
+            cls, exploration_id, exploration_version, state_name,
+            calculation_id, calculation_output_type, calculation_output):
         """Creates or updates StateAnswersCalcOutputModel and then writes
         it to the datastore.
 
@@ -1240,6 +1244,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             exploration_version: int. Version of exploration.
             state_name: str. Name of current state.
             calculation_id: str. ID of the calculation performed.
+            calculation_output_type: str. Type of the calculation output.
             calculation_output: dict. Output of the calculation which is to be
                 stored as a JSON blob.
 
@@ -1255,6 +1260,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
                 id=instance_id, exploration_id=exploration_id,
                 exploration_version=exploration_version,
                 state_name=state_name, calculation_id=calculation_id,
+                calculation_output_type=calculation_output_type,
                 calculation_output=calculation_output)
         else:
             instance.calculation_output = calculation_output

@@ -466,30 +466,99 @@ class SubmittedAnswer(object):
                 self.classification_categorization)
 
 
+class AnswerOccurrence(object):
+    """Domain object that represents a specific answer that occurred some number
+    of times.
+    """
+    def __init__(self, answer, frequency):
+        """Initialize domain object for answer occurrences."""
+        self.answer = answer
+        self.frequency = frequency
+
+    def to_dict(self):
+        return {
+            'answer': self.answer,
+            'frequency': self.frequency
+        }
+
+
+class AnswerFrequencyList(object):
+    """Domain object that represents a list of AnswerOccurrences."""
+    def __init__(self, answer_occurrences=None):
+        """Initialize domain object for answer frequency list for a given list
+        of AnswerOccurrence objects (default is empty list).
+        """
+        self.answer_occurrences = (
+            answer_occurrences if answer_occurrences else [])
+
+    def add_answer(self, answer_occurrence):
+        """Adds a new AnswerOccurrence object."""
+        self.answer_occurrences.append(answer_occurrence)
+
+    def to_dict(self):
+        return [
+            answer_occurrence.to_dict()
+            for answer_occurrence in self.answer_occurrences]
+
+
+class CategorizedAnswerFrequencyLists(object):
+    """AnswerFrequencyLists that are categorized based on arbitrary categories.
+    """
+    def __init__(self, categorized_answer_freq_lists=None):
+        """Initialize domain object for categorized answer frequency lists for
+        a given dict (default is empty).
+        """
+        self.categorized_answer_freq_lists = (
+            categorized_answer_freq_lists
+            if categorized_answer_freq_lists else {})
+
+    def to_dict(self):
+        return {
+            category: answer_frequency_list.to_dict()
+            for category, answer_frequency_list in (
+                self.categorized_answer_freq_lists.iteritems())
+        }
+
+
+CALC_OUTPUT_ANSWER_FREQUENCY_LIST = 'AnswerFrequencyList'
+CALC_OUTPUT_CATEGORIZED_ANSWER_FREQUENCY_LISTS = (
+    'CategorizedAnswerFrequencyLists')
+
+
 class StateAnswersCalcOutput(object):
     """Domain object that represents output of calculations operating on
     state answers.
     """
-
     def __init__(self, exploration_id, exploration_version, state_name,
-                 calculation_id, calculation_output):
+                 calculation_id, calculation_output_type, calculation_output):
         """Initialize domain object for state answers calculation output.
 
-        calculation_output is a list of dicts containing the results of the
-        specific calculation.
+        calculation_output one of AnswerFrequencyList or
+            CategorizedAnswerFrequencyLists.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
         self.state_name = state_name
         self.calculation_id = calculation_id
-        self.calculation_output = calculation_output
+        self.calculation_output_type = calculation_output_type
+        if calculation_output_type:
+            if calculation_output_type == CALC_OUTPUT_ANSWER_FREQUENCY_LIST:
+                self.calculation_output = AnswerFrequencyList(
+                    calculation_output)
+            elif (calculation_output_type ==
+                  CALC_OUTPUT_CATEGORIZED_ANSWER_FREQUENCY_LISTS):
+                self.calculation_output = CategorizedAnswerFrequencyLists(
+                    calculation_output)
+            else:
+                self.calculation_output = None
 
     def save(self):
         """Validate the domain object and commit it to storage."""
         self.validate()
         stats_models.StateAnswersCalcOutputModel.create_or_update(
             self.exploration_id, self.exploration_version, self.state_name,
-            self.calculation_id, self.calculation_output)
+            self.calculation_id, self.calculation_output_type,
+            self.calculation_output.to_dict())
 
     def validate(self):
         """Validates StateAnswersCalcOutputModel domain object entity before
@@ -516,7 +585,15 @@ class StateAnswersCalcOutput(object):
                 'Expected calculation_id to be a string, received %s' % str(
                     self.calculation_id))
 
-        output_data = self.calculation_output
+        if (not isinstance(self.calculation_output, AnswerFrequencyList)
+                and not isinstance(
+                    self.calculation_output, CategorizedAnswerFrequencyLists)):
+            raise utils.ValidationError(
+                'Expected calculation output to be one of AnswerFrequencyList '
+                'or CategorizedAnswerFrequencyLists, encountered: %s' % (
+                    self.calculation_output))
+
+        output_data = self.calculation_output.to_dict()
         if sys.getsizeof(output_data) > max_bytes_per_calc_output_data:
             # TODO(msl): find a better way to deal with big
             # calculation output data, e.g. just skip. At the moment,
