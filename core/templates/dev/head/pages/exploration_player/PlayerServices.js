@@ -377,17 +377,23 @@ oppia.factory('ExplorationPlayerService', [
         if (!_editorPreviewMode) {
           var isFirstHit = Boolean(visitedStateNames.indexOf(
             newStateName) === -1);
-          StatsReportingService.recordStateTransition(
-            oldStateName, newStateName, answer,
-            LearnerParamsService.getAllParams(), isFirstHit);
-          StatsReportingService.recordStateCompleted(oldStateName);
-          visitedStateNames.push(newStateName);
+          if (newStateName !== oldStateName) {
+            StatsReportingService.recordStateTransition(
+              oldStateName, newStateName, answer,
+              LearnerParamsService.getAllParams(), isFirstHit);
 
-          if (oldStateName === exploration.initStateName && (
-              !explorationActuallyStarted)) {
-            StatsReportingService.recordExplorationActuallyStarted(
-              oldStateName);
-            explorationActuallyStarted = true;
+            StatsReportingService.recordStateCompleted(oldStateName);
+            visitedStateNames.push(newStateName);
+
+            if (oldStateName === exploration.initStateName && (
+                !explorationActuallyStarted)) {
+              StatsReportingService.recordExplorationActuallyStarted(
+                oldStateName);
+              explorationActuallyStarted = true;
+            }
+          }
+          if (exploration.isStateTerminal(newStateName)) {
+            StatsReportingService.recordStateCompleted(newStateName);
           }
         }
 
