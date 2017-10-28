@@ -33,7 +33,7 @@
           <div class="form-group">
             <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_USERNAME"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
-              <a ng-if="username" href="/profile/{{username}}">{{username}}</a>
+              <a ng-if="username" href="/profile/<[username]>" ng-bind="username"></a>
               <em ng-if="!username" translate="I18N_PREFERENCES_USERNAME_NOT_SELECTED"></em>
             </div>
           </div>
