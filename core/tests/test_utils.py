@@ -55,7 +55,9 @@ LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 
 
 def empty_environ():
-    """Set up empty environment variables for Tests (used in AppEngineTestBase)"""
+    """Set up empty environment variables for Tests
+        (used in AppEngineTestBase)
+    """
     os.environ['AUTH_DOMAIN'] = 'example.com'
     os.environ['SERVER_NAME'] = 'localhost'
     os.environ['HTTP_HOST'] = 'localhost'
@@ -147,7 +149,7 @@ class TestBase(unittest.TestCase):
 
     def _get_unicode_test_string(self, suffix):
         """Returns a string for unicode compatibility test
-        
+
         Args:
             suffix: string . Test string appended to unicode string
 
@@ -157,23 +159,28 @@ class TestBase(unittest.TestCase):
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
     def setUp(self):
-        """Sets up environment for Test Base (implemented in inherited class)
+        """Sets up environment for Test Base
+            (implemented in inherited class)
 
         Exception:
-            NotImplementedError . Raises exception if the method is not implemented in inherited class
+            NotImplementedError . Raises exception if the method is not
+                implemented in inherited class
         """
         raise NotImplementedError
 
     def tearDown(self):
-        """Deactivates environment of Test Base (implemented in inherited class)
+        """Deactivates environment of Test Base
+            (implemented in inherited class)
 
         Exception:
-            NotImplementedError . Raises exception if the method is not implemented in inherited class
+            NotImplementedError . Raises exception if the method is not
+                implemented in inherited class
         """
         raise NotImplementedError
 
     def _assert_validation_error(self, item, error_substring):
-        """Checks that the given item passes default validation."""
+        """Checks that the given item passes default validation.
+        """
         with self.assertRaisesRegexp(utils.ValidationError, error_substring):
             item.validate()
 
@@ -189,10 +196,12 @@ class TestBase(unittest.TestCase):
         print '%s%s' % (LOG_LINE_PREFIX, line)
 
     def _delete_all_models(self):
-        """Deactivates environment of Test Base (implemented in inherited class)
+        """Deactivates environment of Test Base
+            (implemented in inherited class)
 
         Exception:
-            NotImplementedError . Raises exception if the method is not implemented in inherited class
+            NotImplementedError . Raises exception if the method is not
+            implemented in inherited class
         """
         raise NotImplementedError
 
@@ -234,7 +243,9 @@ class TestBase(unittest.TestCase):
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
 
     def logout(self):
-        """Reassign environment variables of login credentials to null string (False boolean for USER_IS_ADMIN)"""
+        """Reassign environment variables of login credentials to null string
+            (False boolean for USER_IS_ADMIN)
+        """
         os.environ['USER_EMAIL'] = ''
         os.environ['USER_ID'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
@@ -257,7 +268,8 @@ class TestBase(unittest.TestCase):
 
         Args:
             json_response: string (json) . Contains json response from api call.
-            expect_errors: bool . If False, the json response is checked for status code 200 (OK).
+            expect_errors: bool . If False, the json response is checked
+                for status code 200 (OK).
         """
         if not expect_errors:
             self.assertEqual(json_response.status_int, 200)
@@ -273,11 +285,14 @@ class TestBase(unittest.TestCase):
 
         Args:
             url: string (url). url for the api get request.
-            params: string (json). defaualt (None) . parameters relevant to the api call.
-			expect_errors: bool. If False, then if anything is written to wsgi.errors (module webtest) will be an error.
+            params: string (json). defaualt (None).
+                parameters relevant to the api call.
+			expect_errors: bool. If False, then if anything is written
+                to wsgi.errors (module webtest) will be an error.
 
         Returns:
-            json (object). Response from get api call is returned as json object.
+            json (object). Response from get api call is returned
+                as json object.
         """
         json_response = self.testapp.get(
             url, params, expect_errors=expect_errors)
@@ -290,14 +305,20 @@ class TestBase(unittest.TestCase):
 
         Args:
             url: string (url). url for the api post request.
-            payload: string (json). data sent to the server to make the post request.
-            csrf_token: cross-site request forgery token, used for data protection during post request.
-			expect_errors: bool. If False, then if anything is written to wsgi.errors (module webtest) will be an error.
+            payload: string (json). data sent to the server to make
+                the post request.
+            csrf_token: cross-site request forgery token,
+                used for data protection during post request.
+			expect_errors: bool. If False, then if anything is written
+                to wsgi.errors (module webtest) will be an error.
             expected_status_int: integer status code.
-            upload_files: list. list elements of the form (fieldname, filename, filecontent). filecontent is optional. Data will be read from disk.
+            upload_files: list. list elements of the form
+                (fieldname, filename, filecontent). filecontent is optional.
+                Data will be read from disk.
 
         Returns:
-            json (object). Response from post api call is returned as json object.
+            json (object). Response from post api call is returned
+            as json object.
         """
         data = {'payload': json.dumps(payload)}
         if csrf_token:
@@ -318,14 +339,19 @@ class TestBase(unittest.TestCase):
         Args:
             app: application that is being tested
             url: string (url). url for the api post request.
-            data: string (json). data sent to the server to make the post request.
-            expect_errors: bool. If False, then if anything is written to wsgi.errors (module webtest) will be an error.
+            data: string (json). data sent to the server to make
+                the post request.
+            expect_errors: bool. If False, then if anything is written
+                to wsgi.errors (module webtest) will be an error.
             expected_status_int: integer status code.
-            upload_files: list. list elements of the form (fieldname, filename, filecontent). filecontent is optional. Data will be read from disk.
+            upload_files: list. list elements of the form
+                (fieldname, filename, filecontent). filecontent is optional.
+                Data will be read from disk.
             headers: string (json). headers to make the api call.
 
         Returns:
-            json (object). Response from post api call is returned as json object.
+            json (object). Response from post api call is returned
+            as json object.
         """
         json_response = app.post(
             str(url), data, expect_errors=expect_errors,
@@ -336,7 +362,8 @@ class TestBase(unittest.TestCase):
     def post_email(
             self, recipient_email, sender_email, subject, body, html_body=None,
             expect_errors=False, expected_status_int=200):
-        """EmailMessage Class is used for creating the email message. The email backend is then responsible for sending the email.
+        """EmailMessage Class is used for creating the email message.
+            The email backend is then responsible for sending the email.
 
         Args:
             recipient_email: A list or tuple of recipient addresses.
@@ -348,7 +375,8 @@ class TestBase(unittest.TestCase):
             expected_status_int: integer status code.
 
         Returns:
-            json (object). Response from post api call is returned as json object.
+            json (object). Response from post api call is returned
+                as json object.
         """
         email = mail.EmailMessage(
             sender=sender_email, to=recipient_email, subject=subject,
