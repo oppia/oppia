@@ -249,7 +249,7 @@ class StatsEventsHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    def require_aggregated_stats_are_valid(self, aggregated_stats):
+    def _require_aggregated_stats_are_valid(self, aggregated_stats):
         """Checks whether the aggregated stats dict has the correct keys.
 
         Args:
@@ -286,7 +286,7 @@ class StatsEventsHandler(base.BaseHandler):
         aggregated_stats = self.payload.get('aggregated_stats')
         exp_version = self.payload.get('exp_version')
         try:
-            self.require_aggregated_stats_are_valid(aggregated_stats)
+            self._require_aggregated_stats_are_valid(aggregated_stats)
         except self.InvalidInputException as e:
             logging.error(e)
         event_services.StatsEventsHandler.record(
