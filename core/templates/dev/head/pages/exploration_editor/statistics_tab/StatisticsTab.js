@@ -78,7 +78,8 @@ oppia.controller('StatisticsTab', [
           '/createhandler/statistics/' + ExplorationDataService.explorationId);
       } else {
         $scope.explorationStatisticsUrl = (
-          '/createhandler/statistics_old/' + ExplorationDataService.explorationId +
+          '/createhandler/statistics_old/' + 
+          ExplorationDataService.explorationId +
           '/' + version);
       }
       
