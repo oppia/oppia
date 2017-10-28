@@ -97,6 +97,41 @@ def verify_current_branch_name(expected_branch_name):
             expected_branch_name)
 
 
+def ensure_release_scripts_folder_exists_and_is_up_to_date():
+    """Checks that the release-scripts folder exists and is up-to-date."""
+    parent_dirpath = os.path.join(os.getcwd(), os.pardir)
+    release_scripts_dirpath = os.path.join(parent_dirpath, 'release-scripts')
+
+    # If the release-scripts folder does not exist, set it up.
+    if not os.path.isdir(release_scripts_dirpath):
+        with CD(parent_dirpath):
+            # Taken from the "Check your SSH section" at
+            # https://help.github.com/articles/error-repository-not-found/
+            _, stderr = subprocess.Popen(
+                ['ssh', '-T', 'git@github.com'],
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE).communicate()
+            if 'You\'ve successfully authenticated' not in stderr:
+                raise Exception(
+                    'You need SSH access to GitHub. See the '
+                    '"Check your SSH access" section here and follow the '
+                    'instructions: '
+                    'https://help.github.com/articles/'
+                    'error-repository-not-found/#check-your-ssh-access')
+            subprocess.call([
+                'git', 'clone',
+                'git@github.com:oppia/release-scripts.git'])
+
+    with CD(release_scripts_dirpath):
+        verify_local_repo_is_clean()
+        verify_current_branch_name('master')
+
+        # Update the local repo.
+        remote_alias = get_remote_alias(
+            'git@github.com:oppia/release-scripts.git')
+        subprocess.call(['git', 'pull', remote_alias])
+
+
 class CD(object):
     """Context manager for changing the current working directory."""
     def __init__(self, new_path):

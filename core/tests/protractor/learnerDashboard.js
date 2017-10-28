@@ -16,24 +16,28 @@
  * @fileoverview End-to-end tests for the learner dashboard page.
  */
 
-var admin = require('../protractor_utils/admin.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var collectionEditor = require('../protractor_utils/collectionEditor.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
-var library = require('../protractor_utils/library.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var player = require('../protractor_utils/player.js');
 var users = require('../protractor_utils/users.js');
 
 describe('Learner dashboard functionality', function() {
   var creatorDashboardPage = null;
-
+  var adminPage = null;
+  var libraryPage = null;
+  
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    libraryPage = new LibraryPage.LibraryPage();
   });
 
   beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
     // Create a new learner.
     users.createUser('learner@learnerDashboard.com', 'learnerlearnerDashboard');
     users.createUser(
@@ -43,13 +47,8 @@ describe('Learner dashboard functionality', function() {
 
     var USERNAME = 'creator1learnerDashboard';
     users.createAndLoginAdminUser('creator1@learnerDashboard.com', USERNAME);
-    browser.get(general.ADMIN_URL_SUFFIX);
-    // Load all the demo explorations.
-    element.all(by.css(
-      '.protractor-test-reload-all-explorations-button')).first().click();
-    general.acceptAlert();
-    browser.waitForAngular();
-    admin.updateRole(USERNAME, 'collection editor');
+    adminPage.reloadAllExplorations();
+    adminPage.updateRole(USERNAME, 'collection editor');
     browser.get(general.SERVER_URL_PREFIX);
     var dropdown = element(by.css('.protractor-test-profile-dropdown'));
     browser.actions().mouseMove(dropdown).perform();
@@ -83,7 +82,7 @@ describe('Learner dashboard functionality', function() {
     general.acceptAlert();
     browser.ignoreSynchronization = false;
     browser.waitForAngular();
-    library.expectExplorationToBeVisible('Root Linear Coefficient Theorem');
+    libraryPage.expectExplorationToBeVisible('Root Linear Coefficient Theorem');
 
     // Play an exploration completely. It should be added to the 'Completed'
     // section.
@@ -96,7 +95,7 @@ describe('Learner dashboard functionality', function() {
     browser.waitForAngular();
     element(by.css('.protractor-test-completed-section')).click();
     browser.waitForAngular();
-    library.expectExplorationToBeVisible('About Oppia');
+    libraryPage.expectExplorationToBeVisible('About Oppia');
     users.logout();
 
     users.login('creator3@learnerDashboard.com');
@@ -111,7 +110,7 @@ describe('Learner dashboard functionality', function() {
     users.login('learner@learnerDashboard.com');
     browser.get(general.LEARNER_DASHBOARD_URL);
     browser.waitForAngular();
-    library.expectExplorationToBeHidden('Root Linear Coefficient Theorem');
+    libraryPage.expectExplorationToBeHidden('Root Linear Coefficient Theorem');
     users.logout();
   });
 
@@ -236,7 +235,7 @@ describe('Learner dashboard functionality', function() {
     users.login('learner@learnerDashboard.com');
     var feedback = 'A good exploration. Would love to see a few more questions';
 
-    browser.get(general.LIBRARY_URL_SUFFIX);
+    libraryPage.get();
     general.openPlayer('14');
     player.submitAnswer('Continue', null);
     player.submitAnswer(

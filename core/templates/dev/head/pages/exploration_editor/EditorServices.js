@@ -79,7 +79,8 @@ oppia.factory('changeListService', [
       param_changes: true,
       param_specs: true,
       tags: true,
-      title: true
+      title: true,
+      auto_tts_enabled: true
     };
 
     var ALLOWED_STATE_BACKEND_NAMES = {
@@ -461,7 +462,9 @@ oppia.factory('explorationPropertyService', [
         if (this.propertyName === null) {
           throw 'Exploration property name cannot be null.';
         }
+
         this.displayed = this._normalize(this.displayed);
+
         if (!this._isValid(this.displayed) || !this.hasChanged()) {
           this.restoreFromMemento();
           return;
@@ -631,6 +634,28 @@ oppia.factory('explorationParamChangesService', [
   'explorationPropertyService', function(explorationPropertyService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'param_changes';
+    return child;
+  }
+]);
+
+oppia.factory('explorationAutomaticTextToSpeechService', [
+  'explorationPropertyService', function(explorationPropertyService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'auto_tts_enabled';
+
+    child._isValid = function(value) {
+      return (typeof value === 'boolean');
+    };
+
+    child.isAutomaticTextToSpeechEnabled = function() {
+      return child.savedMemento;
+    };
+
+    child.toggleAutomaticTextToSpeech = function() {
+      child.displayed = !child.displayed;
+      child.saveDisplayedValue();
+    };
+
     return child;
   }
 ]);
