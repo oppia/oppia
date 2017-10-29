@@ -43,7 +43,21 @@ oppia.factory('AssetsBackendApiService', [
         responseType: 'blob',
         url: _getAudioDownloadUrl(explorationId, filename),
       }).success(function(data) {
-        var audioBlob = new Blob([data]);
+        try {
+          var audioBlob = new Blob([data]);
+        } catch (exception) {
+          window.BlobBuilder = window.BlobBuilder ||
+                         window.WebKitBlobBuilder ||
+                         window.MozBlobBuilder ||
+                         window.MSBlobBuilder;
+          if (exception.name == 'TypeError' && window.BlobBuilder) {
+            var blobBuilder = new BlobBuilder();
+            blobBuilder.append(data);
+            var audioBlob = blobBuilder.getBlob('audio/*');
+          } else {
+            throw exception;
+          }
+        }
         assetsCache[filename] = audioBlob;
         successCallback(audioBlob);
       }).error(function() {

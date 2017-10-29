@@ -42,7 +42,7 @@ describe('Parameters', function() {
 
     editor.moveToState('card 2');
     editor.addParameterChange('a', '{{answer}}');
-    editor.addParameterChange('b', 3);
+    editor.addMultipleChoiceParameterChange('b', [3]);
     editor.setContent(forms.toRichText(
       'Change value of b from {{b}} to'));
     editor.setInteraction('NumericInput');

@@ -23,18 +23,32 @@ oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
   'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
-  'ReadOnlyExplorationBackendApiService', 'IMPROVE_TYPE_INCOMPLETE',
+  'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
+  'IMPROVE_TYPE_INCOMPLETE', 'ENABLE_NEW_STATS_FRAMEWORK',
   function(
       $scope, $http, $modal, alertsService, explorationStatesService,
       explorationData, computeGraphService, oppiaDatetimeFormatter,
       StatesObjectFactory, StateImprovementSuggestionService,
-      ReadOnlyExplorationBackendApiService, IMPROVE_TYPE_INCOMPLETE) {
+      ReadOnlyExplorationBackendApiService, UrlInterpolationService,
+      IMPROVE_TYPE_INCOMPLETE, ENABLE_NEW_STATS_FRAMEWORK) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
       height: 100,
       legendPosition: 'right',
       width: 500
+    };
+    $scope.COMPLETION_RATE_PIE_CHART_OPTIONS = {
+      title: '',
+      left: 230,
+      pieHole: 0.6,
+      pieSliceTextStyleColor: 'black',
+      pieSliceBorderColor: 'black',
+      chartAreaWidth: 500,
+      colors: ['#d8d8d8', '#008808', 'blue'],
+      height: 300,
+      legendPosition: 'right',
+      width: 600
     };
     var _EXPLORATION_STATS_VERSION_ALL = 'all';
     $scope.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
@@ -44,6 +58,7 @@ oppia.controller('StatisticsTab', [
         millisSinceEpoch);
     };
 
+    $scope.ENABLE_NEW_STATS_FRAMEWORK = ENABLE_NEW_STATS_FRAMEWORK;
     $scope.hasTabLoaded = false;
     $scope.$on('refreshStatisticsTab', function() {
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
@@ -55,11 +70,16 @@ oppia.controller('StatisticsTab', [
       });
     });
 
-    $scope.hasExplorationBeenVisited = false;
+    $scope.explorationHasBeenVisited = false;
     $scope.refreshExplorationStatistics = function(version) {
-      $scope.explorationStatisticsUrl = (
-        '/createhandler/statistics/' + explorationData.explorationId +
-        '/' + version);
+      if ($scope.ENABLE_NEW_STATS_FRAMEWORK) {
+        $scope.explorationStatisticsUrl = (
+          '/createhandler/statistics/' + explorationData.explorationId);
+      } else {
+        $scope.explorationStatisticsUrl = (
+          '/createhandler/statistics_old/' + explorationData.explorationId +
+          '/' + version);
+      }
       $http.get($scope.explorationStatisticsUrl).then(function(response) {
         ReadOnlyExplorationBackendApiService.loadLatestExploration(
           explorationData.explorationId).then(function(response) {
@@ -74,49 +94,71 @@ oppia.controller('StatisticsTab', [
                 states, $scope.stateStats));
             $scope.highlightStates = {};
             improvements.forEach(function(impItem) {
-              // TODO(bhenning): This is the feedback for improvement types and
-              // should be included with the definitions of the improvement
-              // types.
+              // TODO(bhenning): This is the feedback for improvement types
+              // and should be included with the definitions of the
+              // improvement types.
               if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
-                $scope.highlightStates[impItem.stateName] = 'May be confusing';
+                $scope.highlightStates[impItem.stateName] = (
+                  'May be confusing');
               }
             });
           }
         );
-        var data = response.data;
-        var numVisits = data.num_starts;
-        var numCompletions = data.num_completions;
-        var improvements = data.improvements;
-        $scope.stateStats = data.state_stats;
-        $scope.lastUpdated = data.last_updated;
+        // From this point on, all computation done is for the new stats
+        // framework under a development flag.
+        if ($scope.ENABLE_NEW_STATS_FRAMEWORK) {
+          var data = response.data;
+          var numStarts = data.num_starts;
+          var numActualStarts = data.num_actual_starts;
+          var numCompletions = data.num_completions;
+          $scope.stateStats = data.state_stats_mapping;
 
-        if (numVisits > 0) {
-          $scope.hasExplorationBeenVisited = true;
-        }
-
-        $scope.chartData = [
-          ['', 'Completions', 'Non-completions'],
-          ['', numCompletions, numVisits - numCompletions]
-        ];
-
-        $scope.statsGraphOpacities = {
-          legend: 'Students entering state'
-        };
-        // TODO(bhenning): before, there was a special opacity computed for the
-        // ending (numCompletions/numVisits), should we do this for all
-        // terminal nodes, instead? If so, explorationStatesService needs to be
-        // able to provide whether given states are terminal
-
-        explorationStatesService.getStateNames().forEach(function(stateName) {
-          var visits = 0;
-          if ($scope.stateStats.hasOwnProperty(stateName)) {
-            visits = $scope.stateStats[stateName].first_entry_count;
+          if (numStarts > 0) {
+            $scope.explorationHasBeenVisited = true;
           }
-          $scope.statsGraphOpacities[stateName] = Math.max(
-            visits / numVisits, 0.05);
-        });
 
-        $scope.hasTabLoaded = true;
+          $scope.pieChartData = [
+            ['Type', 'Number'],
+            ['Passerby', numStarts - numActualStarts],
+            ['Completions', numCompletions],
+            ['Non-Completions', numActualStarts - numCompletions]
+          ];
+        } else {
+          var data = response.data;
+          var numVisits = data.num_starts;
+          var numCompletions = data.num_completions;
+          var improvements = data.improvements;
+          $scope.stateStats = data.state_stats;
+          $scope.lastUpdated = data.last_updated;
+
+          if (numVisits > 0) {
+            $scope.explorationHasBeenVisited = true;
+          }
+
+          $scope.chartData = [
+            ['', 'Completions', 'Non-completions'],
+            ['', numCompletions, numVisits - numCompletions]
+          ];
+
+          $scope.statsGraphOpacities = {
+            legend: 'Students entering state'
+          };
+          // TODO(bhenning): before, there was a special opacity computed for
+          // the ending (numCompletions/numVisits), should we do this for all
+          // terminal nodes, instead? If so, explorationStatesService needs to
+          // be able to provide whether given states are terminal
+
+          explorationStatesService.getStateNames().forEach(function(stateName) {
+            var visits = 0;
+            if ($scope.stateStats.hasOwnProperty(stateName)) {
+              visits = $scope.stateStats[stateName].first_entry_count;
+            }
+            $scope.statsGraphOpacities[stateName] = Math.max(
+              visits / numVisits, 0.05);
+          });
+
+          $scope.hasTabLoaded = true;
+        }
       });
     };
 
@@ -132,7 +174,9 @@ oppia.controller('StatisticsTab', [
         encodeURIComponent(stateName)
       ).then(function(response) {
         $modal.open({
-          templateUrl: 'modals/stateStats',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/statistics_tab/' +
+            'state_stats_modal_directive.html'),
           backdrop: true,
           resolve: {
             stateName: function() {
@@ -151,11 +195,59 @@ oppia.controller('StatisticsTab', [
           controller: [
             '$scope', '$modalInstance', '$filter', 'stateName', 'stateStats',
             'improvementType', 'visualizationsInfo', 'HtmlEscaperService',
+            'ENABLE_NEW_STATS_FRAMEWORK',
             function($scope, $modalInstance, $filter, stateName, stateStats,
-                improvementType, visualizationsInfo, HtmlEscaperService) {
+                improvementType, visualizationsInfo, HtmlEscaperService,
+                ENABLE_NEW_STATS_FRAMEWORK) {
+              var COMPLETION_RATE_PIE_CHART_OPTIONS = {
+                left: 20,
+                pieHole: 0.6,
+                pieSliceTextStyleColor: 'black',
+                pieSliceBorderColor: 'black',
+                chartAreaWidth: 240,
+                colors: ['#d8d8d8', '#008808', 'blue'],
+                height: 270,
+                legendPosition: 'right',
+                width: 240
+              };
+
+              var title1 = 'Answer feedback statistics';
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1 = angular.copy(
+                COMPLETION_RATE_PIE_CHART_OPTIONS);
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1.title = title1
+
+              var title2 = 'Solution usage statistics';
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2 = angular.copy(
+                COMPLETION_RATE_PIE_CHART_OPTIONS);
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2.title = title2
+
               $scope.stateName = stateName;
               $scope.stateStats = stateStats;
               $scope.improvementType = improvementType;
+
+              $scope.ENABLE_NEW_STATS_FRAMEWORK = ENABLE_NEW_STATS_FRAMEWORK;
+
+              var usefulFeedbackCount = (
+                $scope.stateStats.useful_feedback_count);
+              var totalAnswersCount = (
+                $scope.stateStats.total_answers_count);
+              if (totalAnswersCount > 0) {
+                $scope.hasExplorationBeenAnswered = true;
+              }
+              $scope.pieChartData1 = [
+                ['Type', 'Number'],
+                ['Default feedback', totalAnswersCount - usefulFeedbackCount],
+                ['Useful feedback', usefulFeedbackCount],
+              ];
+
+              var numTimesSolutionViewed = (
+                $scope.stateStats.num_times_solution_viewed);
+              $scope.pieChartData2 = [
+                ['Type', 'Number'],
+                ['Solutions used to answer', numTimesSolutionViewed],
+                ['Solutions not used', totalAnswersCount - (
+                  numTimesSolutionViewed)]
+              ];
 
               var _getVisualizationsHtml = function() {
                 var htmlSnippets = [];

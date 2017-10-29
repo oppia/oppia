@@ -21,6 +21,7 @@ oppia.controller('Splash', [
   'UrlInterpolationService',
   function($scope, $timeout, $window, siteAnalyticsService,
     UrlInterpolationService) {
+    $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.getStaticSubjectImageUrl = function(subjectName) {
       return UrlInterpolationService.getStaticImageUrl('/subjects/' +

@@ -25,11 +25,10 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
     """Tests the ExplorationStats domain object."""
 
     def _get_exploration_stats_from_dict(self, exploration_stats_dict):
-        state_stats_mapping = {
-            state_name: stats_domain.StateStats.from_dict(
+        state_stats_mapping = {}
+        for state_name in exploration_stats_dict['state_stats_mapping']:
+            state_stats_mapping[state_name] = stats_domain.StateStats.from_dict(
                 exploration_stats_dict['state_stats_mapping'][state_name])
-            for state_name in exploration_stats_dict['state_stats_mapping']
-        }
         return stats_domain.ExplorationStats(
             exploration_stats_dict['exp_id'],
             exploration_stats_dict['exp_version'],
@@ -65,7 +64,19 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
             'num_completions_v1': 0,
             'num_completions_v2': 5,
             'state_stats_mapping': {
-                'Home': state_stats_dict
+                'Home': {
+                    'total_answers_count_v1': 0,
+                    'total_answers_count_v2': 10,
+                    'useful_feedback_count_v1': 0,
+                    'useful_feedback_count_v2': 4,
+                    'total_hit_count_v1': 0,
+                    'total_hit_count_v2': 18,
+                    'first_hit_count_v1': 0,
+                    'first_hit_count_v2': 7,
+                    'num_times_solution_viewed_v2': 2,
+                    'num_completions_v1': 0,
+                    'num_completions_v2': 2
+                }
             }
         }
         observed_exploration_stats = self._get_exploration_stats_from_dict(
@@ -98,7 +109,19 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
             'num_completions_v1': 0,
             'num_completions_v2': 5,
             'state_stats_mapping': {
-                'Home': state_stats_dict
+                'Home': {
+                    'total_answers_count_v1': 0,
+                    'total_answers_count_v2': 10,
+                    'useful_feedback_count_v1': 0,
+                    'useful_feedback_count_v2': 4,
+                    'total_hit_count_v1': 0,
+                    'total_hit_count_v2': 18,
+                    'first_hit_count_v1': 0,
+                    'first_hit_count_v2': 7,
+                    'num_times_solution_viewed_v2': 2,
+                    'num_completions_v1': 0,
+                    'num_completions_v2': 2
+                }
             }
         }
         exploration_stats = self._get_exploration_stats_from_dict(

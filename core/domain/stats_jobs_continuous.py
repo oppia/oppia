@@ -607,6 +607,25 @@ class InteractionAnswerSummariesMRJobManager(
         # will refer to the most relevant answers.
         latest_version = versions[0]
         latest_interaction_id = versioned_interaction_ids[latest_version][0]
+
+        if exploration_version == VERSION_ALL:
+            # If aggregating across all versions, verify that the latest answer
+            # version is equal to the latest version of the exploration,
+            # otherwise ignore all answers since none of them can be applied to
+            # the latest version.
+            exp = exp_services.get_exploration_by_id(exploration_id)
+            if state_name in exp.states:
+                loaded_interaction_id = exp.states[state_name].interaction.id
+                # Only check if the version mismatches if the new version has a
+                # different interaction ID.
+                if latest_interaction_id != loaded_interaction_id and (
+                        latest_version != exp.version):
+                    yield (
+                        'Ignoring answers submitted to version %s and below '
+                        'since the latest exploration version is %s' % (
+                            latest_version, exp.version))
+                    versions = []
+
         # In the VERSION_ALL case, we only take into account the most recent
         # consecutive block of versions with the same interaction ID as the
         # current version, and ignore all versions prior to this block. This
