@@ -187,30 +187,30 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
-            version_str = str(value['version'])
+            version = value['version']
 
             if value['event_type'] == feconf.EVENT_TYPE_START_EXPLORATION:
-                start_exploration_counts_by_version[version_str] += 1
+                start_exploration_counts_by_version[version] += 1
             elif value['event_type'] == feconf.EVENT_TYPE_COMPLETE_EXPLORATION:
-                complete_exploration_counts_by_version[version_str] += 1
+                complete_exploration_counts_by_version[version] += 1
                 completed_session_ids.add(value['session_id'])
             elif value['event_type'] == feconf.EVENT_TYPE_STATE_HIT:
                 state_name = value['state_name']
                 session_id = value['session_id']
-                state_hit_counts_by_version[version_str][state_name][
+                state_hit_counts_by_version[version][state_name][
                     'total_hit_count'] += 1
-                state_session_ids_by_version[version_str][state_name].add(
+                state_session_ids_by_version[version][state_name].add(
                     session_id)
 
                 if value['created_on'] > session_id_largest_timestamp_mapping[
-                        version_str][session_id]['created_on']:
-                    session_id_largest_timestamp_mapping[version_str][
+                        version][session_id]['created_on']:
+                    session_id_largest_timestamp_mapping[version][
                         session_id] = value
-                session_id_state_hit_event_mapping[version_str][
+                session_id_state_hit_event_mapping[version][
                     session_id].append(value)
             elif value['event_type'] == (
                     GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS):
-                state_answer_counts_by_version[version_str][
+                state_answer_counts_by_version[version][
                     value['state_name']] = {
                         'total_answers_count': value['total_answers_count'],
                         'useful_feedback_count': value['useful_feedback_count']
@@ -243,11 +243,11 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         exploration_stats_list = []
         for version in version_numbers:
             state_hit_counts_for_this_version = (
-                state_hit_counts_by_version[str(version)])
+                state_hit_counts_by_version[version])
             state_completion_counts_for_this_version = (
-                state_completion_counts_by_version[str(version)])
+                state_completion_counts_by_version[version])
             state_answer_counts_for_this_version = (
-                state_answer_counts_by_version[str(version)])
+                state_answer_counts_by_version[version])
 
             versioned_exploration = explorations_by_version[version - 1]
 
@@ -293,9 +293,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 }
 
             # Computing num_starts and num_completions.
-            num_starts += start_exploration_counts_by_version[str(version)]
+            num_starts += start_exploration_counts_by_version[version]
             num_completions += complete_exploration_counts_by_version[
-                str(version)]
+                version]
 
             # Compute total_hit_count and first_hit_count for the states.
             for state_name in state_hit_counts_for_this_version:
@@ -303,7 +303,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     state_hit_counts_for_this_version[state_name][
                         'total_hit_count'])
                 state_stats_mapping[state_name].first_hit_count_v1 += (
-                    len(state_session_ids_by_version[str(version)][state_name]))
+                    len(state_session_ids_by_version[version][state_name]))
 
             # Compute num_completions for the states.
             for state_name in state_completion_counts_for_this_version:
