@@ -32,7 +32,7 @@ describe('HintsAndSolutions', function() {
                      'hintsAndSolutions');
   });
 
-  it('uses hints and solutions in an exploration', function() {
+  fit('uses hints and solutions in an exploration', function() {
     // Creator creates and publishes an exploration
     users.login('user1@hintsAndSolutions.com');
     workflow.createExploration();
