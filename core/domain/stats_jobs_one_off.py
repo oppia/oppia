@@ -171,9 +171,16 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             lambda: collections.defaultdict(lambda: {}))
         # The set of session_ids of learners completing an exploration.
         completed_session_ids = set()
-        # Dict mapping versions -> sessionID -> StateHitEvents.
+        # Dict mapping versions -> sessionID -> state_names.
         session_id_state_hit_event_mapping = collections.defaultdict(
             lambda: collections.defaultdict(list))
+        # The dict of state completions count mapped by version.
+        state_completion_counts_by_version = collections.defaultdict(
+            lambda: collections.defaultdict(int))
+        # The dict mapping version -> sessionID -> StateHitEvent with largest
+        # timestamp.
+        session_id_largest_timestamp_mapping = collections.defaultdict(
+            lambda: collections.defaultdict(lambda: {'created_on': 0}))
         # Dict mapping versions -> state_names -> set(sessionIDs)
         state_session_ids_by_version = collections.defaultdict(
             lambda: collections.defaultdict(set))
@@ -195,6 +202,10 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 state_session_ids_by_version[version_str][state_name].add(
                     session_id)
 
+                if value['created_on'] > session_id_largest_timestamp_mapping[
+                        version_str][session_id]['created_on']:
+                    session_id_largest_timestamp_mapping[version_str][
+                        session_id] = value
                 session_id_state_hit_event_mapping[version_str][
                     session_id].append(value)
             elif value['event_type'] == (
@@ -205,6 +216,25 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         'useful_feedback_count': value['useful_feedback_count']
                     }
 
+        # Compute num_completions for all versions and state names. Completion
+        # is assumed for all state hit events in a session except the state hit
+        # event with the largest timestamp. If the sessionID belongs to the set
+        # of sessionIDs that completed the exploration, the state hit event with
+        # the largest timestamp also gets a completion increment.
+        for version in session_id_state_hit_event_mapping:
+            for session_id in session_id_state_hit_event_mapping[version]:
+                for state_hit_event in session_id_state_hit_event_mapping[
+                        version][session_id]:
+                    if state_hit_event != session_id_largest_timestamp_mapping[
+                            version][session_id]:
+                        state_completion_counts_by_version[version][
+                            state_hit_event['state_name']] += 1
+                if session_id in completed_session_ids:
+                    final_state_name = session_id_largest_timestamp_mapping[
+                        version][session_id]['state_name']
+                    state_completion_counts_by_version[version][
+                        final_state_name] += 1
+
         # This dict will store the cumulative values of state stats from version
         # 1 till the latest version of an exploration.
         state_stats_mapping = {}
@@ -214,10 +244,10 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         for version in version_numbers:
             state_hit_counts_for_this_version = (
                 state_hit_counts_by_version[str(version)])
+            state_completion_counts_for_this_version = (
+                state_completion_counts_by_version[str(version)])
             state_answer_counts_for_this_version = (
                 state_answer_counts_by_version[str(version)])
-            session_id_state_hit_event_mapping_for_this_version = (
-                session_id_state_hit_event_mapping[str(version)])
 
             versioned_exploration = explorations_by_version[version - 1]
 
@@ -276,29 +306,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     len(state_session_ids_by_version[str(version)][state_name]))
 
             # Compute num_completions for the states.
-            for session_id in (
-                    session_id_state_hit_event_mapping_for_this_version):
-                state_hit_event_dicts_sessioned = (
-                    session_id_state_hit_event_mapping_for_this_version[
-                        session_id])
-                # Sort list of state hit events in increasing order of
-                # timestamp.
-                state_hit_event_dicts_sessioned = sorted(
-                    state_hit_event_dicts_sessioned, key=lambda e: e[
-                        'created_on'])
-                # All state hit events in the above list are ordered by their
-                # timestamp. This implies that the last state hit event is the
-                # state at which the learner quit the exploration (This is only
-                # True if the last state hit event is not the terminal state).
-                # So, if the last state is not the terminal state, we increment
-                # num_completions for all states except the last state.
-                # Otherwise, we increment num_completions for all the states.
-                for state_hit_event in state_hit_event_dicts_sessioned[:-1]:
-                    state_stats_mapping[state_hit_event[
-                        'state_name']].num_completions_v1 += 1
-                if session_id in completed_session_ids:
-                    state_stats_mapping[state_hit_event_dicts_sessioned[-1][
-                        'state_name']].num_completions_v1 += 1
+            for state_name in state_completion_counts_for_this_version:
+                state_stats_mapping[state_name].num_completions_v1 += (
+                    state_completion_counts_for_this_version[state_name])
 
             # Compute total_answers_count and useful_feedback_count.
             for state_name in state_answer_counts_for_this_version:
