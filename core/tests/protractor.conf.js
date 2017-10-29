@@ -57,10 +57,10 @@ exports.config = {
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
     full: [
-      'protractor/hintsAndSolutions.js'
+      'protractor/*.js'
     ],
 
-    /*mainEditor: [
+    mainEditor: [
       'protractor/editorAndPlayer.js',
       'protractor/stateEditor.js',
       'protractor/explorationFeedback.js'
@@ -106,7 +106,7 @@ exports.config = {
 
     embedding: [
       'protractor/embedding.js'
-    ]*/
+    ]
   },
 
   // ----- Capabilities to be passed to the webdriver instance ----
