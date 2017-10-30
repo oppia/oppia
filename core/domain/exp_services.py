@@ -1028,7 +1028,7 @@ def _get_last_updated_by_human_ms(exp_id):
 def publish_exploration_and_update_user_profiles(committer, exp_id):
     """Publishes the exploration with publish_exploration() function in
     rights_manager.py, as well as updates first_contribution_msec. Sends an
-    email to the subscribers of the commiter informing them that an exploration
+    email to the subscribers of the committer informing them that an exploration
     has been published.
 
     It is the responsibility of the caller to check that the exploration is

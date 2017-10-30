@@ -32,6 +32,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 import feconf
 import main
@@ -498,6 +499,12 @@ class TestBase(unittest.TestCase):
         )
         exp_summary_model.put()
 
+    def publish_exploration(self, owner_id, exploration_id):
+        """Publish the exploration of given exploration_id."""
+
+        committer = user_services.UserActionsInfo(owner_id)
+        rights_manager.publish_exploration(committer, exploration_id)
+
     def save_new_default_collection(
             self, collection_id, owner_id, title='A title',
             category='A category', objective='An objective',
@@ -528,6 +535,12 @@ class TestBase(unittest.TestCase):
 
         collection_services.save_new_collection(owner_id, collection)
         return collection
+
+    def publish_collection(self, owner_id, collection_id):
+        """Publish the collection of given collection_id."""
+
+        committer = user_services.UserActionsInfo(owner_id)
+        rights_manager.publish_collection(committer, collection_id)
 
     def get_updated_param_dict(
             self, param_dict, param_changes, exp_param_specs):
