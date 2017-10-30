@@ -34,6 +34,8 @@ QUEUE_NAME_EMAILS = 'emails'
 QUEUE_NAME_EVENTS = 'events'
 # Taskqueue for running one-off jobs.
 QUEUE_NAME_ONE_OFF_JOBS = 'one-off-jobs'
+# Taskqueue for updating stats models.
+QUEUE_NAME_STATS = 'stats'
 
 
 def defer(fn, queue_name, *args, **kwargs):
