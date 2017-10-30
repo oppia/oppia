@@ -220,6 +220,7 @@
 	"I18N_PLAYER_HINT": "힌트",
 	"I18N_PLAYER_HINTS_EXHAUSTED": "죄송합니다, 힌트가 없습니다!",
 	"I18N_PLAYER_HINT_IS_AVAILABLE": "힌트를 보려면 여기를 누르세요!",
+	"I18N_PLAYER_HINT_NEED_A_HINT": "힌트가 필요합니까?",
 	"I18N_PLAYER_HINT_NOT_AVAILABLE": "힌트를 요청하기 전에 조금 더 생각해 보세요!",
 	"I18N_PLAYER_HINT_REQUEST_STRING_1": "힌트를 요청합니다.",
 	"I18N_PLAYER_HINT_REQUEST_STRING_2": "제가 좀 막혔습니다, 힌트가 있나요?",

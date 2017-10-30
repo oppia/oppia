@@ -338,6 +338,7 @@
 	"I18N_PLAYER_HINT": "Hinweis",
 	"I18N_PLAYER_HINTS_EXHAUSTED": "Leider sind die Hinweise ausgegangen!",
 	"I18N_PLAYER_HINT_IS_AVAILABLE": "Hier klicken für einen Hinweis!",
+	"I18N_PLAYER_HINT_NEED_A_HINT": "Benötigst du einen Hinweis?",
 	"I18N_PLAYER_HINT_NOT_AVAILABLE": "Versuche ein bisschen mehr nachzudenken, bevor du um einen Hinweis bittest!",
 	"I18N_PLAYER_HINT_REQUEST_STRING_1": "Ich möchte einen Hinweis bekommen.",
 	"I18N_PLAYER_HINT_REQUEST_STRING_2": "Ich bin ein bisschen stecken geblieben. Irgendwelche Hinweise?",

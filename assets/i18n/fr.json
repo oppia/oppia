@@ -338,6 +338,7 @@
 	"I18N_PLAYER_HINT": "Indice",
 	"I18N_PLAYER_HINTS_EXHAUSTED": "Désolé, je n'ai plus d'indices !",
 	"I18N_PLAYER_HINT_IS_AVAILABLE": "Cliquez ici pour obtenir un indice !",
+	"I18N_PLAYER_HINT_NEED_A_HINT": "Besoin d’un conseil ?",
 	"I18N_PLAYER_HINT_NOT_AVAILABLE": "Essayez de réfléchir un peu plus avant de demander un indice !",
 	"I18N_PLAYER_HINT_REQUEST_STRING_1": "Je voudrais un indice.",
 	"I18N_PLAYER_HINT_REQUEST_STRING_2": "Je suis coincé, est-il possible d'avoir un indice ?",
