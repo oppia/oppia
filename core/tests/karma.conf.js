@@ -14,6 +14,7 @@ module.exports = function(config) {
       'core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
       'assets/constants.js',
+      'assets/rich_text_components_specs.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.0.0/jquery.min.js',
@@ -29,6 +30,12 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*.js',
       'core/templates/dev/head/**/*.html',
       'extensions/**/*.js',
+      {
+        pattern: 'extensions/**/*.png',
+        watched: false,
+        served: true,
+        included: false
+      },
       'extensions/interactions/**/*.html',
       'extensions/interactions/rule_templates.json',
       {
@@ -51,9 +58,10 @@ module.exports = function(config) {
     ],
     proxies: {
       // Karma serves files under the /base directory.
-      // We need to access files in assets folder, without modifying the code,
-      // so we need to proxy the requests from /assets/ to /base/assets/.
-      '/assets/': '/base/assets/'
+      // We access files directly in our code, for example /folder/,
+      // so we need to proxy the requests from /folder/ to /base/folder/.
+      '/assets/': '/base/assets/',
+      '/extensions/': '/base/extensions/'
     },
     preprocessors: {
       'core/templates/dev/head/*.js': ['coverage'],

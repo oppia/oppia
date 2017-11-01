@@ -153,7 +153,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expect_errors=True,
             expected_status_int=400)
-        self.assertEqual(generated_exps_response['code'], 400)
+        self.assertEqual(generated_exps_response['status_code'], 400)
         generated_exps = exp_services.get_all_exploration_summaries()
         published_exps = exp_services.get_recently_published_exp_summaries(5)
         self.assertEqual(len(generated_exps), 0)
@@ -210,7 +210,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             feconf.ADMIN_ROLE_HANDLER_URL,
             {'method': 'username', 'username': username},
             expect_errors=True)
-        self.assertEqual(response['code'], 400)
+        self.assertEqual(response['status_code'], 400)
 
         # Trying to update role of non-existent user.
         response = self.testapp.get(feconf.ADMIN_URL)
@@ -301,7 +301,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             response['error'],
             'Exploration \'exp\' does not have \'state name\' state.')
         self.assertEqual(
-            response['code'], 400)
+            response['status_code'], 400)
 
 
 class SslChallengeHandlerTests(test_utils.GenericTestBase):

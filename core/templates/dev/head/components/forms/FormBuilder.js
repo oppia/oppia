@@ -224,9 +224,9 @@ oppia.directive('textAngularRte', [
             if (!($scope.uiConfig() &&
                   $scope.uiConfig().hide_complex_extensions &&
                   componentDefn.isComplex)) {
-              toolbarOptions[2].push(componentDefn.name);
+              toolbarOptions[2].push(componentDefn.id);
             }
-            var imgClassName = 'oppia-noninteractive-' + componentDefn.name;
+            var imgClassName = 'oppia-noninteractive-' + componentDefn.id;
             whitelistedImgClasses.push(imgClassName);
           }
         );

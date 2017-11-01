@@ -18,11 +18,18 @@
  */
 
 var general = require('../protractor_utils/general.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('screenreader and keyboard user accessibility features', function() {
+  var libraryPage = null;
+
+  beforeEach(function() {
+    libraryPage = new LibraryPage.LibraryPage();
+  });
+
   it('should skip to the main content element', function() {
     var mainContent = element(by.css('.protractor-test-main-content'));
-    browser.get(general.LIBRARY_URL_SUFFIX);
+    libraryPage.get();
     browser.actions().sendKeys(protractor.Key.TAB).perform();
     general.waitForSystem();
     element(by.css('.protractor-test-skip-link')).click();

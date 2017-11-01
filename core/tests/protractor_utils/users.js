@@ -19,7 +19,9 @@
 
 var forms = require('./forms.js');
 var general = require('./general.js');
-var admin = require('./admin.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
+
+var adminPage = new AdminPage.AdminPage();
 
 var login = function(email, isSuperAdmin) {
   // Use of element is not possible because the login page is non-angular.
@@ -65,7 +67,7 @@ var createAndLoginUser = function(email, username) {
 var createModerator = function(email, username) {
   login(email, true);
   _completeSignup(username);
-  admin.updateRole(username, 'moderator');
+  adminPage.updateRole(username, 'moderator');
   logout();
 };
 
@@ -77,7 +79,7 @@ var createAdmin = function(email, username) {
 var createAndLoginAdminUser = function(email, username) {
   login(email, true);
   _completeSignup(username);
-  admin.updateRole(username, 'admin');
+  adminPage.updateRole(username, 'admin');
 };
 
 exports.login = login;
