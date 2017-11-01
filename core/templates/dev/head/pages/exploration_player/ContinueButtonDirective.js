@@ -29,4 +29,4 @@ oppia.directive('continueButton', [
         'continue_button_directive.html')
     };
   }
-  ]);
+]);
