@@ -158,8 +158,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         # The list of exploration start counts mapped by version.
         start_exploration_counts_by_version = collections.defaultdict(int)
         # The list of exploration complete counts mapped by version.
-        complete_exploration_counts_by_version = collections.defaultdict(
-            lambda: 0)
+        complete_exploration_counts_by_version = collections.defaultdict(int)
         # The dict of state hit counts mapped by version.
         state_hit_counts_by_version = collections.defaultdict(
             lambda: collections.defaultdict(lambda: {
@@ -170,8 +169,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         state_answer_counts_by_version = collections.defaultdict(
             lambda: collections.defaultdict(lambda: {}))
         # The set of session_ids of learners completing an exploration.
-        completed_session_ids = set()
-        # Dict mapping versions -> sessionID -> state_names.
+        exp_completed_session_ids = set()
+        # Dict mapping versions -> sessionID -> state hit events.
         session_id_state_hit_event_mapping = collections.defaultdict(
             lambda: collections.defaultdict(list))
         # The dict of state completions count mapped by version.
@@ -179,7 +178,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             lambda: collections.defaultdict(int))
         # The dict mapping version -> sessionID -> StateHitEvent with largest
         # timestamp.
-        session_id_largest_timestamp_mapping = collections.defaultdict(
+        session_id_latest_event_mapping = collections.defaultdict(
             lambda: collections.defaultdict(lambda: {'created_on': 0}))
         # Dict mapping versions -> state_names -> set(sessionIDs)
         state_session_ids_by_version = collections.defaultdict(
@@ -193,7 +192,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 start_exploration_counts_by_version[version] += 1
             elif value['event_type'] == feconf.EVENT_TYPE_COMPLETE_EXPLORATION:
                 complete_exploration_counts_by_version[version] += 1
-                completed_session_ids.add(value['session_id'])
+                exp_completed_session_ids.add(value['session_id'])
             elif value['event_type'] == feconf.EVENT_TYPE_STATE_HIT:
                 state_name = value['state_name']
                 session_id = value['session_id']
@@ -202,9 +201,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 state_session_ids_by_version[version][state_name].add(
                     session_id)
 
-                if value['created_on'] > session_id_largest_timestamp_mapping[
+                if value['created_on'] > session_id_latest_event_mapping[
                         version][session_id]['created_on']:
-                    session_id_largest_timestamp_mapping[version][
+                    session_id_latest_event_mapping[version][
                         session_id] = value
                 session_id_state_hit_event_mapping[version][
                     session_id].append(value)
@@ -225,12 +224,12 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             for session_id in session_id_state_hit_event_mapping[version]:
                 for state_hit_event in session_id_state_hit_event_mapping[
                         version][session_id]:
-                    if state_hit_event != session_id_largest_timestamp_mapping[
+                    if state_hit_event != session_id_latest_event_mapping[
                             version][session_id]:
                         state_completion_counts_by_version[version][
                             state_hit_event['state_name']] += 1
-                if session_id in completed_session_ids:
-                    final_state_name = session_id_largest_timestamp_mapping[
+                if session_id in exp_completed_session_ids:
+                    final_state_name = session_id_latest_event_mapping[
                         version][session_id]['state_name']
                     state_completion_counts_by_version[version][
                         final_state_name] += 1
@@ -240,7 +239,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         state_stats_mapping = {}
         # This list will contain all the ExplorationStats domain objects for
         # each version.
-        exploration_stats_list = []
+        exploration_stats_by_version_updated = []
         for version in version_numbers:
             state_hit_counts_for_this_version = (
                 state_hit_counts_by_version[version])
@@ -278,7 +277,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
             # Handling exploration reverts.
             if revert_to_version:
-                old_exploration_stats = exploration_stats_list[
+                old_exploration_stats = exploration_stats_by_version_updated[
                     revert_to_version - 1]
                 num_starts = old_exploration_stats['num_starts_v1']
                 num_completions = old_exploration_stats['num_completions_v1']
@@ -330,7 +329,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 # leads to. The max is taken instead of sum because the sum of
                 # first_hit_counts will sometimes end up counting a single
                 # learner twice. The max of both first hit counts ensures that
-                # we arecounting only unique learners who traversed past the
+                # we are counting only unique learners who traversed past the
                 # initial state.
                 init_state = versioned_exploration.states[
                     versioned_exploration.init_state_name]
@@ -356,10 +355,12 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 exploration_stats = stats_domain.ExplorationStats(
                     exp_id, version, num_starts, 0, num_actual_starts, 0,
                     num_completions, 0, state_stats_mapping)
-            exploration_stats_list.append(exploration_stats.to_dict())
+            exploration_stats_by_version_updated.append(
+                exploration_stats.to_dict())
 
         # Save all the ExplorationStats models to storage.
-        stats_models.ExplorationStatsModel.save_multi(exploration_stats_list)
+        stats_models.ExplorationStatsModel.save_multi(
+            exploration_stats_by_version_updated)
 
 
 class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):

@@ -256,23 +256,21 @@ def get_exploration_summary_by_id(exploration_id):
 
 def get_multiple_explorations_by_version(exp_id, version_numbers):
     """Returns a list of Exploration domain objects corresponding to the
-    specified versions.
+    specified versions. Check that the exploration has not been deleted before
+    running this method.
 
     Args:
         exp_id: str. ID of the exploration.
         version_numbers: list(int). List of version numbers.
 
     Returns:
-        list(Exploration|None). List of Exploration domain class instances.
+        list(Exploration). List of Exploration domain class instances.
     """
     explorations = []
     exploration_models = exp_models.ExplorationModel.get_multi_versions(
         exp_id, version_numbers)
     for exploration_model in exploration_models:
-        if exploration_model is None:
-            explorations.append(None)
-        else:
-            explorations.append(get_exploration_from_model(exploration_model))
+        explorations.append(get_exploration_from_model(exploration_model))
     return explorations
 
 
