@@ -247,7 +247,7 @@ oppia.directive('conversationSkin', [
       template: '<div ng-include="directiveTemplate"></div>',
       controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
-        'messengerService', 'ExplorationPlayerService', 'urlService',
+        'MessengerService', 'ExplorationPlayerService', 'urlService',
         'FocusManagerService', 'LearnerViewRatingService',
         'windowDimensionsService', 'PlayerTranscriptService',
         'LearnerParamsService', 'PlayerPositionService',
@@ -255,10 +255,10 @@ oppia.directive('conversationSkin', [
         'siteAnalyticsService', 'ExplorationPlayerStateService',
         'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
-        'FatigueDetectionService',
+        'FatigueDetectionService', 'NumberAttemptsService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
-            messengerService, ExplorationPlayerService, urlService,
+            MessengerService, ExplorationPlayerService, urlService,
             FocusManagerService, LearnerViewRatingService,
             windowDimensionsService, PlayerTranscriptService,
             LearnerParamsService, PlayerPositionService,
@@ -266,7 +266,7 @@ oppia.directive('conversationSkin', [
             siteAnalyticsService, ExplorationPlayerStateService,
             TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-            FatigueDetectionService) {
+            FatigueDetectionService, NumberAttemptsService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -320,7 +320,7 @@ oppia.directive('conversationSkin', [
                 // Sometimes setting iframe height to the exact content height
                 // still produces scrollbar, so adding 50 extra px.
                 newHeight += 50;
-                messengerService.sendMessage(messengerService.HEIGHT_CHANGE, {
+                MessengerService.sendMessage(MessengerService.HEIGHT_CHANGE, {
                   height: newHeight,
                   scroll: scroll
                 });
@@ -503,6 +503,7 @@ oppia.directive('conversationSkin', [
                 return;
               }
             }
+            NumberAttemptsService.submitAttempt();
 
             _answerIsBeingProcessed = true;
             hasInteractedAtLeastOnce = true;
@@ -559,6 +560,7 @@ oppia.directive('conversationSkin', [
                     // immediately. Otherwise, give the learner a chance to read
                     // the feedback, and display a 'Continue' button.
                     FatigueDetectionService.reset();
+                    NumberAttemptsService.reset();
 
                     _nextFocusLabel = FocusManagerService.generateFocusLabel();
 
@@ -744,29 +746,6 @@ oppia.directive('conversationSkin', [
 
           $scope.isViewportNarrow = function() {
             return $scope.windowWidth < TWO_CARD_THRESHOLD_PX;
-          };
-
-          $scope.isScreenNarrowAndShowingTutorCard = function() {
-            if (!$scope.isCurrentSupplementalCardNonempty()) {
-              return $scope.isViewportNarrow();
-            }
-            return $scope.isViewportNarrow() && tutorCardIsDisplayedIfNarrow;
-          };
-
-          $scope.isScreenNarrowAndShowingSupplementalCard = function() {
-            return $scope.isViewportNarrow() && !tutorCardIsDisplayedIfNarrow;
-          };
-
-          $scope.showTutorCardIfScreenIsNarrow = function() {
-            if ($scope.isViewportNarrow()) {
-              tutorCardIsDisplayedIfNarrow = true;
-            }
-          };
-
-          $scope.showSupplementalCardIfScreenIsNarrow = function() {
-            if ($scope.isViewportNarrow()) {
-              tutorCardIsDisplayedIfNarrow = false;
-            }
           };
 
           $scope.initializePage();

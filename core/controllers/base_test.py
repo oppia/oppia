@@ -497,7 +497,7 @@ class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
 
             response = self.get_json('/fake', expect_errors=True)
             self.assertTrue(isinstance(response, dict))
-            self.assertEqual(500, response['code'])
+            self.assertEqual(500, response['status_code'])
 
 
 class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
