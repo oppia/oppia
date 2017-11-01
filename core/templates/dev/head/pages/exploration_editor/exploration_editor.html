@@ -123,9 +123,12 @@
 {% block footer_js %}
   {{ super() }}
   <script src="/third_party/static/d3js-3.4.11/d3.min.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/mathjaxConfig.js"></script>
+  <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   <script>
     {{ value_generators_js }}
   </script>
+
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
