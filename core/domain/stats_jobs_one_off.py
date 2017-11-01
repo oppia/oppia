@@ -16,197 +16,210 @@
 
 import ast
 import collections
+import itertools
 
 from core import jobs
+from core.domain import exp_domain
+from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
+from core.domain import stats_services
 from core.platform import models
 
-(stats_models,) = models.Registry.import_models([
-    models.NAMES.statistics
+(exp_models, stats_models,) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.statistics
 ])
 
 
-class RecomputeStateCompleteStatistics(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job for recomputing the statistics for the
-    StateCompleteEvent.
+class RecomputeStatistics(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for recomputing creator statistics from the events
+    in the datastore. Should only be run in events of data corruption.
     """
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [stats_models.StateCompleteEventLogEntryModel]
+        return [stats_models.StateCompleteEventLogEntryModel,
+                stats_models.AnswerSubmittedEventLogEntryModel,
+                stats_models.StateHitEventLogEntryModel,
+                stats_models.SolutionHitEventLogEntryModel,
+                stats_models.ExplorationActualStartEventLogEntryModel,
+                stats_models.CompleteExplorationEventLogEntryModel
+               ]
 
     @staticmethod
     def map(item):
         if item.event_schema_version == 2:
-            yield ((item.exp_id, item.exp_version, item.state_name),
-                   1)
+            if isinstance(item, stats_models.StateCompleteEventLogEntryModel):
+                yield (item.exp_id,
+                       {
+                           'type': 'state_complete',
+                           'version': item.exp_version,
+                           'state': item.state_name
+                       })
+            elif isinstance(
+                    item, stats_models.AnswerSubmittedEventLogEntryModel):
+                yield (item.exp_id,
+                       {
+                           'type': 'answer_submitted',
+                           'version': item.exp_version,
+                           'state': item.state_name,
+                           'is_feedback_useful': item.is_feedback_useful
+                       })
+            elif isinstance(item, stats_models.StateHitEventLogEntryModel):
+                yield (item.exploration_id,
+                       {
+                           'type': 'state_hit',
+                           'version': item.exploration_version,
+                           'state': item.state_name,
+                           'session_id': item.session_id
+                       })
+            elif isinstance(item, stats_models.SolutionHitEventLogEntryModel):
+                yield (item.exp_id,
+                       {
+                           'type': 'solution_hit',
+                           'version': item.exp_version,
+                           'state': item.state_name,
+                           'session_id': item.session_id
+                       })
+            elif isinstance(
+                    item,
+                    stats_models.ExplorationActualStartEventLogEntryModel):
+                yield (item.exp_id,
+                       {
+                           'type': 'exploration_actual_start',
+                           'version': item.exp_version,
+                           'state': item.state_name
+                       })
+            elif isinstance(
+                    item, stats_models.CompleteExplorationEventLogEntryModel):
+                yield (item.exploration_id,
+                       {
+                           'type': 'complete_exploration',
+                           'version': item.exploration_version,
+                           'state': item.state_name
+                       })
+
 
     @staticmethod
     def reduce(key, values):
-        key = ast.literal_eval(key)
-        num_completions = len(values)
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            key[0], key[1])
-        model = stats_models.ExplorationStatsModel.get(model_id)
-        state_stats = model.state_stats_mapping[key[2]]
-        state_stats['num_completions_v2'] = num_completions
-        model.state_stats_mapping[key[2]] = state_stats
-        model.put()
+        values = map(ast.literal_eval, values)
+        values = sorted(values, key=lambda x: x['version'])
 
+        for version, events in itertools.groupby(values,
+                                                 key=lambda x: x['version']):
+            if version == 1:
+                # Get a copy of the uncorrupted *_v1 statistics
+                old_stats = stats_services.get_exploration_stats_by_id(
+                    key, version)
+                for state_stats in old_stats.state_stats_mapping.values():
+                    state_stats.total_answers_count_v2 = 0
+                    state_stats.useful_feedback_count_v2 = 0
+                    state_stats.total_hit_count_v2 = 0
+                    state_stats.first_hit_count_v2 = 0
+                    state_stats.num_times_solution_viewed_v2 = 0
+                    state_stats.num_completions_v2 = 0
+                RecomputeStatistics._recompute_statistics(
+                    key, version, events, old_stats)
+            else:
+                change_list = exp_models.ExplorationCommitLogEntryModel.get(
+                    'exploration-%s-%s' % (key, version)).commit_cmds
 
-class RecomputeAnswerSubmittedStatistics(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job for recomputing the statistics for the
-    AnswerSubmittedEvent.
-    """
+                old_exp_version = version - 1
+                exploration_stats = stats_services.get_exploration_stats_by_id(
+                    key, old_exp_version)
+                if exploration_stats is None:
+                    raise ValueError('Recomputation of exploration with id'
+                                     '%s for version %s failed'
+                                     % (key, old_exp_version))
+                exploration_stats = (
+                    RecomputeStatistics._update_state_stats_mapping(
+                        exploration_stats, change_list))
+
+                RecomputeStatistics._recompute_statistics(
+                    key, version, events, exploration_stats)
 
     @classmethod
-    def entity_classes_to_map_over(cls):
-        return [stats_models.AnswerSubmittedEventLogEntryModel]
+    def _update_state_stats_mapping(cls, old_stats_model, change_list):
+        """Update the state_stats_mapping to correspond with the changes
+        in change_list.
 
-    @staticmethod
-    def map(item):
-        if item.event_schema_version == 2:
-            yield ((item.exp_id, item.exp_version, item.state_name),
-                   item.is_feedback_useful)
+        Args:
+            old_stats_model: ExplorationStatsModel. The stats model
+                for the previous verion.
+            change_list: list(dict). A list of all of the commit cmds to
+                the old_stats_model up to the next version.
 
-    @staticmethod
-    def reduce(key, values):
-        key = ast.literal_eval(key)
-        total_answers_count = len(values)
-        useful_feedback_count = sum([1 for useful_feedback in values
-                                     if useful_feedback == 'True'])
+        Returns:
+            ExplorationStatsModel. An ExplorationStatsModel with updated
+                state_stats_mapping and version.
+        """
+        # Handling state additions, deletions and renames.
+        for change_dict in change_list:
+            if change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
+                old_stats_model.state_stats_mapping[change_dict[
+                    'state_name']] = (stats_domain.StateStats
+                                      .create_default())
+            elif change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
+                old_stats_model.state_stats_mapping.pop(change_dict[
+                    'state_name'])
+            elif change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
+                old_stats_model.state_stats_mapping[
+                    change_dict['new_state_name']] = (
+                        old_stats_model.state_stats_mapping.pop(
+                            change_dict['old_state_name']))
+        old_stats_model.exp_version += 1
 
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            key[0], key[1])
-        model = stats_models.ExplorationStatsModel.get(model_id)
-        state_stats = model.state_stats_mapping[key[2]]
-        state_stats['total_answers_count_v2'] = total_answers_count
-        state_stats['useful_feedback_count_v2'] = useful_feedback_count
-        model.state_stats_mapping[key[2]] = state_stats
-        model.put()
-
-
-class RecomputeStateHitStatistics(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job for recomputing the statistics for the
-    StateHitEvent.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [stats_models.StateHitEventLogEntryModel]
-
-    @staticmethod
-    def map(item):
-        if item.event_schema_version == 2:
-            yield ((item.exploration_id, item.exploration_version,
-                    item.state_name), item.session_id)
-
-    @staticmethod
-    def reduce(key, values):
-        key = ast.literal_eval(key)
-        total_hit_count = len(values)
-        # Only count the first session in which a user submits
-        # the correct answer.
-        first_hit_count = 0
-        for idx, session_id in enumerate(values):
-            if idx == values.index(session_id):
-                first_hit_count += 1
-
-
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            key[0], key[1])
-        model = stats_models.ExplorationStatsModel.get(model_id)
-        state_stats = model.state_stats_mapping[key[2]]
-        state_stats['total_hit_count_v2'] = total_hit_count
-        state_stats['first_hit_count_v2'] = first_hit_count
-        model.state_stats_mapping[key[2]] = state_stats
-        model.put()
-
-
-class RecomputeSolutionHitStatistics(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job for recomputing the statistics for the
-    SolutionHitEvent.
-    """
+        return old_stats_model
 
     @classmethod
-    def entity_classes_to_map_over(cls):
-        return [stats_models.SolutionHitEventLogEntryModel]
+    def _recompute_statistics(
+            cls, exp_id, exp_version, events, old_stats_model):
+        """Create a ExplorationStatsModel with the statistics from
+        events added.
 
-    @staticmethod
-    def map(item):
-        if item.event_schema_version == 2:
-            yield ((item.exp_id, item.exp_version, item.state_name),
-                   item.session_id)
+        Args:
+            exp_id: str. The id of the exploration to recompute statistics for.
+            exp_version. The version of the exploration.
+            events: list(dict). A list of event data dicts from the datastore.
+            stats_model: ExplorationStatsModel. The stats_model to recompute
+                statistics for.
+        """
+        state_hit_ids, solution_hit_ids = set(), set()
 
-    @staticmethod
-    def reduce(key, values):
-        key = ast.literal_eval(key)
-        # Only count the first session in which a user triggers
-        # the solution.
-        solution_triggered = 0
-        for idx, event in enumerate(values):
-            if idx == values.index(event):
-                solution_triggered += 1
+        for event in events:
+            state_stats = old_stats_model.state_stats_mapping[event['state']]
+            if event['type'] == 'answer_submitted':
+                state_stats.total_answers_count_v2 += 1
+                if event['is_feedback_useful'] is True:
+                    state_stats.useful_feedback_count_v2 += 1
+            elif event['type'] == 'state_hit':
+                state_stats.total_hit_count_v2 += 1
+                if event['session_id'] not in state_hit_ids:
+                    state_stats.first_hit_count_v2 += 1
+                    state_hit_ids.add(event['session_id'])
+            elif event['type'] == 'solution_hit':
+                if event['session_id'] not in solution_hit_ids:
+                    state_stats.num_times_solution_viewed_v2 += 1
+                    solution_hit_ids.add(event['session_id'])
+            elif event['type'] == 'exploration_actual_start':
+                old_stats_model.num_actual_starts_v2 += 1
+            elif event['type'] == 'complete_exploration':
+                old_stats_model.num_completions_v2 += 1
+            elif event['type'] == 'state_complete':
+                state_stats.num_completions_v2 += 1
 
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            key[0], key[1])
-        model = stats_models.ExplorationStatsModel.get(model_id)
-        state_stats = model.state_stats_mapping[key[2]]
-        state_stats['num_times_solution_viewed_v2'] = solution_triggered
-        model.state_stats_mapping[key[2]] = state_stats
-        model.put()
+        for state, stats in old_stats_model.state_stats_mapping.iteritems():
+            old_stats_model.state_stats_mapping[state] = stats.to_dict()
 
-
-class RecomputeActualStartStatistics(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job for recomputing the statistics for the
-    ExplorationActualStartEvent.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [stats_models.ExplorationActualStartEventLogEntryModel]
-
-    @staticmethod
-    def map(item):
-        if item.event_schema_version == 2:
-            yield ((item.exp_id, item.exp_version),
-                   1)
-
-    @staticmethod
-    def reduce(key, values):
-        key = ast.literal_eval(key)
-        num_actual_starts = len(values)
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            key[0], key[1])
-        model = stats_models.ExplorationStatsModel.get(model_id)
-        model.num_actual_starts_v2 = num_actual_starts
-        model.put()
-
-
-class RecomputeCompleteEventStatistics(jobs.BaseMapReduceOneOffJobManager):
-    """A one-off job for recomputing the statistics for the
-    CompleteExplorationEvent.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [stats_models.CompleteExplorationEventLogEntryModel]
-
-    @staticmethod
-    def map(item):
-        if item.event_schema_version == 2:
-            yield ((item.exploration_id, item.exploration_version),
-                   1)
-
-    @staticmethod
-    def reduce(key, values):
-        key = ast.literal_eval(key)
-        num_completions = len(values)
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            key[0], key[1])
-        model = stats_models.ExplorationStatsModel.get(model_id)
-        model.num_completions_v2 = num_completions
-        model.put()
+        stats_models.ExplorationStatsModel.create(
+            exp_id=exp_id,
+            exp_version=exp_version,
+            num_starts_v1=old_stats_model.num_starts_v1,
+            num_starts_v2=old_stats_model.num_starts_v2,
+            num_actual_starts_v1=old_stats_model.num_actual_starts_v1,
+            num_actual_starts_v2=old_stats_model.num_actual_starts_v2,
+            num_completions_v1=old_stats_model.num_completions_v1,
+            num_completions_v2=old_stats_model.num_completions_v2,
+            state_stats_mapping=old_stats_model.state_stats_mapping)
 
 
 class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
