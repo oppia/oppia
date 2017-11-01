@@ -22,16 +22,18 @@ var CreatorDashboardPage =
 var collectionEditor = require('../protractor_utils/collectionEditor.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
-var library = require('../protractor_utils/library.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var player = require('../protractor_utils/player.js');
 var users = require('../protractor_utils/users.js');
 
 describe('Learner dashboard functionality', function() {
   var creatorDashboardPage = null;
   var adminPage = null;
-
+  var libraryPage = null;
+  
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    libraryPage = new LibraryPage.LibraryPage();
   });
 
   beforeAll(function() {
@@ -80,7 +82,7 @@ describe('Learner dashboard functionality', function() {
     general.acceptAlert();
     browser.ignoreSynchronization = false;
     browser.waitForAngular();
-    library.expectExplorationToBeVisible('Root Linear Coefficient Theorem');
+    libraryPage.expectExplorationToBeVisible('Root Linear Coefficient Theorem');
 
     // Play an exploration completely. It should be added to the 'Completed'
     // section.
@@ -93,7 +95,7 @@ describe('Learner dashboard functionality', function() {
     browser.waitForAngular();
     element(by.css('.protractor-test-completed-section')).click();
     browser.waitForAngular();
-    library.expectExplorationToBeVisible('About Oppia');
+    libraryPage.expectExplorationToBeVisible('About Oppia');
     users.logout();
 
     users.login('creator3@learnerDashboard.com');
@@ -108,7 +110,7 @@ describe('Learner dashboard functionality', function() {
     users.login('learner@learnerDashboard.com');
     browser.get(general.LEARNER_DASHBOARD_URL);
     browser.waitForAngular();
-    library.expectExplorationToBeHidden('Root Linear Coefficient Theorem');
+    libraryPage.expectExplorationToBeHidden('Root Linear Coefficient Theorem');
     users.logout();
   });
 
@@ -233,7 +235,7 @@ describe('Learner dashboard functionality', function() {
     users.login('learner@learnerDashboard.com');
     var feedback = 'A good exploration. Would love to see a few more questions';
 
-    browser.get(general.LIBRARY_URL_SUFFIX);
+    libraryPage.get();
     general.openPlayer('14');
     player.submitAnswer('Continue', null);
     player.submitAnswer(

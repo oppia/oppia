@@ -33,7 +33,6 @@ from google.appengine.api import users
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
-from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -310,8 +309,6 @@ class BaseHandler(webapp2.RequestHandler):
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
-            'RTE_COMPONENT_SPECS': (
-                rte_component_registry.Registry.get_all_specs()),
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
             'SITE_NAME': feconf.SITE_NAME,
 
