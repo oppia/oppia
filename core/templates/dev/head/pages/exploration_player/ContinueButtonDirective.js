@@ -28,4 +28,5 @@ oppia.directive('continueButton', [
         '/pages/exploration_player/' +
         'continue_button_directive.html')
     };
-  }]);
+  }
+  ]);
