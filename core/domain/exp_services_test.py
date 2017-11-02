@@ -562,6 +562,7 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
     SAMPLE_YAML_CONTENT = ("""author_notes: ''
+auto_tts_enabled: true
 blurb: ''
 category: A category
 init_state_name: %s
@@ -624,6 +625,7 @@ title: A title
     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))
 
     UPDATED_YAML_CONTENT = ("""author_notes: ''
+auto_tts_enabled: true
 blurb: ''
 category: A category
 init_state_name: %s
@@ -2188,6 +2190,7 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
     NEW_EXP_ID = 'exp_id1'
 
     UPGRADED_EXP_YAML = ("""author_notes: ''
+auto_tts_enabled: true
 blurb: ''
 category: category
 init_state_name: %s

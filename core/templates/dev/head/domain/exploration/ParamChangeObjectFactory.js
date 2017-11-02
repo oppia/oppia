@@ -42,7 +42,7 @@ oppia.factory('ParamChangeObjectFactory', [function() {
     };
   };
 
-  ParamChange.resetCustomizationArgs = function() {
+  ParamChange.prototype.resetCustomizationArgs = function() {
     this.customizationArgs = angular.copy(
       DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]);
   };
