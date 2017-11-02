@@ -256,6 +256,7 @@
 	"I18N_PLAYER_HINT": "Pista",
 	"I18N_PLAYER_HINTS_EXHAUSTED": "¡No me quedan pistas!",
 	"I18N_PLAYER_HINT_IS_AVAILABLE": "¡Pulsa aqué para una pista!",
+	"I18N_PLAYER_HINT_NEED_A_HINT": "¿Quieres una pista?",
 	"I18N_PLAYER_HINT_NOT_AVAILABLE": "¡Intenta pensar un poco más antes de pedir una pista!",
 	"I18N_PLAYER_HINT_REQUEST_STRING_1": "Me gustaría una pista.",
 	"I18N_PLAYER_HINT_REQUEST_STRING_2": "Estoy algo trabado. ¿Alguna pista?",
