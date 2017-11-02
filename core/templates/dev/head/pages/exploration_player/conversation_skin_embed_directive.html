@@ -22,7 +22,8 @@
          ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard, 'with-supplementary-card': isCurrentSupplementalCardNonempty()}">
 
       <div class="conversation-skin-main-tutor-card-embed"
-           ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty()}">
+           ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty()}"
+           ng-style="{'margin-bottom': (isViewportNarrow()) ? '100px' : '0'}">
         <tutor-card on-click-continue-button="showUpcomingCard()"
                     on-submit-answer="submitAnswer(answer, rulesService)"
                     start-card-change-animation="startCardChangeAnimation">
@@ -115,7 +116,9 @@ directive. -->
   }
 
   .grid-container{
-     width: 100%;
+    bottom: 0;
+    position: fixed;
+    width: 100%;
   }
 
   .bottom-nav-row:before,
@@ -335,9 +338,6 @@ directive. -->
   .conversation-skin-help-card {
     background: #fff;
     border-radius: 2px;
-    /* We move the help card lower so that it does not block
-     the terminal output in the CodeRepl interaction.
-    */
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
     min-height: 50px;
     opacity: 1;
@@ -349,7 +349,6 @@ directive. -->
   }
 
   .help-card-standard {
-    bottom: -50px;
     position: absolute;
   }
 
@@ -357,7 +356,6 @@ directive. -->
     bottom: 50px;
     position: fixed;
   }
-
 
   .conversation-skin-help-card.ng-enter,
   .conversation-skin-help-card.ng-leave-active {
@@ -619,11 +617,6 @@ directive. -->
   }
 
   @media screen and (max-width: 959px) {
-    .conversation-skin-main-tutor-card-embed,
-    .conversation-skin-future-tutor-card-embed {
-      margin-left: 0;
-    }
-
     .conversation-skin-main-tutor-card-embed.conversation-skin-animate-tutor-card-on-narrow {
       position: absolute;
     }
