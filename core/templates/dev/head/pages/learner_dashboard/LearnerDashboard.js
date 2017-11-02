@@ -535,10 +535,10 @@ oppia.controller('LearnerDashboard', [
         $scope.numberNonexistentCompletedCollections = (
           responseData.number_of_nonexistent_activities.completed_collections
         );
-        $scope.numberNonexistentExplorationPlaylist = (
+        $scope.numberNonexistentExplorationsFromPlaylist = (
           responseData.number_of_nonexistent_activities.exploration_playlist
         );
-        $scope.numberNonexistentCollectionPlaylist = (
+        $scope.numberNonexistentCollectionsFromPlaylist = (
           responseData.number_of_nonexistent_activities.collection_playlist
         );
         $scope.completedToIncompleteCollections = (
