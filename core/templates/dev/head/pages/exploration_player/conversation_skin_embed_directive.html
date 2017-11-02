@@ -27,6 +27,11 @@
                     on-submit-answer="submitAnswer(answer, rulesService)"
                     start-card-change-animation="startCardChangeAnimation">
         </tutor-card>
+        <div ng-if="isCurrentSupplementalCardNonempty() && isViewportNarrow()">
+          <supplemental-card on-click-continue-button="showUpcomingCard()"
+                             on-submit-answer="submitAnswer(answer, rulesService)">
+          </supplemental-card>
+        </div>
       </div>
 
       <div ng-if="isCurrentSupplementalCardNonempty() && !isViewportNarrow()"
