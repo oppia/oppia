@@ -14,6 +14,8 @@
 
 """Base model class."""
 
+import logging
+
 from core.platform import models
 import utils
 
@@ -538,10 +540,14 @@ class VersionedModel(BaseModel):
             version_numbers: list(int). List of version numbers.
 
         Returns:
-            list(VersionedModel|None). Model instances representing the given
+            list(VersionedModel). Model instances representing the given
                 versions.
         """
         instances = []
+        try:
+            cls.get(entity_id)
+        except Exception as  e:
+            logging.error(e)
         # pylint: disable=protected-access
         for version in version_numbers:
             snapshot_id = cls._get_snapshot_id(entity_id, version)

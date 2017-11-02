@@ -167,7 +167,10 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             }))
         # The dict of state answer counts mapped by version.
         state_answer_counts_by_version = collections.defaultdict(
-            lambda: collections.defaultdict(lambda: {}))
+            lambda: collections.defaultdict(lambda: {
+                'total_answers_count': 0,
+                'useful_feedback_count': 0
+            }))
         # The set of session_ids of learners completing an exploration.
         exp_completed_session_ids = set()
         # Dict mapping versions -> sessionID -> state hit events.
@@ -209,11 +212,10 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     session_id].append(value)
             elif value['event_type'] == (
                     GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS):
-                state_answer_counts_by_version[version][
-                    value['state_name']] = {
-                        'total_answers_count': value['total_answers_count'],
-                        'useful_feedback_count': value['useful_feedback_count']
-                    }
+                state_answer_counts_by_version[version][value['state_name']][
+                    'total_answers_count'] += value['total_answers_count']
+                state_answer_counts_by_version[version][value['state_name']][
+                    'useful_feedback_count'] += value['useful_feedback_count']
 
         # Compute num_completions for all versions and state names. Completion
         # is assumed for all state hit events in a session except the state hit
