@@ -23,7 +23,7 @@
 
       <div class="conversation-skin-main-tutor-card-embed"
            ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty()}"
-           ng-style="{'margin-bottom': (isViewportNarrow()) ? '100px' : '0'}">
+           style="margin-bottom: 100px">
         <tutor-card on-click-continue-button="showUpcomingCard()"
                     on-submit-answer="submitAnswer(answer, rulesService)"
                     start-card-change-animation="startCardChangeAnimation">
