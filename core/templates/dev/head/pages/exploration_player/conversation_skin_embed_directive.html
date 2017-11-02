@@ -617,6 +617,11 @@ directive. -->
   }
 
   @media screen and (max-width: 959px) {
+    .conversation-skin-main-tutor-card-embed,
+    .conversation-skin-future-tutor-card-embed {
+      margin-left: 0;
+    }
+
     .conversation-skin-main-tutor-card-embed.conversation-skin-animate-tutor-card-on-narrow {
       position: absolute;
     }
@@ -631,9 +636,11 @@ directive. -->
     }
 
     .conversation-skin-cards-container.with-supplementary-card {
-      min-height: 440px;
+      /* TODO(tjiang11): Find a way to handle arbitrarily long/short content.
+         in supplemental interactions.
+      */
+      min-height: 1000px;
     }
-
 
     .conversation-skin-main-tutor-card {
       left: 0;
