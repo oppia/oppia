@@ -432,7 +432,9 @@ oppia.factory('ExplorationPlayerService', [
         return deferred.promise;
       },
       recordSolutionHit: function(stateName) {
-        StatsReportingService.recordSolutionHit(stateName);
+        if (!_editorPreviewMode) {
+          StatsReportingService.recordSolutionHit(stateName);
+        }
       }
     };
   }
