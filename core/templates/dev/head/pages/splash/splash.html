@@ -121,23 +121,21 @@
         </div>
 
         <div class="oppia-splash-button-container">
-          {% if not user_is_logged_in %}
-            <!-- User must complete the registration process. -->
-            <button type="button"
-                    ng-click="onRedirectToLogin('/creator_dashboard?mode=create')"
-                    class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
-                    style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 210px; z-index: 10;"
-                    translate="I18N_ACTION_CREATE_LESSON">
-            </button>
-          {% else %}
-            <button type="button"
-                    ng-click="onClickCreateExplorationButton()"
-                    class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
-                    style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 210px; z-index: 10;"
-                    translate="I18N_ACTION_CREATE_LESSON">
-            </button>
-          {% endif %}
-
+          <!-- User must complete the registration process. -->
+          <button type="button"
+                  ng-if="!userIsLoggedIn"
+                  ng-click="onRedirectToLogin('/creator_dashboard?mode=create')"
+                  class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
+                  style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 210px; z-index: 10;"
+                  translate="I18N_ACTION_CREATE_LESSON">
+          </button>
+          <button type="button"
+                  ng-if="userIsLoggedIn"
+                  ng-click="onClickCreateExplorationButton()"
+                  class="btn oppia-splash-button oppia-splash-button-create oppia-transition-200"
+                  style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 210px; z-index: 10;"
+                  translate="I18N_ACTION_CREATE_LESSON">
+          </button>
           <button type="button" ng-click="onClickBrowseLibraryButton()"
                   class="btn oppia-splash-button oppia-splash-button-browse oppia-transition-200"
                   style="left: -webkit-calc(130px + 15%); left: -moz-calc(130px + 15%); left: -o-calc(130px + 15%); left: calc(130px + 15%); bottom: 150px; z-index: 10;"

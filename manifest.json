@@ -395,14 +395,14 @@
         }
       },
       "uiBootstrap": {
-        "version": "0.13.4",
+        "version": "0.14.3",
         "downloadFormat": "files",
         "url": "https://raw.githubusercontent.com/angular-ui/bootstrap/gh-pages",
         "rootDirPrefix": "ui-bootstrap-",
         "targetDirPrefix": "ui-bootstrap-",
-        "files": ["ui-bootstrap-tpls-0.13.4.js", "ui-bootstrap-tpls-0.13.4.min.js"],
+        "files": ["ui-bootstrap-tpls-0.14.3.js", "ui-bootstrap-tpls-0.14.3.min.js"],
         "bundle": {
-          "js": ["ui-bootstrap-tpls-0.13.4.js"]
+          "js": ["ui-bootstrap-tpls-0.14.3.js"]
         }
       },
       "uiCodemirror": {

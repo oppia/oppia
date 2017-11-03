@@ -65,6 +65,20 @@ class BaseEventHandler(object):
         cls._handle_event(*args, **kwargs)
 
 
+class StatsEventsHandler(BaseEventHandler):
+    """Event handler for incremental update of analytics model using aggregated
+    stats data.
+    """
+
+    EVENT_TYPE = feconf.EVENT_TYPE_ALL_STATS
+
+    @classmethod
+    def _handle_event(cls, exploration_id, exp_version, aggregated_stats):
+        taskqueue_services.defer(
+            stats_services.update_stats, taskqueue_services.QUEUE_NAME_STATS,
+            exploration_id, exp_version, aggregated_stats)
+
+
 class AnswerSubmissionEventHandler(BaseEventHandler):
     """Event handler for recording answer submissions."""
 
@@ -103,13 +117,6 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
                 exploration_id, exploration_version, state_name, session_id,
                 time_spent_in_secs, feedback_is_useful)
 
-            update_params = {
-                'feedback_is_useful': feedback_is_useful
-            }
-            stats_services.update_stats(
-                exploration_id, exploration_version, state_name, cls.EVENT_TYPE,
-                update_params)
-
 
 class ExplorationActualStartEventHandler(BaseEventHandler):
     """Event handler for recording exploration actual start events."""
@@ -121,8 +128,6 @@ class ExplorationActualStartEventHandler(BaseEventHandler):
             cls, exp_id, exp_version, state_name, session_id):
         stats_models.ExplorationActualStartEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id)
-        stats_services.update_stats(
-            exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
 
 class SolutionHitEventHandler(BaseEventHandler):
@@ -137,8 +142,6 @@ class SolutionHitEventHandler(BaseEventHandler):
         stats_models.SolutionHitEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
             time_spent_in_state_secs)
-        stats_services.update_stats(
-            exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
 
 class StartExplorationEventHandler(BaseEventHandler):
@@ -153,9 +156,6 @@ class StartExplorationEventHandler(BaseEventHandler):
         stats_models.StartExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, params,
             play_type)
-        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            stats_services.update_stats(
-                exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
 
 class MaybeLeaveExplorationEventHandler(BaseEventHandler):
@@ -184,9 +184,6 @@ class CompleteExplorationEventHandler(BaseEventHandler):
         stats_models.CompleteExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, time_spent,
             params, play_type)
-        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            stats_services.update_stats(
-                exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
 
 class RateExplorationEventHandler(BaseEventHandler):
@@ -209,16 +206,10 @@ class StateHitEventHandler(BaseEventHandler):
     @classmethod
     def _handle_event(
             cls, exp_id, exp_version, state_name, session_id,
-            params, play_type, is_first_hit):
+            params, play_type):
         stats_models.StateHitEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
             params, play_type)
-        update_params = {
-            'is_first_hit': is_first_hit
-        }
-        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            stats_services.update_stats(
-                exp_id, exp_version, state_name, cls.EVENT_TYPE, update_params)
 
 
 class StateCompleteEventHandler(BaseEventHandler):
@@ -233,8 +224,6 @@ class StateCompleteEventHandler(BaseEventHandler):
         stats_models.StateCompleteEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
             time_spent_in_state_secs)
-        stats_services.update_stats(
-            exp_id, exp_version, state_name, cls.EVENT_TYPE, {})
 
 
 class FeedbackThreadCreatedEventHandler(BaseEventHandler):
