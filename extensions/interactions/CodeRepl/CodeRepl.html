@@ -24,6 +24,10 @@
   .cm-s-preview.CodeMirror {
     background-color: #eee;
   }
+  .cm-s-preview .CodeMirror-linenumber {
+    /* Without this, Line-number in preview CodeRepl will be overlapped. */
+    white-space: nowrap;
+  }
   .cm-s-preview .CodeMirror-code pre {
     /* Without this, underscore characters are not visible. */
     height: 1.04em;
