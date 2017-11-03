@@ -847,8 +847,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 new_to_old_state_names)
 
     # Save state id mapping model for exploration.
-    if feconf.ENABLE_STATE_ID_MAPPING:
-        create_and_save_state_id_mapping_model(exploration, change_list)
+    create_and_save_state_id_mapping_model(exploration, change_list)
 
 
 def _create_exploration(
@@ -911,8 +910,7 @@ def _create_exploration(
                 exploration, state_names_to_train)
 
     # Save state id mapping model for new exploration.
-    if feconf.ENABLE_STATE_ID_MAPPING:
-        create_and_save_state_id_mapping_model(exploration, commit_cmds)
+    create_and_save_state_id_mapping_model(exploration, commit_cmds)
     create_exploration_summary(exploration.id, committer_id)
 
 
@@ -1352,9 +1350,8 @@ def revert_exploration(
     update_exploration_summary(exploration_id, None)
 
     # Save state id mapping model for the new exploration version.
-    if feconf.ENABLE_STATE_ID_MAPPING:
-        create_and_save_state_id_mapping_model_for_reverted_exploration(
-            exploration_id, current_version, revert_to_version)
+    create_and_save_state_id_mapping_model_for_reverted_exploration(
+        exploration_id, current_version, revert_to_version)
 
 
 # Creation and deletion methods.

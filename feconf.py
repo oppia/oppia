@@ -320,9 +320,6 @@ ENABLE_PROMO_BAR = True
 # determines whether the site is in maintenance mode to avoid queries to the
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
-# Whether to store state id mapping model for explorations. If enabled then
-# state id mapping model for each version of exploration will be stored.
-ENABLE_STATE_ID_MAPPING = False
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
