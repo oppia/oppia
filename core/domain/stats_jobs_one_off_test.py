@@ -19,6 +19,7 @@ import os
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import stats_domain
 from core.domain import stats_jobs_one_off
 from core.domain import stats_services
 from core.platform import models
@@ -121,6 +122,48 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 'End'].useful_feedback_count_v1, 0)
+
+    def test_that_state_answers_sharded_models_accumulate_stats(self):
+        with self.swap(
+            stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE',
+            100000):
+
+            submitted_answer_list = [
+                stats_domain.SubmittedAnswer(
+                    'answer a', 'TextInput', 0, 1,
+                    exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v',
+                    10.0),
+                stats_domain.SubmittedAnswer(
+                    'answer ccc', 'TextInput', 1, 1,
+                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION, {},
+                    'session_id_v', 3.0),
+                stats_domain.SubmittedAnswer(
+                    'answer bbbbb', 'TextInput', 1, 0,
+                    exp_domain.EXPLICIT_CLASSIFICATION, {}, 'session_id_v',
+                    7.5),
+            ]
+            stats_services.record_answers(
+                self.exp_id, self.exploration.version,
+                'Home', 'TextInput',
+                submitted_answer_list * 200)
+
+        job_id = stats_jobs_one_off.GenerateV1StatisticsJob.create_new()
+        stats_jobs_one_off.GenerateV1StatisticsJob.enqueue(job_id)
+
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exploration.version)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Home'].total_answers_count_v1, 602)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Home'].useful_feedback_count_v1, 401)
 
     def test_creation_of_stats_model_for_addition(self):
         # Update exploration to version 2.

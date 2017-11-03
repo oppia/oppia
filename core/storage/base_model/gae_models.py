@@ -542,32 +542,40 @@ class VersionedModel(BaseModel):
                 versions.
 
         Raises:
-            ValueError. Given entity_id is invalid.
+            ValueError. The given entity_id is invalid.
             ValueError. Requested version number cannot be higher than the
                 current version number.
-            ValueError. Version number is invalid.
+            ValueError. At least one version number is invalid.
         """
         instances = []
 
         entity = cls.get(entity_id, strict=False)
         if not entity:
-            raise ValueError('Given entity_id %s is invalid.' % (entity_id))
+            raise ValueError('The given entity_id %s is invalid.' % (entity_id))
         current_version = entity.version
-        if version_numbers[-1] > current_version:
+        if max(version_numbers) > current_version:
             raise ValueError(
                 'Requested version number cannot be higher than the current '
                 'version number.')
 
+        snapshot_ids = []
         # pylint: disable=protected-access
         for version in version_numbers:
             snapshot_id = cls._get_snapshot_id(entity_id, version)
-            try:
-                entity = cls(id=entity_id)._reconstitute_from_snapshot_id(
-                    snapshot_id)
-            except:
-                raise ValueError('Given version number %s is invalid.' % (
-                    version))
-            instances.append(entity)
+            snapshot_ids.append(snapshot_id)
+
+        snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(snapshot_ids)
+        for index, snapshot_model in enumerate(snapshot_models):
+            if snapshot_model is None:
+                raise ValueError(
+                    'At least one version number is invalid.')
+            snapshot_dict = snapshot_model.content
+            reconstituted_model = cls(id=entity_id)._reconstitute(
+                snapshot_dict)
+            reconstituted_model.created_on = snapshot_model.created_on
+            reconstituted_model.last_updated = snapshot_model.last_updated
+
+            instances.append(reconstituted_model)
         # pylint: enable=protected-access
         return instances
 
