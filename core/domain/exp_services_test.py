@@ -323,6 +323,56 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with self.assertRaises(Exception):
             exp_services.get_exploration_by_id('fake_exploration')
 
+    def test_retrieval_of_multiple_exploration_versions(self):
+
+        with self.assertRaisesRegexp(
+                ValueError, 'Given entity_id %s is invalid' % ('fake_exp_id')):
+            exp_services.get_multiple_explorations_by_version(
+                'fake_exp_id', [1, 2, 3])
+
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID, self.owner_id)
+
+        # Update exploration to version 2.
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state',
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+
+        # Update exploration to version 3.
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state 2',
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+
+        exploration_latest = exp_services.get_exploration_by_id(self.EXP_ID)
+        latest_version = exploration_latest.version
+
+        explorations = exp_services.get_multiple_explorations_by_version(
+            self.EXP_ID, range(1, latest_version + 1))
+
+        self.assertEqual(len(explorations), 3)
+        self.assertEqual(explorations[0].version, 1)
+        self.assertEqual(explorations[1].version, 2)
+        self.assertEqual(explorations[2].version, 3)
+
+        with self.assertRaisesRegexp(
+                ValueError,
+                'Requested version number cannot be higher than the current '
+                'version number.'):
+            exp_services.get_multiple_explorations_by_version(
+                self.EXP_ID, [1, 2, 3, 4])
+
+        with self.assertRaisesRegexp(
+                ValueError,
+                'Given version number %s is invalid' % (2.5)):
+            exp_services.get_multiple_explorations_by_version(
+                self.EXP_ID, [1, 2, 2.5, 3])
+
     def test_retrieval_of_multiple_explorations(self):
         exps = {}
         chars = 'abcde'

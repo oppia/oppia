@@ -14,8 +14,6 @@
 
 """Base model class."""
 
-import logging
-
 from core.platform import models
 import utils
 
@@ -542,17 +540,34 @@ class VersionedModel(BaseModel):
         Returns:
             list(VersionedModel). Model instances representing the given
                 versions.
+
+        Raises:
+            ValueError. Given entity_id is invalid.
+            ValueError. Requested version number cannot be higher than the
+                current version number.
+            ValueError. Version number is invalid.
         """
         instances = []
-        try:
-            cls.get(entity_id)
-        except Exception as  e:
-            logging.error(e)
+
+        entity = cls.get(entity_id, strict=False)
+        if not entity:
+            raise ValueError('Given entity_id %s is invalid.' % (entity_id))
+        current_version = entity.version
+        if version_numbers[-1] > current_version:
+            raise ValueError(
+                'Requested version number cannot be higher than the current '
+                'version number.')
+
         # pylint: disable=protected-access
         for version in version_numbers:
             snapshot_id = cls._get_snapshot_id(entity_id, version)
-            instances.append(cls(id=entity_id)._reconstitute_from_snapshot_id(
-                snapshot_id))
+            try:
+                entity = cls(id=entity_id)._reconstitute_from_snapshot_id(
+                    snapshot_id)
+            except:
+                raise ValueError('Given version number %s is invalid.' % (
+                    version))
+            instances.append(entity)
         # pylint: enable=protected-access
         return instances
 

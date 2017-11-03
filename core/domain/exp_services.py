@@ -263,12 +263,9 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
         version_numbers: list(int). List of version numbers.
 
     Returns:
-        list(Exploration)|None. List of Exploration domain class instances. If
-            None is returned, the exploration does not exist.
+        list(Exploration). List of Exploration domain class instances.
     """
     explorations = []
-    if not get_exploration_by_id(exp_id):
-        return None
     exploration_models = exp_models.ExplorationModel.get_multi_versions(
         exp_id, version_numbers)
     for exploration_model in exploration_models:
