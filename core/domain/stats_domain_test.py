@@ -41,6 +41,19 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
             state_stats_mapping)
 
     def test_to_dict(self):
+        state_stats_dict = {
+            'total_answers_count_v1': 0,
+            'total_answers_count_v2': 10,
+            'useful_feedback_count_v1': 0,
+            'useful_feedback_count_v2': 4,
+            'total_hit_count_v1': 0,
+            'total_hit_count_v2': 18,
+            'first_hit_count_v1': 0,
+            'first_hit_count_v2': 7,
+            'num_times_solution_viewed_v2': 2,
+            'num_completions_v1': 0,
+            'num_completions_v2': 2
+        }
         expected_exploration_stats_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 1,
@@ -51,19 +64,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
             'num_completions_v1': 0,
             'num_completions_v2': 5,
             'state_stats_mapping': {
-                'Home': {
-                    'total_answers_count_v1': 0,
-                    'total_answers_count_v2': 10,
-                    'useful_feedback_count_v1': 0,
-                    'useful_feedback_count_v2': 4,
-                    'total_hit_count_v1': 0,
-                    'total_hit_count_v2': 18,
-                    'first_hit_count_v1': 0,
-                    'first_hit_count_v2': 7,
-                    'num_times_solution_viewed_v2': 2,
-                    'num_completions_v1': 0,
-                    'num_completions_v2': 2
-                }
+                'Home': state_stats_dict
             }
         }
         observed_exploration_stats = self._get_exploration_stats_from_dict(
@@ -73,6 +74,19 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
             observed_exploration_stats.to_dict())
 
     def test_validate(self):
+        state_stats_dict = {
+            'total_answers_count_v1': 0,
+            'total_answers_count_v2': 10,
+            'useful_feedback_count_v1': 0,
+            'useful_feedback_count_v2': 4,
+            'total_hit_count_v1': 0,
+            'total_hit_count_v2': 18,
+            'first_hit_count_v1': 0,
+            'first_hit_count_v2': 7,
+            'num_times_solution_viewed_v2': 2,
+            'num_completions_v1': 0,
+            'num_completions_v2': 2
+        }
         exploration_stats_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 1,
@@ -83,19 +97,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
             'num_completions_v1': 0,
             'num_completions_v2': 5,
             'state_stats_mapping': {
-                'Home': {
-                    'total_answers_count_v1': 0,
-                    'total_answers_count_v2': 10,
-                    'useful_feedback_count_v1': 0,
-                    'useful_feedback_count_v2': 4,
-                    'total_hit_count_v1': 0,
-                    'total_hit_count_v2': 18,
-                    'first_hit_count_v1': 0,
-                    'first_hit_count_v2': 7,
-                    'num_times_solution_viewed_v2': 2,
-                    'num_completions_v1': 0,
-                    'num_completions_v2': 2
-                }
+                'Home': state_stats_dict
             }
         }
         exploration_stats = self._get_exploration_stats_from_dict(

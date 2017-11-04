@@ -254,6 +254,25 @@ def get_exploration_summary_by_id(exploration_id):
         return None
 
 
+def get_multiple_explorations_by_version(exp_id, version_numbers):
+    """Returns a list of Exploration domain objects corresponding to the
+    specified versions.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        version_numbers: list(int). List of version numbers.
+
+    Returns:
+        list(Exploration). List of Exploration domain objects.
+    """
+    explorations = []
+    exploration_models = exp_models.ExplorationModel.get_multi_versions(
+        exp_id, version_numbers)
+    for exploration_model in exploration_models:
+        explorations.append(get_exploration_from_model(exploration_model))
+    return explorations
+
+
 def get_multiple_explorations_by_id(exp_ids, strict=True):
     """Returns a dict of domain objects representing explorations with the
     given ids as keys. If an exp_id is not present, it is not included in the
