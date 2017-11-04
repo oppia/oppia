@@ -18,7 +18,7 @@
  */
 
 var general = require('../protractor_utils/general.js');
-var library = require('../protractor_utils/library.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var player = require('../protractor_utils/player.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
@@ -30,8 +30,14 @@ describe('Library pages tour', function() {
   var EXPLORATION_LANGUAGE = 'English';
   var EXPLORATION_RATING = 4;
   var SEARCH_TERM = 'python';
+  var libraryPage = null;
+
+  beforeEach(function() {
+    libraryPage = new LibraryPage.LibraryPage();
+  });
+  
   var visitLibraryPage = function() {
-    browser.get(general.LIBRARY_URL_SUFFIX);
+    libraryPage.get();
   };
 
   var visitRecentlyPublishedPage = function() {
@@ -53,7 +59,7 @@ describe('Library pages tour', function() {
       EXPLORATION_LANGUAGE
     );
     visitLibraryPage();
-    library.playExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
     player.rateExploration(EXPLORATION_RATING);
 
     visitLibraryPage();

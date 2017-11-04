@@ -47,7 +47,8 @@ oppia.controller('ExplorationEditor', [
   'ExplorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
-  'ParamSpecsObjectFactory', 'UrlInterpolationService',
+  'ParamSpecsObjectFactory', 'explorationAutomaticTextToSpeechService',
+  'UrlInterpolationService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       ExplorationDataService, EditorStateService, explorationTitleService,
@@ -61,7 +62,8 @@ oppia.controller('ExplorationEditor', [
       ExplorationAdvancedFeaturesService, $modal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
-      ParamSpecsObjectFactory, UrlInterpolationService) {
+      ParamSpecsObjectFactory, explorationAutomaticTextToSpeechService,
+      UrlInterpolationService) {
     $scope.editabilityService = editabilityService;
     $scope.EditorStateService = EditorStateService;
 
@@ -118,6 +120,7 @@ oppia.controller('ExplorationEditor', [
           ParamSpecsObjectFactory.createFromBackendDict(data.param_specs));
         explorationParamChangesService.init(
           ParamChangesObjectFactory.createFromBackendList(data.param_changes));
+        explorationAutomaticTextToSpeechService.init(data.auto_tts_enabled);
 
         $scope.explorationTitleService = explorationTitleService;
         $scope.explorationCategoryService = explorationCategoryService;

@@ -33,7 +33,7 @@ oppia.factory('SpeechSynthesisChunkerService', [
     var RTE_COMPONENT_NAMES = {};
     Object.keys(RTE_COMPONENT_SPECS).forEach(function(componentSpec) {
       RTE_COMPONENT_NAMES[componentSpec] =
-        RTE_COMPONENT_SPECS[componentSpec].frontend_name;
+        RTE_COMPONENT_SPECS[componentSpec].frontend_id;
     });
 
     // Punctuation marks that should result in an audible pause when playing

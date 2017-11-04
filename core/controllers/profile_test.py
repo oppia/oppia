@@ -56,14 +56,14 @@ class SignupTest(test_utils.GenericTestBase):
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL, {'agreed_to_terms': False},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertIn('you will need to accept', response_dict['error'])
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
             {'agreed_to_terms': 'Hasta la vista!'},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertIn('you will need to accept', response_dict['error'])
 
         self.post_json(
@@ -82,21 +82,21 @@ class SignupTest(test_utils.GenericTestBase):
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL, {'agreed_to_terms': True},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertIn('Empty username supplied', response_dict['error'])
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
             {'username': '', 'agreed_to_terms': True},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertIn('Empty username supplied', response_dict['error'])
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
             {'username': '!a!', 'agreed_to_terms': True},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertIn(
             'can only have alphanumeric characters', response_dict['error'])
 
@@ -104,7 +104,7 @@ class SignupTest(test_utils.GenericTestBase):
             feconf.SIGNUP_DATA_URL,
             {'username': self.UNICODE_TEST_STRING, 'agreed_to_terms': True},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertIn(
             'can only have alphanumeric characters', response_dict['error'])
 
@@ -181,7 +181,7 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
         response_dict = self.post_json(
             feconf.USERNAME_CHECK_DATA_URL, {'username': '!!!INVALID!!!'},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertIn(
             'can only have alphanumeric characters', response_dict['error'])
 
@@ -189,7 +189,7 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
             feconf.USERNAME_CHECK_DATA_URL,
             {'username': self.UNICODE_TEST_STRING},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
-        self.assertEqual(response_dict['code'], 400)
+        self.assertEqual(response_dict['status_code'], 400)
         self.assertIn(
             'can only have alphanumeric characters', response_dict['error'])
 
@@ -676,7 +676,7 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expect_errors=True,
             expected_status_int=400)
-        self.assertEqual(user_bio_response['code'], 400)
+        self.assertEqual(user_bio_response['status_code'], 400)
         self.assertIn('User bio exceeds maximum character limit: 2000',
                       user_bio_response['error'])
         self.logout()

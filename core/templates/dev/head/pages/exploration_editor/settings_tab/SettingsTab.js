@@ -28,6 +28,7 @@ oppia.controller('SettingsTab', [
   'ExplorationAdvancedFeaturesService', 'ALL_CATEGORIES',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
   'EditableExplorationBackendApiService', 'UrlInterpolationService',
+  'explorationAutomaticTextToSpeechService',
   function(
       $scope, $http, $window, $modal, 
       $rootScope, ExplorationDataService, 
@@ -39,7 +40,8 @@ oppia.controller('SettingsTab', [
       explorationParamChangesService, explorationWarningsService,
       ExplorationAdvancedFeaturesService, ALL_CATEGORIES,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
-      EditableExplorationBackendApiService, UrlInterpolationService) {
+      EditableExplorationBackendApiService, UrlInterpolationService,
+      explorationAutomaticTextToSpeechService) {
     $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
@@ -169,6 +171,11 @@ oppia.controller('SettingsTab', [
       ExplorationAdvancedFeaturesService.areParametersEnabled);
     $scope.enableParameters = (
       ExplorationAdvancedFeaturesService.enableParameters);
+
+    $scope.isAutomaticTextToSpeechEnabled = (
+      explorationAutomaticTextToSpeechService.isAutomaticTextToSpeechEnabled);
+    $scope.toggleAutomaticTextToSpeech = (
+      explorationAutomaticTextToSpeechService.toggleAutomaticTextToSpeech);
 
     /********************************************
     * Methods for rights management.

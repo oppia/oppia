@@ -78,37 +78,43 @@ oppia.directive('outcomeDestinationEditor', [
               StateGraphLayoutService.getLastComputedArrangement());
             var allStateNames = explorationStatesService.getStateNames();
 
-            var maxDepth = 0;
-            var maxOffset = 0;
-            for (var stateName in lastComputedArrangement) {
-              maxDepth = Math.max(
-                maxDepth, lastComputedArrangement[stateName].depth);
-              maxOffset = Math.max(
-                maxOffset, lastComputedArrangement[stateName].offset);
-            }
-
-            // Higher scores come later.
-            var allStateScores = {};
-            var unarrangedStateCount = 0;
-            for (var i = 0; i < allStateNames.length; i++) {
-              var stateName = allStateNames[i];
-              if (lastComputedArrangement.hasOwnProperty(stateName)) {
-                allStateScores[stateName] = (
-                  lastComputedArrangement[stateName].depth * (maxOffset + 1) +
-                  lastComputedArrangement[stateName].offset);
-              } else {
-                // States that have just been added in the rule 'create new'
-                // modal are not yet included as part of
-                // lastComputedArrangement so we account for them here.
-                allStateScores[stateName] = (
-                  (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
-                unarrangedStateCount++;
+            // It is possible that lastComputedArrangement is null if the graph
+            // has never been rendered at the time this computation is being
+            // carried out.
+            var stateNames = angular.copy(allStateNames);
+            if (lastComputedArrangement) {
+              var maxDepth = 0;
+              var maxOffset = 0;
+              for (var stateName in lastComputedArrangement) {
+                maxDepth = Math.max(
+                  maxDepth, lastComputedArrangement[stateName].depth);
+                maxOffset = Math.max(
+                  maxOffset, lastComputedArrangement[stateName].offset);
               }
-            }
 
-            var stateNames = allStateNames.sort(function(a, b) {
-              return allStateScores[a] - allStateScores[b];
-            });
+              // Higher scores come later.
+              var allStateScores = {};
+              var unarrangedStateCount = 0;
+              for (var i = 0; i < allStateNames.length; i++) {
+                var stateName = allStateNames[i];
+                if (lastComputedArrangement.hasOwnProperty(stateName)) {
+                  allStateScores[stateName] = (
+                    lastComputedArrangement[stateName].depth * (maxOffset + 1) +
+                    lastComputedArrangement[stateName].offset);
+                } else {
+                  // States that have just been added in the rule 'create new'
+                  // modal are not yet included as part of
+                  // lastComputedArrangement so we account for them here.
+                  allStateScores[stateName] = (
+                    (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
+                  unarrangedStateCount++;
+                }
+              }
+
+              stateNames = allStateNames.sort(function(a, b) {
+                return allStateScores[a] - allStateScores[b];
+              });
+            }
 
             for (var i = 0; i < stateNames.length; i++) {
               if (stateNames[i] !== currentStateName) {
