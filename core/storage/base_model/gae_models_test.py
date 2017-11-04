@@ -96,3 +96,54 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         base_models.BaseModel.get_new_id('¡Hola!')
         base_models.BaseModel.get_new_id(12345)
         base_models.BaseModel.get_new_id({'a': 'b'})
+
+
+class TestSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    pass
+
+
+class TestSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    pass
+
+
+class TestVersionedModel(base_models.VersionedModel):
+    """Model that inherits the VersionedModel for testing."""
+    SNAPSHOT_METADATA_CLASS = TestSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = TestSnapshotContentModel
+
+class VersionedModelTests(test_utils.GenericTestBase):
+    """Test methods for VersionedModel."""
+
+    def test_retrieval_of_multiple_version_models_for_fake_id(self):
+        with self.assertRaisesRegexp(
+            ValueError, 'The given entity_id %s is invalid' % (
+                'fake_exp_id')):
+            TestVersionedModel.get_multi_versions(
+                'fake_exp_id', [1, 2, 3])
+
+    def test_get_multi_versions(self):
+        model1 = TestVersionedModel(id='model_id1')
+        model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        models_by_version = TestVersionedModel.get_multi_versions(
+            'model_id1', [1, 2])
+        self.assertEqual(len(models_by_version), 2)
+        self.assertEqual(models_by_version[0].version, 1)
+        self.assertEqual(models_by_version[1].version, 2)
+
+    def test_get_multi_versions_errors(self):
+        model1 = TestVersionedModel(id='model_id1')
+        model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        with self.assertRaisesRegexp(
+            ValueError,
+            'Requested version number %s cannot be higher than the current '
+            'version number %s.' % (3, 2)):
+            TestVersionedModel.get_multi_versions('model_id1', [1, 2, 3])
+
+        with self.assertRaisesRegexp(
+            ValueError,
+            'At least one version number is invalid'):
+            TestVersionedModel.get_multi_versions('model_id1', [1, 1.5, 2])

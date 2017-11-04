@@ -263,7 +263,7 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
         version_numbers: list(int). List of version numbers.
 
     Returns:
-        list(Exploration). List of Exploration domain class instances.
+        list(Exploration). List of Exploration domain objects.
     """
     explorations = []
     exploration_models = exp_models.ExplorationModel.get_multi_versions(

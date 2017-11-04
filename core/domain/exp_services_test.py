@@ -325,14 +325,13 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_retrieval_of_multiple_exploration_versions_for_fake_exp_id(self):
         with self.assertRaisesRegexp(
-                ValueError, 'The given entity_id %s is invalid' % (
-                    'fake_exp_id')):
+            ValueError, 'The given entity_id %s is invalid' % (
+                'fake_exp_id')):
             exp_services.get_multiple_explorations_by_version(
                 'fake_exp_id', [1, 2, 3])
 
     def test_retrieval_of_multiple_exploration_versions(self):
-        exploration = self.save_new_default_exploration(
-            self.EXP_ID, self.owner_id)
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         # Update exploration to version 2.
         change_list = [{
@@ -362,8 +361,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(explorations[2].version, 3)
 
     def test_version_number_errors_for_get_multiple_exploration_versions(self):
-        exploration = self.save_new_default_exploration(
-            self.EXP_ID, self.owner_id)
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         # Update exploration to version 2.
         change_list = [{
@@ -382,15 +380,15 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
 
         with self.assertRaisesRegexp(
-                ValueError,
-                'Requested version number cannot be higher than the current '
-                'version number.'):
+            ValueError,
+            'Requested version number %s cannot be higher than the current '
+            'version number %s.' % (4, 3)):
             exp_services.get_multiple_explorations_by_version(
                 self.EXP_ID, [1, 2, 3, 4])
 
         with self.assertRaisesRegexp(
-                ValueError,
-                'At least one version number is invalid'):
+            ValueError,
+            'At least one version number is invalid'):
             exp_services.get_multiple_explorations_by_version(
                 self.EXP_ID, [1, 2, 2.5, 3])
 

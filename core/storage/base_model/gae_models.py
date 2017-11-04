@@ -553,10 +553,11 @@ class VersionedModel(BaseModel):
         if not entity:
             raise ValueError('The given entity_id %s is invalid.' % (entity_id))
         current_version = entity.version
-        if max(version_numbers) > current_version:
+        max_version = max(version_numbers)
+        if max_version > current_version:
             raise ValueError(
-                'Requested version number cannot be higher than the current '
-                'version number.')
+                'Requested version number %s cannot be higher than the current '
+                'version number %s.' % (max_version, current_version))
 
         snapshot_ids = []
         # pylint: disable=protected-access
@@ -565,7 +566,7 @@ class VersionedModel(BaseModel):
             snapshot_ids.append(snapshot_id)
 
         snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(snapshot_ids)
-        for index, snapshot_model in enumerate(snapshot_models):
+        for snapshot_model in snapshot_models:
             if snapshot_model is None:
                 raise ValueError(
                     'At least one version number is invalid.')
