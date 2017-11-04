@@ -27,8 +27,11 @@ import utils
 def subscribe_to_thread(user_id, feedback_thread_id):
     """Subscribes a user to a feedback thread.
 
-    Callers of this function should ensure that the user_id and
+    WARNING: Callers of this function should ensure that the user_id and
     feedback_thread_id are valid.
+    Args:
+        user_id: str. User ID.
+        feedback_thread_id: str. The ID of the feedback thread.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
@@ -46,8 +49,12 @@ def subscribe_to_exploration(user_id, exploration_id):
     """Subscribes a user to an exploration (and, therefore, indirectly to all
     feedback threads for that exploration).
 
-    Callers of this function should ensure that the user_id and exploration_id
-    are valid.
+    WARNING: Callers of this function should ensure that the user_id and
+    exploration_id are valid.
+    Args:
+        user_id: str. User ID.
+        exploration_id: str. The exploration ID.
+
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
@@ -62,8 +69,11 @@ def subscribe_to_exploration(user_id, exploration_id):
 def subscribe_to_creator(user_id, creator_id):
     """Subscribes a user (learner) to a creator.
 
-    Callers of this function should ensure that the user_id and creator_id
-    are valid.
+    WARNING: Callers of this function should ensure that the user_id and
+    creator_id are valid.
+    Args:
+        user_id: str. User ID.
+        creator_id: str. The creator ID.
     """
     subscribers_model_creator = user_models.UserSubscribersModel.get(
         creator_id, strict=False)
@@ -88,8 +98,11 @@ def subscribe_to_creator(user_id, creator_id):
 def unsubscribe_from_creator(user_id, creator_id):
     """Unsubscribe a user from a creator.
 
-    Callers of this function should ensure that the user_id and creator_id
-    are valid.
+    WARNING: Callers of this function should ensure that the user_id and
+    creator_id are valid.
+    Args:
+        user_id: str. User ID.
+        creator_id: str. The creator ID.
     """
     subscribers_model_creator = user_models.UserSubscribersModel.get(
         creator_id, strict=False)
@@ -104,10 +117,13 @@ def unsubscribe_from_creator(user_id, creator_id):
 
 
 def get_all_threads_subscribed_to(user_id):
-    """Returns a list with ids of all the feedback and suggestion threads to
-    which the user is subscribed.
-
-    Callers of this function should ensure that the user_id is valid.
+    """
+    WARNING: Callers of this function should ensure that the user_id is valid.
+    Args:
+        user_id: str. User ID.
+    Returns:
+        a list with ids of all the feedback and suggestion threads to
+        which the user is subscribed.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
@@ -118,10 +134,13 @@ def get_all_threads_subscribed_to(user_id):
 
 
 def get_all_creators_subscribed_to(user_id):
-    """Returns a list with ids of all the creators to which this learner has
-    subscribed.
-
-    Callers of this function should ensure that the user_id is valid.
+    """
+    WARNING: Callers of this function should ensure that the user_id is valid.
+    Args:
+        user_id: str. User ID.
+    Returns:
+        a list with ids of all the creators to which this learner has
+        subscribed.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
@@ -131,10 +150,12 @@ def get_all_creators_subscribed_to(user_id):
 
 
 def get_all_subscribers_of_creator(user_id):
-    """Returns a list with ids of all users who have subscribed to this
-    creator.
-
-    Callers of this function should ensure that the user_id is valid.
+    """
+    WARNING: Callers of this function should ensure that the user_id is valid.
+    Args:
+        user_id: str. User ID.
+    Returns:
+        a list with ids of all users who have subscribed to this creator.
     """
     subscribers_model = user_models.UserSubscribersModel.get(
         user_id, strict=False)
@@ -144,10 +165,13 @@ def get_all_subscribers_of_creator(user_id):
 
 
 def get_exploration_ids_subscribed_to(user_id):
-    """Returns a list with ids of all explorations that the given user
-    subscribes to.
-
-    Callers of this function should ensure that the user_id is valid.
+    """
+    WARNING: Callers of this function should ensure that the user_id is valid.
+    Args:
+        user_id: str. User ID.
+    Returns:
+        list with ids of all explorations that the given user
+        subscribes to.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
@@ -157,10 +181,12 @@ def get_exploration_ids_subscribed_to(user_id):
 
 
 def subscribe_to_collection(user_id, collection_id):
-    """Subscribes a user to a collection.
-
-    Callers of this function should ensure that the user_id and collection_id
-    are valid.
+    """
+    WARNING: Callers of this function should ensure that the user_id and
+    collection_id are valid.
+    Args:
+        user_id: str. User ID.
+        collection_id: str. The collection ID.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
@@ -173,10 +199,13 @@ def subscribe_to_collection(user_id, collection_id):
 
 
 def get_collection_ids_subscribed_to(user_id):
-    """Returns a list with ids of all collections that the given user
-    subscribes to.
-
-    Callers of this function should ensure that the user_id is valid.
+    """
+    WARNING: Callers of this function should ensure that the user_id is valid.
+    Args:
+        user_id: str. User ID.
+    Returns:
+        a list with ids of all collections that the given user
+        subscribes to.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
@@ -186,12 +215,14 @@ def get_collection_ids_subscribed_to(user_id):
 
 
 def get_last_seen_notifications_msec(user_id):
-    """Returns the last time, in milliseconds since the Epoch, when the user
-    checked their notifications in the dashboard page or the notifications
-    dropdown.
-
-    If the user has never checked the dashboard page or the notifications
-    dropdown, returns None.
+    """
+    Args:
+        user_id: str. User ID.
+    Returns:
+        str or None. The last time (in msecs since the Epoch), when the user
+        checked their notifications in the dashboard page or the notifications
+        dropdown, or None if the user has never checked the dashboard page or
+        the notifications dropdown.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
@@ -205,6 +236,10 @@ def record_user_has_seen_notifications(user_id, last_seen_msecs):
     """Updates the last_checked time for this user (which represents the time
     the user last saw the notifications in the dashboard page or the
     notifications dropdown).
+    Args:
+        user_id: str. User IDself.
+        last_seen_msecs: str. Last seen of the user when he saw the
+        notifications.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
