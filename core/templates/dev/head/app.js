@@ -400,9 +400,9 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
     var messageAndSourceAndStackTrace = [
       '',
       'Cause: ' + cause,
-      'Source: ' + window.location.href,
       exception.message,
-      String(exception.stack)
+      String(exception.stack),
+      '    at URL: ' + window.location.href
     ].join('\n');
 
     // Catch all errors, to guard against infinite recursive loops.
