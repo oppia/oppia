@@ -116,10 +116,9 @@ class VersionedModelTests(test_utils.GenericTestBase):
 
     def test_retrieval_of_multiple_version_models_for_fake_id(self):
         with self.assertRaisesRegexp(
-            ValueError, 'The given entity_id %s is invalid' % (
-                'fake_exp_id')):
+            ValueError, 'The given entity_id fake_id is invalid'):
             TestVersionedModel.get_multi_versions(
-                'fake_exp_id', [1, 2, 3])
+                'fake_id', [1, 2, 3])
 
     def test_get_multi_versions(self):
         model1 = TestVersionedModel(id='model_id1')
@@ -139,8 +138,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             ValueError,
-            'Requested version number %s cannot be higher than the current '
-            'version number %s.' % (3, 2)):
+            'Requested version number 3 cannot be higher than the current '
+            'version number 2.'):
             TestVersionedModel.get_multi_versions('model_id1', [1, 2, 3])
 
         with self.assertRaisesRegexp(

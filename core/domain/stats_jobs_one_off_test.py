@@ -157,10 +157,12 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
         exploration_stats = stats_services.get_exploration_stats_by_id(
             self.exp_id, self.exploration.version)
 
+        # There are an additional two answers from the setup function.
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 'Home'].total_answers_count_v1, 602)
 
+        # There is an additional answer from the setup function.
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 'Home'].useful_feedback_count_v1, 401)

@@ -325,8 +325,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_retrieval_of_multiple_exploration_versions_for_fake_exp_id(self):
         with self.assertRaisesRegexp(
-            ValueError, 'The given entity_id %s is invalid' % (
-                'fake_exp_id')):
+            ValueError, 'The given entity_id fake_exp_id is invalid'):
             exp_services.get_multiple_explorations_by_version(
                 'fake_exp_id', [1, 2, 3])
 
@@ -381,8 +380,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         with self.assertRaisesRegexp(
             ValueError,
-            'Requested version number %s cannot be higher than the current '
-            'version number %s.' % (4, 3)):
+            'Requested version number 4 cannot be higher than the current '
+            'version number 3.'):
             exp_services.get_multiple_explorations_by_version(
                 self.EXP_ID, [1, 2, 3, 4])
 
