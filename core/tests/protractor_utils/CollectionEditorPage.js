@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Page object for the collection editor page, for use in Protractor
- * tests.
+ * @fileoverview Page object for the collection editor page, for use in
+ * Protractor tests.
  */
 
 // Add existing exploration to the node graph.
