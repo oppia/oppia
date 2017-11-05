@@ -19,7 +19,8 @@
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
-var CollectionEditorPage = require('../protractor_utils/CollectionEditorPage.js');
+var CollectionEditorPage = 
+  require('../protractor_utils/CollectionEditorPage.js');
 
 
 describe('Collections', function() {

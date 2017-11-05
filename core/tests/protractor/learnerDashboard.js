@@ -19,7 +19,7 @@
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
-var CollectionEditorPage = 
+var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
@@ -31,7 +31,7 @@ describe('Learner dashboard functionality', function() {
   var creatorDashboardPage = null;
   var adminPage = null;
   var libraryPage = null;
-  var collectionEditorPage= null;
+  var collectionEditorPage = null;
   
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
