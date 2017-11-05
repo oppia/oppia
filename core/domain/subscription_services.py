@@ -17,6 +17,7 @@
 """Services for managing subscriptions."""
 
 import datetime
+
 from core.platform import models
 import utils
 
@@ -75,7 +76,7 @@ def subscribe_to_creator(user_id, creator_id):
 
     Args:
         user_id: str. The user ID of the new subscriber.
-        creator_id: str. The user Id of the creator.
+        creator_id: str. The user ID of the creator.
     """
     subscribers_model_creator = user_models.UserSubscribersModel.get(
         creator_id, strict=False)
@@ -104,7 +105,7 @@ def unsubscribe_from_creator(user_id, creator_id):
     creator_id are valid.
 
     Args:
-        user_id: str. The user ID of the new subscriber.
+        user_id: str. The user ID of the subscriber.
         creator_id: str. The user ID of the creator.
     """
     subscribers_model_creator = user_models.UserSubscribersModel.get(
@@ -126,10 +127,10 @@ def get_all_threads_subscribed_to(user_id):
     WARNING: Callers of this function should ensure that the user_id is valid.
 
     Args:
-        user_id: str. The user ID of the new subscriber.
+        user_id: str. The user ID of the subscriber.
 
     Returns:
-        list. IDs of all the feedback and suggestion threads to
+        list(str). IDs of all the feedback and suggestion threads to
         which the user is subscribed.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
@@ -147,10 +148,10 @@ def get_all_creators_subscribed_to(user_id):
     WARNING: Callers of this function should ensure that the user_id is valid.
 
     Args:
-        user_id: str. The user ID of the new subscriber.
+        user_id: str. The user ID of the subscriber.
 
     Returns:
-        list. IDs of all the creators to which this learner has
+        list(str). IDs of all the creators to which this learner has
         subscribed.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
@@ -167,10 +168,10 @@ def get_all_subscribers_of_creator(user_id):
     WARNING: Callers of this function should ensure that the user_id is valid.
 
     Args:
-        user_id: str. The user ID of the new subscriber.
+        user_id: str. The user ID of the subscriber.
 
     Returns:
-        list. IDs of all users who have subscribed to this creator.
+        list(str). IDs of all users who have subscribed to this creator.
     """
     subscribers_model = user_models.UserSubscribersModel.get(
         user_id, strict=False)
@@ -186,10 +187,10 @@ def get_exploration_ids_subscribed_to(user_id):
     WARNING: Callers of this function should ensure that the user_id is valid.
 
     Args:
-        user_id: str. The user ID of the new subscriber.
+        user_id: str. The user ID of the subscriber.
 
     Returns:
-        list. IDs of all explorations that the given user
+        list(str). IDs of all explorations that the given user
         subscribes to.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
@@ -226,10 +227,10 @@ def get_collection_ids_subscribed_to(user_id):
     WARNING: Callers of this function should ensure that the user_id is valid.
 
     Args:
-        user_id: str. The user ID of the new subscriber.
+        user_id: str. The user ID of the subscriber.
 
     Returns:
-        list. IDs of all collections that the given user
+        list(str). IDs of all collections that the given user
         subscribes to.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
@@ -248,10 +249,10 @@ def get_last_seen_notifications_msec(user_id):
     dropdown, returns None.
 
     Args:
-        user_id: str. The user ID of the new subscriber.
+        user_id: str. The user ID of the subscriber.
 
     Returns:
-        float or None. The last time (in msecs since the Epoch), when the user
+        float or None. The last time (in msecs since the Epoch) when the user
         checked their notifications in the dashboard page or the notifications
         dropdown, or None if the user has never checked the dashboard page or
         the notifications dropdown.
@@ -270,9 +271,10 @@ def record_user_has_seen_notifications(user_id, last_seen_msecs):
     notifications dropdown).
 
     Args:
-        user_id: str. The user ID of the new subscriber.
-        last_seen_msecs: str. The time (Last seen) when the user last saw the
-            notifications in the dashboard page or the notifications dropdown.
+        user_id: str. The user ID of the subscriber.
+        last_seen_msecs: float. The time (in msecs since the Epoch) when the
+            user last saw the notifications in the dashboard page or the
+            notifications dropdown.
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
