@@ -22,7 +22,7 @@
 var CollectionEditorPage = function()
 {
 
-var addExistingExploration = function(explorationId) {
+this.addExistingExploration = function(explorationId) {
   element(
     by.css('.protractor-test-add-exploration-input')
   ).sendKeys(explorationId);
@@ -110,7 +110,7 @@ var saveChanges = function () {
 };
 };
 
-exports.collectionEditorPage = CollectionEditorPage;
+exports.CollectionEditorPage = CollectionEditorPage;
 /*exports.addExistingExploration = addExistingExploration;
 exports.searchForAndAddExistingExploration = searchForAndAddExistingExploration;
 exports.shiftNodeLeft = shiftNodeLeft;
