@@ -19,7 +19,7 @@
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
-var collectionEditor = require('../protractor_utils/collectionEditor.js');
+var CollectionEditorPage = require('../protractor_utils/CollectionEditorPage.js');
 
 
 describe('Collections', function() {
@@ -51,26 +51,26 @@ describe('Collections', function() {
     element(by.css('.protractor-test-create-collection')).click();
     browser.waitForAngular();
     // Add existing explorations.
-    collectionEditor.addExistingExploration('0');
-    collectionEditor.addExistingExploration('4');
-    collectionEditor.addExistingExploration('13');
+    CollectionEditorPage.addExistingExploration('0');
+    CollectionEditorPage.addExistingExploration('4');
+    CollectionEditorPage.addExistingExploration('13');
     // Search and add existing explorations.
-    collectionEditor.searchForAndAddExistingExploration('Lazy');
-    collectionEditor.searchForAndAddExistingExploration('Linear');
-    collectionEditor.searchForAndAddExistingExploration('The');
+    CollectionEditorPage.searchForAndAddExistingExploration('Lazy');
+    CollectionEditorPage.searchForAndAddExistingExploration('Linear');
+    CollectionEditorPage.searchForAndAddExistingExploration('The');
     // Shifting nodes in the node graph.
-    collectionEditor.shiftNodeLeft(1);
-    collectionEditor.shiftNodeRight(1);
+    CollectionEditorPage.shiftNodeLeft(1);
+    CollectionEditorPage.shiftNodeRight(1);
     // Delete node in the node graph.
-    collectionEditor.deleteNode(1);
+    CollectionEditorPage.deleteNode(1);
     // Publish the collection.
-    collectionEditor.saveDraft();
-    collectionEditor.closeSaveModal();
-    collectionEditor.publishCollection();
-    collectionEditor.setTitle('Test Collection');
-    collectionEditor.setObjective('This is a test collection.');
-    collectionEditor.setCategory('Algebra');
-    collectionEditor.saveChanges();
+    CollectionEditorPage.saveDraft();
+    CollectionEditorPage.closeSaveModal();
+    CollectionEditorPage.publishCollection();
+    CollectionEditorPage.setTitle('Test Collection');
+    CollectionEditorPage.setObjective('This is a test collection.');
+    CollectionEditorPage.setCategory('Algebra');
+    CollectionEditorPage.saveChanges();
     browser.waitForAngular();
     users.logout();
   });

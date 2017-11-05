@@ -19,7 +19,7 @@
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
-var collectionEditor = require('../protractor_utils/collectionEditor.js');
+var CollectionEditorPage = require('../protractor_utils/CollectionEditorPage.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
@@ -58,14 +58,14 @@ describe('Learner dashboard functionality', function() {
     // Create new collection.
     element(by.css('.protractor-test-create-collection')).click();
     browser.waitForAngular();
-    collectionEditor.addExistingExploration('14');
-    collectionEditor.saveDraft();
-    collectionEditor.closeSaveModal();
-    collectionEditor.publishCollection();
-    collectionEditor.setTitle('Test Collection');
-    collectionEditor.setObjective('This is a test collection.');
-    collectionEditor.setCategory('Algebra');
-    collectionEditor.saveChanges();
+    CollectionEditorPage.addExistingExploration('14');
+    CollectionEditorPage.saveDraft();
+    CollectionEditorPage.closeSaveModal();
+    CollectionEditorPage.publishCollection();
+    CollectionEditorPage.setTitle('Test Collection');
+    CollectionEditorPage.setObjective('This is a test collection.');
+    CollectionEditorPage.setCategory('Algebra');
+    CollectionEditorPage.saveChanges();
     browser.waitForAngular();
     users.logout();
   });
@@ -178,15 +178,15 @@ describe('Learner dashboard functionality', function() {
     creatorDashboardPage.navigateToCollectionEditor();
     browser.waitForAngular();
     general.waitForSystem();
-    collectionEditor.addExistingExploration('0');
+    CollectionEditorPage.addExistingExploration('0');
     browser.waitForAngular();
     general.waitForSystem();
-    collectionEditor.saveDraft();
+    CollectionEditorPage.saveDraft();
     browser.waitForAngular();
     general.waitForSystem();
     element(by.css('.protractor-test-commit-message-input')).sendKeys('Update');
     browser.driver.sleep(300);
-    collectionEditor.closeSaveModal();
+    CollectionEditorPage.closeSaveModal();
     general.waitForSystem();
     browser.driver.sleep(300);
     users.logout();
