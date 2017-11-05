@@ -246,7 +246,7 @@ def get_last_seen_notifications_msec(user_id):
 
     If the user has never checked the dashboard page or the notifications
     dropdown, returns None.
-    
+
     Args:
         user_id: str. The user ID of the new subscriber.
 
