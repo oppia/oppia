@@ -20,7 +20,6 @@
 // Add existing exploration to the node graph.
 
 var CollectionEditorPage = function() {
-
   this.addExistingExploration = function(explorationId) {
     element(
       by.css('.protractor-test-add-exploration-input')
