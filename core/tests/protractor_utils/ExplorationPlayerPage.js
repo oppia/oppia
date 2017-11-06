@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for playing through an exploration and checking its
+ * @fileoverview Page object for the Exploration Player Page, for use in Protractor
+ * tests for playing through an exploration and checking its
  * contents when carrying out end-to-end testing with protractor.
  */
 
