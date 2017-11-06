@@ -148,8 +148,8 @@ var ExplorationPlayerPage = function(){
 
   this.submitSuggestion = function(suggestion, description) {
     this.openSuggestionPopup();
-    fillInSuggestion(suggestion);
-    addSuggestionDescription(description);
+    this.fillInSuggestion(suggestion);
+    this.addSuggestionDescription(description);
     element(by.css('.protractor-test-suggestion-submit-btn')).click();
     general.waitForSystem();
   };
