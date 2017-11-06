@@ -28,7 +28,8 @@ var CreatorDashboardPage =
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var player = require('../protractor_utils/player.js');
+var ExplotationPlayerPage = 
+  require('../protractor_utils/ExplotationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 

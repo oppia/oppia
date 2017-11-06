@@ -29,7 +29,7 @@ var CollectionEditorPage = function() {
     element(by.css('.protractor-test-add-exploration-button')).click();
   };
 
-  // Search and add existing exploration to the node graph.
+  // Search and add existinmmg exploration to the node graph.
   this.searchForAndAddExistingExploration = function(query) {
     element(
       by.css('.protractor-test-add-exploration-input')
