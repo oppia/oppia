@@ -82,9 +82,9 @@ var ExplorationPlayerPage = function(){
 
   this.rateExploration = function(ratingValue) {
     element.all(by.css('.protractor-test-rating-star'))
-     .then(function(elements) {
-            elements[ratingValue - 1].click();
-         });
+      .then(function(elements) {
+       elements[ratingValue - 1].click();
+     });
   };
 
   this.expectExplorationRatingOnInformationCardToEqual = function(ratingValue) {
