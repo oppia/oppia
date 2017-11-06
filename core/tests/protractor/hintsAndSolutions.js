@@ -28,14 +28,13 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('HintsAndSolutions', function() {
-  
   var playerPage = null;
 
   beforeEach(function() {
     users.createUser('user1@hintsAndSolutions.com',
                      'hintsAndSolutions');
 
-    playerPage= new ExplorationPlayerPage.ExplorationPlayerPage();
+    playerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   it('uses hints and solutions in an exploration', function() {
@@ -61,7 +60,8 @@ describe('HintsAndSolutions', function() {
     editor.saveChanges();
 
     general.moveToPlayer();
-    playerPage.expectContentToMatch(forms.toRichText('What language is Oppia?'));
+    playerPage.expectContentToMatch(
+      forms.toRichText('What language is Oppia?'));
     playerPage.submitAnswer('TextInput', 'Roman');
     playerPage.viewHint();
     playerPage.submitAnswer('TextInput', 'Greek');

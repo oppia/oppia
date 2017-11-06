@@ -25,7 +25,6 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
 describe('rich-text components', function() {
-
   var playerPage = null;
 
   beforeEach(function(){

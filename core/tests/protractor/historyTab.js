@@ -24,13 +24,13 @@ var editor = require('../protractor_utils/editor.js');
 var ExplorationPlayerPage = 
   require('../protractor_utils/ExplorationPlayerPage.js');
 
-describe('Exploration history', function() {
-  
+describe('Exploration history', function() {  
   var playePage = null;
+  
   beforeEach(function(){
     playerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-
   });
+  
   it('should display the history', function() {
     users.createUser('user@historyTab.com', 'userHistoryTab');
     users.login('user@historyTab.com');

@@ -82,9 +82,9 @@ var ExplorationPlayerPage = function(){
 
   this.rateExploration = function(ratingValue) {
     element.all(by.css('.protractor-test-rating-star'))
-           .then(function(elements) {
-      elements[ratingValue - 1].click();
-    });
+     .then(function(elements) {
+            elements[ratingValue - 1].click();
+         });
   };
 
   this.expectExplorationRatingOnInformationCardToEqual = function(ratingValue) {
@@ -110,11 +110,12 @@ var ExplorationPlayerPage = function(){
   this.openFeedbackPopup = function() {
     element(by.css(
       '.protractor-test-exploration-feedback-popup-link'
-    ))   .click();
+      )).click();
   };
 
   this.openSuggestionPopup = function() {
-    element(by.css('.protractor-test-exploration-suggestion-popup-link')).click();
+    element(by.css('.protractor-test-exploration-suggestion-popup-link'
+      )).click();
   };
 
   this.submitFeedback = function(feedback) {
