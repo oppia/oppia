@@ -63,8 +63,10 @@ var ExplorationPlayerPage = function(){
       expectInteractionDetailsToMatch.apply(null, args);
   };
 
-  // `answerData` is a variable that is passed to the corresponding interaction's
-  // protractor utilities. Its definition and type are interaction-specific.
+  // `answerData` is a variable that is passed to the corresponding
+  //  interaction's
+  // protractor utilities. Its definition and type are 
+  // interaction-specific.
   this.submitAnswer = function(interactionId, answerData) {
     // The .first() targets the inline interaction, if it exists. Otherwise,
     // it will get the supplemental interaction.
@@ -79,7 +81,8 @@ var ExplorationPlayerPage = function(){
   };
 
   this.rateExploration = function(ratingValue) {
-    element.all(by.css('.protractor-test-rating-star')).then(function(elements) {
+    element.all(by.css('.protractor-test-rating-star'))
+           .then(function(elements) {
       elements[ratingValue - 1].click();
     });
   };
@@ -105,7 +108,9 @@ var ExplorationPlayerPage = function(){
   };
 
   this.openFeedbackPopup = function() {
-    element(by.css('.protractor-test-exploration-feedback-popup-link')).click();
+    element(by.css(
+      '.protractor-test-exploration-feedback-popup-link'
+    ))   .click();
   };
 
   this.openSuggestionPopup = function() {
@@ -148,5 +153,4 @@ var ExplorationPlayerPage = function(){
   };
 };
 
-
-exports.ExplorationPlayerPage  = ExplorationPlayerPage;
+exports.ExplorationPlayerPage = ExplorationPlayerPage;
