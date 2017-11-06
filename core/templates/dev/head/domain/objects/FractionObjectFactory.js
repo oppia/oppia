@@ -66,6 +66,17 @@ oppia.factory('FractionObjectFactory', [
       return this.isNegative ?  -floatVal  : floatVal;
     };
 
+    Fraction.prototype.convertToSimplestForm = function () {
+      var gcd = function(x, y) {
+        return y === 0 ? x : gcd(y, x % y);
+      }
+      var g = gcd(this.numerator, this.denominator);
+      var numerator = this.numerator / g;
+      var denominator = this.denominator / g;
+      return new Fraction(
+        this.isNegative, this.wholeNumber, numerator, denominator);
+    };
+
     Fraction.fromRawInputString = function(rawInput) {
       var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
       if (INVALID_CHARS_REGEX.test(rawInput)) {

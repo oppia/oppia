@@ -34,7 +34,7 @@
     "IsEquivalentTo": {
       "description": "is equivalent to {{f|Fraction}}"
     },
-    "IsEquivalentToAndInSimplestFrom": {
+    "IsEquivalentToAndInSimplestForm": {
       "description": "is equivalent to {{f|Fraction}} and in simplist form"
     },
     "IsLessThan": {
