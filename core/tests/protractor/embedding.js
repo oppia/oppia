@@ -30,7 +30,7 @@ describe('Embedding', function() {
   
   beforeEach(function() {
     adminPage = new AdminPage.AdminPage();
-    playerPage = new ExplorationPlayerPage.ExprotationPlayerPage();
+    playerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   it('should display and play embedded explorations', function() {

@@ -113,7 +113,7 @@ var ExplorationPlayerPage = function(){
   };
 
   this.submitFeedback = function(feedback) {
-    openFeedbackPopup();
+    this.openFeedbackPopup();
     element(by.css('.protractor-test-exploration-feedback-textarea')).
       sendKeys(feedback);
     element(by.css('.protractor-test-exploration-feedback-submit-btn')).click();
@@ -140,7 +140,7 @@ var ExplorationPlayerPage = function(){
   };
 
   this.submitSuggestion = function(suggestion, description) {
-    openSuggestionPopup();
+    this.openSuggestionPopup();
     fillInSuggestion(suggestion);
     addSuggestionDescription(description);
     element(by.css('.protractor-test-suggestion-submit-btn')).click();

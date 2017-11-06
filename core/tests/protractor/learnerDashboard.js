@@ -228,7 +228,7 @@ describe('Learner dashboard functionality', function() {
     general.waitForSystem();
     element(by.css('.protractor-test-subscriptions-section')).click();
     browser.waitForAngular();
-    expect(elemeFnt.all(by.css(
+    expect(element.all(by.css(
       '.protractor-test-subscription-name')).first().getText()).toMatch(
       'creator...');
     expect(element.all(by.css(
