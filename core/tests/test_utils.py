@@ -287,7 +287,7 @@ class TestBase(unittest.TestCase):
             url: string (url). url for the api get request.
             params: string (json). defaualt (None).
                 parameters relevant to the api call.
-			expect_errors: bool. If False, then if anything is written
+            expect_errors: bool. If False, then if anything is written
                 to wsgi.errors (module webtest) will be an error.
 
         Returns:
@@ -309,7 +309,7 @@ class TestBase(unittest.TestCase):
                 the post request.
             csrf_token: cross-site request forgery token,
                 used for data protection during post request.
-			expect_errors: bool. If False, then if anything is written
+            expect_errors: bool. If False, then if anything is written
                 to wsgi.errors (module webtest) will be an error.
             expected_status_int: integer status code.
             upload_files: list. list elements of the form
