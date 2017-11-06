@@ -148,9 +148,13 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         latest_exp_version = exploration.version
 
         version_numbers = range(1, latest_exp_version + 1)
-        explorations_by_version = (
-            exp_services.get_multiple_explorations_by_version(
-                exp_id, version_numbers))
+        try:
+            explorations_by_version = (
+                exp_services.get_multiple_explorations_by_version(
+                    exp_id, version_numbers))
+        except utils.ExplorationConversionError:
+            yield "This exploration %s needs to be looked into." % (exp_id)
+            return
         exploration_stats_by_version = (
             stats_services.get_multiple_exploration_stats_by_version(
                 exp_id, version_numbers))
@@ -340,7 +344,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         answer_group.outcome.dest].first_hit_count_v1
                     for answer_group in init_state.interaction.answer_groups
                     if answer_group.outcome.dest != (
-                        versioned_exploration.init_state_name)] or [0])
+                        versioned_exploration.init_state_name) and (
+                            answer_group.outcome.dest in (
+                                versioned_exploration.states))] or [0])
                 num_actual_starts = max_first_hit_from_init_state
 
             # Check if model already exists. If it does, update it, otherwise
