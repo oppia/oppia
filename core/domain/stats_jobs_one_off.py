@@ -263,8 +263,14 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     state_stats_mapping[state_name] = (
                         stats_domain.StateStats.create_default())
             else:
-                exp_commit_log = exp_models.ExplorationCommitLogEntryModel.get(
-                    'exploration-%s-%s' % (exp_id, version))
+                try:
+                    exp_commit_log = (
+                        exp_models.ExplorationCommitLogEntryModel.get(
+                            'exploration-%s-%s' % (exp_id, version)))
+                except Exception:
+                    yield "Check if the exploration %s has snapshot models." % (
+                        exp_id)
+                    return
                 change_list = exp_commit_log.commit_cmds
 
                 # Handling state additions, renames and deletions.
