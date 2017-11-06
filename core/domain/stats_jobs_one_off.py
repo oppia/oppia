@@ -153,7 +153,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 exp_services.get_multiple_explorations_by_version(
                     exp_id, version_numbers))
         except utils.ExplorationConversionError:
-            yield "This exploration %s needs to be looked into." % (exp_id)
+            yield (
+                "ERROR: Exploration %s contains non-existent features that "
+                "need to be looked into." % (exp_id))
             return
         exploration_stats_by_version = (
             stats_services.get_multiple_exploration_stats_by_version(
@@ -268,8 +270,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         exp_models.ExplorationCommitLogEntryModel.get(
                             'exploration-%s-%s' % (exp_id, version)))
                 except Exception:
-                    yield "Check if the exploration %s has snapshot models." % (
-                        exp_id)
+                    yield (
+                        "ERROR: Missing CommitLogEntryModel for exploration "
+                        "%s, version %s." % (exp_id, version))
                     return
                 change_list = exp_commit_log.commit_cmds
 
@@ -343,6 +346,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 # learner twice. The max of both first hit counts ensures that
                 # we are counting only unique learners who traversed past the
                 # initial state.
+                # We also check if the outcome of the initial state is present
+                # in the list of states because some older explorations use an
+                # implicit, pseudo-END state.
                 init_state = versioned_exploration.states[
                     versioned_exploration.init_state_name]
                 max_first_hit_from_init_state = max([
