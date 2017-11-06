@@ -24,7 +24,8 @@ var CollectionEditorPage =
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage = 
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 
 describe('Learner dashboard functionality', function() {
@@ -32,10 +33,12 @@ describe('Learner dashboard functionality', function() {
   var adminPage = null;
   var libraryPage = null;
   var collectionEditorPage = null;
+  var playerPage = null;
   
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
+    playerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   beforeAll(function() {
@@ -79,7 +82,7 @@ describe('Learner dashboard functionality', function() {
     // Play an exploration and leave it in between. It should be added to the
     // 'In Progress' section.
     general.openPlayer('3');
-    player.submitAnswer('Continue', null);
+    playerPage.submitAnswer('Continue', null);
     browser.ignoreSynchronization = true;
     browser.get(general.LEARNER_DASHBOARD_URL);
     general.acceptAlert();
@@ -90,10 +93,10 @@ describe('Learner dashboard functionality', function() {
     // Play an exploration completely. It should be added to the 'Completed'
     // section.
     general.openPlayer('14');
-    player.submitAnswer('Continue', null);
-    player.submitAnswer(
+    playerPage.submitAnswer('Continue', null);
+    playerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
-    player.submitAnswer('Continue', null);
+    playerPage.submitAnswer('Continue', null);
     browser.get(general.LEARNER_DASHBOARD_URL);
     browser.waitForAngular();
     element(by.css('.protractor-test-completed-section')).click();
@@ -130,7 +133,7 @@ describe('Learner dashboard functionality', function() {
       '.protractor-test-collection-node')).first().click();
     // Leave the exploration inbetween. The collection should be found in the
     // 'In Progress' section.
-    player.submitAnswer('Continue', null);
+    playerPage.submitAnswer('Continue', null);
     browser.ignoreSynchronization = true;
     browser.get(general.LEARNER_DASHBOARD_URL);
     general.acceptAlert();
@@ -156,10 +159,10 @@ describe('Learner dashboard functionality', function() {
       '.protractor-test-collection-node')).first().click();
     // Complete the exploration. The collection should be found in the
     // 'Completed' section as the collection is also completed.
-    player.submitAnswer('Continue', null);
-    player.submitAnswer(
+    playerPage.submitAnswer('Continue', null);
+    playerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
-    player.submitAnswer('Continue', null);
+    playerPage.submitAnswer('Continue', null);
     browser.get(general.LEARNER_DASHBOARD_URL);
     browser.waitForAngular();
     general.waitForSystem();
@@ -225,7 +228,7 @@ describe('Learner dashboard functionality', function() {
     general.waitForSystem();
     element(by.css('.protractor-test-subscriptions-section')).click();
     browser.waitForAngular();
-    expect(element.all(by.css(
+    expect(elemeFnt.all(by.css(
       '.protractor-test-subscription-name')).first().getText()).toMatch(
       'creator...');
     expect(element.all(by.css(
@@ -240,11 +243,11 @@ describe('Learner dashboard functionality', function() {
 
     libraryPage.get();
     general.openPlayer('14');
-    player.submitAnswer('Continue', null);
-    player.submitAnswer(
+    playerPage.submitAnswer('Continue', null);
+    playerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
-    player.submitAnswer('Continue', null);
-    player.submitFeedback(feedback);
+    playerPage.submitAnswer('Continue', null);
+    playerPage.submitFeedback(feedback);
     browser.get(general.LEARNER_DASHBOARD_URL);
     browser.waitForAngular();
     element(by.css('.protractor-test-feedback-section')).click();

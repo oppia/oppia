@@ -21,8 +21,8 @@ var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
-var ExplotationPlayerPage = 
-  require('../protractor_utils/ExplotationPlayerPage.js');
+var ExplorationPlayerPage = 
+  require('../protractor_utils/ExplorationPlayerPage.js');
 
 
 
@@ -30,7 +30,7 @@ describe('Full exploration editor', function() {
   var playerPage = null;
 
   beforeEach(function(){
-    playerPage = new ExplotationPlayerPage.ExplotationPlayerPage();  
+    playerPage = new ExplorationPlayerPage.ExplorationPlayerPage();  
   });
 
   

@@ -28,8 +28,8 @@ var CreatorDashboardPage =
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var ExplotationPlayerPage = 
-  require('../protractor_utils/ExplotationPlayerPage.js');
+var ExplorationPlayerPage = 
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
@@ -40,10 +40,13 @@ describe('ExplorationFeedback', function() {
   var EXPLORATION_LANGUAGE = 'English';
   var creatorDashboardPage = null;
   var libraryPage = null;
+  var playerPage = null;
+  
 
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
+    playerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   beforeEach(function() {
@@ -73,7 +76,7 @@ describe('ExplorationFeedback', function() {
     users.login('user2@ExplorationFeedback.com');
     libraryPage.get();
     libraryPage.playExploration(EXPLORATION_TITLE);
-    player.submitFeedback(feedback);
+    playerPage.submitFeedback(feedback);
     users.logout();
 
     // Creator reads the feedback and responds

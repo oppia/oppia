@@ -21,8 +21,8 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var editor = require('../protractor_utils/editor.js');
-var ExplotationPlayerPage = 
-  require('../protractor_utils/ExplotationPlayerPage.js');
+var ExplorationPlayerPage = 
+  require('../protractor_utils/ExplorationPlayerPage.js');
 
 describe('Embedding', function() {
   var adminPage = null;
@@ -30,7 +30,7 @@ describe('Embedding', function() {
   
   beforeEach(function() {
     adminPage = new AdminPage.AdminPage();
-    playerPage = new ExplotationPlayerPage.ExplotationPlayerPage();
+    playerPage = new ExplorationPlayerPage.ExprotationPlayerPage();
   });
 
   it('should display and play embedded explorations', function() {

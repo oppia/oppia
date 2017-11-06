@@ -21,7 +21,8 @@ var CreatorDashboardPage =
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var forms = require('../protractor_utils/forms.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage = 
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
@@ -33,10 +34,12 @@ describe('Suggestions on Explorations', function() {
   var EXPLORATION_LANGUAGE = 'English';
   var creatorDashboardPage = null;
   var libraryPage = null;
+  var playerPage = null;
 
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
+    playerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   beforeEach(function() {
@@ -65,7 +68,7 @@ describe('Suggestions on Explorations', function() {
     var suggestion = 'New Exploration';
     var suggestionDescription = 'Uppercased the first letter';
 
-    player.submitSuggestion(suggestion, suggestionDescription);
+    playerPage.submitSuggestion(suggestion, suggestionDescription);
     users.logout();
 
     // Exploration author reviews the suggestion and accepts it
@@ -79,14 +82,14 @@ describe('Suggestions on Explorations', function() {
     editor.acceptSuggestion(suggestionDescription);
 
     editor.navigateToPreviewTab();
-    player.expectContentToMatch(forms.toRichText(suggestion));
+    playerPage.expectContentToMatch(forms.toRichText(suggestion));
     users.logout();
 
     // Student logs in and plays the exploration, finds the updated content
     users.login('user3@ExplorationSuggestions.com');
     libraryPage.get();
     libraryPage.playExploration(EXPLORATION_TITLE);
-    player.expectContentToMatch(forms.toRichText(suggestion));
+    playerPage.expectContentToMatch(forms.toRichText(suggestion));
     users.logout();
   });
 

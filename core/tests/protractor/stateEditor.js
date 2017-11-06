@@ -23,9 +23,15 @@ var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage = 
+  require('../protractor_utils/ExplorationPlayerPage.js');
 
 describe('State editor', function() {
+  var playerPage = null;
+  
+  beforeEach(function(){
+    playerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
   it('should walk through the tutorial when user repeatedly clicks Next',
     function() {
       var NUM_TUTORIAL_STAGES = 7;
@@ -59,11 +65,11 @@ describe('State editor', function() {
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.expectContentToMatch(forms.toRichText('plain text'));
-    player.expectExplorationToNotBeOver();
-    player.expectInteractionToMatch('Continue', 'click here');
-    player.submitAnswer('Continue', null);
-    player.expectExplorationToBeOver();
+    playerPage.expectContentToMatch(forms.toRichText('plain text'));
+    playerPage.expectExplorationToNotBeOver();
+    playerPage.expectInteractionToMatch('Continue', 'click here');
+    playerPage.submitAnswer('Continue', null);
+    playerPage.expectExplorationToBeOver();
 
     users.logout();
   });
@@ -92,12 +98,12 @@ describe('State editor', function() {
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.expectExplorationToNotBeOver();
-    player.expectInteractionToMatch(
+    playerPage.expectExplorationToNotBeOver();
+    playerPage.expectInteractionToMatch(
       'MultipleChoiceInput',
       [forms.toRichText('option A'), forms.toRichText('option B')]);
-    player.submitAnswer('MultipleChoiceInput', 'option B');
-    player.expectExplorationToBeOver();
+    playerPage.submitAnswer('MultipleChoiceInput', 'option B');
+    playerPage.expectExplorationToBeOver();
 
     users.logout();
   });
@@ -120,17 +126,17 @@ describe('State editor', function() {
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.submitAnswer('NumericInput', 5);
-    player.expectLatestFeedbackToMatch(forms.toRichText('out of bounds'));
-    player.expectExplorationToNotBeOver();
+    playerPage.submitAnswer('NumericInput', 5);
+    playerPage.expectLatestFeedbackToMatch(forms.toRichText('out of bounds'));
+    playerPage.expectExplorationToNotBeOver();
     // It's important to test the value 0 in order to ensure that it would
     // still get submitted even though it is a falsy value in JavaScript.
-    player.submitAnswer('NumericInput', 0);
-    player.expectLatestFeedbackToMatch(function(richTextChecker) {
+    playerPage.submitAnswer('NumericInput', 0);
+    playerPage.expectLatestFeedbackToMatch(function(richTextChecker) {
       richTextChecker.readBoldText('correct');
     });
-    player.clickThroughToNextCard();
-    player.expectExplorationToBeOver();
+    playerPage.clickThroughToNextCard();
+    playerPage.expectExplorationToBeOver();
 
     users.logout();
   });

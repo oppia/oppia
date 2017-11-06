@@ -150,26 +150,3 @@ var ExplorationPlayerPage = function(){
 
 
 exports.ExplorationPlayerPage  = ExplorationPlayerPage;
-
-/*exports.restartExploration = restartExploration;*/
-
-/*exports.expectExplorationNameToBe = expectExplorationNameToBe;
-exports.expectContentToMatch = expectContentToMatch;
-exports.expectLatestFeedbackToMatch = expectLatestFeedbackToMatch;
-
-exports.expectInteractionToMatch = expectInteractionToMatch;
-exports.submitAnswer = submitAnswer;
-exports.clickThroughToNextCard = clickThroughToNextCard;
-exports.rateExploration = rateExploration;
-exports.expectExplorationRatingOnInformationCardToEqual = (
-  expectExplorationRatingOnInformationCardToEqual);
-
-exports.expectExplorationToBeOver = expectExplorationToBeOver;
-exports.expectExplorationToNotBeOver = expectExplorationToNotBeOver;
-
-exports.openFeedbackPopup = openFeedbackPopup;
-exports.submitFeedback = submitFeedback;
-exports.submitSuggestion = submitSuggestion;
-
-exports.viewHint = viewHint;
-exports.viewSolution = viewSolution;*/

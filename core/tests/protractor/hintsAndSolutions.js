@@ -22,14 +22,20 @@
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var forms = require('../protractor_utils/forms.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage = 
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('HintsAndSolutions', function() {
+  
+  var playerPage = null;
+
   beforeEach(function() {
     users.createUser('user1@hintsAndSolutions.com',
                      'hintsAndSolutions');
+
+    playerPage= new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   it('uses hints and solutions in an exploration', function() {
@@ -55,15 +61,15 @@ describe('HintsAndSolutions', function() {
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.expectContentToMatch(forms.toRichText('What language is Oppia?'));
-    player.submitAnswer('TextInput', 'Roman');
-    player.viewHint();
-    player.submitAnswer('TextInput', 'Greek');
-    player.viewSolution();
-    player.expectExplorationToNotBeOver();
-    player.submitAnswer('TextInput', 'Finnish');
-    player.clickThroughToNextCard();
-    player.expectExplorationToBeOver();
+    playerPage.expectContentToMatch(forms.toRichText('What language is Oppia?'));
+    playerPage.submitAnswer('TextInput', 'Roman');
+    playerPage.viewHint();
+    playerPage.submitAnswer('TextInput', 'Greek');
+    playerPage.viewSolution();
+    playerPage.expectExplorationToNotBeOver();
+    playerPage.submitAnswer('TextInput', 'Finnish');
+    playerPage.clickThroughToNextCard();
+    playerPage.expectExplorationToBeOver();
     users.logout();
   });
 
