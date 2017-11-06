@@ -60,6 +60,12 @@ oppia.factory('FractionObjectFactory', [
       };
     };
 
+    Fraction.prototype.toFloat = function () {
+      var totalParts = (this.wholeNumber * this.denominator) + this.numerator;
+      var floatVal  = (totalParts / this.denominator)
+      return this.isNegative ?  -floatVal  : floatVal;
+    };
+
     Fraction.fromRawInputString = function(rawInput) {
       var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
       if (INVALID_CHARS_REGEX.test(rawInput)) {
