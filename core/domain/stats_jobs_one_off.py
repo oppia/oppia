@@ -152,10 +152,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             explorations_by_version = (
                 exp_services.get_multiple_explorations_by_version(
                     exp_id, version_numbers))
-        except utils.ExplorationConversionError:
-            yield (
-                "ERROR: Exploration %s could not be converted to latest schema "
-                "version." % (exp_id))
+        except Exception as e:
+            yield e
             return
         # Retrieve list of snapshot models representing each version of the
         # exploration.
