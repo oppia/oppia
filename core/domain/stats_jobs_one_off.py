@@ -154,8 +154,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     exp_id, version_numbers))
         except utils.ExplorationConversionError:
             yield (
-                "ERROR: Exploration %s contains non-existent features that "
-                "need to be looked into." % (exp_id))
+                "ERROR: Exploration %s could not be converted to latest schema "
+                "version." % (exp_id))
             return
         # Retrieve list of snapshot models representing each version of the
         # exploration.
