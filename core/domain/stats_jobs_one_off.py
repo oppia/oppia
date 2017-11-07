@@ -157,6 +157,11 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 "ERROR: Exploration %s contains non-existent features that "
                 "need to be looked into." % (exp_id))
             return
+        # Retrieve list of snapshot models representing each version of the
+        # exploration.
+        snapshots_by_version = (
+            exp_models.ExplorationModel.get_snapshots_metadata(
+                exp_id, version_numbers))
         exploration_stats_by_version = (
             stats_services.get_multiple_exploration_stats_by_version(
                 exp_id, version_numbers))
@@ -265,16 +270,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     state_stats_mapping[state_name] = (
                         stats_domain.StateStats.create_default())
             else:
-                try:
-                    exp_commit_log = (
-                        exp_models.ExplorationCommitLogEntryModel.get(
-                            'exploration-%s-%s' % (exp_id, version)))
-                except Exception:
-                    yield (
-                        "ERROR: Missing CommitLogEntryModel for exploration "
-                        "%s, version %s." % (exp_id, version))
-                    return
-                change_list = exp_commit_log.commit_cmds
+                change_list = snapshots_by_version[version-1]['commit_cmds']
 
                 # Handling state additions, renames and deletions.
                 for change_dict in change_list:
