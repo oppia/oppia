@@ -1503,42 +1503,6 @@ def load_demo(exploration_id):
     logging.info('Exploration with id %s was loaded.' % exploration_id)
 
 
-def get_next_page_of_all_commits(
-        page_size=feconf.COMMIT_LIST_PAGE_SIZE, urlsafe_start_cursor=None):
-    """Returns a page of commits to all explorations in reverse time order.
-
-    The return value is a tuple (results, cursor, more) as described in
-    fetch_page() at:
-
-        https://developers.google.com/appengine/docs/python/ndb/queryclass
-
-    Args:
-        page_size: int. The maximum number of commits to return.
-        urlsafe_start_cursor: str. If this is not None, then the returned
-            commits start from the cursor location. Otherwise they start from
-            the beginning of the list of commits.
-
-    Returns:
-        tuple. A 3-tuple consisting of:
-            - list(ExplorationCommitLogEntry). A list containing
-              ExplorationCommitlogEntry domain objects.
-            - str. The postion of the cursor.
-            - bool. indicating whether there are (likely) more results after
-              this batch. If False, there are no more results; if True, there
-              are probably more results.
-    """
-    results, new_urlsafe_start_cursor, more = (
-        exp_models.ExplorationCommitLogEntryModel.get_all_commits(
-            page_size, urlsafe_start_cursor))
-
-    return ([exp_domain.ExplorationCommitLogEntry(
-        entry.created_on, entry.last_updated, entry.user_id, entry.username,
-        entry.exploration_id, entry.commit_type, entry.commit_message,
-        entry.commit_cmds, entry.version, entry.post_commit_status,
-        entry.post_commit_community_owned, entry.post_commit_is_private
-    ) for entry in results], new_urlsafe_start_cursor, more)
-
-
 def get_next_page_of_all_non_private_commits(
         page_size=feconf.COMMIT_LIST_PAGE_SIZE, urlsafe_start_cursor=None,
         max_age=None):
