@@ -162,6 +162,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         snapshots_by_version = (
             exp_models.ExplorationModel.get_snapshots_metadata(
                 exp_id, version_numbers))
+        # Sort these in increasing order of version numbers.
+        snapshots_by_version.sort(key=lambda s:s['version_number'])
         exploration_stats_by_version = (
             stats_services.get_multiple_exploration_stats_by_version(
                 exp_id, version_numbers))
@@ -270,7 +272,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     state_stats_mapping[state_name] = (
                         stats_domain.StateStats.create_default())
             else:
-                change_list = snapshots_by_version[version-1]['commit_cmds']
+                change_list = snapshots_by_version[version - 1]['commit_cmds']
 
                 # Handling state additions, renames and deletions.
                 for change_dict in change_list:
