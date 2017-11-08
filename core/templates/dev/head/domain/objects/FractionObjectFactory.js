@@ -62,8 +62,8 @@ oppia.factory('FractionObjectFactory', [
 
     Fraction.prototype.toFloat = function () {
       var totalParts = (this.wholeNumber * this.denominator) + this.numerator;
-      var floatVal  = (totalParts / this.denominator)
-      return this.isNegative ?  -floatVal  : floatVal;
+      var floatVal = (totalParts / this.denominator)
+      return this.isNegative ? -floatVal : floatVal;
     };
 
     Fraction.prototype.convertToSimplestForm = function () {

@@ -59,16 +59,17 @@ describe('Fraction Input rules service', function() {
       createFractionDict(1, 2, 1), RULE_INPUT)).toBe(true);
   });
 
-  it('should have a correct \'equivalent to and in simplist form\' rule', function() {
-    // Equivalent to but not in simplist form.
-    expect(firs.IsEquivalentToAndInSimplestForm(
-      createFractionDict(1, 40, 20), RULE_INPUT)).toBe(false);
-    expect(firs.IsEquivalentToAndInSimplestForm(
-      createFractionDict(1, 2, 1), RULE_INPUT)).toBe(true);
-    // In simplist form but not equivalent to.
-    expect(firs.IsEquivalentToAndInSimplestForm(
-      createFractionDict(1, 5, 3), RULE_INPUT)).toBe(false);
-  });
+  it('should have a correct \'equivalent to and in simplest form\' rule',
+    function() {
+      // Equivalent to but not in simplist form.
+      expect(firs.IsEquivalentToAndInSimplestForm(
+        createFractionDict(1, 40, 20), RULE_INPUT)).toBe(false);
+      expect(firs.IsEquivalentToAndInSimplestForm(
+        createFractionDict(1, 2, 1), RULE_INPUT)).toBe(true);
+      // In simplist form but not equivalent to.
+      expect(firs.IsEquivalentToAndInSimplestForm(
+        createFractionDict(1, 5, 3), RULE_INPUT)).toBe(false);
+    });
 
   it('should have a correct \'exactly equal to\' rule', function() {
     expect(firs.IsExactlyEqualTo(
