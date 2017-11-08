@@ -104,10 +104,9 @@
        expect(Fraction.fromRawInputString('0 4/5').toFloat()).toEqual(0.8);
        expect(Fraction.fromRawInputString('-10/10').toFloat()).toEqual(-1);
        expect(Fraction.fromRawInputString('0 40/50').toFloat()).toEqual(0.8);
-       expect(Fraction.fromRawInputString('0 2/3').toFloat()).toEqual(2/3);
+       expect(Fraction.fromRawInputString('0 2/3').toFloat()).toEqual(2 / 3);
        expect(Fraction.fromRawInputString('0 25/5').toFloat()).toEqual(5);
-       expect(Fraction.fromRawInputString('4 1/3').toFloat()).toEqual(13/3);
-
+       expect(Fraction.fromRawInputString('4 1/3').toFloat()).toEqual(13 / 3);
      })
    });
  });
