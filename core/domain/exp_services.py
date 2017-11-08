@@ -266,19 +266,23 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
         list(Exploration). List of Exploration domain objects.
 
     Raises:
-        Exception. ERROR: Exploration, version could not be converted to latest
-            schema version.
+        Exception. One or more of the given versions of the exploration could
+            not be converted to the latest schema version.
     """
     explorations = []
     exploration_models = exp_models.ExplorationModel.get_multi_versions(
         exp_id, version_numbers)
+    error_versions = []
     for index, exploration_model in enumerate(exploration_models):
         try:
             explorations.append(get_exploration_from_model(exploration_model))
         except utils.ExplorationConversionError:
-            raise Exception(
-                "ERROR: Exploration %s, version %s could not be converted to "
-                "latest schema version." % (exp_id, index + 1))
+            error_versions.append(index + 1)
+
+    if error_versions:
+        raise Exception(
+            "Exploration %s, versions [%s] could not be converted to latest"
+            "schema version." % (exp_id, ', '.join(map(str, error_versions))))
     return explorations
 
 
