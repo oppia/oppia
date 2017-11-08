@@ -172,7 +172,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         # Create a new collection and exploration.
-        collection_services.save_new_valid_collection(
+        self.save_new_valid_collection(
             collection_id, owner_id, exploration_id=exp_id)
 
         # Add a skill.
@@ -198,10 +198,64 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         question.add_skill('test', owner_id)
         skills = question.get_skills()
-        self.assertEqual(skills[0].name, 'test')
+        self.assertEqual(skills[0].name, u'test')
         collection = collection_services.get_collection_by_id(
-            self.collection_id)
+            collection_id)
         skill_id = collection.get_skill_id_from_skill_name('test')
         question.remove_skill(skill_id, owner_id)
         skills = question.get_skills()
         self.assertEqual(len(skills), 0)
+
+    def test_can_user_answer_question(self):
+        """Tests the method can user answer question."""
+        collection_id = 'col1'
+        exp_id = '0_exploration_id'
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        # Create a new collection and exploration.
+        self.save_new_valid_collection(
+            collection_id, owner_id, exploration_id=exp_id)
+
+        # Add a skill.
+        collection_services.update_collection(
+            owner_id, collection_id, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'test'
+            }], 'Add a new skill')
+        collection = collection_services.get_collection_by_id(
+            collection_id)
+        skill_id = collection.get_skill_id_from_skill_name('test')
+        collection_node = collection.get_node(exp_id)
+        collection_node.update_acquired_skill_ids([skill_id])
+        # Update a skill.
+        collection_services.update_collection(
+            owner_id, collection_id, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'property_name': (
+                    collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS), # pylint = false
+                'exploration_id': exp_id,
+                'new_value': [skill_id]
+            }], 'Update skill')
+
+        state = exp_domain.State.create_default_state('ABC')
+        question_data = state.to_dict()
+
+        question_object = {
+            'question_id': 'col1.random',
+            'title': 'abc',
+            'question_data': question_data,
+            'question_data_schema_version': 1,
+            'collection_id': 'col1',
+            'language_code': 'en'
+        }
+
+        question = question_domain.Question.from_dict(question_object)
+
+        question.add_skill('test', owner_id)
+        self.assertEqual(
+            question.can_user_answer_question(owner_id, collection_id), False)
+
+        collection_services.record_played_exploration_in_collection_context(
+            owner_id, collection_id, exp_id)
+        self.assertEqual(
+            question.can_user_answer_question(owner_id, collection_id), True)

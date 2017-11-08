@@ -275,7 +275,6 @@ class Question(object):
 
         question_skills = []
         for skill in skills:
-            print collection.skills[skill].question_ids
             if self.question_id in collection.skills[skill].question_ids:
                 question_skills.append(collection.skills[skill])
         return question_skills
@@ -295,4 +294,7 @@ class Question(object):
         user_skills = (
             collection_services.get_acquired_skills_of_user_given_collection_id(
                 user_id, collection_id))
-        return set(question_skills) < set(user_skills)
+        for question_skill in question_skills:
+            if question_skill.id not in user_skills:
+                return False
+        return True

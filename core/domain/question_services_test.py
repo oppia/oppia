@@ -15,6 +15,8 @@
 # limitations under the License.
 
 from core.domain import exp_domain
+from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import user_services
@@ -109,3 +111,59 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                          question_data_schema_version)
         self.assertEqual(model.collection_id, collection_id)
         self.assertEqual(model.language_code, language_code)
+
+    def test_get_question_batch(self):
+        self.COL_ID_0 = '0_collection_id'
+        self.EXP_ID_0 = '0_exploration_id'
+        self.COL_ID_1 = '1_collection_id'
+        self.EXP_ID_1 = '1_exploration_id'
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        # Create a new collection and exploration.
+        self.save_new_valid_collection(
+            self.COL_ID_0, self.owner_id, exploration_id=self.EXP_ID_0)
+        self.save_new_valid_collection(
+            self.COL_ID_1, self.owner_id, exploration_id=self.EXP_ID_1)
+
+        # Add a skill.
+        collection_services.update_collection(
+            self.owner_id, self.COL_ID_0, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'test'
+            }], 'Add a new skill')
+        collection = collection_services.get_collection_by_id(
+            self.COL_ID_0)
+        skill_id = collection.get_skill_id_from_skill_name('test')
+        collection_node = collection.get_node(self.EXP_ID_0)
+        collection_node.update_acquired_skill_ids([skill_id])
+        # Update a skill.
+        collection_services.update_collection(
+            self.owner_id, self.COL_ID_0, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'property_name': (
+                    collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS), # pylint = false
+                'exploration_id': self.EXP_ID_0,
+                'new_value': [skill_id]
+            }], 'Update skill')
+
+        state = exp_domain.State.create_default_state('ABC')
+        question_data = state.to_dict()
+        question_id = 'dummy'
+        title = 'A Question'
+        question_data_schema_version = 1
+        collection_id = self.COL_ID_0
+        language_code = 'en'
+        question = question_domain.Question(
+            question_id, title, question_data, question_data_schema_version,
+            collection_id, language_code)
+        question.validate()
+
+        question_model = question_services.add_question(self.owner_id, question)
+        question = question_services.get_question_by_id(question_model.id)
+        question.add_skill('test', self.owner_id)
+        collection_services.record_played_exploration_in_collection_context(
+            self.owner_id, self.COL_ID_0, self.EXP_ID_0)
+        question_batch = question_services.get_questions_batch(
+            self.COL_ID_0, [skill_id], self.owner_id, 1)
+        self.assertEqual(question_batch[0].title,  question.title)
+

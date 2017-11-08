@@ -247,14 +247,12 @@ def get_questions_batch(
         collection_services.get_acquired_skills_of_user_given_collection_id(
             user_id, collection_id))
     question_skill_ids = list(set(user_skill_ids) & set(skill_ids))
-
     collection = collection_services.get_collection_by_id(collection_id)
     question_ids = []
     for skill_id in question_skill_ids:
         if skill_id in collection.skills:
             question_ids.extend(collection.skills[skill_id].question_ids)
     unique_question_ids = list(set(question_ids))
-
     if len(unique_question_ids) < batch_size:
         batch_size = len(unique_question_ids)
     random_question_ids = random.sample(unique_question_ids, batch_size)

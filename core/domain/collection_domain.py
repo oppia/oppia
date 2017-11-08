@@ -1143,18 +1143,20 @@ class Collection(object):
             Exception: question_id is already present in skill.
         """
         index = 0
+        skill_index = None
         for _, skill in self.skills.iteritems():
             if skill.name == skill_name:
                 skill_index = index
             index += 1
-        skill_id = CollectionSkill.get_skill_id_from_index(skill_index)
-        question_ids = self.skills[skill_id].question_ids
-        if question_id not in question_ids:
-            self.skills[skill_id].question_ids.append(
-                question_id)
-        else:
-            raise Exception(
-                '%s is already present in %s' % (self.question_id, skill_name))
+        if skill_index is not None:
+            skill_id = CollectionSkill.get_skill_id_from_index(skill_index)
+            question_ids = self.skills[skill_id].question_ids
+            if question_id not in question_ids:
+                self.skills[skill_id].question_ids.append(
+                    question_id)
+            else:
+                raise Exception(
+                    '%s is already present in %s' % (self.question_id, skill_name))
 
     def remove_question_id_from_skill(self, skill_id, question_id):
         """Removes question id from the question list of the appropriate skill.
