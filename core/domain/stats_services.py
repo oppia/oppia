@@ -22,52 +22,71 @@ from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.domain import stats_domain
 from core.platform import models
-import feconf
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+transaction_services = models.Registry.import_transaction_services()
+
 
 # Counts contributions from all versions.
 VERSION_ALL = 'all'
 
-def update_stats(exp_id, exp_version, state_name, event_type, update_params):
-    """Updates ExplorationStatsModel according to the incoming event model.
+def get_exploration_stats(exp_id, exp_version):
+    """Retrieves the ExplorationStats domain instance.
 
     Args:
         exp_id: str. ID of the exploration.
         exp_version: int. Version of the exploration.
-        state_name: str. Name of the state.
-        event_type: str. Type of the event.
-        update_params: dict. Event specific stats update params.
+
+    Returns:
+        ExplorationStats. The exploration stats domain object.
+    """
+    exploration_stats = get_exploration_stats_by_id(exp_id, exp_version)
+
+    if exploration_stats is None:
+        exploration_stats = stats_domain.ExplorationStats.create_default(
+            exp_id, exp_version, {})
+
+    return exploration_stats
+
+def update_stats(exp_id, exp_version, aggregated_stats):
+    """Updates ExplorationStatsModel according to the dict containing aggregated
+    stats.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
+        aggregated_stats: dict. Dict representing an ExplorationStatsModel
+            instance with stats aggregated in the frontend.
     """
     exploration_stats = get_exploration_stats_by_id(
         exp_id, exp_version)
 
-    if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
-        exploration_stats.num_starts += 1
-    elif event_type == feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION:
-        exploration_stats.num_actual_starts += 1
-    elif event_type == feconf.EVENT_TYPE_COMPLETE_EXPLORATION:
-        exploration_stats.num_completions += 1
-    elif event_type == feconf.EVENT_TYPE_ANSWER_SUBMITTED:
-        exploration_stats.state_stats_mapping[
-            state_name].total_answers_count += 1
-        if update_params['feedback_is_useful']:
-            exploration_stats.state_stats_mapping[
-                state_name].useful_feedback_count += 1
-    elif event_type == feconf.EVENT_TYPE_STATE_HIT:
-        exploration_stats.state_stats_mapping[
-            state_name].total_hit_count += 1
-        if update_params['is_first_hit']:
-            exploration_stats.state_stats_mapping[
-                state_name].first_hit_count += 1
-    elif event_type == feconf.EVENT_TYPE_STATE_COMPLETED:
-        exploration_stats.state_stats_mapping[
-            state_name].num_completions += 1
-    elif event_type == feconf.EVENT_TYPE_SOLUTION_HIT:
-        exploration_stats.state_stats_mapping[
-            state_name].num_times_solution_viewed += 1
+    exploration_stats.num_starts_v2 += aggregated_stats['num_starts']
+    exploration_stats.num_completions_v2 += aggregated_stats['num_completions']
+    exploration_stats.num_actual_starts_v2 += aggregated_stats[
+        'num_actual_starts']
 
-    save_stats_model(exploration_stats)
+    for state_name in aggregated_stats['state_stats_mapping']:
+        exploration_stats.state_stats_mapping[
+            state_name].total_answers_count_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['total_answers_count']
+        exploration_stats.state_stats_mapping[
+            state_name].useful_feedback_count_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['useful_feedback_count']
+        exploration_stats.state_stats_mapping[
+            state_name].total_hit_count_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['total_hit_count']
+        exploration_stats.state_stats_mapping[
+            state_name].first_hit_count_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['first_hit_count']
+        exploration_stats.state_stats_mapping[
+            state_name].num_times_solution_viewed_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['num_times_solution_viewed']
+        exploration_stats.state_stats_mapping[
+            state_name].num_completions_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['num_completions']
+
+    save_stats_model_transactional(exploration_stats)
 
 
 def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
@@ -84,8 +103,8 @@ def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
         for state_name in state_names
     }
 
-    exploration_stats = stats_domain.ExplorationStats(
-        exp_id, exp_version, 0, 0, 0, state_stats_mapping)
+    exploration_stats = stats_domain.ExplorationStats.create_default(
+        exp_id, exp_version, state_stats_mapping)
     create_stats_model(exploration_stats)
 
 
@@ -151,6 +170,31 @@ def get_exploration_stats_by_id(exp_id, exp_version):
     return exploration_stats
 
 
+def get_multiple_exploration_stats_by_version(exp_id, version_numbers):
+    """Returns a list of ExplorationStats domain objects corresponding to the
+    specified versions.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        version_numbers: list(int). List of version numbers.
+
+    Returns:
+        list(ExplorationStats|None). List of ExplorationStats domain class
+            instances.
+    """
+    exploration_stats = []
+    exploration_stats_models = (
+        stats_models.ExplorationStatsModel.get_multi_versions(
+            exp_id, version_numbers))
+    for exploration_stats_model in exploration_stats_models:
+        if exploration_stats_model is None:
+            exploration_stats.append(None)
+        else:
+            exploration_stats.append(get_exploration_stats_from_model(
+                exploration_stats_model))
+    return exploration_stats
+
+
 def get_exploration_stats_from_model(exploration_stats_model):
     """Gets an ExplorationStats domain object from an ExplorationStatsModel
     instance.
@@ -170,9 +214,12 @@ def get_exploration_stats_from_model(exploration_stats_model):
     return stats_domain.ExplorationStats(
         exploration_stats_model.exp_id,
         exploration_stats_model.exp_version,
-        exploration_stats_model.num_starts,
-        exploration_stats_model.num_actual_starts,
-        exploration_stats_model.num_completions,
+        exploration_stats_model.num_starts_v1,
+        exploration_stats_model.num_starts_v2,
+        exploration_stats_model.num_actual_starts_v1,
+        exploration_stats_model.num_actual_starts_v2,
+        exploration_stats_model.num_completions_v1,
+        exploration_stats_model.num_completions_v2,
         new_state_stats_mapping)
 
 
@@ -194,15 +241,18 @@ def create_stats_model(exploration_stats):
     instance_id = stats_models.ExplorationStatsModel.create(
         exploration_stats.exp_id,
         exploration_stats.exp_version,
-        exploration_stats.num_starts,
-        exploration_stats.num_actual_starts,
-        exploration_stats.num_completions,
+        exploration_stats.num_starts_v1,
+        exploration_stats.num_starts_v2,
+        exploration_stats.num_actual_starts_v1,
+        exploration_stats.num_actual_starts_v2,
+        exploration_stats.num_completions_v1,
+        exploration_stats.num_completions_v2,
         new_state_stats_mapping
     )
     return instance_id
 
 
-def save_stats_model(exploration_stats):
+def _save_stats_model(exploration_stats):
     """Updates the ExplorationStatsModel datastore instance with the passed
     ExplorationStats domain object.
 
@@ -218,13 +268,32 @@ def save_stats_model(exploration_stats):
     exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
         exploration_stats.exp_id, exploration_stats.exp_version)
 
-    exploration_stats_model.num_starts = exploration_stats.num_starts
-    exploration_stats_model.num_actual_starts = (
-        exploration_stats.num_actual_starts)
-    exploration_stats_model.num_completions = exploration_stats.num_completions
+    exploration_stats_model.num_starts_v1 = exploration_stats.num_starts_v1
+    exploration_stats_model.num_starts_v2 = exploration_stats.num_starts_v2
+    exploration_stats_model.num_actual_starts_v1 = (
+        exploration_stats.num_actual_starts_v1)
+    exploration_stats_model.num_actual_starts_v2 = (
+        exploration_stats.num_actual_starts_v2)
+    exploration_stats_model.num_completions_v1 = (
+        exploration_stats.num_completions_v1)
+    exploration_stats_model.num_completions_v2 = (
+        exploration_stats.num_completions_v2)
     exploration_stats_model.state_stats_mapping = new_state_stats_mapping
 
     exploration_stats_model.put()
+
+
+def save_stats_model_transactional(exploration_stats):
+    """Updates the ExplorationStatsModel datastore instance with the passed
+    ExplorationStats domain object in a transaction.
+
+    Args:
+        exploration_stats. ExplorationStats. The exploration statistics domain
+            object.
+    """
+    transaction_services.run_in_transaction(
+        _save_stats_model, exploration_stats)
+
 
 # TODO(bhenning): Test.
 def get_visualizations_info(exp_id, state_name, interaction_id):

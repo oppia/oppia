@@ -29,6 +29,7 @@ oppia.controller('Preferences', [
     $scope.profilePictureDataUrl = '';
     $scope.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
     $scope.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
+    $scope.username = GLOBALS.username;
 
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
@@ -140,7 +141,8 @@ oppia.controller('Preferences', [
 
     $scope.showEditProfilePictureModal = function() {
       $modal.open({
-        templateUrl: 'modals/editProfilePicture',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/preferences/edit_profile_picture_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', function($scope, $modalInstance) {

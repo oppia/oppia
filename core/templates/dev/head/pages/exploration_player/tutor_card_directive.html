@@ -1,6 +1,5 @@
 <div class="conversation-skin-tutor-card"
-     ng-class="{'animate-card-width': startCardChangeAnimation,
-                'has-shadow': isViewportNarrow() && !isInteractionInline}">
+     ng-class="{'animate-card-width': startCardChangeAnimation}">
   <div class="conversation-skin-tutor-card-content conversation-skin-animate-tutor-card-content"
        ng-class="{'animate-card-change': startCardChangeAnimation}">
     <div class="conversation-skin-tutor-card-top-section">
@@ -63,7 +62,7 @@
       In addition, if the exploration is iframed, the terminal card will
       have no learner input section, so we do not show it.
     -->
-    <div ng-if="isInteractionInline && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
+    <div ng-show="isInteractionInline && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
     ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
     (!isOnTerminalCard() || !isIframed || activeCard.destStateName)">
       <div class="conversation-skin-inline-interaction">
@@ -99,14 +98,10 @@
 
     <div ng-if="!isInteractionInline"
         class="conversation-skin-inline-interaction" style="opacity: 0.8;">
-      <div ng-if="!isViewportNarrow()" style="padding: 6px 12px;">
+      <div style="padding: 6px 12px;">
         <[interactionInstructions]>
-        <i class="material-icons md-18" style="position: relative; top: 3px;">&#xE5C8;</i>
-      </div>
-      <div ng-if="isViewportNarrow()">
-        <md-button class="instructions-button" ng-click="onDismiss()">
-          <[interactionInstructions]>
-        </md-button>
+        <i ng-if="!isViewportNarrow()" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
+        <i ng-if="isViewportNarrow()" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
       </div>
     </div>
 
@@ -192,7 +187,6 @@
   .conversation-skin-future-tutor-card {
     background: #fff;
     border-radius: 2px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
     padding-top: 20px;
     text-align: left;
   }

@@ -58,6 +58,8 @@ INTERACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
+RTE_EXTENSIONS_SPECS_PATH = (
+    os.path.join('assets', 'rich_text_components_specs.js'))
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
@@ -192,6 +194,10 @@ DEFAULT_EXPLORATION_OBJECTIVE = ''
 DEFAULT_INIT_STATE_NAME = 'Introduction'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
+
+# Whether new explorations should have automatic text-to-speech enabled
+# by default.
+DEFAULT_AUTO_TTS_ENABLED = True
 
 # Default title for a newly-minted collection.
 DEFAULT_COLLECTION_TITLE = ''
@@ -600,6 +606,7 @@ NAV_MODE_TEACH = 'teach'
 NAV_MODE_THANKS = 'thanks'
 
 # Event types.
+EVENT_TYPE_ALL_STATS = 'all_stats'
 EVENT_TYPE_STATE_HIT = 'state_hit'
 EVENT_TYPE_STATE_COMPLETED = 'state_complete'
 EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
@@ -640,7 +647,13 @@ SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 
 # Bool to enable update of analytics models.
+# NOTE TO DEVELOPERS: This should be synchronized with app.js
 ENABLE_NEW_STATS_FRAMEWORK = False
+# Current event models schema version. All event models with
+# event_schema_version as 1 are the events collected before the rework of the
+# statistics framework which brought about the recording of new event models.
+# This includes all models recorded before Nov 2017.
+CURRENT_EVENT_MODELS_SCHEMA_VERSION = 1
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'

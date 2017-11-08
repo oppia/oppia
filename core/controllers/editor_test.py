@@ -1028,7 +1028,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'new_member_username': self.COLLABORATOR3_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR,
             }, csrf_token, expect_errors=True, expected_status_int=401)
-        self.assertEqual(response_dict['code'], 401)
+        self.assertEqual(response_dict['status_code'], 401)
 
         self.logout()
 
@@ -1070,7 +1070,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'new_member_username': self.COLLABORATOR3_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR,
                 }, csrf_token, expect_errors=True, expected_status_int=401)
-        self.assertEqual(response_dict['code'], 401)
+        self.assertEqual(response_dict['status_code'], 401)
 
         self.logout()
 
@@ -1454,7 +1454,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             #id is incremented the first time but not the second
         self.assertEqual(exp_user_data.draft_change_list_id, 2)
         self.assertEqual(
-            response, {'code': 400,
+            response, {'status_code': 400,
                        'error': 'Expected title to be a string, received 1'})
 
     def test_draft_updated_version_valid(self):

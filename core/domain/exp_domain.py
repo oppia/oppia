@@ -226,7 +226,7 @@ class ExplorationChange(object):
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'init_state_name')
+        'init_state_name', 'auto_tts_enabled')
 
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
@@ -1573,7 +1573,7 @@ class Exploration(object):
                  language_code, tags, blurb, author_notes,
                  states_schema_version, init_state_name, states_dict,
                  param_specs_dict, param_changes_list, version,
-                 created_on=None, last_updated=None):
+                 auto_tts_enabled, created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
         Args:
@@ -1601,6 +1601,8 @@ class Exploration(object):
                 is created.
             last_updated: datetime.datetime. Date and time when the exploration
                 was last updated.
+            auto_tts_enabled: bool. True if automatic text-to-speech is
+                enabled.
         """
         self.id = exploration_id
         self.title = title
@@ -1628,6 +1630,7 @@ class Exploration(object):
         self.version = version
         self.created_on = created_on
         self.last_updated = last_updated
+        self.auto_tts_enabled = auto_tts_enabled
 
     @classmethod
     def create_default_exploration(
@@ -1664,7 +1667,8 @@ class Exploration(object):
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
-            feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0)
+            feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0,
+            feconf.DEFAULT_AUTO_TTS_ENABLED)
 
     @classmethod
     def from_dict(
@@ -1696,6 +1700,7 @@ class Exploration(object):
         exploration.tags = exploration_dict['tags']
         exploration.blurb = exploration_dict['blurb']
         exploration.author_notes = exploration_dict['author_notes']
+        exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
 
         exploration.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val) for
@@ -1888,6 +1893,11 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Expected param_specs to be a dict, received %s'
                 % self.param_specs)
+
+        if not isinstance(self.auto_tts_enabled, bool):
+            raise utils.ValidationError(
+                'Expected auto_tts_enabled to be a bool, received %s'
+                % self.auto_tts_enabled)
 
         for param_name in self.param_specs:
             if not isinstance(param_name, basestring):
@@ -2223,6 +2233,15 @@ class Exploration(object):
                 'it is not in the list of states %s for this '
                 'exploration.' % (init_state_name, self.states.keys()))
         self.init_state_name = init_state_name
+
+    def update_auto_tts_enabled(self, auto_tts_enabled):
+        """Update whether automatic text-to-speech is enabled.
+
+        Args:
+            auto_tts_enabled: bool. Whether automatic text-to-speech
+                is enabled or not.
+        """
+        self.auto_tts_enabled = auto_tts_enabled
 
     # Methods relating to states.
     def add_states(self, state_names):
@@ -2823,7 +2842,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 17
+    CURRENT_EXP_SCHEMA_VERSION = 18
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3177,6 +3196,21 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v17_dict_to_v18_dict(cls, exploration_dict):
+        """ Converts a v17 exploration dict into a v18 exploration dict.
+
+        Adds auto_tts_enabled property.
+        """
+        exploration_dict['schema_version'] = 18
+
+        if exploration_dict['category'] == 'Languages':
+            exploration_dict['auto_tts_enabled'] = False
+        else:
+            exploration_dict['auto_tts_enabled'] = True
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3293,6 +3327,11 @@ class Exploration(object):
                 exploration_dict)
             exploration_schema_version = 17
 
+        if exploration_schema_version == 17:
+            exploration_dict = cls._convert_v17_dict_to_v18_dict(
+                exploration_dict)
+            exploration_schema_version = 18
+
         return (exploration_dict, initial_schema_version)
 
     @classmethod
@@ -3391,6 +3430,7 @@ class Exploration(object):
             'param_changes': self.param_change_dicts,
             'param_specs': self.param_specs_dict,
             'tags': self.tags,
+            'auto_tts_enabled': self.auto_tts_enabled,
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.iteritems()}
         })

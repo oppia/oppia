@@ -552,7 +552,10 @@ oppia.filter('summarizeAnswerGroup', [
       }
 
       if (hasFeedback) {
-        summary += $filter('convertToPlainText')(outcome.feedback[0]);
+        summary += (
+          shortenRule ?
+          $filter('truncate')(outcome.feedback[0], 30) :
+          $filter('convertToPlainText')(outcome.feedback[0]));
       }
       return summary;
     };
