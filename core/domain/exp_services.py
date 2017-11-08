@@ -277,7 +277,7 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
         try:
             explorations.append(get_exploration_from_model(exploration_model))
         except utils.ExplorationConversionError:
-            error_versions.append(index + 1)
+            error_versions.append(version_numbers[index])
 
     if error_versions:
         raise Exception(
