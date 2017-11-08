@@ -27,7 +27,7 @@
   },
   "Continue": {},
   "EndExploration": {},
-  "Fraction": {
+  "FractionInput": {
     "IsExactlyEqualTo": {
       "description": "is exactly equal to {{f|Fraction}}"
     },
