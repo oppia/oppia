@@ -148,8 +148,17 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         latest_exp_version = exploration.version
 
         version_numbers = range(1, latest_exp_version + 1)
-        explorations_by_version = (
-            exp_services.get_multiple_explorations_by_version(
+        try:
+            explorations_by_version = (
+                exp_services.get_multiple_explorations_by_version(
+                    exp_id, version_numbers))
+        except Exception as e:
+            yield e
+            return
+        # Retrieve list of snapshot models representing each version of the
+        # exploration.
+        snapshots_by_version = (
+            exp_models.ExplorationModel.get_snapshots_metadata(
                 exp_id, version_numbers))
         exploration_stats_by_version = (
             stats_services.get_multiple_exploration_stats_by_version(
@@ -259,9 +268,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     state_stats_mapping[state_name] = (
                         stats_domain.StateStats.create_default())
             else:
-                exp_commit_log = exp_models.ExplorationCommitLogEntryModel.get(
-                    'exploration-%s-%s' % (exp_id, version))
-                change_list = exp_commit_log.commit_cmds
+                change_list = snapshots_by_version[version - 1]['commit_cmds']
 
                 # Handling state additions, renames and deletions.
                 for change_dict in change_list:
@@ -333,6 +340,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 # learner twice. The max of both first hit counts ensures that
                 # we are counting only unique learners who traversed past the
                 # initial state.
+                # We also check if the outcome of the initial state is present
+                # in the list of states because some older explorations use an
+                # implicit, pseudo-END state.
                 init_state = versioned_exploration.states[
                     versioned_exploration.init_state_name]
                 max_first_hit_from_init_state = max([
@@ -340,7 +350,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         answer_group.outcome.dest].first_hit_count_v1
                     for answer_group in init_state.interaction.answer_groups
                     if answer_group.outcome.dest != (
-                        versioned_exploration.init_state_name)] or [0])
+                        versioned_exploration.init_state_name) and (
+                            answer_group.outcome.dest in (
+                                versioned_exploration.states))] or [0])
                 num_actual_starts = max_first_hit_from_init_state
 
             # Check if model already exists. If it does, update it, otherwise
