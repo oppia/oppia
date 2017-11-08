@@ -232,7 +232,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             owner_id, collection_id, [{
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'property_name': (
-                    collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS), # pylint = false
+                    collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS), # pylint: disable=line-too-long
                 'exploration_id': exp_id,
                 'new_value': [skill_id]
             }], 'Update skill')

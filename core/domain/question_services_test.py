@@ -141,7 +141,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.owner_id, self.COL_ID_0, [{
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'property_name': (
-                    collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS), # pylint = false
+                    collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS), # pylint: disable=line-too-long
                 'exploration_id': self.EXP_ID_0,
                 'new_value': [skill_id]
             }], 'Update skill')
@@ -165,5 +165,4 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.owner_id, self.COL_ID_0, self.EXP_ID_0)
         question_batch = question_services.get_questions_batch(
             self.COL_ID_0, [skill_id], self.owner_id, 1)
-        self.assertEqual(question_batch[0].title,  question.title)
-
+        self.assertEqual(question_batch[0].title, question.title)

@@ -1156,7 +1156,8 @@ class Collection(object):
                     question_id)
             else:
                 raise Exception(
-                    '%s is already present in %s' % (self.question_id, skill_name))
+                    '%s is already present in %s' % (
+                        self.question_id, skill_name))
 
     def remove_question_id_from_skill(self, skill_id, question_id):
         """Removes question id from the question list of the appropriate skill.
