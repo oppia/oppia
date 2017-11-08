@@ -120,7 +120,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         # Create a new collection and exploration.
         self.save_new_valid_collection(
             coll_id_0, self.owner_id, exploration_id=exp_id_0)
-        
+
         # Add a skill.
         collection_services.update_collection(
             self.owner_id, coll_id_0, [{
