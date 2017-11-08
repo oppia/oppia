@@ -64,23 +64,9 @@ module.exports = function(config) {
       '/extensions/': '/base/extensions/'
     },
     preprocessors: {
-      'core/templates/dev/head/*.js': ['coverage'],
-      // When all controllers were converted from global functions into the
-      // oppia.controller() format, the syntax 'core/templates/dev/head/*/*.js'
-      // and 'core/templates/dev/head/**/*.js' stopped working, and resulted in
-      // "Uncaught TypeError: Cannot read property '2' of undefined" for all
-      // the JS files. So we enumerate all the directories directly (which,
-      // although it should give an identical result, seems to actually cause
-      // no problems). Note that this only affects which files have coverage
-      // statistics generated for them, and that if a directory is omitted by
-      // accident, that directory will not have coverage statistics generated
-      // for it, which is easily fixed.
-      'core/templates/dev/head/components/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/domain/**/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/expressions/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/forms/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/pages/**/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/services/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
+      'extensions/!(*Spec).js': ['coverage'],
       'extensions/**/!(*Spec).js': ['coverage'],
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
