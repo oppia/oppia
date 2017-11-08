@@ -58,18 +58,18 @@ describe('State Interaction controller', function() {
       ess = $injector.get('explorationStatesService');
       siis = $injector.get('stateInteractionIdService');
       scas = $injector.get('stateCustomizationArgsService');
-      idc = $injector.get('interactionDetailsCache');
+      idc = $injector.get('InteractionDetailsCacheService');
       IS = $injector.get('INTERACTION_SPECS');
       $httpBackend = $injector.get('$httpBackend');
       scope.stateInteractionIdService = siis;
       scope.stateCustomizationArgsService = scas;
-      scope.interactionDetailsCache = idc;
+      scope.InteractionDetailsCacheService = idc;
 
       ess.init({
         'First State': {
           content: {
             html: 'First State Content',
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             id: 'TextInput',
@@ -83,7 +83,6 @@ describe('State Interaction controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: []
           },
           param_changes: []
@@ -91,7 +90,7 @@ describe('State Interaction controller', function() {
         'End State': {
           content: {
             html: '',
-            audio_translations: []
+            audio_translations: {}
           },
           interaction: {
             id: 'TextInput',
@@ -105,7 +104,6 @@ describe('State Interaction controller', function() {
               feedback: [],
               param_changes: []
             },
-            fallbacks: [],
             hints: []
           },
           param_changes: []
@@ -137,7 +135,7 @@ describe('State Interaction controller', function() {
         },
         stateInteractionIdService: siis,
         stateCustomizationArgsService: scas,
-        interactionDetailsCache: idc,
+        InteractionDetailsCacheService: idc,
         INTERACTION_SPECS: IS
       });
     }));

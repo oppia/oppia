@@ -62,9 +62,6 @@ class ExplorationModel(base_models.VersionedModel):
     blurb = ndb.TextProperty(default='', indexed=False)
     # 'Author notes' for this exploration.
     author_notes = ndb.TextProperty(default='', indexed=False)
-    # Schema storing specifications of the contents of any gadget panels,
-    # along with associated customizations for each gadget instance.
-    skin_customizations = ndb.JsonProperty(indexed=False)
 
     # The version of the states blob schema.
     states_schema_version = ndb.IntegerProperty(
@@ -81,6 +78,9 @@ class ExplorationModel(base_models.VersionedModel):
     # The list of parameter changes to be performed once at the start of a
     # reader's encounter with an exploration.
     param_changes = ndb.JsonProperty(repeated=True, indexed=False)
+    # A boolean indicating whether automatic text-to-speech is enabled in
+    # this exploration.
+    auto_tts_enabled = ndb.BooleanProperty(default=True, indexed=True)
 
     # DEPRECATED in v2.0.0.rc.2. Do not use. Retaining it here because deletion
     # caused GAE to raise an error on fetching a specific version of the
@@ -89,7 +89,9 @@ class ExplorationModel(base_models.VersionedModel):
     skill_tags = ndb.StringProperty(repeated=True, indexed=True)
     # DEPRECATED in v2.0.1. Do not use.
     # TODO(sll): Remove this property from the model.
-    default_skin = ndb.StringProperty(default=feconf.DEFAULT_SKIN_ID)
+    default_skin = ndb.StringProperty(default='conversation_v1')
+    # DEPRECATED in v2.5.4. Do not use.
+    skin_customizations = ndb.JsonProperty(indexed=False)
 
     @classmethod
     def get_exploration_count(cls):
@@ -190,8 +192,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
             feconf.ACTIVITY_STATUS_PRIVATE,
-            feconf.ACTIVITY_STATUS_PUBLIC,
-            feconf.ACTIVITY_STATUS_PUBLICIZED
+            feconf.ACTIVITY_STATUS_PUBLIC
         ]
     )
 
@@ -276,8 +277,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
     # for commits to an exploration (as opposed to its rights, etc.)
     version = ndb.IntegerProperty()
 
-    # The status of the exploration after the edit event ('private', 'public',
-    # 'publicized').
+    # The status of the exploration after the edit event ('private', 'public').
     post_commit_status = ndb.StringProperty(indexed=True, required=True)
     # Whether the exploration is community-owned after the edit event.
     post_commit_community_owned = ndb.BooleanProperty(indexed=True)
@@ -362,8 +362,8 @@ class ExpSummaryModel(base_models.BaseModel):
     A ExpSummaryModel instance stores the following information:
 
         id, title, category, objective, language_code, tags,
-        last_updated, created_on, status (private, public or
-        publicized), community_owned, owner_ids, editor_ids,
+        last_updated, created_on, status (private, public),
+        community_owned, owner_ids, editor_ids,
         viewer_ids, version.
 
     The key of each instance is the exploration id.
@@ -402,8 +402,7 @@ class ExpSummaryModel(base_models.BaseModel):
         default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
             feconf.ACTIVITY_STATUS_PRIVATE,
-            feconf.ACTIVITY_STATUS_PUBLIC,
-            feconf.ACTIVITY_STATUS_PUBLICIZED
+            feconf.ACTIVITY_STATUS_PUBLIC
         ]
     )
 
@@ -453,8 +452,7 @@ class ExpSummaryModel(base_models.BaseModel):
                 public in descending order of scaled_average_rating.
         """
         return ExpSummaryModel.query().filter(
-            ndb.OR(ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC,
-                   ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLICIZED)
+            ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).order(
@@ -514,8 +512,7 @@ class ExpSummaryModel(base_models.BaseModel):
                 being first in the list.
         """
         return ExpSummaryModel.query().filter(
-            ndb.OR(ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC,
-                   ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLICIZED)
+            ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).order(

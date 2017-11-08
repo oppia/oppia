@@ -171,6 +171,20 @@ class NonnegativeInt(BaseObject):
         }]
     }
 
+class PositiveInt(BaseObject):
+    """Nonnegative integer class."""
+
+    description = 'A positive integer.'
+    default_value = 1
+
+    SCHEMA = {
+        'type': 'int',
+        'validators': [{
+            'id': 'is_at_least',
+            'min_value': 1
+        }]
+    }
+
 
 class CodeString(BaseObject):
     """Code string class. This is like a normal string, but it should not
@@ -224,6 +238,7 @@ class ListOfCodeEvaluation(BaseObject):
     """Class for lists of CodeEvaluations."""
 
     description = 'A list of code and its evaluation results.'
+    default_value = []
 
     SCHEMA = {
         'type': 'list',
@@ -776,5 +791,37 @@ class MathExpression(BaseObject):
         }, {
             'name': 'latex',
             'schema': UnicodeString.SCHEMA,
+        }]
+    }
+
+class Fraction(BaseObject):
+    """Fraction class."""
+
+    description = 'A fraction type'
+    edit_html_filename = 'fraction_editor'
+    edit_js_filename = 'FractionEditor'
+    default_value = {
+        'isNegative': False,
+        'wholeNumber': 0,
+        'numerator': 0,
+        'denominator': 1
+    }
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'isNegative',
+            'schema': {
+                'type': 'bool'
+            }
+        }, {
+            'name': 'wholeNumber',
+            'schema': NonnegativeInt.SCHEMA
+        }, {
+            'name': 'numerator',
+            'schema': NonnegativeInt.SCHEMA
+        }, {
+            'name': 'denominator',
+            'schema': PositiveInt.SCHEMA
         }]
     }

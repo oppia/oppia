@@ -20,7 +20,8 @@ oppia.directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      templateUrl: 'components/createActivityButton',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/create_button/create_activity_button_directive.html'),
       controller: [
         '$scope', '$timeout', '$window', '$modal', 'ExplorationCreationService',
         'CollectionCreationService', 'siteAnalyticsService', 'urlService',
@@ -28,6 +29,9 @@ oppia.directive('createActivityButton', [
             $scope, $timeout, $window, $modal, ExplorationCreationService,
             CollectionCreationService, siteAnalyticsService, urlService) {
           $scope.creationInProgress = false;
+
+          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+          $scope.allowYamlFileUpload = GLOBALS.allowYamlFileUpload;
 
           $scope.showUploadExplorationModal = (
             ExplorationCreationService.showUploadExplorationModal);
@@ -56,7 +60,9 @@ oppia.directive('createActivityButton', [
               $window.location.replace('/creator_dashboard?mode=create');
             } else {
               $modal.open({
-                templateUrl: 'modals/createActivity',
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/creator_dashboard/' +
+                  'create_activity_modal_directive.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$modalInstance',
@@ -70,6 +76,10 @@ oppia.directive('createActivityButton', [
                       CollectionCreationService.createNewCollection();
                       $modalInstance.close();
                     };
+
+                    $scope.canCreateCollections = (
+                      GLOBALS.can_create_collections
+                    );
 
                     $scope.cancel = function() {
                       $modalInstance.dismiss('cancel');

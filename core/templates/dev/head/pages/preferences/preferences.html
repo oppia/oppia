@@ -33,11 +33,8 @@
           <div class="form-group">
             <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_USERNAME"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
-              {% if username %}
-                <a href="/profile/{{username}}">{{username}}</a>
-              {% else %}
-                <em translate="I18N_PREFERENCES_USERNAME_NOT_SELECTED"></em>
-              {% endif %}
+              <a ng-if="username" ng-href="/profile/<[username]>"><[username]></a>
+              <em ng-if="!username" translate="I18N_PREFERENCES_USERNAME_NOT_SELECTED"></em>
             </div>
           </div>
         </div>
@@ -60,8 +57,28 @@
           <div class="form-group">
             <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_BIO"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
-              <textarea ng-model="userBio" ng-blur="saveUserBio(userBio)" rows="5"></textarea>
+              <textarea ng-model="userBio" ng-blur="saveUserBio(userBio)" rows="5" maxlength="2000"></textarea>
               <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_BIO_EXPLAIN_TEXT"></span>
+            </div>
+          </div>
+        </div>
+
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_PREFERRED_DASHBOARD"></label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <div class="checkbox" style="padding-top: 0;">
+                <label>
+                  <input type="radio" ng-model="defaultDashboard" value="<[DASHBOARD_TYPE_CREATOR]>" ng-change="saveDefaultDashboard(defaultDashboard)">
+                  <span translate="I18N_TOPNAV_CREATOR_DASHBOARD"></span>
+                </label>
+              </div>
+              <div class="checkbox" style="padding-top: 0;">
+                <label>
+                  <input type="radio" ng-model="defaultDashboard" value="<[DASHBOARD_TYPE_LEARNER]>" ng-change="saveDefaultDashboard(defaultDashboard)">
+                  <span translate="I18N_TOPNAV_LEARNER_DASHBOARD"></span>
+                </label>
+              </div>
             </div>
           </div>
         </div>
@@ -73,11 +90,11 @@
               <div ng-if="hasPageLoaded && select2DropdownIsShown">
                 <select2-dropdown
                   item="$parent.subjectInterests"
-                  ng-model="subjectInterests"
-                  tag-mode="true" allow-multiple-choices="true"
-                  new-choice-regex="<[::TAG_REGEX_STRING]>" width="100%"
+                  choices="$parent.subjectInterests"
+                  allow-multiple-choices="true"
+                  new-choice-regex="<[::TAG_REGEX_STRING]>"
+                  width="100%"
                   placeholder="<['I18N_PREFERENCES_SUBJECT_INTERESTS_PLACEHOLDER' | translate]>"
-                  ng-change="onSubjectInterestsSelectionChange($parent.subjectInterests)"
                   invalid-search-term-message="<['I18N_PREFERENCES_SUBJECT_INTERESTS_INVALID_SEARCH' | translate]>"
                   on-selection-change="onSubjectInterestsSelectionChange($parent.subjectInterests)">
                 </select2-dropdown>
@@ -132,9 +149,11 @@
                 updated after the initial page load.
               -->
               <div ng-if="hasPageLoaded">
-                <select2-dropdown choices="LANGUAGE_CHOICES"
-                  item="$parent.preferredLanguageCodes" allow-multiple-choices="true"
-                  new-choice-regex=".^" width="100%"
+                <select2-dropdown
+                  choices="LANGUAGE_CHOICES"
+                  item="$parent.preferredLanguageCodes"
+                  allow-multiple-choices="true"
+                  width="100%"
                   placeholder="<['I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE' | translate]>"
                   on-selection-change="savePreferredLanguageCodes($parent.preferredLanguageCodes)">
                 </select2-dropdown>
@@ -154,16 +173,41 @@
                 updated after the initial page load.
               -->
               <div ng-if="hasPageLoaded && select2DropdownIsShown">
-                <select2-dropdown choices="SITE_LANGUAGE_CHOICES"
+                <select2-dropdown
                   class="protractor-test-system-language-selector"
+                  choices="SITE_LANGUAGE_CHOICES"
                   item="$parent.preferredSiteLanguageCode"
                   allow-multiple-choices="false"
-                  new-choice-regex=".^" width="100%"
+                  width="100%"
                   placeholder="<['I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_PLACEHOLDER' | translate]>"
                   on-selection-change="savePreferredSiteLanguageCodes($parent.preferredSiteLanguageCode)">
                 </select2-dropdown>
               </div>
               <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_EXPLAIN"></span>
+            </div>
+          </div>
+        </div>
+
+        <div role="form" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE"></label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <!--
+                If the ng-if is omitted, the select2-dropdown directive won't be
+                updated after the initial page load.
+              -->
+              <div ng-if="hasPageLoaded && select2DropdownIsShown">
+                <select2-dropdown
+                  class="protractor-test-system-language-selector"
+                  choices="AUDIO_LANGUAGE_CHOICES"
+                  item="$parent.preferredAudioLanguageCode"
+                  allow-multiple-choices="false"
+                  width="100%"
+                  placeholder="<['I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_PLACEHOLDER' | translate]>"
+                  on-selection-change="savePreferredAudioLanguageCode($parent.preferredAudioLanguageCode)">
+                </select2-dropdown>
+              </div>
+              <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_EXPLAIN"></span>
             </div>
           </div>
         </div>
@@ -214,46 +258,6 @@
         </div>
       </div>
 
-      <script type="text/ng-template" id="modals/editProfilePicture">
-        <div class="modal-header">
-          <h3 translate="I18N_PREFERENCES_PROFILE_PICTURE_UPLOAD"></h3>
-        </div>
-
-        <div class="modal-body" style="min-height: 300px;">
-          <div class="oppia-profile-image-uploader">
-            <div ng-hide="uploadedImage">
-              <image-uploader on-file-changed="onFileChanged">
-              </image-uploader>
-            </div>
-
-            <div class="oppia-form-error" ng-if="invalidImageWarningIsShown" style="margin-top: 15px;" translate="I18N_PREFERENCES_PROFILE_PICTURE_ERROR"></div>
-
-            <div ng-show="uploadedImage">
-              <span translate="I18N_PREFERENCES_PROFILE_PICTURE_DRAG"></span>
-              <div class="oppia-profile-picture-crop-area" ng-show="uploadedImage">
-                <button class="btn btn-default oppia-profile-picture-reset-button" ng-click="reset()">
-                  <i class="material-icons oppia-vcenter">&#xE14C;</i>
-                </button>
-                <img-crop image="uploadedImage" result-image="croppedImageDataUrl"
-                          area-type="square" result-image-size="150"
-                          on-load-error="onInvalidImageLoaded()"
-                          result-image-format="image/png">
-                </img-crop>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn btn-default" ng-click="cancel()" translate="I18N_PREFERENCES_CANCEL_BUTTON"></button>
-          <!--
-            The two checks for ng-disabled are necessary. The former is needed because
-            img-crop loads a default white image even when nothing is uploaded. The latter
-            is needed to prevent the saving of invalid files.
-          -->
-          <button class="btn btn-success" ng-click="confirm()" ng-disabled="!uploadedImage || !croppedImageDataUrl" translate="I18N_PREFERENCES_PROFILE_PICTURE_ADD"></button>
-        </div>
-      </script>
     </md-card>
   </div>
 {% endblock %}

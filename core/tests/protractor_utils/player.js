@@ -18,7 +18,6 @@
  */
 
 var forms = require('./forms.js');
-var gadgets = require('../../../extensions/gadgets/protractor.js');
 var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 
@@ -49,36 +48,6 @@ var expectLatestFeedbackToMatch = function(richTextInstructions) {
   forms.expectRichText(
     element.all(by.css('.protractor-test-conversation-feedback')).last()
   ).toMatch(richTextInstructions);
-};
-
-// This can receive additional arguments for the gadget's customizationArgs.
-var expectGadgetToMatch = function(gadgetType) {
-  // Convert additional arguments to an array to send on.
-  var args = [element(
-    by.css('.protractor-test-' + gadgetType + '-gadget'))];
-  for (var i = 1; i < arguments.length; i++) {
-    args.push(arguments[i]);
-  }
-  gadgets.getGadget(gadgetType).
-    expectGadgetDetailsToMatch.apply(null, args);
-};
-
-// Gadget visibility tests use the method proposed:
-// https://github.com/angular/protractor/issues/759
-var expectVisibleGadget = function(gadgetType) {
-  element(by.css('.protractor-test-' + gadgetType + '-gadget'))
-    .isDisplayed()
-    .then(function(isVisible) {
-      expect(isVisible).toBeTruthy;
-    });
-};
-
-var expectInvisibleGadget = function(gadgetType) {
-  element(by.css('.protractor-test-' + gadgetType + '-gadget'))
-    .isDisplayed()
-    .then(function(isVisible) {
-      expect(isVisible).toBeFalsy;
-    });
 };
 
 // Additional arguments may be sent to this function, and they will be
@@ -149,6 +118,14 @@ var submitFeedback = function(feedback) {
   element(by.css('.protractor-test-exploration-feedback-submit-btn')).click();
 };
 
+var viewHint = function() {
+  element(by.css('.protractor-test-view-hint')).click();
+}
+
+var viewSolution = function() {
+  element(by.css('.protractor-test-view-solution')).click();
+}
+
 var fillInSuggestion = function(suggestion) {
   var suggestionModalClass = '.protractor-test-exploration-suggestion-modal';
   var richTextEditor = forms.RichTextEditor(
@@ -175,10 +152,6 @@ exports.expectExplorationNameToBe = expectExplorationNameToBe;
 exports.expectContentToMatch = expectContentToMatch;
 exports.expectLatestFeedbackToMatch = expectLatestFeedbackToMatch;
 
-exports.expectGadgetToMatch = expectGadgetToMatch;
-exports.expectVisibleGadget = expectVisibleGadget;
-exports.expectInvisibleGadget = expectInvisibleGadget;
-
 exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.submitAnswer = submitAnswer;
 exports.clickThroughToNextCard = clickThroughToNextCard;
@@ -192,3 +165,6 @@ exports.expectExplorationToNotBeOver = expectExplorationToNotBeOver;
 exports.openFeedbackPopup = openFeedbackPopup;
 exports.submitFeedback = submitFeedback;
 exports.submitSuggestion = submitSuggestion;
+
+exports.viewHint = viewHint;
+exports.viewSolution = viewSolution;

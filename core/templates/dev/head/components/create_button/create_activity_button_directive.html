@@ -1,22 +1,15 @@
-<script type="text/ng-template" id="components/createActivityButton">
-  <div class="oppia-navbar-button-container">
-    {% if not user_is_logged_in %}
-      <!-- User must complete the registration process. -->
-      <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
-              ng-click="onRedirectToLogin('/creator_dashboard?mode=create')">
-        <span class="oppia-navbar-tab-content" translate="I18N_CREATE_EXPLORATION_CREATE"></span>
-      </button>
-    {% else %}
-      <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
-              ng-click="initCreationProcess()" ng-disabled="creationInProgress">
-        <span class="oppia-navbar-tab-content" translate="I18N_CREATE_EXPLORATION_CREATE"></span>
-      </button>
-      {% if allow_yaml_file_upload %}
-        <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200"
-                ng-click="showUploadExplorationModal()" ng-disabled="creationInProgress">
-          <span class="oppia-navbar-tab-content" translate="I18N_CREATE_EXPLORATION_UPLOAD"></span>
-        </button>
-      {% endif %}
-    {% endif %}
-  </div>
-</script>
+<div class="oppia-navbar-button-container">
+  <!-- User must complete the registration process. -->
+  <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
+          ng-click="onRedirectToLogin('/creator_dashboard?mode=create')" ng-if="!userIsLoggedIn">
+    <span class="oppia-navbar-tab-content" translate="I18N_CREATE_EXPLORATION_CREATE"></span>
+  </button>
+  <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width protractor-test-create-activity oppia-transition-200"
+          ng-click="initCreationProcess()" ng-disabled="creationInProgress" ng-if="userIsLoggedIn">
+    <span class="oppia-navbar-tab-content" translate="I18N_CREATE_EXPLORATION_CREATE"></span>
+  </button>
+  <button class="btn oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200"
+          ng-click="showUploadExplorationModal()" ng-disabled="creationInProgress" ng-if="allowYamlFileUpload && userIsLoggedIn">
+    <span class="oppia-navbar-tab-content" translate="I18N_CREATE_EXPLORATION_UPLOAD"></span>
+  </button>
+</div>

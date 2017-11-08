@@ -17,31 +17,29 @@
  */
 
 describe('Rating display directive', function() {
-  var elt, scope, $httpBackend, compiledElem, ctrlScope;
+  var outerScope, ctrlScope;
 
   beforeEach(module('directiveTemplates'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-  beforeEach(inject(function(
-      $rootScope, $compile, _$httpBackend_, $templateCache) {
-    $httpBackend = _$httpBackend_;
-
-    var templatesHtml = $templateCache.get(
-      'core/templates/dev/head/components/rating_display.html');
-    $compile(templatesHtml)($rootScope);
+  beforeEach(inject(function($rootScope, $compile, $templateCache) {
+    var templateHtml = $templateCache.get(
+      'core/templates/dev/head/components/rating_display_directive.html');
+    $compile(templateHtml)($rootScope);
     $rootScope.$digest();
 
-    scope = $rootScope.$new();
-    elt = angular.element(
+    outerScope = $rootScope.$new();
+
+    var elem = angular.element(
       '<rating-display rating-value="5" is-editable="true">' +
       '</rating-display>');
-    compiledElem = $compile(elt)(scope);
-    scope.$digest();
-    ctrlScope = elt[0].isolateScope();
+    var compiledElem = $compile(elem)(outerScope);
+    outerScope.$digest();
+    ctrlScope = compiledElem[0].getControllerScope();
   }));
 
   it('should display the correct number of stars', function() {
     ctrlScope.ratingValue = 4.2;
-    scope.$digest();
+    outerScope.$digest();
     // Note the array here is zero-indexed but ratings are one-indexed.
     expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
     expect(ctrlScope.stars[1].cssClass).toBe('fa-star');
@@ -50,7 +48,7 @@ describe('Rating display directive', function() {
     expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o');
 
     ctrlScope.ratingValue = 1.7;
-    scope.$digest();
+    outerScope.$digest();
     expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
     expect(ctrlScope.stars[1].cssClass).toBe('fa-star-half-o');
     expect(ctrlScope.stars[2].cssClass).toBe('fa-star-o');
@@ -58,7 +56,7 @@ describe('Rating display directive', function() {
     expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o');
 
     ctrlScope.ratingValue = 1.9;
-    scope.$digest();
+    outerScope.$digest();
     expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
     expect(ctrlScope.stars[1].cssClass).toBe('fa-star');
     expect(ctrlScope.stars[2].cssClass).toBe('fa-star-o');
@@ -66,7 +64,7 @@ describe('Rating display directive', function() {
     expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o');
 
     ctrlScope.ratingValue = 2.25;
-    scope.$digest();
+    outerScope.$digest();
     expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
     expect(ctrlScope.stars[1].cssClass).toBe('fa-star');
     expect(ctrlScope.stars[2].cssClass).toBe('fa-star-half-o');
@@ -74,7 +72,7 @@ describe('Rating display directive', function() {
     expect(ctrlScope.stars[4].cssClass).toBe('fa-star-o');
 
     ctrlScope.ratingValue = 4.3;
-    scope.$digest();
+    outerScope.$digest();
     expect(ctrlScope.stars[0].cssClass).toBe('fa-star');
     expect(ctrlScope.stars[1].cssClass).toBe('fa-star');
     expect(ctrlScope.stars[2].cssClass).toBe('fa-star');

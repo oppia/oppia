@@ -27,7 +27,7 @@ describe('Creator dashboard controller', function() {
         id: 'featured_exp_id',
         num_open_threads: 2,
         num_total_threads: 3,
-        status: 'publicized',
+        status: 'public',
         title: 'Featured exploration'
       }, {
         category: 'Private category',

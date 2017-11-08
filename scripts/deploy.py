@@ -12,15 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Deployment script for Oppia.
+"""This is a deployment script for Oppia that should only be used by release
+coordinators.
 
-USE THIS SCRIPT AT YOUR OWN RISK! A safe option is to modify app.yaml manually
-and run the 'appcfg.py update' command.
-
-This script performs a deployment of Oppia to a Google App Engine appspot
-instance. It creates a build with unnecessary files removed, and saves a copy
-of the uploaded files to a deployment folder in the parent directory of the
-oppia/ folder. It then pushes this build to the production server.
+The script creates a build with unnecessary files removed, and saves a copy of
+the uploaded files to a deployment folder in the parent directory of the oppia/
+folder. It then pushes this build to the production server.
 
 IMPORTANT NOTES:
 1.  You will need to first create a folder called ../deploy_data/[APP_NAME],
@@ -61,22 +58,30 @@ import string
 import subprocess
 # pylint: enable=wrong-import-order
 
-import common
+import common # pylint: disable=relative-import
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--app_name', help='name of the app to deploy to', type=str)
 
+APP_NAME_OPPIASERVER = 'oppiaserver'
+APP_NAME_OPPIATESTSERVER = 'oppiatestserver'
+
 PARSED_ARGS = _PARSER.parse_args()
 if PARSED_ARGS.app_name:
     APP_NAME = PARSED_ARGS.app_name
+    if APP_NAME not in [APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER]:
+        raise Exception('Invalid app name: %s' % APP_NAME)
 else:
     raise Exception('No app name specified.')
 
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
-RELEASE_DIR_NAME = 'deploy-%s-%s' % (
+CURRENT_BRANCH_NAME = common.get_current_branch_name()
+
+RELEASE_DIR_NAME = 'deploy-%s-%s-%s' % (
     '-'.join('-'.join(APP_NAME.split('.')).split(':')),
+    CURRENT_BRANCH_NAME,
     CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
 RELEASE_DIR_PATH = os.path.join(os.getcwd(), '..', RELEASE_DIR_NAME)
 
@@ -86,7 +91,8 @@ APPCFG_PATH = os.path.join(
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
-DEPLOY_DATA_PATH = os.path.join(os.getcwd(), '..', 'deploy_data', APP_NAME)
+DEPLOY_DATA_PATH = os.path.join(
+    os.getcwd(), os.pardir, 'release-scripts', 'deploy_data', APP_NAME)
 
 FILES_AT_ROOT_IN_COMMON = ['favicon.ico', 'robots.txt']
 IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
@@ -103,7 +109,7 @@ def preprocess_release():
     does the following:
 
     (1) Changes the app name in app.yaml to APP_NAME.
-    (2) Substitutes image files in the images/ directory.
+    (2) Substitutes files from the per-app deployment data.
     """
     # Change the app name in app.yaml.
     f = open('app.yaml', 'r')
@@ -149,8 +155,9 @@ def preprocess_release():
 
 
 def _execute_deployment():
-    # Check that the current directory is correct.
+    # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
+    common.ensure_release_scripts_folder_exists_and_is_up_to_date()
 
     current_git_revision = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD']).strip()
@@ -184,7 +191,6 @@ def _execute_deployment():
         print 'Preprocessing release...'
         preprocess_release()
 
-        update_cache_slug()
         # Do a build; ensure there are no errors.
         print 'Building and minifying scripts...'
         subprocess.check_output(['python', 'scripts/build.py'])
@@ -202,6 +208,16 @@ def _execute_deployment():
 
         print 'Returning to oppia/ root directory.'
 
+    # If this is a test server deployment, open the library page (for sanity
+    # checking) and the GAE error logs.
+    if APP_NAME == APP_NAME_OPPIATESTSERVER:
+        common.open_new_tab_in_browser_if_possible(
+            'https://console.cloud.google.com/logs/viewer?'
+            'project=%s&key1=default&minLogLevel=500'
+            % APP_NAME_OPPIATESTSERVER)
+        common.open_new_tab_in_browser_if_possible(
+            'https://%s.appspot.com/library' % APP_NAME_OPPIATESTSERVER)
+
     print 'Done!'
 
 
@@ -210,19 +226,6 @@ def get_unique_id():
     unique_id = ''.join(random.choice(string.ascii_lowercase + string.digits)
                         for _ in range(CACHE_SLUG_PROD_LENGTH))
     return unique_id
-
-
-def update_cache_slug():
-    """Updates the cache slug in cache_slug.yaml"""
-    cache_slug = get_unique_id()
-
-    # Change the cache slug in cache_slug.yaml.
-    with open('cache_slug.yaml', 'r') as f:
-        content = f.read()
-    os.remove('cache_slug.yaml')
-    content = content.replace('default', cache_slug)
-    with open('cache_slug.yaml', 'w+') as d:
-        d.write(content)
 
 
 if __name__ == '__main__':

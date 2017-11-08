@@ -18,13 +18,14 @@
 
 oppia.controller('Signup', [
   '$scope', '$http', '$rootScope', '$modal', 'alertsService', 'urlService',
-  'focusService', 'siteAnalyticsService',
+  'FocusManagerService', 'siteAnalyticsService', 'UrlInterpolationService',
   function(
       $scope, $http, $rootScope, $modal, alertsService, urlService,
-      focusService, siteAnalyticsService) {
+      FocusManagerService, siteAnalyticsService, UrlInterpolationService) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
     $scope.warningI18nCode = '';
+    $scope.siteName = GLOBALS.SITE_NAME;
     $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS;
     $scope.submissionInProcess = false;
 
@@ -35,7 +36,7 @@ oppia.controller('Signup', [
       $scope.hasEverRegistered = data.has_ever_registered;
       $scope.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
       $scope.hasUsername = Boolean($scope.username);
-      focusService.setFocus('usernameInputField');
+      FocusManagerService.setFocus('usernameInputField');
     });
 
     $scope.blurredAtLeastOnce = false;
@@ -50,11 +51,13 @@ oppia.controller('Signup', [
 
     $scope.showLicenseExplanationModal = function() {
       $modal.open({
-        templateUrl: 'modals/licenseExplanation',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/signup/licence_explanation_modal_directive.html'),
         backdrop: true,
         resolve: {},
         controller: [
           '$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.siteName = GLOBALS.SITE_NAME;
             $scope.close = function() {
               $modalInstance.dismiss('cancel');
             };
@@ -124,6 +127,23 @@ oppia.controller('Signup', [
         agreed_to_terms: agreedToTerms,
         can_receive_email_updates: null
       };
+
+      var defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
+      var returnUrl = window.decodeURIComponent(
+        urlService.getUrlParams().return_url);
+
+      if (returnUrl.indexOf('creator_dashboard') !== -1) {
+        defaultDashboard = constants.DASHBOARD_TYPE_CREATOR;
+      } else {
+        defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
+      }
+
+      var requestParams = {
+        agreed_to_terms: agreedToTerms,
+        can_receive_email_updates: null,
+        default_dashboard: defaultDashboard
+      };
+
       if (!$scope.hasUsername) {
         requestParams.username = username;
       }

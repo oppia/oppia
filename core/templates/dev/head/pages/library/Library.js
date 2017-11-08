@@ -27,13 +27,19 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 });
 
 oppia.controller('Library', [
-  '$scope', '$http', '$rootScope', '$window', '$timeout', 'i18nIdService',
-  'urlService', 'ALL_CATEGORIES', 'searchService', 'windowDimensionsService',
-  'UrlInterpolationService', 'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX',
+  '$scope', '$http', '$modal', '$rootScope', '$window', '$timeout',
+  'i18nIdService', 'urlService', 'ALL_CATEGORIES', 'SearchService',
+  'windowDimensionsService', 'UrlInterpolationService', 'LIBRARY_PAGE_MODES',
+  'LIBRARY_TILE_WIDTH_PX', 'alertsService',
+  'LearnerDashboardIdsBackendApiService',
+  'LearnerDashboardActivityIdsObjectFactory', 'LearnerPlaylistService',
   function(
-      $scope, $http, $rootScope, $window, $timeout, i18nIdService,
-      urlService, ALL_CATEGORIES, searchService, windowDimensionsService,
-      UrlInterpolationService, LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX) {
+      $scope, $http, $modal, $rootScope, $window, $timeout,
+      i18nIdService, urlService, ALL_CATEGORIES, SearchService,
+      windowDimensionsService, UrlInterpolationService, LIBRARY_PAGE_MODES,
+      LIBRARY_TILE_WIDTH_PX, alertsService,
+      LearnerDashboardIdsBackendApiService,
+      LearnerDashboardActivityIdsObjectFactory, LearnerPlaylistService) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
     var possibleBannerFilenames = [
       'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
@@ -236,7 +242,7 @@ oppia.controller('Library', [
           selectedCategories[categories[i]] = true;
         }
 
-        var targetSearchQueryUrl = searchService.getSearchUrlQueryString(
+        var targetSearchQueryUrl = SearchService.getSearchUrlQueryString(
           '', selectedCategories, {});
         $window.location.href = '/search/find?q=' + targetSearchQueryUrl;
       }

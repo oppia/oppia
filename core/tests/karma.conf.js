@@ -8,11 +8,13 @@ if (isMinificationNeeded) {
 module.exports = function(config) {
   config.set({
     basePath: '../../',
-    frameworks: ['jasmine'],
+    // jasmine-jquery is used to load contents of external JSON files in tests.
+    frameworks: ['jasmine-jquery', 'jasmine'],
     files: [
       'core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
       'assets/constants.js',
+      'assets/rich_text_components_specs.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.0.0/jquery.min.js',
@@ -26,8 +28,14 @@ module.exports = function(config) {
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*.js',
-      'core/templates/dev/head/components/rating_display.html',
+      'core/templates/dev/head/**/*.html',
       'extensions/**/*.js',
+      {
+        pattern: 'extensions/**/*.png',
+        watched: false,
+        served: true,
+        included: false
+      },
       'extensions/interactions/**/*.html',
       'extensions/interactions/rule_templates.json',
       {
@@ -35,17 +43,25 @@ module.exports = function(config) {
         watched: true,
         served: true,
         included: false
+      },
+      {
+        pattern: 'core/tests/data/**/*.json',
+        watched: false,
+        served: true,
+        included: false
       }
     ],
     exclude: [
       'core/templates/dev/head/**/*-e2e.js',
-      'extensions/**/protractor.js'
+      'extensions/**/protractor.js',
+      'backend_prod_files/extensions/**'
     ],
     proxies: {
       // Karma serves files under the /base directory.
-      // We need to access files in assets folder, without modifying the code,
-      // so we need to proxy the requests from /assets/ to /base/assets/.
-      '/assets/': '/base/assets/'
+      // We access files directly in our code, for example /folder/,
+      // so we need to proxy the requests from /folder/ to /base/folder/.
+      '/assets/': '/base/assets/',
+      '/extensions/': '/base/extensions/'
     },
     preprocessors: {
       'core/templates/dev/head/*.js': ['coverage'],
@@ -69,7 +85,7 @@ module.exports = function(config) {
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
-      'core/templates/dev/head/components/rating_display.html': ['ng-html2js'],
+      'core/templates/dev/head/**/*.html': ['ng-html2js'],
       'extensions/interactions/**/*.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures']
     },

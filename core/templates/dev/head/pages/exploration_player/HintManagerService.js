@@ -17,10 +17,10 @@
  */
 
 oppia.factory('HintManagerService', [
-  '$timeout','playerTranscriptService', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
+  '$timeout','PlayerTranscriptService', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
   'HINT_REQUEST_STRING_I18N_IDS', 'WAIT_FOR_HINT_MSEC',
   function(
-      $timeout, playerTranscriptService, DELAY_FOR_HINT_FEEDBACK_MSEC,
+      $timeout, PlayerTranscriptService, DELAY_FOR_HINT_FEEDBACK_MSEC,
       HINT_REQUEST_STRING_I18N_IDS, WAIT_FOR_HINT_MSEC) {
     var currentHintIsAvailable = false;
     var numHintsConsumed = 0;

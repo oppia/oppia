@@ -1,0 +1,95 @@
+<div>
+  <span ng-if="subtitledHtml.hasAudioTranslations()">
+    <hr>
+    <h4 class="oppia-audio-translations-header">Audio Translations</h4>
+    <div ng-repeat="(languageCode, audioTranslation) in subtitledHtml.getBindableAudioTranslations()">
+      <div class="row">
+        <div class="col-lg-3 col-md-3 col-sm-3 audio-language-description">
+          <span class="needs-update-marker"
+                ng-attr-tooltip="<[audioTranslation.needsUpdate ? 'Audio might not match text. Reupload the file, or click to unflag.' : 'Click to mark this audio translation as not matching text.']>"
+                ng-click="toggleNeedsUpdateAttribute(languageCode)">
+            <i ng-if="audioTranslation.needsUpdate" class="material-icons needs-update">&#xE002;</i>
+            <i ng-if="!audioTranslation.needsUpdate" class="material-icons is-current">&#xE876;</i>
+          </span>
+          <[getAudioLanguageDescription(languageCode)]>
+        </div>
+        <div class="col-lg-8 col-md-8 col-sm-8">
+          <audio controls preload="metadata" controlsList="nodownload" ng-src="<[getAudioTranslationFullUrl(audioTranslation.filename)]>">
+          </audio>
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-1">
+          <button type="button"
+                  class="delete-audio-translation-btn oppia-transition-200"
+                  ng-click="openDeleteAudioTranslationModal(languageCode)"
+                  title="Delete audio translation"
+                  ng-if="isEditable()">
+            <i class="material-icons md-18">&#xE5CD;</i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </span>
+
+  <span class="add-audio-translation-btn-container" ng-if="isEditable() && !subtitledHtml.isFullyTranslated()">
+    <button ng-click="openAddAudioTranslationModal()" class="add-audio-translation-btn">
+      <i class="material-icons md-18">&#xE050;</i>
+      Add audio translation...
+    </button>
+  </span>
+</div>
+
+<style>
+  audio-translations-editor .oppia-audio-translations-header {
+    font-size: 1em;
+    font-weight: bold;
+  }
+
+  audio-translations-editor .audio-language-description {
+    margin: 6px 0;
+  }
+
+  audio-translations-editor .needs-update-marker {
+    cursor: pointer;
+  }
+  audio-translations-editor .needs-update-marker i {
+    font-size: 18px;
+  }
+  audio-translations-editor .needs-update-marker i.needs-update {
+    color: red;
+  }
+  audio-translations-editor .needs-update-marker i.is-current {
+    color: green;
+  }
+
+  audio-translations-editor .delete-audio-translation-btn {
+    background: none;
+    border: 0;
+    color: #000;
+    cursor: pointer;
+    margin: 6px 0;
+    opacity: 0.5;
+    position: absolute;
+    right: -14px;
+  }
+  audio-translations-editor .delete-audio-translation-btn:hover {
+    opacity: 1;
+  }
+
+  audio-translations-editor .add-audio-translation-btn-container {
+    bottom: 6px;
+    color: #333;
+    position: absolute;
+    right: 24px;
+  }
+  audio-translations-editor .add-audio-translation-btn-container:hover,
+  audio-translations-editor .add-audio-translation-btn-container:focus {
+    color: #0844aa;
+  }
+
+  audio-translations-editor .add-audio-translation-btn {
+    background: none repeat scroll 0 0 transparent;
+    border: none;
+    font-size: 12px;
+    font-weight: normal;
+  }
+</style>

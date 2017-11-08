@@ -1,6 +1,32 @@
 <div ng-controller="StatisticsTab" ng-cloak>
   <md-card class="oppia-editor-card" ng-if="!loadingMessage">
-    <div ng-if="hasExplorationBeenVisited">
+    <div ng-if="explorationHasBeenVisited && ENABLE_NEW_STATS_FRAMEWORK">
+      <div class="oppia-statistics-display">
+        <h3>Exploration Completion Rate</h3>
+        <pie-chart data="pieChartData"
+                   options="COMPLETION_RATE_PIE_CHART_OPTIONS">
+        </pie-chart>
+
+        <h3>Card statistics</h3>
+        <div style="font-size: smaller" ng-if="lastUpdated">
+          <em>Last updated: <[getLocaleAbbreviatedDatetimeString(lastUpdated)]></em>
+        </div>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <div state-graph-viz graph-data="statsGraphData"
+                   node-fill="darkseagreen"
+                   highlight-states="highlightStates"
+                   state-stats="stateStats"
+                   on-click-function="onClickStateInStatsGraph">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div ng-if="explorationHasBeenVisited && !ENABLE_NEW_STATS_FRAMEWORK">
       <div class="oppia-statistics-display">
         <h3>Exploration Completion Rate</h3>
         <bar-chart data="chartData"
@@ -16,7 +42,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12">
               <div state-graph-viz graph-data="statsGraphData"
                    node-fill="darkseagreen"
-                   opacity-map="statsGraphOpacities" 
+                   opacity-map="statsGraphOpacities"
                    highlight-states="highlightStates"
                    state-stats="stateStats"
                    on-click-function="onClickStateInStatsGraph">
@@ -26,59 +52,10 @@
         </div>
       </div>
     </div>
-    <div ng-if="!hasExplorationBeenVisited">
+    <div ng-if="!explorationHasBeenVisited">
       <em>
         This exploration has not been visited by anyone yet, so there are no statistics to display.
       </em>
     </div>
   </md-card>
 </div>
-
-<script type="text/ng-template" id="modals/stateStats">
-  <div class="modal-header">
-    <h3>Statistics for "<[stateName]>"</h3>
-  </div>
-
-  <div class="modal-body oppia-state-stats-modal-body">
-    <div class="oppia-state-stats-warning" ng-if="improvementType">
-      <div ng-if="improvementType == 'May be confusing'">
-        <i class="material-icons">&#xE002;</i>
-        <em>
-          This state may be confusing. Learners often leave the exploration when encountering it.
-        </em>
-      </div>
-
-      <div ng-if="improvementType == 'Needs more feedback'">
-        <i class="material-icons">&#xE002;</i>
-        <em>
-          This state may need more feedback. Learners often return to it after giving an answer.
-        </em>
-      </div>
-    </div>
-
-    <div class="section">
-      <p>
-        <strong>Times entered</strong>: <[stateStats.total_entry_count]>
-      </p>
-    </div>
-
-    <div class="section" angular-html-bind="visualizationsHtml"></div>
-  </div>
-
-  <div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Close</button>
-  </div>
-
-  <style>
-    .oppia-state-stats-modal-body .section {
-      margin-top: 18px;
-    }
-
-    .oppia-state-stats-warning {
-      background: #f9edbe;
-      border-radius: 2px;
-      padding: 12px;
-      width: 100%;
-    }
-  </style>
-</script>

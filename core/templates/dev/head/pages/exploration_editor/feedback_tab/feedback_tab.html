@@ -128,10 +128,15 @@
             </span>
           </div>
 
+          <div style="color:#ff0000; margin-top: 7px;" ng-if="tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable'">
+            <i class="material-icons">&#xE88F;</i>
+            <span>Please specify a reason for setting the status to <[getHumanReadableStatus(tmpMessage.status)]>.</span>
+          </div>
+
           <div>
             <button class="btn btn-success protractor-test-oppia-feedback-response-send-btn" style="margin-top: 10px;"
                     ng-click="addNewMessage(activeThread.thread_id, tmpMessage.text, tmpMessage.status)"
-                    ng-disabled="messageSendingInProgress || (!tmpMessage.text && activeThread.status === tmpMessage.status)">
+                    ng-disabled="messageSendingInProgress || (!tmpMessage.text && activeThread.status === tmpMessage.status) || (!tmpMessage.text && (tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable'))">
               <span ng-if="messageSendingInProgress">Sending...</span>
               <span ng-if="!messageSendingInProgress">Send</span>
             </button>
@@ -143,56 +148,3 @@
     {% endif %}
   </div>
 </md-card>
-
-<script type="text/ng-template" id="modals/editorFeedbackCreateThread">
-  <div class="modal-header">
-    <h3>Start New Feedback Thread</h3>
-  </div>
-
-  <div class="modal-body">
-    <p>Thread subject: <input type="text" ng-model="newThreadSubject"></p>
-    <p>Message text <textarea ng-model="newThreadText" rows="6"></textarea></p>
-  </div>
-
-  <div class="modal-footer">
-    <button class="btn btn-success" ng-click="create(newThreadSubject, newThreadText)" ng-disabled="!newThreadSubject || !newThreadText">Create Thread</button>
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-  </div>
-</script>
-
-<script type="text/ng-template" id="modals/editorViewSuggestion">
-  <div class="modal-header">
-    <h3>Review Suggestion</h3>
-  </div>
-
-  <div class="modal-body">
-    <section class="oppia-suggestion-review-container">
-      <div class="oppia-suggestion-review-panel-container" style="float: left;">
-        <strong>Current:</strong>
-        <div class="oppia-suggestion-review-panel">
-          <div ng-if="currentContent" angular-html-bind="currentContent"></div>
-          <div ng-if="!currentContent" style="color: red;">Oops! This state no longer exists!</div>
-        </div>
-      </div>
-      <div class="oppia-suggestion-review-panel-container" style="float: right;">
-        <strong>Suggested:</strong>
-        <div class="oppia-suggestion-review-panel">
-          <div angular-html-bind="newContent"></div>
-        </div>
-      </div>
-    </section>
-    <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept">
-      Brief Description of Changes (required if accepting):
-      <input type="text" ng-model="commitMessage" style="width: 100%">
-    </div>
-  </div>
-
-  <div class="modal-footer">
-    <div ng-show="errorMessage" class="oppia-suggestion-review-error">
-      <[ errorMessage ]>
-    </div>
-    <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
-    <button class="btn btn-danger" ng-show="canEdit && isOpen" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
-    <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isOpen" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
-  </div>
-</script>

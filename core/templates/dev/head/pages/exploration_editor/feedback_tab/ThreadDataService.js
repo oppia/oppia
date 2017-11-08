@@ -17,7 +17,7 @@
  * feedback tab of the exploration editor.
  */
 
-oppia.factory('threadDataService', [
+oppia.factory('ThreadDataService', [
   '$http', '$q', 'explorationData', 'alertsService', 'ACTION_ACCEPT_SUGGESTION',
   function(
       $http, $q, explorationData, alertsService, ACTION_ACCEPT_SUGGESTION) {
@@ -106,8 +106,9 @@ oppia.factory('threadDataService', [
         });
       },
       markThreadAsSeen: function(threadId) {
-        $http.post(_FEEDBACK_THREAD_VIEW_EVENT_URL, {
-          exploration_id: _expId,
+        var requestUrl = (
+          _FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + _expId);
+        $http.post(requestUrl, {
           thread_id: threadId
         });
       },

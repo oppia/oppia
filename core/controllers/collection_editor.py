@@ -17,9 +17,10 @@
 """Controllers for the collections editor."""
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import rights_manager
+from core.domain import search_services
 from core.domain import summary_services
 from core.platform import models
 import feconf
@@ -41,52 +42,6 @@ def _require_valid_version(version_from_payload, collection_version):
             % (collection_version, version_from_payload))
 
 
-def require_editor(handler):
-    """Decorator that checks if the user can edit the given collection."""
-    def test_collection_editor(self, collection_id, **kwargs):
-        """Gets the user and collection id if the user can edit it.
-
-        Args:
-            self: the handler instance
-            collection_id: the collection id
-            **kwargs: any other arguments passed to the handler
-
-        Returns:
-            The relevant handler, if the user is authorized to edit this
-            collection.
-
-        Raises:
-            self.PageNotFoundException: if no such collection exists.
-            self.UnauthorizedUserException: if the user exists but does not
-                have the right credentials.
-        """
-        if not self.user_id:
-            self.redirect(current_user_services.create_login_url(
-                self.request.uri))
-            return
-
-        if (self.username in config_domain.BANNED_USERNAMES.value
-                or self.username not in
-                config_domain.WHITELISTED_COLLECTION_EDITOR_USERNAMES.value):
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-
-        try:
-            collection_services.get_collection_by_id(collection_id)
-        except:
-            raise self.PageNotFoundException
-
-        if not rights_manager.Actor(self.user_id).can_edit(
-                feconf.ACTIVITY_TYPE_COLLECTION, collection_id):
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to edit this collection.',
-                self.user_id)
-
-        return handler(self, collection_id, **kwargs)
-
-    return test_collection_editor
-
-
 class CollectionEditorHandler(base.BaseHandler):
     """Base class for all handlers for the collection editor page."""
     pass
@@ -95,7 +50,7 @@ class CollectionEditorHandler(base.BaseHandler):
 class CollectionEditorPage(CollectionEditorHandler):
     """The editor page for a single collection."""
 
-    @require_editor
+    @acl_decorators.can_edit_collection
     def get(self, collection_id):
         """Handles GET requests."""
 
@@ -131,7 +86,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
                 'which is too old. Please reload the page and try again.'
                 % (collection_version, version_from_payload))
 
-    @require_editor
+    @acl_decorators.can_edit_collection
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
 
@@ -139,7 +94,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
             # Try to retrieve collection
             collection_dict = (
                 summary_services.get_learner_collection_dict_by_id(
-                    collection_id, self.user_id,
+                    collection_id, self.user,
                     allow_invalid_explorations=True))
         except Exception as e:
             raise self.PageNotFoundException(e)
@@ -150,7 +105,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
 
         self.render_json(self.values)
 
-    @require_editor
+    @acl_decorators.can_edit_collection
     def put(self, collection_id):
         """Updates properties of the given collection."""
 
@@ -169,7 +124,8 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
 
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
-                collection_id, self.user_id, allow_invalid_explorations=True))
+                collection_id, self.user,
+                allow_invalid_explorations=True))
 
         # Send the updated collection back to the frontend.
         self.values.update({
@@ -182,16 +138,21 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
 class CollectionRightsHandler(CollectionEditorHandler):
     """Handles management of collection editing rights."""
 
-    @require_editor
+    @acl_decorators.can_edit_collection
     def get(self, collection_id):
-        """Gets the editing rights for the given collection."""
-        collection = collection_services.get_collection_by_id(collection_id)
+        """Gets the editing rights for the given collection.
+
+        Args:
+            collection_id: str. ID for the collection.
+        """
+        (collection, collection_rights) = (
+            collection_services.get_collection_and_collection_rights_by_id(
+                collection_id))
 
         self.values.update({
             'can_edit': True,
-            'can_unpublish': rights_manager.Actor(
-                self.user_id).can_unpublish(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
+            'can_unpublish': rights_manager.check_can_unpublish_activity(
+                self.user, collection_rights),
             'collection_id': collection.id,
             'is_private': rights_manager.is_collection_private(collection_id),
             'owner_names': rights_manager.get_collection_owner_names(
@@ -200,53 +161,75 @@ class CollectionRightsHandler(CollectionEditorHandler):
 
         self.render_json(self.values)
 
-    @require_editor
+
+class CollectionPublishHandler(base.BaseHandler):
+
+    @acl_decorators.can_publish_collection
     def put(self, collection_id):
-        """Updates the editing rights for the given collection."""
+        """Publishes the given collection."""
         collection = collection_services.get_collection_by_id(collection_id)
         version = self.payload.get('version')
         _require_valid_version(version, collection.version)
 
-        # TODO(bhenning): Implement other rights changes here.
-        is_public = self.payload.get('is_public')
+        try:
+            collection.validate(strict=True)
+            collection_services.validate_exps_in_collection_are_public(
+                collection)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
-        if is_public is not None:
-            if is_public:
-                try:
-                    collection.validate(strict=True)
-                    collection_services.validate_exps_in_collection_are_public(
-                        collection)
-                except utils.ValidationError as e:
-                    raise self.InvalidInputException(e)
+        collection_services.publish_collection_and_update_user_profiles(
+            self.user, collection_id)
+        collection_services.index_collections_given_ids([
+            collection_id])
 
-                collection_services.publish_collection_and_update_user_profiles(
-                    self.user_id, collection_id)
-                collection_services.index_collections_given_ids([
-                    collection_id])
-            elif rights_manager.Actor(self.user_id).can_unpublish(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id):
-                rights_manager.unpublish_collection(self.user_id, collection_id)
-                collection_services.delete_documents_from_search_index([
-                    collection_id])
-            else:
-                raise self.InvalidInputException(
-                    'Cannot unpublish a collection.')
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
 
         self.values.update({
             'can_edit': True,
-            'can_unpublish': rights_manager.Actor(
-                self.user_id).can_unpublish(
-                    feconf.ACTIVITY_TYPE_COLLECTION, collection_id),
+            'can_unpublish': rights_manager.check_can_unpublish_activity(
+                self.user, collection_rights),
             'collection_id': collection.id,
             'is_private': rights_manager.is_collection_private(collection_id),
             'owner_names': rights_manager.get_collection_owner_names(
                 collection_id)
         })
+        self.render_json(self.values)
+
+
+class CollectionUnpublishHandler(base.BaseHandler):
+
+    @acl_decorators.can_unpublish_collection
+    def put(self, collection_id):
+        """Unpublishes the given collection."""
+        collection = collection_services.get_collection_by_id(collection_id)
+        version = self.payload.get('version')
+        _require_valid_version(version, collection.version)
+
+        rights_manager.unpublish_collection(self.user, collection_id)
+        search_services.delete_collections_from_search_index([
+            collection_id])
+
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
+
+        self.values.update({
+            'can_edit': True,
+            'can_unpublish': rights_manager.check_can_unpublish_activity(
+                self.user, collection_rights),
+            'collection_id': collection.id,
+            'is_private': rights_manager.is_collection_private(collection_id),
+            'owner_names': rights_manager.get_collection_owner_names(
+                collection_id)
+        })
+        self.render_json(self.values)
 
 
 class ExplorationMetadataSearchHandler(base.BaseHandler):
     """Provides data for exploration search."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         query_string = self.request.get('q')
@@ -255,7 +238,7 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
 
         collection_node_metadata_list, new_search_cursor = (
             summary_services.get_exp_metadata_dicts_matching_query(
-                query_string, search_cursor, self.user_id))
+                query_string, search_cursor, self.user))
 
         self.values.update({
             'collection_node_metadata_list': collection_node_metadata_list,

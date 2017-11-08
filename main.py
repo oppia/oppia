@@ -17,8 +17,10 @@
 import logging
 
 # pylint: disable=relative-import
+from constants import constants
 from core.controllers import admin
 from core.controllers import base
+from core.controllers import classifier
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import creator_dashboard
@@ -27,6 +29,7 @@ from core.controllers import email_dashboard
 from core.controllers import editor
 from core.controllers import feedback
 from core.controllers import learner_dashboard
+from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
@@ -35,6 +38,7 @@ from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
 from core.controllers import subscriptions
+from core.domain import acl_decorators
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -54,6 +58,7 @@ class FrontendErrorHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
+    @acl_decorators.open_access
     def post(self):
         """Records errors reported by the frontend."""
         logging.error('Frontend error: %s' % self.payload.get('error'))
@@ -63,6 +68,7 @@ class FrontendErrorHandler(base.BaseHandler):
 class WarmupHandler(base.BaseHandler):
     """Handles warmup requests."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET warmup requests."""
         pass
@@ -72,19 +78,17 @@ class HomePageRedirectHandler(base.BaseHandler):
     """When a request is made to '/', check the user's login status, and
     redirect them appropriately.
     """
+
+    @acl_decorators.open_access
     def get(self):
         if self.user_id and user_services.has_fully_registered(self.user_id):
-            user_contributions = user_services.get_user_contributions(
+            user_settings = user_services.get_user_settings(
                 self.user_id)
-
-            # 'Creator' is a user who has created or edited an exploration.
-            user_is_creator = user_contributions and (
-                user_contributions.created_exploration_ids or
-                user_contributions.edited_exploration_ids)
-            if user_is_creator:
+            default_dashboard = user_settings.default_dashboard
+            if default_dashboard == constants.DASHBOARD_TYPE_CREATOR:
                 self.redirect(feconf.CREATOR_DASHBOARD_URL)
             else:
-                self.redirect(feconf.LIBRARY_INDEX_URL)
+                self.redirect(feconf.LEARNER_DASHBOARD_URL)
         else:
             self.redirect(feconf.SPLASH_URL)
 
@@ -158,7 +162,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(feconf.SPLASH_URL, pages.SplashPage),
     get_redirect_route(r'/about', pages.AboutPage),
     get_redirect_route(r'/get_started', pages.GetStartedPage),
-    get_redirect_route(r'/foundation', pages.AboutRedirectPage),
+    get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/teach', pages.TeachPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),
@@ -166,7 +170,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/console_errors', pages.ConsoleErrorPage),
     get_redirect_route(r'/contact', pages.ContactPage),
 
-    get_redirect_route(r'/blog', pages.BlogPage),
     get_redirect_route(r'/forum', pages.ForumPage),
     get_redirect_route(r'/donate', pages.DonatePage),
     get_redirect_route(r'/thanks', pages.ThanksPage),
@@ -196,9 +199,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.CREATOR_DASHBOARD_DATA_URL,
         creator_dashboard.CreatorDashboardHandler),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.DASHBOARD_EXPLORATION_STATS_PREFIX,
-        creator_dashboard.ExplorationDashboardStatsHandler),
-    get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL, creator_dashboard.NewExploration),
     get_redirect_route(
         r'%s' % feconf.NEW_COLLECTION_URL, creator_dashboard.NewCollection),
@@ -206,23 +206,34 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         creator_dashboard.UploadExploration),
     get_redirect_route(
-        r'/my_explorations', creator_dashboard.CreatorDashboardRedirectPage),
-    get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_URL,
         learner_dashboard.LearnerDashboardPage),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_DATA_URL,
         learner_dashboard.LearnerDashboardHandler),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_DASHBOARD_IDS_DATA_URL,
+        learner_dashboard.LearnerDashboardIdsHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>/<thread_id>' %
+        feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL,
+        learner_dashboard.LearnerDashboardFeedbackThreadHandler),
 
     get_redirect_route(
-        r'%s/remove_in_progress_exploration' % feconf.LEARNER_DASHBOARD_URL,
-        reader.RemoveExpFromIncompleteListHandler),
+        r'%s/<activity_type>/<activity_id>' %
+        feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+        reader.LearnerIncompleteActivityHandler),
+
     get_redirect_route(
-        r'%s/remove_in_progress_collection' % feconf.LEARNER_DASHBOARD_URL,
-        reader.RemoveCollectionFromIncompleteListHandler),
+        r'%s/<activity_type>/<activity_id>' % feconf.LEARNER_PLAYLIST_DATA_URL,
+        learner_playlist.LearnerPlaylistHandler),
+
     get_redirect_route(
         r'/imagehandler/<exploration_id>/<encoded_filepath>',
         resources.ImageHandler),
+    get_redirect_route(
+        r'/audiohandler/<exploration_id>/audio/<filename>',
+        resources.AudioHandler),
     get_redirect_route(
         r'/object_editor_template/<obj_type>',
         resources.ObjectEditorTemplateHandler),
@@ -291,8 +302,17 @@ URLS = MAPREDUCE_HANDLERS + [
         '/explorehandler/exploration_start_event/<exploration_id>',
         reader.ExplorationStartEventHandler),
     get_redirect_route(
+        '/explorehandler/exploration_actual_start_event/<exploration_id>',
+        reader.ExplorationActualStartEventHandler),
+    get_redirect_route(
+        '/explorehandler/solution_hit_event/<exploration_id>',
+        reader.SolutionHitEventHandler),
+    get_redirect_route(
         r'/explorehandler/state_hit_event/<exploration_id>',
         reader.StateHitEventHandler),
+    get_redirect_route(
+        r'/explorehandler/state_complete_event/<exploration_id>',
+        reader.StateCompleteEventHandler),
     get_redirect_route(
         r'/explorehandler/answer_submitted_event/<exploration_id>',
         reader.AnswerSubmittedEventHandler),
@@ -305,6 +325,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/explorehandler/exploration_maybe_leave_event/<exploration_id>',
         reader.ExplorationMaybeLeaveHandler),
+    get_redirect_route(
+        r'/explorehandler/stats_events/<exploration_id>',
+        reader.StatsEventsHandler),
     get_redirect_route(
         r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler),
     get_redirect_route(
@@ -325,7 +348,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler),
-    get_redirect_route(r'/createhandler/state_yaml', editor.StateYamlHandler),
+    get_redirect_route(
+        r'/createhandler/audioupload/<exploration_id>',
+        editor.AudioUploadHandler),
+    get_redirect_route(
+        r'/createhandler/state_yaml/<exploration_id>',
+        editor.StateYamlHandler),
     get_redirect_route(
         r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
         editor.UntrainedAnswersHandler),
@@ -339,6 +367,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EXPLORATION_RIGHTS_PREFIX,
         editor.ExplorationRightsHandler),
     get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_STATUS_PREFIX,
+        editor.ExplorationStatusHandler),
+    get_redirect_route(
         r'/createhandler/moderatorrights/<exploration_id>',
         editor.ExplorationModeratorRightsHandler),
     get_redirect_route(
@@ -351,13 +382,16 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/statisticsversion/<exploration_id>',
         editor.ExplorationStatsVersionsHandler),
     get_redirect_route(
-        r'/createhandler/statistics/<exploration_id>/<exploration_version>',
+        r'/createhandler/statistics_old/<exploration_id>/<exploration_version>',
+        editor.OldExplorationStatisticsHandler),
+    get_redirect_route(
+        r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler),
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
         editor.StateRulesStatsHandler),
     get_redirect_route(
-        r'/createhandler/started_tutorial_event',
+        r'/createhandler/started_tutorial_event/<exploration_id>',
         editor.StartedTutorialEventHandler),
     get_redirect_route(
         r'/createhandler/autosave_draft/<exploration_id>',
@@ -371,7 +405,7 @@ URLS = MAPREDUCE_HANDLERS + [
         feedback.RecentFeedbackMessagesHandler),
 
     get_redirect_route(
-        r'%s' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL,
+        r'%s/<exploration_id>' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL,
         feedback.FeedbackThreadViewEventHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
@@ -418,6 +452,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
         collection_editor.CollectionRightsHandler),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_PUBLISH_PREFIX,
+        collection_editor.CollectionPublishHandler),
+    get_redirect_route(
+        r'%s/<collection_id>' % feconf.COLLECTION_UNPUBLISH_PREFIX,
+        collection_editor.CollectionUnpublishHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
@@ -442,6 +482,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
 
+    get_redirect_route(
+        r'/ml/trainedclassifierhandler', classifier.TrainedClassifierHandler),
+    get_redirect_route(
+        r'/ml/nextjobhandler', classifier.NextJobHandler),
     get_redirect_route(
         r'/.well-known/acme-challenge/<challenge>',
         admin.SslChallengeHandler),

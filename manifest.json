@@ -70,6 +70,14 @@
         "tarRootDirPrefix": "beautifulsoup4-",
         "rootDirPrefix": "beautifulsoup4-",
         "targetDirPrefix": "beautifulsoup4-"
+      },
+      "mutagen": {
+        "version": "1.38",
+        "downloadFormat": "tar",
+        "url": "https://pypi.python.org/packages/57/ec/d7534cdb2766f1fee534a3aabdbdfbf05d6cf77cde617d77b526336a1a72/mutagen-1.38.tar.gz#md5=c54443dfb8d4ac088eb2a0c4fd569772",
+        "tarRootDirPrefix": "mutagen-",
+        "rootDirPrefix": "mutagen-",
+        "targetDirPrefix": "mutagen-"
       }
     },
     "frontend": {
@@ -92,6 +100,16 @@
             "angular-animate.js", "angular-resource.js", "angular-sanitize.js",
             "angular-touch.js", "angular-aria.js"
           ]
+        }
+      },
+      "angularAudio": {
+        "version": "1.7.4",
+        "downloadFormat": "zip",
+        "url": "https://github.com/danielstern/ngAudio/archive/1.7.4.zip",
+        "rootDirPrefix": "ngAudio-",
+        "targetDirPrefix": "angular-audio-",
+        "bundle": {
+          "js": ["app/angular.audio.js"]
         }
       },
       "angularTest": {
@@ -355,16 +373,14 @@
         }
       },
       "select2": {
-        "version": "3.5.1",
+        "version": "4.0.3",
         "downloadFormat": "zip",
-        "url": "https://github.com/ivaynberg/select2/archive/3.5.1.zip",
+        "url": "https://github.com/select2/select2/archive/4.0.3.zip",
         "rootDirPrefix": "select2-",
         "targetDirPrefix": "select2-",
         "bundle": {
-          "css": ["select2.css"],
-          "cssBackgroundImage": [
-            "select2.png", "select2x2.png", "select2-spinner.gif"],
-          "js": ["select2.js"]
+          "css": ["dist/css/select2.css"],
+          "js": ["dist/js/select2.full.js"]
         }
       },
       "textAngular": {
@@ -379,14 +395,14 @@
         }
       },
       "uiBootstrap": {
-        "version": "0.13.4",
+        "version": "0.14.3",
         "downloadFormat": "files",
         "url": "https://raw.githubusercontent.com/angular-ui/bootstrap/gh-pages",
         "rootDirPrefix": "ui-bootstrap-",
         "targetDirPrefix": "ui-bootstrap-",
-        "files": ["ui-bootstrap-tpls-0.13.4.js", "ui-bootstrap-tpls-0.13.4.min.js"],
+        "files": ["ui-bootstrap-tpls-0.14.3.js", "ui-bootstrap-tpls-0.14.3.min.js"],
         "bundle": {
-          "js": ["ui-bootstrap-tpls-0.13.4.js"]
+          "js": ["ui-bootstrap-tpls-0.14.3.js"]
         }
       },
       "uiCodemirror": {

@@ -125,7 +125,8 @@
                                              node-count="tile.node_count"
                                              category="tile.category"
                                              thumbnail-icon-url="tile.thumbnail_icon_url"
-                                             thumbnail-bg-color="tile.thumbnail_bg_color">
+                                             thumbnail-bg-color="tile.thumbnail_bg_color"
+                                             show-learner-dashboard-icons-if-possible="true">
                     </collection-summary-tile>
                     <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
                                               exploration-id="tile.id"
@@ -137,7 +138,8 @@
                                               num-views="tile.num_views"
                                               thumbnail-icon-url="tile.thumbnail_icon_url"
                                               thumbnail-bg-color="tile.thumbnail_bg_color"
-                                              class="protractor-test-exp-summary-tile">
+                                              class="protractor-test-exp-summary-tile"
+                                              show-learner-dashboard-icons-if-possible="true">
                     </exploration-summary-tile>
                   </div>
                 </div>
@@ -204,8 +206,6 @@
     </div>
   </div>
 
-  {% include 'pages/library/search_results_directive.html' %}
-
 {% endblock %}
 
 {% block footer %}
@@ -218,9 +218,11 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/services/searchService.js"></script>
-  
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/SearchService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/learner_dashboard/LearnerDashboardIdsBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/learner_dashboard/LearnerPlaylistService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/profile_link/ProfileLinkImageDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
@@ -229,6 +231,7 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/Library.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/LibraryFooter.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/learner_dashboard/LearnerDashboardIconsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/ActivityTilesInfinityGridDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/SearchBarDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/library/SearchResultsDirective.js"></script>

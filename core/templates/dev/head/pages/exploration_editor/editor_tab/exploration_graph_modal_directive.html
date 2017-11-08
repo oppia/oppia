@@ -1,0 +1,14 @@
+<div class="modal-header">
+  <h3>Exploration Overview</h3>
+</div>
+
+<div class="modal-body" style="overflow-y: hidden; padding-bottom: 0;">
+  <div state-graph-viz style="height: 300px;" graph-data="graphData" allow-panning="true" current-state-id="currentStateName" on-click-function="selectState" on-delete-function="deleteState" center-at-current-state="true" is-editable="isEditable">
+  </div>
+</div>
+
+<div class="modal-footer" style="margin-top: 0; text-align: inherit;">
+  <span class="pull-right">
+    <button class="btn btn-default" ng-click="cancel()">Close</button>
+  </span>
+</div>

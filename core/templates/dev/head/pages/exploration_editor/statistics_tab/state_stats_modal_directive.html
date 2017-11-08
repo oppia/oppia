@@ -1,0 +1,90 @@
+<div class="modal-header">
+  <h3>Statistics for "<[stateName]>"</h3>
+</div>
+
+<div class="modal-body oppia-state-stats-modal-body" ng-if="ENABLE_NEW_STATS_FRAMEWORK">
+  <div class="oppia-state-stats-warning" ng-if="improvementType">
+    <div ng-if="improvementType == 'May be confusing'">
+      <i class="material-icons">&#xE002;</i>
+      <em>
+        This state may be confusing. Learners often leave the exploration when encountering it.
+      </em>
+    </div>
+
+    <div ng-if="improvementType == 'Needs more feedback'">
+      <i class="material-icons">&#xE002;</i>
+      <em>
+        This state may need more feedback. Learners often return to it after giving an answer.
+      </em>
+    </div>
+  </div>
+
+  <div class="section">
+    <div style="display: inline-block;">
+      <p>
+        <strong>Card entered</strong>: <[stateStats.total_hit_count]> <strong> times. </strong>
+      </p>
+    </div>
+    <div style="display: inline-block; padding-left: 170px;">
+      <strong>Quit at this card</strong>: <[stateStats.total_hit_count - stateStats.num_completions]> <strong> times. </strong>
+    </div>
+  </div>
+
+  <div class="section" ng-if="hasExplorationBeenAnswered">
+    <div style="display: inline-block;">
+      <pie-chart data="pieChartData1"
+                 options="COMPLETION_RATE_PIE_CHART_OPTIONS1">
+      </pie-chart>
+    </div>
+    <div style="display: inline-block; padding-left: 76px;">
+      <pie-chart data="pieChartData2"
+                 options="COMPLETION_RATE_PIE_CHART_OPTIONS2">
+      </pie-chart>
+    </div>
+  </div>
+
+  <div class="section" angular-html-bind="visualizationsHtml"></div>
+</div>
+
+<div class="modal-body oppia-state-stats-modal-body" ng-if="!ENABLE_NEW_STATS_FRAMEWORK">
+  <div class="oppia-state-stats-warning" ng-if="improvementType">
+    <div ng-if="improvementType == 'May be confusing'">
+      <i class="material-icons">&#xE002;</i>
+      <em>
+        This state may be confusing. Learners often leave the exploration when encountering it.
+      </em>
+    </div>
+
+    <div ng-if="improvementType == 'Needs more feedback'">
+      <i class="material-icons">&#xE002;</i>
+      <em>
+        This state may need more feedback. Learners often return to it after giving an answer.
+      </em>
+    </div>
+  </div>
+
+  <div class="section">
+    <p>
+      <strong>Times entered</strong>: <[stateStats.total_entry_count]>
+    </p>
+  </div>
+
+  <div class="section" angular-html-bind="visualizationsHtml"></div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default" ng-click="cancel()">Close</button>
+</div>
+
+<style>
+  .oppia-state-stats-modal-body .section {
+    margin-top: 18px;
+  }
+
+  .oppia-state-stats-warning {
+    background: #f9edbe;
+    border-radius: 2px;
+    padding: 12px;
+    width: 100%;
+  }
+</style>

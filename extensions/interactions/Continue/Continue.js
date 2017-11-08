@@ -20,8 +20,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveContinue', [
-  'oppiaHtmlEscaper', 'continueRulesService',
-  function(oppiaHtmlEscaper, continueRulesService) {
+  'HtmlEscaperService', 'continueRulesService',
+  function(HtmlEscaperService, continueRulesService) {
     return {
       restrict: 'E',
       scope: {
@@ -29,12 +29,25 @@ oppia.directive('oppiaInteractiveContinue', [
       },
       templateUrl: 'interaction/Continue',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.buttonText = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.buttonText = HtmlEscaperService.escapedJsonToObj(
           $attrs.buttonTextWithValue);
 
+        var DEFAULT_BUTTON_TEXT = 'Continue';
+        var DEFAULT_HUMAN_READABLE_ANSWER = 'Please continue.';
+
         $scope.submitAnswer = function() {
+          // We used to show "(Continue)" to indicate a 'continue' action when
+          // the learner browses through the history of the exploration, but
+          // this apparently can be mistaken for a button/control. The
+          // following makes the learner's "answer" a bit more conversational,
+          // as if they were chatting with Oppia.
+          var humanReadableAnswer = DEFAULT_HUMAN_READABLE_ANSWER;
+          if ($scope.buttonText !== DEFAULT_BUTTON_TEXT) {
+            humanReadableAnswer = $scope.buttonText;
+          }
+
           $scope.onSubmit({
-            answer: '(' + $scope.buttonText + ')',
+            answer: humanReadableAnswer,
             rulesService: continueRulesService
           });
         };
@@ -49,9 +62,9 @@ oppia.directive('oppiaResponseContinue', [function() {
     scope: {},
     templateUrl: 'response/Continue',
     controller: [
-      '$scope', '$attrs', 'oppiaHtmlEscaper',
-      function($scope, $attrs, oppiaHtmlEscaper) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      '$scope', '$attrs', 'HtmlEscaperService',
+      function($scope, $attrs, HtmlEscaperService) {
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
   };
 }]);
@@ -62,9 +75,9 @@ oppia.directive('oppiaShortResponseContinue', [function() {
     scope: {},
     templateUrl: 'shortResponse/Continue',
     controller: [
-      '$scope', '$attrs', 'oppiaHtmlEscaper',
-      function($scope, $attrs, oppiaHtmlEscaper) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      '$scope', '$attrs', 'HtmlEscaperService',
+      function($scope, $attrs, HtmlEscaperService) {
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
   };
 }]);

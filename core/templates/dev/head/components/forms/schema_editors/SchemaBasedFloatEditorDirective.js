@@ -32,13 +32,14 @@ oppia.directive('schemaBasedFloatEditor', [
         'schema_based_float_editor_directive.html'),
       restrict: 'E',
       controller: [
-        '$scope', '$filter', '$timeout', 'focusService',
-        function($scope, $filter, $timeout, focusService) {
+        '$scope', '$filter', '$timeout', 'FocusManagerService',
+        function($scope, $filter, $timeout, FocusManagerService) {
           $scope.hasLoaded = false;
           $scope.isUserCurrentlyTyping = false;
           $scope.hasFocusedAtLeastOnce = false;
 
-          $scope.labelForErrorFocusTarget = focusService.generateFocusLabel();
+          $scope.labelForErrorFocusTarget =
+            FocusManagerService.generateFocusLabel();
 
           $scope.validate = function(localValue) {
             return $filter('isFloat')(localValue) !== undefined;
@@ -80,7 +81,7 @@ oppia.directive('schemaBasedFloatEditor', [
               if (
                 Object.keys($scope.floatForm.floatValue.$error).length !== 0) {
                 $scope.isUserCurrentlyTyping = false;
-                focusService.setFocus($scope.labelForErrorFocusTarget);
+                FocusManagerService.setFocus($scope.labelForErrorFocusTarget);
               } else {
                 $scope.$emit('submittedSchemaBasedFloatForm');
               }

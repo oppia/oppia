@@ -17,11 +17,12 @@
 from core.controllers import admin
 from core.controllers import base
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.tests import test_utils
-import feconf
 
+import feconf
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
@@ -105,6 +106,60 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertIn(new_config_value, response.body)
 
 
+class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
+    """ Test the conditions for generation of dummy explorations."""
+
+    def test_generate_count_greater_than_publish_count(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json('/adminhandler', {
+            'action': 'generate_dummy_explorations',
+            'num_dummy_exps_to_generate': 10,
+            'num_dummy_exps_to_publish': 3
+        }, csrf_token)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(len(generated_exps), 10)
+        self.assertEqual(len(published_exps), 3)
+
+    def test_generate_count_equal_to_publish_count(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json('/adminhandler', {
+            'action': 'generate_dummy_explorations',
+            'num_dummy_exps_to_generate': 2,
+            'num_dummy_exps_to_publish': 2
+        }, csrf_token)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(len(generated_exps), 2)
+        self.assertEqual(len(published_exps), 2)
+
+    def test_generate_count_less_than_publish_count(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+        generated_exps_response = self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_explorations',
+                'num_dummy_exps_to_generate': 2,
+                'num_dummy_exps_to_publish': 5
+            },
+            csrf_token=csrf_token,
+            expect_errors=True,
+            expected_status_int=400)
+        self.assertEqual(generated_exps_response['status_code'], 400)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(len(generated_exps), 0)
+        self.assertEqual(len(published_exps), 0)
+
+
 class AdminRoleHandlerTest(test_utils.GenericTestBase):
     """Checks the user role handling on the admin page."""
 
@@ -116,9 +171,9 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
     def test_view_and_update_role(self):
         user_email = 'user1@example.com'
-        user_name = 'user1'
+        username = 'user1'
 
-        self.signup(user_email, user_name)
+        self.signup(user_email, username)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         # Check normal user has expected role. Viewing by username.
@@ -133,7 +188,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
         response_dict = self.post_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            {'role': feconf.ROLE_ID_MODERATOR, 'username': user_name},
+            {'role': feconf.ROLE_ID_MODERATOR, 'username': username},
             csrf_token=csrf_token, expect_errors=False,
             expected_status_int=200)
         self.assertEqual(response_dict, {})
@@ -155,7 +210,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             feconf.ADMIN_ROLE_HANDLER_URL,
             {'method': 'username', 'username': username},
             expect_errors=True)
-        self.assertEqual(response['code'], 400)
+        self.assertEqual(response['status_code'], 400)
 
         # Trying to update role of non-existent user.
         response = self.testapp.get(feconf.ADMIN_URL)
@@ -246,7 +301,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             response['error'],
             'Exploration \'exp\' does not have \'state name\' state.')
         self.assertEqual(
-            response['code'], 400)
+            response['status_code'], 400)
 
 
 class SslChallengeHandlerTests(test_utils.GenericTestBase):

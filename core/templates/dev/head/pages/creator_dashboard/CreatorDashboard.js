@@ -47,16 +47,18 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 });
 
 oppia.controller('CreatorDashboard', [
-  '$scope', '$rootScope', '$window', 'oppiaDatetimeFormatter', 'alertsService',
-  'CreatorDashboardBackendApiService', 'RatingComputationService',
-  'ExplorationCreationService', 'UrlInterpolationService', 'FATAL_ERROR_CODES',
+  '$scope', '$rootScope', '$http', '$window', 'oppiaDatetimeFormatter',
+  'alertsService', 'CreatorDashboardBackendApiService',
+  'RatingComputationService', 'ExplorationCreationService',
+  'UrlInterpolationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   function(
-      $scope, $rootScope, $window, oppiaDatetimeFormatter, alertsService,
-      CreatorDashboardBackendApiService, RatingComputationService,
-      ExplorationCreationService, UrlInterpolationService, FATAL_ERROR_CODES,
+      $scope, $rootScope, $http, $window, oppiaDatetimeFormatter,
+      alertsService, CreatorDashboardBackendApiService,
+      RatingComputationService, ExplorationCreationService,
+      UrlInterpolationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
       HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS) {
@@ -98,9 +100,12 @@ oppia.controller('CreatorDashboard', [
       return '/collection_editor/create/' + collectionId;
     };
 
-    $scope.myExplorationsView = 'card';
     $scope.setMyExplorationsView = function(viewType) {
-      $scope.myExplorationsView = viewType;
+      $http.post('/creatordashboardhandler/data', {
+        display_preference: viewType,
+      }).then(function() {
+        $scope.myExplorationsView = viewType;
+      });
     };
 
     $scope.checkMobileView = function() {
@@ -120,7 +125,8 @@ oppia.controller('CreatorDashboard', [
 
     $scope.updatesGivenScreenWidth = function() {
       if ($scope.checkMobileView()) {
-        $scope.myExplorationsView = 'card';
+        $scope.myExplorationsView = (
+          constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD);
         $scope.publishText = EXP_PUBLISH_TEXTS.smText;
       } else {
         $scope.publishText = EXP_PUBLISH_TEXTS.defaultText;
@@ -178,6 +184,10 @@ oppia.controller('CreatorDashboard', [
       return value;
     };
 
+    $scope.getCompleteThumbnailIconUrl = function (iconUrl) {
+      return UrlInterpolationService.getStaticImageUrl(iconUrl);
+    };
+
     $rootScope.loadingMessage = 'Loading';
     CreatorDashboardBackendApiService.fetchDashboardData().then(
       function(response) {
@@ -191,6 +201,7 @@ oppia.controller('CreatorDashboard', [
         $scope.subscribersList = responseData.subscribers_list;
         $scope.dashboardStats = responseData.dashboard_stats;
         $scope.lastWeekStats = responseData.last_week_stats;
+        $scope.myExplorationsView = responseData.display_preference;
         if ($scope.dashboardStats && $scope.lastWeekStats) {
           $scope.relativeChangeInTotalPlays = (
             $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays

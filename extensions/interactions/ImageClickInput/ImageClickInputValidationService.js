@@ -38,6 +38,7 @@ oppia.factory('ImageClickInputValidationService', [
         }
 
         var areAnyRegionStringsEmpty = false;
+        var areAnyRegionStringsNonAlphaNumeric = false;
         var areAnyRegionStringsDuplicated = false;
         var seenRegionStrings = [];
         if (imgAndRegionArgValue.labeledRegions.length == 0) {
@@ -55,11 +56,7 @@ oppia.factory('ImageClickInputValidationService', [
           if (regionLabel.trim().length === 0) {
             areAnyRegionStringsEmpty = true;
           } else if (!ALPHANUMERIC_REGEX.test(regionLabel)) {
-            warningsList.push({
-              type: WARNING_TYPES.CRITICAL,
-              message: (
-                'The region labels should consist of alphanumeric characters.')
-            });
+            areAnyRegionStringsNonAlphaNumeric = true;
           } else if (seenRegionStrings.indexOf(regionLabel) !== -1) {
             areAnyRegionStringsDuplicated = true;
           } else {
@@ -71,6 +68,13 @@ oppia.factory('ImageClickInputValidationService', [
           warningsList.push({
             type: WARNING_TYPES.CRITICAL,
             message: 'Please ensure the region labels are nonempty.'
+          });
+        }
+        if (areAnyRegionStringsNonAlphaNumeric) {
+          warningsList.push({
+            type: WARNING_TYPES.CRITICAL,
+            message: (
+              'The region labels should consist of alphanumeric characters.')
           });
         }
         if (areAnyRegionStringsDuplicated) {

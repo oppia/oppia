@@ -101,9 +101,7 @@
     </div>
 
     <div ng-if="explorationsList.length === 0 && collectionsList.length === 0">
-      <h2 class="oppia-dashboard-title">
-        Creator Dashboard
-      </h2>
+      <h2 class="oppia-dashboard-title" translate="I18N_DASHBOARD_CREATOR_DASHBOARD"></h2>
     </div>
 
     <div ng-if="activeTab === 'myExplorations'">
@@ -112,14 +110,11 @@
                  class="oppia-page-card oppia-dashboard-intro-card"
                  style="margin-top: 0;">
           <div>
-            <p>
-              It looks like you haven't created any explorations yet.
-              Let's get started!
-            </p>
+            <p translate="I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE"></p>
             <button type="button"
                     class="btn oppia-dashboard-intro-button oppia-transition-200"
-                    ng-click="createNewExploration()">
-              Create Exploration
+                    ng-click="createNewExploration()"
+                    translate="I18N_CREATE_EXPLORATION">
             </button>
           </div>
           <div class="oppia-dashboard-intro-picture">
@@ -178,10 +173,6 @@
               <td>
                 <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
                   <[exploration.title || DEFAULT_EMPTY_TITLE]>
-                  <span ng-if="exploration.status === 'publicized'"
-                        class="featured-badge">
-                    featured
-                  </span>
                 </a>
               </td>
               <td colspan="4"
@@ -226,7 +217,7 @@
             <div class="title-section"
                  style="background-color: <[exploration.thumbnail_bg_color]>;">
               <img class="thumbnail-image"
-                   ng-src="<[exploration.thumbnail_icon_url]>">
+                   ng-src="<[getCompleteThumbnailIconUrl(exploration.thumbnail_icon_url)]>">
               <h2 class="activity-title protractor-test-exp-summary-tile-title">
                 <span><[(exploration.title || DEFAULT_EMPTY_TITLE) | truncate:40]></span>
               </h2>
@@ -292,17 +283,19 @@
                   <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
                 </span>
               </li>
-              <sharing-links ng-if="exploration.status !== 'private'"
-                             ng-click="$event.stopPropagation()"
-                             style="position: relative; right: 1px; bottom: 2px;"
-                             flex="100"
-                             class="dashboard-hide-mobile"
-                             layout-type="row"
-                             layout-align-type="center left"
-                             twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
-                             share-type="exploration"
-                             exploration-id="exploration.id">
-              </sharing-links>
+              <li>
+                <sharing-links ng-if="exploration.status !== 'private'"
+                               ng-click="$event.stopPropagation()"
+                               style="position: relative; right: 1px; bottom: 2px;"
+                               flex="100"
+                               class="dashboard-hide-mobile"
+                               layout-type="row"
+                               layout-align-type="center left"
+                               twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
+                               share-type="exploration"
+                               exploration-id="exploration.id">
+                </sharing-links>
+              </li>
             </ul>
           </div>
         </md-card>
@@ -368,7 +361,8 @@
         <ul class="oppia-dashboard-tiles"
             ng-if="activeTab === 'myCollections' && collectionsList.length > 0">
           <span ng-repeat="collection in collectionsList">
-            <collection-summary-tile collection-id="collection.id"
+            <collection-summary-tile class="protractor-test-collection-card"
+                                     collection-id="collection.id"
                                      collection-title="collection.title"
                                      last-updated-msec="collection.last_updated"
                                      node-count="collection.node_count"
@@ -382,9 +376,6 @@
       </div>
     {% endif %}
   </div>
-
-  {% include 'pages/creator_dashboard/create_activity_modal_directive.html' %}
-
 
 {% endblock %}
 

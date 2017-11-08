@@ -21,7 +21,6 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 
-import collections
 import copy
 import logging
 import re
@@ -29,14 +28,15 @@ import string
 
 from constants import constants
 from core.domain import html_cleaner
-from core.domain import gadget_registry
 from core.domain import interaction_registry
 from core.domain import param_domain
-from core.domain import trigger_registry
+from core.platform import models
 import feconf
 import jinja_utils
 import schema_utils
 import utils
+
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
 # Do not modify the values of these constants. This is to preserve backwards
@@ -52,13 +52,11 @@ STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
 STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME = 'default_outcome'
 STATE_PROPERTY_UNCLASSIFIED_ANSWERS = (
     'confirmed_unclassified_answers')
-STATE_PROPERTY_INTERACTION_FALLBACKS = 'fallbacks'
 STATE_PROPERTY_INTERACTION_HINTS = 'hints'
 STATE_PROPERTY_INTERACTION_SOLUTION = 'solution'
-# These two properties are kept for legacy purposes and are not used anymore.
+# These four properties are kept for legacy purposes and are not used anymore.
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
-
 GADGET_PROPERTY_VISIBILITY = 'gadget_visibility'
 GADGET_PROPERTY_CUST_ARGS = 'gadget_customization_args'
 
@@ -70,14 +68,6 @@ CMD_RENAME_STATE = 'rename_state'
 CMD_DELETE_STATE = 'delete_state'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
-# This takes an additional 'gadget_name' parameter.
-CMD_ADD_GADGET = 'add_gadget'
-# This takes additional 'old_gadget_name' and 'new_gadget_name' parameters.
-CMD_RENAME_GADGET = 'rename_gadget'
-# This takes an additional 'gadget_name' parameter.
-CMD_DELETE_GADGET = 'delete_gadget'
-# This takes additional 'property_name' and 'new_value' parameters.
-CMD_EDIT_GADGET_PROPERTY = 'edit_gadget_property'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property'
 # This takes additional 'from_version' and 'to_version' parameters for logging.
@@ -146,10 +136,8 @@ def _validate_customization_args_and_values(
     customization_args dict.
 
     Args:
-        item_name: str. The item_name is either 'interaction', 'gadget' or
-            'trigger'.
-        item_type: str. The item_type is the id/type of the
-            interaction/gadget/trigger, respectively.
+        item_name: str. This is always 'interaction'.
+        item_type: str. The item_type is the ID of the interaction.
         customization_args: dict. The customization dict. The keys are names of
             customization_args and the values are dicts with a
             single key, 'value', whose corresponding value is the value of
@@ -231,19 +219,14 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_HANDLERS,
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-        STATE_PROPERTY_INTERACTION_FALLBACKS,
         STATE_PROPERTY_INTERACTION_HINTS,
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_UNCLASSIFIED_ANSWERS)
 
-    GADGET_PROPERTIES = (
-        GADGET_PROPERTY_VISIBILITY,
-        GADGET_PROPERTY_CUST_ARGS)
-
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'init_state_name')
+        'init_state_name', 'auto_tts_enabled')
 
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
@@ -258,18 +241,12 @@ class ExplorationChange(object):
                     - 'delete_state' (with state_name)
                     - 'edit_state_property' (with state_name, property_name,
                         new_value and, optionally, old_value)
-                    - 'add_gadget' (with gadget_dict and panel)
-                    - 'rename_gadget' (with old_gadget_name, new_gadget_name)
-                    - 'delete_gadget' (with gadget_name)
-                    - 'edit_gadget_property' (with gadget_name, property_name,
-                        new_value, and optionally, old_value)
                     - 'edit_exploration_property' (with property_name,
                         new_value and, optionally, old_value)
                     - 'migrate_states_schema' (with from_version, to_version)
                 For a state, property_name must be one of STATE_PROPERTIES.
                 For an exploration, property_name must be one of
-                EXPLORATION_PROPERTIES. For a gadget, property_name must be one
-                of GADGET_PROPERTIES.
+                EXPLORATION_PROPERTIES.
 
         Raises:
             Exception: The given change_dict is not valid.
@@ -296,22 +273,6 @@ class ExplorationChange(object):
             if (change_dict['property_name'] not in
                     self.EXPLORATION_PROPERTIES):
                 raise Exception('Invalid change_dict: %s' % change_dict)
-            self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
-        elif self.cmd == CMD_ADD_GADGET:
-            self.gadget_dict = change_dict['gadget_dict']
-            self.gadget_name = change_dict['gadget_dict']['gadget_name']
-            self.panel = change_dict['panel']
-        elif self.cmd == CMD_RENAME_GADGET:
-            self.old_gadget_name = change_dict['old_gadget_name']
-            self.new_gadget_name = change_dict['new_gadget_name']
-        elif self.cmd == CMD_DELETE_GADGET:
-            self.gadget_name = change_dict['gadget_name']
-        elif self.cmd == CMD_EDIT_GADGET_PROPERTY:
-            if change_dict['property_name'] not in self.GADGET_PROPERTIES:
-                raise Exception('Invalid gadget change_dict: %s' % change_dict)
-            self.gadget_name = change_dict['gadget_name']
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict.get('old_value')
@@ -401,7 +362,6 @@ class AudioTranslation(object):
             dict. A dict, mapping all fields of AudioTranslation instance.
         """
         return {
-            'language_code': self.language_code,
             'filename': self.filename,
             'file_size_bytes': self.file_size_bytes,
             'needs_update': self.needs_update,
@@ -419,25 +379,20 @@ class AudioTranslation(object):
             AudioTranslation. The corresponding AudioTranslation domain object.
         """
         return cls(
-            audio_translation_dict['language_code'],
             audio_translation_dict['filename'],
             audio_translation_dict['file_size_bytes'],
             audio_translation_dict['needs_update'])
 
-    def __init__(self, language_code, filename, file_size_bytes, needs_update):
+    def __init__(self, filename, file_size_bytes, needs_update):
         """Initializes a AudioTranslation domain object.
 
         Args:
-            language_code: str. The language code of the audio.
             filename: str. The corresponding audio file path.
             file_size_bytes: int. The file size, in bytes. Used to display
                 potential bandwidth usage to the learner before they download
                 the file.
             needs_update: bool. Whether audio is marked for needing review.
         """
-        # str. A language code, such as ‘en’ or ‘hi’. A hybrid language will be
-        # represented for example as ‘hi-en’ for Hinglish.
-        self.language_code = language_code
         # str. The corresponding audio file path, e.g.
         # "content-en-2-h7sjp8s.mp3".
         self.filename = filename
@@ -454,16 +409,6 @@ class AudioTranslation(object):
             ValidationError: One or more attributes of the AudioTranslation are
             invalid.
         """
-        if not isinstance(self.language_code, basestring):
-            raise utils.ValidationError(
-                'Expected language code to be a string, received: %s' %
-                self.language_code)
-        allowed_audio_language_codes = [
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES]
-        if self.language_code not in allowed_audio_language_codes:
-            raise utils.ValidationError(
-                'Unrecognized language code: %s' % self.language_code)
-
         if not isinstance(self.filename, basestring):
             raise utils.ValidationError(
                 'Expected audio filename to be a string, received %s' %
@@ -477,7 +422,7 @@ class AudioTranslation(object):
             raise utils.ValidationError(
                 'Invalid audio filename: it should have one of '
                 'the following extensions: %s. Received: %s',
-                (feconf.ACCEPTED_AUDIO_EXTENSIONS, self.filename))
+                (feconf.ACCEPTED_AUDIO_EXTENSIONS.keys(), self.filename))
 
         if not isinstance(self.file_size_bytes, int):
             raise utils.ValidationError(
@@ -496,6 +441,21 @@ class AudioTranslation(object):
 class SubtitledHtml(object):
     """Value object representing subtitled HTML."""
 
+    def __init__(self, html, audio_translations):
+        """Initializes a SubtitledHtml domain object.
+
+        Args:
+            html: str. A piece of user submitted HTML. This is cleaned in such
+                a way as to contain a restricted set of HTML tags.
+            audio_translations: dict(str: AudioTranslation). Dict mapping
+                language codes (such as "en" or "hi") to AudioTranslation
+                domain objects. Hybrid languages will be represented using
+                composite language codes, such as "hi-en" for Hinglish.
+        """
+        self.html = html_cleaner.clean(html)
+        self.audio_translations = audio_translations
+        self.validate()
+
     def to_dict(self):
         """Returns a dict representing this SubtitledHtml domain object.
 
@@ -504,9 +464,11 @@ class SubtitledHtml(object):
         """
         return {
             'html': self.html,
-            'audio_translations': [
-                audio_translation.to_dict()
-                for audio_translation in self.audio_translations]
+            'audio_translations': {
+                language_code: audio_translation.to_dict()
+                for language_code, audio_translation
+                in self.audio_translations.iteritems()
+            }
         }
 
     @classmethod
@@ -520,23 +482,11 @@ class SubtitledHtml(object):
         Returns:
             SubtitledHtml. The corresponding SubtitledHtml domain object.
         """
-        return cls(subtitled_html_dict['html'], [
-            AudioTranslation.from_dict(audio_translation_dict)
-            for audio_translation_dict in
-            subtitled_html_dict['audio_translations']])
-
-    def __init__(self, html, audio_translations):
-        """Initializes a SubtitledHtml domain object.
-
-        Args:
-            html: str. A piece of user submitted HTML. This is cleaned in such
-                a way as to contain a restricted set of HTML tags.
-            audio_translations: list(AudioTranslation). List of
-                AudioTranslation domain object.
-        """
-        self.html = html_cleaner.clean(html)
-        self.audio_translations = audio_translations
-        self.validate()
+        return cls(subtitled_html_dict['html'], {
+            language_code: AudioTranslation.from_dict(audio_translation_dict)
+            for language_code, audio_translation_dict in
+            subtitled_html_dict['audio_translations'].iteritems()
+        })
 
     def validate(self):
         """Validates properties of the SubtitledHtml.
@@ -551,12 +501,24 @@ class SubtitledHtml(object):
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
 
-        if not isinstance(self.audio_translations, list):
+        if not isinstance(self.audio_translations, dict):
             raise utils.ValidationError(
-                'Expected audio_translations to be a list, received %s'
+                'Expected audio_translations to be a dict, received %s'
                 % self.audio_translations)
-        for audio_translation in self.audio_translations:
-            audio_translation.validate()
+
+        allowed_audio_language_codes = [
+            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES]
+        for language_code, translation in self.audio_translations.iteritems():
+            if not isinstance(language_code, basestring):
+                raise utils.ValidationError(
+                    'Expected language code to be a string, received: %s' %
+                    language_code)
+
+            if language_code not in allowed_audio_language_codes:
+                raise utils.ValidationError(
+                    'Unrecognized language code: %s' % language_code)
+
+            translation.validate()
 
     def to_html(self, params):
         """Exports this SubtitledHTML object to an HTML string. The HTML is
@@ -894,129 +856,6 @@ class AnswerGroup(object):
         return None
 
 
-class TriggerInstance(object):
-    """Value object representing a trigger.
-
-    A trigger refers to a condition that may arise during a learner
-    playthrough, such as a certain number of loop-arounds on the current state,
-    or a certain amount of time having elapsed.
-    """
-    def __init__(self, trigger_type, customization_args):
-        """Initializes a TriggerInstance domain object.
-
-        Args:
-            trigger_type: str. The type of trigger.
-            customization_args: dict. The customization dict. The keys are
-                names of customization_args and the values are dicts with a
-                single key, 'value', whose corresponding value is the value of
-                the customization arg.
-        """
-        # A string denoting the type of trigger.
-        self.trigger_type = trigger_type
-        # Customization args for the trigger. This is a dict: the keys and
-        # values are the names of the customization_args for this trigger
-        # type, and the corresponding values for this instance of the trigger,
-        # respectively. The values consist of standard Python/JSON data types
-        # (i.e. strings, ints, booleans, dicts and lists, but not objects).
-        self.customization_args = customization_args
-
-    def to_dict(self):
-        """Returns a dict representing this TriggerInstance domain object.
-
-        Returns:
-            dict. A dict mapping all fields of TriggerInstance instance.
-        """
-        return {
-            'trigger_type': self.trigger_type,
-            'customization_args': self.customization_args,
-        }
-
-    @classmethod
-    def from_dict(cls, trigger_dict):
-        """Return a TriggerInstance domain object from a dict.
-
-        Args:
-            trigger_dict: dict. The dict representation of TriggerInstance
-                object.
-
-        Returns:
-            TriggerInstance. The corresponding TriggerInstance domain object.
-        """
-        return cls(
-            trigger_dict['trigger_type'],
-            trigger_dict['customization_args'])
-
-    def validate(self):
-        """Validates various properties of the TriggerInstance.
-
-        Raises:
-            ValidationError: One or more attributes of the TriggerInstance are
-            invalid.
-        """
-        if not isinstance(self.trigger_type, basestring):
-            raise utils.ValidationError(
-                'Expected trigger type to be a string, received %s' %
-                self.trigger_type)
-
-        try:
-            trigger = trigger_registry.Registry.get_trigger(self.trigger_type)
-        except KeyError:
-            raise utils.ValidationError(
-                'Unknown trigger type: %s' % self.trigger_type)
-
-        # Verify that the customization args are valid.
-        _validate_customization_args_and_values(
-            'trigger', self.trigger_type, self.customization_args,
-            trigger.customization_arg_specs)
-
-
-class Fallback(object):
-    """Value object representing a fallback.
-
-    A fallback consists of a trigger and an outcome. When the trigger is
-    satisfied, the user flow is rerouted to the given outcome.
-    """
-    def __init__(self, trigger, outcome):
-        """Initializes a Fallback domain object.
-
-        Args:
-            trigger: TriggerInstance. The satisfied trigger.
-            outcome: Outcome. The outcome to apply when the user hits the
-                trigger.
-        """
-        self.trigger = trigger
-        self.outcome = outcome
-
-    def to_dict(self):
-        """Returns a dict representing this Fallback domain object.
-
-        Returns:
-            dict. A dict mapping all fields of Fallback instance.
-        """
-        return {
-            'trigger': self.trigger.to_dict(),
-            'outcome': self.outcome.to_dict(),
-        }
-
-    @classmethod
-    def from_dict(cls, fallback_dict):
-        """Return a Fallback domain object from a dict.
-
-        Args:
-            fallback_dict: dict. The dict representation of Fallback object.
-
-        Returns:
-            Fallback. The corresponding Fallback domain object.
-        """
-        return cls(
-            TriggerInstance.from_dict(fallback_dict['trigger']),
-            Outcome.from_dict(fallback_dict['outcome']))
-
-    def validate(self):
-        self.trigger.validate()
-        self.outcome.validate()
-
-
 class Hint(object):
     """Value object representing a hint."""
 
@@ -1174,9 +1013,8 @@ class InteractionInstance(object):
                 else None),
             'confirmed_unclassified_answers': (
                 self.confirmed_unclassified_answers),
-            'fallbacks': [fallback.to_dict() for fallback in self.fallbacks],
             'hints': [hint.to_dict() for hint in self.hints],
-            'solution': self.solution,
+            'solution': self.solution.to_dict() if self.solution else None,
         }
 
     @classmethod
@@ -1194,6 +1032,11 @@ class InteractionInstance(object):
         default_outcome_dict = (
             Outcome.from_dict(interaction_dict['default_outcome'])
             if interaction_dict['default_outcome'] is not None else None)
+        solution_dict = (
+            Solution.from_dict(
+                interaction_dict['id'], interaction_dict['solution'])
+            if interaction_dict['solution'] else None)
+
         return cls(
             interaction_dict['id'],
             interaction_dict['customization_args'],
@@ -1201,14 +1044,12 @@ class InteractionInstance(object):
              for h in interaction_dict['answer_groups']],
             default_outcome_dict,
             interaction_dict['confirmed_unclassified_answers'],
-            [Fallback.from_dict(f) for f in interaction_dict['fallbacks']],
             [Hint.from_dict(h) for h in interaction_dict['hints']],
-            interaction_dict['solution'])
+            solution_dict)
 
     def __init__(
             self, interaction_id, customization_args, answer_groups,
-            default_outcome, confirmed_unclassified_answers,
-            fallbacks, hints, solution):
+            default_outcome, confirmed_unclassified_answers, hints, solution):
         """Initializes a InteractionInstance domain object.
 
         Args:
@@ -1224,7 +1065,6 @@ class InteractionInstance(object):
             confirmed_unclassified_answers: list(AnswerGroup). List of answers
                 which have been confirmed to be associated with the default
                 outcome.
-            fallbacks: list(Fallback). List of fallbacks for this interaction.
             hints: list(Hint). List of hints for this interaction.
             solution: Solution. A possible solution for the question asked in
                 this interaction.
@@ -1239,7 +1079,6 @@ class InteractionInstance(object):
         self.answer_groups = answer_groups
         self.default_outcome = default_outcome
         self.confirmed_unclassified_answers = confirmed_unclassified_answers
-        self.fallbacks = fallbacks
         self.hints = hints
         self.solution = solution
 
@@ -1254,31 +1093,18 @@ class InteractionInstance(object):
         return self.id and interaction_registry.Registry.get_interaction_by_id(
             self.id).is_terminal
 
-    def get_all_non_fallback_outcomes(self):
-        """Returns a list of all non-fallback outcomes of this interaction,
-        i.e. every answer group and the default outcome.
+    def get_all_outcomes(self):
+        """Returns a list of all outcomes of this interaction, taking into
+        consideration every answer group and the default outcome.
 
         Returns:
-            list(Outcome). List of non-fallback outcomes of this interaction.
+            list(Outcome). List of all outcomes of this interaction.
         """
         outcomes = []
         for answer_group in self.answer_groups:
             outcomes.append(answer_group.outcome)
         if self.default_outcome is not None:
             outcomes.append(self.default_outcome)
-        return outcomes
-
-    def get_all_outcomes(self):
-        """Returns a list of all outcomes of this interaction, taking into
-        consideration every answer group, the default outcome, and every
-        fallback.
-
-        Returns:
-            list(Outcome). List of all outcomes of this interaction.
-        """
-        outcomes = self.get_all_non_fallback_outcomes()
-        for fallback in self.fallbacks:
-            outcomes.append(fallback.outcome)
         return outcomes
 
     def validate(self, exp_param_specs_dict):
@@ -1327,13 +1153,6 @@ class InteractionInstance(object):
         if self.default_outcome is not None:
             self.default_outcome.validate()
 
-        if not isinstance(self.fallbacks, list):
-            raise utils.ValidationError(
-                'Expected fallbacks to be a list, received %s'
-                % self.fallbacks)
-        for fallback in self.fallbacks:
-            fallback.validate()
-
         if not isinstance(self.hints, list):
             raise utils.ValidationError(
                 'Expected hints to be a list, received %s'
@@ -1341,12 +1160,10 @@ class InteractionInstance(object):
         for hint in self.hints:
             hint.validate()
 
-        if self.hints:
-            if self.solution:
-                Solution.from_dict(
-                    self.id, self.solution).validate(self.id)
+        if self.solution:
+            self.solution.validate(self.id)
 
-        elif self.solution:
+        if self.solution and not self.hints:
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')
 
@@ -1358,7 +1175,6 @@ class InteractionInstance(object):
             - default_outcome: dest is set to 'default_dest_state_name' and
                 feedback and param_changes are initialized as empty lists;
             - confirmed_unclassified_answers: empty list;
-            - fallbacks: empty list;
 
         Args:
             default_dest_state_name: str. The default destination state.
@@ -1370,414 +1186,8 @@ class InteractionInstance(object):
         return cls(
             cls._DEFAULT_INTERACTION_ID,
             {}, [],
-            Outcome(default_dest_state_name, [], {}), [], [], [], {}
+            Outcome(default_dest_state_name, [], {}), [], [], {}
         )
-
-
-class GadgetInstance(object):
-    """Value object for an instance of a gadget."""
-
-    _MAX_GADGET_NAME_LENGTH = 20
-
-    def __init__(self, gadget_type, gadget_name,
-                 visible_in_states, customization_args):
-        """Initializes a GadgetInstance domain object.
-
-        Args:
-            gadget_type: str. Backend ID referring to the gadget's type in
-                gadget registry.
-            gadget_name: str. The gadget name.
-            visible_in_states: list(str). List of state name where this
-                gadget is visible.
-            customization_args: dict. The customization args for the gadget's
-                view.
-        """
-        # Backend ID referring to the gadget's type in gadget registry.
-        self.type = gadget_type
-
-        # Author-facing unique name to distinguish instances in the Editor UI.
-        # Gadgets may use this name as a title in learner facing UI as well.
-        self.name = gadget_name
-
-        # List of State name strings where this Gadget is visible.
-        self.visible_in_states = visible_in_states
-
-        # Customization args for the gadget's view.
-        self.customization_args = customization_args
-
-    @property
-    def gadget(self):
-        """Gets a gadget spec based on its type.
-
-        Returns:
-            GadgetInstance. The corresponding GadgetInstance domain object.
-        """
-        return gadget_registry.Registry.get_gadget_by_type(self.type)
-
-    @property
-    def width(self):
-        """Gets the gadget width in pixels.
-
-        Returns:
-            int. The gadget width, in pixels.
-        """
-        return self.gadget.width_px
-
-    @property
-    def height(self):
-        """Gets the gadget height in pixels.
-
-        Returns:
-            int. The gadget height, in pixels.
-        """
-        return self.gadget.height_px
-
-    @staticmethod
-    def _validate_gadget_name(gadget_name):
-        """Validates gadget_name property of the GadgetInstance. gadget_name is
-        a non-empty string of alphanumerics allowing spaces.
-
-        Raises:
-            ValidationError: gadget_name is a empty string or not alphanumeric
-            or is too long.
-        """
-        if gadget_name == '':
-            raise utils.ValidationError(
-                'Gadget name must not be an empty string.')
-
-        if not isinstance(gadget_name, basestring):
-            raise utils.ValidationError(
-                'Gadget name must be a string. Received type: %s' % str(
-                    type(gadget_name).__name__)
-            )
-
-        if len(gadget_name) > GadgetInstance._MAX_GADGET_NAME_LENGTH:
-            raise utils.ValidationError(
-                '%s gadget name exceeds maximum length of %d' % (
-                    gadget_name,
-                    GadgetInstance._MAX_GADGET_NAME_LENGTH
-                )
-            )
-
-        if not re.search(feconf.ALPHANUMERIC_SPACE_REGEX, gadget_name):
-            raise utils.ValidationError(
-                'Gadget names must be alphanumeric. Spaces are allowed.'
-                ' Received: %s' % gadget_name
-            )
-
-    def validate(self):
-        """Validates properties of the GadgetInstance.
-
-        Raises:
-            ValidationError: One or more attributes of the GadgetInstance are
-            invalid.
-        """
-        try:
-            self.gadget
-        except KeyError:
-            raise utils.ValidationError(
-                'Unknown gadget with type %s is not in the registry.' % (
-                    self.type)
-            )
-
-        self._validate_gadget_name(self.name)
-
-        _validate_customization_args_and_values(
-            'gadget', self.type, self.customization_args,
-            self.gadget.customization_arg_specs)
-
-        # Do additional per-gadget validation on the customization args.
-        self.gadget.validate(self.customization_args)
-
-        if self.visible_in_states == []:
-            raise utils.ValidationError(
-                '%s gadget not visible in any states.' % (
-                    self.name))
-
-        # Validate state name visibility isn't repeated within each gadget.
-        if len(self.visible_in_states) != len(set(self.visible_in_states)):
-            redundant_visible_states = [
-                state_name for state_name, count
-                in collections.Counter(self.visible_in_states).items()
-                if count > 1]
-            raise utils.ValidationError(
-                '%s specifies visibility repeatedly for state%s: %s' % (
-                    self.type,
-                    's' if len(redundant_visible_states) > 1 else '',
-                    ', '.join(redundant_visible_states)))
-
-    def to_dict(self):
-        """Returns a dict representing this GadgetInstance domain object.
-
-        Returns:
-            dict. A dict mapping all fields of GadgetInstance instance.
-        """
-        return {
-            'gadget_type': self.type,
-            'gadget_name': self.name,
-            'visible_in_states': self.visible_in_states,
-            'customization_args': _get_full_customization_args(
-                self.customization_args,
-                self.gadget.customization_arg_specs),
-        }
-
-    @classmethod
-    def from_dict(cls, gadget_dict):
-        """Return a GadgetInstance domain object from a dict.
-
-        Args:
-            gadget_dict: dict. The dict representation of GadgetInstance
-                object.
-
-        Returns:
-            GadgetInstance. The corresponding GadgetInstance domain object.
-        """
-        return GadgetInstance(
-            gadget_dict['gadget_type'],
-            gadget_dict['gadget_name'],
-            gadget_dict['visible_in_states'],
-            gadget_dict['customization_args'])
-
-    def update_customization_args(self, customization_args):
-        """Updates the GadgetInstance's customization arguments.
-
-        Args:
-            customization_args: dict. The customization args for the gadget's
-                view.
-        """
-        self.customization_args = customization_args
-
-    def update_visible_in_states(self, visible_in_states):
-        """Updates the GadgetInstance's visibility in different states.
-
-        Args:
-            visible_in_states: list(str). List of state names where this gadget
-                is visible.
-        """
-        self.visible_in_states = visible_in_states
-
-    def _get_full_customization_args(self):
-        """Populates the customization_args dict of the gadget with
-        default values, if any of the expected customization_args are missing.
-
-        Returns:
-            dict. The customization_args dict of the gadget.
-        """
-        full_customization_args_dict = copy.deepcopy(self.customization_args)
-
-        for ca_spec in self.gadget.customization_arg_specs:
-            if ca_spec.name not in full_customization_args_dict:
-                full_customization_args_dict[ca_spec.name] = {
-                    'value': ca_spec.default_value
-                }
-        return full_customization_args_dict
-
-
-class SkinInstance(object):
-    """Domain object for a skin instance."""
-
-    def __init__(self, skin_id, skin_customizations):
-        """Initializes SkinInstance with any customizations provided.
-        If no customizations are necessary, skin_customizations may be set to
-        None, in which case defaults will be generated that provide empty
-        gadget panels for each panel specified in the skin.
-
-        Args:
-            skin_id: str. The id of the skin.
-            skin_customizations: dict. The customization dictionary.
-        """
-        # TODO(sll): Deprecate this property; it is not used.
-        self.skin_id = skin_id
-        # panel_contents_dict has panel strings as keys and
-        # lists of GadgetInstance instances as values.
-        self.panel_contents_dict = {}
-
-        default_skin_customizations = (
-            SkinInstance._get_default_skin_customizations())
-
-        # Ensure that skin_customizations is a dict.
-        if skin_customizations is None:
-            skin_customizations = (
-                SkinInstance._get_default_skin_customizations())
-
-        # Populate panel_contents_dict with default skin customizations
-        # if they are not specified in skin_customizations.
-        for panel in default_skin_customizations['panels_contents']:
-            if panel not in skin_customizations['panels_contents']:
-                self.panel_contents_dict[panel] = []
-            else:
-                self.panel_contents_dict[panel] = [
-                    GadgetInstance(
-                        gdict['gadget_type'],
-                        gdict['gadget_name'],
-                        gdict['visible_in_states'],
-                        gdict['customization_args']
-                    ) for gdict in skin_customizations['panels_contents'][panel]
-                ]
-
-    @staticmethod
-    def _get_default_skin_customizations():
-        """Generates default skin customizations when none are specified.
-
-        Returns:
-            dict. The default skin customizations.
-        """
-        return {
-            'panels_contents': {
-                panel_name: []
-                for panel_name in feconf.PANELS_PROPERTIES
-            }
-        }
-
-    def validate_gadget_panel(self, panel_name, gadget_list):
-        """Validate proper fit given space requirements specified by
-        feconf.PANELS_PROPERTIES.
-
-        Args:
-            panel_name: str. Unique name that identifies this panel in the
-                skin. This should correspond to an entry in
-                feconf.PANELS_PROPERTIES.
-            gadget_list: list(GadgetInstance). List of GadgetInstance
-                instances.
-
-        Raises:
-            ValidationError: The space requirements are not satisfied.
-        """
-        # If the panel contains no gadgets, max() will raise an error,
-        # so we return early.
-        if not gadget_list:
-            return
-
-        panel_spec = feconf.PANELS_PROPERTIES[panel_name]
-
-        # This is a dict whose keys are state names, and whose corresponding
-        # values are lists of GadgetInstance instances representing the gadgets
-        # visible in that state. Note that the keys only include states for
-        # which at least one gadget is visible.
-        gadget_visibility_map = collections.defaultdict(list)
-        for gadget_instance in gadget_list:
-            for state_name in set(gadget_instance.visible_in_states):
-                gadget_visibility_map[state_name].append(gadget_instance)
-
-        # Validate limitations and fit considering visibility for each state.
-        for state_name, gadget_instances in gadget_visibility_map.iteritems():
-            if len(gadget_instances) > panel_spec['max_gadgets']:
-                raise utils.ValidationError(
-                    "'%s' panel expected at most %d gadget%s, but %d gadgets"
-                    " are visible in state '%s'." % (
-                        panel_name,
-                        panel_spec['max_gadgets'],
-                        's' if panel_spec['max_gadgets'] != 1 else '',
-                        len(gadget_instances),
-                        state_name))
-
-            # Calculate total width and height of gadgets given custom args and
-            # panel stackable axis.
-            total_width = 0
-            total_height = 0
-
-            if (panel_spec['stackable_axis'] ==
-                    feconf.GADGET_PANEL_AXIS_HORIZONTAL):
-                total_width += panel_spec['pixels_between_gadgets'] * (
-                    len(gadget_instances) - 1)
-                total_width += sum(
-                    gadget.width for gadget in gadget_instances)
-                total_height = max(
-                    gadget.height for gadget in gadget_instances)
-            else:
-                raise utils.ValidationError(
-                    "Unrecognized axis for '%s' panel. ")
-
-            # Validate fit for each dimension.
-            if panel_spec['height'] < total_height:
-                raise utils.ValidationError(
-                    "Height %d of panel \'%s\' exceeds limit of %d" % (
-                        total_height, panel_name, panel_spec['height']))
-            elif panel_spec['width'] < total_width:
-                raise utils.ValidationError(
-                    "Width %d of panel \'%s\' exceeds limit of %d" % (
-                        total_width, panel_name, panel_spec['width']))
-
-    def validate(self):
-        """Validates that gadgets fit the skin panel dimensions, and that the
-        gadgets themselves are valid.
-
-        Raises:
-            ValidationError: One or more attributes of the SkinInstance are
-            invalid.
-        """
-        # A list to validate each gadget_instance.name is unique.
-        gadget_instance_names = []
-
-        for panel_name, gadget_instances in (
-                self.panel_contents_dict.iteritems()):
-
-            # Validate existence of panels in the skin.
-            if panel_name not in feconf.PANELS_PROPERTIES:
-                raise utils.ValidationError(
-                    'The panel name \'%s\' is invalid.' % panel_name)
-
-            # Validate gadgets fit each skin panel.
-            self.validate_gadget_panel(panel_name, gadget_instances)
-
-            # Validate gadget internal attributes.
-            for gadget_instance in gadget_instances:
-                gadget_instance.validate()
-                if gadget_instance.name in gadget_instance_names:
-                    raise utils.ValidationError(
-                        '%s gadget instance name must be unique.' % (
-                            gadget_instance.name)
-                    )
-                gadget_instance_names.append(gadget_instance.name)
-
-    def to_dict(self):
-        """Returns a dict representing this SkinInstance domain object.
-
-        Returns:
-            dict. A dict mapping all fields of SkinInstance instance.
-        """
-        return {
-            'skin_id': self.skin_id,
-            'skin_customizations': {
-                'panels_contents': {
-                    panel: [
-                        gadget_instance.to_dict() for gadget_instance
-                        in instances_list]
-                    for panel, instances_list in
-                    self.panel_contents_dict.iteritems()
-                },
-            }
-        }
-
-    @classmethod
-    def from_dict(cls, skin_dict):
-        """Return a SkinInstance domain object from a dict.
-
-        Args:
-            content_dict: dict. The dict representation of SkinInstance object.
-
-        Returns:
-            SkinInstance. The corresponding SkinInstance domain object.
-        """
-        return SkinInstance(
-            skin_dict['skin_id'],
-            skin_dict['skin_customizations'])
-
-    def get_state_names_required_by_gadgets(self):
-        """Returns a list of strings representing State names required by
-        GadgetInstances in this skin.
-
-        Returns:
-            list(str). List of State names required.
-        """
-        state_names = set()
-        for gadget_instances in self.panel_contents_dict.values():
-            for gadget_instance in gadget_instances:
-                for state_name in gadget_instance.visible_in_states:
-                    state_names.add(state_name)
-
-        # We convert to a sorted list for clean deterministic testing.
-        return sorted(state_names)
 
 
 class State(object):
@@ -1793,9 +1203,8 @@ class State(object):
             'param_changes': [],
         },
         'confirmed_unclassified_answers': [],
-        'fallbacks': [],
         'hints': [],
-        'solution': {},
+        'solution': None,
     }
 
     def __init__(self, content, param_changes, interaction,
@@ -1823,7 +1232,7 @@ class State(object):
         self.interaction = InteractionInstance(
             interaction.id, interaction.customization_args,
             interaction.answer_groups, interaction.default_outcome,
-            interaction.confirmed_unclassified_answers, interaction.fallbacks,
+            interaction.confirmed_unclassified_answers,
             interaction.hints, interaction.solution)
         self.classifier_model_id = classifier_model_id
 
@@ -1831,9 +1240,11 @@ class State(object):
         """Validates various properties of the State.
 
         Args:
-            exp_param_specs_dict: dict. A dict of specified parameters used in
-                this exploration. Keys are parameter names and values are
-                ParamSpec value objects with an object type property(obj_type).
+            exp_param_specs_dict: dict or None. A dict of specified parameters
+                used in this exploration. Keys are parameter names and values
+                are ParamSpec value objects with an object type
+                property(obj_type). It is None if the state belongs to a
+                question.
             allow_null_interaction. bool. Whether this state's interaction is
                 allowed to be unspecified.
 
@@ -1854,6 +1265,24 @@ class State(object):
                 'This state does not have any interaction specified.')
         elif self.interaction.id is not None:
             self.interaction.validate(exp_param_specs_dict)
+
+    def get_training_data(self):
+        """Retrieves training data from the State domain object."""
+        training_data = []
+        for (answer_group_index, answer_group) in enumerate(
+                self.interaction.answer_groups):
+            classifier_rule_spec_index = (
+                answer_group.get_classifier_rule_index())
+            if classifier_rule_spec_index is not None:
+                classifier_rule_spec = answer_group.rule_specs[
+                    classifier_rule_spec_index]
+                answers = copy.deepcopy(classifier_rule_spec.inputs[
+                    'training_data'])
+                training_data.append({
+                    'answer_group_index': answer_group_index,
+                    'answers': answers
+                })
+        return training_data
 
     def can_undergo_classification(self):
         """Checks whether the answers for this state satisfy the preconditions
@@ -2022,32 +1451,6 @@ class State(object):
         self.interaction.confirmed_unclassified_answers = (
             confirmed_unclassified_answers)
 
-    def update_interaction_fallbacks(self, fallbacks_list):
-        """Update the fallbacks of InteractionInstance domain object.
-
-        Args:
-            fallbacks_list. list(dict). List of dicts that represent Fallback
-                domain object.
-        """
-        if not isinstance(fallbacks_list, list):
-            raise Exception(
-                'Expected fallbacks_list to be a list, received %s'
-                % fallbacks_list)
-        self.interaction.fallbacks = [
-            Fallback.from_dict(fallback_dict)
-            for fallback_dict in fallbacks_list]
-        if self.interaction.fallbacks:
-            hint_list = []
-            for fallback in self.interaction.fallbacks:
-                if fallback.outcome.feedback:
-                    # If a fallback outcome has a non-empty feedback list
-                    # the feedback is converted to a Hint. It may contain
-                    # only one list item.
-                    hint_list.append(
-                        Hint(fallback.outcome.feedback[0]).to_dict())
-        self.update_interaction_hints(hint_list)
-
-
     def update_interaction_hints(self, hints_list):
         """Update the list of hints.
 
@@ -2070,17 +1473,21 @@ class State(object):
         """Update the solution of interaction.
 
         Args:
-            solution_dict: dict. The dict representation of Solution object.
+            solution_dict: dict or None. The dict representation of
+                Solution object.
 
         Raises:
-            Exception: 'hint_list' is not a list.
+            Exception: 'solution_dict' is not a dict.
         """
-        if not isinstance(solution_dict, dict):
-            raise Exception(
-                'Expected solution to be a dict, received %s'
-                % solution_dict)
-        self.interaction.solution = Solution.from_dict(
-            self.interaction.id, solution_dict)
+        if solution_dict is not None:
+            if not isinstance(solution_dict, dict):
+                raise Exception(
+                    'Expected solution to be a dict, received %s'
+                    % solution_dict)
+            self.interaction.solution = Solution.from_dict(
+                self.interaction.id, solution_dict)
+        else:
+            self.interaction.solution = None
 
     def add_hint(self, hint_text):
         """Add a new hint to the list of hints.
@@ -2153,7 +1560,7 @@ class State(object):
         content_html = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
         return cls(
-            SubtitledHtml(content_html, []),
+            SubtitledHtml(content_html, {}),
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name))
@@ -2163,10 +1570,10 @@ class Exploration(object):
     """Domain object for an Oppia exploration."""
 
     def __init__(self, exploration_id, title, category, objective,
-                 language_code, tags, blurb, author_notes, skin_customizations,
+                 language_code, tags, blurb, author_notes,
                  states_schema_version, init_state_name, states_dict,
                  param_specs_dict, param_changes_list, version,
-                 created_on=None, last_updated=None):
+                 auto_tts_enabled, created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
         Args:
@@ -2178,8 +1585,6 @@ class Exploration(object):
             tags: list(str). The tags given to the exploration.
             blurb: str. The blurb of the exploration.
             author_notes: str. The author notes.
-            skin_customizations: dict. The customization dictionary of
-                SkinInstance domain object.
             states_schema_version: int. Tbe schema version of the exploration.
             init_state_name: str. The name for the initial state of the
                 exploration.
@@ -2196,6 +1601,8 @@ class Exploration(object):
                 is created.
             last_updated: datetime.datetime. Date and time when the exploration
                 was last updated.
+            auto_tts_enabled: bool. True if automatic text-to-speech is
+                enabled.
         """
         self.id = exploration_id
         self.title = title
@@ -2207,9 +1614,6 @@ class Exploration(object):
         self.author_notes = author_notes
         self.states_schema_version = states_schema_version
         self.init_state_name = init_state_name
-
-        self.skin_instance = SkinInstance(
-            feconf.DEFAULT_SKIN_ID, skin_customizations)
 
         self.states = {}
         for (state_name, state_dict) in states_dict.iteritems():
@@ -2226,6 +1630,7 @@ class Exploration(object):
         self.version = version
         self.created_on = created_on
         self.last_updated = last_updated
+        self.auto_tts_enabled = auto_tts_enabled
 
     @classmethod
     def create_default_exploration(
@@ -2239,8 +1644,7 @@ class Exploration(object):
             list; 'states_schema_version' and 'init_state_name' are taken from
             feconf; 'states_dict' is derived from feconf; 'param_specs_dict' is
             an empty dict; 'blurb' and 'author_notes' are initialized to empty
-            empty string; 'skin_customizations' is a null object; 'version' is
-            initializated to 0.
+            empty string; 'version' is initializated to 0.
 
         Args:
             exploration_id: str. The id of the exploration.
@@ -2262,8 +1666,9 @@ class Exploration(object):
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
-            '', None, feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
-            feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0)
+            '', feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
+            feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0,
+            feconf.DEFAULT_AUTO_TTS_ENABLED)
 
     @classmethod
     def from_dict(
@@ -2295,6 +1700,7 @@ class Exploration(object):
         exploration.tags = exploration_dict['tags']
         exploration.blurb = exploration_dict['blurb']
         exploration.author_notes = exploration_dict['author_notes']
+        exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
 
         exploration.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val) for
@@ -2313,12 +1719,11 @@ class Exploration(object):
             state = exploration.states[state_name]
 
             state.content = SubtitledHtml(
-                html_cleaner.clean(sdict['content']['html']),
-                [
-                    AudioTranslation.from_dict(audio_translation)
-                    for audio_translation in
-                    sdict['content']['audio_translations']
-                ])
+                html_cleaner.clean(sdict['content']['html']), {
+                    language_code: AudioTranslation.from_dict(translation)
+                    for language_code, translation in
+                    sdict['content']['audio_translations'].iteritems()
+                })
 
             state.param_changes = [param_domain.ParamChange(
                 pc['name'], pc['generator_id'], pc['customization_args']
@@ -2354,13 +1759,12 @@ class Exploration(object):
 
             solution = (
                 Solution.from_dict(idict['id'], idict['solution'])
-                if idict['solution'] else {})
+                if idict['solution'] else None)
 
             state.interaction = InteractionInstance(
                 idict['id'], idict['customization_args'],
                 interaction_answer_groups, default_outcome,
                 idict['confirmed_unclassified_answers'],
-                [Fallback.from_dict(f) for f in idict['fallbacks']],
                 [Hint.from_dict(h) for h in idict['hints']],
                 solution)
 
@@ -2369,9 +1773,6 @@ class Exploration(object):
         exploration.param_changes = [
             param_domain.ParamChange.from_dict(pc)
             for pc in exploration_dict['param_changes']]
-
-        exploration.skin_instance = SkinInstance(
-            feconf.DEFAULT_SKIN_ID, exploration_dict['skin_customizations'])
 
         exploration.version = exploration_version
         exploration.created_on = exploration_created_on
@@ -2493,6 +1894,11 @@ class Exploration(object):
                 'Expected param_specs to be a dict, received %s'
                 % self.param_specs)
 
+        if not isinstance(self.auto_tts_enabled, bool):
+            raise utils.ValidationError(
+                'Expected auto_tts_enabled to be a bool, received %s'
+                % self.auto_tts_enabled)
+
         for param_name in self.param_specs:
             if not isinstance(param_name, basestring):
                 raise utils.ValidationError(
@@ -2567,39 +1973,6 @@ class Exploration(object):
                             'The parameter %s was used in an answer group, '
                             'but it does not exist in this exploration'
                             % param_change.name)
-
-        # Check that all fallbacks and hints are valid.
-        for state in self.states.values():
-            interaction = state.interaction
-
-            for fallback in interaction.fallbacks:
-                # Check fallback destinations.
-                if fallback.outcome.dest not in all_state_names:
-                    raise utils.ValidationError(
-                        'The fallback destination %s is not a valid state.'
-                        % fallback.outcome.dest)
-
-                for param_change in fallback.outcome.param_changes:
-                    if param_change.name not in self.param_specs:
-                        raise utils.ValidationError(
-                            'The parameter %s was used in a fallback, but it '
-                            'does not exist in this exploration'
-                            % param_change.name)
-
-        # Check that state names required by gadgets exist.
-        state_names_required_by_gadgets = set(
-            self.skin_instance.get_state_names_required_by_gadgets())
-        missing_state_names = state_names_required_by_gadgets - set(
-            self.states.keys())
-        if missing_state_names:
-            raise utils.ValidationError(
-                'Exploration missing required state%s: %s' % (
-                    's' if len(missing_state_names) > 1 else '',
-                    ', '.join(sorted(missing_state_names)))
-                )
-
-        # Check that GadgetInstances fit the skin and that gadgets are valid.
-        self.skin_instance.validate()
 
         if strict:
             warnings_list = []
@@ -2677,8 +2050,7 @@ class Exploration(object):
                 'state: %s' % ', '.join(unseen_states))
 
     def _verify_no_dead_ends(self):
-        """Verifies that all states can reach a terminal state without using
-        fallbacks.
+        """Verifies that all states can reach a terminal state.
 
         Raises:
             ValidationError: If is impossible to complete the exploration from
@@ -2705,7 +2077,7 @@ class Exploration(object):
                 if (state_name not in curr_queue
                         and state_name not in processed_queue):
                     all_outcomes = (
-                        state.interaction.get_all_non_fallback_outcomes())
+                        state.interaction.get_all_outcomes())
                     for outcome in all_outcomes:
                         if outcome.dest == curr_state_name:
                             curr_queue.append(state_name)
@@ -2862,6 +2234,15 @@ class Exploration(object):
                 'exploration.' % (init_state_name, self.states.keys()))
         self.init_state_name = init_state_name
 
+    def update_auto_tts_enabled(self, auto_tts_enabled):
+        """Update whether automatic text-to-speech is enabled.
+
+        Args:
+            auto_tts_enabled: bool. Whether automatic text-to-speech
+                is enabled or not.
+        """
+        self.auto_tts_enabled = auto_tts_enabled
+
     # Methods relating to states.
     def add_states(self, state_names):
         """Adds multiple states to the exploration.
@@ -2946,179 +2327,93 @@ class Exploration(object):
 
         del self.states[state_name]
 
-    # Methods relating to gadgets.
-    def add_gadget(self, gadget_dict, panel):
-        """Adds a gadget to the associated panel.
+
+    def get_state_names_mapping(self, change_list):
+        """Creates a mapping from the current state names of the exploration
+        to their corresponding state names of the older version.
 
         Args:
-            gadget_dict: dict. The dict representation of GadgetInstance
-                object.
-            panel: str. The panel name.
-        """
-        gadget_instance = GadgetInstance(
-            gadget_dict['gadget_type'], gadget_dict['gadget_name'],
-            gadget_dict['visible_in_states'],
-            gadget_dict['customization_args'])
-
-        self.skin_instance.panel_contents_dict[panel].append(
-            gadget_instance)
-
-    def rename_gadget(self, old_gadget_name, new_gadget_name):
-        """Renames the given gadget.
-
-        Args:
-            old_gadget_name: str. The old name of gadget to rename.
-            new_gadget_name: str. The new gadget name.
-
-        Raises:
-            ValueError: The old gadget name does not exist or the new gadget
-            name already exists.
-        """
-        if old_gadget_name not in self.get_all_gadget_names():
-            raise ValueError('Gadget %s does not exist.' % old_gadget_name)
-        if (old_gadget_name != new_gadget_name and
-                new_gadget_name in self.get_all_gadget_names()):
-            raise ValueError('Duplicate gadget name: %s' % new_gadget_name)
-
-        if old_gadget_name == new_gadget_name:
-            return
-
-        GadgetInstance._validate_gadget_name(new_gadget_name)  # pylint: disable=protected-access
-
-        gadget_instance = self.get_gadget_instance_by_name(old_gadget_name)
-        gadget_instance.name = new_gadget_name
-
-    def delete_gadget(self, gadget_name):
-        """Deletes the given gadget.
-
-        Args:
-            gadget_name: str. The name of the gadget to be deleted.
-
-        Raises:
-            ValueError: The gadget does not exist.
-        """
-        if gadget_name not in self.get_all_gadget_names():
-            raise ValueError('Gadget %s does not exist.' % gadget_name)
-
-        panel = self._get_panel_for_gadget(gadget_name)
-        gadget_index = None
-        for index in range(len(
-                self.skin_instance.panel_contents_dict[panel])):
-            if self.skin_instance.panel_contents_dict[
-                    panel][index].name == gadget_name:
-                gadget_index = index
-                break
-        del self.skin_instance.panel_contents_dict[panel][gadget_index]
-
-    def get_gadget_instance_by_name(self, gadget_name):
-        """Returns the GadgetInstance with the given name.
-
-        Args:
-            gadget_name: str. The gadget name.
+            change_list: list(dict). A list of changes introduced in this
+                commit.
 
         Returns:
-            GadgetInstance. The corresponding GadgetInstance domain object.
-
-        Raises:
-            ValueError: The gadget does not exist.
+            dict. The new_to_old_state_names mapping dict.
         """
-        for gadget_instances in (
-                self.skin_instance.panel_contents_dict.itervalues()):
-            for gadget_instance in gadget_instances:
-                if gadget_instance.name == gadget_name:
-                    return gadget_instance
-        raise ValueError('Gadget %s does not exist.' % gadget_name)
+        old_to_new_state_names = {}
 
-    def get_all_gadget_names(self):
-        """Gets a list of names of all gadgets used in this exploration.
+        for state_name in self.states:
+            old_to_new_state_names[state_name] = state_name
+
+        for change_dict in reversed(change_list):
+            if change_dict['cmd'] == CMD_RENAME_STATE:
+                if change_dict['new_state_name'] in old_to_new_state_names:
+                    old_to_new_state_names[change_dict['old_state_name']] = (
+                        old_to_new_state_names.pop(change_dict[
+                            'new_state_name']))
+
+        new_to_old_state_names = {
+            value: key for key, value in old_to_new_state_names.iteritems()
+        }
+        return new_to_old_state_names
+
+
+    def get_trainable_states_dict(self, old_states, new_to_old_state_names):
+        """Retrieves the state names of all trainable states in an exploration
+        segregated into state names with changed and unchanged answer groups.
+        In this method, the new_state_name refers to the name of the state in
+        the current version of the exploration whereas the old_state_name refers
+        to the name of the state in the previous version of the exploration.
+
+        Args:
+            old_states: dict. Dictionary containing all State domain objects.
+            new_to_old_state_names: dict. A mapping from current state names to
+                state names from previous version of the exploration.
 
         Returns:
-            list(GadgetInstance). The list of all gadget names.
+            dict. The trainable states dict. This dict has three keys
+                representing state names with changed answer groups and
+                unchanged answer groups respectively.
         """
-        gadget_names = set()
-        for gadget_instances in (
-                self.skin_instance.panel_contents_dict.itervalues()):
-            for gadget_instance in gadget_instances:
-                gadget_names.add(gadget_instance.name)
-        return sorted(gadget_names)
+        trainable_states_dict = {
+            'state_names_with_changed_answer_groups': [],
+            'state_names_with_unchanged_answer_groups': []
+        }
+        new_states = self.states
 
-    def _get_panel_for_gadget(self, gadget_name):
-        """Returns the panel name for the given GadgetInstance.
+        for new_state_name in new_states:
+            new_state = new_states[new_state_name]
+            if not new_state.can_undergo_classification():
+                continue
 
-        Args:
-            gadget_name: str. The gadget name.
+            old_state_name = new_to_old_state_names[new_state_name]
 
-        Returns:
-            str. The corresponding panel name.
+            # The case where a new state is added. When this happens, the
+            # old_state_name will be equal to the new_state_name and it will not
+            # be present in the exploration's older version.
+            if old_state_name not in old_states:
+                trainable_states_dict[
+                    'state_names_with_changed_answer_groups'].append(
+                        new_state_name)
+                continue
+            old_state = old_states[old_state_name]
+            old_training_data = old_state.get_training_data()
+            new_training_data = new_state.get_training_data()
 
-        Raises:
-            ValueError: The gadget does not exist.
-        """
-        for panel, gadget_instances in (
-                self.skin_instance.panel_contents_dict.iteritems()):
-            for gadget_instance in gadget_instances:
-                if gadget_instance.name == gadget_name:
-                    return panel
-        raise ValueError('Gadget %s does not exist.' % gadget_name)
+            # Check if the training data and interaction_id of the state in the
+            # previous version of the exploration and the state in the new
+            # version of the exploration match. If any of them are not equal,
+            # we create a new job for the state in the current version.
+            if new_training_data == old_training_data and (
+                    new_state.interaction.id == old_state.interaction.id):
+                trainable_states_dict[
+                    'state_names_with_unchanged_answer_groups'].append(
+                        new_state_name)
+            else:
+                trainable_states_dict[
+                    'state_names_with_changed_answer_groups'].append(
+                        new_state_name)
 
-    def _update_gadget_visibilities_for_renamed_state(
-            self, old_state_name, new_state_name):
-        """Updates the visible_in_states property for gadget instances
-        visible in the renamed state.
-
-        Args:
-            old_state_name: str. The name of state to remove.
-            new_state_name: str. The new gadget name to append in
-                'visible_in_states' list.
-        """
-        affected_gadget_instances = (
-            self._get_gadget_instances_visible_in_state(old_state_name))
-
-        for gadget_instance in affected_gadget_instances:
-            # Order within visible_in_states does not affect functionality.
-            # It's sorted purely for deterministic testing.
-            gadget_instance.visible_in_states.remove(old_state_name)
-            gadget_instance.visible_in_states.append(new_state_name)
-            gadget_instance.visible_in_states.sort()
-
-    def _update_gadget_visibilities_for_deleted_state(self, state_name):
-        """Updates the visible_in_states property for gadget instances
-        visible in the deleted state.
-
-        Args:
-            state_name: str. The state name.
-        """
-        affected_gadget_instances = (
-            self._get_gadget_instances_visible_in_state(state_name))
-
-        for gadget_instance in affected_gadget_instances:
-            gadget_instance.visible_in_states.remove(state_name)
-            if len(gadget_instance.visible_in_states) == 0:
-                raise utils.ValidationError(
-                    "Deleting '%s' state leaves '%s' gadget with no visible "
-                    'states. This is not currently supported and should be '
-                    'handled with editor guidance on the front-end.' % (
-                        state_name,
-                        gadget_instance.name)
-                )
-
-    def _get_gadget_instances_visible_in_state(self, state_name):
-        """Helper function to retrieve gadget instances visible in
-        a given state.
-
-        Args:
-            state_name: str. The name of state in which search for gadgets.
-
-        Returns:
-            list(GadgetInstance). List of gadgets visibile in a givent state.
-        """
-        visible_gadget_instances = []
-        for gadget_instances in (
-                self.skin_instance.panel_contents_dict.itervalues()):
-            for gadget_instance in gadget_instances:
-                if state_name in gadget_instance.visible_in_states:
-                    visible_gadget_instances.append(gadget_instance)
-        return visible_gadget_instances
+        return trainable_states_dict
 
     @classmethod
     def _convert_states_v0_dict_to_v1_dict(cls, states_dict):
@@ -3471,7 +2766,7 @@ class Exploration(object):
                         interaction['hints'].append(
                             Hint(fallback['outcome']['feedback'][0]).to_dict())
             if 'solution' not in interaction:
-                interaction['solution'] = {}
+                interaction['solution'] = None
         return states_dict
 
     @classmethod
@@ -3485,6 +2780,35 @@ class Exploration(object):
                 'html': content_html,
                 'audio_translations': []
             }
+        return states_dict
+
+    @classmethod
+    def _convert_states_v11_dict_to_v12_dict(cls, states_dict):
+        """Converts from version 11 to 12. Version 12 refactors audio
+        translations from a list to a dict keyed by language code.
+        """
+        for state_dict in states_dict.values():
+            old_audio_translations = state_dict['content']['audio_translations']
+            state_dict['content']['audio_translations'] = {
+                old_translation['language_code']: {
+                    'filename': old_translation['filename'],
+                    'file_size_bytes': old_translation['file_size_bytes'],
+                    'needs_update': old_translation['needs_update'],
+                }
+                for old_translation in old_audio_translations
+            }
+        return states_dict
+
+    @classmethod
+    def _convert_states_v12_dict_to_v13_dict(cls, states_dict):
+        """Converts from version 12 to 13. Version 13 sets empty
+        solutions to None and removes fallbacks.
+        """
+        for state_dict in states_dict.values():
+            if 'fallbacks' in state_dict['interaction']:
+                del state_dict['interaction']['fallbacks']
+            if not state_dict['interaction']['solution']:
+                state_dict['interaction']['solution'] = None
         return states_dict
 
     @classmethod
@@ -3518,7 +2842,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 14
+    CURRENT_EXP_SCHEMA_VERSION = 18
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3834,6 +3158,59 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v14_dict_to_v15_dict(cls, exploration_dict):
+        """Converts a v14 exploration dict into a v15 exploration dict."""
+
+        exploration_dict['schema_version'] = 15
+
+        exploration_dict['states'] = cls._convert_states_v11_dict_to_v12_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 12
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v15_dict_to_v16_dict(cls, exploration_dict):
+        """Converts a v15 exploration dict into a v16 exploration dict."""
+        exploration_dict['schema_version'] = 16
+
+        exploration_dict['states'] = cls._convert_states_v12_dict_to_v13_dict(
+            exploration_dict['states'])
+
+        exploration_dict['states_schema_version'] = 13
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v16_dict_to_v17_dict(cls, exploration_dict):
+        """Converts a v16 exploration dict into a v17 exploration dict.
+
+        Removes gadgets and skins.
+        """
+        exploration_dict['schema_version'] = 17
+
+        if 'skin_customizations' in exploration_dict:
+            del exploration_dict['skin_customizations']
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v17_dict_to_v18_dict(cls, exploration_dict):
+        """ Converts a v17 exploration dict into a v18 exploration dict.
+
+        Adds auto_tts_enabled property.
+        """
+        exploration_dict['schema_version'] = 18
+
+        if exploration_dict['category'] == 'Languages':
+            exploration_dict['auto_tts_enabled'] = False
+        else:
+            exploration_dict['auto_tts_enabled'] = True
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3935,6 +3312,26 @@ class Exploration(object):
                 exploration_dict)
             exploration_schema_version = 14
 
+        if exploration_schema_version == 14:
+            exploration_dict = cls._convert_v14_dict_to_v15_dict(
+                exploration_dict)
+            exploration_schema_version = 15
+
+        if exploration_schema_version == 15:
+            exploration_dict = cls._convert_v15_dict_to_v16_dict(
+                exploration_dict)
+            exploration_schema_version = 16
+
+        if exploration_schema_version == 16:
+            exploration_dict = cls._convert_v16_dict_to_v17_dict(
+                exploration_dict)
+            exploration_schema_version = 17
+
+        if exploration_schema_version == 17:
+            exploration_dict = cls._convert_v17_dict_to_v18_dict(
+                exploration_dict)
+            exploration_schema_version = 18
+
         return (exploration_dict, initial_schema_version)
 
     @classmethod
@@ -4033,8 +3430,7 @@ class Exploration(object):
             'param_changes': self.param_change_dicts,
             'param_specs': self.param_specs_dict,
             'tags': self.tags,
-            'skin_customizations': self.skin_instance.to_dict()[
-                'skin_customizations'],
+            'auto_tts_enabled': self.auto_tts_enabled,
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.iteritems()}
         })
@@ -4053,8 +3449,6 @@ class Exploration(object):
                 - param_specs: dict. A dict where each key-value pair
                     represents respectively, a param spec name and a dict used
                     to initialize a ParamSpec domain object.
-                - skin_customizations: dict. The customization dictionary of
-                    SkinInstance domain object.
                 - states: dict. Keys are states names and values are dict
                     representation of State domain object.
                 - title: str. The exploration title.
@@ -4064,8 +3458,6 @@ class Exploration(object):
             'init_state_name': self.init_state_name,
             'param_changes': self.param_change_dicts,
             'param_specs': self.param_specs_dict,
-            'skin_customizations': self.skin_instance.to_dict()[
-                'skin_customizations'],
             'states': {
                 state_name: state.to_dict()
                 for (state_name, state) in self.states.iteritems()
@@ -4073,20 +3465,6 @@ class Exploration(object):
             'title': self.title,
             'language_code': self.language_code,
         }
-
-    def get_gadget_types(self):
-        """Gets all gadget types used in this exploration.
-
-        Returns:
-            set(str). The collection of gadget types.
-        """
-        result = set()
-        for gadget_instances in (
-                self.skin_instance.panel_contents_dict.itervalues()):
-            result.update([
-                gadget_instance.type for gadget_instance
-                in gadget_instances])
-        return sorted(result)
 
     def get_interaction_ids(self):
         """Gets all interaction ids used in this exploration.

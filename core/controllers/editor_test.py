@@ -31,6 +31,7 @@ from core.domain import stats_jobs_continuous_test
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
@@ -60,6 +61,10 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
 
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.system_user = user_services.get_system_user()
+        self.editor = user_services.UserActionsInfo(self.editor_id)
+
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
         editable."""
@@ -82,8 +87,9 @@ class EditorTest(BaseEditorControllerTest):
     def setUp(self):
         super(EditorTest, self).setUp()
         exp_services.load_demo('0')
+
         rights_manager.release_ownership_of_exploration(
-            feconf.SYSTEM_COMMITTER_ID, '0')
+            self.system_user, '0')
 
     def test_editor_page(self):
         """Test access to editor pages for the sample exploration."""
@@ -131,9 +137,9 @@ class EditorTest(BaseEditorControllerTest):
 
         response = self.testapp.get('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
-        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
-        self.put_json(rights_url, {
-            'is_public': True,
+        publish_url = '%s/%s' % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
+        self.put_json(publish_url, {
+            'make_public': True,
         }, csrf_token, expect_errors=True, expected_status_int=400)
 
         self.logout()
@@ -232,7 +238,7 @@ class EditorTest(BaseEditorControllerTest):
             exp_id = '15'
             exp_services.load_demo(exp_id)
             rights_manager.release_ownership_of_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exp_id)
+                self.system_user, exp_id)
 
             exploration_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
@@ -277,9 +283,13 @@ class EditorTest(BaseEditorControllerTest):
                 self.ALL_CC_MANAGERS_FOR_TESTS):
                 # Run job on exploration with answers
                 stats_jobs_continuous_test.ModifiedInteractionAnswerSummariesAggregator.start_computation() # pylint: disable=line-too-long
-                self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+                self.assertEqual(
+                    self.count_jobs_in_taskqueue(
+                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
                 self.process_and_flush_pending_tasks()
-                self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+                self.assertEqual(
+                    self.count_jobs_in_taskqueue(
+                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Log in as an editor.
             self.login(self.EDITOR_EMAIL)
@@ -408,7 +418,7 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
     SAMPLE_JSON_CONTENT = {
         'State A': ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -422,15 +432,14 @@ interaction:
     dest: State A
     feedback: []
     param_changes: []
-  fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """),
         'State B': ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -444,15 +453,14 @@ interaction:
     dest: State B
     feedback: []
     param_changes: []
-  fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -466,17 +474,16 @@ interaction:
     dest: %s
     feedback: []
     param_changes: []
-  fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
     SAMPLE_STATE_STRING = ("""classifier_model_id: null
 content:
-  audio_translations: []
+  audio_translations: {}
   html: ''
 interaction:
   answer_groups: []
@@ -490,10 +497,9 @@ interaction:
     dest: State A
     feedback: []
     param_changes: []
-  fallbacks: []
   hints: []
   id: TextInput
-  solution: {}
+  solution: null
 param_changes: []
 """)
 
@@ -584,11 +590,10 @@ param_changes: []
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
 
-
         response = self.testapp.get(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
         csrf_token = self.get_csrf_token_from_response(response)
-        response = self.post_json('/createhandler/state_yaml', {
+        response = self.post_json('/createhandler/state_yaml/%s' % exp_id, {
             'state_dict': exploration.states['State A'].to_dict(),
             'width': 50,
         }, csrf_token=csrf_token)
@@ -609,7 +614,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         rights_manager.assign_role_for_exploration(
-            self.owner_id, unpublished_exp_id, self.editor_id,
+            self.owner, unpublished_exp_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
 
         self.login(self.EDITOR_EMAIL)
@@ -638,9 +643,9 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         rights_manager.assign_role_for_exploration(
-            self.owner_id, published_exp_id, self.editor_id,
+            self.owner, published_exp_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
-        rights_manager.publish_exploration(self.owner_id, published_exp_id)
+        rights_manager.publish_exploration(self.owner, published_exp_id)
 
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.delete(
@@ -698,11 +703,13 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             # not to be checked here (same for admin and moderator).
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(observed_log_messages[0],
-                             '%s tried to delete exploration %s' %
-                             (self.owner_id, exp_id))
+                             '(%s) %s tried to delete exploration %s' %
+                             (feconf.ROLE_ID_EXPLORATION_EDITOR,
+                              self.owner_id, exp_id))
             self.assertEqual(observed_log_messages[2],
-                             '%s deleted exploration %s' %
-                             (self.owner_id, exp_id))
+                             '(%s) %s deleted exploration %s' %
+                             (feconf.ROLE_ID_EXPLORATION_EDITOR,
+                              self.owner_id, exp_id))
             self.logout()
 
             # Checking for admin.
@@ -717,11 +724,11 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(observed_log_messages[0],
-                             '(admin) %s tried to delete exploration %s' %
-                             (self.admin_id, exp_id))
+                             '(%s) %s tried to delete exploration %s' %
+                             (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
             self.assertEqual(observed_log_messages[2],
-                             '(admin) %s deleted exploration %s' %
-                             (self.admin_id, exp_id))
+                             '(%s) %s deleted exploration %s' %
+                             (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
             self.logout()
 
             # Checking for moderator.
@@ -736,11 +743,13 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
             self.assertEqual(len(observed_log_messages), 3)
             self.assertEqual(observed_log_messages[0],
-                             '(moderator) %s tried to delete exploration %s' %
-                             (self.moderator_id, exp_id))
+                             '(%s) %s tried to delete exploration %s' %
+                             (feconf.ROLE_ID_MODERATOR,
+                              self.moderator_id, exp_id))
             self.assertEqual(observed_log_messages[2],
-                             '(moderator) %s deleted exploration %s' %
-                             (self.moderator_id, exp_id))
+                             '(%s) %s deleted exploration %s' %
+                             (feconf.ROLE_ID_MODERATOR,
+                              self.moderator_id, exp_id))
             self.logout()
 
 
@@ -755,7 +764,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
 
         exp_services.load_demo(self.EXP_ID)
         rights_manager.release_ownership_of_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID)
+            self.system_user, self.EXP_ID)
 
         self.login(self.EDITOR_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -773,7 +782,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
                 'state_name': exploration.init_state_name,
                 'new_value': {
                     'html': 'ABC',
-                    'audio_translations': [],
+                    'audio_translations': {},
                 },
             }], 'Change objective and init state content')
 
@@ -876,7 +885,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         exp_id = '0'
         exp_services.load_demo(exp_id)
         rights_manager.release_ownership_of_exploration(
-            feconf.SYSTEM_COMMITTER_ID, exp_id)
+            self.system_user, exp_id)
 
         # Sign-up new editors Joe and Sandra.
         self.signup('joe@example.com', 'joe')
@@ -892,8 +901,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         self.assert_can_edit(response.body)
 
         # Ban joe.
-        config_services.set_property(
-            feconf.SYSTEM_COMMITTER_ID, 'banned_usernames', ['joe'])
+        self.set_banned_users(['joe'])
 
         # Test that Joe is banned. (He can still access the library page.)
         response = self.testapp.get(
@@ -1020,7 +1028,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'new_member_username': self.COLLABORATOR3_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR,
             }, csrf_token, expect_errors=True, expected_status_int=401)
-        self.assertEqual(response_dict['code'], 401)
+        self.assertEqual(response_dict['status_code'], 401)
 
         self.logout()
 
@@ -1062,7 +1070,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'new_member_username': self.COLLABORATOR3_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR,
                 }, csrf_token, expect_errors=True, expected_status_int=401)
-        self.assertEqual(response_dict['code'], 401)
+        self.assertEqual(response_dict['status_code'], 401)
 
         self.logout()
 
@@ -1138,6 +1146,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         super(ModeratorEmailsTest, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -1146,14 +1155,11 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID, self.editor_id, title='My Exploration',
             end_state_name='END')
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
 
         # Set the default email config.
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        config_services.set_property(
-            self.admin_id, 'publicize_exploration_email_html_body',
-            'Default publicization email body')
         config_services.set_property(
             self.admin_id, 'unpublish_exploration_email_html_body',
             'Default unpublishing email body')
@@ -1181,11 +1187,11 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response_dict['error'], 'Invalid moderator action.')
 
-            # Try to publicize the exploration without an email body. This
+            # Try to unpublish the exploration without an email body. This
             # should cause an error.
             response_dict = self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID, {
-                    'action': feconf.MODERATOR_ACTION_PUBLICIZE_EXPLORATION,
+                    'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
                     'email_body': None,
                     'version': 1,
                 }, csrf_token, expect_errors=True, expected_status_int=400)
@@ -1195,7 +1201,7 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
 
             response_dict = self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID, {
-                    'action': feconf.MODERATOR_ACTION_PUBLICIZE_EXPLORATION,
+                    'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
                     'email_body': '',
                     'version': 1,
                 }, csrf_token, expect_errors=True, expected_status_int=400)
@@ -1203,10 +1209,10 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 'Moderator actions should include an email',
                 response_dict['error'])
 
-            # Try to publicize the exploration even if the relevant feconf
+            # Try to unpublish the exploration even if the relevant feconf
             # flags are not set. This should cause a system error.
             valid_payload = {
-                'action': feconf.MODERATOR_ACTION_PUBLICIZE_EXPLORATION,
+                'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
                 'email_body': 'Your exploration is featured!',
                 'version': 1,
             }
@@ -1222,68 +1228,6 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                     valid_payload, csrf_token)
 
             # Log out.
-            self.logout()
-
-    def test_email_is_sent_correctly_when_publicizing(self):
-        with self.swap(
-            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
-            ), self.swap(
-                feconf, 'CAN_SEND_EMAILS', True):
-            # Log in as a moderator.
-            self.login(self.MODERATOR_EMAIL)
-
-            # Go to the exploration editor page.
-            response = self.testapp.get('/create/%s' % self.EXP_ID)
-            self.assertEqual(response.status_int, 200)
-            csrf_token = self.get_csrf_token_from_response(response)
-
-            new_email_body = 'Your exploration is featured!'
-
-            valid_payload = {
-                'action': feconf.MODERATOR_ACTION_PUBLICIZE_EXPLORATION,
-                'email_body': new_email_body,
-                'version': 1,
-            }
-
-            self.put_json(
-                '/createhandler/moderatorrights/%s' % self.EXP_ID,
-                valid_payload, csrf_token)
-
-            # Check that an email was sent with the correct content.
-            messages = self.mail_stub.get_sent_messages(
-                to=self.EDITOR_EMAIL)
-            self.assertEqual(1, len(messages))
-
-            self.assertEqual(
-                messages[0].sender,
-                'Site Admin <%s>' % feconf.SYSTEM_EMAIL_ADDRESS)
-            self.assertEqual(messages[0].to, self.EDITOR_EMAIL)
-            self.assertFalse(hasattr(messages[0], 'cc'))
-            self.assertEqual(messages[0].bcc, feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(
-                messages[0].subject,
-                'Your Oppia exploration "My Exploration" has been featured!')
-            self.assertEqual(messages[0].body.decode(), (
-                'Hi %s,\n\n'
-                '%s\n\n'
-                'Thanks!\n'
-                '%s (Oppia moderator)\n\n'
-                'You can change your email preferences via the Preferences '
-                'page.' % (
-                    self.EDITOR_USERNAME,
-                    new_email_body,
-                    self.MODERATOR_USERNAME)))
-            self.assertEqual(messages[0].html.decode(), (
-                'Hi %s,<br><br>'
-                '%s<br><br>'
-                'Thanks!<br>'
-                '%s (Oppia moderator)<br><br>'
-                'You can change your email preferences via the '
-                '<a href="https://www.example.com">Preferences</a> page.' % (
-                    self.EDITOR_USERNAME,
-                    new_email_body,
-                    self.MODERATOR_USERNAME)))
-
             self.logout()
 
     def test_email_is_sent_correctly_when_unpublishing(self):
@@ -1510,7 +1454,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             #id is incremented the first time but not the second
         self.assertEqual(exp_user_data.draft_change_list_id, 2)
         self.assertEqual(
-            response, {'code': 400,
+            response, {'status_code': 400,
                        'error': 'Expected title to be a string, received 1'})
 
     def test_draft_updated_version_valid(self):

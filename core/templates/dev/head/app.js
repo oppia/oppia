@@ -21,7 +21,7 @@
 // in order to make the testing and production environments match.
 var oppia = angular.module(
   'oppia', [
-    'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngTouch', 'ngResource',
+    'ngMaterial', 'ngAnimate', 'ngAudio', 'ngSanitize', 'ngTouch', 'ngResource',
     'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
     'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
     'toastr'
@@ -42,10 +42,16 @@ oppia.constant('RULE_TYPE_CLASSIFIER', 'FuzzyMatches');
 oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // Feature still in development.
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
-oppia.constant('ENABLE_STRING_CLASSIFIER', false);
+oppia.constant('ENABLE_ML_CLASSIFIERS', false);
+// NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
+oppia.constant('ENABLE_NEW_STATS_FRAMEWORK', false);
 // Feature still in development.
-oppia.constant('ENABLE_HINT_EDITOR', true);
-oppia.constant('ENABLE_FALLBACK_EDITOR', false);
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'The current solution does not lead to another card.');
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',
+  'The solution is now valid!');
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
+  'The current solution is no longer valid.');
 oppia.constant('PARAMETER_TYPES', {
   REAL: 'Real',
   UNICODE_STRING: 'UnicodeString'
@@ -65,22 +71,20 @@ oppia.constant('FATAL_ERROR_CODES', [400, 401, 404, 500]);
 
 oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
 
-// The conditioning on window.GLOBALS.RTE_COMPONENT_SPECS is because, in the
-// Karma tests, this value is undefined.
-oppia.constant(
-  'RTE_COMPONENT_SPECS',
-  window.GLOBALS.RTE_COMPONENT_SPECS ? window.GLOBALS.RTE_COMPONENT_SPECS : {});
+oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
 
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
-    '$delegate', '$document', '$modal', '$timeout', 'focusService',
+    '$delegate', '$document', '$modal', '$timeout', 'FocusManagerService',
     'taRegisterTool', 'rteHelperService', 'alertsService',
     'explorationContextService', 'PAGE_CONTEXT',
+    'UrlInterpolationService',
     function(
-      taOptions, $document, $modal, $timeout, focusService,
+      taOptions, $document, $modal, $timeout, FocusManagerService,
       taRegisterTool, rteHelperService, alertsService,
-      explorationContextService, PAGE_CONTEXT) {
+      explorationContextService, PAGE_CONTEXT,
+      UrlInterpolationService) {
       taOptions.disableSanitizer = true;
       taOptions.forceTextAngularSanitize = false;
       taOptions.classes.textEditor = 'form-control oppia-rte-content';
@@ -98,7 +102,8 @@ oppia.config(['$provide', function($provide) {
         onDismissCallback, refocusFn) {
         $document[0].execCommand('enableObjectResizing', false, false);
         var modalDialog = $modal.open({
-          templateUrl: 'modals/customizeRteComponent',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/forms/customize_rte_component_modal_directive.html'),
           backdrop: 'static',
           resolve: {},
           controller: [
@@ -113,7 +118,7 @@ oppia.config(['$provide', function($provide) {
               // TODO(sll): Make this switch to the first input field in the
               // modal instead.
               $scope.modalIsLoading = true;
-              focusService.setFocus('tmpFocusPoint');
+              FocusManagerService.setFocus('tmpFocusPoint');
               $timeout(function() {
                 $scope.modalIsLoading = false;
               });
@@ -161,7 +166,7 @@ oppia.config(['$provide', function($provide) {
         var canUseFs = explorationContextService.getPageContext() ===
           PAGE_CONTEXT.EDITOR;
 
-        taRegisterTool(componentDefn.name, {
+        taRegisterTool(componentDefn.id, {
           display: buttonDisplay.outerHTML,
           tooltiptext: componentDefn.tooltip,
           disabled: function() {
@@ -171,7 +176,7 @@ oppia.config(['$provide', function($provide) {
           onElementSelect: {
             element: 'img',
             filter: function(elt) {
-              return elt.hasClass('oppia-noninteractive-' + componentDefn.name);
+              return elt.hasClass('oppia-noninteractive-' + componentDefn.id);
             },
             action: function(event, $element) {
               event.preventDefault();
@@ -395,9 +400,9 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
     var messageAndSourceAndStackTrace = [
       '',
       'Cause: ' + cause,
-      'Source: ' + window.location.href,
       exception.message,
-      String(exception.stack)
+      String(exception.stack),
+      '    at URL: ' + window.location.href
     ].join('\n');
 
     // Catch all errors, to guard against infinite recursive loops.
@@ -426,39 +431,6 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
   };
 }]);
 
-// Service for HTML serialization and escaping.
-oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
-  var htmlEscaper = {
-    objToEscapedJson: function(obj) {
-      return this.unescapedStrToEscapedStr(JSON.stringify(obj));
-    },
-    escapedJsonToObj: function(json) {
-      if (!json) {
-        $log.error('Empty string was passed to JSON decoder.');
-        return '';
-      }
-      return JSON.parse(this.escapedStrToUnescapedStr(json));
-    },
-    unescapedStrToEscapedStr: function(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-    },
-    escapedStrToUnescapedStr: function(value) {
-      return String(value)
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, '\'')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&amp;/g, '&');
-    }
-  };
-  return htmlEscaper;
-}]);
-
 // Service for converting dates in milliseconds since the Epoch to
 // human-readable dates.
 oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
@@ -470,8 +442,11 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
     getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
       if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
-        // The replace function removes 'seconds' from the time returned.
-        return date.toLocaleTimeString().replace(/:\d\d /, ' ');
+        return date.toLocaleTimeString([], {
+          hour: 'numeric',
+          minute: 'numeric',
+          hour12: true
+        });
       } else if (date.getFullYear() === new Date().getFullYear()) {
         return $filter('date')(date, 'MMM d');
       } else {
@@ -491,121 +466,20 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
   };
 }]);
 
-// Service for validating things and (optionally) displaying warning messages
-// if the validation fails.
-oppia.factory('validatorsService', [
-  '$filter', 'alertsService', function($filter, alertsService) {
-    return {
-      /**
-       * Checks whether an entity name is valid, and displays a warning message
-       * if it isn't.
-       * @param {string} input - The input to be checked.
-       * @param {boolean} showWarnings - Whether to show warnings in the
-       *   butterbar.
-       * @return {boolean} True if the entity name is valid, false otherwise.
-       */
-      isValidEntityName: function(input, showWarnings, allowEmpty) {
-        input = $filter('normalizeWhitespace')(input);
-        if (!input && !allowEmpty) {
-          if (showWarnings) {
-            alertsService.addWarning('Please enter a non-empty name.');
-          }
-          return false;
-        }
-
-        for (var i = 0; i < GLOBALS.INVALID_NAME_CHARS.length; i++) {
-          if (input.indexOf(GLOBALS.INVALID_NAME_CHARS[i]) !== -1) {
-            if (showWarnings) {
-              alertsService.addWarning(
-               'Invalid input. Please use a non-empty description consisting ' +
-               'of alphanumeric characters, spaces and/or hyphens.'
-              );
-            }
-            return false;
-          }
-        }
-        return true;
-      },
-      isValidExplorationTitle: function(input, showWarnings) {
-        if (!this.isValidEntityName(input, showWarnings)) {
-          return false;
-        }
-
-        if (input.length > 40) {
-          if (showWarnings) {
-            alertsService.addWarning(
-              'Exploration titles should be at most 40 characters long.');
-          }
-          return false;
-        }
-
-        return true;
-      },
-      // NB: this does not check whether the card name already exists in the
-      // states dict.
-      isValidStateName: function(input, showWarnings) {
-        if (!this.isValidEntityName(input, showWarnings)) {
-          return false;
-        }
-
-        if (input.length > 50) {
-          if (showWarnings) {
-            alertsService.addWarning(
-              'Card names should be at most 50 characters long.');
-          }
-          return false;
-        }
-
-        return true;
-      },
-      isNonempty: function(input, showWarnings) {
-        if (!input) {
-          if (showWarnings) {
-            // TODO(sll): Allow this warning to be more specific in terms of
-            // what needs to be entered.
-            alertsService.addWarning('Please enter a non-empty value.');
-          }
-          return false;
-        }
-        return true;
-      },
-      isValidExplorationId: function(input, showWarnings) {
-        // Exploration IDs are urlsafe base64-encoded.
-        var VALID_ID_CHARS_REGEX = /^[a-zA-Z0-9_\-]+$/g;
-        if (!input || !VALID_ID_CHARS_REGEX.test(input)) {
-          if (showWarnings) {
-            alertsService.addWarning('Please enter a valid exploration ID.');
-          }
-          return false;
-        }
-        return true;
-      }
-    };
-  }
-]);
-
-// Service for generating random IDs.
-oppia.factory('IdGenerationService', [function() {
-  return {
-    generateNewId: function() {
-      return Math.random().toString(36).slice(2);
-    }
-  };
-}]);
-
 oppia.factory('rteHelperService', [
   '$filter', '$log', '$interpolate', 'explorationContextService',
-  'RTE_COMPONENT_SPECS', 'oppiaHtmlEscaper',
-  function($filter, $log, $interpolate, explorationContextService,
-           RTE_COMPONENT_SPECS, oppiaHtmlEscaper) {
+  'RTE_COMPONENT_SPECS', 'HtmlEscaperService', 'UrlInterpolationService',
+  function(
+      $filter, $log, $interpolate, explorationContextService,
+      RTE_COMPONENT_SPECS, HtmlEscaperService, UrlInterpolationService) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
       _RICH_TEXT_COMPONENTS.push({
-        backendName: RTE_COMPONENT_SPECS[componentId].backend_name,
+        backendId: RTE_COMPONENT_SPECS[componentId].backend_id,
         customizationArgSpecs: angular.copy(
           RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
-        name: RTE_COMPONENT_SPECS[componentId].frontend_name,
+        id: RTE_COMPONENT_SPECS[componentId].frontend_id,
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
         previewUrlTemplate:
         RTE_COMPONENT_SPECS[componentId].preview_url_template,
@@ -630,7 +504,7 @@ oppia.factory('rteHelperService', [
           continue;
         }
         var argName = attr.name.substring(0, separatorLocation);
-        customizationArgsDict[argName] = oppiaHtmlEscaper.escapedJsonToObj(
+        customizationArgsDict[argName] = HtmlEscaperService.escapedJsonToObj(
           attr.value);
       }
       return customizationArgsDict;
@@ -642,7 +516,9 @@ oppia.factory('rteHelperService', [
       },
       createToolbarIcon: function(componentDefn) {
         var el = $('<img/>');
-        el.attr('src', componentDefn.iconDataUrl);
+        el.attr(
+          'src', UrlInterpolationService.getExtensionResourceUrl(
+            componentDefn.iconDataUrl));
         el.addClass('oppia-rte-toolbar-image');
         return el.get(0);
       },
@@ -661,23 +537,32 @@ oppia.factory('rteHelperService', [
             explorationId: explorationContextService.getExplorationId()
           });
         }
-        var interpolatedUrl = $interpolate(
-          componentDefn.previewUrlTemplate, false, null, true)(
-          customizationArgsDict);
+        var componentPreviewUrlTemplate = componentDefn.previewUrlTemplate;
+        if (componentDefn.previewUrlTemplate.indexOf(
+            '/rich_text_components') === 0) {
+          var interpolatedUrl = UrlInterpolationService.getExtensionResourceUrl(
+            componentPreviewUrlTemplate);
+        } else {
+          var interpolatedUrl = ($interpolate(
+            componentPreviewUrlTemplate, false, null, true)(
+              customizationArgsDict));
+        }
+
         if (!interpolatedUrl) {
           $log.error(
             'Error interpolating url : ' + componentDefn.previewUrlTemplate);
         } else {
           el.attr('src', interpolatedUrl);
         }
-        el.addClass('oppia-noninteractive-' + componentDefn.name);
+        el.addClass('oppia-noninteractive-' + componentDefn.id);
         if (componentDefn.isBlockElement) {
           el.addClass('block-element');
         }
         for (var attrName in customizationArgsDict) {
           el.attr(
             $filter('camelCaseToHyphens')(attrName) + '-with-value',
-            oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
+            HtmlEscaperService.objToEscapedJson(
+              customizationArgsDict[attrName]));
         }
 
         return el.get(0);
@@ -696,7 +581,7 @@ oppia.factory('rteHelperService', [
         var that = this;
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-          elt.find('oppia-noninteractive-' + componentDefn.name).replaceWith(
+          elt.find('oppia-noninteractive-' + componentDefn.id).replaceWith(
             function() {
               return that.createRteElement(
                 componentDefn,
@@ -721,7 +606,7 @@ oppia.factory('rteHelperService', [
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           elt.find(
-            'img.oppia-noninteractive-' + componentDefn.name
+            'img.oppia-noninteractive-' + componentDefn.id
           ).replaceWith(function() {
             // Look for a class name starting with oppia-noninteractive-*.
             var tagNameMatch = /(^|\s)(oppia-noninteractive-[a-z0-9\-]+)/.exec(
@@ -754,45 +639,6 @@ oppia.factory('rteHelperService', [
 ]);
 
 oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
-
-// Service for setting focus. This broadcasts a 'focusOn' event which sets
-// focus to the element in the page with the corresponding focusOn attribute.
-// Note: This requires LABEL_FOR_CLEARING_FOCUS to exist somewhere in the HTML
-// page.
-oppia.factory('focusService', [
-  '$rootScope', '$timeout', 'deviceInfoService', 'LABEL_FOR_CLEARING_FOCUS',
-  'IdGenerationService',
-  function(
-      $rootScope, $timeout, deviceInfoService, LABEL_FOR_CLEARING_FOCUS,
-      IdGenerationService) {
-    var _nextLabelToFocusOn = null;
-    return {
-      clearFocus: function() {
-        this.setFocus(LABEL_FOR_CLEARING_FOCUS);
-      },
-      setFocus: function(name) {
-        if (_nextLabelToFocusOn) {
-          return;
-        }
-
-        _nextLabelToFocusOn = name;
-        $timeout(function() {
-          $rootScope.$broadcast('focusOn', _nextLabelToFocusOn);
-          _nextLabelToFocusOn = null;
-        });
-      },
-      setFocusIfOnDesktop: function(newFocusLabel) {
-        if (!deviceInfoService.isMobileDevice()) {
-          this.setFocus(newFocusLabel);
-        }
-      },
-      // Generates a random string (to be used as a focus label).
-      generateFocusLabel: function() {
-        return IdGenerationService.generateNewId();
-      }
-    };
-  }
-]);
 
 // Service for manipulating the page URL.
 oppia.factory('urlService', ['$window', function($window) {
@@ -840,23 +686,6 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
     }
   };
 }]);
-
-// Service for enabling a background mask that leaves navigation visible.
-oppia.factory('BackgroundMaskService', function() {
-  var maskIsActive = false;
-
-  return {
-    isMaskActive: function() {
-      return maskIsActive;
-    },
-    activateMask: function() {
-      maskIsActive = true;
-    },
-    deactivateMask: function() {
-      maskIsActive = false;
-    }
-  };
-});
 
 // Service for sending events to Google Analytics.
 //
@@ -1033,46 +862,6 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
   };
 }]);
 
-// Service for debouncing function calls.
-oppia.factory('oppiaDebouncer', [function() {
-  return {
-    // Returns a function that will not be triggered as long as it continues to
-    // be invoked. The function only gets executed after it stops being called
-    // for `wait` milliseconds.
-    debounce: function(func, millisecsToWait) {
-      var timeout;
-      var context = this;
-      var args = arguments;
-      var timestamp;
-      var result;
-
-      var later = function() {
-        var last = new Date().getTime() - timestamp;
-        if (last < millisecsToWait) {
-          timeout = setTimeout(later, millisecsToWait - last);
-        } else {
-          timeout = null;
-          result = func.apply(context, args);
-          if (!timeout) {
-            context = null;
-            args = null;
-          }
-        }
-      };
-
-      return function() {
-        context = this;
-        args = arguments;
-        timestamp = new Date().getTime();
-        if (!timeout) {
-          timeout = setTimeout(later, millisecsToWait);
-        }
-        return result;
-      };
-    }
-  };
-}]);
-
 // Shim service for functions on $window that allows these functions to be
 // mocked in unit tests.
 oppia.factory('currentLocationService', ['$window', function($window) {
@@ -1086,16 +875,16 @@ oppia.factory('currentLocationService', ['$window', function($window) {
   };
 }]);
 
-// Service for assembling extension tags (for gadgets and interactions).
+// Service for assembling extension tags (for interactions).
 oppia.factory('extensionTagAssemblerService', [
-  '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
+  '$filter', 'HtmlEscaperService', function($filter, HtmlEscaperService) {
     return {
       formatCustomizationArgAttrs: function(element, customizationArgSpecs) {
         for (var caSpecName in customizationArgSpecs) {
           var caSpecValue = customizationArgSpecs[caSpecName].value;
           element.attr(
             $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
-            oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
+            HtmlEscaperService.objToEscapedJson(caSpecValue));
         }
         return element;
       }
@@ -1129,94 +918,3 @@ if (typeof Object.create !== 'function') {
     };
   })();
 }
-
-// Service for code normalization. Used by the code REPL and pencil code
-// interactions.
-oppia.factory('codeNormalizationService', [function() {
-  var removeLeadingWhitespace = function(str) {
-    return str.replace(/^\s+/g, '');
-  };
-  var removeTrailingWhitespace = function(str) {
-    return str.replace(/\s+$/g, '');
-  };
-  var removeIntermediateWhitespace = function(str) {
-    return str.replace(/\s+/g, ' ');
-  };
-  return {
-    getNormalizedCode: function(codeString) {
-      /*
-       * Normalizes a code string (which is assumed not to contain tab
-       * characters). In particular:
-       *
-       * - Strips out lines that start with '#' (comments), possibly preceded by
-       *     whitespace.
-       * - Trims trailing whitespace on each line, and normalizes multiple
-       *     whitespace characters within a single line into one space
-       *     character.
-       * - Removes blank newlines.
-       * - Make the indentation level four spaces.
-       */
-      // TODO(sll): Augment this function to strip out comments that occur at
-      // the end of a line. However, be careful with lines where '#' is
-      // contained in quotes or the character is escaped.
-      var FOUR_SPACES = '    ';
-      // Maps the number of spaces at the beginning of a line to an int
-      // specifying the desired indentation level.
-      var numSpacesToDesiredIndentLevel = {
-        0: 0
-      };
-
-      var codeLines = removeTrailingWhitespace(codeString).split('\n');
-      var normalizedCodeLines = [];
-      codeLines.forEach(function(line) {
-        if (removeLeadingWhitespace(line).indexOf('#') === 0) {
-          return;
-        }
-        line = removeTrailingWhitespace(line);
-        if (!line) {
-          return;
-        }
-
-        var numSpaces = line.length - removeLeadingWhitespace(line).length;
-
-        var existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
-        var maxNumSpaces = Math.max.apply(null, existingNumSpaces);
-        if (numSpaces > maxNumSpaces) {
-          // Add a new indentation level
-          numSpacesToDesiredIndentLevel[numSpaces] = existingNumSpaces.length;
-        }
-
-        // This is set when the indentation level of the current line does not
-        // start a new scope, and also does not match any previous indentation
-        // level. This case is actually invalid, but for now, we take the
-        // largest indentation level that is less than this one.
-        // TODO(sll): Bad indentation should result in an error nearer the
-        // source.
-        var isShortfallLine =
-          !numSpacesToDesiredIndentLevel.hasOwnProperty(numSpaces) &&
-          numSpaces < maxNumSpaces;
-
-        // Clear all existing indentation levels to the right of this one.
-        for (var indentLength in numSpacesToDesiredIndentLevel) {
-          if (Number(indentLength) > numSpaces) {
-            delete numSpacesToDesiredIndentLevel[indentLength];
-          }
-        }
-
-        if (isShortfallLine) {
-          existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
-          numSpaces = Math.max.apply(null, existingNumSpaces);
-        }
-
-        var normalizedLine = '';
-        for (var i = 0; i < numSpacesToDesiredIndentLevel[numSpaces]; i++) {
-          normalizedLine += FOUR_SPACES;
-        }
-        normalizedLine += removeIntermediateWhitespace(
-          removeLeadingWhitespace(line));
-        normalizedCodeLines.push(normalizedLine);
-      });
-      return normalizedCodeLines.join('\n');
-    }
-  };
-}]);

@@ -17,6 +17,7 @@
 	"I18N_CREATE_YES_PLEASE": "بله, لطفا",
 	"I18N_DASHBOARD_COLLECTIONS": "مجموعه‌ها",
 	"I18N_DASHBOARD_EXPLORATIONS": "تجارب من",
+	"I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE": "به نظر می رسد هنوز کشفیات ایجاد نکرده اید. بیا شروع کنیم!",
 	"I18N_DASHBOARD_OPEN_FEEDBACK": "بازخورد باز",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "تصویر را به اینجا بکشید",
 	"I18N_ERROR_DISABLED_EXPLORATION": "تجارب غیر فعال",
@@ -144,7 +145,6 @@
 	"I18N_PLAYER_CARD_NUMBER_TOOLTIP": "کارت #",
 	"I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP": "جامعه قابل ویرایش",
 	"I18N_PLAYER_CONTINUE_BUTTON": "ادامه",
-	"I18N_PLAYER_CONTINUE_NEXT_CARD": "ادامه در کارت بعدی",
 	"I18N_PLAYER_CONTRIBUTORS_TOOLTIP": "همکاران",
 	"I18N_PLAYER_EDIT_TOOLTIP": "ویرایش",
 	"I18N_PLAYER_EMBED_TOOLTIP": "توکار",
@@ -214,6 +214,7 @@
 	"I18N_TOPNAV_LOGOUT": "خروج",
 	"I18N_TOPNAV_MODERATOR_PAGE": "صفحه ناظر",
 	"I18N_TOPNAV_NOTIFICATIONS": "اعلان‌ها",
+	"I18N_TOPNAV_OPPIA_FOUNDATION": "بنیاد Oppia",
 	"I18N_TOPNAV_PREFERENCES": "تنظیمات",
 	"I18N_TOPNAV_SIGN_IN": "ورود",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "آموزش با Oppia"

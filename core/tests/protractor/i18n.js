@@ -21,7 +21,8 @@
 
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var admin = require('../protractor_utils/admin.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 var _selectLanguage = function(language) {
   element(by.css('.protractor-test-i18n-language-selector')).
@@ -31,7 +32,13 @@ var _selectLanguage = function(language) {
 };
 
 describe('Site language', function() {
+  var adminPage = null;
+  var libraryPage = null;
+
   beforeEach(function() {
+    adminPage = new AdminPage.AdminPage();
+    libraryPage = new LibraryPage.LibraryPage();
+
     // Starting language is English
     browser.get('/about');
     _selectLanguage('English');
@@ -47,7 +54,7 @@ describe('Site language', function() {
   it('should change after selecting a different language', function() {
     browser.get('/about');
     _selectLanguage('Español');
-    browser.get('/library');
+    libraryPage.get();
     expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
     general.ensurePageHasNoTranslationIds();
   });
@@ -57,7 +64,7 @@ describe('Site language', function() {
     users.login('varda@example.com');
     browser.get('/preferences');
     element(by.css('.protractor-test-system-language-selector')).click();
-    var options = element.all(by.css('.select2-drop-active li div')).filter(
+    var options = element.all(by.css('.select2-dropdown li')).filter(
       function(elem) {
         return elem.getText().then(function(text) {
           return text === 'Español';
@@ -76,13 +83,13 @@ describe('Site language', function() {
       users.login('feanor@example.com');
       browser.get('/about');
       _selectLanguage('Español');
-      browser.get('/library');
+      libraryPage.get();
       expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
 
       // The preference page shows the last selected language
       browser.get('/preferences');
       language = element(by.css('.protractor-test-system-language-selector'))
-        .element(by.css('.select2-chosen'));
+        .element(by.css('.select2-selection__rendered'));
       expect(language.getText(), 'Español');
       expect(browser.getTitle()).toEqual(
         'Cambiar sus preferencias de perfil - Oppia');
@@ -105,7 +112,7 @@ describe('Site language', function() {
     users.login('mangue@example.com', true);
     browser.get('/about');
     _selectLanguage('Español');
-    admin.reloadExploration('protractor_test_1.yaml');
+    adminPage.reloadExploration('protractor_test_1.yaml');
     // Open exploration
     general.openPlayer('12');
     // Spanish is still selected

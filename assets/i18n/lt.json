@@ -10,6 +10,7 @@
 	"I18N_CREATE_NO_THANKS": "Ne, Ačiū",
 	"I18N_CREATE_YES_PLEASE": "Taip!",
 	"I18N_DASHBOARD_COLLECTIONS": "Kolekcijos",
+	"I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE": "Atrodo, kad dar nesukūrėte jokių tyrimų. Pradėkime!",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY": "Rūšiuoti Pagal",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY_AVERAGE_RATING": "Vidutinis Įvertinimas",
 	"I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED": "Paskutinis Atnaujinimas",
@@ -133,5 +134,6 @@
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "Dar neprenumeruojate jokių kūrėjų.",
 	"I18N_PREFERENCES_SUBSCRIBED_CREATORS": "Kūrėjai, kuriuos prenumeruojate",
 	"I18N_SUBSCRIBE_BUTTON_TEXT": "Prenumeruoti",
+	"I18N_TOPNAV_OPPIA_FOUNDATION": "Oppia Fondas",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Nutraukti prenumeratą"
 }

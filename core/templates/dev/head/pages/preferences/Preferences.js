@@ -18,13 +18,18 @@
 
 oppia.controller('Preferences', [
   '$scope', '$http', '$rootScope', '$modal', '$timeout', '$translate',
-  'alertsService', 'UrlInterpolationService', 'utilsService',
+  'alertsService', 'UrlInterpolationService', 'UtilsService',
+  'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
   function(
       $scope, $http, $rootScope, $modal, $timeout, $translate, alertsService,
-      UrlInterpolationService, utilsService) {
+      UrlInterpolationService, UtilsService, DASHBOARD_TYPE_CREATOR,
+      DASHBOARD_TYPE_LEARNER) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
     $rootScope.loadingMessage = 'Loading';
     $scope.profilePictureDataUrl = '';
+    $scope.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
+    $scope.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
+    $scope.username = GLOBALS.username;
 
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
@@ -59,7 +64,7 @@ oppia.controller('Preferences', [
 
       if (subjectInterests instanceof Array) {
         for (var i = 0; i < subjectInterests.length; i++) {
-          if (utilsService.isString(subjectInterests[i])) {
+          if (UtilsService.isString(subjectInterests[i])) {
             if (!TAG_REGEX.test(subjectInterests[i])) {
               $scope.subjectInterestsWarningText = (
                 'Subject interests should use only lowercase letters.');
@@ -97,6 +102,12 @@ oppia.controller('Preferences', [
         'preferred_site_language_code', preferredSiteLanguageCode);
     };
 
+    $scope.savePreferredAudioLanguageCode = function(
+      preferredAudioLanguageCode) {
+      _saveDataItem(
+        'preferred_audio_language_code', preferredAudioLanguageCode);
+    };
+
     $scope.showUsernamePopover = function(creatorUsername) {
       // The popover on the subscription card is only shown if the length of
       // the creator username is greater than 10 and the user hovers over
@@ -124,9 +135,14 @@ oppia.controller('Preferences', [
       _saveDataItem('preferred_language_codes', preferredLanguageCodes);
     };
 
+    $scope.saveDefaultDashboard = function(defaultDashboard) {
+      _saveDataItem('default_dashboard', defaultDashboard);
+    };
+
     $scope.showEditProfilePictureModal = function() {
       $modal.open({
-        templateUrl: 'modals/editProfilePicture',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/preferences/edit_profile_picture_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', function($scope, $modalInstance) {
@@ -194,6 +210,7 @@ oppia.controller('Preferences', [
     );
 
     $scope.SITE_LANGUAGE_CHOICES = constants.SUPPORTED_SITE_LANGUAGES;
+    $scope.AUDIO_LANGUAGE_CHOICES = constants.SUPPORTED_AUDIO_LANGUAGES;
 
     $scope.hasPageLoaded = false;
     $http.get(_PREFERENCES_DATA_URL).then(function(response) {
@@ -203,12 +220,14 @@ oppia.controller('Preferences', [
       $scope.subjectInterests = data.subject_interests;
       $scope.preferredLanguageCodes = data.preferred_language_codes;
       $scope.profilePictureDataUrl = data.profile_picture_data_url;
+      $scope.defaultDashboard = data.default_dashboard;
       $scope.canReceiveEmailUpdates = data.can_receive_email_updates;
       $scope.canReceiveEditorRoleEmail = data.can_receive_editor_role_email;
       $scope.canReceiveSubscriptionEmail = data.can_receive_subscription_email;
       $scope.canReceiveFeedbackMessageEmail = (
         data.can_receive_feedback_message_email);
       $scope.preferredSiteLanguageCode = data.preferred_site_language_code;
+      $scope.preferredAudioLanguageCode = data.preferred_audio_language_code;
       $scope.subscriptionList = data.subscription_list;
       $scope.hasPageLoaded = true;
       _forceSelect2Refresh();

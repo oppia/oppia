@@ -10,6 +10,7 @@
     },
     "GraphProperty": "strongly_connected",
     "Int": 0,
+    "ListOfCodeEvaluation": [],
     "ListOfCoordTwoDim": [],
     "ListOfGraph": [],
     "LogicErrorCategory": "mistake",
@@ -20,5 +21,11 @@
     "SetOfHtmlString": [],
     "SetOfNormalizedString": [],
     "SetOfUnicodeString": [],
-    "UnicodeString": ""
+    "UnicodeString": "",
+    "Fraction": {
+      "isNegative": false,
+      "wholeNumber": 0,
+      "numerator": 0,
+      "denominator": 1
+    }
 }

@@ -19,10 +19,13 @@ var constants = {
     "Mathematics", "Medicine", "Music", "Philosophy", "Physics", "Poetry",
     "Probability", "Programming", "Puzzles", "Reading", "Spanish", "Sport",
     "Statistics", "Trigonometry", "Welcome"],
+  "ACTIVITY_TYPE_EXPLORATION": "exploration",
+  "ACTIVITY_TYPE_COLLECTION": "collection",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
-
+  "DASHBOARD_TYPE_CREATOR": "creator",
+  "DASHBOARD_TYPE_LEARNER": "learner",
   "DEFAULT_COLOR": "#a33f40",
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
@@ -101,6 +104,9 @@ var constants = {
     "code": "bg",
     "description": "български (Bulgarian)"
   }, {
+    "code": "bn",
+    "description": "বাংলা (Bangla)"
+  }, {
     "code": "ca",
     "description": "català (Catalan)"
   }, {
@@ -151,6 +157,9 @@ var constants = {
   }, {
     "code": "ja",
     "description": "日本語 (Japanese)"
+  }, {
+    "code": "kab",
+    "description": "Taqbaylit (Kabyle)"
   }, {
     "code": "ko",
     "description": "한국어 (Korean)"
@@ -222,7 +231,7 @@ var constants = {
     "text": "Deutsch"
   }, {
     "id": "fr",
-    "text": "français"
+    "text": "Français"
   }, {
     "id": "nl",
     "text": "Nederlands"
@@ -231,13 +240,22 @@ var constants = {
     "text": "Español"
   }, {
     "id": "hu",
-    "text": "magyar"
+    "text": "Magyar"
   }, {
     "id": "pt",
     "text": "Português"
   }, {
     "id": "pt-br",
     "text": "Português (Brasil)"
+  }, {
+    "id": "sv",
+    "text": "svenska"
+  }, {
+    "id": "ar",
+    "text": "العربية"
+  }, {
+    "id": "kab",
+    "text": "Taqbaylit"
   }, {
     "id": "mk",
     "text": "македонски јазик"
@@ -261,11 +279,186 @@ var constants = {
     "text": "中文(繁體)"
   }],
 
+  "//": [
+    "Related languages are used to prioritize an exploration's language when ",
+    "setting the default audio language."
+  ],
   "SUPPORTED_AUDIO_LANGUAGES": [{
     "id": "en",
-    "text": "English"
+    "text": "English",
+    "related_languages": ["en"]
+  }, {
+    "id": "ar",
+    "text": "Arabic",
+    "related_languages": ["ar"]
+  }, {
+    "id": "bg",
+    "text": "Bulgarian",
+    "related_languages": ["bg"]
+  }, {
+    "id": "bn",
+    "text": "Bangla",
+    "related_languages": ["bn"]
+  }, {
+    "id": "ca",
+    "text": "Catalan",
+    "related_languages": ["ca"]
+  }, {
+    "id": "zh",
+    "text": "Chinese",
+    "related_languages": ["zh"]
+  }, {
+    "id": "hr",
+    "text": "Croatian",
+    "related_languages": ["hr"]
+  }, {
+    "id": "cs",
+    "text": "Czech",
+    "related_languages": ["cs"]
+  }, {
+    "id": "da",
+    "text": "Danish",
+    "related_languages": ["da"]
+  }, {
+    "id": "nl",
+    "text": "Dutch",
+    "related_languages": ["nl"]
+  }, {
+    "id": "tl",
+    "text": "Filipino",
+    "related_languages": ["tl"]
+  }, {
+    "id": "fi",
+    "text": "Finnish",
+    "related_languages": ["fi"]
+  }, {
+    "id": "fr",
+    "text": "French",
+    "related_languages": ["fr"]
+  }, {
+    "id": "de",
+    "text": "German",
+    "related_languages": ["de"]
+  }, {
+    "id": "el",
+    "text": "Greek",
+    "related_languages": ["el"]
+  }, {
+    "id": "he",
+    "text": "Hebrew",
+    "related_languages": ["he"]
+  }, {
+    "id": "hi",
+    "text": "Hindi",
+    "related_languages": ["hi"]
   }, {
     "id": "hi-en",
-    "text": "Hinglish"
-  }]
+    "text": "Hinglish",
+    "related_languages": ["hi", "en"]
+  }, {
+    "id": "hu",
+    "text": "Hungarian",
+    "related_languages": ["hu"]
+  }, {
+    "id": "id",
+    "text": "Indonesian",
+    "related_languages": ["id"]
+  }, {
+    "id": "it",
+    "text": "Italian",
+    "related_languages": ["it"]
+  }, {
+    "id": "ja",
+    "text": "Japanese",
+    "related_languages": ["ja"]
+  }, {
+    "id": "kab",
+    "text": "Kabyle",
+    "related_languages": ["kab"]
+  }, {
+    "id": "ko",
+    "text": "Korean",
+    "related_languages": ["ko"]
+  }, {
+    "id": "lv",
+    "text": "Latvian",
+    "related_languages": ["lv"]
+  }, {
+    "id": "lt",
+    "text": "Lithuanian",
+    "related_languages": ["lt"]
+  }, {
+    "id": "no",
+    "text": "Norwegian",
+    "related_languages": ["no"]
+  }, {
+    "id": "fa",
+    "text": "Persian",
+    "related_languages": ["fa"]
+  }, {
+    "id": "pl",
+    "text": "Polish",
+    "related_languages": ["pl"]
+  }, {
+    "id": "pt",
+    "text": "Portuguese",
+    "related_languages": ["pt"]
+  }, {
+    "id": "ro",
+    "text": "Romanian",
+    "related_languages": ["ro"]
+  }, {
+    "id": "ru",
+    "text": "Russian",
+    "related_languages": ["ru"]
+  }, {
+    "id": "sr",
+    "text": "Serbian",
+    "related_languages": ["sr"]
+  }, {
+    "id": "sk",
+    "text": "Slovak",
+    "related_languages": ["sk"]
+  }, {
+    "id": "sl",
+    "text": "Slovenian",
+    "related_languages": ["sl"]
+  }, {
+    "id": "es",
+    "text": "Spanish",
+    "related_languages": ["es"]
+  }, {
+    "id": "sv",
+    "text": "Swedish",
+    "related_languages": ["sw"]
+  }, {
+    "id": "th",
+    "text": "Thai",
+    "related_languages": ["th"]
+  }, {
+    "id": "tr",
+    "text": "Turkish",
+    "related_languages": ["tr"]
+  }, {
+    "id": "uk",
+    "text": "Ukrainian",
+    "related_languages": ["uk"]
+  }, {
+    "id": "vi",
+    "text": "Vietnamese",
+    "related_languages": ["vi"]
+  }],
+
+  "AUTOGENERATED_AUDIO_LANGUAGES": [{
+    "id": "en-auto",
+    "text": "English (autogenerated)",
+    "exploration_language": "en",
+    "speech_synthesis_code": "en-GB"
+  }],
+
+  "//" : "Types of view in creator dashboard page.",
+  "ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS": {
+    "CARD": "card",
+    "LIST": "list"
+  }
 };

@@ -59,21 +59,18 @@ var GLOBALS = {
       rule_descriptions: {
         StartsWith: 'starts with {{x|NormalizedString}}',
         FuzzyMatches: 'is similar to {{training_data|SetOfNormalizedString}}',
-        FuzzyEquals: 
+        FuzzyEquals:
           'is equal to {{x|NormalizedString}}, ' +
           'misspelled by at most one character',
         Contains: 'contains {{x|NormalizedString}}',
-        CaseSensitiveEquals: 
+        CaseSensitiveEquals:
           'is equal to {{x|NormalizedString}}, taking case into account',
         Equals: 'is equal to {{x|NormalizedString}}'
       },
-      is_string_classifier_trainable: true,
       is_trainable: true,
       narrow_instructions: null
     }
   },
-  GADGET_SPECS: {},
-  PANEL_SPECS: {},
   SUPPORTED_SITE_LANGUAGES: [{
     id: 'id',
     text: 'Bahasa Indonesia'
@@ -81,7 +78,22 @@ var GLOBALS = {
     id: 'en',
     text: 'English'
   }],
-  ASSET_DIR_PREFIX: ''
+  ASSET_DIR_PREFIX: '',
+  GCS_RESOURCE_BUCKET_NAME: null,
+  // This prefix is needed to correctly interpolate directive template URLs in
+  // Karma tests. It is referenced by UrlInterpolationService.
+  TEMPLATE_DIR_PREFIX: 'core/templates/dev/head'
+};
+
+/* hashes for UrlInterpolationService tests */
+var hashes = {
+  '/hash_test.html': 'ijklmopq',
+  '/path_test/hash_test.html': '123456789',
+  '/hash_test.min.js': 'zyx12345',
+  '/assets_test/hash_test.json': '987654321',
+  '/pages_test/hash_test.html': 'abcd12345',
+  '/images/hash_test.png': '98765fghij',
+  '/interactions/interTest/static/interTest.png' : '123654789'
 };
 
 /* This function overwrites the translationProvider for a dummy function

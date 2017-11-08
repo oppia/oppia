@@ -213,6 +213,49 @@ describe('State editor', function() {
     users.logout();
   });
 
+  it('should add/modify/delete a hint', function() {
+    users.login('stateEditorUser1@example.com');
+    workflow.createExploration();
+    editor.setContent(forms.toRichText('some content'));
+
+    editor.openInteraction('TextInput');
+    editor.customizeInteraction('TextInput', 'My PlaceHolder', 2);
+    editor.selectRuleInAddResponseModal('TextInput', 'Equals');
+    editor.setRuleParametersInAddResponseModal('TextInput',
+      'Equals', 'Some Text');
+    editor.expectRuleParametersToBe('TextInput', 'Equals', 'Some Text');
+    editor.selectRuleInAddResponseModal('TextInput', 'Contains');
+    editor.expectRuleParametersToBe('TextInput', 'Equals', 'Some Text');
+    editor.closeAddResponseModal();
+    editor.addHint('hint one');
+    editor.HintEditor(0).setHint('modified hint one');
+    editor.HintEditor(0).deleteHint();
+    editor.saveChanges();
+    users.logout();
+  });
+
+  it('should add a solution', function() {
+    users.login('stateEditorUser1@example.com');
+    workflow.createExploration();
+    editor.setContent(forms.toRichText('some content'));
+
+    editor.openInteraction('TextInput');
+    editor.customizeInteraction('TextInput', 'My PlaceHolder', 2);
+    editor.addResponse('TextInput', function(richTextEditor) {
+      richTextEditor.appendBoldText('correct');
+    }, 'final card', true, 'Equals', 'Some Text');
+
+    editor.addHint('hint one');
+    editor.addSolution('TextInput', {
+      answerIsExclusive: true,
+      correctAnswer: 'Some Text',
+      explanation: 'sample explanation'
+    });
+
+    editor.saveChanges();
+    users.logout();
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
   });

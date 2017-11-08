@@ -24,6 +24,10 @@
   .cm-s-preview.CodeMirror {
     background-color: #eee;
   }
+  .cm-s-preview .CodeMirror-linenumber {
+    /* Without this, Line-number in preview CodeRepl will be overlapped. */
+    white-space: nowrap;
+  }
   .cm-s-preview .CodeMirror-code pre {
     /* Without this, underscore characters are not visible. */
     height: 1.04em;
@@ -41,24 +45,20 @@
     padding: 8px;
     width: 100%;
   }
-
-  @media screen and (max-width: 959px) {
-    .code-repl-container {
-      width: 100vw;
-    }
-  }
 </style>
 
 <script type="text/ng-template" id="interaction/CodeRepl">
   <div class="code-repl-container">
     <div>
+      <!-- This ng-form is needed for submitting answer on hitting enter. -->
       <form ng-submit="runAndSubmitCode(code)">
         <div class="code-repl-input-box">
           <div ui-codemirror="{onLoad: initCodeEditor}">
           </div>
         </div>
         <md-button type="button" class="md-raised" ng-click="runCode(code)" ng-disabled="!hasLoaded">Test Run</md-button>
-        <md-button type="submit" class="md-raised" ng-disabled="!hasLoaded">Submit</md-button>
+        <!-- This ng-click is needed for specifying solutions in the solution editor -->
+        <md-button type="submit" class="md-raised" ng-click="runAndSubmitCode(code)" ng-disabled="!hasLoaded">Submit</md-button>
         <span class="code-repl-language">
           <em>Language: <[language]></em>
         </span>

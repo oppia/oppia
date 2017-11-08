@@ -19,15 +19,17 @@
 
 oppia.controller('StateStatistics', [
   '$rootScope', '$scope', '$modal', 'explorationData', 'editorContextService',
-  'explorationStatesService', 'trainingDataService',
+  'explorationStatesService', 'TrainingDataService',
   'stateCustomizationArgsService', 'oppiaExplorationHtmlFormatterService',
-  'trainingModalService', 'INTERACTION_SPECS',
+  'TrainingModalService', 'INTERACTION_SPECS',
   function(
       $rootScope, $scope, $modal, explorationData, editorContextService,
-      explorationStatesService, trainingDataService,
+      explorationStatesService, TrainingDataService,
       stateCustomizationArgsService, oppiaExplorationHtmlFormatterService,
-      trainingModalService, INTERACTION_SPECS) {
+      TrainingModalService, INTERACTION_SPECS) {
     $scope.isInteractionTrainable = false;
+    $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS =
+      GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS;
 
     $scope.initStateStatistics = function(data) {
       $scope.isInteractionTrainable = (
@@ -39,9 +41,9 @@ oppia.controller('StateStatistics', [
       $rootScope.$on('updatedTrainingData', function() {
         $scope.trainingDataButtonContentsList = [];
 
-        var trainingDataAnswers = trainingDataService.getTrainingDataAnswers();
+        var trainingDataAnswers = TrainingDataService.getTrainingDataAnswers();
         var trainingDataFrequencies = (
-          trainingDataService.getTrainingDataFrequencies());
+          TrainingDataService.getTrainingDataFrequencies());
         for (var i = 0; i < trainingDataAnswers.length; i++) {
           var answerHtml = (
             oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
@@ -62,8 +64,8 @@ oppia.controller('StateStatistics', [
     });
 
     $scope.openTrainUnresolvedAnswerModal = function(trainingDataIndex) {
-      return trainingModalService.openTrainUnresolvedAnswerModal(
-        trainingDataService.getTrainingDataAnswers()[trainingDataIndex], true);
+      return TrainingModalService.openTrainUnresolvedAnswerModal(
+        TrainingDataService.getTrainingDataAnswers()[trainingDataIndex], true);
     };
   }
 ]);

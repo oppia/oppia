@@ -25,6 +25,7 @@ from core.domain import event_services
 from core.domain import exp_services
 from core.domain import stats_jobs_continuous
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
@@ -121,7 +122,9 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             state_hit_counts = (
@@ -165,7 +168,9 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             model_id = '%s:%s' % (exp_id, exp_version)
@@ -193,7 +198,9 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             model_id = '%s:%s' % (exp_id, exp_version)
@@ -218,7 +225,9 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             model_id = '%s:%s' % (exp_id, exp_version)
@@ -242,7 +251,9 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             model_id = '%s:%s' % (exp_id, exp_version)
@@ -286,7 +297,9 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             model_id = '%s:%s' % (exp_id, exp_version)
@@ -312,7 +325,9 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self._record_start(exp_id_2, exp_version, state_2_1, 'session3')
             self.process_and_flush_pending_tasks()
             ModifiedStatisticsAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
             results = ModifiedStatisticsAggregator.get_statistics(
                 exp_id_1, stats_jobs_continuous.VERSION_ALL)
@@ -442,9 +457,13 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             # Run job on exploration with answers
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'AnswerFrequencies'
 
@@ -525,9 +544,13 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             # Run the answers aggregation job.
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'AnswerFrequencies'
 
@@ -582,9 +605,13 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             # Run the aggregator again.
             ModifiedInteractionAnswerSummariesAggregator.stop_computation('a')
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Extract the output from the job.
             calc_output_first_domain_object = (
@@ -638,11 +665,201 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 calculation_output_all,
                 expected_calculation_output_all_answers)
 
-    def test_answers_across_multiple_exp_versions_different_interactions(self):
+    def test_ignores_old_answers_if_new_interaction_has_no_new_answers(self):
         """Similar to test_answers_across_multiple_exploration_versions except
         the exploration has changed interactions in the new versions. The
         aggregation job should not include answers corresponding to exploration
         versions which do not match the latest version's interaction ID.
+        """
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+
+            # Setup example exploration.
+            exp_id = 'eid'
+            exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
+            init_state_name = exp.init_state_name
+
+            time_spent = 5.0
+            params = {}
+
+            # Add a few different answers.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, init_state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 'verb')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, init_state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, '2')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, init_state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 'verb')
+
+            # Change the interaction ID.
+            exp_services.update_exploration('fake@user.com', exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'NumericInput',
+            }], 'Change to NumericInput')
+
+            exp = exp_services.get_exploration_by_id(exp_id)
+            self.assertEqual(exp.version, 2)
+
+            # Run the answers aggregation job.
+            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+
+            calc_id = 'Top10AnswerFrequencies'
+
+            # Check the output of the job.
+            calc_output_latest_version_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, init_state_name, calc_id,
+                    exploration_version='2'))
+            calc_output_first_version_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, init_state_name, calc_id,
+                    exploration_version='1'))
+            calc_output_all_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, init_state_name, calc_id))
+
+            # Since no answers were submitted to the latest version of the
+            # exploration, there should be no calculated output for it.
+            self.assertIsNone(calc_output_latest_version_domain_object)
+
+            # Top answers will still be computed for the first version.
+            self.assertEqual(
+                'Top10AnswerFrequencies',
+                calc_output_first_version_domain_object.calculation_id)
+            calculation_output_first = (
+                calc_output_first_version_domain_object.calculation_output)
+            expected_calculation_output_first_answer = [{
+                'answer': 'verb',
+                'frequency': 2
+            }, {
+                'answer': '2',
+                'frequency': 1
+            }]
+            self.assertEqual(
+                calculation_output_first,
+                expected_calculation_output_first_answer)
+
+            self.assertEqual(
+                'Top10AnswerFrequencies',
+                calc_output_all_domain_object.calculation_id)
+
+            # No answers should be aggregated since all past answers do not
+            # match the newly submitted interaction ID.
+            calculation_output_all = (
+                calc_output_all_domain_object.calculation_output)
+            self.assertEqual(calculation_output_all, [])
+
+    def test_uses_old_answers_if_updated_exploration_has_same_interaction(self):
+        """Similar to
+        test_ignores_old_answers_if_new_interaction_has_no_new_answers except
+        this is demonstrating that if an exploration is updated and no new
+        answers are submitted to the new version, but the interaction ID is the
+        same then old answers should still be aggregated.
+        """
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+
+            # Setup example exploration.
+            exp_id = 'eid'
+            exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
+            init_state_name = exp.init_state_name
+
+            time_spent = 5.0
+            params = {}
+
+            # Add a few different answers.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, init_state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 'verb')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, init_state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, '2')
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, 1, init_state_name, 'TextInput', 0, 0,
+                exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 'verb')
+
+            # Change something other than the interaction ID.
+            exp_services.update_exploration('fake@user.com', exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': {
+                    'html': 'New content',
+                    'audio_translations': {}
+                },
+            }], 'Change state content')
+
+            exp = exp_services.get_exploration_by_id(exp_id)
+            self.assertEqual(exp.version, 2)
+
+            # Run the answers aggregation job.
+            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+
+            calc_id = 'Top10AnswerFrequencies'
+
+            # Extract the output from the job.
+            calc_output_latest_version_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, init_state_name, calc_id,
+                    exploration_version='2'))
+            calc_output_all_domain_object = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
+                    exp_id, init_state_name, calc_id))
+
+            # Since no answers were submitted to the latest version of the
+            # exploration, there should be no calculated output for it.
+            self.assertIsNone(calc_output_latest_version_domain_object)
+
+            self.assertEqual(
+                'Top10AnswerFrequencies',
+                calc_output_all_domain_object.calculation_id)
+            calculation_output_all = (
+                calc_output_all_domain_object.calculation_output)
+            expected_calculation_output_all_answers = [{
+                'answer': 'verb',
+                'frequency': 2
+            }, {
+                'answer': '2',
+                'frequency': 1
+            }]
+            self.assertEqual(
+                calculation_output_all,
+                expected_calculation_output_all_answers)
+
+    def test_answers_across_multiple_exp_versions_different_interactions(self):
+        """Same as
+        test_ignores_old_answers_if_new_interaction_has_no_new_answers except
+        this also adds additional answers after changing the interaction a few
+        times to ensure the aggregation job does not include answers across
+        interaction changes, even if the interaction reverts back to a past
+        interaction type with answers submitted to both versions of the
+        exploration.
         """
         with self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
@@ -705,7 +922,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'new_value': {
                     'html': 'New content description',
-                    'audio_translations': [],
+                    'audio_translations': {},
                 }
             }], 'Change content description')
 
@@ -728,9 +945,13 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             # Run the answers aggregation job.
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             calc_id = 'Top10AnswerFrequencies'
 
@@ -821,9 +1042,13 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             # Run the aggregator job.
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Retrieve outputs for all of the computations running on this
             # interaction.

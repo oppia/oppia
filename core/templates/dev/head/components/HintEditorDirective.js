@@ -26,7 +26,7 @@ oppia.directive('hintEditor', [
         getOnSaveFn: '&onSave'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/' + 'hint_editor_directive.html'),
+        '/components/hint_editor_directive.html'),
       controller: [
         '$scope', 'editabilityService', function($scope, editabilityService) {
           $scope.isEditable = editabilityService.isEditable();
