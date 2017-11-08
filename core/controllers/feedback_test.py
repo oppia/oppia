@@ -518,10 +518,6 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
 
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
-        # Load exploration 0.
-        exp_services.delete_demo(self.EXP_ID)
-        exp_services.load_demo(self.EXP_ID)
-
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
 

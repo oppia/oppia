@@ -527,10 +527,10 @@ class TestBase(unittest.TestCase):
             collection_id, title, category, objective,
             language_code=language_code)
 
-        # Check whether exploration with given exploration_id exist or not.
+        # Check whether exploration with given exploration_id exists or not.
         exploration = exp_services.get_exploration_by_id(
             exploration_id, strict=False)
-        if not exploration:
+        if exploration is None:
             exploration = self.save_new_valid_exploration(
                 exploration_id, owner_id, title, category, objective,
                 end_state_name=end_state_name)

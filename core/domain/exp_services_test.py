@@ -2832,8 +2832,6 @@ class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
         super(ExplorationStateIdMappingTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.enable_state_id_mapping_model = self.swap(
-            feconf, 'ENABLE_STATE_ID_MAPPING', True)
 
     def test_that_correct_state_id_mapping_model_is_stored(self):
         """Test that correct mapping model is stored for new and edited
