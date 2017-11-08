@@ -19,13 +19,13 @@
 oppia.factory('FractionInputValidationService', [
   'WARNING_TYPES', 'baseInteractionValidationService', 'FractionObjectFactory',
   function(
-      WARNING_TYPES, baseInteractionValidationService, FractionObjectFactory) {
+    WARNING_TYPES, baseInteractionValidationService, FractionObjectFactory) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         return [];
       },
       getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
+        stateName, customizationArgs, answerGroups, defaultOutcome) {
         var warningsList = [];
 
         warningsList = warningsList.concat(
@@ -53,11 +53,11 @@ oppia.factory('FractionInputValidationService', [
         var isEnclosedBy = function(ra, rb) {
           // Checks if range ra is enclosed by range rb.
           var lowerBoundConditionIsSatisfied =
-              (rb.lb < ra.lb) || (rb.lb == ra.lb && (!ra.lbi || rb.lbi));
+            (rb.lb < ra.lb) || (rb.lb == ra.lb && (!ra.lbi || rb.lbi));
           var upperBoundConditionIsSatisfied =
-              (rb.ub > ra.ub) || (rb.ub == ra.ub && (!ra.ubi || rb.ubi));
+            (rb.ub > ra.ub) || (rb.ub == ra.ub && (!ra.ubi || rb.ubi));
           return lowerBoundConditionIsSatisfied &&
-              upperBoundConditionIsSatisfied;
+            upperBoundConditionIsSatisfied;
         };
 
         var ranges = [];

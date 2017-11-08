@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-fdescribe('FractionInputValidationService', function() {
+describe('FractionInputValidationService', function() {
   var validatorService, WARNING_TYPES;
 
   var currentState;
@@ -30,12 +30,13 @@ fdescribe('FractionInputValidationService', function() {
 
     createFractionDict = function(
       isNegative, wholeNumber, numerator, denominator) {
-        return {
-          isNegative: isNegative,
-          wholeNumber : wholeNumber,
-          numerator: numerator,
-          denominator: denominator};
-        };
+      return {
+        isNegative: isNegative,
+        wholeNumber: wholeNumber,
+        numerator: numerator,
+        denominator: denominator
+      };
+    };
 
     currentState = 'First State';
     goodDefaultOutcome = {

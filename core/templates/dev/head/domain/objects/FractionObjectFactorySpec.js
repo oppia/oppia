@@ -64,7 +64,7 @@
      it('should throw errors for invalid fractions', function() {
        // Invalid characters.
        expect(function() {Fraction.fromRawInputString('3 \ b')}).toThrow(
-         new Error(errors.INVALID_CHARS));
+          new Error(errors.INVALID_CHARS));
        expect(function() {Fraction.fromRawInputString('a 3/5')}).toThrow(
            new Error(errors.INVALID_CHARS));
        expect(function() {Fraction.fromRawInputString('5 b/c')}).toThrow(

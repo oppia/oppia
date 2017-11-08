@@ -16,7 +16,8 @@
  * @fileoverview Unit tests for Fraction Input rules.
  */
 oppia.factory('fractionInputRulesService', [
-  'FractionObjectFactory', function(FractionObjectFactory) {
+  'FractionObjectFactory',
+  function(FractionObjectFactory) {
     var toFloat = function(fractionDict) {
       return FractionObjectFactory.fromDict(fractionDict).toFloat();
     };
@@ -28,8 +29,8 @@ oppia.factory('fractionInputRulesService', [
       IsEquivalentToAndInSimplestForm: function(answer, inputs) {
         var simplestForm =
           FractionObjectFactory.fromDict(inputs.f).convertToSimplestForm();
-        return toFloat(answer) === toFloat(inputs.f)
-          && JSON.stringify(answer) ===  JSON.stringify(simplestForm);
+        return toFloat(answer) === toFloat(inputs.f) &&
+          JSON.stringify(answer) === JSON.stringify(simplestForm);
       },
       IsExactlyEqualTo: function(answer, inputs) {
         // Only returns true if both answers are structurally equal.
@@ -51,4 +52,5 @@ oppia.factory('fractionInputRulesService', [
         return answer.denominator === inputs.f.denominator;
       },
     };
-}]);
+  }
+]);
