@@ -236,7 +236,8 @@ class TestBase(unittest.TestCase):
         for key in self.stashed_user_env:
             os.environ[key] = self.stashed_user_env[key]
 
-        self.stashed_user_env = None  # pylint: disable=attribute-defined-outside-init
+        self.stashed_user_env = None  
+        # pylint: disable=attribute-defined-outside-init
 
     def login(self, email, is_super_admin=False):
         """Assign environment variables for login credentials of user.
