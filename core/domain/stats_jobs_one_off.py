@@ -265,7 +265,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             if version == 1:
                 # Create default state stats mapping for the first version.
                 state_stats_mapping = collections.defaultdict(
-                    lambda: stats_domain.StateStats.create_default())
+                    stats_domain.StateStats.create_default())
             else:
                 change_list = snapshots_by_version[version - 1]['commit_cmds']
 
