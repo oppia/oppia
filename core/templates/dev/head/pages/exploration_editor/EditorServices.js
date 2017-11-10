@@ -18,10 +18,10 @@
 
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
-  '$http', '$log', '$window', '$q', 'alertsService',
+  '$http', '$log', '$window', '$q', 'AlertsService',
   'EditableExplorationBackendApiService', 'LocalStorageService',
   'ReadOnlyExplorationBackendApiService', 'urlService',
-  function($http, $log, $window, $q, alertsService,
+  function($http, $log, $window, $q, AlertsService,
     EditableExplorationBackendApiService, LocalStorageService,
     ReadOnlyExplorationBackendApiService, urlService) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
@@ -137,7 +137,7 @@ oppia.factory('explorationData', [
           });
       },
       resolveAnswers: function(stateName, resolvedAnswersList) {
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
         $http.put(
           resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName), {
             resolved_answers: resolvedAnswersList
@@ -159,7 +159,7 @@ oppia.factory('explorationData', [
         EditableExplorationBackendApiService.updateExploration(explorationId,
           explorationData.data.version, commitMessage, changeList).then(
             function(response) {
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
               explorationData.data = response;
               if (successCallback) {
                 successCallback(
@@ -243,10 +243,10 @@ oppia.factory('editabilityService', [function() {
 // A service that maintains a provisional list of changes to be committed to
 // the server.
 oppia.factory('changeListService', [
-  '$rootScope', '$log', 'alertsService', 'explorationData',
+  '$rootScope', '$log', 'AlertsService', 'explorationData',
   'autosaveInfoModalsService',
   function(
-      $rootScope, $log, alertsService, explorationData,
+      $rootScope, $log, AlertsService, explorationData,
       autosaveInfoModalsService) {
     // TODO(sll): Implement undo, redo functionality. Show a message on each
     // step saying what the step is doing.
@@ -312,7 +312,7 @@ oppia.factory('changeListService', [
           }
         },
         function() {
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           $log.error(
             'nonStrictValidationFailure: ' +
             JSON.stringify(explorationChangeList));
@@ -375,7 +375,7 @@ oppia.factory('changeListService', [
        */
       editExplorationProperty: function(backendName, newValue, oldValue) {
         if (!ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
-          alertsService.addWarning(
+          AlertsService.addWarning(
             'Invalid exploration property: ' + backendName);
           return;
         }
@@ -398,7 +398,7 @@ oppia.factory('changeListService', [
        */
       editStateProperty: function(stateName, backendName, newValue, oldValue) {
         if (!ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
-          alertsService.addWarning('Invalid state property: ' + backendName);
+          AlertsService.addWarning('Invalid state property: ' + backendName);
           return;
         }
         addChange({
@@ -443,7 +443,7 @@ oppia.factory('changeListService', [
       },
       undoLastChange: function() {
         if (explorationChangeList.length === 0) {
-          alertsService.addWarning('There are no changes to undo.');
+          AlertsService.addWarning('There are no changes to undo.');
           return;
         }
         var lastChange = explorationChangeList.pop();
@@ -456,8 +456,8 @@ oppia.factory('changeListService', [
 
 // A data service that stores data about the rights for this exploration.
 oppia.factory('explorationRightsService', [
-  '$http', '$q', 'explorationData', 'alertsService',
-  function($http, $q, explorationData, alertsService) {
+  '$http', '$q', 'explorationData', 'AlertsService',
+  function($http, $q, explorationData, AlertsService) {
     return {
       init: function(
           ownerNames, editorNames, viewerNames, status, clonedFrom,
@@ -501,7 +501,7 @@ oppia.factory('explorationRightsService', [
           make_community_owned: true
         }).then(function(response) {
           var data = response.data;
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
             data.rights.viewer_names, data.rights.status,
@@ -522,7 +522,7 @@ oppia.factory('explorationRightsService', [
           viewable_if_private: viewableIfPrivate
         }).then(function(response) {
           var data = response.data;
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
             data.rights.viewer_names, data.rights.status,
@@ -544,7 +544,7 @@ oppia.factory('explorationRightsService', [
           new_member_username: newMemberUsername
         }).then(function(response) {
           var data = response.data;
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
             data.rights.viewer_names, data.rights.status,
@@ -564,7 +564,7 @@ oppia.factory('explorationRightsService', [
           make_public: true
         }).then(function(response) {
           var data = response.data;
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
             data.rights.viewer_names, data.rights.status,
@@ -585,7 +585,7 @@ oppia.factory('explorationRightsService', [
           version: explorationData.data.version
         }).then(function(response) {
           var data = response.data;
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
             data.rights.viewer_names, data.rights.status,
@@ -598,8 +598,8 @@ oppia.factory('explorationRightsService', [
 ]);
 
 oppia.factory('explorationPropertyService', [
-  '$rootScope', '$log', 'changeListService', 'alertsService',
-  function($rootScope, $log, changeListService, alertsService) {
+  '$rootScope', '$log', 'changeListService', 'AlertsService',
+  function($rootScope, $log, changeListService, AlertsService) {
     // Public base API for data services corresponding to exploration properties
     // (title, category, etc.)
 
@@ -669,7 +669,7 @@ oppia.factory('explorationPropertyService', [
           return;
         }
 
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         var newBackendValue = angular.copy(this.displayed);
         var oldBackendValue = angular.copy(this.savedMemento);
@@ -860,17 +860,17 @@ oppia.factory('explorationAutomaticTextToSpeechService', [
 // mementos.
 oppia.factory('explorationStatesService', [
   '$log', '$modal', '$filter', '$location', '$rootScope', '$injector', '$q',
-  'explorationInitStateNameService', 'alertsService', 'changeListService',
+  'explorationInitStateNameService', 'AlertsService', 'changeListService',
   'editorContextService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'angularNameService',
-  'AnswerClassificationService', 'explorationContextService',
+  'AnswerClassificationService', 'ExplorationContextService',
   'UrlInterpolationService',
   function(
       $log, $modal, $filter, $location, $rootScope, $injector, $q,
-      explorationInitStateNameService, alertsService, changeListService,
+      explorationInitStateNameService, AlertsService, changeListService,
       editorContextService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, angularNameService,
-      AnswerClassificationService, explorationContextService,
+      AnswerClassificationService, ExplorationContextService,
       UrlInterpolationService) {
     var _states = null;
     // Properties that have a different backend representation from the
@@ -997,7 +997,7 @@ oppia.factory('explorationStatesService', [
           if (solution) {
             var result = (
               AnswerClassificationService.getMatchingClassificationResult(
-                explorationContextService.getExplorationId(),
+                ExplorationContextService.getExplorationId(),
               stateName,
               _states.getState(stateName),
               solution.correctAnswer,
@@ -1029,7 +1029,7 @@ oppia.factory('explorationStatesService', [
       isNewStateNameValid: function(newStateName, showWarnings) {
         if (_states.hasState(newStateName)) {
           if (showWarnings) {
-            alertsService.addWarning('A state with this name already exists.');
+            AlertsService.addWarning('A state with this name already exists.');
           }
           return false;
         }
@@ -1112,10 +1112,10 @@ oppia.factory('explorationStatesService', [
           return;
         }
         if (_states.hasState(newStateName)) {
-          alertsService.addWarning('A state with this name already exists.');
+          AlertsService.addWarning('A state with this name already exists.');
           return;
         }
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         _states.addState(newStateName);
 
@@ -1126,14 +1126,14 @@ oppia.factory('explorationStatesService', [
         }
       },
       deleteState: function(deleteStateName) {
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         var initStateName = explorationInitStateNameService.displayed;
         if (deleteStateName === initStateName) {
           return;
         }
         if (!_states.hasState(deleteStateName)) {
-          alertsService.addWarning(
+          AlertsService.addWarning(
             'No state with name ' + deleteStateName + ' exists.');
           return;
         }
@@ -1161,7 +1161,7 @@ oppia.factory('explorationStatesService', [
 
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
+                AlertsService.clearWarnings();
               };
             }
           ]
@@ -1188,10 +1188,10 @@ oppia.factory('explorationStatesService', [
           return;
         }
         if (_states.hasState(newStateName)) {
-          alertsService.addWarning('A state with this name already exists.');
+          AlertsService.addWarning('A state with this name already exists.');
           return;
         }
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         _states.renameState(oldStateName, newStateName);
 
@@ -1215,8 +1215,8 @@ oppia.factory('explorationStatesService', [
 ]);
 
 oppia.factory('statePropertyService', [
-  '$log', 'changeListService', 'alertsService', 'explorationStatesService',
-  function($log, changeListService, alertsService, explorationStatesService) {
+  '$log', 'changeListService', 'AlertsService', 'explorationStatesService',
+  function($log, changeListService, AlertsService, explorationStatesService) {
     // Public base API for data services corresponding to state properties
     // (interaction id, content, etc.)
     // WARNING: This should be initialized only in the context of the state
@@ -1275,7 +1275,7 @@ oppia.factory('statePropertyService', [
           return;
         }
 
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         var setterFunc = explorationStatesService[this.setterMethodKey];
         setterFunc(this.stateName, angular.copy(this.displayed));
