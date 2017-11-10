@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Fraction Input rules.
+ * @fileoverview Rule evaluation for the fraction input.
  */
 oppia.factory('fractionInputRulesService', [
   'FractionObjectFactory',
@@ -30,11 +30,11 @@ oppia.factory('fractionInputRulesService', [
         var simplestForm =
           FractionObjectFactory.fromDict(inputs.f).convertToSimplestForm();
         return toFloat(answer) === toFloat(inputs.f) &&
-          JSON.stringify(answer) === JSON.stringify(simplestForm);
+          angular.equals(answer, simplestForm);
       },
       IsExactlyEqualTo: function(answer, inputs) {
         // Only returns true if both answers are structurally equal.
-        return JSON.stringify(answer) === JSON.stringify(inputs.f);
+        return angular.equals(answer, inputs.f);
       },
       IsLessThan: function(answer, inputs) {
         return toFloat(answer) < toFloat(inputs.f);

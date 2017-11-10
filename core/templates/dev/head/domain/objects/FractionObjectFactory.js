@@ -62,14 +62,14 @@ oppia.factory('FractionObjectFactory', [
 
     Fraction.prototype.toFloat = function () {
       var totalParts = (this.wholeNumber * this.denominator) + this.numerator;
-      var floatVal = (totalParts / this.denominator)
+      var floatVal = (totalParts / this.denominator);
       return this.isNegative ? -floatVal : floatVal;
     };
 
     Fraction.prototype.convertToSimplestForm = function () {
       var gcd = function(x, y) {
         return y === 0 ? x : gcd(y, x % y);
-      }
+      };
       var g = gcd(this.numerator, this.denominator);
       var numerator = this.numerator / g;
       var denominator = this.denominator / g;
