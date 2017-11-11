@@ -1104,8 +1104,9 @@ class SampleAnswerTests(test_utils.GenericTestBase):
         self.assertLess(len(sample_answers), 100)
 
 
-# TODO(bhenning): Add tests for multiple visualizations for one state (no
-# interactions currently seem to use more than one visualization ID).
+# TODO(bhenning): Either add tests for multiple visualizations for one state or
+# disallow stats from having multiple visualizations (no interactions currently
+# seem to use more than one visualization ID).
 class AnswerVisualizationsTests(test_utils.GenericTestBase):
     """Tests for functionality related to retrieving visualization information
     for answers.
@@ -1115,6 +1116,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
     TEXT_INPUT_EXP_ID = 'exp_id0'
     SET_INPUT_EXP_ID = 'exp_id1'
     DEFAULT_EXP_ID = 'exp_id2'
+    NEW_STATE_NAME = 'new state'
 
     def _get_swap_context(self):
         return self.swap(
@@ -1187,13 +1189,12 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.text_input_exploration = self.save_new_valid_exploration(
+        self.save_new_valid_exploration(
             self.TEXT_INPUT_EXP_ID, self.owner_id, end_state_name='End')
-        self.text_input_exploration = self.save_new_valid_exploration(
+        self.save_new_valid_exploration(
             self.SET_INPUT_EXP_ID, self.owner_id, end_state_name='End',
             interaction_id='SetInput')
-        self.default_exploration = self.save_new_default_exploration(
-            self.DEFAULT_EXP_ID, self.owner_id)
+        self.save_new_default_exploration(self.DEFAULT_EXP_ID, self.owner_id)
 
     def test_no_vis_info_for_exp_with_no_interaction_id(self):
         with self._get_swap_context():
@@ -1364,10 +1365,11 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
     def test_no_vis_info_for_exp_with_new_state_name_before_calculations(self):
         with self._get_swap_context():
             self._record_answer('Answer A')
-            self._rename_state('new state')
+            self._rename_state(self.NEW_STATE_NAME)
             self._run_answer_summaries_aggregator()
 
-            visualizations = self._get_visualizations(state_name='new state')
+            visualizations = self._get_visualizations(
+                state_name=self.NEW_STATE_NAME)
 
             self.assertEqual(visualizations, [])
 
@@ -1375,15 +1377,13 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
         with self._get_swap_context():
             self._record_answer('Answer A')
             self._run_answer_summaries_aggregator()
-            self._rename_state('new state')
+            self._rename_state(self.NEW_STATE_NAME)
 
-            visualizations = self._get_visualizations(state_name='new state')
+            visualizations = self._get_visualizations(
+                state_name=self.NEW_STATE_NAME)
 
             self.assertEqual(visualizations, [])
 
-    # TODO(bhenning): Fix these tests. These fail because we're accessing stale
-    # aggregation data that isn't updated since a different calculation ID is
-    # being referenced.
     def test_no_vis_info_for_exp_with_new_interaction_before_calculations(self):
         with self._get_swap_context():
             self._record_answer('Answer A')

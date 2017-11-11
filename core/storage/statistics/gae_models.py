@@ -1275,7 +1275,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     exploration_version = ndb.StringProperty(indexed=True, required=True)
     state_name = ndb.StringProperty(indexed=True, required=True)
     calculation_id = ndb.StringProperty(indexed=True, required=True)
-    interaction_id = ndb.StringProperty(indexed=False)
+    interaction_id = ndb.StringProperty(indexed=True)
     # Calculation output dict stored as JSON blob
     calculation_output = ndb.JsonProperty(indexed=False)
 
