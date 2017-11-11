@@ -416,9 +416,20 @@ def get_calc_output(
     calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
         exploration_id, exploration_version, state_name, calculation_id)
     if calc_output_model:
+        calculation_output = None
+        if (calc_output_model.calculation_output_type ==
+                stats_domain.CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST):
+            calculation_output = (
+                stats_domain.CategorizedAnswerFrequencyLists.from_raw_type(
+                    calc_output_model.calculation_output))
+        elif (calc_output_model.calculation_output_type ==
+                stats_domain.CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS): # pylint: disable=line-too-long
+            calculation_output = (
+                stats_domain.CategorizedAnswerFrequencyLists.from_raw_type(
+                    calc_output_model.calculation_output))
         return stats_domain.StateAnswersCalcOutput(
             exploration_id, exploration_version, state_name,
             calculation_id, calc_output_model.calculation_output_type,
-            calc_output_model.calculation_output)
+            calculation_output)
     else:
         return None

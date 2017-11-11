@@ -40,6 +40,11 @@ import feconf
 MIGRATED_STATE_ANSWER_SESSION_ID_2017 = 'migrated_state_answer_session_id_2017'
 MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC = 0.0
 
+# These values dictate the types of calculation objects stored in
+# StateAnswersCalcOutput.
+CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST = 'AnswerFrequencyList'
+CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS = (
+    'CategorizedAnswerFrequencyLists')
 
 class ExplorationStats(object):
     """Domain object representing analytics data for an exploration."""
@@ -475,11 +480,17 @@ class AnswerOccurrence(object):
         self.answer = answer
         self.frequency = frequency
 
-    def to_dict(self):
+    def to_raw_type(self):
         return {
             'answer': self.answer,
             'frequency': self.frequency
         }
+
+    @classmethod
+    def from_raw_type(cls, answer_occurrence_dict):
+        return cls(
+            answer_occurrence_dict['answer'],
+            answer_occurrence_dict['frequency'])
 
 
 class AnswerFrequencyList(object):
@@ -495,10 +506,16 @@ class AnswerFrequencyList(object):
         """Adds a new AnswerOccurrence object."""
         self.answer_occurrences.append(answer_occurrence)
 
-    def to_dict(self):
+    def to_raw_type(self):
         return [
-            answer_occurrence.to_dict()
+            answer_occurrence.to_raw_type()
             for answer_occurrence in self.answer_occurrences]
+
+    @classmethod
+    def from_raw_type(cls, answer_occurrence_list):
+        return cls([
+            AnswerOccurence.from_raw_type(answer_occurrence_dict)
+            for answer_occurrence_dict in answer_occurrence_list])
 
 
 class CategorizedAnswerFrequencyLists(object):
@@ -512,17 +529,20 @@ class CategorizedAnswerFrequencyLists(object):
             categorized_answer_freq_lists
             if categorized_answer_freq_lists else {})
 
-    def to_dict(self):
+    def to_raw_type(self):
         return {
-            category: answer_frequency_list.to_dict()
+            category: answer_frequency_list.to_raw_type()
             for category, answer_frequency_list in (
                 self.categorized_answer_freq_lists.iteritems())
         }
 
-
-CALC_OUTPUT_ANSWER_FREQUENCY_LIST = 'AnswerFrequencyList'
-CALC_OUTPUT_CATEGORIZED_ANSWER_FREQUENCY_LISTS = (
-    'CategorizedAnswerFrequencyLists')
+    @classmethod
+    def from_raw_type(cls, categorized_frequency_dict):
+        return cls({
+            category: AnswerFrequencyList.from_raw_type(answer_occurrence_list)
+            for category, answer_frequency_list in (
+                categorized_frequency_dict.iteritems())
+        })
 
 
 class StateAnswersCalcOutput(object):
@@ -541,12 +561,14 @@ class StateAnswersCalcOutput(object):
         self.state_name = state_name
         self.calculation_id = calculation_id
         self.calculation_output_type = calculation_output_type
+        self.calculation_output = calculation_output
         if calculation_output_type:
-            if calculation_output_type == CALC_OUTPUT_ANSWER_FREQUENCY_LIST:
+            if calculation_output_type == (
+                    CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST):
                 self.calculation_output = AnswerFrequencyList(
                     calculation_output)
             elif (calculation_output_type ==
-                  CALC_OUTPUT_CATEGORIZED_ANSWER_FREQUENCY_LISTS):
+                  CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS):
                 self.calculation_output = CategorizedAnswerFrequencyLists(
                     calculation_output)
             else:
@@ -558,7 +580,7 @@ class StateAnswersCalcOutput(object):
         stats_models.StateAnswersCalcOutputModel.create_or_update(
             self.exploration_id, self.exploration_version, self.state_name,
             self.calculation_id, self.calculation_output_type,
-            self.calculation_output.to_dict())
+            self.calculation_output.to_raw_type())
 
     def validate(self):
         """Validates StateAnswersCalcOutputModel domain object entity before
@@ -593,7 +615,23 @@ class StateAnswersCalcOutput(object):
                 'or CategorizedAnswerFrequencyLists, encountered: %s' % (
                     self.calculation_output))
 
-        output_data = self.calculation_output.to_dict()
+        if (isinstance(self.calculation_output, AnswerFrequencyList)
+                and self.calculation_output_type != (
+                    CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)):
+            raise utils.ValidationError(
+                'Expected type of calculation output object to match '
+                'calculation output type field: %s',
+                    self.calculation_output_type)
+
+        if (isinstance(self.calculation_output, CategorizedAnswerFrequencyLists)
+                and self.calculation_output_type != (
+                    CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS)):
+            raise utils.ValidationError(
+                'Expected type of calculation output object to match '
+                'calculation output type field: %s',
+                    self.calculation_output_type)
+
+        output_data = self.calculation_output.to_raw_type()
         if sys.getsizeof(output_data) > max_bytes_per_calc_output_data:
             # TODO(msl): find a better way to deal with big
             # calculation output data, e.g. just skip. At the moment,
