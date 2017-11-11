@@ -984,6 +984,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
         committer_id, '', force_deletion=force_deletion)
 
     exploration_model = exp_models.ExplorationModel.get(exploration_id)
+    exploration_version = exploration_model.version
     exploration_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
         force_deletion=force_deletion)
@@ -1004,6 +1005,10 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     # necessary.
     activity_services.remove_featured_activity(
         constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)
+
+    # Remove associated state id mapping models.
+    delete_state_id_mapping_model_for_exploration(
+        exploration_id, exploration_version)
 
 
 # Operations on exploration snapshots.
@@ -2003,3 +2008,19 @@ def create_and_save_state_id_mapping_model_for_reverted_exploration(
 
     _save_state_id_mapping(new_state_id_mapping)
     return new_state_id_mapping
+
+
+def delete_state_id_mapping_model_for_exploration(
+        exploration_id, exploration_version):
+    """Removes state id mapping model for the exploration.
+
+    Args:
+        exploration_id: str. Id of the exploration.
+        exploration_version: int. Latest version of the exploration.
+    """
+    state_id_mapping_models = [
+        (exploration_id, version)
+        for version in range(1, exploration_version + 1)]
+
+    exp_models.StateIdMappingModel.delete_state_id_mapping_models(
+        state_id_mapping_models)

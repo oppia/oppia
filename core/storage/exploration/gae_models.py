@@ -601,3 +601,17 @@ class StateIdMappingModel(base_models.BaseModel):
         instance_id = cls._generate_instance_id(exp_id, exp_version)
         instance = cls.get(instance_id)
         return instance
+
+    @classmethod
+    def delete_state_id_mapping_models(cls, state_id_mapping_models):
+        """Removes state id mapping models present in state_id_mapping_models.
+
+        Args:
+            state_id_mapping_model: list(tuple(str, int)). A list of tuple
+                where each tuple contains exploration_id and
+                exploration_version of the state id mapping model to be deleted.
+        """
+        keys = [
+            ndb.Key(cls, cls._generate_instance_id(exp_id, exp_version))
+            for (exp_id, exp_version) in state_id_mapping_models]
+        ndb.delete_multi(keys)
