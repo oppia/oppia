@@ -21,7 +21,7 @@ oppia.factory('ExplorationEmbedButtonService', [
   function($modal, siteAnalyticsService, UrlInterpolationService) {
     return {
       showModal: function(explorationId) {
-        $modal.open({
+        var modalInfo = {
           backdrop: true,
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/embed_modal/' +
@@ -53,9 +53,12 @@ oppia.factory('ExplorationEmbedButtonService', [
               };
             }
           ]
-        });
+        };
+        $modal.open(modalInfo);
 
         siteAnalyticsService.registerOpenEmbedInfoEvent(explorationId);
+
+        return modalInfo;
       }
     };
   }
