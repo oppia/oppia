@@ -17,34 +17,20 @@
  */
 
  describe('Exploration Embed Button Service', function () {
-  var ExplorationEmbedButtonService, ModalInstance;
+   var ExplorationEmbedButtonService, ModalInstance;
 
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector, _$controller_) {
-    ExplorationEmbedButtonService = $injector.get('ExplorationEmbedButtonService');
-    ModalInstance = ExplorationEmbedButtonService.showModal(12345);
+   beforeEach(module('oppia'));
+   beforeEach(inject(function($injector) {
+     ExplorationEmbedButtonService =
+       $injector.get('ExplorationEmbedButtonService');
+     ModalInstance = ExplorationEmbedButtonService.showModal(12345);
+   }));
 
-    $controller = _$controller_;
+   it('should return true for backdrop', function(){
+     expect(ModalInstance.backdrop).toBe(true);
+   });
 
-    var mockExplorationId = function () {
-      return 12345;
-
-    serviceController = $controller('ModalInstance.controller',
-      {$scope:$scope, $modalInstance: $modalInstance,
-        $window: $window, explorationId: mockExplorationId});
-    }
-  }));
-
-  it('should return true for backdrop', function(){
-    expect(ModalInstance.backdrop).toBe(true);
-  });
-
-  it('should return correct explorationId', function(){
-    expect(ModalInstance.resolve.explorationId()).toBe(12345);
-  });
-
-  it('should return correct templateUrl', function(){
-    expect(ModalInstance.templateUrl).toBe('core/templates/dev/head/components/embed_modal/embed_exploration_modal_directive.html');
-  });
-
+   it('should return correct explorationId', function(){
+     expect(ModalInstance.resolve.explorationId()).toBe(12345);
+   });
  });
