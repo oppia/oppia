@@ -667,7 +667,7 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     def setUp(self):
         super(StateAnswersCalcOutputValidationTests, self).setUp()
         self.state_answers_calc_output = stats_domain.StateAnswersCalcOutput(
-            'exp_id', 1, 'initial_state', 'AnswerFrequencies', {})
+            'exp_id', 1, 'initial_state', 'TextInput', 'AnswerFrequencies', {})
 
         # The canonical object should have no validation problems
         self.state_answers_calc_output.validate()

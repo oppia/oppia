@@ -295,7 +295,6 @@ def save_stats_model_transactional(exploration_stats):
         _save_stats_model, exploration_stats)
 
 
-# TODO(bhenning): Test.
 def get_visualizations_info(exp_id, state_name, interaction_id):
     """Returns a list of visualization info. Each item in the list is a dict
     with keys 'data' and 'options'.
@@ -329,12 +328,18 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
     for calculation_id in calculation_ids:
         # This is None if the calculation job has not yet been run for this
         # state.
-        calc_output_domain_object = get_calc_output(
+        calc_output_domain_object = _get_calc_output(
             exp_id, state_name, calculation_id)
 
         # If the calculation job has not yet been run for this state, we simply
         # exclude the corresponding visualization results.
         if calc_output_domain_object is None:
+            continue
+
+        # If the output was associated with a different interaction ID, skip the
+        # results. This filtering step is needed since the same calculation_id
+        # can be shared across multiple interaction types.
+        if calc_output_domain_object.interaction_id != interaction_id:
             continue
 
         calculation_ids_to_outputs[calculation_id] = (
@@ -450,9 +455,7 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
         for submitted_answer_dict in sample_answers]
 
 
-def get_calc_output(
-        exploration_id, state_name, calculation_id,
-        exploration_version=VERSION_ALL):
+def _get_calc_output(exploration_id, state_name, calculation_id):
     """Get state answers calculation output domain object obtained from
     StateAnswersCalcOutputModel instance stored in the data store. The
     calculation ID comes from the name of the calculation class used to compute
@@ -464,17 +467,17 @@ def get_calc_output(
         exploration_id: str. ID of the exploration.
         state_name: str. Name of the state.
         calculation_id: str. Name of the calculation class.
-        exploration_version: int. Version of the exploration.
 
     Returns:
         StateAnswersCalcOutput|None. The state answers calculation output
             domain object or None.
     """
     calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
-        exploration_id, exploration_version, state_name, calculation_id)
+        exploration_id, VERSION_ALL, state_name, calculation_id)
     if calc_output_model:
         return stats_domain.StateAnswersCalcOutput(
-            exploration_id, exploration_version, state_name,
-            calculation_id, calc_output_model.calculation_output)
+            exploration_id, VERSION_ALL, state_name,
+            calc_output_model.interaction_id, calculation_id,
+            calc_output_model.calculation_output)
     else:
         return None
