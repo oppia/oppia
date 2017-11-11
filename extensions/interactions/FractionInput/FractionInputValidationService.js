@@ -35,15 +35,15 @@ oppia.factory('FractionInputValidationService', [
           return FractionObjectFactory.fromDict(fraction).toFloat();
         };
         /**
-        * Store an answer range for every rule, then check for redundant
-        * ranges. A range is an object of the form:
-        * {
-        *   lb: float, lower bound
-        *   ub: float, upper bound
-        *   lbi: bool, is lower bound inclusive
-        *   ubi: bool, is upper bound inclusive
-        * }
-        */
+         * Store an answer range for every rule, then check for redundant
+         * ranges. A range is an object of the form:
+         * {
+         *   lb: float, lower bound
+         *   ub: float, upper bound
+         *   lbi: bool, is lower bound inclusive
+         *   ubi: bool, is upper bound inclusive
+         * }
+         */
         var setLowerAndUpperBounds = function(range, lb, ub, lbi, ubi) {
           range.lb = lb;
           range.ub = ub;
