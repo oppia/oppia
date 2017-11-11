@@ -423,7 +423,7 @@ def get_calc_output(
                 stats_domain.CategorizedAnswerFrequencyLists.from_raw_type(
                     calc_output_model.calculation_output))
         elif (calc_output_model.calculation_output_type ==
-                stats_domain.CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS): # pylint: disable=line-too-long
+              stats_domain.CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS):
             calculation_output = (
                 stats_domain.CategorizedAnswerFrequencyLists.from_raw_type(
                     calc_output_model.calculation_output))

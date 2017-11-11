@@ -514,7 +514,7 @@ class AnswerFrequencyList(object):
     @classmethod
     def from_raw_type(cls, answer_occurrence_list):
         return cls([
-            AnswerOccurence.from_raw_type(answer_occurrence_dict)
+            AnswerOccurrence.from_raw_type(answer_occurrence_dict)
             for answer_occurrence_dict in answer_occurrence_list])
 
 
@@ -540,7 +540,7 @@ class CategorizedAnswerFrequencyLists(object):
     def from_raw_type(cls, categorized_frequency_dict):
         return cls({
             category: AnswerFrequencyList.from_raw_type(answer_occurrence_list)
-            for category, answer_frequency_list in (
+            for category, answer_occurrence_list in (
                 categorized_frequency_dict.iteritems())
         })
 
@@ -621,7 +621,7 @@ class StateAnswersCalcOutput(object):
             raise utils.ValidationError(
                 'Expected type of calculation output object to match '
                 'calculation output type field: %s',
-                    self.calculation_output_type)
+                self.calculation_output_type)
 
         if (isinstance(self.calculation_output, CategorizedAnswerFrequencyLists)
                 and self.calculation_output_type != (
@@ -629,7 +629,7 @@ class StateAnswersCalcOutput(object):
             raise utils.ValidationError(
                 'Expected type of calculation output object to match '
                 'calculation output type field: %s',
-                    self.calculation_output_type)
+                self.calculation_output_type)
 
         output_data = self.calculation_output.to_raw_type()
         if sys.getsizeof(output_data) > max_bytes_per_calc_output_data:
