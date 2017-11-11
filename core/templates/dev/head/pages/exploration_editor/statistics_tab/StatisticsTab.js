@@ -79,8 +79,7 @@ oppia.controller('StatisticsTab', [
       } else {
         $scope.explorationStatisticsUrl = (
           '/createhandler/statistics_old/' + 
-          ExplorationDataService.explorationId +
-          '/' + version);
+          ExplorationDataService.explorationId + '/' + version);
       }
       
       $http.get($scope.explorationStatisticsUrl).then(function(response) {
