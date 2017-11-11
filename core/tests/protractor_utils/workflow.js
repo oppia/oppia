@@ -20,6 +20,7 @@
 var forms = require('./forms.js');
 var editor = require('./editor.js');
 var general = require('./general.js');
+var LibraryPage = require('./LibraryPage.js');
 
 // Creates an exploration and opens its editor.
 var createExploration = function() {
@@ -29,8 +30,9 @@ var createExploration = function() {
 
 // Creates a new exploration and wait for the exploration tutorial to start.
 var createExplorationAndStartTutorial = function() {
-  browser.get(general.LIBRARY_URL_SUFFIX);
-  element(by.css('.protractor-test-create-activity')).click();
+  libraryPage = new LibraryPage.LibraryPage();
+  libraryPage.get();
+  libraryPage.clickCreateActivity(); 
 
   // Wait for the dashboard to transition the creator into the editor page.
   browser.waitForAngular();

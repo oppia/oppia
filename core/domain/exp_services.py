@@ -168,7 +168,8 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.init_state_name,
         versioned_exploration_states['states'],
         exploration_model.param_specs, exploration_model.param_changes,
-        exploration_model.version, created_on=exploration_model.created_on,
+        exploration_model.version, exploration_model.auto_tts_enabled,
+        created_on=exploration_model.created_on,
         last_updated=exploration_model.last_updated)
 
 
@@ -251,6 +252,38 @@ def get_exploration_summary_by_id(exploration_id):
         return exp_summary
     else:
         return None
+
+
+def get_multiple_explorations_by_version(exp_id, version_numbers):
+    """Returns a list of Exploration domain objects corresponding to the
+    specified versions.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        version_numbers: list(int). List of version numbers.
+
+    Returns:
+        list(Exploration). List of Exploration domain objects.
+
+    Raises:
+        Exception. One or more of the given versions of the exploration could
+            not be converted to the latest schema version.
+    """
+    explorations = []
+    exploration_models = exp_models.ExplorationModel.get_multi_versions(
+        exp_id, version_numbers)
+    error_versions = []
+    for index, exploration_model in enumerate(exploration_models):
+        try:
+            explorations.append(get_exploration_from_model(exploration_model))
+        except utils.ExplorationConversionError:
+            error_versions.append(version_numbers[index])
+
+    if error_versions:
+        raise Exception(
+            "Exploration %s, versions [%s] could not be converted to latest"
+            "schema version." % (exp_id, ', '.join(map(str, error_versions))))
+    return explorations
 
 
 def get_multiple_explorations_by_id(exp_ids, strict=True):
@@ -739,6 +772,8 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_param_changes(change.new_value)
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
+                elif change.property_name == 'auto_tts_enabled':
+                    exploration.update_auto_tts_enabled(change.new_value)
             elif (
                     change.cmd ==
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
@@ -816,6 +851,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         for (state_name, state) in exploration.states.iteritems()}
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
+    exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
 
     exploration_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
@@ -885,6 +921,7 @@ def _create_exploration(
             for (state_name, state) in exploration.states.iteritems()},
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
+        auto_tts_enabled=exploration.auto_tts_enabled
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
@@ -1477,42 +1514,6 @@ def load_demo(exploration_id):
     index_explorations_given_ids([exploration_id])
 
     logging.info('Exploration with id %s was loaded.' % exploration_id)
-
-
-def get_next_page_of_all_commits(
-        page_size=feconf.COMMIT_LIST_PAGE_SIZE, urlsafe_start_cursor=None):
-    """Returns a page of commits to all explorations in reverse time order.
-
-    The return value is a tuple (results, cursor, more) as described in
-    fetch_page() at:
-
-        https://developers.google.com/appengine/docs/python/ndb/queryclass
-
-    Args:
-        page_size: int. The maximum number of commits to return.
-        urlsafe_start_cursor: str. If this is not None, then the returned
-            commits start from the cursor location. Otherwise they start from
-            the beginning of the list of commits.
-
-    Returns:
-        tuple. A 3-tuple consisting of:
-            - list(ExplorationCommitLogEntry). A list containing
-              ExplorationCommitlogEntry domain objects.
-            - str. The postion of the cursor.
-            - bool. indicating whether there are (likely) more results after
-              this batch. If False, there are no more results; if True, there
-              are probably more results.
-    """
-    results, new_urlsafe_start_cursor, more = (
-        exp_models.ExplorationCommitLogEntryModel.get_all_commits(
-            page_size, urlsafe_start_cursor))
-
-    return ([exp_domain.ExplorationCommitLogEntry(
-        entry.created_on, entry.last_updated, entry.user_id, entry.username,
-        entry.exploration_id, entry.commit_type, entry.commit_message,
-        entry.commit_cmds, entry.version, entry.post_commit_status,
-        entry.post_commit_community_owned, entry.post_commit_is_private
-    ) for entry in results], new_urlsafe_start_cursor, more)
 
 
 def get_next_page_of_all_non_private_commits(
