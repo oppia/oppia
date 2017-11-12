@@ -25,6 +25,7 @@ oppia.controller('Signup', [
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
     $scope.warningI18nCode = '';
+    $scope.siteName = GLOBALS.SITE_NAME;
     $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS;
     $scope.submissionInProcess = false;
 
@@ -56,6 +57,7 @@ oppia.controller('Signup', [
         resolve: {},
         controller: [
           '$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.siteName = GLOBALS.SITE_NAME;
             $scope.close = function() {
               $modalInstance.dismiss('cancel');
             };

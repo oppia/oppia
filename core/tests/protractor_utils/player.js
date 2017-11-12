@@ -118,6 +118,14 @@ var submitFeedback = function(feedback) {
   element(by.css('.protractor-test-exploration-feedback-submit-btn')).click();
 };
 
+var viewHint = function() {
+  element(by.css('.protractor-test-view-hint')).click();
+}
+
+var viewSolution = function() {
+  element(by.css('.protractor-test-view-solution')).click();
+}
+
 var fillInSuggestion = function(suggestion) {
   var suggestionModalClass = '.protractor-test-exploration-suggestion-modal';
   var richTextEditor = forms.RichTextEditor(
@@ -157,3 +165,6 @@ exports.expectExplorationToNotBeOver = expectExplorationToNotBeOver;
 exports.openFeedbackPopup = openFeedbackPopup;
 exports.submitFeedback = submitFeedback;
 exports.submitSuggestion = submitSuggestion;
+
+exports.viewHint = viewHint;
+exports.viewSolution = viewSolution;

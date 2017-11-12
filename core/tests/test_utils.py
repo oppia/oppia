@@ -499,9 +499,13 @@ class TestBase(unittest.TestCase):
         )
         exp_summary_model.put()
 
+        # Note: Also save state id mappping model for new exploration. If not
+        # saved, it may cause errors in test cases.
+        exploration = exp_services.get_exploration_from_model(exp_model)
+        exp_services.create_and_save_state_id_mapping_model(exploration, [])
+
     def publish_exploration(self, owner_id, exploration_id):
         """Publish the exploration of given exploration_id."""
-
         committer = user_services.UserActionsInfo(owner_id)
         rights_manager.publish_exploration(committer, exploration_id)
 
@@ -528,17 +532,21 @@ class TestBase(unittest.TestCase):
         collection = collection_domain.Collection.create_default_collection(
             collection_id, title, category, objective,
             language_code=language_code)
-        collection.add_node(
-            self.save_new_valid_exploration(
+
+        # Check whether exploration with given exploration_id exists or not.
+        exploration = exp_services.get_exploration_by_id(
+            exploration_id, strict=False)
+        if exploration is None:
+            exploration = self.save_new_valid_exploration(
                 exploration_id, owner_id, title, category, objective,
-                end_state_name=end_state_name).id)
+                end_state_name=end_state_name)
+        collection.add_node(exploration.id)
 
         collection_services.save_new_collection(owner_id, collection)
         return collection
 
     def publish_collection(self, owner_id, collection_id):
         """Publish the collection of given collection_id."""
-
         committer = user_services.UserActionsInfo(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 

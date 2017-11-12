@@ -122,7 +122,13 @@ oppia.controller('PreviewTab', [
     $scope.resetPreview = function() {
       $scope.previewWarning = '';
       $scope.isExplorationPopulated = false;
-      $scope.loadPreviewState(explorationInitStateNameService.savedMemento, []);
+      initStateNameForPreview = explorationInitStateNameService.savedMemento;
+      $timeout(function() {
+        ExplorationPlayerService.init(function(exploration, initHtml,
+          newParams) {
+          $scope.loadPreviewState(initStateNameForPreview, []);
+        });
+      }, 200);
     };
 
     // This allows the active state to be kept up-to-date whilst navigating in
