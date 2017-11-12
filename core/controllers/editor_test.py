@@ -714,7 +714,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
 
             # Checking for admin.
             observed_log_messages = []
-            exp_id = 'unpublished_eid'
+            exp_id = 'unpublished_eid2'
             exploration = exp_domain.Exploration.create_default_exploration(
                 exp_id)
             exp_services.save_new_exploration(self.admin_id, exploration)
@@ -733,7 +733,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
 
             # Checking for moderator.
             observed_log_messages = []
-            exp_id = 'unpublished_eid'
+            exp_id = 'unpublished_eid3'
             exploration = exp_domain.Exploration.create_default_exploration(
                 exp_id)
             exp_services.save_new_exploration(self.moderator_id, exploration)

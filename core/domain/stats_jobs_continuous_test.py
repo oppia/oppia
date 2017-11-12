@@ -104,10 +104,16 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             time.sleep(1)
             stats_jobs_continuous._STATE_COUNTER_CUTOFF_DATE = (  # pylint: disable=protected-access
                 datetime.datetime.utcnow())
-            original_init_state = exploration.init_state_name
             new_init_state_name = 'New init state'
-            exploration.rename_state(original_init_state, new_init_state_name)
-            exp_services._save_exploration('owner', exploration, '', [])  # pylint: disable=protected-access
+            original_init_state = exploration.init_state_name
+            change_list = [{
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': original_init_state,
+                'new_state_name': new_init_state_name
+            }]
+            exp_services.update_exploration(
+                'owner', exploration.id, change_list, '')
+            exploration = exp_services.get_exploration_by_id(exp_id)
             exp_version = 2
             state2_name = 'sid2'
 
@@ -401,6 +407,12 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             exp_id, exp_version, state_name, session_id, {},
             feconf.PLAY_TYPE_NORMAL)
 
+    def _get_calc_output_model(
+            self, exploration_id, state_name, calculation_id,
+            exploration_version=stats_jobs_continuous.VERSION_ALL):
+        return stats_models.StateAnswersCalcOutputModel.get_model(
+            exploration_id, exploration_version, state_name, calculation_id)
+
     def test_one_answer(self):
         with self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
@@ -468,14 +480,13 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             calc_id = 'AnswerFrequencies'
 
             # get job output of first state and check it
-            calc_output_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, first_state_name, calc_id,
-                    exploration_version=exp_version))
+            calc_output_model = self._get_calc_output_model(
+                exp_id, first_state_name, calc_id,
+                exploration_version=exp_version)
             self.assertEqual(
-                'AnswerFrequencies', calc_output_domain_object.calculation_id)
+                'AnswerFrequencies', calc_output_model.calculation_id)
 
-            calculation_output = calc_output_domain_object.calculation_output
+            calculation_output = calc_output_model.calculation_output
 
             expected_calculation_output = [{
                 'answer': 'answer1',
@@ -485,19 +496,17 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 'frequency': 1
             }]
 
-            self.assertEqual(
-                calculation_output, expected_calculation_output)
+            self.assertEqual(calculation_output, expected_calculation_output)
 
             # get job output of second state and check it
-            calc_output_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, second_state_name, calc_id,
-                    exploration_version=exp_version))
+            calc_output_model = self._get_calc_output_model(
+                exp_id, second_state_name, calc_id,
+                exploration_version=exp_version)
 
             self.assertEqual(
-                'AnswerFrequencies', calc_output_domain_object.calculation_id)
+                'AnswerFrequencies', calc_output_model.calculation_id)
 
-            calculation_output = calc_output_domain_object.calculation_output
+            calculation_output = calc_output_model.calculation_output
 
             expected_calculation_output = [{
                 'answer': 'answer3',
@@ -555,25 +564,19 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             calc_id = 'AnswerFrequencies'
 
             # Check the output of the job.
-            calc_output_first_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, first_state_name, calc_id,
-                    exploration_version='2'))
-            calc_output_all_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, first_state_name, calc_id))
+            calc_output_first_model = self._get_calc_output_model(
+                exp_id, first_state_name, calc_id, exploration_version='2')
+            calc_output_all_model = self._get_calc_output_model(
+                exp_id, first_state_name, calc_id)
 
             self.assertEqual(
-                'AnswerFrequencies',
-                calc_output_first_domain_object.calculation_id)
+                'AnswerFrequencies', calc_output_first_model.calculation_id)
             self.assertEqual(
-                'AnswerFrequencies',
-                calc_output_all_domain_object.calculation_id)
+                'AnswerFrequencies', calc_output_all_model.calculation_id)
 
             calculation_output_first = (
-                calc_output_first_domain_object.calculation_output)
-            calculation_output_all = (
-                calc_output_all_domain_object.calculation_output)
+                calc_output_first_model.calculation_output)
+            calculation_output_all = calc_output_all_model.calculation_output
 
             expected_calculation_output_first_answer = [{
                 'answer': 'answer1',
@@ -614,34 +617,26 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # Extract the output from the job.
-            calc_output_first_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, first_state_name, calc_id,
-                    exploration_version='2'))
-            calc_output_second_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, first_state_name, calc_id,
-                    exploration_version='3'))
-            calc_output_all_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, first_state_name, calc_id))
+            calc_output_first_model = self._get_calc_output_model(
+                exp_id, first_state_name, calc_id, exploration_version='2')
+            calc_output_second_model = self._get_calc_output_model(
+                exp_id, first_state_name, calc_id, exploration_version='3')
+            calc_output_all_model = self._get_calc_output_model(
+                exp_id, first_state_name, calc_id)
 
             self.assertEqual(
-                'AnswerFrequencies',
-                calc_output_first_domain_object.calculation_id)
+                'AnswerFrequencies', calc_output_first_model.calculation_id)
             self.assertEqual(
-                'AnswerFrequencies',
-                calc_output_second_domain_object.calculation_id)
+                'AnswerFrequencies', calc_output_second_model.calculation_id)
             self.assertEqual(
-                'AnswerFrequencies',
-                calc_output_all_domain_object.calculation_id)
+                'AnswerFrequencies', calc_output_all_model.calculation_id)
 
             calculation_output_first = (
-                calc_output_first_domain_object.calculation_output)
+                calc_output_first_model.calculation_output)
             calculation_output_second = (
-                calc_output_second_domain_object.calculation_output)
+                calc_output_second_model.calculation_output)
             calculation_output_all = (
-                calc_output_all_domain_object.calculation_output)
+                calc_output_all_model.calculation_output)
 
             # The output for version 2 of the exploration should be the same,
             # but the total combined output should include both answers. Also,
@@ -721,28 +716,23 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             calc_id = 'Top10AnswerFrequencies'
 
             # Check the output of the job.
-            calc_output_latest_version_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, init_state_name, calc_id,
-                    exploration_version='2'))
-            calc_output_first_version_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, init_state_name, calc_id,
-                    exploration_version='1'))
-            calc_output_all_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, init_state_name, calc_id))
+            calc_output_model_latest_version = self._get_calc_output_model(
+                exp_id, init_state_name, calc_id, exploration_version='2')
+            calc_output_model_first_version = self._get_calc_output_model(
+                exp_id, init_state_name, calc_id, exploration_version='1')
+            calc_output_model_all = self._get_calc_output_model(
+                exp_id, init_state_name, calc_id)
 
             # Since no answers were submitted to the latest version of the
             # exploration, there should be no calculated output for it.
-            self.assertIsNone(calc_output_latest_version_domain_object)
+            self.assertIsNone(calc_output_model_latest_version)
 
             # Top answers will still be computed for the first version.
             self.assertEqual(
                 'Top10AnswerFrequencies',
-                calc_output_first_version_domain_object.calculation_id)
+                calc_output_model_first_version.calculation_id)
             calculation_output_first = (
-                calc_output_first_version_domain_object.calculation_output)
+                calc_output_model_first_version.calculation_output)
             expected_calculation_output_first_answer = [{
                 'answer': 'verb',
                 'frequency': 2
@@ -755,13 +745,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 expected_calculation_output_first_answer)
 
             self.assertEqual(
-                'Top10AnswerFrequencies',
-                calc_output_all_domain_object.calculation_id)
+                'Top10AnswerFrequencies', calc_output_model_all.calculation_id)
 
             # No answers should be aggregated since all past answers do not
             # match the newly submitted interaction ID.
-            calculation_output_all = (
-                calc_output_all_domain_object.calculation_output)
+            calculation_output_all = calc_output_model_all.calculation_output
             self.assertEqual(calculation_output_all, [])
 
     def test_uses_old_answers_if_updated_exploration_has_same_interaction(self):
@@ -824,23 +812,18 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             calc_id = 'Top10AnswerFrequencies'
 
             # Extract the output from the job.
-            calc_output_latest_version_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, init_state_name, calc_id,
-                    exploration_version='2'))
-            calc_output_all_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, init_state_name, calc_id))
+            calc_output_model_latest_version = self._get_calc_output_model(
+                exp_id, init_state_name, calc_id, exploration_version='2')
+            calc_output_model_all = self._get_calc_output_model(
+                exp_id, init_state_name, calc_id)
 
             # Since no answers were submitted to the latest version of the
             # exploration, there should be no calculated output for it.
-            self.assertIsNone(calc_output_latest_version_domain_object)
+            self.assertIsNone(calc_output_model_latest_version)
 
             self.assertEqual(
-                'Top10AnswerFrequencies',
-                calc_output_all_domain_object.calculation_id)
-            calculation_output_all = (
-                calc_output_all_domain_object.calculation_output)
+                'Top10AnswerFrequencies', calc_output_model_all.calculation_id)
+            calculation_output_all = calc_output_model_all.calculation_output
             expected_calculation_output_all_answers = [{
                 'answer': 'verb',
                 'frequency': 2
@@ -956,20 +939,16 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             calc_id = 'Top10AnswerFrequencies'
 
             # Check the output of the job.
-            calc_output_latest_version_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, init_state_name, calc_id,
-                    exploration_version='4'))
-            calc_output_all_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, init_state_name, calc_id))
+            calc_output_latest_version_model = self._get_calc_output_model(
+                exp_id, init_state_name, calc_id, exploration_version='4')
+            calc_output_all_model = self._get_calc_output_model(
+                exp_id, init_state_name, calc_id)
 
             self.assertEqual(
                 'Top10AnswerFrequencies',
-                calc_output_latest_version_domain_object.calculation_id)
+                calc_output_latest_version_model.calculation_id)
             self.assertEqual(
-                'Top10AnswerFrequencies',
-                calc_output_all_domain_object.calculation_id)
+                'Top10AnswerFrequencies', calc_output_all_model.calculation_id)
 
             expected_calculation_latest_version_output = [{
                 'answer': 'noun',
@@ -993,9 +972,8 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             }]
 
             calculation_latest_version_output = (
-                calc_output_latest_version_domain_object.calculation_output)
-            calculation_output_all = (
-                calc_output_all_domain_object.calculation_output)
+                calc_output_latest_version_model.calculation_output)
+            calculation_output_all = calc_output_all_model.calculation_output
 
             self.assertEqual(
                 calculation_latest_version_output,
@@ -1052,25 +1030,22 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             # Retrieve outputs for all of the computations running on this
             # interaction.
-            answer_frequencies_calc_output_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, first_state_name, 'Top10AnswerFrequencies'))
+            answer_frequencies_calc_output_model = self._get_calc_output_model(
+                exp_id, first_state_name, 'Top10AnswerFrequencies')
             self.assertEqual(
                 'Top10AnswerFrequencies',
-                answer_frequencies_calc_output_domain_object.calculation_id)
+                answer_frequencies_calc_output_model.calculation_id)
 
-            common_elements_calc_output_domain_object = (
-                stats_jobs_continuous.InteractionAnswerSummariesAggregator.get_calc_output( # pylint: disable=line-too-long
-                    exp_id, first_state_name,
-                    'FrequencyCommonlySubmittedElements'))
+            common_elements_calc_output_model = self._get_calc_output_model(
+                exp_id, first_state_name, 'FrequencyCommonlySubmittedElements')
             self.assertEqual(
                 'FrequencyCommonlySubmittedElements',
-                common_elements_calc_output_domain_object.calculation_id)
+                common_elements_calc_output_model.calculation_id)
 
             calculation_output_first = (
-                answer_frequencies_calc_output_domain_object.calculation_output)
+                answer_frequencies_calc_output_model.calculation_output)
             calculation_output_second = (
-                common_elements_calc_output_domain_object.calculation_output)
+                common_elements_calc_output_model.calculation_output)
 
             self.assertEqual(calculation_output_first, [{
                 'answer': ['answer1', 'answer2'],

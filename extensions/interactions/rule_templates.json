@@ -27,6 +27,32 @@
   },
   "Continue": {},
   "EndExploration": {},
+  "FractionInput": {
+    "IsExactlyEqualTo": {
+      "description": "is exactly equal to {{f|Fraction}}"
+    },
+    "IsEquivalentTo": {
+      "description": "is equivalent to {{f|Fraction}}"
+    },
+    "IsEquivalentToAndInSimplestForm": {
+      "description": "is equivalent to {{f|Fraction}} and in simplest form"
+    },
+    "IsLessThan": {
+      "description": "is less than {{f|Fraction}}"
+    },
+    "IsGreaterThan": {
+      "description": "is greater than {{f|Fraction}}"
+    },
+    "HasNumeratorEqualTo": {
+      "description": "has numerator equal to {{x|Int}}"
+    },
+    "HasDenominatorEqualTo": {
+      "description": "has denominator equal to {{x|NonnegativeInt}}"
+    },
+    "HasWholeNumberEqualTo": {
+      "description": "has whole number equal to {{x|Int}}"
+    }
+  },
   "GraphInput": {
     "IsIsomorphicTo": {
       "description": "is isomorphic to {{g|Graph}}, including matching labels"
