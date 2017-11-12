@@ -312,3 +312,37 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class ExplorationConversionErrorIdentificationJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that outputs the list of explorations that currently consist of
+    redundant features and result in an ExplorationConversionError when
+    retrieved.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        try:
+            exploration = exp_services.get_exploration_by_id(item.id)
+        # Handle case where the exploration is deleted.
+        except Exception as e:
+            return
+
+        latest_exp_version = exploration.version
+        version_numbers = range(1, latest_exp_version + 1)
+
+        try:
+            exp_services.get_multiple_explorations_by_version(
+                item.id, version_numbers)
+        except Exception as e:
+            yield (item.id, e)
+            return
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
