@@ -32,7 +32,6 @@ from google.appengine.api import users
 
 from core.domain import config_domain
 from core.domain import config_services
-from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -352,14 +351,8 @@ class BaseHandler(webapp2.RequestHandler):
         if 'nav_mode' not in values:
             values['nav_mode'] = ''
 
-        if (redirect_url_on_logout is None and 'create' in self.request.uri):
-            exploration_id_in_requested_uri = self.request.uri.split('/')[-1]
-            exploration_status = exp_services.get_exploration_summary_by_id(
-              exploration_id_in_requested_uri).status
-            if exploration_status == feconf.ACTIVITY_STATUS_PRIVATE:
-                redirect_url_on_logout = feconf.NAV_MODE_LIBRARY
-            else:
-                redirect_url_on_logout = self.request.uri
+        if redirect_url_on_logout is None:
+            redirect_url_on_logout = self.request.uri
 
         if self.user_id:
             values['login_url'] = None
