@@ -59,7 +59,7 @@ class RecomputeStatistics(jobs.BaseMapReduceOneOffJobManager):
         if isinstance(item, stats_models.StateCompleteEventLogEntryModel):
             yield (item.exp_id,
                    {
-                       'type': feconf.EVENT_TYPE_STATE_COMPLETED,
+                       'event_type': feconf.EVENT_TYPE_STATE_COMPLETED,
                        'version': item.exp_version,
                        'state_name': item.state_name
                    })
@@ -67,7 +67,7 @@ class RecomputeStatistics(jobs.BaseMapReduceOneOffJobManager):
                 item, stats_models.AnswerSubmittedEventLogEntryModel):
             yield (item.exp_id,
                    {
-                       'type': feconf.EVENT_TYPE_ANSWER_SUBMITTED,
+                       'event_type': feconf.EVENT_TYPE_ANSWER_SUBMITTED,
                        'version': item.exp_version,
                        'state_name': item.state_name,
                        'is_feedback_useful': item.is_feedback_useful
@@ -75,7 +75,7 @@ class RecomputeStatistics(jobs.BaseMapReduceOneOffJobManager):
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
             yield (item.exploration_id,
                    {
-                       'type': feconf.EVENT_TYPE_STATE_HIT,
+                       'event_type': feconf.EVENT_TYPE_STATE_HIT,
                        'version': item.exploration_version,
                        'state_name': item.state_name,
                        'session_id': item.session_id
@@ -83,7 +83,7 @@ class RecomputeStatistics(jobs.BaseMapReduceOneOffJobManager):
         elif isinstance(item, stats_models.SolutionHitEventLogEntryModel):
             yield (item.exp_id,
                    {
-                       'type': feconf.EVENT_TYPE_SOLUTION_HIT,
+                       'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
                        'version': item.exp_version,
                        'state_name': item.state_name,
                        'session_id': item.session_id
@@ -93,7 +93,7 @@ class RecomputeStatistics(jobs.BaseMapReduceOneOffJobManager):
                 stats_models.ExplorationActualStartEventLogEntryModel):
             yield (item.exp_id,
                    {
-                       'type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
+                       'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
                        'version': item.exp_version,
                        'state_name': item.state_name
                    })
@@ -101,7 +101,7 @@ class RecomputeStatistics(jobs.BaseMapReduceOneOffJobManager):
                 item, stats_models.CompleteExplorationEventLogEntryModel):
             yield (item.exploration_id,
                    {
-                       'type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+                       'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
                        'version': item.exploration_version,
                        'state_name': item.state_name
                    })
@@ -111,15 +111,21 @@ class RecomputeStatistics(jobs.BaseMapReduceOneOffJobManager):
     def reduce(exp_id, values):
         values = map(ast.literal_eval, values)
         values = sorted(values, key=lambda x: x['version'])
+        versions = [x['version'] for x in values]
+        # Get a copy of the uncorrupted *_v1 statistics
+        old_stats = stats_services.get_multiple_exploration_stats_by_version(
+            exp_id, versions)
 
         exp_stats_dicts = []
         for version, events in itertools.groupby(values,
                                                  key=lambda x: x['version']):
+            v1_stats = old_stats[version-1]
             if version == 1:
-                # Get a copy of the uncorrupted *_v1 statistics
-                old_stats = stats_services.get_exploration_stats_by_id(
-                    exp_id, version)
-                for state_stats in old_stats.state_stats_mapping.values():
+                # Reset the possibly corrupted stats
+                v1_stats.num_starts_v2 = 0
+                v1_stats.num_completions_v2 = 0
+                v1_stats.num_starts_v2 = 0
+                for state_stats in v1_stats.state_stats_mapping.values():
                     state_stats.total_answers_count_v2 = 0
                     state_stats.useful_feedback_count_v2 = 0
                     state_stats.total_hit_count_v2 = 0
@@ -127,16 +133,41 @@ class RecomputeStatistics(jobs.BaseMapReduceOneOffJobManager):
                     state_stats.num_times_solution_viewed_v2 = 0
                     state_stats.num_completions_v2 = 0
                 exp_stats_dict = RecomputeStatistics._recompute_statistics(
-                    exp_id, version, events, old_stats.to_dict())
+                    exp_id, version, events, v1_stats.to_dict())
                 exp_stats_dicts.append(exp_stats_dict)
             else:
                 change_list = exp_models.ExplorationCommitLogEntryModel.get(
                     'exploration-%s-%s' % (exp_id, version)).commit_cmds
 
-                old_exp_stats_dict = copy.deepcopy(exp_stats_dicts[-1])
+                # Copy recomputed v2 events from previous version
+                prev_version = copy.deepcopy(exp_stats_dicts[-1])
+
+                # Copy uncorrupt v1 stats
+                prev_version['num_starts_v1'] = v1_stats.num_starts_v1
+                prev_version['num_completions_v1'] = v1_stats.num_completions_v1
+                prev_version['num_actual_starts_v1'] = (
+                    v1_stats.num_actual_starts_v1)
+                state_stats_mapping = prev_version['state_stats_mapping']
+                for state in state_stats_mapping.keys():
+                    state_stats_mapping[state]['total_answers_count_v1'] = (
+                        v1_stats.state_stats_mapping[state]
+                        .total_answers_count_v1)
+                    state_stats_mapping[state]['useful_feedback_count_v1'] = (
+                        v1_stats.state_stats_mapping[state]
+                        .useful_feedback_count_v1)
+                    state_stats_mapping[state]['total_hit_count_v1'] = (
+                        v1_stats.state_stats_mapping[state]
+                        .total_hit_count_v1)
+                    state_stats_mapping[state]['first_hit_count_v1'] = (
+                        v1_stats.state_stats_mapping[state]
+                        .first_hit_count_v1)
+                    state_stats_mapping[state]['num_completions_v1'] = (
+                        v1_stats.state_stats_mapping[state]
+                        .num_completions_v1)
+
                 exploration_stats = (
                     RecomputeStatistics._update_state_stats_mapping(
-                        old_exp_stats_dict, change_list))
+                        prev_version, change_list))
 
                 exp_stats_dict = RecomputeStatistics._recompute_statistics(
                     exp_id, version, events, exploration_stats)
@@ -201,24 +232,25 @@ class RecomputeStatistics(jobs.BaseMapReduceOneOffJobManager):
         for event in events:
             state_stats = (old_stats_model['state_stats_mapping'][
                 event['state_name']])
-            if event['type'] == feconf.EVENT_TYPE_ANSWER_SUBMITTED:
+            if event['event_type'] == feconf.EVENT_TYPE_ANSWER_SUBMITTED:
                 state_stats['total_answers_count_v2'] += 1
                 if event['is_feedback_useful']:
                     state_stats['useful_feedback_count_v2'] += 1
-            elif event['type'] == feconf.EVENT_TYPE_STATE_HIT:
+            elif event['event_type'] == feconf.EVENT_TYPE_STATE_HIT:
                 state_stats['total_hit_count_v2'] += 1
                 if event['session_id'] not in state_hit_ids:
                     state_stats['first_hit_count_v2'] += 1
                     state_hit_ids.add(event['session_id'])
-            elif event['type'] == feconf.EVENT_TYPE_SOLUTION_HIT:
+            elif event['event_type'] == feconf.EVENT_TYPE_SOLUTION_HIT:
                 if event['session_id'] not in solution_hit_ids:
                     state_stats['num_times_solution_viewed_v2'] += 1
                     solution_hit_ids.add(event['session_id'])
-            elif event['type'] == feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION:
+            elif event['event_type'] == (
+                    feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION):
                 old_stats_model['num_actual_starts_v2'] += 1
-            elif event['type'] == feconf.EVENT_TYPE_COMPLETE_EXPLORATION:
+            elif event['event_type'] == feconf.EVENT_TYPE_COMPLETE_EXPLORATION:
                 old_stats_model['num_completions_v2'] += 1
-            elif event['type'] == feconf.EVENT_TYPE_STATE_COMPLETED:
+            elif event['event_type'] == feconf.EVENT_TYPE_STATE_COMPLETED:
                 state_stats['num_completions_v2'] += 1
             old_stats_model['state_stats_mapping'][event['state_name']] = (
                 state_stats)

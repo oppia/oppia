@@ -18,8 +18,9 @@
 
 """Tests for one off statistics jobs."""
 
-import feconf
 import os
+
+import feconf
 import utils
 
 from core.domain import event_services
