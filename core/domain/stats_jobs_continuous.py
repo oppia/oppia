@@ -22,7 +22,6 @@ from core import jobs
 from core.domain import calculation_registry
 from core.domain import exp_services
 from core.domain import interaction_registry
-from core.domain import stats_domain
 from core.platform import models
 
 import feconf
@@ -508,8 +507,7 @@ class StatisticsMRJobManager(
 class InteractionAnswerSummariesMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):
     """Job to calculate interaction view statistics, e.g. most frequent answers
-    of multiple-choice interactions. Iterate over StateAnswer objects and
-    create StateAnswersCalcOutput objects.
+    of multiple-choice interactions.
     """
     @classmethod
     def _get_continuous_computation_class(cls):
@@ -716,27 +714,3 @@ class InteractionAnswerSummariesAggregator(
     @classmethod
     def _get_batch_job_manager_class(cls):
         return InteractionAnswerSummariesMRJobManager
-
-    # Public query methods.
-    @classmethod
-    def get_calc_output(
-            cls, exploration_id, state_name, calculation_id,
-            exploration_version=VERSION_ALL):
-        """Get state answers calculation output domain object obtained from
-        StateAnswersCalcOutputModel instance stored in the data store. This
-        aggregator does not have a real-time layer, which means the results
-        from this function may be out of date. The calculation ID comes from
-        the name of the calculation class used to compute aggregate data from
-        submitted user answers.
-
-        If 'exploration_version' is VERSION_ALL, this will return aggregated
-        output for all versions of the specified state and exploration.
-        """
-        calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
-            exploration_id, exploration_version, state_name, calculation_id)
-        if calc_output_model:
-            return stats_domain.StateAnswersCalcOutput(
-                exploration_id, exploration_version, state_name,
-                calculation_id, calc_output_model.calculation_output)
-        else:
-            return None

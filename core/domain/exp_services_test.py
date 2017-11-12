@@ -323,6 +323,74 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with self.assertRaises(Exception):
             exp_services.get_exploration_by_id('fake_exploration')
 
+    def test_retrieval_of_multiple_exploration_versions_for_fake_exp_id(self):
+        with self.assertRaisesRegexp(
+            ValueError, 'The given entity_id fake_exp_id is invalid'):
+            exp_services.get_multiple_explorations_by_version(
+                'fake_exp_id', [1, 2, 3])
+
+    def test_retrieval_of_multiple_exploration_versions(self):
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id)
+
+        # Update exploration to version 2.
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state',
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+
+        # Update exploration to version 3.
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state 2',
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+
+        exploration_latest = exp_services.get_exploration_by_id(self.EXP_ID)
+        latest_version = exploration_latest.version
+
+        explorations = exp_services.get_multiple_explorations_by_version(
+            self.EXP_ID, range(1, latest_version + 1))
+
+        self.assertEqual(len(explorations), 3)
+        self.assertEqual(explorations[0].version, 1)
+        self.assertEqual(explorations[1].version, 2)
+        self.assertEqual(explorations[2].version, 3)
+
+    def test_version_number_errors_for_get_multiple_exploration_versions(self):
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id)
+
+        # Update exploration to version 2.
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state',
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+
+        # Update exploration to version 3.
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state 2',
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+
+        with self.assertRaisesRegexp(
+            ValueError,
+            'Requested version number 4 cannot be higher than the current '
+            'version number 3.'):
+            exp_services.get_multiple_explorations_by_version(
+                self.EXP_ID, [1, 2, 3, 4])
+
+        with self.assertRaisesRegexp(
+            ValueError,
+            'At least one version number is invalid'):
+            exp_services.get_multiple_explorations_by_version(
+                self.EXP_ID, [1, 2, 2.5, 3])
+
     def test_retrieval_of_multiple_explorations(self):
         exps = {}
         chars = 'abcde'
@@ -1725,35 +1793,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
         populate_datastore()
 
-    def test_get_next_page_of_all_commits(self):
-        all_commits = exp_services.get_next_page_of_all_commits()[0]
-        self.assertEqual(len(all_commits), 8)
-        for ind, commit in enumerate(all_commits):
-            if ind != 0:
-                self.assertGreater(
-                    all_commits[ind - 1].last_updated,
-                    all_commits[ind].last_updated)
-
-        commit_dicts = [commit.to_dict() for commit in all_commits]
-
-        # Note that commits are ordered from most recent to least recent.
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_CREATE_EXP_1, commit_dicts[-1])
-        self.assertDictContainsSubset(
-            self.COMMIT_BOB_EDIT_EXP_1, commit_dicts[-2])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_CREATE_EXP_2, commit_dicts[-3])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_EDIT_EXP_1, commit_dicts[-4])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_EDIT_EXP_2, commit_dicts[-5])
-        self.assertDictContainsSubset(
-            self.COMMIT_BOB_REVERT_EXP_1, commit_dicts[-6])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_DELETE_EXP_1, commit_dicts[-7])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-8])
-
     def test_get_next_page_of_all_non_private_commits(self):
         all_commits = (
             exp_services.get_next_page_of_all_non_private_commits()[0])
@@ -1763,42 +1802,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
 
         #TODO(frederikcreemers@gmail.com) test max_age here.
-
-    def test_paging(self):
-        all_commits, cursor, more = exp_services.get_next_page_of_all_commits(
-            page_size=5)
-        self.assertEqual(len(all_commits), 5)
-        commit_dicts = [commit.to_dict() for commit in all_commits]
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_EDIT_EXP_1, commit_dicts[-1])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_EDIT_EXP_2, commit_dicts[-2])
-        self.assertDictContainsSubset(
-            self.COMMIT_BOB_REVERT_EXP_1, commit_dicts[-3])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_DELETE_EXP_1, commit_dicts[-4])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-5])
-        self.assertTrue(more)
-
-        all_commits, cursor, more = exp_services.get_next_page_of_all_commits(
-            page_size=5, urlsafe_start_cursor=cursor)
-        self.assertEqual(len(all_commits), 3)
-        commit_dicts = [commit.to_dict() for commit in all_commits]
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_CREATE_EXP_1, commit_dicts[-1])
-        self.assertDictContainsSubset(
-            self.COMMIT_BOB_EDIT_EXP_1, commit_dicts[-2])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_CREATE_EXP_2, commit_dicts[-3])
-        self.assertFalse(more)
-
-
-class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):
-    """Test special cases relating to the exploration commit logs."""
-    def test_paging_with_no_commits(self):
-        all_commits = exp_services.get_next_page_of_all_commits(page_size=5)[0]
-        self.assertEqual(len(all_commits), 0)
 
 
 class ExplorationSearchTests(ExplorationServicesUnitTests):
