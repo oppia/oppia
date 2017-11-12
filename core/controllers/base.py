@@ -351,8 +351,10 @@ class BaseHandler(webapp2.RequestHandler):
         if 'nav_mode' not in values:
             values['nav_mode'] = ''
 
-        if redirect_url_on_logout is None:
+        if redirect_url_on_logout is None and 'create' not in self.request.uri:
             redirect_url_on_logout = self.request.uri
+        else:
+            redirect_url_on_logout = '/'
 
         if self.user_id:
             values['login_url'] = None
