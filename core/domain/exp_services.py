@@ -2018,9 +2018,6 @@ def delete_state_id_mapping_model_for_exploration(
         exploration_id: str. Id of the exploration.
         exploration_version: int. Latest version of the exploration.
     """
-    state_id_mapping_models = [
-        (exploration_id, version)
-        for version in range(1, exploration_version + 1)]
-
+    exp_versions = range(1, exploration_version + 1)
     exp_models.StateIdMappingModel.delete_state_id_mapping_models(
-        state_id_mapping_models)
+        exploration_id, exp_versions)
