@@ -104,10 +104,16 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             time.sleep(1)
             stats_jobs_continuous._STATE_COUNTER_CUTOFF_DATE = (  # pylint: disable=protected-access
                 datetime.datetime.utcnow())
-            original_init_state = exploration.init_state_name
             new_init_state_name = 'New init state'
-            exploration.rename_state(original_init_state, new_init_state_name)
-            exp_services._save_exploration('owner', exploration, '', [])  # pylint: disable=protected-access
+            original_init_state = exploration.init_state_name
+            change_list = [{
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': original_init_state,
+                'new_state_name': new_init_state_name
+            }]
+            exp_services.update_exploration(
+                'owner', exploration.id, change_list, '')
+            exploration = exp_services.get_exploration_by_id(exp_id)
             exp_version = 2
             state2_name = 'sid2'
 
