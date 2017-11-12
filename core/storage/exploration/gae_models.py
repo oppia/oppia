@@ -607,9 +607,9 @@ class StateIdMappingModel(base_models.BaseModel):
         """Removes state id mapping models present in state_id_mapping_models.
 
         Args:
-            state_id_mapping_model: list(tuple(str, int)). A list of tuple
-                where each tuple contains exploration_id and
-                exploration_version of the state id mapping model to be deleted.
+            exp_id: The id of the exploration.
+            exp_versions: list(int). A list of exploration versions for which
+                the state id mapping model is to be deleted.
         """
         keys = [
             ndb.Key(cls, cls._generate_instance_id(exp_id, exp_version))
