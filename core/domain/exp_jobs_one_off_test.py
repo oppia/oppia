@@ -322,11 +322,13 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         # Have one user make two commits.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, user_a_id, title='Original Title')
-        exploration_model = exp_models.ExplorationModel.get(
-            self.EXP_ID, strict=True, version=None)
-        exploration_model.title = 'New title'
-        exploration_model.commit(
-            user_a_id, 'Changed title.', [])
+        change_list = [{
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'New title'
+        }]
+        exp_services.update_exploration(
+            user_a_id, self.EXP_ID, change_list, 'Changed title.')
 
         # Have the second user revert version 2 to version 1
         exp_services.revert_exploration(user_b_id, self.EXP_ID, 2, 1)

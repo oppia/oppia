@@ -3559,3 +3559,197 @@ class ExplorationSummary(object):
             'title': self.title,
             'objective': self.objective,
         }
+
+
+class StateIdMapping(object):
+    """Domain object for state ID mapping model."""
+
+    def __init__(
+            self, exploration_id, exploration_version, state_names_to_ids,
+            largest_state_id_used):
+        """Initialize state id mapping model object.
+
+        Args:
+            exploration_id: str. The exploration id whose state names are
+                mapped.
+            exploration_version: int. The version of the exploration.
+            state_names_to_ids: dict. A dictionary mapping a state name to
+                unique ID.
+            largest_state_id_used: int. The largest integer so far that has been
+                used as a state ID for this exploration.
+        """
+        self.exploration_id = exploration_id
+        self.exploration_version = exploration_version
+        self.state_names_to_ids = state_names_to_ids
+        self.largest_state_id_used = largest_state_id_used
+
+    def has_state_changed_significantly(self, old_state, new_state):
+        """Checks whether there is any significant change in old and new version
+        of the given state.
+
+        A significant change has happened when interaction id has been changed
+        in new version of the state.
+
+        Args:
+            old_state: dict. Old version of the state.
+            new_state: dict. New version of the state.
+
+        Returns:
+            bool. A boolean indicating whether change is significant or not.
+        """
+        # State has changed significantly if interaction id in new state is
+        # different from old state.
+        return old_state.interaction.id != new_state.interaction.id
+
+    def create_mapping_for_new_version(
+            self, old_exploration, new_exploration, change_list):
+        """Get state name to id mapping for new exploration's states.
+
+        Args:
+            old_exploration: Exploration. Old version of the exploration.
+            new_exploration: Exploration. New version of the exploration.
+            change_list: list(dict). List of changes between old and new
+                exploration.
+
+        Returns:
+            StateIdMapping. Domain object for state id mapping.
+        """
+        new_state_names = []
+        state_ids_to_names = {}
+
+        # Generate state id to name mapping dict for old exploration.
+        for state_name in old_exploration.states:
+            state_ids_to_names[self.get_state_id(state_name)] = state_name
+
+        old_state_ids_to_names = copy.deepcopy(state_ids_to_names)
+
+        # Analyse each command in change list one by one to create state id
+        # mapping for new exploration.
+        for change_dict in change_list:
+            if change_dict['cmd'] == CMD_ADD_STATE:
+                new_state_names.append(change_dict['state_name'])
+                assert change_dict['state_name'] not in (
+                    state_ids_to_names.values())
+
+            elif change_dict['cmd'] == CMD_DELETE_STATE:
+                removed_state_name = change_dict['state_name']
+
+                # Find state name in state id mapping. If it exists then
+                # remove it from mapping.
+                if removed_state_name in state_ids_to_names.values():
+                    key = None
+                    for (state_id, state_name) in (
+                            state_ids_to_names.iteritems()):
+                        if state_name == removed_state_name:
+                            key = state_id
+                            break
+                    state_ids_to_names.pop(key)
+
+                    assert removed_state_name not in new_state_names
+                else:
+                    # If the state is not present in state id mapping then
+                    # remove it from new state names list.
+                    new_state_names.remove(removed_state_name)
+
+            elif change_dict['cmd'] == CMD_RENAME_STATE:
+                old_state_name = change_dict['old_state_name']
+                new_state_name = change_dict['new_state_name']
+
+                # Find whether old state name is present in state id mapping.
+                # If it is then replace the old state name to new state name.
+                if old_state_name in state_ids_to_names.values():
+                    key = None
+                    for (state_id, state_name) in (
+                            state_ids_to_names.iteritems()):
+                        if state_name == old_state_name:
+                            key = state_id
+                            break
+                    state_ids_to_names[key] = new_state_name
+
+                    assert old_state_name not in new_state_names
+                    assert new_state_name not in new_state_names
+                else:
+                    # If old state name is not present in state id mapping then
+                    # remove it from new state names and add new state name
+                    # in new state names list.
+                    new_state_names.remove(old_state_name)
+                    new_state_names.append(new_state_name)
+
+        new_state_names_to_ids = dict(
+            zip(state_ids_to_names.values(), state_ids_to_names.keys()))
+
+        # Go through each state id and name and compare the new state
+        # with its corresponding old state to find whether significant
+        # change has happened or not.
+        for (state_id, state_name) in state_ids_to_names.iteritems():
+            new_state = new_exploration.states[state_name]
+            old_state = old_exploration.states[old_state_ids_to_names[state_id]]
+
+            if self.has_state_changed_significantly(old_state, new_state):
+                # If significant change has happend then treat that state as
+                # new state and assign new state id to that state.
+                new_state_names_to_ids.pop(state_name)
+                new_state_names.append(state_name)
+
+        # Assign new ids to each state in new state names list.
+        largest_state_id_used = self.largest_state_id_used
+        for state_name in sorted(new_state_names):
+            largest_state_id_used += 1
+
+            # Check that the state name being assigned is not present in
+            # mapping.
+            assert state_name not in new_state_names_to_ids.keys()
+            new_state_names_to_ids[state_name] = largest_state_id_used
+
+        state_id_map = StateIdMapping(
+            new_exploration.id, new_exploration.version, new_state_names_to_ids,
+            largest_state_id_used)
+        state_id_map.validate()
+        return state_id_map
+
+    @classmethod
+    def create_mapping_for_new_exploration(cls, exploration):
+        """Create state name to id mapping for exploration's states.
+
+        Args:
+            exploration: Exploration. New exploration for which state id mapping
+                is to be generated.
+
+        Returns:
+            StateIdMapping. Domain object for state id mapping.
+        """
+        largest_state_id_used = -1
+        state_names_to_ids = {}
+
+        # Assign state id to each state in exploration.
+        for state_name in exploration.states:
+            largest_state_id_used += 1
+            state_names_to_ids[state_name] = largest_state_id_used
+
+        state_id_map = cls(
+            exploration.id, exploration.version, state_names_to_ids,
+            largest_state_id_used)
+        state_id_map.validate()
+        return state_id_map
+
+    def validate(self):
+        """Validates the state id mapping domain object."""
+        state_ids = self.state_names_to_ids.values()
+        if len(set(state_ids)) != len(state_ids):
+            raise Exception('Assigned state ids should be unique.')
+
+        if not all(state_ids) <= self.largest_state_id_used:
+            raise Exception(
+                'Assigned state ids should be smaller than last state id used.')
+
+    def get_state_id(self, state_name):
+        """Get state id for given state name.
+
+        Args:
+            state_name: str. State name.
+
+        Returns:
+            int. Unique id assigned to given state name.
+        """
+        if state_name in self.state_names_to_ids:
+            return self.state_names_to_ids[state_name]

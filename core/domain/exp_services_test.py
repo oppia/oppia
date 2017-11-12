@@ -807,18 +807,33 @@ title: A title
         init_state = exploration.states[exploration.init_state_name]
         init_interaction = init_state.interaction
         init_interaction.default_outcome.dest = exploration.init_state_name
-        exploration.add_states(['New state'])
-        exploration.states['New state'].update_interaction_id('TextInput')
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'New state',
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }]
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        exp_services.update_exploration(
+            self.owner_id, exploration.id, change_list, '')
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
 
-        exploration.rename_state('New state', 'Renamed state')
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        change_list = [{
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': 'New state',
+            'new_state_name': 'Renamed state'
+        }]
+        exp_services.update_exploration(
+            self.owner_id, exploration.id, change_list, '')
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 3)
 
         # Download version 2
@@ -934,19 +949,34 @@ param_changes: []
         init_state = exploration.states[exploration.init_state_name]
         init_interaction = init_state.interaction
         init_interaction.default_outcome.dest = exploration.init_state_name
-        exploration.add_states(['New state'])
-        exploration.states['New state'].update_interaction_id('TextInput')
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'New state',
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }]
         exploration.objective = 'The objective'
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
             fs_domain.ExplorationFileSystem(self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        exp_services.update_exploration(
+            self.owner_id, exploration.id, change_list, '')
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
 
-        exploration.rename_state('New state', 'Renamed state')
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        change_list = [{
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': 'New state',
+            'new_state_name': 'Renamed state'
+        }]
+        exp_services.update_exploration(
+            self.owner_id, exploration.id, change_list, '')
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 3)
 
         # Download version 2
@@ -1533,10 +1563,18 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(len(snapshots_metadata), 2)
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        exploration.add_states(['New state'])
-        exploration.states['New state'].update_interaction_id('TextInput')
-        exp_services._save_exploration(
-            'second_committer_id', exploration, 'Added new state', [])
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'New state',
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }]
+        exp_services.update_exploration(
+            'second_committer_id', exploration.id, change_list,
+            'Added new state')
 
         commit_dict_3 = {
             'committer_id': 'second_committer_id',
@@ -1560,9 +1598,13 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             exploration.delete_state('invalid_state_name')
 
         # Now delete the new state.
-        exploration.delete_state('New state')
-        exp_services._save_exploration(
-            'committer_id_3', exploration, 'Deleted state: New state', [])
+        change_list = [{
+            'cmd': exp_domain.CMD_DELETE_STATE,
+            'state_name': 'New state'
+        }]
+        exp_services.update_exploration(
+            'committer_id_3', exploration.id, change_list,
+            'Deleted state: New state')
 
         commit_dict_4 = {
             'committer_id': 'committer_id_3',
@@ -1596,10 +1638,17 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # In version 3, a new state is added.
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        exploration.add_states(['New state'])
-        exploration.states['New state'].update_interaction_id('TextInput')
-        exp_services._save_exploration(
-            'committer_id_v3', exploration, 'Added new state', [])
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'New state',
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }]
+        exp_services.update_exploration(
+            'committer_id_v3', exploration.id, change_list, 'Added new state')
 
         # It is not possible to revert from anything other than the most
         # current version.
@@ -2318,9 +2367,15 @@ title: Old Title
         exploration_model.commit(
             self.albert_id, 'Changed title.', [])
 
-        # In version 3, a new state is added.
+        # Version 2 of exploration.
         exploration_model = exp_models.ExplorationModel.get(
             exp_id, strict=True, version=None)
+
+        # Store state id mapping model for new exploration.
+        exploration = exp_services.get_exploration_from_model(exploration_model)
+        exp_services.create_and_save_state_id_mapping_model(exploration, [])
+
+        # In version 3, a new state is added.
         new_state = copy.deepcopy(
             self.VERSION_0_STATES_DICT[feconf.DEFAULT_INIT_STATE_NAME])
         new_state['interaction']['id'] = 'TextInput'
@@ -2330,8 +2385,29 @@ title: Old Title
         init_state = exploration_model.states[feconf.DEFAULT_INIT_STATE_NAME]
         init_handler = init_state['interaction']['handlers'][0]
         init_handler['rule_specs'][0]['dest'] = 'New state'
+
         exploration_model.commit(
             'committer_id_v3', 'Added new state', [])
+
+        # Version 3 of exploration.
+        exploration_model = exp_models.ExplorationModel.get(
+            exp_id, strict=True, version=None)
+
+        # Store state id mapping model for new exploration.
+        exploration = exp_services.get_exploration_from_model(exploration_model)
+
+        # Change list for version 3.
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state'
+        }, {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'New state',
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        }]
+        exp_services.create_and_save_state_id_mapping_model(
+            exploration, change_list)
 
         # Version 4 is an upgrade based on the migration job.
 
@@ -2749,3 +2825,107 @@ class GetExplorationAndExplorationRightsTest(ExplorationServicesUnitTests):
                 'fake_id'))
         self.assertIsNone(exp)
         self.assertIsNone(exp_rights)
+
+
+class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
+    """Tests for functions associated with creating and updating state id
+    mapping."""
+
+    EXP_ID = 'eid'
+
+    def setUp(self):
+        """Initialize owner before each test case."""
+        super(ExplorationStateIdMappingTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_that_correct_state_id_mapping_model_is_stored(self):
+        """Test that correct mapping model is stored for new and edited
+        exploration."""
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
+
+        mapping = exp_services.get_state_id_mapping(
+            self.EXP_ID, exploration.version)
+        expected_mapping = {
+            exploration.init_state_name: 0
+        }
+
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 1)
+        self.assertEqual(
+            mapping.largest_state_id_used, 0)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }], 'Add state name')
+
+        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        new_mapping = exp_services.get_state_id_mapping(
+            self.EXP_ID, new_exploration.version)
+
+        expected_mapping = {
+            new_exploration.init_state_name: 0,
+            'new state': 1
+        }
+        self.assertEqual(
+            new_mapping.exploration_version, new_exploration.version)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 1)
+
+    def test_that_state_id_mapping_model_is_deleted(self):
+        """Test that state id mapping model is correctly deleted."""
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }], 'Add state name')
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exp_services.delete_state_id_mapping_model_for_exploration(
+            exploration.id, exploration.version)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            "Entity for class StateIdMappingModel with id eid.2 not found"):
+            exp_services.get_state_id_mapping(
+                exploration.id, exploration.version)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            "Entity for class StateIdMappingModel with id eid.1 not found"):
+            exp_services.get_state_id_mapping(
+                exploration.id, exploration.version - 1)
+
+
+    def test_that_mapping_is_correct_when_exploration_is_reverted(self):
+        """Test that state id mapping is correct when exploration is reverted
+        to old version."""
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }], 'Add state name')
+
+        # Revert exploration to version 1.
+        exp_services.revert_exploration(self.owner_id, self.EXP_ID, 2, 1)
+
+        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        new_mapping = exp_services.get_state_id_mapping(
+            self.EXP_ID, new_exploration.version)
+
+        # Expected mapping is same as initial version's mapping.
+        expected_mapping = {
+            exploration.init_state_name: 0
+        }
+        self.assertEqual(
+            new_mapping.exploration_version, new_exploration.version)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 1)

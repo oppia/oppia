@@ -2709,3 +2709,247 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         # Should be able to successfully delete it
         exploration.delete_state('END')
         self.assertNotIn('END', exploration.states)
+
+
+class StateIdMappingTests(test_utils.GenericTestBase):
+    """Tests for StateIdMapping domain class."""
+
+    EXP_ID = 'eid'
+
+    def setUp(self):
+        """Initialize owner and store default exploration before each test case.
+        """
+        super(StateIdMappingTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        # Create a default exploration.
+        self.exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.owner_id)
+        self.mapping = exp_services.get_state_id_mapping(
+            self.EXP_ID, self.exploration.version)
+
+    def test_that_correct_mapping_is_stored_for_new_exp(self):
+        """Test that initial state id mapping is correct."""
+        expected_mapping = {
+            self.exploration.init_state_name: 0
+        }
+
+        self.assertEqual(self.mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(self.mapping.exploration_version, 1)
+        self.assertEqual(
+            self.mapping.largest_state_id_used, 0)
+        self.assertDictEqual(self.mapping.state_names_to_ids, expected_mapping)
+
+    def test_that_mapping_remains_same_when_exp_params_changes(self):
+        """Test that state id mapping is unchanged when exploration params are
+        changed."""
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            }], 'Changes.')
+
+        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        new_mapping = exp_services.get_state_id_mapping(
+            self.EXP_ID, new_exploration.version)
+
+        expected_mapping = {
+            new_exploration.init_state_name: 0
+        }
+        self.assertEqual(
+            new_mapping.exploration_version, new_exploration.version)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 0)
+
+    def test_that_mapping_is_correct_when_new_state_is_added(self):
+        """Test that new state id is added in state id mapping when new state is
+        added in exploration."""
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }], 'Add state name')
+
+        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        new_mapping = exp_services.get_state_id_mapping(
+            self.EXP_ID, new_exploration.version)
+
+        expected_mapping = {
+            new_exploration.init_state_name: 0,
+            'new state': 1
+        }
+        self.assertEqual(
+            new_mapping.exploration_version, new_exploration.version)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 1)
+
+    def test_that_mapping_is_correct_when_old_state_is_deleted(self):
+        """Test that state id is removed from state id mapping when the
+        state is removed from exploration."""
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }], 'Add state name')
+
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+            'cmd': exp_domain.CMD_DELETE_STATE,
+            'state_name': 'new state',
+            }], 'delete state')
+
+        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        new_mapping = exp_services.get_state_id_mapping(
+            self.EXP_ID, new_exploration.version)
+
+        expected_mapping = {
+            new_exploration.init_state_name: 0
+        }
+        self.assertEqual(
+            new_mapping.exploration_version, new_exploration.version)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 1)
+
+    def test_that_mapping_remains_when_state_is_renamed(self):
+        """Test that state id mapping is changed accordingly when a state
+        is renamed in exploration."""
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }], 'Add state name')
+
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': 'new state',
+            'new_state_name': 'state',
+        }], 'Change state name')
+
+        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        new_mapping = exp_services.get_state_id_mapping(
+            self.EXP_ID, new_exploration.version)
+
+        expected_mapping = {
+            new_exploration.init_state_name: 0,
+            'state': 1
+        }
+        self.assertEqual(
+            new_mapping.exploration_version, new_exploration.version)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 1)
+
+    def test_that_mapping_is_changed_when_interaction_id_is_changed(self):
+        """Test that state id mapping is changed accordingly when interaction
+        id of state is changed."""
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': self.exploration.init_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput'
+            }], 'Update interaction.')
+
+        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        new_mapping = exp_services.get_state_id_mapping(
+            self.EXP_ID, new_exploration.version)
+
+        expected_mapping = {
+            new_exploration.init_state_name: 1,
+        }
+
+        self.assertEqual(
+            new_mapping.exploration_version, new_exploration.version)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 1)
+
+    def test_that_mapping_is_correct_for_series_of_changes(self):
+        """Test that state id mapping is changed accordingly for series
+        of add, rename, remove and update state changes."""
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }, {
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'new state',
+                'new_state_name': 'state'
+            }, {
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'extra state'
+            }, {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput'
+            }, {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'extra state',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput'
+            }, {
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }, {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'new state',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput'
+            }], 'Heavy changes')
+
+        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        new_mapping = exp_services.get_state_id_mapping(
+            self.EXP_ID, new_exploration.version)
+
+        expected_mapping = {
+            new_exploration.init_state_name: 0,
+            'extra state': 1,
+            'new state': 2,
+            'state': 3,
+        }
+        self.assertEqual(
+            new_mapping.exploration_version, new_exploration.version)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 3)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_DELETE_STATE,
+                'state_name': 'state',
+            }, {
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'extra state',
+                'new_state_name': 'state'
+            }, {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'state',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput'
+            }, {
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'extra state'
+            }, {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'extra state',
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'TextInput'
+            }, {
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'new state',
+                'new_state_name': 'other state'
+            }], 'Heavy changes 2')
+
+        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        new_mapping = exp_services.get_state_id_mapping(
+            self.EXP_ID, new_exploration.version)
+
+        expected_mapping = {
+            new_exploration.init_state_name: 0,
+            'other state': 2,
+            'extra state': 4,
+            'state': 5
+        }
+        self.assertEqual(
+            new_mapping.exploration_version, new_exploration.version)
+        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertEqual(new_mapping.largest_state_id_used, 5)
