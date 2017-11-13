@@ -20,6 +20,7 @@
 
    var AnswerGroupObjectFactory;
    var nics;
+	 var customizationArgs = {};
 
    beforeEach(inject(function($injector) {
      AnswerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');
@@ -40,7 +41,7 @@
          dest: 'Question 1'
        }
      }];
-     expect(nics.isValid(answerGroupsTrue)).toBe(true);
+     expect(nics.isValid(customizationArgs, answerGroupsTrue)).toBe(true);
    });
 
    it('should return false for rule type other than Equals', function() {
@@ -57,7 +58,7 @@
          dest: 'Question 1'
        }
      }];
-     expect(nics.isValid(answerGroupsFalse)).toBe(false);
+     expect(nics.isValid(customizationArgs, answerGroupsFalse)).toBe(false);
    });
 
    it('should return false for more than one rule', function() {
@@ -80,6 +81,6 @@
          dest: 'Question 1'
        }
      }];
-     expect(nics.isValid(answerGroupsFalse)).toBe(false);
+     expect(nics.isValid(customizationArgs, answerGroupsFalse)).toBe(false);
    });
  });
