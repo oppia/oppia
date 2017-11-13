@@ -18,15 +18,15 @@
  describe('Text interaction input checker service', function() {
    beforeEach(module('oppia'));
 
+   var AnswerGroupObjectFactory;
+   var tics;
+
    beforeEach(inject(function($injector) {
      AnswerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');
      tics = $injector.get('TextInputCheckerService');
    }));
-   
-   var AnswerGroupObjectFactory;
-   var tics;
 
-   it('should return true for rule type EqualsS ', function() {
+   it('should return true for rule type Equals', function() {
      var answerGroupsTrue = [{
        rules: [{
          type: 'Equals',
