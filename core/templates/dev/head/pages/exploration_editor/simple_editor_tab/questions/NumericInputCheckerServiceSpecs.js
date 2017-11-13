@@ -40,7 +40,7 @@
          dest: 'Question 1'
        }
      }];
-     expect(nics.isValid('', answerGroupsTrue)).toBe(true);
+     expect(nics.isValid(answerGroupsTrue)).toBe(true);
    });
 
    it('should return false for rule type other than Equals', function() {
@@ -57,7 +57,7 @@
          dest: 'Question 1'
        }
      }];
-     expect(nics.isValid('', answerGroupsFalse)).toBe(false);
+     expect(nics.isValid(answerGroupsFalse)).toBe(false);
    });
 
    it('should return false for more than one rule', function() {
@@ -80,6 +80,6 @@
          dest: 'Question 1'
        }
      }];
-     expect(nics.isValid('', answerGroupsFalse)).toBe(false);
+     expect(nics.isValid(answerGroupsFalse)).toBe(false);
    });
  });

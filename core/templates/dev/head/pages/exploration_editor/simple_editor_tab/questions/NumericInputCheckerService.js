@@ -24,7 +24,7 @@
      // compatibility with the backend data structures is already satisfied
      // (e.g. in terms of types), but they may add additional constraints
      // imposed by the UI of the simple editor.
-     isValid: function(customizationArgs, answerGroups) {
+     isValid: function(answerGroups) {
        // Invariant to check:
        // - Answer group rule type is 'Equals'.
        if (answerGroups.length === 1) {
