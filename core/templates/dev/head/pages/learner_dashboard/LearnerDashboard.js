@@ -523,23 +523,23 @@ oppia.controller('LearnerDashboard', [
         $scope.subscriptionsList = (
           responseData.subscription_list
         );
-        $scope.numberDeletedIncompleteExplorations = (
-          responseData.number_of_deleted_activities.incomplete_explorations
+        $scope.numberNonexistentIncompleteExplorations = (
+          responseData.number_of_nonexistent_activities.incomplete_explorations
         );
-        $scope.numberDeletedIncompleteCollections = (
-          responseData.number_of_deleted_activities.incomplete_collections
+        $scope.numberNonexistentIncompleteCollections = (
+          responseData.number_of_nonexistent_activities.incomplete_collections
         );
-        $scope.numberDeletedCompletedExplorations = (
-          responseData.number_of_deleted_activities.completed_explorations
+        $scope.numberNonexistentCompletedExplorations = (
+          responseData.number_of_nonexistent_activities.completed_explorations
         );
-        $scope.numberDeletedCompletedCollections = (
-          responseData.number_of_deleted_activities.completed_collections
+        $scope.numberNonexistentCompletedCollections = (
+          responseData.number_of_nonexistent_activities.completed_collections
         );
-        $scope.numberDeletedExplorationPlaylist = (
-          responseData.number_of_deleted_activities.exploration_playlist
+        $scope.numberNonexistentExplorationsFromPlaylist = (
+          responseData.number_of_nonexistent_activities.exploration_playlist
         );
-        $scope.numberDeletedCollectionPlaylist = (
-          responseData.number_of_deleted_activities.collection_playlist
+        $scope.numberNonexistentCollectionsFromPlaylist = (
+          responseData.number_of_nonexistent_activities.collection_playlist
         );
         $scope.completedToIncompleteCollections = (
           responseData.completed_to_incomplete_collections
