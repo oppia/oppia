@@ -35,11 +35,6 @@ oppia.directive('simpleEditorBody', [
           StatesToQuestionsService) {
           $scope.data = SimpleEditorManagerService.getData();
 
-          var INTERACTION_TYPES = [{
-            id: 'MultipleChoiceInput',
-            name: 'Multiple choice'
-          }];
-
           $scope.getHumanReadableQuestionType = (
             StatesToQuestionsService.getHumanReadableQuestionType);
 
