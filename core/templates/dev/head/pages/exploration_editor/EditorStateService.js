@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview A service that maintains a record of which state 
- * in the exploration is currently active
+ * in the exploration is currently active.
  */
 
 oppia.factory('EditorStateService', ['$log', function($log) {

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview A service that maps IDs to Angular names
+ * @fileoverview A service that maps IDs to Angular names.
  */
 
 oppia.factory('AngularNameService', [function() {
