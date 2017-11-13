@@ -18,15 +18,15 @@
  describe('Numeric interaction input checker service', function() {
    beforeEach(module('oppia'));
 
+   var AnswerGroupObjectFactory;
+   var nics;
+
    beforeEach(inject(function($injector) {
      AnswerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');
      nics = $injector.get('NumericInputCheckerService');
    }));
 
-   var AnswerGroupObjectFactory;
-   var nics;
-
-   it('should return true for rule type Equals ', function() {
+   it('should return true for rule type Equals', function() {
      var answerGroupsTrue = [{
        rules: [{
          type: 'Equals',
