@@ -20,11 +20,11 @@ oppia.constant(
   'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
 
 oppia.controller('LearnerLocalNav', [
-  '$scope', '$modal', '$http', 'ExplorationPlayerService', 'alertsService',
+  '$scope', '$modal', '$http', 'ExplorationPlayerService', 'AlertsService',
   'FocusManagerService', 'UrlInterpolationService',
   'FLAG_EXPLORATION_URL_TEMPLATE',
   function(
-    $scope, $modal, $http, ExplorationPlayerService, alertsService,
+    $scope, $modal, $http, ExplorationPlayerService, AlertsService,
     FocusManagerService, UrlInterpolationService,
     FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = ExplorationPlayerService.getExplorationId();
@@ -73,7 +73,7 @@ oppia.controller('LearnerLocalNav', [
           description: result.description,
           suggestion_html: result.suggestionHtml
         }).error(function(res) {
-          alertsService.addWarning(res);
+          AlertsService.addWarning(res);
         });
         $modal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -138,7 +138,7 @@ oppia.controller('LearnerLocalNav', [
         $http.post(flagExplorationUrl, {
           report_text: report
         }).error(function(error) {
-          alertsService.addWarning(error);
+          AlertsService.addWarning(error);
         });
         $modal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

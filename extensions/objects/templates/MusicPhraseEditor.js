@@ -15,8 +15,8 @@
 // This directive is always editable.
 
 oppia.directive('musicPhraseEditor', [
-  '$compile', 'OBJECT_EDITOR_URL_PREFIX', 'alertsService',
-  function($compile, OBJECT_EDITOR_URL_PREFIX, alertsService) {
+  '$compile', 'OBJECT_EDITOR_URL_PREFIX', 'AlertsService',
+  function($compile, OBJECT_EDITOR_URL_PREFIX, AlertsService) {
     return {
       link: function(scope, element) {
         scope.getTemplateUrl = function() {
@@ -64,7 +64,7 @@ oppia.directive('musicPhraseEditor', [
         $scope.$watch('localValue', function(newValue, oldValue) {
           if (newValue && oldValue) {
             if (newValue.length > _MAX_NOTES_IN_PHRASE) {
-              alertsService.addWarning(
+              AlertsService.addWarning(
                 'There are too many notes on the staff.');
             } else {
               var parentValues = [];

@@ -19,11 +19,11 @@
  */
 
 oppia.factory('TrainingModalService', [
-  '$rootScope', '$modal', 'alertsService',
-  function($rootScope, $modal, alertsService) {
+  '$rootScope', '$modal', 'AlertsService',
+  function($rootScope, $modal, AlertsService) {
     return {
       openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave) {
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
         if (externalSave) {
           $rootScope.$broadcast('externalSave');
         }
@@ -34,11 +34,11 @@ oppia.factory('TrainingModalService', [
           controller: [
             '$scope', '$injector', '$modalInstance',
             'explorationStatesService', 'editorContextService',
-            'AnswerClassificationService', 'explorationContextService',
+            'AnswerClassificationService', 'ExplorationContextService',
             'stateInteractionIdService', 'angularNameService',
             function($scope, $injector, $modalInstance,
                 explorationStatesService, editorContextService,
-                AnswerClassificationService, explorationContextService,
+                AnswerClassificationService, ExplorationContextService,
                 stateInteractionIdService, angularNameService) {
               $scope.trainingDataAnswer = '';
               $scope.trainingDataFeedback = '';
@@ -57,7 +57,7 @@ oppia.factory('TrainingModalService', [
 
               $scope.init = function() {
                 var explorationId =
-                  explorationContextService.getExplorationId();
+                  ExplorationContextService.getExplorationId();
                 var currentStateName =
                   editorContextService.getActiveStateName();
                 var state = explorationStatesService.getState(currentStateName);

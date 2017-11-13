@@ -250,15 +250,15 @@ oppia.directive('versionDiffVisualization', [
             controller: [
               '$scope', '$http', '$modalInstance', '$timeout', 'newStateName',
               'oldStateName', 'newState', 'oldState', 'headers',
-              'explorationContextService', 'UrlInterpolationService',
+              'ExplorationContextService', 'UrlInterpolationService',
               function(
                   $scope, $http, $modalInstance, $timeout, newStateName,
                   oldStateName, newState, oldState, headers,
-                  explorationContextService, UrlInterpolationService) {
+                  ExplorationContextService, UrlInterpolationService) {
                 var STATE_YAML_URL = UrlInterpolationService.interpolateUrl(
                   '/createhandler/state_yaml/<exploration_id>', {
                     exploration_id: (
-                      explorationContextService.getExplorationId())
+                      ExplorationContextService.getExplorationId())
                   });
 
                 $scope.headers = headers;

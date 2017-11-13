@@ -19,14 +19,14 @@
 
 oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
-  'editorContextService', 'alertsService', 'ResponsesService', 'RouterService',
-  'explorationContextService', 'TrainingDataService',
+  'editorContextService', 'AlertsService', 'ResponsesService', 'RouterService',
+  'ExplorationContextService', 'TrainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
   'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
-      editorContextService, alertsService, ResponsesService, RouterService,
-      explorationContextService, TrainingDataService,
+      editorContextService, AlertsService, ResponsesService, RouterService,
+      ExplorationContextService, TrainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
       INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
     $scope.editorContextService = editorContextService;
@@ -35,7 +35,7 @@ oppia.controller('StateResponses', [
       '/general/drag_dots.png');
 
     var _initializeTrainingData = function() {
-      var explorationId = explorationContextService.getExplorationId();
+      var explorationId = ExplorationContextService.getExplorationId();
       var currentStateName = editorContextService.getActiveStateName();
       TrainingDataService.initializeTrainingData(
         explorationId, currentStateName);
@@ -245,7 +245,7 @@ oppia.controller('StateResponses', [
     });
 
     $scope.openTeachOppiaModal = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
@@ -253,27 +253,27 @@ oppia.controller('StateResponses', [
         backdrop: false,
         controller: [
           '$scope', '$injector', '$modalInstance',
-          'oppiaExplorationHtmlFormatterService',
+          'ExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
-          'explorationContextService', 'editorContextService',
+          'ExplorationContextService', 'editorContextService',
           'explorationStatesService', 'TrainingDataService',
           'AnswerClassificationService', 'FocusManagerService',
           'angularNameService', 'RULE_TYPE_CLASSIFIER',
           function(
               $scope, $injector, $modalInstance,
-              oppiaExplorationHtmlFormatterService,
+              ExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
-              explorationContextService, editorContextService,
+              ExplorationContextService, editorContextService,
               explorationStatesService, TrainingDataService,
               AnswerClassificationService, FocusManagerService,
               angularNameService, RULE_TYPE_CLASSIFIER) {
-            var _explorationId = explorationContextService.getExplorationId();
+            var _explorationId = ExplorationContextService.getExplorationId();
             var _stateName = editorContextService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
 
             $scope.stateContent = _state.content.getHtml();
             $scope.inputTemplate = (
-              oppiaExplorationHtmlFormatterService.getInteractionHtml(
+              ExplorationHtmlFormatterService.getInteractionHtml(
                 stateInteractionIdService.savedMemento,
                 stateCustomizationArgsService.savedMemento,
                 'testInteractionInput'));
@@ -311,7 +311,7 @@ oppia.controller('StateResponses', [
 
             $scope.submitAnswer = function(answer) {
               $scope.answerTemplate = (
-                oppiaExplorationHtmlFormatterService.getAnswerHtml(
+                ExplorationHtmlFormatterService.getAnswerHtml(
                   answer, stateInteractionIdService.savedMemento,
                   stateCustomizationArgsService.savedMemento));
 
@@ -354,7 +354,7 @@ oppia.controller('StateResponses', [
     };
 
     $scope.openAddAnswerGroupModal = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
@@ -418,7 +418,7 @@ oppia.controller('StateResponses', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]
@@ -462,7 +462,7 @@ oppia.controller('StateResponses', [
       // state of the answer group.
       evt.stopPropagation();
 
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
@@ -476,7 +476,7 @@ oppia.controller('StateResponses', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]
