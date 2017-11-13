@@ -20,7 +20,7 @@
 
    var AnswerGroupObjectFactory;
    var nics;
-	 var customizationArgs = {};
+   var customizationArgs = {};
 
    beforeEach(inject(function($injector) {
      AnswerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');

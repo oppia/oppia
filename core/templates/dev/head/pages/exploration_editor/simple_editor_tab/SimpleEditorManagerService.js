@@ -216,7 +216,8 @@ oppia.factory('SimpleEditorManagerService', [
             SimpleEditorShimService.saveAnswerGroups(
               currentStateName, newAnswerGroups);
           }
-          // - Set destination of last question to itself if answer group already exist.
+          // - Set destination of last question to itself if answer group
+          // already exist.
           if (index === questionCount - 1 && doesLastQuestionHaveAnswerGroups) {
             var lastStateName = (
               data.questionList.isEmpty() ?
