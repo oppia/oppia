@@ -2115,28 +2115,19 @@ pre.oppia-pre-wrapped-text {
    .conversation-skin-help-card-content > p' selectors specifying
     the same line-height, margin-top and margin-bottom attributes)
 */
-.oppia-state-content-display-html > p,
-.oppia-feedback-display-html > p,
-.oppia-hint-display-html > p,
-.oppia-solution-display-html > p,
+.oppia-rte-editor > p,
 .form-control.oppia-rte-content > div > p {
   line-height: 28px;
   margin-bottom: 18px;
   margin-top: 18px;
 }
 
-.oppia-state-content-display-html > p:first-child,
-.oppia-feedback-display-html > p:first-child,
-.oppia-hint-display-html > p:first-child,
-.oppia-solution-display-html > p:first-child,
+.oppia-rte-editor > p:first-child,
 .form-control.oppia-rte-content > div > p:first-child {
   margin-top: 0;
 }
 
-.oppia-state-content-display-html > p:last-child,
-.oppia-feedback-display-html > p:last-child,
-.oppia-hint-display-html > p:first-child,
-.oppia-solution-display-html > p:first-child,
+.oppia-rte-editor > p:last-child,
 .form-control.oppia-rte-content > div > p:last-child {
   margin-bottom: 0;
 }
