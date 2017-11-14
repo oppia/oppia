@@ -27,9 +27,9 @@ oppia.directive('progressDots', [
         '/pages/exploration_player/' +
         'progress_dots_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'PlayerPositionService', 'urlService',
-        function($scope, $rootScope, PlayerPositionService, urlService) {
-          var isIframed = urlService.isIframed();
+        '$scope', '$rootScope', 'PlayerPositionService', 'UrlService',
+        function($scope, $rootScope, PlayerPositionService, UrlService) {
+          var isIframed = UrlService.isIframed();
           $scope.MAX_DOTS = isIframed ? 6 : 18;
           $scope.dots = [];
           $scope.currentDotIndex = PlayerPositionService.getActiveCardIndex();

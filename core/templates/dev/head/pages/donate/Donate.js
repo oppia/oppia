@@ -18,11 +18,11 @@
 
 oppia.controller('Donate', [
   '$http', '$scope', '$timeout', '$window', 'UrlInterpolationService',
-  'siteAnalyticsService', 'windowDimensionsService',
+  'siteAnalyticsService', 'WindowDimensionsService',
   function(
       $http, $scope, $timeout, $window, UrlInterpolationService,
-      siteAnalyticsService, windowDimensionsService) {
-    $scope.windowIsNarrow = windowDimensionsService.isWindowNarrow();
+      siteAnalyticsService, WindowDimensionsService) {
+    $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
     $scope.donateImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/opp_donate_text.svg');
 

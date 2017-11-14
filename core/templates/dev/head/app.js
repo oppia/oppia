@@ -647,30 +647,6 @@ oppia.factory('urlService', ['$window', function($window) {
   };
 }]);
 
-// Service for computing the window dimensions.
-oppia.factory('windowDimensionsService', ['$window', function($window) {
-  var onResizeHooks = [];
-  angular.element($window).bind('resize', function() {
-    onResizeHooks.forEach(function(hookFn) {
-      hookFn();
-    });
-  });
-  return {
-    getWidth: function() {
-      return (
-        $window.innerWidth || document.documentElement.clientWidth ||
-        document.body.clientWidth);
-    },
-    registerOnResizeHook: function(hookFn) {
-      onResizeHooks.push(hookFn);
-    },
-    isWindowNarrow: function() {
-      var NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
-      return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
-    }
-  };
-}]);
-
 // Service for sending events to Google Analytics.
 //
 // Note that events are only sent if the CAN_SEND_ANALYTICS_EVENTS flag is
