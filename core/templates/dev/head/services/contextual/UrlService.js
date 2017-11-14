@@ -34,13 +34,10 @@ oppia.factory('UrlService', ['$window', function($window) {
       return urlParts[1] === 'embed';
     },
     getPathname: function() {
-      return window.location.pathname;
+      return $window.location.pathname;
     },
     getHash: function() {
       return $window.location.hash;
-    },
-    getPathname: function() {
-      return $window.location.pathname;
     }
   };
 }]);
