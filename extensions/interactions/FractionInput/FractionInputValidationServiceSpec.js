@@ -16,8 +16,9 @@ describe('FractionInputValidationService', function() {
   var validatorService, WARNING_TYPES;
 
   var currentState;
-  var answerGroups, goodDefaultOutcome;
-  var greaterThanMinusOne, equalsOneRule, equivalentToOneRule, lessThanTwoRule;
+  var answerGroups, goodDefaultOutcome, customizationArgs;
+  var greaterThanMinusOne, equalsOneRule, equivalentToOneRule,
+    lessThanTwoRule;
   var createFractionDict;
   beforeEach(function() {
     module('oppia');
@@ -36,6 +37,12 @@ describe('FractionInputValidationService', function() {
         numerator: numerator,
         denominator: denominator
       };
+    };
+
+    customizationArgs = {
+      requireSimplestForm: {
+        value: true
+      }
     };
 
     currentState = 'First State';
@@ -79,6 +86,13 @@ describe('FractionInputValidationService', function() {
       }
     };
 
+    exactlyEqualToOneAndNotInSimplestFormRule = {
+      type: 'IsExactlyEqualTo',
+      inputs: {
+        f: createFractionDict(false, 0, 10, 10)
+      }
+    };
+
     answerGroups = [{
       rules: [equalsOneRule, lessThanTwoRule],
       outcome: goodDefaultOutcome,
@@ -88,14 +102,16 @@ describe('FractionInputValidationService', function() {
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
   it('should catch redundant rules', function() {
     answerGroups[0].rules = [lessThanTwoRule, equalsOneRule];
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched ' +
@@ -106,15 +122,19 @@ describe('FractionInputValidationService', function() {
   it('should catch identical rules as redundant', function() {
     answerGroups[0].rules = [equalsOneRule, equivalentToOneRule];
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched ' +
         'because it is made redundant by rule 1 from answer group 1.'
     }]);
-    answerGroups[0].rules = [equalsOneRule, equivalentToOneAndSimplestFormRule];
+    answerGroups[0].rules = [equalsOneRule,
+      equivalentToOneAndSimplestFormRule
+    ];
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched ' +
@@ -127,7 +147,8 @@ describe('FractionInputValidationService', function() {
     answerGroups[0].rules = [greaterThanMinusOne];
     answerGroups[1].rules = [equalsOneRule];
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 from answer group 2 will never be matched ' +
@@ -139,11 +160,24 @@ describe('FractionInputValidationService', function() {
     function() {
       answerGroups[0].rules = [greaterThanMinusOne, equalsOneRule];
       var warnings = validatorService.getAllWarnings(
-        currentState, {}, answerGroups, goodDefaultOutcome);
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Rule 2 from answer group 1 will never be matched ' +
           'because it is made redundant by rule 1 from answer group 1.'
       }]);
     });
+
+  it('should catch redundant rules caused by exactly equals', function() {
+    answerGroups[0].rules = [exactlyEqualToOneAndNotInSimplestFormRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 1 from answer group 1 will never be matched ' +
+        'because it is not in simplest form.'
+    }]);
+  });
 });

@@ -17,7 +17,8 @@
  */
 
 oppia.factory('FractionInputValidationService', [
-  'WARNING_TYPES', 'baseInteractionValidationService', 'FractionObjectFactory',
+  'WARNING_TYPES', 'baseInteractionValidationService',
+  'FractionObjectFactory',
   function(
     WARNING_TYPES, baseInteractionValidationService, FractionObjectFactory) {
     return {
@@ -27,6 +28,8 @@ oppia.factory('FractionInputValidationService', [
       getAllWarnings: function(
         stateName, customizationArgs, answerGroups, defaultOutcome) {
         var warningsList = [];
+        var shouldBeInSimplestForm =
+          customizationArgs.requireSimplestForm.value;
 
         warningsList = warningsList.concat(
           this.getCustomizationArgsWarnings(customizationArgs));
@@ -74,7 +77,22 @@ oppia.factory('FractionInputValidationService', [
               ubi: false,
             };
             switch (rule.type) {
-              case 'IsExactlyEqualTo': // fall-through
+              case 'IsExactlyEqualTo':
+                if (shouldBeInSimplestForm) {
+                  var fraction = rule.inputs.f;
+                  var fractionInSimplestForm = FractionObjectFactory.fromDict(
+                    rule.inputs.f).convertToSimplestForm();
+                  if (!angular.equals(fraction, fractionInSimplestForm)) {
+                    warningsList.push({
+                      type: WARNING_TYPES.ERROR,
+                      message: (
+                        'Rule ' + (j + 1) + ' from answer group ' +
+                        (i + 1) + ' will never be matched because it is not ' +
+                        'in simplest form.')
+                    });
+                  }
+                }
+                // fall-through
               case 'IsEquivalentTo': // fall-through
               case 'IsEquivalentToAndInSimplestForm':
                 var f = toFloat(rule.inputs.f);
@@ -98,7 +116,8 @@ oppia.factory('FractionInputValidationService', [
                     'Rule ' + (j + 1) + ' from answer group ' +
                     (i + 1) + ' will never be matched because it ' +
                     'is made redundant by rule ' + ranges[k].ruleIndex +
-                    ' from answer group ' + ranges[k].answerGroupIndex + '.')
+                    ' from answer group ' + ranges[k].answerGroupIndex +
+                    '.')
                 });
               }
             }
