@@ -493,12 +493,22 @@ class AnswerOccurrence(object):
             answer_occurrence_dict['frequency'])
 
 
-class AnswerFrequencyList(object):
+class AnswerCalculationOutput(object):
+    """Domain object superclass that represents the output of an answer
+    calculation.
+    """
+    def __init__(self, calculation_output_type):
+        self.calculation_output_type = calculation_output_type
+
+
+class AnswerFrequencyList(AnswerCalculationOutput):
     """Domain object that represents a list of AnswerOccurrences."""
     def __init__(self, answer_occurrences=None):
         """Initialize domain object for answer frequency list for a given list
         of AnswerOccurrence objects (default is empty list).
         """
+        super(AnswerFrequencyList, self).__init__(
+            CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
         self.answer_occurrences = (
             answer_occurrences if answer_occurrences else [])
 
@@ -518,13 +528,15 @@ class AnswerFrequencyList(object):
             for answer_occurrence_dict in answer_occurrence_list])
 
 
-class CategorizedAnswerFrequencyLists(object):
+class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
     """AnswerFrequencyLists that are categorized based on arbitrary categories.
     """
     def __init__(self, categorized_answer_freq_lists=None):
         """Initialize domain object for categorized answer frequency lists for
         a given dict (default is empty).
         """
+        super(CategorizedAnswerFrequencyLists, self).__init__(
+            CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS)
         self.categorized_answer_freq_lists = (
             categorized_answer_freq_lists
             if categorized_answer_freq_lists else {})
@@ -550,36 +562,34 @@ class StateAnswersCalcOutput(object):
     state answers.
     """
     def __init__(self, exploration_id, exploration_version, state_name,
-                 calculation_id, calculation_output_type, calculation_output):
+                 calculation_id, calculation_output):
         """Initialize domain object for state answers calculation output.
 
-        calculation_output one of AnswerFrequencyList or
-            CategorizedAnswerFrequencyLists.
+        Args:
+            exploration_id: str. The ID of the exploration corresponding to the
+                answer calculation output.
+            exploration_version: str. The version of the exploration
+                corresponding to the answer calculation output.
+            state_name: str. The name of the exploration state to which the
+                aggregated answers were submitted.
+            calculation_id: str. Which calculation was performed on the given
+                answer data.
+            calculation_output: AnswerCalculationOutput. The output of an
+                answer aggregation operation.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
         self.state_name = state_name
         self.calculation_id = calculation_id
-        self.calculation_output_type = calculation_output_type
         self.calculation_output = calculation_output
-        if calculation_output_type:
-            if calculation_output_type == (
-                    CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST):
-                self.calculation_output = AnswerFrequencyList(
-                    calculation_output)
-            elif (calculation_output_type ==
-                  CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS):
-                self.calculation_output = CategorizedAnswerFrequencyLists(
-                    calculation_output)
-            else:
-                self.calculation_output = None
 
     def save(self):
         """Validate the domain object and commit it to storage."""
         self.validate()
         stats_models.StateAnswersCalcOutputModel.create_or_update(
             self.exploration_id, self.exploration_version, self.state_name,
-            self.calculation_id, self.calculation_output_type,
+            self.calculation_id,
+            self.calculation_output.calculation_output_type,
             self.calculation_output.to_raw_type())
 
     def validate(self):
@@ -616,20 +626,20 @@ class StateAnswersCalcOutput(object):
                     self.calculation_output))
 
         if (isinstance(self.calculation_output, AnswerFrequencyList)
-                and self.calculation_output_type != (
+                and self.calculation_output.calculation_output_type != (
                     CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)):
             raise utils.ValidationError(
                 'Expected type of calculation output object to match '
                 'calculation output type field: %s',
-                self.calculation_output_type)
+                self.calculation_output.calculation_output_type)
 
         if (isinstance(self.calculation_output, CategorizedAnswerFrequencyLists)
-                and self.calculation_output_type != (
+                and self.calculation_output.calculation_output_type != (
                     CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS)):
             raise utils.ValidationError(
                 'Expected type of calculation output object to match '
                 'calculation output type field: %s',
-                self.calculation_output_type)
+                self.calculation_output.calculation_output_type)
 
         output_data = self.calculation_output.to_raw_type()
         if sys.getsizeof(output_data) > max_bytes_per_calc_output_data:

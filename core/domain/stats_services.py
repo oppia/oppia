@@ -429,7 +429,6 @@ def get_calc_output(
                     calc_output_model.calculation_output))
         return stats_domain.StateAnswersCalcOutput(
             exploration_id, exploration_version, state_name,
-            calculation_id, calc_output_model.calculation_output_type,
-            calculation_output)
+            calculation_id, calculation_output)
     else:
         return None
