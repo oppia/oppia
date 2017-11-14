@@ -24,10 +24,10 @@ oppia.directive('createActivityButton', [
         '/components/create_button/create_activity_button_directive.html'),
       controller: [
         '$scope', '$timeout', '$window', '$modal', 'ExplorationCreationService',
-        'CollectionCreationService', 'siteAnalyticsService', 'urlService',
+        'CollectionCreationService', 'siteAnalyticsService', 'UrlService',
         function(
             $scope, $timeout, $window, $modal, ExplorationCreationService,
-            CollectionCreationService, siteAnalyticsService, urlService) {
+            CollectionCreationService, siteAnalyticsService, UrlService) {
           $scope.creationInProgress = false;
 
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
@@ -56,7 +56,7 @@ oppia.directive('createActivityButton', [
 
             if (!GLOBALS.can_create_collections) {
               ExplorationCreationService.createNewExploration();
-            } else if (urlService.getPathname() !== '/creator_dashboard') {
+            } else if (UrlService.getPathname() !== '/creator_dashboard') {
               $window.location.replace('/creator_dashboard?mode=create');
             } else {
               $modal.open({
@@ -103,7 +103,7 @@ oppia.directive('createActivityButton', [
           // If the user clicked on a 'create' button to get to the dashboard,
           // open the create modal immediately (or redirect to the exploration
           // editor if the create modal does not need to be shown).
-          if (urlService.getUrlParams().mode === 'create') {
+          if (UrlService.getUrlParams().mode === 'create') {
             if (!GLOBALS.can_create_collections) {
               ExplorationCreationService.createNewExploration();
             } else {

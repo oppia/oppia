@@ -29,11 +29,11 @@ oppia.directive('topNavigationBar', [
       controller: [
         '$scope', '$http', '$window', '$timeout',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS',
-        'siteAnalyticsService', 'windowDimensionsService', 'DebouncerService',
+        'siteAnalyticsService', 'WindowDimensionsService', 'DebouncerService',
         function(
             $scope, $http, $window, $timeout,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS,
-            siteAnalyticsService, windowDimensionsService, DebouncerService) {
+            siteAnalyticsService, WindowDimensionsService, DebouncerService) {
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection'];
@@ -99,8 +99,8 @@ oppia.directive('topNavigationBar', [
             });
           }
 
-          $scope.windowIsNarrow = windowDimensionsService.isWindowNarrow();
-          var currentWindowWidth = windowDimensionsService.getWidth();
+          $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
+          var currentWindowWidth = WindowDimensionsService.getWidth();
           $scope.navElementsVisibilityStatus = {};
           // The order of the elements in this array specifies the order in
           // which they will be hidden. Earlier elements will be hidden first.
@@ -111,11 +111,11 @@ oppia.directive('topNavigationBar', [
             $scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
           }
 
-          windowDimensionsService.registerOnResizeHook(function() {
-            $scope.windowIsNarrow = windowDimensionsService.isWindowNarrow();
+          WindowDimensionsService.registerOnResizeHook(function() {
+            $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             $scope.$apply();
             // If window is resized larger, try displaying the hidden elements.
-            if (currentWindowWidth < windowDimensionsService.getWidth()) {
+            if (currentWindowWidth < WindowDimensionsService.getWidth()) {
               for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
                 if (
                   !$scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]]) {
@@ -128,7 +128,7 @@ oppia.directive('topNavigationBar', [
             // Close the sidebar, if necessary.
             SidebarStatusService.closeSidebar();
             $scope.sidebarIsShown = SidebarStatusService.isSidebarShown();
-            currentWindowWidth = windowDimensionsService.getWidth();
+            currentWindowWidth = WindowDimensionsService.getWidth();
             truncateNavbarDebounced();
           });
           $scope.isSidebarShown = function() {
@@ -168,7 +168,7 @@ oppia.directive('topNavigationBar', [
            */
           var truncateNavbar = function() {
             // If the window is narrow, the standard nav tabs are not shown.
-            if (windowDimensionsService.isWindowNarrow()) {
+            if (WindowDimensionsService.isWindowNarrow()) {
               return;
             }
 
