@@ -47,7 +47,7 @@ class LearnerDashboardHandler(base.BaseHandler):
     @acl_decorators.can_access_learner_dashboard
     def get(self):
         """Handles GET requests."""
-        (learner_progress, number_of_deleted_activities,
+        (learner_progress, number_of_nonexistent_activities,
          completed_to_incomplete_collections) = (
              learner_progress_services.get_activity_progress(self.user_id))
 
@@ -107,7 +107,8 @@ class LearnerDashboardHandler(base.BaseHandler):
             'incomplete_collections_list': incomplete_collection_summary_dicts,
             'exploration_playlist': exploration_playlist_summary_dicts,
             'collection_playlist': collection_playlist_summary_dicts,
-            'number_of_deleted_activities': number_of_deleted_activities,
+            'number_of_nonexistent_activities': (
+                number_of_nonexistent_activities),
             'completed_to_incomplete_collections': (
                 completed_to_incomplete_collections),
             'thread_summaries': thread_summaries,
