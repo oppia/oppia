@@ -74,3 +74,29 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
     ]
   };
 }]);
+
+oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    templateUrl: 'visualizations/EnumeratedFrequencyTable',
+    controller: [
+      '$scope', '$attrs', 'HtmlEscaperService',
+      function($scope, $attrs, HtmlEscaperService) {
+        $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
+        $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
+
+        // Enumerate each unique answer with unique keys.
+        var enumeration = {};
+        for (var i = 0; i < $scope.data.length; i++) {
+          var answer = $scope.data[i].answer;
+          if (!enumeration.hasOwnProperty(answer)) {
+            enumeration[answer] = Object.keys(enumeration).length;
+          }
+          // Make the key accessible via $scope.
+          $scope.data[i].key = enumeration[answer];
+        }
+      }
+    ]
+  };
+}]);

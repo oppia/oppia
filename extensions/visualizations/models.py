@@ -97,3 +97,24 @@ class FrequencyTable(BaseVisualization):
         'description': 'The title of the visualization.',
         'schema': {'type': 'unicode'}
     }]
+
+
+class EnumeratedFrequencyTable(BaseVisualization):
+    """A visualization representing a two-column table with keyed answer counts.
+    """
+
+    _OPTIONS_SPECS = [{
+        'name': 'column_headers',
+        'description': 'The headers for the columns.',
+        'schema': {
+            'type': 'list',
+            'items': {
+                'type': 'unicode',
+            },
+            'len': 2,
+        },
+    }, {
+        'name': 'title',
+        'description': 'The title of the visualization.',
+        'schema': {'type': 'unicode'}
+    }]

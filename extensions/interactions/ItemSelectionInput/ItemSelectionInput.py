@@ -73,7 +73,7 @@ class ItemSelectionInput(base.BaseInteraction):
 
     _answer_visualization_specs = [{
         # Table with answer counts for top N answers.
-        'id': 'FrequencyTable',
+        'id': 'EnumeratedFrequencyTable',
         'options': {
             'column_headers': ['Answer', 'Count'],
             'title': 'Top answers'
