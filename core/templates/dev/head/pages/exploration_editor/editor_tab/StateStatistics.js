@@ -28,6 +28,8 @@ oppia.controller('StateStatistics', [
       stateCustomizationArgsService, oppiaExplorationHtmlFormatterService,
       TrainingModalService, INTERACTION_SPECS) {
     $scope.isInteractionTrainable = false;
+    $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS =
+      GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS;
 
     $scope.initStateStatistics = function(data) {
       $scope.isInteractionTrainable = (

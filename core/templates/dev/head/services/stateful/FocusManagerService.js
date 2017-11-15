@@ -21,10 +21,10 @@
  */
 
 oppia.factory('FocusManagerService', [
-  '$rootScope', '$timeout', 'deviceInfoService', 'LABEL_FOR_CLEARING_FOCUS',
+  '$rootScope', '$timeout', 'DeviceInfoService', 'LABEL_FOR_CLEARING_FOCUS',
   'IdGenerationService',
   function(
-      $rootScope, $timeout, deviceInfoService, LABEL_FOR_CLEARING_FOCUS,
+      $rootScope, $timeout, DeviceInfoService, LABEL_FOR_CLEARING_FOCUS,
       IdGenerationService) {
     var _nextLabelToFocusOn = null;
     return {
@@ -43,7 +43,7 @@ oppia.factory('FocusManagerService', [
         });
       },
       setFocusIfOnDesktop: function(newFocusLabel) {
-        if (!deviceInfoService.isMobileDevice()) {
+        if (!DeviceInfoService.isMobileDevice()) {
           this.setFocus(newFocusLabel);
         }
       },
