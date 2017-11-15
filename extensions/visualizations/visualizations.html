@@ -33,8 +33,8 @@
       <td>
         <a ng-click="toggleAnswer(row.key)"><[row.key]></a>
         <table id="answer-<[row.key]>" class="table" style="display: none;">
-          <tr ng-repeat="answer in row.answer">
-            <td ng-bind-html="answer"></td>
+          <tr ng-repeat="item in row.answer">
+            <td ng-bind-html="item"></td>
           </tr>
         </table>
       </td>
