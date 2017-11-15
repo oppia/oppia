@@ -85,16 +85,26 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
       function($scope, $attrs, HtmlEscaperService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
+        $scope.hideTable = function(key) {
+          var table = document.getElementById("table_" + key);
+          if (table.style.display === "none") {
+            table.style.display = "block";
+          } else {
+            table.style.display = "none";
+          }
+        };
 
         // Enumerate each unique answer with unique keys.
-        var enumeration = {};
+        var enumerator = {};
         for (var i = 0; i < $scope.data.length; i++) {
           var answer = $scope.data[i].answer;
-          if (!enumeration.hasOwnProperty(answer)) {
-            enumeration[answer] = Object.keys(enumeration).length;
+          if (!enumerator.hasOwnProperty(answer)) {
+            enumerator[answer] = Object.keys(enumerator).length + 1;
           }
           // Make the key accessible via $scope.
-          $scope.data[i].key = enumeration[answer];
+          $scope.data[i].key = enumerator[answer];
+          $scope.data[i].escaped_answer = answer.map(
+              HtmlEscaperService.unescapedStrToEscapedStr).join('\n');
         }
       }
     ]
