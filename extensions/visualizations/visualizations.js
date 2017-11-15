@@ -94,7 +94,6 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
             answer.style.display = 'none';
           }
         };
-
       }
     ]
   };
