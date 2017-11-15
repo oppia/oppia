@@ -31,7 +31,7 @@
     </tr>
     <tr ng-repeat="row in data">
       <td>
-        <a ng-click="hideTable(row.key)"><[row.key]></a>
+        <a ng-click="toggleAnswer(row.key)"><[row.key]></a>
         <table id="table-<[row.key]>" class="table" style="display: none;">
           <tr ng-repeat="answer in row.answer">
             <td ng-bind-html="answer"></td>

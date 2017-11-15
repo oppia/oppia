@@ -85,7 +85,7 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
       function($scope, $attrs, HtmlEscaperService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
-        $scope.hideTable = function(key) {
+        $scope.toggleAnswer = function(key) {
           var table = document.getElementById('table-' + key);
           if (table.style.display === 'none') {
             table.style.display = 'block';
