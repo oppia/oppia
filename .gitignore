@@ -2,8 +2,6 @@
 *.pyc
 *.swp
 *.swo
-*.sublime-project
-*.sublime-workspace
 gae_runtime/*
 third_party/*
 backend_prod_files/*
@@ -18,8 +16,6 @@ venv/
 .idea
 .vagrant/*
 .lock
-.gitignore
-setup.cfg
 
 # Oppia uses cache slugs for various resources and we need separate resource
 # directories for dev and prod. Resource directories for prod are generated
