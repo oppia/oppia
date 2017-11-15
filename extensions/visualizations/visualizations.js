@@ -84,7 +84,7 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
       '$scope', '$attrs', 'HtmlEscaperService',
       function($scope, $attrs, HtmlEscaperService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
-        $scope.data.forEach(function (answer, i) { answer.key = i + 1; });
+        $scope.data.forEach(function (row, i) { row.key = i + 1; });
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
         $scope.toggleAnswer = function(key) {
           var answer = document.getElementById('answer-' + key);
