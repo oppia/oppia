@@ -101,10 +101,7 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
           if (!enumerator.hasOwnProperty(answer)) {
             enumerator[answer] = Object.keys(enumerator).length + 1;
           }
-          // Make the key accessible via $scope.
           $scope.data[i].key = enumerator[answer];
-          $scope.data[i].escaped_answer = answer.map(
-              HtmlEscaperService.unescapedStrToEscapedStr).join('\n');
         }
       }
     ]
