@@ -84,6 +84,7 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
       '$scope', '$attrs', 'HtmlEscaperService',
       function($scope, $attrs, HtmlEscaperService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
+        $scope.data.forEach(function (answer, i) { answer.key = i + 1; });
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
         $scope.toggleAnswer = function(key) {
           var answer = document.getElementById('answer-' + key);
@@ -94,15 +95,6 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
           }
         };
 
-        // Enumerate each unique answer with unique keys.
-        var enumerator = {};
-        for (var i = 0; i < $scope.data.length; i++) {
-          var answer = $scope.data[i].answer;
-          if (!enumerator.hasOwnProperty(answer)) {
-            enumerator[answer] = Object.keys(enumerator).length + 1;
-          }
-          $scope.data[i].key = enumerator[answer];
-        }
       }
     ]
   };
