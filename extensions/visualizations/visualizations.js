@@ -86,11 +86,11 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
         $scope.toggleAnswer = function(key) {
-          var table = document.getElementById('table-' + key);
-          if (table.style.display === 'none') {
-            table.style.display = 'block';
+          var answer = document.getElementById('answer-' + key);
+          if (answer.style.display === 'none') {
+            answer.style.display = 'block';
           } else {
-            table.style.display = 'none';
+            answer.style.display = 'none';
           }
         };
 
