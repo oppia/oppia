@@ -24,7 +24,7 @@
 
 <script type="text/ng-template" id="visualizations/EnumeratedFrequencyTable">
   <strong><[options.title]></strong>
-  <table id="freq_table" class="table">
+  <table class="table">
     <tr>
       <th><[options.column_headers[0]]></th>
       <th><[options.column_headers[1]]></th>
@@ -32,7 +32,7 @@
     <tr ng-repeat="row in data">
       <td>
         <a ng-click="hideTable(row.key)"><[row.key]></a>
-        <table id="table_<[row.key]>" class="table" style="display: none;">
+        <table id="table-<[row.key]>" class="table" style="display: none;">
           <tr ng-repeat="answer in row.answer">
             <td ng-bind-html="answer"></td>
           </tr>
