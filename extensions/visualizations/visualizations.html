@@ -32,7 +32,7 @@
     <tr ng-repeat="row in data track by $index">
       <td>
         <a ng-click="toggleAnswerVisibility($index)">#<[$index + 1]></a>
-        <table class="table" ng-show="answerVisibility[$index]">
+        <table class="table" ng-show="answerVisible[$index]">
           <tr ng-repeat="item in row.answer">
             <td ng-bind-html="item"></td>
           </tr>
