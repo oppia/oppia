@@ -32,7 +32,7 @@
     <tr ng-repeat="row in data">
       <td>
         <a ng-click="toggleRowAnswer(row.answerId)"><[row.displayName]></a>
-        <table id="<[row.answerId]>" class="table" style="display: none;">
+        <table id="<[row.answerId]>" class="answer-table">
           <tr ng-repeat="item in row.answer">
             <td ng-bind-html="item"></td>
           </tr>
@@ -43,8 +43,14 @@
   </table>
 
   <style>
-    oppia-visualization-frequency-table table {
+    oppia-visualization-enumerated-frequency-table a {
+      font-weight: bold;
+    }
+    oppia-visualization-enumerated-frequency-table table {
       margin-top: 12px;
+    }
+    oppia-visualization-enumerated-frequency-table table.answer-table {
+      display: none;
     }
   </style>
 </script>
