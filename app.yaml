@@ -129,7 +129,7 @@ libraries:
   version: '1.6.1'
 # This is needed for sending requests to a mailgun HTTPS URL.
 - name: ssl
-  version: '2.7'
+  version: '2.7.11'
 - name: webapp2
   version: '2.5.2'
 # This environmental variable is for serving minified resources
@@ -137,6 +137,7 @@ libraries:
 # running the server in the dev environment.
 env_variables:
   MINIFICATION: false
+  PYTHONHTTPSVERIFY: 1
 
 
 skip_files:
