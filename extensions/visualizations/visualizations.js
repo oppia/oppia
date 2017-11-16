@@ -85,13 +85,13 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
       function($scope, $attrs, HtmlEscaperService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data).map(
           function(row, i) {
-            row.display_name = i + 1;
-            row.answer_id = 'answer-' + i;
+            row.displayName = i + 1;
+            row.answerId = 'answer-' + i;
             return row;
           });
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
-        $scope.toggleRowAnswer = function(answer_id) {
-          var answer = document.getElementById(answer_id);
+        $scope.toggleRowAnswer = function(answerId) {
+          var answer = document.getElementById(answerId);
           if (answer.style.display === 'none') {
             answer.style.display = 'block';
           } else {
