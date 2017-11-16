@@ -31,8 +31,8 @@
     </tr>
     <tr ng-repeat="row in data">
       <td>
-        <a ng-click="toggleAnswer(row.key)"><[row.key]></a>
-        <table id="answer-<[row.key]>" class="table" style="display: none;">
+        <a ng-click="toggleRowAnswer(row.answer_id)"><[row.display_name]></a>
+        <table id="<[row.answer_id]>" class="table" style="display: none;">
           <tr ng-repeat="item in row.answer">
             <td ng-bind-html="item"></td>
           </tr>
