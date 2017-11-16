@@ -31,8 +31,8 @@
     </tr>
     <tr ng-repeat="row in data track by $index">
       <td>
-        <a ng-click="toggleRowAnswer($index)">#<[$index + 1]></a>
-        <table id="<[row.answerId]>" class="answer-table">
+        <a ng-click="toggleAnswerVisibility($index)">#<[$index + 1]></a>
+        <table class="table" ng-show="answerVisibility[$index]">
           <tr ng-repeat="item in row.answer">
             <td ng-bind-html="item"></td>
           </tr>
@@ -48,9 +48,6 @@
     }
     oppia-visualization-enumerated-frequency-table table {
       margin-top: 12px;
-    }
-    oppia-visualization-enumerated-frequency-table table.answer-table {
-      display: none;
     }
   </style>
 </script>
