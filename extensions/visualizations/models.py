@@ -100,7 +100,9 @@ class FrequencyTable(BaseVisualization):
 
 
 class EnumeratedFrequencyTable(BaseVisualization):
-    """A visualization representing a two-column table with keyed answer counts.
+    """A visualization representing a two-column table with answer counts. The
+    contents of the answers are replaced with their ranking, and can be clicked
+    to toggle the answers' visibility below the ranking.
     """
 
     _OPTIONS_SPECS = [{
