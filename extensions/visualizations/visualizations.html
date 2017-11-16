@@ -29,9 +29,9 @@
       <th><[options.column_headers[0]]></th>
       <th><[options.column_headers[1]]></th>
     </tr>
-    <tr ng-repeat="row in data">
+    <tr ng-repeat="row in data track by $index">
       <td>
-        <a ng-click="toggleRowAnswer(row.answerId)"><[row.displayName]></a>
+        <a ng-click="toggleRowAnswer($index)">#<[$index + 1]></a>
         <table id="<[row.answerId]>" class="answer-table">
           <tr ng-repeat="item in row.answer">
             <td ng-bind-html="item"></td>
