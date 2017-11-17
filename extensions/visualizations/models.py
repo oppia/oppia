@@ -102,7 +102,9 @@ class FrequencyTable(BaseVisualization):
 class EnumeratedFrequencyTable(BaseVisualization):
     """A visualization representing a two-column table with answer counts. The
     answer column is made up of a clickable ranking, which toggles the
-    visibility of the answer's contents below it.
+    visibility of the answer's content below it.
+
+    The #1 entry is shown by default, all others begin hidden.
     """
 
     _OPTIONS_SPECS = [{
