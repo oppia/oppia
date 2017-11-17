@@ -104,7 +104,7 @@ class EnumeratedFrequencyTable(BaseVisualization):
     answer column is made up of a clickable ranking, which toggles the
     visibility of the answer's content below it.
 
-    The #1 entry is shown by default, all others begin hidden.
+    The #1 entry is shown by default, all others start hidden.
     """
 
     _OPTIONS_SPECS = [{
