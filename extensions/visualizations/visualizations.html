@@ -34,7 +34,7 @@
         <a ng-click="toggleAnswerVisibility($index)">#<[$index + 1]></a>
         <table class="table" ng-show="answerVisible[$index]">
           <tr ng-repeat="item in row.answer">
-            <td ng-bind-html="item"></td>
+            <td angular-html-bind="item"></td>
           </tr>
         </table>
       </td>
