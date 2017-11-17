@@ -80,11 +80,11 @@ oppia.directive('explorationSummaryTile', [
       controller: [
         '$scope', '$http',
         'oppiaDatetimeFormatter', 'RatingComputationService',
-        'windowDimensionsService',
+        'WindowDimensionsService',
         function(
           $scope, $http,
           oppiaDatetimeFormatter, RatingComputationService,
-          windowDimensionsService) {
+          WindowDimensionsService) {
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.ACTIVITY_TYPE_EXPLORATION = (
             constants.ACTIVITY_TYPE_EXPLORATION);
@@ -154,11 +154,11 @@ oppia.directive('explorationSummaryTile', [
             $scope.mobileCutoffPx = 0;
           }
           $scope.isWindowLarge = (
-            windowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
+            WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
 
-          windowDimensionsService.registerOnResizeHook(function() {
+          WindowDimensionsService.registerOnResizeHook(function() {
             $scope.isWindowLarge = (
-              windowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
+              WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
             $scope.$apply();
           });
 

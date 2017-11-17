@@ -29,16 +29,16 @@ oppia.directive('editorNavigation', [
         'explorationWarningsService',
         'stateEditorTutorialFirstTimeService',
         'ThreadDataService', 'siteAnalyticsService',
-        'explorationContextService', 'windowDimensionsService',
+        'explorationContextService', 'WindowDimensionsService',
         function(
             $scope, $rootScope, $timeout, $modal,
             RouterService, explorationRightsService,
             explorationWarningsService,
             stateEditorTutorialFirstTimeService,
             ThreadDataService, siteAnalyticsService,
-            explorationContextService, windowDimensionsService) {
+            explorationContextService, WindowDimensionsService) {
           $scope.postTutorialHelpPopoverIsShown = false;
-          $scope.isLargeScreen = (windowDimensionsService.getWidth() >= 1024);
+          $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
 
           $scope.$on('openPostTutorialHelpPopover', function() {
             if ($scope.isLargeScreen) {
@@ -109,8 +109,8 @@ oppia.directive('editorNavigation', [
           $scope.selectFeedbackTab = RouterService.navigateToFeedbackTab;
           $scope.getOpenThreadsCount = ThreadDataService.getOpenThreadsCount;
 
-          windowDimensionsService.registerOnResizeHook(function() {
-            $scope.isLargeScreen = (windowDimensionsService.getWidth() >= 1024);
+          WindowDimensionsService.registerOnResizeHook(function() {
+            $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
           });
         }
       ]

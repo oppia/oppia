@@ -37,11 +37,11 @@ oppia.directive('feedbackPopup', [
       controller: [
         '$scope', '$element', '$http', '$timeout', 'FocusManagerService',
         'alertsService', 'BackgroundMaskService', 'PlayerPositionService',
-        'windowDimensionsService',
+        'WindowDimensionsService',
         function(
             $scope, $element, $http, $timeout, FocusManagerService,
             alertsService, BackgroundMaskService, PlayerPositionService,
-            windowDimensionsService) {
+            WindowDimensionsService) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
           $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
@@ -51,7 +51,7 @@ oppia.directive('feedbackPopup', [
           $scope.feedbackPopoverId = (
             'feedbackPopover' + Math.random().toString(36).slice(2));
 
-          if (windowDimensionsService.isWindowNarrow()) {
+          if (WindowDimensionsService.isWindowNarrow()) {
             BackgroundMaskService.activateMask();
           }
 

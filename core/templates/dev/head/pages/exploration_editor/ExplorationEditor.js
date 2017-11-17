@@ -36,7 +36,7 @@ oppia.constant(
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
-  'explorationData', 'editorContextService', 'explorationTitleService',
+  'ExplorationDataService', 'EditorStateService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService',
   'explorationLanguageCodeService', 'explorationRightsService',
   'explorationInitStateNameService', 'explorationTagsService',
@@ -47,10 +47,11 @@ oppia.controller('ExplorationEditor', [
   'ExplorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
-  'ParamSpecsObjectFactory', 'UrlInterpolationService',
+  'ParamSpecsObjectFactory', 'explorationAutomaticTextToSpeechService',
+  'UrlInterpolationService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
-      explorationData, editorContextService, explorationTitleService,
+      ExplorationDataService, EditorStateService, explorationTitleService,
       explorationCategoryService, explorationObjectiveService,
       explorationLanguageCodeService, explorationRightsService,
       explorationInitStateNameService, explorationTagsService,
@@ -61,9 +62,10 @@ oppia.controller('ExplorationEditor', [
       ExplorationAdvancedFeaturesService, $modal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
-      ParamSpecsObjectFactory, UrlInterpolationService) {
+      ParamSpecsObjectFactory, explorationAutomaticTextToSpeechService,
+      UrlInterpolationService) {
     $scope.editabilityService = editabilityService;
-    $scope.editorContextService = editorContextService;
+    $scope.EditorStateService = EditorStateService;
 
     /**********************************************************
      * Called on initial load of the exploration editor page.
@@ -100,7 +102,7 @@ oppia.controller('ExplorationEditor', [
     // Initializes the exploration page using data from the backend. Called on
     // page load.
     $scope.initExplorationPage = function(successCallback) {
-      explorationData.getData(function(explorationId, lostChanges) {
+      ExplorationDataService.getData(function(explorationId, lostChanges) {
         if (!autosaveInfoModalsService.isModalOpen()) {
           autosaveInfoModalsService.showLostChangesModal(
             lostChanges, explorationId);
@@ -118,6 +120,7 @@ oppia.controller('ExplorationEditor', [
           ParamSpecsObjectFactory.createFromBackendDict(data.param_specs));
         explorationParamChangesService.init(
           ParamChangesObjectFactory.createFromBackendList(data.param_changes));
+        explorationAutomaticTextToSpeechService.init(data.auto_tts_enabled);
 
         $scope.explorationTitleService = explorationTitleService;
         $scope.explorationCategoryService = explorationCategoryService;
@@ -148,10 +151,10 @@ oppia.controller('ExplorationEditor', [
 
         graphDataService.recompute();
 
-        if (!editorContextService.getActiveStateName() ||
+        if (!EditorStateService.getActiveStateName() ||
             !explorationStatesService.getState(
-              editorContextService.getActiveStateName())) {
-          editorContextService.setActiveStateName(
+              EditorStateService.getActiveStateName())) {
+          EditorStateService.setActiveStateName(
             explorationInitStateNameService.displayed);
         }
 
@@ -184,7 +187,7 @@ oppia.controller('ExplorationEditor', [
         });
 
         if (explorationStatesService.getState(
-              editorContextService.getActiveStateName())) {
+              EditorStateService.getActiveStateName())) {
           $scope.$broadcast('refreshStateEditor');
         }
 

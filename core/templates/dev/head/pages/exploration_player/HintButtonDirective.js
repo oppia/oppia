@@ -18,6 +18,9 @@
 
 oppia.directive('hintButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
+    var SHOW_NEED_HINT_MESSAGE_DELAY = 1000;
+    var NUM_ATTEMPTS_BEFORE_SHOWING_NEED_HINT_MESSAGE = 2;
+
     return {
       restrict: 'E',
       scope: {
@@ -27,6 +30,37 @@ oppia.directive('hintButton', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
-        'hint_button_directive.html')
+        'hint_button_directive.html'),
+      controller: [
+        '$scope', '$rootScope', '$timeout', 'NumberAttemptsService',
+        'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
+        function($scope, $rootScope, $timeout, NumberAttemptsService,
+            WindowDimensionsService, TWO_CARD_THRESHOLD_PX) {
+          $scope.isShowingHintTooltip = false;
+
+          var viewportIsNarrow =
+            WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
+
+          $scope.getTooltipPlacement = function() {
+            return viewportIsNarrow ? 'right' : 'left';
+          };
+
+          var showNeedHintIfNecessary = function() {
+            if (NumberAttemptsService.getNumberAttempts() >=
+                NUM_ATTEMPTS_BEFORE_SHOWING_NEED_HINT_MESSAGE) {
+              $timeout(function() {
+                $scope.isShowingHintTooltip = true;
+                $scope.isShowingNeedHintMessage = true;
+              }, SHOW_NEED_HINT_MESSAGE_DELAY);
+            }
+          };
+
+          $scope.hideNeedHintMessage = function() {
+            $scope.isShowingHintTooltip = false;
+            $scope.isShowingNeedHintMessage = false;
+          };
+
+          $scope.$on('oppiaFeedbackAvailable', showNeedHintIfNecessary);
+        }]
     };
   }]);

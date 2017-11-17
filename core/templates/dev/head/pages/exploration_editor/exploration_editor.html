@@ -123,9 +123,12 @@
 {% block footer_js %}
   {{ super() }}
   <script src="/third_party/static/d3js-3.4.11/d3.min.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/mathjaxConfig.js"></script>
+  <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   <script>
     {{ value_generators_js }}
   </script>
+
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
@@ -157,6 +160,7 @@
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/CodeStringEditor.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/CoordTwoDimEditor.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/FilepathEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/FractionEditor.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/GraphEditor.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/GraphPropertyEditor.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/HtmlEditor.js"></script>
@@ -211,6 +215,9 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorNavbarBreadcrumbDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorNavigationDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationDataService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorStateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/AngularNameService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/UserEmailPreferencesService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationDiffService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditor.js"></script>
@@ -249,6 +256,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/StateImprovementSuggestionService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/StatisticsTab.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/BarChartDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/PieChartDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/settings_tab/SettingsTab.js"></script>
 
@@ -282,6 +290,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamSpecObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamSpecsObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamTypeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/objects/FractionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/LanguageUtilService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/AudioLanguageObjectFactory.js"></script>
@@ -312,6 +321,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/SolutionManagerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FatigueDetectionService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/NumberAttemptsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioTranslationManagerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioControlsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioPreloaderService.js"></script>

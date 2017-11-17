@@ -104,6 +104,9 @@ var constants = {
     "code": "bg",
     "description": "български (Bulgarian)"
   }, {
+    "code": "bn",
+    "description": "বাংলা (Bangla)"
+  }, {
     "code": "ca",
     "description": "català (Catalan)"
   }, {
@@ -154,6 +157,9 @@ var constants = {
   }, {
     "code": "ja",
     "description": "日本語 (Japanese)"
+  }, {
+    "code": "kab",
+    "description": "Taqbaylit (Kabyle)"
   }, {
     "code": "ko",
     "description": "한국어 (Korean)"
@@ -242,6 +248,15 @@ var constants = {
     "id": "pt-br",
     "text": "Português (Brasil)"
   }, {
+    "id": "sv",
+    "text": "svenska"
+  }, {
+    "id": "ar",
+    "text": "العربية"
+  }, {
+    "id": "kab",
+    "text": "Taqbaylit"
+  }, {
     "id": "mk",
     "text": "македонски јазик"
   }, {
@@ -280,6 +295,10 @@ var constants = {
     "id": "bg",
     "text": "Bulgarian",
     "related_languages": ["bg"]
+  }, {
+    "id": "bn",
+    "text": "Bangla",
+    "related_languages": ["bn"]
   }, {
     "id": "ca",
     "text": "Catalan",
@@ -352,6 +371,10 @@ var constants = {
     "id": "ja",
     "text": "Japanese",
     "related_languages": ["ja"]
+  }, {
+    "id": "kab",
+    "text": "Kabyle",
+    "related_languages": ["kab"]
   }, {
     "id": "ko",
     "text": "Korean",
@@ -432,7 +455,7 @@ var constants = {
     "exploration_language": "en",
     "speech_synthesis_code": "en-GB"
   }],
-  
+
   "//" : "Types of view in creator dashboard page.",
   "ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS": {
     "CARD": "card",

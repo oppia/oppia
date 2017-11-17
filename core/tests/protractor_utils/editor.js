@@ -156,6 +156,7 @@ var expectContentTextToEqual = function(text) {
 // most purposes. Additional arguments may be sent to this function,
 // and they will be passed on to the relevant interaction editor.
 var setInteraction = function(interactionId) {
+  general.waitForSystem();
   openInteraction(interactionId);
   customizeInteraction.apply(null, arguments);
   // If the "Add Response" modal opens, close it.
@@ -277,6 +278,30 @@ var addParameterChange = function(paramName, paramValue) {
   var item = editorRowElem.all(by.tagName('input')).last();
   item.clear();
   item.sendKeys(paramValue);
+
+  element(by.css('.protractor-test-save-param-changes-button')).click();
+
+  general.waitForSystem(500);
+};
+
+// This function adds a multiple-choice parameter change, creating the
+// parameter if necessary.
+var addMultipleChoiceParameterChange = function(paramName, paramValues) {
+  element(by.css('.protractor-test-state-edit-param-changes')).click();
+  element(by.css('.protractor-test-add-param-button')).click();
+
+  var editorRowElem = element.all(by.css(
+    '.protractor-test-param-changes-list')).last();
+
+  forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
+
+  editorRowElem.element(by.cssContainingText('option', 'to one of')).click();
+
+  paramValues.forEach(function(paramValue) {
+    var item = editorRowElem.all(by.tagName('input')).last();
+    item.clear();
+    item.sendKeys(paramValue);
+  });
 
   element(by.css('.protractor-test-save-param-changes-button')).click();
 
@@ -1278,6 +1303,7 @@ exports.setRuleParametersInAddResponseModal = (
 exports.expectRuleParametersToBe = expectRuleParametersToBe;
 
 exports.addParameterChange = addParameterChange;
+exports.addMultipleChoiceParameterChange = addMultipleChoiceParameterChange;
 exports.addExplorationLevelParameterChange = addExplorationLevelParameterChange;
 
 exports.addResponse = addResponse;
