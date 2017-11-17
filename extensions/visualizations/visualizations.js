@@ -87,7 +87,7 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
         $scope.answerVisible = $scope.data.map(function(_, i) {
           // First element is shown by default, all others are hidden.
-          return i == 0;
+          return i === 0;
         });
         $scope.toggleAnswerVisibility = function(index) {
           $scope.answerVisible[index] = !$scope.answerVisible[index];
