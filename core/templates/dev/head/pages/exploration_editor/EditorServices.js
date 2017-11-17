@@ -16,202 +16,6 @@
  * @fileoverview Standalone services for the exploration editor page.
  */
 
-// Service for handling all interactions with the exploration editor backend.
-oppia.factory('explorationData', [
-  '$http', '$log', '$window', '$q', 'alertsService',
-  'EditableExplorationBackendApiService', 'LocalStorageService',
-  'ReadOnlyExplorationBackendApiService', 'UrlService',
-  function($http, $log, $window, $q, alertsService,
-    EditableExplorationBackendApiService, LocalStorageService,
-    ReadOnlyExplorationBackendApiService, UrlService) {
-    // The pathname (without the hash) should be: .../create/{exploration_id}
-    var explorationId = '';
-    var draftChangeListId = null;
-    var pathnameArray = UrlService.getPathname().split('/');
-    for (var i = 0; i < pathnameArray.length; i++) {
-      if (pathnameArray[i] === 'create') {
-        var explorationId = pathnameArray[i + 1];
-        break;
-      }
-    }
-    if (!explorationId) {
-      $log.error(
-        'Unexpected call to explorationData for pathname ', pathnameArray[i]);
-      // Note: if we do not return anything, Karma unit tests fail.
-      return {};
-    }
-
-    var resolvedAnswersUrlPrefix = (
-      '/createhandler/resolved_answers/' + explorationId);
-    var explorationDraftAutosaveUrl = (
-      '/createhandler/autosave_draft/' + explorationId);
-
-    // Put exploration variables here.
-    var explorationData = {
-      explorationId: explorationId,
-      // Note that the changeList is the full changeList since the last
-      // committed version (as opposed to the most recent autosave).
-      autosaveChangeList: function(changeList, successCallback, errorCallback) {
-        // First save locally to be retrieved later if save is unsuccessful.
-        LocalStorageService.saveExplorationDraft(
-          explorationId, changeList, draftChangeListId);
-        $http.put(explorationDraftAutosaveUrl, {
-          change_list: changeList,
-          version: explorationData.data.version
-        }).then(function(response) {
-          draftChangeListId = response.data.draft_change_list_id;
-          // We can safely remove the locally saved draft copy if it was saved
-          // to the backend.
-          LocalStorageService.removeExplorationDraft(explorationId);
-          if (successCallback) {
-            successCallback(response);
-          }
-        }, function() {
-          if (errorCallback) {
-            errorCallback();
-          }
-        });
-      },
-      discardDraft: function(successCallback, errorCallback) {
-        $http.post(explorationDraftAutosaveUrl, {}).then(function() {
-          LocalStorageService.removeExplorationDraft(explorationId);
-          if (successCallback) {
-            successCallback();
-          }
-        }, function() {
-          if (errorCallback) {
-            errorCallback();
-          }
-        });
-      },
-      // Returns a promise that supplies the data for the current exploration.
-      getData: function(errorCallback) {
-        if (explorationData.data) {
-          $log.info('Found exploration data in cache.');
-
-          var deferred = $q.defer();
-          deferred.resolve(explorationData.data);
-          return deferred.promise;
-        } else {
-          // Retrieve data from the server.
-          // WARNING: Note that this is a version of the exploration with draft
-          // changes applied. This makes a force-refresh necessary when changes
-          // are discarded, otherwise the exploration-with-draft-changes
-          // (which is cached here) will be reused.
-          return (
-            EditableExplorationBackendApiService.fetchApplyDraftExploration(
-            explorationId).then(function(response) {
-              $log.info('Retrieved exploration data.');
-              $log.info(response);
-              draftChangeListId = response.draft_change_list_id;
-              explorationData.data = response;
-              var draft = LocalStorageService.getExplorationDraft(
-                explorationId);
-              if (draft) {
-                if (draft.isValid(draftChangeListId)) {
-                  var changeList = draft.getChanges();
-                  explorationData.autosaveChangeList(changeList, function() {
-                    // A reload is needed so that the changelist just saved is
-                    // loaded as opposed to the exploration returned by this
-                    // response.
-                    $window.location.reload();
-                  });
-                } else {
-                  errorCallback(explorationId, draft.getChanges());
-                }
-              }
-              return response;
-            })
-          );
-        }
-      },
-      // Returns a promise supplying the last saved version for the current
-      // exploration.
-      getLastSavedData: function() {
-        return ReadOnlyExplorationBackendApiService.loadLatestExploration(
-          explorationId).then(function(response) {
-            $log.info('Retrieved saved exploration data.');
-            $log.info(response);
-
-            return response.exploration;
-          });
-      },
-      resolveAnswers: function(stateName, resolvedAnswersList) {
-        alertsService.clearWarnings();
-        $http.put(
-          resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName), {
-            resolved_answers: resolvedAnswersList
-          }
-        );
-      },
-      /**
-       * Saves the exploration to the backend, and, on a success callback,
-       * updates the local copy of the exploration data.
-       * @param {object} changeList - Represents the change list for
-       *   this save. Each element of the list is a command representing an
-       *   editing action (such as add state, delete state, etc.). See the
-       *  _'Change' class in exp_services.py for full documentation.
-       * @param {string} commitMessage - The user-entered commit message for
-       *   this save operation.
-       */
-      save: function(
-          changeList, commitMessage, successCallback, errorCallback) {
-        EditableExplorationBackendApiService.updateExploration(explorationId,
-          explorationData.data.version, commitMessage, changeList).then(
-            function(response) {
-              alertsService.clearWarnings();
-              explorationData.data = response;
-              if (successCallback) {
-                successCallback(
-                  response.is_version_of_draft_valid,
-                  response.draft_changes);
-              }
-            }, function() {
-              if (errorCallback) {
-                errorCallback();
-              }
-            }
-          );
-      }
-    };
-
-    return explorationData;
-  }
-]);
-
-// A service that maintains a record of which state in the exploration is
-// currently active.
-oppia.factory('editorContextService', ['$log', function($log) {
-  var activeStateName = null;
-
-  return {
-    getActiveStateName: function() {
-      return activeStateName;
-    },
-    setActiveStateName: function(newActiveStateName) {
-      if (newActiveStateName === '' || newActiveStateName === null) {
-        $log.error('Invalid active state name: ' + newActiveStateName);
-        return;
-      }
-      activeStateName = newActiveStateName;
-    }
-  };
-}]);
-
-
-// A service that maps IDs to Angular names
-oppia.factory('angularNameService', [function() {
-  var angularName = null;
-
-  return {
-    getNameOfInteractionRulesService: function(interactionId) {
-      angularName = interactionId.charAt(0).toLowerCase() +
-        interactionId.slice(1) + 'RulesService';
-      return angularName
-    }
-  };
-}]);
-
 // TODO(sll): Should this depend on a versioning service that keeps track of
 // the current active version? Previous versions should not be editable.
 oppia.factory('editabilityService', [function() {
@@ -243,10 +47,10 @@ oppia.factory('editabilityService', [function() {
 // A service that maintains a provisional list of changes to be committed to
 // the server.
 oppia.factory('changeListService', [
-  '$rootScope', '$log', 'alertsService', 'explorationData',
+  '$rootScope', '$log', 'alertsService', 'ExplorationDataService',
   'autosaveInfoModalsService',
   function(
-      $rootScope, $log, alertsService, explorationData,
+      $rootScope, $log, alertsService, ExplorationDataService,
       autosaveInfoModalsService) {
     // TODO(sll): Implement undo, redo functionality. Show a message on each
     // step saying what the step is doing.
@@ -301,7 +105,7 @@ oppia.factory('changeListService', [
       // opened):
       // - Version Mismatch.
       // - Non-strict Validation Fail.
-      explorationData.autosaveChangeList(
+      ExplorationDataService.autosaveChangeList(
         explorationChangeList,
         function(response) {
           if (!response.data.is_version_of_draft_valid) {
@@ -361,7 +165,7 @@ oppia.factory('changeListService', [
       discardAllChanges: function() {
         explorationChangeList = [];
         undoneChangeStack = [];
-        explorationData.discardDraft();
+        ExplorationDataService.discardDraft();
       },
       /**
        * Saves a change dict that represents a change to an exploration
@@ -456,8 +260,8 @@ oppia.factory('changeListService', [
 
 // A data service that stores data about the rights for this exploration.
 oppia.factory('explorationRightsService', [
-  '$http', '$q', 'explorationData', 'alertsService',
-  function($http, $q, explorationData, alertsService) {
+  '$http', '$q', 'ExplorationDataService', 'alertsService',
+  function($http, $q, ExplorationDataService, alertsService) {
     return {
       init: function(
           ownerNames, editorNames, viewerNames, status, clonedFrom,
@@ -495,9 +299,9 @@ oppia.factory('explorationRightsService', [
         var that = this;
 
         var requestUrl = (
-          '/createhandler/rights/' + explorationData.explorationId);
+          '/createhandler/rights/' + ExplorationDataService.explorationId);
         $http.put(requestUrl, {
-          version: explorationData.data.version,
+          version: ExplorationDataService.data.version,
           make_community_owned: true
         }).then(function(response) {
           var data = response.data;
@@ -516,9 +320,9 @@ oppia.factory('explorationRightsService', [
         var that = this;
 
         var requestUrl = (
-            '/createhandler/rights/' + explorationData.explorationId);
+            '/createhandler/rights/' + ExplorationDataService.explorationId);
         $http.put(requestUrl, {
-          version: explorationData.data.version,
+          version: ExplorationDataService.data.version,
           viewable_if_private: viewableIfPrivate
         }).then(function(response) {
           var data = response.data;
@@ -537,9 +341,9 @@ oppia.factory('explorationRightsService', [
         var that = this;
 
         var requestUrl = (
-            '/createhandler/rights/' + explorationData.explorationId);
+            '/createhandler/rights/' + ExplorationDataService.explorationId);
         $http.put(requestUrl, {
-          version: explorationData.data.version,
+          version: ExplorationDataService.data.version,
           new_member_role: newMemberRole,
           new_member_username: newMemberUsername
         }).then(function(response) {
@@ -559,7 +363,7 @@ oppia.factory('explorationRightsService', [
         var that = this;
 
         var requestUrl = (
-          '/createhandler/status/' + explorationData.explorationId);
+          '/createhandler/status/' + ExplorationDataService.explorationId);
         $http.put(requestUrl, {
           make_public: true
         }).then(function(response) {
@@ -578,11 +382,12 @@ oppia.factory('explorationRightsService', [
         var that = this;
 
         var explorationModeratorRightsUrl = (
-          '/createhandler/moderatorrights/' + explorationData.explorationId);
+          '/createhandler/moderatorrights/' + 
+          ExplorationDataService.explorationId);
         $http.put(explorationModeratorRightsUrl, {
           action: action,
           email_body: emailBody,
-          version: explorationData.data.version
+          version: ExplorationDataService.data.version
         }).then(function(response) {
           var data = response.data;
           alertsService.clearWarnings();
@@ -861,15 +666,15 @@ oppia.factory('explorationAutomaticTextToSpeechService', [
 oppia.factory('explorationStatesService', [
   '$log', '$modal', '$filter', '$location', '$rootScope', '$injector', '$q',
   'explorationInitStateNameService', 'alertsService', 'changeListService',
-  'editorContextService', 'ValidatorsService', 'StatesObjectFactory',
-  'SolutionValidityService', 'angularNameService',
+  'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
+  'SolutionValidityService', 'AngularNameService',
   'AnswerClassificationService', 'explorationContextService',
   'UrlInterpolationService',
   function(
       $log, $modal, $filter, $location, $rootScope, $injector, $q,
       explorationInitStateNameService, alertsService, changeListService,
-      editorContextService, ValidatorsService, StatesObjectFactory,
-      SolutionValidityService, angularNameService,
+      EditorStateService, ValidatorsService, StatesObjectFactory,
+      SolutionValidityService, AngularNameService,
       AnswerClassificationService, explorationContextService,
       UrlInterpolationService) {
     var _states = null;
@@ -1003,7 +808,7 @@ oppia.factory('explorationStatesService', [
               solution.correctAnswer,
               true,
               $injector.get(
-                angularNameService.getNameOfInteractionRulesService(
+                AngularNameService.getNameOfInteractionRulesService(
                   _states.getState(stateName).interaction.id))));
             var solutionIsValid = stateName !== result.outcome.dest;
             SolutionValidityService.updateValidity(
@@ -1170,12 +975,12 @@ oppia.factory('explorationStatesService', [
 
           changeListService.deleteState(deleteStateName);
 
-          if (editorContextService.getActiveStateName() === deleteStateName) {
-            editorContextService.setActiveStateName(
+          if (EditorStateService.getActiveStateName() === deleteStateName) {
+            EditorStateService.setActiveStateName(
               explorationInitStateNameService.savedMemento);
           }
 
-          $location.path('/gui/' + editorContextService.getActiveStateName());
+          $location.path('/gui/' + EditorStateService.getActiveStateName());
           $rootScope.$broadcast('refreshGraph');
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
@@ -1195,7 +1000,7 @@ oppia.factory('explorationStatesService', [
 
         _states.renameState(oldStateName, newStateName);
 
-        editorContextService.setActiveStateName(newStateName);
+        EditorStateService.setActiveStateName(newStateName);
         // The 'rename state' command must come before the 'change
         // init_state_name' command in the change list, otherwise the backend
         // will raise an error because the new initial state name does not
@@ -2056,11 +1861,11 @@ oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
 // response received as a result of the autosaving request.
 oppia.factory('autosaveInfoModalsService', [
   '$log', '$modal', '$timeout', '$window',
-  'explorationData', 'LocalStorageService', 'lostChangesService',
+  'ExplorationDataService', 'LocalStorageService', 'lostChangesService',
   'UrlInterpolationService',
   function(
       $log, $modal, $timeout, $window,
-      explorationData, LocalStorageService, lostChangesService,
+      ExplorationDataService, LocalStorageService, lostChangesService,
       UrlInterpolationService) {
     var _isModalOpen = false;
     var _refreshPage = function(delay) {
@@ -2107,7 +1912,7 @@ oppia.factory('autosaveInfoModalsService', [
             // When the user clicks on discard changes button, signal backend
             // to discard the draft and reload the page thereafter.
             $scope.discardChanges = function() {
-              explorationData.discardDraft(function() {
+              ExplorationDataService.discardDraft(function() {
                 _refreshPage(20);
               });
             };

@@ -13,18 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the state parameter changes section
- * of the editor sidebar.
+ * @fileoverview Unit test for the Angular names service.
  */
 
-oppia.controller('StateParamChangesEditor', [
-  '$scope', 'EditorStateService', 'stateParamChangesService',
-  function($scope, EditorStateService, stateParamChangesService) {
-    $scope.stateParamChangesService = stateParamChangesService;
+describe('Angular names service', function() {
+  beforeEach(module('oppia'));
 
-    $scope.$on('stateEditorInitialized', function(evt, stateData) {
-      stateParamChangesService.init(
-        EditorStateService.getActiveStateName(), stateData.paramChanges);
+  describe('angular name service', function() {
+    var ans = null;
+
+    beforeEach(inject(function($injector) {
+      ans = $injector.get('AngularNameService');
+    }));
+
+    it('should map interaction ID to correct RulesService', function() {
+      expect(ans.getNameOfInteractionRulesService('TextInput')).toEqual(
+        'textInputRulesService');
     });
-  }
-]);
+  });
+});
