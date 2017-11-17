@@ -120,6 +120,9 @@ class ExplorationPage(EditorHandler):
                 iframe_restriction=None)
             return
 
+        exploration_status = exp_services.get_exploration_summary_by_id(
+            exploration_id).status
+
         (exploration, exploration_rights) = (
             exp_services.get_exploration_and_exploration_rights_by_id(
                 exploration_id))
@@ -178,8 +181,14 @@ class ExplorationPage(EditorHandler):
             'TAG_REGEX': feconf.TAG_REGEX,
         })
 
+        if exploration_status == feconf.ACTIVITY_STATUS_PRIVATE:
+            url_on_logout = feconf.LIBRARY_INDEX_URL
+        else:
+            url_on_logout = None
+
         self.render_template(
-            'pages/exploration_editor/exploration_editor.html')
+            'pages/exploration_editor/exploration_editor.html',
+            redirect_url_on_logout=url_on_logout)
 
 
 class ExplorationHandler(EditorHandler):
