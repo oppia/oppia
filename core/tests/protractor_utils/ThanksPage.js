@@ -17,11 +17,13 @@
  * tests.
  */
 
-var ThanksPage = function () {
+var general = require('./general.js');
+
+var ThanksPage = function(){
   var THANKS_PAGE_URL = '/thanks';
 
-  this.get = function() {
-    return THANKS_PAGE_URL;
+  this.get = function(){
+    return browser.get(general.SERVER_URL_PREFIX + THANKS_PAGE_URL);
   };
 };
 
