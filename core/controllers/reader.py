@@ -289,6 +289,56 @@ class ExplorationHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class StatsEventsHandler(base.BaseHandler):
+    """Handles a batch of events coming in from the frontend."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    def _require_aggregated_stats_are_valid(self, aggregated_stats):
+        """Checks whether the aggregated stats dict has the correct keys.
+
+        Args:
+            aggregated_stats: dict. Dict comprising of aggregated stats.
+        """
+        exploration_stats_properties = [
+            'num_starts',
+            'num_actual_starts',
+            'num_completions'
+        ]
+        state_stats_properties = [
+            'total_answers_count',
+            'useful_feedback_count',
+            'total_hit_count',
+            'first_hit_count',
+            'num_times_solution_viewed',
+            'num_completions'
+        ]
+
+        for exp_stats_property in exploration_stats_properties:
+            if exp_stats_property not in aggregated_stats:
+                raise self.InvalidInputException(
+                    '%s not in aggregated stats dict.' % (exp_stats_property))
+        for state_name in aggregated_stats['state_stats_mapping']:
+            for state_stats_property in state_stats_properties:
+                if state_stats_property not in aggregated_stats[
+                        'state_stats_mapping'][state_name]:
+                    raise self.InvalidInputException(
+                        '%s not in state stats mapping of %s in aggregated '
+                        'stats dict.' % (state_stats_property, state_name))
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        aggregated_stats = self.payload.get('aggregated_stats')
+        exp_version = self.payload.get('exp_version')
+        try:
+            self._require_aggregated_stats_are_valid(aggregated_stats)
+        except self.InvalidInputException as e:
+            logging.error(e)
+        event_services.StatsEventsHandler.record(
+            exploration_id, exp_version, aggregated_stats)
+        self.render_json({})
+
+
 class AnswerSubmittedEventHandler(base.BaseHandler):
     """Tracks a learner submitting an answer."""
 
@@ -356,13 +406,12 @@ class StateHitEventHandler(base.BaseHandler):
         client_time_spent_in_secs = self.payload.get(  # pylint: disable=unused-variable
             'client_time_spent_in_secs')
         old_params = self.payload.get('old_params')
-        is_first_hit = self.payload.get('is_first_hit')
 
         # Record the state hit, if it is not the END state.
         if new_state_name is not None:
             event_services.StateHitEventHandler.record(
                 exploration_id, exploration_version, new_state_name,
-                session_id, old_params, feconf.PLAY_TYPE_NORMAL, is_first_hit)
+                session_id, old_params, feconf.PLAY_TYPE_NORMAL)
         else:
             logging.error('Unexpected StateHit event for the END state.')
         self.render_json({})

@@ -17,10 +17,11 @@
  */
 
 oppia.factory('UserEmailPreferencesService', [
-  '$http', '$q', 'explorationData', 'alertsService',
+  '$http', '$q', 'ExplorationDataService', 'alertsService',
   'UrlInterpolationService',
   function(
-      $http, $q, explorationData, alertsService, UrlInterpolationService) {
+      $http, $q, ExplorationDataService, 
+      alertsService, UrlInterpolationService) {
     var MESSAGE_TYPE_SUGGESTION = 'suggestion';
     var MESSAGE_TYPE_FEEDBACK = 'feedback';
     return {
@@ -53,7 +54,7 @@ oppia.factory('UserEmailPreferencesService', [
 
         var emailPreferencesUrl = UrlInterpolationService.interpolateUrl(
           '/createhandler/notificationpreferences/<exploration_id>', {
-            exploration_id: explorationData.explorationId
+            exploration_id: ExplorationDataService.explorationId
           });
         $http.put(emailPreferencesUrl, requestParams).then(
           function(response) {

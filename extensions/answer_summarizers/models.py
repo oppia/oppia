@@ -143,6 +143,7 @@ class AnswerFrequencies(BaseCalculation):
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
             state_answers_dict['state_name'],
+            state_answers_dict['interaction_id'],
             self.id,
             answer_frequency_list)
 
@@ -164,6 +165,7 @@ class Top5AnswerFrequencies(BaseCalculation):
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
             state_answers_dict['state_name'],
+            state_answers_dict['interaction_id'],
             self.id,
             answer_frequency_list)
 
@@ -185,6 +187,7 @@ class Top10AnswerFrequencies(BaseCalculation):
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
             state_answers_dict['state_name'],
+            state_answers_dict['interaction_id'],
             self.id,
             answer_frequency_list)
 
@@ -228,6 +231,7 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
             state_answers_dict['state_name'],
+            state_answers_dict['interaction_id'],
             self.id,
             answer_frequency_list)
 
@@ -287,5 +291,6 @@ class TopAnswersByCategorization(BaseCalculation):
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
             state_answers_dict['state_name'],
+            state_answers_dict['interaction_id'],
             self.id,
             stats_domain.CategorizedAnswerFrequencyLists(answer_occurrences))

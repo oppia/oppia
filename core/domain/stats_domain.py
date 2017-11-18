@@ -83,6 +83,11 @@ class ExplorationStats(object):
 
     def to_dict(self):
         """Returns a dict representation of the domain object."""
+        state_stats_mapping_dict = {}
+        for state_name in self.state_stats_mapping:
+            state_stats_mapping_dict[state_name] = self.state_stats_mapping[
+                state_name].to_dict()
+
         exploration_stats_dict = {
             'exp_id': self.exp_id,
             'exp_version': self.exp_version,
@@ -92,9 +97,43 @@ class ExplorationStats(object):
             'num_actual_starts_v2': self.num_actual_starts_v2,
             'num_completions_v1': self.num_completions_v1,
             'num_completions_v2': self.num_completions_v2,
-            'state_stats_mapping': self.state_stats_mapping
+            'state_stats_mapping': state_stats_mapping_dict
         }
         return exploration_stats_dict
+
+    def to_frontend_dict(self):
+        """Returns a dict representation of the domain object for use in the
+        frontend.
+        """
+        state_stats_mapping_dict = {}
+        for state_name in self.state_stats_mapping:
+            state_stats_mapping_dict[state_name] = self.state_stats_mapping[
+                state_name].to_frontend_dict()
+
+        exploration_stats_dict = {
+            'exp_id': self.exp_id,
+            'exp_version': self.exp_version,
+            'num_starts': self.num_starts_v1 + self.num_starts_v2,
+            'num_actual_starts': (
+                self.num_actual_starts_v1 + self.num_actual_starts_v2),
+            'num_completions': (
+                self.num_completions_v1 + self.num_completions_v2),
+            'state_stats_mapping': state_stats_mapping_dict
+        }
+        return exploration_stats_dict
+
+    @classmethod
+    def create_default(cls, exp_id, exp_version, state_stats_mapping):
+        """Creates a ExplorationStats domain object and sets all properties to
+        0.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+            state_stats_mapping: dict. A dict mapping state names to their
+                corresponding StateStats.
+        """
+        return cls(exp_id, exp_version, 0, 0, 0, 0, 0, 0, state_stats_mapping)
 
     def validate(self):
         """Validates the ExplorationStats domain object."""
@@ -188,7 +227,7 @@ class StateStats(object):
         return cls(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     def to_dict(self):
-        """Returns a dict representation of the domain oject."""
+        """Returns a dict representation of the domain object."""
         state_stats_dict = {
             'total_answers_count_v1': self.total_answers_count_v1,
             'total_answers_count_v2': self.total_answers_count_v2,
@@ -202,6 +241,24 @@ class StateStats(object):
                 self.num_times_solution_viewed_v2),
             'num_completions_v1': self.num_completions_v1,
             'num_completions_v2': self.num_completions_v2
+        }
+        return state_stats_dict
+
+    def to_frontend_dict(self):
+        """Returns a dict representation of the domain object for use in the
+        frontend.
+        """
+        state_stats_dict = {
+            'total_answers_count': (
+                self.total_answers_count_v1 + self.total_answers_count_v2),
+            'useful_feedback_count': (
+                self.useful_feedback_count_v1 + self.useful_feedback_count_v2),
+            'total_hit_count': (
+                self.total_hit_count_v1 + self.total_hit_count_v2),
+            'first_hit_count': (
+                self.first_hit_count_v1 + self.first_hit_count_v2),
+            'num_times_solution_viewed': self.num_times_solution_viewed_v2,
+            'num_completions': self.num_completions_v1 + self.num_completions_v2
         }
         return state_stats_dict
 
@@ -562,7 +619,7 @@ class StateAnswersCalcOutput(object):
     state answers.
     """
     def __init__(self, exploration_id, exploration_version, state_name,
-                 calculation_id, calculation_output):
+                 interaction_id, calculation_id, calculation_output):
         """Initialize domain object for state answers calculation output.
 
         Args:
@@ -581,6 +638,7 @@ class StateAnswersCalcOutput(object):
         self.exploration_version = exploration_version
         self.state_name = state_name
         self.calculation_id = calculation_id
+        self.interaction_id = interaction_id
         self.calculation_output = calculation_output
 
     def save(self):
@@ -588,7 +646,7 @@ class StateAnswersCalcOutput(object):
         self.validate()
         stats_models.StateAnswersCalcOutputModel.create_or_update(
             self.exploration_id, self.exploration_version, self.state_name,
-            self.calculation_id,
+            self.interaction_id, self.calculation_id,
             self.calculation_output.calculation_output_type,
             self.calculation_output.to_raw_type())
 

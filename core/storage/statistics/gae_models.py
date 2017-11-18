@@ -701,7 +701,8 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
 
 
 class ExplorationStatsModel(base_models.BaseModel):
-    """Model for storing analytics data for an exploration.
+    """Model for storing analytics data for an exploration. This model contains
+    statistics data aggregated from version 1 to the version given in the key.
 
     The ID of instances of this class has the form {{exp_id}}.{{exp_version}}.
     """
@@ -804,6 +805,54 @@ class ExplorationStatsModel(base_models.BaseModel):
             state_stats_mapping=state_stats_mapping)
         stats_instance.put()
         return instance_id
+
+    @classmethod
+    def get_multi_versions(cls, exp_id, version_numbers):
+        """Gets stats model instances for each version specified in
+        version_numbers.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            version_numbers: list(int). List of version numbers.
+
+        Returns:
+            list(ExplorationStatsModel|None). Model instances representing the
+                given versions.
+        """
+        entity_ids = [cls.get_entity_id(
+            exp_id, version) for version in version_numbers]
+        exploration_stats_models = cls.get_multi(entity_ids)
+        return exploration_stats_models
+
+    @classmethod
+    def save_multi(cls, exploration_stats_dicts):
+        """Creates/Updates multiple ExplorationStatsModel entries.
+
+        Args:
+            exploration_stats_dicts: list(dict). The list of dicts where each
+                dict represents the attributes of one ExplorationStatsModel
+                instance.
+        """
+        exploration_stats_models = []
+        for exploration_stats_dict in exploration_stats_dicts:
+            instance_id = cls.get_entity_id(
+                exploration_stats_dict['exp_id'],
+                exploration_stats_dict['exp_version'])
+            stats_instance = cls(
+                id=instance_id, exp_id=exploration_stats_dict['exp_id'],
+                exp_version=exploration_stats_dict['exp_version'],
+                num_starts_v1=exploration_stats_dict['num_starts_v1'],
+                num_starts_v2=exploration_stats_dict['num_starts_v2'],
+                num_actual_starts_v1=exploration_stats_dict[
+                    'num_actual_starts_v1'],
+                num_actual_starts_v2=exploration_stats_dict[
+                    'num_actual_starts_v2'],
+                num_completions_v1=exploration_stats_dict['num_completions_v1'],
+                num_completions_v2=exploration_stats_dict['num_completions_v2'],
+                state_stats_mapping=exploration_stats_dict[
+                    'state_stats_mapping'])
+            exploration_stats_models.append(stats_instance)
+        cls.put_multi(exploration_stats_models)
 
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -1225,6 +1274,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     # an aggregation of multiple sets of answers.
     exploration_version = ndb.StringProperty(indexed=True, required=True)
     state_name = ndb.StringProperty(indexed=True, required=True)
+    interaction_id = ndb.StringProperty(indexed=True)
     calculation_id = ndb.StringProperty(indexed=True, required=True)
     # Calculation output type (for deserialization). See
     # stats_domain.StateAnswersCalcOutput for an enumeration of valid types.
@@ -1235,7 +1285,8 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     @classmethod
     def create_or_update(
             cls, exploration_id, exploration_version, state_name,
-            calculation_id, calculation_output_type, calculation_output):
+            interaction_id, calculation_id, calculation_output_type,
+            calculation_output):
         """Creates or updates StateAnswersCalcOutputModel and then writes
         it to the datastore.
 
@@ -1243,6 +1294,8 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             exploration_id: str. ID of the exploration currently being played.
             exploration_version: int. Version of exploration.
             state_name: str. Name of current state.
+            interaction_id: str. ID of the interaction corresponding to the
+                calculated output.
             calculation_id: str. ID of the calculation performed.
             calculation_output_type: str. Type of the calculation output.
             calculation_output: dict. Output of the calculation which is to be
@@ -1259,7 +1312,8 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             instance = cls(
                 id=instance_id, exploration_id=exploration_id,
                 exploration_version=exploration_version,
-                state_name=state_name, calculation_id=calculation_id,
+                state_name=state_name, interaction_id=interaction_id,
+                calculation_id=calculation_id,
                 calculation_output_type=calculation_output_type,
                 calculation_output=calculation_output)
         else:

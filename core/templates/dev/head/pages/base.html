@@ -93,6 +93,7 @@
         POST_COMPLETION_HOOKS: [],
         preferredSiteLanguageCode: JSON.parse(
           '{{preferred_site_language_code|js_string}}'),
+        SITE_NAME: JSON.parse('{{SITE_NAME|js_string}}'),
         SYSTEM_USERNAMES: JSON.parse('{{SYSTEM_USERNAMES|js_string}}'),
         TEMPLATE_DIR_PREFIX: JSON.parse('{{TEMPLATE_DIR_PREFIX|js_string}}'),
         isAdmin: JSON.parse('{{is_admin|js_string}}'),
@@ -209,6 +210,9 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/IdGenerationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/ValidatorsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/DeviceInfoService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/UrlService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/WindowDimensionsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/stateful/BackgroundMaskService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/stateful/FocusManagerService.js"></script>
 
