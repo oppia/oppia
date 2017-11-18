@@ -82,11 +82,10 @@ oppia.directive('simpleEditorSidebar', [
             revert: 100,
             start: function(e, ui) {
               ui.placeholder.height(ui.item.height());
-              // This class is to be added, but it is giving strange behaviour.
               ui.item.addClass('selected');
             },
             update: function(e, ui) {
-              SimpleEditorManagerService.sortQuestions(
+              SimpleEditorManagerService.moveQuestion(
                 ui.item.sortable.index, ui.item.sortable.dropindex);
             },
             stop: function(e, ui) {

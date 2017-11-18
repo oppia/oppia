@@ -81,17 +81,17 @@ oppia.factory('SimpleEditorManagerService', [
       SimpleEditorShimService.saveDefaultOutcome(stateName, null);
     };
 
-    // Changes both states and the present questionList to reflect the changes.
-    var redirectAllIncomingNodes = function(stateName, newStateName) {
+    // Change the destination in all answer groups from oldStateName to newStateName.
+    var changeDestInAnswerGroups = function(oldStateName, newStateName) {
       var allStateNames = SimpleEditorShimService.getAllStateNames();
       for (var i = 0; i < allStateNames.length; i++) {
         var currentState = SimpleEditorShimService.getState(allStateNames[i]);
         var newAnswerGroups = currentState.interaction.answerGroups;
         var answerGroupsHaveChanged = false;
         currentState.interaction.answerGroups.forEach(
-          function(answerGroup, idx) {
-            if (answerGroup.outcome.dest === stateName) {
-              newAnswerGroups[idx].outcome.dest = newStateName;
+          function(answerGroup, index) {
+            if (answerGroup.outcome.dest === oldStateName) {
+              newAnswerGroups[index].outcome.dest = newStateName;
               answerGroupsHaveChanged = true;
             }
           });
@@ -104,13 +104,13 @@ oppia.factory('SimpleEditorManagerService', [
       }
     };
 
-    var directAtoB = function(stateNameA, stateNameB) {
-      var answerGroupsA = SimpleEditorShimService.getState(stateNameA)
+    var setDestOfFirstAnswerGroup = function(sourceState, destinationState) {
+      var answerGroups = SimpleEditorShimService.getState(sourceState)
         .interaction.answerGroups;
-      answerGroupsA[0].outcome.dest = stateNameB;
-      SimpleEditorShimService.saveAnswerGroups(stateNameA, answerGroupsA);
-      data.questionList.getBindableQuestion(stateNameA)
-        .setAnswerGroups(answerGroupsA);
+      answerGroups[0].outcome.dest = destinationState;
+      SimpleEditorShimService.saveAnswerGroups(sourceState, answerGroups);
+      data.questionList.getBindableQuestion(sourceState)
+        .setAnswerGroups(answerGroups);
     };
 
     return {
@@ -252,52 +252,71 @@ oppia.factory('SimpleEditorManagerService', [
         data.questionList.removeQuestion(question);
       },
 
-      sortQuestions: function(sIndex, dIndex) {
+	    moveQuestion: function(oldIndex, newIndex) {
         var stateNamesInOrder = data.questionList.getAllStateNames();
-        var sStateName = stateNamesInOrder[sIndex];
+        var sStateName = stateNamesInOrder[oldIndex];
         var sState = SimpleEditorShimService.getState(sStateName);
-        var dStateName = stateNamesInOrder[dIndex];
+        var dStateName = stateNamesInOrder[newIndex];
         var dState = SimpleEditorShimService.getState(dStateName);
+        // If no answer group, then save default answer group before swapping.
         if (dState.interaction.answerGroups.length === 0 ||
           sState.interaction.answerGroups.length === 0) {
-          var newStateName = this.addState();
-          var newAnswerGroups = [];
-          newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
-            RuleObjectFactory.createNew('Equals', {
-              x: 0
-            })
-          ], OutcomeObjectFactory.createEmpty(newStateName), false));
+          destinationInteractionId = dState.interaction.id;
+          sourceInteractionId = sState.interaction.id;
+
           if (dState.interaction.answerGroups.length === 0) {
+	          var newStateName = this.addState();
+	          var newAnswerGroups = [];
+	          newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+		          RuleObjectFactory.createNew(
+			          DEFAULT_INTERACTION_PROPERTIES[destinationInteractionId].
+				          FIRST_ANSWER_GROUP_RULE.type,
+			          DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
+				          FIRST_ANSWER_GROUP_RULE.value
+		          )
+	          ], OutcomeObjectFactory.createEmpty(newStateName), false));
+
             SimpleEditorShimService.saveAnswerGroups(dStateName,
               newAnswerGroups);
             dState.interaction.answerGroups = newAnswerGroups;
           } else {
+	          var newStateName = this.addState();
+	          var newAnswerGroups = [];
+	          newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+		          RuleObjectFactory.createNew(
+			          DEFAULT_INTERACTION_PROPERTIES[destinationInteractionId].
+				          FIRST_ANSWER_GROUP_RULE.type,
+			          DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
+				          FIRST_ANSWER_GROUP_RULE.value
+		          )
+	          ], OutcomeObjectFactory.createEmpty(newStateName), false));
+
             SimpleEditorShimService.saveAnswerGroups(sStateName,
               newAnswerGroups);
             sState.interaction.answerGroups = newAnswerGroups;
           }
         }
-        var sDestName = sState.interaction.answerGroups[0].outcome.dest;
-        var dDestName = dState.interaction.answerGroups[0].outcome.dest;
+        var sourceOutcomeStateName = sState.interaction.answerGroups[0].outcome.dest;
+        var destinationOutcomeStateName = dState.interaction.answerGroups[0].outcome.dest;
 
-        redirectAllIncomingNodes(sStateName, sDestName);
-        if (sIndex < dIndex) {
-          directAtoB(dStateName, sStateName);
-          directAtoB(sStateName, dDestName);
-          var tmp = SimpleEditorShimService.getState(dDestName).content;
+		    changeDestInAnswerGroups(sStateName, sourceOutcomeStateName);
+        if (oldIndex < newIndex) {
+          setDestOfFirstAnswerGroup(dStateName, sStateName);
+          setDestOfFirstAnswerGroup(sStateName, destinationOutcomeStateName);
+          var tmp = SimpleEditorShimService.getState(destinationOutcomeStateName).content;
           SimpleEditorShimService.saveStateContent(
-            dDestName, SimpleEditorShimService.getState(sDestName).content);
-          SimpleEditorShimService.saveStateContent(sDestName, sState.content);
+            destinationOutcomeStateName, SimpleEditorShimService.getState(sourceOutcomeStateName).content);
+          SimpleEditorShimService.saveStateContent(sourceOutcomeStateName, sState.content);
           SimpleEditorShimService.saveStateContent(sStateName, tmp);
           if (sStateName === SimpleEditorShimService.getInitStateName()) {
-            explorationInitStateNameService.displayed = sDestName;
-            explorationInitStateNameService.saveDisplayedValue(sDestName);
+            explorationInitStateNameService.displayed = sourceOutcomeStateName;
+            explorationInitStateNameService.saveDisplayedValue(sourceOutcomeStateName);
           }
         } else {
           redirectAllIncomingNodes(dStateName, sStateName);
-          directAtoB(sStateName, dStateName);
-          var tmp = SimpleEditorShimService.getState(sDestName).content;
-          SimpleEditorShimService.saveStateContent(sDestName, sState.content);
+          setDestOfFirstAnswerGroup(sStateName, dStateName);
+          var tmp = SimpleEditorShimService.getState(sourceOutcomeStateName).content;
+          SimpleEditorShimService.saveStateContent(sourceOutcomeStateName, sState.content);
           SimpleEditorShimService.saveStateContent(sStateName, dState.content);
           SimpleEditorShimService.saveStateContent(dStateName, tmp);
           if (dStateName === SimpleEditorShimService.getInitStateName()) {
