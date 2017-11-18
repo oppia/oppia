@@ -299,7 +299,7 @@ oppia.factory('SimpleEditorManagerService', [
         var sourceOutcomeStateName = sState.interaction.answerGroups[0].outcome.dest;
         var destinationOutcomeStateName = dState.interaction.answerGroups[0].outcome.dest;
 
-		    changeDestInAnswerGroups(sStateName, sourceOutcomeStateName);
+        changeDestInAnswerGroups(sStateName, sourceOutcomeStateName);
         if (oldIndex < newIndex) {
           setDestOfFirstAnswerGroup(dStateName, sStateName);
           setDestOfFirstAnswerGroup(sStateName, destinationOutcomeStateName);
@@ -325,8 +325,36 @@ oppia.factory('SimpleEditorManagerService', [
           }
         }
       },
+      alternativeMove: function(oldIndex, newIndex) {
+        // - Store temp question.
+        // - change answer group destination.
+        // - change incoming nodes.
+        // - Insert question.
+        var stateNamesInOrder = data.questionList.getAllStateNames();
+        var oldQuestion = stateNamesInOrder[oldIndex];
+        var newQuestion = stateNamesInOrder[newIndex];
+        if (oldIndex > newIndex){
+          // Swap Index to maintain consistency. As question with lower index will have answer group.
+          var tempIndex = oldIndex;
+          oldIndex = newIndex;
+          newIndex = tempIndex;
+        }
+        var newQuestionAnswerGroups = SimpleEditorShimService.getState(newQuestion)
+          .interaction.answerGroups;
+        var oldQuestionAnswerGroups = SimpleEditorShimService.getState(oldQuestion)
+          .interaction.answerGroups;
+        var tempAnswerGroups = oldQuestionAnswerGroups;
+        oldQuestionAnswerGroups[0].outcome.dest = newQuestionAnswerGroups[0].outcome.dest;
+        SimpleEditorShimService.saveAnswerGroups(newQuestion, oldQuestionAnswerGroups);
 
+        newQuestionAnswerGroups[0].outcome.dest = tempAnswerGroups[0].outcome.dest;
+        SimpleEditorShimService.saveAnswerGroups(oldQuestion, newQuestionAnswerGroups);
+      },
+      insertQuestion: function(question, index) {
+
+      },
       canAddNewQuestion: function() {
+        // console.log(data.questionList);
         // Requirements:
         // - If this is the first question, there must already be an
         //   introduction.
