@@ -48,7 +48,7 @@ describe('Oppia static pages tour', function() {
     element(by.css('.protractor-test-donate-link')).click();
   });
 
-  fit('visits the thanks for donating page', function() {
+  it('visits the thanks for donating page', function() {
     thanksPage.get();
   });
 
