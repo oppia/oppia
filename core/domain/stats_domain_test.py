@@ -631,8 +631,139 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
         self.submitted_answer.validate()
 
 
+class AnswerFrequencyListDomainTests(test_utils.GenericTestBase):
+    """Tests AnswerFrequencyList for basic domain object operations."""
+
+    ANSWER_A = stats_domain.AnswerOccurrence('answer a', 3)
+    ANSWER_B = stats_domain.AnswerOccurrence('answer b', 2)
+    ANSWER_C = stats_domain.AnswerOccurrence('answer c', 1)
+
+    def setUp(self):
+        super(AnswerFrequencyListDomainTests, self).setUp()
+
+    def test_has_correct_type(self):
+        answer_frequency_list = stats_domain.AnswerFrequencyList([])
+        self.assertEqual(
+            answer_frequency_list.calculation_output_type,
+            stats_domain.CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
+
+    def test_defaults_to_empty_list(self):
+        answer_frequency_list = stats_domain.AnswerFrequencyList()
+        self.assertEqual(len(answer_frequency_list.answer_occurrences), 0)
+
+    def test_create_list_from_raw_object(self):
+        answer_frequency_list = (
+            stats_domain.AnswerFrequencyList.from_raw_type([{
+                'answer': 'answer a', 'frequency': 3
+            }, {
+                'answer': 'answer b', 'frequency': 2
+            }]))
+        answer_occurrences = answer_frequency_list.answer_occurrences
+        self.assertEqual(len(answer_occurrences), 2)
+        self.assertEqual(answer_occurrences[0].answer, 'answer a')
+        self.assertEqual(answer_occurrences[0].frequency, 3)
+        self.assertEqual(answer_occurrences[1].answer, 'answer b')
+        self.assertEqual(answer_occurrences[1].frequency, 2)
+
+    def test_convert_list_to_raw_object(self):
+        answer_frequency_list = stats_domain.AnswerFrequencyList(
+            [self.ANSWER_A, self.ANSWER_B])
+        self.assertEqual(answer_frequency_list.to_raw_type(), [{
+            'answer': 'answer a', 'frequency': 3
+        }, {
+            'answer': 'answer b', 'frequency': 2
+        }])
+
+    def test_add_answer_appends_to_existing_state(self):
+        answer_frequency_list = stats_domain.AnswerFrequencyList(
+            [self.ANSWER_A])
+        answer_frequency_list.add_answer(self.ANSWER_C)
+        self.assertEqual(
+            answer_frequency_list.answer_occurrences,
+            [self.ANSWER_A, self.ANSWER_C])
+
+
+class CategorizedAnswerFrequencyListsDomainTests(test_utils.GenericTestBase):
+    """Tests CategorizedAnswerFrequencyLists for basic domain object
+    operations.
+    """
+    ANSWER_A = stats_domain.AnswerOccurrence('answer a', 3)
+    ANSWER_B = stats_domain.AnswerOccurrence('answer b', 2)
+    ANSWER_C = stats_domain.AnswerOccurrence('answer c', 1)
+
+    def setUp(self):
+        super(CategorizedAnswerFrequencyListsDomainTests, self).setUp()
+
+    def test_has_correct_type(self):
+        answer_frequency_lists = (
+            stats_domain.CategorizedAnswerFrequencyLists({}))
+        self.assertEqual(
+            answer_frequency_lists.calculation_output_type,
+            stats_domain.CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS)
+
+    def test_defaults_to_empty_dict(self):
+        answer_frequency_lists = stats_domain.CategorizedAnswerFrequencyLists()
+        self.assertEqual(
+            len(answer_frequency_lists.categorized_answer_freq_lists), 0)
+
+    def test_create_list_from_raw_object(self):
+        answer_frequency_lists = (
+            stats_domain.CategorizedAnswerFrequencyLists.from_raw_type({
+                'category a': [{'answer': 'answer a', 'frequency': 3}],
+                'category b': [{
+                    'answer': 'answer b',
+                    'frequency': 2
+                }, {
+                    'answer': 'answer c',
+                    'frequency': 1
+                }]
+            }))
+        self.assertEqual(
+            len(answer_frequency_lists.categorized_answer_freq_lists), 2)
+        self.assertIn(
+            'category a', answer_frequency_lists.categorized_answer_freq_lists)
+        self.assertIn(
+            'category b', answer_frequency_lists.categorized_answer_freq_lists)
+
+        category_a_answer_list = (
+            answer_frequency_lists.categorized_answer_freq_lists['category a'])
+        category_b_answer_list = (
+            answer_frequency_lists.categorized_answer_freq_lists['category b'])
+        category_a_answers = category_a_answer_list.answer_occurrences
+        category_b_answers = category_b_answer_list.answer_occurrences
+        self.assertEqual(len(category_a_answers), 1)
+        self.assertEqual(len(category_b_answers), 2)
+
+        self.assertEqual(category_a_answers[0].answer, 'answer a')
+        self.assertEqual(category_a_answers[0].frequency, 3)
+        self.assertEqual(category_b_answers[0].answer, 'answer b')
+        self.assertEqual(category_b_answers[0].frequency, 2)
+        self.assertEqual(category_b_answers[1].answer, 'answer c')
+        self.assertEqual(category_b_answers[1].frequency, 1)
+
+    def test_convert_list_to_raw_object(self):
+        answer_frequency_lists = stats_domain.CategorizedAnswerFrequencyLists({
+            'category a': stats_domain.AnswerFrequencyList([self.ANSWER_A]),
+            'category b': stats_domain.AnswerFrequencyList(
+                [self.ANSWER_B, self.ANSWER_C]),
+        })
+        self.assertEqual(answer_frequency_lists.to_raw_type(), {
+            'category a': [{'answer': 'answer a', 'frequency': 3}],
+            'category b': [{
+                'answer': 'answer b',
+                'frequency': 2
+            }, {
+                'answer': 'answer c',
+                'frequency': 1
+            }]
+        })
+
+
 class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     """Tests the StateAnswersCalcOutput domain object for validation."""
+
+    class UnknownCalculationOutputObject(object):
+        pass
 
     def setUp(self):
         super(StateAnswersCalcOutputValidationTests, self).setUp()
@@ -660,6 +791,13 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.state_answers_calc_output,
             'Expected calculation_id to be a string')
+
+    def test_calculation_output_must_be_known_type(self):
+        self.state_answers_calc_output.calculation_output = (
+            self.UnknownCalculationOutputObject())
+        self._assert_validation_error(
+            self.state_answers_calc_output,
+            'Expected calculation output to be one of')
 
     def test_calculation_output_must_be_less_than_one_million_bytes(self):
         occurred_answer = stats_domain.AnswerOccurrence(
