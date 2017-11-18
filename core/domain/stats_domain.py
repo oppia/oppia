@@ -625,22 +625,6 @@ class StateAnswersCalcOutput(object):
                 'or CategorizedAnswerFrequencyLists, encountered: %s' % (
                     self.calculation_output))
 
-        if (isinstance(self.calculation_output, AnswerFrequencyList)
-                and self.calculation_output.calculation_output_type != (
-                    CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)):
-            raise utils.ValidationError(
-                'Expected type of calculation output object to match '
-                'calculation output type field: %s',
-                self.calculation_output.calculation_output_type)
-
-        if (isinstance(self.calculation_output, CategorizedAnswerFrequencyLists)
-                and self.calculation_output.calculation_output_type != (
-                    CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS)):
-            raise utils.ValidationError(
-                'Expected type of calculation output object to match '
-                'calculation output type field: %s',
-                self.calculation_output.calculation_output_type)
-
         output_data = self.calculation_output.to_raw_type()
         if sys.getsizeof(output_data) > max_bytes_per_calc_output_data:
             # TODO(msl): find a better way to deal with big
