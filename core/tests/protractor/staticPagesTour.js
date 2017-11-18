@@ -18,10 +18,14 @@
  */
 
 var general = require('../protractor_utils/general.js');
+var ThanksPage = require('../protractor_utils/ThanksPage.js');
 
 describe('Oppia static pages tour', function() {
+  var thanksPage = null;
+
   beforeEach(function() {
     browser.get(general.SERVER_URL_PREFIX);
+    thanksPage = new ThanksPage.ThanksPage();
   });
 
   it('visits the links in About dropdown', function() {
@@ -45,7 +49,7 @@ describe('Oppia static pages tour', function() {
   });
 
   it('visits the thanks for donating page', function() {
-    browser.get(general.SERVER_URL_PREFIX + general.DONATION_THANK_URL_SUFFIX);
+    browser.get(general.SERVER_URL_PREFIX + thanksPage.get());
   });
 
   it('visits the terms page', function() {
