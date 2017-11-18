@@ -638,9 +638,6 @@ class AnswerFrequencyListDomainTests(test_utils.GenericTestBase):
     ANSWER_B = stats_domain.AnswerOccurrence('answer b', 2)
     ANSWER_C = stats_domain.AnswerOccurrence('answer c', 1)
 
-    def setUp(self):
-        super(AnswerFrequencyListDomainTests, self).setUp()
-
     def test_has_correct_type(self):
         answer_frequency_list = stats_domain.AnswerFrequencyList([])
         self.assertEqual(
@@ -690,9 +687,6 @@ class CategorizedAnswerFrequencyListsDomainTests(test_utils.GenericTestBase):
     ANSWER_A = stats_domain.AnswerOccurrence('answer a', 3)
     ANSWER_B = stats_domain.AnswerOccurrence('answer b', 2)
     ANSWER_C = stats_domain.AnswerOccurrence('answer c', 1)
-
-    def setUp(self):
-        super(CategorizedAnswerFrequencyListsDomainTests, self).setUp()
 
     def test_has_correct_type(self):
         answer_frequency_lists = (
