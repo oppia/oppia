@@ -178,6 +178,7 @@
     "I18N_INTERACTIONS_GRAPH_UPDATE_LABEL": "Update Label",
     "I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT": "Update Weight",
     "I18N_INTERACTIONS_IMAGE_CLICK_SELECT": "[Select an image to display]",
+    "I18N_INTERACTIONS_ITEM_SELECTION_MORE": "You may select more choices.",
     "I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH": "{minChoiceNumber, plural, one{Please select at least one choice.} other{Please select at least #.}}",
     "I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE": "{maxAllowableSelectionCount, plural, one{At most 1 choice may be selected.} other{At most # choices may be selected.}}",
     "I18N_INTERACTIONS_ITEM_SELECTION_SUBMIT": "Submit",
