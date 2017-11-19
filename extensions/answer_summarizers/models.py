@@ -209,14 +209,12 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
     def calculate_from_state_answers_dict(self, state_answers_dict):
         """Computes the number of occurrences of each element across all given
         answers, keeping only the top 10 elements. Returns a list of dicts; each
-        dict has keys 'element' and 'frequency'.
+        dict has keys 'answer' and 'frequency'.
 
         This method is run from within the context of a MapReduce job.
         """
         calculation_output = _calculate_top_answer_frequencies(
             state_answers_dict['submitted_answer_list'], limit=10)
-        for d in calculation_output:
-            d['element'] = d.pop('answer')  # Rename answer to element.
 
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
