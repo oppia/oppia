@@ -56,9 +56,6 @@ class _HashedAnswer(object):
         {list: (tuple), set: (frozenset), dict: (sorted tuple of pairs)}.
         Additionally, their elements are converted to hashable values through
         recursive calls. All other values are assumed to already be hashable.
-
-        For single-element lists and sets, the single element is returned by
-        itself.
         """
         if isinstance(value, list):
             return tuple(cls._get_hashable_value(e) for e in value)
