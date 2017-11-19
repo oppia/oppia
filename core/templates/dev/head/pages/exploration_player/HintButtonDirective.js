@@ -27,7 +27,7 @@ oppia.directive('hintButton', [
         onClickHintButton: '&',
         allHintsAreExhausted: '&',
         currentHintIsAvailable: '&',
-        isSupplementalCard: '='
+        isSupplementalCard: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
@@ -43,7 +43,7 @@ oppia.directive('hintButton', [
             WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
 
           $scope.getTooltipPlacement = function() {
-            return (viewportIsNarrow && $scope.isSupplementalCard) ?
+            return (viewportIsNarrow && $scope.isSupplementalCard()) ?
               'right' : 'left';
           };
 
