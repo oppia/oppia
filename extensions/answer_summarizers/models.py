@@ -96,7 +96,7 @@ class _HashableAnswer(object):
         return False
 
 
-def _count_answers(answer_dicts_list, n=None):
+def _count_answers(answer_dicts_list, limit=None):
     """Return the most frequent answers from the list of answer dicts.
 
     Args:
@@ -104,8 +104,8 @@ def _count_answers(answer_dicts_list, n=None):
             particular answer. Must contain the key 'answer', where it's value
             is the actual answer's value. Other keys are ignored by the
             calculation.
-        n: int or None. Maximum number of elements to fetch. If None, the entire
-            colletion is returned.
+        limit: int or None. Maximum number of elements to fetch. If None, the
+            entire colletion is returned.
 
     Returns:
         A list of pairs with the first element being an answer object and the
@@ -114,7 +114,8 @@ def _count_answers(answer_dicts_list, n=None):
     """
     hashed_answer_frequencies = (
         collections.Counter(_HashableAnswer(a) for a in answer_dicts_list))
-    return [(h.value, f) for h, f in hashed_answer_frequencies.most_common(n)]
+    return [
+        (h.value, f) for h, f in hashed_answer_frequencies.most_common(limit)]
 
 
 def _calculate_top_answer_frequencies(state_answers_dict, num_results):
@@ -125,7 +126,7 @@ def _calculate_top_answer_frequencies(state_answers_dict, num_results):
     This method is run from within the context of a MapReduce job.
     """
     top_answer_counts_as_list_of_pairs = _count_answers(
-        state_answers_dict['submitted_answer_list'], n=num_results)
+        state_answers_dict['submitted_answer_list'], limit=num_results)
 
     calculation_output = []
     for item in top_answer_counts_as_list_of_pairs:
