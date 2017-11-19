@@ -2842,8 +2842,9 @@ class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
     def test_that_correct_state_id_mapping_model_is_stored(self):
         """Test that correct mapping model is stored for new and edited
         exploration."""
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
+            exploration = self.save_new_valid_exploration(
+                self.EXP_ID, self.owner_id)
 
         mapping = exp_services.get_state_id_mapping(
             self.EXP_ID, exploration.version)
@@ -2857,11 +2858,12 @@ class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
             mapping.largest_state_id_used, 0)
         self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
 
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [{
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            }], 'Add state name')
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'new state',
+                }], 'Add state name')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -2878,16 +2880,20 @@ class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_state_id_mapping_model_is_deleted(self):
         """Test that state id mapping model is correctly deleted."""
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [{
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            }], 'Add state name')
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
+            exploration = self.save_new_valid_exploration(
+                self.EXP_ID, self.owner_id)
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'new state',
+                }], 'Add state name')
+
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        exp_services.delete_state_id_mapping_model_for_exploration(
-            exploration.id, exploration.version)
+
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
+            exp_services.delete_state_id_mapping_model_for_exploration(
+                exploration.id, exploration.version)
 
         with self.assertRaisesRegexp(
             Exception,
@@ -2905,17 +2911,18 @@ class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
     def test_that_mapping_is_correct_when_exploration_is_reverted(self):
         """Test that state id mapping is correct when exploration is reverted
         to old version."""
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
+            exploration = self.save_new_valid_exploration(
+                self.EXP_ID, self.owner_id)
 
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [{
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            }], 'Add state name')
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'new state',
+                }], 'Add state name')
 
-        # Revert exploration to version 1.
-        exp_services.revert_exploration(self.owner_id, self.EXP_ID, 2, 1)
+            # Revert exploration to version 1.
+            exp_services.revert_exploration(self.owner_id, self.EXP_ID, 2, 1)
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(

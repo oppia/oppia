@@ -352,6 +352,26 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
         return cls._fetch_page_sorted_by_last_updated(
             query, page_size, urlsafe_start_cursor)
 
+    @classmethod
+    def get_all_exploration_commits(cls, exp_id, latest_version):
+        """Fetches all the commits made on a particular exploration upto latest
+        version of exploration.
+
+        Args:
+            exp_id: str. The exploration id.
+            latest_version: int. Latest version of the exploration.
+
+        Returns:
+            list(ExplorationCommitLogEntryModel). Commit log entry model
+            for each version of the given exploration.
+        """
+        model_ids = []
+        for version in range(1, latest_version + 1):
+            model_ids.append('exploration-%s-%s' % (exp_id, version))
+
+        models = cls.get_multi(model_ids)
+        return models
+
 
 class ExpSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia exploration.
