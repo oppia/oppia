@@ -44,8 +44,8 @@ from core.domain import stats_domain
 
 
 class _HashableAnswer(object):
-    """Allows our arbitrarily-complex answer dict objects to be hashed with the
-    built-in collections.
+    """Wraps our arbitrarily-complex answer dict objects into objects that can
+    be hashed into built-in collections.
     """
 
     def __init__(self, answer_dict):
@@ -65,11 +65,9 @@ def _get_hashable_value(value):
     """This function returns a hashable version of the input value.
 
     It converts the built-in collections into their hashable counterparts
-    {list: tuple, set: frozenset, dict: sorted tuple of pairs}.
-    Additionally, their elements are converted to hashable values through a
-    recursive call.
-
-    All other values are assumed to already be hashable.
+    {list: tuple, set: frozenset, dict: sorted tuple of pairs}. Additionally,
+    their elements are converted to hashable values through recursive calls. All
+    other values are assumed to already be hashable.
     """
     if isinstance(value, list):
         if len(value) == 1:
