@@ -6,12 +6,12 @@
   <strong><[options.title]></strong>
   <table class="table">
     <tr>
-      <th><[options.column_headers[0]]></th>
-      <th><[options.column_headers[1]]></th>
+      <th ng-repeat="column_header in options.column_headers"><[column_header]></th>
     </tr>
     <tr ng-repeat="row in data">
       <td><[row.answer]></td>
       <td><[row.frequency]></td>
+      <td>Yes</td>
     </tr>
   </table>
 
