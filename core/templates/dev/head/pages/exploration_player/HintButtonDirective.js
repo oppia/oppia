@@ -43,7 +43,8 @@ oppia.directive('hintButton', [
             WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
 
           $scope.getTooltipPlacement = function() {
-            return (viewportIsNarrow && $scope.isSupplementalCard) ? 'right' : 'left';
+            return (viewportIsNarrow && $scope.isSupplementalCard) ?
+              'right' : 'left';
           };
 
           var showNeedHintIfNecessary = function() {
