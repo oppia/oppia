@@ -288,6 +288,16 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
     post_commit_is_private = ndb.BooleanProperty(indexed=True)
 
     @classmethod
+    def _get_instance_id(cls, exp_id, exp_version):
+        """Returns ID of the exploration commit log entry model.
+
+        Args:
+            exp_id: str. The exploration id whose states are mapped.
+            exp_version: int. The version of the exploration.
+        """
+        return 'exploration-%s-%s' % (exp_id, exp_version)
+
+    @classmethod
     def get_all_commits(cls, page_size, urlsafe_start_cursor):
         """Fetches a list of all the commits sorted by their last updated
         attribute.
@@ -354,7 +364,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_all_exploration_commits(cls, exp_id, latest_version):
-        """Fetches all the commits made on a particular exploration upto latest
+        """Fetches all the commits made on a particular exploration up to latest
         version of exploration.
 
         Args:
@@ -367,7 +377,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
         """
         model_ids = []
         for version in range(1, latest_version + 1):
-            model_ids.append('exploration-%s-%s' % (exp_id, version))
+            model_ids.append(cls._get_instance_id(exp_id, version))
 
         models = cls.get_multi(model_ids)
         return models

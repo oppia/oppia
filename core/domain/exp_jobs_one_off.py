@@ -373,10 +373,10 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
         explorations.append(exploration)
 
         # Get all commit cmds for all versions of exploration.
-        commits = (
+        commit_log_models = (
             exp_models.ExplorationCommitLogEntryModel.get_all_exploration_commits( # pylint: disable=line-too-long
                 exploration.id, exploration.version))
-        change_lists = [commit.commit_cmds for commit in commits]
+        change_lists = [commit.commit_cmds for commit in commit_log_models]
 
         # Create and save state id mapping model for all exploration versions.
         for exploration, change_list in zip(explorations, change_lists):
