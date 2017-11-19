@@ -78,8 +78,8 @@ class _HashedAnswerDict(object):
             return value  # Any other type is assumed to already be hashable.
 
     def __init__(self, answer_dict):
-        self.answer = answer_dict
-        self.answer_hash = self._get_hashable_value(self.answer['answer'])
+        self.answer_dict = answer_dict
+        self.answer_hash = self._get_hashable_value(self.answer_dict['answer'])
 
     def __hash__(self):
         return hash(self.answer_hash)
@@ -108,7 +108,7 @@ def _calculate_top_answer_frequencies(answer_dicts_list, limit=None):
     hashed_answer_frequencies = (
         collections.Counter(_HashedAnswerDict(a) for a in answer_dicts_list))
 
-    return [{'answer': h.answer['answer'], 'frequency': f}
+    return [{'answer': h.answer_dict['answer'], 'frequency': f}
             for h, f in hashed_answer_frequencies.most_common(limit)]
 
 
