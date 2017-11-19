@@ -72,15 +72,15 @@ class _HashedAnswer(object):
             return value  # Any other type is assumed to already be hashable.
 
     def __init__(self, answer_dict):
-        self.value = answer_dict
-        self._hashable_value = self._get_hashable_value(self.value['answer'])
+        self.answer = answer_dict
+        self.answer_hash = self._get_hashable_value(self.answer['answer'])
 
     def __hash__(self):
-        return hash(self._hashable_value)
+        return hash(self.answer_hash)
 
     def __eq__(self, other):
         if isinstance(other, _HashedAnswer):
-            return self._hashable_value == other._hashable_value  # pylint: disable=protected-access
+            return self.answer_hash == other._answer_hash  # pylint: disable=protected-access
         return False
 
 
@@ -103,7 +103,7 @@ def _get_top_answers(answer_dicts_list, limit=None):
     hashed_answer_frequencies = (
         collections.Counter(_HashedAnswer(a) for a in answer_dicts_list))
     return [
-        (h.value, f) for h, f in hashed_answer_frequencies.most_common(limit)]
+        (h.answer, f) for h, f in hashed_answer_frequencies.most_common(limit)]
 
 
 def _calculate_top_answer_frequencies(state_answers_dict, num_results):
