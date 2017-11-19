@@ -68,21 +68,33 @@ def _get_hashable_value(value):
     {list: tuple, set: frozenset, dict: sorted tuple of pairs}. Additionally,
     their elements are converted to hashable values through recursive calls. All
     other values are assumed to already be hashable.
+
+    For single-element lists and sets, the single element is returned by itself.
     """
     if isinstance(value, list):
+        # Can't be sure that all elements of lists are hashable, so apply logic
+        # recursively to each element.
         if len(value) == 1:
-            # Single values don't need to be placed in a tuple.
+            # Single-elements can be returned by themselves.
             return _get_hashable_value(value[0])
         else:
             return tuple(_get_hashable_value(e) for e in value)
+
     elif isinstance(value, set):
-        return frozenset(_get_hashable_value(e) for e in value)
+        # Set elements are always hashable; don't need to call recursively.
+        if len(value) == 1:
+            # Single-elements can be returned by themselves.
+            return next(iter(value))
+        else:
+            return frozenset(value)
+
     elif isinstance(value, dict):
-        return _get_hashable_value(  # Applies existing {list: tuple} logic.
-            sorted((_get_hashable_value(k), _get_hashable_value(v))
-                   for k, v in value.iteritems()))
+        # Dict keys are always hashable. Can't be sure that values are hashable.
+        return _get_hashable_value(  # Reuse existing {list: tuple} logic.
+            sorted((k, _get_hashable_value(v)) for k, v in value.iteritems()))
+
     else:
-        return value  # Assume the value is already hashable.
+        return value  # Any other type is assumed to already be hashable.
 
 
 def _count_answers(answer_dicts_list, n=None):
