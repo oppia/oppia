@@ -43,26 +43,48 @@ from core.domain import exp_domain
 from core.domain import stats_domain
 
 
+class _HashableAnswer(object):
+    """Allows our arbitrarily-complex answer dict objects to be hashed with the
+    built-in collections.
+    """
+
+    def __init__(self, answer_dict):
+        self.value = answer_dict
+        self._hashable_value = _get_hashable_value(self.value['answer'])
+
+    def __hash__(self):
+        return hash(self._hashable_value)
+
+    def __eq__(self, other):
+        if isinstance(other, _HashableAnswer):
+            return self._hashable_value == other._hashable_value
+        return False
+
+
 def _get_hashable_value(value):
-    """This function returns a hashable version of the input value. If the
-    value itself is hashable, it simply returns that value. If it's a list, it
-    will return a tuple with all of the list's elements converted to hashable
-    types. If it's a dictionary, it will first convert it to a list of pairs,
-    where the key and value of the pair are converted to hashable types, then
-    it will convert this list as any other list would be converted.
+    """This function returns a hashable version of the input value.
+
+    It converts the built-in collections into their hashable counterparts
+    {list: tuple, set: frozenset, dict: sorted tuple of pairs}.
+    Additionally, their elements are converted to hashable values through a
+    recursive call.
+
+    All other values are assumed to already be hashable.
     """
     if isinstance(value, list):
-        # Avoid needlessly wrapping a single value in a tuple.
         if len(value) == 1:
+            # Single values don't need to be placed in a tuple.
             return _get_hashable_value(value[0])
-        return tuple([_get_hashable_value(elem) for elem in value])
+        else:
+            return tuple(_get_hashable_value(e) for e in value)
+    elif isinstance(value, set):
+        return frozenset(_get_hashable_value(e) for e in value)
     elif isinstance(value, dict):
-        return _get_hashable_value(
-            sorted([
-                (_get_hashable_value(key), _get_hashable_value(val))
-                for (key, val) in value.iteritems()]))
+        return _get_hashable_value(  # Applies existing {list: tuple} logic.
+            sorted((_get_hashable_value(k), _get_hashable_value(v))
+                   for k, v in value.iteritems()))
     else:
-        return value
+        return value  # Assume that the value is already hashable.
 
 
 def _count_answers(answer_dicts_list):
@@ -70,15 +92,9 @@ def _count_answers(answer_dicts_list):
     returns a list of pairs with the first element being an answer object and
     the second being the number of times it shows up in the input list.
     """
-    hashable_answer_values = [
-        _get_hashable_value(answer_dict['answer'])
-        for answer_dict in answer_dicts_list]
-    answer_frequencies = collections.Counter(hashable_answer_values)
-    return [
-        ([answer_dicts_list[idx]
-          for idx, val in enumerate(hashable_answer_values)
-          if val == hashable_answer][0], frequency)
-        for (hashable_answer, frequency) in answer_frequencies.most_common()]
+    hashed_answer_frequencies = (
+        collections.Counter(_HashableAnswer(a) for a in answer_dicts_list))
+    return [(h.value, n) for h, n in hashed_answer_frequencies.most_common()]
 
 
 def _calculate_top_answer_frequencies(state_answers_dict, num_results):
