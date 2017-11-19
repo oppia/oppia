@@ -207,8 +207,8 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
         """
         all_elements = []
         for answer_dicts_list in state_answers_dict['submitted_answer_list']:
-            all_elements.extend(
-                answer_dict['answer'] for answer_dict in answer_dicts_list)
+            all_elements.extend(itertools.chain.from_iterable(
+                answer_dict['answer'] for answer_dict in answer_dicts_list))
 
         calculation_output = [
             {'answer': e, 'frequency': f} for e, f in (
