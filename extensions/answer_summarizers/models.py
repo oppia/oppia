@@ -85,7 +85,7 @@ def _get_hashable_value(value):
         return value  # Assume the value is already hashable.
 
 
-def _count_answers(answer_dicts_list, n):
+def _count_answers(answer_dicts_list, n=None):
     """Count an input list of answer objects using collections.Counter. This
     returns a list of pairs with the first element being an answer object and
     the second being the number of times it shows up in the input list. The
@@ -112,7 +112,7 @@ def _calculate_top_answer_frequencies(state_answers_dict, num_results):
     This method is run from within the context of a MapReduce job.
     """
     top_answer_counts_as_list_of_pairs = _count_answers(
-        state_answers_dict['submitted_answer_list'], num_results)
+        state_answers_dict['submitted_answer_list'], n=num_results)
 
     calculation_output = []
     for item in top_answer_counts_as_list_of_pairs:
