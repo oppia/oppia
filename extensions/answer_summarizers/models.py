@@ -48,8 +48,8 @@ class _HashedAnswer(object):
     be hashed into built-in collections.
     """
 
-    @classmethod
-    def _hashable(cls, value):
+    @staticmethod
+    def _get_hashable_value(cls, value):
         """This function returns a hashable version of the input value.
 
         It converts the built-in collections into their hashable counterparts
@@ -61,20 +61,19 @@ class _HashedAnswer(object):
         itself.
         """
         if isinstance(value, list):
-            return tuple(cls._hashable(e) for e in value)
+            return tuple(cls._get_hashable_value(e) for e in value)
         elif isinstance(value, set):
-            # Set elements are always hashable; don't need to call recursively.
-            return frozenset(value)
+            return frozenset(value)  # Set elements are always hashable.
         elif isinstance(value, dict):
-            # Dict keys already hashable, only values need converting.
-            return cls._hashable(  # Reuse existing {list: tuple} logic.
-                sorted((k, cls._hashable(v)) for k, v in value.iteritems()))
+            return tuple(sorted(
+                # Dict keys already hashable, only values need converting.
+                (k, cls._get_hashable_value(v)) for k, v in value.iteritems()))
         else:
             return value  # Any other type is assumed to already be hashable.
 
     def __init__(self, answer_dict):
         self.value = answer_dict
-        self._hashable_value = self._hashable(self.value['answer'])
+        self._hashable_value = self._get_hashable_value(self.value['answer'])
 
     def __hash__(self):
         return hash(self._hashable_value)
