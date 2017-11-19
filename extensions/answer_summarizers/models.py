@@ -164,6 +164,7 @@ class AnswerFrequencies(BaseCalculation):
     """Calculation for answers' frequencies (how often each answer was
     submitted).
     """
+
     def calculate_from_state_answers_dict(self, state_answers_dict):
         """Computes the number of occurrences of each answer, and returns a
         list of dicts; each dict has keys 'answer' and 'frequency'.
