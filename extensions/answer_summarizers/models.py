@@ -49,24 +49,25 @@ class _HashableAnswer(object):
     """
 
     @staticmethod
-    def _get_hashable_value(value):
+    def _make_hashable(value):
         """This function returns a hashable version of the input value.
 
         It converts the built-in collections into their hashable counterparts
-        {list: tuple, set: frozenset, dict: sorted tuple of pairs}. Additionally,
-        their elements are converted to hashable values through recursive calls. All
-        other values are assumed to already be hashable.
+        {list: tuple, set: frozenset, dict: sorted tuple of pairs}.
+        Additionally, their elements are converted to hashable values through
+        recursive calls. All other values are assumed to already be hashable.
 
-        For single-element lists and sets, the single element is returned by itself.
+        For single-element lists and sets, the single element is returned by
+        itself.
         """
         if isinstance(value, list):
-            # Can't be sure that all elements of lists are hashable, so apply logic
-            # recursively to each element.
+            # Can't be sure that all elements of lists are hashable, so apply
+            # logic recursively to each element.
             if len(value) == 1:
                 # Single-elements can be returned by themselves.
-                return _get_hashable_value(value[0])
+                return _make_hashable(value[0])
             else:
-                return tuple(_get_hashable_value(e) for e in value)
+                return tuple(_make_hashable(e) for e in value)
         elif isinstance(value, set):
             # Set elements are always hashable; don't need to call recursively.
             if len(value) == 1:
@@ -75,15 +76,16 @@ class _HashableAnswer(object):
             else:
                 return frozenset(value)
         elif isinstance(value, dict):
-            # Dict keys are always hashable. Can't be sure that values are hashable.
-            return _get_hashable_value(  # Reuse existing {list: tuple} logic.
-                sorted((k, _get_hashable_value(v)) for k, v in value.iteritems()))
+            # Dict keys are always hashable. Can't be sure that values are
+            # hashable.
+            return _make_hashable(  # Reuse existing {list: tuple} logic.
+                sorted((k, _make_hashable(v)) for k, v in value.iteritems()))
         else:
             return value  # Any other type is assumed to already be hashable.
 
     def __init__(self, answer_dict):
         self.value = answer_dict
-        self._hashable_value = self._get_hashable_value(self.value['answer'])
+        self._hashable_value = self._make_hashable(self.value['answer'])
 
     def __hash__(self):
         return hash(self._hashable_value)
