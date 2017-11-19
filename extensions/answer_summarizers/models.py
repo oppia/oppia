@@ -92,18 +92,10 @@ class _HashedAnswerDict(object):
 
 def _calculate_top_answer_frequencies(answer_dicts_list, limit=None):
     """Computes the number of occurrences of each answer, keeping only the top
-    limit answers.
+    num_results answers, and returns a list of dicts; each dict has keys
+    'answer' and 'frequency'.
 
     This method is run from within the context of a MapReduce job.
-
-    Args:
-        answer_dicts_list: list(dict(*)). Contains the answers to be counted.
-        limit: int or None. The top number of results to keep.
-
-    Returns:
-        list(dict(str : *)). Where each dict has the keys:
-            answer: *. One of the submitted answers.
-            frequency: int. The number of occurrences of the answer.
     """
     hashed_answer_frequencies = (
         collections.Counter(_HashedAnswerDict(a) for a in answer_dicts_list))
