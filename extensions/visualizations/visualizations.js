@@ -74,18 +74,3 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
     ]
   };
 }]);
-
-oppia.directive('oppiaVisualizationHeatMap', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    templateUrl: 'visualizations/HeatMap',
-    controller: [
-      '$scope', '$attrs', 'HtmlEscaperService',
-      function($scope, $attrs, HtmlEscaperService) {
-        $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
-        $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
-      }
-    ]
-  };
-}]);
