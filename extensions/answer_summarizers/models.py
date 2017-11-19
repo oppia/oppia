@@ -52,7 +52,7 @@ CLASSIFY_CATEGORIES = [
 ]
 
 
-class _HashedAnswer(object):
+class _HashedAnswerDict(object):
     """Wraps an arbitrarily-complex answer dict object into an object that can
     be hashed into built-in collections.
     """
@@ -85,7 +85,7 @@ class _HashedAnswer(object):
         return hash(self.answer_hash)
 
     def __eq__(self, other):
-        if isinstance(other, _HashedAnswer):
+        if isinstance(other, _HashedAnswerDict):
             return self.answer_hash == other.answer_hash  # pylint: disable=protected-access
         return False
 
@@ -106,7 +106,7 @@ def _calculate_top_answer_frequencies(answer_dicts_list, limit=None):
             frequency: int. The number of occurrences of the answer.
     """
     hashed_answer_frequencies = (
-        collections.Counter(_HashedAnswer(a) for a in answer_dicts_list))
+        collections.Counter(_HashedAnswerDict(a) for a in answer_dicts_list))
 
     return [{'answer': h.answer['answer'], 'frequency': f}
             for h, f in hashed_answer_frequencies.most_common(limit)]
