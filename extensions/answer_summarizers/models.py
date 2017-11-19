@@ -116,8 +116,7 @@ def _calculate_top_answer_frequencies(state_answers_dict, num_results):
 
 
 class BaseCalculation(object):
-    """
-    Base calculation class.
+    """Base calculation class.
 
     This is the superclass for all calculations used to generate interaction
     answer views.
@@ -263,6 +262,7 @@ class TopAnswersByCategorization(BaseCalculation):
     classification category, where each list is a ranked list of answers, by
     frequency.
     """
+
     def calculate_from_state_answers_dict(self, state_answers_dict):
         """Computes the number of occurrences of each answer, split into groups
         based on the number of classification categories.
