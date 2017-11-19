@@ -23,9 +23,9 @@ NOTE TO DEVELOPERS: To specify calculations desired for an interaction named
 
     extensions.interactions.<INTERACTION_NAME>.answer_visualizations
 
-This is a list of visualizations, each of which is specified by a dict
-with keys 'id', 'options' and 'calculation_id'. An example for a single
-visualization and calculation may look like this:
+This is a list of visualizations, each of which is specified by a dict with keys
+'id', 'options' and 'calculation_id'. An example for a single visualization and
+calculation may look like this:
 
     answer_visualizations = [{
         'id': 'BarChart',
@@ -44,7 +44,7 @@ from core.domain import stats_domain
 
 
 class _HashableAnswer(object):
-    """Wraps our arbitrarily-complex answer dict objects into objects that can
+    """Wraps an arbitrarily-complex answer dict object into an object that can
     be hashed into built-in collections.
     """
 
@@ -82,7 +82,7 @@ def _get_hashable_value(value):
             sorted((_get_hashable_value(k), _get_hashable_value(v))
                    for k, v in value.iteritems()))
     else:
-        return value  # Assume that the value is already hashable.
+        return value  # Assume the value is already hashable.
 
 
 def _count_answers(answer_dicts_list):
