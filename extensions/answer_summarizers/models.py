@@ -43,7 +43,7 @@ from core.domain import exp_domain
 from core.domain import stats_domain
 
 
-class _HashableAnswer(object):
+class _HashedAnswer(object):
     """Wraps an arbitrarily-complex answer dict object into an object that can
     be hashed into built-in collections.
     """
@@ -91,7 +91,7 @@ class _HashableAnswer(object):
         return hash(self._hashable_value)
 
     def __eq__(self, other):
-        if isinstance(other, _HashableAnswer):
+        if isinstance(other, _HashedAnswer):
             return self._hashable_value == other._hashable_value  # pylint: disable=protected-access
         return False
 
@@ -113,7 +113,7 @@ def _get_top_answers(answer_dicts_list, limit=None):
         pairs are sorted by decreasing frequency.
     """
     hashed_answer_frequencies = (
-        collections.Counter(_HashableAnswer(a) for a in answer_dicts_list))
+        collections.Counter(_HashedAnswer(a) for a in answer_dicts_list))
     return [
         (h.value, f) for h, f in hashed_answer_frequencies.most_common(limit)]
 
