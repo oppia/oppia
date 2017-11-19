@@ -17,10 +17,10 @@
  * tests.
  */
 
-var ThanksPage = function(){
+var ThanksPage = function() {
   var THANKS_PAGE_URL = '/thanks';
 
-  this.get = function(){
+  this.get = function() {
     return browser.get(THANKS_PAGE_URL);
   };
 };
