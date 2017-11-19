@@ -53,7 +53,7 @@ class _HashableAnswer(object):
         """This function returns a hashable version of the input value.
 
         It converts the built-in collections into their hashable counterparts
-        {list: tuple, set: frozenset, dict: sorted tuple of pairs}.
+        {list: (tuple), set: (frozenset), dict: (sorted tuple of pairs)}.
         Additionally, their elements are converted to hashable values through
         recursive calls. All other values are assumed to already be hashable.
 
