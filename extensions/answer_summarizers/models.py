@@ -211,8 +211,8 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
                 answer_dict['answer'] for answer_dict in answer_dicts_list))
 
         calculation_output = [
-            {'answer': e, 'frequency': f} for e, f in (
-                collections.Counter(all_elements).most_common(10))
+            {'answer': e, 'frequency': f}
+            for e, f in collections.Counter(all_elements).most_common(10)
         ]
 
         return stats_domain.StateAnswersCalcOutput(
