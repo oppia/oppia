@@ -85,14 +85,23 @@ def _get_hashable_value(value):
         return value  # Assume the value is already hashable.
 
 
-def _count_answers(answer_dicts_list):
+def _count_answers(answer_dicts_list, n):
     """Count an input list of answer objects using collections.Counter. This
     returns a list of pairs with the first element being an answer object and
-    the second being the number of times it shows up in the input list.
+    the second being the number of times it shows up in the input list. The
+    pairs are sorted by decreasing frequency.
+
+    Args:
+        answer_dicts_list: dict(*). The dict containing information about a
+            particular answer. Must contain the key 'answer', where it's value
+            is the actual answer's value. Other keys are ignored by the
+            calculation.
+        n: int or None. Maximum number of elements to fetch. If None, the entire
+            colletion is returned.
     """
     hashed_answer_frequencies = (
         collections.Counter(_HashableAnswer(a) for a in answer_dicts_list))
-    return [(h.value, n) for h, n in hashed_answer_frequencies.most_common()]
+    return [(h.value, f) for h, f in hashed_answer_frequencies.most_common(n)]
 
 
 def _calculate_top_answer_frequencies(state_answers_dict, num_results):
@@ -103,7 +112,7 @@ def _calculate_top_answer_frequencies(state_answers_dict, num_results):
     This method is run from within the context of a MapReduce job.
     """
     top_answer_counts_as_list_of_pairs = _count_answers(
-        state_answers_dict['submitted_answer_list'])[:num_results]
+        state_answers_dict['submitted_answer_list'], num_results)
 
     calculation_output = []
     for item in top_answer_counts_as_list_of_pairs:
