@@ -92,7 +92,7 @@ class _HashableAnswer(object):
 
     def __eq__(self, other):
         if isinstance(other, _HashableAnswer):
-            return self._hashable_value == other._hashable_value
+            return self._hashable_value == other._hashable_value  # pylint: disable=protected-access
         return False
 
 
