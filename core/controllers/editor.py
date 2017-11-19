@@ -388,13 +388,9 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         an email to all its owners.
         """
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        action = self.payload.get('action')
         email_body = self.payload.get('email_body')
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
-
-        if action not in feconf.VALID_MODERATOR_ACTIONS:
-            raise self.InvalidInputException('Invalid moderator action.')
 
         # If moderator emails can be sent, check that all the prerequisites are
         # satisfied, otherwise do nothing.
@@ -405,24 +401,20 @@ class ExplorationModeratorRightsHandler(EditorHandler):
                     'recipient.')
             email_manager.require_moderator_email_prereqs_are_satisfied()
 
-        # Perform the moderator action.
-        if action == 'unpublish_exploration':
-            rights_manager.unpublish_exploration(self.user, exploration_id)
-            search_services.delete_explorations_from_search_index([
-                exploration_id])
-        else:
-            raise self.InvalidInputException(
-                'No change was made to this exploration.')
-
+        # Unpublish exploration.
+        rights_manager.unpublish_exploration(self.user, exploration_id)
+        search_services.delete_explorations_from_search_index([
+            exploration_id])
         exp_rights = rights_manager.get_exploration_rights(exploration_id)
 
         # If moderator emails can be sent, send an email to the all owners of
         # the exploration notifying them of the change.
         if feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
+            intent = 'unpublish_exploration'
             for owner_id in exp_rights.owner_ids:
                 email_manager.send_moderator_action_email(
                     self.user_id, owner_id,
-                    feconf.VALID_MODERATOR_ACTIONS[action]['email_intent'],
+                    feconf.VALID_MODERATOR_ACTIONS[intent]['email_intent'],
                     exploration.title, email_body)
 
         self.render_json({
