@@ -49,7 +49,7 @@ class _HashableAnswer(object):
     """
 
     @staticmethod
-    def _make_hashable(value):
+    def _to_hashable(value):
         """This function returns a hashable version of the input value.
 
         It converts the built-in collections into their hashable counterparts
@@ -65,9 +65,9 @@ class _HashableAnswer(object):
             # logic recursively to each element.
             if len(value) == 1:
                 # Single-elements can be returned by themselves.
-                return _make_hashable(value[0])
+                return _to_hashable(value[0])
             else:
-                return tuple(_make_hashable(e) for e in value)
+                return tuple(_to_hashable(e) for e in value)
         elif isinstance(value, set):
             # Set elements are always hashable; don't need to call recursively.
             if len(value) == 1:
@@ -78,14 +78,14 @@ class _HashableAnswer(object):
         elif isinstance(value, dict):
             # Dict keys are always hashable. Can't be sure that values are
             # hashable.
-            return _make_hashable(  # Reuse existing {list: tuple} logic.
-                sorted((k, _make_hashable(v)) for k, v in value.iteritems()))
+            return _to_hashable(  # Reuse existing {list: tuple} logic.
+                sorted((k, _to_hashable(v)) for k, v in value.iteritems()))
         else:
             return value  # Any other type is assumed to already be hashable.
 
     def __init__(self, answer_dict):
         self.value = answer_dict
-        self._hashable_value = self._make_hashable(self.value['answer'])
+        self._hashable_value = self._to_hashable(self.value['answer'])
 
     def __hash__(self):
         return hash(self._hashable_value)
@@ -94,7 +94,6 @@ class _HashableAnswer(object):
         if isinstance(other, _HashableAnswer):
             return self._hashable_value == other._hashable_value
         return False
-
 
 
 def _count_answers(answer_dicts_list, n=None):
