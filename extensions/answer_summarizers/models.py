@@ -48,7 +48,7 @@ class _HashedAnswer(object):
     be hashed into built-in collections.
     """
 
-    @staticmethod
+    @classmethod
     def _get_hashable_value(cls, value):
         """This function returns a hashable version of the input value.
 
