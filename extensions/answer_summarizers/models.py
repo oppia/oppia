@@ -86,7 +86,7 @@ class _HashedAnswerDict(object):
 
     def __eq__(self, other):
         if isinstance(other, _HashedAnswerDict):
-            return self.answer_hash == other.answer_hash  # pylint: disable=protected-access
+            return self.answer_hash == other.answer_hash
         return False
 
 
