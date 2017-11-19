@@ -96,7 +96,7 @@ class _HashableAnswer(object):
         return False
 
 
-def _count_answers(answer_dicts_list, limit=None):
+def _get_top_answers(answer_dicts_list, limit=None):
     """Return the most frequent answers from the list of answer dicts.
 
     Args:
@@ -125,7 +125,7 @@ def _calculate_top_answer_frequencies(state_answers_dict, num_results):
 
     This method is run from within the context of a MapReduce job.
     """
-    top_answer_counts_as_list_of_pairs = _count_answers(
+    top_answer_counts_as_list_of_pairs = _get_top_answers(
         state_answers_dict['submitted_answer_list'], limit=num_results)
 
     calculation_output = []
@@ -170,7 +170,7 @@ class AnswerFrequencies(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        answer_counts_as_list_of_pairs = _count_answers(
+        answer_counts_as_list_of_pairs = _get_top_answers(
             state_answers_dict['submitted_answer_list'])
 
         calculation_output = []
@@ -309,7 +309,7 @@ class TopAnswersByCategorization(BaseCalculation):
             for classify_category in classify_categories
         }
         top_answer_count_pairs_by_category = {
-            classify_category: _count_answers(answers)
+            classify_category: _get_top_answers(answers)
             for classify_category, answers
             in submitted_answers_by_categorization.iteritems()
         }
