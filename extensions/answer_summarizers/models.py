@@ -69,7 +69,7 @@ class _HashedAnswerDict(object):
         if isinstance(value, list):
             return tuple(cls._get_hashable_value(e) for e in value)
         elif isinstance(value, set):
-            return frozenset(value)  # Set elements are always hashable.
+            return frozenset(value)  # Set elements are already hashable.
         elif isinstance(value, dict):
             return tuple(sorted(
                 # Dict keys already hashable, only values need converting.
