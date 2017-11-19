@@ -205,8 +205,15 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        calculation_output = _calculate_top_answer_frequencies(
-            state_answers_dict['submitted_answer_list'], limit=10)
+        all_elements = []
+        for answer_dicts_list in state_answers_dict['submitted_answer_list']:
+            all_elements.extend(
+                answer_dict['answer'] for answer_dict in answer_dicts_list)
+
+        calculation_output = [
+            {'answer': e, 'frequency': f} for e, f in (
+                collections.Counter(all_elements).most_common(10))
+        ]
 
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
