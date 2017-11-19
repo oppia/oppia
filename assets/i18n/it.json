@@ -229,6 +229,7 @@
 	"I18N_PLAYER_HINT": "Suggerimento",
 	"I18N_PLAYER_HINTS_EXHAUSTED": "Spiacenti, non ci sono suggerimenti!",
 	"I18N_PLAYER_HINT_IS_AVAILABLE": "Clicca qui per un indizio!",
+	"I18N_PLAYER_HINT_NEED_A_HINT": "Hai bisogno di un suggerimento?",
 	"I18N_PLAYER_HINT_NOT_AVAILABLE": "Prova a pensare ancora un po' prima di chiedere un indizio!",
 	"I18N_PLAYER_HINT_REQUEST_STRING_1": "Vorrei un indizio.",
 	"I18N_PLAYER_HINT_REQUEST_STRING_2": "Sono un po' bloccato, qualche indizio?",
