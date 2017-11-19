@@ -61,23 +61,12 @@ class _HashedAnswer(object):
         itself.
         """
         if isinstance(value, list):
-            # Can't be sure that all elements of lists are hashable, so apply
-            # logic recursively to each element.
-            if len(value) == 1:
-                # Single-elements can be returned by themselves.
-                return cls._hashable(value[0])
-            else:
-                return tuple(cls._hashable(e) for e in value)
+            return tuple(cls._hashable(e) for e in value)
         elif isinstance(value, set):
             # Set elements are always hashable; don't need to call recursively.
-            if len(value) == 1:
-                # Single-elements can be returned by themselves.
-                return next(iter(value))
-            else:
-                return frozenset(value)
+            return frozenset(value)
         elif isinstance(value, dict):
-            # Dict keys are always hashable. Can't be sure that values are
-            # hashable.
+            # Dict keys already hashable, only values need converting.
             return cls._hashable(  # Reuse existing {list: tuple} logic.
                 sorted((k, cls._hashable(v)) for k, v in value.iteritems()))
         else:
