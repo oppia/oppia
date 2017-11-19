@@ -89,16 +89,16 @@ def _get_top_answers(answer_dicts_list, limit=None):
 
     Args:
         answer_dicts_list: dict(*). The dict containing information about a
-            particular answer. Must contain the key 'answer', where it's value
-            is the actual answer's value. Other keys are ignored by the
+            particular answer. Must contain the key 'answer', where its value is
+            the actual answer's value. Other keys are ignored by the
             calculation.
-        limit: int or None. Maximum number of elements to fetch. If None, the
-            entire colletion is returned.
+        limit: int or None. Maximum number of items to fetch. If None, all items
+            are returned.
 
     Returns:
-        A list of pairs with the first element being an answer object and the
-        second being the number of times it shows up in the input list. The
-        pairs are sorted by decreasing frequency.
+        list(tuple). A list of pairs with the first element being an answer
+        object and the second being the number of times it shows up in the input
+        list. The pairs are sorted by decreasing frequency.
     """
     hashed_answer_frequencies = (
         collections.Counter(_HashedAnswer(a) for a in answer_dicts_list))
