@@ -86,10 +86,7 @@ def _get_hashable_value(value):
 
 
 def _count_answers(answer_dicts_list, n=None):
-    """Count an input list of answer objects using collections.Counter. This
-    returns a list of pairs with the first element being an answer object and
-    the second being the number of times it shows up in the input list. The
-    pairs are sorted by decreasing frequency.
+    """Return the most frequent answers from the list of answer dicts.
 
     Args:
         answer_dicts_list: dict(*). The dict containing information about a
@@ -98,6 +95,11 @@ def _count_answers(answer_dicts_list, n=None):
             calculation.
         n: int or None. Maximum number of elements to fetch. If None, the entire
             colletion is returned.
+
+    Returns:
+        A list of pairs with the first element being an answer object and the
+        second being the number of times it shows up in the input list. The
+        pairs are sorted by decreasing frequency.
     """
     hashed_answer_frequencies = (
         collections.Counter(_HashableAnswer(a) for a in answer_dicts_list))
