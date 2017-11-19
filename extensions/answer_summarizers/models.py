@@ -253,7 +253,7 @@ class TopAnswersByCategorization(BaseCalculation):
         calculation_output = {
             category: _calculate_top_answer_frequencies(answer_dicts)
             for category, answer_dicts in
-                submitted_answers_by_categorization.iteritems()
+            submitted_answers_by_categorization.iteritems()
         }
 
         return stats_domain.StateAnswersCalcOutput(
