@@ -150,8 +150,8 @@ class BaseCalculation(object):
         return self.__class__.__name__
 
     def calculate_from_state_answers_dict(self, state_answers_dict):
-        """Perform calculation on a single StateAnswers entity. This is run
-        in the context of a batch MapReduce job.
+        """Perform calculation on a single StateAnswers entity. This is run in
+        the context of a batch MapReduce job.
 
         This method must be overwritten in subclasses.
         """
@@ -166,8 +166,8 @@ class AnswerFrequencies(BaseCalculation):
     """
 
     def calculate_from_state_answers_dict(self, state_answers_dict):
-        """Computes the number of occurrences of each answer, and returns a
-        list of dicts; each dict has keys 'answer' and 'frequency'.
+        """Computes the number of occurrences of each answer, and returns a list
+        of dicts; each dict has keys 'answer' and 'frequency'.
 
         This method is run from within the context of a MapReduce job.
         """
@@ -194,9 +194,9 @@ class Top5AnswerFrequencies(BaseCalculation):
     """Calculation for the top 5 answers, by frequency."""
 
     def calculate_from_state_answers_dict(self, state_answers_dict):
-        """Computes the number of occurrences of each answer, keeping only
-        the top 5 answers, and returns a list of dicts; each dict has keys
-        'answer' and 'frequency'.
+        """Computes the number of occurrences of each answer, keeping only the
+        top 5 answers, and returns a list of dicts; each dict has keys 'answer'
+        and 'frequency'.
 
         This method is run from within the context of a MapReduce job.
         """
@@ -216,9 +216,9 @@ class Top10AnswerFrequencies(BaseCalculation):
     """Calculation for the top 10 answers, by frequency."""
 
     def calculate_from_state_answers_dict(self, state_answers_dict):
-        """Computes the number of occurrences of each answer, keeping only
-        the top 10 answers, and returns a list of dicts; each dict has keys
-        'answer' and 'frequency'.
+        """Computes the number of occurrences of each answer, keeping only the
+        top 10 answers, and returns a list of dicts; each dict has keys 'answer'
+        and 'frequency'.
 
         This method is run from within the context of a MapReduce job.
         """
@@ -240,34 +240,21 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
     """
 
     def calculate_from_state_answers_dict(self, state_answers_dict):
-        """Computes the number of occurrences of each element across
-        all given answers, keeping only the top 10 elements. Returns a
-        list of dicts; each dict has keys 'element' and 'frequency'.
+        """Computes the number of occurrences of each element across all given
+        answers, keeping only the top 10 elements. Returns a list of dicts; each
+        dict has keys 'element' and 'frequency'.
 
         This method is run from within the context of a MapReduce job.
         """
-        answer_values = [
-            answer_dict['answer']
-            for answer_dict in state_answers_dict['submitted_answer_list']]
-
-        list_of_all_elements = []
-        for set_value in answer_values:
-            list_of_all_elements += set_value
-
-        elements_as_list_of_pairs = sorted(
-            collections.Counter(list_of_all_elements).items(),
-            key=lambda x: x[1],
-            reverse=True)
-        # Keep only top 10 elements
-        if len(elements_as_list_of_pairs) > 10:
-            elements_as_list_of_pairs = elements_as_list_of_pairs[:10]
+        elements_as_list_of_pairs = _get_top_answers(
+            state_answers_dict['submitted_answer_list'], limit=10)
 
         calculation_output = []
         for item in elements_as_list_of_pairs:
-            # Save element with key 'answer' so it gets displayed correctly
-            # by FrequencyTable visualization.
+            # Save element with key 'answer' so it gets displayed correctly by
+            # FrequencyTable visualization.
             calculation_output.append({
-                'answer': item[0],
+                'answer': item[0]['answer'],
                 'frequency': item[1],
             })
 
