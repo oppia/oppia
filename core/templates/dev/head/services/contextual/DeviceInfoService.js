@@ -13,18 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the state parameter changes section
- * of the editor sidebar.
+ * @fileoverview Service to check if user is on a mobile device.
  */
 
-oppia.controller('StateParamChangesEditor', [
-  '$scope', 'EditorStateService', 'stateParamChangesService',
-  function($scope, EditorStateService, stateParamChangesService) {
-    $scope.stateParamChangesService = stateParamChangesService;
-
-    $scope.$on('stateEditorInitialized', function(evt, stateData) {
-      stateParamChangesService.init(
-        EditorStateService.getActiveStateName(), stateData.paramChanges);
-    });
-  }
-]);
+// See: http://stackoverflow.com/a/14301832/5020618
+oppia.factory('DeviceInfoService', ['$window', function($window) {
+  return {
+    isMobileDevice: function() {
+      return typeof $window.orientation !== 'undefined';
+    },
+    isMobileUserAgent: function() {
+      return /Mobi/.test(navigator.userAgent);
+    },
+    hasTouchEvents: function() {
+      return 'ontouchstart' in $window;
+    }
+  };
+}]);

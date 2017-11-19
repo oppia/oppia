@@ -35,11 +35,11 @@ oppia.directive('answerGroupEditor', [
         'answer_group_editor_directive.html'),
       controller: [
         '$scope', 'stateInteractionIdService', 'ResponsesService',
-        'editorContextService', 'alertsService', 'INTERACTION_SPECS',
+        'EditorStateService', 'alertsService', 'INTERACTION_SPECS',
         'RULE_TYPE_CLASSIFIER', 'RuleObjectFactory',
         function(
             $scope, stateInteractionIdService, ResponsesService,
-            editorContextService, alertsService, INTERACTION_SPECS,
+            EditorStateService, alertsService, INTERACTION_SPECS,
             RULE_TYPE_CLASSIFIER, RuleObjectFactory) {
           $scope.rulesMemento = null;
           $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();

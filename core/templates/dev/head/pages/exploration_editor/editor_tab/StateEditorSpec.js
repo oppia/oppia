@@ -23,7 +23,7 @@ describe('State Editor controller', function() {
     beforeEach(module('oppia'));
     beforeEach(inject(function($rootScope, $controller, $injector) {
       scope = $rootScope.$new();
-      ecs = $injector.get('editorContextService');
+      ecs = $injector.get('EditorStateService');
       ess = $injector.get('explorationStatesService');
       scs = $injector.get('stateContentService');
 

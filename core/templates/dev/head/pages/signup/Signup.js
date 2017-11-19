@@ -17,10 +17,10 @@
  */
 
 oppia.controller('Signup', [
-  '$scope', '$http', '$rootScope', '$modal', 'alertsService', 'urlService',
+  '$scope', '$http', '$rootScope', '$modal', 'alertsService', 'UrlService',
   'FocusManagerService', 'siteAnalyticsService', 'UrlInterpolationService',
   function(
-      $scope, $http, $rootScope, $modal, alertsService, urlService,
+      $scope, $http, $rootScope, $modal, alertsService, UrlService,
       FocusManagerService, siteAnalyticsService, UrlInterpolationService) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
@@ -130,7 +130,7 @@ oppia.controller('Signup', [
 
       var defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
       var returnUrl = window.decodeURIComponent(
-        urlService.getUrlParams().return_url);
+        UrlService.getUrlParams().return_url);
 
       if (returnUrl.indexOf('creator_dashboard') !== -1) {
         defaultDashboard = constants.DASHBOARD_TYPE_CREATOR;
@@ -169,7 +169,7 @@ oppia.controller('Signup', [
       $scope.submissionInProcess = true;
       $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
         window.location = window.decodeURIComponent(
-          urlService.getUrlParams().return_url);
+          UrlService.getUrlParams().return_url);
       }, function() {
         $scope.submissionInProcess = false;
       });
