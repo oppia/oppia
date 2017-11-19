@@ -48,9 +48,42 @@ class _HashableAnswer(object):
     be hashed into built-in collections.
     """
 
+    @staticmethod
+    def _get_hashable_value(value):
+        """This function returns a hashable version of the input value.
+
+        It converts the built-in collections into their hashable counterparts
+        {list: tuple, set: frozenset, dict: sorted tuple of pairs}. Additionally,
+        their elements are converted to hashable values through recursive calls. All
+        other values are assumed to already be hashable.
+
+        For single-element lists and sets, the single element is returned by itself.
+        """
+        if isinstance(value, list):
+            # Can't be sure that all elements of lists are hashable, so apply logic
+            # recursively to each element.
+            if len(value) == 1:
+                # Single-elements can be returned by themselves.
+                return _get_hashable_value(value[0])
+            else:
+                return tuple(_get_hashable_value(e) for e in value)
+        elif isinstance(value, set):
+            # Set elements are always hashable; don't need to call recursively.
+            if len(value) == 1:
+                # Single-elements can be returned by themselves.
+                return next(iter(value))
+            else:
+                return frozenset(value)
+        elif isinstance(value, dict):
+            # Dict keys are always hashable. Can't be sure that values are hashable.
+            return _get_hashable_value(  # Reuse existing {list: tuple} logic.
+                sorted((k, _get_hashable_value(v)) for k, v in value.iteritems()))
+        else:
+            return value  # Any other type is assumed to already be hashable.
+
     def __init__(self, answer_dict):
         self.value = answer_dict
-        self._hashable_value = _get_hashable_value(self.value['answer'])
+        self._hashable_value = self._get_hashable_value(self.value['answer'])
 
     def __hash__(self):
         return hash(self._hashable_value)
@@ -60,41 +93,6 @@ class _HashableAnswer(object):
             return self._hashable_value == other._hashable_value
         return False
 
-
-def _get_hashable_value(value):
-    """This function returns a hashable version of the input value.
-
-    It converts the built-in collections into their hashable counterparts
-    {list: tuple, set: frozenset, dict: sorted tuple of pairs}. Additionally,
-    their elements are converted to hashable values through recursive calls. All
-    other values are assumed to already be hashable.
-
-    For single-element lists and sets, the single element is returned by itself.
-    """
-    if isinstance(value, list):
-        # Can't be sure that all elements of lists are hashable, so apply logic
-        # recursively to each element.
-        if len(value) == 1:
-            # Single-elements can be returned by themselves.
-            return _get_hashable_value(value[0])
-        else:
-            return tuple(_get_hashable_value(e) for e in value)
-
-    elif isinstance(value, set):
-        # Set elements are always hashable; don't need to call recursively.
-        if len(value) == 1:
-            # Single-elements can be returned by themselves.
-            return next(iter(value))
-        else:
-            return frozenset(value)
-
-    elif isinstance(value, dict):
-        # Dict keys are always hashable. Can't be sure that values are hashable.
-        return _get_hashable_value(  # Reuse existing {list: tuple} logic.
-            sorted((k, _get_hashable_value(v)) for k, v in value.iteritems()))
-
-    else:
-        return value  # Any other type is assumed to already be hashable.
 
 
 def _count_answers(answer_dicts_list, n=None):
