@@ -75,7 +75,8 @@ class _HashedAnswerDict(object):
                 # Dict keys are already hashable, only values need converting.
                 (k, cls._get_hashable_value(v)) for k, v in value.iteritems()))
         else:
-            return value  # Any other type is assumed to already be hashable.
+            # Any other type is assumed to already be hashable.
+            return value
 
     def __init__(self, answer_dict):
         self.answer_dict = answer_dict
@@ -138,7 +139,7 @@ class AnswerFrequencies(BaseCalculation):
         This method is run from within the context of a MapReduce job.
         """
         calculation_output = _calculate_top_answer_frequencies(
-            state_answers_dict['submitted_answer_list'])
+            state_answers_dict['submitted_answer_list'], limit=None)
 
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
@@ -207,8 +208,8 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
         """
         all_elements = []
         for answer_dicts_list in state_answers_dict['submitted_answer_list']:
-            all_elements.extend(itertools.chain.from_iterable(
-                answer_dict['answer'] for answer_dict in answer_dicts_list))
+            for answer_dict in answer_dicts_list:
+                all_elements.extend(answer_dict['answer'])
 
         calculation_output = [
             {'answer': e, 'frequency': f}
