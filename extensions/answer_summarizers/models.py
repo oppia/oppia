@@ -54,14 +54,14 @@ CLASSIFICATION_CATEGORIES = [
 
 class _HashedValue(object):
     """Wraps some arbitrarily-complex object into a new object which can be
-    hashed into built-in collections.
+    hashed and placed into dicts and sets.
     """
 
     @classmethod
     def _get_hashable_value(cls, value):
         """This function returns a hashable version of the input value.
 
-        It converts the built-in collections into their hashable counterparts
+        It converts the built-in sequences into their hashable counterparts
         {list: tuple, set: frozenset, dict: (sorted tuple of pairs)}.
         Additionally, their elements are converted to hashable values through
         recursive calls. All other value types are assumed to already be
