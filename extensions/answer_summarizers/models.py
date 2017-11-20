@@ -217,8 +217,8 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
         """
         hashed_element_frequencies = collections.Counter()
         for answer_dict in state_answers_dict['submitted_answer_list']:
-            for element in answer_dict['answer']:
-                hashed_element_frequencies[_HashedValue(element)] += 1
+            hashed_element_frequencies.update(
+                _HashedValue(element) for element in answer_dict['answer'])
 
         calculation_output = [
             {'answer': h.value, 'frequency': f}
