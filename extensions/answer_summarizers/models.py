@@ -44,7 +44,7 @@ import operator
 from core.domain import exp_domain
 from core.domain import stats_domain
 
-CLASSIFY_CATEGORIES = [
+CLASSIFICATION_CATEGORIES = [
     exp_domain.EXPLICIT_CLASSIFICATION,
     exp_domain.TRAINING_DATA_CLASSIFICATION,
     exp_domain.STATISTICAL_CLASSIFICATION,
@@ -253,7 +253,7 @@ class TopAnswersByCategorization(BaseCalculation):
 
         submitted_answers_by_categorization = collections.defaultdict(list)
         for category, answer_dicts in grouped_submitted_answer_dicts:
-            if category in CLASSIFY_CATEGORIES:
+            if category in CLASSIFICATION_CATEGORIES:
                 submitted_answers_by_categorization[category].extend(
                     answer_dicts)
 
