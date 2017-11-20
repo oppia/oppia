@@ -245,7 +245,7 @@ class TopAnswersByCategorization(BaseCalculation):
         """
         grouped_submitted_answer_dicts = itertools.groupby(
             state_answers_dict['submitted_answer_list'],
-            lambda answer_dict: answer_dict['classification_categorization'])
+            operator.itemgetter('classification_categorization'))
 
         submitted_answers_by_categorization = collections.defaultdict(list)
         for category, answer_dicts in grouped_submitted_answer_dicts:
