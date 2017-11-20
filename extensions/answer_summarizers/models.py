@@ -104,7 +104,7 @@ def _get_top_answers_by_frequency(answer_dicts, limit=None):
     This method is run from within the context of a MapReduce job.
     """
     hashed_answer_frequencies = (
-        collections.Counter(_HashedValue(d['answer']) for d in answer_dicts)
+        collections.Counter(_HashedValue(d['answer']) for d in answer_dicts))
 
     return [
         {'answer': h.value, 'frequency': f}
