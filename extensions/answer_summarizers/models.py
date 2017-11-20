@@ -62,17 +62,18 @@ class _HashedValue(object):
         """This function returns a hashable version of the input value.
 
         It converts the built-in collections into their hashable counterparts
-        {list: (tuple), set: (frozenset), dict: (sorted tuple of pairs)}.
+        {list: tuple, set: frozenset, dict: (sorted tuple of pairs)}.
         Additionally, their elements are converted to hashable values through
         recursive calls. All other values are assumed to already be hashable.
         """
         if isinstance(value, list):
             return tuple(cls._get_hashable_value(e) for e in value)
         elif isinstance(value, set):
-            return frozenset(value)  # Set elements are already hashable.
+            # Set elements are already hashable.
+            return frozenset(value)
         elif isinstance(value, dict):
+            # Dict keys are already hashable, only values need converting.
             return tuple(sorted(
-                # Dict keys are already hashable, only values need converting.
                 (k, cls._get_hashable_value(v)) for k, v in value.iteritems()))
         else:
             # Any other type is assumed to already be hashable.
