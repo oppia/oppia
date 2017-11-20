@@ -81,7 +81,9 @@ class _HashedValue(object):
             return value
 
     def __init__(self, value, key=None):
-        """Wraps value or whatever key(value) returns into a hashable object."""
+        """Wraps value into a hashable object. Bases the hash on key(value) when
+        key is provided, otherwise it will be based simply on value.
+        """
         self.value = value
         self.hash_value = (
             self._get_hashable_value(value if key is None else key(value)))
