@@ -202,25 +202,26 @@ class Top10AnswerFrequencies(BaseCalculation):
 
 
 class FrequencyCommonlySubmittedElements(BaseCalculation):
-    """Calculation for determining the frequency of commonly submitted elements
-    among multiple set answers (such as of type SetOfUnicodeString).
+    """Calculation for determining the frequency of commonly submitted
+    individual answers among multiple set answers (such as of type
+    SetOfUnicodeString).
     """
 
     def calculate_from_state_answers_dict(self, state_answers_dict):
-        """Computes the number of occurrences of each element across all given
-        answers, keeping only the top 10 elements. Returns a list of dicts; each
-        dict has keys 'answer' and 'frequency'.
+        """Computes the number of occurrences of each individual answer across
+        all given answer sets, keeping only the top 10. Returns a list of dicts;
+        each dict has keys 'answer' and 'frequency'.
 
         This method is run from within the context of a MapReduce job.
         """
-        hashed_element_frequencies = collections.Counter()
+        hashed_answer_frequencies = collections.Counter()
         for answer_dict in state_answers_dict['submitted_answer_list']:
-            hashed_element_frequencies.update(
-                _HashedValue(element) for element in answer_dict['answer'])
+            hashed_answer_frequencies.update(
+                _HashedValue(answer) for answer in answer_dict['answer'])
 
         calculation_output = [
             {'answer': h.value, 'frequency': f}
-            for h, f in hashed_element_frequencies.most_common(10)
+            for h, f in hashed_answer_frequencies.most_common(10)
         ]
 
         return stats_domain.StateAnswersCalcOutput(
