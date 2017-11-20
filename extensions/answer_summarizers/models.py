@@ -39,6 +39,7 @@ calculation may look like this:
 
 import collections
 import itertools
+import operator
 
 from core.domain import exp_domain
 from core.domain import stats_domain
@@ -52,9 +53,9 @@ CLASSIFY_CATEGORIES = [
 ]
 
 
-class _HashedAnswerDict(object):
-    """Wraps an arbitrarily-complex answer dict object into an object that can
-    be hashed into built-in collections.
+class _HashedValue(object):
+    """Wraps an arbitrarily-complex object into an object that can be hashed
+    into built-in collections.
     """
 
     @classmethod
@@ -78,30 +79,32 @@ class _HashedAnswerDict(object):
             # Any other type is assumed to already be hashable.
             return value
 
-    def __init__(self, answer_dict):
-        self.answer_dict = answer_dict
-        self.answer_hash = self._get_hashable_value(self.answer_dict['answer'])
+    def __init__(self, value, key=None):
+        self.value = value
+        self.hash_value = (
+            self._get_hashable_value(value if key is None else key(value))
 
     def __hash__(self):
-        return hash(self.answer_hash)
+        return hash(self.hash_value)
 
     def __eq__(self, other):
-        if isinstance(other, _HashedAnswerDict):
-            return self.answer_hash == other.answer_hash
+        if isinstance(other, _HashedValue):
+            return self.hash_value == other.hash_value
         return False
 
 
-def _calculate_top_answer_frequencies(answer_dicts_list, limit=None):
+def _calculate_top_answer_frequencies(answer_dicts, limit=None):
     """Computes the number of occurrences of each answer, keeping only the top
     num_results answers, and returns a list of dicts; each dict has keys
     'answer' and 'frequency'.
 
     This method is run from within the context of a MapReduce job.
     """
-    hashed_answer_frequencies = (
-        collections.Counter(_HashedAnswerDict(a) for a in answer_dicts_list))
+    hashed_answer_frequencies = collections.Counter(
+        _HashedValue(a, key=operator.itemgetter('answer')) for a in answer_dicts
+    )
 
-    return [{'answer': h.answer_dict['answer'], 'frequency': f}
+    return [{'answer': h.value['answer'], 'frequency': f}
             for h, f in hashed_answer_frequencies.most_common(limit)]
 
 
@@ -206,14 +209,15 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        all_elements = []
-        for answer_dicts_list in state_answers_dict['submitted_answer_list']:
-            for answer_dict in answer_dicts_list:
-                all_elements.extend(answer_dict['answer'])
+        hashed_element_counter = collections.Counter()
+        for answer_dicts in state_answers_dict['submitted_answer_list']:
+            for answer_dict in answer_dicts:
+                for element in answer_dict['answer']:
+                    hashed_element_counter.update(_HashedValue(element))
 
         calculation_output = [
-            {'answer': e, 'frequency': f}
-            for e, f in collections.Counter(all_elements).most_common(10)
+            {'answer': e.value, 'frequency': f}
+            for e, f in hashed_element_counter.most_common(10)
         ]
 
         return stats_domain.StateAnswersCalcOutput(
