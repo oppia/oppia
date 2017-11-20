@@ -97,7 +97,7 @@ class _HashedValue(object):
         return False
 
 
-def _calculate_top_answer_frequencies(answer_dicts, limit=None):
+def _get_top_answers_by_frequency(answer_dicts, limit=None):
     """Computes the number of occurrences of each answer, keeping only the top
     num_results answers, and returns a list of dicts; each dict has keys
     'answer' and 'frequency'.
@@ -145,7 +145,7 @@ class AnswerFrequencies(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        calculation_output = _calculate_top_answer_frequencies(
+        calculation_output = _get_top_answers_by_frequency(
             state_answers_dict['submitted_answer_list'], limit=None)
 
         return stats_domain.StateAnswersCalcOutput(
@@ -167,7 +167,7 @@ class Top5AnswerFrequencies(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        calculation_output = _calculate_top_answer_frequencies(
+        calculation_output = _get_top_answers_by_frequency(
             state_answers_dict['submitted_answer_list'], limit=5)
 
         return stats_domain.StateAnswersCalcOutput(
@@ -189,7 +189,7 @@ class Top10AnswerFrequencies(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        calculation_output = _calculate_top_answer_frequencies(
+        calculation_output = _get_top_answers_by_frequency(
             state_answers_dict['submitted_answer_list'], limit=10)
 
         return stats_domain.StateAnswersCalcOutput(
@@ -257,7 +257,7 @@ class TopAnswersByCategorization(BaseCalculation):
                     answer_dicts)
 
         calculation_output = {
-            category: _calculate_top_answer_frequencies(answer_dicts)
+            category: _get_top_answers_by_frequency(answer_dicts, limit=None)
             for category, answer_dicts in
             submitted_answers_by_categorization.iteritems()
         }
