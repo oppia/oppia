@@ -178,6 +178,7 @@
 	"I18N_INTERACTIONS_GRAPH_UPDATE_LABEL": "Bezeichnung aktualisieren",
 	"I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT": "Gewicht aktualisieren",
 	"I18N_INTERACTIONS_IMAGE_CLICK_SELECT": "[Wähle ein Bild zur Anzeige aus]",
+	"I18N_INTERACTIONS_ITEM_SELECTION_MORE": "Du kannst mehr Auswahlen treffen.",
 	"I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH": "{minChoiceNumber, plural, one{Bitte treffe mindestens eine Auswahl.} other{Bitte treffe mindestens # Auswahlen.}}",
 	"I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE": "{maxAllowableSelectionCount, plural, one{Es darf höchstens eine Auswahl getroffen werden.} other{Es dürfen höchstens # Auswahlen getroffen werden.}}",
 	"I18N_INTERACTIONS_ITEM_SELECTION_SUBMIT": "Absenden",

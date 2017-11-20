@@ -178,6 +178,7 @@
 	"I18N_INTERACTIONS_GRAPH_UPDATE_LABEL": "更新標記",
 	"I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT": "更新權重",
 	"I18N_INTERACTIONS_IMAGE_CLICK_SELECT": "[選擇一個圖片來顯示]",
+	"I18N_INTERACTIONS_ITEM_SELECTION_MORE": "您可以選擇更多選項。",
 	"I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH": "{minChoiceNumber, plural, one{請選擇至少一個項目。} other{請選擇至少#個項目。}}",
 	"I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE": "{maxAllowableSelectionCount, plural, one{最多選擇一個項目。} other{最多選擇#個項目。}}",
 	"I18N_INTERACTIONS_ITEM_SELECTION_SUBMIT": "提交",
