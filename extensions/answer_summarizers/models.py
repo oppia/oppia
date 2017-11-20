@@ -221,8 +221,8 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
                 hashed_element_frequencies[_HashedValue(element)] += 1
 
         calculation_output = [
-            {'answer': e.value, 'frequency': f}
-            for e, f in hashed_element_frequencies.most_common(10)
+            {'answer': h.value, 'frequency': f}
+            for h, f in hashed_element_frequencies.most_common(10)
         ]
 
         return stats_domain.StateAnswersCalcOutput(
