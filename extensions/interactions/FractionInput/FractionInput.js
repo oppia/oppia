@@ -12,8 +12,74 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
+
+oppia.directive('oppiaInteractiveFractionInput', ['FractionObjectFactory',
+  function(FractionObjectFactory) {
+    return {
+      restrict: 'E',
+      scope: {
+        onSubmit: '&'
+      },
+      templateUrl: 'interaction/FractionInput',
+      controller: [
+        '$scope', '$attrs', 'FocusManagerService',
+        'fractionInputRulesService',
+        function($scope, $attrs, FocusManagerService,
+          fractionInputRulesService) {
+          $scope.answer = '';
+          $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+          var requireSimplestForm = $attrs.requireSimplestFormWithValue;
+          var errorMessage = '';
+          $scope.FRACTION_INPUT_FORM_SCHEMA = {
+            type: 'unicode',
+            ui_config: {}
+          };
+
+          $scope.getWarningText = function() {
+            return errorMessage;
+          }
+
+          $scope.submitAnswer = function(answer) {
+            try {
+              var fraction = FractionObjectFactory.fromRawInputString(
+                answer);
+              if (requireSimplestForm &&
+                !angular.equals(fraction, fraction.convertToSimplestForm())) {
+                errorMessage = 'Please enter answer in it\'s simplest form'
+              } else {
+                $scope.onSubmit({
+                  answer: fraction,
+                  rulesService: fractionInputRulesService
+                });
+              }
+            } catch (parsingError) {
+              errorMessage = parsingError.message;
+            }
+          };
+        }
+      ]
+    };
+  }
+]);
+
+oppia.directive('oppiaResponseFractionInput', [
+  'FractionObjectFactory', 'HtmlEscaperService',
+  function(FractionObjectFactory, HtmlEscaperService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'response/FractionInput',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        $scope.answer = FractionObjectFactory.fromDict(answer).toString();
+      }]
+    };
+  }
+]);
+
 /**
- * @fileoverview Rule evaluation for the fraction input.
+ * Rule evaluation for the fraction input.
  */
 oppia.factory('fractionInputRulesService', [
   'FractionObjectFactory',

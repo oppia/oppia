@@ -436,6 +436,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
 }, {
     'name': 'Math',
     'interaction_ids': [
+        'FractionInput',
         'GraphInput',
         'LogicProof',
         'NumericInput',
