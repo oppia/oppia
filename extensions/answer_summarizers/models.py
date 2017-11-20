@@ -105,11 +105,13 @@ def _get_top_answers_by_frequency(answer_dicts, limit=None):
     This method is run from within the context of a MapReduce job.
     """
     hashed_answer_frequencies = collections.Counter(
-        _HashedValue(a, key=operator.itemgetter('answer')) for a in answer_dicts
+        _HashedValue(d, key=operator.itemgetter('answer')) for d in answer_dicts
     )
 
-    return [{'answer': h.value['answer'], 'frequency': f}
-            for h, f in hashed_answer_frequencies.most_common(limit)]
+    return [
+        {'answer': h.value['answer'], 'frequency': f}
+        for h, f in hashed_answer_frequencies.most_common(limit)
+    ]
 
 
 class BaseCalculation(object):
