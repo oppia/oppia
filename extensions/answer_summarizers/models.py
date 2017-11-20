@@ -80,13 +80,12 @@ class _HashedValue(object):
             # Any other type is assumed to already be hashable.
             return value
 
-    def __init__(self, value, key=None):
+    def __init__(self, value):
         """Wraps value into a hashable object. Bases the hash on key(value) when
         key is provided, otherwise it will be based simply on value.
         """
         self.value = value
-        self.hash_value = (
-            self._get_hashable_value(value if key is None else key(value)))
+        self.hash_value = self._get_hashable_value(value)
 
     def __hash__(self):
         return hash(self.hash_value)
@@ -104,12 +103,11 @@ def _get_top_answers_by_frequency(answer_dicts, limit=None):
 
     This method is run from within the context of a MapReduce job.
     """
-    hashed_answer_frequencies = collections.Counter(
-        _HashedValue(d, key=operator.itemgetter('answer')) for d in answer_dicts
-    )
+    hashed_answer_frequencies = (
+        collections.Counter(_HashedValue(d['answer']) for d in answer_dicts)
 
     return [
-        {'answer': h.value['answer'], 'frequency': f}
+        {'answer': h.value, 'frequency': f}
         for h, f in hashed_answer_frequencies.most_common(limit)
     ]
 
