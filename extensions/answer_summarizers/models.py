@@ -83,7 +83,7 @@ class _HashedValue(object):
         """Creates a hash for value or for whatever key(value) returns."""
         self.value = value
         self.hash_value = (
-            self._get_hashable_value(value if key is None else key(value))
+            self._get_hashable_value(value if key is None else key(value)))
 
     def __hash__(self):
         return hash(self.hash_value)
