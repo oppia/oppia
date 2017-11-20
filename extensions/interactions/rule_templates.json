@@ -51,6 +51,9 @@
     },
     "HasWholeNumberEqualTo": {
       "description": "has whole number equal to {{x|Int}}"
+    },
+    "HasNoFractionalPart": {
+      "description": "answer is a whole number"
     }
   },
   "GraphInput": {

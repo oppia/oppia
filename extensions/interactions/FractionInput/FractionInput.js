@@ -117,6 +117,9 @@ oppia.factory('fractionInputRulesService', [
       HasDenominatorEqualTo: function(answer, inputs) {
         return answer.denominator === inputs.f.denominator;
       },
+      HasNoFractionalPart: function(answer) {
+        return answer.numerator === 0;
+      },
     };
   }
 ]);
