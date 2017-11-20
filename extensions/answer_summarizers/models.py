@@ -64,7 +64,8 @@ class _HashedValue(object):
         It converts the built-in collections into their hashable counterparts
         {list: tuple, set: frozenset, dict: (sorted tuple of pairs)}.
         Additionally, their elements are converted to hashable values through
-        recursive calls. All other values are assumed to already be hashable.
+        recursive calls. All other value types are assumed to already be
+        hashable.
         """
         if isinstance(value, list):
             return tuple(cls._get_hashable_value(e) for e in value)
@@ -210,15 +211,15 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        hashed_element_counter = collections.Counter()
+        hashed_element_frequencies = collections.Counter()
         for answer_dicts in state_answers_dict['submitted_answer_list']:
             for answer_dict in answer_dicts:
                 for element in answer_dict['answer']:
-                    hashed_element_counter[_HashedValue(element)] += 1
+                    hashed_element_frequencies[_HashedValue(element)] += 1
 
         calculation_output = [
             {'answer': e.value, 'frequency': f}
-            for e, f in hashed_element_counter.most_common(10)
+            for e, f in hashed_element_frequencies.most_common(10)
         ]
 
         return stats_domain.StateAnswersCalcOutput(
