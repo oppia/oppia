@@ -44,7 +44,6 @@ import operator
 from core.domain import exp_domain
 from core.domain import stats_domain
 
-
 CLASSIFY_CATEGORIES = [
     exp_domain.EXPLICIT_CLASSIFICATION,
     exp_domain.TRAINING_DATA_CLASSIFICATION,
@@ -54,8 +53,8 @@ CLASSIFY_CATEGORIES = [
 
 
 class _HashedValue(object):
-    """Wraps some arbitrarily-complex object into an object that can be hashed
-    into built-in collections.
+    """Wraps some arbitrarily-complex object into a new object which can be
+    hashed into built-in collections.
     """
 
     @classmethod
