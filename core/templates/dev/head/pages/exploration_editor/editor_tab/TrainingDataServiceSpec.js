@@ -41,7 +41,7 @@ describe('TrainingDataService', function() {
       autosaveChangeList: function() {}
     };
     module(function($provide) {
-      $provide.value('explorationData', mockExplorationData);
+      $provide.value('ExplorationDataService', mockExplorationData);
     });
     spyOn(mockExplorationData, 'autosaveChangeList');
   });
@@ -50,7 +50,7 @@ describe('TrainingDataService', function() {
     scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
     siis = $injector.get('stateInteractionIdService');
-    ecs = $injector.get('editorContextService');
+    ecs = $injector.get('EditorStateService');
     cls = $injector.get('changeListService');
     ess = $injector.get('explorationStatesService');
     rs = $injector.get('ResponsesService');

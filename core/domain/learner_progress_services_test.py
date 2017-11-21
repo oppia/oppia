@@ -54,29 +54,37 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID_0, self.owner_id, title='Bridges in England',
             category='Architecture', language_code='en')
+        self.publish_exploration(self.owner_id, self.EXP_ID_0)
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.owner_id, title='Sillat Suomi',
             category='Architecture', language_code='fi')
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
         self.save_new_valid_exploration(
             self.EXP_ID_2, self.user_id, title='Introduce Oppia',
             category='Welcome', language_code='en')
+        self.publish_exploration(self.user_id, self.EXP_ID_2)
         self.save_new_valid_exploration(
             self.EXP_ID_3, self.owner_id, title='Welcome Oppia',
             category='Welcome', language_code='en')
+        self.publish_exploration(self.owner_id, self.EXP_ID_3)
 
         # Save a few collections.
         self.save_new_default_collection(
             self.COL_ID_0, self.owner_id, title='Bridges',
             category='Architecture')
+        self.publish_collection(self.owner_id, self.COL_ID_0)
         self.save_new_default_collection(
             self.COL_ID_1, self.owner_id, title='Introduce Oppia',
             category='Welcome')
+        self.publish_collection(self.owner_id, self.COL_ID_1)
         self.save_new_default_collection(
             self.COL_ID_2, self.user_id,
             title='Introduce Interactions in Oppia', category='Welcome')
+        self.publish_collection(self.user_id, self.COL_ID_2)
         self.save_new_default_collection(
             self.COL_ID_3, self.owner_id, title='Welcome Oppia Collection',
             category='Welcome')
+        self.publish_collection(self.owner_id, self.COL_ID_3)
 
     def _get_all_completed_exp_ids(self, user_id):
         completed_activities_model = (

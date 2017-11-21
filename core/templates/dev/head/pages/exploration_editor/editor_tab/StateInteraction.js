@@ -18,7 +18,7 @@
 
 oppia.controller('StateInteraction', [
   '$scope', '$http', '$rootScope', '$modal', '$injector', '$filter',
-  'alertsService', 'editorContextService', 'HtmlEscaperService',
+  'alertsService', 'EditorStateService', 'HtmlEscaperService',
   'INTERACTION_SPECS', 'stateInteractionIdService',
   'stateCustomizationArgsService', 'editabilityService',
   'explorationStatesService', 'graphDataService', 
@@ -26,7 +26,7 @@ oppia.controller('StateInteraction', [
   'oppiaExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
   function($scope, $http, $rootScope, $modal, $injector, $filter,
-      alertsService, editorContextService, HtmlEscaperService,
+      alertsService, EditorStateService, HtmlEscaperService,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
       explorationStatesService, graphDataService,
@@ -75,7 +75,7 @@ oppia.controller('StateInteraction', [
 
       InteractionDetailsCacheService.reset();
 
-      $scope.stateName = editorContextService.getActiveStateName();
+      $scope.stateName = EditorStateService.getActiveStateName();
 
       stateInteractionIdService.init(
         $scope.stateName, stateData.interaction.id);
@@ -83,7 +83,7 @@ oppia.controller('StateInteraction', [
         $scope.stateName, stateData.interaction.customizationArgs);
 
       stateSolutionService.init(
-        editorContextService.getActiveStateName(),
+        EditorStateService.getActiveStateName(),
         stateData.interaction.solution);
 
       $rootScope.$broadcast('initializeAnswerGroups', {
@@ -104,7 +104,7 @@ oppia.controller('StateInteraction', [
     // active state is a terminal one.
     var updateDefaultTerminalStateContentIfEmpty = function() {
       // Get current state.
-      var stateName = editorContextService.getActiveStateName();
+      var stateName = EditorStateService.getActiveStateName();
 
       // Check if the content is currently empty, as expected.
       var previousContent = stateContentService.savedMemento;
@@ -417,11 +417,11 @@ oppia.directive('testInteractionPanel', [
         '/pages/exploration_editor/editor_tab/' +
         'test_interaction_modal_directive.html'),
       controller: [
-        '$scope', 'editorContextService', 'explorationStatesService',
+        '$scope', 'EditorStateService', 'explorationStatesService',
         'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-        function($scope, editorContextService, explorationStatesService,
+        function($scope, EditorStateService, explorationStatesService,
             INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE) {
-          var _stateName = editorContextService.getActiveStateName();
+          var _stateName = EditorStateService.getActiveStateName();
           var _state = explorationStatesService.getState(_stateName);
           $scope.interactionIsInline = (
             INTERACTION_SPECS[_state.interaction.id].display_mode ===

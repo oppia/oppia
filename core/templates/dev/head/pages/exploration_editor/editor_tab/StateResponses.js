@@ -19,24 +19,24 @@
 
 oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
-  'editorContextService', 'alertsService', 'ResponsesService', 'RouterService',
+  'EditorStateService', 'alertsService', 'ResponsesService', 'RouterService',
   'explorationContextService', 'TrainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
   'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
-      editorContextService, alertsService, ResponsesService, RouterService,
+      EditorStateService, alertsService, ResponsesService, RouterService,
       explorationContextService, TrainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
       INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
-    $scope.editorContextService = editorContextService;
+    $scope.EditorStateService = EditorStateService;
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/drag_dots.png');
 
     var _initializeTrainingData = function() {
       var explorationId = explorationContextService.getExplorationId();
-      var currentStateName = editorContextService.getActiveStateName();
+      var currentStateName = EditorStateService.getActiveStateName();
       TrainingDataService.initializeTrainingData(
         explorationId, currentStateName);
     };
@@ -123,7 +123,7 @@ oppia.controller('StateResponses', [
       var isSelfLoop = function(outcome) {
         return (
           outcome &&
-          outcome.dest === editorContextService.getActiveStateName());
+          outcome.dest === EditorStateService.getActiveStateName());
       };
       if (!outcome) {
         return false;
@@ -255,7 +255,7 @@ oppia.controller('StateResponses', [
           '$scope', '$injector', '$modalInstance',
           'oppiaExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
-          'explorationContextService', 'editorContextService',
+          'explorationContextService', 'EditorStateService',
           'explorationStatesService', 'TrainingDataService',
           'AnswerClassificationService', 'FocusManagerService',
           'angularNameService', 'RULE_TYPE_CLASSIFIER',
@@ -263,12 +263,12 @@ oppia.controller('StateResponses', [
               $scope, $injector, $modalInstance,
               oppiaExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
-              explorationContextService, editorContextService,
+              explorationContextService, EditorStateService,
               explorationStatesService, TrainingDataService,
               AnswerClassificationService, FocusManagerService,
               angularNameService, RULE_TYPE_CLASSIFIER) {
             var _explorationId = explorationContextService.getExplorationId();
-            var _stateName = editorContextService.getActiveStateName();
+            var _stateName = EditorStateService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
 
             $scope.stateContent = _state.content.getHtml();
@@ -288,7 +288,7 @@ oppia.controller('StateResponses', [
             var interactionId = stateInteractionIdService.savedMemento;
 
             var rulesServiceName =
-              angularNameService.getNameOfInteractionRulesService(
+              AngularNameService.getNameOfInteractionRulesService(
                 interactionId)
 
             // Inject RulesService dynamically.
@@ -365,11 +365,11 @@ oppia.controller('StateResponses', [
         backdrop: 'static',
         controller: [
           '$scope', '$modalInstance', 'ResponsesService',
-          'editorContextService', 'editorFirstTimeEventsService',
+          'EditorStateService', 'editorFirstTimeEventsService',
           'RuleObjectFactory', 'OutcomeObjectFactory',
           function(
               $scope, $modalInstance, ResponsesService,
-              editorContextService, editorFirstTimeEventsService,
+              EditorStateService, editorFirstTimeEventsService,
               RuleObjectFactory, OutcomeObjectFactory) {
             $scope.feedbackEditorIsOpen = false;
             $scope.openFeedbackEditor = function() {
@@ -377,7 +377,7 @@ oppia.controller('StateResponses', [
             };
             $scope.tmpRule = RuleObjectFactory.createNew(null, {});
             $scope.tmpOutcome = OutcomeObjectFactory.createNew(
-              editorContextService.getActiveStateName(), [''], []);
+              EditorStateService.getActiveStateName(), [''], []);
 
             $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
               var hasFeedback = false;
@@ -389,7 +389,7 @@ oppia.controller('StateResponses', [
               }
 
               return (
-                tmpOutcome.dest === editorContextService.getActiveStateName() &&
+                tmpOutcome.dest === EditorStateService.getActiveStateName() &&
                 !hasFeedback);
             };
 
@@ -520,7 +520,7 @@ oppia.controller('StateResponses', [
     };
 
     $scope.isOutcomeLooping = function(outcome) {
-      var activeStateName = editorContextService.getActiveStateName();
+      var activeStateName = EditorStateService.getActiveStateName();
       return outcome && (outcome.dest === activeStateName);
     };
 
