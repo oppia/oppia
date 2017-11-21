@@ -142,7 +142,6 @@ class AnswerFrequencies(BaseCalculation):
         """
         calculation_output = _get_top_answers_by_frequency(
             state_answers_dict['submitted_answer_list'], limit=None)
-
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -164,7 +163,6 @@ class Top5AnswerFrequencies(BaseCalculation):
         """
         calculation_output = _get_top_answers_by_frequency(
             state_answers_dict['submitted_answer_list'], limit=5)
-
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -186,7 +184,6 @@ class Top10AnswerFrequencies(BaseCalculation):
         """
         calculation_output = _get_top_answers_by_frequency(
             state_answers_dict['submitted_answer_list'], limit=10)
-
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -218,7 +215,6 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
             {'answer': h.value, 'frequency': f}
             for h, f in hashed_answer_frequencies.most_common(10)
         ]
-
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -256,7 +252,6 @@ class TopAnswersByCategorization(BaseCalculation):
             for category, answer_dicts in
             submitted_answers_by_categorization.iteritems()
         }
-
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
