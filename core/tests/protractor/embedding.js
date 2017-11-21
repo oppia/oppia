@@ -27,7 +27,9 @@ var usersPage = new UsersPage.UsersPage()
 
 describe('Embedding', function() {
   var adminPage = null;
-  
+  var USER1 = {email: 'user1@embedding.com', name: 'user1Embedding'};
+  var USER2 = {email: 'embedder2@example.com', name: 'Embedder2'};
+
   beforeEach(function() {
     adminPage = new AdminPage.AdminPage();
   });
@@ -68,8 +70,8 @@ describe('Embedding', function() {
       'Exploration completed'
     ];
 
-    usersPage.createUser('user1@embedding.com', 'user1Embedding');
-    usersPage.login('user1@embedding.com', true);
+    usersPage.createUser(USER1.email, USER1.name);
+    usersPage.login(USER1.email, true);
     adminPage.reloadExploration('protractor_test_1.yaml');
 
     general.openEditor('12');
@@ -169,8 +171,8 @@ describe('Embedding', function() {
       browser.switchTo().defaultContent();
     };
 
-    usersPage.createUser('embedder2@example.com', 'Embedder2');
-    usersPage.login('embedder2@example.com', true);
+    usersPage.createUser(USER2.email, USER2.name);
+    usersPage.login(USER2.email, true);
     adminPage.reloadExploration('protractor_test_1.yaml');
 
     // Change language to Thai, which is not a supported site language.

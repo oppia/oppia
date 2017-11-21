@@ -21,15 +21,13 @@ var UsersPage = require('../protractor_utils/UsersPage.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var collectionEditor = require('../protractor_utils/collectionEditor.js');
 
-var usersPage = new UsersPage.UsersPage()
-
 describe('Collections', function() {
-  var adminPage = null;
+  var adminPage = null, usersPage = new UsersPage.UsersPage(), USEREMAIL = 'alice@collections.com';
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     var USERNAME = 'aliceCollections';
-    usersPage.createUser('alice@collections.com', USERNAME);
+    usersPage.createUser(USER_EMAIL, USERNAME);
     usersPage.createAndLoginAdminUser('testadm@collections.com', 'testadm');
     adminPage.get();
     adminPage.reloadCollection();

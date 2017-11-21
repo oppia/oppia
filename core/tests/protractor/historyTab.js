@@ -26,9 +26,11 @@ var player = require('../protractor_utils/player.js');
 var usersPage = new UsersPage.UsersPage()
 
 describe('Exploration history', function() {
+  var USERNAME = 'userHistoryTab';
+  var USEREMAIL = 'user@historyTab.com';
   it('should display the history', function() {
-    usersPage.createUser('user@historyTab.com', 'userHistoryTab');
-    usersPage.login('user@historyTab.com');
+    usersPage.createUser(USEREMAIL, USERNAME);
+    usersPage.login(USEREMAIL);
     workflow.createExploration();
 
     // Constants for colors of nodes in history graph
