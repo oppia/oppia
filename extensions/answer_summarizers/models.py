@@ -53,7 +53,7 @@ CLASSIFICATION_CATEGORIES = frozenset([
 
 
 class _HashedValue(object):
-    """Wraps some arbitrarily-complex object into a new object which can be
+    """Wraps some arbitrarily-complex JSON object into a new object which can be
     hashed and placed into dicts and sets.
     """
 
@@ -69,9 +69,6 @@ class _HashedValue(object):
         """
         if isinstance(value, list):
             return tuple(cls._get_hashable_value(e) for e in value)
-        elif isinstance(value, set):
-            # Set elements are already hashable.
-            return frozenset(value)
         elif isinstance(value, dict):
             # Dict keys are already hashable, only values need converting.
             return tuple(sorted(
