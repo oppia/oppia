@@ -14,54 +14,53 @@
 
 
 
-oppia.directive('oppiaInteractiveFractionInput', ['FractionObjectFactory',
-  function(FractionObjectFactory) {
-    return {
-      restrict: 'E',
-      scope: {
-        onSubmit: '&'
-      },
-      templateUrl: 'interaction/FractionInput',
-      controller: [
-        '$scope', '$attrs', 'FocusManagerService',
-        'fractionInputRulesService',
-        function($scope, $attrs, FocusManagerService,
-          fractionInputRulesService) {
-          $scope.answer = '';
-          $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
-          var requireSimplestForm = $attrs.requireSimplestFormWithValue;
-          var errorMessage = '';
-          $scope.FRACTION_INPUT_FORM_SCHEMA = {
-            type: 'unicode',
-            ui_config: {}
-          };
+oppia.directive('oppiaInteractiveFractionInput', [function() {
+  return {
+    restrict: 'E',
+    scope: {
+      onSubmit: '&'
+    },
+    templateUrl: 'interaction/FractionInput',
+    controller: [
+      '$scope', '$attrs', 'FocusManagerService',
+      'fractionInputRulesService', 'FractionObjectFactory',
+      function($scope, $attrs, FocusManagerService,
+        fractionInputRulesService, FractionObjectFactory) {
+        $scope.answer = '';
+        $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+        var requireSimplestForm = $attrs.requireSimplestFormWithValue;
+        var errorMessage = '';
+        $scope.FRACTION_INPUT_FORM_SCHEMA = {
+          type: 'unicode',
+          ui_config: {}
+        };
 
-          $scope.getWarningText = function() {
-            return errorMessage;
-          }
-
-          $scope.submitAnswer = function(answer) {
-            try {
-              var fraction = FractionObjectFactory.fromRawInputString(
-                answer);
-              if (requireSimplestForm &&
-                !angular.equals(fraction, fraction.convertToSimplestForm())) {
-                errorMessage = 'Please enter answer in it\'s simplest form'
-              } else {
-                $scope.onSubmit({
-                  answer: fraction,
-                  rulesService: fractionInputRulesService
-                });
-              }
-            } catch (parsingError) {
-              errorMessage = parsingError.message;
-            }
-          };
+        $scope.getWarningText = function() {
+          return errorMessage;
         }
-      ]
-    };
-  }
-]);
+
+        $scope.submitAnswer = function(answer) {
+          try {
+            var fraction = FractionObjectFactory.fromRawInputString(
+              answer);
+            if (requireSimplestForm &&
+              !angular.equals(fraction, fraction.convertToSimplestForm())
+            ) {
+              errorMessage = 'Please enter answer in it\'s simplest form';
+            } else {
+              $scope.onSubmit({
+                answer: fraction,
+                rulesService: fractionInputRulesService
+              });
+            }
+          } catch (parsingError) {
+            errorMessage = parsingError.message;
+          }
+        };
+      }
+    ]
+  };
+}]);
 
 oppia.directive('oppiaResponseFractionInput', [
   'FractionObjectFactory', 'HtmlEscaperService',

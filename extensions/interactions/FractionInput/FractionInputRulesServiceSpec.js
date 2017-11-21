@@ -142,6 +142,8 @@ describe('Fraction Input rules service', function() {
 
   it('should check if the fraction is a whole number', function() {
     expect(firs.HasNoFractionalPart(
+      createPositiveFractionDict(0, 0, 1))).toBe(true);
+    expect(firs.HasNoFractionalPart(
       createPositiveFractionDict(1, 0, 1))).toBe(true);
     expect(firs.HasNoFractionalPart(
       createPositiveFractionDict(1, 8, 4))).toBe(false);
