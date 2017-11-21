@@ -70,11 +70,10 @@ class _HashedValue(object):
         if isinstance(value, list):
             return tuple(cls._get_hashable_value(e) for e in value)
         elif isinstance(value, dict):
-            # Dict keys are already hashable, only values need converting.
             return tuple(sorted(
+                # Dict keys are already hashable, only values need converting.
                 (k, cls._get_hashable_value(v)) for k, v in value.iteritems()))
         else:
-            # Any other type is assumed to already be hashable.
             return value
 
     def __init__(self, value):
