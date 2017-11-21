@@ -1,6 +1,5 @@
 <div ng-controller="StateStatistics">
-  {% if SHOW_TRAINABLE_UNRESOLVED_ANSWERS %}
-  <div ng-if="isInteractionTrainable && trainingDataButtonContentsList.length > 0">
+  <div ng-if="SHOW_TRAINABLE_UNRESOLVED_ANSWERS && isInteractionTrainable && trainingDataButtonContentsList.length > 0">
     <div class="oppia-editor-header">
       <strong>Learner Answers to Teach Oppia</strong>
     </div>
@@ -12,5 +11,4 @@
       </span>
     </button>
   </div>
-  {% endif %}
 </div>

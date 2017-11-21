@@ -21,13 +21,13 @@ oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
-  'explorationData', 'computeGraphService', 'oppiaDatetimeFormatter',
+  'ExplorationDataService', 'computeGraphService', 'oppiaDatetimeFormatter',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
   'IMPROVE_TYPE_INCOMPLETE', 'ENABLE_NEW_STATS_FRAMEWORK',
   function(
       $scope, $http, $modal, alertsService, explorationStatesService,
-      explorationData, computeGraphService, oppiaDatetimeFormatter,
+      ExplorationDataService, computeGraphService, oppiaDatetimeFormatter,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
       IMPROVE_TYPE_INCOMPLETE, ENABLE_NEW_STATS_FRAMEWORK) {
@@ -63,7 +63,8 @@ oppia.controller('StatisticsTab', [
     $scope.$on('refreshStatisticsTab', function() {
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
       $scope.explorationVersionUrl = (
-        '/createhandler/statisticsversion/' + explorationData.explorationId);
+        '/createhandler/statisticsversion/' + 
+        ExplorationDataService.explorationId);
       $http.get($scope.explorationVersionUrl).then(function(response) {
         $scope.versions = response.data.versions;
         $scope.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
@@ -74,15 +75,16 @@ oppia.controller('StatisticsTab', [
     $scope.refreshExplorationStatistics = function(version) {
       if ($scope.ENABLE_NEW_STATS_FRAMEWORK) {
         $scope.explorationStatisticsUrl = (
-          '/createhandler/statistics/' + explorationData.explorationId);
+          '/createhandler/statistics/' + ExplorationDataService.explorationId);
       } else {
         $scope.explorationStatisticsUrl = (
-          '/createhandler/statistics_old/' + explorationData.explorationId +
-          '/' + version);
+          '/createhandler/statistics_old/' + 
+          ExplorationDataService.explorationId + '/' + version);
       }
+      
       $http.get($scope.explorationStatisticsUrl).then(function(response) {
         ReadOnlyExplorationBackendApiService.loadLatestExploration(
-          explorationData.explorationId).then(function(response) {
+          ExplorationDataService.explorationId).then(function(response) {
             var statesDict = response.exploration.states;
             var states = StatesObjectFactory.createFromBackendDict(statesDict);
             var initStateName = response.exploration.init_state_name;

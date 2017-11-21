@@ -18,13 +18,13 @@
  */
 
 oppia.controller('StateParamChangesEditor', [
-  '$scope', 'editorContextService', 'stateParamChangesService',
-  function($scope, editorContextService, stateParamChangesService) {
+  '$scope', 'EditorStateService', 'stateParamChangesService',
+  function($scope, EditorStateService, stateParamChangesService) {
     $scope.stateParamChangesService = stateParamChangesService;
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
       stateParamChangesService.init(
-        editorContextService.getActiveStateName(), stateData.paramChanges);
+        EditorStateService.getActiveStateName(), stateData.paramChanges);
     });
   }
 ]);

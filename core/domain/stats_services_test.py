@@ -16,6 +16,7 @@
 
 import os
 
+from core import jobs_registry
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -24,6 +25,7 @@ from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -1100,3 +1102,304 @@ class SampleAnswerTests(test_utils.GenericTestBase):
             self.EXP_ID, self.exploration.version,
             self.exploration.init_state_name)
         self.assertLess(len(sample_answers), 100)
+
+
+# TODO(bhenning): Either add tests for multiple visualizations for one state or
+# disallow stats from having multiple visualizations (no interactions currently
+# seem to use more than one visualization ID).
+class AnswerVisualizationsTests(test_utils.GenericTestBase):
+    """Tests for functionality related to retrieving visualization information
+    for answers.
+    """
+    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedStatisticsAggregator]
+    INIT_STATE_NAME = feconf.DEFAULT_INIT_STATE_NAME
+    TEXT_INPUT_EXP_ID = 'exp_id0'
+    SET_INPUT_EXP_ID = 'exp_id1'
+    DEFAULT_EXP_ID = 'exp_id2'
+    NEW_STATE_NAME = 'new state'
+
+    def _get_swap_context(self):
+        return self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS)
+
+    def _get_visualizations(
+            self, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        init_state = exploration.states[state_name]
+        return stats_services.get_visualizations_info(
+            exp_id, state_name, init_state.interaction.id)
+
+    def _record_answer(
+            self, answer, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        interaction_id = exploration.states[state_name].interaction.id
+        event_services.AnswerSubmissionEventHandler.record(
+            exp_id, exploration.version, state_name, interaction_id, 0, 0,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', 10.0, {}, answer)
+
+    def _run_answer_summaries_aggregator(self):
+        ModifiedInteractionAnswerSummariesAggregator.start_computation()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+
+    def _rerun_answer_summaries_aggregator(self):
+        ModifiedInteractionAnswerSummariesAggregator.stop_computation('a')
+        self._run_answer_summaries_aggregator()
+
+    def _rename_state(
+            self, new_state_name, exp_id=TEXT_INPUT_EXP_ID,
+            state_name=INIT_STATE_NAME):
+        exp_services.update_exploration(self.owner_id, exp_id, [{
+            'cmd': exp_domain.CMD_RENAME_STATE,
+            'old_state_name': state_name,
+            'new_state_name': new_state_name
+        }], 'Update state name')
+
+    def _change_state_interaction_id(
+            self, interaction_id, exp_id=TEXT_INPUT_EXP_ID,
+            state_name=INIT_STATE_NAME):
+        exp_services.update_exploration(self.owner_id, exp_id, [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': interaction_id
+        }], 'Update state interaction ID')
+
+    def _change_state_content(
+            self, new_content, exp_id=TEXT_INPUT_EXP_ID,
+            state_name=INIT_STATE_NAME):
+        exp_services.update_exploration(self.owner_id, exp_id, [{
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': state_name,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'new_value': {
+                'html': new_content,
+                'audio_translations': {},
+            }
+        }], 'Change content description')
+
+    def setUp(self):
+        super(AnswerVisualizationsTests, self).setUp()
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.save_new_valid_exploration(
+            self.TEXT_INPUT_EXP_ID, self.owner_id, end_state_name='End')
+        self.save_new_valid_exploration(
+            self.SET_INPUT_EXP_ID, self.owner_id, end_state_name='End',
+            interaction_id='SetInput')
+        self.save_new_default_exploration(self.DEFAULT_EXP_ID, self.owner_id)
+
+    def test_no_vis_info_for_exp_with_no_interaction_id(self):
+        with self._get_swap_context():
+            visualizations = self._get_visualizations(
+                exp_id=self.DEFAULT_EXP_ID)
+            self.assertEqual(visualizations, [])
+
+    def test_no_vis_info_for_exp_with_no_answers_no_calculations(self):
+        with self._get_swap_context():
+            visualizations = self._get_visualizations()
+            self.assertEqual(visualizations, [])
+
+    def test_no_vis_info_for_exp_with_answer_no_completed_calculations(self):
+        with self._get_swap_context():
+            self._record_answer('Answer A')
+            visualizations = self._get_visualizations()
+            self.assertEqual(visualizations, [])
+
+    def test_no_vis_info_for_exp_with_no_answers_but_with_calculations(self):
+        with self._get_swap_context():
+            self._run_answer_summaries_aggregator()
+            visualizations = self._get_visualizations()
+            self.assertEqual(visualizations, [])
+
+    def test_has_vis_info_options_for_text_input_interaction(self):
+        with self._get_swap_context():
+            self._record_answer('Answer A')
+            self._run_answer_summaries_aggregator()
+            visualizations = self._get_visualizations()
+            self.assertEqual(len(visualizations), 1)
+
+            visualization = visualizations[0]
+            self.assertEqual(
+                visualization['options']['column_headers'], ['Answer', 'Count'])
+            self.assertIn('Top', visualization['options']['title'])
+
+    def test_has_vis_info_for_exp_with_answer_for_one_calculation(self):
+        with self._get_swap_context():
+            self._record_answer('Answer A')
+            self._run_answer_summaries_aggregator()
+            visualizations = self._get_visualizations()
+            self.assertEqual(len(visualizations), 1)
+
+            visualization = visualizations[0]
+            self.assertEqual(visualization['id'], 'FrequencyTable')
+            self.assertEqual(visualization['data'], [{
+                'answer': 'Answer A',
+                'frequency': 1
+            }])
+
+    def test_has_vis_info_for_exp_with_many_answers_for_one_calculation(self):
+        with self._get_swap_context():
+            self._record_answer('Answer A')
+            self._record_answer('Answer A')
+            self._record_answer('Answer C')
+            self._record_answer('Answer B')
+            self._record_answer('Answer A')
+            self._run_answer_summaries_aggregator()
+            visualizations = self._get_visualizations()
+            self.assertEqual(len(visualizations), 1)
+
+            visualization = visualizations[0]
+            self.assertEqual(visualization['id'], 'FrequencyTable')
+            self.assertEqual(visualization['data'], [{
+                'answer': 'Answer A',
+                'frequency': 3
+            }, {
+                'answer': 'Answer B',
+                'frequency': 1
+            }, {
+                'answer': 'Answer C',
+                'frequency': 1
+            }])
+
+    def test_has_vis_info_for_each_calculation_for_multi_calc_exp(self):
+        with self._get_swap_context():
+            self._record_answer(['A', 'B'], exp_id=self.SET_INPUT_EXP_ID)
+            self._record_answer(['C', 'A'], exp_id=self.SET_INPUT_EXP_ID)
+            self._record_answer(['A', 'B'], exp_id=self.SET_INPUT_EXP_ID)
+            self._record_answer(['A'], exp_id=self.SET_INPUT_EXP_ID)
+            self._record_answer(['A'], exp_id=self.SET_INPUT_EXP_ID)
+            self._record_answer(['A', 'B'], exp_id=self.SET_INPUT_EXP_ID)
+            self._run_answer_summaries_aggregator()
+            visualizations = sorted(self._get_visualizations(
+                exp_id=self.SET_INPUT_EXP_ID))
+            self.assertEqual(len(visualizations), 2)
+
+            # Use options to distinguish between the two visualizations, since
+            # both are FrequencyTable.
+            top_answers_visualization = visualizations[0]
+            self.assertEqual(top_answers_visualization['id'], 'FrequencyTable')
+            self.assertEqual(
+                top_answers_visualization['options']['column_headers'],
+                ['Answer', 'Count'])
+            self.assertEqual(top_answers_visualization['data'], [{
+                'answer': ['A', 'B'],
+                'frequency': 3
+            }, {
+                'answer': ['A'],
+                'frequency': 2
+            }, {
+                'answer': ['C', 'A'],
+                'frequency': 1
+            }])
+
+            common_elements_visualization = visualizations[1]
+            self.assertEqual(
+                common_elements_visualization['id'], 'FrequencyTable')
+            self.assertEqual(
+                common_elements_visualization['options']['column_headers'],
+                ['Element', 'Count'])
+            self.assertEqual(common_elements_visualization['data'], [{
+                'answer': 'A',
+                'frequency': 6
+            }, {
+                'answer': 'B',
+                'frequency': 3
+            }, {
+                'answer': 'C',
+                'frequency': 1
+            }])
+
+    def test_retrieves_latest_vis_info_with_rounds_of_calculations(self):
+        with self._get_swap_context():
+            self._record_answer('Answer A')
+            self._record_answer('Answer C')
+            self._run_answer_summaries_aggregator()
+
+            # Submit a new answer and run the aggregator again.
+            self._record_answer('Answer A')
+            self._rerun_answer_summaries_aggregator()
+            visualizations = self._get_visualizations()
+            self.assertEqual(len(visualizations), 1)
+
+            visualization = visualizations[0]
+            # The latest data should include all submitted answers.
+            self.assertEqual(visualization['data'], [{
+                'answer': 'Answer A',
+                'frequency': 2
+            }, {
+                'answer': 'Answer C',
+                'frequency': 1
+            }])
+
+    def test_retrieves_vis_info_across_multiple_exploration_versions(self):
+        with self._get_swap_context():
+            self._record_answer('Answer A')
+            self._record_answer('Answer B')
+
+            # Change the exploration version and submit a new answer.
+            self._change_state_content('New content')
+            self._record_answer('Answer A')
+
+            self._run_answer_summaries_aggregator()
+            visualizations = self._get_visualizations()
+            self.assertEqual(len(visualizations), 1)
+
+            visualization = visualizations[0]
+            # The latest data should include all submitted answers.
+            self.assertEqual(visualization['data'], [{
+                'answer': 'Answer A',
+                'frequency': 2
+            }, {
+                'answer': 'Answer B',
+                'frequency': 1
+            }])
+
+    def test_no_vis_info_for_exp_with_new_state_name_before_calculations(self):
+        with self._get_swap_context():
+            self._record_answer('Answer A')
+            self._rename_state(self.NEW_STATE_NAME)
+            self._run_answer_summaries_aggregator()
+
+            visualizations = self._get_visualizations(
+                state_name=self.NEW_STATE_NAME)
+
+            self.assertEqual(visualizations, [])
+
+    def test_no_vis_info_for_exp_with_new_state_name_after_calculations(self):
+        with self._get_swap_context():
+            self._record_answer('Answer A')
+            self._run_answer_summaries_aggregator()
+            self._rename_state(self.NEW_STATE_NAME)
+
+            visualizations = self._get_visualizations(
+                state_name=self.NEW_STATE_NAME)
+
+            self.assertEqual(visualizations, [])
+
+    def test_no_vis_info_for_exp_with_new_interaction_before_calculations(self):
+        with self._get_swap_context():
+            self._record_answer('Answer A')
+            self._change_state_interaction_id('SetInput')
+            self._run_answer_summaries_aggregator()
+
+            visualizations = self._get_visualizations()
+
+            self.assertEqual(visualizations, [])
+
+    def test_no_vis_info_for_exp_with_new_interaction_after_calculations(self):
+        with self._get_swap_context():
+            self._record_answer('Answer A')
+            self._run_answer_summaries_aggregator()
+            self._change_state_interaction_id('SetInput')
+
+            visualizations = self._get_visualizations()
+
+            self.assertEqual(visualizations, [])

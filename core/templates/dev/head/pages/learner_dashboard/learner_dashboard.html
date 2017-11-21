@@ -219,9 +219,9 @@
         <div class="oppia-learner-dashboard-main-content-container">
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
             <span style="display: block; padding: 5px 7.5px;"
-                  ng-if="numberDeletedIncompleteExplorations !== 0">
-              <span translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_EXPLORATIONS"
-                    translate-values="{numberDeleted: <[numberDeletedIncompleteExplorations]>}"
+                  ng-if="numberNonexistentIncompleteExplorations !== 0">
+              <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_EXPLORATIONS"
+                    translate-values="{numberNonexistent: <[numberNonexistentIncompleteExplorations]>}"
                     translate-interpolation="messageformat"></span>
               &#9785
             </span>
@@ -274,9 +274,9 @@
 
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS">
             <span style="display: block; padding: 5px 7.5px;"
-                  ng-if="numberDeletedCompletedExplorations !== 0">
-              <span translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_EXPLORATIONS"
-                    translate-values="{numberDeleted: <[numberDeletedCompletedExplorations]>}"
+                  ng-if="numberNonexistentCompletedExplorations !== 0">
+              <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_EXPLORATIONS"
+                    translate-values="{numberNonexistent: <[numberNonexistentCompletedExplorations]>}"
                     translate-interpolation="messageformat"></span>
               &#9785
             </span>
@@ -326,9 +326,9 @@
               <span translate="I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE"></span>
             </span>
             <span style="display: block; padding: 5px 7.5px;"
-                  ng-if="numberDeletedExplorationPlaylist !== 0">
-              <span translate="I18N_LEARNER_DASHBOARD_DELETED_EXPLORATIONS_FROM_PLAYLIST"
-                    translate-values="{numberDeleted: <[numberDeletedExplorationPlaylist]>}"
+                  ng-if="numberNonexistentExplorationsFromPlaylist !== 0">
+              <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_EXPLORATIONS_FROM_PLAYLIST"
+                    translate-values="{numberNonexistent: <[numberNonexistentExplorationsFromPlaylist]>}"
                     translate-interpolation="messageformat"></span>
               &#9785
             </span>
@@ -379,9 +379,9 @@
 
           <div ng-if="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS">
             <span style="display: block; padding: 5px 7.5px;"
-                  ng-if="numberDeletedIncompleteCollections !== 0">
-              <span translate="I18N_LEARNER_DASHBOARD_DELETED_INCOMPLETE_COLLECTIONS"
-                    translate-values="{numberDeleted: <[numberDeletedIncompleteCollections]>}"
+                  ng-if="numberNonexistentIncompleteCollections !== 0">
+              <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_COLLECTIONS"
+                    translate-values="{numberNonexistent: <[numberNonexistentIncompleteCollections]>}"
                     translate-interpolation="messageformat"></span>
               &#9785
             </span>
@@ -436,9 +436,9 @@
               <span translate="I18N_LEARNER_DASHBOARD_REARRANGE_LEARNER_PLAYLIST_MESSAGE"></span>
             </span>
             <span style="display: block; padding: 5px 7.5px;"
-                  ng-if="numberDeletedCollectionPlaylist !== 0">
-              <span translate="I18N_LEARNER_DASHBOARD_DELETED_COLLECTIONS_FROM_PLAYLIST"
-                    translate-values="{numberDeleted: <[numberDeletedCollectionPlaylist]>}"
+                  ng-if="numberNonexistentCollectionsFromPlaylist !== 0">
+              <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_COLLECTIONS_FROM_PLAYLIST"
+                    translate-values="{numberNonexistent: <[numberNonexistentCollectionsFromPlaylist]>}"
                     translate-interpolation="messageformat"></span>
               &#9785
             </span>
@@ -498,9 +498,9 @@
             </span>
 
             <span style="display: block; padding: 5px 7.5px;"
-                  ng-if="numberDeletedCompletedCollections !== 0">
-              <span translate="I18N_LEARNER_DASHBOARD_DELETED_COMPLETED_COLLECTIONS"
-                    translate-values="{numberDeleted: <[numberDeletedCompletedCollections]>}"
+                  ng-if="numberNonexistentCompletedCollections !== 0">
+              <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_COLLECTIONS"
+                    translate-values="{numberNonexistent: <[numberNonexistentCompletedCollections]>}"
                     translate-interpolation="messageformat"></span>
               &#9785
             </span>

@@ -25,7 +25,7 @@ describe('Exploration context service', function() {
 
     beforeEach(function() {
       module(function($provide) {
-        $provide.value('currentLocationService', {
+        $provide.value('UrlService', {
           getPathname: function() {
             return '/explore/123';
           }
@@ -53,7 +53,7 @@ describe('Exploration context service', function() {
 
     beforeEach(function() {
       module(function($provide) {
-        $provide.value('currentLocationService', {
+        $provide.value('UrlService', {
           getPathname: function() {
             return '/create/123';
           }
@@ -79,7 +79,7 @@ describe('Exploration context service', function() {
 
     beforeEach(function() {
       module(function($provide) {
-        $provide.value('currentLocationService', {
+        $provide.value('UrlService', {
           getPathname: function() {
             return '/about';
           }

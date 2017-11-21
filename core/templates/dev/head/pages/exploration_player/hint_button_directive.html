@@ -1,4 +1,4 @@
-<span ng-if="allHintsAreExhausted()" tooltip="<['I18N_PLAYER_HINTS_EXHAUSTED' | translate]>" tooltip-placement="left">
+<span ng-if="allHintsAreExhausted()" tooltip="<['I18N_PLAYER_HINTS_EXHAUSTED' | translate]>" tooltip-placement="<[getTooltipPlacement()]>">
   <md-button class="hint-button"
              ng-click="onClickHintButton()"
              ng-disabled="!currentHintIsAvailable()"
@@ -17,7 +17,7 @@
       <i class="fa fa-lightbulb-o"></i>
     </md-button>
   </span>
-  <span ng-if="!currentHintIsAvailable()" tooltip="<['I18N_PLAYER_HINT_NOT_AVAILABLE' | translate]>" tooltip-placement="left">
+  <span ng-if="!currentHintIsAvailable()" tooltip="<['I18N_PLAYER_HINT_NOT_AVAILABLE' | translate]>" tooltip-placement="<[getTooltipPlacement()]>">
     <md-button class="hint-button"
                ng-click="onClickHintButton()"
                ng-disabled="!currentHintIsAvailable()"

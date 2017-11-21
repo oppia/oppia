@@ -19,7 +19,7 @@
 
 oppia.factory('ResponsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
-  'AnswerGroupsCacheService', 'editorContextService', 'changeListService',
+  'AnswerGroupsCacheService', 'EditorStateService', 'changeListService',
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
   'stateSolutionService', 'SolutionVerificationService', 'alertsService',
   'explorationContextService', 'explorationWarningsService',
@@ -27,7 +27,7 @@ oppia.factory('ResponsesService', [
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
-      AnswerGroupsCacheService, editorContextService, changeListService,
+      AnswerGroupsCacheService, EditorStateService, changeListService,
       explorationStatesService, graphDataService, OutcomeObjectFactory,
       stateSolutionService, SolutionVerificationService, alertsService,
       explorationContextService, explorationWarningsService,
@@ -53,7 +53,7 @@ oppia.factory('ResponsesService', [
         _answerGroups = newAnswerGroups;
         $rootScope.$broadcast('answerGroupChanged');
         explorationStatesService.saveInteractionAnswerGroups(
-          editorContextService.getActiveStateName(),
+          EditorStateService.getActiveStateName(),
           angular.copy(newAnswerGroups));
 
         // To check if the solution is valid once a rule has been changed or
@@ -67,10 +67,10 @@ oppia.factory('ResponsesService', [
           stateSolutionService.savedMemento.correctAnswer !== null);
 
         if (interactionCanHaveSolution && solutionExists) {
-          var currentStateName = editorContextService.getActiveStateName();
+          var currentStateName = EditorStateService.getActiveStateName();
           var solutionWasPreviouslyValid = (
             explorationStatesService.isSolutionValid(
-              editorContextService.getActiveStateName()));
+              EditorStateService.getActiveStateName()));
           SolutionVerificationService.verifySolution(
             explorationContextService.getExplorationId(),
             explorationStatesService.getState(currentStateName),
@@ -123,7 +123,7 @@ oppia.factory('ResponsesService', [
         _defaultOutcome = newDefaultOutcome;
 
         explorationStatesService.saveInteractionDefaultOutcome(
-          editorContextService.getActiveStateName(),
+          EditorStateService.getActiveStateName(),
           angular.copy(newDefaultOutcome));
 
         graphDataService.recompute();
@@ -140,7 +140,7 @@ oppia.factory('ResponsesService', [
         _confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
 
         explorationStatesService.saveConfirmedUnclassifiedAnswers(
-          editorContextService.getActiveStateName(),
+          EditorStateService.getActiveStateName(),
           angular.copy(newConfirmedUnclassifiedAnswers));
 
         _confirmedUnclassifiedAnswersMemento = angular.copy(
@@ -182,7 +182,7 @@ oppia.factory('ResponsesService', [
               _defaultOutcome = null;
             } else if (!_defaultOutcome) {
               _defaultOutcome = OutcomeObjectFactory.createNew(
-                editorContextService.getActiveStateName(), [], []);
+                EditorStateService.getActiveStateName(), [], []);
             }
           }
         }
