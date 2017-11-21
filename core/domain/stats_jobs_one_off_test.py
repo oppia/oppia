@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -171,7 +173,7 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
         # Update exploration to version 2.
         change_list = [{
             'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'New state',
+            'state_name': u'Klüft',
         }]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
@@ -186,7 +188,7 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
             self.exp_id, self.exploration.version, 'Home', 'session_id3',
             {}, feconf.PLAY_TYPE_NORMAL)
         stats_models.StateHitEventLogEntryModel.create(
-            self.exp_id, self.exploration.version, 'New state',
+            self.exp_id, self.exploration.version, u'Klüft',
             'session_id3', {}, feconf.PLAY_TYPE_NORMAL)
         stats_models.StateHitEventLogEntryModel.create(
             self.exp_id, self.exploration.version, 'End', 'session_id3',
@@ -199,11 +201,11 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
             'TextInput', 0, 0, exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
             'session_id3', 0, {}, 'answer2')
         event_services.AnswerSubmissionEventHandler.record(
-            self.exp_id, self.exploration.version, 'New state',
+            self.exp_id, self.exploration.version, u'Klüft',
             'TextInput', 0, 0, exp_domain.EXPLICIT_CLASSIFICATION,
             'session_id3', 0, {}, 'answer3')
         event_services.AnswerSubmissionEventHandler.record(
-            self.exp_id, self.exploration.version, 'New state',
+            self.exp_id, self.exploration.version, u'Klüft',
             'TextInput', 0, 0, exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
             'session_id3', 0, {}, 'answer4')
 
@@ -226,7 +228,7 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping['End'].first_hit_count_v1, 2)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'New state'].first_hit_count_v1, 1)
+                u'Klüft'].first_hit_count_v1, 1)
 
         self.assertEqual(
             exploration_stats.state_stats_mapping['Home'].total_hit_count_v1, 4)
@@ -234,7 +236,7 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping['End'].total_hit_count_v1, 2)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'New state'].total_hit_count_v1, 1)
+                u'Klüft'].total_hit_count_v1, 1)
 
         self.assertEqual(
             exploration_stats.state_stats_mapping['Home'].num_completions_v1, 3)
@@ -242,7 +244,7 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping['End'].num_completions_v1, 2)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'New state'].num_completions_v1, 1)
+                u'Klüft'].num_completions_v1, 1)
 
         self.assertEqual(
             exploration_stats.state_stats_mapping[
@@ -252,7 +254,7 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
             0)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'New state'].total_answers_count_v1, 2)
+                u'Klüft'].total_answers_count_v1, 2)
 
         self.assertEqual(
             exploration_stats.state_stats_mapping[
@@ -262,7 +264,7 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
                 'End'].useful_feedback_count_v1, 0)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'New state'].useful_feedback_count_v1, 1)
+                u'Klüft'].useful_feedback_count_v1, 1)
 
     def test_creation_of_stats_model_for_deletion(self):
         # Update exploration to version 2.
