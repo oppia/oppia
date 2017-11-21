@@ -59,7 +59,7 @@ INTERACTIONS_DIR = (
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 RTE_EXTENSIONS_SPECS_PATH = (
-    os.path.join('assets', 'rich_text_components_specs.js'))
+    os.path.join('assets', 'rich_text_components_definitions.js'))
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
