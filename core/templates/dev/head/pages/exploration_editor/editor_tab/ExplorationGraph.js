@@ -51,7 +51,8 @@ oppia.controller('ExplorationGraph', [
 
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration_editor/exploration_graph_modal_directive.html'),
+          '/pages/exploration_editor/editor_tab/' +
+          'exploration_graph_modal_directive.html'),
         backdrop: true,
         resolve: {
           isEditable: function() {
