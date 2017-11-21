@@ -44,12 +44,12 @@ import operator
 from core.domain import exp_domain
 from core.domain import stats_domain
 
-CLASSIFICATION_CATEGORIES = {
+CLASSIFICATION_CATEGORIES = frozenset([
     exp_domain.EXPLICIT_CLASSIFICATION,
     exp_domain.TRAINING_DATA_CLASSIFICATION,
     exp_domain.STATISTICAL_CLASSIFICATION,
     exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
-}
+])
 
 
 class _HashedValue(object):
