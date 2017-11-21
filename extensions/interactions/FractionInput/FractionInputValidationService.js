@@ -81,18 +81,21 @@ oppia.factory('FractionInputValidationService', [
                 if (shouldBeInSimplestForm) {
                   var fraction = rule.inputs.f;
                   var fractionInSimplestForm = FractionObjectFactory.fromDict(
-                    rule.inputs.f).convertToSimplestForm();
+                    fraction).convertToSimplestForm();
                   if (!angular.equals(fraction, fractionInSimplestForm)) {
                     warningsList.push({
                       type: WARNING_TYPES.ERROR,
                       message: (
                         'Rule ' + (j + 1) + ' from answer group ' +
-                        (i + 1) + ' will never be matched because it is not ' +
+                        (i + 1) +
+                        ' will never be matched because it is not ' +
                         'in simplest form.')
                     });
                   }
                 }
-                // fall-through
+                var f = toFloat(fraction);
+                setLowerAndUpperBounds(range, f, f, true, true);
+                break;
               case 'IsEquivalentTo': // fall-through
               case 'IsEquivalentToAndInSimplestForm':
                 var f = toFloat(rule.inputs.f);
