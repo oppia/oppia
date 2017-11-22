@@ -114,32 +114,37 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         different answers with varying frequency. Note that there are some ties
         here, including on the border of the top 5 most frequent answers.
         """
-        # Since this test is looking for the top 5 answers, it will submit ten
-        # different answers with varying frequency:
-        #   English (12 times), French (9), Finnish (7), Italian (4),
-        #   Spanish (3), Japanese (3), Hungarian (2), Portuguese (1),
-        #   German (1), and Gaelic (1).
-        # Note that there are some ties here, including on the border of the
-        # top 5 most frequent answers.
         all_answer_lists = {
             'english': self._create_sample_answers(
-                'English', [1., 2., 3.], ['sid1', 'sid2', 'sid3', 'sid4'], 12),
+                repeated_answer='English', times_spent_in_card=[1., 2., 3.],
+                session_ids=['sid1', 'sid2', 'sid3', 'sid4'], repeat_count=12),
             'french': self._create_sample_answers(
-                'French', [4., 5., 6.], ['sid2', 'sid3', 'sid5'], 9),
+                repeated_answer='French', times_spent_in_card=[4., 5., 6.],
+                session_ids=['sid2', 'sid3', 'sid5'], repeat_count=9),
             'finnish': self._create_sample_answers(
-                'Finnish', [7., 8., 9.], ['sid1', 'sid3', 'sid5', 'sid6'], 7),
+                repeated_answer='Finnish', times_spent_in_card=[7., 8., 9.],
+                session_ids=['sid1', 'sid3', 'sid5', 'sid6'], repeat_count=7),
             'italian': self._create_sample_answers(
-                'Italian', [1., 4., 7.], ['sid1', 'sid6'], 4),
+                repeated_answer='Italian', times_spent_in_card=[1., 4., 7.],
+                session_ids=['sid1', 'sid6'], repeat_count=4),
             'spanish': self._create_sample_answers(
-                'Spanish', [2., 5., 8.], ['sid3'], 3),
+                repeated_answer='Spanish', times_spent_in_card=[2., 5., 8.],
+                session_ids=['sid3'], repeat_count=3),
             'japanese': self._create_sample_answers(
-                'Japanese', [3., 6., 9.], ['sid1', 'sid2'], 3),
+                repeated_answer='Japanese', times_spent_in_card=[3., 6., 9.],
+                session_ids=['sid1', 'sid2'], repeat_count=3),
             'hungarian': self._create_sample_answers(
-                'Hungarian', [1., 5.], ['sid6', 'sid7'], 2),
+                repeated_answer='Hungarian', times_spent_in_card=[1., 5.],
+                session_ids=['sid6', 'sid7'], repeat_count=2),
             'portuguese': self._create_sample_answers(
-                'Portuguese', [5.], ['sid1'], 1),
-            'german': self._create_sample_answers('German', [4.], ['sid7'], 1),
-            'gaelic': self._create_sample_answers('Gaelic', [7.], ['sid8'], 1)
+                repeated_answer='Portuguese', times_spent_in_card=[5.],
+                session_ids=['sid1'], repeat_count=1),
+            'german': self._create_sample_answers(
+                repeated_answer='German', times_spent_in_card=[4.],
+                session_ids=['sid7'], repeat_count=1),
+            'gaelic': self._create_sample_answers(
+                repeated_answer='Gaelic', times_spent_in_card=[7.],
+                session_ids=['sid8'], repeat_count=1)
         }
 
         # This is a combined list of answers generated above. This list is a
