@@ -478,7 +478,7 @@ def _get_calc_output(exploration_id, state_name, calculation_id):
         if (calc_output_model.calculation_output_type ==
                 stats_domain.CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST):
             calculation_output = (
-                stats_domain.CategorizedAnswerFrequencyLists.from_raw_type(
+                stats_domain.AnswerFrequencyList.from_raw_type(
                     calc_output_model.calculation_output))
         elif (calc_output_model.calculation_output_type ==
               stats_domain.CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS):
