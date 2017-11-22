@@ -278,13 +278,14 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
 
     def test_several_categories(self):
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list=[
+            # EXPLICIT
             self._create_answer_dict(
                 'Explicit A', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
             self._create_answer_dict(
                 'Explicit B', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
             self._create_answer_dict(
                 'Explicit A', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
-
+            # TRAINING DATA
             self._create_answer_dict(
                 'Trained data A', 0., 'sid1',
                 exp_domain.TRAINING_DATA_CLASSIFICATION),
@@ -294,7 +295,7 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
             self._create_answer_dict(
                 'Trained data B', 0., 'sid1',
                 exp_domain.TRAINING_DATA_CLASSIFICATION),
-
+            # STATS CLASSIFIER
             self._create_answer_dict(
                 'Stats B', 0., 'sid1', exp_domain.STATISTICAL_CLASSIFICATION),
             self._create_answer_dict(
@@ -304,7 +305,7 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
             self._create_answer_dict(
                 'Trained data B', 0., 'sid1',
                 exp_domain.STATISTICAL_CLASSIFICATION),
-
+            # DEFAULT OUTCOMES
             self._create_answer_dict(
                 'Default C', 0., 'sid1',
                 exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
