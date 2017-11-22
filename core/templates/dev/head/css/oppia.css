@@ -98,14 +98,14 @@ md-input-group.md-default-theme label
   color: #009688;
 }
 
-.md-button.oppia-learner-continue-button {
+.md-button.oppia-learner-confirm-button {
   background: #0D48A1;
   color: #ffffff;
   padding: 6px 12px;
 }
 
-.md-button.md-default-theme.oppia-learner-continue-button:focus,
-.md-button.md-default-theme.oppia-learner-continue-button:hover {
+.md-button.md-default-theme.oppia-learner-confirm-button:focus,
+.md-button.md-default-theme.oppia-learner-confirm-button:hover {
   background-color: #115FD4;
   text-decoration: none;
 }
