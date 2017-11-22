@@ -15,6 +15,7 @@
 """Common utility functions."""
 
 import base64
+import collections
 import datetime
 import hashlib
 import imghdr
@@ -498,3 +499,46 @@ def convert_to_str(string_to_convert):
     if isinstance(string_to_convert, unicode):
         return string_to_convert.encode('utf-8')
     return string_to_convert
+
+
+class OrderedCounter(collections.Counter, collections.OrderedDict):
+    """Counter that remembers the order elements are first encountered."""
+
+
+class HashedValue(object):
+    """Wraps some arbitrarily-complex JSON-like object into a new object which
+    can be hashed and placed into dicts and sets.
+    """
+
+    @classmethod
+    def _get_hashable_value(cls, value):
+        """This function returns a hashable version of the input value.
+
+        It converts the built-in sequences into their hashable counterparts
+        {list: tuple, dict: (sorted tuple of pairs)}. Additionally, their
+        elements are converted to hashable values through recursive calls. All
+        other value types are assumed to already be hashable.
+        """
+        if isinstance(value, list):
+            return tuple(cls._get_hashable_value(e) for e in value)
+        elif isinstance(value, dict):
+            return tuple(sorted(
+                # Dict keys are already hashable, only values need converting.
+                (k, cls._get_hashable_value(v)) for k, v in value.iteritems()))
+        else:
+            return value
+
+    def __init__(self, value):
+        """Wraps value into a hashable object. Bases the hash on key(value) when
+        key is provided, otherwise it will be based simply on value.
+        """
+        self.value = value
+        self.hash_value = self._get_hashable_value(value)
+
+    def __hash__(self):
+        return hash(self.hash_value)
+
+    def __eq__(self, other):
+        if isinstance(other, HashedValue):
+            return self.hash_value == other.hash_value
+        return False
