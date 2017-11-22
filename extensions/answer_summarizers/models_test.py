@@ -62,7 +62,8 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
             itertools.cycle(answers), itertools.cycle(times_spent_in_card),
             itertools.cycle(session_ids), itertools.cycle(classify_categories))
         return [
-            self._create_answer_dict(*a) for a in itertools.islice(inf_args, num)
+            self._create_answer_dict(*a)
+            for a in itertools.islice(inf_args, num)
         ]
 
     def _create_session_ids(self, num):
