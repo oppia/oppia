@@ -459,7 +459,7 @@ def _get_calc_output(exploration_id, state_name, calculation_id):
     """Get state answers calculation output domain object obtained from
     StateAnswersCalcOutputModel instance stored in the data store. The
     calculation ID comes from the name of the calculation class used to compute
-    aggregate data from submitted user answers This returns aggregated output
+    aggregate data from submitted user answers. This returns aggregated output
     for all versions of the specified state and exploration.
 
     Args:

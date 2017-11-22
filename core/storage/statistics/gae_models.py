@@ -1279,7 +1279,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     # Calculation output type (for deserialization). See
     # stats_domain.StateAnswersCalcOutput for an enumeration of valid types.
     calculation_output_type = ndb.StringProperty(indexed=True)
-    # Calculation output dict stored as JSON blob
+    # Calculation output dict stored as JSON blob.
     calculation_output = ndb.JsonProperty(indexed=False)
 
     @classmethod
