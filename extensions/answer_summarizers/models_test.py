@@ -41,10 +41,13 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         answer N times. It reuses times_spent_in_card and session_ids
         cyclically as it constructs the list of sample answers.
         """
-        return [self._create_sample_answer(
-            repeated_answer,
-            times_spent_in_card[i % len(times_spent_in_card)],
-            session_ids[i % len(session_ids)]) for i in range(repeat_count)]
+        return [
+            self._create_sample_answer(
+                repeated_answer,
+                times_spent_in_card[i % len(times_spent_in_card)],
+                session_ids[i % len(session_ids)])
+            for i in range(repeat_count)
+        ]
 
     def test_answer_frequencies_calculation(self):
         """For multiple choice interactions, test if the most common answers
