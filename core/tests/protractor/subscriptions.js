@@ -18,15 +18,18 @@
 
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
+var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('Subscriptions functionality', function() {
   var creatorDashboardPage = null;
+  var preferencesPage = null;
 
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    preferencesPage = new PreferencesPage.PreferencesPage();
   });
 
   it('handle subscriptions to creators correctly', function() {
@@ -50,13 +53,9 @@ describe('Subscriptions functionality', function() {
     browser.get('/profile/creator2subscriptions');
     browser.waitForAngular();
     element(by.css('.protractor-test-subscription-button')).click();
-    browser.get(general.USER_PREFERENCES_URL);
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).first().getText()).toMatch(
-      'creator...');
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).last().getText()).toMatch(
-      'creator...');
+    preferencesPage.get();
+    preferencesPage.expectFirstSubscriberToBe('creator...');
+    preferencesPage.expectLasttSubscriberToBe('creator...');
     users.logout();
 
     // Create a learner who subscribes to one creator and unsubscribes from the
@@ -72,35 +71,25 @@ describe('Subscriptions functionality', function() {
     element(by.css('.protractor-test-subscription-button')).click();
     browser.waitForAngular();
     element(by.css('.protractor-test-subscription-button')).click();
-    browser.get(general.USER_PREFERENCES_URL);
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).count()).toEqual(1);
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).first().getText()).toMatch(
-      'creator...');
+    preferencesPage.get();
+    preferencesPage.expectSubscriberCountToEqual(1);
+    preferencesPage.expectFirstSubscriberToBe('creator...');
     users.logout();
 
     users.login('creator1@subscriptions.com');
     creatorDashboardPage.get();
     browser.waitForAngular();
     creatorDashboardPage.navigateToSubscriptionDashboard();
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).first().getText()).toMatch(
-      'learner...');
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).last().getText()).toMatch(
-      'learner...');
+    preferencesPage.expectFirstSubscriberToBe('creator...');
+    preferencesPage.expectLasttSubscriberToBe('creator...');
     users.logout();
 
     users.login('creator2@subscriptions.com');
     creatorDashboardPage.get();
     browser.waitForAngular();
     creatorDashboardPage.navigateToSubscriptionDashboard();
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).count()).toEqual(1);
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).last().getText()).toMatch(
-      'learner...');
+    preferencesPage.expectSubscriberCountToEqual(1);
+    preferencesPage.expectLasttSubscriberToBe('creator...');
     users.logout();
   });
 

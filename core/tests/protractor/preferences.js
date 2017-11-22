@@ -19,30 +19,38 @@
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var PreferencesPage = require('../protractor_utils/PreferencesPage');
 
 describe('Preferences', function() {
+  var preferencesPage = null;
+  var EditorBox = 'editor';
+  var FeedbackBox = 'feedback';
+  beforeEach(function() {
+    preferencesPage = PreferencesPage.PreferencesPage();
+  });
+
   it('should change editor role email checkbox value', function() {
     users.createUser('alice@preferences.com', 'alicePreferences');
     users.login('alice@preferences.com');
-    browser.get('/preferences');
-    var checkbox = element(by.model('canReceiveEditorRoleEmail'));
-    expect(checkbox.isSelected()).toBe(true);
-    checkbox.click();
-    expect(checkbox.isSelected()).toBe(false);
+    preferencesPage.get();
+    preferencesPage.clickBox(EditorBox);
+    expect(preferencesPage.getValue(EditorBox)).toBe(true);
+    preferencesPage.clickBox(EditorBox);
+    expect(preferencesPage.getValue(EditorBox)).toBe(false);
     browser.refresh();
-    expect(checkbox.isSelected()).toBe(false);
+    expect(preferencesPage.getValue(EditorBox)).toBe(false);
   });
 
   it('should change feedback message email checkbox value', function() {
     users.createUser('bob@preferences.com', 'bobPreferences');
     users.login('bob@preferences.com');
-    browser.get('/preferences');
-    var checkbox = element(by.model('canReceiveFeedbackMessageEmail'));
-    expect(checkbox.isSelected()).toBe(true);
-    checkbox.click();
-    expect(checkbox.isSelected()).toBe(false);
+    preferencesPage.get();
+    preferencesPage.clickBox(FeedbackBox);
+    expect(preferencesPage.getValue(FeedbackBox)).toBe(true);
+    preferencesPage.clickBox(FeedbackBox);
+    expect(preferencesPage.getValue(FeedbackBox)).toBe(false);
     browser.refresh();
-    expect(checkbox.isSelected()).toBe(false);
+    expect(preferencesPage.getValue(FeedbackBox)).toBe(false);
   });
 
   afterEach(function() {
