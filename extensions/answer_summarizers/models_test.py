@@ -103,7 +103,62 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
         return state_answers_calc_output.calculation_output
 
 
-class Top5AnswerFrequenciesUnitTests(CalculationUnitTestBase):
+class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
+    """Tests for arbitrary answer frequency calculations."""
+
+    CALCULATION_ID = 'AnswerFrequencies'
+
+    def test_top_answers_without_ties(self):
+        # Create 12 answers with different frequencies.
+        answers = ''.join(
+            v * r for v, r in zip('ABCDEFGHIJKL', range(12, 0, -1)))
+        answer_dicts_list = self._create_answer_dicts_list(
+            answers, times_spent_in_card=[1., 2., 3., 4., 5.],
+            session_ids=self._create_session_ids(7))
+        state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
+
+        actual_calc_output = self._perform_calculation(state_answers_dict)
+        expected_calc_output = [
+            {'answer': 'A', 'frequency': 12},
+            {'answer': 'B', 'frequency': 11},
+            {'answer': 'C', 'frequency': 10},
+            {'answer': 'D', 'frequency': 9},
+            {'answer': 'E', 'frequency': 8},
+            {'answer': 'F', 'frequency': 7},
+            {'answer': 'G', 'frequency': 6},
+            {'answer': 'H', 'frequency': 5},
+            {'answer': 'I', 'frequency': 4},
+            {'answer': 'J', 'frequency': 3},
+            {'answer': 'K', 'frequency': 2},
+            {'answer': 'L', 'frequency': 1},
+        ]
+        self.assertEqual(actual_calc_output, expected_calc_output)
+
+    def test_answers_with_ties(self):
+        """Ties are resolved by submission ordering: earlier ranks higher."""
+        answer_dicts_list = self._create_answer_dicts_list(
+            answers='ABCDEFGHIJKL', times_spent_in_card=[1., 2.],
+            session_ids=self._create_session_ids(3))
+        state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
+
+        actual_calc_output = self._perform_calculation(state_answers_dict)
+        expected_calc_output = [
+            {'answer': 'A', 'frequency': 1},
+            {'answer': 'B', 'frequency': 1},
+            {'answer': 'C', 'frequency': 1},
+            {'answer': 'D', 'frequency': 1},
+            {'answer': 'E', 'frequency': 1},
+            {'answer': 'F', 'frequency': 1},
+            {'answer': 'G', 'frequency': 1},
+            {'answer': 'H', 'frequency': 1},
+            {'answer': 'I', 'frequency': 1},
+            {'answer': 'J', 'frequency': 1},
+            {'answer': 'K', 'frequency': 1},
+            {'answer': 'L', 'frequency': 1},
+        ]
+        self.assertEqual(actual_calc_output, expected_calc_output)
+
+class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
     """Tests for Top 5 answer frequency calculations."""
 
     CALCULATION_ID = 'Top5AnswerFrequencies'
@@ -124,7 +179,7 @@ class Top5AnswerFrequenciesUnitTests(CalculationUnitTestBase):
             {'answer': 'D', 'frequency': 2},
             {'answer': 'E', 'frequency': 1},
         ]
-        self.assertItemsEqual(actual_calc_output, expected_calc_output)
+        self.assertEqual(actual_calc_output, expected_calc_output)
 
     def test_top5_with_ties(self):
         """Ties are resolved by submission ordering: earlier ranks higher."""
@@ -141,4 +196,57 @@ class Top5AnswerFrequenciesUnitTests(CalculationUnitTestBase):
             {'answer': 'D', 'frequency': 1},
             {'answer': 'E', 'frequency': 1},
         ]
-        self.assertItemsEqual(actual_calc_output, expected_calc_output)
+        self.assertEqual(actual_calc_output, expected_calc_output)
+
+
+class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
+    """Tests for Top 10 answer frequency calculations."""
+
+    CALCULATION_ID = 'Top10AnswerFrequencies'
+
+    def test_top10_answers_without_ties(self):
+        # Create 12 answers with different frequencies.
+        answers = ''.join(
+            v * r for v, r in zip('ABCDEFGHIJ', range(10, 0, -1)))
+        answer_dicts_list = self._create_answer_dicts_list(
+            answers, times_spent_in_card=[1., 2., 3., 4., 5.],
+            session_ids=self._create_session_ids(7))
+        state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
+
+        actual_calc_output = self._perform_calculation(state_answers_dict)
+        expected_calc_output = [
+            {'answer': 'A', 'frequency': 10},
+            {'answer': 'B', 'frequency': 9},
+            {'answer': 'C', 'frequency': 8},
+            {'answer': 'D', 'frequency': 7},
+            {'answer': 'E', 'frequency': 6},
+            {'answer': 'F', 'frequency': 5},
+            {'answer': 'G', 'frequency': 4},
+            {'answer': 'H', 'frequency': 3},
+            {'answer': 'I', 'frequency': 2},
+            {'answer': 'J', 'frequency': 1},
+        ]
+        self.assertEqual(actual_calc_output, expected_calc_output)
+
+    def test_top10_with_ties(self):
+        """Ties are resolved by submission ordering: earlier ranks higher."""
+        answer_dicts_list = self._create_answer_dicts_list(
+            answers='ABCDEFGHIJ', times_spent_in_card=[1., 2.],
+            session_ids=self._create_session_ids(3))
+        state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
+
+        actual_calc_output = self._perform_calculation(state_answers_dict)
+        expected_calc_output = [
+            {'answer': 'A', 'frequency': 1},
+            {'answer': 'B', 'frequency': 1},
+            {'answer': 'C', 'frequency': 1},
+            {'answer': 'D', 'frequency': 1},
+            {'answer': 'E', 'frequency': 1},
+            {'answer': 'F', 'frequency': 1},
+            {'answer': 'G', 'frequency': 1},
+            {'answer': 'H', 'frequency': 1},
+            {'answer': 'I', 'frequency': 1},
+            {'answer': 'J', 'frequency': 1},
+        ]
+        self.assertEqual(actual_calc_output, expected_calc_output)
+
