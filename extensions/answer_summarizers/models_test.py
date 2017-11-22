@@ -198,9 +198,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
 
         # Ensure the submission queue includes all of the answers from the
         # generated answer lists. This protects further changes to the test.
-        total_answer_count = sum([
-            len(all_answer_lists[list_name])
-            for list_name in all_answer_lists])
+        total_answer_count = sum(len(l) for l in all_answer_lists.itervalues())
         self.assertEqual(total_answer_count, len(answer_list))
 
         # Verify the frequencies of answers in the submission queue. This is
