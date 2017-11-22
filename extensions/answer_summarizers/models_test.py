@@ -50,7 +50,8 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
 
     def _create_answer_dicts_list(
             self, answers, times_spent_in_card, session_ids,
-            classify_categories=[exp_domain.EXPLICIT_CLASSIFICATION], num=None):
+            classify_categories=(exp_domain.EXPLICIT_CLASSIFICATION,),
+            num=None):
         """This is similar to _create_answer_dict, except it provides a list
         of N answers. It reuses answers, times_spent_in_card, and session_ids
         cyclically to construct the list. When num isn't provided, the returned
