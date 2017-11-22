@@ -57,12 +57,12 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
         """
         if num is None:
             num = len(answers)
-        inf_args = itertools.izip(
+        infinite_arguments = itertools.izip(
             itertools.cycle(answers), itertools.cycle(times_spent_in_card),
             itertools.cycle(session_ids), itertools.cycle(classify_categories))
         return [
             self._create_answer_dict(*a)
-            for a in itertools.islice(inf_args, num)
+            for a in itertools.islice(infinite_arguments, num)
         ]
 
     def _create_session_ids(self, num):
