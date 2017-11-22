@@ -30,9 +30,9 @@ class BaseCalculationUnitTest(test_utils.GenericTestBase):
     """Test cases for BaseCalculation."""
 
     def test_requires_override_for_calculation(self):
-        _ = {}
         with self.assertRaises(NotImplementedError):
-            answer_models.BaseCalculation().calculate_from_state_answers_dict(_)
+            answer_models.BaseCalculation().calculate_from_state_answers_dict(
+                state_answers_dict={})
 
 
 class CalculationUnitTestBase(test_utils.GenericTestBase):
@@ -251,11 +251,11 @@ class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
         self.assertEqual(actual_calc_output, expected_calc_output)
 
 
-class FrequencyCommonlySubmittedElementsTestCase(CalculationUnitTestBase):
+class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
     pass
 
 
-class TopAnswersByCategorizationTestCase(CalculationUnitTestBase):
+class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
     CALCULATION_ID = 'TopAnswersByCategorization'
 
     def test_empty_state_answers_dict(self):
