@@ -17,8 +17,6 @@
 """Test calculations to get interaction answer views."""
 
 import itertools
-import random
-import string
 
 from extensions.answer_summarizers import models as answer_models
 from core.domain import calculation_registry
