@@ -30,10 +30,10 @@ class FractionInput(base.BaseInteraction):
     can_have_solution = True
 
     _customization_arg_specs = [{
-            'name': 'requireSimplestForm',
-            'description': 'Require the learner\'s answer to be in simplest form',
-            'schema': {
-                'type': 'bool',
-            },
-            'default_value': 'false'
+        'name': 'requireSimplestForm',
+        'description': 'Require the learner\'s answer to be in simplest form',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': 'false'
         }]
