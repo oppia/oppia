@@ -276,7 +276,7 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
         }
         self.assertEqual(actual_calc_output, expected_calc_output)
 
-    def test_several_categories(self):
+    def test_many_categories(self):
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list=[
             # EXPLICIT
             self._create_answer_dict(
