@@ -320,20 +320,20 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
         expected_calc_output = {
             'explicit': [
                 {'answer': 'Explicit A', 'frequency': 2},
-                {'answer': 'Explicit B', 'frequency': 1}
+                {'answer': 'Explicit B', 'frequency': 1},
             ],
             'training_data_match': [
                 {'answer': 'Trained data B', 'frequency': 2},
-                {'answer': 'Trained data A', 'frequency': 1}
+                {'answer': 'Trained data A', 'frequency': 1},
             ],
             'statistical_classifier': [
                 {'answer': 'Stats C', 'frequency': 2},
                 {'answer': 'Stats B', 'frequency': 1},
-                {'answer': 'Trained data B', 'frequency': 1}
+                {'answer': 'Trained data B', 'frequency': 1},
             ],
             'default_outcome': [
                 {'answer': 'Default C', 'frequency': 2},
-                {'answer': 'Default B', 'frequency': 1}
+                {'answer': 'Default B', 'frequency': 1},
             ],
         }
         self.assertEqual(actual_calc_output, expected_calc_output)
