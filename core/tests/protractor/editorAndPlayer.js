@@ -18,15 +18,27 @@
 
 var general = require('../protractor_utils/general.js');
 var forms = require('../protractor_utils/forms.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
 
 describe('Full exploration editor', function() {
+
+  var USERS = [
+    {name: 'user4EditorAndPlayer', email: 'user4@editorAndPlayer.com'},
+    {name: 'user5EditorAndPlayer', email: 'user5@editorAndPlayer.com'},
+    {name: 'user6EditorAndPlayer', email: 'user6@editorAndPlayer.com'},
+    {name: 'user7EditorAndPlayer', email: 'user7@editorAndPlayer.com'},
+  ]
+
+  beforeAll(function() {
+    var usersPage = new UsersPage.UsersPage();
+  });
+
   it('should navigate multiple states correctly, with parameters', function() {
-    users.createUser('user4@editorAndPlayer.com', 'user4EditorAndPlayer');
-    users.login('user4@editorAndPlayer.com');
+    usersPage.createUser(USERS[0].email, USERS[0].name);
+    usersPage.login(USERS[0].email);
 
     workflow.createExploration();
     editor.setStateName('card 1');
@@ -64,14 +76,14 @@ describe('Full exploration editor', function() {
     player.expectExplorationToNotBeOver();
     player.submitAnswer('MultipleChoiceInput', 'complete');
     player.expectExplorationToBeOver();
-    users.logout();
+    usersPage.logout();
   });
 
   it('should handle discarding changes, navigation, deleting states, ' +
       'changing the first state, displaying content, deleting responses and ' +
       'switching to preview mode', function() {
-    users.createUser('user5@editorAndPlayer.com', 'user5EditorAndPlayer');
-    users.login('user5@editorAndPlayer.com');
+    usersPage.createUser(USERS[1].email, USERS[1].name);
+    usersPage.login(USERS[1].email);
 
     workflow.createExploration();
     general.getExplorationIdFromEditor().then(function(explorationId) {
@@ -168,15 +180,15 @@ describe('Full exploration editor', function() {
       player.expectExplorationToBeOver();
 
       editor.discardChanges();
-      users.logout();
+      usersPage.logout();
     });
   });
 
   it('should handle multiple rules in an answer group and also disallow ' +
       'editing of a read-only exploration', function() {
-    users.createUser('user6@editorAndPlayer.com', 'user6EditorAndPlayer');
-    users.createUser('user7@editorAndPlayer.com', 'user7EditorAndPlayer');
-    users.login('user6@editorAndPlayer.com');
+    usersPage.createUser(USERS[2].email, USERS[2].name);
+    usersPage.createUser(USERS[3].email, USERS[3].name);
+    usersPage.login(USERS[2].email);
     workflow.createExploration();
 
     general.getExplorationIdFromEditor().then(function(explorationId) {
@@ -212,8 +224,8 @@ describe('Full exploration editor', function() {
 
       // Login as another user and verify that the exploration editor does not
       // allow the second user to modify the exploration.
-      users.logout();
-      users.login('user7@editorAndPlayer.com');
+      usersPage.logout();
+      usersPage.login(USERS[3].email);
       general.openEditor(explorationId);
       editor.exitTutorialIfNecessary();
 
@@ -273,7 +285,7 @@ describe('Full exploration editor', function() {
       player.clickThroughToNextCard();
       player.expectExplorationToBeOver();
 
-      users.logout();
+      usersPage.logout();
     });
   });
 

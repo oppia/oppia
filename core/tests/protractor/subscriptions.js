@@ -19,8 +19,10 @@
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
 var workflow = require('../protractor_utils/workflow.js');
+
+var usersPage = new UsersPage.UsersPage()
 
 describe('Subscriptions functionality', function() {
   var creatorDashboardPage = null;
@@ -31,19 +33,19 @@ describe('Subscriptions functionality', function() {
 
   it('handle subscriptions to creators correctly', function() {
     // Create two creators.
-    users.createUser('creator1@subscriptions.com', 'creator1subscriptions');
-    users.login('creator1@subscriptions.com');
+    usersPage.createUser('creator1@subscriptions.com', 'creator1subscriptions');
+    usersPage.login('creator1@subscriptions.com');
     workflow.createExploration();
-    users.logout();
+    usersPage.logout();
 
-    users.createUser('creator2@subscriptions.com', 'creator2subscriptions');
-    users.login('creator2@subscriptions.com');
+    usersPage.createUser('creator2@subscriptions.com', 'creator2subscriptions');
+    usersPage.login('creator2@subscriptions.com');
     workflow.createExploration();
-    users.logout();
+    usersPage.logout();
 
     // Create a learner who subscribes to both the creators.
-    users.createUser('learner1@subscriptions.com', 'learner1subscriptions');
-    users.login('learner1@subscriptions.com');
+    usersPage.createUser('learner1@subscriptions.com', 'learner1subscriptions');
+    usersPage.login('learner1@subscriptions.com');
     browser.get('/profile/creator1subscriptions');
     browser.waitForAngular();
     element(by.css('.protractor-test-subscription-button')).click();
@@ -57,12 +59,12 @@ describe('Subscriptions functionality', function() {
     expect(element.all(by.css(
       '.protractor-test-subscription-name')).last().getText()).toMatch(
       'creator...');
-    users.logout();
+    usersPage.logout();
 
     // Create a learner who subscribes to one creator and unsubscribes from the
     // other.
-    users.createUser('learner2@subscriptions.com', 'learner2subscriptions');
-    users.login('learner2@subscriptions.com');
+    usersPage.createUser('learner2@subscriptions.com', 'learner2subscriptions');
+    usersPage.login('learner2@subscriptions.com');
     browser.get('/profile/creator1subscriptions');
     browser.waitForAngular();
     element(by.css('.protractor-test-subscription-button')).click();
@@ -78,9 +80,9 @@ describe('Subscriptions functionality', function() {
     expect(element.all(by.css(
       '.protractor-test-subscription-name')).first().getText()).toMatch(
       'creator...');
-    users.logout();
+    usersPage.logout();
 
-    users.login('creator1@subscriptions.com');
+    usersPage.login('creator1@subscriptions.com');
     creatorDashboardPage.get();
     browser.waitForAngular();
     creatorDashboardPage.navigateToSubscriptionDashboard();
@@ -90,9 +92,9 @@ describe('Subscriptions functionality', function() {
     expect(element.all(by.css(
       '.protractor-test-subscription-name')).last().getText()).toMatch(
       'learner...');
-    users.logout();
+    usersPage.logout();
 
-    users.login('creator2@subscriptions.com');
+    usersPage.login('creator2@subscriptions.com');
     creatorDashboardPage.get();
     browser.waitForAngular();
     creatorDashboardPage.navigateToSubscriptionDashboard();
@@ -101,7 +103,7 @@ describe('Subscriptions functionality', function() {
     expect(element.all(by.css(
       '.protractor-test-subscription-name')).last().getText()).toMatch(
       'learner...');
-    users.logout();
+    usersPage.logout();
   });
 
   afterEach(function() {

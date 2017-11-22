@@ -20,18 +20,20 @@
 var general = require('../protractor_utils/general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var forms = require('../protractor_utils/forms.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
+
+var usersPage = new UsersPage.UsersPage()
 
 describe('State editor', function() {
   it('should walk through the tutorial when user repeatedly clicks Next',
     function() {
       var NUM_TUTORIAL_STAGES = 7;
-      users.createUser(
+      usersPage.createUser(
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
-      users.login('userTutorial@stateEditor.com');
+      usersPage.login('userTutorial@stateEditor.com');
 
       workflow.createExplorationAndStartTutorial();
       editor.startTutorial();
@@ -40,13 +42,13 @@ describe('State editor', function() {
         general.waitForSystem();
       }
       editor.finishTutorial();
-      users.logout();
+      usersPage.logout();
     }
   );
 
   it('should display plain text content', function() {
-    users.createUser('user1@stateEditor.com', 'user1StateEditor');
-    users.login('user1@stateEditor.com');
+    usersPage.createUser('user1@stateEditor.com', 'user1StateEditor');
+    usersPage.login('user1@stateEditor.com');
 
     workflow.createExploration();
     editor.setContent(forms.toRichText('plain text'));
@@ -65,12 +67,12 @@ describe('State editor', function() {
     player.submitAnswer('Continue', null);
     player.expectExplorationToBeOver();
 
-    users.logout();
+    usersPage.logout();
   });
 
   it('should create content and multiple choice interactions', function() {
-    users.createUser('user2@stateEditor.com', 'user2StateEditor');
-    users.login('user2@stateEditor.com');
+    usersPage.createUser('user2@stateEditor.com', 'user2StateEditor');
+    usersPage.login('user2@stateEditor.com');
     workflow.createExploration();
     editor.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold text');
@@ -99,12 +101,12 @@ describe('State editor', function() {
     player.submitAnswer('MultipleChoiceInput', 'option B');
     player.expectExplorationToBeOver();
 
-    users.logout();
+    usersPage.logout();
   });
 
   it('should obey numeric interaction rules and display feedback', function() {
-    users.createUser('user3@stateEditor.com', 'user3StateEditor');
-    users.login('user3@stateEditor.com');
+    usersPage.createUser('user3@stateEditor.com', 'user3StateEditor');
+    usersPage.login('user3@stateEditor.com');
 
     workflow.createExploration();
     editor.setContent(forms.toRichText('some content'));
@@ -132,13 +134,13 @@ describe('State editor', function() {
     player.clickThroughToNextCard();
     player.expectExplorationToBeOver();
 
-    users.logout();
+    usersPage.logout();
   });
 
   it('should skip the customization modal for interactions having no ' +
       'customization options', function() {
-    users.createUser('user4@stateEditor.com', 'user4StateEditor');
-    users.login('user4@stateEditor.com');
+    usersPage.createUser('user4@stateEditor.com', 'user4StateEditor');
+    usersPage.login('user4@stateEditor.com');
 
     workflow.createExploration();
     editor.setContent(forms.toRichText('some content'));
@@ -156,13 +158,13 @@ describe('State editor', function() {
     // customization modal does appear and so does the save interaction button.
     editor.openInteraction('Continue');
     expect(saveInteractionBtn.isPresent()).toBe(true);
-    users.logout();
+    usersPage.logout();
   });
 
   it('should open appropriate modal on re-clicking an interaction to ' +
      'customize it', function() {
-    users.createUser('user5@stateEditor.com', 'user5StateEditor');
-    users.login('user5@stateEditor.com');
+    usersPage.createUser('user5@stateEditor.com', 'user5StateEditor');
+    usersPage.login('user5@stateEditor.com');
 
     workflow.createExploration();
     editor.setContent(forms.toRichText('some content'));
@@ -189,13 +191,13 @@ describe('State editor', function() {
     expect(saveInteractionBtn.isPresent()).toBe(true);
     saveInteractionBtn.click();
 
-    users.logout();
+    usersPage.logout();
   });
 
   it('should preserve input value when rule type changes in' +
       ' add response modal', function() {
-    users.createUser('stateEditorUser1@example.com', 'stateEditorUser1');
-    users.login('stateEditorUser1@example.com');
+    usersPage.createUser('stateEditorUser1@example.com', 'stateEditorUser1');
+    usersPage.login('stateEditorUser1@example.com');
     workflow.createExploration();
     editor.setContent(forms.toRichText('some content'));
 
@@ -210,11 +212,11 @@ describe('State editor', function() {
     editor.closeAddResponseModal();
 
     editor.saveChanges();
-    users.logout();
+    usersPage.logout();
   });
 
   it('should add/modify/delete a hint', function() {
-    users.login('stateEditorUser1@example.com');
+    usersPage.login('stateEditorUser1@example.com');
     workflow.createExploration();
     editor.setContent(forms.toRichText('some content'));
 
@@ -231,11 +233,11 @@ describe('State editor', function() {
     editor.HintEditor(0).setHint('modified hint one');
     editor.HintEditor(0).deleteHint();
     editor.saveChanges();
-    users.logout();
+    usersPage.logout();
   });
 
   it('should add a solution', function() {
-    users.login('stateEditorUser1@example.com');
+    usersPage.login('stateEditorUser1@example.com');
     workflow.createExploration();
     editor.setContent(forms.toRichText('some content'));
 
@@ -253,7 +255,7 @@ describe('State editor', function() {
     });
 
     editor.saveChanges();
-    users.logout();
+    usersPage.logout();
   });
 
   afterEach(function() {

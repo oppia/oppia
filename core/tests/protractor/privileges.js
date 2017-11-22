@@ -19,35 +19,37 @@
 var forms = require('../protractor_utils/forms.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
 var workflow = require('../protractor_utils/workflow.js');
+
+var usersPage = new UsersPage.UsersPage()
 
 describe('Permissions for private explorations', function() {
   it('should be correct for collaborators', function() {
-    users.createUser('alice@privileges.com', 'alicePrivileges');
-    users.createUser('bob@privileges.com', 'bobPrivileges');
-    users.createUser('eve@privileges.com', 'evePrivileges');
+    usersPage.createUser('alice@privileges.com', 'alicePrivileges');
+    usersPage.createUser('bob@privileges.com', 'bobPrivileges');
+    usersPage.createUser('eve@privileges.com', 'evePrivileges');
 
-    users.login('alice@privileges.com');
+    usersPage.login('alice@privileges.com');
     workflow.createExploration();
     workflow.addExplorationCollaborator('bobPrivileges');
     expect(workflow.getExplorationManagers()).toEqual(['alicePrivileges']);
     expect(workflow.getExplorationCollaborators()).toEqual(['bobPrivileges']);
     expect(workflow.getExplorationPlaytesters()).toEqual([]);
     general.getExplorationIdFromEditor().then(function(explorationId) {
-      users.logout();
+      usersPage.logout();
 
-      users.login('bob@privileges.com');
+      usersPage.login('bob@privileges.com');
       general.openEditor(explorationId);
       editor.setContent(forms.toRichText('I love you'));
       editor.setInteraction('TextInput');
       editor.saveChanges();
-      users.logout();
+      usersPage.logout();
 
-      users.login('eve@privileges.com');
+      usersPage.login('eve@privileges.com');
       general.openEditor(explorationId);
       general.expect404Error();
-      users.logout();
+      usersPage.logout();
     });
   });
 

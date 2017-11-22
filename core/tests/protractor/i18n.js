@@ -20,9 +20,11 @@
  */
 
 var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+
+var usersPage = new UsersPage.UsersPage()
 
 var _selectLanguage = function(language) {
   element(by.css('.protractor-test-i18n-language-selector')).
@@ -60,8 +62,8 @@ describe('Site language', function() {
   });
 
   it('should use language selected in the Preferences page.', function() {
-    users.createUser('varda@example.com', 'Varda');
-    users.login('varda@example.com');
+    usersPage.createUser('varda@example.com', 'Varda');
+    usersPage.login('varda@example.com');
     browser.get('/preferences');
     element(by.css('.protractor-test-system-language-selector')).click();
     var options = element.all(by.css('.select2-dropdown li')).filter(
@@ -74,13 +76,13 @@ describe('Site language', function() {
     expect(element(by.css('.protractor-test-preferences-title'))
       .getText()).toEqual('Preferencias');
     general.ensurePageHasNoTranslationIds();
-    users.logout();
+    usersPage.logout();
   });
 
   it('should save the language selected in the footer into the preferences.',
     function() {
-      users.createUser('feanor@example.com', 'Feanor');
-      users.login('feanor@example.com');
+      usersPage.createUser('feanor@example.com', 'Feanor');
+      usersPage.login('feanor@example.com');
       browser.get('/about');
       _selectLanguage('Español');
       libraryPage.get();
@@ -94,7 +96,7 @@ describe('Site language', function() {
       expect(browser.getTitle()).toEqual(
         'Cambiar sus preferencias de perfil - Oppia');
       general.ensurePageHasNoTranslationIds();
-      users.logout();
+      usersPage.logout();
     }
   );
 
@@ -108,8 +110,8 @@ describe('Site language', function() {
   });
 
   it('should not change in an exploration', function() {
-    users.createUser('mangue@example.com', 'Mangue');
-    users.login('mangue@example.com', true);
+    usersPage.createUser('mangue@example.com', 'Mangue');
+    usersPage.login('mangue@example.com', true);
     browser.get('/about');
     _selectLanguage('Español');
     adminPage.reloadExploration('protractor_test_1.yaml');
@@ -120,7 +122,7 @@ describe('Site language', function() {
       .getAttribute('placeholder');
     expect(placeholder).toEqual('Ingresa un número');
     general.ensurePageHasNoTranslationIds();
-    users.logout();
+    usersPage.logout();
   });
 
   afterEach(function() {

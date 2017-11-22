@@ -17,30 +17,29 @@
  */
 
 var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var collectionEditor = require('../protractor_utils/collectionEditor.js');
 
-
 describe('Collections', function() {
-  var adminPage = null;
+  var adminPage = null, usersPage = new UsersPage.UsersPage(), USEREMAIL = 'alice@collections.com';
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     var USERNAME = 'aliceCollections';
-    users.createUser('alice@collections.com', USERNAME);
-    users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
+    usersPage.createUser(USER_EMAIL, USERNAME);
+    usersPage.createAndLoginAdminUser('testadm@collections.com', 'testadm');
     adminPage.get();
     adminPage.reloadCollection();
     general.acceptAlert();
     browser.waitForAngular();
     adminPage.reloadAllExplorations();
     adminPage.updateRole(USERNAME, 'collection editor');
-    users.logout();
+    usersPage.logout();
   });
 
   it('visits the collection editor', function() {
-    users.login('alice@collections.com');
+    usersPage.login('alice@collections.com');
     browser.get(general.SERVER_URL_PREFIX);
     var dropdown = element(by.css('.protractor-test-profile-dropdown'));
     browser.actions().mouseMove(dropdown).perform();
@@ -72,14 +71,14 @@ describe('Collections', function() {
     collectionEditor.setCategory('Algebra');
     collectionEditor.saveChanges();
     browser.waitForAngular();
-    users.logout();
+    usersPage.logout();
   });
 
   it('visits the collection player', function() {
-    users.login('alice@collections.com');
+    usersPage.login('alice@collections.com');
     browser.get('/collection/0');
     browser.waitForAngular();
-    users.logout();
+    usersPage.logout();
   });
 
   afterEach(function() {

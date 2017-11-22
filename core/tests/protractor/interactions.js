@@ -17,17 +17,19 @@
  */
 
 var forms = require('../protractor_utils/forms.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var player = require('../protractor_utils/player.js');
 var workflow = require('../protractor_utils/workflow.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 
+var usersPage = new UsersPage.UsersPage()
+
 describe('Interactions', function() {
   it('should pass their own test suites', function() {
-    users.createUser('user@interactions.com', 'userInteractions');
-    users.login('user@interactions.com');
+    usersPage.createUser('user@interactions.com', 'userInteractions');
+    usersPage.login('user@interactions.com');
     workflow.createExploration();
     editor.setStateName('first');
     editor.setContent(forms.toRichText('some content'));
@@ -68,7 +70,7 @@ describe('Interactions', function() {
     }
 
     editor.discardChanges();
-    users.logout();
+    usersPage.logout();
   });
 
   afterEach(function() {

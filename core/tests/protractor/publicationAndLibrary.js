@@ -22,8 +22,10 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var player = require('../protractor_utils/player.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
 var workflow = require('../protractor_utils/workflow.js');
+
+var usersPage = new UsersPage.UsersPage()
 
 describe('Library index page', function() {
   var libraryPage = null;
@@ -41,36 +43,36 @@ describe('Library index page', function() {
     var LANGUAGE_FRANCAIS = 'français';
     var LANGUAGE_DEUTSCH = 'Deutsch';
 
-    users.createModerator(
+    usersPage.createModerator(
       'varda@publicationAndLibrary.com', 'vardaPublicationAndLibrary');
-    users.createUser(
+    usersPage.createUser(
       'feanor@publicationAndLibrary.com', 'feanorPublicationAndLibrary');
-    users.createUser(
+    usersPage.createUser(
       'celebrimor@publicationAndLibrary.com', 'celebriorPublicationAndLibrary');
-    users.createUser(
+    usersPage.createUser(
       'earendil@publicationAndLibrary.com', 'earendilPublicationAndLibrary');
 
-    users.login('feanor@publicationAndLibrary.com');
+    usersPage.login('feanor@publicationAndLibrary.com');
     workflow.createAndPublishExploration(
       EXPLORATION_SILMARILS, CATEGORY_ARCHITECTURE,
       'hold the light of the two trees', LANGUAGE_DEUTSCH);
-    users.logout();
+    usersPage.logout();
 
-    users.login('earendil@publicationAndLibrary.com');
+    usersPage.login('earendil@publicationAndLibrary.com');
     workflow.createAndPublishExploration(
       EXPLORATION_VINGILOT, CATEGORY_BUSINESS, 'seek the aid of the Valar');
-    users.logout();
+    usersPage.logout();
 
-    users.login('varda@publicationAndLibrary.com');
+    usersPage.login('varda@publicationAndLibrary.com');
     libraryPage.get();
     libraryPage.playExploration(EXPLORATION_VINGILOT);
     general.moveToEditor();
     // Moderators can edit explorations.
     editor.setLanguage(LANGUAGE_FRANCAIS);
     editor.saveChanges('change language');
-    users.logout();
+    usersPage.logout();
 
-    users.login('celebrimor@publicationAndLibrary.com');
+    usersPage.login('celebrimor@publicationAndLibrary.com');
     workflow.createExploration();
     editor.setContent(forms.toRichText('Celebrimbor wrote this'));
     editor.setInteraction('EndExploration');
@@ -151,7 +153,7 @@ describe('Library index page', function() {
     libraryPage.playExploration(EXPLORATION_SILMARILS);
     player.expectExplorationNameToBe('silmarils');
 
-    users.logout();
+    usersPage.logout();
   });
 
   it('should not have any non translated strings', function() {
@@ -160,15 +162,15 @@ describe('Library index page', function() {
     var CATEGORY_ENVIRONMENT = 'Environment';
     var CATEGORY_BUSINESS = 'Business';
     var LANGUAGE_FRANCAIS = 'français';
-    users.createUser('aule@example.com', 'Aule');
+    usersPage.createUser('aule@example.com', 'Aule');
 
-    users.login('aule@example.com');
+    usersPage.login('aule@example.com');
     workflow.createAndPublishExploration(
       EXPLORATION_SILMARILS, CATEGORY_BUSINESS,
       'hold the light of the two trees', LANGUAGE_FRANCAIS);
     workflow.createAndPublishExploration(
       EXPLORATION_VINGILOT, CATEGORY_ENVIRONMENT, 'seek the aid of the Valar');
-    users.logout();
+    usersPage.logout();
 
     libraryPage.get();
     expect(browser.getTitle()).toEqual('Exploration Library - Oppia');

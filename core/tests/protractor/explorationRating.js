@@ -21,8 +21,10 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var player = require('../protractor_utils/player.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UserPage.js');
 var workflow = require('../protractor_utils/workflow.js');
+
+var usersPage = new UserPage.UserPage()
 
 describe('Library index page', function() {
   var EXPLORATION_RATINGTEST = 'RatingTest';
@@ -36,25 +38,25 @@ describe('Library index page', function() {
   });
   
   var addRating = function(userEmail, userName, explorationName, ratingValue) {
-    users.createUser(userEmail, userName);
-    users.login(userEmail);
+    usersPage.createUser(userEmail, userName);
+    usersPage.login(userEmail);
     libraryPage.get();
     libraryPage.playExploration(EXPLORATION_RATINGTEST);
     player.expectExplorationNameToBe(explorationName);
     player.rateExploration(ratingValue);
 
-    users.logout();
+    usersPage.logout();
   };
 
   it('should display ratings on exploration when minimum ratings have been ' +
      'submitted', function() {
-    users.createUser('user1@explorationRating.com', 'user1Rating');
+    usersPage.createUser('user1@explorationRating.com', 'user1Rating');
     // Create an test exploration
-    users.login('user1@explorationRating.com');
+    usersPage.login('user1@explorationRating.com');
     workflow.createAndPublishExploration(
       EXPLORATION_RATINGTEST, CATEGORY_BUSINESS,
       'this is an objective', LANGUAGE_ENGLISH);
-    users.logout();
+    usersPage.logout();
 
     // Create test users, play exploration and review them after completion
     for (var i = 0; i < MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS - 1; i++) {

@@ -20,8 +20,10 @@
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var player = require('../protractor_utils/player.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
 var workflow = require('../protractor_utils/workflow.js');
+
+var usersPage = new UsersPage.UsersPage()
 
 describe('Library pages tour', function() {
   var EXPLORATION_TITLE = 'Test Exploration';
@@ -51,7 +53,7 @@ describe('Library pages tour', function() {
   it('visits the top rated page', function() {
     // To visit the top rated page, at least one
     // exploration has to be rated by the user
-    users.createAndLoginAdminUser('random@gmail.com', 'random');
+    usersPage.createAndLoginAdminUser('random@gmail.com', 'random');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
       EXPLORATION_CATEGORY,
@@ -65,7 +67,7 @@ describe('Library pages tour', function() {
     visitLibraryPage();
     element(by.css('.protractor-test-library-top-rated')).click();
     expect(browser.getCurrentUrl()).toContain('library/top_rated');
-    users.logout();
+    usersPage.logout();
   });
 
   it('visits the recent explorations page', function() {

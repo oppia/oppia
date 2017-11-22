@@ -18,8 +18,10 @@
 
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var users = require('../protractor_utils/users.js');
+var usersPage = require('../protractor_utils/UsersPage.js');
 var workflow = require('../protractor_utils/workflow.js');
+
+var usersPage = new UsersPage.UsersPage()
 
 describe('Account creation', function() {
   var libraryPage = null;
@@ -29,32 +31,37 @@ describe('Account creation', function() {
   });
 
   it('should create users', function() {
-    users.createUser(
+    usersPage.createUser(
       'ordinaryuser@userManagement.com', 'ordinaryUserManagement');
 
+<<<<<<< HEAD
     users.login('ordinaryuser@userManagement.com');
     libraryPage.get();
+=======
+    usersPage.login('ordinaryuser@userManagement.com');
+    browser.get(general.LIBRARY_URL_SUFFIX);
+>>>>>>> fix #3954 add UsersPage page object
     general.checkForConsoleErrors([]);
 
     browser.get(general.MODERATOR_URL_SUFFIX);
     general.checkForConsoleErrors([
       'Failed to load resource: the server responded with a status of 401']);
-    users.logout();
+    usersPage.logout();
   });
 
   it('should create moderators', function() {
-    users.createModerator('mod@userManagement.com', 'moderatorUserManagement');
+    usersPage.createModerator('mod@userManagement.com', 'moderatorUserManagement');
 
-    users.login('mod@userManagement.com');
+    usersPage.login('mod@userManagement.com');
     browser.get(general.MODERATOR_URL_SUFFIX);
-    users.logout();
+    usersPage.logout();
 
     general.checkForConsoleErrors([]);
   });
 
   // Usernames containing "admin" are not permitted.
   it('should create admins', function() {
-    users.createAdmin('admin@userManagement.com', 'adm1nUserManagement');
+    usersPage.createAdmin('admin@userManagement.com', 'adm1nUserManagement');
     general.checkForConsoleErrors([]);
   });
 });

@@ -22,9 +22,16 @@ var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var forms = require('../protractor_utils/forms.js');
 var player = require('../protractor_utils/player.js');
+<<<<<<< HEAD
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var users = require('../protractor_utils/users.js');
+=======
+var library = require('../protractor_utils/library.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
+>>>>>>> fix #3954 add UsersPage page object
 var workflow = require('../protractor_utils/workflow.js');
+
+var usersPage = new UsersPage.UsersPage()
 
 describe('Suggestions on Explorations', function() {
   var EXPLORATION_TITLE = 'Sample Exploration';
@@ -40,36 +47,42 @@ describe('Suggestions on Explorations', function() {
   });
 
   beforeEach(function() {
-    users.createUser('user1@ExplorationSuggestions.com',
+    usersPage.createUser('user1@ExplorationSuggestions.com',
                      'authorExplorationSuggestions');
-    users.createUser('user2@ExplorationSuggestions.com',
+    usersPage.createUser('user2@ExplorationSuggestions.com',
                      'suggesterExplorationSuggestions');
-    users.createUser('user3@ExplorationSuggestions.com',
+    usersPage.createUser('user3@ExplorationSuggestions.com',
                      'studentExplorationSuggestions');
   });
 
   it('accepts a suggestion on a published exploration', function() {
-    users.login('user1@ExplorationSuggestions.com');
+    usersPage.login('user1@ExplorationSuggestions.com');
     workflow.createAndPublishExploration(EXPLORATION_TITLE,
                                          EXPLORATION_CATEGORY,
                                          EXPLORATION_OBJECTIVE,
                                          EXPLORATION_LANGUAGE);
     browser.get(general.SERVER_URL_PREFIX);
-    users.logout();
+    usersPage.logout();
 
     // Suggester plays the exploration and suggests a change
+<<<<<<< HEAD
     users.login('user2@ExplorationSuggestions.com');
     libraryPage.get();
     libraryPage.playExploration(EXPLORATION_TITLE);
+=======
+    usersPage.login('user2@ExplorationSuggestions.com');
+    browser.get(general.LIBRARY_URL_SUFFIX);
+    library.playExploration(EXPLORATION_TITLE);
+>>>>>>> fix #3954 add UsersPage page object
 
     var suggestion = 'New Exploration';
     var suggestionDescription = 'Uppercased the first letter';
 
     player.submitSuggestion(suggestion, suggestionDescription);
-    users.logout();
+    usersPage.logout();
 
     // Exploration author reviews the suggestion and accepts it
-    users.login('user1@ExplorationSuggestions.com');
+    usersPage.login('user1@ExplorationSuggestions.com');
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
     editor.getSuggestionThreads().then(function(threads) {
@@ -80,14 +93,20 @@ describe('Suggestions on Explorations', function() {
 
     editor.navigateToPreviewTab();
     player.expectContentToMatch(forms.toRichText(suggestion));
-    users.logout();
+    usersPage.logout();
 
     // Student logs in and plays the exploration, finds the updated content
+<<<<<<< HEAD
     users.login('user3@ExplorationSuggestions.com');
     libraryPage.get();
     libraryPage.playExploration(EXPLORATION_TITLE);
+=======
+    usersPage.login('user3@ExplorationSuggestions.com');
+    browser.get(general.LIBRARY_URL_SUFFIX);
+    library.playExploration(EXPLORATION_TITLE);
+>>>>>>> fix #3954 add UsersPage page object
     player.expectContentToMatch(forms.toRichText(suggestion));
-    users.logout();
+    usersPage.logout();
   });
 
   afterEach(function() {

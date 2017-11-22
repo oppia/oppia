@@ -17,13 +17,15 @@
  */
 
 var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
 var workflow = require('../protractor_utils/workflow.js');
+
+var usersPage = new UsersPage.UsersPage()
 
 describe('Preferences', function() {
   it('should change editor role email checkbox value', function() {
-    users.createUser('alice@preferences.com', 'alicePreferences');
-    users.login('alice@preferences.com');
+    usersPage.createUser('alice@preferences.com', 'alicePreferences');
+    usersPage.login('alice@preferences.com');
     browser.get('/preferences');
     var checkbox = element(by.model('canReceiveEditorRoleEmail'));
     expect(checkbox.isSelected()).toBe(true);
@@ -34,8 +36,8 @@ describe('Preferences', function() {
   });
 
   it('should change feedback message email checkbox value', function() {
-    users.createUser('bob@preferences.com', 'bobPreferences');
-    users.login('bob@preferences.com');
+    usersPage.createUser('bob@preferences.com', 'bobPreferences');
+    usersPage.login('bob@preferences.com');
     browser.get('/preferences');
     var checkbox = element(by.model('canReceiveFeedbackMessageEmail'));
     expect(checkbox.isSelected()).toBe(true);

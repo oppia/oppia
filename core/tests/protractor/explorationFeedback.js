@@ -29,8 +29,10 @@ var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var player = require('../protractor_utils/player.js');
-var users = require('../protractor_utils/users.js');
+var UsersPage = require('../protractor_utils/UsersPage.js');
 var workflow = require('../protractor_utils/workflow.js');
+
+var usersPage = new UsersPage.UsersPage()
 
 describe('ExplorationFeedback', function() {
   var EXPLORATION_TITLE = 'Sample Exploration';
@@ -46,9 +48,9 @@ describe('ExplorationFeedback', function() {
   });
 
   beforeEach(function() {
-    users.createUser('user1@ExplorationFeedback.com',
+    usersPage.createUser('user1@ExplorationFeedback.com',
                      'creatorExplorationFeedback');
-    users.createUser('user2@ExplorationFeedback.com',
+    usersPage.createUser('user2@ExplorationFeedback.com',
                      'learnerExplorationFeedback');
   });
 
@@ -57,7 +59,7 @@ describe('ExplorationFeedback', function() {
     var feedbackResponse = 'Thanks for the feedback';
 
     // Creator creates and publishes an exploration
-    users.login('user1@ExplorationFeedback.com');
+    usersPage.login('user1@ExplorationFeedback.com');
     workflow.createAndPublishExploration(EXPLORATION_TITLE,
                                          EXPLORATION_CATEGORY,
                                          EXPLORATION_OBJECTIVE,
@@ -66,17 +68,19 @@ describe('ExplorationFeedback', function() {
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
     ).toEqual(0);
-    users.logout();
+    usersPage.logout();
 
     // Learner plays the exploration and submits a feedback
-    users.login('user2@ExplorationFeedback.com');
+    usersPage.login('user2@ExplorationFeedback.com');
     libraryPage.get();
     libraryPage.playExploration(EXPLORATION_TITLE);
+    browser.get(general.LIBRARY_URL_SUFFIX);
+    library.playExploration(EXPLORATION_TITLE);
     player.submitFeedback(feedback);
-    users.logout();
+    usersPage.logout();
 
     // Creator reads the feedback and responds
-    users.login('user1@ExplorationFeedback.com');
+    usersPage.login('user1@ExplorationFeedback.com');
     creatorDashboardPage.get();
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -88,7 +92,7 @@ describe('ExplorationFeedback', function() {
       expect(messages[0]).toEqual(feedback);
     });
     editor.sendResponseToLatestFeedback(feedbackResponse);
-    users.logout();
+    usersPage.logout();
   });
 
   afterEach(function() {
