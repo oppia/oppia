@@ -58,12 +58,11 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
         """
         if num is None:
             num = len(answers)
-        infinite_args = itertools.izip(
+        inf_args = itertools.izip(
             itertools.cycle(answers), itertools.cycle(times_spent_in_card),
             itertools.cycle(session_ids), itertools.cycle(classify_categories))
         return [
-            self._create_answer_dict(*a)
-            for a in itertools.islice(infinite_args, num)
+            self._create_answer_dict(*a) for a in itertools.islice(inf_args, num)
         ]
 
     def _create_session_ids(self, num):
@@ -157,6 +156,7 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
             {'answer': 'L', 'frequency': 1},
         ]
         self.assertEqual(actual_calc_output, expected_calc_output)
+
 
 class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
     """Tests for Top 5 answer frequency calculations."""
