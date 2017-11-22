@@ -16,6 +16,8 @@
 
 """Test calculations to get interaction answer views."""
 
+import itertools
+
 from core.domain import calculation_registry
 from core.domain import exp_domain
 from core.tests import test_utils
@@ -41,13 +43,11 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
         answer N times. It reuses times_spent_in_card and session_ids
         cyclically as it constructs the list of sample answers.
         """
-        return [
-            self._create_sample_answer(
-                repeated_answer,
-                times_spent_in_card[i % len(times_spent_in_card)],
-                session_ids[i % len(session_ids)])
-            for i in range(repeat_count)
-        ]
+        args_as_tuples = itertools.izip(
+            itertools.repeat(repeated_answer, repeat_count),
+            itertools.cycle(times_spent_in_card),
+            itertools.cycle(session_ids))
+        return [self._create_sample_answer(*a) for a in args_as_tuples]
 
     def test_answer_frequencies_calculation(self):
         """For multiple choice interactions, test if the most common answers
