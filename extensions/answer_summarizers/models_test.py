@@ -40,8 +40,8 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             self, repeated_answer, times_spent_in_card, session_ids,
             repeat_count):
         """This is similar to _create_sample_answer, except it repeats a single
-        answer N times. It reuses times_spent_in_card and session_ids
-        cyclically as it constructs the list of sample answers.
+        answer N times. It reuses times_spent_in_card and session_ids cyclically
+        as it constructs the list of sample answers.
         """
         args_as_tuples = itertools.izip(
             itertools.repeat(repeated_answer, repeat_count),
@@ -109,6 +109,10 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
 
     def test_top5_answer_frequencies_calculation(self):
         """Ensure the top 5 most frequent answers are submitted for TextInput.
+
+        Since this test is looking for the top 5 answers, it will submit ten
+        different answers with varying frequency. Note that there are some ties
+        here, including on the border of the top 5 most frequent answers.
         """
         # Since this test is looking for the top 5 answers, it will submit ten
         # different answers with varying frequency:
@@ -463,8 +467,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
 
     def test_top_answers_by_categorization_ignores_invalid_category(self):
         """The TopAnswersByCategorization calculation cannot use answers with
-        unknown categorizations. It will throw an exception in these
-        situations.
+        unknown categorizations. It will throw an exception in these situations.
         """
         calculation_instance = (
             calculation_registry.Registry.get_calculation_by_id(
