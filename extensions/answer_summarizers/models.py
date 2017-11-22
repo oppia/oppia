@@ -43,6 +43,7 @@ import operator
 
 from core.domain import exp_domain
 from core.domain import stats_domain
+import utils
 
 CLASSIFICATION_CATEGORIES = frozenset([
     exp_domain.EXPLICIT_CLASSIFICATION,
@@ -52,45 +53,6 @@ CLASSIFICATION_CATEGORIES = frozenset([
 ])
 
 
-class _HashedValue(object):
-    """Wraps some arbitrarily-complex JSON-like object into a new object which
-    can be hashed and placed into dicts and sets.
-    """
-
-    @classmethod
-    def _get_hashable_value(cls, value):
-        """This function returns a hashable version of the input value.
-
-        It converts the built-in sequences into their hashable counterparts
-        {list: tuple, dict: (sorted tuple of pairs)}. Additionally, their
-        elements are converted to hashable values through recursive calls. All
-        other value types are assumed to already be hashable.
-        """
-        if isinstance(value, list):
-            return tuple(cls._get_hashable_value(e) for e in value)
-        elif isinstance(value, dict):
-            return tuple(sorted(
-                # Dict keys are already hashable, only values need converting.
-                (k, cls._get_hashable_value(v)) for k, v in value.iteritems()))
-        else:
-            return value
-
-    def __init__(self, value):
-        """Wraps value into a hashable object. Bases the hash on key(value) when
-        key is provided, otherwise it will be based simply on value.
-        """
-        self.value = value
-        self.hash_value = self._get_hashable_value(value)
-
-    def __hash__(self):
-        return hash(self.hash_value)
-
-    def __eq__(self, other):
-        if isinstance(other, _HashedValue):
-            return self.hash_value == other.hash_value
-        return False
-
-
 def _get_top_answers_by_frequency(answer_dicts, limit=None):
     """Computes the number of occurrences of each answer, keeping only the top
     num_results answers, and returns a list of dicts; each dict has keys
@@ -98,8 +60,8 @@ def _get_top_answers_by_frequency(answer_dicts, limit=None):
 
     This method is run from within the context of a MapReduce job.
     """
-    hashed_answer_frequencies = (
-        collections.Counter(_HashedValue(d['answer']) for d in answer_dicts))
+    hashed_answer_frequencies = utils.OrderedCounter(
+        utils.HashedValue(d['answer']) for d in answer_dicts)
 
     return [
         {'answer': h.value, 'frequency': f}
@@ -206,10 +168,10 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        hashed_answer_frequencies = collections.Counter()
+        hashed_answer_frequencies = utils.OrderedCounter()
         for answer_dict in state_answers_dict['submitted_answer_list']:
             hashed_answer_frequencies.update(
-                _HashedValue(answer) for answer in answer_dict['answer'])
+                utils.HashedValue(answer) for answer in answer_dict['answer'])
 
         calculation_output = [
             {'answer': h.value, 'frequency': f}
