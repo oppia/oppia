@@ -1281,13 +1281,30 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self._record_answer(['A'], exp_id=self.SET_INPUT_EXP_ID)
             self._record_answer(['A', 'B'], exp_id=self.SET_INPUT_EXP_ID)
             self._run_answer_summaries_aggregator()
-            visualizations = sorted(self._get_visualizations(
-                exp_id=self.SET_INPUT_EXP_ID))
+            visualizations = sorted(
+                self._get_visualizations(exp_id=self.SET_INPUT_EXP_ID),
+                key=lambda x: x['data'].to_raw_type())
             self.assertEqual(len(visualizations), 2)
 
             # Use options to distinguish between the two visualizations, since
             # both are FrequencyTable.
-            common_elements_visualization = visualizations[0]
+            top_answers_visualization = visualizations[0]
+            self.assertEqual(top_answers_visualization['id'], 'FrequencyTable')
+            self.assertEqual(
+                top_answers_visualization['options']['column_headers'],
+                ['Answer', 'Count'])
+            self.assertEqual(top_answers_visualization['data'].to_raw_type(), [{
+                'answer': ['A', 'B'],
+                'frequency': 3
+            }, {
+                'answer': ['A'],
+                'frequency': 2
+            }, {
+                'answer': ['C', 'A'],
+                'frequency': 1
+            }])
+
+            common_elements_visualization = visualizations[1]
             self.assertEqual(
                 common_elements_visualization['id'], 'FrequencyTable')
             self.assertEqual(
@@ -1304,22 +1321,6 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
                 'frequency': 3
             }, {
                 'answer': 'C',
-                'frequency': 1
-            }])
-
-            top_answers_visualization = visualizations[1]
-            self.assertEqual(top_answers_visualization['id'], 'FrequencyTable')
-            self.assertEqual(
-                top_answers_visualization['options']['column_headers'],
-                ['Answer', 'Count'])
-            self.assertEqual(top_answers_visualization['data'].to_raw_type(), [{
-                'answer': ['A', 'B'],
-                'frequency': 3
-            }, {
-                'answer': ['A'],
-                'frequency': 2
-            }, {
-                'answer': ['C', 'A'],
                 'frequency': 1
             }])
 

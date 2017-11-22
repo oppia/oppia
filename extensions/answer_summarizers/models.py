@@ -284,7 +284,7 @@ class TopAnswersByCategorization(BaseCalculation):
 
         # Remove empty lists if no answers match within those categories.
         for classify_category in classify_categories:
-            if not answer_occurrences[classify_category]:
+            if not answer_occurrences[classify_category].answer_occurrences:
                 del answer_occurrences[classify_category]
 
         return stats_domain.StateAnswersCalcOutput(
