@@ -252,7 +252,32 @@ class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
 
 class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
-    pass
+    CALCULATION_ID = 'FrequencyCommonlySubmittedElements'
+
+    def test_shared_answers(self):
+        """This calculation only works on answers that accept multiple answers.
+        """
+        answers = [
+            {'B': 1},
+            'A',
+            ['C', 'D', 'E'],
+            {'A': 3},
+        ]
+        state_answers_dict = self._create_state_answers_dict(answer_dicts_list=[
+            self._create_answer_dict([answers[1], answers[0]], 0.1, 'sid1'),
+            self._create_answer_dict([answers[0], answers[2]], 0.1, 'sid1'),
+            self._create_answer_dict([answers[3]], 0.1, 'sid1'),
+            self._create_answer_dict([answers[1], answers[0]], 0.1, 'sid1')
+        ])
+
+        actual_calc_output = self._perform_calculation(state_answers_dict)
+        expected_calc_output = [
+            {'answer': {'B': 1}, 'frequency': 3},
+            {'answer': 'A', 'frequency': 2},
+            {'answer': ['C', 'D', 'E'], 'frequency': 1},
+            {'answer': {'A': 3}, 'frequency': 1},
+        ]
+        self.assertEqual(actual_calc_output, expected_calc_output)
 
 
 class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
