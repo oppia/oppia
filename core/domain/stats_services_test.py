@@ -1107,6 +1107,9 @@ class SampleAnswerTests(test_utils.GenericTestBase):
 # TODO(bhenning): Either add tests for multiple visualizations for one state or
 # disallow stats from having multiple visualizations (no interactions currently
 # seem to use more than one visualization ID).
+
+# TODO(bhenning): Add tests for each possible visualization
+# (TopAnswersByCategorization is not currently used yet by any interactions).
 class AnswerVisualizationsTests(test_utils.GenericTestBase):
     """Tests for functionality related to retrieving visualization information
     for answers.
@@ -1240,7 +1243,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             visualization = visualizations[0]
             self.assertEqual(visualization['id'], 'FrequencyTable')
-            self.assertEqual(visualization['data'], [{
+            self.assertEqual(visualization['data'].to_raw_type(), [{
                 'answer': 'Answer A',
                 'frequency': 1
             }])
@@ -1258,7 +1261,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             visualization = visualizations[0]
             self.assertEqual(visualization['id'], 'FrequencyTable')
-            self.assertEqual(visualization['data'], [{
+            self.assertEqual(visualization['data'].to_raw_type(), [{
                 'answer': 'Answer A',
                 'frequency': 3
             }, {
@@ -1278,8 +1281,9 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self._record_answer(['A'], exp_id=self.SET_INPUT_EXP_ID)
             self._record_answer(['A', 'B'], exp_id=self.SET_INPUT_EXP_ID)
             self._run_answer_summaries_aggregator()
-            visualizations = sorted(self._get_visualizations(
-                exp_id=self.SET_INPUT_EXP_ID))
+            visualizations = sorted(
+                self._get_visualizations(exp_id=self.SET_INPUT_EXP_ID),
+                key=lambda x: x['data'].to_raw_type())
             self.assertEqual(len(visualizations), 2)
 
             # Use options to distinguish between the two visualizations, since
@@ -1289,7 +1293,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self.assertEqual(
                 top_answers_visualization['options']['column_headers'],
                 ['Answer', 'Count'])
-            self.assertEqual(top_answers_visualization['data'], [{
+            self.assertEqual(top_answers_visualization['data'].to_raw_type(), [{
                 'answer': ['A', 'B'],
                 'frequency': 3
             }, {
@@ -1306,7 +1310,10 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self.assertEqual(
                 common_elements_visualization['options']['column_headers'],
                 ['Element', 'Count'])
-            self.assertEqual(common_elements_visualization['data'], [{
+
+            common_visualization_data = (
+                common_elements_visualization['data'].to_raw_type())
+            self.assertEqual(common_visualization_data, [{
                 'answer': 'A',
                 'frequency': 6
             }, {
@@ -1331,7 +1338,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             visualization = visualizations[0]
             # The latest data should include all submitted answers.
-            self.assertEqual(visualization['data'], [{
+            self.assertEqual(visualization['data'].to_raw_type(), [{
                 'answer': 'Answer A',
                 'frequency': 2
             }, {
@@ -1354,7 +1361,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             visualization = visualizations[0]
             # The latest data should include all submitted answers.
-            self.assertEqual(visualization['data'], [{
+            self.assertEqual(visualization['data'].to_raw_type(), [{
                 'answer': 'Answer A',
                 'frequency': 2
             }, {
