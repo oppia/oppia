@@ -48,8 +48,7 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
 
     def _create_answer_dicts_list(
             self, answer_list, times_spent_in_card, session_ids,
-            classify_categories=(exp_domain.EXPLICIT_CLASSIFICATION,),
-            num=None):
+            classify_categories=None, num=None):
         """This is similar to _create_answer_dict, except it simplifies building
         several different answers at once.
 
@@ -72,6 +71,8 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
         """
         if num is None:
             num = len(answer_list)
+        if classify_categories is None:
+            classify_categories = [exp_domain.EXPLICIT_CLASSIFICATION]
         infinite_args = itertools.izip(
             itertools.cycle(answer_list), itertools.cycle(times_spent_in_card),
             itertools.cycle(session_ids), itertools.cycle(classify_categories))
