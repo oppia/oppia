@@ -37,7 +37,7 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
   I18N_SIGNUP_LOADING: 'Loading'
 });
 
-oppia.factory('I18nFileHashLoader', [
+oppia.factory('TranslationFileHashLoaderService', [
   '$http', '$q', 'UrlInterpolationService',
   function($http, $q, UrlInterpolationService) {
     /* Options object contains:
@@ -119,7 +119,7 @@ oppia.config([
     $translateProvider
       .registerAvailableLanguageKeys(
         availableLanguageKeys, availableLanguageKeysMap)
-      .useLoader('I18nFileHashLoader', {
+      .useLoader('TranslationFileHashLoaderService', {
         prefix: '/i18n/',
         suffix: '.json'
       })
@@ -141,15 +141,3 @@ oppia.config([
   }
 ]);
 
-// Service to dynamically construct translation ids for i18n.
-oppia.factory('i18nIdService', function() {
-  return {
-    // Construct a translation id for library from name and a prefix.
-    // Ex: 'categories', 'art' -> 'I18N_LIBRARY_CATEGORIES_ART'
-    getLibraryId: function(prefix, name) {
-      return (
-        'I18N_LIBRARY_' + prefix.toUpperCase() + '_' +
-        name.toUpperCase().split(' ').join('_'));
-    }
-  };
-});
