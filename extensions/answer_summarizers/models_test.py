@@ -18,13 +18,13 @@
 
 import itertools
 
-from extensions.answer_summarizers import models as answer_models
 from core.domain import calculation_registry
 from core.domain import exp_domain
 from core.tests import test_utils
+from extensions.answer_summarizers import models as answer_models
 
 
-class BaseCalculationUnitTest(test_utils.GenericTestBase):
+class BaseCalculationUnitTests(test_utils.GenericTestBase):
     """Test cases for BaseCalculation."""
 
     def test_requires_override_for_calculation(self):
@@ -50,19 +50,33 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
             self, answers, times_spent_in_card, session_ids,
             classify_categories=(exp_domain.EXPLICIT_CLASSIFICATION,),
             num=None):
-        """This is similar to _create_answer_dict, except it provides a list
-        of N answers. It reuses answers, times_spent_in_card, and session_ids
-        cyclically to construct the list. When num isn't provided, the returned
-        list will be len(answers).
+        """This is similar to _create_answer_dict, except it simplifies building
+        several different answers at once.
+
+        Args:
+            answers: iterable of str. Each member is used cyclically to produce
+                each individual answer_dict.
+            times_spent_in_card: iterable of float. Each member is used
+                cyclically to produce each individual answer_dict.
+            session_ids: iterable of str. Each member is used cyclically to
+                produce each individual answer_dict.
+            classify_categories: iterable of str. The classifications that will
+                be assigned to the answers. Each member is used cyclically to
+                produce each individual answer_dict.
+            num: int or None. The total number of answers to produce. When None,
+                len(answers) is used instead.
+
+        Returns:
+            dict(str : *). Built by sending zipped args to _create_answer_dict.
         """
         if num is None:
             num = len(answers)
-        infinite_arguments = itertools.izip(
+        infinite_args = itertools.izip(
             itertools.cycle(answers), itertools.cycle(times_spent_in_card),
             itertools.cycle(session_ids), itertools.cycle(classify_categories))
         return [
-            self._create_answer_dict(*a)
-            for a in itertools.islice(infinite_arguments, num)
+            self._create_answer_dict(*create_answer_dict_args)
+            for create_answer_dict_args in itertools.islice(infinite_args, num)
         ]
 
     def _create_session_ids(self, num):
@@ -110,8 +124,9 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_top_answers_without_ties(self):
         # Create 12 answers with different frequencies.
+        letters, repeats = 'ABCDEFGHIJKL', range(12, 0, -1)
         answers = ''.join(
-            v * r for v, r in zip('ABCDEFGHIJKL', range(12, 0, -1)))
+            letter * repeat for letter, repeat in zip(letters, repeats))
         answer_dicts_list = self._create_answer_dicts_list(
             answers, times_spent_in_card=[1., 2., 3., 4., 5.],
             session_ids=self._create_session_ids(7))
