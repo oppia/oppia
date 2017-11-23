@@ -24,34 +24,34 @@
 13 silly mapToRegistry uri https://registry.npmjs.org/karma-jasmine-jquery
 14 verbose request uri https://registry.npmjs.org/karma-jasmine-jquery
 15 verbose request no auth needed
-16 info attempt registry request try #1 at 1:57:55 AM
-17 verbose request id 4894efeee723e98b
+16 info attempt registry request try #1 at 2:04:31 AM
+17 verbose request id f4536a8f3d2c809c
 18 verbose etag W/"542bd497-1e51"
 19 verbose lastModified Wed, 01 Oct 2014 10:16:55 GMT
 20 http request GET https://registry.npmjs.org/karma-jasmine-jquery
 21 http 304 https://registry.npmjs.org/karma-jasmine-jquery
-22 verbose headers { date: 'Thu, 23 Nov 2017 20:27:55 GMT',
+22 verbose headers { date: 'Thu, 23 Nov 2017 20:34:31 GMT',
 22 verbose headers   via: '1.1 varnish',
 22 verbose headers   'cache-control': 'max-age=300',
 22 verbose headers   etag: 'W/"542bd497-1e51"',
 22 verbose headers   age: '0',
 22 verbose headers   connection: 'keep-alive',
-22 verbose headers   'x-served-by': 'cache-sin18033-SIN',
+22 verbose headers   'x-served-by': 'cache-sin18029-SIN',
 22 verbose headers   'x-cache': 'HIT',
 22 verbose headers   'x-cache-hits': '1',
-22 verbose headers   'x-timer': 'S1511468876.557977,VS0,VE140',
+22 verbose headers   'x-timer': 'S1511469271.206162,VS0,VE609',
 22 verbose headers   vary: 'Accept-Encoding, Accept' }
 23 silly get cb [ 304,
-23 silly get   { date: 'Thu, 23 Nov 2017 20:27:55 GMT',
+23 silly get   { date: 'Thu, 23 Nov 2017 20:34:31 GMT',
 23 silly get     via: '1.1 varnish',
 23 silly get     'cache-control': 'max-age=300',
 23 silly get     etag: 'W/"542bd497-1e51"',
 23 silly get     age: '0',
 23 silly get     connection: 'keep-alive',
-23 silly get     'x-served-by': 'cache-sin18033-SIN',
+23 silly get     'x-served-by': 'cache-sin18029-SIN',
 23 silly get     'x-cache': 'HIT',
 23 silly get     'x-cache-hits': '1',
-23 silly get     'x-timer': 'S1511468876.557977,VS0,VE140',
+23 silly get     'x-timer': 'S1511469271.206162,VS0,VE609',
 23 silly get     vary: 'Accept-Encoding, Accept' } ]
 24 verbose etag https://registry.npmjs.org/karma-jasmine-jquery from cache
 25 verbose get saving karma-jasmine-jquery to /home/mrkumar/.npm/registry.npmjs.org/karma-jasmine-jquery/.cache.json
@@ -139,7 +139,7 @@
 70 verbose correctMkdir /home/mrkumar/.npm/_git-remotes correctMkdir not in flight; initializing
 71 verbose request uri https://registry.npmjs.org/bower
 72 verbose request no auth needed
-73 info attempt registry request try #1 at 1:57:57 AM
+73 info attempt registry request try #1 at 2:04:33 AM
 74 verbose etag W/"59f6fd0f-30039"
 75 verbose lastModified Mon, 30 Oct 2017 10:21:03 GMT
 76 http request GET https://registry.npmjs.org/bower
@@ -149,28 +149,28 @@
 77 info git   'git://github.com/bessdsv/bower-installer.git',
 77 info git   '/home/mrkumar/.npm/_git-remotes/git-github-com-bessdsv-bower-installer-git-temp-5f628818' ]
 78 http 304 https://registry.npmjs.org/bower
-79 verbose headers { date: 'Thu, 23 Nov 2017 20:27:56 GMT',
+79 verbose headers { date: 'Thu, 23 Nov 2017 20:34:32 GMT',
 79 verbose headers   via: '1.1 varnish',
 79 verbose headers   'cache-control': 'max-age=300',
 79 verbose headers   etag: 'W/"59f6fd0f-30039"',
-79 verbose headers   age: '0',
+79 verbose headers   age: '25',
 79 verbose headers   connection: 'keep-alive',
-79 verbose headers   'x-served-by': 'cache-sin18033-SIN',
+79 verbose headers   'x-served-by': 'cache-sin18029-SIN',
 79 verbose headers   'x-cache': 'HIT',
 79 verbose headers   'x-cache-hits': '1',
-79 verbose headers   'x-timer': 'S1511468876.279808,VS0,VE583',
+79 verbose headers   'x-timer': 'S1511469272.428877,VS0,VE1',
 79 verbose headers   vary: 'Accept-Encoding, Accept' }
 80 silly get cb [ 304,
-80 silly get   { date: 'Thu, 23 Nov 2017 20:27:56 GMT',
+80 silly get   { date: 'Thu, 23 Nov 2017 20:34:32 GMT',
 80 silly get     via: '1.1 varnish',
 80 silly get     'cache-control': 'max-age=300',
 80 silly get     etag: 'W/"59f6fd0f-30039"',
-80 silly get     age: '0',
+80 silly get     age: '25',
 80 silly get     connection: 'keep-alive',
-80 silly get     'x-served-by': 'cache-sin18033-SIN',
+80 silly get     'x-served-by': 'cache-sin18029-SIN',
 80 silly get     'x-cache': 'HIT',
 80 silly get     'x-cache-hits': '1',
-80 silly get     'x-timer': 'S1511468876.279808,VS0,VE583',
+80 silly get     'x-timer': 'S1511469272.428877,VS0,VE1',
 80 silly get     vary: 'Accept-Encoding, Accept' } ]
 81 verbose etag https://registry.npmjs.org/bower from cache
 82 verbose get saving bower to /home/mrkumar/.npm/registry.npmjs.org/bower/.cache.json
