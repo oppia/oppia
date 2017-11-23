@@ -43,7 +43,6 @@ import operator
 
 from core.domain import exp_domain
 from core.domain import stats_domain
-import utils
 
 CLASSIFICATION_CATEGORIES = frozenset([
     exp_domain.EXPLICIT_CLASSIFICATION,

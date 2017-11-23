@@ -593,9 +593,10 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         """
         super(AnswerFrequencyList, self).__init__(
             CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
+        answer_occurrences = answer_occurrences or []
         self._answer_counter = utils.OrderedCounter(
             answer_occurrence.to_raw_pair()
-            for answer_occurrence in (answer_occurrences or []))
+            for answer_occurrence in answer_occurrences)
         self.limit = limit
 
     def add_answer(self, answer):
