@@ -22,6 +22,7 @@
 // here to be loaded synchronously with the script to prevent a FOUC or
 // Flash of Untranslated Content.
 // See http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
+
 oppia.constant('DEFAULT_TRANSLATIONS', {
   I18N_LIBRARY_PAGE_TITLE: 'Library',
   I18N_LIBRARY_LOADING: 'Loading',
@@ -36,31 +37,6 @@ oppia.constant('DEFAULT_TRANSLATIONS', {
   I18N_SIGNUP_REGISTRATION: 'Registration',
   I18N_SIGNUP_LOADING: 'Loading'
 });
-
-oppia.factory('TranslationFileHashLoaderService', [
-  '$http', '$q', 'UrlInterpolationService',
-  function($http, $q, UrlInterpolationService) {
-    /* Options object contains:
-     *  prefix: added before key, defined by developer
-     *  key: language key, determined internally by i18n library
-     *  suffix: added after key, defined by developer
-     */
-    return function(options) {
-      var fileUrl = [
-        options.prefix,
-        options.key,
-        options.suffix
-      ].join('');
-      return $http.get(
-        UrlInterpolationService.getTranslateJsonUrl(fileUrl)
-      ).then(function(result) {
-        return result.data;
-      }, function () {
-        return $q.reject(options.key);
-      });
-    };
-  }
-]);
 
 oppia.controller('I18nFooter', [
   '$http', '$rootScope', '$scope', '$translate', '$timeout', '$cookies',
@@ -140,4 +116,3 @@ oppia.config([
       .forceAsyncReload(true);
   }
 ]);
-
