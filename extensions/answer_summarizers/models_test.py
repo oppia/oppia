@@ -50,10 +50,23 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
             self, answers, times_spent_in_card, session_ids,
             classify_categories=(exp_domain.EXPLICIT_CLASSIFICATION,),
             num=None):
-        """This is similar to _create_answer_dict, except it provides a list
-        of N answers. It reuses answers, times_spent_in_card, and session_ids
-        cyclically to construct the list. When num isn't provided, the returned
-        list will be len(answers).
+        """This is similar to _create_answer_dict, except it simplifies building
+        several different answers at once.
+
+        Args:
+            answers: iterable of str. Each member is used cyclically to produce
+                each individual answer_dict.
+            times_spent_in_card: iterable of float. Each member is used
+                cyclically to produce each individual answer_dict.
+            session_ids: iterable of str. Each member is used cyclically to
+                produce each individual answer_dict.
+            classify_categories: iterable of str. The classifications that will
+                be assigned to the answers.
+            num: int or None. The total number of answers to produce. When None,
+                len(answers) is used instead.
+
+        Returns:
+            dict(str : *). Built by sending zipped args to _create_answer_dict.
         """
         if num is None:
             num = len(answers)
