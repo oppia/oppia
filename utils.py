@@ -503,6 +503,7 @@ def convert_to_str(string_to_convert):
 
 class OrderedCounter(collections.Counter, collections.OrderedDict):
     """Counter that remembers the order elements are first encountered."""
+    pass
 
 
 class HashedValue(object):
