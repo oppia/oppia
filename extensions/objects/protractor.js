@@ -181,7 +181,7 @@ var OBJECT_EDITORS = {
   Boolean: BooleanEditor,
   CoordTwoDim: CoordTwoDim,
   Filepath: FilepathEditor,
-  Fraction: fractionEditor,
+  Fraction: FractionEditor,
   Int: IntEditor,
   MathLatexString: MathLatexStringEditor,
   NonnegativeInt: NonnegativeIntEditor,
@@ -193,7 +193,7 @@ var OBJECT_EDITORS = {
 
 exports.BooleanEditor = BooleanEditor;
 exports.CoordTwoDim = CoordTwoDim;
-exports.Fraction = FractionEditor;
+exports.FractionEditor = FractionEditor;
 exports.FilepathEditor = FilepathEditor;
 exports.IntEditor = IntEditor;
 exports.MathLatexStringEditor = MathLatexStringEditor;

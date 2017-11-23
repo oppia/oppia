@@ -18,8 +18,9 @@
 
 var objects = require('../../objects/protractor.js');
 
-var customizeInteraction = function(elem) {
-
+var customizeInteraction = function(elem, requireSimplestForm) {
+  objects.BooleanEditor(elem.element(by.tagName('schema-based-bool-editor')))
+    .setValue(requireSimplestForm);
 };
 
 var expectInteractionDetailsToMatch = function(elem) {
@@ -30,17 +31,17 @@ var expectInteractionDetailsToMatch = function(elem) {
 
 var submitAnswer = function(elem, answer) {
   elem.element(by.tagName('oppia-interactive-fraction-input')).
-    element(by.tagName('input')).sendKeys(answer + '\n');
+  element(by.tagName('input')).sendKeys(answer + '\n');
 };
 
 var answerObjectType = 'Fraction';
 
 
 var testSuite = [{
-  interactionArguments: [],
+  interactionArguments: [false],
   ruleArguments: ['IsExactlyEqualTo', '1/2'],
   expectedInteractionDetails: [],
-  wrongAnswers: ['4/8', 'a'],
+  wrongAnswers: ['4/8'],
   correctAnswers: ['1/2']
 }];
 

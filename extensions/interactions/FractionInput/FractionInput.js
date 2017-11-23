@@ -28,7 +28,7 @@ oppia.directive('oppiaInteractiveFractionInput', [function() {
         fractionInputRulesService, FractionObjectFactory) {
         $scope.answer = '';
         $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
-        var requireSimplestForm = $attrs.requireSimplestFormWithValue;
+        var requireSimplestForm = $attrs.requireSimplestFormWithValue === 'true';
         var errorMessage = '';
         $scope.FRACTION_INPUT_FORM_SCHEMA = {
           type: 'unicode',
