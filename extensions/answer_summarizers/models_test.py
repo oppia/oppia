@@ -122,8 +122,9 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_top_answers_without_ties(self):
         # Create 12 answers with different frequencies.
+        letters, repeats = 'ABCDEFGHIJKL', range(12, 0, -1)
         answers = ''.join(
-            v * r for v, r in zip('ABCDEFGHIJKL', range(12, 0, -1)))
+            letter * repeat for letter, repeat in zip(letters, repeats))
         answer_dicts_list = self._create_answer_dicts_list(
             answers, times_spent_in_card=[1., 2., 3., 4., 5.],
             session_ids=self._create_session_ids(7))
