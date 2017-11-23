@@ -18,13 +18,13 @@
 
 import itertools
 
-from extensions.answer_summarizers import models as answer_models
 from core.domain import calculation_registry
 from core.domain import exp_domain
 from core.tests import test_utils
+from extensions.answer_summarizers import models as answer_models
 
 
-class BaseCalculationUnitTest(test_utils.GenericTestBase):
+class BaseCalculationUnitTests(test_utils.GenericTestBase):
     """Test cases for BaseCalculation."""
 
     def test_requires_override_for_calculation(self):
@@ -61,8 +61,8 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
             itertools.cycle(answers), itertools.cycle(times_spent_in_card),
             itertools.cycle(session_ids), itertools.cycle(classify_categories))
         return [
-            self._create_answer_dict(*a)
-            for a in itertools.islice(infinite_args, num)
+            self._create_answer_dict(*create_answer_dict_args)
+            for create_answer_dict_args in itertools.islice(infinite_args, num)
         ]
 
     def _create_session_ids(self, num):
