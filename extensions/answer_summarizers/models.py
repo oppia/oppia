@@ -55,18 +55,16 @@ CLASSIFICATION_CATEGORIES = frozenset([
 
 def _get_top_answers_by_frequency(answer_dicts, limit=None):
     """Computes the number of occurrences of each answer, keeping only the top
-    num_results answers, and returns a list of dicts; each dict has keys
-    'answer' and 'frequency'.
+    num_results answers, and returns an AnswerFrequencyList.
 
     This method is run from within the context of a MapReduce job.
     """
-    hashed_answer_frequencies = utils.OrderedCounter(
-        utils.HashedValue(d['answer']) for d in answer_dicts)
-
-    return [
-        {'answer': h.value, 'frequency': f}
-        for h, f in hashed_answer_frequencies.most_common(limit)
-    ]
+    answer_frequency_list = stats_domain.AnswerFrequencyList(
+        answer_occurrences=None, limit=limit)
+    answer_frequency_list.add_answers(
+        stats_domain.Answer.from_raw_type(answer_dict['answer'])
+        for answer_dict in answer_dicts)
+    return answer_frequency_list
 
 
 class BaseCalculation(object):
@@ -102,7 +100,7 @@ class AnswerFrequencies(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        calculation_output = _get_top_answers_by_frequency(
+        answer_frequency_list = _get_top_answers_by_frequency(
             state_answers_dict['submitted_answer_list'], limit=None)
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
@@ -110,7 +108,7 @@ class AnswerFrequencies(BaseCalculation):
             state_answers_dict['state_name'],
             state_answers_dict['interaction_id'],
             self.id,
-            calculation_output)
+            answer_frequency_list)
 
 
 class Top5AnswerFrequencies(BaseCalculation):
@@ -123,7 +121,7 @@ class Top5AnswerFrequencies(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        calculation_output = _get_top_answers_by_frequency(
+        answer_frequency_list = _get_top_answers_by_frequency(
             state_answers_dict['submitted_answer_list'], limit=5)
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
@@ -131,7 +129,7 @@ class Top5AnswerFrequencies(BaseCalculation):
             state_answers_dict['state_name'],
             state_answers_dict['interaction_id'],
             self.id,
-            calculation_output)
+            answer_frequency_list)
 
 
 class Top10AnswerFrequencies(BaseCalculation):
@@ -144,7 +142,7 @@ class Top10AnswerFrequencies(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        calculation_output = _get_top_answers_by_frequency(
+        answer_frequency_list = _get_top_answers_by_frequency(
             state_answers_dict['submitted_answer_list'], limit=10)
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
@@ -152,7 +150,7 @@ class Top10AnswerFrequencies(BaseCalculation):
             state_answers_dict['state_name'],
             state_answers_dict['interaction_id'],
             self.id,
-            calculation_output)
+            answer_frequency_list)
 
 
 class FrequencyCommonlySubmittedElements(BaseCalculation):
@@ -168,22 +166,18 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        hashed_answer_frequencies = utils.OrderedCounter()
+        answer_frequency_list = stats_domain.AnswerFrequencyList(
+            answer_occurrences=None, limit=10)
         for answer_dict in state_answers_dict['submitted_answer_list']:
-            hashed_answer_frequencies.update(
-                utils.HashedValue(answer) for answer in answer_dict['answer'])
-
-        calculation_output = [
-            {'answer': h.value, 'frequency': f}
-            for h, f in hashed_answer_frequencies.most_common(10)
-        ]
+            answer_frequency_list.add_answers(
+                map(stats_domain.Answer.from_raw_type, answer_dict['answer']))
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
             state_answers_dict['state_name'],
             state_answers_dict['interaction_id'],
             self.id,
-            calculation_output)
+            answer_frequency_list)
 
 
 class TopAnswersByCategorization(BaseCalculation):
@@ -209,15 +203,16 @@ class TopAnswersByCategorization(BaseCalculation):
                 submitted_answers_by_categorization[category].extend(
                     answer_dicts)
 
-        calculation_output = {
+        answer_occurrences = {
             category: _get_top_answers_by_frequency(answer_dicts, limit=None)
             for category, answer_dicts in
             submitted_answers_by_categorization.iteritems()
         }
+
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
             state_answers_dict['state_name'],
             state_answers_dict['interaction_id'],
             self.id,
-            calculation_output)
+            stats_domain.CategorizedAnswerFrequencyLists(answer_occurrences))

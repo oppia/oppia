@@ -149,7 +149,7 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
             {'answer': 'K', 'frequency': 2},
             {'answer': 'L', 'frequency': 1},
         ]
-        self.assertEqual(actual_calc_output, expected_calc_output)
+        self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
     def test_answers_with_ties(self):
         """Ties are resolved by submission ordering: earlier ranks higher."""
@@ -173,7 +173,7 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
             {'answer': 'K', 'frequency': 1},
             {'answer': 'L', 'frequency': 1},
         ]
-        self.assertEqual(actual_calc_output, expected_calc_output)
+        self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
 
 class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
@@ -199,7 +199,7 @@ class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
             {'answer': 'D', 'frequency': 2},
             {'answer': 'E', 'frequency': 1},
         ]
-        self.assertEqual(actual_calc_output, expected_calc_output)
+        self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
     def test_top5_with_ties(self):
         """Ties are resolved by submission ordering: earlier ranks higher."""
@@ -216,7 +216,7 @@ class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
             {'answer': 'D', 'frequency': 1},
             {'answer': 'E', 'frequency': 1},
         ]
-        self.assertEqual(actual_calc_output, expected_calc_output)
+        self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
 
 class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
@@ -247,7 +247,7 @@ class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
             {'answer': 'I', 'frequency': 2},
             {'answer': 'J', 'frequency': 1},
         ]
-        self.assertEqual(actual_calc_output, expected_calc_output)
+        self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
     def test_top10_with_ties(self):
         """Ties are resolved by submission ordering: earlier ranks higher."""
@@ -269,7 +269,7 @@ class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
             {'answer': 'I', 'frequency': 1},
             {'answer': 'J', 'frequency': 1},
         ]
-        self.assertEqual(actual_calc_output, expected_calc_output)
+        self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
 
 class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
@@ -298,7 +298,7 @@ class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
             {'answer': ['C', 'D', 'E'], 'frequency': 1},
             {'answer': {'A': 3}, 'frequency': 1},
         ]
-        self.assertEqual(actual_calc_output, expected_calc_output)
+        self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
 
 class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
@@ -308,7 +308,7 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
         state_answers_dict = self._create_state_answers_dict([])
         actual_calc_output = self._perform_calculation(state_answers_dict)
         expected_calc_output = {}
-        self.assertEqual(actual_calc_output, expected_calc_output)
+        self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
     def test_only_one_category(self):
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list=[
@@ -320,7 +320,7 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
         expected_calc_output = {
             'explicit': [{'answer': 'Hard A', 'frequency': 1}],
         }
-        self.assertEqual(actual_calc_output, expected_calc_output)
+        self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
     def test_many_categories(self):
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list=[
@@ -383,4 +383,4 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
                 {'answer': 'Default B', 'frequency': 1},
             ],
         }
-        self.assertEqual(actual_calc_output, expected_calc_output)
+        self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
