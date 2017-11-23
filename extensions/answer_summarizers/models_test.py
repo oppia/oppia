@@ -61,7 +61,8 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
             session_ids: iterable of str. Each member is used cyclically to
                 produce each individual answer_dict.
             classify_categories: iterable of str. The classifications that will
-                be assigned to the answers.
+                be assigned to the answers. Each member is used cyclically to
+                produce each individual answer_dict.
             num: int or None. The total number of answers to produce. When None,
                 len(answers) is used instead.
 
