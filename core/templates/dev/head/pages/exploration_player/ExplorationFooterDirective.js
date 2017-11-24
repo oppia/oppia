@@ -43,11 +43,9 @@ oppia.directive('explorationFooter', [
             return $scope.twitterText;
           };
 
-          $scope.mobileFeedbackIsShown =
-            WindowDimensionsService.isWindowNarrow();
+          $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
           WindowDimensionsService.registerOnResizeHook(function() {
-            $scope.mobileFeedbackIsShown =
-              WindowDimensionsService.isWindowNarrow();
+            $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             $scope.$apply();
           });
 
