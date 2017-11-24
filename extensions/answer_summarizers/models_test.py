@@ -36,10 +36,9 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
 class CalculationUnitTestBase(test_utils.GenericTestBase):
     """Utility methods for testing calculations."""
 
-    SIMPLE_ANSWER_LIST = [
-        [letter] * frequency
-        for letter, frequency in zip('ABCDEFGHIJKL', range(12, 0, -1))
-    ]
+    SIMPLE_ANSWER_LIST = (['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 +
+                          ['E'] *  8 + ['F'] *  7 + ['G'] *  6 + ['H'] * 5 +
+                          ['I'] *  4 + ['J'] *  3 + ['K'] *  2 + ['L'])
     TIED_ANSWER_LIST = list('ABCDEFGHIJKL')
     SIMPLE_CLASSIFY_CATEGORIES = [exp_domain.EXPLICIT_CLASSIFICATION]
     SIMPLE_SESSION_IDS = ['sid{}'.format(n) for n in range(6)]
@@ -128,10 +127,7 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_top_answers_without_ties(self):
         # Create 12 answers with different frequencies.
-        answers = []
-        for letter, repeat in zip('ABCDEFGHIJKL', range(12, 0, -1)):
-            answers.extend(itertools.repeat(letter, repeat))
-        answer_dicts_list = self._create_answer_dicts_list(answers)
+        answer_dicts_list = self._create_answer_dicts_list()
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
