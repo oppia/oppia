@@ -80,10 +80,6 @@ def _get_top_answers_by_frequency(answers, limit=None):
         for hashable_answer, frequency in answer_counter.most_common(limit))
 
 
-def _make_answers_iter_from_answer_dicts(answer_dicts):
-    return map(operator.itemgetter('answer'), answer_dicts)
-
-
 class BaseCalculation(object):
     """Base calculation class.
 
@@ -117,9 +113,9 @@ class AnswerFrequencies(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        answer_dicts_list = state_answers_dict['submitted_answer_list']
-        answer_frequency_list = _get_top_answers_by_frequency(
-            _make_answers_iter_from_answer_dicts(answer_dicts_list))
+        answer_dicts = state_answers_dict['submitted_answer_list']
+        answer_frequency_list = (
+            _get_top_answers_by_frequency(d['answer'] for d in answer_dicts))
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -139,9 +135,9 @@ class Top5AnswerFrequencies(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        answer_dicts_list = state_answers_dict['submitted_answer_list']
+        answer_dicts = state_answers_dict['submitted_answer_list']
         answer_frequency_list = _get_top_answers_by_frequency(
-            _make_answers_iter_from_answer_dicts(answer_dicts_list), limit=5)
+            (d['answer'] for d in answer_dicts), limit=5)
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -161,9 +157,9 @@ class Top10AnswerFrequencies(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        answer_dicts_list = state_answers_dict['submitted_answer_list']
+        answer_dicts = state_answers_dict['submitted_answer_list']
         answer_frequency_list = _get_top_answers_by_frequency(
-            _make_answers_iter_from_answer_dicts(answer_dicts_list), limit=10)
+            (d['answer'] for d in answer_dicts), limit=10)
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -186,10 +182,9 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        answer_dicts_list = state_answers_dict['submitted_answer_list']
+        answer_dicts = state_answers_dict['submitted_answer_list']
         answer_frequency_list = _get_top_answers_by_frequency(
-            itertools.chain.from_iterable(
-                _make_answers_iter_from_answer_dicts(answer_dicts_list)),
+            itertools.chain.from_iterable(d['answer'] for d in answer_dicts),
             limit=10)
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
@@ -213,16 +208,15 @@ class TopAnswersByCategorization(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        answer_dicts_list = state_answers_dict['submitted_answer_list']
         grouped_submitted_answer_dicts = itertools.groupby(
-            answer_dicts_list,
+            state_answers_dict['submitted_answer_list'],
             operator.itemgetter('classification_categorization'))
 
         submitted_answers_by_categorization = collections.defaultdict(list)
         for category, answer_dicts in grouped_submitted_answer_dicts:
             if category in CLASSIFICATION_CATEGORIES:
                 submitted_answers_by_categorization[category].extend(
-                    _make_answers_iter_from_answer_dicts(answer_dicts))
+                    d['answer'] for d in answer_dicts)
 
         answer_occurrences = {
             category: _get_top_answers_by_frequency(grouped_answers)
