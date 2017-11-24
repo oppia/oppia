@@ -28,7 +28,8 @@ oppia.directive('oppiaInteractiveFractionInput', [function() {
         fractionInputRulesService, FractionObjectFactory) {
         $scope.answer = '';
         $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
-        var requireSimplestForm = $attrs.requireSimplestFormWithValue === 'true';
+        var requireSimplestForm =
+          $attrs.requireSimplestFormWithValue === 'true';
         var errorMessage = '';
         $scope.FRACTION_INPUT_FORM_SCHEMA = {
           type: 'unicode',
@@ -46,7 +47,8 @@ oppia.directive('oppiaInteractiveFractionInput', [function() {
             if (requireSimplestForm &&
               !angular.equals(fraction, fraction.convertToSimplestForm())
             ) {
-              errorMessage = 'Please enter answer in it\'s simplest form';
+              errorMessage =
+                'Please enter answer in it\'s simplest form';
             } else {
               $scope.onSubmit({
                 answer: fraction,
