@@ -45,7 +45,7 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
     SIMPLE_TIMES_SPENT_IN_CARD = [float(n) for n in range(5)]
 
     def _create_answer_dict(
-            self, answer, time_spent_in_card, session_id,
+            self, answer, time_spent_in_card=3.2, session_id='sid1',
             classify_category=exp_domain.EXPLICIT_CLASSIFICATION):
         return {
             'answer': answer,
@@ -262,10 +262,10 @@ class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
         """This calculation only works on answers that accept multiple answers.
         """
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list=[
-            self._create_answer_dict(['B', 'A'], 1., 'sid1'),
-            self._create_answer_dict(['A', 'C'], 1., 'sid2'),
-            self._create_answer_dict(['D'], 1., 'sid3'),
-            self._create_answer_dict(['B', 'A'], 1., 'sid1'),
+            self._create_answer_dict(['B', 'A']),
+            self._create_answer_dict(['A', 'C']),
+            self._create_answer_dict(['D']),
+            self._create_answer_dict(['B', 'A']),
         ])
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -290,7 +290,7 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
     def test_only_one_category(self):
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list=[
             self._create_answer_dict(
-                'Hard A', 0.2, 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
+                'Hard A', classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
         ])
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -303,41 +303,47 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list=[
             # EXPLICIT
             self._create_answer_dict(
-                'Explicit A', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
+                'Explicit A',
+                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
             self._create_answer_dict(
-                'Explicit B', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
+                'Explicit B',
+                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
             self._create_answer_dict(
-                'Explicit A', 0., 'sid1', exp_domain.EXPLICIT_CLASSIFICATION),
+                'Explicit A',
+                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
             # TRAINING DATA
             self._create_answer_dict(
-                'Trained data A', 0., 'sid1',
-                exp_domain.TRAINING_DATA_CLASSIFICATION),
+                'Trained data A',
+                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
             self._create_answer_dict(
-                'Trained data B', 0., 'sid1',
-                exp_domain.TRAINING_DATA_CLASSIFICATION),
+                'Trained data B',
+                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
             self._create_answer_dict(
-                'Trained data B', 0., 'sid1',
-                exp_domain.TRAINING_DATA_CLASSIFICATION),
+                'Trained data B',
+                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
             # STATS CLASSIFIER
             self._create_answer_dict(
-                'Stats B', 0., 'sid1', exp_domain.STATISTICAL_CLASSIFICATION),
+                'Stats B',
+                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
             self._create_answer_dict(
-                'Stats C', 0., 'sid1', exp_domain.STATISTICAL_CLASSIFICATION),
+                'Stats C',
+                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
             self._create_answer_dict(
-                'Stats C', 0., 'sid1', exp_domain.STATISTICAL_CLASSIFICATION),
+                'Stats C',
+                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
             self._create_answer_dict(
-                'Trained data B', 0., 'sid1',
-                exp_domain.STATISTICAL_CLASSIFICATION),
+                'Trained data B',
+                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
             # DEFAULT OUTCOMES
             self._create_answer_dict(
-                'Default C', 0., 'sid1',
-                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+                'Default C',
+                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
             self._create_answer_dict(
-                'Default C', 0., 'sid1',
-                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+                'Default C',
+                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
             self._create_answer_dict(
-                'Default B', 0., 'sid1',
-                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+                'Default B',
+                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
         ])
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
