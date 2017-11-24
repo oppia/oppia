@@ -27,7 +27,9 @@ oppia.directive('oppiaInteractiveCodeRepl', [
       scope: {
         onSubmit: '&'
       },
-      templateUrl: 'interaction/CodeRepl',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/CodeRepl/directives/' +
+        'code_repl_interaction_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.language = HtmlEscaperService.escapedJsonToObj(
           $attrs.languageWithValue);
@@ -237,7 +239,9 @@ oppia.directive('oppiaResponseCodeRepl', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'response/CodeRepl',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/CodeRepl/directives/' +
+        'code_repl_response_directive.html'),
       controller: [
         '$scope', '$attrs', 'FocusManagerService',
         function($scope, $attrs, FocusManagerService) {
@@ -258,7 +262,9 @@ oppia.directive('oppiaShortResponseCodeRepl', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'shortResponse/CodeRepl',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/CodeRepl/directives/' +
+        'code_repl_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]

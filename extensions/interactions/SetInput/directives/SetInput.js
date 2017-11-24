@@ -26,7 +26,9 @@ oppia.directive('oppiaInteractiveSetInput', [function() {
     scope: {
       onSubmit: '&'
     },
-    templateUrl: 'interaction/SetInput',
+    templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+      '/interactions/SetInput/directives/' +
+      'set_input_interaction_directive.html'),
     controller: [
       '$scope', '$attrs', '$translate', 'setInputRulesService',
       function($scope, $attrs, $translate, setInputRulesService) {
@@ -77,7 +79,9 @@ oppia.directive('oppiaResponseSetInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'response/SetInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/SetInput/directives/' +
+        'set_input_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
@@ -90,7 +94,9 @@ oppia.directive('oppiaShortResponseSetInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'shortResponse/SetInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/SetInput/directives/' +
+        'set_input_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         $scope.displayedAnswer = (

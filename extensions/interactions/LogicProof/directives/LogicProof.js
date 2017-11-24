@@ -19,7 +19,9 @@ oppia.directive('oppiaInteractiveLogicProof', [
       scope: {
         onSubmit: '&'
       },
-      templateUrl: 'interaction/LogicProof',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/LogicProof/directives/' +
+        'logic_proof_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$modal', 'logicProofRulesService',
         function($scope, $attrs, $modal, logicProofRulesService) {
@@ -242,7 +244,9 @@ oppia.directive('oppiaInteractiveLogicProof', [
 
           $scope.showHelp = function() {
             $modal.open({
-              templateUrl: 'modals/logicProofHelp',
+              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+                '/interactions/LogicProof/directives/' +
+                'logic_proof_help_modal_directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$modalInstance',
@@ -264,7 +268,9 @@ oppia.directive('oppiaResponseLogicProof', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'response/LogicProof',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/LogicProof/directives/' +
+        'logic_proof_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
@@ -277,7 +283,9 @@ oppia.directive('oppiaShortResponseLogicProof', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'shortResponse/LogicProof',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/LogicProof/directives/' +
+        'logic_proof_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]

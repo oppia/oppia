@@ -30,7 +30,9 @@ oppia.directive('oppiaInteractiveGraphInput', [
       scope: {
         onSubmit: '&'
       },
-      templateUrl: 'interaction/GraphInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/GraphInput/directives/' +
+        'graph_input_interaction_directive.html'),
       controller: [
         '$scope', '$element', '$attrs',
         function($scope, $element, $attrs) {
@@ -144,7 +146,9 @@ oppia.directive('oppiaResponseGraphInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'response/GraphInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/GraphInput/directives/' +
+        'graph_input_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.graph = HtmlEscaperService.escapedJsonToObj($attrs.answer);
 
@@ -170,7 +174,9 @@ oppia.directive('oppiaShortResponseGraphInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'shortResponse/GraphInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/GraphInput/directives/' +
+        'graph_input_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         // TODO(bhenning): Improve this short response by using a small version
         // of the graph image instead of an arbitrary label of vertices and
@@ -200,7 +206,9 @@ oppia.directive('graphViz', function() {
       canEditEdgeWeight: '=',
       canEditOptions: '='
     },
-    templateUrl: 'graphViz/graphVizSvg',
+    templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+      '/interactions/GraphInput/directives/' +
+      'graph_viz_directive.html'),
     controller: [
       '$scope', '$element', '$attrs', '$document', 'FocusManagerService',
       'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',

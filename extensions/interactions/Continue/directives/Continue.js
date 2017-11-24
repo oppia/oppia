@@ -27,7 +27,9 @@ oppia.directive('oppiaInteractiveContinue', [
       scope: {
         onSubmit: '&'
       },
-      templateUrl: 'interaction/Continue',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/Continue/directives/' +
+        'continue_interaction_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.buttonText = HtmlEscaperService.escapedJsonToObj(
           $attrs.buttonTextWithValue);
@@ -60,7 +62,9 @@ oppia.directive('oppiaResponseContinue', [function() {
   return {
     restrict: 'E',
     scope: {},
-    templateUrl: 'response/Continue',
+    templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+      '/interactions/Continue/directives/' +
+      'continue_response_directive.html'),
     controller: [
       '$scope', '$attrs', 'HtmlEscaperService',
       function($scope, $attrs, HtmlEscaperService) {
@@ -73,7 +77,9 @@ oppia.directive('oppiaShortResponseContinue', [function() {
   return {
     restrict: 'E',
     scope: {},
-    templateUrl: 'shortResponse/Continue',
+    templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+      '/interactions/Continue/directives/' +
+      'continue_short_response_directive.html'),
     controller: [
       '$scope', '$attrs', 'HtmlEscaperService',
       function($scope, $attrs, HtmlEscaperService) {

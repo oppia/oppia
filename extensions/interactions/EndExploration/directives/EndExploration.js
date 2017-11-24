@@ -23,7 +23,9 @@ oppia.directive('oppiaInteractiveEndExploration', [function() {
   return {
     restrict: 'E',
     scope: {},
-    templateUrl: 'interaction/EndExploration',
+    templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+      '/interactions/EndExploration/directives/' +
+      'end_exploration_interaction_directive.html'),
     controller: [
       '$scope', '$http', '$attrs', '$q', 'UrlService',
       'explorationContextService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
@@ -96,7 +98,7 @@ oppia.directive('oppiaResponseEndExploration', [function() {
   return {
     restrict: 'E',
     scope: {},
-    templateUrl: 'response/EndExploration'
+    template: ''
   };
 }]);
 
@@ -104,7 +106,7 @@ oppia.directive('oppiaShortResponseEndExploration', [function() {
   return {
     restrict: 'E',
     scope: {},
-    templateUrl: 'shortResponse/EndExploration'
+    template: ''
   };
 }]);
 

@@ -85,7 +85,9 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
       scope: {
         onSubmit: '&'
       },
-      templateUrl: 'interaction/MusicNotesInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/MusicNotesInput/directives/' +
+        'music_notes_input_interaction_directive.html'),
       link: function(scope, element, attrs) {
         // This is needed in order for the scope to be retrievable during Karma
         // unit testing. See http://stackoverflow.com/a/29833832 for more
@@ -860,7 +862,9 @@ oppia.directive('oppiaResponseMusicNotesInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'response/MusicNotesInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/MusicNotesInput/directives/' +
+        'music_notes_input_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         _notes = [];
@@ -885,7 +889,9 @@ oppia.directive('oppiaShortResponseMusicNotesInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'shortResponse/MusicNotesInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/MusicNotesInput/directives/' +
+        'music_notes_input_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         var _notes = [];

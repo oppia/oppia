@@ -26,7 +26,9 @@ oppia.directive('oppiaInteractiveTextInput', [
       scope: {
         onSubmit: '&'
       },
-      templateUrl: 'interaction/TextInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/TextInput/directives/' +
+        'text_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'FocusManagerService', 'textInputRulesService',
         function($scope, $attrs, FocusManagerService, textInputRulesService) {
@@ -69,7 +71,9 @@ oppia.directive('oppiaResponseTextInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'response/TextInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/TextInput/directives/' +
+        'text_input_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
@@ -82,7 +86,9 @@ oppia.directive('oppiaShortResponseTextInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'shortResponse/TextInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/TextInput/directives/' +
+        'text_input_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]

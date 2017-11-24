@@ -1,29 +1,2 @@
 <script src="{{cache_slug}}/extensions/interactions/NumericInput/NumericInput.js"></script>
 <script src="{{cache_slug}}/extensions/interactions/NumericInput/NumericInputValidationService.js"></script>
-
-<script type="text/ng-template" id="interaction/NumericInput">
-  <div class="row numeric-input-container">
-    <!-- This ng-form is needed for submitting answer on hitting enter. -->
-    <form ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
-      <div class="col-lg-12 col-md-12 col-sm-12">
-        <ng-form name="numericInputForm">
-          <schema-based-editor schema="NUMERIC_INPUT_FORM_SCHEMA" local-value="answer" label-for-focus-target="labelForFocusTarget">
-          </schema-based-editor>
-        </ng-form>
-
-        <!-- This ng-click is needed for specifying solutions in the solution editor -->
-        <md-button class="oppia-learner-confirm-button" ng-click="submitAnswer(answer)" style="margin-top: 15px;">
-          Submit
-        </md-button>
-      </div>
-    </form>
-  </div>
-</script>
-
-<script type="text/ng-template" id="response/NumericInput">
-  <[answer]>
-</script>
-
-<script type="text/ng-template" id="shortResponse/NumericInput">
-  <[answer]>
-</script>

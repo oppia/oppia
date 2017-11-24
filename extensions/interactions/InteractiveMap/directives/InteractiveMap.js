@@ -27,7 +27,9 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
       scope: {
         onSubmit: '&'
       },
-      templateUrl: 'interaction/InteractiveMap',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/InteractiveMap/directives/' +
+        'interactive_map_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$timeout', function($scope, $attrs, $timeout) {
           $scope.coords = [
@@ -87,7 +89,9 @@ oppia.directive('oppiaResponseInteractiveMap', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'response/InteractiveMap',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/InteractiveMap/directives/' +
+        'interactive_map_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
 
@@ -107,7 +111,9 @@ oppia.directive('oppiaShortResponseInteractiveMap', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'shortResponse/InteractiveMap',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/InteractiveMap/directives/' +
+        'interactive_map_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         $scope.formattedCoords = Math.abs(_answer[0]).toFixed(3) + '° ';

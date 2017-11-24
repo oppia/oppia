@@ -28,7 +28,9 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
       scope: {
         onSubmit: '&'
       },
-      templateUrl: 'interaction/ItemSelectionInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/ItemSelectionInput/directives/' +
+        'item_selection_input_interaction_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.choices = HtmlEscaperService.escapedJsonToObj(
           $attrs.choicesWithValue);
@@ -96,7 +98,9 @@ oppia.directive('oppiaResponseItemSelectionInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'response/ItemSelectionInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/ItemSelectionInput/directives/' +
+        'item_selection_input_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
@@ -109,7 +113,9 @@ oppia.directive('oppiaShortResponseItemSelectionInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'shortResponse/ItemSelectionInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/ItemSelectionInput/directives/' +
+        'item_selection_input_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]

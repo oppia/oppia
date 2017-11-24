@@ -25,7 +25,9 @@ oppia.directive('oppiaInteractiveNumericInput', [function() {
     scope: {
       onSubmit: '&'
     },
-    templateUrl: 'interaction/NumericInput',
+    templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+      '/interactions/NumericInput/directives/' +
+      'numeric_input_interaction_directive.html'),
     controller: [
       '$scope', '$attrs', 'FocusManagerService', 'numericInputRulesService',
       function($scope, $attrs, FocusManagerService, numericInputRulesService) {
@@ -55,7 +57,9 @@ oppia.directive('oppiaResponseNumericInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'response/NumericInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/NumericInput/directives/' +
+        'numeric_input_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         // If the answer is an integer, omit the fractional part.
@@ -72,7 +76,9 @@ oppia.directive('oppiaShortResponseNumericInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'shortResponse/NumericInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/NumericInput/directives/' +
+        'numeric_input_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         // If the answer is an integer, omit the fractional part.

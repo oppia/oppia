@@ -27,7 +27,9 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
       scope: {
         onSubmit: '&'
       },
-      templateUrl: 'interaction/MultipleChoiceInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/MultipleChoiceInput/directives/' +
+        'multiple_choice_input_interaction_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.choices = HtmlEscaperService.escapedJsonToObj(
           $attrs.choicesWithValue);
@@ -50,7 +52,9 @@ oppia.directive('oppiaResponseMultipleChoiceInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'response/MultipleChoiceInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/MultipleChoiceInput/directives/' +
+        'multiple_choice_input_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
@@ -65,7 +69,9 @@ oppia.directive('oppiaShortResponseMultipleChoiceInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'shortResponse/MultipleChoiceInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/MultipleChoiceInput/directives/' +
+        'multiple_choice_input_short_response_directive.html'),
       controller: [
         '$scope', '$attrs', '$filter',
         function($scope, $attrs, $filter) {

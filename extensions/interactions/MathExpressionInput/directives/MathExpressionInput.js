@@ -27,7 +27,9 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
       scope: {
         onSubmit: '&'
       },
-      templateUrl: 'interaction/MathExpressionInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/MathExpressionInput/directives/' +
+        'math_expression_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
         'DebouncerService', 'DeviceInfoService',
@@ -202,7 +204,9 @@ oppia.directive('oppiaResponseMathExpressionInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'response/MathExpressionInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/MathExpressionInput/directives/' +
+        'math_expression_input_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.latexAnswer = HtmlEscaperService.escapedJsonToObj(
           $attrs.answer).latex;
@@ -216,7 +220,9 @@ oppia.directive('oppiaShortResponseMathExpressionInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'shortResponse/MathExpressionInput',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/MathExpressionInput/directives/' +
+        'math_expression_input_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.latexAnswer = HtmlEscaperService.escapedJsonToObj(
           $attrs.answer).latex;

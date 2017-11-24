@@ -27,7 +27,9 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
       scope: {
         onSubmit: '&'
       },
-      templateUrl: 'interaction/PencilCodeEditor',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/PencilCodeEditor/directives/' +
+        'pencil_code_editor_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$element', '$timeout', '$modal',
         'FocusManagerService', 'pencilCodeEditorRulesService',
@@ -70,7 +72,9 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
 
           $scope.reset = function() {
             $modal.open({
-              templateUrl: 'modals/pencilCodeResetConfirmation',
+              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+                '/interactions/PencilCodeEditor/directives/' +
+                'pencil_code_reset_confirmation_directive.html'),
               backdrop: 'static',
               keyboard: false,
               controller: [
@@ -170,7 +174,9 @@ oppia.directive('oppiaResponsePencilCodeEditor', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'response/PencilCodeEditor',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/PencilCodeEditor/directives/' +
+        'pencil_code_editor_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answerCode = HtmlEscaperService.escapedJsonToObj(
           $attrs.answer).code;
@@ -184,7 +190,9 @@ oppia.directive('oppiaShortResponsePencilCodeEditor', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'shortResponse/PencilCodeEditor',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/PencilCodeEditor/directives/' +
+        'pencil_code_editor_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answerCode = HtmlEscaperService.escapedJsonToObj(
           $attrs.answer).code;
