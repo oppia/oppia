@@ -1265,12 +1265,12 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
                 'answer': 'Answer A',
                 'frequency': 3
             }, {
-                'answer': 'Answer B',
-                'frequency': 1
-            }, {
                 'answer': 'Answer C',
                 'frequency': 1
-            }])
+            }, {
+                'answer': 'Answer B',
+                'frequency': 1
+            }], msg=repr(visualization['data'].to_raw_type()))
 
     def test_has_vis_info_for_each_calculation_for_multi_calc_exp(self):
         with self._get_swap_context():
