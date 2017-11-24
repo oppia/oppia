@@ -81,13 +81,11 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
 
     def _get_calculation_instance(self):
         """Requires the existance of the class constant: CALCULATION_ID."""
-        try:
-            calculation_id = self.CALCULATION_ID
-        except AttributeError:
+        if not hasattr(self, 'CALCULATION_ID'):
             raise NotImplementedError(
                 'Subclasses must provide a value for CALCULATION_ID.')
         return calculation_registry.Registry.get_calculation_by_id(
-            calculation_id)
+            self.CALCULATION_ID)
 
     def _perform_calculation(self, state_answers_dict):
         """Performs calculation on state_answers_dict and returns its output."""
