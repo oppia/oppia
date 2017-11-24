@@ -70,11 +70,11 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
         """
         if answer_list is None:
             answer_list = self.SIMPLE_ANSWER_LIST
-        # NOTE: args will have len(answer_list).
         args = itertools.izip(
             answer_list, itertools.cycle(self.SIMPLE_TIMES_SPENT_IN_CARD),
             itertools.cycle(self.SIMPLE_SESSION_IDS),
             itertools.cycle(self.SIMPLE_CLASSIFY_CATEGORIES))
+        # NOTE: len(list(args)) == len(answer_list).
         return [self._create_answer_dict(*a) for a in args]
 
     def _create_session_ids(self, num):
