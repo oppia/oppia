@@ -583,14 +583,14 @@ class AnswerCalculationOutput(object):
 
 class AnswerFrequencyList(AnswerCalculationOutput):
     """Domain object that represents a list of AnswerOccurrences."""
-    def __init__(self, answer_occurrences=None):
+    def __init__(self):
         """Initialize domain object for answer frequency list for a given list
         of AnswerOccurrence objects (default is empty list).
         """
         super(AnswerFrequencyList, self).__init__(
             CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
         self.answer_counter = utils.OrderedCounter()
-        for answer_occurrence in answer_occurrences or []:
+        for answer_occurrence in answer_occurrences:
             self.answer_counter.update({
                 answer_occurrence.hashable_answer: answer_occurrence.frequency
             })
