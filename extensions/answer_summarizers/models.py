@@ -220,8 +220,8 @@ class TopAnswersByCategorization(BaseCalculation):
 
         categorized_answer_frequency_lists = (
             stats_domain.CategorizedAnswerFrequencyLists({
-                category: _get_top_answers_by_frequency(grouped_answers)
-                for category, grouped_answers in
+                category: _get_top_answers_by_frequency(categorized_answers)
+                for category, categorized_answers in
                 submitted_answers_by_categorization.iteritems()}))
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
