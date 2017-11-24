@@ -827,10 +827,14 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
             'Expected calculation output to be one of')
 
     def test_calculation_output_must_be_less_than_one_million_bytes(self):
-        answer = stats_domain.HashableAnswer('This is not a long sentence.')
-        occurred_answer = stats_domain.AnswerOccurrence(answer, 1)
         self.state_answers_calc_output.calculation_output = (
-            stats_domain.AnswerFrequencyList([occurred_answer] * 200000))
+            stats_domain.AnswerFrequencyList([]))
+        for _ in range(200000):
+            unique_answer = (
+                stats_domain.HashableAnswer('This is not a long sentence.'))
+            unique_answer.hashable_answer = object()  # Make unique.
+            self.state_answers_calc_output.calculation_output.add_answer(
+                unique_answer)
         self._assert_validation_error(
             self.state_answers_calc_output,
             'calculation_output is too big to be stored')
