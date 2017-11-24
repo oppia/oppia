@@ -212,23 +212,21 @@ class TopAnswersByCategorization(BaseCalculation):
         grouped_submitted_answer_dicts = itertools.groupby(
             state_answers_dict['submitted_answer_list'],
             operator.itemgetter('classification_categorization'))
-
         submitted_answers_by_categorization = collections.defaultdict(list)
         for category, answer_dicts in grouped_submitted_answer_dicts:
             if category in CLASSIFICATION_CATEGORIES:
                 submitted_answers_by_categorization[category].extend(
                     d['answer'] for d in answer_dicts)
 
-        answer_occurrences = {
-            category: _get_top_answers_by_frequency(grouped_answers)
-            for category, grouped_answers in
-            submitted_answers_by_categorization.iteritems()
-        }
-
+        categorized_answer_frequency_lists = (
+            stats_domain.CategorizedAnswerFrequencyLists({
+                category: _get_top_answers_by_frequency(grouped_answers)
+                for category, grouped_answers in
+                submitted_answers_by_categorization.iteritems()}))
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
             state_answers_dict['state_name'],
             state_answers_dict['interaction_id'],
             self.id,
-            stats_domain.CategorizedAnswerFrequencyLists(answer_occurrences))
+            categorized_answer_frequency_lists)
