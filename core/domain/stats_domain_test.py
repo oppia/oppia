@@ -678,7 +678,7 @@ class AnswerFrequencyListDomainTests(test_utils.GenericTestBase):
             stats_domain.CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
 
     def test_defaults_to_empty_list(self):
-        answer_frequency_list = stats_domain.AnswerFrequencyList()
+        answer_frequency_list = stats_domain.AnswerFrequencyList([])
         self.assertEqual(len(answer_frequency_list.answer_counter), 0)
 
     def test_create_list_from_raw_object(self):
