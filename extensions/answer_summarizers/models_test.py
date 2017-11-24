@@ -41,6 +41,9 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
                           ['I'] *  4 + ['J'] *  3 + ['K'] *  2 + ['L'])
     TIED_ANSWER_LIST = list('ABCDEFGHIJKL')
 
+    # TODO(brianrodri, msl): Only non-zero answer-counts are tested. Should look
+    # into adding coverage for answers with zero-frequencies.
+
     def _create_answer_dict(
             self, answer, time_spent_in_card=3.2, session_id='sid1',
             classify_category=exp_domain.EXPLICIT_CLASSIFICATION):
