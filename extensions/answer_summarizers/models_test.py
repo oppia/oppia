@@ -65,7 +65,7 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
         """
         if answer_list is None:
             answer_list = self.SIMPLE_ANSWER_LIST
-        return [self._create_answer_dict(*a) for a in answer_list]
+        return [self._create_answer_dict(answer) for answer in answer_list]
 
     def _create_state_answers_dict(
             self, answer_dicts_list, exploration_id='0', exploration_version=1,
