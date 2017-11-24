@@ -51,7 +51,7 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
             'classification_categorization': classify_category,
         }
 
-    def _create_answer_dicts_list(self, answer_list=None):
+    def _create_answer_dicts_list(self, answer_list):
         """This is similar to _create_answer_dict, except it simplifies building
         several different answers at once.
 
@@ -63,8 +63,6 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
             list(dict(str : *)). Each dict is built by a call to
             _create_answer_dict.
         """
-        if answer_list is None:
-            answer_list = self.SIMPLE_ANSWER_LIST
         return [self._create_answer_dict(answer) for answer in answer_list]
 
     def _create_state_answers_dict(
@@ -106,7 +104,8 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_top_answers_without_ties(self):
         # Create 12 answers with different frequencies.
-        answer_dicts_list = self._create_answer_dicts_list()
+        answer_dicts_list = (
+            self._create_answer_dicts_list(self.SIMPLE_ANSWER_LIST))
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -160,7 +159,8 @@ class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
     def test_top5_without_ties(self):
         """Simplest case: ordering is obvious."""
         # Create 12 answers with different frequencies.
-        answer_dicts_list = self._create_answer_dicts_list()
+        answer_dicts_list = (
+            self._create_answer_dicts_list(self.SIMPLE_ANSWER_LIST))
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -200,7 +200,8 @@ class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_top10_answers_without_ties(self):
         # Create 12 answers with different frequencies.
-        answer_dicts_list = self._create_answer_dicts_list()
+        answer_dicts_list = (
+            self._create_answer_dicts_list(self.SIMPLE_ANSWER_LIST))
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
