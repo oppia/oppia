@@ -137,7 +137,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         skill_id = collection.get_skill_id_from_skill_name('test')
         collection_node = collection.get_node(exp_id)
         collection_node.update_acquired_skill_ids([skill_id])
-       
+
         # Update skill.
         collection_services.update_collection(
             owner_id, collection_id, [{
@@ -150,14 +150,14 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
 
         acquired_skills = (
             collection_services.get_acquired_skills_of_user_given_collection_id(
-            owner_id, collection_id))
+                owner_id, collection_id))
         self.assertEqual(len(acquired_skills), 0)
 
         collection_services.record_played_exploration_in_collection_context(
             owner_id, collection_id, exp_id)
         acquired_skills = (
             collection_services.get_acquired_skills_of_user_given_collection_id(
-            owner_id, collection_id))
+                owner_id, collection_id))
         self.assertEqual(skill_id in acquired_skills, True)
 
 class CollectionProgressUnitTests(CollectionServicesUnitTests):

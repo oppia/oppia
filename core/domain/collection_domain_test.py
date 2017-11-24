@@ -584,7 +584,6 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'exp_id')
         self.assertEqual(collection.skills, {})
 
-        
         collection.add_skill('skillname1')
         collection.add_skill('skillname2')
         skill_id = collection.get_skill_id_from_skill_name('skillname1')
