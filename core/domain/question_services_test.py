@@ -69,7 +69,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             collection_id, language_code)
         question.validate()
 
-        question1_model = question_services.add_question(self.owner_id, question)
+        question1_model = question_services.add_question(
+            self.owner_id, question)
         state = exp_domain.State.create_default_state('ABC')
         question_data = state.to_dict()
         question_id = 'dummy2'
@@ -82,7 +83,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             collection_id, language_code)
         question.validate()
 
-        question2_model = question_services.add_question(self.owner_id, question)
+        question2_model = question_services.add_question(
+            self.owner_id, question)
         questions = question_services.get_questions_by_ids(
             [question1_model.id, question2_model.id])
         self.assertEqual(len(questions), 2)

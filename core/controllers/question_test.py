@@ -18,7 +18,6 @@ classifiers."""
 import json
 import os
 
-from core.controllers import question
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -34,9 +33,9 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
     """Test the handler for rendering questions batch."""
 
     def setUp(self):
-    	super(QuestionsBatchHandlerTest, self).setUp()
+        super(QuestionsBatchHandlerTest, self).setUp()
 
-    	self.coll_id = '0'
+        self.coll_id = '0'
         self.exp_id = '1'
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -90,5 +89,6 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
 
     def test_get(self):
         """Test to verify the get method."""
-        json_response = self.get_json(feconf.QUESTION_DATA_URL + '/batch/%s'% self.coll_id,
-                                       self.payload, expect_errors=False)
+        json_response = self.get_json(
+            feconf.QUESTION_DATA_URL + '/batch/%s'% self.coll_id,
+            self.payload, expect_errors=False)
