@@ -267,10 +267,11 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
     def test_only_one_category(self):
-        state_answers_dict = self._create_state_answers_dict(answer_dicts_list=[
+        answer_dicts_list = [
             self._create_answer_dict(
                 'Hard A', classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
-        ])
+        ]
+        state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
         expected_calc_output = {
@@ -279,7 +280,7 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
     def test_many_categories(self):
-        state_answers_dict = self._create_state_answers_dict(answer_dicts_list=[
+        answer_dicts_list = [
             # EXPLICIT
             self._create_answer_dict(
                 'Explicit A',
@@ -323,7 +324,8 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
             self._create_answer_dict(
                 'Default B',
                 classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
-        ])
+        ]
+        state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
         expected_calc_output = {
