@@ -54,7 +54,7 @@ CLASSIFICATION_CATEGORIES = frozenset([
 
 
 class _HashableAnswer(object):
-    """Wrapps answer with object that can be placed into sets and dicts."""
+    """Wraps answer with object that can be placed into sets and dicts."""
 
     def __init__(self, answer):
         self.answer = answer
