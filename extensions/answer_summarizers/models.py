@@ -71,7 +71,7 @@ class _HashableAnswer(object):
 
 def _get_top_answers_by_frequency(answers, limit=None):
     """Computes the number of occurrences of each answer, keeping only the top
-    limited answers, and returns an AnswerFrequencyList.
+    limit answers, and returns an AnswerFrequencyList.
 
     This method is run from within the context of a MapReduce job.
     """
