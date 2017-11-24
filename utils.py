@@ -508,6 +508,15 @@ def get_hashable_value(value):
     {list: tuple, dict: (sorted tuple of pairs)}. Additionally, their
     elements are converted to hashable values through recursive calls. All
     other value types are assumed to already be hashable.
+
+    Args:
+        value: *. Some JSON-like object, that is, an object made-up of only:
+            lists, dicts, strings, ints, bools, None. Types can be nested in
+            each other.
+
+    Returns:
+        hashed_value: *. A new object that will always have the same hash for
+        "equivalent" values.
     """
     if isinstance(value, list):
         return tuple(get_hashable_value(e) for e in value)
