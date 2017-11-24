@@ -528,7 +528,7 @@ class SubmittedAnswer(object):
                 self.classification_categorization)
 
 
-class Answer(object):
+class HashableAnswer(object):
     """Domain object that represents a specific answer. Is hashable."""
     def __init__(self, answer):
         """Initialize domain object for answer occurrences."""
@@ -539,7 +539,7 @@ class Answer(object):
         return hash(self.hashable_answer)
 
     def __eq__(self, other):
-        if isinstance(other, Answer):
+        if isinstance(other, HashableAnswer):
             return self.hashable_answer == other.hashable_answer
         return False
 
@@ -555,25 +555,21 @@ class AnswerOccurrence(object):
     """Domain object that represents a specific answer that occurred some number
     of times.
     """
-    def __init__(self, answer, frequency):
+    def __init__(self, hashable_answer, frequency):
         """Initialize domain object for answer occurrences."""
-        self.answer = answer
+        self.hashable_answer = hashable_answer
         self.frequency = frequency
-
-    def to_pair(self):
-        """Used to initialize dicts."""
-        return (self.answer, self.frequency)
 
     def to_raw_type(self):
         return {
-            'answer': self.answer.to_raw_type(),
+            'answer': self.hashable_answer.to_raw_type(),
             'frequency': self.frequency
         }
 
     @classmethod
     def from_raw_type(cls, answer_occurrence_dict):
         return cls(
-            Answer.from_raw_type(answer_occurrence_dict['answer']),
+            HashableAnswer.from_raw_type(answer_occurrence_dict['answer']),
             answer_occurrence_dict['frequency'])
 
 
@@ -593,24 +589,23 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         """
         super(AnswerFrequencyList, self).__init__(
             CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
-        answer_occurrences = answer_occurrences or []
-        self.answer_counter = utils.OrderedCounter(
-            answer_occurrence.to_pair()
-            for answer_occurrence in answer_occurrences)
+        self.answer_counter = utils.OrderedCounter({
+            answer_occurrence.hashable_answer: answer_occurrence.frequency
+            for answer_occurrence in answer_occurrences or []})
         self.limit = limit
 
-    def add_answer(self, answer):
+    def add_answer(self, hashable_answer):
         """Adds a new Answer object."""
-        self.answer_counter[answer] += 1
+        self.answer_counter[hashable_answer] += 1
 
-    def add_answers(self, answers):
+    def add_answers(self, hashable_answers):
         """Adds an iterable of new Answer objects."""
-        self.answer_counter.update(answers)
+        self.answer_counter.update(hashable_answers)
 
     def to_raw_type(self):
         return [
-            AnswerOccurrence(answer, frequency).to_raw_type()
-            for answer, frequency in (
+            AnswerOccurrence(hashable_answer, frequency).to_raw_type()
+            for hashable_answer, frequency in (
                 self.answer_counter.most_common(self.limit))]
 
     @classmethod
