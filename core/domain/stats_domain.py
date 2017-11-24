@@ -589,9 +589,12 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         """
         super(AnswerFrequencyList, self).__init__(
             CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
-        self.answer_counter = utils.OrderedCounter({
-            answer_occurrence.hashable_answer: answer_occurrence.frequency
-            for answer_occurrence in answer_occurrences or []})
+        self.answer_counter = utils.OrderedCounter()
+        for answer_occurrence in answer_occurrences or []:
+            self.answer_counter.update({
+                answer_occurrence.hashable_answer: answer_occurrence.frequency
+            })
+        self._len_limit = None
 
     def add_answer(self, hashable_answer):
         """Adds a new Answer object."""
@@ -601,11 +604,14 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         """Adds an iterable of new Answer objects."""
         self.answer_counter.update(hashable_answers)
 
-    def to_raw_type(self, len_limit=None):
+    def truncate(self, len_limit):
+        self._len_limit = len_limit
+
+    def to_raw_type(self):
         return [
             AnswerOccurrence(hashable_answer, frequency).to_raw_type()
             for hashable_answer, frequency in (
-                self.answer_counter.most_common(len_limit))]
+                self.answer_counter.most_common(self._len_limit))]
 
     @classmethod
     def from_raw_type(cls, answer_occurrence_list):
