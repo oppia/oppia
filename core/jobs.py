@@ -23,7 +23,6 @@ import datetime
 import json
 import logging
 import traceback
-import utils
 
 from core.platform import models
 import utils
