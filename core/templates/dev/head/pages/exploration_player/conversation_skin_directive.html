@@ -120,20 +120,19 @@
 </div>
 
 <script>
-  if ( $(window).width() < 769)
-  {
+  if ($(window).width() < 769) {
     var previousScroll = 0,
         headerOrgOffset = $('.oppia-navbar').height();
     $(window).scroll(function () {
-        var currentScroll = $(this).scrollTop();
-        if (currentScroll > headerOrgOffset) {
-            if (currentScroll > previousScroll) {
-                $('.oppia-navbar').slideUp();
-            } else {
-                $('.oppia-navbar').slideDown();
-            }
-        }
-        previousScroll = currentScroll;
+      var currentScroll = $(this).scrollTop();
+      if (currentScroll > headerOrgOffset) {
+          if (currentScroll > previousScroll) {
+              $('.oppia-navbar').slideUp();
+          } else {
+              $('.oppia-navbar').slideDown();
+          }
+      }
+      previousScroll = currentScroll;
     });
   }
 </script>
