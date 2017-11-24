@@ -74,6 +74,14 @@ def _get_top_answers_by_frequency(answers, limit=None):
     limit answers, and returns an AnswerFrequencyList.
 
     This method is run from within the context of a MapReduce job.
+
+    Args:
+        answers: iterable of *. The collection of answers to be tallied.
+        limit: int or None. The number of answers in the resulting list. When
+            None, all answers are returned.
+
+    Returns:
+        stats_domain.AnswerFrequencyList.
     """
     answer_counter = utils.OrderedCounter(_HashableAnswer(a) for a in answers)
     return stats_domain.AnswerFrequencyList([
