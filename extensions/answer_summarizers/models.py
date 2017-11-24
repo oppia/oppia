@@ -76,7 +76,7 @@ def _get_top_answers_by_frequency(answers, limit=None):
     This method is run from within the context of a MapReduce job.
 
     Args:
-        answers: iterable of *. The collection of answers to be tallied.
+        answers: iterable(*). The collection of answers to be tallied.
         limit: int or None. The maximum number of answer to return. When None,
             all answers are returned.
 
