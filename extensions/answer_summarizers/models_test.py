@@ -110,6 +110,7 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
+        # All 12 should be sorted.
         expected_calc_output = [
             {'answer': 'A', 'frequency': 12},
             {'answer': 'B', 'frequency': 11},
@@ -133,6 +134,7 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
+        # All 12 should appear in-order.
         expected_calc_output = [
             {'answer': 'A', 'frequency': 1},
             {'answer': 'B', 'frequency': 1},
