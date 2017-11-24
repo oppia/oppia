@@ -27,15 +27,6 @@ from extensions.answer_summarizers import models as answer_models
 class BaseCalculationUnitTests(test_utils.GenericTestBase):
     """Test cases for BaseCalculation."""
 
-    SIMPLE_ANSWER_LIST = [
-        [letter] * frequency
-        for letter, frequency in zip('ABCDEFGHIJKL', range(12, 0, -1))
-    ]
-    TIED_ANSWER_LIST = list('ABCDEFGHIJKL')
-    SIMPLE_CLASSIFY_CATEGORIES = [exp_domain.EXPLICIT_CLASSIFICATION]
-    SIMPLE_SESSION_IDS = ['sid{}'.format(n) for n in range(6)]
-    SIMPLE_TIMES_SPENT_IN_CARD = [float(n) for n in range(5)]
-
     def test_requires_override_for_calculation(self):
         with self.assertRaises(NotImplementedError):
             answer_models.BaseCalculation().calculate_from_state_answers_dict(
@@ -44,6 +35,15 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
 
 class CalculationUnitTestBase(test_utils.GenericTestBase):
     """Utility methods for testing calculations."""
+
+    SIMPLE_ANSWER_LIST = [
+        [letter] * frequency
+        for letter, frequency in zip('ABCDEFGHIJKL', range(12, 0, -1))
+    ]
+    TIED_ANSWER_LIST = list('ABCDEFGHIJKL')
+    SIMPLE_CLASSIFY_CATEGORIES = [exp_domain.EXPLICIT_CLASSIFICATION]
+    SIMPLE_SESSION_IDS = ['sid{}'.format(n) for n in range(6)]
+    SIMPLE_TIMES_SPENT_IN_CARD = [float(n) for n in range(5)]
 
     def _create_answer_dict(
             self, answer, time_spent_in_card, session_id,
