@@ -17,7 +17,6 @@
 """Common classes and methods for managing long running jobs."""
 
 import ast
-import collections
 import copy
 import datetime
 import json
