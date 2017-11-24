@@ -90,4 +90,3 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
             feconf.QUESTION_DATA_URL + '/batch/%s'% self.coll_id,
             self.payload, expect_errors=False)
         print json_response
-
