@@ -16,8 +16,6 @@
 
 """Test calculations to get interaction answer views."""
 
-import itertools
-
 from core.domain import calculation_registry
 from core.domain import exp_domain
 from core.tests import test_utils
