@@ -569,10 +569,6 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         self.answer_occurrences = (
             answer_occurrences if answer_occurrences else [])
 
-    def add_answer(self, answer_occurrence):
-        """Adds a new AnswerOccurrence object."""
-        self.answer_occurrences.append(answer_occurrence)
-
     def to_raw_type(self):
         return [
             answer_occurrence.to_raw_type()
