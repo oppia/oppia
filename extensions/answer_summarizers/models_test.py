@@ -54,7 +54,7 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
             'classification_categorization': classify_category,
         }
 
-    def _create_answer_dicts_list(self, answer_list=None, num=None):
+    def _create_answer_dicts_list(self, answer_list=None):
         """This is similar to _create_answer_dict, except it simplifies building
         several different answers at once.
 
@@ -70,17 +70,12 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
         """
         if answer_list is None:
             answer_list = self.SIMPLE_ANSWER_LIST
-        if num is None:
-            num = len(answer_list)
-        infinite_args = itertools.izip(
+        args = itertools.izip(
             itertools.cycle(answer_list),
             itertools.cycle(self.SIMPLE_TIMES_SPENT_IN_CARD),
             itertools.cycle(self.SIMPLE_SESSION_IDS),
             itertools.cycle(self.SIMPLE_CLASSIFY_CATEGORIES))
-        return [
-            self._create_answer_dict(*create_answer_dict_args)
-            for create_answer_dict_args in itertools.islice(infinite_args, num)
-        ]
+        return [self._create_answer_dict(*a) for a in args]
 
     def _create_session_ids(self, num):
         """Builds a list of N simple session id values."""
