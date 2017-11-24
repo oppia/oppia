@@ -30,8 +30,8 @@ var expectInteractionDetailsToMatch = function(elem) {
 };
 
 var submitAnswer = function(elem, answer) {
-  elem.element(by.tagName('oppia-interactive-fraction-input')).
-  element(by.tagName('input')).sendKeys(answer + '\n');
+  elem.element(by.tagName('oppia-interactive-fraction-input'))
+    .element(by.tagName('input')).sendKeys(answer + '\n');
 };
 
 var answerObjectType = 'Fraction';
