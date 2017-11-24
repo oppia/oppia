@@ -54,20 +54,6 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
             'classification_categorization': classify_category,
         }
 
-    def _create_answer_dicts_list(self, answer_list):
-        """This is similar to _create_answer_dict, except it simplifies building
-        several different answers at once.
-
-        Args:
-            answer_list: list(*). Each element will appear in-order in the
-                returned list.
-
-        Returns:
-            list(dict(str : *)). Each dict is built by a call to
-            _create_answer_dict.
-        """
-        return [self._create_answer_dict(answer) for answer in answer_list]
-
     def _create_state_answers_dict(
             self, answer_dicts_list, exploration_id='0', exploration_version=1,
             state_name='Welcome!', interaction_id='MultipleChoiceInput'):
@@ -107,8 +93,8 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_top_answers_without_ties(self):
         # Create 12 answers with different frequencies.
-        answer_dicts_list = (
-            self._create_answer_dicts_list(self.SIMPLE_ANSWER_LIST))
+        answer_dicts_list = [
+            self._create_answer_dict(a) for a in self.SIMPLE_ANSWER_LIST]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -131,8 +117,8 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_answers_with_ties(self):
         """Ties are resolved by submission ordering: earlier ranks higher."""
-        answer_dicts_list = (
-            self._create_answer_dicts_list(self.TIED_ANSWER_LIST))
+        answer_dicts_list = [
+            self._create_answer_dict(a) for a in self.TIED_ANSWER_LIST]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -162,8 +148,8 @@ class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
     def test_top5_without_ties(self):
         """Simplest case: ordering is obvious."""
         # Create 12 answers with different frequencies.
-        answer_dicts_list = (
-            self._create_answer_dicts_list(self.SIMPLE_ANSWER_LIST))
+        answer_dicts_list = [
+            self._create_answer_dict(a) for a in self.SIMPLE_ANSWER_LIST]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -180,8 +166,8 @@ class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
     def test_top5_with_ties(self):
         """Ties are resolved by submission ordering: earlier ranks higher."""
         # Create 12 answers with same frequencies.
-        answer_dicts_list = (
-            self._create_answer_dicts_list(self.TIED_ANSWER_LIST))
+        answer_dicts_list = [
+            self._create_answer_dict(a) for a in self.TIED_ANSWER_LIST]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -203,8 +189,8 @@ class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_top10_answers_without_ties(self):
         # Create 12 answers with different frequencies.
-        answer_dicts_list = (
-            self._create_answer_dicts_list(self.SIMPLE_ANSWER_LIST))
+        answer_dicts_list = [
+            self._create_answer_dict(a) for a in self.SIMPLE_ANSWER_LIST]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -226,8 +212,8 @@ class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
     def test_top10_with_ties(self):
         """Ties are resolved by submission ordering: earlier ranks higher."""
         # Create 12 answers with same frequencies.
-        answer_dicts_list = (
-            self._create_answer_dicts_list(self.TIED_ANSWER_LIST))
+        answer_dicts_list = [
+            self._create_answer_dict(a) for a in self.TIED_ANSWER_LIST]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
