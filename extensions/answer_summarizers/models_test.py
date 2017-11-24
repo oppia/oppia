@@ -41,8 +41,6 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
                           ['I'] *  4 + ['J'] *  3 + ['K'] *  2 + ['L'])
     TIED_ANSWER_LIST = list('ABCDEFGHIJKL')
     SIMPLE_CLASSIFY_CATEGORIES = [exp_domain.EXPLICIT_CLASSIFICATION]
-    SIMPLE_SESSION_IDS = ['sid{}'.format(n) for n in range(6)]
-    SIMPLE_TIMES_SPENT_IN_CARD = [float(n) for n in range(5)]
 
     def _create_answer_dict(
             self, answer, time_spent_in_card=3.2, session_id='sid1',
@@ -68,16 +66,7 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
         """
         if answer_list is None:
             answer_list = self.SIMPLE_ANSWER_LIST
-        args = itertools.izip(
-            answer_list, itertools.cycle(self.SIMPLE_TIMES_SPENT_IN_CARD),
-            itertools.cycle(self.SIMPLE_SESSION_IDS),
-            itertools.cycle(self.SIMPLE_CLASSIFY_CATEGORIES))
-        # NOTE: len(list(args)) == len(answer_list).
-        return [self._create_answer_dict(*a) for a in args]
-
-    def _create_session_ids(self, num):
-        """Builds a list of N simple session id values."""
-        return ['sid%d' % n for n in range(1, num + 1)]
+        return [self._create_answer_dict(*a) for a in answer_list]
 
     def _create_state_answers_dict(
             self, answer_dicts_list, exploration_id='0', exploration_version=1,
