@@ -239,12 +239,13 @@ class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
     def test_shared_answers(self):
         """This calculation only works on answers that accept multiple answers.
         """
-        state_answers_dict = self._create_state_answers_dict(answer_dicts_list=[
+        answer_dicts_list = [
             self._create_answer_dict(['B', 'A']),
             self._create_answer_dict(['A', 'C']),
             self._create_answer_dict(['D']),
             self._create_answer_dict(['B', 'A']),
-        ])
+        ]
+        state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
         expected_calc_output = [
