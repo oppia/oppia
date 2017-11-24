@@ -80,7 +80,7 @@ def _get_top_answers_by_frequency(answers, limit=None):
         for hashable_answer, frequency in answer_counter.most_common(limit))
 
 
-def _make_iterable_answers(answer_dicts_list):
+def _make_answers_iter_from_answer_dicts(answer_dicts_list):
     return map(operator.itemgetter('answer'), answer_dicts_list)
 
 
@@ -119,7 +119,7 @@ class AnswerFrequencies(BaseCalculation):
         """
         answer_dicts_list = state_answers_dict['submitted_answer_list']
         answer_frequency_list = _get_top_answers_by_frequency(
-            _make_iterable_answers(answer_dicts_list))
+            _make_answers_iter_from_answer_dicts(answer_dicts_list))
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -141,7 +141,7 @@ class Top5AnswerFrequencies(BaseCalculation):
         """
         answer_dicts_list = state_answers_dict['submitted_answer_list']
         answer_frequency_list = _get_top_answers_by_frequency(
-            _make_iterable_answers(answer_dicts_list), limit=5)
+            _make_answers_iter_from_answer_dicts(answer_dicts_list), limit=5)
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -163,7 +163,7 @@ class Top10AnswerFrequencies(BaseCalculation):
         """
         answer_dicts_list = state_answers_dict['submitted_answer_list']
         answer_frequency_list = _get_top_answers_by_frequency(
-            _make_iterable_answers(answer_dicts_list), limit=10)
+            _make_answers_iter_from_answer_dicts(answer_dicts_list), limit=10)
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -188,7 +188,7 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
         """
         answer_dicts_list = state_answers_dict['submitted_answer_list']
         answer_frequency_list = _get_top_answers_by_frequency(
-            itertools.chain.from_iterable(_make_iterable_answers(
+            itertools.chain.from_iterable(_make_answers_iter_from_answer_dicts(
                 answer_dicts_list)),
             limit=10)
         return stats_domain.StateAnswersCalcOutput(
@@ -222,7 +222,7 @@ class TopAnswersByCategorization(BaseCalculation):
         for category, answer_dicts in grouped_submitted_answer_dicts:
             if category in CLASSIFICATION_CATEGORIES:
                 submitted_answers_by_categorization[category].extend(
-                    _make_iterable_answers(answer_dicts))
+                    _make_answers_iter_from_answer_dicts(answer_dicts))
 
         answer_occurrences = {
             category: _get_top_answers_by_frequency(answers)
