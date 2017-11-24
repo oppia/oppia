@@ -594,24 +594,24 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         super(AnswerFrequencyList, self).__init__(
             CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
         answer_occurrences = answer_occurrences or []
-        self._answer_counter = utils.OrderedCounter(
+        self.answer_counter = utils.OrderedCounter(
             answer_occurrence.to_pair()
             for answer_occurrence in answer_occurrences)
         self.limit = limit
 
     def add_answer(self, answer):
         """Adds a new Answer object."""
-        self._answer_counter[answer] += 1
+        self.answer_counter[answer] += 1
 
     def add_answers(self, answers):
         """Adds an iterable of new Answer objects."""
-        self._answer_counter.update(answers)
+        self.answer_counter.update(answers)
 
     def to_raw_type(self):
         return [
             AnswerOccurrence(answer, frequency).to_raw_type()
             for answer, frequency in (
-                self._answer_counter.most_common(self.limit))]
+                self.answer_counter.most_common(self.limit))]
 
     @classmethod
     def from_raw_type(cls, answer_occurrence_list):
