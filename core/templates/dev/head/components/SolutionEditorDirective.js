@@ -19,14 +19,14 @@
 oppia.directive('solutionEditor', [
   '$modal', 'UrlInterpolationService', 'stateSolutionService',
   'EditorStateService', 'explorationStatesService',
-  'explorationWarningsService', 'alertsService',
+  'ExplorationWarningsService', 'alertsService',
   'SolutionObjectFactory', 'SolutionVerificationService',
   'explorationContextService', 'oppiaExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateCustomizationArgsService',
   'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function($modal, UrlInterpolationService, stateSolutionService,
            EditorStateService, explorationStatesService,
-           explorationWarningsService, alertsService,
+           ExplorationWarningsService, alertsService,
            SolutionObjectFactory, SolutionVerificationService,
            explorationContextService, oppiaExplorationHtmlFormatterService,
            stateInteractionIdService, stateCustomizationArgsService,
@@ -128,12 +128,12 @@ oppia.directive('solutionEditor', [
                 function () {
                   explorationStatesService.updateSolutionValidity(
                     currentStateName, true);
-                  explorationWarningsService.updateWarnings();
+                  ExplorationWarningsService.updateWarnings();
                 },
                 function () {
                   explorationStatesService.updateSolutionValidity(
                     currentStateName, false);
-                  explorationWarningsService.updateWarnings();
+                  ExplorationWarningsService.updateWarnings();
                   alertsService.addInfoMessage(
                     INFO_MESSAGE_SOLUTION_IS_INVALID);
                 }

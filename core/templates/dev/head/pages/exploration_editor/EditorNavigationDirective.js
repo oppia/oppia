@@ -26,14 +26,14 @@ oppia.directive('editorNavigation', [
       controller: [
         '$scope', '$rootScope', '$timeout', '$modal',
         'RouterService', 'explorationRightsService',
-        'explorationWarningsService',
+        'ExplorationWarningsService',
         'stateEditorTutorialFirstTimeService',
         'ThreadDataService', 'siteAnalyticsService',
         'explorationContextService', 'WindowDimensionsService',
         function(
             $scope, $rootScope, $timeout, $modal,
             RouterService, explorationRightsService,
-            explorationWarningsService,
+            ExplorationWarningsService,
             stateEditorTutorialFirstTimeService,
             ThreadDataService, siteAnalyticsService,
             explorationContextService, WindowDimensionsService) {
@@ -94,10 +94,10 @@ oppia.directive('editorNavigation', [
             });
           };
 
-          $scope.countWarnings = explorationWarningsService.countWarnings;
-          $scope.getWarnings = explorationWarningsService.getWarnings;
+          $scope.countWarnings = ExplorationWarningsService.countWarnings;
+          $scope.getWarnings = ExplorationWarningsService.getWarnings;
           $scope.hasCriticalWarnings = (
-            explorationWarningsService.hasCriticalWarnings);
+            ExplorationWarningsService.hasCriticalWarnings);
 
           $scope.explorationRightsService = explorationRightsService;
           $scope.getTabStatuses = RouterService.getTabStatuses;

@@ -22,14 +22,14 @@ oppia.controller('StateSolution', [
   'SolutionVerificationService', 'oppiaExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
   'SolutionObjectFactory', 'explorationContextService',
-  'explorationWarningsService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'ExplorationWarningsService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function(
     $scope, $rootScope, $modal, EditorStateService, alertsService,
     INTERACTION_SPECS, stateSolutionService, explorationStatesService,
     SolutionVerificationService, oppiaExplorationHtmlFormatterService,
     stateInteractionIdService, stateHintsService, UrlInterpolationService,
     SolutionObjectFactory, explorationContextService,
-    explorationWarningsService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
+    ExplorationWarningsService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
     $scope.correctAnswer = null;
     $scope.correctAnswerEditorHtml = '';
     $scope.inlineSolutionEditorIsActive = false;
@@ -40,7 +40,7 @@ oppia.controller('StateSolution', [
     $scope.stateSolutionService = stateSolutionService;
 
 
-    explorationWarningsService.updateWarnings();
+    ExplorationWarningsService.updateWarnings();
 
     $scope.isSolutionValid = function() {
       return explorationStatesService.isSolutionValid(
@@ -133,12 +133,12 @@ oppia.controller('StateSolution', [
           function () {
             explorationStatesService.updateSolutionValidity(
               currentStateName, true);
-            explorationWarningsService.updateWarnings();
+            ExplorationWarningsService.updateWarnings();
           },
           function () {
             explorationStatesService.updateSolutionValidity(
               currentStateName, false);
-            explorationWarningsService.updateWarnings();
+            ExplorationWarningsService.updateWarnings();
             alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
           }
         );
