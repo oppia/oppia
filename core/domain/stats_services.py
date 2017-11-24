@@ -307,7 +307,7 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
     Returns:
         list(dict). Each item in the list is a dict with keys representing
         - 'id': str. The visualization ID.
-        - 'data': list(dict). A list of calculation IDs.
+        - 'data': list(dict). A list of answer/frequency dicts.
         - 'options': dict. The visualization options.
 
         An example of the returned value may be:
@@ -343,7 +343,7 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
             continue
 
         calculation_ids_to_outputs[calculation_id] = (
-            calc_output_domain_object.calculation_output)
+            calc_output_domain_object.calculation_output.to_raw_type())
     return [{
         'id': visualization.id,
         'data': calculation_ids_to_outputs[visualization.calculation_id],

@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import operator
 import os
 
 from core import jobs_registry
@@ -1243,7 +1244,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             visualization = visualizations[0]
             self.assertEqual(visualization['id'], 'FrequencyTable')
-            self.assertEqual(visualization['data'].to_raw_type(), [{
+            self.assertEqual(visualization['data'], [{
                 'answer': 'Answer A',
                 'frequency': 1
             }])
@@ -1262,7 +1263,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             visualization = visualizations[0]
             self.assertEqual(visualization['id'], 'FrequencyTable')
             # Ties will appear in same order they are submitted in.
-            self.assertEqual(visualization['data'].to_raw_type(), [{
+            self.assertEqual(visualization['data'], [{
                 'answer': 'Answer A',
                 'frequency': 3
             }, {
@@ -1284,7 +1285,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self._run_answer_summaries_aggregator()
             visualizations = sorted(
                 self._get_visualizations(exp_id=self.SET_INPUT_EXP_ID),
-                key=lambda x: x['data'].to_raw_type())
+                key=operator.itemgetter('data'))
             self.assertEqual(len(visualizations), 2)
 
             # Use options to distinguish between the two visualizations, since
@@ -1294,7 +1295,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self.assertEqual(
                 top_answers_visualization['options']['column_headers'],
                 ['Answer', 'Count'])
-            self.assertEqual(top_answers_visualization['data'].to_raw_type(), [{
+            self.assertEqual(top_answers_visualization['data'], [{
                 'answer': ['A', 'B'],
                 'frequency': 3
             }, {
@@ -1313,7 +1314,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
                 ['Element', 'Count'])
 
             common_visualization_data = (
-                common_elements_visualization['data'].to_raw_type())
+                common_elements_visualization['data'])
             self.assertEqual(common_visualization_data, [{
                 'answer': 'A',
                 'frequency': 6
@@ -1339,7 +1340,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             visualization = visualizations[0]
             # The latest data should include all submitted answers.
-            self.assertEqual(visualization['data'].to_raw_type(), [{
+            self.assertEqual(visualization['data'], [{
                 'answer': 'Answer A',
                 'frequency': 2
             }, {
@@ -1362,7 +1363,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             visualization = visualizations[0]
             # The latest data should include all submitted answers.
-            self.assertEqual(visualization['data'].to_raw_type(), [{
+            self.assertEqual(visualization['data'], [{
                 'answer': 'Answer A',
                 'frequency': 2
             }, {
