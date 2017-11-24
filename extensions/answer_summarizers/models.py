@@ -77,11 +77,11 @@ def _get_top_answers_by_frequency(answers, limit=None):
 
     Args:
         answers: iterable of *. The collection of answers to be tallied.
-        limit: int or None. The number of answers in the resulting list. When
-            None, all answers are returned.
+        limit: int or None. The maximum number of answer to return. When None,
+            all answers are returned.
 
     Returns:
-        stats_domain.AnswerFrequencyList.
+        stats_domain.AnswerFrequencyList. A list of the top "limit" answers.
     """
     answer_counter = utils.OrderedCounter(_HashableAnswer(a) for a in answers)
     return stats_domain.AnswerFrequencyList([
