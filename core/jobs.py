@@ -23,6 +23,7 @@ import datetime
 import json
 import logging
 import traceback
+import utils
 
 from core.platform import models
 import utils
@@ -216,17 +217,8 @@ class BaseJobManager(object):
         """
         _MAX_OUTPUT_LEN_CHARS = 900000
 
-        class _OrderedCounter(collections.Counter, collections.OrderedDict):
-            """Counter that remembers the order elements are first encountered.
-
-            We use this class so that our tests can rely on deterministic
-            ordering, instead of simply using `collections.Counter` which has
-            non-deterministic ordering.
-            """
-            pass
-
         # Consolidate the lines of output since repeating them isn't useful.
-        counter = _OrderedCounter(str(output) for output in output_list)
+        counter = utils.OrderedCounter(str(output) for output in output_list)
         output_str_list = [
             output_str if count == 1 else '(%dx) %s' % (count, output_str)
             for (output_str, count) in counter.iteritems()
