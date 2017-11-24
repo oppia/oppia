@@ -74,7 +74,7 @@ def _get_top_answers_by_frequency(answers, limit=None):
 
     This method is run from within the context of a MapReduce job.
     """
-    answer_counter = utils.OrderedCounter(map(_HashableAnswer, answers))
+    answer_counter = utils.OrderedCounter(_HashableAnswer(a) for a in answers)
     return stats_domain.AnswerFrequencyList(
         stats_domain.AnswerOccurrence(hashable_answer.answer, frequency)
         for hashable_answer, frequency in answer_counter.most_common(limit))
