@@ -583,7 +583,7 @@ class AnswerCalculationOutput(object):
 
 class AnswerFrequencyList(AnswerCalculationOutput):
     """Domain object that represents a list of AnswerOccurrences."""
-    def __init__(self, answer_occurrences=None, limit=None):
+    def __init__(self, answer_occurrences=None):
         """Initialize domain object for answer frequency list for a given list
         of AnswerOccurrence objects (default is empty list).
         """
@@ -592,7 +592,6 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         self.answer_counter = utils.OrderedCounter({
             answer_occurrence.hashable_answer: answer_occurrence.frequency
             for answer_occurrence in answer_occurrences or []})
-        self.limit = limit
 
     def add_answer(self, hashable_answer):
         """Adds a new Answer object."""
@@ -602,11 +601,11 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         """Adds an iterable of new Answer objects."""
         self.answer_counter.update(hashable_answers)
 
-    def to_raw_type(self):
+    def to_raw_type(self, len_limit=None):
         return [
             AnswerOccurrence(hashable_answer, frequency).to_raw_type()
             for hashable_answer, frequency in (
-                self.answer_counter.most_common(self.limit))]
+                self.answer_counter.most_common(len_limit))]
 
     @classmethod
     def from_raw_type(cls, answer_occurrence_list):
