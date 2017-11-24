@@ -59,13 +59,11 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
         several different answers at once.
 
         Args:
-            answer_list: list(*). Each element is used cyclically to produce
-                each individual answer_dict.
-            num: int or None. The total number of answers to produce. When None,
-                len(answer_list) is used instead.
+            answer_list: list(*). Each element will appear in-order in the
+                returned list.
 
         Returns:
-            list(dict(str : *)). Each dict is build by a call to
+            list(dict(str : *)). Each dict is built by a call to
             _create_answer_dict.
         """
         if answer_list is None:
