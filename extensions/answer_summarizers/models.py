@@ -143,6 +143,7 @@ class Top10AnswerFrequencies(BaseCalculation):
         """
         answer_frequency_list = _get_top_answers_by_frequency(
             state_answers_dict['submitted_answer_list'])
+        answer_frequency_list.truncate(10)
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
@@ -170,6 +171,7 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
             answer_frequency_list.add_answers(
                 stats_domain.HashableAnswer.from_raw_type(raw_answer)
                 for raw_answer in answer_dict['answer'])
+        answer_frequency_list.truncate(10)
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
             state_answers_dict['exploration_version'],
