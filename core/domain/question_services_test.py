@@ -38,6 +38,57 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
+    def test_get_question_by_id(self):
+        state = exp_domain.State.create_default_state('ABC')
+        question_data = state.to_dict()
+        question_id = 'dummy'
+        title = 'A Question'
+        question_data_schema_version = 1
+        collection_id = 'col1'
+        language_code = 'en'
+        question = question_domain.Question(
+            question_id, title, question_data, question_data_schema_version,
+            collection_id, language_code)
+        question.validate()
+
+        question_model = question_services.add_question(self.owner_id, question)
+        question = question_services.get_question_by_id(question_model.id)
+
+        self.assertEqual(question.title, title)
+
+    def test_get_questions_by_ids(self):
+        state = exp_domain.State.create_default_state('ABC')
+        question_data = state.to_dict()
+        question_id = 'dummy'
+        title = 'A Question'
+        question_data_schema_version = 1
+        collection_id = 'col1'
+        language_code = 'en'
+        question = question_domain.Question(
+            question_id, title, question_data, question_data_schema_version,
+            collection_id, language_code)
+        question.validate()
+
+        question1_model = question_services.add_question(self.owner_id, question)
+        state = exp_domain.State.create_default_state('ABC')
+        question_data = state.to_dict()
+        question_id = 'dummy2'
+        title = 'A Question2'
+        question_data_schema_version = 1
+        collection_id = 'col2'
+        language_code = 'en'
+        question = question_domain.Question(
+            question_id, title, question_data, question_data_schema_version,
+            collection_id, language_code)
+        question.validate()
+
+        question2_model = question_services.add_question(self.owner_id, question)
+        questions = question_services.get_questions_by_ids(
+            [question1_model.id, question2_model.id])
+        self.assertEqual(len(questions), 2)
+        self.assertEqual(questions[0].title, question1_model.title)
+        self.assertEqual(questions[1].title, question2_model.title)
+
     def test_add_question(self):
         state = exp_domain.State.create_default_state('ABC')
         question_data = state.to_dict()

@@ -15,18 +15,22 @@
 """Controller for Question object."""
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import question_services
 import feconf
 
 class QuestionsBatchHandler(base.BaseHandler):
     """This handler completes requests for questions batch."""
 
-    def post(self, collection_id):
-        """Handles post requests."""
+    @acl_decorators.open_access
+    def get(self, collection_id):
+        """Handles get requests."""
         skill_ids = self.payload.get('skill_ids')
         user_id = self.payload.get('user_id')
         batch_size = feconf.QUESTION_BATCH_SIZE
+        print self.payload
         questions_batch = (
             question_services.get_questions_batch(
                 collection_id, skill_ids, user_id, batch_size))
-        return questions_batch
+
+        return {'questions_batch' :questions_batch}

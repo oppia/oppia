@@ -116,6 +116,49 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
                     }
                 })
 
+    def test_get_acquired_skills_of_user_given_collection_id(self):
+        """Tests get_acquired_skills_of_user_given_collection_id method."""
+        collection_id = 'col1'
+        exp_id = '0_exploration_id'
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        # Create a new collection and exploration.
+        self.save_new_valid_collection(
+            collection_id, owner_id, exploration_id=exp_id)
+
+        # Add a skill.
+        collection_services.update_collection(
+            owner_id, collection_id, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'test'
+            }], 'Add a new skill')
+        collection = collection_services.get_collection_by_id(
+            collection_id)
+        skill_id = collection.get_skill_id_from_skill_name('test')
+        collection_node = collection.get_node(exp_id)
+        collection_node.update_acquired_skill_ids([skill_id])
+       
+        # Update skill.
+        collection_services.update_collection(
+            owner_id, collection_id, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'property_name': (
+                    collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS), # pylint: disable=line-too-long
+                'exploration_id': exp_id,
+                'new_value': [skill_id]
+            }], 'Update skill')
+
+        acquired_skills = (
+            collection_services.get_acquired_skills_of_user_given_collection_id(
+            owner_id, collection_id))
+        self.assertEqual(len(acquired_skills), 0)
+
+        collection_services.record_played_exploration_in_collection_context(
+            owner_id, collection_id, exp_id)
+        acquired_skills = (
+            collection_services.get_acquired_skills_of_user_given_collection_id(
+            owner_id, collection_id))
+        self.assertEqual(skill_id in acquired_skills, True)
 
 class CollectionProgressUnitTests(CollectionServicesUnitTests):
     """Tests functions which deal with any progress a user has made within a

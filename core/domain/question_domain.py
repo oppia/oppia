@@ -274,9 +274,9 @@ class Question(object):
         skills = collection.skills
 
         question_skills = []
-        for skill in skills:
-            if self.question_id in collection.skills[skill].question_ids:
-                question_skills.append(collection.skills[skill])
+        for skill_id in skills:
+            if self.question_id in collection.skills[skill_id].question_ids:
+                question_skills.append(collection.skills[skill_id])
         return question_skills
 
     def can_user_answer_question(self, user_id, collection_id):

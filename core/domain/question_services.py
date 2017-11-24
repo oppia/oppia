@@ -126,8 +126,8 @@ def get_questions_by_ids(question_ids):
         question_ids: list(str). List of question ids.
 
     Returns:
-        list or None. A list of domain objects representing question with the
-        given ids.
+        list(Question) or None. A list of domain objects representing questions
+        with the given ids or None when the id is not valid.
     """
     question_model_list = question_models.QuestionModel.get_multi(question_ids)
     questions = []
@@ -253,11 +253,8 @@ def get_questions_batch(
         if skill_id in collection.skills:
             question_ids.extend(collection.skills[skill_id].question_ids)
     unique_question_ids = list(set(question_ids))
-    if len(unique_question_ids) < batch_size:
-        batch_size = len(unique_question_ids)
-    random_question_ids = random.sample(unique_question_ids, batch_size)
+    random_question_ids = random.sample(
+        unique_question_ids, min(batch_size, len(unique_question_ids)))
 
-    questions_batch = []
-    for question_id in random_question_ids:
-        questions_batch.append(get_question_by_id(question_id))
+    questions_batch = get_questions_by_ids(random_question_ids)
     return questions_batch

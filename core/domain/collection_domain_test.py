@@ -578,6 +578,28 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             collection.get_node('exp_id_1').prerequisite_skill_ids, [])
 
+    def test_get_skill_id_from_skill_name(self):
+        """Test to verify get_skill_id_from_skill_name works."""
+        collection = collection_domain.Collection.create_default_collection(
+            'exp_id')
+        self.assertEqual(collection.skills, {})
+
+        
+        collection.add_skill('skillname1')
+        collection.add_skill('skillname2')
+        skill_id = collection.get_skill_id_from_skill_name('skillname1')
+        skills = collection.skills.keys()
+        self.assertEqual(skills[1], skill_id)
+
+        collection.delete_skill(skill_id)
+        skill_id = collection.get_skill_id_from_skill_name('skillname1')
+        skills = collection.skills.keys()
+        self.assertEqual(skill_id, None)
+
+
+
+
+
 class ExplorationGraphUnitTests(test_utils.GenericTestBase):
     """Test the skill graph structure within a collection."""
 
