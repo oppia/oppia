@@ -15,9 +15,6 @@
 """Tests for the controllers that communicate with VM for training
 classifiers."""
 
-import json
-import os
-
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -92,3 +89,5 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
         json_response = self.get_json(
             feconf.QUESTION_DATA_URL + '/batch/%s'% self.coll_id,
             self.payload, expect_errors=False)
+        print json_response
+
