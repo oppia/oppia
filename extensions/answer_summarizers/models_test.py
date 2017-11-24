@@ -171,10 +171,12 @@ class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_top5_without_ties(self):
         """Simplest case: ordering is obvious."""
+        # Create 12 answers with different frequencies.
         answer_dicts_list = self._create_answer_dicts_list()
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
+        # Only top 5 are kept.
         expected_calc_output = [
             {'answer': 'A', 'frequency': 12},
             {'answer': 'B', 'frequency': 11},
@@ -186,11 +188,13 @@ class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_top5_with_ties(self):
         """Ties are resolved by submission ordering: earlier ranks higher."""
+        # Create 12 answers with same frequencies.
         answer_dicts_list = (
             self._create_answer_dicts_list(self.TIED_ANSWER_LIST))
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
+        # Only first 5 are kept.
         expected_calc_output = [
             {'answer': 'A', 'frequency': 1},
             {'answer': 'B', 'frequency': 1},
@@ -212,6 +216,7 @@ class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
+        # Only top 10 are kept.
         expected_calc_output = [
             {'answer': 'A', 'frequency': 12},
             {'answer': 'B', 'frequency': 11},
@@ -228,11 +233,13 @@ class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_top10_with_ties(self):
         """Ties are resolved by submission ordering: earlier ranks higher."""
+        # Create 12 answers with same frequencies.
         answer_dicts_list = (
             self._create_answer_dicts_list(self.TIED_ANSWER_LIST))
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
+        # Only first 10 are kept.
         expected_calc_output = [
             {'answer': 'A', 'frequency': 1},
             {'answer': 'B', 'frequency': 1},
@@ -254,25 +261,19 @@ class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
     def test_shared_answers(self):
         """This calculation only works on answers that accept multiple answers.
         """
-        answers = [
-            {'B': 1},
-            'A',
-            ['C', 'D', 'E'],
-            {'A': 3},
-        ]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list=[
-            self._create_answer_dict([answers[1], answers[0]], 0.1, 'sid1'),
-            self._create_answer_dict([answers[0], answers[2]], 0.1, 'sid1'),
-            self._create_answer_dict([answers[3]], 0.1, 'sid1'),
-            self._create_answer_dict([answers[1], answers[0]], 0.1, 'sid1')
+            self._create_answer_dict(['B', 'A'], 1., 'sid1'),
+            self._create_answer_dict(['A', 'C'], 1., 'sid2'),
+            self._create_answer_dict(['D'], 1., 'sid3'),
+            self._create_answer_dict(['B', 'A'], 1., 'sid1'),
         ])
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
         expected_calc_output = [
-            {'answer': {'B': 1}, 'frequency': 3},
-            {'answer': 'A', 'frequency': 2},
-            {'answer': ['C', 'D', 'E'], 'frequency': 1},
-            {'answer': {'A': 3}, 'frequency': 1},
+            {'answer': 'A', 'frequency': 3},
+            {'answer': 'B', 'frequency': 2},
+            {'answer': 'C', 'frequency': 1},
+            {'answer': 'D', 'frequency': 1},
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
