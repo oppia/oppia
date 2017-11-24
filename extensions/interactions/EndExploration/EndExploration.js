@@ -25,18 +25,18 @@ oppia.directive('oppiaInteractiveEndExploration', [function() {
     scope: {},
     templateUrl: 'interaction/EndExploration',
     controller: [
-      '$scope', '$http', '$attrs', '$q', 'urlService',
+      '$scope', '$http', '$attrs', '$q', 'UrlService',
       'explorationContextService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
       'HtmlEscaperService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
       function(
-          $scope, $http, $attrs, $q, urlService,
+          $scope, $http, $attrs, $q, UrlService,
           explorationContextService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT,
           HtmlEscaperService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
         var authorRecommendedExplorationIds = (
           HtmlEscaperService.escapedJsonToObj(
             $attrs.recommendedExplorationIdsWithValue));
 
-        $scope.isIframed = urlService.isIframed();
+        $scope.isIframed = UrlService.isIframed();
         $scope.isInEditorPage = (
           explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
         $scope.isInEditorPreviewMode = $scope.isInEditorPage && (

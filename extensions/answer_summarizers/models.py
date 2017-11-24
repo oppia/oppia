@@ -83,22 +83,19 @@ def _count_answers(answer_dicts_list):
 
 def _calculate_top_answer_frequencies(state_answers_dict, num_results):
     """Computes the number of occurrences of each answer, keeping only the top
-    num_results answers, and returns a list of dicts; each dict has keys
-    'answer' and 'frequency'.
+    num_results answers, and returns an AnswerFrequencyList.
 
     This method is run from within the context of a MapReduce job.
     """
     top_answer_counts_as_list_of_pairs = _count_answers(
         state_answers_dict['submitted_answer_list'])[:num_results]
 
-    calculation_output = []
+    answer_frequency_list = stats_domain.AnswerFrequencyList()
     for item in top_answer_counts_as_list_of_pairs:
-        calculation_output.append({
-            'answer': item[0]['answer'],
-            'frequency': item[1],
-        })
+        answer_frequency_list.add_answer(
+            stats_domain.AnswerOccurrence(item[0]['answer'], item[1]))
 
-    return calculation_output
+    return answer_frequency_list
 
 
 class BaseCalculation(object):
@@ -137,12 +134,10 @@ class AnswerFrequencies(BaseCalculation):
         answer_counts_as_list_of_pairs = _count_answers(
             state_answers_dict['submitted_answer_list'])
 
-        calculation_output = []
+        answer_frequency_list = stats_domain.AnswerFrequencyList()
         for item in answer_counts_as_list_of_pairs:
-            calculation_output.append({
-                'answer': item[0]['answer'],
-                'frequency': item[1],
-            })
+            answer_frequency_list.add_answer(
+                stats_domain.AnswerOccurrence(item[0]['answer'], item[1]))
 
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
@@ -150,7 +145,7 @@ class AnswerFrequencies(BaseCalculation):
             state_answers_dict['state_name'],
             state_answers_dict['interaction_id'],
             self.id,
-            calculation_output)
+            answer_frequency_list)
 
 
 class Top5AnswerFrequencies(BaseCalculation):
@@ -163,7 +158,7 @@ class Top5AnswerFrequencies(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        calculation_output = _calculate_top_answer_frequencies(
+        answer_frequency_list = _calculate_top_answer_frequencies(
             state_answers_dict, 5)
 
         return stats_domain.StateAnswersCalcOutput(
@@ -172,7 +167,7 @@ class Top5AnswerFrequencies(BaseCalculation):
             state_answers_dict['state_name'],
             state_answers_dict['interaction_id'],
             self.id,
-            calculation_output)
+            answer_frequency_list)
 
 
 class Top10AnswerFrequencies(BaseCalculation):
@@ -185,7 +180,7 @@ class Top10AnswerFrequencies(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        calculation_output = _calculate_top_answer_frequencies(
+        answer_frequency_list = _calculate_top_answer_frequencies(
             state_answers_dict, 10)
 
         return stats_domain.StateAnswersCalcOutput(
@@ -194,7 +189,7 @@ class Top10AnswerFrequencies(BaseCalculation):
             state_answers_dict['state_name'],
             state_answers_dict['interaction_id'],
             self.id,
-            calculation_output)
+            answer_frequency_list)
 
 
 class FrequencyCommonlySubmittedElements(BaseCalculation):
@@ -225,14 +220,12 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
         if len(elements_as_list_of_pairs) > 10:
             elements_as_list_of_pairs = elements_as_list_of_pairs[:10]
 
-        calculation_output = []
+        answer_frequency_list = stats_domain.AnswerFrequencyList()
         for item in elements_as_list_of_pairs:
             # Save element with key 'answer' so it gets displayed correctly
             # by FrequencyTable visualization.
-            calculation_output.append({
-                'answer': item[0],
-                'frequency': item[1],
-            })
+            answer_frequency_list.add_answer(
+                stats_domain.AnswerOccurrence(item[0], item[1]))
 
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
@@ -240,7 +233,7 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
             state_answers_dict['state_name'],
             state_answers_dict['interaction_id'],
             self.id,
-            calculation_output)
+            answer_frequency_list)
 
 
 class TopAnswersByCategorization(BaseCalculation):
@@ -277,23 +270,22 @@ class TopAnswersByCategorization(BaseCalculation):
             in submitted_answers_by_categorization.iteritems()
         }
 
-        calculation_output = {
-            classify_category: []
+        answer_occurrences = {
+            classify_category: stats_domain.AnswerFrequencyList()
             for classify_category in classify_categories
         }
         for classify_category, top_answer_counts_as_list_of_pairs in (
                 top_answer_count_pairs_by_category.iteritems()):
             for item in top_answer_counts_as_list_of_pairs:
                 answer_dict = item[0]
-                calculation_output[classify_category].append({
-                    'answer': answer_dict['answer'],
-                    'frequency': item[1]
-                })
+                answer_occurrences[classify_category].add_answer(
+                    stats_domain.AnswerOccurrence(
+                        answer_dict['answer'], item[1]))
 
         # Remove empty lists if no answers match within those categories.
         for classify_category in classify_categories:
-            if not calculation_output[classify_category]:
-                del calculation_output[classify_category]
+            if not answer_occurrences[classify_category].answer_occurrences:
+                del answer_occurrences[classify_category]
 
         return stats_domain.StateAnswersCalcOutput(
             state_answers_dict['exploration_id'],
@@ -301,4 +293,4 @@ class TopAnswersByCategorization(BaseCalculation):
             state_answers_dict['state_name'],
             state_answers_dict['interaction_id'],
             self.id,
-            calculation_output)
+            stats_domain.CategorizedAnswerFrequencyLists(answer_occurrences))

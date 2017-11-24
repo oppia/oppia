@@ -32,9 +32,9 @@ oppia.directive('outcomeEditor', [
         '/components/' +
         'outcome_editor_directive.html'),
       controller: [
-        '$scope', 'editorContextService',
+        '$scope', 'EditorStateService',
         'stateInteractionIdService',
-        function($scope, editorContextService,
+        function($scope, EditorStateService,
           stateInteractionIdService) {
           $scope.editOutcomeForm = {};
           $scope.feedbackEditorIsOpen = false;
@@ -83,7 +83,7 @@ oppia.directive('outcomeEditor', [
           $scope.isSelfLoop = function(outcome) {
             return (
               outcome &&
-              outcome.dest === editorContextService.getActiveStateName());
+              outcome.dest === EditorStateService.getActiveStateName());
           };
 
           $scope.getCurrentInteractionId = function() {
