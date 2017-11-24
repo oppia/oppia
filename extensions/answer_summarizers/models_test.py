@@ -40,7 +40,6 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
                           ['E'] *  8 + ['F'] *  7 + ['G'] *  6 + ['H'] * 5 +
                           ['I'] *  4 + ['J'] *  3 + ['K'] *  2 + ['L'])
     TIED_ANSWER_LIST = list('ABCDEFGHIJKL')
-    SIMPLE_CLASSIFY_CATEGORIES = [exp_domain.EXPLICIT_CLASSIFICATION]
 
     def _create_answer_dict(
             self, answer, time_spent_in_card=3.2, session_id='sid1',
