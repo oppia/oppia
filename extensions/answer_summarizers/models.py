@@ -58,8 +58,7 @@ def _get_top_answers_by_frequency(answer_dicts):
 
     This method is run from within the context of a MapReduce job.
     """
-    answer_frequency_list = stats_domain.AnswerFrequencyList(
-        answer_occurrences=None)
+    answer_frequency_list = stats_domain.AnswerFrequencyList([])
     answer_frequency_list.add_answers(
         stats_domain.HashableAnswer.from_raw_type(answer_dict['answer'])
         for answer_dict in answer_dicts)
@@ -166,8 +165,7 @@ class FrequencyCommonlySubmittedElements(BaseCalculation):
 
         This method is run from within the context of a MapReduce job.
         """
-        answer_frequency_list = stats_domain.AnswerFrequencyList(
-            answer_occurrences=None)
+        answer_frequency_list = stats_domain.AnswerFrequencyList([])
         for answer_dict in state_answers_dict['submitted_answer_list']:
             answer_frequency_list.add_answers(
                 stats_domain.HashableAnswer.from_raw_type(raw_answer)

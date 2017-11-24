@@ -583,7 +583,7 @@ class AnswerCalculationOutput(object):
 
 class AnswerFrequencyList(AnswerCalculationOutput):
     """Domain object that represents a list of AnswerOccurrences."""
-    def __init__(self):
+    def __init__(self, answer_occurrences):
         """Initialize domain object for answer frequency list for a given list
         of AnswerOccurrence objects (default is empty list).
         """
