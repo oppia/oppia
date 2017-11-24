@@ -80,8 +80,8 @@ def _get_top_answers_by_frequency(answers, limit=None):
         for hashable_answer, frequency in answer_counter.most_common(limit))
 
 
-def _make_answers_iter_from_answer_dicts(answer_dicts_list):
-    return map(operator.itemgetter('answer'), answer_dicts_list)
+def _make_answers_iter_from_answer_dicts(answer_dicts):
+    return map(operator.itemgetter('answer'), answer_dicts)
 
 
 class BaseCalculation(object):
