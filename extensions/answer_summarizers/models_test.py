@@ -232,10 +232,10 @@ class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
 
 class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
+    """This calculation only works on answers which are all lists."""
     CALCULATION_ID = 'FrequencyCommonlySubmittedElements'
 
     def test_shared_answers(self):
-        """This calculation only works on answers which are all lists."""
         answer_dicts_list = [
             self._create_answer_dict(['B', 'A']),
             self._create_answer_dict(['A', 'C']),
