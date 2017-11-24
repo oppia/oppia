@@ -54,7 +54,6 @@ CLASSIFICATION_CATEGORIES = frozenset([
 
 
 class _HashableAnswer(object):
-
     def __init__(self, answer):
         self.answer = answer
         self.hashable_answer = utils.get_hashable_value(answer)
