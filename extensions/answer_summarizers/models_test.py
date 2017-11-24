@@ -253,6 +253,31 @@ class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
+    def test_many_shared_answers(self):
+        split = len(self.SIMPLE_ANSWER_LIST) // 4
+        answer_dicts_list = [
+            self._create_answer_dict(self.SIMPLE_ANSWER_LIST[:split]),
+            self._create_answer_dict(self.SIMPLE_ANSWER_LIST[split:split*2]),
+            self._create_answer_dict(self.SIMPLE_ANSWER_LIST[split*2:split*3]),
+            self._create_answer_dict(self.SIMPLE_ANSWER_LIST[split*3:]),
+        ]
+        state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
+
+        actual_calc_output = self._perform_calculation(state_answers_dict)
+        # Only top 10 are kept.
+        expected_calc_output = [
+            {'answer': 'A', 'frequency': 12},
+            {'answer': 'B', 'frequency': 11},
+            {'answer': 'C', 'frequency': 10},
+            {'answer': 'D', 'frequency': 9},
+            {'answer': 'E', 'frequency': 8},
+            {'answer': 'F', 'frequency': 7},
+            {'answer': 'G', 'frequency': 6},
+            {'answer': 'H', 'frequency': 5},
+            {'answer': 'I', 'frequency': 4},
+            {'answer': 'J', 'frequency': 3},
+        ]
+        self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
 class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
     CALCULATION_ID = 'TopAnswersByCategorization'
