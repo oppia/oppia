@@ -77,7 +77,7 @@ def _get_top_answers_by_frequency(answers, limit=None):
 
     Args:
         answers: iterable(*). The collection of answers to be tallied.
-        limit: int or None. The maximum numbers of answer to return. When None,
+        limit: int or None. The maximum number of answers to return. When None,
             all answers are returned.
 
     Returns:
