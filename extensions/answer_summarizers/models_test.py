@@ -27,6 +27,15 @@ from extensions.answer_summarizers import models as answer_models
 class BaseCalculationUnitTests(test_utils.GenericTestBase):
     """Test cases for BaseCalculation."""
 
+    SIMPLE_ANSWER_LIST = [
+        [letter] * frequency
+        for letter, frequency in zip('ABCDEFGHIJKL', range(12, 0, -1))
+    ]
+    TIED_ANSWER_LIST = list('ABCDEFGHIJKL')
+    SIMPLE_CLASSIFY_CATEGORIES = [exp_domain.EXPLICIT_CLASSIFICATION]
+    SIMPLE_SESSION_IDS = ['sid{}'.format(n) for n in range(6)]
+    SIMPLE_TIMES_SPENT_IN_CARD = [float(n) for n in range(5)]
+
     def test_requires_override_for_calculation(self):
         with self.assertRaises(NotImplementedError):
             answer_models.BaseCalculation().calculate_from_state_answers_dict(
@@ -46,22 +55,13 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
             'classification_categorization': classify_category,
         }
 
-    def _create_answer_dicts_list(
-            self, answer_list, times_spent_in_card, session_ids,
-            classify_categories=None, num=None):
+    def _create_answer_dicts_list(self, answer_list=None, num=None):
         """This is similar to _create_answer_dict, except it simplifies building
         several different answers at once.
 
         Args:
             answer_list: list(*). Each element is used cyclically to produce
                 each individual answer_dict.
-            times_spent_in_card: list(float). Each member is used cyclically to
-                produce each individual answer_dict.
-            session_ids: list(str). Each member is used cyclically to produce
-                each individual answer_dict.
-            classify_categories: list(str). The classifications that will be
-                assigned to the answers. Each member is used cyclically to
-                produce each individual answer_dict.
             num: int or None. The total number of answers to produce. When None,
                 len(answer_list) is used instead.
 
@@ -69,13 +69,15 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
             list(dict(str : *)). Each dict is build by a call to
             _create_answer_dict.
         """
+        if answer_list is None:
+            answer_list = self.SIMPLE_ANSWER_LIST
         if num is None:
             num = len(answer_list)
-        if classify_categories is None:
-            classify_categories = [exp_domain.EXPLICIT_CLASSIFICATION]
         infinite_args = itertools.izip(
-            itertools.cycle(answer_list), itertools.cycle(times_spent_in_card),
-            itertools.cycle(session_ids), itertools.cycle(classify_categories))
+            itertools.cycle(answer_list),
+            itertools.cycle(self.SIMPLE_TIMES_SPENT_IN_CARD),
+            itertools.cycle(self.SIMPLE_SESSION_IDS),
+            itertools.cycle(self.SIMPLE_CLASSIFY_CATEGORIES))
         return [
             self._create_answer_dict(*create_answer_dict_args)
             for create_answer_dict_args in itertools.islice(infinite_args, num)
@@ -129,9 +131,7 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
         answers = []
         for letter, repeat in zip('ABCDEFGHIJKL', range(12, 0, -1)):
             answers.extend(itertools.repeat(letter, repeat))
-        answer_dicts_list = self._create_answer_dicts_list(
-            answer_list=answers, times_spent_in_card=[1., 2., 3., 4., 5.],
-            session_ids=self._create_session_ids(7))
+        answer_dicts_list = self._create_answer_dicts_list(answers)
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -153,9 +153,8 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_answers_with_ties(self):
         """Ties are resolved by submission ordering: earlier ranks higher."""
-        answer_dicts_list = self._create_answer_dicts_list(
-            answer_list=list('ABCDEFGHIJKL'), times_spent_in_card=[1., 2.],
-            session_ids=self._create_session_ids(3))
+        answer_dicts_list = (
+            self._create_answer_dicts_list(self.TIED_ANSWER_LIST))
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -183,29 +182,23 @@ class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_top5_without_ties(self):
         """Simplest case: ordering is obvious."""
-        answers = []
-        for letter, repeat in zip('ABCDE', range(5, 0, -1)):
-            answers.extend(itertools.repeat(letter, repeat))
-        answer_dicts_list = self._create_answer_dicts_list(
-            answer_list=answers, times_spent_in_card=[1., 2., 3.],
-            session_ids=self._create_session_ids(4))
+        answer_dicts_list = self._create_answer_dicts_list()
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
         expected_calc_output = [
-            {'answer': 'A', 'frequency': 5},
-            {'answer': 'B', 'frequency': 4},
-            {'answer': 'C', 'frequency': 3},
-            {'answer': 'D', 'frequency': 2},
-            {'answer': 'E', 'frequency': 1},
+            {'answer': 'A', 'frequency': 12},
+            {'answer': 'B', 'frequency': 11},
+            {'answer': 'C', 'frequency': 10},
+            {'answer': 'D', 'frequency': 9},
+            {'answer': 'E', 'frequency': 8},
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
     def test_top5_with_ties(self):
         """Ties are resolved by submission ordering: earlier ranks higher."""
-        answer_dicts_list = self._create_answer_dicts_list(
-            answer_list=list('ABCDE'), times_spent_in_card=[1., 2.],
-            session_ids=self._create_session_ids(3))
+        answer_dicts_list = (
+            self._create_answer_dicts_list(self.TIED_ANSWER_LIST))
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -226,34 +219,28 @@ class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_top10_answers_without_ties(self):
         # Create 12 answers with different frequencies.
-        answers = []
-        for letter, repeat in zip('ABCDEFGHIJ', range(10, 0, -1)):
-            answers.extend(itertools.repeat(letter, repeat))
-        answer_dicts_list = self._create_answer_dicts_list(
-            answer_list=answers, times_spent_in_card=[1., 2., 3., 4., 5.],
-            session_ids=self._create_session_ids(7))
+        answer_dicts_list = self._create_answer_dicts_list()
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
         expected_calc_output = [
-            {'answer': 'A', 'frequency': 10},
-            {'answer': 'B', 'frequency': 9},
-            {'answer': 'C', 'frequency': 8},
-            {'answer': 'D', 'frequency': 7},
-            {'answer': 'E', 'frequency': 6},
-            {'answer': 'F', 'frequency': 5},
-            {'answer': 'G', 'frequency': 4},
-            {'answer': 'H', 'frequency': 3},
-            {'answer': 'I', 'frequency': 2},
-            {'answer': 'J', 'frequency': 1},
+            {'answer': 'A', 'frequency': 12},
+            {'answer': 'B', 'frequency': 11},
+            {'answer': 'C', 'frequency': 10},
+            {'answer': 'D', 'frequency': 9},
+            {'answer': 'E', 'frequency': 8},
+            {'answer': 'F', 'frequency': 7},
+            {'answer': 'G', 'frequency': 6},
+            {'answer': 'H', 'frequency': 5},
+            {'answer': 'I', 'frequency': 4},
+            {'answer': 'J', 'frequency': 3},
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
     def test_top10_with_ties(self):
         """Ties are resolved by submission ordering: earlier ranks higher."""
-        answer_dicts_list = self._create_answer_dicts_list(
-            answer_list=list('ABCDEFGHIJ'), times_spent_in_card=[1., 2.],
-            session_ids=self._create_session_ids(3))
+        answer_dicts_list = (
+            self._create_answer_dicts_list(self.TIED_ANSWER_LIST))
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
