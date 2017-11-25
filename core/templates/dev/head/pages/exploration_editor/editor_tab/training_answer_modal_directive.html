@@ -1,0 +1,73 @@
+<div class="form-inline" style="margin-bottom: 10px;">
+  <div style="margin-top: 10px;">
+    <span><strong>If Oppia encounters the answer:</strong></span>
+  </div>
+
+  <div>
+    <div angular-html-bind="answerTemplate">
+    </div>
+  </div>
+
+  <br>
+
+  <div>
+    <span><strong>it will reply with:</strong></span>
+  </div>
+
+  <div>
+    <div angular-html-bind="answerFeedback">
+    </div>
+  </div>
+
+  <br>
+
+  <div>
+    <span><strong>and then direct the learner to: </strong></span>
+    <span angular-html-bind="answerOutcomeDest"></span>
+  </div>
+
+  <br>
+
+  <div>
+    <span><strong>Is this right?</strong></span>
+  </div>
+
+  <div>
+    <button class="btn btn-default" ng-disabled="changingAnswerGroupIndex" ng-click="beginChangingAnswerGroupIndex()">No</button>
+    <button class="btn btn-default" ng-disabled="changingAnswerGroupIndex" ng-click="confirmAnswerGroupIndex(classification.answerGroupIndex)">Yes</button>
+  </div>
+
+  <br>
+
+  <div ng-if="changingAnswerGroupIndex">
+    <span><strong>Select correct feedback or type a new response:</strong></span>
+
+    <div class="trained-feedback-selection-form-container">
+      <form>
+        <div class="trained-feedback-selection-container" ng-repeat="outcome in allOutcomes track by $index">
+          <button class="trained-feedback-selection" ng-click="confirmAnswerGroupIndex($index)">
+            <span ng-if="outcome.feedback.length > 0" angular-html-bind="outcome.feedback[0]">
+            </span>
+            <span ng-if="outcome.feedback.length == 0">
+              <em>(No feedback)</em>
+            </span>
+
+            <br>
+
+            <span style="float: right;" ng-if="outcome.dest != getCurrentStateName()">
+              → <[outcome.dest]>
+            </span>
+            <span style="float: right;" ng-if="outcome.dest == getCurrentStateName()">
+              <em>→ (try again)</em>
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <button class="btn btn-default" ng-if="!addingNewResponse" ng-click="beginAddingNewResponse()">New Response</button>
+    <outcome-feedback-editor ng-if="addingNewResponse" outcome="classification.newOutcome">
+    </outcome-feedback-editor>
+    <button class="btn btn-default btn-success" ng-if="addingNewResponse" ng-click="confirmNewFeedback()">Save New Response</button>
+  </div>
+</div>

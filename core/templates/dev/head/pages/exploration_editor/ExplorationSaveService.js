@@ -16,25 +16,25 @@
  * @fileoverview Service for exploration saving & publication functionality.
  */
 
-oppia.factory('explorationSaveService', [
+oppia.factory('ExplorationSaveService', [
   '$modal', '$timeout', '$rootScope', '$log', '$q',
-  'alertsService', 'explorationData', 'explorationStatesService',
+  'alertsService', 'ExplorationDataService', 'explorationStatesService',
   'explorationTagsService', 'explorationTitleService',
   'explorationObjectiveService', 'explorationCategoryService',
   'explorationLanguageCodeService', 'explorationRightsService',
   'explorationWarningsService', 'ExplorationDiffService',
-  'explorationInitStateNameService', 'routerService',
-  'focusService', 'changeListService', 'siteAnalyticsService',
+  'explorationInitStateNameService', 'RouterService',
+  'FocusManagerService', 'changeListService', 'siteAnalyticsService',
   'StatesObjectFactory', 'UrlInterpolationService',
   function(
       $modal, $timeout, $rootScope, $log, $q,
-      alertsService, explorationData, explorationStatesService,
+      alertsService, ExplorationDataService, explorationStatesService,
       explorationTagsService, explorationTitleService,
       explorationObjectiveService, explorationCategoryService,
       explorationLanguageCodeService, explorationRightsService,
       explorationWarningsService, ExplorationDiffService,
-      explorationInitStateNameService, routerService,
-      focusService, changeListService, siteAnalyticsService,
+      explorationInitStateNameService, RouterService,
+      FocusManagerService, changeListService, siteAnalyticsService,
       StatesObjectFactory, UrlInterpolationService) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
@@ -132,7 +132,7 @@ oppia.factory('explorationSaveService', [
 
             showCongratulatorySharingModal();
             siteAnalyticsService.registerPublishExplorationEvent(
-              explorationData.explorationId);
+              ExplorationDataService.explorationId);
             whenModalClosed.resolve();
           });
       });
@@ -149,19 +149,19 @@ oppia.factory('explorationSaveService', [
 
       if (explorationRightsService.isPrivate()) {
         siteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
-          explorationData.explorationId);
+          ExplorationDataService.explorationId);
       } else {
         siteAnalyticsService.registerCommitChangesToPublicExplorationEvent(
-          explorationData.explorationId);
+          ExplorationDataService.explorationId);
       }
 
       if (explorationWarningsService.countWarnings() === 0) {
         siteAnalyticsService.registerSavePlayableExplorationEvent(
-          explorationData.explorationId);
+          ExplorationDataService.explorationId);
       }
       saveIsInProgress = true;
 
-      explorationData.save(
+      ExplorationDataService.save(
         changeList, commitMessage,
         function(isDraftVersionValid, draftChanges) {
           if (isDraftVersionValid === false &&
@@ -202,7 +202,9 @@ oppia.factory('explorationSaveService', [
 
       discardChanges: function() {
         $modal.open({
-          templateUrl: 'modals/confirmDiscardChanges',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/' +
+            'confirm_discard_changes_modal_directive.html'),
           backdrop: 'static',
           keyboard: false,
           controller: [
@@ -241,7 +243,7 @@ oppia.factory('explorationSaveService', [
 
           // The reload is necessary because, otherwise, the
           // exploration-with-draft-changes will be reloaded
-          // (since it is already cached in explorationData).
+          // (since it is already cached in ExplorationDataService).
           location.reload();
         });
       },
@@ -253,7 +255,7 @@ oppia.factory('explorationSaveService', [
         var whenModalsClosed = $q.defer();
 
         siteAnalyticsService.registerOpenPublishExplorationModalEvent(
-          explorationData.explorationId);
+          ExplorationDataService.explorationId);
         alertsService.clearWarnings();
 
         // If the metadata has not yet been specified, open the pre-publication
@@ -443,7 +445,7 @@ oppia.factory('explorationSaveService', [
         // controller 'saveIsInProgress' back to false.
         var whenModalClosed = $q.defer();
 
-        routerService.savePendingChanges();
+        RouterService.savePendingChanges();
 
         if (!explorationRightsService.isPrivate() &&
             explorationWarningsService.countWarnings() > 0) {
@@ -453,7 +455,7 @@ oppia.factory('explorationSaveService', [
           return;
         }
 
-        explorationData.getLastSavedData().then(function(data) {
+        ExplorationDataService.getLastSavedData().then(function(data) {
           var oldStates = StatesObjectFactory.createFromBackendDict(
             data.states).getStateObjects();
           var newStates = explorationStatesService.getStates()
@@ -542,7 +544,7 @@ oppia.factory('explorationSaveService', [
             // The $timeout seems to be needed
             // in order to give the modal time to render.
             $timeout(function() {
-              focusService.setFocus('saveChangesModalOpened');
+              FocusManagerService.setFocus('saveChangesModalOpened');
             });
           });
 

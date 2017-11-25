@@ -24,7 +24,6 @@ storage model to be changed without affecting this module and others above it.
 
 import collections
 import copy
-import datetime
 import logging
 import os
 
@@ -1201,83 +1200,6 @@ def load_demo(collection_id):
             exp_services.load_demo(exp_id)
 
     logging.info('Collection with id %s was loaded.' % collection_id)
-
-
-# TODO(bhenning): Cleanup search logic and abstract it between explorations and
-# collections to avoid code duplication.
-
-
-def get_next_page_of_all_commits(
-        page_size=feconf.COMMIT_LIST_PAGE_SIZE, urlsafe_start_cursor=None):
-    """Returns a page of commits to all collections in reverse time order.
-
-    Args:
-        page_size: int. Number of pages of commits to be returned.
-        urlsafe_start_cursor: str or None. If provided, the list of returned
-            commits starts from this datastore cursor. Otherwise, the returned
-            commits start from the beginning of the full list of commits.
-
-    Returns:
-        3-tuple of (results, cursor, more) as described in fetch_page() at:
-        https://developers.google.com/appengine/docs/python/ndb/queryclass,
-        where:
-            results: list(CollectionCommitLogEntry). List of query results.
-            cursor: str or None. A query cursor pointing to the next batch of
-                results. If there are no more results, this will be None.
-            more: bool. Whether there are more results after this
-                batch.
-    """
-    results, new_urlsafe_start_cursor, more = (
-        collection_models.CollectionCommitLogEntryModel.get_all_commits(
-            page_size, urlsafe_start_cursor))
-
-    return ([collection_domain.CollectionCommitLogEntry(
-        entry.created_on, entry.last_updated, entry.user_id, entry.username,
-        entry.collection_id, entry.commit_type, entry.commit_message,
-        entry.commit_cmds, entry.version, entry.post_commit_status,
-        entry.post_commit_community_owned, entry.post_commit_is_private
-    ) for entry in results], new_urlsafe_start_cursor, more)
-
-
-def get_next_page_of_all_non_private_commits(
-        page_size=feconf.COMMIT_LIST_PAGE_SIZE, urlsafe_start_cursor=None,
-        max_age=None):
-    """Returns a page of non-private commits to all collections in reverse time
-    order.
-
-    Args:
-        page_size: int. Number of pages of commits to be returned.
-        urlsafe_start_cursor: str or None. If provided, the list of returned
-            commits starts from this datastore cursor. Otherwise, the returned
-            commits start from the beginning of the full list of commits.
-        max_age: datetime.timedelta. The maximum age of a non-private commit to
-            be included in the return page. It should be a datetime.timedelta
-            instance.
-
-    Returns:
-        3-tuple of (results, cursor, more) as described in fetch_page() at:
-        https://developers.google.com/appengine/docs/python/ndb/queryclass,
-        where:
-            results: list(CollectionCommitLogEntry). List of query results.
-            cursor: str or None. A query cursor pointing to the next batch of
-                results. If there are no more results, this will be None.
-            more: bool. Whether there are more results after this
-                batch.
-    """
-    if max_age is not None and not isinstance(max_age, datetime.timedelta):
-        raise ValueError(
-            "max_age must be a datetime.timedelta instance. or None.")
-
-    results, new_urlsafe_start_cursor, more = (
-        collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits( # pylint: disable=line-too-long
-            page_size, urlsafe_start_cursor, max_age=max_age))
-
-    return ([collection_domain.CollectionCommitLogEntry(
-        entry.created_on, entry.last_updated, entry.user_id, entry.username,
-        entry.collection_id, entry.commit_type, entry.commit_message,
-        entry.commit_cmds, entry.version, entry.post_commit_status,
-        entry.post_commit_community_owned, entry.post_commit_is_private
-    ) for entry in results], new_urlsafe_start_cursor, more)
 
 
 def index_collections_given_ids(collection_ids):

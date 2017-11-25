@@ -19,7 +19,25 @@
 describe('Language util service', function() {
   var lus = null;
 
-  beforeEach(module('oppia'));
+  beforeEach(function() {
+    module('oppia', function($provide) {
+      var mockSupportedAudioLanguages = [{
+        id: 'en',
+        text: 'English',
+        related_languages: ['en']
+      }, {
+        id: 'hi-en',
+        text: 'Hinglish',
+        related_languages: ['hi', 'en']
+      }, {
+        id: 'es',
+        text: 'Spanish',
+        related_languages: ['es']
+      }];
+      $provide.constant('SUPPORTED_AUDIO_LANGUAGES',
+        mockSupportedAudioLanguages);
+    });
+  });
 
   beforeEach(inject(function($injector) {
     lus = $injector.get('LanguageUtilService');

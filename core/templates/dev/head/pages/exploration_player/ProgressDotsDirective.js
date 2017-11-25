@@ -27,12 +27,12 @@ oppia.directive('progressDots', [
         '/pages/exploration_player/' +
         'progress_dots_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'playerPositionService', 'urlService',
-        function($scope, $rootScope, playerPositionService, urlService) {
-          var isIframed = urlService.isIframed();
+        '$scope', '$rootScope', 'PlayerPositionService', 'UrlService',
+        function($scope, $rootScope, PlayerPositionService, UrlService) {
+          var isIframed = UrlService.isIframed();
           $scope.MAX_DOTS = isIframed ? 6 : 18;
           $scope.dots = [];
-          $scope.currentDotIndex = playerPositionService.getActiveCardIndex();
+          $scope.currentDotIndex = PlayerPositionService.getActiveCardIndex();
           var initialDotCount = $scope.getNumDots();
           for (var i = 0; i < initialDotCount; i++) {
             $scope.dots.push({});
@@ -63,9 +63,9 @@ oppia.directive('progressDots', [
           });
 
           $scope.changeActiveDot = function(index) {
-            playerPositionService.setActiveCardIndex(index);
+            PlayerPositionService.setActiveCardIndex(index);
             $rootScope.$broadcast('updateActiveStateIfInEditor',
-                                  playerPositionService.getCurrentStateName());
+              PlayerPositionService.getCurrentStateName());
             $scope.currentDotIndex = index;
           };
 

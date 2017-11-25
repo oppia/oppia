@@ -1,0 +1,69 @@
+<div class="modal-header" style="border-bottom: 0; padding-bottom: 0;">
+  <h3 ng-if="!stateInteractionIdService.displayed">
+    Choose Interaction
+  </h3>
+
+  <h3 ng-if="stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)">
+    Customize Interaction (<[INTERACTION_SPECS[stateInteractionIdService.displayed].name]>)
+  </h3>
+</div>
+
+<div class="modal-body">
+  <div ng-if="!stateInteractionIdService.displayed" ng-cloak>
+    <tabset>
+      <tab ng-repeat="category in ALLOWED_INTERACTION_CATEGORIES"
+           heading="<[category.name]>" active="category.active"
+           class="protractor-test-interaction-tab-<[category.name]>">
+        <br>
+        <div ng-repeat="interactionId in category.interaction_ids"
+             ng-click="onChangeInteractionId(interactionId)"
+             class="oppia-interaction-tile protractor-test-interaction-tile-<[interactionId]>">
+          <img ng-src="<[getInteractionThumbnailImageUrl(interactionId)]>">
+          <div class="oppia-interaction-tile-name">
+            <[INTERACTION_SPECS[interactionId].name]>
+          </div>
+        </div>
+      </tab>
+    </tabset>
+  </div>
+
+  <form ng-if="stateInteractionIdService.displayed && hasCustomizationArgs" name="form.schemaForm" class="protractor-test-interaction-editor">
+    <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
+      <div class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
+      <div>
+        <schema-based-editor local-value="stateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema">
+        </schema-based-editor>
+        <div style="margin-bottom: 15px;"></div>
+      </div>
+    </div>
+  </form>
+
+  <form ng-if="stateInteractionIdService.displayed && !hasCustomizationArgs && customizationModalReopened">
+    This interaction cannot be modified. To delete it, close this popup and click the 'x' button in the top-right corner.
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default" ng-click="cancel()" ng-if="!hasCustomizationArgs">Cancel</button>
+  <!-- Do not show this button if an interaction is already selected. -->
+  <button class="btn btn-default" style="float: left;" ng-click="returnToInteractionSelector()" ng-if="stateInteractionIdService.displayed && !stateInteractionIdService.savedMemento && hasCustomizationArgs">Change Interaction</button>
+
+  <button class="btn btn-default" ng-click="cancel()" ng-if="hasCustomizationArgs">Cancel</button>
+  <div class="btn-group"
+       ng-if="hasCustomizationArgs"
+       popover-append-to-body
+       popover-placement="bottom"
+       popover-trigger="<[isSaveInteractionButtonEnabled() ? 'none' : 'mouseenter']>"
+       ng-attr-popover="<[getSaveInteractionButtonTooltip()]>">
+    <button class="btn btn-success protractor-test-save-interaction"
+            ng-click="save()"
+            ng-disabled="!isSaveInteractionButtonEnabled()">
+      Save Interaction
+    </button>
+  </div>
+  <button class="btn btn-success protractor-test-close-no-customization-modal"
+          ng-click="okay()"
+          ng-if="!hasCustomizationArgs && customizationModalReopened">
+    Okay
+  </button>
+</div>

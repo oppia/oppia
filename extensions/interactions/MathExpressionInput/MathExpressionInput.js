@@ -20,8 +20,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveMathExpressionInput', [
-  'oppiaHtmlEscaper', 'mathExpressionInputRulesService',
-  function(oppiaHtmlEscaper, mathExpressionInputRulesService) {
+  'HtmlEscaperService', 'mathExpressionInputRulesService',
+  function(HtmlEscaperService, mathExpressionInputRulesService) {
     return {
       restrict: 'E',
       scope: {
@@ -30,9 +30,9 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
       templateUrl: 'interaction/MathExpressionInput',
       controller: [
         '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
-        'oppiaDebouncer', 'deviceInfoService',
+        'DebouncerService', 'DeviceInfoService',
         function($scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS,
-          oppiaDebouncer, deviceInfoService) {
+          DebouncerService, DeviceInfoService) {
           var guppyDivElt = $element[0].querySelector('.guppy-div');
 
           /**
@@ -112,7 +112,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             // Debounce clear/refill cycles to 1 per 100ms.
             $('#fakeInputForMathExpression').on(
               'input change compositionupdate keydown',
-              oppiaDebouncer.debounce(function() {
+              DebouncerService.debounce(function() {
                 setGuppyContentFromInput();
               }, 100)
             ).on('blur', function() {
@@ -129,8 +129,8 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                 GLOBALS.ASSET_DIR_PREFIX +
                 '/assets/overrides/guppy/oppia_symbols.json');
 
-              if (deviceInfoService.isMobileUserAgent() &&
-                deviceInfoService.hasTouchEvents()) {
+              if (DeviceInfoService.isMobileUserAgent() &&
+                DeviceInfoService.hasTouchEvents()) {
                 $scope.mobileOverlayIsShown = true;
                 // Wait for the scope change to apply. Since we interact with
                 // the DOM elements, they need to be added by angular before
@@ -198,13 +198,13 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
 ]);
 
 oppia.directive('oppiaResponseMathExpressionInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/MathExpressionInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.latexAnswer = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.latexAnswer = HtmlEscaperService.escapedJsonToObj(
           $attrs.answer).latex;
       }]
     };
@@ -212,13 +212,13 @@ oppia.directive('oppiaResponseMathExpressionInput', [
 ]);
 
 oppia.directive('oppiaShortResponseMathExpressionInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'shortResponse/MathExpressionInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.latexAnswer = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.latexAnswer = HtmlEscaperService.escapedJsonToObj(
           $attrs.answer).latex;
       }]
     };

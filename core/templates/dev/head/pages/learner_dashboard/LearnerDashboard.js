@@ -69,10 +69,10 @@ oppia.constant('FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS', {
 oppia.controller('LearnerDashboard', [
   '$scope', '$rootScope', '$window', '$http', '$modal', 'alertsService',
   'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
-  'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES', 
+  'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
   'LearnerDashboardBackendApiService', 'UrlInterpolationService',
   'LEARNER_DASHBOARD_SECTION_I18N_IDS',
-  'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'threadStatusDisplayService',
+  'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'ThreadStatusDisplayService',
   'oppiaDatetimeFormatter', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
   'FeedbackThreadSummaryObjectFactory', 'FeedbackMessageSummaryObjectFactory',
   function(
@@ -81,7 +81,7 @@ oppia.controller('LearnerDashboard', [
       SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
       LearnerDashboardBackendApiService, UrlInterpolationService,
       LEARNER_DASHBOARD_SECTION_I18N_IDS,
-      LEARNER_DASHBOARD_SUBSECTION_I18N_IDS, threadStatusDisplayService,
+      LEARNER_DASHBOARD_SUBSECTION_I18N_IDS, ThreadStatusDisplayService,
       oppiaDatetimeFormatter, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
       FeedbackThreadSummaryObjectFactory, FeedbackMessageSummaryObjectFactory) {
     $scope.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
@@ -105,9 +105,9 @@ oppia.controller('LearnerDashboard', [
       text: ''
     };
 
-    $scope.getLabelClass = threadStatusDisplayService.getLabelClass;
+    $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
     $scope.getHumanReadableStatus = (
-      threadStatusDisplayService.getHumanReadableStatus);
+      ThreadStatusDisplayService.getHumanReadableStatus);
     $scope.getLocaleAbbreviatedDatetimeString = (
       oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
 
@@ -361,7 +361,9 @@ oppia.controller('LearnerDashboard', [
 
     $scope.showSuggestionModal = function(newContent, oldContent, description) {
       $modal.open({
-        templateUrl: 'modals/learnerViewSuggestion',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/learner_dashboard/' +
+          'learner_view_suggestion_modal_directive.html'),
         backdrop: true,
         resolve: {
           newContent: function() {
@@ -521,23 +523,23 @@ oppia.controller('LearnerDashboard', [
         $scope.subscriptionsList = (
           responseData.subscription_list
         );
-        $scope.numberDeletedIncompleteExplorations = (
-          responseData.number_of_deleted_activities.incomplete_explorations
+        $scope.numberNonexistentIncompleteExplorations = (
+          responseData.number_of_nonexistent_activities.incomplete_explorations
         );
-        $scope.numberDeletedIncompleteCollections = (
-          responseData.number_of_deleted_activities.incomplete_collections
+        $scope.numberNonexistentIncompleteCollections = (
+          responseData.number_of_nonexistent_activities.incomplete_collections
         );
-        $scope.numberDeletedCompletedExplorations = (
-          responseData.number_of_deleted_activities.completed_explorations
+        $scope.numberNonexistentCompletedExplorations = (
+          responseData.number_of_nonexistent_activities.completed_explorations
         );
-        $scope.numberDeletedCompletedCollections = (
-          responseData.number_of_deleted_activities.completed_collections
+        $scope.numberNonexistentCompletedCollections = (
+          responseData.number_of_nonexistent_activities.completed_collections
         );
-        $scope.numberDeletedExplorationPlaylist = (
-          responseData.number_of_deleted_activities.exploration_playlist
+        $scope.numberNonexistentExplorationsFromPlaylist = (
+          responseData.number_of_nonexistent_activities.exploration_playlist
         );
-        $scope.numberDeletedCollectionPlaylist = (
-          responseData.number_of_deleted_activities.collection_playlist
+        $scope.numberNonexistentCollectionsFromPlaylist = (
+          responseData.number_of_nonexistent_activities.collection_playlist
         );
         $scope.completedToIncompleteCollections = (
           responseData.completed_to_incomplete_collections

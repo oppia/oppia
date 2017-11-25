@@ -17,11 +17,13 @@
  * feedback tab of the exploration editor.
  */
 
-oppia.factory('threadDataService', [
-  '$http', '$q', 'explorationData', 'alertsService', 'ACTION_ACCEPT_SUGGESTION',
+oppia.factory('ThreadDataService', [
+  '$http', '$q', 'ExplorationDataService', 'alertsService', 
+  'ACTION_ACCEPT_SUGGESTION',
   function(
-      $http, $q, explorationData, alertsService, ACTION_ACCEPT_SUGGESTION) {
-    var _expId = explorationData.explorationId;
+      $http, $q, ExplorationDataService, alertsService, 
+      ACTION_ACCEPT_SUGGESTION) {
+    var _expId = ExplorationDataService.explorationId;
     var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
     var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
     var _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler/' + _expId;

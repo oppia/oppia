@@ -526,7 +526,7 @@ oppia.factory('StateGraphLayoutService', [
       },
       modifyPositionValues: function(nodeData, graphWidth, graphHeight) {
         var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
-        var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];  
+        var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];
 
         // Change the position values in nodeData to use pixels.
         for (var nodeId in nodeData) {
@@ -546,7 +546,7 @@ oppia.factory('StateGraphLayoutService', [
         // to use as a scaling factor to determine the width of graph nodes.
         // This is not an entirely accurate description because it also takes
         // into account the horizontal whitespace between graph nodes.
-        var letterWidthInPixels = 10.5;          
+        var letterWidthInPixels = 10.5;
         return maxNodesPerRow * maxNodeLabelLength * letterWidthInPixels;
       },
       getGraphHeight: function(nodeData) {

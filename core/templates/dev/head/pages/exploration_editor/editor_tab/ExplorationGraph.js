@@ -17,13 +17,13 @@
  */
 
 oppia.controller('ExplorationGraph', [
-  '$scope', '$modal', 'editorContextService', 'alertsService',
-  'explorationStatesService', 'editabilityService', 'routerService',
-  'graphDataService',
+  '$scope', '$modal', 'EditorStateService', 'alertsService',
+  'explorationStatesService', 'editabilityService', 'RouterService',
+  'graphDataService', 'UrlInterpolationService',
   function(
-      $scope, $modal, editorContextService, alertsService,
-      explorationStatesService, editabilityService, routerService,
-      graphDataService) {
+    $scope, $modal, EditorStateService, alertsService,
+    explorationStatesService, editabilityService, RouterService,
+    graphDataService, UrlInterpolationService) {
     $scope.getGraphData = graphDataService.getGraphData;
     $scope.isEditable = editabilityService.isEditable;
 
@@ -39,18 +39,20 @@ oppia.controller('ExplorationGraph', [
     };
 
     $scope.onClickStateInMinimap = function(stateName) {
-      routerService.navigateToMainTab(stateName);
+      RouterService.navigateToMainTab(stateName);
     };
 
     $scope.getActiveStateName = function() {
-      return editorContextService.getActiveStateName();
+      return EditorStateService.getActiveStateName();
     };
 
     $scope.openStateGraphModal = function() {
       alertsService.clearWarnings();
 
       $modal.open({
-        templateUrl: 'modals/stateGraph',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/' +
+          'exploration_graph_modal_directive.html'),
         backdrop: true,
         resolve: {
           isEditable: function() {
@@ -59,11 +61,11 @@ oppia.controller('ExplorationGraph', [
         },
         windowClass: 'oppia-large-modal-window',
         controller: [
-          '$scope', '$modalInstance', 'editorContextService',
+          '$scope', '$modalInstance', 'EditorStateService',
           'graphDataService', 'isEditable',
-          function($scope, $modalInstance, editorContextService,
+          function($scope, $modalInstance, EditorStateService,
                    graphDataService, isEditable) {
-            $scope.currentStateName = editorContextService.getActiveStateName();
+            $scope.currentStateName = EditorStateService.getActiveStateName();
             $scope.graphData = graphDataService.getGraphData();
             $scope.isEditable = isEditable;
 

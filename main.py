@@ -163,7 +163,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(feconf.SPLASH_URL, pages.SplashPage),
     get_redirect_route(r'/about', pages.AboutPage),
     get_redirect_route(r'/get_started', pages.GetStartedPage),
-    get_redirect_route(r'/foundation', pages.AboutRedirectPage),
+    get_redirect_route(r'/foundation', pages.FoundationRedirectPage),
     get_redirect_route(r'/credits', pages.AboutRedirectPage),
     get_redirect_route(r'/teach', pages.TeachPage),
     get_redirect_route(r'/participate', pages.TeachRedirectPage),
@@ -171,7 +171,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'/console_errors', pages.ConsoleErrorPage),
     get_redirect_route(r'/contact', pages.ContactPage),
 
-    get_redirect_route(r'/blog', pages.BlogPage),
     get_redirect_route(r'/forum', pages.ForumPage),
     get_redirect_route(r'/donate', pages.DonatePage),
     get_redirect_route(r'/thanks', pages.ThanksPage),
@@ -304,8 +303,17 @@ URLS = MAPREDUCE_HANDLERS + [
         '/explorehandler/exploration_start_event/<exploration_id>',
         reader.ExplorationStartEventHandler),
     get_redirect_route(
+        '/explorehandler/exploration_actual_start_event/<exploration_id>',
+        reader.ExplorationActualStartEventHandler),
+    get_redirect_route(
+        '/explorehandler/solution_hit_event/<exploration_id>',
+        reader.SolutionHitEventHandler),
+    get_redirect_route(
         r'/explorehandler/state_hit_event/<exploration_id>',
         reader.StateHitEventHandler),
+    get_redirect_route(
+        r'/explorehandler/state_complete_event/<exploration_id>',
+        reader.StateCompleteEventHandler),
     get_redirect_route(
         r'/explorehandler/answer_submitted_event/<exploration_id>',
         reader.AnswerSubmittedEventHandler),
@@ -318,6 +326,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/explorehandler/exploration_maybe_leave_event/<exploration_id>',
         reader.ExplorationMaybeLeaveHandler),
+    get_redirect_route(
+        r'/explorehandler/stats_events/<exploration_id>',
+        reader.StatsEventsHandler),
     get_redirect_route(
         r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler),
     get_redirect_route(
@@ -372,7 +383,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/statisticsversion/<exploration_id>',
         editor.ExplorationStatsVersionsHandler),
     get_redirect_route(
-        r'/createhandler/statistics/<exploration_id>/<exploration_version>',
+        r'/createhandler/statistics_old/<exploration_id>/<exploration_version>',
+        editor.OldExplorationStatisticsHandler),
+    get_redirect_route(
+        r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler),
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
@@ -477,9 +491,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/ml/trainedclassifierhandler', classifier.TrainedClassifierHandler),
     get_redirect_route(
         r'/ml/nextjobhandler', classifier.NextJobHandler),
-    get_redirect_route(
-        r'/.well-known/acme-challenge/<challenge>',
-        admin.SslChallengeHandler),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),

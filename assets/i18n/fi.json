@@ -237,6 +237,7 @@
 	"I18N_TOPNAV_LIBRARY": "Kirjasto",
 	"I18N_TOPNAV_LOGOUT": "Kirjaudu ulos",
 	"I18N_TOPNAV_NOTIFICATIONS": "Ilmoitukset",
+	"I18N_TOPNAV_OPPIA_FOUNDATION": "Oppia Foundation",
 	"I18N_TOPNAV_PREFERENCES": "Asetukset",
 	"I18N_TOPNAV_SIGN_IN": "Kirjaudu sisään",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Sinulla on yhteensä <[totalSubscribers]> tilaajaa.",

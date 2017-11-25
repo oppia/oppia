@@ -8,11 +8,13 @@ if (isMinificationNeeded) {
 module.exports = function(config) {
   config.set({
     basePath: '../../',
-    frameworks: ['jasmine'],
+    // jasmine-jquery is used to load contents of external JSON files in tests.
+    frameworks: ['jasmine-jquery', 'jasmine'],
     files: [
       'core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
       'assets/constants.js',
+      'assets/rich_text_components_definitions.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.0.0/jquery.min.js',
@@ -28,11 +30,23 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*.js',
       'core/templates/dev/head/**/*.html',
       'extensions/**/*.js',
+      {
+        pattern: 'extensions/**/*.png',
+        watched: false,
+        served: true,
+        included: false
+      },
       'extensions/interactions/**/*.html',
       'extensions/interactions/rule_templates.json',
       {
         pattern: 'assets/i18n/**/*.json',
         watched: true,
+        served: true,
+        included: false
+      },
+      {
+        pattern: 'core/tests/data/**/*.json',
+        watched: false,
         served: true,
         included: false
       }
@@ -44,28 +58,15 @@ module.exports = function(config) {
     ],
     proxies: {
       // Karma serves files under the /base directory.
-      // We need to access files in assets folder, without modifying the code,
-      // so we need to proxy the requests from /assets/ to /base/assets/.
-      '/assets/': '/base/assets/'
+      // We access files directly in our code, for example /folder/,
+      // so we need to proxy the requests from /folder/ to /base/folder/.
+      '/assets/': '/base/assets/',
+      '/extensions/': '/base/extensions/'
     },
     preprocessors: {
-      'core/templates/dev/head/*.js': ['coverage'],
-      // When all controllers were converted from global functions into the
-      // oppia.controller() format, the syntax 'core/templates/dev/head/*/*.js'
-      // and 'core/templates/dev/head/**/*.js' stopped working, and resulted in
-      // "Uncaught TypeError: Cannot read property '2' of undefined" for all
-      // the JS files. So we enumerate all the directories directly (which,
-      // although it should give an identical result, seems to actually cause
-      // no problems). Note that this only affects which files have coverage
-      // statistics generated for them, and that if a directory is omitted by
-      // accident, that directory will not have coverage statistics generated
-      // for it, which is easily fixed.
-      'core/templates/dev/head/components/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/domain/**/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/expressions/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/forms/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/pages/**/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/services/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
+      'extensions/!(*Spec).js': ['coverage'],
       'extensions/**/!(*Spec).js': ['coverage'],
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'

@@ -83,7 +83,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             actual_state_answers_calc_output.calculation_id,
             'AnswerFrequencies')
         actual_calc_output = (
-            actual_state_answers_calc_output.calculation_output)
+            actual_state_answers_calc_output.calculation_output.to_raw_type())
 
         # Expected answer counts (result of calculation)
         # TODO(msl): Include answers that were never clicked and received 0
@@ -252,7 +252,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             actual_state_answers_calc_output.calculation_id,
             'Top5AnswerFrequencies')
         actual_calc_output = (
-            actual_state_answers_calc_output.calculation_output)
+            actual_state_answers_calc_output.calculation_output.to_raw_type())
 
         # TODO(msl): Include answers that were never clicked and received 0
         # count from the calculation. This is useful to help creators identify
@@ -308,7 +308,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             actual_state_answers_calc_output.calculation_id,
             'Top5AnswerFrequencies')
         actual_calc_output = (
-            actual_state_answers_calc_output.calculation_output)
+            actual_state_answers_calc_output.calculation_output.to_raw_type())
 
         expected_answer_counts = [{
             'answer': 'English',
@@ -349,7 +349,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             'TopAnswersByCategorization')
 
         actual_calc_output = (
-            actual_state_answers_calc_output.calculation_output)
+            actual_state_answers_calc_output.calculation_output.to_raw_type())
         self.assertEqual(actual_calc_output, {})
 
         # Only submitting a hard rule should result in only one returned
@@ -365,7 +365,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             calculation_instance.calculate_from_state_answers_dict(
                 state_answers_dict))
         actual_calc_output = (
-            actual_state_answers_calc_output.calculation_output)
+            actual_state_answers_calc_output.calculation_output.to_raw_type())
 
         self.assertEqual(actual_calc_output, {
             'explicit': [{
@@ -422,7 +422,7 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             calculation_instance.calculate_from_state_answers_dict(
                 state_answers_dict))
         actual_calc_output = (
-            actual_state_answers_calc_output.calculation_output)
+            actual_state_answers_calc_output.calculation_output.to_raw_type())
 
         self.assertEqual(actual_calc_output, {
             'explicit': [{
@@ -484,5 +484,5 @@ class InteractionAnswerSummaryCalculationUnitTests(test_utils.GenericTestBase):
             calculation_instance.calculate_from_state_answers_dict(
                 state_answers_dict))
         actual_calc_output = (
-            actual_state_answers_calc_output.calculation_output)
+            actual_state_answers_calc_output.calculation_output.to_raw_type())
         self.assertEqual(actual_calc_output, {})

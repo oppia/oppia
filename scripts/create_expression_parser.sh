@@ -38,7 +38,7 @@ source $(dirname $0)/setup.sh || exit 1
 
 
 EXPRESSION_PARSER_DEFINITION=core/templates/dev/head/expressions/parser.pegjs
-EXPRESSION_PARSER_JS=core/templates/dev/head/expressions/parser.js
+EXPRESSION_PARSER_JS=core/templates/dev/head/expressions/ExpressionParserService.js
 
 # Install the basic environment, e.g. nodejs.
 bash scripts/install_third_party.sh
@@ -50,7 +50,7 @@ if [ ! -d "$NODE_MODULE_DIR/pegjs" ]; then
 fi
 
 $NODE_MODULE_DIR/pegjs/bin/pegjs $EXPRESSION_PARSER_DEFINITION $EXPRESSION_PARSER_JS
-sed -i "s/module\.exports.*$/oppia.factory('expressionParserService', ['\$log', function(\$log) {/" $EXPRESSION_PARSER_JS
+sed -i "s/module\.exports.*$/oppia.factory('ExpressionParserService', ['\$log', function(\$log) {/" $EXPRESSION_PARSER_JS
 sed -i  's/^})();\s*$/}]);/' $EXPRESSION_PARSER_JS
 
 

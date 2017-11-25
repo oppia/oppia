@@ -22,7 +22,6 @@ from core import jobs
 from core.domain import calculation_registry
 from core.domain import exp_services
 from core.domain import interaction_registry
-from core.domain import stats_domain
 from core.platform import models
 
 import feconf
@@ -508,8 +507,7 @@ class StatisticsMRJobManager(
 class InteractionAnswerSummariesMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):
     """Job to calculate interaction view statistics, e.g. most frequent answers
-    of multiple-choice interactions. Iterate over StateAnswer objects and
-    create StateAnswersCalcOutput objects.
+    of multiple-choice interactions.
     """
     @classmethod
     def _get_continuous_computation_class(cls):
@@ -607,6 +605,25 @@ class InteractionAnswerSummariesMRJobManager(
         # will refer to the most relevant answers.
         latest_version = versions[0]
         latest_interaction_id = versioned_interaction_ids[latest_version][0]
+
+        if exploration_version == VERSION_ALL:
+            # If aggregating across all versions, verify that the latest answer
+            # version is equal to the latest version of the exploration,
+            # otherwise ignore all answers since none of them can be applied to
+            # the latest version.
+            exp = exp_services.get_exploration_by_id(exploration_id)
+            if state_name in exp.states:
+                loaded_interaction_id = exp.states[state_name].interaction.id
+                # Only check if the version mismatches if the new version has a
+                # different interaction ID.
+                if latest_interaction_id != loaded_interaction_id and (
+                        latest_version != exp.version):
+                    yield (
+                        'Ignoring answers submitted to version %s and below '
+                        'since the latest exploration version is %s' % (
+                            latest_version, exp.version))
+                    versions = []
+
         # In the VERSION_ALL case, we only take into account the most recent
         # consecutive block of versions with the same interaction ID as the
         # current version, and ignore all versions prior to this block. This
@@ -697,27 +714,3 @@ class InteractionAnswerSummariesAggregator(
     @classmethod
     def _get_batch_job_manager_class(cls):
         return InteractionAnswerSummariesMRJobManager
-
-    # Public query methods.
-    @classmethod
-    def get_calc_output(
-            cls, exploration_id, state_name, calculation_id,
-            exploration_version=VERSION_ALL):
-        """Get state answers calculation output domain object obtained from
-        StateAnswersCalcOutputModel instance stored in the data store. This
-        aggregator does not have a real-time layer, which means the results
-        from this function may be out of date. The calculation ID comes from
-        the name of the calculation class used to compute aggregate data from
-        submitted user answers.
-
-        If 'exploration_version' is VERSION_ALL, this will return aggregated
-        output for all versions of the specified state and exploration.
-        """
-        calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
-            exploration_id, exploration_version, state_name, calculation_id)
-        if calc_output_model:
-            return stats_domain.StateAnswersCalcOutput(
-                exploration_id, exploration_version, state_name,
-                calculation_id, calc_output_model.calculation_output)
-        else:
-            return None

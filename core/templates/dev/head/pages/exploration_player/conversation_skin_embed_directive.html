@@ -22,22 +22,21 @@
          ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard, 'with-supplementary-card': isCurrentSupplementalCardNonempty()}">
 
       <div class="conversation-skin-main-tutor-card-embed"
-           ng-show="!isViewportNarrow() || isScreenNarrowAndShowingTutorCard()"
-           ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty()}">
+           ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty()}"
+           style="margin-bottom: 100px">
         <tutor-card on-click-continue-button="showUpcomingCard()"
                     on-submit-answer="submitAnswer(answer, rulesService)"
-                    on-dismiss="showSupplementalCardIfScreenIsNarrow()"
                     start-card-change-animation="startCardChangeAnimation">
         </tutor-card>
+        <div ng-if="isCurrentSupplementalCardNonempty() && isViewportNarrow()">
+          <supplemental-card on-click-continue-button="showUpcomingCard()"
+                             on-submit-answer="submitAnswer(answer, rulesService)">
+          </supplemental-card>
+        </div>
       </div>
 
-      <div ng-if="isCurrentSupplementalCardNonempty()"
+      <div ng-if="isCurrentSupplementalCardNonempty() && !isViewportNarrow()"
            class="conversation-skin-supplemental-card-container">
-        <img class="conversation-skin-oppia-avatar show-tutor-card"
-             ng-if="isScreenNarrowAndShowingSupplementalCard() && isCurrentSupplementalCardNonempty()"
-             ng-src="<[::OPPIA_AVATAR_IMAGE_URL]>"
-             ng-click="showTutorCardIfScreenIsNarrow()" alt="">
-        <div ng-if="isScreenNarrowAndShowingTutorCard()" class="supplemental-mask"></div>
         <supplemental-card on-click-continue-button="showUpcomingCard()"
                            on-submit-answer="submitAnswer(answer, rulesService)">
         </supplemental-card>
@@ -51,7 +50,7 @@
         <div ng-if="activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1].oppiaResponse &&
                     !isCurrentSupplementalCardNonempty() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback && activeCard.destStateName &&
                     !isOnTerminalCard()">
-          <md-button aria-label="" class="oppia-learner-continue-button protractor-test-continue-to-next-card-button" focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>" ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)" translate="I18N_PLAYER_CONTINUE_BUTTON">
+          <md-button aria-label="" class="oppia-learner-confirm-button protractor-test-continue-to-next-card-button" focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>" ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)" translate="I18N_PLAYER_CONTINUE_BUTTON">
           </md-button>
         </div>
         <div ng-if="isOnTerminalCard()" class="nav-bar-bottom-replay-content">
@@ -117,7 +116,9 @@ directive. -->
   }
 
   .grid-container{
-     width: 100%;
+    bottom: 0;
+    position: fixed;
+    width: 100%;
   }
 
   .bottom-nav-row:before,
@@ -337,9 +338,6 @@ directive. -->
   .conversation-skin-help-card {
     background: #fff;
     border-radius: 2px;
-    /* We move the help card lower so that it does not block
-     the terminal output in the CodeRepl interaction.
-    */
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
     min-height: 50px;
     opacity: 1;
@@ -351,7 +349,6 @@ directive. -->
   }
 
   .help-card-standard {
-    bottom: -50px;
     position: absolute;
   }
 
@@ -359,7 +356,6 @@ directive. -->
     bottom: 50px;
     position: fixed;
   }
-
 
   .conversation-skin-help-card.ng-enter,
   .conversation-skin-help-card.ng-leave-active {
@@ -412,7 +408,7 @@ directive. -->
     padding: 0 20px;
   }
   /* These rules must be kept in sync with corresponding rules in oppia.css
-     (those with '.oppia-state-content-display-html > p,
+     (those with '.oppia-rte-editor > p,
        .form-control.oppia-rte-content > div > p' selectors specifying
       the same line-height, margin-top and margin-bottom attributes)
   */
@@ -469,6 +465,7 @@ directive. -->
   .conversation-skin-oppia-feedback-content,
   .conversation-skin-learner-answer-content {
     padding: 8px 12px;
+    word-wrap: break-word;
   }
 
   .conversation-skin-tutor-card-top-content,
@@ -532,11 +529,6 @@ directive. -->
     margin-top: 8px;
     padding: 16px 20px;
     position: relative;
-  }
-
-  .conversation-skin-learner-answer,
-  .conversation-skin-oppia-feedback {
-    word-wrap: break-word;
   }
 
   .conversation-skin-feedback-dot-one,
@@ -640,9 +632,11 @@ directive. -->
     }
 
     .conversation-skin-cards-container.with-supplementary-card {
-      min-height: 440px;
+      /* TODO(tjiang11): Find a way to handle arbitrarily long/short content.
+         in supplemental interactions.
+      */
+      min-height: 1000px;
     }
-
 
     .conversation-skin-main-tutor-card {
       left: 0;

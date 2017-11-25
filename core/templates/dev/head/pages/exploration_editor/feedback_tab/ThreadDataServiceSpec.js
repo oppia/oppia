@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for threadDataService, which retrieves thread
+ * @fileoverview Unit tests for ThreadDataService, which retrieves thread
  * data for the feedback tab of the exploration editor.
  */
 
@@ -23,15 +23,15 @@ describe('retrieving threads service', function() {
   beforeEach(function() {
     module('oppia');
     module(function($provide) {
-      $provide.value('explorationData', {
+      $provide.value('ExplorationDataService', {
         explorationId: expId
       });
     });
   });
 
-  var threadDataService, httpBackend;
-  beforeEach(inject(function(_threadDataService_, $httpBackend) {
-    threadDataService = _threadDataService_;
+  var ThreadDataService, httpBackend;
+  beforeEach(inject(function(_ThreadDataService_, $httpBackend) {
+    ThreadDataService = _ThreadDataService_;
     httpBackend = $httpBackend;
   }));
 
@@ -88,15 +88,15 @@ describe('retrieving threads service', function() {
        threads: mockOpenSuggestionThreads
      });
 
-    threadDataService.fetchThreads();
+    ThreadDataService.fetchThreads();
     httpBackend.flush();
 
     for (var i = 0; i < mockFeedbackThreads.length; i++) {
-      expect(threadDataService.data.feedbackThreads).toContain(
+      expect(ThreadDataService.data.feedbackThreads).toContain(
         mockFeedbackThreads[i]);
     }
     for (var i = 0; i < mockOpenSuggestionThreads.length; i++) {
-      expect(threadDataService.data.suggestionThreads).toContain(
+      expect(ThreadDataService.data.suggestionThreads).toContain(
         mockOpenSuggestionThreads[i]);
     }
   });

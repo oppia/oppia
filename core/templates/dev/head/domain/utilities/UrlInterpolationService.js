@@ -18,7 +18,7 @@
  */
 
 oppia.factory('UrlInterpolationService', [
-  'alertsService', 'utilsService', function(alertsService, utilsService) {
+  'alertsService', 'UtilsService', function(alertsService, UtilsService) {
     var validateResourcePath = function(resourcePath) {
       if (!resourcePath) {
         alertsService.fatalWarning('Empty path passed in method.');
@@ -120,7 +120,7 @@ oppia.factory('UrlInterpolationService', [
         var escapedInterpolationValues = {};
         for (var varName in interpolationValues) {
           var value = interpolationValues[varName];
-          if (!utilsService.isString(value)) {
+          if (!UtilsService.isString(value)) {
             alertsService.fatalWarning(
               'Parameters passed into interpolateUrl must be strings.');
             return null;

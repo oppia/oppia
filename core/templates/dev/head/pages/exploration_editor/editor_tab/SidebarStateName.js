@@ -18,12 +18,12 @@
 
 oppia.controller('SidebarStateName', [
   '$scope', '$filter', '$rootScope', 'editabilityService',
-  'editorContextService', 'focusService', 'explorationStatesService',
-  'routerService',
+  'EditorStateService', 'FocusManagerService', 'explorationStatesService',
+  'RouterService',
   function(
       $scope, $filter, $rootScope, editabilityService,
-      editorContextService, focusService, explorationStatesService,
-      routerService) {
+      EditorStateService, FocusManagerService, explorationStatesService,
+      RouterService) {
     $scope.editabilityService = editabilityService;
 
     var _stateNameMemento = null;
@@ -35,14 +35,14 @@ oppia.controller('SidebarStateName', [
     $scope.initStateNameEditor = function() {
       _stateNameMemento = null;
       $scope.stateNameEditorIsShown = false;
-      $scope.stateName = editorContextService.getActiveStateName();
+      $scope.stateName = EditorStateService.getActiveStateName();
     };
 
     $scope.openStateNameEditor = function() {
       $scope.stateNameEditorIsShown = true;
       $scope.tmpStateName = $scope.stateName;
       _stateNameMemento = $scope.stateName;
-      focusService.setFocus('stateNameEditorOpened');
+      FocusManagerService.setFocus('stateNameEditorOpened');
     };
 
     $scope.saveStateName = function(newStateName) {
@@ -56,7 +56,7 @@ oppia.controller('SidebarStateName', [
         return false;
       } else {
         explorationStatesService.renameState(
-          editorContextService.getActiveStateName(), normalizedNewName);
+          EditorStateService.getActiveStateName(), normalizedNewName);
         $scope.stateNameEditorIsShown = false;
         // Save the contents of other open fields.
         $rootScope.$broadcast('externalSave');
@@ -76,7 +76,7 @@ oppia.controller('SidebarStateName', [
     };
 
     var _isNewStateNameValid = function(stateName) {
-      if (stateName === editorContextService.getActiveStateName()) {
+      if (stateName === EditorStateService.getActiveStateName()) {
         return true;
       }
       return explorationStatesService.isNewStateNameValid(stateName, true);
@@ -86,7 +86,7 @@ oppia.controller('SidebarStateName', [
       var normalizedStateName = $scope._getNormalizedStateName(newStateName);
       var valid = $scope.saveStateName(normalizedStateName);
       if (valid) {
-        routerService.navigateToMainTab(normalizedStateName);
+        RouterService.navigateToMainTab(normalizedStateName);
       }
     };
   }

@@ -36,34 +36,36 @@ oppia.constant(
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
-  'explorationData', 'editorContextService', 'explorationTitleService',
+  'ExplorationDataService', 'EditorStateService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService',
   'explorationLanguageCodeService', 'explorationRightsService',
   'explorationInitStateNameService', 'explorationTagsService',
-  'editabilityService', 'explorationStatesService', 'routerService',
+  'editabilityService', 'explorationStatesService', 'RouterService',
   'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'explorationWarningsService', '$templateCache', 'explorationContextService',
-  'explorationAdvancedFeaturesService', '$modal', 'changeListService',
+  'ExplorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
+  'ParamSpecsObjectFactory', 'explorationAutomaticTextToSpeechService',
   'UrlInterpolationService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
-      explorationData, editorContextService, explorationTitleService,
+      ExplorationDataService, EditorStateService, explorationTitleService,
       explorationCategoryService, explorationObjectiveService,
       explorationLanguageCodeService, explorationRightsService,
       explorationInitStateNameService, explorationTagsService,
-      editabilityService, explorationStatesService, routerService,
+      editabilityService, explorationStatesService, RouterService,
       graphDataService, stateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       explorationWarningsService, $templateCache, explorationContextService,
-      explorationAdvancedFeaturesService, $modal, changeListService,
+      ExplorationAdvancedFeaturesService, $modal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
+      ParamSpecsObjectFactory, explorationAutomaticTextToSpeechService,
       UrlInterpolationService) {
     $scope.editabilityService = editabilityService;
-    $scope.editorContextService = editorContextService;
+    $scope.EditorStateService = EditorStateService;
 
     /**********************************************************
      * Called on initial load of the exploration editor page.
@@ -77,7 +79,7 @@ oppia.controller('ExplorationEditor', [
     $scope.revertExplorationUrl = (
       '/createhandler/revert/' + $scope.explorationId);
 
-    $scope.getTabStatuses = routerService.getTabStatuses;
+    $scope.getTabStatuses = RouterService.getTabStatuses;
 
     /********************************************
     * Methods affecting the graph visualization.
@@ -100,7 +102,7 @@ oppia.controller('ExplorationEditor', [
     // Initializes the exploration page using data from the backend. Called on
     // page load.
     $scope.initExplorationPage = function(successCallback) {
-      explorationData.getData(function(explorationId, lostChanges) {
+      ExplorationDataService.getData(function(explorationId, lostChanges) {
         if (!autosaveInfoModalsService.isModalOpen()) {
           autosaveInfoModalsService.showLostChangesModal(
             lostChanges, explorationId);
@@ -114,9 +116,11 @@ oppia.controller('ExplorationEditor', [
         explorationLanguageCodeService.init(data.language_code);
         explorationInitStateNameService.init(data.init_state_name);
         explorationTagsService.init(data.tags);
-        explorationParamSpecsService.init(data.param_specs);
+        explorationParamSpecsService.init(
+          ParamSpecsObjectFactory.createFromBackendDict(data.param_specs));
         explorationParamChangesService.init(
           ParamChangesObjectFactory.createFromBackendList(data.param_changes));
+        explorationAutomaticTextToSpeechService.init(data.auto_tts_enabled);
 
         $scope.explorationTitleService = explorationTitleService;
         $scope.explorationCategoryService = explorationCategoryService;
@@ -131,7 +135,7 @@ oppia.controller('ExplorationEditor', [
         $scope.currentUser = data.user;
         $scope.currentVersion = data.version;
 
-        explorationAdvancedFeaturesService.init(data);
+        ExplorationAdvancedFeaturesService.init(data);
         explorationRightsService.init(
           data.rights.owner_names, data.rights.editor_names,
           data.rights.viewer_names, data.rights.status,
@@ -147,17 +151,17 @@ oppia.controller('ExplorationEditor', [
 
         graphDataService.recompute();
 
-        if (!editorContextService.getActiveStateName() ||
+        if (!EditorStateService.getActiveStateName() ||
             !explorationStatesService.getState(
-              editorContextService.getActiveStateName())) {
-          editorContextService.setActiveStateName(
+              EditorStateService.getActiveStateName())) {
+          EditorStateService.setActiveStateName(
             explorationInitStateNameService.displayed);
         }
 
-        if (!routerService.isLocationSetToNonStateEditorTab() &&
+        if (!RouterService.isLocationSetToNonStateEditorTab() &&
             !data.states.hasOwnProperty(
-              routerService.getCurrentStateFromLocationPath('gui'))) {
-          routerService.navigateToMainTab();
+              RouterService.getCurrentStateFromLocationPath('gui'))) {
+          RouterService.navigateToMainTab();
         }
 
         explorationWarningsService.updateWarnings();
@@ -183,7 +187,7 @@ oppia.controller('ExplorationEditor', [
         });
 
         if (explorationStatesService.getState(
-              editorContextService.getActiveStateName())) {
+              EditorStateService.getActiveStateName())) {
           $scope.$broadcast('refreshStateEditor');
         }
 
@@ -357,7 +361,7 @@ oppia.controller('ExplorationEditor', [
 
     $scope.tutorialInProgress = false;
     $scope.startTutorial = function() {
-      routerService.navigateToMainTab();
+      RouterService.navigateToMainTab();
       // The $timeout wrapper is needed for all components on the page to load,
       // otherwise elements within ng-if's are not guaranteed to be present on
       // the page.

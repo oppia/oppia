@@ -25,8 +25,11 @@ from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import param_domain
 from core.domain import rights_manager
+from core.domain import stats_domain
+from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
@@ -426,9 +429,6 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
-        # Load exploration 0.
-        exp_services.load_demo(self.EXP_ID)
-
         # Login and create exploration.
         self.login(self.EDITOR_EMAIL)
 
@@ -793,3 +793,81 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [])
+
+
+class StatsEventHandlerTest(test_utils.GenericTestBase):
+    """Tests for all the statistics event models recording handlers."""
+
+    def setUp(self):
+        super(StatsEventHandlerTest, self).setUp()
+        self.exp_id = '15'
+
+        self.login(self.VIEWER_EMAIL)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        exp_services.delete_demo(self.exp_id)
+        exp_services.load_demo(self.exp_id)
+        exploration = exp_services.get_exploration_by_id(self.exp_id)
+
+        self.exp_version = exploration.version
+        self.state_name = 'Home'
+        self.session_id = 'session_id1'
+        state_stats_mapping = {
+            self.state_name: stats_domain.StateStats.create_default()
+        }
+        exploration_stats = stats_domain.ExplorationStats(
+            self.exp_id, self.exp_version, 0, 0, 0, 0, 0, 0,
+            state_stats_mapping)
+        stats_services.create_stats_model(exploration_stats)
+
+        self.aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                }
+            }
+        }
+
+    def test_stats_events_handler(self):
+        """Test the handler for handling batched events."""
+        with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
+            self.post_json('/explorehandler/stats_events/%s' % (
+                self.exp_id), {
+                    'aggregated_stats': self.aggregated_stats,
+                    'exp_version': self.exp_version})
+
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_STATS), 1)
+        self.process_and_flush_pending_tasks()
+
+        # Check that the models are updated.
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exp_version)
+        self.assertEqual(exploration_stats.num_starts_v2, 1)
+        self.assertEqual(exploration_stats.num_actual_starts_v2, 1)
+        self.assertEqual(exploration_stats.num_completions_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                self.state_name].total_hit_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                self.state_name].first_hit_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                self.state_name].total_answers_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                self.state_name].useful_feedback_count_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                self.state_name].num_completions_v2, 1)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                self.state_name].num_times_solution_viewed_v2, 1)

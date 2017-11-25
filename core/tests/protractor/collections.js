@@ -18,21 +18,24 @@
 
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var admin = require('../protractor_utils/admin.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var collectionEditor = require('../protractor_utils/collectionEditor.js');
 
+
 describe('Collections', function() {
+  var adminPage = null;
+
   beforeAll(function() {
+    adminPage = new AdminPage.AdminPage();
     var USERNAME = 'aliceCollections';
     users.createUser('alice@collections.com', USERNAME);
     users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
-    browser.get(general.ADMIN_URL_SUFFIX);
-    element.all(by.css(
-      '.protractor-test-reload-collection-button')).first().click();
+    adminPage.get();
+    adminPage.reloadCollection();
     general.acceptAlert();
     browser.waitForAngular();
-    admin.reloadAllExplorations();
-    admin.updateRole(USERNAME, 'collection editor');
+    adminPage.reloadAllExplorations();
+    adminPage.updateRole(USERNAME, 'collection editor');
     users.logout();
   });
 

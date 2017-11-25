@@ -27,9 +27,9 @@ oppia.filter('convertHtmlToUnicode', [function() {
 }]);
 
 oppia.filter('convertUnicodeToHtml', [
-  '$sanitize', 'oppiaHtmlEscaper', function($sanitize, oppiaHtmlEscaper) {
+  '$sanitize', 'HtmlEscaperService', function($sanitize, HtmlEscaperService) {
     return function(text) {
-      return $sanitize(oppiaHtmlEscaper.unescapedStrToEscapedStr(text));
+      return $sanitize(HtmlEscaperService.unescapedStrToEscapedStr(text));
     };
   }
 ]);
@@ -186,10 +186,10 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
 }]);
 
 oppia.directive('textAngularRte', [
-  '$filter', '$timeout', 'oppiaHtmlEscaper', 'rteHelperService',
+  '$filter', '$timeout', 'HtmlEscaperService', 'rteHelperService',
   'textAngularManager',
   function(
-    $filter, $timeout, oppiaHtmlEscaper, rteHelperService,
+    $filter, $timeout, HtmlEscaperService, rteHelperService,
     textAngularManager) {
     return {
       restrict: 'E',
@@ -224,9 +224,9 @@ oppia.directive('textAngularRte', [
             if (!($scope.uiConfig() &&
                   $scope.uiConfig().hide_complex_extensions &&
                   componentDefn.isComplex)) {
-              toolbarOptions[2].push(componentDefn.name);
+              toolbarOptions[2].push(componentDefn.id);
             }
-            var imgClassName = 'oppia-noninteractive-' + componentDefn.name;
+            var imgClassName = 'oppia-noninteractive-' + componentDefn.id;
             whitelistedImgClasses.push(imgClassName);
           }
         );

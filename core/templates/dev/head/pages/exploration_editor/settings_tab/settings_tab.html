@@ -170,6 +170,28 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div role="form" class="form-horizontal">
+            <label for="enableAutomaticTextToSpeech" class="col-lg-2 col-md-2 col-sm-2">
+              Automatic Text-to-speech
+            </label>
+            <span class="col-lg-2 col-md-2 col-sm-2">
+              <button type="button" class="btn btn-default protractor-test-enable-automatic-text-to-speech" ng-click="toggleAutomaticTextToSpeech()" style="margin-top: 16px">
+                <span ng-if="!isAutomaticTextToSpeechEnabled()">
+                  Enable
+                </span>
+                <span ng-if="isAutomaticTextToSpeechEnabled()">
+                  Disable
+                </span>
+              </button>
+            </span>
+            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              Automatic text-to-speech generates audio from your content for learners to listen to. This feature is enabled by default. It is recommended that you disable this feature if creating an exploration whose content consists of multiple languages.
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   </md-card>
 
@@ -409,12 +431,12 @@
 
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
-        <div ng-show="isEmpty(explorationParamSpecsService.savedMemento)">
+        <div ng-show="isEmpty(explorationParamSpecsService.savedMemento.getParamDict())">
           <em>No parameters used.</em>
         </div>
         <ol>
-          <li ng-repeat="(paramName, paramSpecValue) in explorationParamSpecsService.savedMemento">
-            <b><[paramName]></b> (<[paramSpecValue.obj_type]>)
+          <li ng-repeat="(paramName, paramSpec) in explorationParamSpecsService.savedMemento.getParamDict()">
+            <b><[paramName]></b> (<[paramSpec.getType().getName()]>)
           </li>
         </ol>
       </div>
@@ -435,105 +457,3 @@
     </div>
   </md-card>
 </div>
-
-
-<script type="text/ng-template" id="modals/transferExplorationOwnership">
-  <div class="modal-header">
-    <h3>Transfer Ownership to the Community</h3>
-  </div>
-
-  <div class="modal-body">
-    <p>
-      You are about to transfer ownership of this exploration to the
-      community! This will allow anyone to freely edit and improve
-      the exploration. Your previous contributions will still be visible
-      in the version history logs, and you will still be able to view and
-      edit the exploration.
-    </p>
-
-    <p>
-      Please note that after the ownership of an exploration is transferred
-      to the community, it will no longer have an explicit list of managers,
-      so this action is <strong>not reversible</strong>.
-    </p>
-
-    <p>
-      Would you like to transfer ownership of this exploration to the
-      community?
-    </p>
-  </div>
-
-  <div class="modal-footer">
-    <button class="btn btn-success" ng-click="transfer()">Transfer Ownership</button>
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-  </div>
-</script>
-
-<script type="text/ng-template" id="modals/takeModeratorAction">
-  <div class="modal-header">
-    <h3 ng-if="action === 'unpublish_exploration'">Unpublish exploration (as moderator)</h3>
-  </div>
-
-  <div class="modal-body">
-    <p ng-if="action === 'unpublish_exploration'">
-      You are about to unpublish this exploration.
-    </p>
-
-    <div ng-if="willEmailBeSent">
-      <br>
-      <p>
-        Doing so will send the following email to all exploration owners;
-        please edit it as needed. (NB: do not include a salutation or a
-        signoff -- the text "Hi [username]" and "Thanks! [your username] (Oppia moderator)" will
-        be auto-added.)
-      </p>
-
-      <schema-based-editor schema="EMAIL_BODY_SCHEMA" local-value="$parent.emailBody">
-      </schema-based-editor>
-    </div>
-  </div>
-
-  <div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success" ng-click="reallyTakeAction()">
-      <span ng-if="action === 'unpublish_exploration'">Unpublish Exploration</span>
-    </button>
-  </div>
-</script>
-
-<script type="text/ng-template" id="modals/deleteExploration">
-  <div class="modal-header">
-    <h3>Delete Exploration</h3>
-  </div>
-
-  <div class="modal-body">
-    <p>Really delete this exploration? <strong>This action cannot be reversed.</strong></p>
-  </div>
-
-  <div class="modal-footer">
-    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-danger protractor-test-really-delete-exploration-button" ng-click="reallyDelete()">Delete Exploration</button>
-  </div>
-</script>
-
-<script type="text/ng-template" id="modals/previewSummaryTile">
-  <div class="modal-header">
-    <h3>Preview Summary Card</h3>
-  </div>
-
-  <div class="modal-body text-center">
-    This is how your activity will appear to learners in search results
-    or the library.
-    <exploration-summary-tile exploration-title="getExplorationTitle()"
-                              objective="getExplorationObjective()"
-                              category="getExplorationCategory()"
-                              thumbnail-icon-url="getThumbnailIconUrl()"
-                              thumbnail-bg-color="getThumbnailBgColor()"
-                              class="protractor-test-exploration-summary-tile">
-    </exploration-summary-tile>
-  </div>
-
-  <div class="modal-footer">
-    <button class="btn btn-default protractor-test-close-preview-summary-modal" ng-click="close()">Return to editor</button>
-  </div>
-</script>

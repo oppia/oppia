@@ -17,28 +17,28 @@
  */
 
 oppia.controller('StateHints', [
-  '$scope', '$rootScope', '$modal', '$filter', 'editorContextService',
+  '$scope', '$rootScope', '$modal', '$filter', 'EditorStateService',
   'alertsService', 'INTERACTION_SPECS', 'stateHintsService',
   'explorationStatesService', 'stateInteractionIdService',
-  'UrlInterpolationService', 'HintObjectFactory', 'oppiaPlayerService',
+  'UrlInterpolationService', 'HintObjectFactory', 'ExplorationPlayerService',
   'stateSolutionService',
   function(
-    $scope, $rootScope, $modal, $filter, editorContextService,
+    $scope, $rootScope, $modal, $filter, EditorStateService,
     alertsService, INTERACTION_SPECS, stateHintsService,
     explorationStatesService, stateInteractionIdService,
-    UrlInterpolationService, HintObjectFactory, oppiaPlayerService,
+    UrlInterpolationService, HintObjectFactory, ExplorationPlayerService,
     stateSolutionService) {
-    $scope.editorContextService = editorContextService;
+    $scope.EditorStateService = EditorStateService;
     $scope.stateHintsService = stateHintsService;
     $scope.activeHintIndex = null;
-    $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
+    $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/drag_dots.png');
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
       stateHintsService.init(
-        editorContextService.getActiveStateName(),
+        EditorStateService.getActiveStateName(),
           stateData.interaction.hints);
 
       $scope.activeHintIndex = null;
@@ -84,11 +84,13 @@ oppia.controller('StateHints', [
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
-        templateUrl: 'modals/addHint',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/' +
+          'add_hint_modal_directive.html'),
         backdrop: 'static',
         controller: [
-          '$scope', '$modalInstance', 'editorContextService',
-          function($scope, $modalInstance, editorContextService) {
+          '$scope', '$modalInstance', 'EditorStateService',
+          function($scope, $modalInstance, EditorStateService) {
             $scope.HINT_FORM_SCHEMA = {
               type: 'html',
               ui_config: {}
@@ -146,7 +148,8 @@ oppia.controller('StateHints', [
 
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration_editor/editor_tab/delete_last_hint_modal.html'),
+          '/pages/exploration_editor/editor_tab/' +
+          'delete_last_hint_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance',
@@ -176,7 +179,9 @@ oppia.controller('StateHints', [
 
       alertsService.clearWarnings();
       $modal.open({
-        templateUrl: 'modals/deleteHint',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/' +
+          'delete_hint_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', function($scope, $modalInstance) {

@@ -24,10 +24,10 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
     restrict: 'E',
     scope: {},
     controller: [
-      '$scope', '$attrs', '$element', 'oppiaHtmlEscaper',
-      function($scope, $attrs, $element, oppiaHtmlEscaper) {
-        $scope.data = oppiaHtmlEscaper.escapedJsonToObj($attrs.data);
-        $scope.options = oppiaHtmlEscaper.escapedJsonToObj($attrs.options);
+      '$scope', '$attrs', '$element', 'HtmlEscaperService',
+      function($scope, $attrs, $element, HtmlEscaperService) {
+        $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
+        $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
 
         var dataArray = [['Answers', '']];
         for (var i = 0; i < $scope.data.length; i++) {
@@ -66,10 +66,32 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
     scope: {},
     templateUrl: 'visualizations/FrequencyTable',
     controller: [
-      '$scope', '$attrs', 'oppiaHtmlEscaper',
-      function($scope, $attrs, oppiaHtmlEscaper) {
-        $scope.data = oppiaHtmlEscaper.escapedJsonToObj($attrs.data);
-        $scope.options = oppiaHtmlEscaper.escapedJsonToObj($attrs.options);
+      '$scope', '$attrs', 'HtmlEscaperService',
+      function($scope, $attrs, HtmlEscaperService) {
+        $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
+        $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
+      }
+    ]
+  };
+}]);
+
+oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    templateUrl: 'visualizations/EnumeratedFrequencyTable',
+    controller: [
+      '$scope', '$attrs', 'HtmlEscaperService',
+      function($scope, $attrs, HtmlEscaperService) {
+        $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
+        $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
+        $scope.answerVisible = $scope.data.map(function(_, i) {
+          // First element is shown by default, all others are hidden.
+          return i === 0;
+        });
+        $scope.toggleAnswerVisibility = function(index) {
+          $scope.answerVisible[index] = !$scope.answerVisible[index];
+        };
       }
     ]
   };

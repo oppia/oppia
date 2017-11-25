@@ -17,14 +17,15 @@
  */
 
 oppia.controller('Signup', [
-  '$scope', '$http', '$rootScope', '$modal', 'alertsService', 'urlService',
-  'focusService', 'siteAnalyticsService',
+  '$scope', '$http', '$rootScope', '$modal', 'alertsService', 'UrlService',
+  'FocusManagerService', 'siteAnalyticsService', 'UrlInterpolationService',
   function(
-      $scope, $http, $rootScope, $modal, alertsService, urlService,
-      focusService, siteAnalyticsService) {
+      $scope, $http, $rootScope, $modal, alertsService, UrlService,
+      FocusManagerService, siteAnalyticsService, UrlInterpolationService) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
     $scope.warningI18nCode = '';
+    $scope.siteName = GLOBALS.SITE_NAME;
     $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS;
     $scope.submissionInProcess = false;
 
@@ -35,7 +36,7 @@ oppia.controller('Signup', [
       $scope.hasEverRegistered = data.has_ever_registered;
       $scope.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
       $scope.hasUsername = Boolean($scope.username);
-      focusService.setFocus('usernameInputField');
+      FocusManagerService.setFocus('usernameInputField');
     });
 
     $scope.blurredAtLeastOnce = false;
@@ -50,11 +51,13 @@ oppia.controller('Signup', [
 
     $scope.showLicenseExplanationModal = function() {
       $modal.open({
-        templateUrl: 'modals/licenseExplanation',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/signup/licence_explanation_modal_directive.html'),
         backdrop: true,
         resolve: {},
         controller: [
           '$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.siteName = GLOBALS.SITE_NAME;
             $scope.close = function() {
               $modalInstance.dismiss('cancel');
             };
@@ -127,7 +130,7 @@ oppia.controller('Signup', [
 
       var defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
       var returnUrl = window.decodeURIComponent(
-        urlService.getUrlParams().return_url);
+        UrlService.getUrlParams().return_url);
 
       if (returnUrl.indexOf('creator_dashboard') !== -1) {
         defaultDashboard = constants.DASHBOARD_TYPE_CREATOR;
@@ -166,7 +169,7 @@ oppia.controller('Signup', [
       $scope.submissionInProcess = true;
       $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
         window.location = window.decodeURIComponent(
-          urlService.getUrlParams().return_url);
+          UrlService.getUrlParams().return_url);
       }, function() {
         $scope.submissionInProcess = false;
       });

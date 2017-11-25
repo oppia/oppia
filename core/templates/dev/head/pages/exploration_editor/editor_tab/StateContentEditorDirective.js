@@ -36,11 +36,11 @@ oppia.directive('stateContentEditor', [
       controller: [
         '$scope', '$modal', 'stateContentService', 'editabilityService',
         'editorFirstTimeEventsService', 'explorationInitStateNameService',
-        'editorContextService',
+        'EditorStateService',
         function(
             $scope, $modal, stateContentService, editabilityService,
             editorFirstTimeEventsService, explorationInitStateNameService,
-            editorContextService) {
+            EditorStateService) {
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
@@ -88,7 +88,7 @@ oppia.directive('stateContentEditor', [
 
           $scope.isCurrentStateInitialState = function() {
             return (
-              editorContextService.getActiveStateName() ===
+              EditorStateService.getActiveStateName() ===
               explorationInitStateNameService.savedMemento);
           };
 
