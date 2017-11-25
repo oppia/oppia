@@ -25,11 +25,11 @@ oppia.directive('editorNavbarBreadcrumb', [
         '/pages/exploration_editor/' +
         'editor_navbar_breadcrumb_directive.html'),
       controller: [
-        '$scope', 'explorationTitleService', 'routerService',
-        'focusService', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
+        '$scope', 'explorationTitleService', 'RouterService',
+        'FocusManagerService', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
         function(
-            $scope, explorationTitleService, routerService,
-            focusService, EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
+            $scope, explorationTitleService, RouterService,
+            FocusManagerService, EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
           $scope.navbarTitle = null;
           $scope.$on('explorationPropertyChanged', function() {
             var _MAX_TITLE_LENGTH = 20;
@@ -41,8 +41,8 @@ oppia.directive('editorNavbarBreadcrumb', [
           });
 
           $scope.editTitle = function() {
-            routerService.navigateToSettingsTab();
-            focusService.setFocus(EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
+            RouterService.navigateToSettingsTab();
+            FocusManagerService.setFocus(EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
           };
 
           var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
@@ -55,11 +55,11 @@ oppia.directive('editorNavbarBreadcrumb', [
           };
 
           $scope.getCurrentTabName = function() {
-            if (!routerService.getTabStatuses()) {
+            if (!RouterService.getTabStatuses()) {
               return '';
             } else {
               return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-                routerService.getTabStatuses().active];
+                RouterService.getTabStatuses().active];
             }
           };
         }

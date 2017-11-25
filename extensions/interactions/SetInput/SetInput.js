@@ -73,26 +73,26 @@ oppia.directive('oppiaInteractiveSetInput', [function() {
 }]);
 
 oppia.directive('oppiaResponseSetInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/SetInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
     };
   }
 ]);
 
 oppia.directive('oppiaShortResponseSetInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'shortResponse/SetInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        var _answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         $scope.displayedAnswer = (
           _answer.length > 0 ? _answer.join(', ') :
           'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER');

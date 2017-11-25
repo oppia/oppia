@@ -65,7 +65,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         response_dict = self.get_json(
             '%s/bad_exp_id' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
             expect_errors=True)
-        self.assertEqual(response_dict['code'], 404)
+        self.assertEqual(response_dict['status_code'], 404)
 
     def test_invalid_thread_ids_return_empty_message_list(self):
         response_dict = self.get_json(
@@ -517,10 +517,6 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         self.editor = user_services.UserActionsInfo(self.editor_id)
-
-        # Load exploration 0.
-        exp_services.delete_demo(self.EXP_ID)
-        exp_services.load_demo(self.EXP_ID)
 
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)

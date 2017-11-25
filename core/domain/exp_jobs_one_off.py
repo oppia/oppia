@@ -144,23 +144,6 @@ class ExplorationFirstPublishedOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             first_published_msec)
 
 
-class IndexAllExplorationsJobManager(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job that indexes all explorations and computes their ranks."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if not item.deleted:
-            exp_services.index_explorations_given_ids([item.id])
-
-    @staticmethod
-    def reduce(key, values):
-        pass
-
-
 class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
     """Job that checks that all explorations have appropriate validation
     statuses.
@@ -325,6 +308,87 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
         if (exploration_rights.status == feconf.ACTIVITY_STATUS_PRIVATE
                 and exploration_rights.viewable_if_private):
             yield (item.id, item.title.encode('utf-8'))
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class ExplorationConversionErrorIdentificationJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that outputs the list of explorations that currently consist of
+    redundant features and result in an ExplorationConversionError when
+    retrieved.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        try:
+            exploration = exp_services.get_exploration_by_id(item.id)
+        # Handle case where the exploration is deleted.
+        except Exception as e:
+            return
+
+        latest_exp_version = exploration.version
+        version_numbers = range(1, latest_exp_version + 1)
+
+        try:
+            exp_services.get_multiple_explorations_by_version(
+                item.id, version_numbers)
+        except Exception as e:
+            yield (item.id, e)
+            return
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job produces state id mapping model for all explorations currently
+    present in datastore.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+        # Ignore latest version since we already have corresponding exploration.
+        versions = range(1, exploration.version)
+
+        # Get all exploration versions for current exploration id.
+        explorations = exp_services.get_multiple_explorations_by_version(
+            exploration.id, versions)
+        # Append latest exploration to the list of explorations.
+        explorations.append(exploration)
+
+        # Get all commit cmds for all versions of exploration.
+        commit_log_models = (
+            exp_models.ExplorationCommitLogEntryModel.get_all_exploration_commits( # pylint: disable=line-too-long
+                exploration.id, exploration.version))
+        change_lists = [commit.commit_cmds for commit in commit_log_models]
+
+        # Create and save state id mapping model for all exploration versions.
+        for exploration, change_list in zip(explorations, change_lists):
+            # Check if commit is to revert the exploration.
+            if change_list[0]['cmd'].endswith('revert_version_number'):
+                reverted_version = change_list[0]['version_number']
+                exp_services.create_and_save_state_id_mapping_model_for_reverted_exploration( # pylint: disable=line-too-long
+                    exploration.id, exploration.version - 1, reverted_version)
+            else:
+                exp_services.create_and_save_state_id_mapping_model(
+                    exploration, change_list)
+        yield (exploration.id, exploration.version)
 
     @staticmethod
     def reduce(key, values):

@@ -58,6 +58,8 @@ INTERACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
+RTE_EXTENSIONS_DEFINITIONS_PATH = (
+    os.path.join('assets', 'rich_text_components_definitions.js'))
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
@@ -162,6 +164,9 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 13
 # number must be changed.
 CURRENT_COLLECTION_SCHEMA_VERSION = 4
 
+# The current version of the question schema.
+CURRENT_QUESTION_SCHEMA_VERSION = 1
+
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
 CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
@@ -189,6 +194,10 @@ DEFAULT_EXPLORATION_OBJECTIVE = ''
 DEFAULT_INIT_STATE_NAME = 'Introduction'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
+
+# Whether new explorations should have automatic text-to-speech enabled
+# by default.
+DEFAULT_AUTO_TTS_ENABLED = True
 
 # Default title for a newly-minted collection.
 DEFAULT_COLLECTION_TITLE = ''
@@ -499,6 +508,9 @@ DISABLED_EXPLORATION_IDS = ['5']
 EMBEDDED_GOOGLE_GROUP_URL = (
     'https://groups.google.com/forum/embed/?place=forum/oppia')
 
+# External URL for the Foundation site
+FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
+
 # Whether to allow YAML file uploads.
 ALLOW_YAML_FILE_UPLOAD = False
 
@@ -579,7 +591,6 @@ USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 
 NAV_MODE_ABOUT = 'about'
 NAV_MODE_GET_STARTED = 'get_started'
-NAV_MODE_BLOG = 'blog'
 NAV_MODE_COLLECTION = 'collection'
 NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
@@ -595,15 +606,19 @@ NAV_MODE_TEACH = 'teach'
 NAV_MODE_THANKS = 'thanks'
 
 # Event types.
+EVENT_TYPE_ALL_STATS = 'all_stats'
 EVENT_TYPE_STATE_HIT = 'state_hit'
+EVENT_TYPE_STATE_COMPLETED = 'state_complete'
 EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
 EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
 EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
 EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
 EVENT_TYPE_RATE_EXPLORATION = 'rate_exploration'
+EVENT_TYPE_SOLUTION_HIT = 'solution_hit'
 # The values for these event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'
+EVENT_TYPE_ACTUAL_START_EXPLORATION = 'actual_start'
 EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
 EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 
@@ -617,6 +632,7 @@ PLAY_TYPE_NORMAL = 'normal'
 # Predefined commit messages.
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
+COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
@@ -629,6 +645,18 @@ OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
+# Whether state id mapping model should be generated and stored when exploration
+# is created or updated.
+ENABLE_STATE_ID_MAPPING = False
+
+# Bool to enable update of analytics models.
+# NOTE TO DEVELOPERS: This should be synchronized with app.js
+ENABLE_NEW_STATS_FRAMEWORK = False
+# Current event models schema version. All event models with
+# event_schema_version as 1 are the events collected before the rework of the
+# statistics framework which brought about the recording of new event models.
+# This includes all models recorded before Nov 2017.
+CURRENT_EVENT_MODELS_SCHEMA_VERSION = 1
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
@@ -715,8 +743,6 @@ ABOUT_PAGE_DESCRIPTION = (
     'scenarios for others.')
 GET_STARTED_PAGE_DESCRIPTION = (
     'Learn how to get started using Oppia.')
-BLOG_PAGE_DESCRIPTION = (
-    'Keep up to date with Oppia news and updates via our blog.')
 CONTACT_PAGE_DESCRIPTION = (
     'Contact the Oppia team, submit feedback, and learn how to get involved '
     'with the Oppia project.')

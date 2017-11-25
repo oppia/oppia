@@ -229,13 +229,13 @@ oppia.animation('.conversation-skin-animate-cards', function() {
 });
 
 oppia.directive('conversationSkin', [
-  'urlService', 'UrlInterpolationService',
-  function(urlService, UrlInterpolationService) {
+  'UrlService', 'UrlInterpolationService',
+  function(UrlService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       link: function(scope) {
-        var isIframed = urlService.isIframed();
+        var isIframed = UrlService.isIframed();
         scope.directiveTemplate = isIframed ?
           UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/' +
@@ -247,26 +247,26 @@ oppia.directive('conversationSkin', [
       template: '<div ng-include="directiveTemplate"></div>',
       controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
-        'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
-        'LearnerViewRatingService', 'windowDimensionsService',
-        'playerTranscriptService', 'LearnerParamsService',
-        'playerPositionService', 'explorationRecommendationsService',
-        'StatsReportingService',
+        'MessengerService', 'ExplorationPlayerService', 'UrlService',
+        'FocusManagerService', 'LearnerViewRatingService',
+        'WindowDimensionsService', 'PlayerTranscriptService',
+        'LearnerParamsService', 'PlayerPositionService',
+        'ExplorationRecommendationsService', 'StatsReportingService',
         'siteAnalyticsService', 'ExplorationPlayerStateService',
         'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
-        'FatigueDetectionService',
+        'FatigueDetectionService', 'NumberAttemptsService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
-            messengerService, oppiaPlayerService, urlService, focusService,
-            LearnerViewRatingService, windowDimensionsService,
-            playerTranscriptService, LearnerParamsService,
-            playerPositionService, explorationRecommendationsService,
-            StatsReportingService,
+            MessengerService, ExplorationPlayerService, UrlService,
+            FocusManagerService, LearnerViewRatingService,
+            WindowDimensionsService, PlayerTranscriptService,
+            LearnerParamsService, PlayerPositionService,
+            ExplorationRecommendationsService, StatsReportingService,
             siteAnalyticsService, ExplorationPlayerStateService,
             TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-            FatigueDetectionService) {
+            FatigueDetectionService, NumberAttemptsService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -281,9 +281,9 @@ oppia.directive('conversationSkin', [
           // Indicates whether the tutor card is displayed.
           var tutorCardIsDisplayedIfNarrow = true;
 
-          $scope.explorationId = oppiaPlayerService.getExplorationId();
-          $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
-          $scope.isIframed = urlService.isIframed();
+          $scope.explorationId = ExplorationPlayerService.getExplorationId();
+          $scope.isInPreviewMode = ExplorationPlayerService.isInPreviewMode();
+          $scope.isIframed = UrlService.isIframed();
           $rootScope.loadingMessage = 'Loading';
           $scope.hasFullyLoaded = false;
           $scope.recommendedExplorationSummaries = null;
@@ -320,7 +320,7 @@ oppia.directive('conversationSkin', [
                 // Sometimes setting iframe height to the exact content height
                 // still produces scrollbar, so adding 50 extra px.
                 newHeight += 50;
-                messengerService.sendMessage(messengerService.HEIGHT_CHANGE, {
+                MessengerService.sendMessage(MessengerService.HEIGHT_CHANGE, {
                   height: newHeight,
                   scroll: scroll
                 });
@@ -359,13 +359,13 @@ oppia.directive('conversationSkin', [
           var _navigateToActiveCard = function() {
             $scope.$broadcast(EVENT_ACTIVE_CARD_CHANGED);
 
-            var index = playerPositionService.getActiveCardIndex();
-            $scope.activeCard = playerTranscriptService.getCard(index);
+            var index = PlayerPositionService.getActiveCardIndex();
+            $scope.activeCard = PlayerTranscriptService.getCard(index);
             tutorCardIsDisplayedIfNarrow = true;
-            if (_nextFocusLabel && playerTranscriptService.isLastCard(index)) {
-              focusService.setFocusIfOnDesktop(_nextFocusLabel);
+            if (_nextFocusLabel && PlayerTranscriptService.isLastCard(index)) {
+              FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
             } else {
-              focusService.setFocusIfOnDesktop(
+              FocusManagerService.setFocusIfOnDesktop(
                 $scope.getContentFocusLabel(index));
             }
           };
@@ -392,12 +392,12 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.isCurrentCardAtEndOfTranscript = function() {
-            return playerTranscriptService.isLastCard(
-              playerPositionService.getActiveCardIndex());
+            return PlayerTranscriptService.isLastCard(
+              PlayerPositionService.getActiveCardIndex());
           };
           var _addNewCard = function(
               stateName, newParams, contentHtml, interactionHtml) {
-            playerTranscriptService.addNewCard(
+            PlayerTranscriptService.addNewCard(
               stateName, newParams, contentHtml, interactionHtml);
 
             if (newParams) {
@@ -406,19 +406,19 @@ oppia.directive('conversationSkin', [
 
             $scope.numProgressDots++;
 
-            var totalNumCards = playerTranscriptService.getNumCards();
+            var totalNumCards = PlayerTranscriptService.getNumCards();
 
             var previousSupplementalCardIsNonempty = (
               totalNumCards > 1 &&
               isSupplementalCardNonempty(
-                playerTranscriptService.getCard(totalNumCards - 2)));
+                PlayerTranscriptService.getCard(totalNumCards - 2)));
             var nextSupplementalCardIsNonempty = isSupplementalCardNonempty(
-              playerTranscriptService.getLastCard());
+              PlayerTranscriptService.getLastCard());
 
             if (totalNumCards > 1 && !$scope.isViewportNarrow() &&
                 !previousSupplementalCardIsNonempty &&
                 nextSupplementalCardIsNonempty) {
-              playerPositionService.setActiveCardIndex(
+              PlayerPositionService.setActiveCardIndex(
                   $scope.numProgressDots - 1);
               animateToTwoCards(function() {});
             } else if (
@@ -426,16 +426,16 @@ oppia.directive('conversationSkin', [
                 previousSupplementalCardIsNonempty &&
                 !nextSupplementalCardIsNonempty) {
               animateToOneCard(function() {
-                playerPositionService.setActiveCardIndex(
+                PlayerPositionService.setActiveCardIndex(
                   $scope.numProgressDots - 1);
               });
             } else {
-              playerPositionService.setActiveCardIndex(
+              PlayerPositionService.setActiveCardIndex(
                 $scope.numProgressDots - 1);
             }
 
             if (ExplorationPlayerStateService.isStateTerminal(stateName)) {
-              explorationRecommendationsService.getRecommendedSummaryDicts(
+              ExplorationRecommendationsService.getRecommendedSummaryDicts(
                 ExplorationPlayerStateService.getAuthorRecommendedExpIds(
                   stateName),
                 function(summaries) {
@@ -448,17 +448,18 @@ oppia.directive('conversationSkin', [
             hasInteractedAtLeastOnce = false;
             $scope.recommendedExplorationSummaries = null;
 
-            playerPositionService.init(_navigateToActiveCard);
-            oppiaPlayerService.init(function(exploration, initHtml, newParams) {
+            PlayerPositionService.init(_navigateToActiveCard);
+            ExplorationPlayerService.init(function(
+              exploration, initHtml, newParams) {
               ExplorationPlayerStateService.setExploration(exploration);
-              $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
-              _nextFocusLabel = focusService.generateFocusLabel();
+              $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
+              _nextFocusLabel = FocusManagerService.generateFocusLabel();
 
               _addNewCard(
                 exploration.initStateName,
                 newParams,
                 initHtml,
-                oppiaPlayerService.getInteractionHtml(
+                ExplorationPlayerService.getInteractionHtml(
                   exploration.initStateName, _nextFocusLabel));
               $rootScope.loadingMessage = '';
               $scope.hasFullyLoaded = true;
@@ -472,7 +473,7 @@ oppia.directive('conversationSkin', [
                 });
               if ($scope.isIframed) {
                 var explorationLanguageCode = (
-                  oppiaPlayerService.getExplorationLanguageCode());
+                  ExplorationPlayerService.getExplorationLanguageCode());
                 if (langCodes.indexOf(explorationLanguageCode) !== -1) {
                   $translate.use(explorationLanguageCode);
                 } else {
@@ -481,7 +482,7 @@ oppia.directive('conversationSkin', [
               }
               $scope.adjustPageHeight(false, null);
               $window.scrollTo(0, 0);
-              focusService.setFocusIfOnDesktop(_nextFocusLabel);
+              FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
             });
           };
 
@@ -502,16 +503,17 @@ oppia.directive('conversationSkin', [
                 return;
               }
             }
+            NumberAttemptsService.submitAttempt();
 
             _answerIsBeingProcessed = true;
             hasInteractedAtLeastOnce = true;
 
-            var _oldStateName = playerTranscriptService.getLastCard().stateName;
-            playerTranscriptService.addNewInput(answer, false);
+            var _oldStateName = PlayerTranscriptService.getLastCard().stateName;
+            PlayerTranscriptService.addNewInput(answer, false);
 
             var timeAtServerCall = new Date().getTime();
 
-            oppiaPlayerService.submitAnswer(
+            ExplorationPlayerService.submitAnswer(
               answer, interactionRulesService, function(
                   newStateName, refreshInteraction, feedbackHtml, contentHtml,
                   newParams) {
@@ -527,12 +529,12 @@ oppia.directive('conversationSkin', [
                 $timeout(function() {
                   $scope.$broadcast('oppiaFeedbackAvailable');
                   var pairs = (
-                    playerTranscriptService.getLastCard().inputResponsePairs);
+                    PlayerTranscriptService.getLastCard().inputResponsePairs);
                   var lastAnswerFeedbackPair = pairs[pairs.length - 1];
 
                   if (_oldStateName === newStateName) {
                     // Stay on the same card.
-                    playerTranscriptService.addNewResponse(feedbackHtml);
+                    PlayerTranscriptService.addNewResponse(feedbackHtml);
                     if (feedbackHtml &&
                         !ExplorationPlayerStateService.isInteractionInline(
                           $scope.activeCard.stateName)) {
@@ -544,45 +546,47 @@ oppia.directive('conversationSkin', [
                     if (refreshInteraction) {
                       // Replace the previous interaction with another of the
                       // same type.
-                      _nextFocusLabel = focusService.generateFocusLabel();
-                      playerTranscriptService.updateLatestInteractionHtml(
-                        oppiaPlayerService.getInteractionHtml(
+                      _nextFocusLabel =
+                        FocusManagerService.generateFocusLabel();
+                      PlayerTranscriptService.updateLatestInteractionHtml(
+                        ExplorationPlayerService.getInteractionHtml(
                           newStateName, _nextFocusLabel) +
-                        oppiaPlayerService.getRandomSuffix());
+                        ExplorationPlayerService.getRandomSuffix());
                     }
-                    focusService.setFocusIfOnDesktop(_nextFocusLabel);
+                    FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
                     scrollToBottom();
                   } else {
                     // There is a new card. If there is no feedback, move on
                     // immediately. Otherwise, give the learner a chance to read
                     // the feedback, and display a 'Continue' button.
                     FatigueDetectionService.reset();
+                    NumberAttemptsService.reset();
 
-                    _nextFocusLabel = focusService.generateFocusLabel();
+                    _nextFocusLabel = FocusManagerService.generateFocusLabel();
 
-                    playerTranscriptService.setDestination(newStateName);
+                    PlayerTranscriptService.setDestination(newStateName);
 
                     // These are used to compute the dimensions for the
                     // next card.
                     $scope.upcomingStateName = newStateName;
                     $scope.upcomingParams = newParams;
                     $scope.upcomingContentHtml = (
-                      contentHtml + oppiaPlayerService.getRandomSuffix());
+                      contentHtml + ExplorationPlayerService.getRandomSuffix());
 
                     var _isNextInteractionInline = (
                       ExplorationPlayerStateService.isInteractionInline(
                         newStateName));
                     $scope.upcomingInlineInteractionHtml = (
                       _isNextInteractionInline ?
-                      oppiaPlayerService.getInteractionHtml(
+                      ExplorationPlayerService.getInteractionHtml(
                         newStateName, _nextFocusLabel
-                      ) + oppiaPlayerService.getRandomSuffix() : '');
+                      ) + ExplorationPlayerService.getRandomSuffix() : '');
                     $scope.upcomingInteractionInstructions = (
                       ExplorationPlayerStateService.getInteractionInstructions(
                         $scope.upcomingStateName));
 
                     if (feedbackHtml) {
-                      playerTranscriptService.addNewResponse(feedbackHtml);
+                      PlayerTranscriptService.addNewResponse(feedbackHtml);
 
                       if (!ExplorationPlayerStateService.isInteractionInline(
                             $scope.activeCard.stateName)) {
@@ -593,14 +597,15 @@ oppia.directive('conversationSkin', [
                       }
 
                       _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
-                      focusService.setFocusIfOnDesktop(_nextFocusLabel);
+                      FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
                       scrollToBottom();
                     } else {
-                      playerTranscriptService.addNewResponse(feedbackHtml);
+                      PlayerTranscriptService.addNewResponse(feedbackHtml);
                       $scope.showPendingCard(
                         newStateName,
                         newParams,
-                        contentHtml + oppiaPlayerService.getRandomSuffix());
+                        contentHtml +
+                        ExplorationPlayerService.getRandomSuffix());
                     }
                   }
 
@@ -615,11 +620,13 @@ oppia.directive('conversationSkin', [
             $scope.startCardChangeAnimation = true;
 
             $timeout(function() {
-              var newInteractionHtml = oppiaPlayerService.getInteractionHtml(
+              var newInteractionHtml =
+                ExplorationPlayerService.getInteractionHtml(
                 newStateName, _nextFocusLabel);
               // Note that newInteractionHtml may be null.
               if (newInteractionHtml) {
-                newInteractionHtml += oppiaPlayerService.getRandomSuffix();
+                newInteractionHtml +=
+                  ExplorationPlayerService.getRandomSuffix();
               }
 
               _addNewCard(
@@ -633,7 +640,7 @@ oppia.directive('conversationSkin', [
             }, TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC);
 
             $timeout(function() {
-              focusService.setFocusIfOnDesktop(_nextFocusLabel);
+              FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
               scrollToTop();
             },
             TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC +
@@ -692,9 +699,9 @@ oppia.directive('conversationSkin', [
           $window.addEventListener('beforeunload', function(e) {
             if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&
                 !ExplorationPlayerStateService.isStateTerminal(
-                  playerTranscriptService.getLastCard().stateName)) {
+                  PlayerTranscriptService.getLastCard().stateName)) {
               StatsReportingService.recordMaybeLeaveEvent(
-                playerTranscriptService.getLastStateName(),
+                PlayerTranscriptService.getLastStateName(),
                 LearnerParamsService.getAllParams());
               var confirmationMessage = (
                 'If you navigate away from this page, your progress on the ' +
@@ -704,10 +711,10 @@ oppia.directive('conversationSkin', [
             }
           });
 
-          $scope.windowWidth = windowDimensionsService.getWidth();
+          $scope.windowWidth = WindowDimensionsService.getWidth();
           $window.onresize = function() {
             $scope.adjustPageHeight(false, null);
-            $scope.windowWidth = windowDimensionsService.getWidth();
+            $scope.windowWidth = WindowDimensionsService.getWidth();
           };
 
           $window.addEventListener('scroll', function() {
@@ -739,29 +746,6 @@ oppia.directive('conversationSkin', [
 
           $scope.isViewportNarrow = function() {
             return $scope.windowWidth < TWO_CARD_THRESHOLD_PX;
-          };
-
-          $scope.isScreenNarrowAndShowingTutorCard = function() {
-            if (!$scope.isCurrentSupplementalCardNonempty()) {
-              return $scope.isViewportNarrow();
-            }
-            return $scope.isViewportNarrow() && tutorCardIsDisplayedIfNarrow;
-          };
-
-          $scope.isScreenNarrowAndShowingSupplementalCard = function() {
-            return $scope.isViewportNarrow() && !tutorCardIsDisplayedIfNarrow;
-          };
-
-          $scope.showTutorCardIfScreenIsNarrow = function() {
-            if ($scope.isViewportNarrow()) {
-              tutorCardIsDisplayedIfNarrow = true;
-            }
-          };
-
-          $scope.showSupplementalCardIfScreenIsNarrow = function() {
-            if ($scope.isViewportNarrow()) {
-              tutorCardIsDisplayedIfNarrow = false;
-            }
           };
 
           $scope.initializePage();

@@ -37,7 +37,7 @@ describe('Sidebar state name controller', function() {
         autosaveChangeList: function() {}
       };
       module(function($provide) {
-        $provide.value('explorationData', mockExplorationData);
+        $provide.value('ExplorationDataService', mockExplorationData);
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
@@ -47,8 +47,8 @@ describe('Sidebar state name controller', function() {
       scope = $rootScope.$new();
       filter = $filter;
       rootScope = $rootScope;
-      ecs = $injector.get('editorContextService');
-      fs = $injector.get('focusService');
+      ecs = $injector.get('EditorStateService');
+      fs = $injector.get('FocusManagerService');
       ess = $injector.get('explorationStatesService');
       $httpBackend = $injector.get('$httpBackend');
 
@@ -121,10 +121,10 @@ describe('Sidebar state name controller', function() {
             return true;
           }
         },
-        editorContextService: ecs,
-        focusService: fs,
+        EditorStateService: ecs,
+        FocusManagerService: fs,
         explorationStatesService: ess,
-        routerService: {}
+        RouterService: {}
       });
     }));
 

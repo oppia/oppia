@@ -35,13 +35,13 @@ oppia.directive('ruleEditor', [
         '/components/' +
         'rule_editor_directive.html'),
       controller: [
-        '$scope', '$timeout', 'editorContextService',
-        'explorationStatesService', 'routerService', 'validatorsService',
-        'responsesService', 'stateInteractionIdService', 'INTERACTION_SPECS',
+        '$scope', '$timeout', 'EditorStateService',
+        'explorationStatesService', 'RouterService', 'ValidatorsService',
+        'ResponsesService', 'stateInteractionIdService', 'INTERACTION_SPECS',
         'RULE_TYPE_CLASSIFIER', function(
-            $scope, $timeout, editorContextService,
-            explorationStatesService, routerService, validatorsService,
-            responsesService, stateInteractionIdService, INTERACTION_SPECS,
+            $scope, $timeout, EditorStateService,
+            explorationStatesService, RouterService, ValidatorsService,
+            ResponsesService, stateInteractionIdService, INTERACTION_SPECS,
             RULE_TYPE_CLASSIFIER) {
           var DEFAULT_OBJECT_VALUES = GLOBALS.DEFAULT_OBJECT_VALUES;
 
@@ -76,7 +76,7 @@ oppia.directive('ruleEditor', [
                 break;
               }
 
-              var answerChoices = responsesService.getAnswerChoices();
+              var answerChoices = ResponsesService.getAnswerChoices();
 
               if (answerChoices) {
                 // This rule is for a multiple-choice, image-click, or item
@@ -158,7 +158,7 @@ oppia.directive('ruleEditor', [
             var tmpRuleDescription = computeRuleDescriptionFragments();
             // This provides the list of choices for the multiple-choice and
             // image-click interactions.
-            var answerChoices = responsesService.getAnswerChoices();
+            var answerChoices = ResponsesService.getAnswerChoices();
 
             // Finds the parameters and sets them in $scope.rule.inputs.
             var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;

@@ -81,9 +81,9 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
-- url: /extensions/rich_text_components/(.*)/static/(.*)
-  static_files: extensions/rich_text_components/\1/static/\2
-  upload: extensions/rich_text_components/(.*)/static/(.*)
+- url: /extensions/rich_text_components/(.*)/directives/(.*\.(html))
+  static_files: extensions/rich_text_components/\1/directives/\2
+  upload: extensions/rich_text_components/(.*)/directives/(.*\.(html))
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
@@ -91,9 +91,9 @@ handlers:
 # under extensions in dev mode. This regex allows us to recursively serve js
 # scripts under the three specified directories. "\1" and "\2" insert capture
 # groups from the url pattern.
-- url: /extensions/(interactions|rich_text_components|objects|classifiers)/(.*\.(js))$
+- url: /extensions/(interactions|rich_text_components|objects|classifiers)/(.*\.(js|png))$
   static_files: extensions/\1/\2
-  upload: extensions/(interactions|rich_text_components|objects|classifiers)/(.*\.(js))$
+  upload: extensions/(interactions|rich_text_components|objects|classifiers)/(.*\.(js|png))$
   secure: always
 - url: /mapreduce/pipeline/images
   static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
@@ -129,7 +129,7 @@ libraries:
   version: '1.6.1'
 # This is needed for sending requests to a mailgun HTTPS URL.
 - name: ssl
-  version: '2.7'
+  version: '2.7.11'
 - name: webapp2
   version: '2.5.2'
 # This environmental variable is for serving minified resources
@@ -137,6 +137,7 @@ libraries:
 # running the server in the dev environment.
 env_variables:
   MINIFICATION: false
+  PYTHONHTTPSVERIFY: 1
 
 
 skip_files:

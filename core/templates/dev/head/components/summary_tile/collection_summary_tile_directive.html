@@ -6,7 +6,6 @@
 </learner-dashboard-icons>
 <md-card class="oppia-activity-summary-tile"
          ng-class="{'oppia-activity-playlist-tile': isPlaylistTile()}"
-         ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)"
          style="position: relative; z-index: 5;">
   <a ng-href="<[getCollectionLink()]>" style="text-decoration: none;">
     <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
@@ -34,7 +33,8 @@
         </li>
       </ul>
     </div>
-    <div ng-if="!isPlaylistTile()" class="title-section-mask"></div>
+    <div ng-if="!isPlaylistTile()" class="title-section-mask"
+         ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)"></div>
   </a>
 </md-card>
 

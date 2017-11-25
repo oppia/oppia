@@ -37,8 +37,9 @@ from core.domain import fs_domain
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
-from core.domain import rte_component_registry
+from core.domain import search_services
 from core.domain import stats_services
+from core.domain import stats_services_old
 from core.domain import user_services
 from core.domain import value_generators_domain
 from core.domain import visualization_registry
@@ -119,11 +120,9 @@ class ExplorationPage(EditorHandler):
                 iframe_restriction=None)
             return
 
-        exploration = exp_services.get_exploration_by_id(
-            exploration_id, strict=False)
-
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
+        (exploration, exploration_rights) = (
+            exp_services.get_exploration_and_exploration_rights_by_id(
+                exploration_id))
 
         visualizations_html = visualization_registry.Registry.get_full_html()
 
@@ -138,7 +137,6 @@ class ExplorationPage(EditorHandler):
                 interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
 
         interaction_templates = (
-            rte_component_registry.Registry.get_html_for_all_components() +
             interaction_registry.Registry.get_interaction_html(
                 interaction_ids))
 
@@ -221,6 +219,7 @@ class ExplorationHandler(EditorHandler):
             user_services.get_email_preferences_for_exploration(
                 self.user_id, exploration_id))
         editor_dict = {
+            'auto_tts_enabled': exploration.auto_tts_enabled,
             'category': exploration.category,
             'draft_change_list_id': draft_change_list_id,
             'exploration_id': exploration_id,
@@ -409,7 +408,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         # Perform the moderator action.
         if action == 'unpublish_exploration':
             rights_manager.unpublish_exploration(self.user, exploration_id)
-            exp_services.delete_documents_from_search_index([
+            search_services.delete_explorations_from_search_index([
                 exploration_id])
         else:
             raise self.InvalidInputException(
@@ -689,7 +688,7 @@ class ExplorationRevertHandler(EditorHandler):
         self.render_json({})
 
 
-class ExplorationStatisticsHandler(EditorHandler):
+class OldExplorationStatisticsHandler(EditorHandler):
     """Returns statistics for an exploration."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -698,12 +697,34 @@ class ExplorationStatisticsHandler(EditorHandler):
     def get(self, exploration_id, exploration_version):
         """Handles GET requests."""
         try:
-            exp_services.get_exploration_by_id(exploration_id)
+            current_exploration = exp_services.get_exploration_by_id(
+                exploration_id)
+        except:
+            raise self.PageNotFoundException
+
+        self.render_json(stats_services_old.get_exploration_stats(
+            current_exploration.id, exploration_version,
+            current_exploration.states))
+
+
+class ExplorationStatisticsHandler(EditorHandler):
+    """Returns statistics for an exploration. This is the handler for the new
+    statistics framework.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_view_exploration_stats
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        try:
+            current_exploration = exp_services.get_exploration_by_id(
+                exploration_id)
         except:
             raise self.PageNotFoundException
 
         self.render_json(stats_services.get_exploration_stats(
-            exploration_id, exploration_version))
+            exploration_id, current_exploration.version).to_frontend_dict())
 
 
 class ExplorationStatsVersionsHandler(EditorHandler):
@@ -720,7 +741,7 @@ class ExplorationStatsVersionsHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json({
-            'versions': stats_services.get_versions_for_exploration_stats(
+            'versions': stats_services_old.get_versions_for_exploration_stats(
                 exploration_id)})
 
 
@@ -733,19 +754,22 @@ class StateRulesStatsHandler(EditorHandler):
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
         try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
+            current_exploration = exp_services.get_exploration_by_id(
+                exploration_id)
         except:
             raise self.PageNotFoundException
 
         state_name = utils.unescape_encoded_uri_component(escaped_state_name)
-        if state_name not in exploration.states:
+        if state_name not in current_exploration.states:
             logging.error('Could not find state: %s' % state_name)
-            logging.error('Available states: %s' % exploration.states.keys())
+            logging.error('Available states: %s' % (
+                current_exploration.states.keys()))
             raise self.PageNotFoundException
 
         self.render_json({
             'visualizations_info': stats_services.get_visualizations_info(
-                exploration_id, state_name),
+                current_exploration.id, state_name,
+                current_exploration.states[state_name].interaction.id),
         })
 
 

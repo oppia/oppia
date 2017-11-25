@@ -16,42 +16,17 @@
     width: 60px;
   }
 
-  .oppia-exploration-footer .author-profile, .oppia-exploration-footer .mobile-feedback {
+  .oppia-exploration-footer .author-profile {
     color: #fff;
     list-style-type: none;
     padding-left: 0;
   }
 
-  .oppia-exploration-footer .mobile-feedback {
-    margin-bottom: 0;
-  }
-
-  .oppia-exploration-footer .mobile-feedback li > a {
-    margin-top: 2px;
-  }
-
-  .oppia-exploration-footer .mobile-feedback > .popover {
-    color: rgba(0,0,0,0.87);
-    margin-left: 5px;
-    margin-right: 5px;
-    max-width: 97.6vw;
-    right: 15px;
-    width: auto;
-  }
-
-  .oppia-exploration-footer .mobile-feedback .popover > .arrow {
-    display: none;
-  }
-
-  .oppia-exploration-footer .mobile-feedback feedback-popup .oppia-feedback-popover-textarea {
-    width: 100%;
-  }
-  
   .oppia-exploration-footer .author-profile a:hover {
     text-decoration: none;
   }
 
-  .oppia-exploration-footer .author-profile li, .oppia-exploration-footer .mobile-feedback li {
+  .oppia-exploration-footer .author-profile li {
     float: left;
   }
 
@@ -168,10 +143,10 @@
       display: none;
     }
     .oppia-exploration-footer .oppia-navbar-footer-info-icon {
-      margin-top: -11px;
+      margin-top: -3px;
     }
     .oppia-exploration-footer .oppia-navbar-footer-info-icon:hover {
-      margin-top: -11px;
+      margin-top: -3px;
     }
   }
 
@@ -185,7 +160,7 @@
 <div class="footer navbar-fixed-bottom oppia-exploration-footer">
   <div class="row">
     <div class="col-sm-5">
-      <ul class="author-profile" ng-if="!mobileFeedbackIsShown">
+      <ul class="author-profile" ng-if="!windowIsNarrow">
         <li>
           <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="exploration-footer-img"
                alt="">
@@ -199,7 +174,7 @@
           <div class="dropup" ng-class="{'open':hovering}">
             <a id="dropdownMenu2" class="dropdown-toggle"
                ng-class="{'hovered-text':hovering}"
-               data-toggle="dropdown" 
+               data-toggle="dropdown"
                ng-if="contributorNames.length > 0"
                role="menuitem"
                aria-haspopup="true"
@@ -213,14 +188,6 @@
               </li>
             </ul>
           </div>
-        </li>
-      </ul>
-      <ul class="mobile-feedback" ng-if="mobileFeedbackIsShown">
-        <li popover-placement="top-left" popover-template="'popover/feedback'" popover-trigger="click">
-          <a href="" class="btn oppia-navbar-button">
-            <i class="material-icons">&#xE87F;</i>
-            <span translate="I18N_PLAYER_FEEDBACK_TOOLTIP"></span>
-          </a>
         </li>
       </ul>
     </div>

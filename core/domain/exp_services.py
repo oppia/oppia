@@ -39,13 +39,15 @@ from core.domain import exp_domain
 from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import rights_manager
+from core.domain import search_services
+from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
 
+datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
-search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
@@ -60,10 +62,6 @@ SEARCH_INDEX_EXPLORATIONS = 'explorations'
 # The maximum number of iterations allowed for populating the results of a
 # search query.
 MAX_ITERATIONS = 10
-
-# This is done to prevent the rank hitting 0 too easily. Note that
-# negative ranks are disallowed in the Search API.
-_DEFAULT_RANK = 20
 
 
 def _migrate_states_schema(versioned_exploration_states):
@@ -170,7 +168,8 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.init_state_name,
         versioned_exploration_states['states'],
         exploration_model.param_specs, exploration_model.param_changes,
-        exploration_model.version, created_on=exploration_model.created_on,
+        exploration_model.version, exploration_model.auto_tts_enabled,
+        created_on=exploration_model.created_on,
         last_updated=exploration_model.last_updated)
 
 
@@ -255,6 +254,38 @@ def get_exploration_summary_by_id(exploration_id):
         return None
 
 
+def get_multiple_explorations_by_version(exp_id, version_numbers):
+    """Returns a list of Exploration domain objects corresponding to the
+    specified versions.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        version_numbers: list(int). List of version numbers.
+
+    Returns:
+        list(Exploration). List of Exploration domain objects.
+
+    Raises:
+        Exception. One or more of the given versions of the exploration could
+            not be converted to the latest schema version.
+    """
+    explorations = []
+    exploration_models = exp_models.ExplorationModel.get_multi_versions(
+        exp_id, version_numbers)
+    error_versions = []
+    for index, exploration_model in enumerate(exploration_models):
+        try:
+            explorations.append(get_exploration_from_model(exploration_model))
+        except utils.ExplorationConversionError:
+            error_versions.append(version_numbers[index])
+
+    if error_versions:
+        raise Exception(
+            "Exploration %s, versions [%s] could not be converted to latest"
+            "schema version." % (exp_id, ', '.join(map(str, error_versions))))
+    return explorations
+
+
 def get_multiple_explorations_by_id(exp_ids, strict=True):
     """Returns a dict of domain objects representing explorations with the
     given ids as keys. If an exp_id is not present, it is not included in the
@@ -314,6 +345,39 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
 
     result.update(db_results_dict)
     return result
+
+
+def get_exploration_and_exploration_rights_by_id(exploration_id):
+    """Returns a tuple for exploration domain object and exploration rights
+    object.
+
+    Args:
+        exploration_id: str. Id of the exploration.
+
+    Returns:
+        tuple(Exploration|None, ExplorationRights|None). The exploration and
+        exploration rights object, respectively.
+    """
+    exploration_and_rights = (
+        datastore_services.fetch_multiple_entities_by_ids_and_models(
+            [
+                ('ExplorationModel', [exploration_id]),
+                ('ExplorationRightsModel', [exploration_id])
+            ]))
+
+    exploration = None
+    if exploration_and_rights[0][0] is not None:
+        exploration = get_exploration_from_model(
+            exploration_and_rights[0][0])
+
+    exploration_rights = None
+    if exploration_and_rights[1][0] is not None:
+        exploration_rights = (
+            rights_manager.get_activity_rights_from_model(
+                exploration_and_rights[1][0],
+                constants.ACTIVITY_TYPE_EXPLORATION))
+
+    return (exploration, exploration_rights)
 
 
 def get_new_exploration_id():
@@ -441,7 +505,7 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
         remaining_to_fetch = feconf.SEARCH_RESULTS_PAGE_SIZE - len(
             returned_exploration_ids)
 
-        exp_ids, search_cursor = search_explorations(
+        exp_ids, search_cursor = search_services.search_explorations(
             query_string, remaining_to_fetch, cursor=search_cursor)
 
         invalid_exp_ids = []
@@ -708,6 +772,8 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_param_changes(change.new_value)
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
+                elif change.property_name == 'auto_tts_enabled':
+                    exploration.update_auto_tts_enabled(change.new_value)
             elif (
                     change.cmd ==
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
@@ -785,12 +851,19 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         for (state_name, state) in exploration.states.iteritems()}
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
+    exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
 
     exploration_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
     index_explorations_given_ids([exploration.id])
 
     exploration.version += 1
+
+    # Trigger statistics model update.
+    if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+        stats_services.handle_stats_creation_for_new_exp_version(
+            exploration.id, exploration.version, exploration.states,
+            change_list)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         new_to_old_state_names = exploration.get_state_names_mapping(
@@ -808,6 +881,9 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             classifier_services.handle_non_retrainable_states(
                 exploration, state_names_with_unchanged_answer_groups,
                 new_to_old_state_names)
+
+    # Save state id mapping model for exploration.
+    create_and_save_state_id_mapping_model(exploration, change_list)
 
 
 def _create_exploration(
@@ -848,9 +924,15 @@ def _create_exploration(
             for (state_name, state) in exploration.states.iteritems()},
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
+        auto_tts_enabled=exploration.auto_tts_enabled
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
+
+    # Trigger statistics model creation.
+    if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+        stats_services.handle_stats_creation_for_new_exploration(
+            exploration.id, exploration.version, exploration.states)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         # Find out all states that need a classifier to be trained.
@@ -864,6 +946,8 @@ def _create_exploration(
             classifier_services.handle_trainable_states(
                 exploration, state_names_to_train)
 
+    # Save state id mapping model for new exploration.
+    create_and_save_state_id_mapping_model(exploration, commit_cmds)
     create_exploration_summary(exploration.id, committer_id)
 
 
@@ -913,6 +997,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
         committer_id, '', force_deletion=force_deletion)
 
     exploration_model = exp_models.ExplorationModel.get(exploration_id)
+    exploration_version = exploration_model.version
     exploration_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
         force_deletion=force_deletion)
@@ -923,7 +1008,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     memcache_services.delete(exploration_memcache_key)
 
     # Delete the exploration from search.
-    delete_documents_from_search_index([exploration_id])
+    search_services.delete_explorations_from_search_index([exploration_id])
 
     # Delete the exploration summary, regardless of whether or not
     # force_deletion is True.
@@ -933,6 +1018,10 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     # necessary.
     activity_services.remove_featured_activity(
         constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)
+
+    # Remove associated state id mapping models.
+    delete_state_id_mapping_model_for_exploration(
+        exploration_id, exploration_version)
 
 
 # Operations on exploration snapshots.
@@ -986,7 +1075,7 @@ def _get_last_updated_by_human_ms(exp_id):
 def publish_exploration_and_update_user_profiles(committer, exp_id):
     """Publishes the exploration with publish_exploration() function in
     rights_manager.py, as well as updates first_contribution_msec. Sends an
-    email to the subscribers of the commiter informing them that an exploration
+    email to the subscribers of the committer informing them that an exploration
     has been published.
 
     It is the responsibility of the caller to check that the exploration is
@@ -1302,6 +1391,10 @@ def revert_exploration(
     # not add the committer of the revert to the list of contributors.
     update_exploration_summary(exploration_id, None)
 
+    # Save state id mapping model for the new exploration version.
+    create_and_save_state_id_mapping_model_for_reverted_exploration(
+        exploration_id, current_version, revert_to_version)
+
 
 # Creation and deletion methods.
 def get_demo_exploration_components(demo_path):
@@ -1437,42 +1530,6 @@ def load_demo(exploration_id):
     logging.info('Exploration with id %s was loaded.' % exploration_id)
 
 
-def get_next_page_of_all_commits(
-        page_size=feconf.COMMIT_LIST_PAGE_SIZE, urlsafe_start_cursor=None):
-    """Returns a page of commits to all explorations in reverse time order.
-
-    The return value is a tuple (results, cursor, more) as described in
-    fetch_page() at:
-
-        https://developers.google.com/appengine/docs/python/ndb/queryclass
-
-    Args:
-        page_size: int. The maximum number of commits to return.
-        urlsafe_start_cursor: str. If this is not None, then the returned
-            commits start from the cursor location. Otherwise they start from
-            the beginning of the list of commits.
-
-    Returns:
-        tuple. A 3-tuple consisting of:
-            - list(ExplorationCommitLogEntry). A list containing
-              ExplorationCommitlogEntry domain objects.
-            - str. The postion of the cursor.
-            - bool. indicating whether there are (likely) more results after
-              this batch. If False, there are no more results; if True, there
-              are probably more results.
-    """
-    results, new_urlsafe_start_cursor, more = (
-        exp_models.ExplorationCommitLogEntryModel.get_all_commits(
-            page_size, urlsafe_start_cursor))
-
-    return ([exp_domain.ExplorationCommitLogEntry(
-        entry.created_on, entry.last_updated, entry.user_id, entry.username,
-        entry.exploration_id, entry.commit_type, entry.commit_message,
-        entry.commit_cmds, entry.version, entry.post_commit_status,
-        entry.post_commit_community_owned, entry.post_commit_is_private
-    ) for entry in results], new_urlsafe_start_cursor, more)
-
-
 def get_next_page_of_all_non_private_commits(
         page_size=feconf.COMMIT_LIST_PAGE_SIZE, urlsafe_start_cursor=None,
         max_age=None):
@@ -1515,17 +1572,6 @@ def get_next_page_of_all_non_private_commits(
         entry.commit_cmds, entry.version, entry.post_commit_status,
         entry.post_commit_community_owned, entry.post_commit_is_private
     ) for entry in results], new_urlsafe_start_cursor, more)
-
-
-def _should_index(exp):
-    """Returns whether the given exploration should be indexed for future
-    search queries.
-
-    Args:
-        exp: Exploration domain object.
-    """
-    rights = rights_manager.get_exploration_rights(exp.id)
-    return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
 
 
 def get_number_of_ratings(ratings):
@@ -1591,35 +1637,7 @@ def get_scaled_average_rating(ratings):
     wilson_score_lower_bound = (a - b)/(1 + z**2/n)
     return 1 + 4 * wilson_score_lower_bound
 
-
-def get_search_rank_from_exp_summary(exp_summary):
-    """Returns an integer determining the document's rank in search.
-
-    Featured explorations get a ranking bump, and so do explorations that
-    have been more recently updated. Good ratings will increase the ranking
-    and bad ones will lower it.
-
-    Args:
-        exp_summary: ExplorationSummary. ExplorationSummary domain object.
-
-    Returns:
-        int. Document's rank in search.
-    """
-    # TODO(sll): Improve this calculation.
-    rating_weightings = {'1': -5, '2': -2, '3': 2, '4': 5, '5': 10}
-
-    rank = _DEFAULT_RANK
-    if exp_summary.ratings:
-        for rating_value in exp_summary.ratings:
-            rank += (
-                exp_summary.ratings[rating_value] *
-                rating_weightings[rating_value])
-
-    # Ranks must be non-negative.
-    return max(rank, 0)
-
-
-def get_search_rank(exp_id):
+def get_exploration_search_rank(exp_id):
     """Returns the search rank.
 
     Args:
@@ -1629,39 +1647,7 @@ def get_search_rank(exp_id):
         int. The rank of the exploration.
     """
     exp_summary = get_exploration_summary_by_id(exp_id)
-    return get_search_rank_from_exp_summary(exp_summary)
-
-
-def _exp_to_search_dict(exp):
-    """Updates the dict to be returned, whether the given exploration is to
-    be indexed for further queries or not.
-
-    Args:
-        exp: Exploration. Exploration domain object.
-
-    Returns:
-        dict. The representation of the given exploration, in a form that can
-        be used by the search index.
-    """
-    doc = {
-        'id': exp.id,
-        'language_code': exp.language_code,
-        'title': exp.title,
-        'category': exp.category,
-        'tags': exp.tags,
-        'blurb': exp.blurb,
-        'objective': exp.objective,
-        'author_notes': exp.author_notes,
-        'rank': get_search_rank(exp.id),
-    }
-    return doc
-
-
-def clear_search_index():
-    """WARNING: This runs in-request, and may therefore fail if there are too
-    many entries in the index.
-    """
-    search_services.clear_index(SEARCH_INDEX_EXPLORATIONS)
+    return search_services.get_search_rank_from_exp_summary(exp_summary)
 
 
 def index_explorations_given_ids(exp_ids):
@@ -1670,80 +1656,10 @@ def index_explorations_given_ids(exp_ids):
     Args:
         exp_ids: list(str). List of ids of the explorations to be indexed.
     """
-    # We pass 'strict=False' so as not to index deleted explorations.
-    exploration_models = get_multiple_explorations_by_id(exp_ids, strict=False)
-    search_services.add_documents_to_index([
-        _exp_to_search_dict(exp) for exp in exploration_models.values()
-        if _should_index(exp)
-    ], SEARCH_INDEX_EXPLORATIONS)
-
-
-def patch_exploration_search_document(exp_id, update):
-    """Patches an exploration's current search document, with the values
-    from the 'update' dictionary.
-
-    Args:
-        exp_id: str. The id of the exploration to be patched.
-        update: dict. Key-value pairs to patch the exploration's search
-            document with.
-    """
-    doc = search_services.get_document_from_index(
-        exp_id, SEARCH_INDEX_EXPLORATIONS)
-    doc.update(update)
-    search_services.add_documents_to_index([doc], SEARCH_INDEX_EXPLORATIONS)
-
-
-def update_exploration_status_in_search(exp_id):
-    """Updates the exploration status in its search doc.
-
-    Args:
-        exp_id: str. The id of the exploration whose status is to be
-            updated.
-    """
-    rights = rights_manager.get_exploration_rights(exp_id)
-    if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-        delete_documents_from_search_index([exp_id])
-    else:
-        patch_exploration_search_document(rights.id, {})
-
-
-def delete_documents_from_search_index(exploration_ids):
-    """Deletes the documents corresponding to these exploration_ids from the
-    search index.
-
-    Args:
-        exploration_ids: list(str). A list of exploration ids whose
-            documents are to be deleted from the search index.
-    """
-    search_services.delete_documents_from_index(
-        exploration_ids, SEARCH_INDEX_EXPLORATIONS)
-
-
-def search_explorations(query, limit, sort=None, cursor=None):
-    """Searches through the available explorations.
-
-    Args:
-        query_string: str. The query string to search for.
-        limit: int. The maximum number of results to return.
-        sort: str. A string indicating how to sort results. This should be a
-            string of space separated values. Each value should start with a
-            '+' or a '-' character indicating whether to sort in ascending or
-            descending order respectively. This character should be followed by
-            a field name to sort on. When this is None, results are based on
-            'rank'. See get_search_rank to see how rank is determined.
-        cursor: str or None. A cursor, used to get the next page of results. If
-            there are more documents that match the query than 'limit', this
-            function will return a cursor to get the next page.
-
-    Returns:
-        tuple. A 2-tuple consisting of:
-            - list(str). A list of exploration ids that match the query.
-            - str or None. A cursor if there are more matching explorations to
-              fetch, None otherwise. If a cursor is returned, it will be a
-              web-safe string that can be used in URLs.
-    """
-    return search_services.search(
-        query, SEARCH_INDEX_EXPLORATIONS, cursor, limit, sort, ids_only=True)
+    exploration_summaries = get_exploration_summaries_matching_ids(exp_ids)
+    search_services.index_exploration_summaries([
+        exploration_summary for exploration_summary in exploration_summaries
+        if exploration_summary is not None])
 
 
 def _is_suggestion_valid(thread_id, exploration_id):
@@ -2011,3 +1927,119 @@ def discard_draft(exp_id, user_id):
         exp_user_data.draft_change_list_last_updated = None
         exp_user_data.draft_change_list_exp_version = None
         exp_user_data.put()
+
+
+def get_state_id_mapping(exp_id, exp_version):
+    """Retrieve state id mapping model instance from the datastore.
+
+    Args:
+        exp_id: str. The exploration id.
+        exp_version: int. The exploration version.
+
+    Returnes:
+        StateIdMapping. Domain object for state id mapping model instance.
+    """
+    model = exp_models.StateIdMappingModel.get_state_id_mapping_model(
+        exp_id, exp_version)
+    state_id_mapping = exp_domain.StateIdMapping(
+        model.exploration_id, model.exploration_version,
+        copy.deepcopy(model.state_names_to_ids), model.largest_state_id_used)
+    return state_id_mapping
+
+
+def _save_state_id_mapping(state_id_mapping):
+    """Stores state id mapping instance in datastore.
+
+    Args:
+        state_id_mapping: StateIdMapping. State ID mapping which is to be
+            stored in database.
+    """
+    exp_models.StateIdMappingModel.create(
+        state_id_mapping.exploration_id,
+        state_id_mapping.exploration_version,
+        state_id_mapping.state_names_to_ids,
+        state_id_mapping.largest_state_id_used)
+
+
+def create_and_save_state_id_mapping_model(exploration, change_list):
+    """Create and store state id mapping for new exploration.
+
+    Args:
+        exploration: Exploration. Exploration for which state id mapping is
+            to be stored.
+        change_list: list(dict). A list of changes made in the exploration.
+
+    Returns:
+        StateIdMapping. Domain object of StateIdMappingModel instance.
+    """
+    if not feconf.ENABLE_STATE_ID_MAPPING:
+        return
+
+    if exploration.version > 1:
+        # Get state id mapping for new exploration from old exploration with
+        # the help of change list.
+        old_exploration = get_exploration_by_id(
+            exploration.id, version=exploration.version - 1)
+        old_state_id_mapping = get_state_id_mapping(
+            old_exploration.id, old_exploration.version)
+        new_state_id_mapping = (
+            old_state_id_mapping.create_mapping_for_new_version(
+                old_exploration, exploration, change_list))
+    else:
+        # Get state id mapping for first version of exploration.
+        new_state_id_mapping = (
+            exp_domain.StateIdMapping.create_mapping_for_new_exploration(
+                exploration))
+
+    _save_state_id_mapping(new_state_id_mapping)
+    return new_state_id_mapping
+
+
+def create_and_save_state_id_mapping_model_for_reverted_exploration(
+        exploration_id, current_version, revert_to_version):
+    """Create and save state id mapping model for when exploration is reverted.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+        current_version: str. The current version of the exploration.
+        revert_to_version: int. The version to which the given exploration
+            is to be reverted.
+
+    Returns:
+        StateIdMapping. Domain object of StateIdMappingModel instance.
+    """
+    if not feconf.ENABLE_STATE_ID_MAPPING:
+        return
+
+    old_state_id_mapping = get_state_id_mapping(
+        exploration_id, revert_to_version)
+    previous_state_id_mapping = get_state_id_mapping(
+        exploration_id, current_version)
+
+    # Note: when an exploration is reverted state id mapping should
+    # be same as reverted version of the exploration but largest
+    # state id used should be kept as it is as in old exploration.
+    new_version = current_version + 1
+    new_state_id_mapping = exp_domain.StateIdMapping(
+        exploration_id, new_version, old_state_id_mapping.state_names_to_ids,
+        previous_state_id_mapping.largest_state_id_used)
+    new_state_id_mapping.validate()
+
+    _save_state_id_mapping(new_state_id_mapping)
+    return new_state_id_mapping
+
+
+def delete_state_id_mapping_model_for_exploration(
+        exploration_id, exploration_version):
+    """Removes state id mapping model for the exploration.
+
+    Args:
+        exploration_id: str. Id of the exploration.
+        exploration_version: int. Latest version of the exploration.
+    """
+    if not feconf.ENABLE_STATE_ID_MAPPING:
+        return
+
+    exp_versions = range(1, exploration_version + 1)
+    exp_models.StateIdMappingModel.delete_state_id_mapping_models(
+        exploration_id, exp_versions)

@@ -17,13 +17,13 @@
  * exploration.
  */
 
-oppia.factory('explorationRecommendationsService', [
-  '$http', 'urlService', 'explorationContextService', 'PAGE_CONTEXT',
+oppia.factory('ExplorationRecommendationsService', [
+  '$http', 'UrlService', 'explorationContextService', 'PAGE_CONTEXT',
   'EDITOR_TAB_CONTEXT',
   function(
-      $http, urlService, explorationContextService, PAGE_CONTEXT,
+      $http, UrlService, explorationContextService, PAGE_CONTEXT,
       EDITOR_TAB_CONTEXT) {
-    var isIframed = urlService.isIframed();
+    var isIframed = UrlService.isIframed();
     var isInEditorPage = (
       explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
     var isInEditorPreviewMode = isInEditorPage && (

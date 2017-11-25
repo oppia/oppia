@@ -27,8 +27,8 @@ oppia.directive('oppiaInteractiveNumericInput', [function() {
     },
     templateUrl: 'interaction/NumericInput',
     controller: [
-      '$scope', '$attrs', 'focusService', 'numericInputRulesService',
-      function($scope, $attrs, focusService, numericInputRulesService) {
+      '$scope', '$attrs', 'FocusManagerService', 'numericInputRulesService',
+      function($scope, $attrs, FocusManagerService, numericInputRulesService) {
         $scope.answer = '';
         $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
@@ -51,13 +51,13 @@ oppia.directive('oppiaInteractiveNumericInput', [function() {
 }]);
 
 oppia.directive('oppiaResponseNumericInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/NumericInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         // If the answer is an integer, omit the fractional part.
         if ($scope.answer % 1 === 0) {
           $scope.answer = Math.round($scope.answer);
@@ -68,13 +68,13 @@ oppia.directive('oppiaResponseNumericInput', [
 ]);
 
 oppia.directive('oppiaShortResponseNumericInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'shortResponse/NumericInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         // If the answer is an integer, omit the fractional part.
         if ($scope.answer % 1 === 0) {
           $scope.answer = Math.round($scope.answer);

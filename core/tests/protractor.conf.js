@@ -68,7 +68,8 @@ exports.config = {
 
     editorFeatures: [
       'protractor/historyTab.js',
-      'protractor/parameters.js'
+      'protractor/parameters.js',
+      'protractor/hintsAndSolutions.js'
     ],
 
     extensions: [

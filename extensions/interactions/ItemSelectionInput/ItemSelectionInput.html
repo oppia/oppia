@@ -15,7 +15,7 @@
   md-checkbox.item-selection-input-checkbox.md-default-theme .md-icon {
     border-color: #0d48a1;
   }
-  md-checkbox.item-selection-input-checkbox.md-default-theme:focus .md-icon {
+  md-checkbox.item-selection-input-checkbox.md-default-theme.md-checked .md-icon {
     background-color: rgba(102, 187, 106, 0.87);
   }
 
@@ -90,6 +90,20 @@
 <script type="text/ng-template" id="interaction/ItemSelectionInput">
   <div class="item-selection-input-form-container">
     <form ng-submit="submitAnswer()">
+      <small ng-if="displayCheckboxes">
+        <span ng-if="notEnoughSelections">
+          <span translate="I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH" translate-values="{minChoiceNumber:<[minAllowableSelectionCount]>}" translate-interpolation="messageformat"></span>
+        </span>
+
+        <span ng-if="preventAdditionalSelections">
+          <span translate="I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE" translate-values="{maxAllowableSelectionCount:<[maxAllowableSelectionCount]>}" translate-interpolation="messageformat">
+          </span>
+        </span>
+
+        <span ng-if="!notEnoughSelections && !preventAdditionalSelections">
+          <span translate="I18N_INTERACTIONS_ITEM_SELECTION_MORE"></span>
+        </span>
+      </small>
       <div class="item-selection-input-container" ng-repeat="choice in choices track by $index">
         <div ng-if="displayCheckboxes">
           <label class="item-selection-input-item">
@@ -118,17 +132,7 @@
         least 2. If maxAllowableSelectionCount is 1, the choices will be buttons
         rather than checkboxes. -->
       <div ng-if="displayCheckboxes">
-        <small class="pull-right">
-          <span ng-if="notEnoughSelections">
-            <span translate="I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH" translate-values="{minChoiceNumber:<[minAllowableSelectionCount]>}" translate-interpolation="messageformat"></span>
-          </span>
-
-          <span ng-if="preventAdditionalSelections">
-            <span translate="I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE" translate-values="{maxAllowableSelectionCount:<[maxAllowableSelectionCount]>}" translate-interpolation="messageformat">
-          </span>
-        </small>
-
-        <md-button class="md-button-success"
+        <md-button class="oppia-learner-confirm-button"
                    ng-click="submitAnswer(userSelections)" aria-label="Submit"
                    ng-disabled="notEnoughSelections" translate="I18N_INTERACTIONS_ITEM_SELECTION_SUBMIT">
         </md-button>

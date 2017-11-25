@@ -16,46 +16,21 @@
  * @fileoverview Controllers for a state's interaction editor.
  */
 
-// A state-specific cache for interaction details. It stores customization args
-// corresponding to an interaction id so that they can be restored if the
-// interaction is changed back while the user is still in this state. This
-// cache should be reset each time the state editor is initialized.
-oppia.factory('interactionDetailsCache', [function() {
-  var _cache = {};
-  return {
-    reset: function() {
-      _cache = {};
-    },
-    contains: function(interactionId) {
-      return _cache.hasOwnProperty(interactionId);
-    },
-    set: function(interactionId, interactionCustomizationArgs) {
-      _cache[interactionId] = {
-        customization: angular.copy(interactionCustomizationArgs)
-      };
-    },
-    get: function(interactionId) {
-      if (!_cache.hasOwnProperty(interactionId)) {
-        return null;
-      }
-      return angular.copy(_cache[interactionId]);
-    }
-  };
-}]);
-
 oppia.controller('StateInteraction', [
   '$scope', '$http', '$rootScope', '$modal', '$injector', '$filter',
-  'alertsService', 'editorContextService', 'oppiaHtmlEscaper',
+  'alertsService', 'EditorStateService', 'HtmlEscaperService',
   'INTERACTION_SPECS', 'stateInteractionIdService',
   'stateCustomizationArgsService', 'editabilityService',
-  'explorationStatesService', 'graphDataService', 'interactionDetailsCache',
+  'explorationStatesService', 'graphDataService', 
+  'InteractionDetailsCacheService',
   'oppiaExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
   function($scope, $http, $rootScope, $modal, $injector, $filter,
-      alertsService, editorContextService, oppiaHtmlEscaper,
+      alertsService, EditorStateService, HtmlEscaperService,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
-      explorationStatesService, graphDataService, interactionDetailsCache,
+      explorationStatesService, graphDataService,
+      InteractionDetailsCacheService,
       oppiaExplorationHtmlFormatterService, UrlInterpolationService,
       SubtitledHtmlObjectFactory, stateSolutionService, stateContentService) {
     var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
@@ -98,9 +73,9 @@ oppia.controller('StateInteraction', [
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
       $scope.hasLoaded = false;
 
-      interactionDetailsCache.reset();
+      InteractionDetailsCacheService.reset();
 
-      $scope.stateName = editorContextService.getActiveStateName();
+      $scope.stateName = EditorStateService.getActiveStateName();
 
       stateInteractionIdService.init(
         $scope.stateName, stateData.interaction.id);
@@ -108,7 +83,7 @@ oppia.controller('StateInteraction', [
         $scope.stateName, stateData.interaction.customizationArgs);
 
       stateSolutionService.init(
-        editorContextService.getActiveStateName(),
+        EditorStateService.getActiveStateName(),
         stateData.interaction.solution);
 
       $rootScope.$broadcast('initializeAnswerGroups', {
@@ -129,7 +104,7 @@ oppia.controller('StateInteraction', [
     // active state is a terminal one.
     var updateDefaultTerminalStateContentIfEmpty = function() {
       // Get current state.
-      var stateName = editorContextService.getActiveStateName();
+      var stateName = EditorStateService.getActiveStateName();
 
       // Check if the content is currently empty, as expected.
       var previousContent = stateContentService.savedMemento;
@@ -157,7 +132,7 @@ oppia.controller('StateInteraction', [
 
       stateCustomizationArgsService.saveDisplayedValue();
 
-      interactionDetailsCache.set(
+      InteractionDetailsCacheService.set(
         stateInteractionIdService.savedMemento,
         stateCustomizationArgsService.savedMemento);
 
@@ -177,18 +152,20 @@ oppia.controller('StateInteraction', [
         alertsService.clearWarnings();
 
         $modal.open({
-          templateUrl: 'modals/customizeInteraction',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/editor_tab/' +
+            'customize_interaction_modal_directive.html'),
           backdrop: true,
           resolve: {},
           controller: [
             '$scope', '$modalInstance', '$injector', 'stateSolutionService',
             'stateInteractionIdService', 'stateCustomizationArgsService',
-            'interactionDetailsCache', 'INTERACTION_SPECS',
+            'InteractionDetailsCacheService', 'INTERACTION_SPECS',
             'UrlInterpolationService', 'editorFirstTimeEventsService',
             function(
                 $scope, $modalInstance, $injector, stateSolutionService,
                 stateInteractionIdService, stateCustomizationArgsService,
-                interactionDetailsCache, INTERACTION_SPECS,
+                InteractionDetailsCacheService, INTERACTION_SPECS,
                 UrlInterpolationService, editorFirstTimeEventsService) {
               editorFirstTimeEventsService
                 .registerFirstClickAddInteractionEvent();
@@ -261,9 +238,9 @@ oppia.controller('StateInteraction', [
 
                 stateInteractionIdService.displayed = newInteractionId;
                 stateCustomizationArgsService.displayed = {};
-                if (interactionDetailsCache.contains(newInteractionId)) {
+                if (InteractionDetailsCacheService.contains(newInteractionId)) {
                   stateCustomizationArgsService.displayed = (
-                    interactionDetailsCache.get(
+                    InteractionDetailsCacheService.get(
                       newInteractionId).customization);
                 } else {
                   $scope.customizationArgSpecs.forEach(function(caSpec) {
@@ -286,7 +263,7 @@ oppia.controller('StateInteraction', [
               };
 
               $scope.returnToInteractionSelector = function() {
-                interactionDetailsCache.set(
+                InteractionDetailsCacheService.set(
                   stateInteractionIdService.displayed,
                   stateCustomizationArgsService.displayed);
 
@@ -350,7 +327,9 @@ oppia.controller('StateInteraction', [
     $scope.deleteInteraction = function() {
       alertsService.clearWarnings();
       $modal.open({
-        templateUrl: 'modals/deleteInteraction',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/' +
+          'delete_interaction_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', function($scope, $modalInstance) {
@@ -425,31 +404,35 @@ oppia.controller('StateInteraction', [
   }
 ]);
 
-oppia.directive('testInteractionPanel', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      stateContent: '&',
-      inputTemplate: '&',
-      onSubmitAnswer: '&'
-    },
-    templateUrl: 'teaching/testInteractionPanel',
-    controller: [
-      '$scope', 'editorContextService', 'explorationStatesService',
-      'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-      function($scope, editorContextService, explorationStatesService,
-          INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE) {
-        var _stateName = editorContextService.getActiveStateName();
-        var _state = explorationStatesService.getState(_stateName);
-        $scope.interactionIsInline = (
-          INTERACTION_SPECS[_state.interaction.id].display_mode ===
-          INTERACTION_DISPLAY_MODE_INLINE);
-        $scope.submitAnswer = function(answer) {
-          $scope.onSubmitAnswer({
-            answer: answer
-          });
-        };
-      }
-    ]
-  };
-}]);
+oppia.directive('testInteractionPanel', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        stateContent: '&',
+        inputTemplate: '&',
+        onSubmitAnswer: '&'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_editor/editor_tab/' +
+        'test_interaction_modal_directive.html'),
+      controller: [
+        '$scope', 'EditorStateService', 'explorationStatesService',
+        'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
+        function($scope, EditorStateService, explorationStatesService,
+            INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE) {
+          var _stateName = EditorStateService.getActiveStateName();
+          var _state = explorationStatesService.getState(_stateName);
+          $scope.interactionIsInline = (
+            INTERACTION_SPECS[_state.interaction.id].display_mode ===
+            INTERACTION_DISPLAY_MODE_INLINE);
+          $scope.submitAnswer = function(answer) {
+            $scope.onSubmitAnswer({
+              answer: answer
+            });
+          };
+        }
+      ]
+    };
+  }
+]);

@@ -19,6 +19,7 @@
 import inspect
 
 from core import jobs_registry
+from core.domain import exp_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.platform import models
@@ -64,6 +65,20 @@ class BaseEventHandler(object):
         cls._handle_event(*args, **kwargs)
 
 
+class StatsEventsHandler(BaseEventHandler):
+    """Event handler for incremental update of analytics model using aggregated
+    stats data.
+    """
+
+    EVENT_TYPE = feconf.EVENT_TYPE_ALL_STATS
+
+    @classmethod
+    def _handle_event(cls, exploration_id, exp_version, aggregated_stats):
+        taskqueue_services.defer(
+            stats_services.update_stats, taskqueue_services.QUEUE_NAME_STATS,
+            exploration_id, exp_version, aggregated_stats)
+
+
 class AnswerSubmissionEventHandler(BaseEventHandler):
     """Event handler for recording answer submissions."""
 
@@ -92,6 +107,41 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
                 normalized_answer, interaction_id, answer_group_index,
                 rule_spec_index, classification_categorization, params,
                 session_id, time_spent_in_secs))
+
+        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            feedback_is_useful = (
+                classification_categorization != (
+                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION))
+
+            stats_models.AnswerSubmittedEventLogEntryModel.create(
+                exploration_id, exploration_version, state_name, session_id,
+                time_spent_in_secs, feedback_is_useful)
+
+
+class ExplorationActualStartEventHandler(BaseEventHandler):
+    """Event handler for recording exploration actual start events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION
+
+    @classmethod
+    def _handle_event(
+            cls, exp_id, exp_version, state_name, session_id):
+        stats_models.ExplorationActualStartEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id)
+
+
+class SolutionHitEventHandler(BaseEventHandler):
+    """Event handler for recording solution hit events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_SOLUTION_HIT
+
+    @classmethod
+    def _handle_event(
+            cls, exp_id, exp_version, state_name, session_id,
+            time_spent_in_state_secs):
+        stats_models.SolutionHitEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id,
+            time_spent_in_state_secs)
 
 
 class StartExplorationEventHandler(BaseEventHandler):
@@ -160,6 +210,20 @@ class StateHitEventHandler(BaseEventHandler):
         stats_models.StateHitEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
             params, play_type)
+
+
+class StateCompleteEventHandler(BaseEventHandler):
+    """Event handler for recording state complete events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_STATE_COMPLETED
+
+    @classmethod
+    def _handle_event(
+            cls, exp_id, exp_version, state_name, session_id,
+            time_spent_in_state_secs):
+        stats_models.StateCompleteEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id,
+            time_spent_in_state_secs)
 
 
 class FeedbackThreadCreatedEventHandler(BaseEventHandler):

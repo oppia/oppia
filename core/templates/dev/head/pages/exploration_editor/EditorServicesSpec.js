@@ -17,48 +17,6 @@
  *   editor page.
  */
 
-describe('Editor context service', function() {
-  beforeEach(module('oppia'));
-
-  describe('editor context service', function() {
-    var ecs = null;
-
-    beforeEach(inject(function($injector) {
-      ecs = $injector.get('editorContextService');
-    }));
-
-    it('should correctly set and get state names', function() {
-      ecs.setActiveStateName('A State');
-      expect(ecs.getActiveStateName()).toBe('A State');
-    });
-
-    it('should not allow invalid state names to be set', function() {
-      ecs.setActiveStateName('');
-      expect(ecs.getActiveStateName()).toBeNull();
-
-      ecs.setActiveStateName(null);
-      expect(ecs.getActiveStateName()).toBeNull();
-    });
-  });
-});
-
-describe('Angular names service', function() {
-  beforeEach(module('oppia'));
-
-  describe('angular name service', function() {
-    var ans = null;
-
-    beforeEach(inject(function($injector) {
-      ans = $injector.get('angularNameService');
-    }));
-
-    it('should map interaction ID to correct RulesService', function() {
-      expect(ans.getNameOfInteractionRulesService('TextInput')).toEqual(
-        'textInputRulesService');
-    });
-  });
-});
-
 describe('Change list service', function() {
   beforeEach(module('oppia'));
 
@@ -87,7 +45,7 @@ describe('Change list service', function() {
         discardDraft: function() {}
       };
       module(function($provide) {
-        $provide.value('explorationData', mockExplorationData);
+        $provide.value('ExplorationDataService', mockExplorationData);
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
@@ -261,7 +219,7 @@ describe('Exploration title service', function() {
         autosaveChangeList: function() {}
       };
       module(function($provide) {
-        $provide.value('explorationData', mockExplorationData);
+        $provide.value('ExplorationDataService', mockExplorationData);
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
@@ -269,6 +227,8 @@ describe('Exploration title service', function() {
     beforeEach(inject(function($injector) {
       ets = $injector.get('explorationTitleService');
       $httpBackend = $injector.get('$httpBackend');
+
+      GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
     }));
 
     it('correctly initializes the service', function() {

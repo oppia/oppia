@@ -30,7 +30,8 @@
            role="menuitem"
            aria-haspopup="true"
            aria-expanded="false"
-           tabindex="0">
+           tabindex="0"
+           ng-mouseleave="onMouseoutDropdownMenuAbout($event)">
           <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_ABOUT"></span>
           <span class="caret"></span>
         </a>
@@ -41,9 +42,10 @@
           <li><a class="protractor-test-about-link oppia-navbar-tab-content" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
           <li><a class="protractor-test-get-started-link oppia-navbar-tab-content" href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
           <li><a class="protractor-test-teach-link oppia-navbar-tab-content" href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
-          <li><a href="/blog" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_BLOG"></a></li>
+          <li><a href="https://medium.com/oppia-org" target="_blank" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_BLOG"></a></li>
           <li><a href="/forum" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_FORUM"></a></li>
           <li><a class="protractor-test-contact-link oppia-navbar-tab-content" href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
+          <li><a href="/foundation" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_OPPIA_FOUNDATION"></a></li>
         </ul>
       </li>
       <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_DONATE">

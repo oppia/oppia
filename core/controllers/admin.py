@@ -32,7 +32,6 @@ from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
-from core.domain import rte_component_registry
 from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
@@ -40,27 +39,6 @@ import feconf
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
-
-
-SSL_CHALLENGE_RESPONSES = config_domain.ConfigProperty(
-    'ssl_challenge_responses', {
-        'type': 'list',
-        'items': {
-            'type': 'dict',
-            'properties': [{
-                'name': 'challenge',
-                'schema': {
-                    'type': 'unicode'
-                }
-            }, {
-                'name': 'response',
-                'schema': {
-                    'type': 'unicode'
-                }
-            }]
-        },
-    },
-    'Challenge-response pairs for SSL validation.', [])
 
 
 class AdminPage(base.BaseHandler):
@@ -111,8 +89,6 @@ class AdminPage(base.BaseHandler):
                     utils.get_current_time_in_millisecs())),
             'one_off_job_specs': one_off_job_specs,
             'recent_job_data': recent_job_data,
-            'rte_components_html': jinja2.utils.Markup(
-                rte_component_registry.Registry.get_html_for_all_components()),
             'unfinished_job_data': unfinished_job_data,
             'value_generators_js': jinja2.utils.Markup(
                 editor.get_value_generators_js()),
@@ -393,22 +369,3 @@ class DataExtractionQueryHandler(base.BaseHandler):
             'data': extracted_answers
         }
         self.render_json(response)
-
-
-class SslChallengeHandler(base.BaseHandler):
-    """Plaintext page for responding to LetsEncrypt SSL challenges."""
-
-    @acl_decorators.open_access
-    def get(self, challenge):
-        """Handles GET requests."""
-        challenge_responses = SSL_CHALLENGE_RESPONSES.value
-        response = None
-        for challenge_response_pair in challenge_responses:
-            if challenge_response_pair['challenge'] == challenge:
-                response = challenge_response_pair['response']
-
-        if response is None:
-            raise self.PageNotFoundException()
-
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write(response)

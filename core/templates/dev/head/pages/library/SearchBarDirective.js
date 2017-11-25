@@ -25,13 +25,13 @@ oppia.directive('searchBar', [
         'search_bar_directive.html'),
       controller: [
         '$scope', '$rootScope', '$timeout', '$window', '$location',
-        '$translate', 'searchService', 'oppiaDebouncer', 'oppiaHtmlEscaper',
-        'urlService', 'i18nIdService',
+        '$translate', 'SearchService', 'DebouncerService', 'HtmlEscaperService',
+        'UrlService', 'i18nIdService',
         function(
             $scope, $rootScope, $timeout, $window, $location, $translate,
-            searchService, oppiaDebouncer, oppiaHtmlEscaper, urlService,
+            SearchService, DebouncerService, HtmlEscaperService, UrlService,
             i18nIdService) {
-          $scope.isSearchInProgress = searchService.isSearchInProgress;
+          $scope.isSearchInProgress = SearchService.isSearchInProgress;
           $scope.SEARCH_DROPDOWN_CATEGORIES = (
             GLOBALS.SEARCH_DROPDOWN_CATEGORIES.map(
               function(categoryName) {
@@ -138,11 +138,11 @@ oppia.directive('searchBar', [
           });
 
           var onSearchQueryChangeExec = function() {
-            searchService.executeSearchQuery(
+            SearchService.executeSearchQuery(
               $scope.searchQuery, $scope.selectionDetails.categories.selections,
               $scope.selectionDetails.languageCodes.selections);
 
-            var searchUrlQueryString = searchService.getSearchUrlQueryString(
+            var searchUrlQueryString = SearchService.getSearchUrlQueryString(
               $scope.searchQuery, $scope.selectionDetails.categories.selections,
               $scope.selectionDetails.languageCodes.selections
             );
@@ -159,19 +159,19 @@ oppia.directive('searchBar', [
           }
 
           var updateSearchFieldsBasedOnUrlQuery = function() {
-            var oldQueryString = searchService.getCurrentUrlQueryString();
+            var oldQueryString = SearchService.getCurrentUrlQueryString();
 
             $scope.selectionDetails.categories.selections = {};
             $scope.selectionDetails.languageCodes.selections = {};
 
             $scope.searchQuery =
-             searchService.updateSearchFieldsBasedOnUrlQuery(
+             SearchService.updateSearchFieldsBasedOnUrlQuery(
               $window.location.search, $scope.selectionDetails);
 
             updateSelectionDetails('categories');
             updateSelectionDetails('languageCodes');
 
-            var newQueryString = searchService.getCurrentUrlQueryString();
+            var newQueryString = SearchService.getCurrentUrlQueryString();
 
             if (oldQueryString !== newQueryString) {
               onSearchQueryChangeExec();
@@ -179,7 +179,7 @@ oppia.directive('searchBar', [
           };
 
           $scope.$on('$locationChangeSuccess', function() {
-            if (urlService.getUrlParams().hasOwnProperty('q')) {
+            if (UrlService.getUrlParams().hasOwnProperty('q')) {
               updateSearchFieldsBasedOnUrlQuery();
             }
           });
@@ -199,7 +199,7 @@ oppia.directive('searchBar', [
 
               updateSelectionDetails('languageCodes');
 
-              if (urlService.getUrlParams().hasOwnProperty('q')) {
+              if (UrlService.getUrlParams().hasOwnProperty('q')) {
                 updateSearchFieldsBasedOnUrlQuery();
               }
 

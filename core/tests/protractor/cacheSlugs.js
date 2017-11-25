@@ -56,7 +56,8 @@ describe('Cache Slugs', function() {
   it('should check that errors get logged for missing resources', function() {
     browser.get(ERROR_PAGE_URL_SUFFIX);
     var expectedErrors = [
-      'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
+      'http://localhost:9001/build/fail/logo/288x128_logo_white.png',
+      '\\$modal is now deprecated. Use \\$uibModal instead.'
     ];
     checkConsoleErrorsExist(expectedErrors);
   });

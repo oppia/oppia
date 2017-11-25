@@ -20,8 +20,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveCodeRepl', [
-  'oppiaHtmlEscaper', 'codeReplRulesService',
-  function(oppiaHtmlEscaper, codeReplRulesService) {
+  'HtmlEscaperService', 'codeReplRulesService',
+  function(HtmlEscaperService, codeReplRulesService) {
     return {
       restrict: 'E',
       scope: {
@@ -29,13 +29,13 @@ oppia.directive('oppiaInteractiveCodeRepl', [
       },
       templateUrl: 'interaction/CodeRepl',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.language = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.language = HtmlEscaperService.escapedJsonToObj(
           $attrs.languageWithValue);
-        $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.placeholder = HtmlEscaperService.escapedJsonToObj(
           $attrs.placeholderWithValue);
-        $scope.preCode = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.preCode = HtmlEscaperService.escapedJsonToObj(
           $attrs.preCodeWithValue);
-        $scope.postCode = oppiaHtmlEscaper.escapedJsonToObj(
+        $scope.postCode = HtmlEscaperService.escapedJsonToObj(
           $attrs.postCodeWithValue);
 
         // Make sure $scope.preCode ends with a newline:
@@ -233,19 +233,19 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 ]);
 
 oppia.directive('oppiaResponseCodeRepl', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'response/CodeRepl',
       controller: [
-        '$scope', '$attrs', 'focusService',
-        function($scope, $attrs, focusService) {
-          $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        '$scope', '$attrs', 'FocusManagerService',
+        function($scope, $attrs, FocusManagerService) {
+          $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
 
           if ($scope.answer.error) {
-            $scope.errorFocusLabel = focusService.generateFocusLabel();
-            focusService.setFocus($scope.errorFocusLabel);
+            $scope.errorFocusLabel = FocusManagerService.generateFocusLabel();
+            FocusManagerService.setFocus($scope.errorFocusLabel);
           }
         }
       ]
@@ -254,41 +254,41 @@ oppia.directive('oppiaResponseCodeRepl', [
 ]);
 
 oppia.directive('oppiaShortResponseCodeRepl', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: 'shortResponse/CodeRepl',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
     };
   }
 ]);
 
 oppia.factory('codeReplRulesService', [
-  '$filter', 'codeNormalizationService',
-  function($filter, codeNormalizationService) {
+  '$filter', 'CodeNormalizerService',
+  function($filter, CodeNormalizerService) {
     return {
       CodeEquals: function(answer, inputs) {
         var normalizedCode =
-          codeNormalizationService.getNormalizedCode(answer.code);
+          CodeNormalizerService.getNormalizedCode(answer.code);
         var normalizedExpectedCode =
-          codeNormalizationService.getNormalizedCode(inputs.x);
+          CodeNormalizerService.getNormalizedCode(inputs.x);
         return normalizedCode === normalizedExpectedCode;
       },
       CodeContains: function(answer, inputs) {
         var normalizedCode =
-          codeNormalizationService.getNormalizedCode(answer.code);
+          CodeNormalizerService.getNormalizedCode(answer.code);
         var normalizedSnippet =
-          codeNormalizationService.getNormalizedCode(inputs.x);
+          CodeNormalizerService.getNormalizedCode(inputs.x);
         return normalizedCode.indexOf(normalizedSnippet) !== -1;
       },
       CodeDoesNotContain: function(answer, inputs) {
         var normalizedCode =
-          codeNormalizationService.getNormalizedCode(answer.code);
+          CodeNormalizerService.getNormalizedCode(answer.code);
         var normalizedSnippet =
-          codeNormalizationService.getNormalizedCode(inputs.x);
+          CodeNormalizerService.getNormalizedCode(inputs.x);
         return normalizedCode.indexOf(normalizedSnippet) === -1;
       },
       OutputContains: function(answer, inputs) {

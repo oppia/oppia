@@ -34,19 +34,19 @@ oppia.directive('answerGroupEditor', [
         '/components/' +
         'answer_group_editor_directive.html'),
       controller: [
-        '$scope', 'stateInteractionIdService', 'responsesService',
-        'editorContextService', 'alertsService', 'INTERACTION_SPECS',
+        '$scope', 'stateInteractionIdService', 'ResponsesService',
+        'EditorStateService', 'alertsService', 'INTERACTION_SPECS',
         'RULE_TYPE_CLASSIFIER', 'RuleObjectFactory',
         function(
-            $scope, stateInteractionIdService, responsesService,
-            editorContextService, alertsService, INTERACTION_SPECS,
+            $scope, stateInteractionIdService, ResponsesService,
+            EditorStateService, alertsService, INTERACTION_SPECS,
             RULE_TYPE_CLASSIFIER, RuleObjectFactory) {
           $scope.rulesMemento = null;
-          $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
+          $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           $scope.editAnswerGroupForm = {};
 
           $scope.getAnswerChoices = function() {
-            return responsesService.getAnswerChoices();
+            return ResponsesService.getAnswerChoices();
           };
           $scope.answerChoices = $scope.getAnswerChoices();
 
@@ -192,7 +192,7 @@ oppia.directive('answerGroupEditor', [
             $scope.rulesMemento = angular.copy($scope.rules);
 
             // TODO(bhenning): Should use functionality in ruleEditor.js, but
-            // move it to responsesService in StateResponses.js to properly
+            // move it to ResponsesService in StateResponses.js to properly
             // form a new rule.
             $scope.rules.push(RuleObjectFactory.createNew(ruleType, inputs));
             $scope.changeActiveRuleIndex($scope.rules.length - 1);
@@ -223,8 +223,8 @@ oppia.directive('answerGroupEditor', [
           };
 
           $scope.changeActiveRuleIndex = function(newIndex) {
-            responsesService.changeActiveRuleIndex(newIndex);
-            $scope.activeRuleIndex = responsesService.getActiveRuleIndex();
+            ResponsesService.changeActiveRuleIndex(newIndex);
+            $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           };
 
           $scope.openRuleEditor = function(index) {
