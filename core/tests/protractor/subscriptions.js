@@ -54,8 +54,8 @@ describe('Subscriptions functionality', function() {
     browser.waitForAngular();
     element(by.css('.protractor-test-subscription-button')).click();
     preferencesPage.get();
-    preferencesPage.expectFirstSubscriberToBe('creator...');
-    preferencesPage.expectLasttSubscriberToBe('creator...');
+    preferencesPage.expectFirstSubscriptionToBe('creator1subscriptions');
+    preferencesPage.expectLastSubscriptionToBe('creator2subscriptions');
     users.logout();
 
     // Create a learner who subscribes to one creator and unsubscribes from the
@@ -72,24 +72,31 @@ describe('Subscriptions functionality', function() {
     browser.waitForAngular();
     element(by.css('.protractor-test-subscription-button')).click();
     preferencesPage.get();
-    preferencesPage.expectSubscriberCountToEqual(1);
-    preferencesPage.expectFirstSubscriberToBe('creator...');
+    preferencesPage.expectSubscriptionCountToEqual(1);
+    preferencesPage.expectFirstSubscriptionToBe('creator1subscriptions');
     users.logout();
 
     users.login('creator1@subscriptions.com');
     creatorDashboardPage.get();
     browser.waitForAngular();
     creatorDashboardPage.navigateToSubscriptionDashboard();
-    preferencesPage.expectFirstSubscriberToBe('creator...');
-    preferencesPage.expectLasttSubscriberToBe('creator...');
+    expect(element.all(by.css(
+      '.protractor-test-subscription-name')).first().getText()).toMatch(
+      'learner1subscriptions');
+    expect(element.all(by.css(
+      '.protractor-test-subscription-name')).last().getText()).toMatch(
+      'learner2subscriptions');
     users.logout();
 
     users.login('creator2@subscriptions.com');
     creatorDashboardPage.get();
     browser.waitForAngular();
     creatorDashboardPage.navigateToSubscriptionDashboard();
-    preferencesPage.expectSubscriberCountToEqual(1);
-    preferencesPage.expectLasttSubscriberToBe('creator...');
+    expect(element.all(by.css(
+      '.protractor-test-subscription-name')).count()).toEqual(1);
+    expect(element.all(by.css(
+      '.protractor-test-subscription-name')).last().getText()).toMatch(
+      'learner1subscriptions');
     users.logout();
   });
 

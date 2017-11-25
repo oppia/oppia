@@ -23,8 +23,7 @@ var PreferencesPage = require('../protractor_utils/PreferencesPage');
 
 describe('Preferences', function() {
   var preferencesPage = null;
-  var EditorBox = 'editor';
-  var FeedbackBox = 'feedback';
+  
   beforeEach(function() {
     preferencesPage = PreferencesPage.PreferencesPage();
   });
@@ -33,24 +32,24 @@ describe('Preferences', function() {
     users.createUser('alice@preferences.com', 'alicePreferences');
     users.login('alice@preferences.com');
     preferencesPage.get();
-    preferencesPage.clickBox(EditorBox);
-    expect(preferencesPage.getValue(EditorBox)).toBe(true);
-    preferencesPage.clickBox(EditorBox);
-    expect(preferencesPage.getValue(EditorBox)).toBe(false);
+    preferencesPage.toggleEditorRoleEmailsCheckBox();
+    expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(true);
+    preferencesPage.toggleEditorRoleEmailsCheckBox();
+    expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(false);
     browser.refresh();
-    expect(preferencesPage.getValue(EditorBox)).toBe(false);
+    expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(false);
   });
 
   it('should change feedback message email checkbox value', function() {
     users.createUser('bob@preferences.com', 'bobPreferences');
     users.login('bob@preferences.com');
     preferencesPage.get();
-    preferencesPage.clickBox(FeedbackBox);
-    expect(preferencesPage.getValue(FeedbackBox)).toBe(true);
-    preferencesPage.clickBox(FeedbackBox);
-    expect(preferencesPage.getValue(FeedbackBox)).toBe(false);
+    preferencesPage.toggleFeedbackEmailsCheckBox();
+    expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(true);
+    preferencesPage.toggleFeedbackEmailsCheckBox();
+    expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
     browser.refresh();
-    expect(preferencesPage.getValue(FeedbackBox)).toBe(false);
+    expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
   });
 
   afterEach(function() {

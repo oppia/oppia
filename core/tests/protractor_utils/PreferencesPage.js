@@ -17,45 +17,43 @@
  * tests.
  */
 
- var PreferencesPage = function() {
- 	var USER_PREFERENCES_URL = '/preferences';
- 	var editorRoleBox = element(by.model('canReceiveEditorRoleEmail'));
- 	var feedbackMessageBox = element(by.model('canReceiveFeedbackMessageEmail'));
- 	var subscribers = element.all(by.css('.protractor-test-subscription-name');
+var PreferencesPage = function() {
+  var USER_PREFERENCES_URL = '/preferences';
+  var editorRoleEmailsCheckBox = element(by.model('canReceiveEditorRoleEmail'));
+  var feedbackMessageEmailsCheckBox = element(by.model('canReceiveFeedbackMessageEmail'));
+  var subscriptions = element.all(by.css('.protractor-test-subscription-name');
 
- 	var getBox = function(name) {
- 		if(name=='feedback') {
- 			return feedbackMessageBox;
- 		}
- 		else if(name=='editor') {
- 			return editorRoleBox;
- 		}
- 			
-
- 	};
- 	this.get = function() {
+  this.get = function() {
     return browser.get(USER_PREFERENCES_URL);
- 	};
+  };
 
- 	this.getValue = function(name) {
- 		return getBox(name).isSelected();
- 	};
+  this.toggleEditorRoleEmailsCheckBox = function() {
+    editorRoleEmailsCheckBox.click();
+  };
+  
+  this.toggleFeedbackEmailsCheckBox = function() {
+    feedbackMessageEmailsCheckBox.click();
+  };
 
- 	this.clickBox = function(name) {
- 		getBox(name).click();
- 	};
+  this.isFeedbackEmailsCheckboxSelected = function() {
+    return feedbackMessageEmailsCheckBox.isSelected();
+  };
 
- 	this.expectFirstSubscriberToBe = function(name) {
- 		expect(subscribers.first().getText().toMatch(name));
- 	};
+  this.isEditorRoleEmailsCheckboxSelected = function() {
+    return editorRoleEmailsCheckBox.isSelected();
+  };
 
- 	this.expectLastSubscriberToBe = function(name) {
- 		expect(subscribers.last().getText().toMatch(name));
- 	};
+  this.expectFirstSubscriptionToBe = function(name) {
+    expect(subscriptions.first().getText().toMatch(name));
+  };
 
- 	this.expectSubscriberCountToEqual = function(value) {
- 		expect(subscribers.count()).toEqual(value);
- 	};
- };
+  this.expectLastSubscriptionToBe = function(name) {
+    expect(subscriptions.last().getText().toMatch(name));
+  };
 
- export.PreferencesPage = PreferencesPage;
+  this.expectSubscriptionCountToEqual = function(value) {
+    expect(subscriptions.count()).toEqual(value);
+  };
+};
+
+export.PreferencesPage = PreferencesPage;
