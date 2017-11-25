@@ -20,8 +20,9 @@
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
   var editorRoleEmailsCheckBox = element(by.model('canReceiveEditorRoleEmail'));
-  var feedbackMessageEmailsCheckBox = element(by.model('canReceiveFeedbackMessageEmail'));
-  var subscriptions = element.all(by.css('.protractor-test-subscription-name');
+  var feedbackMessageEmailsCheckBox = element(
+    by.model('canReceiveFeedbackMessageEmail'));
+  var subscriptions = element.all(by.css('.protractor-test-subscription-name'));
 
   this.get = function() {
     return browser.get(USER_PREFERENCES_URL);
@@ -44,11 +45,11 @@ var PreferencesPage = function() {
   };
 
   this.expectFirstSubscriptionToBe = function(name) {
-    expect(subscriptions.first().getText().toMatch(name));
+    expect(subscriptions.first().getText()).toMatch(name);
   };
 
   this.expectLastSubscriptionToBe = function(name) {
-    expect(subscriptions.last().getText().toMatch(name));
+    expect(subscriptions.last().getText()).toMatch(name);
   };
 
   this.expectSubscriptionCountToEqual = function(value) {
@@ -56,4 +57,4 @@ var PreferencesPage = function() {
   };
 };
 
-export.PreferencesPage = PreferencesPage;
+exports.PreferencesPage = PreferencesPage;
