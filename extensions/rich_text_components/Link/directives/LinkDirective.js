@@ -28,8 +28,8 @@ oppia.directive('oppiaNoninteractiveLink', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/rich_text_components/Link/directives/link_directive.html'),
       controller: [
-        '$scope', '$attrs', 'explorationContextService',
-        function($scope, $attrs, explorationContextService) {
+        '$scope', '$attrs', 'ExplorationContextService',
+        function($scope, $attrs, ExplorationContextService) {
           var untrustedUrl = encodeURI(HtmlEscaperService.escapedJsonToObj(
             $attrs.urlWithValue));
           if (untrustedUrl.indexOf('http://') !== 0 &&
@@ -55,7 +55,7 @@ oppia.directive('oppiaNoninteractiveLink', [
 
           // This following check disbales the link in Editor being caught
           // by tabbing while in Exploration Editor mode.
-          if (explorationContextService.isInExplorationEditorMode()) {
+          if (ExplorationContextService.isInExplorationEditorMode()) {
             $scope.tabIndexVal = -1;
           }
         }]
