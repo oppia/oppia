@@ -20,13 +20,13 @@
 oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
   'EditorStateService', 'AlertsService', 'ResponsesService', 'RouterService',
-  'explorationContextService', 'TrainingDataService',
+  'ExplorationContextService', 'TrainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
   'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
       EditorStateService, AlertsService, ResponsesService, RouterService,
-      explorationContextService, TrainingDataService,
+      ExplorationContextService, TrainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
       INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
     $scope.EditorStateService = EditorStateService;
@@ -35,7 +35,7 @@ oppia.controller('StateResponses', [
       '/general/drag_dots.png');
 
     var _initializeTrainingData = function() {
-      var explorationId = explorationContextService.getExplorationId();
+      var explorationId = ExplorationContextService.getExplorationId();
       var currentStateName = EditorStateService.getActiveStateName();
       TrainingDataService.initializeTrainingData(
         explorationId, currentStateName);
@@ -255,7 +255,7 @@ oppia.controller('StateResponses', [
           '$scope', '$injector', '$modalInstance',
           'oppiaExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
-          'explorationContextService', 'EditorStateService',
+          'ExplorationContextService', 'EditorStateService',
           'explorationStatesService', 'TrainingDataService',
           'AnswerClassificationService', 'FocusManagerService',
           'angularNameService', 'RULE_TYPE_CLASSIFIER',
@@ -263,11 +263,11 @@ oppia.controller('StateResponses', [
               $scope, $injector, $modalInstance,
               oppiaExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
-              explorationContextService, EditorStateService,
+              ExplorationContextService, EditorStateService,
               explorationStatesService, TrainingDataService,
               AnswerClassificationService, FocusManagerService,
               angularNameService, RULE_TYPE_CLASSIFIER) {
-            var _explorationId = explorationContextService.getExplorationId();
+            var _explorationId = ExplorationContextService.getExplorationId();
             var _stateName = EditorStateService.getActiveStateName();
             var _state = explorationStatesService.getState(_stateName);
 

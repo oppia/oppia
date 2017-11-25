@@ -668,14 +668,14 @@ oppia.factory('explorationStatesService', [
   'explorationInitStateNameService', 'AlertsService', 'changeListService',
   'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'AngularNameService',
-  'AnswerClassificationService', 'explorationContextService',
+  'AnswerClassificationService', 'ExplorationContextService',
   'UrlInterpolationService',
   function(
       $log, $modal, $filter, $location, $rootScope, $injector, $q,
       explorationInitStateNameService, AlertsService, changeListService,
       EditorStateService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, AngularNameService,
-      AnswerClassificationService, explorationContextService,
+      AnswerClassificationService, ExplorationContextService,
       UrlInterpolationService) {
     var _states = null;
     // Properties that have a different backend representation from the
@@ -802,7 +802,7 @@ oppia.factory('explorationStatesService', [
           if (solution) {
             var result = (
               AnswerClassificationService.getMatchingClassificationResult(
-                explorationContextService.getExplorationId(),
+                ExplorationContextService.getExplorationId(),
               stateName,
               _states.getState(stateName),
               solution.correctAnswer,

@@ -80,8 +80,8 @@ oppia.factory('ExplorationSaveService', [
           'post_publish_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'explorationContextService',
-          function($scope, $modalInstance, explorationContextService) {
+          '$scope', '$modalInstance', 'ExplorationContextService',
+          function($scope, $modalInstance, ExplorationContextService) {
             $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
@@ -90,7 +90,7 @@ oppia.factory('ExplorationSaveService', [
               $modalInstance.dismiss('cancel');
             };
             $scope.explorationId = (
-              explorationContextService.getExplorationId());
+              ExplorationContextService.getExplorationId());
           }
         ]
       });

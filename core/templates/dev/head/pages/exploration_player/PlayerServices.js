@@ -26,7 +26,7 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // in the learner view, or whether it is being previewed in the editor view.
 oppia.factory('ExplorationPlayerService', [
   '$http', '$rootScope', '$q', 'LearnerParamsService',
-  'AlertsService', 'AnswerClassificationService', 'explorationContextService',
+  'AlertsService', 'AnswerClassificationService', 'ExplorationContextService',
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
   'PlayerTranscriptService', 'ExplorationObjectFactory',
   'ExpressionInterpolationService', 'StateClassifierMappingService',
@@ -36,7 +36,7 @@ oppia.factory('ExplorationPlayerService', [
   'LanguageUtilService', 'NumberAttemptsService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
-      AlertsService, AnswerClassificationService, explorationContextService,
+      AlertsService, AnswerClassificationService, ExplorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       PlayerTranscriptService, ExplorationObjectFactory,
       ExpressionInterpolationService, StateClassifierMappingService,
@@ -44,9 +44,9 @@ oppia.factory('ExplorationPlayerService', [
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService,
       LanguageUtilService, NumberAttemptsService) {
-    var _explorationId = explorationContextService.getExplorationId();
+    var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
-      explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+      ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
     var _isLoggedIn = GLOBALS.userIsLoggedIn;
     var answerIsBeingProcessed = false;
 

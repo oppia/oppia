@@ -78,12 +78,12 @@ oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
     '$delegate', '$document', '$modal', '$timeout', 'FocusManagerService',
     'taRegisterTool', 'rteHelperService', 'AlertsService',
-    'explorationContextService', 'PAGE_CONTEXT',
+    'ExplorationContextService', 'PAGE_CONTEXT',
     'UrlInterpolationService',
     function(
       taOptions, $document, $modal, $timeout, FocusManagerService,
       taRegisterTool, rteHelperService, AlertsService,
-      explorationContextService, PAGE_CONTEXT,
+      ExplorationContextService, PAGE_CONTEXT,
       UrlInterpolationService) {
       taOptions.disableSanitizer = true;
       taOptions.forceTextAngularSanitize = false;
@@ -163,7 +163,7 @@ oppia.config(['$provide', function($provide) {
 
       rteHelperService.getRichTextComponents().forEach(function(componentDefn) {
         var buttonDisplay = rteHelperService.createToolbarIcon(componentDefn);
-        var canUseFs = explorationContextService.getPageContext() ===
+        var canUseFs = ExplorationContextService.getPageContext() ===
           PAGE_CONTEXT.EDITOR;
 
         taRegisterTool(componentDefn.id, {
@@ -451,10 +451,10 @@ oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
 }]);
 
 oppia.factory('rteHelperService', [
-  '$filter', '$log', '$interpolate', 'explorationContextService',
+  '$filter', '$log', '$interpolate', 'ExplorationContextService',
   'RTE_COMPONENT_SPECS', 'HtmlEscaperService', 'UrlInterpolationService',
   function(
-      $filter, $log, $interpolate, explorationContextService,
+      $filter, $log, $interpolate, ExplorationContextService,
       RTE_COMPONENT_SPECS, HtmlEscaperService, UrlInterpolationService) {
     var _RICH_TEXT_COMPONENTS = [];
 
@@ -509,7 +509,7 @@ oppia.factory('rteHelperService', [
       // Returns a DOM node.
       createRteElement: function(componentDefn, customizationArgsDict) {
         var el = $('<img/>');
-        if (explorationContextService.isInExplorationContext()) {
+        if (ExplorationContextService.isInExplorationContext()) {
           // TODO(sll): This extra key was introduced in commit
           // 19a934ce20d592a3fc46bd97a2f05f41d33e3d66 in order to retrieve an
           // image for RTE previews. However, it has had the unfortunate side-
@@ -518,7 +518,7 @@ oppia.factory('rteHelperService', [
           // convertRteToHtml(), but we need to find a less invasive way to
           // handle previews.
           customizationArgsDict = angular.extend(customizationArgsDict, {
-            explorationId: explorationContextService.getExplorationId()
+            explorationId: ExplorationContextService.getExplorationId()
           });
         }
         var componentPreviewUrlTemplate = componentDefn.previewUrlTemplate;
