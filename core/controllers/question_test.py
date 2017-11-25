@@ -32,9 +32,10 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         super(QuestionsBatchHandlerTest, self).setUp()
 
-        self.coll_id = '0'
-        self.exp_id = '1'
+        self.coll_id = 'coll_0'
+        self.exp_id = 'exp_1'
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         # Create a new collection and exploration.
         self.save_new_valid_collection(
@@ -75,18 +76,24 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
         question.validate()
 
         question_model = question_services.add_question(self.owner_id, question)
-        question = question_services.get_question_by_id(question_model.id)
-        question.add_skill('test', self.owner_id)
+        self.question = question_services.get_question_by_id(question_model.id)
+        self.question.add_skill('test', self.owner_id)
         collection_services.record_played_exploration_in_collection_context(
             self.owner_id, self.coll_id, self.exp_id)
 
         self.payload = {}
         self.payload['user_id'] = self.owner_id
-        self.payload['skill_ids'] = [skill_id]
+        self.payload['skill_ids'] = [skill_id, 'test']
 
     def test_get(self):
         """Test to verify the get method."""
-        json_response = self.get_json(
+        response_json = self.get_json(
             feconf.QUESTION_DATA_URL + '/batch/%s'% self.coll_id,
             self.payload, expect_errors=False)
-        print json_response
+        self.assertEqual(response_json[0], self.question.to_dict())
+
+        self.payload['user_id'] = self.viewer_id
+        response_json = self.get_json(
+            feconf.QUESTION_DATA_URL + '/batch/%s'% self.coll_id,
+            self.payload, expect_errors=False)
+        self.assertEqual(len(response_json), 0)

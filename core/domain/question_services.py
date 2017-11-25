@@ -132,7 +132,7 @@ def get_questions_by_ids(question_ids):
     question_model_list = question_models.QuestionModel.get_multi(question_ids)
     questions = []
     for question_model in question_model_list:
-        questions.append(get_question_from_model(question_model))
+        questions.append((get_question_from_model(question_model)).to_dict())
     return questions
 
 
@@ -246,9 +246,11 @@ def get_questions_batch(
     user_skill_ids = (
         collection_services.get_acquired_skills_of_user_given_collection_id(
             user_id, collection_id))
+
     question_skill_ids = list(set(user_skill_ids) & set(skill_ids))
     collection = collection_services.get_collection_by_id(collection_id)
     question_ids = []
+
     for skill_id in question_skill_ids:
         if skill_id in collection.skills:
             question_ids.extend(collection.skills[skill_id].question_ids)
