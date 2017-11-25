@@ -23,7 +23,7 @@ oppia.controller('StateInteraction', [
   'stateCustomizationArgsService', 'editabilityService',
   'explorationStatesService', 'graphDataService',
   'InteractionDetailsCacheService',
-  'oppiaExplorationHtmlFormatterService', 'UrlInterpolationService',
+  'ExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
   function($scope, $http, $rootScope, $modal, $injector, $filter,
       AlertsService, EditorStateService, HtmlEscaperService,
@@ -31,7 +31,7 @@ oppia.controller('StateInteraction', [
       stateCustomizationArgsService, editabilityService,
       explorationStatesService, graphDataService,
       InteractionDetailsCacheService,
-      oppiaExplorationHtmlFormatterService, UrlInterpolationService,
+      ExplorationHtmlFormatterService, UrlInterpolationService,
       SubtitledHtmlObjectFactory, stateSolutionService, stateContentService) {
     var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
 
@@ -66,7 +66,7 @@ oppia.controller('StateInteraction', [
       if (!stateInteractionIdService.savedMemento) {
         return '';
       }
-      return oppiaExplorationHtmlFormatterService.getInteractionHtml(
+      return ExplorationHtmlFormatterService.getInteractionHtml(
         stateInteractionIdService.savedMemento, interactionCustomizationArgs);
     };
 

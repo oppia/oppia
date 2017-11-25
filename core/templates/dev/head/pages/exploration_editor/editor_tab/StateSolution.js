@@ -19,14 +19,14 @@
 oppia.controller('StateSolution', [
   '$scope', '$rootScope', '$modal', 'EditorStateService', 'AlertsService',
   'INTERACTION_SPECS', 'stateSolutionService', 'explorationStatesService',
-  'SolutionVerificationService', 'oppiaExplorationHtmlFormatterService',
+  'SolutionVerificationService', 'ExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
   'SolutionObjectFactory', 'ExplorationContextService',
   'explorationWarningsService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function(
     $scope, $rootScope, $modal, EditorStateService, AlertsService,
     INTERACTION_SPECS, stateSolutionService, explorationStatesService,
-    SolutionVerificationService, oppiaExplorationHtmlFormatterService,
+    SolutionVerificationService, ExplorationHtmlFormatterService,
     stateInteractionIdService, stateHintsService, UrlInterpolationService,
     SolutionObjectFactory, ExplorationContextService,
     explorationWarningsService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
@@ -48,7 +48,7 @@ oppia.controller('StateSolution', [
     };
 
     $scope.correctAnswerEditorHtml = (
-      oppiaExplorationHtmlFormatterService.getInteractionHtml(
+      ExplorationHtmlFormatterService.getInteractionHtml(
         stateInteractionIdService.savedMemento,
         explorationStatesService.getInteractionCustomizationArgsMemento(
           EditorStateService.getActiveStateName()),
@@ -87,7 +87,7 @@ oppia.controller('StateSolution', [
             $scope, $modalInstance, stateSolutionService) {
             $scope.stateSolutionService = stateSolutionService;
             $scope.correctAnswerEditorHtml = (
-              oppiaExplorationHtmlFormatterService.getInteractionHtml(
+              ExplorationHtmlFormatterService.getInteractionHtml(
                 stateInteractionIdService.savedMemento,
                 explorationStatesService.getInteractionCustomizationArgsMemento(
                   EditorStateService.getActiveStateName()),

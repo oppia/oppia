@@ -21,14 +21,14 @@ oppia.directive('solutionEditor', [
   'EditorStateService', 'explorationStatesService',
   'explorationWarningsService', 'AlertsService',
   'SolutionObjectFactory', 'SolutionVerificationService',
-  'ExplorationContextService', 'oppiaExplorationHtmlFormatterService',
+  'ExplorationContextService', 'ExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateCustomizationArgsService',
   'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function($modal, UrlInterpolationService, stateSolutionService,
            EditorStateService, explorationStatesService,
            explorationWarningsService, AlertsService,
            SolutionObjectFactory, SolutionVerificationService,
-           ExplorationContextService, oppiaExplorationHtmlFormatterService,
+           ExplorationContextService, ExplorationHtmlFormatterService,
            stateInteractionIdService, stateCustomizationArgsService,
            INFO_MESSAGE_SOLUTION_IS_INVALID) {
     return {
@@ -50,7 +50,7 @@ oppia.directive('solutionEditor', [
           };
 
           $scope.getAnswerHtml = function () {
-            return oppiaExplorationHtmlFormatterService.getAnswerHtml(
+            return ExplorationHtmlFormatterService.getAnswerHtml(
               stateSolutionService.savedMemento.correctAnswer,
               stateInteractionIdService.savedMemento,
               stateCustomizationArgsService.savedMemento);
@@ -65,17 +65,17 @@ oppia.directive('solutionEditor', [
               controller: [
                 '$scope', '$modalInstance', 'stateInteractionIdService',
                 'stateSolutionService', 'EditorStateService',
-                'oppiaExplorationHtmlFormatterService',
+                'ExplorationHtmlFormatterService',
                 'explorationStatesService',
                 function($scope, $modalInstance, stateInteractionIdService,
                          stateSolutionService, EditorStateService,
-                         oppiaExplorationHtmlFormatterService,
+                         ExplorationHtmlFormatterService,
                          explorationStatesService) {
                   $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
                     'currentCorrectAnswerEditorHtmlForSolutionEditor');
                   $scope.correctAnswer = null;
                   $scope.correctAnswerEditorHtml = (
-                    oppiaExplorationHtmlFormatterService.getInteractionHtml(
+                    ExplorationHtmlFormatterService.getInteractionHtml(
                       stateInteractionIdService.savedMemento,
                       /* eslint-disable max-len */
                       explorationStatesService.getInteractionCustomizationArgsMemento(
