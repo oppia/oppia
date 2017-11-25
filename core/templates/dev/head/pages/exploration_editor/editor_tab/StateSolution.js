@@ -17,14 +17,14 @@
  */
 
 oppia.controller('StateSolution', [
-  '$scope', '$rootScope', '$modal', 'EditorStateService', 'alertsService',
+  '$scope', '$rootScope', '$modal', 'EditorStateService', 'AlertsService',
   'INTERACTION_SPECS', 'stateSolutionService', 'explorationStatesService',
   'SolutionVerificationService', 'oppiaExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
   'SolutionObjectFactory', 'explorationContextService',
   'explorationWarningsService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function(
-    $scope, $rootScope, $modal, EditorStateService, alertsService,
+    $scope, $rootScope, $modal, EditorStateService, AlertsService,
     INTERACTION_SPECS, stateSolutionService, explorationStatesService,
     SolutionVerificationService, oppiaExplorationHtmlFormatterService,
     stateInteractionIdService, stateHintsService, UrlInterpolationService,
@@ -72,7 +72,7 @@ oppia.controller('StateSolution', [
     };
 
     $scope.openAddOrUpdateSolutionModal = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
       $scope.inlineSolutionEditorIsActive = false;
 
@@ -118,7 +118,7 @@ oppia.controller('StateSolution', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]
@@ -139,7 +139,7 @@ oppia.controller('StateSolution', [
             explorationStatesService.updateSolutionValidity(
               currentStateName, false);
             explorationWarningsService.updateWarnings();
-            alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+            AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
           }
         );
 
@@ -151,7 +151,7 @@ oppia.controller('StateSolution', [
     $scope.deleteSolution = function(evt) {
       evt.stopPropagation();
 
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
@@ -166,7 +166,7 @@ oppia.controller('StateSolution', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]

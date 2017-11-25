@@ -18,15 +18,15 @@
 
 oppia.controller('StateInteraction', [
   '$scope', '$http', '$rootScope', '$modal', '$injector', '$filter',
-  'alertsService', 'EditorStateService', 'HtmlEscaperService',
+  'AlertsService', 'EditorStateService', 'HtmlEscaperService',
   'INTERACTION_SPECS', 'stateInteractionIdService',
   'stateCustomizationArgsService', 'editabilityService',
-  'explorationStatesService', 'graphDataService', 
+  'explorationStatesService', 'graphDataService',
   'InteractionDetailsCacheService',
   'oppiaExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
   function($scope, $http, $rootScope, $modal, $injector, $filter,
-      alertsService, EditorStateService, HtmlEscaperService,
+      AlertsService, EditorStateService, HtmlEscaperService,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
       explorationStatesService, graphDataService,
@@ -149,7 +149,7 @@ oppia.controller('StateInteraction', [
 
     $scope.openInteractionCustomizerModal = function() {
       if (editabilityService.isEditable()) {
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         $modal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -325,7 +325,7 @@ oppia.controller('StateInteraction', [
     };
 
     $scope.deleteInteraction = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
@@ -339,7 +339,7 @@ oppia.controller('StateInteraction', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]

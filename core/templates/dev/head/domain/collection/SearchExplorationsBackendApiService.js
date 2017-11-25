@@ -17,10 +17,10 @@
  */
 
 oppia.factory('SearchExplorationsBackendApiService', [
-  '$http', '$q', 'alertsService', 'SEARCH_EXPLORATION_URL_TEMPLATE',
+  '$http', '$q', 'AlertsService', 'SEARCH_EXPLORATION_URL_TEMPLATE',
   'UrlInterpolationService',
   function(
-      $http, $q, alertsService, SEARCH_EXPLORATION_URL_TEMPLATE,
+      $http, $q, AlertsService, SEARCH_EXPLORATION_URL_TEMPLATE,
       UrlInterpolationService) {
     var _fetchExplorations = function(
       searchQuery, successCallback, errorCallback) {
@@ -37,7 +37,7 @@ oppia.factory('SearchExplorationsBackendApiService', [
     };
     return {
       /**
-       * Returns exploration's metadata dict, given a search query. Search 
+       * Returns exploration's metadata dict, given a search query. Search
        * queries are tokens that will be matched against exploration's title
        * and objective.
        */

@@ -26,7 +26,7 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // in the learner view, or whether it is being previewed in the editor view.
 oppia.factory('ExplorationPlayerService', [
   '$http', '$rootScope', '$q', 'LearnerParamsService',
-  'alertsService', 'AnswerClassificationService', 'explorationContextService',
+  'AlertsService', 'AnswerClassificationService', 'explorationContextService',
   'PAGE_CONTEXT', 'oppiaExplorationHtmlFormatterService',
   'PlayerTranscriptService', 'ExplorationObjectFactory',
   'ExpressionInterpolationService', 'StateClassifierMappingService',
@@ -36,7 +36,7 @@ oppia.factory('ExplorationPlayerService', [
   'LanguageUtilService', 'NumberAttemptsService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
-      alertsService, AnswerClassificationService, explorationContextService,
+      AlertsService, AnswerClassificationService, explorationContextService,
       PAGE_CONTEXT, oppiaExplorationHtmlFormatterService,
       PlayerTranscriptService, ExplorationObjectFactory,
       ExpressionInterpolationService, StateClassifierMappingService,
@@ -115,13 +115,13 @@ oppia.factory('ExplorationPlayerService', [
       var newParams = makeParams(
         oldParams, initialState.paramChanges, [oldParams]);
       if (newParams === null) {
-        alertsService.addWarning('Expression parsing error.');
+        AlertsService.addWarning('Expression parsing error.');
         return;
       }
 
       var questionHtml = makeQuestion(initialState, [newParams]);
       if (questionHtml === null) {
-        alertsService.addWarning('Expression parsing error.');
+        AlertsService.addWarning('Expression parsing error.');
         return;
       }
 
@@ -342,7 +342,7 @@ oppia.factory('ExplorationPlayerService', [
         var feedbackHtml = makeFeedback(outcome.feedback, [oldParams]);
         if (feedbackHtml === null) {
           answerIsBeingProcessed = false;
-          alertsService.addWarning('Expression parsing error.');
+          AlertsService.addWarning('Expression parsing error.');
           return;
         }
 
@@ -351,7 +351,7 @@ oppia.factory('ExplorationPlayerService', [
             oldParams, newState.paramChanges, [oldParams]) : oldParams);
         if (newParams === null) {
           answerIsBeingProcessed = false;
-          alertsService.addWarning('Expression parsing error.');
+          AlertsService.addWarning('Expression parsing error.');
           return;
         }
 
@@ -360,7 +360,7 @@ oppia.factory('ExplorationPlayerService', [
         }]);
         if (questionHtml === null) {
           answerIsBeingProcessed = false;
-          alertsService.addWarning('Expression parsing error.');
+          AlertsService.addWarning('Expression parsing error.');
           return;
         }
 

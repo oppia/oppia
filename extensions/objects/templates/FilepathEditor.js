@@ -15,10 +15,10 @@
 // This directive can only be used in the context of an exploration.
 
 oppia.directive('filepathEditor', [
-  '$compile', '$http', '$sce', 'alertsService', 'explorationContextService',
+  '$compile', '$http', '$sce', 'AlertsService', 'explorationContextService',
   'OBJECT_EDITOR_URL_PREFIX',
   function(
-      $compile, $http, $sce, alertsService, explorationContextService,
+      $compile, $http, $sce, AlertsService, explorationContextService,
       OBJECT_EDITOR_URL_PREFIX) {
     return {
       link: function(scope, element) {
@@ -410,7 +410,7 @@ oppia.directive('filepathEditor', [
 
         $scope.getCropButtonBarDynamicStyles = function() {
           return 'left: ' + $scope.cropArea.x2 + 'px;' +
-                 'top: ' + $scope.cropArea.y1 + 'px;';          
+                 'top: ' + $scope.cropArea.y1 + 'px;';
         };
 
         $scope.getCropAreaDynamicStyles = function() {
@@ -589,7 +589,7 @@ oppia.directive('filepathEditor', [
             }
           };
           if (updateParent) {
-            alertsService.clearWarnings();
+            AlertsService.clearWarnings();
             $scope.$parent.value = filename;
           }
         };
@@ -604,10 +604,10 @@ oppia.directive('filepathEditor', [
         };
 
         $scope.saveUploadedFile = function() {
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
 
           if (!$scope.data.metadata.uploadedFile) {
-            alertsService.addWarning('No image file detected.');
+            AlertsService.addWarning('No image file detected.');
             return;
           }
 
@@ -619,7 +619,7 @@ oppia.directive('filepathEditor', [
 
           var resampledFile = convertImageDataToImageFile(resampledImageData);
           if (resampledFile === null) {
-            alertsService.addWarning('Could not get resampled file.');
+            AlertsService.addWarning('Could not get resampled file.');
             return;
           }
 
@@ -654,7 +654,7 @@ oppia.directive('filepathEditor', [
             // Remove the XSSI prefix.
             var transformedData = data.responseText.substring(5);
             var parsedResponse = JSON.parse(transformedData);
-            alertsService.addWarning(
+            AlertsService.addWarning(
               parsedResponse.error || 'Error communicating with server.');
             $scope.$apply();
           });
@@ -725,7 +725,7 @@ oppia.directive('filepathEditor', [
           e.preventDefault();
           $scope.userIsDraggingCropArea = false;
           $scope.userIsResizingCropArea = false;
-        }, false);        
+        }, false);
       }]
     };
   }

@@ -77,12 +77,12 @@ oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
     '$delegate', '$document', '$modal', '$timeout', 'FocusManagerService',
-    'taRegisterTool', 'rteHelperService', 'alertsService',
+    'taRegisterTool', 'rteHelperService', 'AlertsService',
     'explorationContextService', 'PAGE_CONTEXT',
     'UrlInterpolationService',
     function(
       taOptions, $document, $modal, $timeout, FocusManagerService,
-      taRegisterTool, rteHelperService, alertsService,
+      taRegisterTool, rteHelperService, AlertsService,
       explorationContextService, PAGE_CONTEXT,
       UrlInterpolationService) {
       taOptions.disableSanitizer = true;
@@ -185,7 +185,7 @@ oppia.config(['$provide', function($provide) {
               if (!canUseFs && componentDefn.requiresFs) {
                 var FS_UNAUTHORIZED_WARNING = 'Unfortunately, only ' +
                   'exploration authors can make changes involving files.';
-                alertsService.addWarning(FS_UNAUTHORIZED_WARNING);
+                AlertsService.addWarning(FS_UNAUTHORIZED_WARNING);
                 // Without this, the view will not update to show the warning.
                 textAngular.$editor().$parent.$apply();
                 return;
@@ -302,7 +302,7 @@ oppia.config([
     // Add an interceptor to convert requests to strings and to log and show
     // warnings for error responses.
     $httpProvider.interceptors.push([
-      '$q', '$log', 'alertsService', function($q, $log, alertsService) {
+      '$q', '$log', 'AlertsService', function($q, $log, AlertsService) {
         return {
           request: function(config) {
             if (config.data) {
@@ -327,7 +327,7 @@ oppia.config([
               if (rejection.data && rejection.data.error) {
                 warningMessage = rejection.data.error;
               }
-              alertsService.addWarning(warningMessage);
+              AlertsService.addWarning(warningMessage);
             }
             return $q.reject(rejection);
           }

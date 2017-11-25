@@ -19,13 +19,13 @@
 
 oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
-  'EditorStateService', 'alertsService', 'ResponsesService', 'RouterService',
+  'EditorStateService', 'AlertsService', 'ResponsesService', 'RouterService',
   'explorationContextService', 'TrainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
   'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
   function(
       $scope, $rootScope, $modal, $filter, stateInteractionIdService,
-      EditorStateService, alertsService, ResponsesService, RouterService,
+      EditorStateService, AlertsService, ResponsesService, RouterService,
       explorationContextService, TrainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
       INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
@@ -245,7 +245,7 @@ oppia.controller('StateResponses', [
     });
 
     $scope.openTeachOppiaModal = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
@@ -354,7 +354,7 @@ oppia.controller('StateResponses', [
     };
 
     $scope.openAddAnswerGroupModal = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
@@ -418,7 +418,7 @@ oppia.controller('StateResponses', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]
@@ -462,7 +462,7 @@ oppia.controller('StateResponses', [
       // state of the answer group.
       evt.stopPropagation();
 
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
@@ -476,7 +476,7 @@ oppia.controller('StateResponses', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]

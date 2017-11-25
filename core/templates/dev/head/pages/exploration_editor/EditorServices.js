@@ -47,10 +47,10 @@ oppia.factory('editabilityService', [function() {
 // A service that maintains a provisional list of changes to be committed to
 // the server.
 oppia.factory('changeListService', [
-  '$rootScope', '$log', 'alertsService', 'ExplorationDataService',
+  '$rootScope', '$log', 'AlertsService', 'ExplorationDataService',
   'autosaveInfoModalsService',
   function(
-      $rootScope, $log, alertsService, ExplorationDataService,
+      $rootScope, $log, AlertsService, ExplorationDataService,
       autosaveInfoModalsService) {
     // TODO(sll): Implement undo, redo functionality. Show a message on each
     // step saying what the step is doing.
@@ -116,7 +116,7 @@ oppia.factory('changeListService', [
           }
         },
         function() {
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           $log.error(
             'nonStrictValidationFailure: ' +
             JSON.stringify(explorationChangeList));
@@ -179,7 +179,7 @@ oppia.factory('changeListService', [
        */
       editExplorationProperty: function(backendName, newValue, oldValue) {
         if (!ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
-          alertsService.addWarning(
+          AlertsService.addWarning(
             'Invalid exploration property: ' + backendName);
           return;
         }
@@ -202,7 +202,7 @@ oppia.factory('changeListService', [
        */
       editStateProperty: function(stateName, backendName, newValue, oldValue) {
         if (!ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
-          alertsService.addWarning('Invalid state property: ' + backendName);
+          AlertsService.addWarning('Invalid state property: ' + backendName);
           return;
         }
         addChange({
@@ -247,7 +247,7 @@ oppia.factory('changeListService', [
       },
       undoLastChange: function() {
         if (explorationChangeList.length === 0) {
-          alertsService.addWarning('There are no changes to undo.');
+          AlertsService.addWarning('There are no changes to undo.');
           return;
         }
         var lastChange = explorationChangeList.pop();
@@ -260,8 +260,8 @@ oppia.factory('changeListService', [
 
 // A data service that stores data about the rights for this exploration.
 oppia.factory('explorationRightsService', [
-  '$http', '$q', 'ExplorationDataService', 'alertsService',
-  function($http, $q, ExplorationDataService, alertsService) {
+  '$http', '$q', 'ExplorationDataService', 'AlertsService',
+  function($http, $q, ExplorationDataService, AlertsService) {
     return {
       init: function(
           ownerNames, editorNames, viewerNames, status, clonedFrom,
@@ -305,7 +305,7 @@ oppia.factory('explorationRightsService', [
           make_community_owned: true
         }).then(function(response) {
           var data = response.data;
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
             data.rights.viewer_names, data.rights.status,
@@ -326,7 +326,7 @@ oppia.factory('explorationRightsService', [
           viewable_if_private: viewableIfPrivate
         }).then(function(response) {
           var data = response.data;
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
             data.rights.viewer_names, data.rights.status,
@@ -348,7 +348,7 @@ oppia.factory('explorationRightsService', [
           new_member_username: newMemberUsername
         }).then(function(response) {
           var data = response.data;
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
             data.rights.viewer_names, data.rights.status,
@@ -368,7 +368,7 @@ oppia.factory('explorationRightsService', [
           make_public: true
         }).then(function(response) {
           var data = response.data;
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
             data.rights.viewer_names, data.rights.status,
@@ -382,7 +382,7 @@ oppia.factory('explorationRightsService', [
         var that = this;
 
         var explorationModeratorRightsUrl = (
-          '/createhandler/moderatorrights/' + 
+          '/createhandler/moderatorrights/' +
           ExplorationDataService.explorationId);
         $http.put(explorationModeratorRightsUrl, {
           action: action,
@@ -390,7 +390,7 @@ oppia.factory('explorationRightsService', [
           version: ExplorationDataService.data.version
         }).then(function(response) {
           var data = response.data;
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
             data.rights.viewer_names, data.rights.status,
@@ -403,8 +403,8 @@ oppia.factory('explorationRightsService', [
 ]);
 
 oppia.factory('explorationPropertyService', [
-  '$rootScope', '$log', 'changeListService', 'alertsService',
-  function($rootScope, $log, changeListService, alertsService) {
+  '$rootScope', '$log', 'changeListService', 'AlertsService',
+  function($rootScope, $log, changeListService, AlertsService) {
     // Public base API for data services corresponding to exploration properties
     // (title, category, etc.)
 
@@ -474,7 +474,7 @@ oppia.factory('explorationPropertyService', [
           return;
         }
 
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         var newBackendValue = angular.copy(this.displayed);
         var oldBackendValue = angular.copy(this.savedMemento);
@@ -665,14 +665,14 @@ oppia.factory('explorationAutomaticTextToSpeechService', [
 // mementos.
 oppia.factory('explorationStatesService', [
   '$log', '$modal', '$filter', '$location', '$rootScope', '$injector', '$q',
-  'explorationInitStateNameService', 'alertsService', 'changeListService',
+  'explorationInitStateNameService', 'AlertsService', 'changeListService',
   'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'AngularNameService',
   'AnswerClassificationService', 'explorationContextService',
   'UrlInterpolationService',
   function(
       $log, $modal, $filter, $location, $rootScope, $injector, $q,
-      explorationInitStateNameService, alertsService, changeListService,
+      explorationInitStateNameService, AlertsService, changeListService,
       EditorStateService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, AngularNameService,
       AnswerClassificationService, explorationContextService,
@@ -834,7 +834,7 @@ oppia.factory('explorationStatesService', [
       isNewStateNameValid: function(newStateName, showWarnings) {
         if (_states.hasState(newStateName)) {
           if (showWarnings) {
-            alertsService.addWarning('A state with this name already exists.');
+            AlertsService.addWarning('A state with this name already exists.');
           }
           return false;
         }
@@ -917,10 +917,10 @@ oppia.factory('explorationStatesService', [
           return;
         }
         if (_states.hasState(newStateName)) {
-          alertsService.addWarning('A state with this name already exists.');
+          AlertsService.addWarning('A state with this name already exists.');
           return;
         }
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         _states.addState(newStateName);
 
@@ -931,14 +931,14 @@ oppia.factory('explorationStatesService', [
         }
       },
       deleteState: function(deleteStateName) {
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         var initStateName = explorationInitStateNameService.displayed;
         if (deleteStateName === initStateName) {
           return;
         }
         if (!_states.hasState(deleteStateName)) {
-          alertsService.addWarning(
+          AlertsService.addWarning(
             'No state with name ' + deleteStateName + ' exists.');
           return;
         }
@@ -966,7 +966,7 @@ oppia.factory('explorationStatesService', [
 
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
+                AlertsService.clearWarnings();
               };
             }
           ]
@@ -993,10 +993,10 @@ oppia.factory('explorationStatesService', [
           return;
         }
         if (_states.hasState(newStateName)) {
-          alertsService.addWarning('A state with this name already exists.');
+          AlertsService.addWarning('A state with this name already exists.');
           return;
         }
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         _states.renameState(oldStateName, newStateName);
 
@@ -1020,8 +1020,8 @@ oppia.factory('explorationStatesService', [
 ]);
 
 oppia.factory('statePropertyService', [
-  '$log', 'changeListService', 'alertsService', 'explorationStatesService',
-  function($log, changeListService, alertsService, explorationStatesService) {
+  '$log', 'changeListService', 'AlertsService', 'explorationStatesService',
+  function($log, changeListService, AlertsService, explorationStatesService) {
     // Public base API for data services corresponding to state properties
     // (interaction id, content, etc.)
     // WARNING: This should be initialized only in the context of the state
@@ -1080,7 +1080,7 @@ oppia.factory('statePropertyService', [
           return;
         }
 
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         var setterFunc = explorationStatesService[this.setterMethodKey];
         setterFunc(this.stateName, angular.copy(this.displayed));

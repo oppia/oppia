@@ -21,7 +21,7 @@ oppia.factory('ResponsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
   'AnswerGroupsCacheService', 'EditorStateService', 'changeListService',
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
-  'stateSolutionService', 'SolutionVerificationService', 'alertsService',
+  'stateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'explorationContextService', 'explorationWarningsService',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
@@ -29,7 +29,7 @@ oppia.factory('ResponsesService', [
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       AnswerGroupsCacheService, EditorStateService, changeListService,
       explorationStatesService, graphDataService, OutcomeObjectFactory,
-      stateSolutionService, SolutionVerificationService, alertsService,
+      stateSolutionService, SolutionVerificationService, AlertsService,
       explorationContextService, explorationWarningsService,
       INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
@@ -80,7 +80,7 @@ oppia.factory('ResponsesService', [
                 currentStateName, true);
               explorationWarningsService.updateWarnings();
               if (!solutionWasPreviouslyValid) {
-                alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
+                AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
               }
             },
             function() {
@@ -88,10 +88,10 @@ oppia.factory('ResponsesService', [
                 currentStateName, false);
               explorationWarningsService.updateWarnings();
               if (solutionWasPreviouslyValid) {
-                alertsService.addInfoMessage(
+                AlertsService.addInfoMessage(
                   INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
               } else {
-                alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+                AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
               }
             }
           );
