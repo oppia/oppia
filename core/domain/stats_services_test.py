@@ -1262,14 +1262,15 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             visualization = visualizations[0]
             self.assertEqual(visualization['id'], 'FrequencyTable')
+            # Ties will appear in same order they are submitted in.
             self.assertEqual(visualization['data'], [{
                 'answer': 'Answer A',
                 'frequency': 3
             }, {
-                'answer': 'Answer B',
+                'answer': 'Answer C',
                 'frequency': 1
             }, {
-                'answer': 'Answer C',
+                'answer': 'Answer B',
                 'frequency': 1
             }])
 
