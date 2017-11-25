@@ -35,12 +35,16 @@ oppia.directive('hintButton', [
       controller: [
         '$scope', '$rootScope', '$timeout', 'NumberAttemptsService',
         'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
+        'FocusManagerService', 'DeviceInfoService',
         function($scope, $rootScope, $timeout, NumberAttemptsService,
-            WindowDimensionsService, TWO_CARD_THRESHOLD_PX) {
+            WindowDimensionsService, TWO_CARD_THRESHOLD_PX, FocusManagerService,
+            DeviceInfoService) {
           $scope.isShowingHintTooltip = false;
 
           var viewportIsNarrow =
             WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
+
+          $scope.HintButtonId = 'HintButton';
 
           $scope.getTooltipPlacement = function() {
             return (viewportIsNarrow && $scope.isSupplementalCard()) ?
@@ -53,6 +57,10 @@ oppia.directive('hintButton', [
               $timeout(function() {
                 $scope.isShowingHintTooltip = true;
                 $scope.isShowingNeedHintMessage = true;
+                // Auto scroll to hint button only if using mobile device.
+                if (DeviceInfoService.isMobileDevice()) {
+                  FocusManagerService.setFocus($scope.HintButtonId);
+                }
               }, SHOW_NEED_HINT_MESSAGE_DELAY);
             }
           };
