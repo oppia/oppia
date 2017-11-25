@@ -377,22 +377,6 @@ oppia.config(['toastrConfig', function(toastrConfig) {
   });
 }]);
 
-// Returns true if the user is on a mobile device.
-// See: http://stackoverflow.com/a/14301832/5020618
-oppia.factory('deviceInfoService', ['$window', function($window) {
-  return {
-    isMobileDevice: function() {
-      return typeof $window.orientation !== 'undefined';
-    },
-    isMobileUserAgent: function() {
-      return /Mobi/.test(navigator.userAgent);
-    },
-    hasTouchEvents: function() {
-      return 'ontouchstart' in $window;
-    }
-  };
-}]);
-
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
 oppia.factory('$exceptionHandler', ['$log', function($log) {
@@ -663,30 +647,6 @@ oppia.factory('urlService', ['$window', function($window) {
   };
 }]);
 
-// Service for computing the window dimensions.
-oppia.factory('windowDimensionsService', ['$window', function($window) {
-  var onResizeHooks = [];
-  angular.element($window).bind('resize', function() {
-    onResizeHooks.forEach(function(hookFn) {
-      hookFn();
-    });
-  });
-  return {
-    getWidth: function() {
-      return (
-        $window.innerWidth || document.documentElement.clientWidth ||
-        document.body.clientWidth);
-    },
-    registerOnResizeHook: function(hookFn) {
-      onResizeHooks.push(hookFn);
-    },
-    isWindowNarrow: function() {
-      var NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
-      return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
-    }
-  };
-}]);
-
 // Service for sending events to Google Analytics.
 //
 // Note that events are only sent if the CAN_SEND_ANALYTICS_EVENTS flag is
@@ -858,19 +818,6 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     },
     registerFinishExploration: function() {
       _sendEventToGoogleAnalytics('PlayerFinishExploration', 'click', '');
-    }
-  };
-}]);
-
-// Shim service for functions on $window that allows these functions to be
-// mocked in unit tests.
-oppia.factory('currentLocationService', ['$window', function($window) {
-  return {
-    getHash: function() {
-      return $window.location.hash;
-    },
-    getPathname: function() {
-      return $window.location.pathname;
     }
   };
 }]);

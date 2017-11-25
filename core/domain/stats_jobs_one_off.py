@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -111,7 +113,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             value = {
                 'event_type': feconf.EVENT_TYPE_STATE_HIT,
                 'version': item.exploration_version,
-                'state_name': item.state_name,
+                'state_name': item.state_name.encode('utf-8'),
                 'session_id': item.session_id,
                 'created_on': utils.get_time_in_millisecs(item.created_on)
             }
@@ -127,7 +129,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             value = {
                 'event_type': GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS,
                 'version': item.exploration_version,
-                'state_name': item.state_name,
+                'state_name': item.state_name.encode('utf-8'),
                 'total_answers_count': total_answers_count,
                 'useful_feedback_count': useful_feedback_count
             }
@@ -265,7 +267,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             if version == 1:
                 # Create default state stats mapping for the first version.
                 for state_name in versioned_exploration.states:
-                    state_stats_mapping[state_name] = (
+                    state_stats_mapping[state_name.encode('utf-8')] = (
                         stats_domain.StateStats.create_default())
             else:
                 change_list = snapshots_by_version[version - 1]['commit_cmds']
@@ -273,14 +275,18 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 # Handling state additions, renames and deletions.
                 for change_dict in change_list:
                     if change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
-                        state_stats_mapping[change_dict['state_name']] = (
-                            stats_domain.StateStats.create_default())
+                        state_stats_mapping[change_dict[
+                            'state_name'].encode('utf-8')] = (
+                                stats_domain.StateStats.create_default())
                     elif change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
-                        state_stats_mapping.pop(change_dict['state_name'])
+                        state_stats_mapping.pop(
+                            change_dict['state_name'].encode('utf-8'))
                     elif change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
-                        state_stats_mapping[change_dict['new_state_name']] = (
-                            state_stats_mapping.pop(
-                                change_dict['old_state_name']))
+                        state_stats_mapping[change_dict[
+                            'new_state_name'].encode('utf-8')] = (
+                                state_stats_mapping.pop(
+                                    change_dict['old_state_name'].encode(
+                                        'utf-8')))
                     elif change_dict['cmd'] == 'AUTO_revert_version_number':
                         revert_to_version = change_dict['version_number']
 
@@ -307,11 +313,19 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
             # Compute total_hit_count and first_hit_count for the states.
             for state_name in state_hit_counts_for_this_version:
-                state_stats_mapping[state_name].total_hit_count_v1 += (
-                    state_hit_counts_for_this_version[state_name][
-                        'total_hit_count'])
-                state_stats_mapping[state_name].first_hit_count_v1 += (
-                    len(state_session_ids_by_version[version][state_name]))
+                try:
+                    state_stats_mapping[state_name].total_hit_count_v1 += (
+                        state_hit_counts_for_this_version[state_name][
+                            'total_hit_count'])
+                    state_stats_mapping[state_name].first_hit_count_v1 += (
+                        len(state_session_ids_by_version[version][state_name]))
+                except KeyError:
+                    yield (
+                        'ERROR: State not in stats mapping exp_id %s, version '
+                        '%s, State %s, state_stats_mapping [%s]' % (
+                            exp_id, version, state_name.encode('utf-8'),
+                            ', '.join(map(str, state_stats_mapping.keys()))))
+                    raise
 
             # Compute num_completions for the states.
             for state_name in state_completion_counts_for_this_version:
@@ -345,15 +359,32 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 # implicit, pseudo-END state.
                 init_state = versioned_exploration.states[
                     versioned_exploration.init_state_name]
-                max_first_hit_from_init_state = max([
-                    state_stats_mapping[
-                        answer_group.outcome.dest].first_hit_count_v1
-                    for answer_group in init_state.interaction.answer_groups
-                    if answer_group.outcome.dest != (
-                        versioned_exploration.init_state_name) and (
-                            answer_group.outcome.dest in (
-                                versioned_exploration.states))] or [0])
-                num_actual_starts = max_first_hit_from_init_state
+                first_hit_counts_from_init_state = []
+                # Log exp_id, exp_version, state_names, state_stats_mapping.
+                for answer_group in init_state.interaction.answer_groups:
+                    dest_state = answer_group.outcome.dest
+                    if dest_state != (
+                            versioned_exploration.init_state_name) and (
+                                dest_state in versioned_exploration.states):
+                        try:
+                            first_hit_counts_from_init_state.append(
+                                state_stats_mapping[
+                                    dest_state.encode(
+                                        'utf-8')].first_hit_count_v1)
+                        except KeyError:
+                            state_names = [s.encode('utf-8') for s in (
+                                versioned_exploration.states)]
+                            yield (
+                                'ERROR: Pseudo-END state: exp_id %s, version '
+                                '%s, dest-state: %s, states [%s], '
+                                'state_stats_mapping [%s]' % (
+                                    exp_id, version, dest_state,
+                                    ', '.join(map(str, state_names)),
+                                    ', '.join(
+                                        map(str, state_stats_mapping.keys()))))
+                            raise
+                num_actual_starts = max(
+                    first_hit_counts_from_init_state or [0])
 
             # Check if model already exists. If it does, update it, otherwise
             # create a fresh ExplorationStatsModel instance.

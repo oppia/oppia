@@ -429,9 +429,6 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
-        # Load exploration 0.
-        exp_services.load_demo(self.EXP_ID)
-
         # Login and create exploration.
         self.login(self.EDITOR_EMAIL)
 

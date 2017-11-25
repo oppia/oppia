@@ -40,6 +40,11 @@ import feconf
 MIGRATED_STATE_ANSWER_SESSION_ID_2017 = 'migrated_state_answer_session_id_2017'
 MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC = 0.0
 
+# These values dictate the types of calculation objects stored in
+# StateAnswersCalcOutput.
+CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST = 'AnswerFrequencyList'
+CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS = (
+    'CategorizedAnswerFrequencyLists')
 
 class ExplorationStats(object):
     """Domain object representing analytics data for an exploration."""
@@ -523,22 +528,117 @@ class SubmittedAnswer(object):
                 self.classification_categorization)
 
 
+class AnswerOccurrence(object):
+    """Domain object that represents a specific answer that occurred some number
+    of times.
+    """
+    def __init__(self, answer, frequency):
+        """Initialize domain object for answer occurrences."""
+        self.answer = answer
+        self.frequency = frequency
+
+    def to_raw_type(self):
+        return {
+            'answer': self.answer,
+            'frequency': self.frequency
+        }
+
+    @classmethod
+    def from_raw_type(cls, answer_occurrence_dict):
+        return cls(
+            answer_occurrence_dict['answer'],
+            answer_occurrence_dict['frequency'])
+
+
+class AnswerCalculationOutput(object):
+    """Domain object superclass that represents the output of an answer
+    calculation.
+    """
+    def __init__(self, calculation_output_type):
+        self.calculation_output_type = calculation_output_type
+
+
+class AnswerFrequencyList(AnswerCalculationOutput):
+    """Domain object that represents a list of AnswerOccurrences."""
+    def __init__(self, answer_occurrences=None):
+        """Initialize domain object for answer frequency list for a given list
+        of AnswerOccurrence objects (default is empty list).
+        """
+        super(AnswerFrequencyList, self).__init__(
+            CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
+        self.answer_occurrences = (
+            answer_occurrences if answer_occurrences else [])
+
+    def add_answer(self, answer_occurrence):
+        """Adds a new AnswerOccurrence object."""
+        self.answer_occurrences.append(answer_occurrence)
+
+    def to_raw_type(self):
+        return [
+            answer_occurrence.to_raw_type()
+            for answer_occurrence in self.answer_occurrences]
+
+    @classmethod
+    def from_raw_type(cls, answer_occurrence_list):
+        return cls([
+            AnswerOccurrence.from_raw_type(answer_occurrence_dict)
+            for answer_occurrence_dict in answer_occurrence_list])
+
+
+class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
+    """AnswerFrequencyLists that are categorized based on arbitrary categories.
+    """
+    def __init__(self, categorized_answer_freq_lists=None):
+        """Initialize domain object for categorized answer frequency lists for
+        a given dict (default is empty).
+        """
+        super(CategorizedAnswerFrequencyLists, self).__init__(
+            CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS)
+        self.categorized_answer_freq_lists = (
+            categorized_answer_freq_lists
+            if categorized_answer_freq_lists else {})
+
+    def to_raw_type(self):
+        return {
+            category: answer_frequency_list.to_raw_type()
+            for category, answer_frequency_list in (
+                self.categorized_answer_freq_lists.iteritems())
+        }
+
+    @classmethod
+    def from_raw_type(cls, categorized_frequency_dict):
+        return cls({
+            category: AnswerFrequencyList.from_raw_type(answer_occurrence_list)
+            for category, answer_occurrence_list in (
+                categorized_frequency_dict.iteritems())
+        })
+
+
 class StateAnswersCalcOutput(object):
     """Domain object that represents output of calculations operating on
     state answers.
     """
-
     def __init__(self, exploration_id, exploration_version, state_name,
-                 calculation_id, calculation_output):
+                 interaction_id, calculation_id, calculation_output):
         """Initialize domain object for state answers calculation output.
 
-        calculation_output is a list of dicts containing the results of the
-        specific calculation.
+        Args:
+            exploration_id: str. The ID of the exploration corresponding to the
+                answer calculation output.
+            exploration_version: str. The version of the exploration
+                corresponding to the answer calculation output.
+            state_name: str. The name of the exploration state to which the
+                aggregated answers were submitted.
+            calculation_id: str. Which calculation was performed on the given
+                answer data.
+            calculation_output: AnswerCalculationOutput. The output of an
+                answer aggregation operation.
         """
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version
         self.state_name = state_name
         self.calculation_id = calculation_id
+        self.interaction_id = interaction_id
         self.calculation_output = calculation_output
 
     def save(self):
@@ -546,7 +646,9 @@ class StateAnswersCalcOutput(object):
         self.validate()
         stats_models.StateAnswersCalcOutputModel.create_or_update(
             self.exploration_id, self.exploration_version, self.state_name,
-            self.calculation_id, self.calculation_output)
+            self.interaction_id, self.calculation_id,
+            self.calculation_output.calculation_output_type,
+            self.calculation_output.to_raw_type())
 
     def validate(self):
         """Validates StateAnswersCalcOutputModel domain object entity before
@@ -573,7 +675,15 @@ class StateAnswersCalcOutput(object):
                 'Expected calculation_id to be a string, received %s' % str(
                     self.calculation_id))
 
-        output_data = self.calculation_output
+        if (not isinstance(self.calculation_output, AnswerFrequencyList)
+                and not isinstance(
+                    self.calculation_output, CategorizedAnswerFrequencyLists)):
+            raise utils.ValidationError(
+                'Expected calculation output to be one of AnswerFrequencyList '
+                'or CategorizedAnswerFrequencyLists, encountered: %s' % (
+                    self.calculation_output))
+
+        output_data = self.calculation_output.to_raw_type()
         if sys.getsizeof(output_data) > max_bytes_per_calc_output_data:
             # TODO(msl): find a better way to deal with big
             # calculation output data, e.g. just skip. At the moment,

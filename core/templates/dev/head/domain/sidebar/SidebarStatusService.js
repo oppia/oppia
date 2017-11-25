@@ -18,12 +18,12 @@
  */
 
 oppia.factory('SidebarStatusService', [
-  'windowDimensionsService', function(windowDimensionsService) {
+  'WindowDimensionsService', function(WindowDimensionsService) {
     var pendingSidebarClick = false;
     var sidebarIsShown = false;
 
     var _openSidebar = function() {
-      if (windowDimensionsService.isWindowNarrow() && !sidebarIsShown) {
+      if (WindowDimensionsService.isWindowNarrow() && !sidebarIsShown) {
         sidebarIsShown = true;
         pendingSidebarClick = true;
       }

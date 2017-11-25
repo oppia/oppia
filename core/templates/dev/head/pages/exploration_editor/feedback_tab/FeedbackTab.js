@@ -19,13 +19,13 @@
 oppia.controller('FeedbackTab', [
   '$scope', '$http', '$modal', '$timeout', '$rootScope', 'alertsService',
   'oppiaDatetimeFormatter', 'ThreadStatusDisplayService',
-  'ThreadDataService', 'explorationStatesService', 'explorationData',
+  'ThreadDataService', 'explorationStatesService', 'ExplorationDataService',
   'changeListService', 'StateObjectFactory', 'UrlInterpolationService',
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
     $scope, $http, $modal, $timeout, $rootScope, alertsService,
     oppiaDatetimeFormatter, ThreadStatusDisplayService,
-    ThreadDataService, explorationStatesService, explorationData,
+    ThreadDataService, explorationStatesService, ExplorationDataService,
     changeListService, StateObjectFactory, UrlInterpolationService,
     ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
     $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
@@ -223,14 +223,14 @@ oppia.controller('FeedbackTab', [
             if (result.action === ACTION_ACCEPT_SUGGESTION) {
               var suggestion = $scope.activeThread.suggestion;
               var stateName = suggestion.state_name;
-              var stateDict = explorationData.data.states[stateName];
+              var stateDict = ExplorationDataService.data.states[stateName];
               var state = StateObjectFactory.createFromBackendDict(
                 stateName, stateDict);
               state.content.setHtml(suggestion.suggestion_html);
               if (result.audioUpdateRequired) {
                 state.content.markAllAudioAsNeedingUpdate();
               }
-              explorationData.data.version += 1;
+              ExplorationDataService.data.version += 1;
               explorationStatesService.setState(stateName, state);
               $rootScope.$broadcast('refreshVersionHistory', {
                 forceRefresh: true

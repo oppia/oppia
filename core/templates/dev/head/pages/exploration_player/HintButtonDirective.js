@@ -26,23 +26,25 @@ oppia.directive('hintButton', [
       scope: {
         onClickHintButton: '&',
         allHintsAreExhausted: '&',
-        currentHintIsAvailable: '&'
+        currentHintIsAvailable: '&',
+        isSupplementalCard: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
         'hint_button_directive.html'),
       controller: [
         '$scope', '$rootScope', '$timeout', 'NumberAttemptsService',
-        'windowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
+        'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
         function($scope, $rootScope, $timeout, NumberAttemptsService,
-            windowDimensionsService, TWO_CARD_THRESHOLD_PX) {
+            WindowDimensionsService, TWO_CARD_THRESHOLD_PX) {
           $scope.isShowingHintTooltip = false;
 
-          var viewportIsNarrow = 
-            windowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
+          var viewportIsNarrow =
+            WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
 
           $scope.getTooltipPlacement = function() {
-            return viewportIsNarrow ? 'right' : 'left';
+            return (viewportIsNarrow && $scope.isSupplementalCard()) ?
+              'right' : 'left';
           };
 
           var showNeedHintIfNecessary = function() {
