@@ -29,9 +29,9 @@ oppia.directive('oppiaNoninteractiveVideo', [
         '/rich_text_components/Video/directives/video_directive.html'),
       controller: [
         '$scope', '$attrs', 'explorationContextService', '$element',
-        'autoplayedVideosService', 'PAGE_CONTEXT', '$timeout', '$window',
+        'AutoplayedVideosService', 'PAGE_CONTEXT', '$timeout', '$window',
         function($scope, $attrs, explorationContextService, $element,
-          autoplayedVideosService, PAGE_CONTEXT, $timeout, $window) {
+          AutoplayedVideosService, PAGE_CONTEXT, $timeout, $window) {
           var start = (
             HtmlEscaperService.escapedJsonToObj($attrs.startWithValue));
           var end = HtmlEscaperService.escapedJsonToObj($attrs.endWithValue);
@@ -61,10 +61,10 @@ oppia.directive('oppiaNoninteractiveVideo', [
               PAGE_CONTEXT.LEARNER && autoplayVal) {
               // If it has been autoplayed then do not autoplay again.
               if (
-                !autoplayedVideosService.hasVideoBeenAutoplayed(
+                !AutoplayedVideosService.hasVideoBeenAutoplayed(
                   $scope.videoId) && isVisible) {
                 $scope.autoplaySuffix = '&autoplay=1';
-                autoplayedVideosService.addAutoplayedVideo($scope.videoId);
+                AutoplayedVideosService.addAutoplayedVideo($scope.videoId);
               }
             }
 
