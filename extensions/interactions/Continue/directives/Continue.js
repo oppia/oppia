@@ -20,8 +20,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveContinue', [
-  'HtmlEscaperService', 'continueRulesService',
-  function(HtmlEscaperService, continueRulesService) {
+  'HtmlEscaperService', 'continueRulesService', 'UrlInterpolationService',
+  function(HtmlEscaperService, continueRulesService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -58,34 +58,36 @@ oppia.directive('oppiaInteractiveContinue', [
   }
 ]);
 
-oppia.directive('oppiaResponseContinue', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-      '/interactions/Continue/directives/' +
-      'continue_response_directive.html'),
-    controller: [
-      '$scope', '$attrs', 'HtmlEscaperService',
-      function($scope, $attrs, HtmlEscaperService) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+oppia.directive('oppiaResponseContinue', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/Continue/directives/' +
+        'continue_response_directive.html'),
+      controller: [
+        '$scope', '$attrs', 'HtmlEscaperService',
+        function($scope, $attrs, HtmlEscaperService) {
+          $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
-  };
+    };
 }]);
 
-oppia.directive('oppiaShortResponseContinue', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-      '/interactions/Continue/directives/' +
-      'continue_short_response_directive.html'),
-    controller: [
-      '$scope', '$attrs', 'HtmlEscaperService',
-      function($scope, $attrs, HtmlEscaperService) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+oppia.directive('oppiaShortResponseContinue', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/Continue/directives/' +
+        'continue_short_response_directive.html'),
+      controller: [
+        '$scope', '$attrs', 'HtmlEscaperService',
+        function($scope, $attrs, HtmlEscaperService) {
+          $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
-  };
+    };
 }]);
 
 oppia.factory('continueRulesService', [function() {

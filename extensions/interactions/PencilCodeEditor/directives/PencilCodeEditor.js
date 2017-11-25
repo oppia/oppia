@@ -21,7 +21,8 @@
  */
 
 oppia.directive('oppiaInteractivePencilCodeEditor', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -170,7 +171,8 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
 ]);
 
 oppia.directive('oppiaResponsePencilCodeEditor', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -186,7 +188,8 @@ oppia.directive('oppiaResponsePencilCodeEditor', [
 ]);
 
 oppia.directive('oppiaShortResponsePencilCodeEditor', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

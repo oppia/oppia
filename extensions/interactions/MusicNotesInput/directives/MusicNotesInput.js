@@ -78,8 +78,10 @@ oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
 oppia.directive('oppiaInteractiveMusicNotesInput', [
   'HtmlEscaperService', 'NOTE_NAMES_TO_MIDI_VALUES',
   'musicNotesInputRulesService', 'musicPhrasePlayerService',
+  'UrlInterpolationService',
   function(HtmlEscaperService, NOTE_NAMES_TO_MIDI_VALUES,
-      musicNotesInputRulesService, musicPhrasePlayerService) {
+      musicNotesInputRulesService, musicPhrasePlayerService,
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -858,7 +860,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
 ]);
 
 oppia.directive('oppiaResponseMusicNotesInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -885,7 +888,8 @@ oppia.directive('oppiaResponseMusicNotesInput', [
 ]);
 
 oppia.directive('oppiaShortResponseMusicNotesInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

@@ -20,8 +20,9 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveInteractiveMap', [
-  'HtmlEscaperService', 'interactiveMapRulesService', function(
-  HtmlEscaperService, interactiveMapRulesService) {
+  'HtmlEscaperService', 'interactiveMapRulesService', 'UrlInterpolationService',
+  function(
+      HtmlEscaperService, interactiveMapRulesService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -85,7 +86,8 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
 ]);
 
 oppia.directive('oppiaResponseInteractiveMap', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -107,7 +109,8 @@ oppia.directive('oppiaResponseInteractiveMap', [
 ]);
 
 oppia.directive('oppiaShortResponseInteractiveMap', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

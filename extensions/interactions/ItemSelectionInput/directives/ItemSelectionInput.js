@@ -21,8 +21,11 @@
  */
 
 oppia.directive('oppiaInteractiveItemSelectionInput', [
-  'HtmlEscaperService', 'itemSelectionInputRulesService', function(
-      HtmlEscaperService, itemSelectionInputRulesService) {
+  'HtmlEscaperService', 'itemSelectionInputRulesService',
+  'UrlInterpolationService',
+  function(
+      HtmlEscaperService, itemSelectionInputRulesService,
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -94,7 +97,8 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
 ]);
 
 oppia.directive('oppiaResponseItemSelectionInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -109,7 +113,8 @@ oppia.directive('oppiaResponseItemSelectionInput', [
 ]);
 
 oppia.directive('oppiaShortResponseItemSelectionInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

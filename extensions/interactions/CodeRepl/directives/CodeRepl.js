@@ -20,8 +20,8 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaInteractiveCodeRepl', [
-  'HtmlEscaperService', 'codeReplRulesService',
-  function(HtmlEscaperService, codeReplRulesService) {
+  'HtmlEscaperService', 'codeReplRulesService', 'UrlInterpolationService',
+  function(HtmlEscaperService, codeReplRulesService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -235,7 +235,8 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 ]);
 
 oppia.directive('oppiaResponseCodeRepl', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -258,7 +259,8 @@ oppia.directive('oppiaResponseCodeRepl', [
 ]);
 
 oppia.directive('oppiaShortResponseCodeRepl', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

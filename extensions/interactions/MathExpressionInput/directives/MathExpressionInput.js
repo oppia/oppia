@@ -21,7 +21,10 @@
  */
 oppia.directive('oppiaInteractiveMathExpressionInput', [
   'HtmlEscaperService', 'mathExpressionInputRulesService',
-  function(HtmlEscaperService, mathExpressionInputRulesService) {
+  'UrlInterpolationService',
+  function(
+      HtmlEscaperService, mathExpressionInputRulesService,
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -200,7 +203,8 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
 ]);
 
 oppia.directive('oppiaResponseMathExpressionInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -216,7 +220,8 @@ oppia.directive('oppiaResponseMathExpressionInput', [
 ]);
 
 oppia.directive('oppiaShortResponseMathExpressionInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

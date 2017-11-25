@@ -13,7 +13,8 @@
 // limitations under the License.
 
 oppia.directive('oppiaInteractiveLogicProof', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -264,7 +265,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
 ]);
 
 oppia.directive('oppiaResponseLogicProof', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -279,7 +281,8 @@ oppia.directive('oppiaResponseLogicProof', [
 ]);
 
 oppia.directive('oppiaShortResponseLogicProof', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

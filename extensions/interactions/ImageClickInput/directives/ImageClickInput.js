@@ -22,9 +22,9 @@
 
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'explorationContextService',
-  'imageClickInputRulesService',
+  'imageClickInputRulesService', 'UrlInterpolationService',
   function($sce, HtmlEscaperService, explorationContextService,
-           imageClickInputRulesService) {
+           imageClickInputRulesService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -100,7 +100,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
   }
 ]);
 
-oppia.directive('oppiaResponseImageClickInput', [function() {
+oppia.directive('oppiaResponseImageClickInput', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
   return {
     restrict: 'E',
     scope: {},
@@ -120,7 +121,8 @@ oppia.directive('oppiaResponseImageClickInput', [function() {
 }]);
 
 oppia.directive('oppiaShortResponseImageClickInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

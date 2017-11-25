@@ -19,41 +19,43 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-oppia.directive('oppiaInteractiveNumericInput', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      onSubmit: '&'
-    },
-    templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-      '/interactions/NumericInput/directives/' +
-      'numeric_input_interaction_directive.html'),
-    controller: [
-      '$scope', '$attrs', 'FocusManagerService', 'numericInputRulesService',
-      function($scope, $attrs, FocusManagerService, numericInputRulesService) {
-        $scope.answer = '';
-        $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+oppia.directive('oppiaInteractiveNumericInput', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        onSubmit: '&'
+      },
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/NumericInput/directives/' +
+        'numeric_input_interaction_directive.html'),
+      controller: [
+        '$scope', '$attrs', 'FocusManagerService', 'numericInputRulesService',
+        function($scope, $attrs, FocusManagerService, numericInputRulesService) {
+          $scope.answer = '';
+          $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
-        $scope.NUMERIC_INPUT_FORM_SCHEMA = {
-          type: 'float',
-          ui_config: {}
-        };
+          $scope.NUMERIC_INPUT_FORM_SCHEMA = {
+            type: 'float',
+            ui_config: {}
+          };
 
-        $scope.submitAnswer = function(answer) {
-          if (answer !== undefined && answer !== null && answer !== '') {
-            $scope.onSubmit({
-              answer: answer,
-              rulesService: numericInputRulesService
-            });
-          }
-        };
-      }
-    ]
-  };
+          $scope.submitAnswer = function(answer) {
+            if (answer !== undefined && answer !== null && answer !== '') {
+              $scope.onSubmit({
+                answer: answer,
+                rulesService: numericInputRulesService
+              });
+            }
+          };
+        }
+      ]
+    };
 }]);
 
 oppia.directive('oppiaResponseNumericInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -72,7 +74,8 @@ oppia.directive('oppiaResponseNumericInput', [
 ]);
 
 oppia.directive('oppiaShortResponseNumericInput', [
-  'HtmlEscaperService', function(HtmlEscaperService) {
+  'HtmlEscaperService', 'UrlInterpolationService',
+  function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

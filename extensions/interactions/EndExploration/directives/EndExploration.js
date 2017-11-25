@@ -19,79 +19,80 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-oppia.directive('oppiaInteractiveEndExploration', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-      '/interactions/EndExploration/directives/' +
-      'end_exploration_interaction_directive.html'),
-    controller: [
-      '$scope', '$http', '$attrs', '$q', 'UrlService',
-      'explorationContextService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
-      'HtmlEscaperService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
-      function(
-          $scope, $http, $attrs, $q, UrlService,
-          explorationContextService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT,
-          HtmlEscaperService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
-        var authorRecommendedExplorationIds = (
-          HtmlEscaperService.escapedJsonToObj(
-            $attrs.recommendedExplorationIdsWithValue));
+oppia.directive('oppiaInteractiveEndExploration', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/EndExploration/directives/' +
+        'end_exploration_interaction_directive.html'),
+      controller: [
+        '$scope', '$http', '$attrs', '$q', 'UrlService',
+        'explorationContextService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
+        'HtmlEscaperService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+        function(
+            $scope, $http, $attrs, $q, UrlService,
+            explorationContextService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT,
+            HtmlEscaperService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
+          var authorRecommendedExplorationIds = (
+            HtmlEscaperService.escapedJsonToObj(
+              $attrs.recommendedExplorationIdsWithValue));
 
-        $scope.isIframed = UrlService.isIframed();
-        $scope.isInEditorPage = (
-          explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
-        $scope.isInEditorPreviewMode = $scope.isInEditorPage && (
-          explorationContextService.getEditorTabContext() ===
-            EDITOR_TAB_CONTEXT.PREVIEW);
-        $scope.isInEditorMainTab = $scope.isInEditorPage && (
-          explorationContextService.getEditorTabContext() ===
-            EDITOR_TAB_CONTEXT.EDITOR);
+          $scope.isIframed = UrlService.isIframed();
+          $scope.isInEditorPage = (
+            explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+          $scope.isInEditorPreviewMode = $scope.isInEditorPage && (
+            explorationContextService.getEditorTabContext() ===
+              EDITOR_TAB_CONTEXT.PREVIEW);
+          $scope.isInEditorMainTab = $scope.isInEditorPage && (
+            explorationContextService.getEditorTabContext() ===
+              EDITOR_TAB_CONTEXT.EDITOR);
 
-        $scope.collectionId = GLOBALS.collectionId;
-        $scope.getCollectionTitle = function() {
-          return GLOBALS.collectionTitle;
-        };
+          $scope.collectionId = GLOBALS.collectionId;
+          $scope.getCollectionTitle = function() {
+            return GLOBALS.collectionTitle;
+          };
 
-        $scope.errorMessage = '';
+          $scope.errorMessage = '';
 
-        if ($scope.isInEditorPage) {
-          // Display a message if any author-recommended explorations are
-          // invalid.
-          var explorationId = explorationContextService.getExplorationId();
-          $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
-            params: {
-              stringified_exp_ids: JSON.stringify(
-                authorRecommendedExplorationIds)
-            }
-          }).then(function(response) {
-            var data = response.data;
-            var foundExpIds = [];
-            data.summaries.map(function(expSummary) {
-              foundExpIds.push(expSummary.id);
-            });
+          if ($scope.isInEditorPage) {
+            // Display a message if any author-recommended explorations are
+            // invalid.
+            var explorationId = explorationContextService.getExplorationId();
+            $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
+              params: {
+                stringified_exp_ids: JSON.stringify(
+                  authorRecommendedExplorationIds)
+              }
+            }).then(function(response) {
+              var data = response.data;
+              var foundExpIds = [];
+              data.summaries.map(function(expSummary) {
+                foundExpIds.push(expSummary.id);
+              });
 
-            var missingExpIds = [];
-            authorRecommendedExplorationIds.forEach(function(expId) {
-              if (foundExpIds.indexOf(expId) === -1) {
-                missingExpIds.push(expId);
+              var missingExpIds = [];
+              authorRecommendedExplorationIds.forEach(function(expId) {
+                if (foundExpIds.indexOf(expId) === -1) {
+                  missingExpIds.push(expId);
+                }
+              });
+
+              if (missingExpIds.length === 0) {
+                $scope.errorMessage = '';
+              } else {
+                var listOfIds = missingExpIds.join('", "');
+                $scope.errorMessage = (
+                  'Warning: exploration(s) with the IDs "' + listOfIds +
+                  '" will ' + 'not be shown as recommendations because they ' +
+                  'either do not exist, or are not publicly viewable.');
               }
             });
-
-            if (missingExpIds.length === 0) {
-              $scope.errorMessage = '';
-            } else {
-              var listOfIds = missingExpIds.join('", "');
-              $scope.errorMessage = (
-                'Warning: exploration(s) with the IDs "' + listOfIds +
-                '" will ' + 'not be shown as recommendations because they ' +
-                'either do not exist, or are not publicly viewable.');
-            }
-          });
+          }
         }
-      }
-    ]
-  };
+      ]
+    };
 }]);
 
 oppia.directive('oppiaResponseEndExploration', [function() {
