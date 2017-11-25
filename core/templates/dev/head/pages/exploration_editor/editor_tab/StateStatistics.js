@@ -18,14 +18,14 @@
  */
 
 oppia.controller('StateStatistics', [
-  '$rootScope', '$scope', '$modal', 'ExplorationDataService', 
+  '$rootScope', '$scope', '$modal', 'ExplorationDataService',
   'EditorStateService', 'explorationStatesService', 'TrainingDataService',
-  'stateCustomizationArgsService', 'oppiaExplorationHtmlFormatterService',
+  'stateCustomizationArgsService', 'ExplorationHtmlFormatterService',
   'TrainingModalService', 'INTERACTION_SPECS',
   function(
       $rootScope, $scope, $modal, ExplorationDataService, EditorStateService,
       explorationStatesService, TrainingDataService,
-      stateCustomizationArgsService, oppiaExplorationHtmlFormatterService,
+      stateCustomizationArgsService, ExplorationHtmlFormatterService,
       TrainingModalService, INTERACTION_SPECS) {
     $scope.isInteractionTrainable = false;
     $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS =
@@ -46,7 +46,7 @@ oppia.controller('StateStatistics', [
           TrainingDataService.getTrainingDataFrequencies());
         for (var i = 0; i < trainingDataAnswers.length; i++) {
           var answerHtml = (
-            oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+            ExplorationHtmlFormatterService.getShortAnswerHtml(
               trainingDataAnswers[i], data.interaction.id,
               stateCustomizationArgsService.savedMemento));
           $scope.trainingDataButtonContentsList.push({
