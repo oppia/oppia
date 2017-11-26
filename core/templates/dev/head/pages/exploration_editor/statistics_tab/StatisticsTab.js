@@ -21,13 +21,13 @@ oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'AlertsService', 'explorationStatesService',
-  'ExplorationDataService', 'computeGraphService', 'oppiaDatetimeFormatter',
+  'ExplorationDataService', 'ComputeGraphService', 'oppiaDatetimeFormatter',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
   'IMPROVE_TYPE_INCOMPLETE', 'ENABLE_NEW_STATS_FRAMEWORK',
   function(
       $scope, $http, $modal, AlertsService, explorationStatesService,
-      ExplorationDataService, computeGraphService, oppiaDatetimeFormatter,
+      ExplorationDataService, ComputeGraphService, oppiaDatetimeFormatter,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
       IMPROVE_TYPE_INCOMPLETE, ENABLE_NEW_STATS_FRAMEWORK) {
@@ -89,7 +89,7 @@ oppia.controller('StatisticsTab', [
             var states = StatesObjectFactory.createFromBackendDict(statesDict);
             var initStateName = response.exploration.init_state_name;
 
-            $scope.statsGraphData = computeGraphService.compute(
+            $scope.statsGraphData = ComputeGraphService.compute(
               initStateName, states);
             var improvements = (
               StateImprovementSuggestionService.getStateImprovements(
