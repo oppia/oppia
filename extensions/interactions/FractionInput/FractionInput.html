@@ -9,7 +9,7 @@
       </schema-based-editor>
     </ng-form>
 
-    <div class="oppia-form-error">
+    <div class="oppia-form-error oppia-fraction-input-error">
       <[getWarningText()]>
     </div>
     <!-- This ng-click is needed for specifying solutions in the solution editor. -->
@@ -23,3 +23,9 @@
 <script type="text/ng-template" id="response/FractionInput">
   <[answer]>
 </script>
+
+<style>
+  .oppia-fraction-input-error {
+    margin-top: 10px;
+  }
+</style>
