@@ -13,15 +13,15 @@
 // limitations under the License.
 
 /**
- *  @fileoverview Service for handling all interactions 
+ *  @fileoverview Service for handling all interactions
  *  with the exploration editor backend.
  */
 
 oppia.factory('ExplorationDataService', [
-  '$http', '$log', '$window', '$q', 'alertsService',
+  '$http', '$log', '$window', '$q', 'AlertsService',
   'EditableExplorationBackendApiService', 'LocalStorageService',
   'ReadOnlyExplorationBackendApiService', 'urlService',
-  function($http, $log, $window, $q, alertsService,
+  function($http, $log, $window, $q, AlertsService,
     EditableExplorationBackendApiService, LocalStorageService,
     ReadOnlyExplorationBackendApiService, urlService) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
@@ -36,7 +36,7 @@ oppia.factory('ExplorationDataService', [
     }
     if (!explorationId) {
       $log.error(
-        'Unexpected call to ExplorationDataService for pathname ', 
+        'Unexpected call to ExplorationDataService for pathname ',
         pathnameArray[i]);
       // Note: if we do not return anything, Karma unit tests fail.
       return {};
@@ -138,7 +138,7 @@ oppia.factory('ExplorationDataService', [
           });
       },
       resolveAnswers: function(stateName, resolvedAnswersList) {
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
         $http.put(
           resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName), {
             resolved_answers: resolvedAnswersList
@@ -160,7 +160,7 @@ oppia.factory('ExplorationDataService', [
         EditableExplorationBackendApiService.updateExploration(explorationId,
           explorationData.data.version, commitMessage, changeList).then(
             function(response) {
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
               explorationData.data = response;
               if (successCallback) {
                 successCallback(

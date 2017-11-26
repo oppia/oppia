@@ -17,11 +17,11 @@
  */
 
 oppia.controller('Base', [
-  '$scope', '$rootScope', '$document', 'alertsService', 'BackgroundMaskService',
+  '$scope', '$rootScope', '$document', 'AlertsService', 'BackgroundMaskService',
   'SidebarStatusService',
-  function($scope, $rootScope, $document, alertsService, BackgroundMaskService,
+  function($scope, $rootScope, $document, AlertsService, BackgroundMaskService,
   SidebarStatusService) {
-    $scope.alertsService = alertsService;
+    $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
     $scope.promoBarIsEnabled = GLOBALS.PROMO_BAR_IS_ENABLED;
     $scope.promoBarMessage = GLOBALS.PROMO_BAR_MESSAGE;
