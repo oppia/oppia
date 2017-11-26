@@ -27,7 +27,8 @@ describe('CodeRepl interaction', function() {
     beforeEach(inject(function($compile, _$templateCache_, $rootScope) {
       $templateCache = _$templateCache_;
       var templatesHtml = $templateCache.get(
-        'extensions/interactions/CodeRepl/CodeRepl.html');
+        '/extensions/interactions/CodeRepl/directives/' +
+        'code_repl_interaction_directive.html');
       $compile(templatesHtml)($rootScope);
       $rootScope.$digest();
     }));
