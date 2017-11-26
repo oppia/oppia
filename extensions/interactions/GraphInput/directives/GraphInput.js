@@ -263,9 +263,9 @@ oppia.directive('graphViz', [
             $scope.state.mouseY = event.pageY - vizContainer.offset().top;
             // We use vertexDragStartX/Y and mouseDragStartX/Y to make
             // mouse-dragging by label more natural, by moving the vertex
-            // according to the difference from the original position. Otherwise,
-            // mouse-dragging by label will make the vertex awkwardly jump to the
-            // mouse.
+            // according to the difference from the original position.
+            // Otherwise, mouse-dragging by label will make the vertex
+            // awkwardly jump to the mouse.
             if ($scope.state.currentlyDraggedVertex !== null &&
                 ($scope.state.mouseX > GRAPH_INPUT_LEFT_MARGIN)) {
               $scope.graph.vertices[$scope.state.currentlyDraggedVertex].x =

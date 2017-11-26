@@ -93,7 +93,8 @@ oppia.directive('oppiaInteractiveEndExploration', [
         }
       ]
     };
-}]);
+  }
+]);
 
 oppia.directive('oppiaResponseEndExploration', [function() {
   return {

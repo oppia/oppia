@@ -31,7 +31,8 @@ oppia.directive('oppiaInteractiveNumericInput', [
         'numeric_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'FocusManagerService', 'numericInputRulesService',
-        function($scope, $attrs, FocusManagerService, numericInputRulesService) {
+        function(
+            $scope, $attrs, FocusManagerService, numericInputRulesService) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
@@ -51,7 +52,8 @@ oppia.directive('oppiaInteractiveNumericInput', [
         }
       ]
     };
-}]);
+  }
+]);
 
 oppia.directive('oppiaResponseNumericInput', [
   'HtmlEscaperService', 'UrlInterpolationService',

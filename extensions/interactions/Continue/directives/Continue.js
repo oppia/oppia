@@ -70,9 +70,11 @@ oppia.directive('oppiaResponseContinue', [
         '$scope', '$attrs', 'HtmlEscaperService',
         function($scope, $attrs, HtmlEscaperService) {
           $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-      }]
+        }
+      ]
     };
-}]);
+  }
+]);
 
 oppia.directive('oppiaShortResponseContinue', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -86,9 +88,11 @@ oppia.directive('oppiaShortResponseContinue', [
         '$scope', '$attrs', 'HtmlEscaperService',
         function($scope, $attrs, HtmlEscaperService) {
           $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-      }]
+        }
+      ]
     };
-}]);
+  }
+]);
 
 oppia.factory('continueRulesService', [function() {
   return {};

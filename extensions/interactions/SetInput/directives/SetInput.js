@@ -71,9 +71,11 @@ oppia.directive('oppiaInteractiveSetInput', [
               });
             }
           };
-        }]
+        }
+      ]
     };
-}]);
+  }
+]);
 
 oppia.directive('oppiaResponseSetInput', [
   'HtmlEscaperService', 'UrlInterpolationService',

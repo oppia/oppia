@@ -102,23 +102,25 @@ oppia.directive('oppiaInteractiveImageClickInput', [
 
 oppia.directive('oppiaResponseImageClickInput', [
   'UrlInterpolationService', function(UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    scope: {},
-    templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-      '/interactions/ImageClickInput/directives/' +
-      'image_click_input_response_directive.html'),
-    controller: [
-      '$scope', '$attrs', 'HtmlEscaperService',
-      function($scope, $attrs, HtmlEscaperService) {
-        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/ImageClickInput/directives/' +
+        'image_click_input_response_directive.html'),
+      controller: [
+        '$scope', '$attrs', 'HtmlEscaperService',
+        function($scope, $attrs, HtmlEscaperService) {
+          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
 
-        $scope.clickRegionLabel = '(Clicks on ' + (
-          _answer.clickedRegions.length > 0 ?
-          '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
-      }]
-  };
-}]);
+          $scope.clickRegionLabel = '(Clicks on ' + (
+            _answer.clickedRegions.length > 0 ?
+            '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
+        }
+      ]
+    };
+  }
+]);
 
 oppia.directive('oppiaShortResponseImageClickInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
