@@ -279,8 +279,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             #  Optional:
             #    * A JS file called {InteractionName}ValidationServiceSpecs.js
             #    * A JS file called {InteractionName}RulesServiceSpecs.js
-            directives_dir_contents = (
-                self._listdir_omit_ignored(directives_dir))
 
             directives_dir_optional_dirs_and_files_count = 0
 
@@ -349,7 +347,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertIn(
                 'oppiaInteractive%s' % interaction_id, js_file_content)
             self.assertIn('oppiaResponse%s' % interaction_id, js_file_content)
-            directive_prefix = '<script type="text/ng-template"'
             # Check that the html template includes js script for the
             # interaction.
             self.assertIn(
