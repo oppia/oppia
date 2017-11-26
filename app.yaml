@@ -136,7 +136,7 @@ libraries:
 # when set to true. It allows minified resources to be used when
 # running the server in the dev environment.
 env_variables:
-  MINIFICATION: true
+  MINIFICATION: false
   PYTHONHTTPSVERIFY: 1
 
 
