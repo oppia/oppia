@@ -25,7 +25,7 @@ describe('Preferences', function() {
   var preferencesPage = null;
   
   beforeEach(function() {
-    preferencesPage = PreferencesPage.PreferencesPage();
+    preferencesPage = new PreferencesPage.PreferencesPage();
   });
 
   it('should change editor role email checkbox value', function() {
