@@ -93,7 +93,7 @@ oppia.factory('FractionInputValidationService', [
                     });
                   }
                 }
-                var f = toFloat(fraction);
+                var f = toFloat(rule.inputs.f);
                 setLowerAndUpperBounds(range, f, f, true, true);
                 break;
               case 'IsEquivalentTo': // fall-through
