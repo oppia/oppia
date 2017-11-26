@@ -20,13 +20,13 @@
 oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
-  '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
+  '$scope', '$http', '$modal', 'AlertsService', 'explorationStatesService',
   'ExplorationDataService', 'computeGraphService', 'oppiaDatetimeFormatter',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
   'IMPROVE_TYPE_INCOMPLETE', 'ENABLE_NEW_STATS_FRAMEWORK',
   function(
-      $scope, $http, $modal, alertsService, explorationStatesService,
+      $scope, $http, $modal, AlertsService, explorationStatesService,
       ExplorationDataService, computeGraphService, oppiaDatetimeFormatter,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
@@ -63,7 +63,7 @@ oppia.controller('StatisticsTab', [
     $scope.$on('refreshStatisticsTab', function() {
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
       $scope.explorationVersionUrl = (
-        '/createhandler/statisticsversion/' + 
+        '/createhandler/statisticsversion/' +
         ExplorationDataService.explorationId);
       $http.get($scope.explorationVersionUrl).then(function(response) {
         $scope.versions = response.data.versions;
@@ -78,10 +78,10 @@ oppia.controller('StatisticsTab', [
           '/createhandler/statistics/' + ExplorationDataService.explorationId);
       } else {
         $scope.explorationStatisticsUrl = (
-          '/createhandler/statistics_old/' + 
+          '/createhandler/statistics_old/' +
           ExplorationDataService.explorationId + '/' + version);
       }
-      
+
       $http.get($scope.explorationStatisticsUrl).then(function(response) {
         ReadOnlyExplorationBackendApiService.loadLatestExploration(
           ExplorationDataService.explorationId).then(function(response) {
@@ -169,7 +169,7 @@ oppia.controller('StatisticsTab', [
     };
 
     $scope.showStateStatsModal = function(stateName, improvementType) {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
 
       $http.get(
         '/createhandler/state_rules_stats/' + $scope.explorationId + '/' +
@@ -272,7 +272,7 @@ oppia.controller('StatisticsTab', [
 
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
+                AlertsService.clearWarnings();
               };
             }
           ]

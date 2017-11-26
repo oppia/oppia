@@ -25,10 +25,11 @@
        angular-html-bind="activeCard.interactionHtml">
   </div>
   <div ng-if="hintsExist" style="text-align: left; padding: 8px">
-    <hint-button ng-if="!areAllHintsExhausted()"
+    <hint-button ng-show="!areAllHintsExhausted() || (areAllHintsExhausted() && !solutionExists)"
                  on-click-hint-button="consumeHint()"
                  current-hint-is-available="isHintAvailable()"
-                 all-hints-are-exhausted="areAllHintsExhausted()">
+                 all-hints-are-exhausted="areAllHintsExhausted()"
+                 is-supplemental-card="true">
     </hint-button>
     <solution-button ng-if="areAllHintsExhausted()"
                      on-click-solution-button="viewSolution()"
