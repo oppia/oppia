@@ -113,12 +113,12 @@ describe('Fraction Input rules service', function() {
       createPositiveFractionDict(1, 0, 2), RULE_INPUT)).toBe(false);
   });
 
-  it('should have a correct \'has whole number equal to\' rule', function() {
-    expect(firs.HasWholeNumberEqualTo(
+  it('should have a correct \'has integer part equal to\' rule', function() {
+    expect(firs.HasIntegerPartEqualTo(
       createPositiveFractionDict(1, 0, 20), RULE_INPUT)).toBe(true);
-    expect(firs.HasWholeNumberEqualTo(
+    expect(firs.HasIntegerPartEqualTo(
       createPositiveFractionDict(0, 8, 4), RULE_INPUT)).toBe(false);
-    expect(firs.HasWholeNumberEqualTo(
+    expect(firs.HasIntegerPartEqualTo(
       createPositiveFractionDict(2, 0, 2), RULE_INPUT)).toBe(false);
   });
 

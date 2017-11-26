@@ -29,7 +29,7 @@
   "EndExploration": {},
   "FractionInput": {
     "IsExactlyEqualTo": {
-      "description": "is exactly equal to {{f|Fraction}}"
+      "description": "exactly matches {{f|Fraction}}"
     },
     "IsEquivalentTo": {
       "description": "is equivalent to {{f|Fraction}}"
@@ -49,11 +49,11 @@
     "HasDenominatorEqualTo": {
       "description": "has denominator equal to {{x|NonnegativeInt}}"
     },
-    "HasWholeNumberEqualTo": {
-      "description": "has whole number equal to {{x|Int}}"
+    "HasIntegerPartEqualTo": {
+      "description": "has integer part equal to {{x|Int}}"
     },
     "HasNoFractionalPart": {
-      "description": "answer is a whole number"
+      "description": "is an integer"
     }
   },
   "GraphInput": {

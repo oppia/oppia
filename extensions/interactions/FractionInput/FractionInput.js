@@ -109,7 +109,7 @@ oppia.factory('fractionInputRulesService', [
       IsGreaterThan: function(answer, inputs) {
         return toFloat(answer) > toFloat(inputs.f);
       },
-      HasWholeNumberEqualTo: function(answer, inputs) {
+      HasIntegerPartEqualTo: function(answer, inputs) {
         return answer.wholeNumber === inputs.f.wholeNumber;
       },
       HasNumeratorEqualTo: function(answer, inputs) {
