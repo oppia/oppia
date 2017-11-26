@@ -35,7 +35,7 @@ oppia.factory('AudioPreloaderService', [
       allAudioTranslations.map(function(audioTranslation) {
         AssetsBackendApiService.loadAudio(
           explorationContextService.getExplorationId(),
-          audioTranslation.filename).then(function(loadedFilename) {
+          audioTranslation.filename).then(function() {
             if (audioTranslation.filename === currentlyRequestedAudioFilename) {
               currentlyRequestedAudioLoadedCallback();
             }
