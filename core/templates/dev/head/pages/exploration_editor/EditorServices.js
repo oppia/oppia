@@ -1156,7 +1156,7 @@ oppia.factory('stateSolutionService', [
 
 // Service for computing graph data.
 oppia.factory('graphDataService', [
-  'expCorationStatesService', 'explorationInitStateNameService',
+  'explorationStatesService', 'explorationInitStateNameService',
   'ComputeGraphService',
   function(
       explorationStatesService, explorationInitStateNameService,
