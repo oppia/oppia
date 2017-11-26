@@ -70,6 +70,16 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
       function($scope, $attrs, HtmlEscaperService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
+        $scope.needsAddressing = $scope.data.map(function(datum, i) {
+          return (i % 3 === 0) ? null : 'not-null';
+        });
+        $scope.addressedCellContent = function(index) {
+          if ($scope.needsAddressing[index] !== null) {
+            return "<span>No</span>&nbsp;&nbsp;&nbsp;<a href='#'>Address Now</a>";
+          } else {
+            return "<span>Yes</span>";
+          }
+        };
       }
     ]
   };
