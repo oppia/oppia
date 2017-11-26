@@ -203,8 +203,7 @@ oppia.directive('audioControls', [
                       $scope.audioIsLoading = false;
                     });
                 }
-
-            });
+              });
           };
         }]
     }
