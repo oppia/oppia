@@ -68,7 +68,7 @@ class ObjectJsFilenamesUnitTests(test_utils.GenericTestBase):
 
 class ObjectDefaultValuesUnitTests(test_utils.GenericTestBase):
     """Test that the default value of objects recorded in
-    extensions/interactions/object_defaults.json correspond to
+    extensions/objects/object_defaults.json correspond to
     the defined default values in objects.py for all objects that
     are used in rules.
     """

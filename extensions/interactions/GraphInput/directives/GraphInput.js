@@ -603,7 +603,8 @@ oppia.directive('graphViz', [
         }
       ]
     };
-});
+  }
+]);
 
 oppia.factory('graphUtilsService', [function() {
   return {

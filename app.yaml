@@ -81,9 +81,9 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
-- url: /extensions/rich_text_components/(.*)/directives/(.*\.(html))
-  static_files: extensions/rich_text_components/\1/directives/\2
-  upload: extensions/rich_text_components/(.*)/directives/(.*\.(html))
+- url: /extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
+  static_files: extensions/\1/\2/directives/\3
+  upload: extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
@@ -136,7 +136,7 @@ libraries:
 # when set to true. It allows minified resources to be used when
 # running the server in the dev environment.
 env_variables:
-  MINIFICATION: false
+  MINIFICATION: true
   PYTHONHTTPSVERIFY: 1
 
 
