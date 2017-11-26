@@ -36,4 +36,4 @@ class FractionInput(base.BaseInteraction):
             'type': 'bool',
         },
         'default_value': False
-        }]
+    }]

@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-
 oppia.directive('oppiaInteractiveFractionInput', [function() {
   return {
     restrict: 'E',
@@ -38,7 +36,7 @@ oppia.directive('oppiaInteractiveFractionInput', [function() {
 
         $scope.getWarningText = function() {
           return errorMessage;
-        }
+        };
 
         $scope.submitAnswer = function(answer) {
           try {
@@ -48,7 +46,7 @@ oppia.directive('oppiaInteractiveFractionInput', [function() {
               !angular.equals(fraction, fraction.convertToSimplestForm())
             ) {
               errorMessage =
-                'Please enter answer in it\'s simplest form';
+                'Please enter an answer in its simplest form';
             } else {
               $scope.onSubmit({
                 answer: fraction,
