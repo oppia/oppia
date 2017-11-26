@@ -701,14 +701,6 @@ class AnswerFrequencyListDomainTests(test_utils.GenericTestBase):
             'answer': 'answer b', 'frequency': 2
         }])
 
-    def test_add_answer_appends_to_existing_state(self):
-        answer_frequency_list = stats_domain.AnswerFrequencyList(
-            [self.ANSWER_A])
-        answer_frequency_list.add_answer(self.ANSWER_C)
-        self.assertEqual(
-            answer_frequency_list.answer_occurrences,
-            [self.ANSWER_A, self.ANSWER_C])
-
 
 class CategorizedAnswerFrequencyListsDomainTests(test_utils.GenericTestBase):
     """Tests CategorizedAnswerFrequencyLists for basic domain object
