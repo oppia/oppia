@@ -33,7 +33,7 @@ oppia.factory('ExplorationPlayerService', [
   'StatsReportingService', 'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
-  'LanguageUtilService', 'NumberAttemptsService',
+  'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       alertsService, AnswerClassificationService, explorationContextService,
@@ -43,7 +43,7 @@ oppia.factory('ExplorationPlayerService', [
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService,
-      LanguageUtilService, NumberAttemptsService) {
+      LanguageUtilService, NumberAttemptsService, AudioPreloaderService) {
     var _explorationId = explorationContextService.getExplorationId();
     var _editorPreviewMode = (
       explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -205,6 +205,9 @@ oppia.factory('ExplorationPlayerService', [
                 exploration.getLanguageCode(),
                 data.auto_tts_enabled);
               _loadInitialState(successCallback);
+              AudioPreloaderService.preloadAllAudioFiles(
+                exploration,
+                AudioTranslationManagerService.getCurrentAudioLanguageCode());
               NumberAttemptsService.reset();
             });
         } else {
@@ -234,7 +237,9 @@ oppia.factory('ExplorationPlayerService', [
               data.preferred_audio_language_code,
               exploration.getLanguageCode(),
               data.auto_tts_enabled);
-
+            AudioPreloaderService.preloadAllAudioFiles(
+              exploration,
+              AudioTranslationManagerService.getCurrentAudioLanguageCode());
             _loadInitialState(successCallback);
             $rootScope.$broadcast('playerServiceInitialized');
           });
