@@ -45,8 +45,9 @@ oppia.directive('oppiaInteractiveFractionInput', [function() {
             if (requireSimplestForm &&
               !angular.equals(fraction, fraction.convertToSimplestForm())
             ) {
-              errorMessage =
-                'Please enter an answer in its simplest form';
+              errorMessage = (
+                'Please enter an answer in simplest form ' +
+                '(e.g., 1/3 instead of 2/6).');
             } else {
               $scope.onSubmit({
                 answer: fraction,
