@@ -35,5 +35,5 @@ class FractionInput(base.BaseInteraction):
         'schema': {
             'type': 'bool',
         },
-        'default_value': 'false'
+        'default_value': False
         }]
