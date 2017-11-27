@@ -363,12 +363,17 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         exploration = exp_services.get_exploration_from_model(item)
-        # Ignore latest version since we already have corresponding exploration.
-        versions = range(1, exploration.version)
+        explorations = []
 
-        # Get all exploration versions for current exploration id.
-        explorations = exp_services.get_multiple_explorations_by_version(
-            exploration.id, versions)
+        # Fetch all versions of the exploration, if they exist.
+        if exploration.version > 1:
+            # Ignore latest version since we already have corresponding
+            # exploration.
+            versions = range(1, exploration.version)
+            # Get all exploration versions for current exploration id.
+            explorations = exp_services.get_multiple_explorations_by_version(
+                exploration.id, versions)
+
         # Append latest exploration to the list of explorations.
         explorations.append(exploration)
 
