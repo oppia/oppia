@@ -365,7 +365,7 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
         exploration = exp_services.get_exploration_from_model(item)
         explorations = []
 
-        # Fetch all versions of the exploration, if exist.
+        # Fetch all versions of the exploration, if they exist.
         if exploration.version > 1:
             # Ignore latest version since we already have corresponding
             # exploration.
@@ -373,7 +373,8 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
             # Get all exploration versions for current exploration id.
             explorations = exp_services.get_multiple_explorations_by_version(
                 exploration.id, versions)
-            # Append latest exploration to the list of explorations.
+
+        # Append latest exploration to the list of explorations.
         explorations.append(exploration)
 
         # Get all commit cmds for all versions of exploration.
