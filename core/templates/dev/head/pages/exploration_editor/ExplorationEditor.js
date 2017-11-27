@@ -43,7 +43,7 @@ oppia.controller('ExplorationEditor', [
   'editabilityService', 'explorationStatesService', 'RouterService',
   'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
-  'ExplorationWarningsService', '$templateCache', 'explorationContextService',
+  'ExplorationWarningsService', '$templateCache', 'ExplorationContextService',
   'ExplorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
@@ -58,7 +58,7 @@ oppia.controller('ExplorationEditor', [
       editabilityService, explorationStatesService, RouterService,
       graphDataService, stateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
-      ExplorationWarningsService, $templateCache, explorationContextService,
+      ExplorationWarningsService, $templateCache, ExplorationContextService,
       ExplorationAdvancedFeaturesService, $modal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
@@ -72,7 +72,7 @@ oppia.controller('ExplorationEditor', [
      *********************************************************/
     $rootScope.loadingMessage = 'Loading';
 
-    $scope.explorationId = explorationContextService.getExplorationId();
+    $scope.explorationId = ExplorationContextService.getExplorationId();
     $scope.explorationUrl = '/create/' + $scope.explorationId;
     $scope.explorationDownloadUrl = (
       '/createhandler/download/' + $scope.explorationId);
@@ -379,10 +379,10 @@ oppia.controller('ExplorationEditor', [
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', 'siteAnalyticsService',
-          'explorationContextService',
+          'ExplorationContextService',
           function($scope, $modalInstance, siteAnalyticsService,
-          explorationContextService) {
-            var explorationId = explorationContextService.getExplorationId();
+          ExplorationContextService) {
+            var explorationId = ExplorationContextService.getExplorationId();
 
             siteAnalyticsService.registerTutorialModalOpenEvent(explorationId);
 

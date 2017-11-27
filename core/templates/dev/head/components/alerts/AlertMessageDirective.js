@@ -25,9 +25,9 @@ oppia.directive('alertMessage', [function() {
     },
     template: '<div class="oppia-alert-message"></div>',
     controller: [
-      '$scope', 'alertsService', 'toastr',
-      function($scope, alertsService, toastr) {
-        $scope.alertsService = alertsService;
+      '$scope', 'AlertsService', 'toastr',
+      function($scope, AlertsService, toastr) {
+        $scope.AlertsService = AlertsService;
         $scope.toastr = toastr;
       }
     ],
@@ -36,13 +36,13 @@ oppia.directive('alertMessage', [function() {
       if (message.type === 'info') {
         scope.toastr.info(message.content, {
           onHidden: function() {
-            scope.alertsService.deleteMessage(message);
+            scope.AlertsService.deleteMessage(message);
           }
         });
       } else if (message.type === 'success') {
         scope.toastr.success(message.content, {
           onHidden: function() {
-            scope.alertsService.deleteMessage(message);
+            scope.AlertsService.deleteMessage(message);
           }
         });
       }
