@@ -93,6 +93,20 @@ describe('FractionInputValidationService', function() {
       }
     };
 
+    nonIntegerRule = {
+      type: 'HasNumeratorEqualTo',
+      inputs: {
+        x: 0.5
+      }
+    };
+
+    zeroDenominatorRule = {
+      type: 'HasDenominatorEqualTo',
+      inputs: {
+        x: 0
+      }
+    };
+
     answerGroups = [{
       rules: [equalsOneRule, lessThanTwoRule],
       outcome: goodDefaultOutcome,
@@ -129,7 +143,9 @@ describe('FractionInputValidationService', function() {
       message: 'Rule 2 from answer group 1 will never be matched ' +
         'because it is made redundant by rule 1 from answer group 1.'
     }]);
-    answerGroups[0].rules = [equalsOneRule, equivalentToOneAndSimplestFormRule];
+    answerGroups[0].rules = [equalsOneRule,
+      equivalentToOneAndSimplestFormRule
+    ];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -176,6 +192,66 @@ describe('FractionInputValidationService', function() {
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 from answer group 1 will never be matched ' +
         'because it is not in simplest form.'
+    }]);
+  });
+
+
+  // ========================== NEW RULES =================================
+  it('should catch non integer inputs in the numerator', function() {
+    answerGroups[0].rules = [nonIntegerRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Rule ' + 1 + ' from answer group ' +
+        1 + ' is invalid as input must be an ' +
+        'integer.')
+    }]);
+  });
+
+  it('should catch non integer inputs in the whole number', function() {
+    nonIntegerRule.type = 'HasIntegerPartEqualTo';
+    answerGroups[0].rules = [nonIntegerRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Rule ' + 1 + ' from answer group ' +
+        1 + ' is invalid as input must be an ' +
+        'integer.')
+    }]);
+  });
+
+  it('should catch non integer inputs in the denominator', function() {
+    nonIntegerRule.type = 'HasDenominatorEqualTo';
+    answerGroups[0].rules = [nonIntegerRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Rule ' + 1 + ' from answer group ' +
+        1 + ' is invalid as input must be an ' +
+        'integer.')
+    }]);
+  });
+
+  it('should catch non integer inputs in the numerator', function() {
+    answerGroups[0].rules = [zeroDenominatorRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Rule ' + 1 + ' from answer group ' +
+        1 + ' is invalid as denominator must be ' +
+        'greater than zero.')
     }]);
   });
 });

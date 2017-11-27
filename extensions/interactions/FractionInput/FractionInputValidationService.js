@@ -21,6 +21,15 @@ oppia.factory('FractionInputValidationService', [
   'FractionObjectFactory',
   function(
     WARNING_TYPES, baseInteractionValidationService, FractionObjectFactory) {
+    getNonIntegerInputWarning = function(i, j) {
+      return {
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule ' + (j + 1) + ' from answer group ' +
+          (i + 1) + ' is invalid as input must be an ' +
+          'integer.')
+      };
+    }
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         return [];
@@ -109,7 +118,32 @@ oppia.factory('FractionInputValidationService', [
                 var f = toFloat(rule.inputs.f);
                 setLowerAndUpperBounds(range, -Infinity, f, false, false);
                 break;
+              case 'HasNumeratorEqualTo':
+                if (!Number.isInteger(rule.inputs.x)) {
+                  warningsList.push(getNonIntegerInputWarning(i, j));
+                }
+                break;
+              case 'HasIntegerPartEqualTo':
+                if (!Number.isInteger(rule.inputs.x)) {
+                  warningsList.push(getNonIntegerInputWarning(i, j));
+                }
+                break;
+              case 'HasDenominatorEqualTo':
+                if (!Number.isInteger(rule.inputs.x)) {
+                  warningsList.push(getNonIntegerInputWarning(i, j));
+                }
+                if (rule.inputs.x == 0) {
+                  warningsList.push({
+                    type: WARNING_TYPES.ERROR,
+                    message: (
+                      'Rule ' + (j + 1) + ' from answer group ' +
+                      (i + 1) + ' is invalid as denominator ' +
+                      'must be greater than zero.')
+                  });
+                }
+                break;
               default:
+                break;
             }
             for (var k = 0; k < ranges.length; k++) {
               if (isEnclosedBy(range, ranges[k])) {
