@@ -280,30 +280,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             #    * A JS file called {InteractionName}ValidationServiceSpecs.js
             #    * A JS file called {InteractionName}RulesServiceSpecs.js
 
-            directives_dir_optional_dirs_and_files_count = 0
-
-            try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    directives_dir, '%sSpec.js' % interaction_id)))
-                directives_dir_optional_dirs_and_files_count += 1
-            except Exception:
-                pass
-
-            try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    directives_dir,
-                    '%sValidationServiceSpec.js' % interaction_id)))
-                directives_dir_optional_dirs_and_files_count += 1
-            except Exception:
-                pass
-
-            try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    directives_dir, '%sRulesServiceSpec.js' % interaction_id)))
-                directives_dir_optional_dirs_and_files_count += 1
-            except Exception:
-                pass
-
             snakecase_interaction_id = (
                 utils.camelcase_to_snakecase(interaction_id))
 
