@@ -28,7 +28,7 @@ oppia.factory('MessengerService', ['$log', '$window', function($log, $window) {
   };
 
   var SUPPORTED_HASHDICT_VERSIONS = [
-    '0.0.0', '0.0.1', '0.0.2', '0.0.3'
+    '0.0.0', '0.0.1', '0.0.2', '0.0.3', '0.0.4'
   ];
 
   MESSAGE_VALIDATORS = {
@@ -37,6 +37,9 @@ oppia.factory('MessengerService', ['$log', '$window', function($log, $window) {
     },
     explorationLoaded: function() {
       return true;
+    },
+    answerSubmit: function(payload) {
+      return Boolean(payload.stateName);
     },
     stateTransition: function(payload) {
       return Boolean(payload.oldStateName) || Boolean(payload.newStateName);
@@ -60,6 +63,13 @@ oppia.factory('MessengerService', ['$log', '$window', function($log, $window) {
       return {
         explorationVersion: data.explorationVersion,
         explorationTitle: data.explorationTitle
+      };
+    },
+    answerSubmit: function(data) {
+      return {
+        explorationVersion: data.explorationVersion,
+        stateName: data.stateName,
+        jsonAnswer: data.jsonAnswer,
       };
     },
     stateTransition: function(data) {
@@ -86,6 +96,7 @@ oppia.factory('MessengerService', ['$log', '$window', function($log, $window) {
   var messenger = {
     HEIGHT_CHANGE: 'heightChange',
     EXPLORATION_LOADED: 'explorationLoaded',
+    ANSWER_SUBMIT: 'answerSubmit',
     STATE_TRANSITION: 'stateTransition',
     EXPLORATION_RESET: 'explorationReset',
     EXPLORATION_COMPLETED: 'explorationCompleted',
