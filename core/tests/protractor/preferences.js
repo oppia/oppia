@@ -19,7 +19,7 @@
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
-var PreferencesPage = require('../protractor_utils/PreferencesPage');
+var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 
 describe('Preferences', function() {
   var preferencesPage = null;

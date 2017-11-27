@@ -44,11 +44,11 @@ var PreferencesPage = function() {
     return editorRoleEmailsCheckBox.isSelected();
   };
 
-  this.expectFirstSubscriptionToMatch = function(name) {
+  this.expectFirstSubscriptionToBe = function(name) {
     expect(subscriptions.first().getText()).toMatch(name);
   };
 
-  this.expectLastSubscriptionToMatch = function(name) {
+  this.expectLastSubscriptionToBe = function(name) {
     expect(subscriptions.last().getText()).toMatch(name);
   };
 
