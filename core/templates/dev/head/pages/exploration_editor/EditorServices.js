@@ -1154,7 +1154,6 @@ oppia.factory('stateSolutionService', [
   }
 ]);
 
-
 oppia.factory('computeGraphService', [
   'INTERACTION_SPECS', function(INTERACTION_SPECS) {
     var _computeGraphData = function(initStateId, states) {
@@ -1291,7 +1290,6 @@ oppia.constant('STATE_ERROR_MESSAGES', {
   INCORRECT_SOLUTION: (
     'The current solution does not lead to another card.')
 });
-
 
 oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
   var CMD_ADD_STATE = 'add_state';
