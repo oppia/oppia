@@ -66,14 +66,16 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
     scope: {},
     templateUrl: 'visualizations/FrequencyTable',
     controller: [
-      '$scope', '$attrs', 'HtmlEscaperService',
-      function($scope, $attrs, HtmlEscaperService) {
+      '$scope', '$attrs', 'HtmlEscaperService', 'SolutionVerificationService',
+      function(
+          $scope, $attrs, HtmlEscaperService, SolutionVerificationService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
         $scope.needsAddressing = $scope.data.map(function(datum, i) {
           return (i % 3 === 0) ? null : 'not-null';
         });
         $scope.addressedCellContent = function(index) {
+          return $attrs.data + '\n' + $attrs.options;
           if ($scope.needsAddressing[index] !== null) {
             return "<span>No</span>&nbsp;&nbsp;&nbsp;<a href='#'>Address Now</a>";
           } else {
