@@ -28,17 +28,9 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 
 oppia.controller('Library', [
   '$scope', '$http', '$modal', '$rootScope', '$window', '$timeout',
-<<<<<<< HEAD
-  'ConstructTranslationIdsService', 'UrlService',
-  'ALL_CATEGORIES',
-  'SearchService','WindowDimensionsService',
-  'UrlInterpolationService', 'LIBRARY_PAGE_MODES',
-  'LIBRARY_TILE_WIDTH_PX', 'alertsService',
-=======
-  'i18nIdService', 'UrlService', 'ALL_CATEGORIES', 'SearchService',
+  'ConstructTranslationIdsService', 'UrlService', 'ALL_CATEGORIES', 'SearchService',
   'WindowDimensionsService', 'UrlInterpolationService', 'LIBRARY_PAGE_MODES',
   'LIBRARY_TILE_WIDTH_PX', 'AlertsService',
->>>>>>> develop
   'LearnerDashboardIdsBackendApiService',
   'LearnerDashboardActivityIdsObjectFactory', 'LearnerPlaylistService',
   function(
