@@ -43,7 +43,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           $scope.imageUrl = (
             $scope.filepath ?
             $sce.trustAsResourceUrl(
-              '/imagehandler/' + explorationContextService.getExplorationId() +
+              '/imagehandler/' + ExplorationContextService.getExplorationId() +
               '/' + encodeURIComponent($scope.filepath)) : null);
           $scope.mouseX = 0;
           $scope.mouseY = 0;

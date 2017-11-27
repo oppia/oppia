@@ -15,6 +15,7 @@
 """Common utility functions."""
 
 import base64
+import collections
 import datetime
 import hashlib
 import imghdr
@@ -501,3 +502,35 @@ def convert_to_str(string_to_convert):
     if isinstance(string_to_convert, unicode):
         return string_to_convert.encode('utf-8')
     return string_to_convert
+
+
+def get_hashable_value(value):
+    """This function returns a hashable version of the input JSON-like value.
+
+    It converts the built-in sequences into their hashable counterparts
+    {list: tuple, dict: (sorted tuple of pairs)}. Additionally, their
+    elements are converted to hashable values through recursive calls. All
+    other value types are assumed to already be hashable.
+
+    Args:
+        value: *. Some JSON-like object, that is, an object made-up of only:
+            lists, dicts, strings, ints, bools, None. Types can be nested in
+            each other.
+
+    Returns:
+        hashed_value: *. A new object that will always have the same hash for
+        "equivalent" values.
+    """
+    if isinstance(value, list):
+        return tuple(get_hashable_value(e) for e in value)
+    elif isinstance(value, dict):
+        return tuple(sorted(
+            # Dict keys are already hashable, only values need converting.
+            (k, get_hashable_value(v)) for k, v in value.iteritems()))
+    else:
+        return value
+
+
+class OrderedCounter(collections.Counter, collections.OrderedDict):
+    """Counter that remembers the order elements are first encountered."""
+    pass

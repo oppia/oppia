@@ -17,8 +17,8 @@
  */
 
  oppia.factory('LearnerPlaylistService', [
-  '$http', '$modal', 'alertsService', 'UrlInterpolationService',
-  function($http, $modal, alertsService, UrlInterpolationService) {
+  '$http', '$modal', 'AlertsService', 'UrlInterpolationService',
+  function($http, $modal, AlertsService, UrlInterpolationService) {
     var _addToLearnerPlaylist = function(activityId, activityType) {
       var successfullyAdded = true;
       var addToLearnerPlaylistUrl = (
@@ -31,24 +31,24 @@
         .then(function(response) {
           if (response.data.belongs_to_completed_or_incomplete_list) {
             successfullyAdded = false;
-            alertsService.addInfoMessage(
+            AlertsService.addInfoMessage(
               'You have already completed or are completing this ' +
               'activity.');
           }
           if (response.data.belongs_to_subscribed_activities) {
             successfullyAdded = false;
-            alertsService.addInfoMessage(
+            AlertsService.addInfoMessage(
               'This is present in your creator dashboard');
           }
           if (response.data.playlist_limit_exceeded) {
             successfullyAdded = false;
-            alertsService.addInfoMessage(
+            AlertsService.addInfoMessage(
               'Your \'Play Later\' list is full!  Either you can ' +
               'complete some or you can head to the learner dashboard ' +
               'and remove some.');
           }
           if (successfullyAdded) {
-            alertsService.addSuccessMessage(
+            AlertsService.addSuccessMessage(
               'Successfully added to your \'Play Later\' list.');
           }
         });

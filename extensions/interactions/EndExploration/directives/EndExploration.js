@@ -29,11 +29,11 @@ oppia.directive('oppiaInteractiveEndExploration', [
         'end_exploration_interaction_directive.html'),
       controller: [
         '$scope', '$http', '$attrs', '$q', 'UrlService',
-        'explorationContextService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
+        'ExplorationContextService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
         'HtmlEscaperService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
         function(
             $scope, $http, $attrs, $q, UrlService,
-            explorationContextService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT,
+            ExplorationContextService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT,
             HtmlEscaperService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
           var authorRecommendedExplorationIds = (
             HtmlEscaperService.escapedJsonToObj(
@@ -41,12 +41,12 @@ oppia.directive('oppiaInteractiveEndExploration', [
 
           $scope.isIframed = UrlService.isIframed();
           $scope.isInEditorPage = (
-            explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+            ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
           $scope.isInEditorPreviewMode = $scope.isInEditorPage && (
-            explorationContextService.getEditorTabContext() ===
+            ExplorationContextService.getEditorTabContext() ===
               EDITOR_TAB_CONTEXT.PREVIEW);
           $scope.isInEditorMainTab = $scope.isInEditorPage && (
-            explorationContextService.getEditorTabContext() ===
+            ExplorationContextService.getEditorTabContext() ===
               EDITOR_TAB_CONTEXT.EDITOR);
 
           $scope.collectionId = GLOBALS.collectionId;
@@ -59,7 +59,7 @@ oppia.directive('oppiaInteractiveEndExploration', [
           if ($scope.isInEditorPage) {
             // Display a message if any author-recommended explorations are
             // invalid.
-            var explorationId = explorationContextService.getExplorationId();
+            var explorationId = ExplorationContextService.getExplorationId();
             $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
               params: {
                 stringified_exp_ids: JSON.stringify(

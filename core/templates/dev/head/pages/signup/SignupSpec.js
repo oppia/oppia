@@ -47,7 +47,7 @@ describe('Signup controller', function() {
         $scope: scope,
         $http: $http,
         $rootScope: rootScope,
-        alertsService: mockAlertsService
+        AlertsService: mockAlertsService
       });
     }));
 

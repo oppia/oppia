@@ -307,7 +307,7 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
     Returns:
         list(dict). Each item in the list is a dict with keys representing
         - 'id': str. The visualization ID.
-        - 'data': list(dict). A list of calculation IDs.
+        - 'data': list(dict). A list of answer/frequency dicts.
         - 'options': dict. The visualization options.
 
         An example of the returned value may be:
@@ -343,7 +343,7 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
             continue
 
         calculation_ids_to_outputs[calculation_id] = (
-            calc_output_domain_object.calculation_output)
+            calc_output_domain_object.calculation_output.to_raw_type())
     return [{
         'id': visualization.id,
         'data': calculation_ids_to_outputs[visualization.calculation_id],
@@ -459,9 +459,8 @@ def _get_calc_output(exploration_id, state_name, calculation_id):
     """Get state answers calculation output domain object obtained from
     StateAnswersCalcOutputModel instance stored in the data store. The
     calculation ID comes from the name of the calculation class used to compute
-    aggregate data from submitted user answers.
-    If 'exploration_version' is VERSION_ALL, this will return aggregated
-    output for all versions of the specified state and exploration.
+    aggregate data from submitted user answers. This returns aggregated output
+    for all versions of the specified state and exploration.
 
     Args:
         exploration_id: str. ID of the exploration.
@@ -475,9 +474,20 @@ def _get_calc_output(exploration_id, state_name, calculation_id):
     calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
         exploration_id, VERSION_ALL, state_name, calculation_id)
     if calc_output_model:
+        calculation_output = None
+        if (calc_output_model.calculation_output_type ==
+                stats_domain.CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST):
+            calculation_output = (
+                stats_domain.AnswerFrequencyList.from_raw_type(
+                    calc_output_model.calculation_output))
+        elif (calc_output_model.calculation_output_type ==
+              stats_domain.CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS):
+            calculation_output = (
+                stats_domain.CategorizedAnswerFrequencyLists.from_raw_type(
+                    calc_output_model.calculation_output))
         return stats_domain.StateAnswersCalcOutput(
             exploration_id, VERSION_ALL, state_name,
             calc_output_model.interaction_id, calculation_id,
-            calc_output_model.calculation_output)
+            calculation_output)
     else:
         return None
