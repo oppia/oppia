@@ -129,6 +129,7 @@ oppia.factory('FractionInputValidationService', [
                 }
                 break;
               case 'HasDenominatorEqualTo':
+              console.log(rule.inputs.x);
                 if (!Number.isInteger(rule.inputs.x)) {
                   warningsList.push(getNonIntegerInputWarning(i, j));
                 }

@@ -31,7 +31,10 @@ oppia.directive('intEditor', [
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: ['$scope', function($scope) {
         $scope.SCHEMA = {
-          type: 'int'
+          type: 'int',
+          validators: [{
+            id: 'is_integer'
+          }]
         };
 
         if (!$scope.$parent.value) {

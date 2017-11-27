@@ -109,13 +109,13 @@ oppia.factory('fractionInputRulesService', [
         return toFloat(answer) > toFloat(inputs.f);
       },
       HasIntegerPartEqualTo: function(answer, inputs) {
-        return answer.wholeNumber === inputs.f.wholeNumber;
+        return answer.wholeNumber === inputs.x;
       },
       HasNumeratorEqualTo: function(answer, inputs) {
-        return answer.numerator === inputs.f.numerator;
+        return answer.numerator === inputs.x;
       },
       HasDenominatorEqualTo: function(answer, inputs) {
-        return answer.denominator === inputs.f.denominator;
+        return answer.denominator === inputs.x;
       },
       HasNoFractionalPart: function(answer) {
         return answer.numerator === 0;
