@@ -110,9 +110,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             })
 
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
-            try:
-                state_name = item.state_name.encode('utf-8')
-            except AttributeError:
+            state_name = item.state_name.encode('utf-8')
+            if state_name is None:
                 yield (
                     "ERROR: State name is None for this event of type %s "
                     "created on %s for exploration with ID %s." % (
