@@ -32,11 +32,11 @@ oppia.directive('inputResponsePair', [
       controller: [
         '$scope', 'ExplorationPlayerService', 'PlayerTranscriptService',
         'oppiaExplorationHtmlFormatterService', 'INTERACTION_SPECS',
-        'PlayerPositionService', 'FocusManagerService', 'DeviceInfoService',
+        'PlayerPositionService',
         function(
             $scope, ExplorationPlayerService, PlayerTranscriptService,
             oppiaExplorationHtmlFormatterService, INTERACTION_SPECS,
-            PlayerPositionService, FocusManagerService, DeviceInfoService) {
+            PlayerPositionService) {
           $scope.isCurrentCardAtEndOfTranscript = function() {
             return PlayerTranscriptService.isLastCard(
               PlayerPositionService.getActiveCardIndex());

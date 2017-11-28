@@ -35,16 +35,12 @@ oppia.directive('hintButton', [
       controller: [
         '$scope', '$rootScope', '$timeout', 'NumberAttemptsService',
         'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
-        'FocusManagerService', 'DeviceInfoService',
         function($scope, $rootScope, $timeout, NumberAttemptsService,
-            WindowDimensionsService, TWO_CARD_THRESHOLD_PX, FocusManagerService,
-            DeviceInfoService) {
+            WindowDimensionsService, TWO_CARD_THRESHOLD_PX) {
           $scope.isShowingHintTooltip = false;
 
           var viewportIsNarrow =
             WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
-
-          $scope.HintButtonId = 'HintButton';
 
           $scope.getTooltipPlacement = function() {
             return (viewportIsNarrow && $scope.isSupplementalCard()) ?
