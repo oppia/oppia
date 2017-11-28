@@ -13,8 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview A Service registering analytics events for the editor for events which are
- *  only logged when they happen after the editor is opened for the first time
+ * @fileoverview A Service registering analytics events for the editor
+ *  for events which are  only logged when they happen after the editor
+ *  is opened for the first time
  *  for an exploration.
  */
 
