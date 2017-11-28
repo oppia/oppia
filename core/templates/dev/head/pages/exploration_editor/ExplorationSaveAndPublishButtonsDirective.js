@@ -24,11 +24,11 @@ oppia.directive('explorationSaveAndPublishButtons', [
         'exploration_save_and_publish_buttons_directive.html'),
       controller: [
         '$scope', 'changeListService', 'editabilityService',
-        'explorationRightsService', 'explorationWarningsService',
+        'explorationRightsService', 'ExplorationWarningsService',
         'ExplorationSaveService',
         function(
             $scope, changeListService, editabilityService,
-            explorationRightsService, explorationWarningsService,
+            explorationRightsService, ExplorationWarningsService,
             ExplorationSaveService) {
           $scope.saveIsInProcess = false;
           $scope.publishIsInProcess = false;
@@ -47,7 +47,7 @@ oppia.directive('explorationSaveAndPublishButtons', [
           };
 
           $scope.countWarnings = function() {
-            return explorationWarningsService.countWarnings();
+            return ExplorationWarningsService.countWarnings();
           };
 
           $scope.discardChanges = function() {
@@ -63,7 +63,7 @@ oppia.directive('explorationSaveAndPublishButtons', [
           };
 
           $scope.getPublishExplorationButtonTooltip = function() {
-            if (explorationWarningsService.countWarnings() > 0) {
+            if (ExplorationWarningsService.countWarnings() > 0) {
               return 'Please resolve the warnings before publishing.';
             } else if (changeListService.isExplorationLockedForEditing()) {
               return 'Please save your changes before publishing.';
@@ -73,7 +73,7 @@ oppia.directive('explorationSaveAndPublishButtons', [
           };
 
           $scope.getSaveButtonTooltip = function() {
-            if (explorationWarningsService.hasCriticalWarnings() > 0) {
+            if (ExplorationWarningsService.hasCriticalWarnings() > 0) {
               return 'Please resolve the warnings.';
             } else if (explorationRightsService.isPrivate()) {
               return 'Save Draft';

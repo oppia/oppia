@@ -22,7 +22,7 @@ oppia.factory('ResponsesService', [
   'AnswerGroupsCacheService', 'EditorStateService', 'changeListService',
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
   'stateSolutionService', 'SolutionVerificationService', 'AlertsService',
-  'ExplorationContextService', 'explorationWarningsService',
+  'ExplorationContextService', 'ExplorationWarningsService',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
@@ -30,7 +30,7 @@ oppia.factory('ResponsesService', [
       AnswerGroupsCacheService, EditorStateService, changeListService,
       explorationStatesService, graphDataService, OutcomeObjectFactory,
       stateSolutionService, SolutionVerificationService, AlertsService,
-      ExplorationContextService, explorationWarningsService,
+      ExplorationContextService, ExplorationWarningsService,
       INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
@@ -78,7 +78,7 @@ oppia.factory('ResponsesService', [
             function() {
               explorationStatesService.updateSolutionValidity(
                 currentStateName, true);
-              explorationWarningsService.updateWarnings();
+              ExplorationWarningsService.updateWarnings();
               if (!solutionWasPreviouslyValid) {
                 AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
               }
@@ -86,7 +86,7 @@ oppia.factory('ResponsesService', [
             function() {
               explorationStatesService.updateSolutionValidity(
                 currentStateName, false);
-              explorationWarningsService.updateWarnings();
+              ExplorationWarningsService.updateWarnings();
               if (solutionWasPreviouslyValid) {
                 AlertsService.addInfoMessage(
                   INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
