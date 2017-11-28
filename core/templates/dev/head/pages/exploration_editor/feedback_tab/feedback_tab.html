@@ -9,11 +9,9 @@
     </div>
 
     <div class="pull-right">
-      {% if user_email %}
-        <button class="btn btn-success pull-right" ng-click="showCreateThreadModal()">
+        <button ng-if="allowResponseToFeedback" class="btn btn-success pull-right" ng-click="showCreateThreadModal()">
           Start new thread
         </button>
-      {% endif %}
     </div>
 
     <h2>Exploration Feedback</h2>
@@ -28,9 +26,8 @@
                   on-click-row="setActiveThread">
     </thread-table>
 
-    {% if not user_email %}
-      <em>To create a new feedback thread, please log in.</em>
-    {% endif %}
+    
+      <em ng-if="!allowResponseToFeedback">To create a new feedback thread, please log in.</em>
   </div>
 
   <div ng-if="activeThread">
@@ -104,8 +101,7 @@
 
     <hr>
 
-    {% if user_email %}
-      <div class="row">
+      <div class="row" ng-if="allowResponseToFeedback">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div>
             <label for="tmpMessageText">
@@ -143,8 +139,6 @@
           </div>
         </div>
       </div>
-    {% else %}
-      <em>To respond to a feedback thread, please log in.</em>
-    {% endif %}
+      <em ng-if="!allowResponseToFeedback">To respond to a feedback thread, please log in.</em>
   </div>
 </md-card>
