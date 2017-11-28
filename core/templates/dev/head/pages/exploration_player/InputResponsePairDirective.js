@@ -23,7 +23,8 @@ oppia.directive('inputResponsePair', [
       scope: {
         data: '=',
         oppiaAvatarImageUrl: '&',
-        profilePicture: '&'
+        profilePicture: '&',
+        inputResponsePairId: '=',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
@@ -31,11 +32,11 @@ oppia.directive('inputResponsePair', [
       controller: [
         '$scope', 'ExplorationPlayerService', 'PlayerTranscriptService',
         'oppiaExplorationHtmlFormatterService', 'INTERACTION_SPECS',
-        'PlayerPositionService',
+        'PlayerPositionService', 'FocusManagerService', 'DeviceInfoService',
         function(
             $scope, ExplorationPlayerService, PlayerTranscriptService,
             oppiaExplorationHtmlFormatterService, INTERACTION_SPECS,
-            PlayerPositionService) {
+            PlayerPositionService, FocusManagerService, DeviceInfoService) {
           $scope.isCurrentCardAtEndOfTranscript = function() {
             return PlayerTranscriptService.isLastCard(
               PlayerPositionService.getActiveCardIndex());

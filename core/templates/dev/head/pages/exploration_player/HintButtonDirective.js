@@ -57,10 +57,6 @@ oppia.directive('hintButton', [
               $timeout(function() {
                 $scope.isShowingHintTooltip = true;
                 $scope.isShowingNeedHintMessage = true;
-                // Auto scroll to hint button only if using mobile device.
-                if (DeviceInfoService.isMobileDevice()) {
-                  FocusManagerService.setFocus($scope.HintButtonId);
-                }
               }, SHOW_NEED_HINT_MESSAGE_DELAY);
             }
           };
