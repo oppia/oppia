@@ -75,11 +75,10 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
           return (i % 3 === 0) ? null : 'not-null';
         });
         $scope.addressedCellContent = function(index) {
-          return $attrs.data + '\n' + $attrs.options;
           if ($scope.needsAddressing[index] !== null) {
-            return "<span>No</span>&nbsp;&nbsp;&nbsp;<a href='#'>Address Now</a>";
+            return '<span>No</span><a href="#">Address Now</a>';
           } else {
-            return "<span>Yes</span>";
+            return '<span>Yes</span>';
           }
         };
       }
