@@ -117,11 +117,10 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         feconf.EVENT_TYPE_STATE_HIT, item.created_on,
                         item.exploration_id))
                 return
-            state_name = item.state_name.encode('utf-8')
             value = {
                 'event_type': feconf.EVENT_TYPE_STATE_HIT,
                 'version': item.exploration_version,
-                'state_name': state_name,
+                'state_name': item.state_name.encode('utf-8'),
                 'session_id': item.session_id,
                 'created_on': utils.get_time_in_millisecs(item.created_on)
             }
