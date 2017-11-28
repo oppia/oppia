@@ -14,7 +14,7 @@ module.exports = function(config) {
       'core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
       'assets/constants.js',
-      'assets/rich_text_components_specs.js',
+      'assets/rich_text_components_definitions.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.0.0/jquery.min.js',
@@ -28,7 +28,7 @@ module.exports = function(config) {
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*.js',
-      'core/templates/dev/head/**/*.html',
+      'core/templates/dev/head/**/*_directive.html',
       'extensions/**/*.js',
       {
         pattern: 'extensions/**/*.png',
@@ -36,7 +36,7 @@ module.exports = function(config) {
         served: true,
         included: false
       },
-      'extensions/interactions/**/*.html',
+      'extensions/interactions/**/*_directive.html',
       'extensions/interactions/rule_templates.json',
       {
         pattern: 'assets/i18n/**/*.json',
@@ -71,8 +71,8 @@ module.exports = function(config) {
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
-      'core/templates/dev/head/**/*.html': ['ng-html2js'],
-      'extensions/interactions/**/*.html': ['ng-html2js'],
+      'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
+      'extensions/interactions/**/*_directive.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures']
     },
     reporters: ['progress', 'coverage'],
@@ -112,10 +112,8 @@ module.exports = function(config) {
       'karma-coverage'
     ],
     ngHtml2JsPreprocessor: {
-      cacheIdFromPath: function(filepath) {
-        return filepath;
-      },
-      moduleName: 'directiveTemplates'
+      moduleName: 'directiveTemplates',
+      prependPrefix: '/'
     },
     jsonFixturesPreprocessor: {
       variableName: '__fixtures__'

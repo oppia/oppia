@@ -18,10 +18,10 @@
 
 oppia.controller('Preferences', [
   '$scope', '$http', '$rootScope', '$modal', '$timeout', '$translate',
-  'alertsService', 'UrlInterpolationService', 'UtilsService',
+  'AlertsService', 'UrlInterpolationService', 'UtilsService',
   'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
   function(
-      $scope, $http, $rootScope, $modal, $timeout, $translate, alertsService,
+      $scope, $http, $rootScope, $modal, $timeout, $translate, AlertsService,
       UrlInterpolationService, UtilsService, DASHBOARD_TYPE_CREATOR,
       DASHBOARD_TYPE_LEARNER) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
@@ -85,7 +85,7 @@ oppia.controller('Preferences', [
     };
 
     $scope.onSubjectInterestsSelectionChange = function(subjectInterests) {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $scope.subjectInterestsChangedAtLeastOnce = true;
       $scope.subjectInterestsWarningText = null;
       $scope.updateSubjectInterestsWarning(subjectInterests);

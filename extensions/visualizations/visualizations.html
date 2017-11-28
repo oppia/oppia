@@ -21,3 +21,39 @@
     }
   </style>
 </script>
+
+<script type="text/ng-template" id="visualizations/EnumeratedFrequencyTable">
+  <strong><[options.title]></strong>
+  <table class="table">
+    <tr>
+      <th><[options.column_headers[0]]></th>
+      <th><[options.column_headers[1]]></th>
+    </tr>
+    <tr ng-repeat="row in data track by $index">
+      <td>
+        <a class="answer-rank" ng-click="toggleAnswerVisibility($index)">Answer Set #<[$index + 1]></a>
+        <table class="item table" ng-show="answerVisible[$index]">
+          <tr ng-repeat="item in row.answer">
+            <td angular-html-bind="item"></td>
+          </tr>
+        </table>
+      </td>
+      <td><[row.frequency]></td>
+    </tr>
+  </table>
+
+  <style>
+    oppia-visualization-enumerated-frequency-table a.answer-rank {
+      font-weight: bold;
+    }
+    oppia-visualization-enumerated-frequency-table table {
+      margin-top: 12px;
+    }
+    oppia-visualization-enumerated-frequency-table table.item {
+      margin-top: 8px;
+    }
+    oppia-visualization-enumerated-frequency-table table.item tr:nth-child(odd) {
+      background-color: rgba(242, 242, 242, 1);
+    }
+  </style>
+</script>

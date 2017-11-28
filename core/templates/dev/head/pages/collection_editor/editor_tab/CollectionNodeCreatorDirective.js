@@ -24,13 +24,13 @@ oppia.directive('collectionNodeCreator', [
         '/pages/collection_editor/editor_tab/' +
         'collection_node_creator_directive.html'),
       controller: [
-        '$scope', '$http', '$window', '$filter', 'alertsService',
+        '$scope', '$http', '$window', '$filter', 'AlertsService',
         'ValidatorsService', 'CollectionEditorStateService',
         'CollectionLinearizerService', 'CollectionUpdateService',
         'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
         'SearchExplorationsBackendApiService', 'siteAnalyticsService',
         function(
-            $scope, $http, $window, $filter, alertsService,
+            $scope, $http, $window, $filter, AlertsService,
             ValidatorsService, CollectionEditorStateService,
             CollectionLinearizerService, CollectionUpdateService,
             CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
@@ -62,8 +62,8 @@ oppia.directive('collectionNodeCreator', [
                   });
                 return options;
               }, function() {
-                alertsService.addWarning(
-                  'There was an error when searching for matching ' + 
+                AlertsService.addWarning(
+                  'There was an error when searching for matching ' +
                   'explorations.');
               });
             } else {
@@ -80,11 +80,11 @@ oppia.directive('collectionNodeCreator', [
 
           var addExplorationToCollection = function(newExplorationId) {
             if (!newExplorationId) {
-              alertsService.addWarning('Cannot add an empty exploration ID.');
+              AlertsService.addWarning('Cannot add an empty exploration ID.');
               return;
             }
             if ($scope.collection.containsCollectionNode(newExplorationId)) {
-              alertsService.addWarning(
+              AlertsService.addWarning(
                 'There is already an exploration in this collection ' +
                 'with that id.');
               return;
@@ -102,12 +102,12 @@ oppia.directive('collectionNodeCreator', [
                   CollectionLinearizerService.appendCollectionNode(
                     $scope.collection, newExplorationId, summaryBackendObject);
                 } else {
-                  alertsService.addWarning(
+                  AlertsService.addWarning(
                     'That exploration does not exist or you do not have edit ' +
                     'access to it.');
                 }
               }, function() {
-                alertsService.addWarning(
+                AlertsService.addWarning(
                   'There was an error while adding an exploration to the ' +
                   'collection.');
               }

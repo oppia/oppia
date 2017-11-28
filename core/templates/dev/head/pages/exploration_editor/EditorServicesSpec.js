@@ -36,7 +36,7 @@ describe('Change list service', function() {
         addWarning: function() {}
       };
       module(function($provide) {
-        $provide.value('alertsService', mockWarningsData);
+        $provide.value('AlertsService', mockWarningsData);
       });
       spyOn(mockWarningsData, 'addWarning');
       mockExplorationData = {
