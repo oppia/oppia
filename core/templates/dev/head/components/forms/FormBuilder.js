@@ -310,8 +310,7 @@ oppia.filter('isNonempty', [function() {
 
 oppia.filter('isInteger', [function() {
   return function(input) {
-    var INTEGER_REGEX = /^(\+|-)?\d*$/;
-    return INTEGER_REGEX.test(input);
+    return Number.isInteger(Number(input));
   };
 }])
 
