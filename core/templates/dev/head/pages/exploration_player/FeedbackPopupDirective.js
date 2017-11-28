@@ -36,11 +36,11 @@ oppia.directive('feedbackPopup', [
         '/pages/exploration_player/feedback_popup_directive.html'),
       controller: [
         '$scope', '$element', '$http', '$timeout', 'FocusManagerService',
-        'alertsService', 'BackgroundMaskService', 'PlayerPositionService',
+        'AlertsService', 'BackgroundMaskService', 'PlayerPositionService',
         'WindowDimensionsService',
         function(
             $scope, $element, $http, $timeout, FocusManagerService,
-            alertsService, BackgroundMaskService, PlayerPositionService,
+            AlertsService, BackgroundMaskService, PlayerPositionService,
             WindowDimensionsService) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;

@@ -1,0 +1,10 @@
+<div>
+  <span ng-if="answer.length === 0" translate="I18N_INTERACTIONS_SET_INPUT_NO_ANSWER"></span>
+  <span ng-if="answer.length > 0">
+    <ul style="padding-left: 12px">
+      <li ng-repeat="item in answer">
+        <[item]>
+      </li>
+    </ul>
+  </span>
+</div>

@@ -74,3 +74,25 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
     ]
   };
 }]);
+
+oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    templateUrl: 'visualizations/EnumeratedFrequencyTable',
+    controller: [
+      '$scope', '$attrs', 'HtmlEscaperService',
+      function($scope, $attrs, HtmlEscaperService) {
+        $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
+        $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
+        $scope.answerVisible = $scope.data.map(function(_, i) {
+          // First element is shown by default, all others are hidden.
+          return i === 0;
+        });
+        $scope.toggleAnswerVisibility = function(index) {
+          $scope.answerVisible[index] = !$scope.answerVisible[index];
+        };
+      }
+    ]
+  };
+}]);

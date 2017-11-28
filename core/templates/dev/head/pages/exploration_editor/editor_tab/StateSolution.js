@@ -17,19 +17,19 @@
  */
 
 oppia.controller('StateSolution', [
-  '$scope', '$rootScope', '$modal', 'EditorStateService', 'alertsService',
+  '$scope', '$rootScope', '$modal', 'EditorStateService', 'AlertsService',
   'INTERACTION_SPECS', 'stateSolutionService', 'explorationStatesService',
-  'SolutionVerificationService', 'oppiaExplorationHtmlFormatterService',
+  'SolutionVerificationService', 'ExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
-  'SolutionObjectFactory', 'explorationContextService',
-  'explorationWarningsService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'SolutionObjectFactory', 'ExplorationContextService',
+  'ExplorationWarningsService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function(
-    $scope, $rootScope, $modal, EditorStateService, alertsService,
+    $scope, $rootScope, $modal, EditorStateService, AlertsService,
     INTERACTION_SPECS, stateSolutionService, explorationStatesService,
-    SolutionVerificationService, oppiaExplorationHtmlFormatterService,
+    SolutionVerificationService, ExplorationHtmlFormatterService,
     stateInteractionIdService, stateHintsService, UrlInterpolationService,
-    SolutionObjectFactory, explorationContextService,
-    explorationWarningsService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
+    SolutionObjectFactory, ExplorationContextService,
+    ExplorationWarningsService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
     $scope.correctAnswer = null;
     $scope.correctAnswerEditorHtml = '';
     $scope.inlineSolutionEditorIsActive = false;
@@ -40,7 +40,7 @@ oppia.controller('StateSolution', [
     $scope.stateSolutionService = stateSolutionService;
 
 
-    explorationWarningsService.updateWarnings();
+    ExplorationWarningsService.updateWarnings();
 
     $scope.isSolutionValid = function() {
       return explorationStatesService.isSolutionValid(
@@ -48,7 +48,7 @@ oppia.controller('StateSolution', [
     };
 
     $scope.correctAnswerEditorHtml = (
-      oppiaExplorationHtmlFormatterService.getInteractionHtml(
+      ExplorationHtmlFormatterService.getInteractionHtml(
         stateInteractionIdService.savedMemento,
         explorationStatesService.getInteractionCustomizationArgsMemento(
           EditorStateService.getActiveStateName()),
@@ -72,7 +72,7 @@ oppia.controller('StateSolution', [
     };
 
     $scope.openAddOrUpdateSolutionModal = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
       $scope.inlineSolutionEditorIsActive = false;
 
@@ -87,7 +87,7 @@ oppia.controller('StateSolution', [
             $scope, $modalInstance, stateSolutionService) {
             $scope.stateSolutionService = stateSolutionService;
             $scope.correctAnswerEditorHtml = (
-              oppiaExplorationHtmlFormatterService.getInteractionHtml(
+              ExplorationHtmlFormatterService.getInteractionHtml(
                 stateInteractionIdService.savedMemento,
                 explorationStatesService.getInteractionCustomizationArgsMemento(
                   EditorStateService.getActiveStateName()),
@@ -118,7 +118,7 @@ oppia.controller('StateSolution', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]
@@ -127,19 +127,19 @@ oppia.controller('StateSolution', [
         var currentStateName = EditorStateService.getActiveStateName();
         var state = explorationStatesService.getState(currentStateName);
         SolutionVerificationService.verifySolution(
-          explorationContextService.getExplorationId(),
+          ExplorationContextService.getExplorationId(),
           state,
           correctAnswer,
           function () {
             explorationStatesService.updateSolutionValidity(
               currentStateName, true);
-            explorationWarningsService.updateWarnings();
+            ExplorationWarningsService.updateWarnings();
           },
           function () {
             explorationStatesService.updateSolutionValidity(
               currentStateName, false);
-            explorationWarningsService.updateWarnings();
-            alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+            ExplorationWarningsService.updateWarnings();
+            AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
           }
         );
 
@@ -151,7 +151,7 @@ oppia.controller('StateSolution', [
     $scope.deleteSolution = function(evt) {
       evt.stopPropagation();
 
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
@@ -166,7 +166,7 @@ oppia.controller('StateSolution', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]

@@ -17,8 +17,8 @@
 */
 
 oppia.controller('Moderator', [
-  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter', 'alertsService',
-  function($scope, $http, $rootScope, oppiaDatetimeFormatter, alertsService) {
+  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter', 'AlertsService',
+  function($scope, $http, $rootScope, oppiaDatetimeFormatter, AlertsService) {
     $scope.getDatetimeAsString = function(millisSinceEpoch) {
       return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
         millisSinceEpoch);
@@ -96,7 +96,7 @@ oppia.controller('Moderator', [
     };
 
     $scope.saveFeaturedActivityReferences = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
 
       var activityReferencesToSave = angular.copy(
         $scope.displayedFeaturedActivityReferences);
@@ -104,7 +104,7 @@ oppia.controller('Moderator', [
         featured_activity_reference_dicts: activityReferencesToSave
       }).then(function() {
         $scope.lastSavedFeaturedActivityReferences = activityReferencesToSave;
-        alertsService.addSuccessMessage('Featured activities saved.');
+        AlertsService.addSuccessMessage('Featured activities saved.');
       });
     };
   }
