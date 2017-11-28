@@ -110,7 +110,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             })
 
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
-            if state_name is None:
+            if item.state_name is None:
                 yield (
                     "ERROR: State name is None for this event of type %s "
                     "created on %s for exploration with ID %s." % (
