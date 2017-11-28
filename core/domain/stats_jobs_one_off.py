@@ -110,7 +110,6 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             })
 
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
-            state_name = item.state_name.encode('utf-8')
             if state_name is None:
                 yield (
                     "ERROR: State name is None for this event of type %s "
@@ -118,6 +117,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         feconf.EVENT_TYPE_STATE_HIT, item.created_on,
                         item.exploration_id))
                 return
+            state_name = item.state_name.encode('utf-8')
             value = {
                 'event_type': feconf.EVENT_TYPE_STATE_HIT,
                 'version': item.exploration_version,
