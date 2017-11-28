@@ -38,8 +38,7 @@ oppia.directive('searchBar', [
                 return {
                   id: categoryName,
                   text: ConstructTranslationIdsService.getLibraryId(
-                    'categories', categoryName
-                   )
+                    'categories', categoryName)
                 };
               }
             )
