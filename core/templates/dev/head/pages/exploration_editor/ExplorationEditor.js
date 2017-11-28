@@ -43,7 +43,7 @@ oppia.controller('ExplorationEditor', [
   'editabilityService', 'explorationStatesService', 'RouterService',
   'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
-  'explorationWarningsService', '$templateCache', 'ExplorationContextService',
+  'ExplorationWarningsService', '$templateCache', 'ExplorationContextService',
   'ExplorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
@@ -58,7 +58,7 @@ oppia.controller('ExplorationEditor', [
       editabilityService, explorationStatesService, RouterService,
       graphDataService, stateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
-      explorationWarningsService, $templateCache, ExplorationContextService,
+      ExplorationWarningsService, $templateCache, ExplorationContextService,
       ExplorationAdvancedFeaturesService, $modal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
@@ -92,7 +92,7 @@ oppia.controller('ExplorationEditor', [
 
     $scope.$on('refreshGraph', function() {
       graphDataService.recompute();
-      explorationWarningsService.updateWarnings();
+      ExplorationWarningsService.updateWarnings();
     });
 
     $scope.getExplorationUrl = function(explorationId) {
@@ -164,7 +164,7 @@ oppia.controller('ExplorationEditor', [
           RouterService.navigateToMainTab();
         }
 
-        explorationWarningsService.updateWarnings();
+        ExplorationWarningsService.updateWarnings();
 
         // Initialize changeList by draft changes if they exist.
         if (data.draft_changes !== null) {
