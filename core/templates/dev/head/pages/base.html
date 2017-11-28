@@ -71,6 +71,18 @@
     {% block header_css %}
       {% include 'pages/header_css_libs.html' %}
     {% endblock header_css %}
+    <style media="screen">
+    .headroom {
+      will-change: transform;
+      transition: transform 200ms linear;
+    }
+    .headroom--pinned {
+      transform: translateY(0%);
+    }
+    .headroom--unpinned {
+      transform: translateY(-100%);
+    }
+    </style>
 
     <script>
       var GLOBALS = {
@@ -138,7 +150,7 @@
         <div class="oppia-content-container">
           <div id="wrapper">
             <div class="oppia-main-body">
-              <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
+              <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation" headroom tolerance="3" offset="0">
                 <div class="navbar-container">
                   <top-navigation-bar></top-navigation-bar>
 
@@ -151,7 +163,6 @@
                   </div>
                 </div>
               </nav>
-
               <div class="oppia-top-of-page-padding">
               </div>
 
