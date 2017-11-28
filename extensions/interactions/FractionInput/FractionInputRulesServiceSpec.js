@@ -53,6 +53,10 @@ describe('Fraction Input rules service', function() {
     }
   };
 
+  var INTEGER_RULE_INPUT = {
+    x: 20
+  };
+
   it('should have a correct \'equivalence\' rule', function() {
     expect(firs.IsEquivalentTo(
       createNegativeFractionDict(1, 8, 4), RULE_INPUT)).toBe(false);
@@ -115,29 +119,38 @@ describe('Fraction Input rules service', function() {
 
   it('should have a correct \'has integer part equal to\' rule', function() {
     expect(firs.HasIntegerPartEqualTo(
-      createPositiveFractionDict(1, 0, 20), RULE_INPUT)).toBe(true);
+      createPositiveFractionDict(20, 0, 20), INTEGER_RULE_INPUT)).toBe(
+      true);
     expect(firs.HasIntegerPartEqualTo(
-      createPositiveFractionDict(0, 8, 4), RULE_INPUT)).toBe(false);
+      createPositiveFractionDict(0, 8, 4), INTEGER_RULE_INPUT)).toBe(
+      false);
     expect(firs.HasIntegerPartEqualTo(
-      createPositiveFractionDict(2, 0, 2), RULE_INPUT)).toBe(false);
+      createPositiveFractionDict(2, 0, 2), INTEGER_RULE_INPUT)).toBe(
+      false);
   });
 
   it('should have a correct \'has numerator equal to\' rule', function() {
     expect(firs.HasNumeratorEqualTo(
-      createPositiveFractionDict(0, 40, 60), RULE_INPUT)).toBe(true);
+      createPositiveFractionDict(0, 20, 60), INTEGER_RULE_INPUT)).toBe(
+      true);
     expect(firs.HasNumeratorEqualTo(
-      createPositiveFractionDict(1, 8, 4), RULE_INPUT)).toBe(false);
+      createPositiveFractionDict(1, 8, 4), INTEGER_RULE_INPUT)).toBe(
+      false);
     expect(firs.HasNumeratorEqualTo(
-      createPositiveFractionDict(1, 80, 2), RULE_INPUT)).toBe(false);
+      createPositiveFractionDict(1, 80, 2), INTEGER_RULE_INPUT)).toBe(
+      false);
   });
 
   it('should have a correct \'has denominator equal to\' rule', function() {
     expect(firs.HasDenominatorEqualTo(
-      createPositiveFractionDict(1, 49, 20), RULE_INPUT)).toBe(true);
+      createPositiveFractionDict(1, 49, 20), INTEGER_RULE_INPUT)).toBe(
+      true);
     expect(firs.HasDenominatorEqualTo(
-      createPositiveFractionDict(1, 8, 4), RULE_INPUT)).toBe(false);
+      createPositiveFractionDict(1, 8, 4), INTEGER_RULE_INPUT)).toBe(
+      false);
     expect(firs.HasDenominatorEqualTo(
-      createPositiveFractionDict(1, 0, 2), RULE_INPUT)).toBe(false);
+      createPositiveFractionDict(1, 0, 2), INTEGER_RULE_INPUT)).toBe(
+      false);
   });
 
   it('should check if the fraction is a whole number', function() {
