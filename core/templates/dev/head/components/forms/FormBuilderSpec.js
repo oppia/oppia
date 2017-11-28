@@ -56,7 +56,7 @@ describe('HTML to text', function() {
   }));
 });
 
-fdescribe('Normalizer tests', function() {
+describe('Normalizer tests', function() {
   var filterNames = [
     'isFloat',
     'isAtLeast',
