@@ -9,7 +9,7 @@
     </div>
 
     <div class="pull-right">
-        <button ng-if="allowResponseToFeedback" class="btn btn-success pull-right" ng-click="showCreateThreadModal()">
+        <button ng-if="userIsLoggedIn" class="btn btn-success pull-right" ng-click="showCreateThreadModal()">
           Start new thread
         </button>
     </div>
@@ -26,7 +26,7 @@
                   on-click-row="setActiveThread">
     </thread-table>
 
-      <em ng-if="!allowResponseToFeedback">To create a new feedback thread, please log in.</em>
+      <em ng-if="!userIsLoggedIn">To create a new feedback thread, please log in.</em>
   </div>
 
   <div ng-if="activeThread">
@@ -100,7 +100,7 @@
 
     <hr>
 
-      <div class="row" ng-if="allowResponseToFeedback">
+      <div class="row" ng-if="userIsLoggedIn">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div>
             <label for="tmpMessageText">
@@ -138,6 +138,6 @@
           </div>
         </div>
       </div>
-      <em ng-if="!allowResponseToFeedback">To respond to a feedback thread, please log in.</em>
+      <em ng-if="!userIsLoggedIn">To respond to a feedback thread, please log in.</em>
   </div>
 </md-card>
