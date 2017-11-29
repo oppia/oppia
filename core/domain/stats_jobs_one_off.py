@@ -117,13 +117,12 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         feconf.EVENT_TYPE_STATE_HIT, item.created_on,
                         item.exploration_id))
                 return
-            encoded_state_name = item.state_name
-            if not isinstance(encoded_state_name, unicode):
-                encoded_state_name = encoded_state_name.decode('utf-8')
+            unicode_state_name = item.state_name if isinstance(
+                item.state_name, unicode) else item.state_name.decode('utf-8')
             value = {
                 'event_type': feconf.EVENT_TYPE_STATE_HIT,
                 'version': item.exploration_version,
-                'state_name': encoded_state_name,
+                'state_name': unicode_state_name,
                 'session_id': item.session_id,
                 'created_on': utils.get_time_in_millisecs(item.created_on)
             }
@@ -137,9 +136,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS,
                         item.created_on, item.exploration_id))
                 return
-            encoded_state_name = item.state_name
-            if not isinstance(encoded_state_name, unicode):
-                encoded_state_name = encoded_state_name.decode('utf-8')
+
+            unicode_state_name = item.state_name if isinstance(
+                item.state_name, unicode) else item.state_name.decode('utf-8')
 
             total_answers_count = len(item.submitted_answer_list)
             useful_feedback_count = 0
@@ -150,7 +149,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             value = {
                 'event_type': GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS,
                 'version': item.exploration_version,
-                'state_name': encoded_state_name,
+                'state_name': unicode_state_name,
                 'total_answers_count': total_answers_count,
                 'useful_feedback_count': useful_feedback_count
             }
