@@ -79,7 +79,6 @@ oppia.controller('CreatorDashboard', [
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
       GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
 
-    $scope.canCreateCollections = GLOBALS.can_create_collections;
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);

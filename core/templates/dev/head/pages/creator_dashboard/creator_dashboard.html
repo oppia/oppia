@@ -60,11 +60,11 @@
              translate="I18N_DASHBOARD_EXPLORATIONS">
           </a>
         </li>
-        <div ng-if="!canCreateCollections">
+        {% if not can_create_collections %}
           <!-- A layout fix when the 'My Collections' tab is absent. -->
           <li ng-if="collectionsList.length === 0 && subscribersList.length === 0"></li>
-        </div>
-        <div ng-if="canCreateCollections">
+        {% endif %}
+        {% if can_create_collections %}
           <li ng-if="collectionsList.length > 0"
               ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
             <a class="oppia-dashboard-tabs-text"
@@ -72,7 +72,7 @@
                translate="I18N_DASHBOARD_COLLECTIONS">
             </a>
           </li>
-        </div>
+        {% endif %}
         <li ng-if="subscribersList.length > 0"
             class="protractor-test-subscription-tab"
             ng-class="{'oppia-dashboard-tabs-active': activeTab === 'mySubscribers'}">
@@ -352,7 +352,7 @@
       </md-card>
     </div>
 
-    <div ng-if="canCreateCollections">
+    {% if can_create_collections %}
       <div ng-if="activeTab === 'myCollections'">
         <div ng-if="collectionsList.length === 0" class="oppia-dashboard-empty-text">
           <em>There are no collections to display.</em>
@@ -374,7 +374,7 @@
           </span>
         </ul>
       </div>
-    </div>
+    {% endif %}
   </div>
 
 {% endblock %}
