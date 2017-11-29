@@ -9,9 +9,9 @@
     </div>
 
     <div class="pull-right">
-        <button ng-if="userIsLoggedIn" class="btn btn-success pull-right" ng-click="showCreateThreadModal()">
-          Start new thread
-        </button>
+      <button ng-if="userIsLoggedIn" class="btn btn-success pull-right" ng-click="showCreateThreadModal()">
+        Start new thread
+      </button>
     </div>
 
     <h2>Exploration Feedback</h2>
@@ -26,7 +26,7 @@
                   on-click-row="setActiveThread">
     </thread-table>
 
-      <em ng-if="!userIsLoggedIn">To create a new feedback thread, please log in.</em>
+    <em ng-if="!userIsLoggedIn">To create a new feedback thread, please log in.</em>
   </div>
 
   <div ng-if="activeThread">
