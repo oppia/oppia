@@ -333,11 +333,20 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
             # Compute total_hit_count and first_hit_count for the states.
             for state_name in state_hit_counts_for_this_version:
-                state_stats_mapping[state_name].total_hit_count_v1 += (
-                    state_hit_counts_for_this_version[state_name][
-                        'total_hit_count'])
-                state_stats_mapping[state_name].first_hit_count_v1 += (
-                    len(state_session_ids_by_version[version][state_name]))
+                try:
+                    state_stats_mapping[state_name].total_hit_count_v1 += (
+                        state_hit_counts_for_this_version[state_name][
+                            'total_hit_count'])
+                    state_stats_mapping[state_name].first_hit_count_v1 += (
+                        len(state_session_ids_by_version[version][state_name]))
+                except KeyError:
+                    yield (
+                        'ERROR: State not in stats mapping exp_id %s, version '
+                        '%s, State %s, Encoded State %s, '
+                        'state_stats_mapping [%s]' % (
+                            exp_id, version, state_name,
+                            state_name.encode('utf-8'),
+                            ', '.join(map(str, state_stats_mapping.keys()))))
 
             # Compute num_completions for the states.
             for state_name in state_completion_counts_for_this_version:
