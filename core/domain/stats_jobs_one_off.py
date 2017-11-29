@@ -18,7 +18,6 @@
 
 import ast
 import collections
-import logging
 
 from core import jobs
 from core.domain import exp_domain
@@ -111,16 +110,12 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
             if item.state_name is None:
-                yield (
-                    "ERROR: State name is None for this event of type %s "
-                    "created on %s for exploration with ID %s." % (
-                        feconf.EVENT_TYPE_STATE_HIT, item.created_on,
-                        item.exploration_id))
                 return
             unicode_state_name = item.state_name if isinstance(
                 item.state_name, unicode) else item.state_name.decode('utf-8')
             value = {
                 'event_type': feconf.EVENT_TYPE_STATE_HIT,
+                'event_id': item.id,
                 'version': item.exploration_version,
                 'state_name': unicode_state_name,
                 'session_id': item.session_id,
@@ -130,11 +125,6 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
         else:
             if item.state_name is None:
-                yield (
-                    "ERROR: State name is None for this event of type %s "
-                    "created on %s for exploration with ID %s." % (
-                        GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS,
-                        item.created_on, item.exploration_id))
                 return
 
             unicode_state_name = item.state_name if isinstance(
@@ -163,8 +153,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
         try:
             exploration = exp_services.get_exploration_by_id(exp_id)
+        # Exploration does not exist.
         except Exception as e:
-            logging.error(e)
             return
 
         latest_exp_version = exploration.version
@@ -234,6 +224,14 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     'total_hit_count'] += 1
                 state_session_ids_by_version[version][state_name].add(
                     session_id)
+
+                # Explicit logging of state names with + characters insted of
+                # spaces.
+                if '+' in state_name:
+                    yield (
+                        'ERROR: State name %s of event (with ID %s created on '
+                        '%s) contains + instead of spaces.' % (
+                            state_name, value['event_id'], value['created_on']))
 
                 if value['created_on'] > session_id_latest_event_mapping[
                         version][session_id]['created_on']:
@@ -338,6 +336,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                             'total_hit_count'])
                     state_stats_mapping[state_name].first_hit_count_v1 += (
                         len(state_session_ids_by_version[version][state_name]))
+                # There are a few state hit events which contain the pseudo end
+                # state as state name. These events are meant to be skipped.
                 except KeyError:
                     yield (
                         'ERROR: State not in stats mapping exp_id %s, version '
@@ -384,25 +384,17 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 # Log exp_id, exp_version, state_names, state_stats_mapping.
                 for answer_group in init_state.interaction.answer_groups:
                     dest_state = answer_group.outcome.dest
+                    # Implicit handling of the pseudo-END state, where we
+                    # skip the state as a possible state leading out of the
+                    # initial state.
                     if dest_state != (
                             versioned_exploration.init_state_name) and (
-                                dest_state in versioned_exploration.states):
-                        try:
-                            first_hit_counts_from_init_state.append(
-                                state_stats_mapping[
-                                    dest_state].first_hit_count_v1)
-                        except KeyError:
-                            state_names = [s.encode('utf-8') for s in (
-                                versioned_exploration.states)]
-                            yield (
-                                'ERROR: Pseudo-END state: exp_id %s, version '
-                                '%s, dest-state: %s, states [%s], '
-                                'state_stats_mapping [%s]' % (
-                                    exp_id, version, dest_state,
-                                    ', '.join(map(str, state_names)),
-                                    ', '.join(
-                                        map(str, state_stats_mapping.keys()))))
-                            continue
+                                dest_state != 'END') and (
+                                    dest_state in versioned_exploration.states):
+                        first_hit_counts_from_init_state.append(
+                            state_stats_mapping[
+                                dest_state].first_hit_count_v1)
+
                 num_actual_starts = max(
                     first_hit_counts_from_init_state or [0])
 
