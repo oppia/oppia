@@ -110,36 +110,36 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             })
 
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
-            state_name = item.state_name
-            if state_name is None:
+            if item.state_name is None:
                 yield (
                     "ERROR: State name is None for this event of type %s "
                     "created on %s for exploration with ID %s." % (
                         feconf.EVENT_TYPE_STATE_HIT, item.created_on,
                         item.exploration_id))
                 return
-            if not isinstance(state_name, unicode):
-                state_name = state_name.decode('utf-8')
+            encoded_state_name = item.state_name
+            if not isinstance(encoded_state_name, unicode):
+                encoded_state_name = encoded_state_name.decode('utf-8')
             value = {
                 'event_type': feconf.EVENT_TYPE_STATE_HIT,
                 'version': item.exploration_version,
-                'state_name': state_name,
+                'state_name': encoded_state_name,
                 'session_id': item.session_id,
                 'created_on': utils.get_time_in_millisecs(item.created_on)
             }
             yield (item.exploration_id, value)
 
         else:
-            state_name = item.state_name
-            if state_name is None:
+            if item.state_name is None:
                 yield (
                     "ERROR: State name is None for this event of type %s "
                     "created on %s for exploration with ID %s." % (
                         GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS,
                         item.created_on, item.exploration_id))
                 return
-            if not isinstance(state_name, unicode):
-                state_name = state_name.decode('utf-8')
+            encoded_state_name = item.state_name
+            if not isinstance(encoded_state_name, unicode):
+                encoded_state_name = encoded_state_name.decode('utf-8')
 
             total_answers_count = len(item.submitted_answer_list)
             useful_feedback_count = 0
@@ -150,7 +150,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             value = {
                 'event_type': GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS,
                 'version': item.exploration_version,
-                'state_name': state_name,
+                'state_name': encoded_state_name,
                 'total_answers_count': total_answers_count,
                 'useful_feedback_count': useful_feedback_count
             }
