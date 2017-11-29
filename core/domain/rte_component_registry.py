@@ -30,7 +30,7 @@ class Registry(object):
     def _refresh(cls):
         """Repopulate the registry."""
         cls._rte_components.clear()
-        with open(feconf.RTE_EXTENSIONS_SPECS_PATH, 'r') as f:
+        with open(feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r') as f:
             cls._rte_components = constants.parse_json_from_js(f)
 
     @classmethod

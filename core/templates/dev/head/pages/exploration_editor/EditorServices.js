@@ -47,10 +47,10 @@ oppia.factory('editabilityService', [function() {
 // A service that maintains a provisional list of changes to be committed to
 // the server.
 oppia.factory('changeListService', [
-  '$rootScope', '$log', 'alertsService', 'ExplorationDataService',
+  '$rootScope', '$log', 'AlertsService', 'ExplorationDataService',
   'autosaveInfoModalsService',
   function(
-      $rootScope, $log, alertsService, ExplorationDataService,
+      $rootScope, $log, AlertsService, ExplorationDataService,
       autosaveInfoModalsService) {
     // TODO(sll): Implement undo, redo functionality. Show a message on each
     // step saying what the step is doing.
@@ -116,7 +116,7 @@ oppia.factory('changeListService', [
           }
         },
         function() {
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           $log.error(
             'nonStrictValidationFailure: ' +
             JSON.stringify(explorationChangeList));
@@ -179,7 +179,7 @@ oppia.factory('changeListService', [
        */
       editExplorationProperty: function(backendName, newValue, oldValue) {
         if (!ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
-          alertsService.addWarning(
+          AlertsService.addWarning(
             'Invalid exploration property: ' + backendName);
           return;
         }
@@ -202,7 +202,7 @@ oppia.factory('changeListService', [
        */
       editStateProperty: function(stateName, backendName, newValue, oldValue) {
         if (!ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
-          alertsService.addWarning('Invalid state property: ' + backendName);
+          AlertsService.addWarning('Invalid state property: ' + backendName);
           return;
         }
         addChange({
@@ -247,7 +247,7 @@ oppia.factory('changeListService', [
       },
       undoLastChange: function() {
         if (explorationChangeList.length === 0) {
-          alertsService.addWarning('There are no changes to undo.');
+          AlertsService.addWarning('There are no changes to undo.');
           return;
         }
         var lastChange = explorationChangeList.pop();
@@ -260,8 +260,8 @@ oppia.factory('changeListService', [
 
 // A data service that stores data about the rights for this exploration.
 oppia.factory('explorationRightsService', [
-  '$http', '$q', 'ExplorationDataService', 'alertsService',
-  function($http, $q, ExplorationDataService, alertsService) {
+  '$http', '$q', 'ExplorationDataService', 'AlertsService',
+  function($http, $q, ExplorationDataService, AlertsService) {
     return {
       init: function(
           ownerNames, editorNames, viewerNames, status, clonedFrom,
@@ -305,7 +305,7 @@ oppia.factory('explorationRightsService', [
           make_community_owned: true
         }).then(function(response) {
           var data = response.data;
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
             data.rights.viewer_names, data.rights.status,
@@ -326,7 +326,7 @@ oppia.factory('explorationRightsService', [
           viewable_if_private: viewableIfPrivate
         }).then(function(response) {
           var data = response.data;
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
             data.rights.viewer_names, data.rights.status,
@@ -348,7 +348,7 @@ oppia.factory('explorationRightsService', [
           new_member_username: newMemberUsername
         }).then(function(response) {
           var data = response.data;
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
             data.rights.viewer_names, data.rights.status,
@@ -368,7 +368,7 @@ oppia.factory('explorationRightsService', [
           make_public: true
         }).then(function(response) {
           var data = response.data;
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
             data.rights.viewer_names, data.rights.status,
@@ -382,7 +382,7 @@ oppia.factory('explorationRightsService', [
         var that = this;
 
         var explorationModeratorRightsUrl = (
-          '/createhandler/moderatorrights/' + 
+          '/createhandler/moderatorrights/' +
           ExplorationDataService.explorationId);
         $http.put(explorationModeratorRightsUrl, {
           action: action,
@@ -390,7 +390,7 @@ oppia.factory('explorationRightsService', [
           version: ExplorationDataService.data.version
         }).then(function(response) {
           var data = response.data;
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
             data.rights.viewer_names, data.rights.status,
@@ -403,8 +403,8 @@ oppia.factory('explorationRightsService', [
 ]);
 
 oppia.factory('explorationPropertyService', [
-  '$rootScope', '$log', 'changeListService', 'alertsService',
-  function($rootScope, $log, changeListService, alertsService) {
+  '$rootScope', '$log', 'changeListService', 'AlertsService',
+  function($rootScope, $log, changeListService, AlertsService) {
     // Public base API for data services corresponding to exploration properties
     // (title, category, etc.)
 
@@ -474,7 +474,7 @@ oppia.factory('explorationPropertyService', [
           return;
         }
 
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         var newBackendValue = angular.copy(this.displayed);
         var oldBackendValue = angular.copy(this.savedMemento);
@@ -665,17 +665,17 @@ oppia.factory('explorationAutomaticTextToSpeechService', [
 // mementos.
 oppia.factory('explorationStatesService', [
   '$log', '$modal', '$filter', '$location', '$rootScope', '$injector', '$q',
-  'explorationInitStateNameService', 'alertsService', 'changeListService',
+  'explorationInitStateNameService', 'AlertsService', 'changeListService',
   'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'AngularNameService',
-  'AnswerClassificationService', 'explorationContextService',
+  'AnswerClassificationService', 'ExplorationContextService',
   'UrlInterpolationService',
   function(
       $log, $modal, $filter, $location, $rootScope, $injector, $q,
-      explorationInitStateNameService, alertsService, changeListService,
+      explorationInitStateNameService, AlertsService, changeListService,
       EditorStateService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, AngularNameService,
-      AnswerClassificationService, explorationContextService,
+      AnswerClassificationService, ExplorationContextService,
       UrlInterpolationService) {
     var _states = null;
     // Properties that have a different backend representation from the
@@ -802,7 +802,7 @@ oppia.factory('explorationStatesService', [
           if (solution) {
             var result = (
               AnswerClassificationService.getMatchingClassificationResult(
-                explorationContextService.getExplorationId(),
+                ExplorationContextService.getExplorationId(),
               stateName,
               _states.getState(stateName),
               solution.correctAnswer,
@@ -834,7 +834,7 @@ oppia.factory('explorationStatesService', [
       isNewStateNameValid: function(newStateName, showWarnings) {
         if (_states.hasState(newStateName)) {
           if (showWarnings) {
-            alertsService.addWarning('A state with this name already exists.');
+            AlertsService.addWarning('A state with this name already exists.');
           }
           return false;
         }
@@ -917,10 +917,10 @@ oppia.factory('explorationStatesService', [
           return;
         }
         if (_states.hasState(newStateName)) {
-          alertsService.addWarning('A state with this name already exists.');
+          AlertsService.addWarning('A state with this name already exists.');
           return;
         }
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         _states.addState(newStateName);
 
@@ -931,14 +931,14 @@ oppia.factory('explorationStatesService', [
         }
       },
       deleteState: function(deleteStateName) {
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         var initStateName = explorationInitStateNameService.displayed;
         if (deleteStateName === initStateName) {
           return;
         }
         if (!_states.hasState(deleteStateName)) {
-          alertsService.addWarning(
+          AlertsService.addWarning(
             'No state with name ' + deleteStateName + ' exists.');
           return;
         }
@@ -966,7 +966,7 @@ oppia.factory('explorationStatesService', [
 
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
+                AlertsService.clearWarnings();
               };
             }
           ]
@@ -993,10 +993,10 @@ oppia.factory('explorationStatesService', [
           return;
         }
         if (_states.hasState(newStateName)) {
-          alertsService.addWarning('A state with this name already exists.');
+          AlertsService.addWarning('A state with this name already exists.');
           return;
         }
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         _states.renameState(oldStateName, newStateName);
 
@@ -1020,8 +1020,8 @@ oppia.factory('explorationStatesService', [
 ]);
 
 oppia.factory('statePropertyService', [
-  '$log', 'changeListService', 'alertsService', 'explorationStatesService',
-  function($log, changeListService, alertsService, explorationStatesService) {
+  '$log', 'changeListService', 'AlertsService', 'explorationStatesService',
+  function($log, changeListService, AlertsService, explorationStatesService) {
     // Public base API for data services corresponding to state properties
     // (interaction id, content, etc.)
     // WARNING: This should be initialized only in the context of the state
@@ -1080,7 +1080,7 @@ oppia.factory('statePropertyService', [
           return;
         }
 
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         var setterFunc = explorationStatesService[this.setterMethodKey];
         setterFunc(this.stateName, angular.copy(this.displayed));
@@ -1153,7 +1153,6 @@ oppia.factory('stateSolutionService', [
     return child;
   }
 ]);
-
 
 oppia.factory('computeGraphService', [
   'INTERACTION_SPECS', function(INTERACTION_SPECS) {
@@ -1291,309 +1290,6 @@ oppia.constant('STATE_ERROR_MESSAGES', {
   INCORRECT_SOLUTION: (
     'The current solution does not lead to another card.')
 });
-
-// Service for the list of exploration warnings.
-oppia.factory('explorationWarningsService', [
-  '$injector', 'graphDataService', 'explorationStatesService',
-  'ExpressionInterpolationService', 'explorationParamChangesService',
-  'ParameterMetadataService', 'INTERACTION_SPECS',
-  'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
-  function(
-      $injector, graphDataService, explorationStatesService,
-      ExpressionInterpolationService, explorationParamChangesService,
-      ParameterMetadataService, INTERACTION_SPECS,
-      WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
-    var _warningsList = [];
-    var stateWarnings = {};
-    var hasCriticalStateWarning = false;
-
-    var _getStatesWithoutInteractionIds = function() {
-      var statesWithoutInteractionIds = [];
-
-      var states = explorationStatesService.getStates();
-
-      states.getStateNames().forEach(function(stateName) {
-        if (!states.getState(stateName).interaction.id) {
-          statesWithoutInteractionIds.push(stateName);
-        }
-      });
-
-      return statesWithoutInteractionIds;
-    };
-
-    var _getStatesWithIncorrectSolution = function() {
-      var statesWithIncorrectSolution = [];
-
-      var states = explorationStatesService.getStates();
-      states.getStateNames().forEach(function(stateName) {
-        if (states.getState(stateName).interaction.solution &&
-            !explorationStatesService.isSolutionValid(stateName)) {
-          statesWithIncorrectSolution.push(stateName);
-        }
-      });
-      return statesWithIncorrectSolution;
-    };
-
-    // Returns a list of names of all nodes which are unreachable from the
-    // initial node.
-    //
-    // Args:
-    // - initNodeIds: a list of initial node ids
-    // - nodes: an object whose keys are node ids, and whose values are node
-    //     names
-    // - edges: a list of edges, each of which is an object with keys 'source',
-    //     and 'target'.
-    var _getUnreachableNodeNames = function(
-        initNodeIds, nodes, edges) {
-      var queue = initNodeIds;
-      var seen = {};
-      for (var i = 0; i < initNodeIds.length; i++) {
-        seen[initNodeIds[i]] = true;
-      }
-      while (queue.length > 0) {
-        var currNodeId = queue.shift();
-        edges.forEach(function(edge) {
-          if (edge.source === currNodeId && !seen.hasOwnProperty(edge.target)) {
-            seen[edge.target] = true;
-            queue.push(edge.target);
-          }
-        });
-      }
-
-      var unreachableNodeNames = [];
-      for (var nodeId in nodes) {
-        if (!(seen.hasOwnProperty(nodes[nodeId]))) {
-          unreachableNodeNames.push(nodes[nodeId]);
-        }
-      }
-
-      return unreachableNodeNames;
-    };
-
-    // Given an array of objects with two keys 'source' and 'target', returns
-    // an array with the same objects but with the values of 'source' and
-    // 'target' switched. (The objects represent edges in a graph, and this
-    // operation amounts to reversing all the edges.)
-    var _getReversedLinks = function(links) {
-      return links.map(function(link) {
-        return {
-          source: link.target,
-          target: link.source,
-        };
-      });
-    };
-
-    // Verify that all parameters referred to in a state are guaranteed to
-    // have been set beforehand.
-    var _verifyParameters = function(initNodeIds) {
-      var unsetParametersInfo = (
-        ParameterMetadataService.getUnsetParametersInfo(initNodeIds));
-
-      var paramWarningsList = [];
-      unsetParametersInfo.forEach(function(unsetParameterData) {
-        if (!unsetParameterData.stateName) {
-          // The parameter value is required in the initial list of parameter
-          // changes.
-          paramWarningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: (
-              'Please ensure the value of parameter "' +
-              unsetParameterData.paramName +
-              '" is set before it is referred to in the initial list of ' +
-              'parameter changes.')
-          });
-        } else {
-          // The parameter value is required in a subsequent state.
-          paramWarningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: (
-              'Please ensure the value of parameter "' +
-              unsetParameterData.paramName +
-              '" is set before using it in "' + unsetParameterData.stateName +
-              '".')
-          });
-        }
-      });
-
-      return paramWarningsList;
-    };
-
-    var _getAnswerGroupIndexesWithEmptyClassifiers = function(state) {
-      var indexes = [];
-      var answerGroups = state.interaction.answerGroups;
-      for (var i = 0; i < answerGroups.length; i++) {
-        var group = answerGroups[i];
-        if (group.rules.length === 1 &&
-            group.rules[0].type === RULE_TYPE_CLASSIFIER &&
-            group.rules[0].inputs.training_data.length === 0) {
-          indexes.push(i);
-        }
-      }
-      return indexes;
-    };
-
-    var _getStatesAndAnswerGroupsWithEmptyClassifiers = function() {
-      var results = [];
-
-      var states = explorationStatesService.getStates();
-
-      states.getStateNames().forEach(function(stateName) {
-        var groupIndexes = _getAnswerGroupIndexesWithEmptyClassifiers(
-          states.getState(stateName));
-        if (groupIndexes.length > 0) {
-          results.push({
-            groupIndexes: groupIndexes,
-            stateName: stateName
-          });
-        }
-      });
-
-      return results;
-    };
-
-    var _updateWarningsList = function() {
-      _warningsList = [];
-      stateWarnings = {};
-      hasCriticalStateWarning = false;
-
-      graphDataService.recompute();
-      var _graphData = graphDataService.getGraphData();
-
-      var _states = explorationStatesService.getStates();
-      _states.getStateNames().forEach(function(stateName) {
-        var interaction = _states.getState(stateName).interaction;
-        if (interaction.id) {
-          var validatorServiceName =
-            _states.getState(stateName).interaction.id + 'ValidationService';
-          var validatorService = $injector.get(validatorServiceName);
-          var interactionWarnings = validatorService.getAllWarnings(
-            stateName, interaction.customizationArgs,
-            interaction.answerGroups, interaction.defaultOutcome);
-
-          for (var j = 0; j < interactionWarnings.length; j++) {
-            if (stateWarnings.hasOwnProperty(stateName)) {
-              stateWarnings[stateName].push(interactionWarnings[j].message);
-            } else {
-              stateWarnings[stateName] = [interactionWarnings[j].message];
-            }
-
-            if (interactionWarnings[j].type === WARNING_TYPES.CRITICAL) {
-              hasCriticalStateWarning = true;
-            }
-          }
-        }
-      });
-
-      var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
-      angular.forEach(statesWithoutInteractionIds, function(
-        stateWithoutInteractionIds) {
-        if (stateWarnings.hasOwnProperty(stateWithoutInteractionIds)) {
-          stateWarnings[stateWithoutInteractionIds].push(
-            STATE_ERROR_MESSAGES.ADD_INTERACTION);
-        } else {
-          stateWarnings[stateWithoutInteractionIds] = [
-            STATE_ERROR_MESSAGES.ADD_INTERACTION];
-        }
-      });
-
-      var statesWithIncorrectSolution = _getStatesWithIncorrectSolution();
-      angular.forEach(statesWithIncorrectSolution, function(state) {
-        if (stateWarnings.hasOwnProperty(state)) {
-          stateWarnings[state].push(STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
-        } else {
-          stateWarnings[state] = [STATE_ERROR_MESSAGES.INCORRECT_SOLUTION];
-        }
-      });
-
-      if (_graphData) {
-        var unreachableStateNames = _getUnreachableNodeNames(
-          [_graphData.initStateId], _graphData.nodes, _graphData.links, true);
-
-        if (unreachableStateNames.length) {
-          angular.forEach(unreachableStateNames, function(
-            unreachableStateName) {
-            if (stateWarnings.hasOwnProperty(unreachableStateName)) {
-              stateWarnings[unreachableStateName].push(
-                STATE_ERROR_MESSAGES.STATE_UNREACHABLE);
-            } else {
-              stateWarnings[unreachableStateName] =
-                [STATE_ERROR_MESSAGES.STATE_UNREACHABLE];
-            }
-          });
-        } else {
-          // Only perform this check if all states are reachable.
-          var deadEndStates = _getUnreachableNodeNames(
-            _graphData.finalStateIds, _graphData.nodes,
-            _getReversedLinks(_graphData.links), false);
-          if (deadEndStates.length) {
-            angular.forEach(deadEndStates, function(deadEndState) {
-              if (stateWarnings.hasOwnProperty(deadEndState)) {
-                stateWarnings[deadEndState].push(
-                  STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION);
-              } else {
-                stateWarnings[deadEndState] = [
-                  STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION];
-              }
-            });
-          }
-        }
-
-        _warningsList = _warningsList.concat(_verifyParameters([
-          _graphData.initStateId]));
-      }
-
-      if (Object.keys(stateWarnings).length) {
-        var errorString = (
-          Object.keys(stateWarnings).length > 1 ? 'cards have' : 'card has');
-        _warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'The following ' + errorString + ' errors: ' +
-            Object.keys(stateWarnings).join(', ') + '.')
-        });
-      }
-
-      var statesWithAnswerGroupsWithEmptyClassifiers = (
-        _getStatesAndAnswerGroupsWithEmptyClassifiers());
-      statesWithAnswerGroupsWithEmptyClassifiers.forEach(function(result) {
-        var warningMessage = 'In \'' + result.stateName + '\'';
-        if (result.groupIndexes.length !== 1) {
-          warningMessage += ', the following answer groups have classifiers ';
-          warningMessage += 'with no training data: ';
-        } else {
-          warningMessage += ', the following answer group has a classifier ';
-          warningMessage += 'with no training data: ';
-        }
-        warningMessage += result.groupIndexes.join(', ');
-
-        _warningsList.push({
-          message: warningMessage,
-          type: WARNING_TYPES.ERROR
-        });
-      });
-    };
-
-    return {
-      countWarnings: function() {
-        return _warningsList.length;
-      },
-      getAllStateRelatedWarnings: function() {
-        return stateWarnings;
-      },
-      getWarnings: function() {
-        return _warningsList;
-      },
-      hasCriticalWarnings: function() {
-        return hasCriticalStateWarning || _warningsList.some(function(warning) {
-          return warning.type === WARNING_TYPES.CRITICAL;
-        });
-      },
-      updateWarnings: function() {
-        _updateWarningsList();
-      }
-    };
-  }
-]);
 
 oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
   var CMD_ADD_STATE = 'add_state';

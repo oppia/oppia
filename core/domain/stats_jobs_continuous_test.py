@@ -959,15 +959,16 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             }]
 
             # Only includes versions 3-4 since version 2 has a different
-            # interaction ID.
+            # interaction ID. Note that the output is dependent on the order of
+            # submission (verb submitted before 2 -> verb ranked higher).
             expected_calculation_all_versions_output = [{
                 'answer': 'noun',
                 'frequency': 2
             }, {
-                'answer': '2',
+                'answer': 'verb',
                 'frequency': 1
             }, {
-                'answer': 'verb',
+                'answer': '2',
                 'frequency': 1
             }]
 

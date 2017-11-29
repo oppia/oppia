@@ -26,17 +26,17 @@ oppia.directive('editorNavigation', [
       controller: [
         '$scope', '$rootScope', '$timeout', '$modal',
         'RouterService', 'explorationRightsService',
-        'explorationWarningsService',
+        'ExplorationWarningsService',
         'stateEditorTutorialFirstTimeService',
         'ThreadDataService', 'siteAnalyticsService',
-        'explorationContextService', 'WindowDimensionsService',
+        'ExplorationContextService', 'WindowDimensionsService',
         function(
             $scope, $rootScope, $timeout, $modal,
             RouterService, explorationRightsService,
-            explorationWarningsService,
+            ExplorationWarningsService,
             stateEditorTutorialFirstTimeService,
             ThreadDataService, siteAnalyticsService,
-            explorationContextService, WindowDimensionsService) {
+            ExplorationContextService, WindowDimensionsService) {
           $scope.postTutorialHelpPopoverIsShown = false;
           $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
 
@@ -54,7 +54,7 @@ oppia.directive('editorNavigation', [
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
 
           $scope.showUserHelpModal = function() {
-            var explorationId = explorationContextService.getExplorationId();
+            var explorationId = ExplorationContextService.getExplorationId();
             siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
             var modalInstance = $modal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -63,12 +63,12 @@ oppia.directive('editorNavigation', [
               backdrop: true,
               controller: [
                 '$scope', '$modalInstance',
-                'siteAnalyticsService', 'explorationContextService',
+                'siteAnalyticsService', 'ExplorationContextService',
                 function(
                   $scope, $modalInstance,
-                  siteAnalyticsService, explorationContextService) {
+                  siteAnalyticsService, ExplorationContextService) {
                   var explorationId = (
-                    explorationContextService.getExplorationId());
+                    ExplorationContextService.getExplorationId());
 
                   $scope.beginTutorial = function() {
                     siteAnalyticsService
@@ -94,10 +94,10 @@ oppia.directive('editorNavigation', [
             });
           };
 
-          $scope.countWarnings = explorationWarningsService.countWarnings;
-          $scope.getWarnings = explorationWarningsService.getWarnings;
+          $scope.countWarnings = ExplorationWarningsService.countWarnings;
+          $scope.getWarnings = ExplorationWarningsService.getWarnings;
           $scope.hasCriticalWarnings = (
-            explorationWarningsService.hasCriticalWarnings);
+            ExplorationWarningsService.hasCriticalWarnings);
 
           $scope.explorationRightsService = explorationRightsService;
           $scope.getTabStatuses = RouterService.getTabStatuses;

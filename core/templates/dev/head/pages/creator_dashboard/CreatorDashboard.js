@@ -48,7 +48,7 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
 
 oppia.controller('CreatorDashboard', [
   '$scope', '$rootScope', '$http', '$window', 'oppiaDatetimeFormatter',
-  'alertsService', 'CreatorDashboardBackendApiService',
+  'AlertsService', 'CreatorDashboardBackendApiService',
   'RatingComputationService', 'ExplorationCreationService',
   'UrlInterpolationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
@@ -56,7 +56,7 @@ oppia.controller('CreatorDashboard', [
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
   function(
       $scope, $rootScope, $http, $window, oppiaDatetimeFormatter,
-      alertsService, CreatorDashboardBackendApiService,
+      AlertsService, CreatorDashboardBackendApiService,
       RatingComputationService, ExplorationCreationService,
       UrlInterpolationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
@@ -217,7 +217,7 @@ oppia.controller('CreatorDashboard', [
       },
       function(errorResponse) {
         if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-          alertsService.addWarning('Failed to get dashboard data');
+          AlertsService.addWarning('Failed to get dashboard data');
         }
       }
     );
