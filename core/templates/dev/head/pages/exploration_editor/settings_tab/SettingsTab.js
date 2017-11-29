@@ -24,7 +24,7 @@ oppia.controller('SettingsTab', [
   'explorationTagsService', 'explorationRightsService',
   'explorationInitStateNameService', 'explorationParamSpecsService',
   'changeListService', 'AlertsService', 'explorationStatesService',
-  'explorationParamChangesService', 'explorationWarningsService',
+  'explorationParamChangesService', 'ExplorationWarningsService',
   'ExplorationAdvancedFeaturesService', 'ALL_CATEGORIES',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
   'EditableExplorationBackendApiService', 'UrlInterpolationService',
@@ -37,7 +37,7 @@ oppia.controller('SettingsTab', [
       explorationTagsService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService,
       changeListService, AlertsService, explorationStatesService,
-      explorationParamChangesService, explorationWarningsService,
+      explorationParamChangesService, ExplorationWarningsService,
       ExplorationAdvancedFeaturesService, ALL_CATEGORIES,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
       EditableExplorationBackendApiService, UrlInterpolationService,
@@ -161,7 +161,7 @@ oppia.controller('SettingsTab', [
     };
 
     $scope.postSaveParamChangesHook = function() {
-      explorationWarningsService.updateWarnings();
+      ExplorationWarningsService.updateWarnings();
     };
 
     /********************************************
