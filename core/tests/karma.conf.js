@@ -21,6 +21,8 @@ module.exports = function(config) {
       'third_party/static/jqueryui-1.10.3/jquery-ui.min.js',
       'third_party/static/angularjs-1.5.8/angular.js',
       'third_party/static/angularjs-1.5.8/angular-mocks.js',
+      'third_party/static/headroom-js-0.9.4/headroom.min.js',
+      'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
       'third_party/static/math-expressions-370a77/build/math-expressions.js',
       generatedJs,
       'core/templates/dev/head/*.js',
