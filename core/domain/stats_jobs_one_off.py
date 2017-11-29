@@ -347,6 +347,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                             exp_id, version, state_name,
                             state_name.encode('utf-8'),
                             ', '.join(map(str, state_stats_mapping.keys()))))
+                    return
 
             # Compute num_completions for the states.
             for state_name in state_completion_counts_for_this_version:
