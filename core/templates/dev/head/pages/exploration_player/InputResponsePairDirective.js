@@ -24,7 +24,7 @@ oppia.directive('inputResponsePair', [
         data: '=',
         oppiaAvatarImageUrl: '&',
         profilePicture: '&',
-        inputResponsePairId: '=',
+        getInputResponsePairId: '&inputResponsePairId',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
