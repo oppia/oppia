@@ -110,23 +110,37 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             })
 
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
-            if item.state_name is None:
+            state_name = item.state_name
+            if state_name is None:
                 yield (
                     "ERROR: State name is None for this event of type %s "
                     "created on %s for exploration with ID %s." % (
                         feconf.EVENT_TYPE_STATE_HIT, item.created_on,
                         item.exploration_id))
                 return
+            if not isinstance(state_name, unicode):
+                state_name = state_name.decode('utf-8')
             value = {
                 'event_type': feconf.EVENT_TYPE_STATE_HIT,
                 'version': item.exploration_version,
-                'state_name': item.state_name.encode('utf-8'),
+                'state_name': state_name,
                 'session_id': item.session_id,
                 'created_on': utils.get_time_in_millisecs(item.created_on)
             }
             yield (item.exploration_id, value)
 
         else:
+            state_name = item.state_name
+            if state_name is None:
+                yield (
+                    "ERROR: State name is None for this event of type %s "
+                    "created on %s for exploration with ID %s." % (
+                        GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS,
+                        item.created_on, item.exploration_id))
+                return
+            if not isinstance(state_name, unicode):
+                state_name = state_name.decode('utf-8')
+
             total_answers_count = len(item.submitted_answer_list)
             useful_feedback_count = 0
             for answer in item.submitted_answer_list:
@@ -136,7 +150,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             value = {
                 'event_type': GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS,
                 'version': item.exploration_version,
-                'state_name': item.state_name.encode('utf-8'),
+                'state_name': state_name,
                 'total_answers_count': total_answers_count,
                 'useful_feedback_count': useful_feedback_count
             }
@@ -274,7 +288,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             if version == 1:
                 # Create default state stats mapping for the first version.
                 for state_name in versioned_exploration.states:
-                    state_stats_mapping[state_name.encode('utf-8')] = (
+                    state_stats_mapping[state_name] = (
                         stats_domain.StateStats.create_default())
             else:
                 change_list = snapshots_by_version[version - 1]['commit_cmds']
@@ -283,17 +297,16 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 for change_dict in change_list:
                     if change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
                         state_stats_mapping[change_dict[
-                            'state_name'].encode('utf-8')] = (
+                            'state_name']] = (
                                 stats_domain.StateStats.create_default())
                     elif change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
                         state_stats_mapping.pop(
-                            change_dict['state_name'].encode('utf-8'))
+                            change_dict['state_name'])
                     elif change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
                         state_stats_mapping[change_dict[
-                            'new_state_name'].encode('utf-8')] = (
+                            'new_state_name']] = (
                                 state_stats_mapping.pop(
-                                    change_dict['old_state_name'].encode(
-                                        'utf-8')))
+                                    change_dict['old_state_name']))
                     elif change_dict['cmd'] == 'AUTO_revert_version_number':
                         revert_to_version = change_dict['version_number']
 
@@ -368,8 +381,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         try:
                             first_hit_counts_from_init_state.append(
                                 state_stats_mapping[
-                                    dest_state.encode(
-                                        'utf-8')].first_hit_count_v1)
+                                    dest_state].first_hit_count_v1)
                         except KeyError:
                             state_names = [s.encode('utf-8') for s in (
                                 versioned_exploration.states)]
