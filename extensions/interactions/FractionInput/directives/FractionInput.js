@@ -21,14 +21,17 @@ oppia.directive('oppiaInteractiveFractionInput', [function() {
     templateUrl: 'interaction/FractionInput',
     controller: [
       '$scope', '$attrs', 'FocusManagerService',
-      'fractionInputRulesService', 'FractionObjectFactory',
+      'fractionInputRulesService',
+      'FractionObjectFactory', 'FRACTION_PARSING_ERRORS',
       function($scope, $attrs, FocusManagerService,
-        fractionInputRulesService, FractionObjectFactory) {
+        fractionInputRulesService,
+        FractionObjectFactory, FRACTION_PARSING_ERRORS) {
         $scope.answer = '';
         $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
         var requireSimplestForm =
           $attrs.requireSimplestFormWithValue === 'true';
         var errorMessage = '';
+        var FORM_ERROR_TYPE = 'FRACTION_FORMAT_ERROR';
         $scope.FRACTION_INPUT_FORM_SCHEMA = {
           type: 'unicode',
           ui_config: {}
@@ -37,6 +40,40 @@ oppia.directive('oppiaInteractiveFractionInput', [function() {
         $scope.getWarningText = function() {
           return errorMessage;
         };
+
+        /**
+         * Disables the input box if the data entered is not a valid prefix
+         * for a fraction.
+         * Examples of valid prefixes:
+         * -- 1
+         * -- 1 2
+         * -- 1 2/
+         * -- 2/
+         * -- 1 2/3
+         */
+        $scope.$watch('answer', function(newValue) {
+          var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
+          // Accepts incomplete fraction inputs (see examples above except last).
+          var PARTIAL_FRACTION_REGEX =
+            /^\s*(-?\s*((\d*\s*\d+\s*\/?\s*)|\d+)\s*)?$/;
+          // Accepts complete fraction inputs.
+          var FRACTION_REGEX =
+            /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
+          if (INVALID_CHARS_REGEX.test(newValue)) {
+            errorMessage = FRACTION_PARSING_ERRORS.INVALID_CHARS;
+            $scope.FractionInputForm.answer.$setValidity(
+              FORM_ERROR_TYPE, false);
+          } else if (!(FRACTION_REGEX.test(newValue) ||
+              PARTIAL_FRACTION_REGEX.test(newValue))) {
+            errorMessage = FRACTION_PARSING_ERRORS.INVALID_FORMAT;
+            $scope.FractionInputForm.answer.$setValidity(
+              FORM_ERROR_TYPE, false);
+          } else {
+            errorMessage = '';
+            $scope.FractionInputForm.answer.$setValidity(
+              FORM_ERROR_TYPE, true);
+          }
+        });
 
         $scope.submitAnswer = function(answer) {
           try {
@@ -48,6 +85,8 @@ oppia.directive('oppiaInteractiveFractionInput', [function() {
               errorMessage = (
                 'Please enter an answer in simplest form ' +
                 '(e.g., 1/3 instead of 2/6).');
+              $scope.FractionInputForm.answer.$setValidity(
+                FORM_ERROR_TYPE, false);
             } else {
               $scope.onSubmit({
                 answer: fraction,
@@ -56,6 +95,8 @@ oppia.directive('oppiaInteractiveFractionInput', [function() {
             }
           } catch (parsingError) {
             errorMessage = parsingError.message;
+            $scope.FractionInputForm.answer.$setValidity(
+              FORM_ERROR_TYPE, false);
           }
         };
       }

@@ -1,19 +1,18 @@
-<script src="{{cache_slug}}/extensions/interactions/FractionInput/FractionInput.js"></script>
-<script src="{{cache_slug}}/extensions/interactions/FractionInput/FractionInputValidationService.js"></script>
+<script src="{{cache_slug}}/extensions/interactions/FractionInput/directives/FractionInput.js"></script>
+<script src="{{cache_slug}}/extensions/interactions/FractionInput/directives/FractionInputValidationService.js"></script>
 
 <script type="text/ng-template" id="interaction/FractionInput">
-  <form ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
+  <form ng-disabled="FractionInputForm.$invalid" ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
     <!-- This ng-form is needed for submitting answer on hitting enter. -->
     <ng-form name="FractionInputForm">
-      <schema-based-editor schema="FRACTION_INPUT_FORM_SCHEMA" local-value="answer" label-for-focus-target="labelForFocusTarget">
-      </schema-based-editor>
+      <input type="text" name="answer" ng-model="answer" class="form-control">
     </ng-form>
 
     <div class="oppia-form-error oppia-fraction-input-error">
       <[getWarningText()]>
     </div>
     <!-- This ng-click is needed for specifying solutions in the solution editor. -->
-    <md-button class="oppia-learner-confirm-button" ng-click="submitAnswer(answer)" style="margin-top: 15px;">
+    <md-button ng-disabled="FractionInputForm.$invalid" class="oppia-learner-confirm-button" ng-click="submitAnswer(answer)" style="margin-top: 15px;">
       Submit
     </md-button>
   </form>
@@ -27,5 +26,10 @@
 <style>
   .oppia-fraction-input-error {
     margin-top: 10px;
+  }
+
+  .ng-invalid {
+    border-color: red;
+    outline-color: red;
   }
 </style>
