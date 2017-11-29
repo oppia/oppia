@@ -57,7 +57,8 @@ oppia.directive('oppiaInteractiveFractionInput', [
            */
           $scope.$watch('answer', function(newValue) {
             var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
-            // Accepts incomplete fraction inputs (see examples above except last).
+            // Accepts incomplete fraction inputs
+            // (see examples above except last).
             var PARTIAL_FRACTION_REGEX =
               /^\s*(-?\s*((\d*\s*\d+\s*\/?\s*)|\d+)\s*)?$/;
             // Accepts complete fraction inputs.
