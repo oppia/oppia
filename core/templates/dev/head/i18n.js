@@ -22,7 +22,6 @@
 // here to be loaded synchronously with the script to prevent a FOUC or
 // Flash of Untranslated Content.
 // See http://angular-translate.github.io/docs/#/guide/12_asynchronous-loading
-
 oppia.constant('DEFAULT_TRANSLATIONS', {
   I18N_LIBRARY_PAGE_TITLE: 'Library',
   I18N_LIBRARY_LOADING: 'Loading',

@@ -13,11 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for validating things and (optionally) displaying
- * warning messages if the validation fails.
+ * @fileoverview Service to dynamically construct translation ids for i18n.
  */
 
-// Service to dynamically construct translation ids for i18n.
 oppia.factory('ConstructTranslationIdsService', function() {
   return {
     // Construct a translation id for library from name and a prefix.

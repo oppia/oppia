@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for HTML serialization and escaping.
+ * @fileoverview Service to load the i18n translation file.
  */
 
 oppia.factory('TranslationFileHashLoaderService', [
