@@ -228,10 +228,18 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 # Explicit logging of state names with + characters insted of
                 # spaces.
                 if '+' in state_name:
+                    state_name = state_name.replace('+',' ')
                     yield (
                         'ERROR: State name %s of event (with ID %s created on '
                         '%s) contains + instead of spaces.' % (
-                            state_name, value['event_id'], value['created_on']))
+                            state_name, value['event_id'],
+                            datetime.datetime.fromtimestamp(
+                                value['created_on'])))
+
+                # There are a few state hit events which contain the pseudo end
+                # state as state name. These events are meant to be skipped.
+                if state_name == 'END':
+                    continue
 
                 if value['created_on'] > session_id_latest_event_mapping[
                         version][session_id]['created_on']:
@@ -330,23 +338,11 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
             # Compute total_hit_count and first_hit_count for the states.
             for state_name in state_hit_counts_for_this_version:
-                try:
-                    state_stats_mapping[state_name].total_hit_count_v1 += (
-                        state_hit_counts_for_this_version[state_name][
-                            'total_hit_count'])
-                    state_stats_mapping[state_name].first_hit_count_v1 += (
-                        len(state_session_ids_by_version[version][state_name]))
-                # There are a few state hit events which contain the pseudo end
-                # state as state name. These events are meant to be skipped.
-                except KeyError:
-                    yield (
-                        'ERROR: State not in stats mapping exp_id %s, version '
-                        '%s, State %s, Encoded State %s, '
-                        'state_stats_mapping [%s]' % (
-                            exp_id, version, state_name,
-                            state_name.encode('utf-8'),
-                            ', '.join(map(str, state_stats_mapping.keys()))))
-                    return
+                state_stats_mapping[state_name].total_hit_count_v1 += (
+                    state_hit_counts_for_this_version[state_name][
+                        'total_hit_count'])
+                state_stats_mapping[state_name].first_hit_count_v1 += (
+                    len(state_session_ids_by_version[version][state_name]))
 
             # Compute num_completions for the states.
             for state_name in state_completion_counts_for_this_version:
@@ -384,7 +380,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 # Log exp_id, exp_version, state_names, state_stats_mapping.
                 for answer_group in init_state.interaction.answer_groups:
                     dest_state = answer_group.outcome.dest
-                    # Implicit handling of the pseudo-END state, where we
+                    # Explicit handling of the pseudo-END state, where we
                     # skip the state as a possible state leading out of the
                     # initial state.
                     if dest_state != (
