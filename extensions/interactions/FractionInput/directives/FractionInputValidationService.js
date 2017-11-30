@@ -17,9 +17,19 @@
  */
 
 oppia.factory('FractionInputValidationService', [
-  'WARNING_TYPES', 'baseInteractionValidationService', 'FractionObjectFactory',
+  'WARNING_TYPES', 'baseInteractionValidationService',
+  'FractionObjectFactory',
   function(
     WARNING_TYPES, baseInteractionValidationService, FractionObjectFactory) {
+    var getNonIntegerInputWarning = function(i, j) {
+      return {
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule ' + (j + 1) + ' from answer group ' +
+          (i + 1) + ' is invalid: input should be an ' +
+          'integer.')
+      };
+    };
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         return [];
@@ -27,6 +37,8 @@ oppia.factory('FractionInputValidationService', [
       getAllWarnings: function(
         stateName, customizationArgs, answerGroups, defaultOutcome) {
         var warningsList = [];
+        var shouldBeInSimplestForm =
+          customizationArgs.requireSimplestForm.value;
 
         warningsList = warningsList.concat(
           this.getCustomizationArgsWarnings(customizationArgs));
@@ -74,7 +86,25 @@ oppia.factory('FractionInputValidationService', [
               ubi: false,
             };
             switch (rule.type) {
-              case 'IsExactlyEqualTo': // fall-through
+              case 'IsExactlyEqualTo':
+                if (shouldBeInSimplestForm) {
+                  var fraction = rule.inputs.f;
+                  var fractionInSimplestForm = FractionObjectFactory.fromDict(
+                    fraction).convertToSimplestForm();
+                  if (!angular.equals(fraction, fractionInSimplestForm)) {
+                    warningsList.push({
+                      type: WARNING_TYPES.ERROR,
+                      message: (
+                        'Rule ' + (j + 1) + ' from answer group ' +
+                        (i + 1) +
+                        ' will never be matched because it is not ' +
+                        'in simplest form.')
+                    });
+                  }
+                }
+                var f = toFloat(rule.inputs.f);
+                setLowerAndUpperBounds(range, f, f, true, true);
+                break;
               case 'IsEquivalentTo': // fall-through
               case 'IsEquivalentToAndInSimplestForm':
                 var f = toFloat(rule.inputs.f);
@@ -88,7 +118,32 @@ oppia.factory('FractionInputValidationService', [
                 var f = toFloat(rule.inputs.f);
                 setLowerAndUpperBounds(range, -Infinity, f, false, false);
                 break;
+              case 'HasNumeratorEqualTo':
+                if (!Number.isInteger(rule.inputs.x)) {
+                  warningsList.push(getNonIntegerInputWarning(i, j));
+                }
+                break;
+              case 'HasIntegerPartEqualTo':
+                if (!Number.isInteger(rule.inputs.x)) {
+                  warningsList.push(getNonIntegerInputWarning(i, j));
+                }
+                break;
+              case 'HasDenominatorEqualTo':
+                if (!Number.isInteger(rule.inputs.x)) {
+                  warningsList.push(getNonIntegerInputWarning(i, j));
+                }
+                if (rule.inputs.x == 0) {
+                  warningsList.push({
+                    type: WARNING_TYPES.ERROR,
+                    message: (
+                      'Rule ' + (j + 1) + ' from answer group ' +
+                      (i + 1) + ' is invalid: denominator ' +
+                      'should be greater than zero.')
+                  });
+                }
+                break;
               default:
+                break;
             }
             for (var k = 0; k < ranges.length; k++) {
               if (isEnclosedBy(range, ranges[k])) {
@@ -98,7 +153,8 @@ oppia.factory('FractionInputValidationService', [
                     'Rule ' + (j + 1) + ' from answer group ' +
                     (i + 1) + ' will never be matched because it ' +
                     'is made redundant by rule ' + ranges[k].ruleIndex +
-                    ' from answer group ' + ranges[k].answerGroupIndex + '.')
+                    ' from answer group ' + ranges[k].answerGroupIndex +
+                    '.')
                 });
               }
             }

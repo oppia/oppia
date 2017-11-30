@@ -16,8 +16,9 @@ describe('FractionInputValidationService', function() {
   var validatorService, WARNING_TYPES;
 
   var currentState;
-  var answerGroups, goodDefaultOutcome;
-  var greaterThanMinusOne, equalsOneRule, equivalentToOneRule, lessThanTwoRule;
+  var answerGroups, goodDefaultOutcome, customizationArgs;
+  var greaterThanMinusOneRule, equalsOneRule, equivalentToOneRule,
+    lessThanTwoRule;
   var createFractionDict;
   beforeEach(function() {
     module('oppia');
@@ -38,6 +39,12 @@ describe('FractionInputValidationService', function() {
       };
     };
 
+    customizationArgs = {
+      requireSimplestForm: {
+        value: true
+      }
+    };
+
     currentState = 'First State';
     goodDefaultOutcome = {
       dest: 'Second State',
@@ -51,7 +58,7 @@ describe('FractionInputValidationService', function() {
       }
     };
 
-    greaterThanMinusOne = {
+    greaterThanMinusOneRule = {
       type: 'IsGreaterThan',
       inputs: {
         f: createFractionDict(true, 0, 1, 1)
@@ -79,6 +86,27 @@ describe('FractionInputValidationService', function() {
       }
     };
 
+    exactlyEqualToOneAndNotInSimplestFormRule = {
+      type: 'IsExactlyEqualTo',
+      inputs: {
+        f: createFractionDict(false, 0, 10, 10)
+      }
+    };
+
+    nonIntegerRule = {
+      type: 'HasNumeratorEqualTo',
+      inputs: {
+        x: 0.5
+      }
+    };
+
+    zeroDenominatorRule = {
+      type: 'HasDenominatorEqualTo',
+      inputs: {
+        x: 0
+      }
+    };
+
     answerGroups = [{
       rules: [equalsOneRule, lessThanTwoRule],
       outcome: goodDefaultOutcome,
@@ -88,14 +116,16 @@ describe('FractionInputValidationService', function() {
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
   it('should catch redundant rules', function() {
     answerGroups[0].rules = [lessThanTwoRule, equalsOneRule];
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched ' +
@@ -106,7 +136,8 @@ describe('FractionInputValidationService', function() {
   it('should catch identical rules as redundant', function() {
     answerGroups[0].rules = [equalsOneRule, equivalentToOneRule];
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched ' +
@@ -114,7 +145,8 @@ describe('FractionInputValidationService', function() {
     }]);
     answerGroups[0].rules = [equalsOneRule, equivalentToOneAndSimplestFormRule];
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 2 from answer group 1 will never be matched ' +
@@ -124,10 +156,11 @@ describe('FractionInputValidationService', function() {
 
   it('should catch redundant rules in separate answer groups', function() {
     answerGroups[1] = angular.copy(answerGroups[0]);
-    answerGroups[0].rules = [greaterThanMinusOne];
+    answerGroups[0].rules = [greaterThanMinusOneRule];
     answerGroups[1].rules = [equalsOneRule];
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
       message: 'Rule 1 from answer group 2 will never be matched ' +
@@ -137,13 +170,84 @@ describe('FractionInputValidationService', function() {
 
   it('should catch redundant rules caused by greater/less than range',
     function() {
-      answerGroups[0].rules = [greaterThanMinusOne, equalsOneRule];
+      answerGroups[0].rules = [greaterThanMinusOneRule, equalsOneRule];
       var warnings = validatorService.getAllWarnings(
-        currentState, {}, answerGroups, goodDefaultOutcome);
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
         message: 'Rule 2 from answer group 1 will never be matched ' +
           'because it is made redundant by rule 1 from answer group 1.'
       }]);
     });
+
+  it('should catch redundant rules caused by exactly equals', function() {
+    answerGroups[0].rules = [exactlyEqualToOneAndNotInSimplestFormRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 1 from answer group 1 will never be matched ' +
+        'because it is not in simplest form.'
+    }]);
+  });
+
+  it('should catch non integer inputs in the numerator', function() {
+    answerGroups[0].rules = [nonIntegerRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Rule ' + 1 + ' from answer group ' +
+        1 + ' is invalid: input should be an ' +
+        'integer.')
+    }]);
+  });
+
+  it('should catch non integer inputs in the whole number', function() {
+    nonIntegerRule.type = 'HasIntegerPartEqualTo';
+    answerGroups[0].rules = [nonIntegerRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Rule ' + 1 + ' from answer group ' +
+        1 + ' is invalid: input should be an ' +
+        'integer.')
+    }]);
+  });
+
+  it('should catch non integer inputs in the denominator', function() {
+    nonIntegerRule.type = 'HasDenominatorEqualTo';
+    answerGroups[0].rules = [nonIntegerRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Rule ' + 1 + ' from answer group ' +
+        1 + ' is invalid: input should be an ' +
+        'integer.')
+    }]);
+  });
+
+  it('should catch zero input in denominator', function() {
+    answerGroups[0].rules = [zeroDenominatorRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Rule ' + 1 + ' from answer group ' +
+        1 + ' is invalid: denominator should be ' +
+        'greater than zero.')
+    }]);
+  });
 });
