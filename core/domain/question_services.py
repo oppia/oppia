@@ -165,12 +165,14 @@ def apply_change_list(question_id, change_list):
                     question.update_question_data(change.new_value)
                 elif (change.cmd ==
                       question_domain.QUESTION_PROPERTY_ADD_SKILL):
-                    add_question_id_to_skill(question.id, question.collection_id,
-                        change.skill_id, change.user_id)
+                    add_question_id_to_skill(
+                        question.id, question.collection_id, change.skill_id,
+                        change.user_id)
                 elif (change.cmd ==
                       question_domain.QUESTION_PROPERTY_DELETE_SKILL):
-                    remove_skill(question.id, question.collection_id,
-                        change.skill_id, change.user_id)
+                    remove_skill(
+                        question.id, question.collection_id, change.skill_id,
+                        change.user_id)
 
         return question
 
@@ -247,8 +249,8 @@ def add_question_id_to_skill(question_id, collection_id, skill_id, user_id):
             'cmd': collection_domain.CMD_ADD_QUESTION_ID_TO_SKILL,
             'skill_id': skill_id,
             'question_id': question_id
-        }], 'Add a new question with ID %s to skill with ID %s'%(question_id,
-            skill_id))
+        }], 'Add a new question with ID %s to skill with ID %s'%(
+            question_id, skill_id))
 
 
 def remove_skill(question_id, collection_id, skill_id, user_id):

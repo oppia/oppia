@@ -71,7 +71,8 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
 
         question_model = question_services.add_question(self.owner_id, question)
         self.question = question_services.get_question_by_id(question_model.id)
-        question_services.add_question_id_to_skill(self.question.question_id, self.question.collection_id,
+        question_services.add_question_id_to_skill(
+            self.question.question_id, self.question.collection_id,
             skill_id, self.owner_id)
         collection_services.record_played_exploration_in_collection_context(
             self.owner_id, self.collection_id, self.exp_id)
@@ -83,13 +84,13 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
 
     def test_get(self):
         """Test to verify the get method."""
-        response_json = self.get_json('%s/batch'%
-            feconf.QUESTION_DATA_URL, self.payload,
+        response_json = self.get_json(
+            '%s/batch'%feconf.QUESTION_DATA_URL, self.payload,
             expect_errors=False)
         self.assertEqual(response_json[0], self.question.to_dict())
 
         self.payload['user_id'] = self.viewer_id
-        response_json = self.get_json('%s/batch'%
-            feconf.QUESTION_DATA_URL, self.payload,
+        response_json = self.get_json(
+            '%s/batch'%feconf.QUESTION_DATA_URL, self.payload,
             expect_errors=False)
         self.assertEqual(len(response_json), 0)

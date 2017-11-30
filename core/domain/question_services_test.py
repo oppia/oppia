@@ -167,8 +167,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         collection = collection_services.get_collection_by_id(collection_id)
         skill_id = collection.get_skill_id_from_skill_name('skill0')
         question = question_domain.Question.from_dict(question_dict)
-        question_services.add_question_id_to_skill(question.question_id, collection_id, skill_id,
-            owner_id)
+        question_services.add_question_id_to_skill(
+            question.question_id, collection_id, skill_id, owner_id)
         skills = question.get_skills()
         self.assertEqual(len(skills), 1)
         self.assertEqual(skills[0].name, u'skill0')
@@ -206,15 +206,16 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         skill_id = collection.get_skill_id_from_skill_name('skill0')
         question = question_domain.Question.from_dict(question_dict)
 
-        question_services.add_question_id_to_skill(question.question_id, collection_id,
-            skill_id, owner_id)
+        question_services.add_question_id_to_skill(
+            question.question_id, collection_id, skill_id, owner_id)
         skills = question.get_skills()
         self.assertEqual(len(skills), 1)
         self.assertEqual(skills[0].name, u'skill0')
         collection = collection_services.get_collection_by_id(
             collection_id)
         skill_id = collection.get_skill_id_from_skill_name('skill0')
-        question_services.remove_skill(question.question_id, collection_id, skill_id, owner_id)
+        question_services.remove_skill(
+            question.question_id, collection_id, skill_id, owner_id)
         skills = question.get_skills()
         self.assertEqual(len(skills), 0)
 
@@ -255,8 +256,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         question_model = question_services.add_question(self.owner_id, question)
         question = question_services.get_question_by_id(question_model.id)
-        question_services.add_question_id_to_skill(question.question_id, coll_id_0,
-            skill_id, self.owner_id)
+        question_services.add_question_id_to_skill(
+            question.question_id, coll_id_0, skill_id, self.owner_id)
         collection_services.record_played_exploration_in_collection_context(
             self.owner_id, coll_id_0, exp_id_0)
         question_batch = question_services.get_questions_batch(

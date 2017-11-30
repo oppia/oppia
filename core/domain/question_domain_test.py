@@ -203,8 +203,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         skills = question.get_skills()
         self.assertEqual(len(skills), 0)
 
-        question_services.add_question_id_to_skill(question.question_id, collection_id, skill_id,
-            owner_id)
+        question_services.add_question_id_to_skill(
+            question.question_id, collection_id, skill_id, owner_id)
         skills = question.get_skills()
         self.assertEqual(len(skills), 1)
         self.assertEqual(skills[0].name, u'skill0')
@@ -256,7 +256,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         skill_id = collection.get_skill_id_from_skill_name('skill0')
         question = question_domain.Question.from_dict(question_dict)
 
-        question_services.add_question_id_to_skill(question.question_id, collection_id, skill_id, owner_id)
+        question_services.add_question_id_to_skill(
+            question.question_id, collection_id, skill_id, owner_id)
         self.assertEqual(
             question.can_user_answer_question(owner_id, collection_id), False)
 
