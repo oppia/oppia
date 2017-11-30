@@ -381,10 +381,17 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
         commit_log_models = (
             exp_models.ExplorationCommitLogEntryModel.get_all_exploration_commits( # pylint: disable=line-too-long
                 exploration.id, exploration.version))
-        change_lists = [commit.commit_cmds for commit in commit_log_models]
 
         # Create and save state id mapping model for all exploration versions.
-        for exploration, change_list in zip(explorations, change_lists):
+        for exploration, commit in zip(explorations, commit_log_models):
+            if commit is None:
+                yield Exception(
+                    'No exploration commit log model entry found for'
+                    ' exploration %s, version %d' % (
+                        exploration.id, exploration.version))
+                return
+
+            change_list = commit.commit_cmds
             # Check if commit is to revert the exploration.
             if change_list[0]['cmd'].endswith('revert_version_number'):
                 reverted_version = change_list[0]['version_number']

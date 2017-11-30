@@ -30,15 +30,15 @@ oppia.directive('outcomeDestinationEditor', [
       controller: [
         '$scope', 'EditorStateService', 'explorationStatesService',
         'StateGraphLayoutService', 'PLACEHOLDER_OUTCOME_DEST',
-        'FocusManagerService', 'editorFirstTimeEventsService',
+        'FocusManagerService', 'EditorFirstTimeEventsService',
         function(
             $scope, EditorStateService, explorationStatesService,
             StateGraphLayoutService, PLACEHOLDER_OUTCOME_DEST,
-            FocusManagerService, editorFirstTimeEventsService) {
+            FocusManagerService, EditorFirstTimeEventsService) {
           $scope.$on('saveOutcomeDestDetails', function() {
             // Create new state if specified.
             if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
-              editorFirstTimeEventsService
+              EditorFirstTimeEventsService
                 .registerFirstCreateSecondStateEvent();
 
               var newStateName = $scope.outcome.newStateName;
