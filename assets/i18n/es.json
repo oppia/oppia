@@ -159,7 +159,7 @@
 	"I18N_LANGUAGE_FOOTER_VIEW_IN": "Ver Oppia en:",
 	"I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE": "Responder",
 	"I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION": "En proceso",
-	"I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_EXPLORATIONS": "{numberNonexistent, plural, una de busquedas que no son mas disponibles{1 lo sentimos por este problema} otra{# of the explorations in progress are no longer available. We are sorry for the inconvenience}}",
+	"I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_EXPLORATIONS": "{numberNonexistent, plural, one{1 de las exploraciones en curso ya no está disponible. Sentimos las molestas} other{# de las exploraciones en curso ya no están disponibles. Sentimos las molestias}}",
 	"I18N_LEARNER_DASHBOARD_REMOVE_BUTTON": "Eliminar",
 	"I18N_LEARNER_DASHBOARD_RETURN_TO_FEEDBACK_THREADS_MESSAGE": "Volver a la lista de mensajes",
 	"I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE": "Enviar",
