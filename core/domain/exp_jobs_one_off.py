@@ -385,8 +385,8 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
         # Create and save state id mapping model for all exploration versions.
         for exploration, commit in zip(explorations, commit_log_models):
             if commit is None:
-                yield Exception(
-                    'No exploration commit log model entry found for'
+                yield (
+                    'Error: No exploration commit log model entry found for'
                     ' exploration %s, version %d' % (
                         exploration.id, exploration.version))
                 return
