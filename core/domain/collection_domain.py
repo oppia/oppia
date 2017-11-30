@@ -59,9 +59,9 @@ CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
 CMD_ADD_COLLECTION_SKILL = 'add_collection_skill'
 # This takes an additional 'skill_id' parameter.
 CMD_DELETE_COLLECTION_SKILL = 'delete_collection_skill'
-# This takes additional 'question_id' and 'skill' parameters.
+# This takes additional 'question_id' and 'skill_id' parameters.
 CMD_ADD_QUESTION_ID_TO_SKILL = 'add_question_id_to_skill'
-# This takes additional 'question_id' and 'skill' parameters.
+# This takes additional 'question_id' and 'skill_id' parameters.
 CMD_REMOVE_QUESTION_ID_FROM_SKILL = 'remove_question_id_from_skill'
 
 
@@ -134,7 +134,7 @@ class CollectionChange(object):
         elif self.cmd == CMD_ADD_COLLECTION_SKILL:
             self.name = change_dict['name']
         elif self.cmd == CMD_ADD_QUESTION_ID_TO_SKILL:
-            self.skill_name = change_dict['skill_name']
+            self.skill_id = change_dict['skill_id']
             self.question_id = change_dict['question_id']
         elif self.cmd == CMD_REMOVE_QUESTION_ID_FROM_SKILL:
             self.skill_id = change_dict['skill_id']
@@ -1131,20 +1131,16 @@ class Collection(object):
 
         del self.skills[skill_id]
 
-    def add_question_id_to_skill(self, skill_name, question_id):
+    def add_question_id_to_skill(self, skill_id, question_id):
         """Adds the question id to the question list of the appropriate skill.
 
         Args:
-            skill_name: str. The name of the skill.
+            skill_id: str. The id of the skill.
             question_id: str. The id of the question.
 
         Raises:
             Exception: question_id is already present in skill.
         """
-        skill_id = None
-        for _, skill in self.skills.iteritems():
-            if skill.name == skill_name:
-                skill_id = skill.id
         if skill_id is not None:
             question_ids = self.skills[skill_id].question_ids
             if question_id not in question_ids:
@@ -1152,8 +1148,8 @@ class Collection(object):
                     question_id)
             else:
                 raise Exception(
-                    '%s is already present in %s' % (
-                        self.question_id, skill_name))
+                    'Question ID %s is already present in %s' % (
+                        self.question_id, skill_id))
 
     def remove_question_id_from_skill(self, skill_id, question_id):
         """Removes question id from the question list of the appropriate skill.
@@ -1167,7 +1163,7 @@ class Collection(object):
         """
         if question_id not in self.skills[skill_id].question_ids:
             raise Exception(
-                '%s is not present in %s' % (
+                'Question ID %s is not present in %s' % (
                     question_id, self.skills[skill_id].name))
         else:
             self.skills[skill_id].question_ids.remove(question_id)
@@ -1184,7 +1180,7 @@ class Collection(object):
             collection_node = self.get_node(exp_id)
             if collection_node:
                 acquired_skill_ids.update(collection_node.acquired_skill_ids)
-        return acquired_skill_ids
+        return list(acquired_skill_ids)
 
     def validate(self, strict=True):
         """Validates all properties of this collection and its constituents.

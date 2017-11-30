@@ -659,7 +659,7 @@ def apply_change_list(collection_id, change_list):
                 collection.add_skill(change.name)
             elif change.cmd == collection_domain.CMD_ADD_QUESTION_ID_TO_SKILL:
                 collection.add_question_id_to_skill(
-                    change.skill_name, change.question_id)
+                    change.skill_id, change.question_id)
             elif (change.cmd ==
                   collection_domain.CMD_REMOVE_QUESTION_ID_FROM_SKILL):
                 collection.remove_question_id_from_skill(
@@ -1224,7 +1224,7 @@ def get_acquired_skills_of_user_given_collection_id(user_id, collection_id):
         collection_id: str. The id of the collection.
 
     Returns:
-        list. A list of skill ids acquired by the user.
+        list(str). A list of skill ids acquired by the user.
     """
     completed_exploration_ids = get_completed_exploration_ids(
         user_id, collection_id)

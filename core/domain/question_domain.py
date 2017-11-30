@@ -238,37 +238,12 @@ class Question(object):
         """
         self.question_data = question_data
 
-    def add_skill(self, skill_name, user_id):
-        """Adds the question id to the question list of the appropriate skill.
-
-        Args:
-            skill_name: str. The name of the skill.
-            user_id: str. The id of the user.
-        """
-        collection_services.update_collection(
-            user_id, self.collection_id, [{
-                'cmd': collection_domain.CMD_ADD_QUESTION_ID_TO_SKILL,
-                'skill_name': skill_name,
-                'question_id': self.question_id
-            }], 'Add a question_id to skill')
-
-    def remove_skill(self, skill_id, user_id):
-        """Removes the question id from the question list of the appropriate
-        skill.
-
-        Args:
-            skill_id: str. The id of the skill.
-            user_id: str. The id of the user.
-        """
-        collection_services.update_collection(
-            user_id, self.collection_id, [{
-                'cmd': collection_domain.CMD_REMOVE_QUESTION_ID_FROM_SKILL,
-                'skill_id': skill_id,
-                'question_id': self.question_id
-            }], 'Remove a question_id from skill')
-
     def get_skills(self):
-        """Fetches the skills associated with the question."""
+        """Fetches the skills associated with the question.
+
+        Returns:
+            list(CollectionSkill). A list of CollectionSkill domain objects.
+        """
         collection = collection_services.get_collection_by_id(
             self.collection_id)
         skills = collection.skills

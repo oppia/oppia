@@ -20,6 +20,7 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import question_domain
+from core.domain import question_services
 from core.tests import test_utils
 import utils
 
@@ -122,8 +123,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertDictEqual(expected_object, question.to_dict())
 
     def test_create_default_question(self):
-        """Test to verify create_default_question method of question domain
-        object."""
+        """Test to verify create_default_question method of the Question domain
+        object.
+        """
 
         question_id = 'col1.random'
         collection_id = 'col1'
@@ -164,83 +166,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question.update_language_code('es')
         self.assertEqual(question.language_code, 'es')
 
-    def test_add_skill(self):
-        """Test to verify add_skill."""
-        collection_id = 'col1'
-        exp_id = '0_exploration_id'
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        # Create a new collection and exploration.
-        self.save_new_valid_collection(
-            collection_id, owner_id, exploration_id=exp_id)
-
-        # Add a skill.
-        collection_services.update_collection(
-            owner_id, collection_id, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
-                'name': 'test'
-            }], 'Add a new skill')
-
-        state = exp_domain.State.create_default_state('ABC')
-        question_data = state.to_dict()
-
-        question_dict = {
-            'question_id': 'col1.random',
-            'title': 'abc',
-            'question_data': question_data,
-            'question_data_schema_version': 1,
-            'collection_id': 'col1',
-            'language_code': 'en'
-        }
-
-        question = question_domain.Question.from_dict(question_dict)
-
-        question.add_skill('test', owner_id)
-        skills = question.get_skills()
-        self.assertEqual(len(skills), 1)
-        self.assertEqual(skills[0].name, u'test')
-
-    def test_remove_skill(self):
-        """Tests to verify remove_skill method."""
-        collection_id = 'col1'
-        exp_id = '0_exploration_id'
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        # Create a new collection and exploration.
-        self.save_new_valid_collection(
-            collection_id, owner_id, exploration_id=exp_id)
-
-        # Add a skill.
-        collection_services.update_collection(
-            owner_id, collection_id, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
-                'name': 'test'
-            }], 'Add a new skill')
-
-        state = exp_domain.State.create_default_state('ABC')
-        question_data = state.to_dict()
-
-        question_dict = {
-            'question_id': 'col1.random',
-            'title': 'abc',
-            'question_data': question_data,
-            'question_data_schema_version': 1,
-            'collection_id': 'col1',
-            'language_code': 'en'
-        }
-
-        question = question_domain.Question.from_dict(question_dict)
-
-        question.add_skill('test', owner_id)
-        skills = question.get_skills()
-        self.assertEqual(len(skills), 1)
-        self.assertEqual(skills[0].name, u'test')
-        collection = collection_services.get_collection_by_id(
-            collection_id)
-        skill_id = collection.get_skill_id_from_skill_name('test')
-        question.remove_skill(skill_id, owner_id)
-        skills = question.get_skills()
-        self.assertEqual(len(skills), 0)
 
     def test_get_skills(self):
         """Tests get_skills method."""
@@ -256,7 +181,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         collection_services.update_collection(
             owner_id, collection_id, [{
                 'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
-                'name': 'test'
+                'name': 'skill0'
             }], 'Add a new skill')
 
         state = exp_domain.State.create_default_state('ABC')
@@ -271,15 +196,18 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'language_code': 'en'
         }
 
+        collection = collection_services.get_collection_by_id(collection_id)
+        skill_id = collection.get_skill_id_from_skill_name('skill0')
         question = question_domain.Question.from_dict(question_dict)
 
         skills = question.get_skills()
         self.assertEqual(len(skills), 0)
 
-        question.add_skill('test', owner_id)
+        question_services.add_question_id_to_skill(question.question_id, collection_id, skill_id,
+            owner_id)
         skills = question.get_skills()
         self.assertEqual(len(skills), 1)
-        self.assertEqual(skills[0].name, u'test')
+        self.assertEqual(skills[0].name, u'skill0')
 
     def test_can_user_answer_question(self):
         """Tests the method can user answer question."""
@@ -295,14 +223,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         collection_services.update_collection(
             owner_id, collection_id, [{
                 'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
-                'name': 'test'
+                'name': 'skill0'
             }], 'Add a new skill')
         collection = collection_services.get_collection_by_id(
             collection_id)
-        skill_id = collection.get_skill_id_from_skill_name('test')
+        skill_id = collection.get_skill_id_from_skill_name('skill0')
         collection_node = collection.get_node(exp_id)
         collection_node.update_acquired_skill_ids([skill_id])
-        # Update a skill.
+        # Update the acquired skill IDs for the exploration.
         collection_services.update_collection(
             owner_id, collection_id, [{
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
@@ -324,9 +252,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'language_code': 'en'
         }
 
+        collection = collection_services.get_collection_by_id(collection_id)
+        skill_id = collection.get_skill_id_from_skill_name('skill0')
         question = question_domain.Question.from_dict(question_dict)
 
-        question.add_skill('test', owner_id)
+        question_services.add_question_id_to_skill(question.question_id, collection_id, skill_id, owner_id)
         self.assertEqual(
             question.can_user_answer_question(owner_id, collection_id), False)
 

@@ -138,7 +138,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         collection_node = collection.get_node(exp_id)
         collection_node.update_acquired_skill_ids([skill_id])
 
-        # Update skill.
+        # Update the acquired skill IDs for the exploration.
         collection_services.update_collection(
             owner_id, collection_id, [{
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,

@@ -14,6 +14,8 @@
 
 """Controller for Question object."""
 
+import json
+
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import question_services
@@ -23,14 +25,14 @@ class QuestionsBatchHandler(base.BaseHandler):
     """This handler completes requests for questions batch."""
 
     @acl_decorators.open_access
-    def get(self, collection_id):
-        """Handles get requests."""
-        skill_ids = self.request.get('skill_ids')
-        skill_ids = skill_ids.split(",")
+    def get(self):
+        """Handles GET requests."""
+        collection_id = self.request.get('collection_id')
+        skill_ids = json.loads(self.request.get('skill_ids'))
         user_id = self.request.get('user_id')
         batch_size = feconf.QUESTION_BATCH_SIZE
-        questions_batch = (
+        questions_dict = (
             question_services.get_questions_batch(
                 collection_id, skill_ids, user_id, batch_size))
 
-        return self.render_json(questions_batch)
+        return self.render_json(questions_dict)

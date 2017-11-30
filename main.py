@@ -461,7 +461,7 @@ URLS = MAPREDUCE_HANDLERS + [
         collection_editor.CollectionUnpublishHandler),
 
     get_redirect_route(
-        r'%s/batch/<collection_id>' % feconf.QUESTION_DATA_URL,
+        r'%s/batch' % feconf.QUESTION_DATA_URL,
         question.QuestionsBatchHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
