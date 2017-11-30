@@ -226,11 +226,11 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     session_id)
 
                 # Explicit logging of state names with + characters insted of
-                # spaces.
+                # spaces for future reference.
                 if '+' in state_name:
                     state_name = state_name.replace('+',' ')
                     yield (
-                        'ERROR: State name %s of event (with ID %s created on '
+                        'LOG: State name %s of event (with ID %s created on '
                         '%s) contains + instead of spaces.' % (
                             state_name, value['event_id'],
                             datetime.datetime.fromtimestamp(
