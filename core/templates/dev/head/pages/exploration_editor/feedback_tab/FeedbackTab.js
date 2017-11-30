@@ -37,6 +37,7 @@ oppia.controller('FeedbackTab', [
       oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
 
     $scope.activeThread = null;
+    $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
     $rootScope.loadingMessage = 'Loading';
     $scope.tmpMessage = {
       status: null,
