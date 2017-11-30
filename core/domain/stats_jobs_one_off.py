@@ -231,7 +231,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 if '+' in state_name:
                     state_name = state_name.replace('+', ' ')
                     yield (
-                        'LO: State name %s of event (with ID %s created on '
+                        'LOG: State name %s of event (with ID %s created on '
                         '%s) contains + instead of spaces.' % (
                             state_name, value['event_id'],
                             datetime.datetime.fromtimestamp(
@@ -239,7 +239,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
                 # There are a few state hit events which contain the pseudo end
                 # state as state name. These events are meant to be skipped.
-                if state_name == 'END':
+                if state_name == 'END' and state_name not in (
+                        explorations_by_version[version].states):
                     continue
 
                 if value['created_on'] > session_id_latest_event_mapping[
