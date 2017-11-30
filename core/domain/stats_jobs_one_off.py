@@ -221,15 +221,12 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             elif value['event_type'] == feconf.EVENT_TYPE_STATE_HIT:
                 state_name = value['state_name']
                 session_id = value['session_id']
-                state_hit_counts_by_version[version][state_name][
-                    'total_hit_count'] += 1
-                state_session_ids_by_version[version][state_name].add(
-                    session_id)
 
                 # Explicit logging of state names with + characters insted of
                 # spaces for future reference.
                 if '+' in state_name:
                     state_name = state_name.replace('+', ' ')
+                    value['state_name'] = state_name
                     yield (
                         'LOG: State name %s of event (with ID %s created on '
                         '%s) contains + instead of spaces.' % (
@@ -240,8 +237,14 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 # There are a few state hit events which contain the pseudo end
                 # state as state name. These events are meant to be skipped.
                 if state_name == 'END' and state_name not in (
-                        explorations_by_version[version].states):
+                        explorations_by_version[version - 1].states):
                     continue
+
+
+                state_hit_counts_by_version[version][state_name][
+                    'total_hit_count'] += 1
+                state_session_ids_by_version[version][state_name].add(
+                    session_id)
 
                 if value['created_on'] > session_id_latest_event_mapping[
                         version][session_id]['created_on']:
