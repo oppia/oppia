@@ -1,5 +1,5 @@
-application: oppiatestserver
-version: pranav-01-12-2017-6
+application: oppiaserver
+version: default
 runtime: python27
 api_version: 1
 threadsafe: false
