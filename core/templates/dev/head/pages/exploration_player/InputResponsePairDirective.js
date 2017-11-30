@@ -23,7 +23,8 @@ oppia.directive('inputResponsePair', [
       scope: {
         data: '=',
         oppiaAvatarImageUrl: '&',
-        profilePicture: '&'
+        profilePicture: '&',
+        getInputResponsePairId: '&inputResponsePairId',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
