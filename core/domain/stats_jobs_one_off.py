@@ -18,6 +18,7 @@
 
 import ast
 import collections
+import datetime
 
 from core import jobs
 from core.domain import exp_domain
@@ -228,13 +229,13 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 # Explicit logging of state names with + characters insted of
                 # spaces for future reference.
                 if '+' in state_name:
-                    state_name = state_name.replace('+',' ')
+                    state_name = state_name.replace('+', ' ')
                     yield (
-                        'LOG: State name %s of event (with ID %s created on '
+                        'LO: State name %s of event (with ID %s created on '
                         '%s) contains + instead of spaces.' % (
                             state_name, value['event_id'],
                             datetime.datetime.fromtimestamp(
-                                value['created_on'])))
+                                value['created_on']/1000)))
 
                 # There are a few state hit events which contain the pseudo end
                 # state as state name. These events are meant to be skipped.
