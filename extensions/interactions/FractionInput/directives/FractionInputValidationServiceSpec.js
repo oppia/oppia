@@ -17,7 +17,7 @@ describe('FractionInputValidationService', function() {
 
   var currentState;
   var answerGroups, goodDefaultOutcome, customizationArgs;
-  var greaterThanMinusOne, equalsOneRule, equivalentToOneRule,
+  var greaterThanMinusOneRule, equalsOneRule, equivalentToOneRule,
     lessThanTwoRule;
   var createFractionDict;
   beforeEach(function() {
@@ -58,7 +58,7 @@ describe('FractionInputValidationService', function() {
       }
     };
 
-    greaterThanMinusOne = {
+    greaterThanMinusOneRule = {
       type: 'IsGreaterThan',
       inputs: {
         f: createFractionDict(true, 0, 1, 1)
@@ -156,7 +156,7 @@ describe('FractionInputValidationService', function() {
 
   it('should catch redundant rules in separate answer groups', function() {
     answerGroups[1] = angular.copy(answerGroups[0]);
-    answerGroups[0].rules = [greaterThanMinusOne];
+    answerGroups[0].rules = [greaterThanMinusOneRule];
     answerGroups[1].rules = [equalsOneRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
@@ -170,7 +170,7 @@ describe('FractionInputValidationService', function() {
 
   it('should catch redundant rules caused by greater/less than range',
     function() {
-      answerGroups[0].rules = [greaterThanMinusOne, equalsOneRule];
+      answerGroups[0].rules = [greaterThanMinusOneRule, equalsOneRule];
       var warnings = validatorService.getAllWarnings(
         currentState, customizationArgs, answerGroups,
         goodDefaultOutcome);
@@ -193,8 +193,6 @@ describe('FractionInputValidationService', function() {
     }]);
   });
 
-
-  // ========================== NEW RULES =================================
   it('should catch non integer inputs in the numerator', function() {
     answerGroups[0].rules = [nonIntegerRule];
     var warnings = validatorService.getAllWarnings(
@@ -204,7 +202,7 @@ describe('FractionInputValidationService', function() {
       type: WARNING_TYPES.ERROR,
       message: (
         'Rule ' + 1 + ' from answer group ' +
-        1 + ' is invalid as input must be an ' +
+        1 + ' is invalid: input should be an ' +
         'integer.')
     }]);
   });
@@ -219,7 +217,7 @@ describe('FractionInputValidationService', function() {
       type: WARNING_TYPES.ERROR,
       message: (
         'Rule ' + 1 + ' from answer group ' +
-        1 + ' is invalid as input must be an ' +
+        1 + ' is invalid: input should be an ' +
         'integer.')
     }]);
   });
@@ -234,12 +232,12 @@ describe('FractionInputValidationService', function() {
       type: WARNING_TYPES.ERROR,
       message: (
         'Rule ' + 1 + ' from answer group ' +
-        1 + ' is invalid as input must be an ' +
+        1 + ' is invalid: input should be an ' +
         'integer.')
     }]);
   });
 
-  it('should catch non integer inputs in the numerator', function() {
+  it('should catch zero input in denominator', function() {
     answerGroups[0].rules = [zeroDenominatorRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
@@ -248,7 +246,7 @@ describe('FractionInputValidationService', function() {
       type: WARNING_TYPES.ERROR,
       message: (
         'Rule ' + 1 + ' from answer group ' +
-        1 + ' is invalid as denominator must be ' +
+        1 + ' is invalid: denominator should be ' +
         'greater than zero.')
     }]);
   });

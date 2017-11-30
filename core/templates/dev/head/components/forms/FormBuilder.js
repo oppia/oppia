@@ -309,6 +309,13 @@ oppia.filter('isNonempty', [function() {
 }]);
 
 oppia.filter('isInteger', [function() {
+  // Note: Number.isInteger is not supported in IE so polyfill below
+  // is needed.
+  Number.isInteger = Number.isInteger || function(value) {
+    return typeof value === 'number' &&
+      isFinite(value) &&
+      Math.floor(value) === value;
+  };
   return function(input) {
     return Number.isInteger(Number(input));
   };
@@ -337,8 +344,7 @@ oppia.filter('isFloat', [function() {
       if (viewValue.slice(-1) === '%') {
         // This is a percentage, so the input needs to be divided by 100.
         return parseFloat(
-          viewValue.substring(0, viewValue.length - 1).replace(',',
-            '.')
+          viewValue.substring(0, viewValue.length - 1).replace(',', '.')
         ) / 100.0;
       } else {
         return parseFloat(viewValue.replace(',', '.'));
@@ -372,8 +378,7 @@ oppia.directive('applyValidation', ['$filter', function($filter) {
           for (key in validatorSpec) {
             if (key !== 'id') {
               filterArgs[$filter('underscoresToCamelCase')(key)] =
-                angular.copy(
-                  validatorSpec[key]);
+                angular.copy(validatorSpec[key]);
             }
           }
 

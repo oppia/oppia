@@ -35,6 +35,7 @@ oppia.directive('oppiaInteractiveFractionInput', [
           var requireSimplestForm =
             $attrs.requireSimplestFormWithValue === 'true';
           var errorMessage = '';
+          // Label for errors caused whilst parsing a fraction.
           var FORM_ERROR_TYPE = 'FRACTION_FORMAT_ERROR';
           $scope.FRACTION_INPUT_FORM_SCHEMA = {
             type: 'unicode',
@@ -112,8 +113,8 @@ oppia.directive('oppiaInteractiveFractionInput', [
 
 oppia.directive('oppiaResponseFractionInput', [
   'FractionObjectFactory', 'HtmlEscaperService', 'UrlInterpolationService',
-  function(FractionObjectFactory, HtmlEscaperService,
-    UrlInterpolationService) {
+  function(
+    FractionObjectFactory, HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -130,8 +131,8 @@ oppia.directive('oppiaResponseFractionInput', [
 
 oppia.directive('oppiaShortResponseFractionInput', [
   'FractionObjectFactory', 'HtmlEscaperService', 'UrlInterpolationService',
-  function(FractionObjectFactory, HtmlEscaperService,
-    UrlInterpolationService) {
+  function(
+    FractionObjectFactory, HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

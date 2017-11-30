@@ -21,15 +21,15 @@ oppia.factory('FractionInputValidationService', [
   'FractionObjectFactory',
   function(
     WARNING_TYPES, baseInteractionValidationService, FractionObjectFactory) {
-    getNonIntegerInputWarning = function(i, j) {
+    var getNonIntegerInputWarning = function(i, j) {
       return {
         type: WARNING_TYPES.ERROR,
         message: (
           'Rule ' + (j + 1) + ' from answer group ' +
-          (i + 1) + ' is invalid as input must be an ' +
+          (i + 1) + ' is invalid: input should be an ' +
           'integer.')
       };
-    }
+    };
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         return [];
@@ -137,8 +137,8 @@ oppia.factory('FractionInputValidationService', [
                     type: WARNING_TYPES.ERROR,
                     message: (
                       'Rule ' + (j + 1) + ' from answer group ' +
-                      (i + 1) + ' is invalid as denominator ' +
-                      'must be greater than zero.')
+                      (i + 1) + ' is invalid: denominator ' +
+                      'should be greater than zero.')
                   });
                 }
                 break;
