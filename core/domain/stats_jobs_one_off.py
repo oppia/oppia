@@ -240,7 +240,6 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         explorations_by_version[version - 1].states):
                     continue
 
-
                 state_hit_counts_by_version[version][state_name][
                     'total_hit_count'] += 1
                 state_session_ids_by_version[version][state_name].add(
