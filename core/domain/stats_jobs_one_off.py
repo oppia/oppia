@@ -350,6 +350,12 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
             # Compute num_completions for the states.
             for state_name in state_completion_counts_for_this_version:
+                # There are a few state hit events which contain the pseudo end
+                # state as state name. These states are meant to be skipped.
+                if state_name not in state_stats_mapping and (
+                        state_name == 'END'):
+                    continue
+
                 state_stats_mapping[state_name].num_completions_v1 += (
                     state_completion_counts_for_this_version[state_name])
 
