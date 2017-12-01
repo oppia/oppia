@@ -508,7 +508,7 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
             exp_version = exp_stats['exp_version']
 
             num_starts_v1 = exp_stats['num_starts_v1']
-            num_completions_v1 = exp_stats['num_completions_v1'],
+            num_completions_v1 = exp_stats['num_completions_v1']
             num_actual_starts_v1 = exp_stats['num_actual_starts_v1']
 
             StatisticsAuditV1.require_non_negative(
