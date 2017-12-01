@@ -24,6 +24,7 @@ var LearnerDashboardPage = function() {
   var dropdown = element(by.css('.protractor-test-profile-dropdown'));
   var subscriptionButton =
     element(by.css('.protractor-test-subscription-button'));
+  var dashboardLink = element(by.css('.protractor-test-dashboard-link'));
   var createCollection = element(by.css('.protractor-test-create-collection'));
 
   this.get = function() {
@@ -36,7 +37,7 @@ var LearnerDashboardPage = function() {
     subscriptionButton.click();
   }
 
-  this.subscribeCreatorOne = function() {
+  this.subscribeCreatorTwo = function() {
     browser.get('/profile/creator2learnerDashboard');
     browser.waitForAngular();
     subscriptionButton.click();
@@ -44,7 +45,7 @@ var LearnerDashboardPage = function() {
 
   this.selectDropdown = function() {
     browser.actions().mouseMove(dropdown).perform();
-    dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+    dropdown.dashboardLink.click();
     browser.waitForAngular();
   }
 
