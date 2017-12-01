@@ -1173,14 +1173,14 @@ class Collection(object):
         explorations in the collection.
 
         Returns:
-            list(str). A list of skill ids.
+            set(str). A set of skill ids.
         """
         acquired_skill_ids = set()
         for exp_id in exploration_ids:
             collection_node = self.get_node(exp_id)
             if collection_node:
                 acquired_skill_ids.update(collection_node.acquired_skill_ids)
-        return list(acquired_skill_ids)
+        return acquired_skill_ids
 
     def validate(self, strict=True):
         """Validates all properties of this collection and its constituents.
