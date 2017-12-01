@@ -98,7 +98,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         if isinstance(item, stats_models.StartExplorationEventLogEntryModel):
             yield (item.exploration_id, {
                 'event_type': feconf.EVENT_TYPE_START_EXPLORATION,
-                'version': item.exploration_version
+                'version': item.exploration_version,
+                'session_id': item.session_id
             })
 
         elif isinstance(
@@ -193,6 +194,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 'total_answers_count': 0,
                 'useful_feedback_count': 0
             }))
+        # The set of session_ids of learners starting an exploration.
+        exp_started_session_ids = set()
         # The set of session_ids of learners completing an exploration.
         exp_completed_session_ids = set()
         # Dict mapping versions -> sessionID -> state hit events.
@@ -214,9 +217,12 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             version = value['version']
 
             if value['event_type'] == feconf.EVENT_TYPE_START_EXPLORATION:
-                start_exploration_counts_by_version[version] += 1
+                if value['session_id'] not in exp_started_session_ids:
+                    start_exploration_counts_by_version[version] += 1
+                exp_started_session_ids.add(value['session_id'])
             elif value['event_type'] == feconf.EVENT_TYPE_COMPLETE_EXPLORATION:
-                complete_exploration_counts_by_version[version] += 1
+                if value['session_id'] not in exp_completed_session_ids:
+                    complete_exploration_counts_by_version[version] += 1
                 exp_completed_session_ids.add(value['session_id'])
             elif value['event_type'] == feconf.EVENT_TYPE_STATE_HIT:
                 state_name = value['state_name']
@@ -390,15 +396,19 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 # Log exp_id, exp_version, state_names, state_stats_mapping.
                 for answer_group in init_state.interaction.answer_groups:
                     dest_state = answer_group.outcome.dest
-                    # Some older explorations had the pseudo-END state as a
-                    # potential destination from the initial state. We skip the
-                    # pseudo-END state for the purposes of this calculation.
-                    if (dest_state != versioned_exploration.init_state_name and
-                            dest_state != 'END' and
-                            dest_state in versioned_exploration.states):
-                        first_hit_counts_from_init_state.append(
-                            state_stats_mapping[
-                                dest_state].first_hit_count_v1)
+                    if (dest_state != versioned_exploration.init_state_name):
+                        # Some older explorations had the pseudo-END state as a
+                        # potential destination from the initial state. For
+                        # these states, the first hit count is the completions
+                        # count of the exploration.
+                        if dest_state == 'END' and dest_state not in (
+                                versioned_exploration.states):
+                            first_hit_counts_from_init_state.append(
+                                num_completions)
+                        else:
+                            first_hit_counts_from_init_state.append(
+                                state_stats_mapping[
+                                    dest_state].first_hit_count_v1)
 
                 num_actual_starts = max(
                     first_hit_counts_from_init_state or [0])
