@@ -64,7 +64,6 @@ var LearnerDashboardPage = function() {
     collectionEditor.saveChanges();
     browser.waitForAngular();
   };
-
 };
 
 exports.LearnerDashboardPage = LearnerDashboardPage;
