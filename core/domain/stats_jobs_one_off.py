@@ -154,8 +154,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
         try:
             exploration = exp_services.get_exploration_by_id(exp_id)
-        # Exploration does not exist.
         except Exception as e:
+            # Exploration does not exist.
             return
 
         latest_exp_version = exploration.version
@@ -222,8 +222,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 state_name = value['state_name']
                 session_id = value['session_id']
 
-                # Explicit logging of state names with + characters insted of
-                # spaces for future reference.
+                # Some state names in events have spaces replaced with plus
+                # signs. We explicitly log these for future reference.
                 if '+' in state_name:
                     state_name = state_name.replace('+', ' ')
                     value['state_name'] = state_name
@@ -390,13 +390,12 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 # Log exp_id, exp_version, state_names, state_stats_mapping.
                 for answer_group in init_state.interaction.answer_groups:
                     dest_state = answer_group.outcome.dest
-                    # Explicit handling of the pseudo-END state, where we
-                    # skip the state as a possible state leading out of the
-                    # initial state.
-                    if dest_state != (
-                            versioned_exploration.init_state_name) and (
-                                dest_state != 'END') and (
-                                    dest_state in versioned_exploration.states):
+                    # Some older explorations had the pseudo-END state as a
+                    # potential destination from the initial state. We skip the
+                    # pseudo-END state for the purposes of this calculation.
+                    if (dest_state != versioned_exploration.init_state_name and
+                            dest_state != 'END' and
+                            dest_state in versioned_exploration.states):
                         first_hit_counts_from_init_state.append(
                             state_stats_mapping[
                                 dest_state].first_hit_count_v1)
