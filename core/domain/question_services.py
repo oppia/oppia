@@ -134,7 +134,7 @@ def get_questions_by_ids(question_ids):
     question_model_list = question_models.QuestionModel.get_multi(question_ids)
     questions = []
     for question_model in question_model_list:
-        questions.append(get_question_from_model(question_model).to_dict())
+        questions.append(get_question_from_model(question_model))
     return questions
 
 

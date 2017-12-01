@@ -67,8 +67,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         questions = question_services.get_questions_by_ids(
             [question1_model.id, question2_model.id])
         self.assertEqual(len(questions), 2)
-        self.assertEqual(questions[0]['title'], question1_model.title)
-        self.assertEqual(questions[1]['title'], question2_model.title)
+        self.assertEqual(questions[0].title, question1_model.title)
+        self.assertEqual(questions[1].title, question2_model.title)
 
     def test_add_question(self):
         state = exp_domain.State.create_default_state('ABC')
@@ -262,4 +262,4 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.owner_id, coll_id_0, exp_id_0)
         question_batch = question_services.get_questions_batch(
             coll_id_0, [skill_id], self.owner_id, 1)
-        self.assertEqual(question_batch[0]['title'], question.title)
+        self.assertEqual(question_batch[0].title, question.title)

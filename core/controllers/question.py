@@ -31,8 +31,9 @@ class QuestionsBatchHandler(base.BaseHandler):
         skill_ids = json.loads(self.request.get('skill_ids'))
         user_id = self.request.get('user_id')
         batch_size = feconf.QUESTION_BATCH_SIZE
-        questions_dict = (
+        questions_batch = (
             question_services.get_questions_batch(
                 collection_id, skill_ids, user_id, batch_size))
+        questions_dict = [question.to_dict() for question in questions_batch]
 
         return self.render_json(questions_dict)
