@@ -309,13 +309,6 @@ oppia.filter('isNonempty', [function() {
 }]);
 
 oppia.filter('isInteger', [function() {
-  // Note: Number.isInteger is not supported in IE so polyfill below
-  // is needed.
-  Number.isInteger = Number.isInteger || function(value) {
-    return typeof value === 'number' &&
-      isFinite(value) &&
-      Math.floor(value) === value;
-  };
   return function(input) {
     return Number.isInteger(Number(input));
   };

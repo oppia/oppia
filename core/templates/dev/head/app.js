@@ -865,3 +865,10 @@ if (typeof Object.create !== 'function') {
     };
   })();
 }
+
+// Add a Number.isInteger() polyfill for IE.
+Number.isInteger = Number.isInteger || function(value) {
+  return (
+    typeof value === 'number' && isFinite(value) &&
+    Math.floor(value) === value);
+};
