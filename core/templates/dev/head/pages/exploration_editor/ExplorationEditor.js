@@ -38,7 +38,7 @@ oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
   'ExplorationDataService', 'EditorStateService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService',
-  'explorationLanguageCodeService', 'explorationRightsService',
+  'explorationLanguageCodeService', 'ExplorationRightsService',
   'explorationInitStateNameService', 'explorationTagsService',
   'editabilityService', 'explorationStatesService', 'RouterService',
   'graphDataService', 'stateEditorTutorialFirstTimeService',
@@ -53,7 +53,7 @@ oppia.controller('ExplorationEditor', [
       $scope, $http, $window, $rootScope, $log, $timeout,
       ExplorationDataService, EditorStateService, explorationTitleService,
       explorationCategoryService, explorationObjectiveService,
-      explorationLanguageCodeService, explorationRightsService,
+      explorationLanguageCodeService, ExplorationRightsService,
       explorationInitStateNameService, explorationTagsService,
       editabilityService, explorationStatesService, RouterService,
       graphDataService, stateEditorTutorialFirstTimeService,
@@ -125,7 +125,7 @@ oppia.controller('ExplorationEditor', [
         $scope.explorationTitleService = explorationTitleService;
         $scope.explorationCategoryService = explorationCategoryService;
         $scope.explorationObjectiveService = explorationObjectiveService;
-        $scope.explorationRightsService = explorationRightsService;
+        $scope.ExplorationRightsService = ExplorationRightsService;
         $scope.explorationInitStateNameService = (
           explorationInitStateNameService);
 
@@ -136,7 +136,7 @@ oppia.controller('ExplorationEditor', [
         $scope.currentVersion = data.version;
 
         ExplorationAdvancedFeaturesService.init(data);
-        explorationRightsService.init(
+        ExplorationRightsService.init(
           data.rights.owner_names, data.rights.editor_names,
           data.rights.viewer_names, data.rights.status,
           data.rights.cloned_from, data.rights.community_owned,

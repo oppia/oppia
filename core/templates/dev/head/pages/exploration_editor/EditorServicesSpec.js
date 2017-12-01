@@ -289,7 +289,7 @@ describe('Exploration rights service', function() {
     var ers = null;
 
     beforeEach(inject(function($injector) {
-      ers = $injector.get('explorationRightsService');
+      ers = $injector.get('ExplorationRightsService');
 
       GLOBALS.ACTIVITY_STATUS_PRIVATE = 'private';
       GLOBALS.ACTIVITY_STATUS_PUBLIC = 'public';

@@ -196,32 +196,32 @@
   </md-card>
 
   <md-card class="oppia-editor-card">
-    <div ng-if="explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()">
+    <div ng-if="ExplorationRightsService.ownerNames.length > 0 && !ExplorationRightsService.isCloned()">
       <div class="row">
         <div class="col-lg-5 col-md-5 col-sm-5">
           <h3>Roles</h3>
-          <div ng-show="explorationRightsService.ownerNames.length > 0">
+          <div ng-show="ExplorationRightsService.ownerNames.length > 0">
             <strong>Managers</strong>
             <ul>
-              <li ng-repeat="ownerName in explorationRightsService.ownerNames track by $index">
+              <li ng-repeat="ownerName in ExplorationRightsService.ownerNames track by $index">
                 <[ownerName]>
               </li>
             </ul>
           </div>
 
-          <div ng-show="explorationRightsService.editorNames.length > 0">
+          <div ng-show="ExplorationRightsService.editorNames.length > 0">
             <strong>Collaborators</strong>
             <ul>
-              <li ng-repeat="editorName in explorationRightsService.editorNames track by $index">
+              <li ng-repeat="editorName in ExplorationRightsService.editorNames track by $index">
                 <[editorName]>
               </li>
             </ul>
           </div>
 
-          <div ng-show="explorationRightsService.viewerNames.length > 0">
+          <div ng-show="ExplorationRightsService.viewerNames.length > 0">
             <strong>Playtesters</strong>
             <ul>
-              <li ng-repeat="viewerName in explorationRightsService.viewerNames track by $index">
+              <li ng-repeat="viewerName in ExplorationRightsService.viewerNames track by $index">
                 <[viewerName]>
               </li>
             </ul>
@@ -266,45 +266,45 @@
 
         <div class="col-lg-7 col-md-7 col-sm-7">
           <h3>Permissions</h3>
-          <p ng-if="explorationRightsService.isPrivate() &&explorationRightsService.viewableIfPrivate()">
+          <p ng-if="ExplorationRightsService.isPrivate() &&ExplorationRightsService.viewableIfPrivate()">
             This exploration is <strong>private</strong>. Anyone with the link can access it.
           </p>
-          <p ng-if="explorationRightsService.isPrivate() &&!explorationRightsService.viewableIfPrivate()">
+          <p ng-if="ExplorationRightsService.isPrivate() &&!ExplorationRightsService.viewableIfPrivate()">
             This exploration is <strong>private</strong>. Only invited users, moderators and site admins can
             access it.
           </p>
-          <p ng-if="!explorationRightsService.isPrivate()">
+          <p ng-if="!ExplorationRightsService.isPrivate()">
             This exploration is <strong>public</strong>: anyone can access it.
           </p>
 
-          <p ng-if="!explorationRightsService.isPrivate() || explorationRightsService.viewableIfPrivate()">
+          <p ng-if="!ExplorationRightsService.isPrivate() || ExplorationRightsService.viewableIfPrivate()">
             <em>Link to share:</em>
             <input class="form-control" type="text" value="<[getExplorePageUrl(explorationId)]>" readonly="readonly" onClick="this.select();">
           </p>
 
           <br>
 
-          <p ng-if="explorationRightsService.isPrivate()">
+          <p ng-if="ExplorationRightsService.isPrivate()">
             It is <strong>not shown</strong> in the Oppia library.
           </p>
-          <p ng-if="!explorationRightsService.isPrivate()">
+          <p ng-if="!ExplorationRightsService.isPrivate()">
             It is <strong>available</strong> in the Oppia library.
           </p>
         </div>
       </div>
     </div>
 
-    <div ng-if="explorationRightsService.ownerNames.length === 0 && !explorationRightsService.isCloned()">
+    <div ng-if="ExplorationRightsService.ownerNames.length === 0 && !ExplorationRightsService.isCloned()">
       <h3>Permissions</h3>
       <div>
         This exploration is <strong>public</strong> and <strong>community-editable</strong>.
-        <p ng-if="!explorationRightsService.isPrivate()">
+        <p ng-if="!ExplorationRightsService.isPrivate()">
           It is <strong>available</strong> in the Oppia library.
         </p>
       </div>
     </div>
 
-    <div ng-if="explorationRightsService.isCloned()">
+    <div ng-if="ExplorationRightsService.isCloned()">
       <h3>Status</h3>
       <div>
         This exploration was <strong>cloned</strong> from another exploration.
@@ -379,7 +379,7 @@
         <h3>Controls</h3>
 
         {% if can_release_ownership %}
-          <p class="oppia-exploration-ctrl" ng-hide="explorationRightsService.isCommunityOwned()">
+          <p class="oppia-exploration-ctrl" ng-hide="ExplorationRightsService.isCommunityOwned()">
             <button type="button" class="btn btn-default" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
               Transfer ownership to the community
             </button>
@@ -392,7 +392,7 @@
 
         {% if can_delete %}
           <p class="oppia-exploration-ctrl">
-            <button type="button" ng-if="explorationRightsService.isPrivate()"
+            <button type="button" ng-if="ExplorationRightsService.isPrivate()"
                     class="btn btn-danger" ng-click="deleteExploration()"
                     title="Delete this exploration">
               Delete Exploration
@@ -405,7 +405,7 @@
         <h3>Admin Controls</h3>
 
         {% if can_unpublish %}
-          <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="explorationRightsService.isPublic()">
+          <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="ExplorationRightsService.isPublic()">
             <button type="button" class="btn btn-default" ng-click="unpublishExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
               Unpublish
               <span ng-if="currentUserIsAdmin">(as admin)</span>
@@ -414,7 +414,7 @@
           </p>
         {% endif %}
 
-        <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
+        <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="ExplorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
           <button type="button" class="btn btn-danger protractor-test-delete-exploration-button"
                   ng-click="deleteExploration()">
             Delete Exploration
