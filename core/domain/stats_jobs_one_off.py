@@ -401,8 +401,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         # potential destination from the initial state. For
                         # these states, the first hit count is the completions
                         # count of the exploration.
-                        if dest_state == 'END' and dest_state not in (
-                                versioned_exploration.states):
+                        if dest_state == 'END':
                             first_hit_counts_from_init_state.append(
                                 num_completions)
                         else:
