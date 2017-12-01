@@ -32,8 +32,9 @@ oppia.directive('progressDots', [
         function($scope, $rootScope, PlayerPositionService, UrlService,
             WindowDimensionsService) {
           var isIframed = UrlService.isIframed();
-          $scope.MAX_DOTS = WindowDimensionsService.isWindowNarrow() ||
-            isIframed ? 6 : 18;
+          $scope.MAX_DOTS = (
+            WindowDimensionsService.isWindowNarrow() || isIframed ?
+            6 : 18);
           $scope.dots = [];
           $scope.currentDotIndex = PlayerPositionService.getActiveCardIndex();
           var initialDotCount = $scope.getNumDots();
