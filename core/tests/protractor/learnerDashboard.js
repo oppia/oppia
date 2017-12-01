@@ -37,11 +37,11 @@ describe('Learner dashboard functionality', function() {
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
-    learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
   });
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
+    learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
     // Create a new learner.
     users.createUser('learner@learnerDashboard.com', 'learnerlearnerDashboard');
     users.createUser(
@@ -54,11 +54,16 @@ describe('Learner dashboard functionality', function() {
     adminPage.reloadAllExplorations();
     adminPage.updateRole(USERNAME, 'collection editor');
     browser.get(general.SERVER_URL_PREFIX);
-    learnerDashboard.selectDropdown();
+    var dropdown = element(by.css('.protractor-test-profile-dropdown'));
+    browser.actions().mouseMove(dropdown).perform();
+    dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+    browser.waitForAngular();
     element(by.css('.protractor-test-create-activity')).click();
     // Create new collection.
-    learnerDashboard.createExploration();
-    learnerDashboard.publishExploration();
+    learnerDashboardPage.createExploration();
+    browser.waitForAngular();
+    learnerDashboardPage.publishExploration();
+    browser.waitForAngular();
     users.logout();
   });
 
@@ -70,7 +75,7 @@ describe('Learner dashboard functionality', function() {
     general.openPlayer('3');
     player.submitAnswer('Continue', null);
     browser.ignoreSynchronization = true;
-    learnerDashboard.get();
+    learnerDashboardPage.get();
     general.acceptAlert();
     browser.ignoreSynchronization = false;
     browser.waitForAngular();
@@ -83,9 +88,9 @@ describe('Learner dashboard functionality', function() {
     player.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
     player.submitAnswer('Continue', null);
-    learnerDashboard.get();
+    learnerDashboardPage.get();
     browser.waitForAngular();
-    element(by.css('.protractor-test-completed-section')).click();
+    learnerDashboardPage.completedProfileTest();
     browser.waitForAngular();
     libraryPage.expectExplorationToBeVisible('About Oppia');
     users.logout();
@@ -100,7 +105,7 @@ describe('Learner dashboard functionality', function() {
     users.logout();
 
     users.login('learner@learnerDashboard.com');
-    learnerDashboard.get();
+    learnerDashboardPage.get();
     browser.waitForAngular();
     libraryPage.expectExplorationToBeHidden('Root Linear Coefficient Theorem');
     users.logout();
@@ -121,17 +126,17 @@ describe('Learner dashboard functionality', function() {
     // 'In Progress' section.
     player.submitAnswer('Continue', null);
     browser.ignoreSynchronization = true;
-    learnerDashboard.get();
+    learnerDashboardPage.get();
     general.acceptAlert();
     browser.waitForAngular();
     general.waitForSystem();
     browser.ignoreSynchronization = false;
-    element(by.css('.protractor-test-incomplete-collection-section')).click();
+    learnerDashboardPage.incompleteCollectionSection();
     browser.waitForAngular();
     general.waitForSystem();
-    expect(element.all(by.css(
-      '.protractor-test-collection-summary-tile-title')).first(
-    ).getText()).toMatch('Test Collection');
+    expect(
+      learnerDashboardPage.summaryTile()
+    ).toMatch('Test Collection');
 
     // Go to the test collection.
     browser.get('/search/find?q=');
@@ -149,18 +154,18 @@ describe('Learner dashboard functionality', function() {
     player.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
     player.submitAnswer('Continue', null);
-    learnerDashboard.get();
+    learnerDashboardPage.get();
     browser.waitForAngular();
     general.waitForSystem();
-    element(by.css('.protractor-test-completed-section')).click();
+    learnerDashboardPage.completedProfileTest();
     browser.waitForAngular();
     general.waitForSystem();
-    element(by.css('.protractor-test-completed-collection-section')).click();
+    learnerDashboardPage.completedCollectionSection();
     browser.waitForAngular();
     general.waitForSystem();
-    expect(element.all(by.css(
-      '.protractor-test-collection-summary-tile-title')).first(
-    ).getText()).toMatch('Test Collection');
+    expect(
+      learnerDashboardPage.summaryTile()
+    ).toMatch('Test Collection');
     users.logout();
 
     users.login('creator1@learnerDashboard.com');
@@ -184,15 +189,15 @@ describe('Learner dashboard functionality', function() {
     users.logout();
 
     users.login('learner@learnerDashboard.com');
-    learnerDashboard.get();
+    learnerDashboardPage.get();
     browser.waitForAngular();
     general.waitForSystem();
-    element(by.css('.protractor-test-incomplete-collection-section')).click();
+    learnerDashboardPage.incompleteCollectionSection();
     browser.waitForAngular();
     general.waitForSystem();
-    expect(element.all(by.css(
-      '.protractor-test-collection-summary-tile-title')).first(
-    ).getText()).toMatch('Test Collection');
+    expect(
+      learnerDashboardPage.summaryTile()
+    ).toMatch('Test Collection');
     users.logout();
   });
 
@@ -200,12 +205,16 @@ describe('Learner dashboard functionality', function() {
     users.login('learner@learnerDashboard.com');
 
     // Subscribe to both the creators.
-    learnerDashboard.subscribeCreatorOne();
-    learnerDashboard.subscribeCreatorTwo();
+    browser.get('/profile/creator1learnerDashboard');
+    browser.waitForAngular();
+    learnerDashboardPage.clickSubscriptionButton();
+    browser.get('/profile/creator2learnerDashboard');
+    browser.waitForAngular();
+    learnerDashboardPage.clickSubscriptionButton();
 
     // Both creators should be present in the subscriptions section of the
     // dashboard.
-    learnerDashboard.get();
+    learnerDashboardPage.get();
     browser.waitForAngular();
     general.waitForSystem();
     element(by.css('.protractor-test-subscriptions-section')).click();
@@ -230,7 +239,7 @@ describe('Learner dashboard functionality', function() {
       'MultipleChoiceInput', 'Those were all the questions I had!');
     player.submitAnswer('Continue', null);
     player.submitFeedback(feedback);
-    learnerDashboard.get();
+    learnerDashboardPage.get();
     browser.waitForAngular();
     element(by.css('.protractor-test-feedback-section')).click();
     browser.waitForAngular();

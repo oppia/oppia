@@ -21,37 +21,45 @@ var collectionEditor = require('./collectionEditor.js');
 
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner_dashboard';
-  var dropdown = element(by.css('.protractor-test-profile-dropdown'));
   var subscriptionButton =
     element(by.css('.protractor-test-subscription-button'));
   var dashboardLink = element(by.css('.protractor-test-dashboard-link'));
   var createCollection = element(by.css('.protractor-test-create-collection'));
+  var profileTestCompleted =
+    element(by.css('.protractor-test-completed-section'));
+  var completedCollection =
+    element(by.css('.protractor-test-completed-collection-section'));
+  var incompleteCollection =
+    element(by.css('.protractor-test-incomplete-collection-section'));
+  var summary =
+    element.all(by.css('.protractor-test-collection-summary-tile-title'));
 
   this.get = function() {
     return browser.get(LEARNER_DASHBOARD_URL);
   };
 
-  this.subscribeCreatorOne = function() {
-    browser.get('/profile/creator1learnerDashboard');
-    browser.waitForAngular();
+  this.clickSubscriptionButton = function() {
     subscriptionButton.click();
-  }
-
-  this.subscribeCreatorTwo = function() {
-    browser.get('/profile/creator2learnerDashboard');
-    browser.waitForAngular();
-    subscriptionButton.click();
-  }
-
-  this.selectDropdown = function() {
-    browser.actions().mouseMove(dropdown).perform();
-    dropdown.dashboardLink.click();
-    browser.waitForAngular();
   }
 
   this.createExploration = function() {
     createCollection.click();
-    browser.waitForAngular();
+  }
+
+  this.completedProfileTest = function() {
+    profileTestCompleted.click();
+  }
+
+  this.incompleteCollectionSection = function() {
+    incompleteCollection.click();
+  }
+
+  this.completedCollectionSection = function() {
+    completedCollection.click();
+  }
+
+  this.summaryTile = function() {
+    return summary.first().getText();
   }
 
   this.publishExploration = function() {
@@ -63,7 +71,6 @@ var LearnerDashboardPage = function() {
     collectionEditor.setObjective('This is a test collection.');
     collectionEditor.setCategory('Algebra');
     collectionEditor.saveChanges();
-    browser.waitForAngular();
   };
 };
 
