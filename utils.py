@@ -20,6 +20,7 @@ import datetime
 import hashlib
 import imghdr
 import json
+import logging
 import os
 import random
 import re
@@ -503,6 +504,37 @@ def convert_to_str(string_to_convert):
         return string_to_convert.encode('utf-8')
     return string_to_convert
 
+def get_sorted_nodes(nodes):
+    """Returns the nodes in topological sorted order.
+
+    Args:
+        nodes: list(dict). Unorderd list of nodes.
+
+    Returns:
+        list(dict). The list of nodes in topological sorted order.
+    """
+    unsorted_nodes = list(nodes)
+    orderd_skills_ids = set()
+    sorted_nodes = []
+    while len(unsorted_nodes):
+        for index, node in enumerate(unsorted_nodes):
+            prerequisite_skill_ids = set(node['prerequisite_skill_ids'])
+            acquired_skill_ids = set(node['acquired_skill_ids'])
+
+            if len(prerequisite_skill_ids) == 0 or (
+                    prerequisite_skill_ids <= orderd_skills_ids):
+                sorted_nodes.append(node)
+                orderd_skills_ids = orderd_skills_ids | acquired_skill_ids
+                unsorted_nodes.pop(index)
+                break
+
+            if index + 1 == len(unsorted_nodes):
+                logging.info(
+                    'Cannot arrange the explorations in order for this '
+                    'collection.')
+                return nodes
+
+    return sorted_nodes
 
 def get_hashable_value(value):
     """This function returns a hashable version of the input JSON-like value.

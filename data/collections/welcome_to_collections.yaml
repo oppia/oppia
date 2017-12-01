@@ -42,7 +42,7 @@ skills:
     name: About Oppia
     question_ids: []
   skill4:
-    name: Demonstrating soft rules
+    name: Demonstrating string classifier
     question_ids: []
 tags: []
 title: Introduction to Collections in Oppia

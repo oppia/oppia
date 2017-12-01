@@ -563,7 +563,8 @@ class Collection(object):
             collection_dict['schema_version'],
             [
                 CollectionNode.from_dict(node_dict)
-                for node_dict in collection_dict['nodes']
+                for node_dict in (
+                    utils.get_sorted_nodes(collection_dict['nodes']))
             ], {
                 skill_id: CollectionSkill.from_dict(skill_id, skill_dict)
                 for skill_id, skill_dict in
