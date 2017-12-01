@@ -1237,43 +1237,6 @@ oppia.factory('graphDataService', [
   }
 ]);
 
-// Service for the state editor tutorial.
-oppia.factory('stateEditorTutorialFirstTimeService', [
-  '$http', '$rootScope', 'EditorFirstTimeEventsService',
-  function($http, $rootScope, EditorFirstTimeEventsService) {
-    // Whether this is the first time the tutorial has been seen by this user.
-    var _currentlyInFirstVisit = true;
-
-    var STARTED_TUTORIAL_EVENT_URL = '/createhandler/started_tutorial_event';
-
-    return {
-      // After the first call to it in a client session, this does nothing.
-      init: function(firstTime, expId) {
-        if (!firstTime || !_currentlyInFirstVisit) {
-          _currentlyInFirstVisit = false;
-        }
-
-        if (_currentlyInFirstVisit) {
-          $rootScope.$broadcast('enterEditorForTheFirstTime');
-          EditorFirstTimeEventsService.initRegisterEvents(expId);
-          $http.post(STARTED_TUTORIAL_EVENT_URL + '/' + expId).error(
-            function() {
-              console.error('Warning: could not record tutorial start event.');
-            });
-        }
-      },
-      markTutorialFinished: function() {
-        if (_currentlyInFirstVisit) {
-          $rootScope.$broadcast('openPostTutorialHelpPopover');
-          EditorFirstTimeEventsService.registerEditorFirstEntryEvent();
-        }
-
-        _currentlyInFirstVisit = false;
-      }
-    };
-  }
-]);
-
 oppia.constant('WARNING_TYPES', {
   // These must be fixed before the exploration can be saved.
   CRITICAL: 'critical',
