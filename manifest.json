@@ -272,6 +272,17 @@
           "js": ["hammer.js"]
         }
       },
+      "headroomJs": {
+        "version": "0.9.4",
+        "downloadFormat": "files",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4",
+        "rootDirPrefix": "headroom-js-",
+        "targetDirPrefix": "headroom-js-",
+        "files": ["angular.headroom.min.js", "headroom.min.js"],
+        "bundle": {
+          "js": []
+        }
+      },
       "jquery": {
         "version": "3.0.0",
         "downloadFormat": "files",
