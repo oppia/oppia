@@ -234,12 +234,6 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                             datetime.datetime.fromtimestamp(
                                 value['created_on']/1000)))
 
-                # There are a few state hit events which contain the pseudo end
-                # state as state name. These events are meant to be skipped.
-                if state_name == 'END' and state_name not in (
-                        explorations_by_version[version - 1].states):
-                    continue
-
                 state_hit_counts_by_version[version][state_name][
                     'total_hit_count'] += 1
                 state_session_ids_by_version[version][state_name].add(
@@ -342,6 +336,12 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
             # Compute total_hit_count and first_hit_count for the states.
             for state_name in state_hit_counts_for_this_version:
+                # There are a few state hit events which contain the pseudo end
+                # state as state name. These states are meant to be skipped.
+                if state_name not in state_stats_mapping and (
+                        state_name == 'END'):
+                    continue
+
                 state_stats_mapping[state_name].total_hit_count_v1 += (
                     state_hit_counts_for_this_version[state_name][
                         'total_hit_count'])
