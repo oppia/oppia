@@ -503,7 +503,6 @@ def convert_to_str(string_to_convert):
         return string_to_convert.encode('utf-8')
     return string_to_convert
 
-
 def get_hashable_value(value):
     """This function returns a hashable version of the input JSON-like value.
 

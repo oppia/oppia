@@ -411,6 +411,46 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection.add_skill('Skill 0')
         self.collection.validate()
 
+    def test_sort_nodes(self):
+        collection = collection_domain.Collection.create_default_collection(
+            'collection_id')
+        collection.add_node('exp_id_1')
+        collection.add_node('exp_id_2')
+        collection.add_node('exp_id_0')
+
+        # Add skills
+        collection.add_skill('skill0')
+        collection.add_skill('skill1')
+        collection.add_skill('skill2')
+
+        # Updating node's prerequisite and acquired skill_ids
+        collection_node0 = collection.get_node('exp_id_1')
+        collection_node0.update_prerequisite_skill_ids(['skill0'])
+        collection_node0.update_acquired_skill_ids(['skill1'])
+
+        collection_node1 = collection.get_node('exp_id_2')
+        collection_node1.update_prerequisite_skill_ids(['skill1'])
+        collection_node1.update_acquired_skill_ids(['skill2'])
+
+        collection_node2 = collection.get_node('exp_id_0')
+        collection_node2.update_prerequisite_skill_ids([])
+        collection_node2.update_acquired_skill_ids(['skill0'])
+
+        # Validating collection
+        collection.validate(strict=False)
+
+        # Sorting nodes in order
+        collection.sort_nodes()
+
+        # Expected order of explorations.
+        ordered_explorations_list = ['exp_id_0', 'exp_id_1', 'exp_id_2']
+
+        # Validates the number of nodes present in collection after sorting.
+        self.assertEqual(len(collection.nodes), 3)
+
+        # Checks the order of exploration.
+        self.assertEqual(collection.exploration_ids, ordered_explorations_list)
+
     def test_validate_all_skills_are_used_in_strict_validation(self):
         collection_node0 = self.collection.get_node('exp_id_0')
         self.collection.add_skill('Skill 0')
