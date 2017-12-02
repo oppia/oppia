@@ -20,7 +20,8 @@ var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage = 
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
@@ -30,9 +31,11 @@ describe('Library index page', function() {
   var LANGUAGE_ENGLISH = 'English';
   var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1;
   var libraryPage = null;
+  var playerPage = null;
 
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
+    playerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
   
   var addRating = function(userEmail, userName, explorationName, ratingValue) {
@@ -40,8 +43,8 @@ describe('Library index page', function() {
     users.login(userEmail);
     libraryPage.get();
     libraryPage.playExploration(EXPLORATION_RATINGTEST);
-    player.expectExplorationNameToBe(explorationName);
-    player.rateExploration(ratingValue);
+    playerPage.expectExplorationNameToBe(explorationName);
+    playerPage.rateExploration(ratingValue);
 
     users.logout();
   };
@@ -74,7 +77,7 @@ describe('Library index page', function() {
     libraryPage.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, '4.0');
 
     libraryPage.playExploration(EXPLORATION_RATINGTEST);
-    player.expectExplorationRatingOnInformationCardToEqual('4.0');
+    playerPage.expectExplorationRatingOnInformationCardToEqual('4.0');
   });
 
   afterEach(function() {

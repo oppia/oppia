@@ -21,9 +21,16 @@ var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage = 
+  require('../protractor_utils/ExplorationPlayerPage.js');
 
 describe('rich-text components', function() {
+  var playerPage = null;
+
+  beforeEach(function(){
+    playerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
+
   it('should display correctly', function() {
     users.createUser('user@richTextComponents.com', 'userRichTextComponents');
     users.login('user@richTextComponents.com');
@@ -52,7 +59,7 @@ describe('rich-text components', function() {
 
     editor.navigateToPreviewTab();
 
-    player.expectContentToMatch(function(richTextChecker) {
+    playerPage.expectContentToMatch(function(richTextChecker) {
       richTextChecker.readBoldText('bold');
       richTextChecker.readPlainText(' ');
       richTextChecker.readRteComponent('Link', 'http://google.com/', true);

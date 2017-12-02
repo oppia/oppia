@@ -21,9 +21,21 @@ var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage = 
+  require('../protractor_utils/ExplorationPlayerPage.js');
+
+
 
 describe('Full exploration editor', function() {
+  var playerPage = null;
+
+  beforeEach(function(){
+    playerPage = new ExplorationPlayerPage.ExplorationPlayerPage();  
+  });
+
+  
+  
+
   it('should navigate multiple states correctly, with parameters', function() {
     users.createUser('user4@editorAndPlayer.com', 'user4EditorAndPlayer');
     users.login('user4@editorAndPlayer.com');
@@ -51,19 +63,19 @@ describe('Full exploration editor', function() {
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.expectContentToMatch(forms.toRichText('this is card 1'));
-    player.submitAnswer('NumericInput', 19);
-    player.submitAnswer('NumericInput', 21);
-    player.expectContentToMatch(forms.toRichText(
+    playerPage.expectContentToMatch(forms.toRichText('this is card 1'));
+    playerPage.submitAnswer('NumericInput', 19);
+    playerPage.submitAnswer('NumericInput', 21);
+    playerPage.expectContentToMatch(forms.toRichText(
       'this is card 2 with previous answer 21'));
-    player.submitAnswer('MultipleChoiceInput', 'return');
-    player.expectContentToMatch(forms.toRichText('this is card 1'));
-    player.submitAnswer('NumericInput', 21);
-    player.expectContentToMatch(forms.toRichText(
+    playerPage.submitAnswer('MultipleChoiceInput', 'return');
+    playerPage.expectContentToMatch(forms.toRichText('this is card 1'));
+    playerPage.submitAnswer('NumericInput', 21);
+    playerPage.expectContentToMatch(forms.toRichText(
       'this is card 2 with previous answer 21'));
-    player.expectExplorationToNotBeOver();
-    player.submitAnswer('MultipleChoiceInput', 'complete');
-    player.expectExplorationToBeOver();
+    playerPage.expectExplorationToNotBeOver();
+    playerPage.submitAnswer('MultipleChoiceInput', 'complete');
+    playerPage.expectExplorationToBeOver();
     users.logout();
   });
 
@@ -150,22 +162,22 @@ describe('Full exploration editor', function() {
 
       // Check that preview/editor switch doesn't change state
       editor.navigateToPreviewTab();
-      player.expectExplorationToBeOver();
+      playerPage.expectExplorationToBeOver();
       editor.navigateToMainTab();
       editor.expectCurrentStateToBe('final card');
       editor.moveToState('second');
 
       // Check editor preview tab
       editor.navigateToPreviewTab();
-      player.expectContentToMatch(function(richTextEditor) {
+      playerPage.expectContentToMatch(function(richTextEditor) {
         richTextEditor.readItalicText('Welcome');
       });
-      player.expectInteractionToMatch('NumericInput');
-      player.submitAnswer('NumericInput', 6);
+      playerPage.expectInteractionToMatch('NumericInput');
+      playerPage.submitAnswer('NumericInput', 6);
       // This checks the previously-deleted group no longer applies.
-      player.expectLatestFeedbackToMatch(forms.toRichText('Farewell'));
-      player.clickThroughToNextCard();
-      player.expectExplorationToBeOver();
+      playerPage.expectLatestFeedbackToMatch(forms.toRichText('Farewell'));
+      playerPage.clickThroughToNextCard();
+      playerPage.expectExplorationToBeOver();
 
       editor.discardChanges();
       users.logout();
@@ -247,31 +259,31 @@ describe('Full exploration editor', function() {
 
       // Check editor preview tab to verify multiple rules are working.
       general.moveToPlayer();
-      player.expectContentToMatch(forms.toRichText('How are you feeling?'));
-      player.expectInteractionToMatch('TextInput');
+      playerPage.expectContentToMatch(forms.toRichText('How are you feeling?'));
+      playerPage.expectInteractionToMatch('TextInput');
 
-      player.submitAnswer('TextInput', 'happy');
-      player.expectLatestFeedbackToMatch(
+      playerPage.submitAnswer('TextInput', 'happy');
+      playerPage.expectLatestFeedbackToMatch(
         forms.toRichText('You must be happy!'));
 
-      player.submitAnswer('TextInput', 'meh, I\'m okay');
-      player.expectLatestFeedbackToMatch(
+      playerPage.submitAnswer('TextInput', 'meh, I\'m okay');
+      playerPage.expectLatestFeedbackToMatch(
         forms.toRichText('You must be happy!'));
 
-      player.submitAnswer('TextInput', 'NO I\'M SAD');
-      player.expectLatestFeedbackToMatch(forms.toRichText('No being sad!'));
+      playerPage.submitAnswer('TextInput', 'NO I\'M SAD');
+      playerPage.expectLatestFeedbackToMatch(forms.toRichText('No being sad!'));
 
-      player.submitAnswer('TextInput', 'Fine...I\'m doing okay');
-      player.expectLatestFeedbackToMatch(
+      playerPage.submitAnswer('TextInput', 'Fine...I\'m doing okay');
+      playerPage.expectLatestFeedbackToMatch(
         forms.toRichText('You must be happy!'));
 
       // Finish the exploration.
-      player.submitAnswer('TextInput', 'Whatever...');
+      playerPage.submitAnswer('TextInput', 'Whatever...');
 
-      player.expectLatestFeedbackToMatch(
+      playerPage.expectLatestFeedbackToMatch(
         forms.toRichText('Okay, now this is just becoming annoying.'));
-      player.clickThroughToNextCard();
-      player.expectExplorationToBeOver();
+      playerPage.clickThroughToNextCard();
+      playerPage.expectExplorationToBeOver();
 
       users.logout();
     });

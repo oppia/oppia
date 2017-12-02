@@ -21,13 +21,16 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var editor = require('../protractor_utils/editor.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage = 
+  require('../protractor_utils/ExplorationPlayerPage.js');
 
 describe('Embedding', function() {
   var adminPage = null;
+  var playerPage = null;
   
   beforeEach(function() {
     adminPage = new AdminPage.AdminPage();
+    playerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   it('should display and play embedded explorations', function() {
@@ -43,19 +46,19 @@ describe('Embedding', function() {
       general.waitForSystem();
       browser.waitForAngular();
 
-      player.expectContentToMatch(
+      playerPage.expectContentToMatch(
         forms.toRichText((version === 1) ?
           'Suppose you were given three balls: one red, one blue, and one ' +
           'yellow. How many ways are there to arrange them in a straight ' +
           'line?' :
           'Version 2'));
-      player.submitAnswer('NumericInput', 6);
-      player.expectContentToMatch(
+      playerPage.submitAnswer('NumericInput', 6);
+      playerPage.expectContentToMatch(
         forms.toRichText('Right! Why do you think it is 6?'));
-      player.expectExplorationToNotBeOver();
-      player.submitAnswer('TextInput', 'factorial');
-      player.clickThroughToNextCard();
-      player.expectExplorationToBeOver();
+      playerPage.expectExplorationToNotBeOver();
+      playerPage.submitAnswer('TextInput', 'factorial');
+      playerPage.clickThroughToNextCard();
+      playerPage.expectExplorationToBeOver();
     };
 
     var PLAYTHROUGH_LOGS = [

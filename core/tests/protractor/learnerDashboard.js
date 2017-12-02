@@ -19,25 +19,31 @@
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
-var collectionEditor = require('../protractor_utils/collectionEditor.js');
+var CollectionEditorPage =
+  require('../protractor_utils/CollectionEditorPage.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage = 
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 
 describe('Learner dashboard functionality', function() {
   var creatorDashboardPage = null;
   var adminPage = null;
   var libraryPage = null;
+  var collectionEditorPage = null;
+  var playerPage = null;
   
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
+    playerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
+    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     // Create a new learner.
     users.createUser('learner@learnerDashboard.com', 'learnerlearnerDashboard');
     users.createUser(
@@ -58,14 +64,14 @@ describe('Learner dashboard functionality', function() {
     // Create new collection.
     element(by.css('.protractor-test-create-collection')).click();
     browser.waitForAngular();
-    collectionEditor.addExistingExploration('14');
-    collectionEditor.saveDraft();
-    collectionEditor.closeSaveModal();
-    collectionEditor.publishCollection();
-    collectionEditor.setTitle('Test Collection');
-    collectionEditor.setObjective('This is a test collection.');
-    collectionEditor.setCategory('Algebra');
-    collectionEditor.saveChanges();
+    collectionEditorPage.addExistingExploration('14');
+    collectionEditorPage.saveDraft();
+    collectionEditorPage.closeSaveModal();
+    collectionEditorPage.publishCollection();
+    collectionEditorPage.setTitle('Test Collection');
+    collectionEditorPage.setObjective('This is a test collection.');
+    collectionEditorPage.setCategory('Algebra');
+    collectionEditorPage.saveChanges();
     browser.waitForAngular();
     users.logout();
   });
@@ -76,7 +82,7 @@ describe('Learner dashboard functionality', function() {
     // Play an exploration and leave it in between. It should be added to the
     // 'In Progress' section.
     general.openPlayer('3');
-    player.submitAnswer('Continue', null);
+    playerPage.submitAnswer('Continue', null);
     browser.ignoreSynchronization = true;
     browser.get(general.LEARNER_DASHBOARD_URL);
     general.acceptAlert();
@@ -87,10 +93,10 @@ describe('Learner dashboard functionality', function() {
     // Play an exploration completely. It should be added to the 'Completed'
     // section.
     general.openPlayer('14');
-    player.submitAnswer('Continue', null);
-    player.submitAnswer(
+    playerPage.submitAnswer('Continue', null);
+    playerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
-    player.submitAnswer('Continue', null);
+    playerPage.submitAnswer('Continue', null);
     browser.get(general.LEARNER_DASHBOARD_URL);
     browser.waitForAngular();
     element(by.css('.protractor-test-completed-section')).click();
@@ -127,7 +133,7 @@ describe('Learner dashboard functionality', function() {
       '.protractor-test-collection-node')).first().click();
     // Leave the exploration inbetween. The collection should be found in the
     // 'In Progress' section.
-    player.submitAnswer('Continue', null);
+    playerPage.submitAnswer('Continue', null);
     browser.ignoreSynchronization = true;
     browser.get(general.LEARNER_DASHBOARD_URL);
     general.acceptAlert();
@@ -153,10 +159,10 @@ describe('Learner dashboard functionality', function() {
       '.protractor-test-collection-node')).first().click();
     // Complete the exploration. The collection should be found in the
     // 'Completed' section as the collection is also completed.
-    player.submitAnswer('Continue', null);
-    player.submitAnswer(
+    playerPage.submitAnswer('Continue', null);
+    playerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
-    player.submitAnswer('Continue', null);
+    playerPage.submitAnswer('Continue', null);
     browser.get(general.LEARNER_DASHBOARD_URL);
     browser.waitForAngular();
     general.waitForSystem();
@@ -178,15 +184,15 @@ describe('Learner dashboard functionality', function() {
     creatorDashboardPage.navigateToCollectionEditor();
     browser.waitForAngular();
     general.waitForSystem();
-    collectionEditor.addExistingExploration('0');
+    collectionEditorPage.addExistingExploration('0');
     browser.waitForAngular();
     general.waitForSystem();
-    collectionEditor.saveDraft();
+    collectionEditorPage.saveDraft();
     browser.waitForAngular();
     general.waitForSystem();
     element(by.css('.protractor-test-commit-message-input')).sendKeys('Update');
     browser.driver.sleep(300);
-    collectionEditor.closeSaveModal();
+    collectionEditorPage.closeSaveModal();
     general.waitForSystem();
     browser.driver.sleep(300);
     users.logout();
@@ -237,11 +243,11 @@ describe('Learner dashboard functionality', function() {
 
     libraryPage.get();
     general.openPlayer('14');
-    player.submitAnswer('Continue', null);
-    player.submitAnswer(
+    playerPage.submitAnswer('Continue', null);
+    playerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
-    player.submitAnswer('Continue', null);
-    player.submitFeedback(feedback);
+    playerPage.submitAnswer('Continue', null);
+    playerPage.submitFeedback(feedback);
     browser.get(general.LEARNER_DASHBOARD_URL);
     browser.waitForAngular();
     element(by.css('.protractor-test-feedback-section')).click();
