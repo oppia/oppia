@@ -129,7 +129,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         self.assertEqual(
             collection_dict['title'], 'Introduction to Collections in Oppia')
 
-        # Verify there are 3 explorations in this collection, the initial
+        # Verify there are 4 explorations in this collection, the initial
         # explorations to be completed, and that there are no explorations
         # currently completed within the context of this collection.
         self.assertEqual(len(collection_dict['nodes']), 4)
