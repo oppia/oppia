@@ -394,14 +394,16 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     versioned_exploration.init_state_name]
                 first_hit_counts_from_init_state = []
                 # Log exp_id, exp_version, state_names, state_stats_mapping.
+                if exp_id == '8' or exp_id == 'yH-urXrwmp9T' or (
+                        exp_id == 'bVpKoKSq23r9'):
+                    answer_groups = [answer_group.outcome.dest
+                                     for answer_group in init_state.interaction.answer_groups] # pylint: disable=line-too-long
+                    yield (
+                        "LOG: exp_id: %s version %s dest_states [%s]" % (
+                            exp_id, version,
+                            ', '.join(map(str, answer_groups))))
                 for answer_group in init_state.interaction.answer_groups:
                     dest_state = answer_group.outcome.dest
-                    if exp_id == '8' or exp_id == 'yH-urXrwmp9T' or (
-                            exp_id == 'bVpKoKSq23r9'):
-                        yield (
-                            "LOG: exp_id: %s version %s dest_state %s "
-                            "init_state %s" % (
-                                exp_id, version, dest_state, init_state))
                     if dest_state != versioned_exploration.init_state_name:
                         # Some older explorations had the pseudo-END state as a
                         # potential destination from the initial state. For
