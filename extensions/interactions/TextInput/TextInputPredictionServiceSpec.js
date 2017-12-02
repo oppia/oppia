@@ -30,7 +30,7 @@ describe('Text Input Prediction Service', function() {
       $scope = $rootScope.$new();
     }));
 
-    it('should predict correct answer group for the answers', function() {
+    it('should not have accuracy less than 85', function() {
       // These answers are taken from the text_input_training_data.json
       // in Oppia-ml. Never test classifiers using training data unless it
       // is only the functionality that you want to test (like in this case).
@@ -40,16 +40,21 @@ describe('Text Input Prediction Service', function() {
 
       var classifierData = getJSONFixture('text_input_classifier_data.json');
       var trainingData = getJSONFixture('text_input_training_data.json');
-      var predictedAnswerGroup;
+      var correctPredictions = 0, totalAnswers = 0;
 
+      // To keep things simple, we will calculate accuracy score
+      // and not F1 score.
       for(var i = 0; i < trainingData.length; i++) {
         for(var j = 0; j < trainingData[i].answers.length; j++) {
           predictedAnswerGroup = predictionService.predict(
             classifierData, trainingData[i].answers[j]);
-          // expect(predictedAnswerGroup).toEqual(
-            // trainingData[i].answer_group_index + '');
+          if(predictedAnswerGroup == trainingData[i].answer_group_index) {
+            correctPredictions++;
+          }
+          totalAnswers++;
         }
       }
+      expect((correctPredictions * 100) / totalAnswers).not.toBeLessThan(85.0);
     });
   });
 });
