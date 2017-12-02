@@ -33,6 +33,7 @@ from google.appengine.api import users
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
+from core.domain import role_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -311,11 +312,10 @@ class BaseHandler(webapp2.RequestHandler):
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
             'SITE_NAME': feconf.SITE_NAME,
-
             'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
             'TEMPLATE_DIR_PREFIX': utils.get_template_dir_prefix(),
             'can_create_collections': bool(
-                self.role == feconf.ROLE_ID_COLLECTION_EDITOR),
+                role_services.ACTION_CREATE_COLLECTION in self.user.actions),
             'username': self.username,
             'user_is_logged_in': user_services.has_fully_registered(
                 self.user_id),
