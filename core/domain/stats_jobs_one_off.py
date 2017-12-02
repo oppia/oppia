@@ -396,13 +396,17 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 # Log exp_id, exp_version, state_names, state_stats_mapping.
                 for answer_group in init_state.interaction.answer_groups:
                     dest_state = answer_group.outcome.dest
+                    if exp_id == '8' or exp_id == 'yH-urXrwmp9T' or (
+                            exp_id == 'bVpKoKSq23r9'):
+                        yield (
+                            "LOG: exp_id: %s version %s dest_state %s "
+                            "init_state %s" % (
+                                exp_id, version, dest_state, init_state))
                     if dest_state != versioned_exploration.init_state_name:
                         # Some older explorations had the pseudo-END state as a
                         # potential destination from the initial state. For
                         # these states, the first hit count is the completions
                         # count of the exploration.
-                        yield ("LOG: exp_id: %s version %s dest_state %s" % (
-                            exp_id, version, dest_state))
                         if dest_state == 'END':
                             first_hit_counts_from_init_state.append(
                                 num_completions)
