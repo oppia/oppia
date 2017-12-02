@@ -12,9 +12,14 @@ nodes:
   - skill0
 - acquired_skill_ids:
   - skill2
-  exploration_id: '0'
+  exploration_id: '21'
   prerequisite_skill_ids:
   - skill1
+- acquired_skill_ids:
+  - skill3
+  exploration_id: '0'
+  prerequisite_skill_ids:
+  - skill2
 language_code: en
 objective: To introduce collections using demo explorations.
 schema_version: 4
@@ -26,6 +31,9 @@ skills:
     name: Second Example Exploration in Collection
     question_ids: []
   skill2:
+    name: Third Example Exploration in Collection
+    question_ids: []
+  skill3:
     name: Welcome to Oppia!
     question_ids: []
 tags: []

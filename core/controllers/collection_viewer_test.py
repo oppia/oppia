@@ -132,7 +132,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         # Verify there are 3 explorations in this collection, the initial
         # explorations to be completed, and that there are no explorations
         # currently completed within the context of this collection.
-        self.assertEqual(len(collection_dict['nodes']), 3)
+        self.assertEqual(len(collection_dict['nodes']), 4)
 
         playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(playthrough_dict['next_exploration_ids'], ['19'])
@@ -160,9 +160,23 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
 
         playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(
-            playthrough_dict['next_exploration_ids'], ['0'])
+            playthrough_dict['next_exploration_ids'], ['21'])
         self.assertEqual(
             playthrough_dict['completed_exploration_ids'], ['19', '20'])
+
+        # Completing the next exploration results in a fourth and final
+        # suggested exp.
+        collection_services.record_played_exploration_in_collection_context(
+            self.viewer_id, '0', '21')
+        response_dict = self.get_json(
+            '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
+        collection_dict = response_dict['collection']
+
+        playthrough_dict = collection_dict['playthrough_dict']
+        self.assertEqual(
+            playthrough_dict['next_exploration_ids'], ['0'])
+        self.assertEqual(
+            playthrough_dict['completed_exploration_ids'], ['19', '20', '21'])
 
         # Completing the final exploration should result in no new suggestions.
         collection_services.record_played_exploration_in_collection_context(
@@ -174,4 +188,5 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(playthrough_dict['next_exploration_ids'], [])
         self.assertEqual(
-            playthrough_dict['completed_exploration_ids'], ['19', '20', '0'])
+            playthrough_dict['completed_exploration_ids'],
+            ['19', '20', '21', '0'])

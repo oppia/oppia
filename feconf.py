@@ -497,6 +497,7 @@ DEMO_EXPLORATIONS = {
     u'18': 'code_classifier_test.yaml',
     u'19': 'example_exploration_in_collection1.yaml',
     u'20': 'example_exploration_in_collection2.yaml',
+    u'21': 'example_exploration_in_collection3.yaml',
 }
 
 DEMO_COLLECTIONS = {
