@@ -35,8 +35,7 @@ describe('Text Input Prediction Service', function() {
       // in Oppia-ml. Never test classifiers using training data unless it
       // is only the functionality that you want to test (like in this case).
 
-      jasmine.getJSONFixtures().fixturesPath = 
-        '/home/anmol/Projects/oppia/core/tests/data';
+      jasmine.getJSONFixtures().fixturesPath = 'base/core/tests/data';
 
       var classifierData = getJSONFixture('text_input_classifier_data.json');
       var trainingData = getJSONFixture('text_input_training_data.json');
