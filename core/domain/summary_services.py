@@ -144,6 +144,7 @@ def get_learner_collection_dict_by_id(
         next_exploration_ids = collection.init_exploration_ids
         completed_exp_ids = []
 
+    collection.sort_nodes()
     collection_dict = collection.to_dict()
     collection_dict['playthrough_dict'] = {
         'next_exploration_ids': next_exploration_ids,

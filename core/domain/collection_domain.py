@@ -563,8 +563,7 @@ class Collection(object):
             collection_dict['schema_version'],
             [
                 CollectionNode.from_dict(node_dict)
-                for node_dict in (
-                    utils.get_sorted_nodes(collection_dict['nodes']))
+                for node_dict in collection_dict['nodes']
             ], {
                 skill_id: CollectionSkill.from_dict(skill_id, skill_dict)
                 for skill_id, skill_dict in
@@ -1030,6 +1029,30 @@ class Collection(object):
             if node.exploration_id == exploration_id:
                 return node
         return None
+
+    def sort_nodes(self):
+        """Arrange the nodes in topologically sorted order unless it's
+        impossible, otherwise returns the unordered nodes.
+        """
+        unsorted_nodes = copy.deepcopy(self.nodes)
+        orderd_skills_ids = set()
+        sorted_nodes = []
+        while len(unsorted_nodes):
+            for index, node in enumerate(unsorted_nodes):
+                prerequisite_skill_ids = set(node.prerequisite_skill_ids)
+                acquired_skill_ids = set(node.acquired_skill_ids)
+
+                if prerequisite_skill_ids <= orderd_skills_ids:
+                    sorted_nodes.append(node)
+                    orderd_skills_ids |= acquired_skill_ids
+                    unsorted_nodes.pop(index)
+                    break
+
+                if index + 1 == len(unsorted_nodes):
+                    raise Exception(
+                        'Cannot arrange the explorations in order for this '
+                        'collection.')
+        self.nodes = sorted_nodes
 
     def add_node(self, exploration_id):
         """Adds a new node to the collection; the new node represents the given
