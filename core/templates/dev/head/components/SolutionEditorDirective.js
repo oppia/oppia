@@ -121,10 +121,10 @@ oppia.directive('solutionEditor', [
               var correctAnswer = result.solution.correctAnswer;
               var currentStateName = EditorStateService.getActiveStateName();
               var state = explorationStatesService.getState(currentStateName);
-              var isValid = SolutionVerificationService.verifySolution(
+              var solutionIsValid = SolutionVerificationService.verifySolution(
                 ExplorationContextService.getExplorationId(), state,
                 correctAnswer);
-              if (isValid) {
+              if (solutionIsValid) {
                 explorationStatesService.updateSolutionValidity(
                   currentStateName, true);
                 ExplorationWarningsService.updateWarnings();
