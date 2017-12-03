@@ -24,7 +24,8 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
   return {
     restrict: 'E',
     scope: {},
-    controller: ['$scope', '$attrs', '$element', 'HtmlEscaperService',
+    controller: [
+      '$scope', '$attrs', '$element', 'HtmlEscaperService',
       function($scope, $attrs, $element, HtmlEscaperService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
@@ -65,7 +66,8 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
     restrict: 'E',
     scope: {},
     templateUrl: 'visualizations/FrequencyTable',
-    controller: ['$scope', '$attrs', 'HtmlEscaperService',
+    controller: [
+      '$scope', '$attrs', 'HtmlEscaperService',
       function($scope, $attrs, HtmlEscaperService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
@@ -81,7 +83,8 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
     restrict: 'E',
     scope: {},
     templateUrl: 'visualizations/EnumeratedFrequencyTable',
-    controller: ['$scope', '$attrs', 'HtmlEscaperService',
+    controller: [
+      '$scope', '$attrs', 'HtmlEscaperService',
       function($scope, $attrs, HtmlEscaperService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
