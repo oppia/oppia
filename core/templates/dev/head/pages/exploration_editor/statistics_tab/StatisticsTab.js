@@ -267,8 +267,10 @@ oppia.controller('StatisticsTab', [
                             HtmlEscaperService.objToEscapedJson(datum));
                         }));
 
-                    var el = $('<oppia-visualization-' +
-                      $filter('camelCaseToHyphens')(visualizationInfo.id) + '/>');
+                    var el = $(
+                      '<oppia-visualization-' +
+                      $filter('camelCaseToHyphens')(visualizationInfo.id) +
+                      '/>');
                     el.attr('data', escapedData);
                     el.attr('options', escapedOptions);
                     el.attr('is-addressed', escapedIsAddressedResults);
