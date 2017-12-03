@@ -13,7 +13,10 @@
     <tr ng-repeat="row in data track by $index">
       <td><[row.answer]></td>
       <td><[row.frequency]></td>
-      <td angular-html-bind="addressedCellContent($index)"></td>
+      <td>
+        <span ng-if="isAddressed[$index]">Yes</span>
+        <span ng-if="!isAddressed[$index]">No</span>
+      </td>
     </tr>
   </table>
 
@@ -45,7 +48,10 @@
         </table>
       </td>
       <td><[row.frequency]></td>
-      <td angular-html-bind="addressedCellContent($index)"></td>
+      <td>
+        <span ng-if="isAddressed[$index]">Yes</span>
+        <span ng-if="!isAddressed[$index]">No</span>
+      </td>
     </tr>
   </table>
 

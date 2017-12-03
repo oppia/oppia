@@ -71,10 +71,9 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
           $scope, $attrs, HtmlEscaperService, SolutionVerificationService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
-        $scope.isAddressed = $scope.data.map(function() { return false; });
-        $scope.addressedCellContent = function(i) {
-          return $scope.isAddressed[i] ? '<span>Yes</span>' : '<span>No</span>';
-        };
+        $scope.isAddressed = $scope.data.map(function() {
+          return false;
+        });
 
         var state = HtmlEscaperService.escapedJsonToObj($attrs.state);
         $scope.isAddressed.forEach(function(_, i, isAddressed) {
@@ -107,10 +106,9 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
         $scope.toggleAnswerVisibility = function(i) {
           $scope.answerVisible[i] = !$scope.answerVisible[i];
         };
-        $scope.isAddressed = $scope.data.map(function() { return false; });
-        $scope.addressedCellContent = function(i) {
-          return $scope.isAddressed[i] ? '<span>Yes</span>' : '<span>No</span>';
-        };
+        $scope.isAddressed = $scope.data.map(function() {
+          return false;
+        });
 
         var state = HtmlEscaperService.escapedJsonToObj($attrs.state);
         $scope.isAddressed.forEach(function(_, i, isAddressed) {
