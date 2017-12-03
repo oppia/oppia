@@ -74,6 +74,7 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
         $scope.isAddressed = $scope.data.map(function() { return false; });
+
         $scope.addressedCellContent = function(index) {
           return $scope.isAddressed[index] ?
             '<span>Yes</span>' : '<span>No</span>';
@@ -98,17 +99,35 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
     scope: {},
     templateUrl: 'visualizations/EnumeratedFrequencyTable',
     controller: [
-      '$scope', '$attrs', 'HtmlEscaperService',
-      function($scope, $attrs, HtmlEscaperService) {
+      '$scope', '$attrs', 'HtmlEscaperService', 'SolutionVerificationService',
+      'explorationStatesService',
+      function(
+          $scope, $attrs, HtmlEscaperService, SolutionVerificationService,
+          explorationStatesService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
         $scope.answerVisible = $scope.data.map(function(_, i) {
           // First element is shown by default, all others are hidden.
           return i === 0;
         });
+        $scope.isAddressed = $scope.data.map(function() { return false; });
+
         $scope.toggleAnswerVisibility = function(index) {
           $scope.answerVisible[index] = !$scope.answerVisible[index];
         };
+        $scope.addressedCellContent = function(index) {
+          return $scope.isAddressed[index] ?
+            '<span>Yes</span>' : '<span>No</span>';
+        };
+
+        var state = HtmlEscaperService.escapedJsonToObj($attrs.state);
+        $scope.isAddressed.forEach(function(_, i, isAddressed) {
+          SolutionVerificationService.verifySolution(
+            $attrs.explorationId, state,
+            HtmlEscaperService.objToEscapedJson($scope.data[i]),
+            /*successCallback=*/function() { isAddressed[i] = true; },
+            /*errorCallback=*/function() { isAddressed[i] = false; });
+        });
       }
     ]
   };
