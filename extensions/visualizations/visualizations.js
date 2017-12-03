@@ -67,10 +67,8 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
     templateUrl: 'visualizations/FrequencyTable',
     controller: [
       '$scope', '$attrs', 'HtmlEscaperService', 'SolutionVerificationService',
-      'explorationStatesService',
       function(
-          $scope, $attrs, HtmlEscaperService, SolutionVerificationService,
-          explorationStatesService) {
+          $scope, $attrs, HtmlEscaperService, SolutionVerificationService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
         $scope.isAddressed = $scope.data.map(function() { return false; });
@@ -100,10 +98,8 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
     templateUrl: 'visualizations/EnumeratedFrequencyTable',
     controller: [
       '$scope', '$attrs', 'HtmlEscaperService', 'SolutionVerificationService',
-      'explorationStatesService',
       function(
-          $scope, $attrs, HtmlEscaperService, SolutionVerificationService,
-          explorationStatesService) {
+          $scope, $attrs, HtmlEscaperService, SolutionVerificationService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
         $scope.answerVisible = $scope.data.map(function(_, i) {
