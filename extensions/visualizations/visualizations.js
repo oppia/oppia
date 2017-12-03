@@ -72,19 +72,18 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
         $scope.isAddressed = $scope.data.map(function() { return false; });
-
-        $scope.addressedCellContent = function(index) {
-          return $scope.isAddressed[index] ?
-            '<span>Yes</span>' : '<span>No</span>';
+        $scope.addressedCellContent = function(i) {
+          return $scope.isAddressed[i] ? '<span>Yes</span>' : '<span>No</span>';
         };
 
         var state = HtmlEscaperService.escapedJsonToObj($attrs.state);
         $scope.isAddressed.forEach(function(_, i, isAddressed) {
+          var successCallback = function() { isAddressed[i] = true; };
+          var errorCallback = function() { isAddressed[i] = false; };
           SolutionVerificationService.verifySolution(
             $attrs.explorationId, state,
             HtmlEscaperService.objToEscapedJson($scope.data[i]),
-            /*successCallback=*/function() { isAddressed[i] = true; },
-            /*errorCallback=*/function() { isAddressed[i] = false; });
+            successCallback, errorCallback);
         });
       }
     ]
@@ -103,26 +102,24 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
         $scope.answerVisible = $scope.data.map(function(_, i) {
-          // First element is shown by default, all others are hidden.
-          return i === 0;
+          return i === 0;  // 1st element shown & all others hidden by default.
         });
-        $scope.isAddressed = $scope.data.map(function() { return false; });
-
-        $scope.toggleAnswerVisibility = function(index) {
-          $scope.answerVisible[index] = !$scope.answerVisible[index];
+        $scope.toggleAnswerVisibility = function(i) {
+          $scope.answerVisible[i] = !$scope.answerVisible[i];
         };
-        $scope.addressedCellContent = function(index) {
-          return $scope.isAddressed[index] ?
-            '<span>Yes</span>' : '<span>No</span>';
+        $scope.isAddressed = $scope.data.map(function() { return false; });
+        $scope.addressedCellContent = function(i) {
+          return $scope.isAddressed[i] ? '<span>Yes</span>' : '<span>No</span>';
         };
 
         var state = HtmlEscaperService.escapedJsonToObj($attrs.state);
         $scope.isAddressed.forEach(function(_, i, isAddressed) {
+          var successCallback = function() { isAddressed[i] = true; };
+          var errorCallback = function() { isAddressed[i] = false; };
           SolutionVerificationService.verifySolution(
             $attrs.explorationId, state,
             HtmlEscaperService.objToEscapedJson($scope.data[i]),
-            /*successCallback=*/function() { isAddressed[i] = true; },
-            /*errorCallback=*/function() { isAddressed[i] = false; });
+            successCallback, errorCallback);
         });
       }
     ]
