@@ -20,5 +20,4 @@ describe('Focus Manager Service', function() {
   var FocusManagerService;
 
   beforeEach(module('oppia'));
-
 });
