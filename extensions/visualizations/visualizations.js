@@ -77,8 +77,12 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
 
         var state = HtmlEscaperService.escapedJsonToObj($attrs.state);
         $scope.isAddressed.forEach(function(_, i, isAddressed) {
-          var successCallback = function() { isAddressed[i] = true; };
-          var errorCallback = function() { isAddressed[i] = false; };
+          var successCallback = function() {
+            isAddressed[i] = true;
+          };
+          var errorCallback = function() {
+            isAddressed[i] = false;
+          };
           SolutionVerificationService.verifySolution(
             $attrs.explorationId, state,
             HtmlEscaperService.objToEscapedJson($scope.data[i]),
@@ -112,8 +116,12 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
 
         var state = HtmlEscaperService.escapedJsonToObj($attrs.state);
         $scope.isAddressed.forEach(function(_, i, isAddressed) {
-          var successCallback = function() { isAddressed[i] = true; };
-          var errorCallback = function() { isAddressed[i] = false; };
+          var successCallback = function() {
+            isAddressed[i] = true;
+          };
+          var errorCallback = function() {
+            isAddressed[i] = false;
+          };
           SolutionVerificationService.verifySolution(
             $attrs.explorationId, state,
             HtmlEscaperService.objToEscapedJson($scope.data[i]),
