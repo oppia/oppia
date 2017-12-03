@@ -66,7 +66,7 @@ oppia.controller('ExplorationEditor', [
       UrlInterpolationService) {
     $scope.editabilityService = editabilityService;
     $scope.EditorStateService = EditorStateService;
-    $scope.username = GLOBALS.title;
+    $scope.title = GLOBALS.title;
     /**********************************************************
      * Called on initial load of the exploration editor page.
      *********************************************************/
