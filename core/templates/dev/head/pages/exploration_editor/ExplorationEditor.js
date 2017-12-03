@@ -67,6 +67,7 @@ oppia.controller('ExplorationEditor', [
     $scope.editabilityService = editabilityService;
     $scope.EditorStateService = EditorStateService;
     $scope.title = GLOBALS.title;
+    
     /**********************************************************
      * Called on initial load of the exploration editor page.
      *********************************************************/
