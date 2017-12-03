@@ -16,9 +16,9 @@
  * @fileoverview Directives for all reusable data visualization components.
  */
 
-// Each visualization receives four variables: 'data', 'options',
-// 'explorationId', and 'stateName'. The exact format for each of these is
-// specific to the particular visualization.
+// Each visualization receives three variables: 'data', 'options', and
+// 'isAddressed'. The exact format for each of these is specific to the
+// particular visualization.
 
 oppia.directive('oppiaVisualizationBarChart', [function() {
   return {
