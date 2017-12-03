@@ -39,7 +39,8 @@
         <div ng-if="!$last || !isInteractionInline">
           <input-response-pair data="responsePair"
                                 profile-picture="profilePicture"
-                                oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL">
+                                oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
+                                input-response-pair-id="getInputResponsePairId($index)">
           </input-response-pair>
         </div>
       </div>
@@ -49,7 +50,8 @@
     <div class="conversation-skin-tutor-card-bottom-section" ng-if="isInteractionInline && activeCard.inputResponsePairs.length > 0">
       <input-response-pair data="activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1]"
                             profile-picture="profilePicture"
-                            oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL">
+                            oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
+                            input-response-pair-id="getInputResponsePairId(activeCard.inputResponsePairs.length - 1)">
       </input-response-pair>
     </div>
 

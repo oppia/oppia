@@ -26,15 +26,15 @@ oppia.directive('editorNavigation', [
       controller: [
         '$scope', '$rootScope', '$timeout', '$modal',
         'RouterService', 'explorationRightsService',
-        'explorationWarningsService',
-        'stateEditorTutorialFirstTimeService',
+        'ExplorationWarningsService',
+        'StateEditorTutorialFirstTimeService',
         'ThreadDataService', 'siteAnalyticsService',
         'ExplorationContextService', 'WindowDimensionsService',
         function(
             $scope, $rootScope, $timeout, $modal,
             RouterService, explorationRightsService,
-            explorationWarningsService,
-            stateEditorTutorialFirstTimeService,
+            ExplorationWarningsService,
+            StateEditorTutorialFirstTimeService,
             ThreadDataService, siteAnalyticsService,
             ExplorationContextService, WindowDimensionsService) {
           $scope.postTutorialHelpPopoverIsShown = false;
@@ -90,14 +90,14 @@ oppia.directive('editorNavigation', [
             modalInstance.result.then(function() {
               $rootScope.$broadcast('openEditorTutorial');
             }, function() {
-              stateEditorTutorialFirstTimeService.markTutorialFinished();
+              StateEditorTutorialFirstTimeService.markTutorialFinished();
             });
           };
 
-          $scope.countWarnings = explorationWarningsService.countWarnings;
-          $scope.getWarnings = explorationWarningsService.getWarnings;
+          $scope.countWarnings = ExplorationWarningsService.countWarnings;
+          $scope.getWarnings = ExplorationWarningsService.getWarnings;
           $scope.hasCriticalWarnings = (
-            explorationWarningsService.hasCriticalWarnings);
+            ExplorationWarningsService.hasCriticalWarnings);
 
           $scope.explorationRightsService = explorationRightsService;
           $scope.getTabStatuses = RouterService.getTabStatuses;

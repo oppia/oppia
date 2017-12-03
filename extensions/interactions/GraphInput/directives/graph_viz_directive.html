@@ -1,0 +1,137 @@
+<style>
+  .oppia-graph-input-viz-container {
+    border: 1px solid black;
+    background-color: white;
+    cursor: default;
+  }
+  .oppia-graph-button-label {
+    font-family: 'Glyphicons Halflings';
+  }
+  .unselectable-text {
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+    cursor: default;
+  }
+  .unclickable-text {
+    pointer-events: none;
+  }
+</style>
+<div class="oppia-graph-input-viz-container">
+  <svg class="oppia-graph-viz-svg" width="100%" height="250" ng-mousemove="mousemoveGraphSVG($event)" ng-click="onClickGraphSVG($event)">
+    <svg viewBox="0 0 90 250" width="100%" height="250" preserveAspectRatio="xMaxYMin meet">
+      <g ng-if="canEditOptions" ng-repeat="button in graphOptions">
+        <rect width="70"
+          height="30"
+          x="10"
+          ng-attr-y="<[10 + 50 * $index]>"
+          rx="5"
+          ry="5"
+          ng-attr-style="stroke: black; fill: white; stroke-width: <[graph[button.option] ? 3 : 1]>;"
+          ng-click="toggleGraphOption(button.option)">
+        </rect>
+        <text class="unselectable-text unclickable-text"
+          x="45"
+          ng-attr-y="<[30 + 50 * $index]>"
+          style="text-anchor: middle">
+          <[button.text]>
+        </text>
+      </g>
+    </svg>
+
+    <g ng-repeat="button in buttons">
+      <rect width="140"
+        height="30"
+        x="10"
+        ng-attr-y="<[10 + 50 * $index]>"
+        rx="5"
+        ry="5"
+        ng-click="onClickModeButton(button.mode, $event)"
+        ng-mouseenter="state.hoveredModeButton = button.mode"
+        ng-mouseleave="state.hoveredModeButton = (state.hoveredModeButton == button.mode) ? null : state.hoveredModeButton"
+        ng-attr-style="fill: white; stroke: black; stroke-width: <[(state.currentMode == button.mode) ? 3 : 1]>;">
+      </rect>
+      <text class="oppia-graph-button-label unselectable-text unclickable-text" x="18" ng-attr-y="<[32 + 50 * $index]>">
+        <[button.text]>
+      </text>
+      <text class="unselectable-text unclickable-text" x="40" ng-attr-y="<[30 + 50 * $index]>" text-anchor="right">
+        <[button.description | translate]>
+      </text>
+    </g>
+
+    <line ng-if="state.addEdgeVertex !== null"
+      ng-attr-x1="<[graph.vertices[state.addEdgeVertex].x]>"
+      ng-attr-y1="<[graph.vertices[state.addEdgeVertex].y]>"
+      ng-attr-x2="<[state.mouseX]>"
+      ng-attr-y2="<[state.mouseY]>"
+      style="stroke: black; stroke-width: <[::EDGE_WIDTH]>;">
+    </line>
+    <g ng-repeat="edge in graph.edges">
+      <line
+        ng-click="onClickEdge($index)"
+        ng-mouseenter="state.hoveredEdge = $index"
+        ng-mouseleave="state.hoveredEdge = ($index === state.hoveredEdge) ? null : state.hoveredEdge"
+        ng-attr-x1="<[graph.vertices[edge.src].x]>"
+        ng-attr-y1="<[graph.vertices[edge.src].y]>"
+        ng-attr-x2="<[graph.vertices[edge.dst].x]>"
+        ng-attr-y2="<[graph.vertices[edge.dst].y]>"
+        ng-attr-style="stroke: <[getEdgeColor($index)]>; stroke-width: <[::EDGE_WIDTH]>;">
+      </line>
+      <polygon
+        ng-if="graph.isDirected"
+        ng-mouseenter="state.hoveredEdge = $index"
+        ng-mouseleave="state.hoveredEdge = ($index === state.hoveredEdge) ? null : state.hoveredEdge"
+        ng-attr-points="<[getDirectedEdgeArrowPoints($index)]>"
+        ng-attr-style="fill: <[getEdgeColor($index)]>;">
+      </polygon>
+      <text ng-if="graph.isWeighted"
+        ng-attr-x="<[getEdgeCentre($index).x]>"
+        ng-attr-y="<[getEdgeCentre($index).y - 12]>"
+        ng-attr-style="fill: <[getEdgeColor($index)]>;"
+        ng-click="onClickEdge($index)"
+        ng-mouseenter="state.hoveredEdge = $index"
+        ng-mouseleave="state.hoveredEdge = ($index === state.hoveredEdge) ? null : state.hoveredEdge"
+        class="unselectable-text">
+        <[edge.weight]>
+      </text>
+    </g>
+    <g
+      ng-repeat="vertex in graph.vertices"
+      ng-attr-transform="translate(<[vertex.x]>, <[vertex.y]>)">
+      <text ng-if="graph.isLabeled"
+        x="0"
+        y="-10"
+        ng-click="onClickVertex($index)"
+        ng-mouseenter="state.hoveredVertex = $index"
+        ng-mouseleave="state.hoveredVertex = ($index === state.hoveredVertex) ? null : state.hoveredVertex"
+        ng-mousedown="onMousedownVertex($index)"
+        ng-mouseup="onMouseupVertex($index)"
+        ng-attr-style="fill: <[getVertexColor($index)]>;"
+        class="unselectable-text">
+        <[vertex.label]>
+      </text>
+      <circle ng-mouseenter="state.hoveredVertex = $index"
+        ng-mouseleave="state.hoveredVertex = ($index === state.hoveredVertex) ? null : state.hoveredVertex"
+        ng-click="onClickVertex($index)"
+        ng-mousedown="onMousedownVertex($index)"
+        ng-mouseup="onMouseupVertex($index)"
+        ng-attr-style="fill: <[getVertexColor($index)]>;"
+        cx="0"
+        cy="0"
+        ng-attr-r="<[::VERTEX_RADIUS]>">
+      </circle>
+    </g>
+  </svg>
+</div>
+
+<div style="float: right; height: 35px;">
+  <div ng-if="state.selectedVertex !== null && graph.isLabeled && canEditVertexLabel">
+    <input type="text" ng-model="selectedVertexLabelGetterSetter" ng-model-options="{getterSetter: true}" focus-on="vertexLabelEditBegun"></input>
+    <md-button class="md-raised" ng-click="state.selectedVertex = null;" translate="I18N_INTERACTIONS_GRAPH_UPDATE_LABEL"></md-button>
+  </div>
+  <div ng-if="state.selectedEdge !== null && graph.isWeighted && canEditEdgeWeight">
+    <input type="number" ng-model="selectedEdgeWeight" ng-model-options="{getterSetter: true}" focus-on="edgeWeightEditBegun"></input>
+    <md-button class="md-raised" ng-click="state.selectedEdge = null;" translate="I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT"></md-button>
+  </div>
+</div>

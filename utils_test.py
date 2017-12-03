@@ -109,6 +109,21 @@ class UtilsTests(test_utils.GenericTestBase):
             self.assertEqual(
                 utils.camelcase_to_hyphenated(test_case[0]), test_case[1])
 
+    def test_camelcase_to_snakecase(self):
+        """Test camelcase_to_hyphenated method."""
+        test_cases = [
+            ('AbcDef', 'abc_def'),
+            ('Abc', 'abc'),
+            ('abc_def', 'abc_def'),
+            ('Abc012Def345', 'abc012_def345'),
+            ('abcDef', 'abc_def'),
+            ('abc-def', 'abc-def'),
+        ]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                utils.camelcase_to_snakecase(test_case[0]), test_case[1])
+
     def test_set_url_query_parameter(self):
         """Test set_url_query_parameter method."""
         self.assertEqual(
