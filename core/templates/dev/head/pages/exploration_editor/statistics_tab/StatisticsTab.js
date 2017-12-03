@@ -195,11 +195,10 @@ oppia.controller('StatisticsTab', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', '$filter', '$q', 'stateName',
-            'stateStats', 'improvementType', 'visualizationsInfo',
-            'HtmlEscaperService', 'SolutionVerificationService',
-            'ENABLE_NEW_STATS_FRAMEWORK',
-            function($scope, $modalInstance, $filter, $q, stateName, stateStats,
+            '$scope', '$modalInstance', '$filter', 'stateName', 'stateStats',
+            'improvementType', 'visualizationsInfo', 'HtmlEscaperService',
+            'SolutionVerificationService', 'ENABLE_NEW_STATS_FRAMEWORK',
+            function($scope, $modalInstance, $filter, stateName, stateStats,
                 improvementType, visualizationsInfo, HtmlEscaperService,
                 SolutionVerificationService, ENABLE_NEW_STATS_FRAMEWORK) {
               var COMPLETION_RATE_PIE_CHART_OPTIONS = {
