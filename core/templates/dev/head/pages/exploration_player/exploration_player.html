@@ -6,8 +6,8 @@
 
 {% block header_js %}
   {{ super() }}
-  {% if exploration_version %}
-    <script type="text/javascript">
+  <div ng-controller="ExplorationPlayer">
+    <script ng-if="exploration_version" type="text/javascript">
       GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
       GLOBALS.collectionTitle = JSON.parse('{{collection_title|js_string}}');
       GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = JSON.parse(
@@ -17,7 +17,7 @@
       GLOBALS.INTERACTION_SPECS = JSON.parse(
         '{{INTERACTION_SPECS|js_string}}');
     </script>
-  {% endif %}
+  </div>
 
   <style>
     @media(max-width: 500px) {
