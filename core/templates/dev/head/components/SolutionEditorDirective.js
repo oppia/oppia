@@ -118,11 +118,12 @@ oppia.directive('solutionEditor', [
                 }
               ]
             }).result.then(function(result) {
-              var answer = result.solution.correctAnswer;
+              var correctAnswer = result.solution.correctAnswer;
               var currentStateName = EditorStateService.getActiveStateName();
               var state = explorationStatesService.getState(currentStateName);
               var isValid = SolutionVerificationService.verifySolution(
-                ExplorationContextService.getExplorationId(), state, answer);
+                ExplorationContextService.getExplorationId(), state,
+                correctAnswer);
               if (isValid) {
                 explorationStatesService.updateSolutionValidity(
                   currentStateName, true);
@@ -131,8 +132,7 @@ oppia.directive('solutionEditor', [
                 explorationStatesService.updateSolutionValidity(
                   currentStateName, false);
                 ExplorationWarningsService.updateWarnings();
-                AlertsService.addInfoMessage(
-                  INFO_MESSAGE_SOLUTION_IS_INVALID);
+                AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
               }
 
               stateSolutionService.displayed = result.solution;
