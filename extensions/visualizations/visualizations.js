@@ -92,7 +92,7 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
           $attrs.isAddressed);
 
         $scope.answerVisible = $scope.data.map(function(_, i) {
-          // First element is shown while all others hidden by default.
+          // First element is shown while all others are hidden by default.
           return i === 0;
         });
         $scope.toggleAnswerVisibility = function(i) {
