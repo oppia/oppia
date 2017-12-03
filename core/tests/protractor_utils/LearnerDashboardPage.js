@@ -25,13 +25,13 @@ var LearnerDashboardPage = function() {
     element(by.css('.protractor-test-completed-section'));
   var feedbackSection =
     element(by.css('.protractor-test-feedback-section'));
-  var completedCollection =
+  var completedCollectionSection =
     element(by.css('.protractor-test-completed-collection-section'));
-  var incompleteCollection =
+  var incompleteCollectionSection =
     element(by.css('.protractor-test-incomplete-collection-section'));
   var subscriptionsSection =
     element(by.css('.protractor-test-subscriptions-section'));
-  var summaryTile =
+  var titleOfSummaryTile =
     element.all(by.css('.protractor-test-collection-summary-tile-title'));
 
   this.get = function() {
@@ -40,27 +40,27 @@ var LearnerDashboardPage = function() {
 
   this.navigateToCompletedSection = function() {
     completedSection.click();
-  }
+  };
 
-  this.navigateToIncompleteCollection = function() {
-    incompleteCollection.click();
-  }
+  this.navigateToIncompleteCollectionSection = function() {
+    incompleteCollectionSection.click();
+  };
 
-  this.navigateToCompletedCollection = function() {
-    completedCollection.click();
-  }
+  this.navigateToCompletedCollectionSection = function() {
+    completedCollectionSection.click();
+  };
 
   this.navigateToFeedbackSection = function() {
     feedbackSection.click();
-  }
+  };
 
   this.navigateToSubscriptionsSection = function() {
     subscriptionsSection.click();
-  }
+  };
 
-  this.openSummaryTile = function() {
-    return summaryTile.first().getText();
-  }
+  this.getTitleOfSummaryTile = function() {
+    return titleOfSummaryTile.first().getText();
+  };
 };
 
 exports.LearnerDashboardPage = LearnerDashboardPage;

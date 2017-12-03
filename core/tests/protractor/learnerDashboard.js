@@ -138,11 +138,11 @@ describe('Learner dashboard functionality', function() {
     browser.waitForAngular();
     general.waitForSystem();
     browser.ignoreSynchronization = false;
-    learnerDashboardPage.navigateToIncompleteCollection();
+    learnerDashboardPage.navigateToIncompleteCollectionSection();
     browser.waitForAngular();
     general.waitForSystem();
     expect(
-      learnerDashboardPage.openSummaryTile()
+      learnerDashboardPage.getTitleOfSummaryTile()
     ).toMatch('Test Collection');
 
     // Go to the test collection.
@@ -167,11 +167,11 @@ describe('Learner dashboard functionality', function() {
     learnerDashboardPage.navigateToCompletedSection();
     browser.waitForAngular();
     general.waitForSystem();
-    learnerDashboardPage.navigateToCompletedCollection();
+    learnerDashboardPage.navigateToCompletedCollectionSection();
     browser.waitForAngular();
     general.waitForSystem();
     expect(
-      learnerDashboardPage.openSummaryTile()
+      learnerDashboardPage.getTitleOfSummaryTile()
     ).toMatch('Test Collection');
     users.logout();
 
@@ -199,11 +199,11 @@ describe('Learner dashboard functionality', function() {
     learnerDashboardPage.get();
     browser.waitForAngular();
     general.waitForSystem();
-    learnerDashboardPage.navigateToIncompleteCollection();
+    learnerDashboardPage.navigateToIncompleteCollectionSection();
     browser.waitForAngular();
     general.waitForSystem();
     expect(
-      learnerDashboardPage.openSummaryTile()
+      learnerDashboardPage.getTitleOfSummaryTile()
     ).toMatch('Test Collection');
     users.logout();
   });
