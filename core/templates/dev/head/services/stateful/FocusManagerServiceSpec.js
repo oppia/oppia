@@ -18,6 +18,59 @@
 
 describe('Focus Manager Service', function() {
   var FocusManagerService;
+  var DeviceInfoService;
+  var IdGenerationService;
+  var clearFocusLabel;
+  var rootScope;
+  var $timeout;
+  var focuslabel = 'FocusLabel';
 
   beforeEach(module('oppia'));
+  beforeEach(inject(function($injector, LABEL_FOR_CLEARING_FOCUS) {
+    FocusManagerService = $injector.get('FocusManagerService');
+    DeviceInfoService = $injector.get('DeviceInfoService');
+    IdGenerationService = $injector.get('IdGenerationService');
+    rootScope = $injector.get('$rootScope');
+    $timeout = $injector.get('$timeout');
+    clearLabel = LABEL_FOR_CLEARING_FOCUS;
+    spyOn(rootScope, '$broadcast');
+  }));
+
+  it('should generate a random string for focus label', function() {
+    spyOn(IdGenerationService, 'generateNewId');
+    FocusManagerService.generateFocusLabel();
+    expect(IdGenerationService.generateNewId).toHaveBeenCalled();
+  });
+
+  it('should set focus label and broadcast it', function() {
+    FocusManagerService.setFocus(focuslabel);
+    $timeout(function () {
+      expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn',focuslabel);
+    });
+    $timeout.flush();
+  });
+
+  it('should not set focus label if _nextLabelToFocusOn is set', function() {
+    FocusManagerService.setFocusLabel(focuslabel);
+    ctr = FocusManagerService.setFocus(focuslabel);
+    expect(ctr).toEqual(undefined);
+  });
+
+  it('should set label to clear focus and broadcast it', function() {
+    FocusManagerService.clearFocus();
+    $timeout(function () {
+      expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn',clearLabel);
+    });
+    $timeout.flush();
+  });
+
+  it('should set focus label if on desktop and broadcast it', function() {
+    FocusManagerService.setFocusIfOnDesktop(focuslabel);
+    if (!DeviceInfoService.isMobileDevice()) {
+      $timeout(function () {
+        expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn',focuslabel);
+      });
+      $timeout.flush();
+    }
+  });
 });
