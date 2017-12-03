@@ -253,47 +253,27 @@ oppia.controller('StatisticsTab', [
               ];
 
               var _getVisualizationsHtml = function() {
-                var htmlSnippetPromises = visualizationsInfo.map(function(viz) {
-                  var htmlSnippets = [];
+                return visualizationsInfo.map(function(visualizationInfo) {
                   var escapedData = HtmlEscaperService.objToEscapedJson(
-                    viz.data);
+                    visualizationInfo.data);
                   var escapedOptions = HtmlEscaperService.objToEscapedJson(
-                    viz.options);
+                    visualizationInfo.options);
+                  var escapedIsAddressedResults =
+                    HtmlEscaperService.objToEscapedJson(
+                      visualizationInfo.data.map(function(datum) {
+                        return SolutionVerificationService.verifySolution(
+                          ExplorationDataService.explorationId,
+                          explorationStatesService.getState($scope.stateName),
+                          HtmlEscaperService.objToEscapedJson(datum));
+                      }));
 
-                  var isAddressedPromises = viz.data.map(function(datum) {
-                    var deferred = $q.defer();
-                    var successCallback = function() {
-                      deferred.resolve(true);
-                    };
-                    var errorCallback = function() {
-                      deferred.resolve(false);
-                    };
-
-                    SolutionVerificationService.verifySolution(
-                      ExplorationDataService.explorationId,
-                      explorationStatesService.getState($scope.stateName),
-                      HtmlEscaperService.objToEscapedJson(datum),
-                      successCallback, errorCallback);
-                    return deferred.promise;
-                  });
-
-                  return $q.all(isAddressedPromises).then(
-                    function(isAddressedResults) {
-                      var el = $(
-                      '<oppia-visualization-' +
-                        $filter('camelCaseToHyphens')(viz.id) + '/>');
-                      el.attr('data', escapedData);
-                      el.attr('options', escapedOptions);
-                      el.attr(
-                        'is-addressed', HtmlEscaperService.objToEscapedJson(
-                          isAddressedResults));
-                      return el.get(0).outerHTML;
-                    });
-                });
-
-                return $q.all(htmlSnippetPromises).then(function(htmlSnippets) {
-                  return htmlSnippets.join('');
-                });
+                  var el = $('<oppia-visualization-' +
+                    $filter('camelCaseToHyphens')(visualizationInfo.id) + '/>');
+                  el.attr('data', escapedData);
+                  el.attr('options', escapedOptions);
+                  el.attr('is-addressed', escapedIsAddressedResults);
+                  return el.get(0).outerHTML;
+                }).join('');
               };
 
               $scope.visualizationsHtml = _getVisualizationsHtml();
