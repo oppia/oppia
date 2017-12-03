@@ -254,46 +254,46 @@ oppia.controller('StatisticsTab', [
 
               var _getVisualizationsHtml = function() {
                 var htmlSnippetPromises = visualizationsInfo.map(function(viz) {
-                    var htmlSnippets = [];
-                    var escapedData = HtmlEscaperService.objToEscapedJson(
-                      viz.data);
-                    var escapedOptions = HtmlEscaperService.objToEscapedJson(
-                      viz.options);
+                  var htmlSnippets = [];
+                  var escapedData = HtmlEscaperService.objToEscapedJson(
+                    viz.data);
+                  var escapedOptions = HtmlEscaperService.objToEscapedJson(
+                    viz.options);
 
-                    var isAddressedPromises = viz.data.map(function(datum) {
-                      var deferred = $q.defer();
-                      var successCallback = function() {
-                        deferred.resolve(true);
-                      };
-                      var errorCallback = function() {
-                        deferred.resolve(false);
-                      };
+                  var isAddressedPromises = viz.data.map(function(datum) {
+                    var deferred = $q.defer();
+                    var successCallback = function() {
+                      deferred.resolve(true);
+                    };
+                    var errorCallback = function() {
+                      deferred.resolve(false);
+                    };
 
-                      SolutionVerificationService.verifySolution(
-                        ExplorationDataService.explorationId,
-                        explorationStatesService.getState($scope.stateName),
-                        HtmlEscaperService.objToEscapedJson(datum),
-                        successCallback, errorCallback);
-                      return deferred.promise;
-                    });
+                    SolutionVerificationService.verifySolution(
+                      ExplorationDataService.explorationId,
+                      explorationStatesService.getState($scope.stateName),
+                      HtmlEscaperService.objToEscapedJson(datum),
+                      successCallback, errorCallback);
+                    return deferred.promise;
+                  });
 
-                    return $q.all(isAddressedPromises).then(function(results) {
+                  return $q.all(isAddressedPromises).then(
+                    function(isAddressedResults) {
                       var el = $(
-                        '<oppia-visualization-' +
+                      '<oppia-visualization-' +
                         $filter('camelCaseToHyphens')(viz.id) + '/>');
                       el.attr('data', escapedData);
                       el.attr('options', escapedOptions);
-                      el.attr('is-addressed',
-                        HtmlEscaperService.objToEscapedJson(results));
+                      el.attr(
+                        'is-addressed', HtmlEscaperService.objToEscapedJson(
+                          isAddressedResults));
                       return el.get(0).outerHTML;
                     });
                   });
 
-                $q.all(htmlSnippetPromises).then(function(htmlSnippets) {
+                return $q.all(htmlSnippetPromises).then(function(htmlSnippets) {
                   return htmlSnippets.join('');
                 });
-
-                return htmlSnippets;
               };
 
               $scope.visualizationsHtml = _getVisualizationsHtml();
