@@ -51,12 +51,10 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
-  <div>
+  <div ng-controller="ExplorationPlayer">
     <background-banner></background-banner>
     <conversation-skin></conversation-skin>
-    {% if not iframed %}
-      <attribution-guide></attribution-guide>
-    {% endif %}
+    <attribution-guide ng-if="!iframed"></attribution-guide>
   </div>
   <style>
     .oppia-exploration-h1 {
@@ -78,9 +76,9 @@
 {% endblock %}
 
 {% block footer %}
-  {% if not iframed %}
-    <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
-  {% endif %}
+  <div ng-controller="ExplorationPlayer">
+    <exploration-footer ng-if="!iframed" twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
+  </div>
 {% endblock %}
 
 {% block footer_js %}
@@ -169,7 +167,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioPreloaderService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationPlayer.js"></script>
-  
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionSyntaxTreeService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionEvaluatorService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionParserService.js"></script>
