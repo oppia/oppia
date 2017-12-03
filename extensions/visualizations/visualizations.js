@@ -16,15 +16,15 @@
  * @fileoverview Directives for all reusable data visualization components.
  */
 
-// Each visualization receives two variables: 'data' and 'options'. The exact
-// format for each of these is specific to the particular visualization.
+// Each visualization receives four variables: 'data', 'options',
+// 'explorationId', and 'stateName'. The exact format for each of these is
+// specific to the particular visualization.
 
 oppia.directive('oppiaVisualizationBarChart', [function() {
   return {
     restrict: 'E',
     scope: {},
-    controller: [
-      '$scope', '$attrs', '$element', 'HtmlEscaperService',
+    controller: ['$scope', '$attrs', '$element', 'HtmlEscaperService',
       function($scope, $attrs, $element, HtmlEscaperService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
@@ -65,31 +65,12 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
     restrict: 'E',
     scope: {},
     templateUrl: 'visualizations/FrequencyTable',
-    controller: [
-      '$scope', '$attrs', 'explorationStatesService', 'HtmlEscaperService',
-      'SolutionVerificationService',
-      function(
-          $scope, $attrs, explorationStatesService, HtmlEscaperService,
-          SolutionVerificationService) {
+    controller: ['$scope', '$attrs', 'HtmlEscaperService',
+      function($scope, $attrs, HtmlEscaperService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
-        $scope.isAddressed = $scope.data.map(function() {
-          return false;
-        });
-
-        var state = explorationStatesService.getState($attrs.stateName);
-        $scope.isAddressed.forEach(function(_, i, isAddressed) {
-          var successCallback = function() {
-            isAddressed[i] = true;
-          };
-          var errorCallback = function() {
-            isAddressed[i] = false;
-          };
-          SolutionVerificationService.verifySolution(
-            $attrs.explorationId, state,
-            HtmlEscaperService.objToEscapedJson($scope.data[i]),
-            successCallback, errorCallback);
-        });
+        $scope.isAddressed = HtmlEscaperService.escapedJsonToObj(
+          $attrs.isAddressed);
       }
     ]
   };
@@ -100,37 +81,19 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
     restrict: 'E',
     scope: {},
     templateUrl: 'visualizations/EnumeratedFrequencyTable',
-    controller: [
-      '$scope', '$attrs', 'explorationStatesService', 'HtmlEscaperService',
-      'SolutionVerificationService',
-      function(
-          $scope, $attrs, explorationStatesService, HtmlEscaperService,
-          SolutionVerificationService) {
+    controller: ['$scope', '$attrs', 'HtmlEscaperService',
+      function($scope, $attrs, HtmlEscaperService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
+        $scope.isAddressed = HtmlEscaperService.escapedJsonToObj(
+          $attrs.isAddressed);
+
         $scope.answerVisible = $scope.data.map(function(_, i) {
           return i === 0;  // 1st element shown & all others hidden by default.
         });
         $scope.toggleAnswerVisibility = function(i) {
           $scope.answerVisible[i] = !$scope.answerVisible[i];
         };
-        $scope.isAddressed = $scope.data.map(function() {
-          return false;
-        });
-
-        var state = explorationStatesService.getState($attrs.stateName);
-        $scope.isAddressed.forEach(function(_, i, isAddressed) {
-          var successCallback = function() {
-            isAddressed[i] = true;
-          };
-          var errorCallback = function() {
-            isAddressed[i] = false;
-          };
-          SolutionVerificationService.verifySolution(
-            $attrs.explorationId, state,
-            HtmlEscaperService.objToEscapedJson($scope.data[i]),
-            successCallback, errorCallback);
-        });
       }
     ]
   };

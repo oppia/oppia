@@ -195,12 +195,13 @@ oppia.controller('StatisticsTab', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', '$filter', 'stateName', 'stateStats',
-            'improvementType', 'visualizationsInfo', 'HtmlEscaperService',
+            '$scope', '$modalInstance', '$filter', '$q', 'stateName',
+            'stateStats', 'improvementType', 'visualizationsInfo',
+            'HtmlEscaperService', 'SolutionVerificationService',
             'ENABLE_NEW_STATS_FRAMEWORK',
-            function($scope, $modalInstance, $filter, stateName, stateStats,
+            function($scope, $modalInstance, $filter, $q, stateName, stateStats,
                 improvementType, visualizationsInfo, HtmlEscaperService,
-                ENABLE_NEW_STATS_FRAMEWORK) {
+                SolutionVerificationService, ENABLE_NEW_STATS_FRAMEWORK) {
               var COMPLETION_RATE_PIE_CHART_OPTIONS = {
                 left: 20,
                 pieHole: 0.6,
@@ -252,23 +253,47 @@ oppia.controller('StatisticsTab', [
               ];
 
               var _getVisualizationsHtml = function() {
-                var htmlSnippets = [];
+                var htmlSnippetPromises = visualizationsInfo.map(function(viz) {
+                    var htmlSnippets = [];
+                    var escapedData = HtmlEscaperService.objToEscapedJson(
+                      viz.data);
+                    var escapedOptions = HtmlEscaperService.objToEscapedJson(
+                      viz.options);
 
-                for (var i = 0; i < visualizationsInfo.length; i++) {
-                  var el = $(
-                    '<oppia-visualization-' +
-                    $filter('camelCaseToHyphens')(visualizationsInfo[i].id) +
-                    '/>');
-                  el.attr('data', HtmlEscaperService.objToEscapedJson(
-                    visualizationsInfo[i].data));
-                  el.attr('options', HtmlEscaperService.objToEscapedJson(
-                    visualizationsInfo[i].options));
-                  el.attr(
-                    'exploration-id', ExplorationDataService.explorationId);
-                  el.attr('state-name', $scope.stateName);
-                  htmlSnippets.push(el.get(0).outerHTML);
-                }
-                return htmlSnippets.join('');
+                    var isAddressedPromises = viz.data.map(function(datum) {
+                      var deferred = $q.defer();
+                      var successCallback = function() {
+                        deferred.resolve(true);
+                      };
+                      var errorCallback = function() {
+                        deferred.resolve(false);
+                      };
+
+                      SolutionVerificationService.verifySolution(
+                        ExplorationDataService.explorationId,
+                        explorationStatesService.getState($scope.stateName),
+                        HtmlEscaperService.objToEscapedJson(datum),
+                        successCallback, errorCallback);
+                      return deferred.promise;
+                    });
+
+                    return $q.all(isAddressedPromises).then(function(results) {
+                      var el = $(
+                        '<oppia-visualization-' +
+                        $filter('camelCaseToHyphens')(viz.id) + '/>');
+                      el.attr('data', escapedData);
+                      el.attr('options', escapedOptions);
+                      el.attr('is-addressed',
+                        HtmlEscaperService.objToEscapedJson(results));
+                      return el.get(0).outerHTML;
+                    });
+                  });
+
+                $q.all(htmlSnippetPromises).then(function(htmlSnippets) {
+                  return htmlSnippets.join('');
+                });
+
+                return htmlSnippets;
               };
 
               $scope.visualizationsHtml = _getVisualizationsHtml();
