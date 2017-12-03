@@ -263,6 +263,8 @@ oppia.controller('StatisticsTab', [
                     visualizationsInfo[i].data));
                   el.attr('options', HtmlEscaperService.objToEscapedJson(
                     visualizationsInfo[i].options));
+                  el.attr('explorationId', $scope.explorationId);
+                  el.attr('stateName', stateName);
                   htmlSnippets.push(el.get(0).outerHTML);
                 }
                 return htmlSnippets.join('');
