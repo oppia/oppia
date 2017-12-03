@@ -100,6 +100,10 @@ oppia.factory('ExplorationObjectFactory', [
           INTERACTION_DISPLAY_MODE_INLINE);
     };
 
+    Exploration.prototype.getStates = function() {
+      return angular.copy(this.states);
+    };
+
     Exploration.prototype.getState = function(stateName) {
       return this.states.getState(stateName);
     };

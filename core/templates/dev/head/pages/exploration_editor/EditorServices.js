@@ -1154,57 +1154,13 @@ oppia.factory('stateSolutionService', [
   }
 ]);
 
-oppia.factory('computeGraphService', [
-  'INTERACTION_SPECS', function(INTERACTION_SPECS) {
-    var _computeGraphData = function(initStateId, states) {
-      var nodes = {};
-      var links = [];
-      var finalStateIds = states.getFinalStateNames();
-
-      states.getStateNames().forEach(function(stateName) {
-        var interaction = states.getState(stateName).interaction;
-        nodes[stateName] = stateName;
-        if (interaction.id) {
-          var groups = interaction.answerGroups;
-          for (var h = 0; h < groups.length; h++) {
-            links.push({
-              source: stateName,
-              target: groups[h].outcome.dest,
-            });
-          }
-
-          if (interaction.defaultOutcome) {
-            links.push({
-              source: stateName,
-              target: interaction.defaultOutcome.dest,
-            });
-          }
-        }
-      });
-
-      return {
-        finalStateIds: finalStateIds,
-        initStateId: initStateId,
-        links: links,
-        nodes: nodes
-      };
-    };
-
-    return {
-      compute: function(initStateId, states) {
-        return _computeGraphData(initStateId, states);
-      }
-    };
-  }
-]);
-
 // Service for computing graph data.
 oppia.factory('graphDataService', [
   'explorationStatesService', 'explorationInitStateNameService',
-  'computeGraphService',
+  'ComputeGraphService',
   function(
       explorationStatesService, explorationInitStateNameService,
-      computeGraphService) {
+      ComputeGraphService) {
     var _graphData = null;
 
     // Returns an object which can be treated as the input to a visualization
@@ -1223,7 +1179,7 @@ oppia.factory('graphDataService', [
 
       var states = explorationStatesService.getStates();
       var initStateId = explorationInitStateNameService.savedMemento;
-      _graphData = computeGraphService.compute(initStateId, states);
+      _graphData = ComputeGraphService.compute(initStateId, states);
     };
 
     return {
