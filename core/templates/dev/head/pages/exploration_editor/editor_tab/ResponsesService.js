@@ -71,30 +71,29 @@ oppia.factory('ResponsesService', [
           var solutionWasPreviouslyValid = (
             explorationStatesService.isSolutionValid(
               EditorStateService.getActiveStateName()));
-          SolutionVerificationService.verifySolution(
-            ExplorationContextService.getExplorationId(),
-            explorationStatesService.getState(currentStateName),
-            stateSolutionService.savedMemento.correctAnswer,
-            function() {
-              explorationStatesService.updateSolutionValidity(
-                currentStateName, true);
-              ExplorationWarningsService.updateWarnings();
-              if (!solutionWasPreviouslyValid) {
-                AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
-              }
-            },
-            function() {
-              explorationStatesService.updateSolutionValidity(
-                currentStateName, false);
-              ExplorationWarningsService.updateWarnings();
-              if (solutionWasPreviouslyValid) {
-                AlertsService.addInfoMessage(
-                  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
-              } else {
-                AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
-              }
+          var solutionIsCurrentlyValid = (
+            SolutionVerificationService.verifySolution(
+              ExplorationContextService.getExplorationId(),
+              explorationStatesService.getState(currentStateName),
+              stateSolutionService.savedMemento.correctAnswer));
+          if (solutionIsCurrentlyValid) {
+            explorationStatesService.updateSolutionValidity(
+              currentStateName, true);
+            ExplorationWarningsService.updateWarnings();
+            if (!solutionWasPreviouslyValid) {
+              AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
             }
-          );
+          } else {
+            explorationStatesService.updateSolutionValidity(
+              currentStateName, false);
+            ExplorationWarningsService.updateWarnings();
+            if (solutionWasPreviouslyValid) {
+              AlertsService.addInfoMessage(
+                INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
+            } else {
+              AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+            }
+          }
         }
 
         graphDataService.recompute();
