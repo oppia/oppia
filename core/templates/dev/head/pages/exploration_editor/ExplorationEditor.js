@@ -41,7 +41,7 @@ oppia.controller('ExplorationEditor', [
   'explorationLanguageCodeService', 'explorationRightsService',
   'explorationInitStateNameService', 'explorationTagsService',
   'editabilityService', 'explorationStatesService', 'RouterService',
-  'graphDataService', 'stateEditorTutorialFirstTimeService',
+  'graphDataService', 'StateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'ExplorationWarningsService', '$templateCache', 'ExplorationContextService',
   'ExplorationAdvancedFeaturesService', '$modal', 'changeListService',
@@ -56,7 +56,7 @@ oppia.controller('ExplorationEditor', [
       explorationLanguageCodeService, explorationRightsService,
       explorationInitStateNameService, explorationTagsService,
       editabilityService, explorationStatesService, RouterService,
-      graphDataService, stateEditorTutorialFirstTimeService,
+      graphDataService, StateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       ExplorationWarningsService, $templateCache, ExplorationContextService,
       ExplorationAdvancedFeaturesService, $modal, changeListService,
@@ -195,7 +195,7 @@ oppia.controller('ExplorationEditor', [
           successCallback();
         }
 
-        stateEditorTutorialFirstTimeService.init(
+        StateEditorTutorialFirstTimeService.init(
           data.show_state_editor_tutorial_on_load, $scope.explorationId);
       });
     };
@@ -345,7 +345,7 @@ oppia.controller('ExplorationEditor', [
     var leaveTutorial = function() {
       editabilityService.onEndTutorial();
       $scope.$apply();
-      stateEditorTutorialFirstTimeService.markTutorialFinished();
+      StateEditorTutorialFirstTimeService.markTutorialFinished();
       $scope.tutorialInProgress = false;
     };
 
@@ -409,7 +409,7 @@ oppia.controller('ExplorationEditor', [
       modalInstance.result.then(function() {
         $scope.startTutorial();
       }, function() {
-        stateEditorTutorialFirstTimeService.markTutorialFinished();
+        StateEditorTutorialFirstTimeService.markTutorialFinished();
       });
     };
 

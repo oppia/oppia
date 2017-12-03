@@ -35,7 +35,7 @@ describe('Library pages tour', function() {
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
-  
+
   var visitLibraryPage = function() {
     libraryPage.get();
   };
@@ -51,7 +51,8 @@ describe('Library pages tour', function() {
   it('visits the top rated page', function() {
     // To visit the top rated page, at least one
     // exploration has to be rated by the user
-    users.createAndLoginAdminUser('random@gmail.com', 'random');
+    users.createUser('random@gmail.com', 'random');
+    users.login('random@gmail.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
       EXPLORATION_CATEGORY,
