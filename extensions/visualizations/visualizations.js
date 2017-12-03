@@ -66,16 +66,18 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
     scope: {},
     templateUrl: 'visualizations/FrequencyTable',
     controller: [
-      '$scope', '$attrs', 'HtmlEscaperService', 'SolutionVerificationService',
+      '$scope', '$attrs', 'explorationStatesService', 'HtmlEscaperService',
+      'SolutionVerificationService',
       function(
-          $scope, $attrs, HtmlEscaperService, SolutionVerificationService) {
+          $scope, $attrs, explorationStatesService, HtmlEscaperService,
+          SolutionVerificationService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
         $scope.isAddressed = $scope.data.map(function() {
           return false;
         });
 
-        var state = HtmlEscaperService.escapedJsonToObj($attrs.state);
+        var state = explorationStatesService.getState($attrs.stateName);
         $scope.isAddressed.forEach(function(_, i, isAddressed) {
           var successCallback = function() {
             isAddressed[i] = true;
@@ -99,9 +101,11 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
     scope: {},
     templateUrl: 'visualizations/EnumeratedFrequencyTable',
     controller: [
-      '$scope', '$attrs', 'HtmlEscaperService', 'SolutionVerificationService',
+      '$scope', '$attrs', 'explorationStatesService', 'HtmlEscaperService',
+      'SolutionVerificationService',
       function(
-          $scope, $attrs, HtmlEscaperService, SolutionVerificationService) {
+          $scope, $attrs, explorationStatesService, HtmlEscaperService,
+          SolutionVerificationService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
         $scope.answerVisible = $scope.data.map(function(_, i) {
@@ -114,7 +118,7 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
           return false;
         });
 
-        var state = HtmlEscaperService.escapedJsonToObj($attrs.state);
+        var state = explorationStatesService.getState($attrs.stateName);
         $scope.isAddressed.forEach(function(_, i, isAddressed) {
           var successCallback = function() {
             isAddressed[i] = true;
