@@ -33,6 +33,8 @@ describe('Collections', function() {
     adminPage.get();
     adminPage.reloadCollection();
     general.acceptAlert();
+    browser.waitForAngular();
+    adminPage.reloadAllExplorations();
     adminPage.updateRole(USERNAME, 'collection editor');
     users.logout();
   });
