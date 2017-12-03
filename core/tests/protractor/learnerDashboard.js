@@ -60,9 +60,16 @@ describe('Learner dashboard functionality', function() {
     browser.waitForAngular();
     element(by.css('.protractor-test-create-activity')).click();
     // Create new collection.
-    learnerDashboardPage.createExploration();
+    element(by.css('.protractor-test-create-collection')).click();
     browser.waitForAngular();
-    learnerDashboardPage.publishExploration();
+    collectionEditor.addExistingExploration('14');
+    collectionEditor.saveDraft();
+    collectionEditor.closeSaveModal();
+    collectionEditor.publishCollection();
+    collectionEditor.setTitle('Test Collection');
+    collectionEditor.setObjective('This is a test collection.');
+    collectionEditor.setCategory('Algebra');
+    collectionEditor.saveChanges();
     browser.waitForAngular();
     users.logout();
   });
@@ -90,7 +97,7 @@ describe('Learner dashboard functionality', function() {
     player.submitAnswer('Continue', null);
     learnerDashboardPage.get();
     browser.waitForAngular();
-    learnerDashboardPage.completedProfileTest();
+    learnerDashboardPage.navigateToCompletedSection();
     browser.waitForAngular();
     libraryPage.expectExplorationToBeVisible('About Oppia');
     users.logout();
@@ -131,11 +138,11 @@ describe('Learner dashboard functionality', function() {
     browser.waitForAngular();
     general.waitForSystem();
     browser.ignoreSynchronization = false;
-    learnerDashboardPage.incompleteCollectionSection();
+    learnerDashboardPage.navigateToIncompleteCollection();
     browser.waitForAngular();
     general.waitForSystem();
     expect(
-      learnerDashboardPage.summaryTile()
+      learnerDashboardPage.openSummaryTile()
     ).toMatch('Test Collection');
 
     // Go to the test collection.
@@ -157,14 +164,14 @@ describe('Learner dashboard functionality', function() {
     learnerDashboardPage.get();
     browser.waitForAngular();
     general.waitForSystem();
-    learnerDashboardPage.completedProfileTest();
+    learnerDashboardPage.navigateToCompletedSection();
     browser.waitForAngular();
     general.waitForSystem();
-    learnerDashboardPage.completedCollectionSection();
+    learnerDashboardPage.navigateToCompletedCollection();
     browser.waitForAngular();
     general.waitForSystem();
     expect(
-      learnerDashboardPage.summaryTile()
+      learnerDashboardPage.openSummaryTile()
     ).toMatch('Test Collection');
     users.logout();
 
@@ -192,11 +199,11 @@ describe('Learner dashboard functionality', function() {
     learnerDashboardPage.get();
     browser.waitForAngular();
     general.waitForSystem();
-    learnerDashboardPage.incompleteCollectionSection();
+    learnerDashboardPage.navigateToIncompleteCollection();
     browser.waitForAngular();
     general.waitForSystem();
     expect(
-      learnerDashboardPage.summaryTile()
+      learnerDashboardPage.openSummaryTile()
     ).toMatch('Test Collection');
     users.logout();
   });
@@ -207,17 +214,17 @@ describe('Learner dashboard functionality', function() {
     // Subscribe to both the creators.
     browser.get('/profile/creator1learnerDashboard');
     browser.waitForAngular();
-    learnerDashboardPage.clickSubscriptionButton();
+    element(by.css('.protractor-test-subscription-button')).click();
     browser.get('/profile/creator2learnerDashboard');
     browser.waitForAngular();
-    learnerDashboardPage.clickSubscriptionButton();
+    element(by.css('.protractor-test-subscription-button')).click();
 
     // Both creators should be present in the subscriptions section of the
     // dashboard.
     learnerDashboardPage.get();
     browser.waitForAngular();
     general.waitForSystem();
-    element(by.css('.protractor-test-subscriptions-section')).click();
+    learnerDashboardPage.navigateToSubscriptionsSection();
     browser.waitForAngular();
     expect(element.all(by.css(
       '.protractor-test-subscription-name')).first().getText()).toMatch(
@@ -241,7 +248,7 @@ describe('Learner dashboard functionality', function() {
     player.submitFeedback(feedback);
     learnerDashboardPage.get();
     browser.waitForAngular();
-    element(by.css('.protractor-test-feedback-section')).click();
+    learnerDashboardPage.navigateToFeedbackSection();
     browser.waitForAngular();
     expect(element.all(by.css(
       '.protractor-test-feedback-exploration')).first().getText()).toMatch(

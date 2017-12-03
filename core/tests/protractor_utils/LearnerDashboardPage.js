@@ -21,57 +21,46 @@ var collectionEditor = require('./collectionEditor.js');
 
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner_dashboard';
-  var subscriptionButton =
-    element(by.css('.protractor-test-subscription-button'));
-  var dashboardLink = element(by.css('.protractor-test-dashboard-link'));
-  var createCollection = element(by.css('.protractor-test-create-collection'));
-  var profileTestCompleted =
+  var completedSection =
     element(by.css('.protractor-test-completed-section'));
+  var feedbackSection =
+    element(by.css('.protractor-test-feedback-section'));
   var completedCollection =
     element(by.css('.protractor-test-completed-collection-section'));
   var incompleteCollection =
     element(by.css('.protractor-test-incomplete-collection-section'));
-  var summary =
+  var subscriptionsSection =
+    element(by.css('.protractor-test-subscriptions-section'));
+  var summaryTile =
     element.all(by.css('.protractor-test-collection-summary-tile-title'));
 
   this.get = function() {
     return browser.get(LEARNER_DASHBOARD_URL);
   };
 
-  this.clickSubscriptionButton = function() {
-    subscriptionButton.click();
+  this.navigateToCompletedSection = function() {
+    completedSection.click();
   }
 
-  this.createExploration = function() {
-    createCollection.click();
-  }
-
-  this.completedProfileTest = function() {
-    profileTestCompleted.click();
-  }
-
-  this.incompleteCollectionSection = function() {
+  this.navigateToIncompleteCollection = function() {
     incompleteCollection.click();
   }
 
-  this.completedCollectionSection = function() {
+  this.navigateToCompletedCollection = function() {
     completedCollection.click();
   }
 
-  this.summaryTile = function() {
-    return summary.first().getText();
+  this.navigateToFeedbackSection = function() {
+    feedbackSection.click();
   }
 
-  this.publishExploration = function() {
-    collectionEditor.addExistingExploration('14');
-    collectionEditor.saveDraft();
-    collectionEditor.closeSaveModal();
-    collectionEditor.publishCollection();
-    collectionEditor.setTitle('Test Collection');
-    collectionEditor.setObjective('This is a test collection.');
-    collectionEditor.setCategory('Algebra');
-    collectionEditor.saveChanges();
-  };
+  this.navigateToSubscriptionsSection = function() {
+    subscriptionsSection.click();
+  }
+
+  this.openSummaryTile = function() {
+    return summaryTile.first().getText();
+  }
 };
 
 exports.LearnerDashboardPage = LearnerDashboardPage;
