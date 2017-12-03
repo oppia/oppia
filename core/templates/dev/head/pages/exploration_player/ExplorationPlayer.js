@@ -17,8 +17,8 @@
  */
 
  oppia.controller('ExplorationPlayer', [
-    '$scope', function($scope) {
-      $scope.exploration_version = GLOBALS.exploration_version;
-      $scope.iframed = GLOBALS.iframed;
-    }
+  '$scope', function($scope) {
+    $scope.exploration_version = GLOBALS.exploration_version;
+    $scope.iframed = GLOBALS.iframed;
+  }
 ]);
