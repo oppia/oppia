@@ -289,7 +289,7 @@ oppia.controller('StatisticsTab', [
                           isAddressedResults));
                       return el.get(0).outerHTML;
                     });
-                  });
+                });
 
                 return $q.all(htmlSnippetPromises).then(function(htmlSnippets) {
                   return htmlSnippets.join('');
