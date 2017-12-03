@@ -92,7 +92,8 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
           $attrs.isAddressed);
 
         $scope.answerVisible = $scope.data.map(function(_, i) {
-          return i === 0;  // 1st element shown & all others hidden by default.
+          // First element is shown while all others hidden by default.
+          return i === 0;
         });
         $scope.toggleAnswerVisibility = function(i) {
           $scope.answerVisible[i] = !$scope.answerVisible[i];
