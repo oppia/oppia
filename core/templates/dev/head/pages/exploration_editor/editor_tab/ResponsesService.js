@@ -76,23 +76,18 @@ oppia.factory('ResponsesService', [
               ExplorationContextService.getExplorationId(),
               explorationStatesService.getState(currentStateName),
               stateSolutionService.savedMemento.correctAnswer));
-          if (solutionIsCurrentlyValid) {
-            explorationStatesService.updateSolutionValidity(
-              currentStateName, true);
-            ExplorationWarningsService.updateWarnings();
-            if (!solutionWasPreviouslyValid) {
-              AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
-            }
-          } else {
-            explorationStatesService.updateSolutionValidity(
-              currentStateName, false);
-            ExplorationWarningsService.updateWarnings();
-            if (solutionWasPreviouslyValid) {
-              AlertsService.addInfoMessage(
-                INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
-            } else {
-              AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
-            }
+
+          explorationStatesService.updateSolutionValidity(
+            currentStateName, solutionIsCurrentlyValid);
+          ExplorationWarningsService.updateWarnings();
+
+          if (solutionIsCurrentlyValid && !solutionWasPreviouslyValid) {
+            AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
+          } else if (!solutionIsCurrentlyValid && solutionWasPreviouslyValid) {
+            AlertsService.addInfoMessage(
+              INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
+          } else if (!solutionIsCurrentlyValid && !solutionWasPreviouslyValid) {
+            AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
           }
         }
 
