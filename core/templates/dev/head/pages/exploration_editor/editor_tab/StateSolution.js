@@ -126,16 +126,13 @@ oppia.controller('StateSolution', [
         var correctAnswer = result.solution.correctAnswer;
         var currentStateName = EditorStateService.getActiveStateName();
         var state = explorationStatesService.getState(currentStateName);
-        var isValid = SolutionVerificationService.verifySolution(
+        var solutionIsValid = SolutionVerificationService.verifySolution(
           ExplorationContextService.getExplorationId(), state, correctAnswer);
-        if (isValid) {
-          explorationStatesService.updateSolutionValidity(
-            currentStateName, true);
-          ExplorationWarningsService.updateWarnings();
-        } else {
-          explorationStatesService.updateSolutionValidity(
-            currentStateName, false);
-          ExplorationWarningsService.updateWarnings();
+
+        explorationStatesService.updateSolutionValidity(
+          currentStateName, solutionIsValid);
+        ExplorationWarningsService.updateWarnings();
+        if (!solutionIsValid) {
           AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
         }
 
