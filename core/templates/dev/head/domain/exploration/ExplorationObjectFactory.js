@@ -139,9 +139,10 @@ oppia.factory('ExplorationObjectFactory', [
         var totalFileSizeMB = 0;
         var allAudioTranslations =
           this.states.getAllAudioTranslations(languageCode);
-        allAudioTranslations.map(function(audioTranslation) {
-          totalFileSizeMB += audioTranslation.getFileSizeMB();
-        });
+        for (audioTranslationStateName in allAudioTranslations) {
+          totalFileSizeMB += 
+            allAudioTranslations[audioTranslationStateName].getFileSizeMB();
+        }
         return totalFileSizeMB;
       };
 

@@ -119,25 +119,25 @@ describe('Exploration object factory', function() {
 
     it('should correctly get audio translations from an exploration', 
     function() {
-      expect(exploration.getAllAudioTranslations('hi-en')).toEqual([
-        atof.createFromBackendDict({
+      expect(exploration.getAllAudioTranslations('hi-en')).toEqual({
+        'first state': atof.createFromBackendDict({
           filename: 'myfile3.mp3',
           file_size_bytes: 430000,
           needs_update: false
         }),
-        atof.createFromBackendDict({
+        'second state': atof.createFromBackendDict({
           filename: 'myfile2.mp3',
           file_size_bytes: 120000,
           needs_update: false
         })
-      ]);
-      expect(exploration.getAllAudioTranslations('en')).toEqual([
-        atof.createFromBackendDict({
+      });
+      expect(exploration.getAllAudioTranslations('en')).toEqual({
+        'first state': atof.createFromBackendDict({
           filename: 'myfile1.mp3',
           file_size_bytes: 210000,
           needs_update: false
         })
-      ]);
+      });
     });
 
     it('should get the correct file size in MB of all audio translations',
