@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview A data service that stores data
- *               about the rights for this exploration.
+ * about the rights for this exploration.
  */
 
 oppia.factory('ExplorationRightsService', [
