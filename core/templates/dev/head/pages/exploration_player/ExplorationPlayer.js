@@ -15,8 +15,7 @@
 /**
  * @fileoverview Data and controllers for the Oppia 'exploration_player' page.
  */
-
- oppia.controller('ExplorationPlayer', [
+oppia.controller('ExplorationPlayer', [
   '$scope', function($scope) {
     $scope.exploration_version = GLOBALS.exploration_version;
     $scope.iframed = GLOBALS.iframed;
