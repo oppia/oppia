@@ -58,9 +58,9 @@ oppia.controller('Library', [
     $scope.leftmostCardIndices = [];
 
     if(['group', 'search'].indexOf($scope.pageMode) !== -1){
-    	$rootScope.libraryTitle = 'Find explorations to learn from - Oppia';
+      $rootScope.libraryTitle = 'Find explorations to learn from - Oppia';
     } else {
-    	$rootScope.libraryTitle = 'I18N_LIBRARY_PAGE_TITLE';
+      $rootScope.libraryTitle = 'I18N_LIBRARY_PAGE_TITLE';
     }
 
     if ($scope.pageMode === LIBRARY_PAGE_MODES.GROUP) {
