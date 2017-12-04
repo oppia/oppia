@@ -98,7 +98,6 @@ describe('Learner dashboard functionality', function() {
     learnerDashboardPage.get();
     browser.waitForAngular();
     learnerDashboardPage.navigateToCompletedSection();
-    browser.waitForAngular();
     libraryPage.expectExplorationToBeVisible('About Oppia');
     users.logout();
 
@@ -139,8 +138,6 @@ describe('Learner dashboard functionality', function() {
     general.waitForSystem();
     browser.ignoreSynchronization = false;
     learnerDashboardPage.navigateToIncompleteCollectionsSection();
-    browser.waitForAngular();
-    general.waitForSystem();
     learnerDashboardPage.expectTitleOfSummaryTileToMatch('Test Collection');
 
     // Go to the test collection.
@@ -163,11 +160,8 @@ describe('Learner dashboard functionality', function() {
     browser.waitForAngular();
     general.waitForSystem();
     learnerDashboardPage.navigateToCompletedSection();
-    browser.waitForAngular();
     general.waitForSystem();
     learnerDashboardPage.navigateToCompletedCollectionsSection();
-    browser.waitForAngular();
-    general.waitForSystem();
     learnerDashboardPage.expectTitleOfSummaryTileToMatch('Test Collection');
     users.logout();
 
@@ -196,8 +190,6 @@ describe('Learner dashboard functionality', function() {
     browser.waitForAngular();
     general.waitForSystem();
     learnerDashboardPage.navigateToIncompleteCollectionsSection();
-    browser.waitForAngular();
-    general.waitForSystem();
     learnerDashboardPage.expectTitleOfSummaryTileToMatch('Test Collection');
     users.logout();
   });
@@ -219,7 +211,6 @@ describe('Learner dashboard functionality', function() {
     browser.waitForAngular();
     general.waitForSystem();
     learnerDashboardPage.navigateToSubscriptionsSection();
-    browser.waitForAngular();
     learnerDashboardPage.expectSubscriptionFirstNameToMatch('creator...');
     learnerDashboardPage.expectSubscriptionLastNameToMatch('creator...');
     users.logout();
@@ -239,10 +230,8 @@ describe('Learner dashboard functionality', function() {
     learnerDashboardPage.get();
     browser.waitForAngular();
     learnerDashboardPage.navigateToFeedbackSection();
-    browser.waitForAngular();
     learnerDashboardPage.expectFeedbackExplorationTitleToMatch('About Oppia');
     learnerDashboardPage.navigateToFeedbackThread();
-    browser.waitForAngular();
     learnerDashboardPage.expectFeedbackMessageToMatch(feedback);
     users.logout();
   });

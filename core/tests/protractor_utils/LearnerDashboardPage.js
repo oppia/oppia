@@ -17,7 +17,7 @@
  * tests.
  */
 
-var collectionEditor = require('./collectionEditor.js');
+var general = require('./general.js');
 
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner_dashboard';
@@ -48,26 +48,34 @@ var LearnerDashboardPage = function() {
 
   this.navigateToCompletedSection = function() {
     completedSection.click();
+    browser.waitForAngular();
   };
 
   this.navigateToIncompleteCollectionsSection = function() {
     incompleteCollectionsSection.click();
+    browser.waitForAngular();
+    general.waitForSystem();
   };
 
   this.navigateToCompletedCollectionsSection = function() {
     completedCollectionsSection.click();
+    browser.waitForAngular();
+    general.waitForSystem();
   };
 
   this.navigateToFeedbackSection = function() {
     feedbackSection.click();
+    browser.waitForAngular();
   };
 
   this.navigateToFeedbackThread = function() {
     feedbackThread.click();
+    browser.waitForAngular();
   };
 
   this.navigateToSubscriptionsSection = function() {
     subscriptionsSection.click();
+    browser.waitForAngular();
   };
 
   this.expectTitleOfSummaryTileToMatch = function(title) {
