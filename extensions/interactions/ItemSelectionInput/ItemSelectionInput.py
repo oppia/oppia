@@ -75,7 +75,11 @@ class ItemSelectionInput(base.BaseInteraction):
         # Table with keyed answer counts for top N answers.
         'id': 'EnumeratedFrequencyTable',
         'options': {
-            'column_headers': ['Answer (click to expand/collapse)', 'Count'],
+            'column_headers': [
+                'Answer (click to expand/collapse)',
+                'Count',
+                'Addressed?',
+            ],
             'title': 'Top answers',
         },
         'calculation_id': 'Top10AnswerFrequencies',

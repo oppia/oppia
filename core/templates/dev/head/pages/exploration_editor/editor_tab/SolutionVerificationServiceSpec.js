@@ -120,82 +120,42 @@ describe('Solution Verification Service', function() {
   }));
 
   describe('Success case', function() {
-    it('should verify a correct solution',
-      function(done) {
-        mockFunctions = {
-          successCallback: function() {
-            done();
-          },
-          errorCallback: function() {
-            done();
-          }
-        };
+    it('should verify a correct solution', function() {
+      ecs.setActiveStateName('First State');
+      var state = ess.getState('First State');
+      siis.init(
+        'First State', state.interaction.id, state.interaction, 'widget_id');
+      scas.init(
+        'First State', state.interaction.customizationArgs,
+        state.interaction, 'widget_customization_args');
 
-        successCallbackSpy = spyOn(
-          mockFunctions, 'successCallback').and.callThrough();
-        errorCallbackSpy = spyOn(
-          mockFunctions, 'errorCallback').and.callThrough();
+      siis.savedMemento = 'TextInput';
+      ess.saveSolution('First State', sof.createNew(false, 'abc', 'nothing'));
 
-        ecs.setActiveStateName('First State');
-        var state = ess.getState('First State');
-        siis.init(
-          'First State', state.interaction.id, state.interaction, 'widget_id');
-        scas.init(
-          'First State', state.interaction.customizationArgs,
-          state.interaction, 'widget_customization_args');
-
-        siis.savedMemento = 'TextInput';
-        ess.saveSolution('First State', sof.createNew(false, 'abc', 'nothing'));
-
+      expect(
         svs.verifySolution(0, state,
-          ess.getState('First State').interaction.solution.correctAnswer,
-          mockFunctions.successCallback, mockFunctions.errorCallback);
-      }
-    );
-
-    afterEach(function() {
-      expect(successCallbackSpy).toHaveBeenCalled();
-      expect(errorCallbackSpy).not.toHaveBeenCalled();
+          ess.getState('First State').interaction.solution.correctAnswer)
+      ).toBe(true);
     });
   });
 
   describe('Failure case', function() {
-    it('should verify an incorrect solution',
-      function(done) {
-        mockFunctions = {
-          successCallback: function() {
-            done();
-          },
-          errorCallback: function() {
-            done();
-          }
-        };
+    it('should verify an incorrect solution', function() {
+      ecs.setActiveStateName('First State');
+      var state = ess.getState('First State');
+      siis.init(
+        'First State', state.interaction.id, state.interaction, 'widget_id');
+      scas.init(
+        'First State', state.interaction.customizationArgs,
+        state.interaction, 'widget_customization_args');
 
-        successCallbackSpy = spyOn(
-          mockFunctions, 'successCallback').and.callThrough();
-        errorCallbackSpy = spyOn(
-          mockFunctions, 'errorCallback').and.callThrough();
+      siis.savedMemento = 'TextInput';
+      ess.saveSolution('First State', sof.createNew(false, 'xyz', 'nothing'));
 
-        ecs.setActiveStateName('First State');
-        var state = ess.getState('First State');
-        siis.init(
-          'First State', state.interaction.id, state.interaction, 'widget_id');
-        scas.init(
-          'First State', state.interaction.customizationArgs,
-          state.interaction, 'widget_customization_args');
-
-        siis.savedMemento = 'TextInput';
-        ess.saveSolution('First State', sof.createNew(false, 'xyz', 'nothing'));
-
+      expect(
         svs.verifySolution(0, state,
-          ess.getState('First State').interaction.solution.correctAnswer,
-          mockFunctions.successCallback, mockFunctions.errorCallback)
-      }
-    );
-
-    afterEach(function() {
-      expect(successCallbackSpy).not.toHaveBeenCalled();
-      expect(errorCallbackSpy).toHaveBeenCalled();
+          ess.getState('First State').interaction.solution.correctAnswer)
+      ).toBe(false);
     });
   });
 });

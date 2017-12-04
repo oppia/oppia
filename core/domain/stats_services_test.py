@@ -1232,7 +1232,8 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             visualization = visualizations[0]
             self.assertEqual(
-                visualization['options']['column_headers'], ['Answer', 'Count'])
+                visualization['options']['column_headers'],
+                ['Answer', 'Count', 'Addressed?'])
             self.assertIn('Top', visualization['options']['title'])
 
     def test_has_vis_info_for_exp_with_answer_for_one_calculation(self):
@@ -1294,7 +1295,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self.assertEqual(top_answers_visualization['id'], 'FrequencyTable')
             self.assertEqual(
                 top_answers_visualization['options']['column_headers'],
-                ['Answer', 'Count'])
+                ['Answer', 'Count', 'Addressed?'])
             self.assertEqual(top_answers_visualization['data'], [{
                 'answer': ['A', 'B'],
                 'frequency': 3
@@ -1311,7 +1312,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
                 common_elements_visualization['id'], 'FrequencyTable')
             self.assertEqual(
                 common_elements_visualization['options']['column_headers'],
-                ['Element', 'Count'])
+                ['Element', 'Count', 'Addressed?'])
 
             common_visualization_data = (
                 common_elements_visualization['data'])

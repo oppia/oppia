@@ -16,8 +16,9 @@
  * @fileoverview Directives for all reusable data visualization components.
  */
 
-// Each visualization receives two variables: 'data' and 'options'. The exact
-// format for each of these is specific to the particular visualization.
+// Each visualization receives three variables: 'data', 'options', and
+// 'isAddressed'. The exact format for each of these is specific to the
+// particular visualization.
 
 oppia.directive('oppiaVisualizationBarChart', [function() {
   return {
@@ -70,6 +71,8 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
       function($scope, $attrs, HtmlEscaperService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
+        $scope.isAddressed = HtmlEscaperService.escapedJsonToObj(
+          $attrs.isAddressed);
       }
     ]
   };
@@ -85,12 +88,15 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
       function($scope, $attrs, HtmlEscaperService) {
         $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
         $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
+        $scope.isAddressed = HtmlEscaperService.escapedJsonToObj(
+          $attrs.isAddressed);
+
         $scope.answerVisible = $scope.data.map(function(_, i) {
-          // First element is shown by default, all others are hidden.
+          // First element is shown while all others are hidden by default.
           return i === 0;
         });
-        $scope.toggleAnswerVisibility = function(index) {
-          $scope.answerVisible[index] = !$scope.answerVisible[index];
+        $scope.toggleAnswerVisibility = function(i) {
+          $scope.answerVisible[i] = !$scope.answerVisible[i];
         };
       }
     ]
