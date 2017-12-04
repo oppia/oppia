@@ -138,7 +138,7 @@ describe('Learner dashboard functionality', function() {
     browser.waitForAngular();
     general.waitForSystem();
     browser.ignoreSynchronization = false;
-    learnerDashboardPage.navigateToIncompleteCollectionSection();
+    learnerDashboardPage.navigateToIncompleteCollectionsSection();
     browser.waitForAngular();
     general.waitForSystem();
     expect(
@@ -167,7 +167,7 @@ describe('Learner dashboard functionality', function() {
     learnerDashboardPage.navigateToCompletedSection();
     browser.waitForAngular();
     general.waitForSystem();
-    learnerDashboardPage.navigateToCompletedCollectionSection();
+    learnerDashboardPage.navigateToCompletedCollectionsSection();
     browser.waitForAngular();
     general.waitForSystem();
     expect(
@@ -199,7 +199,7 @@ describe('Learner dashboard functionality', function() {
     learnerDashboardPage.get();
     browser.waitForAngular();
     general.waitForSystem();
-    learnerDashboardPage.navigateToIncompleteCollectionSection();
+    learnerDashboardPage.navigateToIncompleteCollectionsSection();
     browser.waitForAngular();
     general.waitForSystem();
     expect(

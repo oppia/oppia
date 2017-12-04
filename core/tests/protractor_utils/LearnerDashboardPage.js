@@ -25,9 +25,9 @@ var LearnerDashboardPage = function() {
     element(by.css('.protractor-test-completed-section'));
   var feedbackSection =
     element(by.css('.protractor-test-feedback-section'));
-  var completedCollectionSection =
+  var completedCollectionsSection =
     element(by.css('.protractor-test-completed-collection-section'));
-  var incompleteCollectionSection =
+  var incompleteCollectionsSection =
     element(by.css('.protractor-test-incomplete-collection-section'));
   var subscriptionsSection =
     element(by.css('.protractor-test-subscriptions-section'));
@@ -42,12 +42,12 @@ var LearnerDashboardPage = function() {
     completedSection.click();
   };
 
-  this.navigateToIncompleteCollectionSection = function() {
-    incompleteCollectionSection.click();
+  this.navigateToIncompleteCollectionsSection = function() {
+    incompleteCollectionsSection.click();
   };
 
-  this.navigateToCompletedCollectionSection = function() {
-    completedCollectionSection.click();
+  this.navigateToCompletedCollectionsSection = function() {
+    completedCollectionsSection.click();
   };
 
   this.navigateToFeedbackSection = function() {
