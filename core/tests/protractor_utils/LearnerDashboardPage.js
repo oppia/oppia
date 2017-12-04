@@ -25,14 +25,22 @@ var LearnerDashboardPage = function() {
     element(by.css('.protractor-test-completed-section'));
   var feedbackSection =
     element(by.css('.protractor-test-feedback-section'));
+  var feedbackThread =
+    element(by.css('.protractor-test-feedback-thread'));
   var completedCollectionsSection =
     element(by.css('.protractor-test-completed-collection-section'));
   var incompleteCollectionsSection =
     element(by.css('.protractor-test-incomplete-collection-section'));
   var subscriptionsSection =
     element(by.css('.protractor-test-subscriptions-section'));
+  var subscriptionName =
+    element.all(by.css('.protractor-test-subscription-name'));
   var titleOfSummaryTile =
     element.all(by.css('.protractor-test-collection-summary-tile-title'));
+  var feedbackExplorationTitle =
+    element.all(by.css('.protractor-test-feedback-exploration'));
+  var feedbackMessage =
+    element.all(by.css('.protractor-test-feedback-message'));
 
   this.get = function() {
     return browser.get(LEARNER_DASHBOARD_URL);
@@ -54,12 +62,42 @@ var LearnerDashboardPage = function() {
     feedbackSection.click();
   };
 
+  this.navigateToFeedbackThread = function() {
+    feedbackThread.click();
+  };
+
   this.navigateToSubscriptionsSection = function() {
     subscriptionsSection.click();
   };
 
-  this.getTitleOfSummaryTile = function() {
-    return titleOfSummaryTile.first().getText();
+  this.expectTitleOfSummaryTileToMatch = function(title) {
+    expect(
+      titleOfSummaryTile.first().getText()
+    ).toMatch(title);
+  };
+
+  this.expectSubscriptionFirstNameToMatch = function(name) {
+    expect(
+      subscriptionName.first().getText()
+    ).toMatch(name);
+  };
+
+  this.expectSubscriptionLastNameToMatch = function(name) {
+    expect(
+      subscriptionName.last().getText()
+    ).toMatch(name);
+  };
+
+  this.expectFeedbackExplorationTitleToMatch = function(title) {
+    expect(
+      feedbackExplorationTitle.first().getText()
+    ).toMatch(title);
+  };
+
+  this.expectFeedbackMessageToMatch = function(message) {
+    expect(
+      feedbackMessage.first().getText()
+    ).toMatch(message);
   };
 };
 

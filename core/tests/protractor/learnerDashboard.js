@@ -141,9 +141,7 @@ describe('Learner dashboard functionality', function() {
     learnerDashboardPage.navigateToIncompleteCollectionsSection();
     browser.waitForAngular();
     general.waitForSystem();
-    expect(
-      learnerDashboardPage.getTitleOfSummaryTile()
-    ).toMatch('Test Collection');
+    learnerDashboardPage.expectTitleOfSummaryTileToMatch('Test Collection');
 
     // Go to the test collection.
     browser.get('/search/find?q=');
@@ -170,9 +168,7 @@ describe('Learner dashboard functionality', function() {
     learnerDashboardPage.navigateToCompletedCollectionsSection();
     browser.waitForAngular();
     general.waitForSystem();
-    expect(
-      learnerDashboardPage.getTitleOfSummaryTile()
-    ).toMatch('Test Collection');
+    learnerDashboardPage.expectTitleOfSummaryTileToMatch('Test Collection');
     users.logout();
 
     users.login('creator1@learnerDashboard.com');
@@ -202,9 +198,7 @@ describe('Learner dashboard functionality', function() {
     learnerDashboardPage.navigateToIncompleteCollectionsSection();
     browser.waitForAngular();
     general.waitForSystem();
-    expect(
-      learnerDashboardPage.getTitleOfSummaryTile()
-    ).toMatch('Test Collection');
+    learnerDashboardPage.expectTitleOfSummaryTileToMatch('Test Collection');
     users.logout();
   });
 
@@ -226,12 +220,8 @@ describe('Learner dashboard functionality', function() {
     general.waitForSystem();
     learnerDashboardPage.navigateToSubscriptionsSection();
     browser.waitForAngular();
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).first().getText()).toMatch(
-      'creator...');
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).last().getText()).toMatch(
-      'creator...');
+    learnerDashboardPage.expectSubscriptionFirstNameToMatch('creator...');
+    learnerDashboardPage.expectSubscriptionLastNameToMatch('creator...');
     users.logout();
   });
 
@@ -250,14 +240,10 @@ describe('Learner dashboard functionality', function() {
     browser.waitForAngular();
     learnerDashboardPage.navigateToFeedbackSection();
     browser.waitForAngular();
-    expect(element.all(by.css(
-      '.protractor-test-feedback-exploration')).first().getText()).toMatch(
-      'About Oppia');
-    element(by.css('.protractor-test-feedback-thread')).click();
+    learnerDashboardPage.expectFeedbackExplorationTitleToMatch('About Oppia');
+    learnerDashboardPage.navigateToFeedbackThread();
     browser.waitForAngular();
-    expect(element.all(by.css(
-      '.protractor-test-feedback-message')).first().getText()).toMatch(
-      feedback);
+    learnerDashboardPage.expectFeedbackMessageToMatch(feedback);
     users.logout();
   });
 
