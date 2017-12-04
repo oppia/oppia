@@ -45,7 +45,7 @@ oppia.controller('StatisticsTab', [
       pieSliceTextStyleColor: 'black',
       pieSliceBorderColor: 'black',
       chartAreaWidth: 500,
-      colors: ['#d8d8d8', '#008808', 'blue'],
+      colors: ['#008808', '#d8d8d8'],
       height: 300,
       legendPosition: 'right',
       width: 600
@@ -119,9 +119,9 @@ oppia.controller('StatisticsTab', [
             $scope.explorationHasBeenVisited = true;
           }
 
+          $scope.numPassersby = numStarts - numActualStarts;
           $scope.pieChartData = [
             ['Type', 'Number'],
-            ['Passerby', numStarts - numActualStarts],
             ['Completions', numCompletions],
             ['Non-Completions', numActualStarts - numCompletions]
           ];
