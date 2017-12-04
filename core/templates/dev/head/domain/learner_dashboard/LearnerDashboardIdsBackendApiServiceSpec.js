@@ -13,49 +13,39 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for LearnerDashboardBackendApiService.
+ * @fileoverview Unit tests for LearnerDashboardIdsBackendApiService.
  */
 
 describe('Learner Dashboard Backend API Service', function() {
-  var LearnerDashboardBackendApiService = null;
+  var LearnerDashboardIdsBackendApiService = null;
   var $httpBackend = null;
 
   var sampleDataResults = {
     'username': 'test',
-    'number_of_unread_threads': 0,
-    'completed_to_incomplete_collections': [],
-    'is_admin': false,
     'profile_picture_data_url': 'TestURL',
-    'exploration_playlist': [],
-    'user_email': 'test@example.com',
-    'collection_playlist': [],
-    'is_moderator': false,
-    'number_of_nonexistent_activities': {
-      'completed_collections': 0,
-      'incomplete_collections': 0,
-      'collection_playlist': 0,
-      'incomplete_explorations': 0,
-      'exploration_playlist': 0,
-      'completed_explorations': 0
+    'learner_dashboard_activity_ids': {
+      'completed_exploration_ids': [],
+      'exploration_playlist_ids': [],
+      'completed_collection_ids': [],
+      'incomplete_exploration_ids': [],
+      'collection_playlist_ids': [],
+      'incomplete_collection_ids': []
     },
-    'incomplete_collections_list': [],
-    'thread_summaries': [],
-    'incomplete_explorations_list': [],
-    'subscription_list': [],
-    'completed_explorations_list': [],
+    'user_email': 'test@example.com',
+    'is_admin': false,
     'is_super_admin': false,
-    'completed_collections_list': []
+    'is_moderator': false
   };
 
-  var LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data';
+  var LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data';
   var ERROR_STATUS_CODE = 500;
 
   beforeEach(module('oppia'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(inject(function($injector) {
-    LearnerDashboardBackendApiService = $injector.get(
-      'LearnerDashboardBackendApiService');
+    LearnerDashboardIdsBackendApiService = $injector.get(
+      'LearnerDashboardIdsBackendApiService');
     UrlInterpolationService = $injector.get('UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
   }));
@@ -65,14 +55,14 @@ describe('Learner Dashboard Backend API Service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should successfully fetch learner dashboard data from the backend',
+  it('should successfully fetch learner dashboard IDs data from the backend',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', LEARNER_DASHBOARD_DATA_URL).respond(
+      $httpBackend.expect('GET', LEARNER_DASHBOARD_IDS_DATA_URL).respond(
         sampleDataResults);
-      LearnerDashboardBackendApiService.fetchLearnerDashboardData().then(
+      LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds().then(
         successHandler, failHandler);
       $httpBackend.flush();
 
@@ -81,14 +71,14 @@ describe('Learner Dashboard Backend API Service', function() {
     }
   );
 
-  it('should use rejection handler if learner dashboard data backend request failed',
+  it('should use rejection handler if learner dashboard IDs data backend request failed',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', LEARNER_DASHBOARD_DATA_URL).respond(
-        ERROR_STATUS_CODE, 'Error loading dashboard data.');
-      LearnerDashboardBackendApiService.fetchLearnerDashboardData().then(
+      $httpBackend.expect('GET', LEARNER_DASHBOARD_IDS_DATA_URL).respond(
+        ERROR_STATUS_CODE, 'Error loading dashboard IDs data.');
+      LearnerDashboardIdsBackendApiService.fetchLearnerDashboardIds().then(
         successHandler, failHandler);
       $httpBackend.flush();
 
