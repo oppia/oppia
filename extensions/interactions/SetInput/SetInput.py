@@ -46,7 +46,7 @@ class SetInput(base.BaseInteraction):
         # Table with most commonly submitted elements of set.
         'id': 'FrequencyTable',
         'options': {
-            'column_headers': ['Element', 'Count'],
+            'column_headers': ['Element', 'Count', 'Addressed?'],
             'title': 'Commonly submitted elements'
         },
         'calculation_id': 'FrequencyCommonlySubmittedElements',
