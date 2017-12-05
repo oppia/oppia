@@ -165,7 +165,10 @@ def _get_served_version():
     """
     listed_versions = subprocess.check_output(
         [APPCFG_PATH, '--application=%s' % APP_NAME, 'list_versions'])
-    listed_versions = listed_versions[listed_versions.index('default: [') + 10:]
+    default_version_line_start_str = 'default: ['
+    listed_versions = listed_versions[
+        listed_versions.index(default_version_line_start_str) + len(
+            default_version_line_start_str):]
     return listed_versions[:listed_versions.index(',')].replace('-', '.')
 
 
@@ -175,9 +178,11 @@ def _get_current_release_version():
     Returns:
         (str): The current (local) Oppia release version.
     """
-    if not CURRENT_BRANCH_NAME.startswith('release-'):
+    release_branch_name_prefix = 'release-'
+    if not CURRENT_BRANCH_NAME.startswith(release_branch_name_prefix):
         raise Exception('Deploy script must be run from a release branch.')
-    return CURRENT_BRANCH_NAME[8:].replace('-', '.')
+    return CURRENT_BRANCH_NAME[len(
+        release_branch_name_prefix):].replace('-', '.')
 
 
 def _execute_deployment():
