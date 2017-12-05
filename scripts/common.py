@@ -16,7 +16,6 @@
 
 import os
 import subprocess
-import sys
 
 
 def ensure_directory_exists(d):
