@@ -20,19 +20,20 @@ describe('Focus Manager Service', function() {
   var FocusManagerService;
   var DeviceInfoService;
   var IdGenerationService;
-  var clearFocusLabel;
   var rootScope;
   var $timeout;
-  var focuslabel = 'FocusLabel';
+  var clearLabel;
+  var focusLabel = 'FocusLabel';
+  var focusLabelTwo = 'FocusLabelTwo';
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector, LABEL_FOR_CLEARING_FOCUS) {
+  beforeEach(inject(function($injector) {
     FocusManagerService = $injector.get('FocusManagerService');
     DeviceInfoService = $injector.get('DeviceInfoService');
     IdGenerationService = $injector.get('IdGenerationService');
     rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
-    clearLabel = LABEL_FOR_CLEARING_FOCUS;
+    clearLabel = $injector.get('LABEL_FOR_CLEARING_FOCUS');
     spyOn(rootScope, '$broadcast');
   }));
 
@@ -43,17 +44,19 @@ describe('Focus Manager Service', function() {
   });
 
   it('should set focus label and broadcast it', function() {
-    FocusManagerService.setFocus(focuslabel);
+    FocusManagerService.setFocus(focusLabel);
     $timeout(function () {
-      expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn',focuslabel);
+      expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn',focusLabel);
     });
     $timeout.flush();
   });
 
   it('should not set focus label if _nextLabelToFocusOn is set', function() {
-    FocusManagerService.setFocusLabel(focuslabel);
-    ctr = FocusManagerService.setFocus(focuslabel);
-    expect(ctr).toEqual(undefined);
+    FocusManagerService.setFocus(focusLabel);
+    expect(FocusManagerService.setFocus(focusLabelTwo)).toEqual(undefined);
+    $timeout.flush();
+    $timeout.verifyNoPendingTasks();
+    expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn',focusLabel);
   });
 
   it('should set label to clear focus and broadcast it', function() {
@@ -65,10 +68,10 @@ describe('Focus Manager Service', function() {
   });
 
   it('should set focus label if on desktop and broadcast it', function() {
-    FocusManagerService.setFocusIfOnDesktop(focuslabel);
+    FocusManagerService.setFocusIfOnDesktop(focusLabel);
     if (!DeviceInfoService.isMobileDevice()) {
       $timeout(function () {
-        expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn',focuslabel);
+        expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn',focusLabel);
       });
       $timeout.flush();
     }

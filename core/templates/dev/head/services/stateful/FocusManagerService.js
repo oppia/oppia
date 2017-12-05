@@ -42,9 +42,6 @@ oppia.factory('FocusManagerService', [
           _nextLabelToFocusOn = null;
         });
       },
-      setFocusLabel: function(label) {
-        _nextLabelToFocusOn = label;
-      },
       setFocusIfOnDesktop: function(newFocusLabel) {
         if (!DeviceInfoService.isMobileDevice()) {
           this.setFocus(newFocusLabel);
