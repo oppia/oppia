@@ -266,10 +266,10 @@
 
         <div class="col-lg-7 col-md-7 col-sm-7">
           <h3>Permissions</h3>
-          <p ng-if="ExplorationRightsService.isPrivate() &&ExplorationRightsService.viewableIfPrivate()">
+          <p ng-if="ExplorationRightsService.isPrivate() && ExplorationRightsService.viewableIfPrivate()">
             This exploration is <strong>private</strong>. Anyone with the link can access it.
           </p>
-          <p ng-if="ExplorationRightsService.isPrivate() &&!ExplorationRightsService.viewableIfPrivate()">
+          <p ng-if="ExplorationRightsService.isPrivate() && !ExplorationRightsService.viewableIfPrivate()">
             This exploration is <strong>private</strong>. Only invited users, moderators and site admins can
             access it.
           </p>

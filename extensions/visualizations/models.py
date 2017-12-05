@@ -90,7 +90,7 @@ class FrequencyTable(BaseVisualization):
             'items': {
                 'type': 'unicode',
             },
-            'len': 2,
+            'len': 3,
         },
     }, {
         'name': 'title',
@@ -115,7 +115,7 @@ class EnumeratedFrequencyTable(BaseVisualization):
             'items': {
                 'type': 'unicode',
             },
-            'len': 2,
+            'len': 3,
         },
     }, {
         'name': 'title',

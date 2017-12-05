@@ -27,14 +27,14 @@ oppia.directive('editorNavigation', [
         '$scope', '$rootScope', '$timeout', '$modal',
         'RouterService', 'ExplorationRightsService',
         'ExplorationWarningsService',
-        'stateEditorTutorialFirstTimeService',
+        'StateEditorTutorialFirstTimeService',
         'ThreadDataService', 'siteAnalyticsService',
         'ExplorationContextService', 'WindowDimensionsService',
         function(
             $scope, $rootScope, $timeout, $modal,
             RouterService, ExplorationRightsService,
             ExplorationWarningsService,
-            stateEditorTutorialFirstTimeService,
+            StateEditorTutorialFirstTimeService,
             ThreadDataService, siteAnalyticsService,
             ExplorationContextService, WindowDimensionsService) {
           $scope.postTutorialHelpPopoverIsShown = false;
@@ -90,7 +90,7 @@ oppia.directive('editorNavigation', [
             modalInstance.result.then(function() {
               $rootScope.$broadcast('openEditorTutorial');
             }, function() {
-              stateEditorTutorialFirstTimeService.markTutorialFinished();
+              StateEditorTutorialFirstTimeService.markTutorialFinished();
             });
           };
 
