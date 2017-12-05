@@ -66,11 +66,14 @@ _PARSER.add_argument(
 
 APP_NAME_OPPIASERVER = 'oppiaserver'
 APP_NAME_OPPIATESTSERVER = 'oppiatestserver'
+APP_NAME_OPPIASERVER_BACKUP_MIGRATION = 'oppiaserver-backup-migration'
 
 PARSED_ARGS = _PARSER.parse_args()
 if PARSED_ARGS.app_name:
     APP_NAME = PARSED_ARGS.app_name
-    if APP_NAME not in [APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER]:
+    if APP_NAME not in [
+            APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER,
+            APP_NAME_OPPIASERVER_BACKUP_MIGRATION]:
         raise Exception('Invalid app name: %s' % APP_NAME)
 else:
     raise Exception('No app name specified.')
@@ -207,16 +210,6 @@ def _execute_deployment():
                     current_git_revision))
 
         print 'Returning to oppia/ root directory.'
-
-    # If this is a test server deployment, open the library page (for sanity
-    # checking) and the GAE error logs.
-    if APP_NAME == APP_NAME_OPPIATESTSERVER:
-        common.open_new_tab_in_browser_if_possible(
-            'https://console.cloud.google.com/logs/viewer?'
-            'project=%s&key1=default&minLogLevel=500'
-            % APP_NAME_OPPIATESTSERVER)
-        common.open_new_tab_in_browser_if_possible(
-            'https://%s.appspot.com/library' % APP_NAME_OPPIATESTSERVER)
 
     print 'Done!'
 

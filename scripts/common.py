@@ -16,6 +16,7 @@
 
 import os
 import subprocess
+import sys
 
 
 def ensure_directory_exists(d):
@@ -75,8 +76,15 @@ def verify_local_repo_is_clean():
 
     branch_is_clean_message = 'nothing to commit, working directory clean'
     if not branch_is_clean_message in git_status_output:
-        raise Exception(
-            'ERROR: This script should be run from a clean branch.')
+        while True:
+            print 'WARNING: Your local branch state is not clean.'
+            print 'Please confirm: are you okay with proceeding? '
+            answer = raw_input().lower()
+            if answer in ['y', 'ye', 'yes']:
+                break
+            elif answer:
+                print 'Exiting since local branch is not clean.'
+                sys.exit()
 
 
 def get_current_branch_name():
