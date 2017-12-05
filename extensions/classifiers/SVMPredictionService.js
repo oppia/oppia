@@ -104,7 +104,7 @@ oppia.factory('SVMPredictionService', ['$log', function($log) {
             sum += kvalues[sj + k] * coef2[sj + k];
           }
 
-          sum -= intercept[p];
+          sum += intercept[p];
           if (sum > 0) {
             votes[i]++;
           }

@@ -49,12 +49,6 @@ module.exports = function(config) {
         watched: false,
         served: true,
         included: false
-      },
-      {
-        pattern: 'core/tests/data/**/*.json',
-        watched: false,
-        served: true,
-        included: false
       }
     ],
     exclude: [
