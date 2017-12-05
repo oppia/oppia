@@ -35,7 +35,7 @@ describe('Solution Verification Service', function() {
     });
   });
 
-  var ecs, ess, siis, scas, idc, sof, svs, IS, mockFunctions;
+  var ess, siis, scas, idc, sof, svs, IS, mockFunctions;
   var rootScope;
   var mockExplorationData;
   var successCallbackSpy, errorCallbackSpy;
@@ -52,7 +52,6 @@ describe('Solution Verification Service', function() {
   });
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
-    ecs = $injector.get('EditorStateService');
     ess = $injector.get('explorationStatesService');
     siis = $injector.get('stateInteractionIdService');
     scas = $injector.get('stateCustomizationArgsService');
@@ -121,7 +120,6 @@ describe('Solution Verification Service', function() {
 
   describe('Success case', function() {
     it('should verify a correct solution', function() {
-      ecs.setActiveStateName('First State');
       var state = ess.getState('First State');
       siis.init(
         'First State', state.interaction.id, state.interaction, 'widget_id');
@@ -141,7 +139,6 @@ describe('Solution Verification Service', function() {
 
   describe('Failure case', function() {
     it('should verify an incorrect solution', function() {
-      ecs.setActiveStateName('First State');
       var state = ess.getState('First State');
       siis.init(
         'First State', state.interaction.id, state.interaction, 'widget_id');
