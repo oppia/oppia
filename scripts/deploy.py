@@ -231,8 +231,9 @@ def _execute_deployment():
 
         print 'Returning to oppia/ root directory.'
 
-    # If this is a test server deployment, open the library page (for sanity
-    # checking) and the GAE error logs.
+    # If this is a test server deployment and the current release version is
+    # already serving, open the library page (for sanity checking) and the GAE
+    # error logs.
     if (APP_NAME == APP_NAME_OPPIATESTSERVER or 'migration' in APP_NAME) and (
             _get_served_version() == _get_current_release_version()):
         common.open_new_tab_in_browser_if_possible(
