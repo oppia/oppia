@@ -101,20 +101,6 @@ oppia.directive('explorationSummaryTile', [
           );
 
           $scope.avatarsList = [];
-          if ($scope.isCommunityOwned()) {
-            var COMMUNITY_OWNED_IMAGE_PATH = (
-              UrlInterpolationService.getStaticImageUrl(
-                '/avatar/fa_globe_72px.png'));
-
-            var COMMUNITY_OWNED_TOOLTIP_TEXT = 'Community Owned';
-
-            var communityOwnedAvatar = {
-              image: COMMUNITY_OWNED_IMAGE_PATH,
-              tooltipText: COMMUNITY_OWNED_TOOLTIP_TEXT
-            };
-
-            $scope.avatarsList.unshift(communityOwnedAvatar);
-          }
 
           $scope.MAX_AVATARS_TO_DISPLAY = 5;
 

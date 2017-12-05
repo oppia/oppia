@@ -61,7 +61,8 @@ describe('Normalizer tests', function() {
     'isFloat',
     'isAtLeast',
     'isAtMost',
-    'isNonempty'
+    'isNonempty',
+    'isInteger'
   ];
 
   beforeEach(module('oppia'));
@@ -134,6 +135,14 @@ describe('Normalizer tests', function() {
     var filter = $filter('isNonempty');
     expect(filter('a')).toBe(true);
     expect(filter('')).toBe(false);
+  }));
+
+  it('should validate integers', inject(function($filter) {
+    var filter = $filter('isInteger');
+    expect(filter('3')).toBe(true);
+    expect(filter('-3')).toBe(true);
+    expect(filter('3.0')).toBe(true);
+    expect(filter('3.5')).toBe(false);
   }));
 });
 

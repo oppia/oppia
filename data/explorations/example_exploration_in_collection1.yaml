@@ -1,0 +1,48 @@
+author_notes: ''
+blurb: ''
+category: Welcome
+init_state_name: Start
+language_code: en
+objective: part of demonstrating the functionality of collections
+param_changes: []
+param_specs: {}
+schema_version: 17
+states:
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  Start:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: First example exploration in collection.
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value: Continue
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      hints: []
+      id: Continue
+      solution: null
+    param_changes: []
+states_schema_version: 13
+tags: []
+title: First Example Exploration in Collection
