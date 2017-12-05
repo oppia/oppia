@@ -28,12 +28,12 @@ describe('Focus Manager Service', function() {
 
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
+    clearLabel = $injector.get('LABEL_FOR_CLEARING_FOCUS');
     FocusManagerService = $injector.get('FocusManagerService');
     DeviceInfoService = $injector.get('DeviceInfoService');
     IdGenerationService = $injector.get('IdGenerationService');
     rootScope = $injector.get('$rootScope');
     $timeout = $injector.get('$timeout');
-    clearLabel = $injector.get('LABEL_FOR_CLEARING_FOCUS');
     spyOn(rootScope, '$broadcast');
   }));
 
