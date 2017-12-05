@@ -66,14 +66,13 @@ _PARSER.add_argument(
 
 APP_NAME_OPPIASERVER = 'oppiaserver'
 APP_NAME_OPPIATESTSERVER = 'oppiatestserver'
-APP_NAME_OPPIASERVER_BACKUP_MIGRATION = 'oppiaserver-backup-migration'
 
 PARSED_ARGS = _PARSER.parse_args()
 if PARSED_ARGS.app_name:
     APP_NAME = PARSED_ARGS.app_name
     if APP_NAME not in [
-            APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER,
-            APP_NAME_OPPIASERVER_BACKUP_MIGRATION]:
+            APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER] and (
+                'migration' not in APP_NAME):
         raise Exception('Invalid app name: %s' % APP_NAME)
 else:
     raise Exception('No app name specified.')
@@ -157,6 +156,30 @@ def preprocess_release():
             shutil.copyfile(src, dst)
 
 
+def _get_served_version():
+    """Retrieves the default version being served on the specified application
+    being served on app engine.
+
+    Returns:
+        (str): The current serving version.
+    """
+    listed_versions = subprocess.check_output(
+        [APPCFG_PATH, '--application=%s' % APP_NAME, 'list_versions'])
+    listed_versions = listed_versions[listed_versions.index('default: [') + 10:]
+    return listed_versions[:listed_versions.index(',')].replace('-', '.')
+
+
+def _get_current_release_version():
+    """Retrieves the current branch's release version.
+
+    Returns:
+        (str): The current (local) Oppia release version.
+    """
+    if not CURRENT_BRANCH_NAME.startswith('release-'):
+        raise Exception('Deploy script must be run from a release branch.')
+    return CURRENT_BRANCH_NAME[8:].replace('-', '.')
+
+
 def _execute_deployment():
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
@@ -164,9 +187,6 @@ def _execute_deployment():
 
     current_git_revision = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD']).strip()
-
-    print ''
-    print 'Starting deployment process.'
 
     if not os.path.exists(THIRD_PARTY_DIR):
         raise Exception(
@@ -210,6 +230,17 @@ def _execute_deployment():
                     current_git_revision))
 
         print 'Returning to oppia/ root directory.'
+
+    # If this is a test server deployment, open the library page (for sanity
+    # checking) and the GAE error logs.
+    if (APP_NAME == APP_NAME_OPPIATESTSERVER or 'migration' in APP_NAME) and (
+            _get_served_version() == _get_current_release_version()):
+        common.open_new_tab_in_browser_if_possible(
+            'https://console.cloud.google.com/logs/viewer?'
+            'project=%s&key1=default&minLogLevel=500'
+            % APP_NAME_OPPIATESTSERVER)
+        common.open_new_tab_in_browser_if_possible(
+            'https://%s.appspot.com/library' % APP_NAME_OPPIATESTSERVER)
 
     print 'Done!'
 
