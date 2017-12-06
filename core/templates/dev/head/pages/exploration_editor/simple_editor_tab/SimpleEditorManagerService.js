@@ -229,6 +229,7 @@ oppia.factory('SimpleEditorManagerService', [
         data.questionList.updateQuestion(index, questions[index]);
       },
       deleteQuestion: function(question) {
+        console.log(question);
         // - Change destination of answer groups that point to it.
         // - Move content stored in present state to next state if it exists.
         // - Delete the state.
@@ -251,85 +252,22 @@ oppia.factory('SimpleEditorManagerService', [
         SimpleEditorShimService.deleteState(stateName);
         data.questionList.removeQuestion(question);
       },
-
-	    moveQuestion: function(oldIndex, newIndex) {
+      alternativeMove: function(oldIndex,newIndex) {
         var stateNamesInOrder = data.questionList.getAllStateNames();
-        var sStateName = stateNamesInOrder[oldIndex];
-        var sState = SimpleEditorShimService.getState(sStateName);
-        var dStateName = stateNamesInOrder[newIndex];
-        var dState = SimpleEditorShimService.getState(dStateName);
-        // If no answer group, then save default answer group before swapping.
-        if (dState.interaction.answerGroups.length === 0 ||
-          sState.interaction.answerGroups.length === 0) {
-          destinationInteractionId = dState.interaction.id;
-          sourceInteractionId = sState.interaction.id;
-
-          if (dState.interaction.answerGroups.length === 0) {
-	          var newStateName = this.addState();
-	          var newAnswerGroups = [];
-	          newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
-		          RuleObjectFactory.createNew(
-			          DEFAULT_INTERACTION_PROPERTIES[destinationInteractionId].
-				          FIRST_ANSWER_GROUP_RULE.type,
-			          DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
-				          FIRST_ANSWER_GROUP_RULE.value
-		          )
-	          ], OutcomeObjectFactory.createEmpty(newStateName), false));
-
-            SimpleEditorShimService.saveAnswerGroups(dStateName,
-              newAnswerGroups);
-            dState.interaction.answerGroups = newAnswerGroups;
-          } else {
-	          var newStateName = this.addState();
-	          var newAnswerGroups = [];
-	          newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
-		          RuleObjectFactory.createNew(
-			          DEFAULT_INTERACTION_PROPERTIES[destinationInteractionId].
-				          FIRST_ANSWER_GROUP_RULE.type,
-			          DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
-				          FIRST_ANSWER_GROUP_RULE.value
-		          )
-	          ], OutcomeObjectFactory.createEmpty(newStateName), false));
-
-            SimpleEditorShimService.saveAnswerGroups(sStateName,
-              newAnswerGroups);
-            sState.interaction.answerGroups = newAnswerGroups;
-          }
-        }
-        var sourceOutcomeStateName = sState.interaction.answerGroups[0].outcome.dest;
-        var destinationOutcomeStateName = dState.interaction.answerGroups[0].outcome.dest;
-
-        changeDestInAnswerGroups(sStateName, sourceOutcomeStateName);
-        if (oldIndex < newIndex) {
-          setDestOfFirstAnswerGroup(dStateName, sStateName);
-          setDestOfFirstAnswerGroup(sStateName, destinationOutcomeStateName);
-          var tmp = SimpleEditorShimService.getState(destinationOutcomeStateName).content;
-          SimpleEditorShimService.saveStateContent(
-            destinationOutcomeStateName, SimpleEditorShimService.getState(sourceOutcomeStateName).content);
-          SimpleEditorShimService.saveStateContent(sourceOutcomeStateName, sState.content);
-          SimpleEditorShimService.saveStateContent(sStateName, tmp);
-          if (sStateName === SimpleEditorShimService.getInitStateName()) {
-            explorationInitStateNameService.displayed = sourceOutcomeStateName;
-            explorationInitStateNameService.saveDisplayedValue(sourceOutcomeStateName);
-          }
-        } else {
-          redirectAllIncomingNodes(dStateName, sStateName);
-          setDestOfFirstAnswerGroup(sStateName, dStateName);
-          var tmp = SimpleEditorShimService.getState(sourceOutcomeStateName).content;
-          SimpleEditorShimService.saveStateContent(sourceOutcomeStateName, sState.content);
-          SimpleEditorShimService.saveStateContent(sStateName, dState.content);
-          SimpleEditorShimService.saveStateContent(dStateName, tmp);
-          if (dStateName === SimpleEditorShimService.getInitStateName()) {
-            explorationInitStateNameService.displayed = sStateName;
-            explorationInitStateNameService.saveDisplayedValue(sStateName);
-          }
-        }
+        var oldQuestion = SimpleEditorShimService.getState(stateNamesInOrder[oldIndex]);
+        var question = data.questionList._questions[oldIndex];
+        this.deleteQuestion(question);
       },
-      alternativeMove: function(oldIndex, newIndex) {
+      insertQuestion: function(oldIndex, newIndex) {
+      },
+      move: function(index) {
+        console.log(oldIndex+"=>"+newIndex);
 
-
+       console.log(data.questionList);
        var stateNamesInOrder = data.questionList.getAllStateNames();
-       var oldQuestion = SimpleEditorShimService.getState(stateNamesInOrder[oldIndex]);
+       var oldQuestion = SimpleEditorShimService.getState(stateNamesInOrder[oldIndex+1]);
+       console.log(oldQuestion);
+
        var oldQuestionAnswerGroups = oldQuestion.interaction.answerGroups;
        var previousQuestion = SimpleEditorShimService.getState(stateNamesInOrder[newIndex-1]);
        var previousQuestionAnswerGroups = previousQuestion.interaction.answerGroups;
@@ -338,26 +276,15 @@ oppia.factory('SimpleEditorManagerService', [
        var oldpreviousQuestionAnswerGroups = previousQuestion.interaction.answerGroups;
 
        var questionCount = data.questionList.getQuestionCount();
-
-       if(oldIndex === 1){
-         //Change Initial Question ID.
-
-       }
-       else{
-
-       }
-
-       if(oldIndex === questionCount - 1 ){
+       if (oldIndex === questionCount - 1 ){
          //Self Loop last Question.
          oldpreviousQuestionAnswerGroups[0].outcome.dest = stateNamesInOrder[oldIndex-1];
-         SimpleEditorShimService.saveAnswerGroups(stateNamesInOrder[oldIndex-1], oldpreviousQuestionAnswerGroups);
+         makeStateTerminal(stateNamesInOrder[oldIndex-1]);
        }
-       else{
+       else {
          oldpreviousQuestionAnswerGroups[0].outcome.dest = stateNamesInOrder[oldIndex+1];
          SimpleEditorShimService.saveAnswerGroups(stateNamesInOrder[oldIndex-1], oldpreviousQuestionAnswerGroups);
        }
-       // Change the pointer of previous question, so question is not present in linked list.
-
         // Set dest in new Question to question to be moved.
         oldQuestionAnswerGroups[0].outcome.dest = stateNamesInOrder[newIndex];
         SimpleEditorShimService.saveAnswerGroups(stateNamesInOrder[oldIndex], oldQuestionAnswerGroups);
@@ -365,8 +292,8 @@ oppia.factory('SimpleEditorManagerService', [
        // Set dest of newIndex-1 to question to be moved.
        previousQuestionAnswerGroups[0].outcome.dest = stateNamesInOrder[oldIndex];
        SimpleEditorShimService.saveAnswerGroups(stateNamesInOrder[newIndex-1], previousQuestionAnswerGroups);
-       if(oldIndex>newIndex){
-         for(i= oldIndex+1; i > newIndex; i--){
+       if(oldIndex > newIndex){
+         for(i= oldIndex; i > newIndex; i--){
           var tempQuestion = SimpleEditorShimService.getState(stateNamesInOrder[i-1]);
           data.questionList.updateQuestion(i, tempQuestion);
         }
@@ -378,15 +305,15 @@ oppia.factory('SimpleEditorManagerService', [
         }
        }
        data.questionList.updateQuestion(newIndex, oldQuestion);
+       console.log(data.questionList);
       },
       canAddNewQuestion: function() {
-        // console.log(data.questionList);
         // Requirements:
         // - If this is the first question, there must already be an
         //   introduction.
         // - Otherwise, the requirement is that, for the last question in the
         //   list, there is at least one answer group.
-        console.log(data.questionList);
+      //  console.log(data.questionList);
         if (data.questionList.isEmpty()) {
           return Boolean(data.introductionHtml);
         } else {
