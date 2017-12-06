@@ -68,8 +68,7 @@
          inputs: {
            x: 10
          }
-       },
-       {
+       }, {
          type: 'Equals',
          inputs: {
            x: 21
