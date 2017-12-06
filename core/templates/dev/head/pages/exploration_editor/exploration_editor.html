@@ -1,8 +1,6 @@
 {% extends 'pages/base.html' %}
-
-{% block maintitle %}
-  <a ng-if="title">[title]-Oppia Editor</a>
   <a ng-if="!title">Untitled Exploration - Oppia Editor</a>
+  <a ng-if="title"><[title]>-Oppia Editor</a>
 {% endblock maintitle %}
 
 {% block header_js %}
