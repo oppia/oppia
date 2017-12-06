@@ -326,32 +326,58 @@ oppia.factory('SimpleEditorManagerService', [
         }
       },
       alternativeMove: function(oldIndex, newIndex) {
-        // - Store temp question.
-        // - change answer group destination.
-        // - change incoming nodes.
-        // - Insert question.
-        var stateNamesInOrder = data.questionList.getAllStateNames();
-        var oldQuestion = stateNamesInOrder[oldIndex];
-        var newQuestion = stateNamesInOrder[newIndex];
-        if (oldIndex > newIndex){
-          // Swap Index to maintain consistency. As question with lower index will have answer group.
-          var tempIndex = oldIndex;
-          oldIndex = newIndex;
-          newIndex = tempIndex;
+
+
+       var stateNamesInOrder = data.questionList.getAllStateNames();
+       var oldQuestion = SimpleEditorShimService.getState(stateNamesInOrder[oldIndex]);
+       var oldQuestionAnswerGroups = oldQuestion.interaction.answerGroups;
+       var previousQuestion = SimpleEditorShimService.getState(stateNamesInOrder[newIndex-1]);
+       var previousQuestionAnswerGroups = previousQuestion.interaction.answerGroups;
+
+       var oldpreviousQuestion = SimpleEditorShimService.getState(stateNamesInOrder[oldIndex-1]);
+       var oldpreviousQuestionAnswerGroups = previousQuestion.interaction.answerGroups;
+
+       var questionCount = data.questionList.getQuestionCount();
+
+       if(oldIndex === 1){
+         //Change Initial Question ID.
+
+       }
+       else{
+
+       }
+
+       if(oldIndex === questionCount - 1 ){
+         //Self Loop last Question.
+         oldpreviousQuestionAnswerGroups[0].outcome.dest = stateNamesInOrder[oldIndex-1];
+         SimpleEditorShimService.saveAnswerGroups(stateNamesInOrder[oldIndex-1], oldpreviousQuestionAnswerGroups);
+       }
+       else{
+         oldpreviousQuestionAnswerGroups[0].outcome.dest = stateNamesInOrder[oldIndex+1];
+         SimpleEditorShimService.saveAnswerGroups(stateNamesInOrder[oldIndex-1], oldpreviousQuestionAnswerGroups);
+       }
+       // Change the pointer of previous question, so question is not present in linked list.
+
+        // Set dest in new Question to question to be moved.
+        oldQuestionAnswerGroups[0].outcome.dest = stateNamesInOrder[newIndex];
+        SimpleEditorShimService.saveAnswerGroups(stateNamesInOrder[oldIndex], oldQuestionAnswerGroups);
+
+       // Set dest of newIndex-1 to question to be moved.
+       previousQuestionAnswerGroups[0].outcome.dest = stateNamesInOrder[oldIndex];
+       SimpleEditorShimService.saveAnswerGroups(stateNamesInOrder[newIndex-1], previousQuestionAnswerGroups);
+       if(oldIndex>newIndex){
+         for(i= oldIndex+1; i > newIndex; i--){
+          var tempQuestion = SimpleEditorShimService.getState(stateNamesInOrder[i-1]);
+          data.questionList.updateQuestion(i, tempQuestion);
         }
-        var newQuestionAnswerGroups = SimpleEditorShimService.getState(newQuestion)
-          .interaction.answerGroups;
-        var oldQuestionAnswerGroups = SimpleEditorShimService.getState(oldQuestion)
-          .interaction.answerGroups;
-        var tempAnswerGroups = oldQuestionAnswerGroups;
-        oldQuestionAnswerGroups[0].outcome.dest = newQuestionAnswerGroups[0].outcome.dest;
-        SimpleEditorShimService.saveAnswerGroups(newQuestion, oldQuestionAnswerGroups);
-
-        newQuestionAnswerGroups[0].outcome.dest = tempAnswerGroups[0].outcome.dest;
-        SimpleEditorShimService.saveAnswerGroups(oldQuestion, newQuestionAnswerGroups);
-      },
-      insertQuestion: function(question, index) {
-
+       }
+       else{
+         for(i= oldIndex; i < newIndex; i++){
+          var tempQuestion = SimpleEditorShimService.getState(stateNamesInOrder[i+1]);
+          data.questionList.updateQuestion(i, tempQuestion);
+        }
+       }
+       data.questionList.updateQuestion(newIndex, oldQuestion);
       },
       canAddNewQuestion: function() {
         // console.log(data.questionList);
@@ -360,6 +386,7 @@ oppia.factory('SimpleEditorManagerService', [
         //   introduction.
         // - Otherwise, the requirement is that, for the last question in the
         //   list, there is at least one answer group.
+        console.log(data.questionList);
         if (data.questionList.isEmpty()) {
           return Boolean(data.introductionHtml);
         } else {
