@@ -23,6 +23,7 @@
         <ul class="dropdown-menu oppia-question-list-menu" >
           <li ng-click="changeQuestionType('MultipleChoiceInput', $index)">Multiple Choice Input</li>
           <li ng-click="changeQuestionType('NumericInput', $index)">Numeric Input</li>
+          <li ng-click="changeQuestionType('TextInput', $index)">Text Input</li>
           <li ng-click="changeQuestionType('ItemSelectionInput', $index)">Checkbox Input</li>
         </ul>
       </div>
@@ -59,6 +60,17 @@
                        save-default-outcome="saveDefaultOutcome(question.getStateName(), newValue)"
                        add-state="addState()">
       </checkbox-editor>
+
+      <text-editor ng-if="question.getInteractionId() === 'TextInput'"
+                   unique-id="question.getId()"
+                   customization-args="question.getInteractionCustomizationArgs()"
+                   answer-groups="question.getAnswerGroups()"
+                   default-outcome="question.getDefaultOutcome()"
+                   save-customization-args="saveCustomizationArgs(question.getStateName(), newValue)"
+                   save-answer-groups="saveAnswerGroups(question.getStateName(), newValue)"
+                   save-default-outcome="saveDefaultOutcome(question.getStateName(), newValue)"
+                   add-state="addState()">
+      </text-editor>
 
       <!-- TODO(sll): Update this condition when control of individual field visibility is added. -->
       <div ng-if="!$last" id="<[getSubfieldId(question, 'Bridge text')]>">

@@ -28,6 +28,9 @@ oppia.factory('StatesToQuestionsService', [
       id: 'NumericInput',
       name: 'Number'
     }, {
+      id: 'TextInput',
+      name: 'Text'
+    }, {
       id: 'ItemSelectionInput',
       name: 'Checkbox'
     }];

@@ -76,6 +76,22 @@ oppia.factory('SimpleEditorManagerService', [
           }
         }
       },
+      TextInput: {
+        CUSTOMIZATION_ARGS:  {
+          placeholder: {
+            value: 'Type your answer here'
+          },
+          rows: {
+            value: 1
+          }
+        },
+        FIRST_ANSWER_GROUP_RULE: {
+          type: 'Equals',
+          value: {
+            x: 'replace'
+          }
+        }
+      }
     };
 
     var END_EXPLORATION_INTERACTION = {
