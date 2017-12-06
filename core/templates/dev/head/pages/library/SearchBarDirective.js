@@ -26,18 +26,19 @@ oppia.directive('searchBar', [
       controller: [
         '$scope', '$rootScope', '$timeout', '$window', '$location',
         '$translate', 'SearchService', 'DebouncerService', 'HtmlEscaperService',
-        'urlService', 'i18nIdService',
+        'UrlService', 'ConstructTranslationIdsService',
         function(
             $scope, $rootScope, $timeout, $window, $location, $translate,
-            SearchService, DebouncerService, HtmlEscaperService, urlService,
-            i18nIdService) {
+            SearchService, DebouncerService, HtmlEscaperService, UrlService,
+            ConstructTranslationIdsService) {
           $scope.isSearchInProgress = SearchService.isSearchInProgress;
           $scope.SEARCH_DROPDOWN_CATEGORIES = (
             GLOBALS.SEARCH_DROPDOWN_CATEGORIES.map(
               function(categoryName) {
                 return {
                   id: categoryName,
-                  text: i18nIdService.getLibraryId('categories', categoryName)
+                  text: ConstructTranslationIdsService.getLibraryId(
+                    'categories', categoryName)
                 };
               }
             )
@@ -179,7 +180,7 @@ oppia.directive('searchBar', [
           };
 
           $scope.$on('$locationChangeSuccess', function() {
-            if (urlService.getUrlParams().hasOwnProperty('q')) {
+            if (UrlService.getUrlParams().hasOwnProperty('q')) {
               updateSearchFieldsBasedOnUrlQuery();
             }
           });
@@ -199,7 +200,7 @@ oppia.directive('searchBar', [
 
               updateSelectionDetails('languageCodes');
 
-              if (urlService.getUrlParams().hasOwnProperty('q')) {
+              if (UrlService.getUrlParams().hasOwnProperty('q')) {
                 updateSearchFieldsBasedOnUrlQuery();
               }
 

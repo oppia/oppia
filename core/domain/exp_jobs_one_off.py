@@ -312,3 +312,100 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class ExplorationConversionErrorIdentificationJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that outputs the list of explorations that currently consist of
+    redundant features and result in an ExplorationConversionError when
+    retrieved.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        try:
+            exploration = exp_services.get_exploration_by_id(item.id)
+        # Handle case where the exploration is deleted.
+        except Exception as e:
+            return
+
+        latest_exp_version = exploration.version
+        version_numbers = range(1, latest_exp_version + 1)
+
+        try:
+            exp_services.get_multiple_explorations_by_version(
+                item.id, version_numbers)
+        except Exception as e:
+            yield (item.id, e)
+            return
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job produces state id mapping model for all explorations currently
+    present in datastore.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+        explorations = []
+
+        # Fetch all versions of the exploration, if they exist.
+        if exploration.version > 1:
+            # Ignore latest version since we already have corresponding
+            # exploration.
+            versions = range(1, exploration.version)
+
+            # Get all exploration versions for current exploration id.
+            explorations = exp_services.get_multiple_explorations_by_version(
+                exploration.id, versions)
+
+        # Append latest exploration to the list of explorations.
+        explorations.append(exploration)
+
+        # Retrieve list of snapshot models representing each version of the
+        # exploration.
+        versions = range(1, exploration.version + 1)
+        snapshots_by_version = (
+            exp_models.ExplorationModel.get_snapshots_metadata(
+                exploration.id, versions))
+
+        # Create and save state id mapping model for all exploration versions.
+        for exploration, snapshot in zip(explorations, snapshots_by_version):
+            if snapshot is None:
+                yield (
+                    'Error: No exploration snapshot metadata model instance '
+                    'found for exploration %s, version %d' % (
+                        exploration.id, exploration.version))
+                return
+
+            change_list = snapshot['commit_cmds']
+            # Check if commit is to revert the exploration.
+            if change_list and change_list[0]['cmd'].endswith(
+                    'revert_version_number'):
+                reverted_version = change_list[0]['version_number']
+                exp_services.create_and_save_state_id_mapping_model_for_reverted_exploration( # pylint: disable=line-too-long
+                    exploration.id, exploration.version - 1, reverted_version)
+            else:
+                exp_services.create_and_save_state_id_mapping_model(
+                    exploration, change_list)
+        yield (exploration.id, exploration.version)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

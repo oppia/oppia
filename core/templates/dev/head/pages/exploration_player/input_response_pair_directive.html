@@ -1,14 +1,14 @@
 <div class="conversation-skin-learner-answer-container">
   <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture()]>" alt="">
   <div ng-if="!data.isHint">
-    <div ng-if="getShortAnswerHtml()" class="conversation-skin-learner-answer-content"
+    <div ng-if="getShortAnswerHtml()"
          popover-placement="bottom" popover-template="'popover/answer'"
          popover-trigger="click" style="cursor: pointer;">
-      <div class="conversation-skin-learner-answer" angular-html-bind="getShortAnswerHtml()">
+      <div class="conversation-skin-learner-answer-content" angular-html-bind="getShortAnswerHtml()">
       </div>
     </div>
-    <div class="conversation-skin-learner-answer-content" ng-if="!getShortAnswerHtml()">
-      <div class="conversation-skin-learner-answer" angular-html-bind="getAnswerHtml()">
+    <div ng-if="!getShortAnswerHtml()">
+      <div class="conversation-skin-learner-answer-content" angular-html-bind="getAnswerHtml()">
       </div>
     </div>
   </div>
@@ -21,17 +21,17 @@
 
 <div class="conversation-skin-oppia-feedback-container" ng-if="data.oppiaResponse !== ''">
   <img class="conversation-skin-oppia-avatar img-circle" ng-src="<[oppiaAvatarImageUrl()]>" alt="">
-  <div class="conversation-skin-oppia-feedback-content">
     <div ng-if="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()">
       <div class="conversation-skin-feedback-dot-one"></div>
       <div class="conversation-skin-feedback-dot-two"></div>
       <div class="conversation-skin-feedback-dot-three"></div>
     </div>
+    <span id="<[getInputResponsePairId()]>"></span>
     <div ng-if="data.oppiaResponse !== null"
          angular-html-bind="data.oppiaResponse"
-         class="protractor-test-conversation-feedback conversation-skin-oppia-feedback">
+         class="conversation-skin-oppia-feedback-content protractor-test-conversation-feedback">
     </div>
-  </div>
+  
 </div>
 
 <style>
@@ -43,7 +43,6 @@
 
   .conversation-skin-learner-answer-container {
     text-align: right;
-    width: 550px;
   }
 
   .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
@@ -59,7 +58,6 @@
     border-color: rgb(236, 239, 241) transparent transparent rgb(236, 239, 241);
     content: ' ';
     height: 0;
-    left: 96.5%;
     position: absolute;
     top: 11%;  
     width: 0;

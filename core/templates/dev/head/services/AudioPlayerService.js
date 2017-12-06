@@ -18,10 +18,10 @@
 
 oppia.factory('AudioPlayerService', [
   '$q', '$timeout', 'ngAudio', 'AssetsBackendApiService',
-  'explorationContextService',
+  'ExplorationContextService',
   function(
       $q, $timeout, ngAudio, AssetsBackendApiService,
-      explorationContextService) {
+      ExplorationContextService) {
     // The ID of the directive that contains the currently playing
     // audio. This is a unique generated string in each directive.
     var _currentAudioControlsDirectiveId = null;
@@ -32,17 +32,17 @@ oppia.factory('AudioPlayerService', [
         filename, directiveId, successCallback, errorCallback) {
       if (filename !== _currentTrackFilename) {
         AssetsBackendApiService.loadAudio(
-        explorationContextService.getExplorationId(), filename)
+        ExplorationContextService.getExplorationId(), filename)
           .then(function(audioBlob) {
             var blobUrl = URL.createObjectURL(audioBlob);
             _currentTrack = ngAudio.load(blobUrl);
             _currentTrackFilename = filename;
-            _currentAudioControlsDirectiveId = directiveId; 
+            _currentAudioControlsDirectiveId = directiveId;
 
-            // ngAudio doesn't seem to be provide any way of detecting 
-            // when native audio object has finished loading. It seems 
+            // ngAudio doesn't seem to be provide any way of detecting
+            // when native audio object has finished loading. It seems
             // that after creating an ngAudio object, the native audio
-            // object is asynchronously loaded. So we use a timeout 
+            // object is asynchronously loaded. So we use a timeout
             // to grab native audio.
             // TODO(tjiang11): Look for a better way to handle this.
             $timeout(function() {

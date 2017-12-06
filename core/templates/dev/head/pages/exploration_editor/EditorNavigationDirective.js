@@ -26,19 +26,19 @@ oppia.directive('editorNavigation', [
       controller: [
         '$scope', '$rootScope', '$timeout', '$modal',
         'RouterService', 'explorationRightsService',
-        'explorationWarningsService',
-        'stateEditorTutorialFirstTimeService',
+        'ExplorationWarningsService',
+        'StateEditorTutorialFirstTimeService',
         'ThreadDataService', 'siteAnalyticsService',
-        'explorationContextService', 'windowDimensionsService',
+        'ExplorationContextService', 'WindowDimensionsService',
         function(
             $scope, $rootScope, $timeout, $modal,
             RouterService, explorationRightsService,
-            explorationWarningsService,
-            stateEditorTutorialFirstTimeService,
+            ExplorationWarningsService,
+            StateEditorTutorialFirstTimeService,
             ThreadDataService, siteAnalyticsService,
-            explorationContextService, windowDimensionsService) {
+            ExplorationContextService, WindowDimensionsService) {
           $scope.postTutorialHelpPopoverIsShown = false;
-          $scope.isLargeScreen = (windowDimensionsService.getWidth() >= 1024);
+          $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
 
           $scope.$on('openPostTutorialHelpPopover', function() {
             if ($scope.isLargeScreen) {
@@ -54,7 +54,7 @@ oppia.directive('editorNavigation', [
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
 
           $scope.showUserHelpModal = function() {
-            var explorationId = explorationContextService.getExplorationId();
+            var explorationId = ExplorationContextService.getExplorationId();
             siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
             var modalInstance = $modal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -63,12 +63,12 @@ oppia.directive('editorNavigation', [
               backdrop: true,
               controller: [
                 '$scope', '$modalInstance',
-                'siteAnalyticsService', 'explorationContextService',
+                'siteAnalyticsService', 'ExplorationContextService',
                 function(
                   $scope, $modalInstance,
-                  siteAnalyticsService, explorationContextService) {
+                  siteAnalyticsService, ExplorationContextService) {
                   var explorationId = (
-                    explorationContextService.getExplorationId());
+                    ExplorationContextService.getExplorationId());
 
                   $scope.beginTutorial = function() {
                     siteAnalyticsService
@@ -90,14 +90,14 @@ oppia.directive('editorNavigation', [
             modalInstance.result.then(function() {
               $rootScope.$broadcast('openEditorTutorial');
             }, function() {
-              stateEditorTutorialFirstTimeService.markTutorialFinished();
+              StateEditorTutorialFirstTimeService.markTutorialFinished();
             });
           };
 
-          $scope.countWarnings = explorationWarningsService.countWarnings;
-          $scope.getWarnings = explorationWarningsService.getWarnings;
+          $scope.countWarnings = ExplorationWarningsService.countWarnings;
+          $scope.getWarnings = ExplorationWarningsService.getWarnings;
           $scope.hasCriticalWarnings = (
-            explorationWarningsService.hasCriticalWarnings);
+            ExplorationWarningsService.hasCriticalWarnings);
 
           $scope.explorationRightsService = explorationRightsService;
           $scope.getTabStatuses = RouterService.getTabStatuses;
@@ -109,8 +109,8 @@ oppia.directive('editorNavigation', [
           $scope.selectFeedbackTab = RouterService.navigateToFeedbackTab;
           $scope.getOpenThreadsCount = ThreadDataService.getOpenThreadsCount;
 
-          windowDimensionsService.registerOnResizeHook(function() {
-            $scope.isLargeScreen = (windowDimensionsService.getWidth() >= 1024);
+          WindowDimensionsService.registerOnResizeHook(function() {
+            $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
           });
         }
       ]

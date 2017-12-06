@@ -19,11 +19,11 @@
  */
 
 oppia.factory('TrainingModalService', [
-  '$rootScope', '$modal', 'alertsService',
-  function($rootScope, $modal, alertsService) {
+  '$rootScope', '$modal', 'AlertsService',
+  function($rootScope, $modal, AlertsService) {
     return {
       openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave) {
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
         if (externalSave) {
           $rootScope.$broadcast('externalSave');
         }
@@ -33,13 +33,13 @@ oppia.factory('TrainingModalService', [
           backdrop: true,
           controller: [
             '$scope', '$injector', '$modalInstance',
-            'explorationStatesService', 'editorContextService',
-            'AnswerClassificationService', 'explorationContextService',
-            'stateInteractionIdService', 'angularNameService',
+            'explorationStatesService', 'EditorStateService',
+            'AnswerClassificationService', 'ExplorationContextService',
+            'stateInteractionIdService', 'AngularNameService',
             function($scope, $injector, $modalInstance,
-                explorationStatesService, editorContextService,
-                AnswerClassificationService, explorationContextService,
-                stateInteractionIdService, angularNameService) {
+                explorationStatesService, EditorStateService,
+                AnswerClassificationService, ExplorationContextService,
+                stateInteractionIdService, AngularNameService) {
               $scope.trainingDataAnswer = '';
               $scope.trainingDataFeedback = '';
               $scope.trainingDataOutcomeDest = '';
@@ -57,16 +57,16 @@ oppia.factory('TrainingModalService', [
 
               $scope.init = function() {
                 var explorationId =
-                  explorationContextService.getExplorationId();
+                  ExplorationContextService.getExplorationId();
                 var currentStateName =
-                  editorContextService.getActiveStateName();
+                  EditorStateService.getActiveStateName();
                 var state = explorationStatesService.getState(currentStateName);
 
                 // Retrieve the interaction ID.
                 var interactionId = stateInteractionIdService.savedMemento;
 
                 var rulesServiceName =
-                  angularNameService.getNameOfInteractionRulesService(
+                  AngularNameService.getNameOfInteractionRulesService(
                     interactionId)
 
                 // Inject RulesService dynamically.

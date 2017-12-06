@@ -23,7 +23,7 @@ describe('retrieving threads service', function() {
   beforeEach(function() {
     module('oppia');
     module(function($provide) {
-      $provide.value('explorationData', {
+      $provide.value('ExplorationDataService', {
         explorationId: expId
       });
     });

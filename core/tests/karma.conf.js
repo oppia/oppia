@@ -14,13 +14,15 @@ module.exports = function(config) {
       'core/tests/karma-globals.js',
       // Constants must be loaded before everything else.
       'assets/constants.js',
-      'assets/rich_text_components_specs.js',
+      'assets/rich_text_components_definitions.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.0.0/jquery.min.js',
       'third_party/static/jqueryui-1.10.3/jquery-ui.min.js',
       'third_party/static/angularjs-1.5.8/angular.js',
       'third_party/static/angularjs-1.5.8/angular-mocks.js',
+      'third_party/static/headroom-js-0.9.4/headroom.min.js',
+      'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
       'third_party/static/math-expressions-370a77/build/math-expressions.js',
       generatedJs,
       'core/templates/dev/head/*.js',
@@ -28,7 +30,7 @@ module.exports = function(config) {
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*.js',
-      'core/templates/dev/head/**/*.html',
+      'core/templates/dev/head/**/*_directive.html',
       'extensions/**/*.js',
       {
         pattern: 'extensions/**/*.png',
@@ -36,7 +38,7 @@ module.exports = function(config) {
         served: true,
         included: false
       },
-      'extensions/interactions/**/*.html',
+      'extensions/interactions/**/*_directive.html',
       'extensions/interactions/rule_templates.json',
       {
         pattern: 'assets/i18n/**/*.json',
@@ -64,29 +66,15 @@ module.exports = function(config) {
       '/extensions/': '/base/extensions/'
     },
     preprocessors: {
-      'core/templates/dev/head/*.js': ['coverage'],
-      // When all controllers were converted from global functions into the
-      // oppia.controller() format, the syntax 'core/templates/dev/head/*/*.js'
-      // and 'core/templates/dev/head/**/*.js' stopped working, and resulted in
-      // "Uncaught TypeError: Cannot read property '2' of undefined" for all
-      // the JS files. So we enumerate all the directories directly (which,
-      // although it should give an identical result, seems to actually cause
-      // no problems). Note that this only affects which files have coverage
-      // statistics generated for them, and that if a directory is omitted by
-      // accident, that directory will not have coverage statistics generated
-      // for it, which is easily fixed.
-      'core/templates/dev/head/components/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/domain/**/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/expressions/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/forms/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/pages/**/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/services/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
+      'extensions/!(*Spec).js': ['coverage'],
       'extensions/**/!(*Spec).js': ['coverage'],
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
-      'core/templates/dev/head/**/*.html': ['ng-html2js'],
-      'extensions/interactions/**/*.html': ['ng-html2js'],
+      'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
+      'extensions/interactions/**/*_directive.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures']
     },
     reporters: ['progress', 'coverage'],
@@ -126,10 +114,8 @@ module.exports = function(config) {
       'karma-coverage'
     ],
     ngHtml2JsPreprocessor: {
-      cacheIdFromPath: function(filepath) {
-        return filepath;
-      },
-      moduleName: 'directiveTemplates'
+      moduleName: 'directiveTemplates',
+      prependPrefix: '/'
     },
     jsonFixturesPreprocessor: {
       variableName: '__fixtures__'

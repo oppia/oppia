@@ -17,25 +17,27 @@
  */
 
 oppia.controller('SettingsTab', [
-  '$scope', '$http', '$window', '$modal', '$rootScope',
-  'explorationData', 'explorationTitleService', 'explorationCategoryService',
+  '$scope', '$http', '$window', '$modal',
+  '$rootScope', 'ExplorationDataService',
+  'explorationTitleService', 'explorationCategoryService',
   'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationTagsService', 'explorationRightsService',
   'explorationInitStateNameService', 'explorationParamSpecsService',
-  'changeListService', 'alertsService', 'explorationStatesService',
-  'explorationParamChangesService', 'explorationWarningsService',
+  'changeListService', 'AlertsService', 'explorationStatesService',
+  'explorationParamChangesService', 'ExplorationWarningsService',
   'ExplorationAdvancedFeaturesService', 'ALL_CATEGORIES',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
   'EditableExplorationBackendApiService', 'UrlInterpolationService',
   'explorationAutomaticTextToSpeechService',
   function(
-      $scope, $http, $window, $modal, $rootScope,
-      explorationData, explorationTitleService, explorationCategoryService,
+      $scope, $http, $window, $modal,
+      $rootScope, ExplorationDataService,
+      explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService,
       explorationTagsService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService,
-      changeListService, alertsService, explorationStatesService,
-      explorationParamChangesService, explorationWarningsService,
+      changeListService, AlertsService, explorationStatesService,
+      explorationParamChangesService, ExplorationWarningsService,
       ExplorationAdvancedFeaturesService, ALL_CATEGORIES,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
       EditableExplorationBackendApiService, UrlInterpolationService,
@@ -76,7 +78,7 @@ oppia.controller('SettingsTab', [
       $scope.explorationParamChangesService = explorationParamChangesService;
       $scope.UserEmailPreferencesService = UserEmailPreferencesService;
 
-      explorationData.getData().then(function() {
+      ExplorationDataService.getData().then(function() {
         $scope.refreshSettingsTab();
         $scope.hasPageLoaded = true;
       });
@@ -147,7 +149,7 @@ oppia.controller('SettingsTab', [
       var newInitStateName = explorationInitStateNameService.displayed;
 
       if (!explorationStatesService.getState(newInitStateName)) {
-        alertsService.addWarning(
+        AlertsService.addWarning(
           'Invalid initial state name: ' + newInitStateName);
         explorationInitStateNameService.restoreFromMemento();
         return;
@@ -159,7 +161,7 @@ oppia.controller('SettingsTab', [
     };
 
     $scope.postSaveParamChangesHook = function() {
-      explorationWarningsService.updateWarnings();
+      ExplorationWarningsService.updateWarnings();
     };
 
     /********************************************
@@ -223,7 +225,7 @@ oppia.controller('SettingsTab', [
     * Methods relating to control buttons.
     ********************************************/
     $scope.previewSummaryTile = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/settings_tab/' +
@@ -259,7 +261,7 @@ oppia.controller('SettingsTab', [
 
             $scope.close = function() {
               $modalInstance.dismiss();
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]
@@ -267,7 +269,7 @@ oppia.controller('SettingsTab', [
     };
 
     $scope.showTransferExplorationOwnershipModal = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/settings_tab/' +
@@ -279,7 +281,7 @@ oppia.controller('SettingsTab', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]
@@ -289,7 +291,7 @@ oppia.controller('SettingsTab', [
     };
 
     $scope.deleteExploration = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
 
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -302,7 +304,7 @@ oppia.controller('SettingsTab', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]
@@ -315,7 +317,7 @@ oppia.controller('SettingsTab', [
     };
 
     var openModalForModeratorAction = function(action) {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
 
       var moderatorEmailDraftUrl = '/moderatorhandler/email_draft/' + action;
 
@@ -358,7 +360,7 @@ oppia.controller('SettingsTab', [
 
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
+                AlertsService.clearWarnings();
               };
             }
           ]
