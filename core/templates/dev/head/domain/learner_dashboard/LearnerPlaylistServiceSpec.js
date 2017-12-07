@@ -16,14 +16,54 @@
  * @fileoverview Tests for LearnerPlaylistService.js.
  */
 
-describe('Feedback thread object factory', function() {
+describe('Learner playlist service factory', function() {
   var LearnerPlaylistService = null;
+  var $httpBackend = null;
+  var activityType = constants.ACTIVITY_TYPE_EXPLORATION;
+  var activityId = 'activity_1';
+  var addToLearnerPlaylistUrl = '/learnerplaylistactivityhandler' 
+    + activityType + '/' + activityId;
+  var mockAlertsService = null;
+  var spyInfoMessage = null;
+  var spySuccessMessage = null;
 
   beforeEach(module('oppia'));
 
+  beforeEach(function(){
+    mockAlertsService = {
+      addInfoMessage: function(message) {},
+      addSuccessMessage: function(message) {}
+    };
+    module(function($provide) {
+      $provide.value(
+        'AlertsService', mockAlertsService);
+    });
+    spyOn(mockAlertsService, 'addInfoMessage').and.callThrough();
+    spyOn(mockAlertsService, 'addSuccessMessage').and.callThrough();
+  })
   beforeEach(inject(function($injector) {
+    $httpBackend = $injector.get('$httpBackend');
     LearnerPlaylistService = $injector.get(
       'LearnerPlaylistService');
+    
   }));
-  
+
+  it('should successfully add playlist to play later list', function(){
+    var response = {
+      belongs_to_completed_or_incomplete_list: false,
+      belongs_to_subscribed_activities: false,
+      playlist_limit_exceeded: false
+    };
+
+    $httpBackend.expect('POST', addToLearnerPlaylistUrl, {}).respond({
+      data: response
+    });
+
+    LearnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+    $httpBackend.flush();
+    expect(AlertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'Successfully added to your \'Play Later\' list.');
+    expect(AlertsService.addInfoMessage).not.toHaveBeenCalled();
+  });
+
 });

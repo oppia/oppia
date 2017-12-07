@@ -56,7 +56,6 @@ describe('Learner Dashboard Backend API Service', function() {
   beforeEach(inject(function($injector) {
     LearnerDashboardBackendApiService = $injector.get(
       'LearnerDashboardBackendApiService');
-    UrlInterpolationService = $injector.get('UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
   }));
 
