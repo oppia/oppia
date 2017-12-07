@@ -19,34 +19,41 @@
 describe('Learner playlist service factory', function() {
   var LearnerPlaylistService = null;
   var $httpBackend = null;
+  var $rootScope = null
   var activityType = constants.ACTIVITY_TYPE_EXPLORATION;
-  var activityId = 'activity_1';
-  var addToLearnerPlaylistUrl = '/learnerplaylistactivityhandler' 
-    + activityType + '/' + activityId;
-  var mockAlertsService = null;
+  var UrlInterpolationService = null;
+  var activityId = '1';
+  var addToLearnerPlaylistUrl = '';
+  var AlertsService = null;
   var spyInfoMessage = null;
   var spySuccessMessage = null;
 
   beforeEach(module('oppia'));
+  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-  beforeEach(function(){
-    mockAlertsService = {
-      addInfoMessage: function(message) {},
-      addSuccessMessage: function(message) {}
-    };
-    module(function($provide) {
-      $provide.value(
-        'AlertsService', mockAlertsService);
-    });
-    spyOn(mockAlertsService, 'addInfoMessage').and.callThrough();
-    spyOn(mockAlertsService, 'addSuccessMessage').and.callThrough();
-  })
   beforeEach(inject(function($injector) {
     $httpBackend = $injector.get('$httpBackend');
     LearnerPlaylistService = $injector.get(
       'LearnerPlaylistService');
-    
+    $rootScope = $injector.get('$rootScope');
+    UrlInterpolationService = $injector.get('UrlInterpolationService');
+    AlertsService = $injector.get('AlertsService');
+    spyOn(AlertsService, 'addInfoMessage').and.callThrough();
+    spyOn(AlertsService, 'addSuccessMessage').and.callThrough();
   }));
+
+  beforeEach(function(){
+    addToLearnerPlaylistUrl = (
+      UrlInterpolationService.interpolateUrl(
+        '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
+          activityType: activityType,
+          activityId: activityId
+        }));
+  })
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
+  });
 
   it('should successfully add playlist to play later list', function(){
     var response = {
@@ -54,16 +61,70 @@ describe('Learner playlist service factory', function() {
       belongs_to_subscribed_activities: false,
       playlist_limit_exceeded: false
     };
-
-    $httpBackend.expect('POST', addToLearnerPlaylistUrl, {}).respond({
-      data: response
-    });
-
+    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
+      JSON.stringify(response));
     LearnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+
     $httpBackend.flush();
+    $rootScope.$digest();
     expect(AlertsService.addSuccessMessage).toHaveBeenCalledWith(
       'Successfully added to your \'Play Later\' list.');
     expect(AlertsService.addInfoMessage).not.toHaveBeenCalled();
   });
 
+  it('should not add playlist to play later list' +
+    'and show belongs to completed or incomplete list', function(){
+    var response = {
+      belongs_to_completed_or_incomplete_list: true,
+      belongs_to_subscribed_activities: false,
+      playlist_limit_exceeded: false
+    };
+    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
+      JSON.stringify(response));
+    LearnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+
+    $httpBackend.flush();
+    $rootScope.$digest();
+    expect(AlertsService.addInfoMessage).toHaveBeenCalledWith(
+      'You have already completed or are completing this activity.');
+    expect(AlertsService.addSuccessMessage).not.toHaveBeenCalled();
+  });
+
+  it('should not add playlist to play later list' +
+    'and show belongs to subscribed activities', function(){
+    var response = {
+      belongs_to_completed_or_incomplete_list: false,
+      belongs_to_subscribed_activities: true,
+      playlist_limit_exceeded: false
+    };
+    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
+      JSON.stringify(response));
+    LearnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+
+    $httpBackend.flush();
+    $rootScope.$digest();
+    expect(AlertsService.addInfoMessage).toHaveBeenCalledWith(
+      'This is present in your creator dashboard');
+    expect(AlertsService.addSuccessMessage).not.toHaveBeenCalled();
+  });
+
+  it('should not add playlist to play later list' +
+    'and show playlist limit exceeded', function(){
+    var response = {
+      belongs_to_completed_or_incomplete_list: false,
+      belongs_to_subscribed_activities: false,
+      playlist_limit_exceeded: true
+    };
+    $httpBackend.expectPOST(addToLearnerPlaylistUrl).respond(
+      JSON.stringify(response));
+    LearnerPlaylistService.addToLearnerPlaylist(activityId, activityType);
+
+    $httpBackend.flush();
+    $rootScope.$digest();
+    expect(AlertsService.addInfoMessage).toHaveBeenCalledWith(
+      'Your \'Play Later\' list is full!  Either you can ' +
+      'complete some or you can head to the learner dashboard ' +
+      'and remove some.');
+    expect(AlertsService.addSuccessMessage).not.toHaveBeenCalled();
+  });
 });
