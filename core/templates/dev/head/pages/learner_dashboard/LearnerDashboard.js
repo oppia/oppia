@@ -73,7 +73,7 @@ oppia.controller('LearnerDashboard', [
   'LearnerDashboardBackendApiService', 'UrlInterpolationService',
   'LEARNER_DASHBOARD_SECTION_I18N_IDS',
   'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'ThreadStatusDisplayService',
-  'oppiaDatetimeFormatter', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
+  'DateTimeFormatService', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
   'FeedbackThreadSummaryObjectFactory', 'FeedbackMessageSummaryObjectFactory',
   function(
       $scope, $rootScope, $window, $http, $modal, AlertsService,
@@ -82,7 +82,7 @@ oppia.controller('LearnerDashboard', [
       LearnerDashboardBackendApiService, UrlInterpolationService,
       LEARNER_DASHBOARD_SECTION_I18N_IDS,
       LEARNER_DASHBOARD_SUBSECTION_I18N_IDS, ThreadStatusDisplayService,
-      oppiaDatetimeFormatter, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
+      DateTimeFormatService, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
       FeedbackThreadSummaryObjectFactory, FeedbackMessageSummaryObjectFactory) {
     $scope.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
       EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
@@ -109,7 +109,7 @@ oppia.controller('LearnerDashboard', [
     $scope.getHumanReadableStatus = (
       ThreadStatusDisplayService.getHumanReadableStatus);
     $scope.getLocaleAbbreviatedDatetimeString = (
-      oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
+      DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
     $scope.setActiveSection = function(newActiveSectionName) {
       $scope.activeSection = newActiveSectionName;

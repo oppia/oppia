@@ -26,7 +26,7 @@ describe('Datetime Formatter', function() {
     var OldDate = Date;
 
     beforeEach(inject(function($injector) {
-      df = $injector.get('oppiaDatetimeFormatter');
+      df = $injector.get('DateTimeFormatService');
 
       // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there
       // doesn't seem to be a good way to set the timezone locale directly.)
