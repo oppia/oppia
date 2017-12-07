@@ -258,150 +258,6 @@ oppia.factory('changeListService', [
   }
 ]);
 
-// A data service that stores data about the rights for this exploration.
-oppia.factory('explorationRightsService', [
-  '$http', '$q', 'ExplorationDataService', 'AlertsService',
-  function($http, $q, ExplorationDataService, AlertsService) {
-    return {
-      init: function(
-          ownerNames, editorNames, viewerNames, status, clonedFrom,
-          isCommunityOwned, viewableIfPrivate) {
-        this.ownerNames = ownerNames;
-        this.editorNames = editorNames;
-        this.viewerNames = viewerNames;
-        this._status = status;
-        // This is null if the exploration was not cloned from anything,
-        // otherwise it is the exploration ID of the source exploration.
-        this._clonedFrom = clonedFrom;
-        this._isCommunityOwned = isCommunityOwned;
-        this._viewableIfPrivate = viewableIfPrivate;
-      },
-      clonedFrom: function() {
-        return this._clonedFrom;
-      },
-      isPrivate: function() {
-        return this._status === GLOBALS.ACTIVITY_STATUS_PRIVATE;
-      },
-      isPublic: function() {
-        return this._status === GLOBALS.ACTIVITY_STATUS_PUBLIC;
-      },
-      isCloned: function() {
-        return Boolean(this._clonedFrom);
-      },
-      isCommunityOwned: function() {
-        return this._isCommunityOwned;
-      },
-      viewableIfPrivate: function() {
-        return this._viewableIfPrivate;
-      },
-      makeCommunityOwned: function() {
-        var whenCommunityOwnedSet = $q.defer();
-        var that = this;
-
-        var requestUrl = (
-          '/createhandler/rights/' + ExplorationDataService.explorationId);
-        $http.put(requestUrl, {
-          version: ExplorationDataService.data.version,
-          make_community_owned: true
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
-          whenCommunityOwnedSet.resolve();
-        });
-        return whenCommunityOwnedSet.promise;
-      },
-      setViewability: function(viewableIfPrivate) {
-        var whenViewabilityChanged = $q.defer();
-        var that = this;
-
-        var requestUrl = (
-            '/createhandler/rights/' + ExplorationDataService.explorationId);
-        $http.put(requestUrl, {
-          version: ExplorationDataService.data.version,
-          viewable_if_private: viewableIfPrivate
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
-          whenViewabilityChanged.resolve();
-        });
-        return whenViewabilityChanged.promise;
-      },
-      saveRoleChanges: function(newMemberUsername, newMemberRole) {
-        var whenRolesSaved = $q.defer();
-        var that = this;
-
-        var requestUrl = (
-            '/createhandler/rights/' + ExplorationDataService.explorationId);
-        $http.put(requestUrl, {
-          version: ExplorationDataService.data.version,
-          new_member_role: newMemberRole,
-          new_member_username: newMemberUsername
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
-          whenRolesSaved.resolve();
-        });
-        return whenRolesSaved.promise;
-      },
-      publish: function() {
-        var whenPublishStatusChanged = $q.defer();
-        var that = this;
-
-        var requestUrl = (
-          '/createhandler/status/' + ExplorationDataService.explorationId);
-        $http.put(requestUrl, {
-          make_public: true
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
-          whenPublishStatusChanged.resolve();
-        });
-        return whenPublishStatusChanged.promise;
-      },
-      saveModeratorChangeToBackend: function(action, emailBody) {
-        var that = this;
-
-        var explorationModeratorRightsUrl = (
-          '/createhandler/moderatorrights/' +
-          ExplorationDataService.explorationId);
-        $http.put(explorationModeratorRightsUrl, {
-          action: action,
-          email_body: emailBody,
-          version: ExplorationDataService.data.version
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
-        });
-      }
-    };
-  }
-]);
-
 oppia.factory('explorationPropertyService', [
   '$rootScope', '$log', 'changeListService', 'AlertsService',
   function($rootScope, $log, changeListService, AlertsService) {
@@ -504,16 +360,16 @@ oppia.factory('explorationPropertyService', [
 // displayed and edited in multiple places in the UI.
 oppia.factory('explorationTitleService', [
   'explorationPropertyService', '$filter', 'ValidatorsService',
-  'explorationRightsService',
+  'ExplorationRightsService',
   function(
     explorationPropertyService, $filter, ValidatorsService,
-    explorationRightsService) {
+    ExplorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'title';
     child._normalize = $filter('normalizeWhitespace');
     child._isValid = function(value) {
       return ValidatorsService.isValidEntityName(
-        value, true, explorationRightsService.isPrivate());
+        value, true, ExplorationRightsService.isPrivate());
     };
     return child;
   }
@@ -523,16 +379,16 @@ oppia.factory('explorationTitleService', [
 // displayed and edited in multiple places in the UI.
 oppia.factory('explorationCategoryService', [
   'explorationPropertyService', '$filter', 'ValidatorsService',
-  'explorationRightsService',
+  'ExplorationRightsService',
   function(
     explorationPropertyService, $filter, ValidatorsService,
-    explorationRightsService) {
+    ExplorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'category';
     child._normalize = $filter('normalizeWhitespace');
     child._isValid = function(value) {
       return ValidatorsService.isValidEntityName(
-        value, true, explorationRightsService.isPrivate());
+        value, true, ExplorationRightsService.isPrivate());
     };
     return child;
   }
@@ -542,16 +398,16 @@ oppia.factory('explorationCategoryService', [
 // be displayed and edited in multiple places in the UI.
 oppia.factory('explorationObjectiveService', [
   'explorationPropertyService', '$filter', 'ValidatorsService',
-  'explorationRightsService',
+  'ExplorationRightsService',
   function(
     explorationPropertyService, $filter, ValidatorsService,
-    explorationRightsService) {
+    ExplorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'objective';
     child._normalize = $filter('normalizeWhitespace');
     child._isValid = function(value) {
       return (
-        explorationRightsService.isPrivate() ||
+        ExplorationRightsService.isPrivate() ||
         ValidatorsService.isNonempty(value, false));
     };
     return child;
