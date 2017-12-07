@@ -93,9 +93,11 @@
         POST_COMPLETION_HOOKS: [],
         preferredSiteLanguageCode: JSON.parse(
           '{{preferred_site_language_code|js_string}}'),
+        SITE_FEEDBACK_FORM_URL: JSON.parse('{{SITE_FEEDBACK_FORM_URL}}'),
         SITE_NAME: JSON.parse('{{SITE_NAME|js_string}}'),
         SYSTEM_USERNAMES: JSON.parse('{{SYSTEM_USERNAMES|js_string}}'),
         TEMPLATE_DIR_PREFIX: JSON.parse('{{TEMPLATE_DIR_PREFIX|js_string}}'),
+        iframed: JSON.parse('{{iframed}}'),
         isAdmin: JSON.parse('{{is_admin|js_string}}'),
         isModerator: JSON.parse('{{is_moderator|js_string}}'),
         isSuperAdmin: JSON.parse('{{is_super_admin|js_string}}'),
@@ -123,9 +125,10 @@
   </head>
 
   <body>
-    {% if iframed %}
+    <div ng-if="iframed">
       {{ warnings_and_loader() }}
-    {% else %}
+    </div>
+    <div ng-if="!iframed">
       <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
       <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
       </promo-bar>
@@ -178,21 +181,17 @@
         </div>
       </div>
 
-      {% if DEV_MODE %}
-        <div class="oppia-dev-mode">
-          Dev Mode
-        </div>
-      {% endif %}
-
-      {% if SITE_FEEDBACK_FORM_URL %}
-        <a href="{{SITE_FEEDBACK_FORM_URL}}" target="_blank"
-           class="oppia-site-feedback oppia-transition-200">
-          <i class="material-icons md-18">&#xE87F;</i>
-            <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
-          </i>
-        </a>
-      {% endif %}
-    {% endif %}
+      <div ng-if="DEV_MODE" class="oppia-dev-mode">
+        Dev Mode
+      </div>
+      
+      <a ng-if="SITE_FEEDBACK_FORM_URL" href="{{SITE_FEEDBACK_FORM_URL}}" target="_blank"
+         class="oppia-site-feedback oppia-transition-200">
+        <i class="material-icons md-18">&#xE87F;</i>
+          <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
+        </i>
+      </a>
+    </div>
 
     {% include 'pages/footer_js_libs.html' %}
 
