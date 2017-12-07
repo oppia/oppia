@@ -415,7 +415,6 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
   };
 }]);
 
-
 oppia.factory('rteHelperService', [
   '$filter', '$log', '$interpolate', 'ExplorationContextService',
   'RTE_COMPONENT_SPECS', 'HtmlEscaperService', 'UrlInterpolationService',

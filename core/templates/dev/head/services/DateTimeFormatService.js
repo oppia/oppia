@@ -17,6 +17,7 @@
 * since the Epoch to human-readable dates.
 */
 oppia.factory('DateTimeFormatService', ['$filter', function($filter) {
+  
   return {
     // Returns just the time if the local datetime representation has the
     // same date as the current date. Otherwise, returns just the date if the
