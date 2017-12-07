@@ -57,7 +57,7 @@ oppia.controller('Library', [
     // Keeps track of the index of the left-most visible card of each group.
     $scope.leftmostCardIndices = [];
 
-    if(['group', 'search'].indexOf($scope.pageMode) !== -1){
+    if([LIBRARY_PAGE_MODES.GROUP, LIBRARY_PAGE_MODES.SEARCH].indexOf($scope.pageMode) !== -1){
       $rootScope.libraryTitle = 'Find explorations to learn from - Oppia';
     } else {
       $rootScope.libraryTitle = 'I18N_LIBRARY_PAGE_TITLE';
