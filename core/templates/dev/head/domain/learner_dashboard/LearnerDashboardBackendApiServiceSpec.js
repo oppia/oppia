@@ -80,7 +80,8 @@ describe('Learner Dashboard Backend API Service', function() {
     }
   );
 
-  it('should use rejection handler if learner dashboard data backend request failed',
+  it('should use rejection handler if learner dashboard data ' + 
+    'backend request failed',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
