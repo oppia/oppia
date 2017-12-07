@@ -50,7 +50,7 @@
         <div ng-if="activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1].oppiaResponse &&
                     !isCurrentSupplementalCardNonempty() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback && activeCard.destStateName &&
                     !isOnTerminalCard()">
-          <md-button aria-label="" class="oppia-learner-continue-button protractor-test-continue-to-next-card-button" focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>" ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)" translate="I18N_PLAYER_CONTINUE_BUTTON">
+          <md-button aria-label="" class="oppia-learner-confirm-button protractor-test-continue-to-next-card-button" focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>" ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)" translate="I18N_PLAYER_CONTINUE_BUTTON">
           </md-button>
         </div>
         <div ng-if="isOnTerminalCard()" class="nav-bar-bottom-replay-content">
@@ -408,7 +408,7 @@ directive. -->
     padding: 0 20px;
   }
   /* These rules must be kept in sync with corresponding rules in oppia.css
-     (those with '.oppia-state-content-display-html > p,
+     (those with '.oppia-rte-editor > p,
        .form-control.oppia-rte-content > div > p' selectors specifying
       the same line-height, margin-top and margin-bottom attributes)
   */

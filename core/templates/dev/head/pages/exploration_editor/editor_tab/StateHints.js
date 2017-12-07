@@ -17,18 +17,18 @@
  */
 
 oppia.controller('StateHints', [
-  '$scope', '$rootScope', '$modal', '$filter', 'editorContextService',
-  'alertsService', 'INTERACTION_SPECS', 'stateHintsService',
+  '$scope', '$rootScope', '$modal', '$filter', 'EditorStateService',
+  'AlertsService', 'INTERACTION_SPECS', 'stateHintsService',
   'explorationStatesService', 'stateInteractionIdService',
   'UrlInterpolationService', 'HintObjectFactory', 'ExplorationPlayerService',
   'stateSolutionService',
   function(
-    $scope, $rootScope, $modal, $filter, editorContextService,
-    alertsService, INTERACTION_SPECS, stateHintsService,
+    $scope, $rootScope, $modal, $filter, EditorStateService,
+    AlertsService, INTERACTION_SPECS, stateHintsService,
     explorationStatesService, stateInteractionIdService,
     UrlInterpolationService, HintObjectFactory, ExplorationPlayerService,
     stateSolutionService) {
-    $scope.editorContextService = editorContextService;
+    $scope.EditorStateService = EditorStateService;
     $scope.stateHintsService = stateHintsService;
     $scope.activeHintIndex = null;
     $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
@@ -38,7 +38,7 @@ oppia.controller('StateHints', [
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
       stateHintsService.init(
-        editorContextService.getActiveStateName(),
+        EditorStateService.getActiveStateName(),
           stateData.interaction.hints);
 
       $scope.activeHintIndex = null;
@@ -60,7 +60,7 @@ oppia.controller('StateHints', [
           openDeleteLastHintModal();
           return;
         } else {
-          alertsService.addInfoMessage('Deleting empty hint.');
+          AlertsService.addInfoMessage('Deleting empty hint.');
           stateHintsService.displayed.splice(currentActiveIndex, 1);
           stateHintsService.saveDisplayedValue();
         }
@@ -80,7 +80,7 @@ oppia.controller('StateHints', [
     };
 
     $scope.openAddHintModal = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
@@ -89,8 +89,8 @@ oppia.controller('StateHints', [
           'add_hint_modal_directive.html'),
         backdrop: 'static',
         controller: [
-          '$scope', '$modalInstance', 'editorContextService',
-          function($scope, $modalInstance, editorContextService) {
+          '$scope', '$modalInstance', 'EditorStateService',
+          function($scope, $modalInstance, EditorStateService) {
             $scope.HINT_FORM_SCHEMA = {
               type: 'html',
               ui_config: {}
@@ -112,7 +112,7 @@ oppia.controller('StateHints', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]
@@ -144,7 +144,7 @@ oppia.controller('StateHints', [
     };
 
     var openDeleteLastHintModal = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
 
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -160,7 +160,7 @@ oppia.controller('StateHints', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]
@@ -177,7 +177,7 @@ oppia.controller('StateHints', [
       // state of the hint.
       evt.stopPropagation();
 
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
@@ -191,7 +191,7 @@ oppia.controller('StateHints', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]

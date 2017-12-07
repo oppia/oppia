@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import copy
 import datetime
 
 # pylint: disable=relative-import
@@ -107,6 +108,21 @@ class UtilsTests(test_utils.GenericTestBase):
         for test_case in test_cases:
             self.assertEqual(
                 utils.camelcase_to_hyphenated(test_case[0]), test_case[1])
+
+    def test_camelcase_to_snakecase(self):
+        """Test camelcase_to_hyphenated method."""
+        test_cases = [
+            ('AbcDef', 'abc_def'),
+            ('Abc', 'abc'),
+            ('abc_def', 'abc_def'),
+            ('Abc012Def345', 'abc012_def345'),
+            ('abcDef', 'abc_def'),
+            ('abc-def', 'abc-def'),
+        ]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                utils.camelcase_to_snakecase(test_case[0]), test_case[1])
 
     def test_set_url_query_parameter(self):
         """Test set_url_query_parameter method."""
@@ -224,3 +240,17 @@ class UtilsTests(test_utils.GenericTestBase):
         string2 = u'Лорем'
         self.assertEqual(utils.convert_to_str(string1), string1)
         self.assertEqual(utils.convert_to_str(string2), string2.encode('utf-8'))
+
+    def test_get_hashable_value(self):
+        json1 = ['foo', 'bar', {'baz': 3}]
+        json2 = ['fee', {'fie': ['foe', 'fum']}]
+        json1_deepcopy = copy.deepcopy(json1)
+        json2_deepcopy = copy.deepcopy(json2)
+
+        test_set = {utils.get_hashable_value(json1)}
+        self.assertIn(utils.get_hashable_value(json1_deepcopy), test_set)
+        test_set.add(utils.get_hashable_value(json2))
+        self.assertEqual(test_set, {
+            utils.get_hashable_value(json1_deepcopy),
+            utils.get_hashable_value(json2_deepcopy),
+        })

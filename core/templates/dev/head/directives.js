@@ -123,10 +123,10 @@ oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
   return {
     restrict: 'A',
     scope: true,
-    controller: ['$scope', 'deviceInfoService', function(
-        $scope, deviceInfoService) {
+    controller: ['$scope', 'DeviceInfoService', function(
+        $scope, DeviceInfoService) {
       $scope.opened = false;
-      $scope.deviceHasTouchEvents = deviceInfoService.hasTouchEvents();
+      $scope.deviceHasTouchEvents = DeviceInfoService.hasTouchEvents();
     }],
     link: function(scope, element) {
       var TIME_TOOLTIP_CLOSE_DELAY_MOBILE = 1000;

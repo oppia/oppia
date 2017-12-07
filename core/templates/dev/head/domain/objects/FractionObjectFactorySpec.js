@@ -66,7 +66,7 @@
        expect(function() {Fraction.fromRawInputString('3 \ b')}).toThrow(
          new Error(errors.INVALID_CHARS));
        expect(function() {Fraction.fromRawInputString('a 3/5')}).toThrow(
-           new Error(errors.INVALID_CHARS));
+         new Error(errors.INVALID_CHARS));
        expect(function() {Fraction.fromRawInputString('5 b/c')}).toThrow(
          new Error(errors.INVALID_CHARS));
        expect(function() {Fraction.fromRawInputString('a b/c')}).toThrow(
@@ -87,7 +87,7 @@
        expect(function() {Fraction.fromRawInputString('1 / 2 3')}).toThrow(
          new Error(errors.INVALID_FORMAT));
        expect(function() {Fraction.fromRawInputString('- / 3')}).toThrow(
-            new Error(errors.INVALID_FORMAT));
+         new Error(errors.INVALID_FORMAT));
        expect(function() {Fraction.fromRawInputString('/ 3')}).toThrow(
          new Error(errors.INVALID_FORMAT));
        // Division by zero.
@@ -96,5 +96,17 @@
        expect(function() {Fraction.fromRawInputString('1 2 /0')}).toThrow(
          new Error(errors.DIVISION_BY_ZERO));
      });
+
+     it('should convert to the correct float value', function() {
+       expect(Fraction.fromRawInputString('1').toFloat()).toEqual(1);
+       expect(Fraction.fromRawInputString('1 0/5').toFloat()).toEqual(1);
+       expect(Fraction.fromRawInputString('1 4/5').toFloat()).toEqual(1.8);
+       expect(Fraction.fromRawInputString('0 4/5').toFloat()).toEqual(0.8);
+       expect(Fraction.fromRawInputString('-10/10').toFloat()).toEqual(-1);
+       expect(Fraction.fromRawInputString('0 40/50').toFloat()).toEqual(0.8);
+       expect(Fraction.fromRawInputString('0 2/3').toFloat()).toEqual(2 / 3);
+       expect(Fraction.fromRawInputString('0 25/5').toFloat()).toEqual(5);
+       expect(Fraction.fromRawInputString('4 1/3').toFloat()).toEqual(13 / 3);
+     })
    });
  });

@@ -229,13 +229,13 @@ oppia.animation('.conversation-skin-animate-cards', function() {
 });
 
 oppia.directive('conversationSkin', [
-  'urlService', 'UrlInterpolationService',
-  function(urlService, UrlInterpolationService) {
+  'UrlService', 'UrlInterpolationService',
+  function(UrlService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       link: function(scope) {
-        var isIframed = urlService.isIframed();
+        var isIframed = UrlService.isIframed();
         scope.directiveTemplate = isIframed ?
           UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/' +
@@ -247,24 +247,24 @@ oppia.directive('conversationSkin', [
       template: '<div ng-include="directiveTemplate"></div>',
       controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
-        'MessengerService', 'ExplorationPlayerService', 'urlService',
+        'MessengerService', 'ExplorationPlayerService', 'UrlService',
         'FocusManagerService', 'LearnerViewRatingService',
-        'windowDimensionsService', 'PlayerTranscriptService',
+        'WindowDimensionsService', 'PlayerTranscriptService',
         'LearnerParamsService', 'PlayerPositionService',
         'ExplorationRecommendationsService', 'StatsReportingService',
         'siteAnalyticsService', 'ExplorationPlayerStateService',
-        'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'alertsService',
+        'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'AlertsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'FatigueDetectionService', 'NumberAttemptsService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
-            MessengerService, ExplorationPlayerService, urlService,
+            MessengerService, ExplorationPlayerService, UrlService,
             FocusManagerService, LearnerViewRatingService,
-            windowDimensionsService, PlayerTranscriptService,
+            WindowDimensionsService, PlayerTranscriptService,
             LearnerParamsService, PlayerPositionService,
             ExplorationRecommendationsService, StatsReportingService,
             siteAnalyticsService, ExplorationPlayerStateService,
-            TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, alertsService,
+            TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, AlertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
             FatigueDetectionService, NumberAttemptsService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
@@ -283,7 +283,7 @@ oppia.directive('conversationSkin', [
 
           $scope.explorationId = ExplorationPlayerService.getExplorationId();
           $scope.isInPreviewMode = ExplorationPlayerService.isInPreviewMode();
-          $scope.isIframed = urlService.isIframed();
+          $scope.isIframed = UrlService.isIframed();
           $rootScope.loadingMessage = 'Loading';
           $scope.hasFullyLoaded = false;
           $scope.recommendedExplorationSummaries = null;
@@ -711,10 +711,10 @@ oppia.directive('conversationSkin', [
             }
           });
 
-          $scope.windowWidth = windowDimensionsService.getWidth();
+          $scope.windowWidth = WindowDimensionsService.getWidth();
           $window.onresize = function() {
             $scope.adjustPageHeight(false, null);
-            $scope.windowWidth = windowDimensionsService.getWidth();
+            $scope.windowWidth = WindowDimensionsService.getWidth();
           };
 
           $window.addEventListener('scroll', function() {
@@ -768,7 +768,7 @@ oppia.directive('conversationSkin', [
                 $scope.collectionSummary = response.data.summaries[0];
               },
               function() {
-                alertsService.addWarning(
+                AlertsService.addWarning(
                   'There was an error while fetching the collection summary.');
               }
             );

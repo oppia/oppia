@@ -78,7 +78,7 @@ class CodeRepl(base.BaseInteraction):
     _answer_visualization_specs = [{
         'id': 'FrequencyTable',
         'options': {
-            'column_headers': ['Answer', 'Count'],
+            'column_headers': ['Answer', 'Count', 'Addressed?'],
             'title': 'Top 10 answers'
         },
         'calculation_id': 'Top10AnswerFrequencies',
