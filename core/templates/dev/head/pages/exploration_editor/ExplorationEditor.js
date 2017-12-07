@@ -146,6 +146,12 @@ oppia.controller('ExplorationEditor', [
           data.email_preferences.mute_feedback_notifications,
           data.email_preferences.mute_suggestion_notifications);
 
+        if(($scope.title) !== -1){
+          $rootScope.title = 'Untitled Exploration - Oppia Editor';
+        } else {
+          $rootScope.title = '{{title }} - Oppia Editor';
+        }
+
         if (GLOBALS.can_edit) {
           editabilityService.markEditable();
         }
