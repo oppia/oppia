@@ -59,7 +59,8 @@ describe('HintsAndSolutions', function() {
     editor.saveChanges();
 
     general.moveToPlayer();
-    explorationPlayerPage.expectContentToMatch(forms.toRichText('What language is Oppia?'));
+    explorationPlayerPage.expectContentToMatch(
+      forms.toRichText('What language is Oppia?'));
     explorationPlayerPage.submitAnswer('TextInput', 'Roman');
     explorationPlayerPage.viewHint();
     explorationPlayerPage.submitAnswer('TextInput', 'Greek');

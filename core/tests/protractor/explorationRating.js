@@ -76,7 +76,8 @@ describe('Library index page', function() {
     libraryPage.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, '4.0');
 
     libraryPage.playExploration(EXPLORATION_RATINGTEST);
-    explorationPlayerPage.expectExplorationRatingOnInformationCardToEqual('4.0');
+    explorationPlayerPage.expectExplorationRatingOnInformationCardToEqual(
+      '4.0');
   });
 
   afterEach(function() {

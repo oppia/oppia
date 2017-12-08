@@ -58,13 +58,15 @@ describe('Full exploration editor', function() {
     editor.saveChanges();
 
     general.moveToPlayer();
-    explorationPlayerPage.expectContentToMatch(forms.toRichText('this is card 1'));
+    explorationPlayerPage.expectContentToMatch(
+      forms.toRichText('this is card 1'));
     explorationPlayerPage.submitAnswer('NumericInput', 19);
     explorationPlayerPage.submitAnswer('NumericInput', 21);
     explorationPlayerPage.expectContentToMatch(forms.toRichText(
       'this is card 2 with previous answer 21'));
     explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'return');
-    explorationPlayerPage.expectContentToMatch(forms.toRichText('this is card 1'));
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+      'this is card 1'));
     explorationPlayerPage.submitAnswer('NumericInput', 21);
     explorationPlayerPage.expectContentToMatch(forms.toRichText(
       'this is card 2 with previous answer 21'));
@@ -170,7 +172,8 @@ describe('Full exploration editor', function() {
       explorationPlayerPage.expectInteractionToMatch('NumericInput');
       explorationPlayerPage.submitAnswer('NumericInput', 6);
       // This checks the previously-deleted group no longer applies.
-      explorationPlayerPage.expectLatestFeedbackToMatch(forms.toRichText('Farewell'));
+      explorationPlayerPage.expectLatestFeedbackToMatch(
+        forms.toRichText('Farewell'));
       explorationPlayerPage.clickThroughToNextCard();
       explorationPlayerPage.expectExplorationToBeOver();
 
@@ -254,7 +257,8 @@ describe('Full exploration editor', function() {
 
       // Check editor preview tab to verify multiple rules are working.
       general.moveToPlayer();
-      explorationPlayerPage.expectContentToMatch(forms.toRichText('How are you feeling?'));
+      explorationPlayerPage.expectContentToMatch(
+        forms.toRichText('How are you feeling?'));
       explorationPlayerPage.expectInteractionToMatch('TextInput');
 
       explorationPlayerPage.submitAnswer('TextInput', 'happy');
@@ -266,7 +270,8 @@ describe('Full exploration editor', function() {
         forms.toRichText('You must be happy!'));
 
       explorationPlayerPage.submitAnswer('TextInput', 'NO I\'M SAD');
-      explorationPlayerPage.expectLatestFeedbackToMatch(forms.toRichText('No being sad!'));
+      explorationPlayerPage.expectLatestFeedbackToMatch(
+        forms.toRichText('No being sad!'));
 
       explorationPlayerPage.submitAnswer('TextInput', 'Fine...I\'m doing okay');
       explorationPlayerPage.expectLatestFeedbackToMatch(
