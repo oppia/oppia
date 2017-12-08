@@ -611,8 +611,9 @@ class InteractionAnswerSummariesMRJobManager(
             # version is equal to the latest version of the exploration,
             # otherwise ignore all answers since none of them can be applied to
             # the latest version.
-            exp = exp_services.get_exploration_by_id(exploration_id)
-            if state_name in exp.states:
+            exp = exp_services.get_exploration_by_id(
+                exploration_id, strict=False)
+            if exp and state_name in exp.states:
                 loaded_interaction_id = exp.states[state_name].interaction.id
                 # Only check if the version mismatches if the new version has a
                 # different interaction ID.
@@ -623,6 +624,8 @@ class InteractionAnswerSummariesMRJobManager(
                         'since the latest exploration version is %s' % (
                             latest_version, exp.version))
                     versions = []
+            elif not exp:
+                versions = []
 
         # In the VERSION_ALL case, we only take into account the most recent
         # consecutive block of versions with the same interaction ID as the

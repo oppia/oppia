@@ -515,6 +515,61 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             self.assertEqual(calculation_output, expected_calculation_output)
 
+    def test_one_answer_ignored_for_deleted_exploration(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+
+            # setup example exploration
+            exp_id = 'eid'
+            exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
+            first_state_name = exp.init_state_name
+            exp_services.update_exploration('fake@user.com', exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': first_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput',
+            }], 'Update interaction type')
+            exp = exp_services.get_exploration_by_id(exp_id)
+            exp_version = exp.version
+
+            time_spent = 5.0
+            params = {}
+
+            self._record_start(
+                exp_id, exp_version, first_state_name, 'session1')
+            self.process_and_flush_pending_tasks()
+
+            # Add an answer.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 'answer1')
+
+            # Delete the exploration.
+            exp_services.delete_exploration('fake@user.com', exp_id)
+
+            # Now run the job.
+            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+
+            # There should be no job output corresponding to all versions since
+            # the exploration was deleted before the job could run. Note that if
+            # the job before and after deletion, the old output would still be
+            # available. This is also true for deleted explorations and data
+            # corresponding to specific versions. This is fine in practice since
+            # the deleted exploration is not accessible, so its answer stats
+            # should never be loaded by the frontend.
+            calc_output_model = self._get_calc_output_model(
+                exp_id, first_state_name, 'AnswerFrequencies')
+            self.assertEqual(calc_output_model.calculation_output, [])
+
     def test_answers_across_multiple_exploration_versions(self):
         with self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
