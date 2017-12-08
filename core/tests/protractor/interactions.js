@@ -63,12 +63,16 @@ describe('Interactions', function() {
         explorationPlayerPage.expectInteractionToMatch.apply(
           null, [interactionId].concat(test.expectedInteractionDetails));
         for (var j = 0; j < test.wrongAnswers.length; j++) {
-          explorationPlayerPage.submitAnswer(interactionId, test.wrongAnswers[j]);
-          explorationPlayerPage.expectLatestFeedbackToMatch(forms.toRichText('no'));
+          explorationPlayerPage.submitAnswer(
+            interactionId, test.wrongAnswers[j]);
+          explorationPlayerPage.expectLatestFeedbackToMatch(
+            forms.toRichText('no'));
         }
         for (var j = 0; j < test.correctAnswers.length; j++) {
-          explorationPlayerPage.submitAnswer(interactionId, test.correctAnswers[j]);
-          explorationPlayerPage.expectLatestFeedbackToMatch(forms.toRichText('yes'));
+          explorationPlayerPage.submitAnswer(
+            interactionId, test.correctAnswers[j]);
+          explorationPlayerPage.expectLatestFeedbackToMatch(
+            forms.toRichText('yes'));
         }
         editor.navigateToMainTab();
       }
