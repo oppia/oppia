@@ -342,10 +342,12 @@ describe('Exploration history', function() {
     // Check that reverting works
     editor.revertToVersion(2);
     general.moveToPlayer();
-    explorationPlayerPage.expectContentToMatch(forms.toRichText('enter 6 to continue'));
+    explorationPlayerPage.expectContentToMatch(
+      forms.toRichText('enter 6 to continue'));
     explorationPlayerPage.submitAnswer('NumericInput', 6);
     explorationPlayerPage.expectExplorationToNotBeOver();
-    explorationPlayerPage.expectContentToMatch(forms.toRichText('this is card 2'));
+    explorationPlayerPage.expectContentToMatch(
+      forms.toRichText('this is card 2'));
     explorationPlayerPage.expectInteractionToMatch('Continue', 'CONTINUE');
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.expectExplorationToBeOver();
