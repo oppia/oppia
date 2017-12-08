@@ -20,13 +20,17 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var collectionEditor = require('../protractor_utils/collectionEditor.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 
 
 describe('Collections', function() {
   var adminPage = null;
+  var explorationPlayerPage = null;
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     var USERNAME = 'aliceCollections';
     users.createUser('alice@collections.com', USERNAME);
     users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
@@ -77,8 +81,7 @@ describe('Collections', function() {
 
   it('visits the collection player', function() {
     users.login('alice@collections.com');
-    browser.get('/collection/0');
-    browser.waitForAngular();
+    explorationPlayerPage.navigateToCollection('0');
     users.logout();
   });
 
