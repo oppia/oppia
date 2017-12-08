@@ -103,12 +103,12 @@ oppia.factory('SVMPredictionService', ['$log', function($log) {
           for(var k = 0; k < cj; k++) {
             sum += kvalues[sj + k] * coef2[sj + k];
           }
-
+          // TODO(prasanna08): Verify why libsvm uses subtraction 
+          // instead of addition.
           sum += intercept[p];
           if (sum > 0) {
             votes[i]++;
-          }
-          else {
+          } else {
             votes[j]++;
           }
           p++;
