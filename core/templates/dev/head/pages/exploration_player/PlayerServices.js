@@ -205,6 +205,7 @@ oppia.factory('ExplorationPlayerService', [
                 exploration.getLanguageCode(),
                 data.auto_tts_enabled);
               AudioPreloaderService.init(exploration);
+              AudioPreloaderService.kickOffAudioPreloader(initStateName);
               _loadInitialState(successCallback);
               NumberAttemptsService.reset();
             });
@@ -236,6 +237,7 @@ oppia.factory('ExplorationPlayerService', [
               exploration.getLanguageCode(),
               data.auto_tts_enabled);
             AudioPreloaderService.init(exploration);
+            AudioPreloaderService.kickOffAudioPreloader(exploration.getInitialState().name);
             _loadInitialState(successCallback);
             $rootScope.$broadcast('playerServiceInitialized');
           });

@@ -31,12 +31,14 @@ oppia.factory('AudioPreloaderService', [
     var _filesToBeDownloaded = [];
     var _exploration = null;
     var _isRunning = false;
+    var _audioLoadedCallback = null;
+    var _mostRecentlyRequestedAudioOnCurrentCard = null;
 
     var _init = function(exploration) {
       _exploration = exploration;
     };
 
-    var _bfsForAudioFiles = function(sourceStateName) {
+    var _getAudioFilesInBfsOrder = function(sourceStateName) {
       var languageCode = AudioTranslationManagerService
         .getCurrentAudioLanguageCode();
       var explorationGraph = ComputeGraphService.compute(
@@ -65,37 +67,36 @@ oppia.factory('AudioPreloaderService', [
       return audioFiles;
     };
 
-    var beginDownlading = function(audioFile, finishedLoadingAudioCallback) {
+    var loadAudio = function(audioFile) {
       AssetsBackendApiService.loadAudio(
-          ExplorationContextService.getExplorationId(),
-          audioFile).then(function(loadedAudio) {
-            for (var i = 0; i < _filesBeingDownloaded.length; i++) {
-              if (_filesBeingDownloaded[i] === audioFile) {
-                _filesBeingDownloaded.splice(i, 1);
-                break;
-              }
+        ExplorationContextService.getExplorationId(), audioFile
+        ).then(function(loadedAudio) {
+          for (var i = 0; i < _filesBeingDownloaded.length; i++) {
+            if (_filesBeingDownloaded[i] === audioFile) {
+              _filesBeingDownloaded.splice(i, 1);
+              break;
             }
-            if (_filesToBeDownloaded.length > 0) {
-              var audioFile = _filesToBeDownloaded.shift();
-              _filesBeingDownloaded.push(audioFile);
-              beginDownlading(audioFile);
-            }
-            if (finishedLoadingAudioCallback) {
-              finishedLoadingAudioCallback(loadedAudio.filename);
-            }
-          });
+          }
+          if (_filesToBeDownloaded.length > 0) {
+            var audioFile = _filesToBeDownloaded.shift();
+            _filesBeingDownloaded.push(audioFile);
+            loadAudio(audioFile);
+          }
+          if (_audioLoadedCallback) {
+            _audioLoadedCallback(loadedAudio.filename);
+          }
+        });
     };
 
-    var _kickOffAudioPreloader = function(
-        sourceStateName, finishedLoadingAudioCallback) {
+    var _kickOffAudioPreloader = function(sourceStateName) {
       _isRunning = true;
-      _filesToBeDownloaded = _bfsForAudioFiles(sourceStateName);
+      _filesToBeDownloaded = _getAudioFilesInBfsOrder(sourceStateName);
       while (_filesBeingDownloaded.length <
           MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY && 
           _filesToBeDownloaded.length > 0) {
         var audioFile = _filesToBeDownloaded.shift();
         _filesBeingDownloaded.push(audioFile);
-        beginDownlading(audioFile, finishedLoadingAudioCallback);
+        loadAudio(audioFile);
       }
     };
 
@@ -112,20 +113,31 @@ oppia.factory('AudioPreloaderService', [
       init: function(exploration) {
         _init(exploration);
       },
-      kickOffAudioPreloader: function(
-          sourceStateName, finishedLoadingAudioCallback) {
-        _kickOffAudioPreloader(sourceStateName, finishedLoadingAudioCallback);
+      kickOffAudioPreloader: function(sourceStateName) {
+        _kickOffAudioPreloader(sourceStateName);
       },
       isLoadingAudioFile: function(filename) {
         return _filesBeingDownloaded.indexOf(filename) !== -1;
       },
-      restartAudioPreloader: function(
-          sourceStateName, finishedLoadingAudioCallback) {
+      restartAudioPreloader: function(sourceStateName) {
         _cancelPreloading();
-        _kickOffAudioPreloader(sourceStateName, finishedLoadingAudioCallback);
+        _kickOffAudioPreloader(sourceStateName);
       },
       isRunning: function() {
         return _isRunning;
+      },
+      setAudioLoadedCallback: function(audioLoadedCallback) {
+        _audioLoadedCallback = audioLoadedCallback;
+      },
+      setMostRecentlyRequestedAudioOnCurrentCard: function(
+          mostRecentlyRequestedAudio) {
+        _mostRecentlyRequestedAudioOnCurrentCard = mostRecentlyRequestedAudio;
+      },
+      clearMostRecentlyRequestedAudioOnCurrentCard: function() {
+        _mostRecentlyRequestedAudioOnCurrentCard = null;
+      },
+      getMostRecentlyRequestedAudioOnCurrentCard: function() {
+        return _mostRecentlyRequestedAudioOnCurrentCard;
       }
     };
   }

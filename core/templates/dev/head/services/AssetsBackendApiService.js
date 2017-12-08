@@ -18,9 +18,9 @@
  */
 
 oppia.factory('AssetsBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService',
+  '$http', '$q', 'UrlInterpolationService', 'AudioFileObjectFactory',
   function(
-      $http, $q, UrlInterpolationService) {
+      $http, $q, UrlInterpolationService, AudioFileObjectFactory) {
     // List of filenames that have had been requested for but have
     // yet to return a response.
     var _filesCurrentlyBeingRequested = [];
@@ -64,10 +64,7 @@ oppia.factory('AssetsBackendApiService', [
           }
         }
         assetsCache[filename] = audioBlob;
-        successCallback({
-          blob: audioBlob,
-          filename: filename
-        });
+        successCallback(AudioFileObjectFactory.createNew(filename, audioBlob));
       }).error(function() {
         errorCallback();
       })['finally'](function() {
@@ -163,10 +160,7 @@ oppia.factory('AssetsBackendApiService', [
       loadAudio: function(explorationId, filename) {
         return $q(function(resolve, reject) {
           if (_isCached(filename)) {
-            resolve({
-              blob: assetsCache[filename],
-              filename: filename
-            });
+            resolve(AudioFileObjectFactory.createNew(filename, assetsCache[filename]));
           } else if (!_isCurrentlyBeingRequested(filename)) {
             _fetchAudio(explorationId, filename, resolve, reject);
           }

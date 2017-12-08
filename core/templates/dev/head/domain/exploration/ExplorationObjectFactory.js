@@ -139,7 +139,7 @@ oppia.factory('ExplorationObjectFactory', [
         var totalFileSizeMB = 0;
         var allAudioTranslations =
           this.states.getAllAudioTranslations(languageCode);
-        for (audioTranslationStateName in allAudioTranslations) {
+        for (var audioTranslationStateName in allAudioTranslations) {
           totalFileSizeMB += 
             allAudioTranslations[audioTranslationStateName].getFileSizeMB();
         }
