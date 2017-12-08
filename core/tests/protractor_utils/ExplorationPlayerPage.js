@@ -34,6 +34,8 @@ var ExplorationPlayerPage = function() {
     element(by.css('.protractor-test-continue-to-next-card-button'));
   var feedbackPopupLink =
     element(by.css('.protractor-test-exploration-feedback-popup-link'));
+  var suggestionPopupLink =
+    element(by.css('.protractor-test-exploration-suggestion-popup-link'));
   var feedbackTextArea =
     element(by.css('.protractor-test-exploration-feedback-textarea'));
   var feedbackSubmitButton =
@@ -46,10 +48,17 @@ var ExplorationPlayerPage = function() {
   var infoCardRating = element(by.css('.protractor-test-info-card-rating'));
   var hint = element(by.css('.protractor-test-view-hint'));
   var solution = element(by.css('.protractor-test-view-solution'));
+  var restart =
+    element(by.css('.protractor-test-restart-exploration'));
+  var explorationSuggestionModal =
+    element(by.css('.protractor-test-exploration-suggestion-modal'));
+  var suggestionDescriptionInput =
+    element(by.css('.protractor-test-suggestion-description-input'));
+  var suggestionSubmitBtn =
+    element(by.css('.protractor-test-suggestion-submit-btn'));
 
-  this.navigateToCollection = function(collectionIndex) {
-    browser.get('/collection/' + collectionIndex);
-    browser.waitForAngular();
+  this.restartExploration = function() {
+    restart.click();
   };
 
   // This verifies the question just asked, including formatting and
@@ -141,6 +150,14 @@ var ExplorationPlayerPage = function() {
     feedbackPopupLink.click();
     feedbackTextArea.sendKeys(feedback);
     feedbackSubmitButton.click();
+  };
+
+  this.submitSuggestion = function(suggestion, description) {
+    suggestionPopupLink.click();
+    forms.RichTextEditor(explorationSuggestionModal).setPlainText(suggestion);
+    suggestionDescriptionInput.sendKeys(description);
+    suggestionSubmitBtn.click();
+    general.waitForSystem();
   };
 };
 

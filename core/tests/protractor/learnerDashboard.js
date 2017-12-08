@@ -23,7 +23,8 @@ var collectionEditor = require('../protractor_utils/collectionEditor.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 var LearnerDashboardPage =
   require('../protractor_utils/LearnerDashboardPage.js');
@@ -33,10 +34,12 @@ describe('Learner dashboard functionality', function() {
   var adminPage = null;
   var libraryPage = null;
   var learnerDashboardPage = null;
+  var explorationPlayerPage = null;
 
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   beforeAll(function() {
@@ -80,7 +83,7 @@ describe('Learner dashboard functionality', function() {
     // Play an exploration and leave it in between. It should be added to the
     // 'In Progress' section.
     general.openPlayer('3');
-    player.submitAnswer('Continue', null);
+    explorationPlayerPage.submitAnswer('Continue', null);
     browser.ignoreSynchronization = true;
     learnerDashboardPage.get();
     general.acceptAlert();
@@ -91,10 +94,10 @@ describe('Learner dashboard functionality', function() {
     // Play an exploration completely. It should be added to the 'Completed'
     // section.
     general.openPlayer('14');
-    player.submitAnswer('Continue', null);
-    player.submitAnswer(
+    explorationPlayerPage.submitAnswer('Continue', null);
+    explorationPlayerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
-    player.submitAnswer('Continue', null);
+    explorationPlayerPage.submitAnswer('Continue', null);
     learnerDashboardPage.get();
     browser.waitForAngular();
     learnerDashboardPage.navigateToCompletedSection();
@@ -130,7 +133,7 @@ describe('Learner dashboard functionality', function() {
       '.protractor-test-collection-node')).first().click();
     // Leave the exploration inbetween. The collection should be found in the
     // 'In Progress' section.
-    player.submitAnswer('Continue', null);
+    explorationPlayerPage.submitAnswer('Continue', null);
     browser.ignoreSynchronization = true;
     learnerDashboardPage.get();
     general.acceptAlert();
@@ -152,10 +155,10 @@ describe('Learner dashboard functionality', function() {
       '.protractor-test-collection-node')).first().click();
     // Complete the exploration. The collection should be found in the
     // 'Completed' section as the collection is also completed.
-    player.submitAnswer('Continue', null);
-    player.submitAnswer(
+    explorationPlayerPage.submitAnswer('Continue', null);
+    explorationPlayerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
-    player.submitAnswer('Continue', null);
+    explorationPlayerPage.submitAnswer('Continue', null);
     learnerDashboardPage.get();
     browser.waitForAngular();
     general.waitForSystem();
@@ -222,11 +225,11 @@ describe('Learner dashboard functionality', function() {
 
     libraryPage.get();
     general.openPlayer('14');
-    player.submitAnswer('Continue', null);
-    player.submitAnswer(
+    explorationPlayerPage.submitAnswer('Continue', null);
+    explorationPlayerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
-    player.submitAnswer('Continue', null);
-    player.submitFeedback(feedback);
+    explorationPlayerPage.submitAnswer('Continue', null);
+    explorationPlayerPage.submitFeedback(feedback);
     learnerDashboardPage.get();
     browser.waitForAngular();
     learnerDashboardPage.navigateToFeedbackSection();
