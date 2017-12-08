@@ -165,7 +165,8 @@ oppia.directive('audioControls', [
           var onFinishedLoadingAudio = function(loadedFilename) {
             if (audioRequestIsPending &&
                 loadedFilename === 
-                  AudioPreloaderService.getMostRecentlyRequestedAudioOnCurrentCard()) {
+                  AudioPreloaderService
+                    .getMostRecentlyRequestedAudioOnCurrentCard()) {
               audioRequestIsPending = false;
               AudioPlayerService.load(loadedFilename, directiveId)
                 .then(function() {

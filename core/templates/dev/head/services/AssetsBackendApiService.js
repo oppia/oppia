@@ -160,7 +160,8 @@ oppia.factory('AssetsBackendApiService', [
       loadAudio: function(explorationId, filename) {
         return $q(function(resolve, reject) {
           if (_isCached(filename)) {
-            resolve(AudioFileObjectFactory.createNew(filename, assetsCache[filename]));
+            resolve(AudioFileObjectFactory.createNew(
+              filename, assetsCache[filename]));
           } else if (!_isCurrentlyBeingRequested(filename)) {
             _fetchAudio(explorationId, filename, resolve, reject);
           }
