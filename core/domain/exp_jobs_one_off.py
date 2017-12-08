@@ -377,7 +377,7 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
                     exp_services.get_multiple_explorations_by_version(
                         exploration.id, versions))
             except Exception as e:
-                yield e
+                yield ('ERROR with exp_id %s' % item.id, str(e))
                 return
 
         # Append latest exploration to the list of explorations.
