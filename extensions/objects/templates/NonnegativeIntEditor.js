@@ -35,6 +35,8 @@ oppia.directive('nonnegativeIntEditor', [
           validators: [{
             id: 'is_at_least',
             min_value: 0
+          }, {
+            id: 'is_integer'
           }]
         };
 

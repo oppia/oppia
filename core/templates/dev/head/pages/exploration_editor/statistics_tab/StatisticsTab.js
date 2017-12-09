@@ -45,7 +45,7 @@ oppia.controller('StatisticsTab', [
       pieSliceTextStyleColor: 'black',
       pieSliceBorderColor: 'black',
       chartAreaWidth: 500,
-      colors: ['#d8d8d8', '#008808', 'blue'],
+      colors: ['#008808', '#d8d8d8'],
       height: 300,
       legendPosition: 'right',
       width: 600
@@ -119,9 +119,9 @@ oppia.controller('StatisticsTab', [
             $scope.explorationHasBeenVisited = true;
           }
 
+          $scope.numPassersby = numStarts - numActualStarts;
           $scope.pieChartData = [
             ['Type', 'Number'],
-            ['Passerby', numStarts - numActualStarts],
             ['Completions', numCompletions],
             ['Non-Completions', numActualStarts - numCompletions]
           ];
@@ -197,10 +197,10 @@ oppia.controller('StatisticsTab', [
           controller: [
             '$scope', '$modalInstance', '$filter', 'stateName', 'stateStats',
             'improvementType', 'visualizationsInfo', 'HtmlEscaperService',
-            'ENABLE_NEW_STATS_FRAMEWORK',
+            'SolutionVerificationService', 'ENABLE_NEW_STATS_FRAMEWORK',
             function($scope, $modalInstance, $filter, stateName, stateStats,
                 improvementType, visualizationsInfo, HtmlEscaperService,
-                ENABLE_NEW_STATS_FRAMEWORK) {
+                SolutionVerificationService, ENABLE_NEW_STATS_FRAMEWORK) {
               var COMPLETION_RATE_PIE_CHART_OPTIONS = {
                 left: 20,
                 pieHole: 0.6,
@@ -252,19 +252,31 @@ oppia.controller('StatisticsTab', [
               ];
 
               var _getVisualizationsHtml = function() {
-                var htmlSnippets = [];
+                htmlSnippets = visualizationsInfo.map(
+                  function(visualizationInfo) {
+                    var escapedData = HtmlEscaperService.objToEscapedJson(
+                      visualizationInfo.data);
+                    var escapedOptions = HtmlEscaperService.objToEscapedJson(
+                      visualizationInfo.options);
+                    var escapedIsAddressedResults =
+                      HtmlEscaperService.objToEscapedJson(
+                        visualizationInfo.data.map(function(datum) {
+                          return SolutionVerificationService.verifySolution(
+                            ExplorationDataService.explorationId,
+                            explorationStatesService.getState($scope.stateName),
+                            HtmlEscaperService.objToEscapedJson(datum));
+                        }));
 
-                for (var i = 0; i < visualizationsInfo.length; i++) {
-                  var el = $(
-                    '<oppia-visualization-' +
-                    $filter('camelCaseToHyphens')(visualizationsInfo[i].id) +
-                    '/>');
-                  el.attr('data', HtmlEscaperService.objToEscapedJson(
-                    visualizationsInfo[i].data));
-                  el.attr('options', HtmlEscaperService.objToEscapedJson(
-                    visualizationsInfo[i].options));
-                  htmlSnippets.push(el.get(0).outerHTML);
-                }
+                    var el = $(
+                      '<oppia-visualization-' +
+                      $filter('camelCaseToHyphens')(visualizationInfo.id) +
+                      '/>');
+                    el.attr('data', escapedData);
+                    el.attr('options', escapedOptions);
+                    el.attr('is-addressed', escapedIsAddressedResults);
+                    return el.get(0).outerHTML;
+                  });
+
                 return htmlSnippets.join('');
               };
 

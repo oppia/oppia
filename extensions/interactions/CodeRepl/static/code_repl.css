@@ -1,0 +1,43 @@
+.code-repl-input-box {
+  border: 1px solid #ccc;
+}
+.code-repl-language {
+  float: right;
+  font-size: 0.8em;
+  margin-top: 8px;
+}
+.code-repl-terminal {
+  background-color: #222;
+  color: white;
+  font-weight: bold;
+  max-height: 600px;
+}
+.code-repl-terminal-error {
+  background-color: #222;
+  color: red;
+  font-weight: bold;
+}
+.cm-s-preview.CodeMirror {
+  background-color: #eee;
+}
+.cm-s-preview .CodeMirror-linenumber {
+  /* Without this, Line-number in preview CodeRepl will be overlapped. */
+  white-space: nowrap;
+}
+.cm-s-preview .CodeMirror-code pre {
+  /* Without this, underscore characters are not visible. */
+  height: 1.04em;
+  width: 100%;
+}
+.cm-s-preview .CodeMirror-code .code-repl-noneditable-line {
+  background-color: #eee;
+  opacity: 0.8;
+}
+.CodeMirror-lines {
+  background-color: white;
+}
+.code-repl-container {
+  background: #fff;
+  padding: 8px;
+  width: 100%;
+}

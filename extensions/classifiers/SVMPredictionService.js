@@ -42,8 +42,17 @@ oppia.factory('SVMPredictionService', ['$log', function($log) {
           }
           kvalues.push(Math.exp(-gamma * sum));
         }
-        return kvalues;
+      } else if (kernel == 'linear') {
+        var vectorLength = input.length;
+        for (var i = 0; i < supportVectors.length; i++) {
+          var sum = 0;
+          for (var j = 0; j < input.length; j++) {
+            sum += supportVectors[i][j] * input[j];
+          }
+          kvalues.push(sum);
+        }
       }
+      return kvalues;
     },
 
     predict: function(classifierData, input) {
@@ -94,12 +103,12 @@ oppia.factory('SVMPredictionService', ['$log', function($log) {
           for(var k = 0; k < cj; k++) {
             sum += kvalues[sj + k] * coef2[sj + k];
           }
-
-          sum -= intercept[p];
+          // TODO(prasanna08): Verify why libsvm uses subtraction 
+          // instead of addition.
+          sum += intercept[p];
           if (sum > 0) {
             votes[i]++;
-          }
-          else {
+          } else {
             votes[j]++;
           }
           p++;

@@ -38,12 +38,12 @@ oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
   'ExplorationDataService', 'EditorStateService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService',
-  'explorationLanguageCodeService', 'explorationRightsService',
+  'explorationLanguageCodeService', 'ExplorationRightsService',
   'explorationInitStateNameService', 'explorationTagsService',
   'editabilityService', 'explorationStatesService', 'RouterService',
-  'graphDataService', 'stateEditorTutorialFirstTimeService',
+  'graphDataService', 'StateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
-  'explorationWarningsService', '$templateCache', 'ExplorationContextService',
+  'ExplorationWarningsService', '$templateCache', 'ExplorationContextService',
   'ExplorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
@@ -53,12 +53,12 @@ oppia.controller('ExplorationEditor', [
       $scope, $http, $window, $rootScope, $log, $timeout,
       ExplorationDataService, EditorStateService, explorationTitleService,
       explorationCategoryService, explorationObjectiveService,
-      explorationLanguageCodeService, explorationRightsService,
+      explorationLanguageCodeService, ExplorationRightsService,
       explorationInitStateNameService, explorationTagsService,
       editabilityService, explorationStatesService, RouterService,
-      graphDataService, stateEditorTutorialFirstTimeService,
+      graphDataService, StateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
-      explorationWarningsService, $templateCache, ExplorationContextService,
+      ExplorationWarningsService, $templateCache, ExplorationContextService,
       ExplorationAdvancedFeaturesService, $modal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
@@ -92,7 +92,7 @@ oppia.controller('ExplorationEditor', [
 
     $scope.$on('refreshGraph', function() {
       graphDataService.recompute();
-      explorationWarningsService.updateWarnings();
+      ExplorationWarningsService.updateWarnings();
     });
 
     $scope.getExplorationUrl = function(explorationId) {
@@ -125,7 +125,7 @@ oppia.controller('ExplorationEditor', [
         $scope.explorationTitleService = explorationTitleService;
         $scope.explorationCategoryService = explorationCategoryService;
         $scope.explorationObjectiveService = explorationObjectiveService;
-        $scope.explorationRightsService = explorationRightsService;
+        $scope.ExplorationRightsService = ExplorationRightsService;
         $scope.explorationInitStateNameService = (
           explorationInitStateNameService);
 
@@ -136,7 +136,7 @@ oppia.controller('ExplorationEditor', [
         $scope.currentVersion = data.version;
 
         ExplorationAdvancedFeaturesService.init(data);
-        explorationRightsService.init(
+        ExplorationRightsService.init(
           data.rights.owner_names, data.rights.editor_names,
           data.rights.viewer_names, data.rights.status,
           data.rights.cloned_from, data.rights.community_owned,
@@ -164,7 +164,7 @@ oppia.controller('ExplorationEditor', [
           RouterService.navigateToMainTab();
         }
 
-        explorationWarningsService.updateWarnings();
+        ExplorationWarningsService.updateWarnings();
 
         // Initialize changeList by draft changes if they exist.
         if (data.draft_changes !== null) {
@@ -195,7 +195,7 @@ oppia.controller('ExplorationEditor', [
           successCallback();
         }
 
-        stateEditorTutorialFirstTimeService.init(
+        StateEditorTutorialFirstTimeService.init(
           data.show_state_editor_tutorial_on_load, $scope.explorationId);
       });
     };
@@ -345,7 +345,7 @@ oppia.controller('ExplorationEditor', [
     var leaveTutorial = function() {
       editabilityService.onEndTutorial();
       $scope.$apply();
-      stateEditorTutorialFirstTimeService.markTutorialFinished();
+      StateEditorTutorialFirstTimeService.markTutorialFinished();
       $scope.tutorialInProgress = false;
     };
 
@@ -409,7 +409,7 @@ oppia.controller('ExplorationEditor', [
       modalInstance.result.then(function() {
         $scope.startTutorial();
       }, function() {
-        stateEditorTutorialFirstTimeService.markTutorialFinished();
+        StateEditorTutorialFirstTimeService.markTutorialFinished();
       });
     };
 

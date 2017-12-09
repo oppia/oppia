@@ -6,18 +6,26 @@
   <strong><[options.title]></strong>
   <table class="table">
     <tr>
-      <th><[options.column_headers[0]]></th>
-      <th><[options.column_headers[1]]></th>
+      <th ng-repeat="column_header in options.column_headers">
+        <[column_header]>
+      </th>
     </tr>
-    <tr ng-repeat="row in data">
+    <tr ng-repeat="row in data track by $index">
       <td><[row.answer]></td>
       <td><[row.frequency]></td>
+      <td>
+        <span ng-if="isAddressed[$index]">Yes</span>
+        <span ng-if="!isAddressed[$index]">No</span>
+      </td>
     </tr>
   </table>
 
   <style>
     oppia-visualization-frequency-table table {
       margin-top: 12px;
+    }
+    oppia-visualization-frequency-table table td:first-child {
+      width: 60%;
     }
   </style>
 </script>
@@ -26,8 +34,9 @@
   <strong><[options.title]></strong>
   <table class="table">
     <tr>
-      <th><[options.column_headers[0]]></th>
-      <th><[options.column_headers[1]]></th>
+      <th ng-repeat="column_header in options.column_headers">
+        <[column_header]>
+      </th>
     </tr>
     <tr ng-repeat="row in data track by $index">
       <td>
@@ -39,6 +48,10 @@
         </table>
       </td>
       <td><[row.frequency]></td>
+      <td>
+        <span ng-if="isAddressed[$index]">Yes</span>
+        <span ng-if="!isAddressed[$index]">No</span>
+      </td>
     </tr>
   </table>
 
@@ -48,6 +61,9 @@
     }
     oppia-visualization-enumerated-frequency-table table {
       margin-top: 12px;
+    }
+    oppia-visualization-enumerated-frequency-table table td:first-child {
+      width: 60%;
     }
     oppia-visualization-enumerated-frequency-table table.item {
       margin-top: 8px;
