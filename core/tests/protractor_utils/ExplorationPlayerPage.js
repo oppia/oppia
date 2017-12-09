@@ -22,43 +22,48 @@ var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 
 var ExplorationPlayerPage = function() {
-  var conversationInputAll =
-    element.all(by.css('.protractor-test-conversation-input'));
-  var conversationInput =
-    element(by.css('.protractor-test-conversation-input'));
+  var conversationInput = by.css('.protractor-test-conversation-input');
+  var suggestionDescriptionInput =
+    element(by.css('.protractor-test-suggestion-description-input'));
   var conversationContent =
     element.all(by.css('.protractor-test-conversation-content'));
   var conversationFeedback =
     element.all(by.css('.protractor-test-conversation-feedback'));
-  var toNextCard =
-    element(by.css('.protractor-test-continue-to-next-card-button'));
+  var explorationHeader =
+    element(by.css('.protractor-test-exploration-header'));
+  var infoCardRating = element(by.css('.protractor-test-info-card-rating'));
+  var explorationSuggestionModal =
+      element(by.css('.protractor-test-exploration-suggestion-modal'));
+  var feedbackTextArea =
+      element(by.css('.protractor-test-exploration-feedback-textarea'));
+  var ratingStar = element.all(by.css('.protractor-test-rating-star'));
+
+  var suggestionSubmitButton =
+      element(by.css('.protractor-test-suggestion-submit-btn'));
+  var feedbackSubmitButton =
+      element(by.css('.protractor-test-exploration-feedback-submit-btn'));
+  var explorationInfoIcon =
+      element(by.css('.protractor-test-exploration-info-icon'));
+  var nextCardButton =
+      element(by.css('.protractor-test-continue-to-next-card-button'));
+  var viewHintButton = element(by.css('.protractor-test-view-hint'));
+  var viewSolutionButton = element(by.css('.protractor-test-view-solution'));
+
   var feedbackPopupLink =
     element(by.css('.protractor-test-exploration-feedback-popup-link'));
   var suggestionPopupLink =
     element(by.css('.protractor-test-exploration-suggestion-popup-link'));
-  var feedbackTextArea =
-    element(by.css('.protractor-test-exploration-feedback-textarea'));
-  var feedbackSubmitButton =
-    element(by.css('.protractor-test-exploration-feedback-submit-btn'));
-  var explorationHeader =
-    element(by.css('.protractor-test-exploration-header'));
-  var ratingStar = element.all(by.css('.protractor-test-rating-star'));
-  var explorationInfoIcon =
-    element(by.css('.protractor-test-exploration-info-icon'));
-  var infoCardRating = element(by.css('.protractor-test-info-card-rating'));
-  var hint = element(by.css('.protractor-test-view-hint'));
-  var solution = element(by.css('.protractor-test-view-solution'));
-  var restart =
-    element(by.css('.protractor-test-restart-exploration'));
-  var explorationSuggestionModal =
-    element(by.css('.protractor-test-exploration-suggestion-modal'));
-  var suggestionDescriptionInput =
-    element(by.css('.protractor-test-suggestion-description-input'));
-  var suggestionSubmitBtn =
-    element(by.css('.protractor-test-suggestion-submit-btn'));
 
-  this.restartExploration = function() {
-    restart.click();
+  this.clickThroughToNextCard = function() {
+    nextCardButton.click();
+  };
+
+  this.viewHint = function() {
+    viewHintButton.click();
+  };
+
+  this.viewSolution = function() {
+    viewSolutionButton.click();
   };
 
   // This verifies the question just asked, including formatting and
@@ -71,7 +76,6 @@ var ExplorationPlayerPage = function() {
       conversationContent.last()
     ).toMatch(richTextInstructions);
   };
-
 
   this.expectExplorationToBeOver = function() {
     expect(
@@ -89,7 +93,7 @@ var ExplorationPlayerPage = function() {
   // passed on to the relevant interaction's detail checker.
   this.expectInteractionToMatch = function(interactionId) {
     // Convert additional arguments to an array to send on.
-    var args = [conversationInput];
+    var args = [element(conversationInput)];
     for (var i = 1; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
@@ -105,28 +109,10 @@ var ExplorationPlayerPage = function() {
     ).toMatch(richTextInstructions);
   };
 
-  this.clickThroughToNextCard = function() {
-    toNextCard.click();
-  };
-
   this.expectExplorationNameToBe = function(name) {
     expect(
       explorationHeader.getText()
     ).toBe(name);
-  };
-
-  this.viewHint = function() {
-    hint.click();
-  }
-
-  this.viewSolution = function() {
-    solution.click();
-  }
-
-  this.rateExploration = function(ratingValue) {
-    ratingStar.then(function(elements) {
-      elements[ratingValue - 1].click();
-    });
   };
 
   this.expectExplorationRatingOnInformationCardToEqual = function(ratingValue) {
@@ -136,13 +122,19 @@ var ExplorationPlayerPage = function() {
     });
   };
 
+  this.rateExploration = function(ratingValue) {
+    ratingStar.then(function(elements) {
+      elements[ratingValue - 1].click();
+    });
+  };
+
   //`answerData` is a variable that is passed to the corresponding interaction's
   //protractor utilities. Its definition and type are interaction-specific.
   this.submitAnswer = function(interactionId, answerData) {
     // The .first() targets the inline interaction, if it exists. Otherwise,
     // it will get the supplemental interaction.
     interactions.getInteraction(interactionId).submitAnswer(
-      conversationInputAll.first(), answerData);
+      element.all(conversationInput).first(), answerData);
     general.waitForSystem();
   };
 
@@ -156,7 +148,7 @@ var ExplorationPlayerPage = function() {
     suggestionPopupLink.click();
     forms.RichTextEditor(explorationSuggestionModal).setPlainText(suggestion);
     suggestionDescriptionInput.sendKeys(description);
-    suggestionSubmitBtn.click();
+    suggestionSubmitButton.click();
     general.waitForSystem();
   };
 };
