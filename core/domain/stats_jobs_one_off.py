@@ -230,7 +230,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
                 # Some state names in events have spaces replaced with plus
                 # signs. We explicitly log these for future reference.
-                if '+' in state_name:
+                versioned_exploration = explorations_by_version[version - 1]
+                if '+' in state_name and (
+                        state_name not in versioned_exploration.states):
                     state_name = state_name.replace('+', ' ')
                     value['state_name'] = state_name
                     yield (
