@@ -34,6 +34,11 @@ class BaseCalculationUnitTests(test_utils.GenericTestBase):
 class CalculationUnitTestBase(test_utils.GenericTestBase):
     """Utility methods for testing calculations."""
 
+    SIMPLE_ANSWER_LIST = (['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 +
+                          ['E'] *  8 + ['F'] *  7 + ['G'] *  6 + ['H'] * 5 +
+                          ['I'] *  4 + ['J'] *  3 + ['K'] *  2 + ['L'])
+    TIED_ANSWER_LIST = list('ABCDEFGHIJKL')
+
     # TODO(brianrodri, msl): Only non-zero answer-counts are tested. Should look
     # into adding coverage for answers with zero-frequencies.
 
@@ -86,11 +91,8 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_top_answers_without_ties(self):
         # Create 12 answers with different frequencies.
-        answers = (
-            ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 +
-            ['E'] *  8 + ['F'] *  7 + ['G'] *  6 + ['H'] * 5 +
-            ['I'] *  4 + ['J'] *  3 + ['K'] *  2 + ['L'])
-        answer_dicts_list = [self._create_answer_dict(a) for a in answers]
+        answer_dicts_list = [
+            self._create_answer_dict(a) for a in self.SIMPLE_ANSWER_LIST]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -113,8 +115,8 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_answers_with_ties(self):
         """Ties are resolved by submission ordering: earlier ranks higher."""
-        answers = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
-        answer_dicts_list = [self._create_answer_dict(a) for a in answers]
+        answer_dicts_list = [
+            self._create_answer_dict(a) for a in self.TIED_ANSWER_LIST]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -144,11 +146,8 @@ class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
     def test_top5_without_ties(self):
         """Simplest case: ordering is obvious."""
         # Create 12 answers with different frequencies.
-        answers = (
-            ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 +
-            ['E'] *  8 + ['F'] *  7 + ['G'] *  6 + ['H'] * 5 +
-            ['I'] *  4 + ['J'] *  3 + ['K'] *  2 + ['L'])
-        answer_dicts_list = [self._create_answer_dict(a) for a in answers]
+        answer_dicts_list = [
+            self._create_answer_dict(a) for a in self.SIMPLE_ANSWER_LIST]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -165,8 +164,8 @@ class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
     def test_top5_with_ties(self):
         """Ties are resolved by submission ordering: earlier ranks higher."""
         # Create 12 answers with same frequencies.
-        answers = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
-        answer_dicts_list = [self._create_answer_dict(a) for a in answers]
+        answer_dicts_list = [
+            self._create_answer_dict(a) for a in self.TIED_ANSWER_LIST]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -188,11 +187,8 @@ class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
 
     def test_top10_answers_without_ties(self):
         # Create 12 answers with different frequencies.
-        answers = (
-            ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 +
-            ['E'] *  8 + ['F'] *  7 + ['G'] *  6 + ['H'] * 5 +
-            ['I'] *  4 + ['J'] *  3 + ['K'] *  2 + ['L'])
-        answer_dicts_list = [self._create_answer_dict(a) for a in answers]
+        answer_dicts_list = [
+            self._create_answer_dict(a) for a in self.SIMPLE_ANSWER_LIST]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -214,8 +210,8 @@ class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
     def test_top10_with_ties(self):
         """Ties are resolved by submission ordering: earlier ranks higher."""
         # Create 12 answers with same frequencies.
-        answers = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
-        answer_dicts_list = [self._create_answer_dict(a) for a in answers]
+        answer_dicts_list = [
+            self._create_answer_dict(a) for a in self.TIED_ANSWER_LIST]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
         actual_calc_output = self._perform_calculation(state_answers_dict)
@@ -258,16 +254,12 @@ class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
     def test_many_shared_answers(self):
-        answers = (
-            ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 +
-            ['E'] *  8 + ['F'] *  7 + ['G'] *  6 + ['H'] * 5 +
-            ['I'] *  4 + ['J'] *  3 + ['K'] *  2 + ['L'])
-        split = len(answers) // 4
+        split = len(self.SIMPLE_ANSWER_LIST) // 4
         answer_dicts_list = [
-            self._create_answer_dict(answers[       :split*1]),
-            self._create_answer_dict(answers[split*1:split*2]),
-            self._create_answer_dict(answers[split*2:split*3]),
-            self._create_answer_dict(answers[split*3:       ]),
+            self._create_answer_dict(self.SIMPLE_ANSWER_LIST[:split]),
+            self._create_answer_dict(self.SIMPLE_ANSWER_LIST[split:split*2]),
+            self._create_answer_dict(self.SIMPLE_ANSWER_LIST[split*2:split*3]),
+            self._create_answer_dict(self.SIMPLE_ANSWER_LIST[split*3:]),
         ]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
