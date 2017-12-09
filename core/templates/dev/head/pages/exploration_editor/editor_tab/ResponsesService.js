@@ -71,30 +71,24 @@ oppia.factory('ResponsesService', [
           var solutionWasPreviouslyValid = (
             explorationStatesService.isSolutionValid(
               EditorStateService.getActiveStateName()));
-          SolutionVerificationService.verifySolution(
-            ExplorationContextService.getExplorationId(),
-            explorationStatesService.getState(currentStateName),
-            stateSolutionService.savedMemento.correctAnswer,
-            function() {
-              explorationStatesService.updateSolutionValidity(
-                currentStateName, true);
-              ExplorationWarningsService.updateWarnings();
-              if (!solutionWasPreviouslyValid) {
-                AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
-              }
-            },
-            function() {
-              explorationStatesService.updateSolutionValidity(
-                currentStateName, false);
-              ExplorationWarningsService.updateWarnings();
-              if (solutionWasPreviouslyValid) {
-                AlertsService.addInfoMessage(
-                  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
-              } else {
-                AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
-              }
-            }
-          );
+          var solutionIsCurrentlyValid = (
+            SolutionVerificationService.verifySolution(
+              ExplorationContextService.getExplorationId(),
+              explorationStatesService.getState(currentStateName),
+              stateSolutionService.savedMemento.correctAnswer));
+
+          explorationStatesService.updateSolutionValidity(
+            currentStateName, solutionIsCurrentlyValid);
+          ExplorationWarningsService.updateWarnings();
+
+          if (solutionIsCurrentlyValid && !solutionWasPreviouslyValid) {
+            AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
+          } else if (!solutionIsCurrentlyValid && solutionWasPreviouslyValid) {
+            AlertsService.addInfoMessage(
+              INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
+          } else if (!solutionIsCurrentlyValid && !solutionWasPreviouslyValid) {
+            AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+          }
         }
 
         graphDataService.recompute();
