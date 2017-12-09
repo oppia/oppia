@@ -267,7 +267,7 @@ class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
             self._create_answer_dict(answers[           :split_len*1]),
             self._create_answer_dict(answers[split_len*1:split_len*2]),
             self._create_answer_dict(answers[split_len*2:split_len*3]),
-            self._create_answer_dict(answers[split_len*3:       ]),
+            self._create_answer_dict(answers[split_len*3:           ]),
         ]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
