@@ -178,7 +178,8 @@ oppia.factory('fractionInputRulesService', [
         return toFloat(answer) > toFloat(inputs.f);
       },
       HasIntegerPartEqualTo: function(answer, inputs) {
-        return answer.wholeNumber === inputs.x;
+        var answerFraction = FractionObjectFactory.fromDict(answer);
+        return answerFraction.getIntegerPart() === inputs.x;
       },
       HasNumeratorEqualTo: function(answer, inputs) {
         return answer.numerator === inputs.x;
