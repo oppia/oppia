@@ -262,12 +262,12 @@ class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
             ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 +
             ['E'] *  8 + ['F'] *  7 + ['G'] *  6 + ['H'] * 5 +
             ['I'] *  4 + ['J'] *  3 + ['K'] *  2 + ['L'])
-        split = len(answers) // 4
+        split_len = len(answers) // 4
         answer_dicts_list = [
-            self._create_answer_dict(answers[       :split*1]),
-            self._create_answer_dict(answers[split*1:split*2]),
-            self._create_answer_dict(answers[split*2:split*3]),
-            self._create_answer_dict(answers[split*3:       ]),
+            self._create_answer_dict(answers[           :split_len*1]),
+            self._create_answer_dict(answers[split_len*1:split_len*2]),
+            self._create_answer_dict(answers[split_len*2:split_len*3]),
+            self._create_answer_dict(answers[split_len*3:       ]),
         ]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
