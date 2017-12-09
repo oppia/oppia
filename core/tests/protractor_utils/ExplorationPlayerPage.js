@@ -22,7 +22,8 @@ var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 
 var ExplorationPlayerPage = function() {
-  var conversationInput = by.css('.protractor-test-conversation-input');
+  var conversationInput =
+    element(by.css('.protractor-test-conversation-input'));
   var suggestionDescriptionInput =
     element(by.css('.protractor-test-suggestion-description-input'));
   var conversationContent =
@@ -93,7 +94,7 @@ var ExplorationPlayerPage = function() {
   // passed on to the relevant interaction's detail checker.
   this.expectInteractionToMatch = function(interactionId) {
     // Convert additional arguments to an array to send on.
-    var args = [element(conversationInput)];
+    var args = [conversationInput];
     for (var i = 1; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
@@ -134,7 +135,7 @@ var ExplorationPlayerPage = function() {
     // The .first() targets the inline interaction, if it exists. Otherwise,
     // it will get the supplemental interaction.
     interactions.getInteraction(interactionId).submitAnswer(
-      element.all(conversationInput).first(), answerData);
+      conversationInput, answerData);
     general.waitForSystem();
   };
 
