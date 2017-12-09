@@ -22,14 +22,14 @@ oppia.controller('StateSolution', [
   'SolutionVerificationService', 'ExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
   'SolutionObjectFactory', 'ExplorationContextService',
-  'explorationWarningsService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'ExplorationWarningsService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function(
     $scope, $rootScope, $modal, EditorStateService, AlertsService,
     INTERACTION_SPECS, stateSolutionService, explorationStatesService,
     SolutionVerificationService, ExplorationHtmlFormatterService,
     stateInteractionIdService, stateHintsService, UrlInterpolationService,
     SolutionObjectFactory, ExplorationContextService,
-    explorationWarningsService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
+    ExplorationWarningsService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
     $scope.correctAnswer = null;
     $scope.correctAnswerEditorHtml = '';
     $scope.inlineSolutionEditorIsActive = false;
@@ -40,7 +40,7 @@ oppia.controller('StateSolution', [
     $scope.stateSolutionService = stateSolutionService;
 
 
-    explorationWarningsService.updateWarnings();
+    ExplorationWarningsService.updateWarnings();
 
     $scope.isSolutionValid = function() {
       return explorationStatesService.isSolutionValid(
@@ -126,22 +126,15 @@ oppia.controller('StateSolution', [
         var correctAnswer = result.solution.correctAnswer;
         var currentStateName = EditorStateService.getActiveStateName();
         var state = explorationStatesService.getState(currentStateName);
-        SolutionVerificationService.verifySolution(
-          ExplorationContextService.getExplorationId(),
-          state,
-          correctAnswer,
-          function () {
-            explorationStatesService.updateSolutionValidity(
-              currentStateName, true);
-            explorationWarningsService.updateWarnings();
-          },
-          function () {
-            explorationStatesService.updateSolutionValidity(
-              currentStateName, false);
-            explorationWarningsService.updateWarnings();
-            AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
-          }
-        );
+        var solutionIsValid = SolutionVerificationService.verifySolution(
+          ExplorationContextService.getExplorationId(), state, correctAnswer);
+
+        explorationStatesService.updateSolutionValidity(
+          currentStateName, solutionIsValid);
+        ExplorationWarningsService.updateWarnings();
+        if (!solutionIsValid) {
+          AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+        }
 
         stateSolutionService.displayed = result.solution;
         stateSolutionService.saveDisplayedValue();

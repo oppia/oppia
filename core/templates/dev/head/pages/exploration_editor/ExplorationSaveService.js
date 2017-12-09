@@ -21,8 +21,8 @@ oppia.factory('ExplorationSaveService', [
   'AlertsService', 'ExplorationDataService', 'explorationStatesService',
   'explorationTagsService', 'explorationTitleService',
   'explorationObjectiveService', 'explorationCategoryService',
-  'explorationLanguageCodeService', 'explorationRightsService',
-  'explorationWarningsService', 'ExplorationDiffService',
+  'explorationLanguageCodeService', 'ExplorationRightsService',
+  'ExplorationWarningsService', 'ExplorationDiffService',
   'explorationInitStateNameService', 'RouterService',
   'FocusManagerService', 'changeListService', 'siteAnalyticsService',
   'StatesObjectFactory', 'UrlInterpolationService',
@@ -31,8 +31,8 @@ oppia.factory('ExplorationSaveService', [
       AlertsService, ExplorationDataService, explorationStatesService,
       explorationTagsService, explorationTitleService,
       explorationObjectiveService, explorationCategoryService,
-      explorationLanguageCodeService, explorationRightsService,
-      explorationWarningsService, ExplorationDiffService,
+      explorationLanguageCodeService, ExplorationRightsService,
+      ExplorationWarningsService, ExplorationDiffService,
       explorationInitStateNameService, RouterService,
       FocusManagerService, changeListService, siteAnalyticsService,
       StatesObjectFactory, UrlInterpolationService) {
@@ -124,7 +124,7 @@ oppia.factory('ExplorationSaveService', [
           onStartSaveCallback();
         }
 
-        explorationRightsService.publish().then(
+        ExplorationRightsService.publish().then(
           function() {
             if (onSaveDoneCallback) {
               onSaveDoneCallback();
@@ -147,7 +147,7 @@ oppia.factory('ExplorationSaveService', [
 
       var changeList = changeListService.getChangeList();
 
-      if (explorationRightsService.isPrivate()) {
+      if (ExplorationRightsService.isPrivate()) {
         siteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
           ExplorationDataService.explorationId);
       } else {
@@ -155,7 +155,7 @@ oppia.factory('ExplorationSaveService', [
           ExplorationDataService.explorationId);
       }
 
-      if (explorationWarningsService.countWarnings() === 0) {
+      if (ExplorationWarningsService.countWarnings() === 0) {
         siteAnalyticsService.registerSavePlayableExplorationEvent(
           ExplorationDataService.explorationId);
       }
@@ -192,10 +192,10 @@ oppia.factory('ExplorationSaveService', [
         return (
           changeListService.isExplorationLockedForEditing() &&
           !saveIsInProgress && (
-            (explorationRightsService.isPrivate() &&
-              !explorationWarningsService.hasCriticalWarnings()) ||
-            (!explorationRightsService.isPrivate() &&
-              explorationWarningsService.countWarnings() === 0)
+            (ExplorationRightsService.isPrivate() &&
+              !ExplorationWarningsService.hasCriticalWarnings()) ||
+            (!ExplorationRightsService.isPrivate() &&
+              ExplorationWarningsService.countWarnings() === 0)
           )
         );
       },
@@ -447,11 +447,11 @@ oppia.factory('ExplorationSaveService', [
 
         RouterService.savePendingChanges();
 
-        if (!explorationRightsService.isPrivate() &&
-            explorationWarningsService.countWarnings() > 0) {
+        if (!ExplorationRightsService.isPrivate() &&
+            ExplorationWarningsService.countWarnings() > 0) {
           // If the exploration is not private, warnings should be fixed before
           // it can be saved.
-          AlertsService.addWarning(explorationWarningsService.getWarnings()[0]);
+          AlertsService.addWarning(ExplorationWarningsService.getWarnings()[0]);
           return;
         }
 
@@ -493,7 +493,7 @@ oppia.factory('ExplorationSaveService', [
             backdrop: true,
             resolve: {
               isExplorationPrivate: function() {
-                return explorationRightsService.isPrivate();
+                return ExplorationRightsService.isPrivate();
               },
               diffData: function() {
                 return diffData;
