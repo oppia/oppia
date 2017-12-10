@@ -124,6 +124,12 @@ EXCLUDED_PATHS = (
     'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg',
     '*.min.js', 'assets/scripts/*', 'core/tests/data/*', '*.mp3')
 
+WHITELISTED_DIRECTIVE_IDS = [
+    'modals/teachOppia',
+    'popover/feedback',
+    'popover/answer'
+]
+
 if not os.getcwd().endswith('oppia'):
     print ''
     print 'ERROR    Please run this script from the oppia root directory.'
@@ -505,6 +511,83 @@ def _check_newline_character(all_files):
     return summary_messages
 
 
+def _get_ng_template_id(line):
+    """This function returns the id of the ng-template, if present.
+    The function assumes id is writted as id="id_name" i.e there is no space
+    before and after '=' and id_name is wrapped in '\"'
+
+    Args:
+        line: str. Line to search for ng-template.
+
+    Returns:
+        str or None. Id of the tag or None.
+    """
+    template_pattern = re.compile(".*text\/ng-template")
+    line = template_pattern.match(line)
+
+    if line is not None:
+        line = line.string
+    else:
+        return None
+
+    line = line.split(' ')
+    for attr in line:
+        attr_value = attr.split('=')
+
+        if attr_value[0] == 'id':
+            return attr_value[1].strip().strip('\"\>')
+
+    return None
+
+
+def _check_directives_directly_referenced(all_files):
+    """This function is used to check that the directives which don't use jinja templating
+    are directly referenced in js files.
+    """
+
+    print 'Starting directives-directly-referenced check'
+    print '-----------------------------------------'
+    check_failed = 0
+    file_pattern = re.compile(".*core.*\.html$")
+    all_files = [
+        file_name for file_name in all_files
+        if file_pattern.match(file_name) is not None ]
+    total_files_checked = len(all_files)
+    total_error_count = 0
+
+    for file_name in all_files:
+        f = open(file_name, 'rb')
+
+        for line in f.readlines():
+            template_id = _get_ng_template_id(line)
+
+            if template_id is not None:
+                if template_id not in WHITELISTED_DIRECTIVE_IDS:
+                    print (
+                        'ng-template with id %s in %s file should be directly'
+                        ' referenced in js file.' % (template_id, file_name))
+                    total_error_count += 1
+
+    if total_error_count > 0:
+        summary_message = [
+            '%s Directives Directly Referenced check failed.' % (
+                _MESSAGE_TYPE_FAILED)]
+    else:
+        summary_message = [
+            '%s Directives Directly Referenced check passed.' % (
+                _MESSAGE_TYPE_SUCCESS)]
+    
+    print '\n----------------------------------------\n'
+    if total_files_checked == 0:
+        print 'There are no files to be checked.'
+    else:
+        print '(%s files checked, %s errors found)' % (
+            total_files_checked, total_error_count)
+        print summary_message
+
+    return summary_message
+
+
 def _check_bad_patterns(all_files):
     """This function is used for detecting bad patterns.
     """
@@ -572,7 +655,10 @@ def main():
     newline_messages = _check_newline_character(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
-    all_messages = linter_messages + newline_messages + pattern_messages
+    check_directive_messages = _check_directives_directly_referenced(all_files)
+    all_messages = (
+        linter_messages + newline_messages + pattern_messages +
+        check_directive_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
