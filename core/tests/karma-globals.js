@@ -69,6 +69,12 @@ var GLOBALS = {
       },
       is_trainable: true,
       narrow_instructions: null
+    },
+    Continue: {
+      is_terminal: false
+    },
+    EndExploration: {
+      is_terminal: true
     }
   },
   SUPPORTED_SITE_LANGUAGES: [{

@@ -19,9 +19,11 @@
 
 oppia.factory('AssetsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'AudioFileObjectFactory',
+  'FileDownloadRequestObjectFactory',
   function(
-      $http, $q, UrlInterpolationService, AudioFileObjectFactory) {
-    // List of filenames that have had been requested for but have
+      $http, $q, UrlInterpolationService, AudioFileObjectFactory,
+      FileDownloadRequestObjectFactory) {
+    // List of filenames that have been requested for but have
     // yet to return a response.
     var _filesCurrentlyBeingRequested = [];
 
@@ -38,10 +40,8 @@ oppia.factory('AssetsBackendApiService', [
     var _fetchAudio = function(
         explorationId, filename, successCallback, errorCallback) {
       var canceler = $q.defer();
-      _filesCurrentlyBeingRequested.push({
-        filename: filename,
-        canceler: canceler
-      });
+      _filesCurrentlyBeingRequested.push(
+        FileDownloadRequestObjectFactory.createNew(filename, canceler));
       $http({
         method: 'GET',
         responseType: 'blob',
@@ -81,10 +81,10 @@ oppia.factory('AssetsBackendApiService', [
 
     var _removeFromFilesCurrentlyBeingRequested = function(filename) {
       if (_isCurrentlyBeingRequested(filename)) {
-        for (var fileToRemoveIndex = 0; fileToRemoveIndex < 
-             _filesCurrentlyBeingRequested.length; fileToRemoveIndex++) {
-          if (_filesCurrentlyBeingRequested[i].filename === filename) {
-            _filesCurrentlyBeingRequested.splice(fileToRemoveIndex, 1);
+        for (var index = 0; index <
+             _filesCurrentlyBeingRequested.length; index++) {
+          if (_filesCurrentlyBeingRequested[index].filename === filename) {
+            _filesCurrentlyBeingRequested.splice(index, 1);
             break;
           }
         }
@@ -144,12 +144,9 @@ oppia.factory('AssetsBackendApiService', [
     };
 
     var _isCurrentlyBeingRequested = function(filename) {
-      for (var idx = 0; idx < _filesCurrentlyBeingRequested.length; idx++) {
-        if (_filesCurrentlyBeingRequested[idx].filename === filename) {
-          return true;
-        }
-      }
-      return false;
+      return _filesCurrentlyBeingRequested.some(function(request) {
+        return request.filename === filename;
+      });
     };
 
     var _isCached = function(filename) {
@@ -180,6 +177,9 @@ oppia.factory('AssetsBackendApiService', [
       },
       abortAllCurrentDownloads: function() {
         _abortAllCurrentDownloads();
+      },
+      getFilesCurrentlyBeingRequested: function() {
+        return _filesCurrentlyBeingRequested;
       }
     };
   }

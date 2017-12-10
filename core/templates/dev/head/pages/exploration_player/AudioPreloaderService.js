@@ -27,86 +27,74 @@ oppia.factory('AudioPreloaderService', [
       ComputeGraphService) {
     var MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
-    var _filesBeingDownloaded = [];
-    var _filesToBeDownloaded = [];
+    var _filenamesOfAudioCurrentlyDownloading = [];
+    var _filenamesOfAudioToBeDownloaded = [];
     var _exploration = null;
-    var _isRunning = false;
     var _audioLoadedCallback = null;
-    var _mostRecentlyRequestedAudioOnCurrentCard = null;
+    var _mostRecentlyRequestedAudioFilename = null;
 
     var _init = function(exploration) {
       _exploration = exploration;
     };
 
-    var _getAudioFilesInBfsOrder = function(sourceStateName) {
+    var _getAudioFilenamesInBfsOrder = function(sourceStateName) {
       var languageCode = AudioTranslationManagerService
         .getCurrentAudioLanguageCode();
-      var explorationGraph = ComputeGraphService.compute(
-        _exploration.getInitialState().name, _exploration.getStates());
-      var queue = [];
-      var seen = {};
-      var audioFiles = [];
+      var stateNamesInBfsOrder =
+        ComputeGraphService.computeBfsTraversalOfStates(
+          _exploration.getInitialState().name,
+          _exploration.getStates(),
+          sourceStateName);
+      var audioFilenames = [];
       allAudioTranslations = _exploration.getAllAudioTranslations(
         languageCode);
-      queue.push(sourceStateName);
-      while (queue.length > 0) {
-        var currStateName = queue.shift();
-        var audioFile = allAudioTranslations[currStateName];
-        if (audioFile != null) {
-          audioFiles.push(audioFile.filename);
+      stateNamesInBfsOrder.forEach(function(stateName) {
+        var audioTranslation = allAudioTranslations[stateName];
+        if (audioTranslation != null) {
+          audioFilenames.push(audioTranslation.filename);
         }
-        for (var e = 0; e < explorationGraph.links.length; e++) {
-          var edge = explorationGraph.links[e];
-          var dest = edge.target;
-          if (edge.source === currStateName && !seen.hasOwnProperty(dest)) {
-            seen[dest] = true;
-            queue.push(dest);
-          }
-        }
-      }
-      return audioFiles;
+      });
+      return audioFilenames;
     };
 
-    var loadAudio = function(audioFile) {
+    var _loadAudio = function(audioFilename) {
       AssetsBackendApiService.loadAudio(
-        ExplorationContextService.getExplorationId(), audioFile
-        ).then(function(loadedAudio) {
-          for (var i = 0; i < _filesBeingDownloaded.length; i++) {
-            if (_filesBeingDownloaded[i] === audioFile) {
-              _filesBeingDownloaded.splice(i, 1);
-              break;
-            }
+        ExplorationContextService.getExplorationId(), audioFilename
+      ).then(function(loadedAudio) {
+        for (var i = 0;
+             i < _filenamesOfAudioCurrentlyDownloading.length; i++) {
+          if (_filenamesOfAudioCurrentlyDownloading[i] ===
+              loadedAudio.filename) {
+            _filenamesOfAudioCurrentlyDownloading.splice(i, 1);
+            break;
           }
-          if (_filesToBeDownloaded.length > 0) {
-            var audioFile = _filesToBeDownloaded.shift();
-            _filesBeingDownloaded.push(audioFile);
-            loadAudio(audioFile);
-          }
-          if (_audioLoadedCallback) {
-            _audioLoadedCallback(loadedAudio.filename);
-          }
-        });
+        }
+        if (_filenamesOfAudioToBeDownloaded.length > 0) {
+          var nextAudioFile = _filenamesOfAudioToBeDownloaded.shift();
+          _filenamesOfAudioCurrentlyDownloading.push(nextAudioFile);
+          _loadAudio(nextAudioFile);
+        }
+        if (_audioLoadedCallback) {
+          _audioLoadedCallback(loadedAudio.filename);
+        }
+      });
     };
 
     var _kickOffAudioPreloader = function(sourceStateName) {
-      _isRunning = true;
-      _filesToBeDownloaded = _getAudioFilesInBfsOrder(sourceStateName);
-      while (_filesBeingDownloaded.length <
+      _filenamesOfAudioToBeDownloaded =
+        _getAudioFilenamesInBfsOrder(sourceStateName);
+      while (_filenamesOfAudioCurrentlyDownloading.length <
           MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY && 
-          _filesToBeDownloaded.length > 0) {
-        var audioFile = _filesToBeDownloaded.shift();
-        _filesBeingDownloaded.push(audioFile);
-        loadAudio(audioFile);
+          _filenamesOfAudioToBeDownloaded.length > 0) {
+        var audioFilename = _filenamesOfAudioToBeDownloaded.shift();
+        _filenamesOfAudioCurrentlyDownloading.push(audioFilename);
+        _loadAudio(audioFilename);
       }
     };
 
     var _cancelPreloading = function() {
-      _isRunning = false;
       AssetsBackendApiService.abortAllCurrentDownloads();
-      _filesBeingDownloaded.forEach(function(file) {
-        _filesToBeDownloaded.push(file);
-      });
-      _filesBeingDownloaded = [];
+      _filenamesOfAudioCurrentlyDownloading = [];
     };
 
     return {
@@ -117,27 +105,28 @@ oppia.factory('AudioPreloaderService', [
         _kickOffAudioPreloader(sourceStateName);
       },
       isLoadingAudioFile: function(filename) {
-        return _filesBeingDownloaded.indexOf(filename) !== -1;
+        return _filenamesOfAudioCurrentlyDownloading.indexOf(filename) !== -1;
       },
       restartAudioPreloader: function(sourceStateName) {
         _cancelPreloading();
         _kickOffAudioPreloader(sourceStateName);
       },
-      isRunning: function() {
-        return _isRunning;
-      },
       setAudioLoadedCallback: function(audioLoadedCallback) {
         _audioLoadedCallback = audioLoadedCallback;
       },
-      setMostRecentlyRequestedAudioOnCurrentCard: function(
-          mostRecentlyRequestedAudio) {
-        _mostRecentlyRequestedAudioOnCurrentCard = mostRecentlyRequestedAudio;
+      setMostRecentlyRequestedAudioFilename: function(
+          mostRecentlyRequestedAudioFilename) {
+        _mostRecentlyRequestedAudioFilename =
+          mostRecentlyRequestedAudioFilename;
       },
-      clearMostRecentlyRequestedAudioOnCurrentCard: function() {
-        _mostRecentlyRequestedAudioOnCurrentCard = null;
+      clearMostRecentlyRequestedAudioFilename: function() {
+        _mostRecentlyRequestedAudioFilename = null;
       },
-      getMostRecentlyRequestedAudioOnCurrentCard: function() {
-        return _mostRecentlyRequestedAudioOnCurrentCard;
+      getMostRecentlyRequestedAudioFilename: function() {
+        return _mostRecentlyRequestedAudioFilename;
+      },
+      getFilenamesOfAudioCurrentlyDownloading: function() {
+        return _filenamesOfAudioCurrentlyDownloading;
       }
     };
   }

@@ -110,6 +110,11 @@ oppia.factory('ExplorationContextService', [
       isInExplorationEditorMode: function() {
         return (this.getPageContext() === PAGE_CONTEXT.EDITOR &&
             this.getEditorTabContext() === EDITOR_TAB_CONTEXT.EDITOR);
+      },
+
+      // To be used for testing purposes only.
+      setExplorationId: function(dummyExplorationId) {
+        explorationId = dummyExplorationId;
       }
     };
   }

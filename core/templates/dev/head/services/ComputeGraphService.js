@@ -53,9 +53,37 @@ oppia.factory('ComputeGraphService', [
       };
     };
 
+    var _computeBfsTraversalOfStates = function(
+        initStateId, states, sourceStateName) {
+      var stateGraph = _computeGraphData(initStateId, states);
+      var stateNamesInBfsOrder = [];
+      var queue = [];
+      var seen = {};
+      seen[sourceStateName] = true;
+      queue.push(sourceStateName);
+      while (queue.length > 0) {
+        var currStateName = queue.shift();
+        stateNamesInBfsOrder.push(currStateName);
+        for (var e = 0; e < stateGraph.links.length; e++) {
+          var edge = stateGraph.links[e];
+          var dest = edge.target;
+          if (edge.source === currStateName && !seen.hasOwnProperty(dest)) {
+            seen[dest] = true;
+            queue.push(dest);
+          }
+        }
+      }
+      return stateNamesInBfsOrder;
+    };
+
     return {
       compute: function(initStateId, states) {
         return _computeGraphData(initStateId, states);
+      },
+      computeBfsTraversalOfStates: function(
+        initStateId, states, sourceStateName) {
+        return _computeBfsTraversalOfStates(
+          initStateId, states, sourceStateName);
       }
     };
   }
