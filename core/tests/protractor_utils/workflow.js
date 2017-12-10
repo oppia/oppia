@@ -32,7 +32,7 @@ var createExploration = function() {
 var createExplorationAndStartTutorial = function() {
   libraryPage = new LibraryPage.LibraryPage();
   libraryPage.get();
-  libraryPage.clickCreateActivity(); 
+  libraryPage.clickCreateActivity();
 
   // Wait for the dashboard to transition the creator into the editor page.
   browser.waitForAngular();
@@ -103,7 +103,7 @@ var _getExplorationRoles = function(roleName) {
     var itemName = roleName + 'Name';
     var listName = roleName + 'Names';
     return element.all(by.repeater(
-      itemName + ' in explorationRightsService.' + listName + ' track by $index'
+      itemName + ' in ExplorationRightsService.' + listName + ' track by $index'
     )).map(function(elem) {
       return elem.getText();
     });

@@ -17,13 +17,13 @@
  */
 
 oppia.controller('FeedbackTab', [
-  '$scope', '$http', '$modal', '$timeout', '$rootScope', 'alertsService',
+  '$scope', '$http', '$modal', '$timeout', '$rootScope', 'AlertsService',
   'oppiaDatetimeFormatter', 'ThreadStatusDisplayService',
   'ThreadDataService', 'explorationStatesService', 'ExplorationDataService',
   'changeListService', 'StateObjectFactory', 'UrlInterpolationService',
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
-    $scope, $http, $modal, $timeout, $rootScope, alertsService,
+    $scope, $http, $modal, $timeout, $rootScope, AlertsService,
     oppiaDatetimeFormatter, ThreadStatusDisplayService,
     ThreadDataService, explorationStatesService, ExplorationDataService,
     changeListService, StateObjectFactory, UrlInterpolationService,
@@ -37,6 +37,7 @@ oppia.controller('FeedbackTab', [
       oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
 
     $scope.activeThread = null;
+    $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
     $rootScope.loadingMessage = 'Loading';
     $scope.tmpMessage = {
       status: null,
@@ -68,11 +69,11 @@ oppia.controller('FeedbackTab', [
 
           $scope.create = function(newThreadSubject, newThreadText) {
             if (!newThreadSubject) {
-              alertsService.addWarning('Please specify a thread subject.');
+              AlertsService.addWarning('Please specify a thread subject.');
               return;
             }
             if (!newThreadText) {
-              alertsService.addWarning('Please specify a message.');
+              AlertsService.addWarning('Please specify a message.');
               return;
             }
 
@@ -90,7 +91,7 @@ oppia.controller('FeedbackTab', [
         ThreadDataService.createNewThread(
           result.newThreadSubject, result.newThreadText, function() {
             $scope.clearActiveThread();
-            alertsService.addSuccessMessage('Feedback thread created.');
+            AlertsService.addSuccessMessage('Feedback thread created.');
           });
       });
     };
@@ -245,11 +246,11 @@ oppia.controller('FeedbackTab', [
 
     $scope.addNewMessage = function(threadId, tmpText, tmpStatus) {
       if (threadId === null) {
-        alertsService.addWarning('Cannot add message to thread with ID: null.');
+        AlertsService.addWarning('Cannot add message to thread with ID: null.');
         return;
       }
       if (!tmpStatus) {
-        alertsService.addWarning('Invalid message status: ' + tmpStatus);
+        AlertsService.addWarning('Invalid message status: ' + tmpStatus);
         return;
       }
 

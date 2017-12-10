@@ -72,11 +72,11 @@ oppia.directive('stateGraphViz', [
         'state_graph_visualization_directive.html'),
       controller: [
         '$scope', '$element', '$timeout', '$filter', 'StateGraphLayoutService',
-        'explorationWarningsService', 'MAX_NODES_PER_ROW',
+        'ExplorationWarningsService', 'MAX_NODES_PER_ROW',
         'MAX_NODE_LABEL_LENGTH',
         function(
             $scope, $element, $timeout, $filter, StateGraphLayoutService,
-            explorationWarningsService, MAX_NODES_PER_ROW,
+            ExplorationWarningsService, MAX_NODES_PER_ROW,
             MAX_NODE_LABEL_LENGTH) {
           var redrawGraph = function() {
             if ($scope.graphData()) {
@@ -273,7 +273,7 @@ oppia.directive('stateGraphViz', [
 
             $scope.getNodeErrorMessage = function(nodeLabel) {
               var warnings =
-                explorationWarningsService.getAllStateRelatedWarnings();
+                ExplorationWarningsService.getAllStateRelatedWarnings();
               if (warnings.hasOwnProperty(nodeLabel)) {
                 return warnings[nodeLabel][0].toString();
               }
