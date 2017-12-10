@@ -71,7 +71,7 @@
 
   <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'history'}">
     <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
-       disabled="explorationRightsService.isCloned()"
+       disabled="ExplorationRightsService.isCloned()"
        class="oppia-editor-navbar-tab-anchor protractor-test-history-tab">
       <i class="material-icons">&#xE192;</i>
     </a>

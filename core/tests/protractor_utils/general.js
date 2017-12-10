@@ -65,7 +65,6 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 var SERVER_URL_PREFIX = 'http://localhost:9001';
 var EDITOR_URL_SLICE = '/create/';
 var PLAYER_URL_SLICE = '/explore/';
-var LEARNER_DASHBOARD_URL = '/learner_dashboard';
 var USER_PREFERENCES_URL = '/preferences';
 var LOGIN_URL_SUFFIX = '/_ah/login';
 var MODERATOR_URL_SUFFIX = '/moderator';
@@ -165,7 +164,6 @@ exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
 
 exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
-exports.LEARNER_DASHBOARD_URL = LEARNER_DASHBOARD_URL;
 exports.USER_PREFERENCES_URL = USER_PREFERENCES_URL;
 exports.EDITOR_URL_SLICE = EDITOR_URL_SLICE;
 exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;

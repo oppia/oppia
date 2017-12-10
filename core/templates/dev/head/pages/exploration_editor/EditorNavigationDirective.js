@@ -25,14 +25,14 @@ oppia.directive('editorNavigation', [
         '/pages/exploration_editor/editor_navigation_directive.html'),
       controller: [
         '$scope', '$rootScope', '$timeout', '$modal',
-        'RouterService', 'explorationRightsService',
+        'RouterService', 'ExplorationRightsService',
         'ExplorationWarningsService',
         'StateEditorTutorialFirstTimeService',
         'ThreadDataService', 'siteAnalyticsService',
         'ExplorationContextService', 'WindowDimensionsService',
         function(
             $scope, $rootScope, $timeout, $modal,
-            RouterService, explorationRightsService,
+            RouterService, ExplorationRightsService,
             ExplorationWarningsService,
             StateEditorTutorialFirstTimeService,
             ThreadDataService, siteAnalyticsService,
@@ -99,7 +99,7 @@ oppia.directive('editorNavigation', [
           $scope.hasCriticalWarnings = (
             ExplorationWarningsService.hasCriticalWarnings);
 
-          $scope.explorationRightsService = explorationRightsService;
+          $scope.ExplorationRightsService = ExplorationRightsService;
           $scope.getTabStatuses = RouterService.getTabStatuses;
           $scope.selectMainTab = RouterService.navigateToMainTab;
           $scope.selectPreviewTab = RouterService.navigateToPreviewTab;

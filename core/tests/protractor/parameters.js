@@ -21,9 +21,16 @@ var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 
 describe('Parameters', function() {
+  var explorationPlayerPage = null;
+
+  beforeEach(function() {
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
+
   it('should navigate multiple states correctly, with parameters', function() {
     users.createUser('user4@parameters.com', 'user4parameters');
     users.login('user4@parameters.com');
@@ -67,28 +74,28 @@ describe('Parameters', function() {
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.expectContentToMatch(forms.toRichText(
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
       'Change value of a from 2 to'));
-    player.submitAnswer('NumericInput', 5);
-    player.expectContentToMatch(forms.toRichText(
+    explorationPlayerPage.submitAnswer('NumericInput', 5);
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
       'Change value of b from 3 to'));
-    player.submitAnswer('NumericInput', 2);
-    player.expectContentToMatch(forms.toRichText(
+    explorationPlayerPage.submitAnswer('NumericInput', 2);
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
       'sum of 2 and 2 is 4, sum of 5 and 2 is 7'));
-    player.submitAnswer('MultipleChoiceInput', 'return');
-    player.expectContentToMatch(forms.toRichText(
+    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'return');
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
       'Change value of b from 3 to'));
-    player.submitAnswer('NumericInput', 5);
-    player.expectContentToMatch(forms.toRichText(
+    explorationPlayerPage.submitAnswer('NumericInput', 5);
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
       'sum of 2 and 5 is 7, sum of 5 and 5 is 10'));
-    player.submitAnswer('MultipleChoiceInput', 'return');
-    player.expectContentToMatch(forms.toRichText(
+    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'return');
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
       'Change value of b from 3 to'));
-    player.submitAnswer('NumericInput', 4);
-    player.expectContentToMatch(forms.toRichText(
+    explorationPlayerPage.submitAnswer('NumericInput', 4);
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
       'sum of 2 and 4 is 6, sum of 5 and 4 is 9'));
-    player.submitAnswer('MultipleChoiceInput', 'complete');
-    player.expectExplorationToBeOver();
+    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'complete');
+    explorationPlayerPage.expectExplorationToBeOver();
     users.logout();
   });
 
