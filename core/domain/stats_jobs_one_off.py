@@ -174,7 +174,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         snapshots_by_version = (
             exp_models.ExplorationModel.get_snapshots_metadata(
                 exp_id, version_numbers))
-        snapshot_timestamps = [
+        snapshot_timestamps_msec = [
             snapshot['created_on_ms']
             for snapshot in snapshots_by_version]
         exploration_stats_by_version = (
@@ -238,11 +238,12 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 if version is None:
                     # If the event timestamp is greater than the max snapshot
                     # timestamp, then it is the latest version.
-                    if event_timestamp_msec > max(snapshot_timestamps):
-                        version = len(snapshot_timestamps)
+                    if event_timestamp_msec > max(snapshot_timestamps_msec):
+                        version = len(snapshot_timestamps_msec)
                     else:
-                        for index, timestamp in enumerate(snapshot_timestamps):
-                            if event_timestamp_msec < timestamp:
+                        for index, timestamp_msec in enumerate(
+                                snapshot_timestamps_msec):
+                            if event_timestamp_msec < timestamp_msec:
                                 version = index
                                 break
 
