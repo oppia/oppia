@@ -174,6 +174,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         snapshots_by_version = (
             exp_models.ExplorationModel.get_snapshots_metadata(
                 exp_id, version_numbers))
+        snapshot_timestamps = [
+            snapshot['created_on_ms']
+            for snapshot in snapshots_by_version]
         exploration_stats_by_version = (
             stats_services.get_multiple_exploration_stats_by_version(
                 exp_id, version_numbers))
@@ -227,25 +230,40 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             elif value['event_type'] == feconf.EVENT_TYPE_STATE_HIT:
                 state_name = value['state_name']
                 session_id = value['session_id']
+                event_ts = value['created_on']
+
+                # Some state hit events have version as None. In these cases,
+                # we identify the version by comparing the event timestamp with
+                # the snapshot timestamps.
+                if version is None:
+                    # If the event timestamp is greater than the max snapshot
+                    # timetamp, then it is the latest version.
+                    if event_ts > max(snapshot_timestamps):
+                        version = len(snapshot_timestamps)
+                    else:
+                        for index, timestamp in enumerate(snapshot_timestamps):
+                            if event_ts < timestamp:
+                                version = index
 
                 # Some state names in events have spaces replaced with plus
                 # signs. We explicitly log these for future reference.
-                if '+' in state_name:
+                versioned_exploration = explorations_by_version[version - 1]
+                if '+' in state_name and (
+                        state_name not in versioned_exploration.states):
                     state_name = state_name.replace('+', ' ')
                     value['state_name'] = state_name
                     yield (
                         'LOG: State name %s of event (with ID %s created on '
                         '%s) contains + instead of spaces.' % (
                             state_name, value['event_id'],
-                            datetime.datetime.fromtimestamp(
-                                value['created_on']/1000)))
+                            datetime.datetime.fromtimestamp(event_ts/1000)))
 
                 state_hit_counts_by_version[version][state_name][
                     'total_hit_count'] += 1
                 state_session_ids_by_version[version][state_name].add(
                     session_id)
 
-                if value['created_on'] > session_id_latest_event_mapping[
+                if event_ts > session_id_latest_event_mapping[
                         version][session_id]['created_on']:
                     session_id_latest_event_mapping[version][
                         session_id] = value
