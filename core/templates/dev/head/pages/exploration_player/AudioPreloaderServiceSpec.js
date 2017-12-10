@@ -1,13 +1,13 @@
 // Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Version 2.0 (the 'License');
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
+// distributed under the License is distributed on an 'AS-IS' BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -42,12 +42,12 @@ describe('Audio preloader service', function() {
       states_schema_version: 15,
       init_state_name: 'Introduction',
       states: {
-        "State 1": {
+        'State 1': {
           param_changes: [],
           content: {
-            html: "<p>State 1 Content</p>",
+            html: '<p>State 1 Content</p>',
             audio_translations: {        
-              'en': {
+              en: {
                 filename: 'en-1.mp3',
                 file_size_bytes: 120000,
                 needs_update: false
@@ -55,16 +55,16 @@ describe('Audio preloader service', function() {
             }
           },
           interaction: {
-            id: "Continue",
+            id: 'Continue',
             default_outcome: {
               feedback: [],
-              dest: "State 3",
+              dest: 'State 3',
               param_changes: []
             },
             confirmed_unclassified_answers: [],
             customization_args: {
               buttonText: {
-                value: "Continue"
+                value: 'Continue'
               }
             },
             solution: null,
@@ -73,12 +73,12 @@ describe('Audio preloader service', function() {
           },
           classifier_model_id: null
         },
-        "State 3": {
+        'State 3': {
           param_changes: [],
           content: {
-            html: "Congratulations, you have finished!",
+            html: 'Congratulations, you have finished!',
             audio_translations: {        
-              'en': {
+              en: {
                 filename: 'en-3.mp3',
                 file_size_bytes: 120000,
                 needs_update: false
@@ -86,7 +86,7 @@ describe('Audio preloader service', function() {
             }
           },
           interaction: {
-            id: "EndExploration",
+            id: 'EndExploration',
             default_outcome: null,
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -100,12 +100,12 @@ describe('Audio preloader service', function() {
           },
           classifier_model_id: null
         },
-        "State 2": {
+        'State 2': {
           param_changes: [],
           content: {
-            html: "<p>State 2 Content</p>",
+            html: '<p>State 2 Content</p>',
             audio_translations: {        
-              'en': {
+              en: {
                 filename: 'en-2.mp3',
                 file_size_bytes: 120000,
                 needs_update: false
@@ -113,16 +113,16 @@ describe('Audio preloader service', function() {
             }
           },
           interaction: {
-            id: "Continue",
+            id: 'Continue',
             default_outcome: {
               feedback: [],
-              dest: "State 3",
+              dest: 'State 3',
               param_changes: []
             },
             confirmed_unclassified_answers: [],
             customization_args: {
               buttonText: {
-                value: "Continue"
+                value: 'Continue'
               }
             },
             solution: null,
@@ -131,12 +131,12 @@ describe('Audio preloader service', function() {
           },
           classifier_model_id: null
         },
-        'Introduction': {
+        Introduction: {
           param_changes: [],
           content: {
-            html: "<p>Introduction Content</p>",
+            html: '<p>Introduction Content</p>',
             audio_translations: {        
-              'en': {
+              en: {
                 filename: 'en-0.mp3',
                 file_size_bytes: 120000,
                 needs_update: false
@@ -144,12 +144,12 @@ describe('Audio preloader service', function() {
             }
           },
           interaction: {
-            id: "TextInput",
+            id: 'TextInput',
             default_outcome: {
               feedback: [
-                "<p>Try again.</p>"
+                '<p>Try again.</p>'
               ],
-              dest: "Introduction",
+              dest: 'Introduction',
               param_changes: []
             },
             confirmed_unclassified_answers: [],
@@ -158,7 +158,7 @@ describe('Audio preloader service', function() {
                 value: 1
               },
               placeholder: {
-                value: ""
+                value: ''
               }
             },
             solution: null,
@@ -167,9 +167,9 @@ describe('Audio preloader service', function() {
                 rule_specs: [
                   {
                     inputs: {
-                      x: "1"
+                      x: '1'
                     },
-                    rule_type: "Contains"
+                    rule_type: 'Contains'
                   }
                 ],
                 correct: false,
@@ -177,7 +177,7 @@ describe('Audio preloader service', function() {
                   feedback: [
                     "<p>Let's go to State 1</p>"
                   ],
-                  dest: "State 1",
+                  dest: 'State 1',
                   param_changes: []
                 }
               },
@@ -185,9 +185,9 @@ describe('Audio preloader service', function() {
                 rule_specs: [
                   {
                     inputs: {
-                      x: "2"
+                      x: '2'
                     },
-                    rule_type: "Contains"
+                    rule_type: 'Contains'
                   }
                 ],
                 correct: false,
@@ -195,7 +195,7 @@ describe('Audio preloader service', function() {
                   feedback: [
                     "<p>Let's go to State 2</p>"
                   ],
-                  dest: "State 2",
+                  dest: 'State 2',
                   param_changes: []
                 }
               }
@@ -214,22 +214,22 @@ describe('Audio preloader service', function() {
       '/audiohandler/<exploration_id>/audio/<filename>', {
         exploration_id: '1',
         filename: 'en-0.mp3'
-    });
+      });
     requestUrl2 = UrlInterpolationService.interpolateUrl(
       '/audiohandler/<exploration_id>/audio/<filename>', {
         exploration_id: '1',
         filename: 'en-1.mp3'
-    });
+      });
     requestUrl3 = UrlInterpolationService.interpolateUrl(
       '/audiohandler/<exploration_id>/audio/<filename>', {
         exploration_id: '1',
         filename: 'en-2.mp3'
-    });
+      });
     requestUrl4 = UrlInterpolationService.interpolateUrl(
       '/audiohandler/<exploration_id>/audio/<filename>', {
         exploration_id: '1',
         filename: 'en-3.mp3'
-    });
+      });
   }));
 
   it('should maintain the correct number of download requests in queue',
@@ -268,10 +268,10 @@ describe('Audio preloader service', function() {
     ecs.setExplorationId('1');
     aps.kickOffAudioPreloader(exploration.getInitialState().name);
     expect(aps.getFilenamesOfAudioCurrentlyDownloading().length).toBe(3);
-    aps.restartAudioPreloader("State 3");
+    aps.restartAudioPreloader('State 3');
     expect(aps.getFilenamesOfAudioCurrentlyDownloading().length).toBe(1);
     expect(aps.isLoadingAudioFile('en-3.mp3')).toBe(true);
-    aps.restartAudioPreloader("State 2");
+    aps.restartAudioPreloader('State 2');
     expect(aps.getFilenamesOfAudioCurrentlyDownloading().length).toBe(2);
     expect(aps.isLoadingAudioFile('en-2.mp3')).toBe(true);
     expect(aps.isLoadingAudioFile('en-3.mp3')).toBe(true);
