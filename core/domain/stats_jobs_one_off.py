@@ -241,9 +241,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     if event_timestamp_msec > max(snapshot_timestamps_msec):
                         version = len(snapshot_timestamps_msec)
                     else:
-                        for index, timestamp_msec in enumerate(
+                        for index, snapshot_timestamp_msec in enumerate(
                                 snapshot_timestamps_msec):
-                            if event_timestamp_msec < timestamp_msec:
+                            if event_timestamp_msec < snapshot_timestamp_msec:
                                 version = index
                                 break
 
