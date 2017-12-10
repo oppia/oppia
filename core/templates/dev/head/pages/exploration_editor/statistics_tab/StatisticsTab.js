@@ -264,7 +264,7 @@ oppia.controller('StatisticsTab', [
                           return SolutionVerificationService.verifySolution(
                             ExplorationDataService.explorationId,
                             explorationStatesService.getState($scope.stateName),
-                            HtmlEscaperService.objToEscapedJson(datum));
+                            datum.answer);
                         }));
 
                     var el = $(
