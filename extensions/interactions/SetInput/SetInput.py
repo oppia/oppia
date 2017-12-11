@@ -40,19 +40,19 @@ class SetInput(base.BaseInteraction):
         'options': {
             'column_headers': ['Answer', 'Count'],
             'title': 'Top 10 answers',
-            'show_addressed_info': True,
         },
         'calculation_id': 'Top10AnswerFrequencies',
+        'show_addressed_info': True,
     }, {
         # Table with most commonly submitted elements of set.
         'id': 'FrequencyTable',
         'options': {
             'column_headers': ['Element', 'Count'],
             'title': 'Commonly submitted elements',
-            # Since individual answer elements are not generally intended to be
-            # used as a single response to SetInput interactions, we omit the
-            # addressed column entirely.
-            'show_addressed_info': False,
         },
         'calculation_id': 'FrequencyCommonlySubmittedElements',
+        # Since individual answer elements are not generally intended to be
+        # used as a single response to SetInput interactions, we omit the
+        # addressed column entirely.
+        'show_addressed_info': False,
     }]

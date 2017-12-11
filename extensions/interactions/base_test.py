@@ -107,7 +107,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
     def _validate_answer_visualization_specs(self, answer_visualization_specs):
         _ANSWER_VISUALIZATIONS_SPECS_SCHEMA = [
             ('id', basestring), ('options', dict),
-            ('calculation_id', basestring)]
+            ('calculation_id', basestring), ('show_addressed_info', bool)]
         _ANSWER_VISUALIZATION_KEYS = [
             item[0] for item in _ANSWER_VISUALIZATIONS_SPECS_SCHEMA]
 
