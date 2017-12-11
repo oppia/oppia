@@ -59,7 +59,7 @@ class ImageClickInput(base.BaseInteraction):
         'options': {
             'x_axis_label': 'Answer',
             'y_axis_label': 'Count',
-            'show_addressed_column': False,
+            'show_addressed_info': False,
         },
         'calculation_id': 'AnswerFrequencies',
     }]

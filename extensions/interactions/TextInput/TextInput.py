@@ -67,7 +67,7 @@ class TextInput(base.BaseInteraction):
         'options': {
             'column_headers': ['Answer', 'Count'],
             'title': 'Top answers',
-            'show_addressed_column': True,
+            'show_addressed_info': True,
         },
         'calculation_id': 'Top10AnswerFrequencies',
     }]
