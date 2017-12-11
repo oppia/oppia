@@ -40,7 +40,7 @@ class NumericInput(base.BaseInteraction):
         'options': {
             'column_headers': ['Answer', 'Count'],
             'title': 'Top 10 answers',
-            'show_addressed_info': True,
+            'use_addressed_info': True,
         },
         'calculation_id': 'Top10AnswerFrequencies',
     }]
