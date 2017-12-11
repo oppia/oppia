@@ -102,12 +102,47 @@ BAD_PATTERNS_JS_REGEXP = [
         'regexp': r"\b(ddescribe|fdescribe)\(",
         'message': "In tests, please use 'describe' instead of 'ddescribe'"
                    "or 'fdescribe'",
-        'excluded_files': ()
+        'excluded_files': (),
+        'excluded_dirs': ()
     },
     {
         'regexp': r"\b(iit|fit)\(",
         'message': "In tests, please use 'it' instead of 'iit' or 'fit'",
-        'excluded_files': ()
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': r"templateUrl: \'",
+        'message': "The directives must be directly referenced.",
+        'excluded_files': (
+            'core/templates/dev/head/pages/exploration_editor/'
+            'editor_tab/StateResponses.js',
+            'core/templates/dev/head/pages/exploration_player/'
+            'FeedbackPopupDirective.js'
+            ),
+        'excluded_dirs': (
+            'extensions/')
+    }
+]
+
+BAD_PATTERNS_HTML_REGEXP = [
+    {
+        'regexp': r"text\/ng-template",
+        'message': "The directives must be directly referenced.",
+        'excluded_files': (
+            'core/templates/dev/head/pages/exploration_editor/'
+            'editor_tab/state_editor_responses.html',
+            'core/templates/dev/head/pages/exploration_player/'
+            'conversation_skin_directive.html',
+            'core/templates/dev/head/pages/exploration_player/'
+            'feedback_popup_container_directive.html',
+            'core/templates/dev/head/pages/exploration_player/'
+            'learner_local_nav.html',
+            'core/templates/dev/head/pages/exploration_player/'
+            'input_response_pair_directive.html'
+            ),
+        'excluded_dirs': (
+            'extensions/')
     }
 ]
 
@@ -124,11 +159,6 @@ EXCLUDED_PATHS = (
     'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg',
     '*.min.js', 'assets/scripts/*', 'core/tests/data/*', '*.mp3')
 
-WHITELISTED_DIRECTIVE_IDS = [
-    'modals/teachOppia',
-    'popover/feedback',
-    'popover/answer'
-]
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -511,81 +541,25 @@ def _check_newline_character(all_files):
     return summary_messages
 
 
-def _get_ng_template_id(line):
-    """This function returns the id of the ng-template, if present.
-    The function assumes id is writted as id="id_name" i.e there is no space
-    before and after '=' and id_name is wrapped in '\"'
-
-    Args:
-        line: str. Line to search for ng-template.
-
-    Returns:
-        str or None. Id of the tag or None.
+def _check_bad_pattern_in_file(filename, content, pattern):
     """
-    template_pattern = re.compile(".*text\/ng-template")
-    line = template_pattern.match(line)
-
-    if line is not None:
-        line = line.string
-    else:
-        return None
-
-    line = line.split(' ')
-    for attr in line:
-        attr_value = attr.split('=')
-
-        if attr_value[0] == 'id':
-            return attr_value[1].strip().strip('\"\>')
-
-    return None
-
-
-def _check_directives_directly_referenced(all_files):
-    """This function is used to check that the directives which don't use jinja templating
-    are directly referenced in js files.
+        Detects whether the given pattern is present in the file.
+        Args:
+            filename: str. Name of the file.
+            content: str. Contents of the file.
+            pattern: dict. Object containing details for the pattern
+                to be checked.
     """
-
-    print 'Starting directives-directly-referenced check'
-    print '-----------------------------------------'
-    check_failed = 0
-    file_pattern = re.compile(".*core.*\.html$")
-    all_files = [
-        file_name for file_name in all_files
-        if file_pattern.match(file_name) is not None ]
-    total_files_checked = len(all_files)
-    total_error_count = 0
-
-    for file_name in all_files:
-        f = open(file_name, 'rb')
-
-        for line in f.readlines():
-            template_id = _get_ng_template_id(line)
-
-            if template_id is not None:
-                if template_id not in WHITELISTED_DIRECTIVE_IDS:
-                    print (
-                        'ng-template with id %s in %s file should be directly'
-                        ' referenced in js file.' % (template_id, file_name))
-                    total_error_count += 1
-
-    if total_error_count > 0:
-        summary_message = [
-            '%s Directives Directly Referenced check failed.' % (
-                _MESSAGE_TYPE_FAILED)]
-    else:
-        summary_message = [
-            '%s Directives Directly Referenced check passed.' % (
-                _MESSAGE_TYPE_SUCCESS)]
-    
-    print '\n----------------------------------------\n'
-    if total_files_checked == 0:
-        print 'There are no files to be checked.'
-    else:
-        print '(%s files checked, %s errors found)' % (
-            total_files_checked, total_error_count)
-        print summary_message
-
-    return summary_message
+    regexp_pattern = pattern['regexp']
+    if not (any(filename.startswith(bad_pattern)
+                for bad_pattern in pattern['excluded_dirs'])
+            or filename in pattern['excluded_files']):
+        if re.search(regexp_pattern, content):
+            failed = True
+            print '%s --> %s' % (
+                filename, pattern['message'])
+            return 1
+    return 0
 
 
 def _check_bad_patterns(all_files):
@@ -612,16 +586,17 @@ def _check_bad_patterns(all_files):
                     print '%s --> %s' % (
                         filename, BAD_PATTERNS[pattern]['message'])
                     total_error_count += 1
+
             if filename.endswith('.js'):
                 for regexp in BAD_PATTERNS_JS_REGEXP:
-                    regexp_pattern = regexp['regexp']
-                    if filename not in regexp['excluded_files']:
-                        if re.search(regexp_pattern, content):
-                            failed = True
-                            print '%s --> %s' % (
-                                filename,
-                                regexp['message'])
-                            total_error_count += 1
+                    total_error_count += _check_bad_pattern_in_file(
+                        filename, content, regexp)
+    
+            if filename.endswith('.html'):
+                for regexp in BAD_PATTERNS_HTML_REGEXP:
+                    total_error_count += _check_bad_pattern_in_file(
+                        filename, content, regexp)
+
             if filename == 'app.yaml':
                 for pattern in BAD_PATTERNS_APP_YAML:
                     if pattern in content:
@@ -655,10 +630,8 @@ def main():
     newline_messages = _check_newline_character(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
-    check_directive_messages = _check_directives_directly_referenced(all_files)
     all_messages = (
-        linter_messages + newline_messages + pattern_messages +
-        check_directive_messages)
+        linter_messages + newline_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
