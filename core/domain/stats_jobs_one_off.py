@@ -479,8 +479,57 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 exploration_stats = stats_domain.ExplorationStats(
                     exp_id, version, num_starts, 0, num_actual_starts, 0,
                     num_completions, 0, state_stats_mapping)
+
+            # Check if the number of actual starts is greater than the number of
+            # starts and update num_starts to be the maximum of the
+            # first hit count of all states of the exploration.
+            if exploration_stats.num_actual_starts_v1 > (
+                    exploration_stats.num_starts_v1):
+                exploration_stats.num_starts_v1 = max([
+                    exploration_stats.state_stats_mapping[
+                        state_name].first_hit_count_v1
+                    for state_name in exploration_stats.state_stats_mapping])
+
             exploration_stats_by_version_updated.append(
                 exploration_stats.to_dict())
+
+        refresh = False
+        # Check if number of actual starts is still greater than the number of
+        # starts for any version of the exploration.
+        for exploration_stats_dict in exploration_stats_by_version_updated:
+            if exploration_stats_dict['num_actual_starts_v1'] > (
+                    exploration_stats_dict['num_starts_v1']):
+                yield (
+                    'LOG: Refreshing statistics due to actual starts being '
+                    'greater than starts for exploration with ID %s ' % (
+                        exp_id))
+                refresh = True
+                break
+
+        # Check if number of actual starts is lesser than the number of
+        # completions for any version of the exploration.
+        for exploration_stats_dict in exploration_stats_by_version_updated:
+            if exploration_stats_dict['num_actual_starts_v1'] < (
+                    exploration_stats_dict['num_completions_v1']):
+                yield (
+                    'LOG: Refreshing statistics due to actual starts being '
+                    'lesser than completions for exploration with ID %s ' % (
+                        exp_id))
+                refresh = True
+                break
+
+        # Refresh statistics for all versions of the exploration.
+        if refresh:
+            for index, exploration_stats_dict in enumerate(
+                    exploration_stats_by_version_updated):
+                default_state_stats_mapping = {}
+                for state_name in exploration_stats_dict['state_stats_mapping']:
+                    default_state_stats_mapping[state_name] = (
+                        stats_domain.StateStats.create_default())
+                exploration_stats_by_version_updated[index] = (
+                    stats_domain.ExplorationStats.create_default(
+                        exp_id, index + 1,
+                        default_state_stats_mapping).to_dict())
 
         # Save all the ExplorationStats models to storage.
         stats_models.ExplorationStatsModel.save_multi(
