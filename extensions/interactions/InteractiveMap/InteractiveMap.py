@@ -75,8 +75,9 @@ class InteractiveMap(base.BaseInteraction):
         # Table with answer counts for top N answers.
         'id': 'FrequencyTable',
         'options': {
-            'column_headers': ['Answer', 'Count', 'Addressed?'],
-            'title': 'Top 10 answers'
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top 10 answers',
+            'show_addressed_column': True,
         },
         'calculation_id': 'Top10AnswerFrequencies',
     }]

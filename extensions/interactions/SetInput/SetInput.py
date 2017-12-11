@@ -38,16 +38,21 @@ class SetInput(base.BaseInteraction):
         # Table with answer counts for top N answers.
         'id': 'FrequencyTable',
         'options': {
-            'column_headers': ['Answer', 'Count', 'Addressed?'],
-            'title': 'Top 10 answers'
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top 10 answers',
+            'show_addressed_column': True,
         },
         'calculation_id': 'Top10AnswerFrequencies',
     }, {
         # Table with most commonly submitted elements of set.
         'id': 'FrequencyTable',
         'options': {
-            'column_headers': ['Element', 'Count', 'Addressed?'],
-            'title': 'Commonly submitted elements'
+            'column_headers': ['Element', 'Count'],
+            'title': 'Commonly submitted elements',
+            # Since individual answer elements are not generally intended to be
+            # used as a single response to SetInput interactions, we omit the
+            # addressed column entirely.
+            'show_addressed_column': False,
         },
         'calculation_id': 'FrequencyCommonlySubmittedElements',
     }]

@@ -62,6 +62,7 @@ class MultipleChoiceInput(base.BaseInteraction):
         'options': {
             'x_axis_label': 'Answer',
             'y_axis_label': 'Count',
+            'show_addressed_column': True,
         },
         'calculation_id': 'AnswerFrequencies',
     }]
