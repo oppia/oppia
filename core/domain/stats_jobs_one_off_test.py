@@ -423,3 +423,50 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_stats.state_stats_mapping[
                 'New + day'].total_hit_count_v1, 1)
+
+    def test_none_version_uses_snapshot_timestamp(self):
+        # Update exploration to version 2.
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': u'New',
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        stats_models.StateHitEventLogEntryModel.create(
+            self.exp_id, None, u'New',
+            'session_id4', {}, feconf.PLAY_TYPE_NORMAL)
+
+        # Update exploration to version 3.
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': u'New 2',
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        stats_models.StateHitEventLogEntryModel.create(
+            self.exp_id, None, u'New 2',
+            'session_id4', {}, feconf.PLAY_TYPE_NORMAL)
+
+        job_id = stats_jobs_one_off.GenerateV1StatisticsJob.create_new()
+        stats_jobs_one_off.GenerateV1StatisticsJob.enqueue(job_id)
+
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        # Test the exploration stats for version 2.
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, 2)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'New'].total_hit_count_v1, 1)
+        self.assertFalse('New 2' in exploration_stats.state_stats_mapping)
+
+        # Test the exploration stats for version 3.
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, 3)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'New 2'].total_hit_count_v1, 1)
