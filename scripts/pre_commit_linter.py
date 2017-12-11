@@ -102,12 +102,47 @@ BAD_PATTERNS_JS_REGEXP = [
         'regexp': r"\b(ddescribe|fdescribe)\(",
         'message': "In tests, please use 'describe' instead of 'ddescribe'"
                    "or 'fdescribe'",
-        'excluded_files': ()
+        'excluded_files': (),
+        'excluded_dirs': ()
     },
     {
         'regexp': r"\b(iit|fit)\(",
         'message': "In tests, please use 'it' instead of 'iit' or 'fit'",
-        'excluded_files': ()
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': r"templateUrl: \'",
+        'message': "The directives must be directly referenced.",
+        'excluded_files': (
+            'core/templates/dev/head/pages/exploration_editor/'
+            'editor_tab/StateResponses.js',
+            'core/templates/dev/head/pages/exploration_player/'
+            'FeedbackPopupDirective.js'
+            ),
+        'excluded_dirs': (
+            'extensions/')
+    }
+]
+
+BAD_PATTERNS_HTML_REGEXP = [
+    {
+        'regexp': r"text\/ng-template",
+        'message': "The directives must be directly referenced.",
+        'excluded_files': (
+            'core/templates/dev/head/pages/exploration_editor/'
+            'editor_tab/state_editor_responses.html',
+            'core/templates/dev/head/pages/exploration_player/'
+            'conversation_skin_directive.html',
+            'core/templates/dev/head/pages/exploration_player/'
+            'feedback_popup_container_directive.html',
+            'core/templates/dev/head/pages/exploration_player/'
+            'learner_local_nav.html',
+            'core/templates/dev/head/pages/exploration_player/'
+            'input_response_pair_directive.html'
+            ),
+        'excluded_dirs': (
+            'extensions/')
     }
 ]
 
@@ -123,6 +158,7 @@ EXCLUDED_PATHS = (
     'scripts/pre_commit_linter.py', 'integrations/*',
     'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg',
     '*.min.js', 'assets/scripts/*', 'core/tests/data/*', '*.mp3')
+
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -505,6 +541,27 @@ def _check_newline_character(all_files):
     return summary_messages
 
 
+def _check_bad_pattern_in_file(filename, content, pattern):
+    """
+        Detects whether the given pattern is present in the file.
+        Args:
+            filename: str. Name of the file.
+            content: str. Contents of the file.
+            pattern: dict. Object containing details for the pattern
+                to be checked.
+    """
+    regexp_pattern = pattern['regexp']
+    if not (any(filename.startswith(bad_pattern)
+                for bad_pattern in pattern['excluded_dirs'])
+            or filename in pattern['excluded_files']):
+        if re.search(regexp_pattern, content):
+            failed = True
+            print '%s --> %s' % (
+                filename, pattern['message'])
+            return 1
+    return 0
+
+
 def _check_bad_patterns(all_files):
     """This function is used for detecting bad patterns.
     """
@@ -529,16 +586,17 @@ def _check_bad_patterns(all_files):
                     print '%s --> %s' % (
                         filename, BAD_PATTERNS[pattern]['message'])
                     total_error_count += 1
+
             if filename.endswith('.js'):
                 for regexp in BAD_PATTERNS_JS_REGEXP:
-                    regexp_pattern = regexp['regexp']
-                    if filename not in regexp['excluded_files']:
-                        if re.search(regexp_pattern, content):
-                            failed = True
-                            print '%s --> %s' % (
-                                filename,
-                                regexp['message'])
-                            total_error_count += 1
+                    total_error_count += _check_bad_pattern_in_file(
+                        filename, content, regexp)
+    
+            if filename.endswith('.html'):
+                for regexp in BAD_PATTERNS_HTML_REGEXP:
+                    total_error_count += _check_bad_pattern_in_file(
+                        filename, content, regexp)
+
             if filename == 'app.yaml':
                 for pattern in BAD_PATTERNS_APP_YAML:
                     if pattern in content:
@@ -572,7 +630,8 @@ def main():
     newline_messages = _check_newline_character(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
-    all_messages = linter_messages + newline_messages + pattern_messages
+    all_messages = (
+        linter_messages + newline_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
