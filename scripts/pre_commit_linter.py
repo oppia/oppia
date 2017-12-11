@@ -119,9 +119,8 @@ BAD_PATTERNS_JS_REGEXP = [
             'editor_tab/StateResponses.js',
             'core/templates/dev/head/pages/exploration_player/'
             'FeedbackPopupDirective.js'
-            ),
-        'excluded_dirs': (
-            'extensions/')
+        ),
+        'excluded_dirs': ('extensions/',)
     }
 ]
 
@@ -133,16 +132,11 @@ BAD_PATTERNS_HTML_REGEXP = [
             'core/templates/dev/head/pages/exploration_editor/'
             'editor_tab/state_editor_responses.html',
             'core/templates/dev/head/pages/exploration_player/'
-            'conversation_skin_directive.html',
-            'core/templates/dev/head/pages/exploration_player/'
             'feedback_popup_container_directive.html',
             'core/templates/dev/head/pages/exploration_player/'
-            'learner_local_nav.html',
-            'core/templates/dev/head/pages/exploration_player/'
             'input_response_pair_directive.html'
-            ),
-        'excluded_dirs': (
-            'extensions/')
+        ),
+        'excluded_dirs': ('extensions/',)
     }
 ]
 
@@ -542,24 +536,31 @@ def _check_newline_character(all_files):
 
 
 def _check_bad_pattern_in_file(filename, content, pattern):
+    """Detects whether the given pattern is present in the file.
+
+    Args:
+        filename: str. Name of the file.
+        content: str. Contents of the file.
+        pattern: dict ( regexp(regex pattern) : pattern to match,
+            message(str) : message to show if pattern matches,
+            excluded_files(tuple(str)) : files to be excluded from matching,
+            excluded_dirs(tuple(str)) : directories to be excluded from
+                matching). 
+            Object containing details for the pattern to be checked.
+
+    Returns:
+        bool. True if there is bad pattern else false.
     """
-        Detects whether the given pattern is present in the file.
-        Args:
-            filename: str. Name of the file.
-            content: str. Contents of the file.
-            pattern: dict. Object containing details for the pattern
-                to be checked.
-    """
-    regexp_pattern = pattern['regexp']
-    if not (any(filename.startswith(bad_pattern)
-                for bad_pattern in pattern['excluded_dirs'])
+    regexp = pattern['regexp']
+    if not (any(filename.startswith(excluded_dir)
+                for excluded_dir in pattern['excluded_dirs'])
             or filename in pattern['excluded_files']):
-        if re.search(regexp_pattern, content):
+        if re.search(regexp, content):
             failed = True
             print '%s --> %s' % (
                 filename, pattern['message'])
-            return 1
-    return 0
+            return True
+    return False
 
 
 def _check_bad_patterns(all_files):
@@ -589,13 +590,13 @@ def _check_bad_patterns(all_files):
 
             if filename.endswith('.js'):
                 for regexp in BAD_PATTERNS_JS_REGEXP:
-                    total_error_count += _check_bad_pattern_in_file(
-                        filename, content, regexp)
+                    if _check_bad_pattern_in_file(filename, content, regexp):
+                        total_error_count += 1
     
             if filename.endswith('.html'):
                 for regexp in BAD_PATTERNS_HTML_REGEXP:
-                    total_error_count += _check_bad_pattern_in_file(
-                        filename, content, regexp)
+                    if _check_bad_pattern_in_file(filename, content, regexp):
+                        total_error_count += 1
 
             if filename == 'app.yaml':
                 for pattern in BAD_PATTERNS_APP_YAML:
