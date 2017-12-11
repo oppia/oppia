@@ -39,8 +39,8 @@ oppia.directive('barChart', [function() {
           try {
             // Occasionally, we run into the following error:
             //"TypeError: google.visualization.BarChart is not a constructor".
-            // This attempts to handle it more safely, but still catch it if it
-            // occurs and log some debug info.
+            // This ignores the above error since the bar chart directive is to
+            // be deprecated soon.
             chart = new google.visualization.BarChart($element[0]);
           } catch(e) {
             return;
