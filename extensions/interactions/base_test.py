@@ -34,7 +34,7 @@ import utils
 
 # File names ending in any of these suffixes will be ignored when checking the
 # validity of interaction definitions.
-IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store']
+IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store', '.swp']
 # Expected dimensions for an interaction thumbnail PNG image.
 INTERACTION_THUMBNAIL_WIDTH_PX = 178
 INTERACTION_THUMBNAIL_HEIGHT_PX = 146
