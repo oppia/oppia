@@ -1232,8 +1232,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             visualization = visualizations[0]
             self.assertEqual(
-                visualization['options']['column_headers'],
-                ['Answer', 'Count', 'Addressed?'])
+                visualization['options']['column_headers'], ['Answer', 'Count'])
             self.assertIn('Top', visualization['options']['title'])
 
     def test_has_vis_info_for_exp_with_answer_for_one_calculation(self):
