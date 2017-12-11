@@ -256,12 +256,12 @@ oppia.controller('StatisticsTab', [
                   function(visualizationInfo) {
                     var isAddressedResults = null;
                     if (visualizationInfo.options.show_addressed_column) {
+                      var explorationId = ExplorationDataService.explorationId;
+                      var stateName = explorationStatesService.getState(
+                        $scope.stateName);
+
                       isAddressedResults = visualizationInfo.data.map(
                         function(datum) {
-                          var explorationId =
-                            ExplorationDataService.explorationId;
-                          var stateName = explorationStatesService.getState(
-                            $scope.stateName);
                           return SolutionVerificationService.verifySolution(
                             explorationId, stateName, datum.answer);
                         });
