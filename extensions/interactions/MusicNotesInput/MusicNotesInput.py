@@ -55,7 +55,7 @@ class MusicNotesInput(base.BaseInteraction):
         'id': 'FrequencyTable',
         'options': {
             'column_headers': ['Answer', 'Count'],
-            'title': 'Top 10 answers'
+            'title': 'Top 10 answers',
             'show_addressed_column': True,
         },
         'calculation_id': 'Top10AnswerFrequencies',
