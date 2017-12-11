@@ -254,24 +254,25 @@ oppia.controller('StatisticsTab', [
               var _getVisualizationsHtml = function() {
                 htmlSnippets = visualizationsInfo.map(
                   function(visualizationInfo) {
+                    var isAddressedResults = null;
+                    if (visualizationInfo.options.show_addressed_column) {
+                      isAddressedResults = visualizationInfo.data.map(
+                        function(datum) {
+                          var explorationId =
+                            ExplorationDataService.explorationId;
+                          var stateName = explorationStatesService.getState(
+                            $scope.stateName);
+                          return SolutionVerificationService.verifySolution(
+                            explorationId, stateName, datum.answer);
+                        });
+                    }
+
                     var escapedData = HtmlEscaperService.objToEscapedJson(
                       visualizationInfo.data);
                     var escapedOptions = HtmlEscaperService.objToEscapedJson(
                       visualizationInfo.options);
-                    var escapedIsAddressedResults = null;
-
-                    if (visualizationInfo.options.show_addressed_column) {
-                      escapedIsAddressedResults =
-                        HtmlEscaperService.objToEscapedJson(
-                          visualizationInfo.data.map(function(datum) {
-                            var explorationId =
-                              ExplorationDataService.explorationId;
-                            var stateName = explorationStatesService.getState(
-                                $scope.stateName);
-                            return SolutionVerificationService.verifySolution(
-                              explorationId, stateName, datum.answer);
-                          }));
-                    }
+                    var escapedIsAddressedResults =
+                      HtmlEscaperService.objToEscapedJson(isAddressedResults);
 
                     var el = $(
                       '<oppia-visualization-' +
