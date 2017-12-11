@@ -394,6 +394,7 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
         for exploration, snapshot in zip(explorations, snapshots_by_version):
             if snapshot is None:
                 yield (
+                    'ERROR with exp_id %s' % item.id,
                     'Error: No exploration snapshot metadata model instance '
                     'found for exploration %s, version %d' % (
                         exploration.id, exploration.version))
