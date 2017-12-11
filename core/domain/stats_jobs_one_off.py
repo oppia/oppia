@@ -174,6 +174,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         snapshots_by_version = (
             exp_models.ExplorationModel.get_snapshots_metadata(
                 exp_id, version_numbers))
+        snapshot_timestamps_msec = [
+            snapshot['created_on_ms']
+            for snapshot in snapshots_by_version]
         exploration_stats_by_version = (
             stats_services.get_multiple_exploration_stats_by_version(
                 exp_id, version_numbers))
@@ -227,10 +230,27 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             elif value['event_type'] == feconf.EVENT_TYPE_STATE_HIT:
                 state_name = value['state_name']
                 session_id = value['session_id']
+                event_timestamp_msec = value['created_on']
+
+                # Some state hit events have version as None. In these cases,
+                # we identify the version by comparing the event timestamp with
+                # the snapshot timestamps.
+                if version is None:
+                    # If the event timestamp is greater than the max snapshot
+                    # timestamp, then it is the latest version.
+                    if event_timestamp_msec > max(snapshot_timestamps_msec):
+                        version = len(snapshot_timestamps_msec)
+                    else:
+                        for index, snapshot_timestamp_msec in enumerate(
+                                snapshot_timestamps_msec):
+                            if event_timestamp_msec < snapshot_timestamp_msec:
+                                version = index
+                                break
+
+                versioned_exploration = explorations_by_version[version - 1]
 
                 # Some state names in events have spaces replaced with plus
                 # signs. We explicitly log these for future reference.
-                versioned_exploration = explorations_by_version[version - 1]
                 if '+' in state_name and (
                         state_name not in versioned_exploration.states):
                     state_name = state_name.replace('+', ' ')
@@ -240,14 +260,24 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         '%s) contains + instead of spaces.' % (
                             state_name, value['event_id'],
                             datetime.datetime.fromtimestamp(
-                                value['created_on']/1000)))
+                                event_timestamp_msec/1000)))
+
+                # Check that the event state name is in the list of states of
+                # the exploration domain object. If it is not, skip the event.
+                if state_name not in versioned_exploration.states:
+                    yield (
+                        'LOG: StateHitEvent with ID %s does not correspond to '
+                        'state name %s of version %s of the exploration with '
+                        'ID %s.' % (
+                            value['event_id'], state_name, version, exp_id))
+                    continue
 
                 state_hit_counts_by_version[version][state_name][
                     'total_hit_count'] += 1
                 state_session_ids_by_version[version][state_name].add(
                     session_id)
 
-                if value['created_on'] > session_id_latest_event_mapping[
+                if event_timestamp_msec > session_id_latest_event_mapping[
                         version][session_id]['created_on']:
                     session_id_latest_event_mapping[version][
                         session_id] = value
