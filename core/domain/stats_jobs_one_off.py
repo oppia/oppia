@@ -343,21 +343,23 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     elif change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
                         if change_dict['state_name'] not in state_stats_mapping:
                             yield (
-                                'State name %s not in state stats mapping of '
-                                'exploration with ID %s and version %s' % (
+                                'ERROR during state deletion: State name %s not'
+                                ' in state stats mapping of exploration with ID'
+                                ' %s and version %s' % (
                                     change_dict['state_name'], exp_id, version))
-                            continue
+                            return
                         state_stats_mapping.pop(
                             change_dict['state_name'])
                     elif change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
                         if change_dict['old_state_name'] not in (
                                 state_stats_mapping):
                             yield (
-                                'State name %s not in state stats mapping of '
-                                'exploration with ID %s and version %s' % (
+                                'ERROR during state rename: State name %s not '
+                                'in state stats mapping of exploration with ID '
+                                '%s and version %s' % (
                                     change_dict['old_state_name'], exp_id,
                                     version))
-                            continue
+                            return
                         state_stats_mapping[change_dict[
                             'new_state_name']] = (
                                 state_stats_mapping.pop(
@@ -443,7 +445,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 dest_states = [
                     answer_group.outcome.dest
                     for answer_group in init_state.interaction.answer_groups]
-                if init_state.interaction.default_outcome:
+                if init_state.interaction.default_outcome is not None:
                     dest_states.append(
                         init_state.interaction.default_outcome.dest)
                 for dest_state in dest_states:
