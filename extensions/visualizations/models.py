@@ -76,14 +76,6 @@ class BarChart(BaseVisualization):
         'schema': {
             'type': 'unicode',
         },
-    }, {
-        'name': 'show_addressed_info',
-        'description': (
-            'Whether the visualization can display links to help address any '
-            'answers that do not have an explicit address response.'),
-        'schema': {
-            'type': 'bool',
-        },
     }]
 
 
@@ -98,20 +90,12 @@ class FrequencyTable(BaseVisualization):
             'items': {
                 'type': 'unicode',
             },
-            'len': 2,
+            'len': 3,
         },
     }, {
         'name': 'title',
         'description': 'The title of the visualization.',
         'schema': {'type': 'unicode'}
-    }, {
-        'name': 'show_addressed_info',
-        'description': (
-            'Whether the visualization can display links to help address any '
-            'answers that do not have an explicit address response.'),
-        'schema': {
-            'type': 'bool',
-        },
     }]
 
 
@@ -131,18 +115,10 @@ class EnumeratedFrequencyTable(BaseVisualization):
             'items': {
                 'type': 'unicode',
             },
-            'len': 2,
+            'len': 3,
         },
     }, {
         'name': 'title',
         'description': 'The title of the visualization.',
         'schema': {'type': 'unicode'}
-    }, {
-        'name': 'show_addressed_info',
-        'description': (
-            'Whether the visualization can display links to help address any '
-            'answers that do not have an explicit address response.'),
-        'schema': {
-            'type': 'bool',
-        },
     }]
