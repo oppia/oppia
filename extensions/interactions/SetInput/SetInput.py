@@ -40,7 +40,7 @@ class SetInput(base.BaseInteraction):
         'options': {
             'column_headers': ['Answer', 'Count'],
             'title': 'Top 10 answers',
-            'use_addressed_info': True,
+            'show_addressed_info': True,
         },
         'calculation_id': 'Top10AnswerFrequencies',
     }, {
@@ -52,7 +52,7 @@ class SetInput(base.BaseInteraction):
             # Since individual answer elements are not generally intended to be
             # used as a single response to SetInput interactions, we omit the
             # addressed column entirely.
-            'use_addressed_info': False,
+            'show_addressed_info': False,
         },
         'calculation_id': 'FrequencyCommonlySubmittedElements',
     }]
