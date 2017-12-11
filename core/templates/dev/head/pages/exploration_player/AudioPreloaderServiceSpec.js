@@ -17,7 +17,24 @@
  */
 
 describe('Audio preloader service', function() {
-  beforeEach(module('oppia'));
+  beforeEach(function() {
+    module('oppia')
+    // Set a global value for INTERACTION_SPECS that will be used by all the
+    // descendant dependencies.
+    module(function($provide) {
+      $provide.constant('INTERACTION_SPECS', {
+        TextInput: {
+          is_terminal: false
+        },
+        Continue: {
+          is_terminal: false
+        },
+        EndExploration: {
+          is_terminal: true
+        }
+      });
+    });
+  });
   
   var aps, atms, eof, ecs;
   var $httpBackend = null;
@@ -30,6 +47,7 @@ describe('Audio preloader service', function() {
     atms = $injector.get('AudioTranslationManagerService');
     eof = $injector.get('ExplorationObjectFactory');
     ecs = $injector.get('ExplorationContextService');
+    spyOn(ecs, 'getExplorationId').and.returnValue('1');
     $rootScope = $injector.get('$rootScope');
     explorationDict = {
       id: 1,
@@ -237,11 +255,10 @@ describe('Audio preloader service', function() {
       $httpBackend.expect('GET', requestUrl1).respond(201, 'audio data 1');
       $httpBackend.expect('GET', requestUrl2).respond(201, 'audio data 2');
       $httpBackend.expect('GET', requestUrl3).respond(201, 'audio data 3');
-
+      $httpBackend.expect('GET', requestUrl4).respond(201, 'audio data 4');
       var exploration = eof.createFromBackendDict(explorationDict);
       aps.init(exploration);
       atms.init('en', 'en', 'en');
-      ecs.setExplorationId('1');
       aps.kickOffAudioPreloader(exploration.getInitialState().name);
 
       expect(aps.getFilenamesOfAudioCurrentlyDownloading().length).toBe(3);
@@ -259,13 +276,14 @@ describe('Audio preloader service', function() {
       expect(aps.isLoadingAudioFile('en-1.mp3')).toBe(false);
       expect(aps.isLoadingAudioFile('en-2.mp3')).toBe(false);
       expect(aps.isLoadingAudioFile('en-3.mp3')).toBe(true);
+      $httpBackend.flush(1);
+      expect(aps.getFilenamesOfAudioCurrentlyDownloading().length).toBe(0);
     });
 
   it('should properly restart pre-loading from a new state', function() {
     var exploration = eof.createFromBackendDict(explorationDict);
     aps.init(exploration);
     atms.init('en', 'en', 'en');
-    ecs.setExplorationId('1');
     aps.kickOffAudioPreloader(exploration.getInitialState().name);
     expect(aps.getFilenamesOfAudioCurrentlyDownloading().length).toBe(3);
     aps.restartAudioPreloader('State 3');

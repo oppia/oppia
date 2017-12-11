@@ -49,9 +49,8 @@ oppia.factory('AudioPreloaderService', [
       allAudioTranslations = _exploration.getAllAudioTranslations(
         languageCode);
       stateNamesInBfsOrder.forEach(function(stateName) {
-        var audioTranslation = allAudioTranslations[stateName];
-        if (audioTranslation != null) {
-          audioFilenames.push(audioTranslation.filename);
+        if (allAudioTranslations.hasOwnProperty(stateName)) {
+          audioFilenames.push(allAudioTranslations[stateName].filename);
         }
       });
       return audioFilenames;
@@ -70,9 +69,9 @@ oppia.factory('AudioPreloaderService', [
           }
         }
         if (_filenamesOfAudioToBeDownloaded.length > 0) {
-          var nextAudioFile = _filenamesOfAudioToBeDownloaded.shift();
-          _filenamesOfAudioCurrentlyDownloading.push(nextAudioFile);
-          _loadAudio(nextAudioFile);
+          var nextAudioFilename = _filenamesOfAudioToBeDownloaded.shift();
+          _filenamesOfAudioCurrentlyDownloading.push(nextAudioFilename);
+          _loadAudio(nextAudioFilename);
         }
         if (_audioLoadedCallback) {
           _audioLoadedCallback(loadedAudio.filename);
