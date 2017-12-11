@@ -161,7 +161,8 @@ oppia.directive('audioControls', [
               AudioPlayerService.getCurrentAudioControlsDirectiveId();
           };
 
-          var playCachedAudioTranslation = function(audioFilename, directiveId) {
+          var playCachedAudioTranslation = function(
+            audioFilename, directiveId) {
             AudioPlayerService.load(audioFilename, directiveId)
               .then(function() {
                 $scope.audioLoadingIndicatorIsShown = false;
@@ -192,7 +193,8 @@ oppia.directive('audioControls', [
               audioTranslation.filename);
             if (audioTranslation) {
               if (isCached(audioTranslation)) {
-                playCachedAudioTranslation(audioTranslation.filename, directiveId);
+                playCachedAudioTranslation(
+                  audioTranslation.filename, directiveId);
               } else if (!AudioPreloaderService.isLoadingAudioFile(
                   audioTranslation.filename)) {
                 AudioPreloaderService.restartAudioPreloader(
