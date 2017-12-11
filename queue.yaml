@@ -3,7 +3,7 @@ queue:
 - name: backups
   rate: 5/s
 - name: continuous-jobs
-  rate: 10/s
+  rate: 2/m
 - name: default
   rate: 2/m
 - name: emails
