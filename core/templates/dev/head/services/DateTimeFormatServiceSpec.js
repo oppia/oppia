@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for generic services.
+ * @fileoverview Unit test for DateTimeFormatService.
  */
 
 describe('Datetime Formatter', function() {
