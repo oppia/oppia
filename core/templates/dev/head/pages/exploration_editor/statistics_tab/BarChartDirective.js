@@ -43,8 +43,7 @@ oppia.directive('barChart', [function() {
             // occurs and log some debug info.
             chart = new google.visualization.BarChart($element[0]);
           } catch(e) {
-            console.error(google.visualization);
-            throw e;
+            return;
           }
         }
         chart.draw(google.visualization.arrayToDataTable($scope.data()), {
