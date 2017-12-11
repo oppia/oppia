@@ -255,7 +255,6 @@ oppia.controller('StatisticsTab', [
                 htmlSnippets = visualizationsInfo.map(
                   function(visualizationInfo) {
                     var isAddressedResults = null;
-                    console.log(JSON.stringify(visualizationInfo));
                     if (visualizationInfo.show_addressed_info) {
                       var explorationId = ExplorationDataService.explorationId;
                       var stateName = explorationStatesService.getState(
