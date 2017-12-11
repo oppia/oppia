@@ -62,6 +62,9 @@ class MultipleChoiceInput(base.BaseInteraction):
         'options': {
             'x_axis_label': 'Answer',
             'y_axis_label': 'Count',
+            # Bar charts don't have any useful way to display which answers are
+            # addressed yet. By setting this option to False, we consequentially
+            # avoid doing extra computation.
             'show_addressed_info': False,
         },
         'calculation_id': 'AnswerFrequencies',
