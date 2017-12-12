@@ -345,12 +345,17 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         pseudo_end_state = 'END'
                         if change_dict['from_version'] < 2 <= change_dict[
                                 'to_version']:
+                            prev_exploration = explorations_by_version[
+                                version - 2]
                             # The explicit end state is created only if there is
                             # some state that used to refer to an implicit 'END'
                             # state. This is confirmed by checking that there is
                             # a state called 'END' in the immediate version of
                             # the exploration after migration.
-                            if pseudo_end_state in versioned_exploration.states:
+                            if pseudo_end_state in (
+                                    versioned_exploration.states) and (
+                                        pseudo_end_state not in (
+                                            prev_exploration.states)):
                                 state_stats_mapping[pseudo_end_state] = (
                                     stats_domain.StateStats.create_default())
                     if change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
