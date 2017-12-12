@@ -336,6 +336,16 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
                 # Handling state additions, renames and deletions.
                 for change_dict in change_list:
+                    # During v1 -> v2 migration of states, all pseudo END states
+                    # were replaced by an explicit END state through this
+                    # migration. We account for that change in the
+                    # state_stats_mapping too.
+                    if change_dict['cmd'] == (
+                            'migrate_states_schema_to_latest_version'):
+                        if change_dict['from_version'] < 2 <= change_dict[
+                                'to_version']:
+                            state_stats_mapping['END'] = (
+                                stats_domain.StateStats.create_default())
                     if change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
                         state_stats_mapping[change_dict[
                             'state_name']] = (
