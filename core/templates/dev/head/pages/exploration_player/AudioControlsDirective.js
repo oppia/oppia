@@ -168,7 +168,7 @@ oppia.directive('audioControls', [
                 $scope.audioLoadingIndicatorIsShown = false;
                 AudioPlayerService.play();
               });
-          }
+          };
 
           /**
            * Called when an audio file finishes loading.
