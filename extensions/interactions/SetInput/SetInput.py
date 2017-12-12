@@ -38,7 +38,7 @@ class SetInput(base.BaseInteraction):
         # Table with answer counts for top N answers.
         'id': 'FrequencyTable',
         'options': {
-            'column_headers': ['Answer', 'Count', 'Addressed?'],
+            'column_headers': ['Answer', 'Count', 'has specific feedback?'],
             'title': 'Top 10 answers'
         },
         'calculation_id': 'Top10AnswerFrequencies',
@@ -46,7 +46,7 @@ class SetInput(base.BaseInteraction):
         # Table with most commonly submitted elements of set.
         'id': 'FrequencyTable',
         'options': {
-            'column_headers': ['Element', 'Count', 'Addressed?'],
+            'column_headers': ['Element', 'Count', 'has specific feedback?'],
             'title': 'Commonly submitted elements'
         },
         'calculation_id': 'FrequencyCommonlySubmittedElements',

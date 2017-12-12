@@ -78,7 +78,7 @@ class ItemSelectionInput(base.BaseInteraction):
             'column_headers': [
                 'Answer (click to expand/collapse)',
                 'Count',
-                'Addressed?',
+                'has specific feedback?',
             ],
             'title': 'Top answers',
         },

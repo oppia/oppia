@@ -65,7 +65,7 @@ class TextInput(base.BaseInteraction):
         # Table with answer counts for top N answers.
         'id': 'FrequencyTable',
         'options': {
-            'column_headers': ['Answer', 'Count', 'Addressed?'],
+            'column_headers': ['Answer', 'Count', 'has specific feedback?'],
             'title': 'Top answers'
         },
         'calculation_id': 'Top10AnswerFrequencies',
