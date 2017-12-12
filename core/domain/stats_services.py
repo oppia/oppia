@@ -348,6 +348,7 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
         'id': visualization.id,
         'data': calculation_ids_to_outputs[visualization.calculation_id],
         'options': visualization.options,
+        'show_addressed_info': visualization.show_addressed_info,
     } for visualization in visualizations
             if visualization.calculation_id in calculation_ids_to_outputs]
 
