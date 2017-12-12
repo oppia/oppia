@@ -84,7 +84,8 @@ describe('Library pages tour', function() {
       return browser.getCurrentUrl().then(function(url) {
         return /search/.test(url);
       });
-    });
+    }, 4000);
+    general.waitForSystem();
     expect(browser.getCurrentUrl()).toContain('search/find?q=python');
   });
 
