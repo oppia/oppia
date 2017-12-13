@@ -64,6 +64,22 @@ var FilepathEditor = function(elem) {
   };
 };
 
+var FractionEditor = function(elem) {
+  return {
+    setValue: function(value) {
+      elem.element(by.tagName('input')).clear();
+      elem.element(by.tagName('input')).sendKeys(value);
+    },
+    expectValueToBe: function(expectedValue) {
+      elem.element(by.tagName('input')).getAttribute('value').then(
+        function(value) {
+          expect(value).toEqual(expectedValue);
+        }
+      );
+    }
+  };
+};
+
 var IntEditor = function(elem) {
   return {
     setValue: function(value) {
@@ -165,6 +181,7 @@ var OBJECT_EDITORS = {
   Boolean: BooleanEditor,
   CoordTwoDim: CoordTwoDim,
   Filepath: FilepathEditor,
+  Fraction: FractionEditor,
   Int: IntEditor,
   MathLatexString: MathLatexStringEditor,
   NonnegativeInt: NonnegativeIntEditor,
@@ -176,6 +193,7 @@ var OBJECT_EDITORS = {
 
 exports.BooleanEditor = BooleanEditor;
 exports.CoordTwoDim = CoordTwoDim;
+exports.FractionEditor = FractionEditor;
 exports.FilepathEditor = FilepathEditor;
 exports.IntEditor = IntEditor;
 exports.MathLatexStringEditor = MathLatexStringEditor;

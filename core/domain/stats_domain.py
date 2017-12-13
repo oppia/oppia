@@ -559,7 +559,7 @@ class AnswerCalculationOutput(object):
 
 
 class AnswerFrequencyList(AnswerCalculationOutput):
-    """Domain object that represents a list of AnswerOccurrences."""
+    """Domain object that represents an output list of AnswerOccurrences."""
     def __init__(self, answer_occurrences=None):
         """Initialize domain object for answer frequency list for a given list
         of AnswerOccurrence objects (default is empty list).
@@ -568,10 +568,6 @@ class AnswerFrequencyList(AnswerCalculationOutput):
             CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
         self.answer_occurrences = (
             answer_occurrences if answer_occurrences else [])
-
-    def add_answer(self, answer_occurrence):
-        """Adds a new AnswerOccurrence object."""
-        self.answer_occurrences.append(answer_occurrence)
 
     def to_raw_type(self):
         return [

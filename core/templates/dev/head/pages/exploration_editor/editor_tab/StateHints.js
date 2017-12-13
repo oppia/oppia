@@ -18,13 +18,13 @@
 
 oppia.controller('StateHints', [
   '$scope', '$rootScope', '$modal', '$filter', 'EditorStateService',
-  'alertsService', 'INTERACTION_SPECS', 'stateHintsService',
+  'AlertsService', 'INTERACTION_SPECS', 'stateHintsService',
   'explorationStatesService', 'stateInteractionIdService',
   'UrlInterpolationService', 'HintObjectFactory', 'ExplorationPlayerService',
   'stateSolutionService',
   function(
     $scope, $rootScope, $modal, $filter, EditorStateService,
-    alertsService, INTERACTION_SPECS, stateHintsService,
+    AlertsService, INTERACTION_SPECS, stateHintsService,
     explorationStatesService, stateInteractionIdService,
     UrlInterpolationService, HintObjectFactory, ExplorationPlayerService,
     stateSolutionService) {
@@ -60,7 +60,7 @@ oppia.controller('StateHints', [
           openDeleteLastHintModal();
           return;
         } else {
-          alertsService.addInfoMessage('Deleting empty hint.');
+          AlertsService.addInfoMessage('Deleting empty hint.');
           stateHintsService.displayed.splice(currentActiveIndex, 1);
           stateHintsService.saveDisplayedValue();
         }
@@ -80,7 +80,7 @@ oppia.controller('StateHints', [
     };
 
     $scope.openAddHintModal = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
@@ -112,7 +112,7 @@ oppia.controller('StateHints', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]
@@ -144,7 +144,7 @@ oppia.controller('StateHints', [
     };
 
     var openDeleteLastHintModal = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
 
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -160,7 +160,7 @@ oppia.controller('StateHints', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]
@@ -177,7 +177,7 @@ oppia.controller('StateHints', [
       // state of the hint.
       evt.stopPropagation();
 
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
@@ -191,7 +191,7 @@ oppia.controller('StateHints', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]

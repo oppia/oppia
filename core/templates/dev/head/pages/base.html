@@ -1,8 +1,8 @@
 {% macro warnings_and_loader() -%}
   <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content" ng-cloak>
     <div class="oppia-toast-container toast-top-center">
-      <div ng-repeat="warning in (alertsService.warnings | limitTo:5) track by $index" class="toast toast-warning oppia-toast">
-        <button type="button" class="toast-close-button" ng-click="alertsService.deleteWarning(warning)" role="button">&times;</button>
+      <div ng-repeat="warning in (AlertsService.warnings | limitTo:5) track by $index" class="toast toast-warning oppia-toast">
+        <button type="button" class="toast-close-button" ng-click="AlertsService.deleteWarning(warning)" role="button">&times;</button>
         <div class="toast-message">
           <[warning.content]>
         </div>
@@ -10,7 +10,7 @@
     </div>
 
     <div>
-      <div ng-repeat="message in alertsService.messages track by $index">
+      <div ng-repeat="message in AlertsService.messages track by $index">
         <alert-message message-object="message" message-index="$index"></alert-message>
       </div>
     </div>
@@ -138,7 +138,7 @@
         <div class="oppia-content-container">
           <div id="wrapper">
             <div class="oppia-main-body">
-              <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
+              <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation" headroom tolerance="3" offset="0">
                 <div class="navbar-container">
                   <top-navigation-bar></top-navigation-bar>
 
@@ -203,13 +203,16 @@
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Base.js"></script>
 
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/alertsService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationContextService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/AlertsService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ExplorationContextService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/UtilsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/DebouncerService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/DateTimeFormatService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/IdGenerationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/ValidatorsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/TranslationFileHashLoaderService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ConstructTranslationIdsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/DeviceInfoService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/UrlService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/WindowDimensionsService.js"></script>

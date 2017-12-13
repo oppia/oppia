@@ -189,6 +189,7 @@ var openInteraction = function(interactionId) {
   var INTERACTION_ID_TO_TAB_NAME = {
     Continue: 'General',
     EndExploration: 'General',
+    FractionInput: 'Math',
     ImageClickInput: 'General',
     MultipleChoiceInput: 'General',
     TextInput: 'General',

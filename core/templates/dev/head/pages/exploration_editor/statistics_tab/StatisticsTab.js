@@ -20,14 +20,14 @@
 oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
-  '$scope', '$http', '$modal', 'alertsService', 'explorationStatesService',
-  'ExplorationDataService', 'computeGraphService', 'oppiaDatetimeFormatter',
+  '$scope', '$http', '$modal', 'AlertsService', 'explorationStatesService',
+  'ExplorationDataService', 'ComputeGraphService', 'DateTimeFormatService',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
   'IMPROVE_TYPE_INCOMPLETE', 'ENABLE_NEW_STATS_FRAMEWORK',
   function(
-      $scope, $http, $modal, alertsService, explorationStatesService,
-      ExplorationDataService, computeGraphService, oppiaDatetimeFormatter,
+      $scope, $http, $modal, AlertsService, explorationStatesService,
+      ExplorationDataService, ComputeGraphService, DateTimeFormatService,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
       IMPROVE_TYPE_INCOMPLETE, ENABLE_NEW_STATS_FRAMEWORK) {
@@ -45,7 +45,7 @@ oppia.controller('StatisticsTab', [
       pieSliceTextStyleColor: 'black',
       pieSliceBorderColor: 'black',
       chartAreaWidth: 500,
-      colors: ['#d8d8d8', '#008808', 'blue'],
+      colors: ['#008808', '#d8d8d8'],
       height: 300,
       legendPosition: 'right',
       width: 600
@@ -54,7 +54,7 @@ oppia.controller('StatisticsTab', [
     $scope.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
 
     $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-      return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+      return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
         millisSinceEpoch);
     };
 
@@ -63,7 +63,7 @@ oppia.controller('StatisticsTab', [
     $scope.$on('refreshStatisticsTab', function() {
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
       $scope.explorationVersionUrl = (
-        '/createhandler/statisticsversion/' + 
+        '/createhandler/statisticsversion/' +
         ExplorationDataService.explorationId);
       $http.get($scope.explorationVersionUrl).then(function(response) {
         $scope.versions = response.data.versions;
@@ -78,10 +78,10 @@ oppia.controller('StatisticsTab', [
           '/createhandler/statistics/' + ExplorationDataService.explorationId);
       } else {
         $scope.explorationStatisticsUrl = (
-          '/createhandler/statistics_old/' + 
+          '/createhandler/statistics_old/' +
           ExplorationDataService.explorationId + '/' + version);
       }
-      
+
       $http.get($scope.explorationStatisticsUrl).then(function(response) {
         ReadOnlyExplorationBackendApiService.loadLatestExploration(
           ExplorationDataService.explorationId).then(function(response) {
@@ -89,7 +89,7 @@ oppia.controller('StatisticsTab', [
             var states = StatesObjectFactory.createFromBackendDict(statesDict);
             var initStateName = response.exploration.init_state_name;
 
-            $scope.statsGraphData = computeGraphService.compute(
+            $scope.statsGraphData = ComputeGraphService.compute(
               initStateName, states);
             var improvements = (
               StateImprovementSuggestionService.getStateImprovements(
@@ -119,9 +119,9 @@ oppia.controller('StatisticsTab', [
             $scope.explorationHasBeenVisited = true;
           }
 
+          $scope.numPassersby = numStarts - numActualStarts;
           $scope.pieChartData = [
             ['Type', 'Number'],
-            ['Passerby', numStarts - numActualStarts],
             ['Completions', numCompletions],
             ['Non-Completions', numActualStarts - numCompletions]
           ];
@@ -169,7 +169,7 @@ oppia.controller('StatisticsTab', [
     };
 
     $scope.showStateStatsModal = function(stateName, improvementType) {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
 
       $http.get(
         '/createhandler/state_rules_stats/' + $scope.explorationId + '/' +
@@ -197,10 +197,10 @@ oppia.controller('StatisticsTab', [
           controller: [
             '$scope', '$modalInstance', '$filter', 'stateName', 'stateStats',
             'improvementType', 'visualizationsInfo', 'HtmlEscaperService',
-            'ENABLE_NEW_STATS_FRAMEWORK',
+            'SolutionVerificationService', 'ENABLE_NEW_STATS_FRAMEWORK',
             function($scope, $modalInstance, $filter, stateName, stateStats,
                 improvementType, visualizationsInfo, HtmlEscaperService,
-                ENABLE_NEW_STATS_FRAMEWORK) {
+                SolutionVerificationService, ENABLE_NEW_STATS_FRAMEWORK) {
               var COMPLETION_RATE_PIE_CHART_OPTIONS = {
                 left: 20,
                 pieHole: 0.6,
@@ -252,19 +252,38 @@ oppia.controller('StatisticsTab', [
               ];
 
               var _getVisualizationsHtml = function() {
-                var htmlSnippets = [];
+                htmlSnippets = visualizationsInfo.map(
+                  function(visualizationInfo) {
+                    var isAddressedResults = null;
+                    if (visualizationInfo.show_addressed_info) {
+                      var explorationId = ExplorationDataService.explorationId;
+                      var stateName = explorationStatesService.getState(
+                        $scope.stateName);
 
-                for (var i = 0; i < visualizationsInfo.length; i++) {
-                  var el = $(
-                    '<oppia-visualization-' +
-                    $filter('camelCaseToHyphens')(visualizationsInfo[i].id) +
-                    '/>');
-                  el.attr('data', HtmlEscaperService.objToEscapedJson(
-                    visualizationsInfo[i].data));
-                  el.attr('options', HtmlEscaperService.objToEscapedJson(
-                    visualizationsInfo[i].options));
-                  htmlSnippets.push(el.get(0).outerHTML);
-                }
+                      isAddressedResults = visualizationInfo.data.map(
+                        function(datum) {
+                          return SolutionVerificationService.verifySolution(
+                            explorationId, stateName, datum.answer);
+                        });
+                    }
+
+                    var escapedData = HtmlEscaperService.objToEscapedJson(
+                      visualizationInfo.data);
+                    var escapedOptions = HtmlEscaperService.objToEscapedJson(
+                      visualizationInfo.options);
+                    var escapedIsAddressedResults =
+                      HtmlEscaperService.objToEscapedJson(isAddressedResults);
+
+                    var el = $(
+                      '<oppia-visualization-' +
+                      $filter('camelCaseToHyphens')(visualizationInfo.id) +
+                      '/>');
+                    el.attr('data', escapedData);
+                    el.attr('options', escapedOptions);
+                    el.attr('is-addressed', escapedIsAddressedResults);
+                    return el.get(0).outerHTML;
+                  });
+
                 return htmlSnippets.join('');
               };
 
@@ -272,7 +291,7 @@ oppia.controller('StatisticsTab', [
 
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
+                AlertsService.clearWarnings();
               };
             }
           ]

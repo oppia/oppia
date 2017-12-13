@@ -18,18 +18,24 @@
 
 describe('Assets Backend API Service', function() {
   var AssetsBackendApiService = null;
+  var FileDownloadRequestObjectFactory = null;
+  var UrlInterpolationService = null;
   var $httpBackend = null;
   var $rootScope = null;
+  var $q = null;
 
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
     AssetsBackendApiService = $injector.get(
       'AssetsBackendApiService');
+    FileDownloadRequestObjectFactory = $injector.get(
+      'FileDownloadRequestObjectFactory');
     UrlInterpolationService = $injector.get(
       'UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
+    $q = $injector.get('$q');
   }));
 
   afterEach(function() {
@@ -53,8 +59,11 @@ describe('Assets Backend API Service', function() {
 
     AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
       successHandler, failHandler);
+    expect(AssetsBackendApiService.getFilesCurrentlyBeingRequested().length)
+      .toBe(1);
     $httpBackend.flush();
-
+    expect(AssetsBackendApiService.getFilesCurrentlyBeingRequested().length)
+      .toBe(0);
     expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(true);
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();

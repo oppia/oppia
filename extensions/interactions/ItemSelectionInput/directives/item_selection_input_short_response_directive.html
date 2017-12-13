@@ -1,0 +1,13 @@
+<div ng-if="answer.length === 0">
+  <em>No choices selected.</em>
+</div>
+
+<div ng-if="answer.length === 1">
+  <span angular-html-bind="answer[0]"></span>
+</div>
+
+<ul ng-if="answer.length > 1">
+  <li ng-repeat="response in answer track by $index">
+    <span angular-html-bind="response"></span>
+  </li>
+</ul>

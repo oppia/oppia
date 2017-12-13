@@ -43,16 +43,16 @@ oppia.directive('collectionSummaryTile', [
         '/components/summary_tile/' +
         'collection_summary_tile_directive.html'),
       controller: [
-        '$scope', 'oppiaDatetimeFormatter',
+        '$scope', 'DateTimeFormatService',
         'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function(
-          $scope, oppiaDatetimeFormatter,
+          $scope, DateTimeFormatService,
           COLLECTION_VIEWER_URL, COLLECTION_EDITOR_URL) {
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
           $scope.ACTIVITY_TYPE_COLLECTION = constants.ACTIVITY_TYPE_COLLECTION;
 
           $scope.getLastUpdatedDatetime = function() {
-            return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               $scope.getLastUpdatedMsec());
           };
 
