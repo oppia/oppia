@@ -467,6 +467,16 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 5)
         self.assertEqual(exploration_stats.num_completions_v2, 2)
 
+    def test_get_views_multi(self):
+        """Test the get_view_multi method."""
+        stats_models.ExplorationStatsModel.create(
+            'exp_id2', 2, 10, 0, 0, 0, 0, 0, {})
+        exp_ids = [self.exp_id, 'exp_id2']
+        version_numbers = [self.exp_version, 2]
+
+        views = stats_services.get_view_multi(exp_ids, version_numbers)
+        self.assertEqual(views, [0, 10])
+
 
 class ModifiedStatisticsAggregator(stats_jobs_continuous.StatisticsAggregator):
     """A modified StatisticsAggregator that does not start a new batch

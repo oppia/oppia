@@ -23,7 +23,10 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import stats_jobs_continuous
+from core.domain import stats_services
 from core.domain import user_services
+
+import feconf
 import utils
 
 _LIBRARY_INDEX_GROUPS = [{
@@ -372,9 +375,16 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
         exploration_summary.id
         for exploration_summary in exploration_summaries]
 
-    view_counts = (
-        stats_jobs_continuous.StatisticsAggregator.get_views_multi(
-            exploration_ids))
+    if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+        version_numbers = [
+            exploration_summary.version
+            for exploration_summary in exploration_summaries]
+        view_counts = stats_services.get_view_multi(
+            exploration_ids, version_numbers)
+    else:
+        view_counts = (
+            stats_jobs_continuous.StatisticsAggregator.get_views_multi(
+                exploration_ids))
     displayable_exp_summaries = []
 
     for ind, exploration_summary in enumerate(exploration_summaries):
