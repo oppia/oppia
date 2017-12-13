@@ -19,7 +19,8 @@
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
-var CreatorDashboardPage = require('../protractor_utils/CreatorDashboardPage.js');
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
 var collectionEditor = require('../protractor_utils/collectionEditor.js');
 
 
@@ -86,7 +87,8 @@ describe('Node count error', function() {
     collectionEditor.saveDraft();
     browser.waitForAngular();
     general.waitForSystem();
-    element(by.css('.protractor-test-commit-message-input')).sendKeys('Add exploration');
+    element(by.css(
+      '.protractor-test-commit-message-input')).sendKeys('Add exploration');
     browser.driver.sleep(300);
     collectionEditor.closeSaveModal();
     browser.waitForAngular();
@@ -116,7 +118,8 @@ describe('Node count error', function() {
     collectionEditor.saveDraft();
     browser.waitForAngular();
     general.waitForSystem();
-    element(by.css('.protractor-test-commit-message-input')).sendKeys('Add exploration');
+    element(by.css(
+      '.protractor-test-commit-message-input')).sendKeys('Add exploration');
     browser.driver.sleep(300);
     collectionEditor.closeSaveModal();
     browser.waitForAngular();
@@ -146,7 +149,8 @@ describe('Node count error', function() {
     collectionEditor.saveDraft();
     browser.waitForAngular();
     general.waitForSystem();
-    element(by.css('.protractor-test-commit-message-input')).sendKeys('Add exploration');
+    element(by.css(
+      '.protractor-test-commit-message-input')).sendKeys('Add exploration');
     browser.driver.sleep(300);
     collectionEditor.closeSaveModal();
     browser.waitForAngular();
@@ -164,9 +168,9 @@ describe('Node count error', function() {
   afterEach(function() {
     browser.manage().logs().get('browser').then(function(browserLog) {
       var i = 0, severWarnings = false, errors = 0;
-      for(i; i<=browserLog.length-1; i++){
+      for (i; i <= browserLog.length - 1; i++) {
         // Check only for console errors and not warnings
-        if(browserLog[i].level.name_ === 'SEVERE'){
+        if (browserLog[i].level.name_ === 'SEVERE') {
           errors = errors + 1;
         }
       }
