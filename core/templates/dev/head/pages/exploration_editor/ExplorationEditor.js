@@ -149,7 +149,7 @@ oppia.controller('ExplorationEditor', [
         if(($scope.title) !== -1){
           $rootScope.title = 'Untitled Exploration - Oppia Editor';
         } else {
-          $rootScope.title = '<[title ]> - Oppia Editor';
+          $rootScope.title = '{{title }} - Oppia Editor';
         }
 
         if (GLOBALS.can_edit) {
