@@ -609,7 +609,7 @@ class InteractionAnswerSummariesMRJobManager(
         # Ensure the exploration corresponding to these answers exists.
         exp = exp_services.get_exploration_by_id(
             exploration_id, strict=False)
-        if not exp:
+        if exp is None:
             return
 
         if exploration_version == VERSION_ALL:
@@ -628,8 +628,6 @@ class InteractionAnswerSummariesMRJobManager(
                         'since the latest exploration version is %s' % (
                             latest_version, exp.version))
                     versions = []
-            elif not exp:
-                versions = []
 
         # In the VERSION_ALL case, we only take into account the most recent
         # consecutive block of versions with the same interaction ID as the
