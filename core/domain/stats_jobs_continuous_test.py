@@ -560,15 +560,12 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
             # There should be no job output corresponding to all versions since
-            # the exploration was deleted before the job could run. Note that if
-            # the job before and after deletion, the old output would still be
-            # available. This is also true for deleted explorations and data
-            # corresponding to specific versions. This is fine in practice since
-            # the deleted exploration is not accessible, so its answer stats
-            # should never be loaded by the frontend.
+            # the exploration was deleted before the job could run. Note that
+            # this applies regardless of whether the job runs before or after
+            # deletion of the exploration.
             calc_output_model = self._get_calc_output_model(
                 exp_id, first_state_name, 'AnswerFrequencies')
-            self.assertEqual(calc_output_model.calculation_output, [])
+            self.assertIsNone(calc_output_model)
 
     def test_answers_across_multiple_exploration_versions(self):
         with self.swap(
