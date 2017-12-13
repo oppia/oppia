@@ -239,7 +239,7 @@ oppia.controller('StatisticsTab', [
               $scope.pieChartData1 = [
                 ['Type', 'Number'],
                 ['Default feedback', totalAnswersCount - usefulFeedbackCount],
-                ['Useful feedback', usefulFeedbackCount],
+                ['Specific feedback', usefulFeedbackCount],
               ];
 
               var numTimesSolutionViewed = (
