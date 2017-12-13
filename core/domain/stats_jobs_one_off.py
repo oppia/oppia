@@ -342,7 +342,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     # state_stats_mapping too.
                     if change_dict['cmd'] == (
                             'migrate_states_schema_to_latest_version'):
-                        pseudo_end_state = 'END'
+                        pseudo_end_state_name = 'END'
                         if change_dict['from_version'] < 2 <= change_dict[
                                 'to_version']:
                             prev_exploration = explorations_by_version[
@@ -352,11 +352,11 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                             # state. This is confirmed by checking that there is
                             # a state called 'END' in the immediate version of
                             # the exploration after migration.
-                            if pseudo_end_state in (
+                            if pseudo_end_state_name in (
                                     versioned_exploration.states) and (
-                                        pseudo_end_state not in (
+                                        pseudo_end_state_name not in (
                                             prev_exploration.states)):
-                                state_stats_mapping[pseudo_end_state] = (
+                                state_stats_mapping[pseudo_end_state_name] = (
                                     stats_domain.StateStats.create_default())
                     if change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
                         state_stats_mapping[change_dict[
