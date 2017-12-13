@@ -19,11 +19,11 @@
 oppia.controller('HistoryTab', [
   '$scope', '$http', '$rootScope', '$log',
   '$modal', 'ExplorationDataService',
-  'VersionTreeService', 'CompareVersionsService', 'graphDataService',
+  'VersionTreeService', 'CompareVersionsService',
   'DateTimeFormatService', 'UrlInterpolationService',
   function(
       $scope, $http, $rootScope, $log, $modal, ExplorationDataService,
-      VersionTreeService, CompareVersionsService, graphDataService,
+      VersionTreeService, CompareVersionsService,
       DateTimeFormatService, UrlInterpolationService) {
     $scope.explorationId = ExplorationDataService.explorationId;
     $scope.explorationAllSnapshotsUrl =

@@ -32,9 +32,20 @@ oppia.directive('barChart', [function() {
         return;
       }
       var options = $scope.options();
-      var chart = new google.visualization.BarChart($element[0]);
+      var chart = null;
 
       var redrawChart = function() {
+        if (!chart) {
+          try {
+            // Occasionally, we run into the following error:
+            //"TypeError: google.visualization.BarChart is not a constructor".
+            // This ignores the above error since the bar chart directive is to
+            // be deprecated soon.
+            chart = new google.visualization.BarChart($element[0]);
+          } catch(e) {
+            return;
+          }
+        }
         chart.draw(google.visualization.arrayToDataTable($scope.data()), {
           chartArea: {
             left: 0,

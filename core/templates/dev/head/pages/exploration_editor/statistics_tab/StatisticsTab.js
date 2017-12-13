@@ -21,13 +21,13 @@ oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
   '$scope', '$http', '$modal', 'AlertsService', 'explorationStatesService',
-  'ExplorationDataService', 'computeGraphService', 'DateTimeFormatService',
+  'ExplorationDataService', 'ComputeGraphService', 'DateTimeFormatService',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
   'IMPROVE_TYPE_INCOMPLETE', 'ENABLE_NEW_STATS_FRAMEWORK',
   function(
       $scope, $http, $modal, AlertsService, explorationStatesService,
-      ExplorationDataService, computeGraphService, DateTimeFormatService,
+      ExplorationDataService, ComputeGraphService, DateTimeFormatService,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
       IMPROVE_TYPE_INCOMPLETE, ENABLE_NEW_STATS_FRAMEWORK) {
@@ -89,7 +89,7 @@ oppia.controller('StatisticsTab', [
             var states = StatesObjectFactory.createFromBackendDict(statesDict);
             var initStateName = response.exploration.init_state_name;
 
-            $scope.statsGraphData = computeGraphService.compute(
+            $scope.statsGraphData = ComputeGraphService.compute(
               initStateName, states);
             var improvements = (
               StateImprovementSuggestionService.getStateImprovements(
@@ -254,18 +254,25 @@ oppia.controller('StatisticsTab', [
               var _getVisualizationsHtml = function() {
                 htmlSnippets = visualizationsInfo.map(
                   function(visualizationInfo) {
+                    var isAddressedResults = null;
+                    if (visualizationInfo.show_addressed_info) {
+                      var explorationId = ExplorationDataService.explorationId;
+                      var stateName = explorationStatesService.getState(
+                        $scope.stateName);
+
+                      isAddressedResults = visualizationInfo.data.map(
+                        function(datum) {
+                          return SolutionVerificationService.verifySolution(
+                            explorationId, stateName, datum.answer);
+                        });
+                    }
+
                     var escapedData = HtmlEscaperService.objToEscapedJson(
                       visualizationInfo.data);
                     var escapedOptions = HtmlEscaperService.objToEscapedJson(
                       visualizationInfo.options);
                     var escapedIsAddressedResults =
-                      HtmlEscaperService.objToEscapedJson(
-                        visualizationInfo.data.map(function(datum) {
-                          return SolutionVerificationService.verifySolution(
-                            ExplorationDataService.explorationId,
-                            explorationStatesService.getState($scope.stateName),
-                            HtmlEscaperService.objToEscapedJson(datum));
-                        }));
+                      HtmlEscaperService.objToEscapedJson(isAddressedResults);
 
                     var el = $(
                       '<oppia-visualization-' +

@@ -19,7 +19,8 @@
 
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
@@ -31,9 +32,11 @@ describe('Library pages tour', function() {
   var EXPLORATION_RATING = 4;
   var SEARCH_TERM = 'python';
   var libraryPage = null;
+  var explorationPlayerPage = null;
 
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   var visitLibraryPage = function() {
@@ -61,7 +64,7 @@ describe('Library pages tour', function() {
     );
     visitLibraryPage();
     libraryPage.playExploration(EXPLORATION_TITLE);
-    player.rateExploration(EXPLORATION_RATING);
+    explorationPlayerPage.rateExploration(EXPLORATION_RATING);
 
     visitLibraryPage();
     element(by.css('.protractor-test-library-top-rated')).click();
@@ -81,7 +84,8 @@ describe('Library pages tour', function() {
       return browser.getCurrentUrl().then(function(url) {
         return /search/.test(url);
       });
-    });
+    }, 4000);
+    general.waitForSystem();
     expect(browser.getCurrentUrl()).toContain('search/find?q=python');
   });
 

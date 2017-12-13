@@ -6,14 +6,14 @@
   <strong><[options.title]></strong>
   <table class="table">
     <tr>
-      <th ng-repeat="column_header in options.column_headers">
-        <[column_header]>
-      </th>
+      <th><[options.column_headers[0]]></th>
+      <th><[options.column_headers[1]]></th>
+      <th ng-if="isAddressed !== null">Addressed?</th>
     </tr>
     <tr ng-repeat="row in data track by $index">
       <td><[row.answer]></td>
       <td><[row.frequency]></td>
-      <td>
+      <td ng-if="isAddressed !== null">
         <span ng-if="isAddressed[$index]">Yes</span>
         <span ng-if="!isAddressed[$index]">No</span>
       </td>
@@ -34,9 +34,9 @@
   <strong><[options.title]></strong>
   <table class="table">
     <tr>
-      <th ng-repeat="column_header in options.column_headers">
-        <[column_header]>
-      </th>
+      <th><[options.column_headers[0]]></th>
+      <th><[options.column_headers[1]]></th>
+      <th ng-if="isAddressed !== null">Addressed?</th>
     </tr>
     <tr ng-repeat="row in data track by $index">
       <td>
@@ -48,7 +48,7 @@
         </table>
       </td>
       <td><[row.frequency]></td>
-      <td>
+      <td ng-if="isAddressed !== null">
         <span ng-if="isAddressed[$index]">Yes</span>
         <span ng-if="!isAddressed[$index]">No</span>
       </td>
