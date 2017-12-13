@@ -320,13 +320,20 @@ oppia.factory('ExplorationPlayerService', [
             interactionRulesService));
 
         if (!_editorPreviewMode) {
+          // Replace this with the isClassifiedExplicitlyOrGoesToNewState method
+          // in AnswerClassificationService.
+          var feedbackIsUseful = (
+            classificationResult.outcome.dest !== oldStateName ||
+            classificationResult.classificationCategorization !==
+              DEFAULT_OUTCOME_CLASSIFICATION);
           StatsReportingService.recordAnswerSubmitted(
             oldStateName,
             LearnerParamsService.getAllParams(),
             answer,
             classificationResult.answerGroupIndex,
             classificationResult.ruleIndex,
-            classificationResult.classificationCategorization);
+            classificationResult.classificationCategorization,
+            feedbackIsUseful);
         }
 
         // Use angular.copy() to clone the object

@@ -133,22 +133,22 @@ oppia.factory('StatsReportingService', [
           aggregatedStats.state_stats_mapping[stateName].first_hit_count += 1
 
           postStatsToBackend();
+        } else {
+          $http.post(getFullStatsUrl('EXPLORATION_STARTED'), {
+            params: params,
+            session_id: sessionId,
+            state_name: stateName,
+            version: explorationVersion
+          });
+
+          $http.post(getFullStatsUrl('STATE_HIT'), {
+            client_time_spent_in_secs: 0.0,
+            exploration_version: explorationVersion,
+            new_state_name: stateName,
+            old_params: params,
+            session_id: sessionId,
+          });
         }
-
-        $http.post(getFullStatsUrl('EXPLORATION_STARTED'), {
-          params: params,
-          session_id: sessionId,
-          state_name: stateName,
-          version: explorationVersion
-        });
-
-        $http.post(getFullStatsUrl('STATE_HIT'), {
-          client_time_spent_in_secs: 0.0,
-          exploration_version: explorationVersion,
-          new_state_name: stateName,
-          old_params: params,
-          session_id: sessionId,
-        });
 
         MessengerService.sendMessage(MessengerService.EXPLORATION_LOADED, {
           explorationVersion: explorationVersion,
@@ -164,13 +164,13 @@ oppia.factory('StatsReportingService', [
       recordExplorationActuallyStarted: function(stateName) {
         if (ENABLE_NEW_STATS_FRAMEWORK) {
           aggregatedStats.num_actual_starts += 1
+        } else {
+          $http.post(getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
+            exploration_version: explorationVersion,
+            state_name: stateName,
+            session_id: sessionId
+          });
         }
-
-        $http.post(getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
-          exploration_version: explorationVersion,
-          state_name: stateName,
-          session_id: sessionId
-        });
       },
       recordSolutionHit: function(stateName) {
         if (ENABLE_NEW_STATS_FRAMEWORK) {
@@ -179,14 +179,14 @@ oppia.factory('StatsReportingService', [
           }
           aggregatedStats.state_stats_mapping[
             stateName].num_times_solution_viewed += 1
+        } else {
+          $http.post(getFullStatsUrl('SOLUTION_HIT'), {
+            exploration_version: explorationVersion,
+            state_name: stateName,
+            session_id: sessionId,
+            time_spent_in_state_secs: stateStopwatch.getTimeInSecs()
+          });
         }
-
-        $http.post(getFullStatsUrl('SOLUTION_HIT'), {
-          exploration_version: explorationVersion,
-          state_name: stateName,
-          session_id: sessionId,
-          time_spent_in_state_secs: stateStopwatch.getTimeInSecs()
-        });
       },
       // Note that this also resets the stateStopwatch.
       recordStateTransition: function(
@@ -201,16 +201,16 @@ oppia.factory('StatsReportingService', [
             aggregatedStats.state_stats_mapping[
               newStateName].first_hit_count += 1
           }
+        } else {
+          $http.post(getFullStatsUrl('STATE_HIT'), {
+            // This is the time spent since the last submission.
+            client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
+            exploration_version: explorationVersion,
+            new_state_name: newStateName,
+            old_params: oldParams,
+            session_id: sessionId,
+          });
         }
-
-        $http.post(getFullStatsUrl('STATE_HIT'), {
-          // This is the time spent since the last submission.
-          client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
-          exploration_version: explorationVersion,
-          new_state_name: newStateName,
-          old_params: oldParams,
-          session_id: sessionId,
-        });
 
         // Broadcast information about the state transition to listeners.
         MessengerService.sendMessage(MessengerService.STATE_TRANSITION, {
@@ -235,27 +235,28 @@ oppia.factory('StatsReportingService', [
             createDefaultStateStatsMapping(stateName);
           }
           aggregatedStats.state_stats_mapping[stateName].num_completions += 1
+        } else {
+          $http.post(getFullStatsUrl('STATE_COMPLETED'), {
+            exp_version: explorationVersion,
+            state_name: stateName,
+            session_id: sessionId,
+            time_spent_in_state_secs: stateStopwatch.getTimeInSecs()
+          });
         }
-
-        $http.post(getFullStatsUrl('STATE_COMPLETED'), {
-          exp_version: explorationVersion,
-          state_name: stateName,
-          session_id: sessionId,
-          time_spent_in_state_secs: stateStopwatch.getTimeInSecs()
-        });
       },
       recordExplorationCompleted: function(stateName, params) {
         if (ENABLE_NEW_STATS_FRAMEWORK) {
           aggregatedStats.num_completions += 1
+        } else {
+          $http.post(getFullStatsUrl('EXPLORATION_COMPLETED'), {
+            client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
+            collection_id: optionalCollectionId,
+            params: params,
+            session_id: sessionId,
+            state_name: stateName,
+            version: explorationVersion
+          });
         }
-        $http.post(getFullStatsUrl('EXPLORATION_COMPLETED'), {
-          client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
-          collection_id: optionalCollectionId,
-          params: params,
-          session_id: sessionId,
-          state_name: stateName,
-          version: explorationVersion
-        });
 
         MessengerService.sendMessage(MessengerService.EXPLORATION_COMPLETED, {
           explorationVersion: explorationVersion,
@@ -270,42 +271,43 @@ oppia.factory('StatsReportingService', [
       },
       recordAnswerSubmitted: function(
           stateName, params, answer, answerGroupIndex, ruleIndex,
-          classificationCategorization) {
+          classificationCategorization, feedbackIsUseful) {
         if (ENABLE_NEW_STATS_FRAMEWORK) {
           if (!aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
             createDefaultStateStatsMapping(stateName);
           }
           aggregatedStats.state_stats_mapping[
             stateName].total_answers_count += 1
-          if (classificationCategorization !== DEFAULT_OUTCOME_CLASSIFICATION) {
+          if (feedbackIsUseful) {
             aggregatedStats.state_stats_mapping[
               stateName].useful_feedback_count += 1
           }
+        } else {
+          $http.post(getFullStatsUrl('ANSWER_SUBMITTED'), {
+            answer: answer,
+            params: params,
+            version: explorationVersion,
+            session_id: sessionId,
+            client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
+            old_state_name: stateName,
+            answer_group_index: answerGroupIndex,
+            rule_spec_index: ruleIndex,
+            classification_categorization: classificationCategorization
+          });
         }
-        $http.post(getFullStatsUrl('ANSWER_SUBMITTED'), {
-          answer: answer,
-          params: params,
-          version: explorationVersion,
-          session_id: sessionId,
-          client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
-          old_state_name: stateName,
-          answer_group_index: answerGroupIndex,
-          rule_spec_index: ruleIndex,
-          classification_categorization: classificationCategorization
-        });
       },
       recordMaybeLeaveEvent: function(stateName, params) {
-        $http.post(getFullStatsUrl('EXPLORATION_MAYBE_LEFT'), {
-          client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
-          collection_id: optionalCollectionId,
-          params: params,
-          session_id: sessionId,
-          state_name: stateName,
-          version: explorationVersion
-        });
-
         if (ENABLE_NEW_STATS_FRAMEWORK) {
           postStatsToBackend();
+        } else {
+          $http.post(getFullStatsUrl('EXPLORATION_MAYBE_LEFT'), {
+            client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
+            collection_id: optionalCollectionId,
+            params: params,
+            session_id: sessionId,
+            state_name: stateName,
+            version: explorationVersion
+          });
         }
       }
     };
