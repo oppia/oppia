@@ -13,9 +13,10 @@
 // limitations under the License.
 
 /**
- *  @fileoverview Service for handling all interactions 
- *  with the exploration editor backend.
- */
+ * @fileoverview Service for handling all interactions 
+ * to human readable form and making necessary 
+*/
+
  oppia.factory('ChangesInHumanReadableFormService', ['UtilsService', function(UtilsService) {
   var CMD_ADD_STATE = 'add_state';
   var CMD_RENAME_STATE = 'rename_state';
@@ -274,6 +275,7 @@
   };
 
   return {
+    
     makeHumanReadable: makeHumanReadable
   };
 }]);
