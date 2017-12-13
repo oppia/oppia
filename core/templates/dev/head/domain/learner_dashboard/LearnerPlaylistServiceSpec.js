@@ -19,7 +19,7 @@
 describe('Learner playlist service factory', function() {
   var LearnerPlaylistService = null;
   var $httpBackend = null;
-  var $rootScope = null
+  var $rootScope = null;
   var activityType = constants.ACTIVITY_TYPE_EXPLORATION;
   var UrlInterpolationService = null;
   var activityId = '1';
