@@ -28,7 +28,7 @@ oppia.factory('SolutionVerificationService', [
         var rulesService = $injector.get(rulesServiceName);
         var result = (
           AnswerClassificationService.getMatchingClassificationResult(
-            explorationId, state.name, state, correctAnswer, true, rulesService
+            explorationId, state.name, state, correctAnswer, rulesService
           ));
         return state.name !== result.outcome.dest;
       }

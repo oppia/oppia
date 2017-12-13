@@ -75,7 +75,7 @@ oppia.factory('TrainingModalService', [
                 var classificationResult = (
                   AnswerClassificationService.getMatchingClassificationResult(
                     explorationId, currentStateName, state, unhandledAnswer,
-                    true, rulesService));
+                    rulesService));
                 var feedback = 'Nothing';
                 var dest = classificationResult.outcome.dest;
                 if (classificationResult.outcome.feedback.length > 0) {
