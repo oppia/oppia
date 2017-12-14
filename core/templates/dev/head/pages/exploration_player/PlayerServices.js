@@ -34,7 +34,6 @@ oppia.factory('ExplorationPlayerService', [
   'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
   'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
-  'DEFAULT_OUTCOME_CLASSIFICATION',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       AlertsService, AnswerClassificationService, ExplorationContextService,
@@ -44,8 +43,7 @@ oppia.factory('ExplorationPlayerService', [
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService,
-      LanguageUtilService, NumberAttemptsService, AudioPreloaderService,
-      DEFAULT_OUTCOME_CLASSIFICATION) {
+      LanguageUtilService, NumberAttemptsService, AudioPreloaderService) {
     var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
       ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -325,9 +323,9 @@ oppia.factory('ExplorationPlayerService', [
           // Replace this with the isClassifiedExplicitlyOrGoesToNewState method
           // in AnswerClassificationService.
           var feedbackIsUseful = (
-            classificationResult.outcome.dest !== oldStateName ||
-            classificationResult.classificationCategorization !==
-              DEFAULT_OUTCOME_CLASSIFICATION);
+            AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+              _explorationId, oldStateName, oldState, answer,
+              interactionRulesService));
           StatsReportingService.recordAnswerSubmitted(
             oldStateName,
             LearnerParamsService.getAllParams(),
