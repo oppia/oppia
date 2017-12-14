@@ -442,10 +442,8 @@ def _pre_commit_linter(all_files):
     print '\n'.join(js_messages)
     print '----------------------------------------'
     summary_messages = []
-    # Require block = False to prevent unnecessary waiting for the process
-    # output.
-    summary_messages.append(js_result.get(block=False))
-    summary_messages.append(py_result.get(block=False))
+    summary_messages.append(js_result.get())
+    summary_messages.append(py_result.get())
     print '\n'.join(summary_messages)
     print ''
     return summary_messages
