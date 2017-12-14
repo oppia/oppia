@@ -320,8 +320,6 @@ oppia.factory('ExplorationPlayerService', [
             interactionRulesService));
 
         if (!_editorPreviewMode) {
-          // Replace this with the isClassifiedExplicitlyOrGoesToNewState method
-          // in AnswerClassificationService.
           var feedbackIsUseful = (
             AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
               _explorationId, oldStateName, oldState, answer,
