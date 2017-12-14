@@ -8,7 +8,7 @@
     <tr>
       <th><[options.column_headers[0]]></th>
       <th><[options.column_headers[1]]></th>
-      <th ng-if="isAddressed !== null">Addressed?</th>
+      <th ng-if="isAddressed !== null">Addressed specifically?</th>
     </tr>
     <tr ng-repeat="row in data track by $index">
       <td><[row.answer]></td>
@@ -36,7 +36,7 @@
     <tr>
       <th><[options.column_headers[0]]></th>
       <th><[options.column_headers[1]]></th>
-      <th ng-if="isAddressed !== null">Addressed?</th>
+      <th ng-if="isAddressed !== null">Addressed specifically?</th>
     </tr>
     <tr ng-repeat="row in data track by $index">
       <td>

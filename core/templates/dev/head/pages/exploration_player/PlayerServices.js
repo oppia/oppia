@@ -315,7 +315,7 @@ oppia.factory('ExplorationPlayerService', [
         var oldState = exploration.getState(oldStateName);
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
-            _explorationId, oldStateName, oldState, answer, false,
+            _explorationId, oldStateName, oldState, answer,
             interactionRulesService));
 
         if (!_editorPreviewMode) {

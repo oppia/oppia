@@ -195,12 +195,14 @@ oppia.controller('StatisticsTab', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', '$filter', 'stateName', 'stateStats',
-            'improvementType', 'visualizationsInfo', 'HtmlEscaperService',
-            'SolutionVerificationService', 'ENABLE_NEW_STATS_FRAMEWORK',
-            function($scope, $modalInstance, $filter, stateName, stateStats,
-                improvementType, visualizationsInfo, HtmlEscaperService,
-                SolutionVerificationService, ENABLE_NEW_STATS_FRAMEWORK) {
+            '$scope', '$modalInstance', '$filter', '$injector', 'stateName',
+            'stateStats', 'improvementType', 'visualizationsInfo',
+            'HtmlEscaperService', 'AngularNameService',
+            'AnswerClassificationService', 'ENABLE_NEW_STATS_FRAMEWORK',
+            function($scope, $modalInstance, $filter, $injector, stateName,
+                stateStats, improvementType, visualizationsInfo,
+                HtmlEscaperService, AngularNameService,
+                AnswerClassificationService, ENABLE_NEW_STATS_FRAMEWORK) {
               var COMPLETION_RATE_PIE_CHART_OPTIONS = {
                 left: 20,
                 pieHole: 0.6,
@@ -239,7 +241,7 @@ oppia.controller('StatisticsTab', [
               $scope.pieChartData1 = [
                 ['Type', 'Number'],
                 ['Default feedback', totalAnswersCount - usefulFeedbackCount],
-                ['Useful feedback', usefulFeedbackCount],
+                ['Specific feedback', usefulFeedbackCount],
               ];
 
               var numTimesSolutionViewed = (
@@ -257,14 +259,25 @@ oppia.controller('StatisticsTab', [
                     var isAddressedResults = null;
                     if (visualizationInfo.show_addressed_info) {
                       var explorationId = ExplorationDataService.explorationId;
-                      var stateName = explorationStatesService.getState(
+                      var state = explorationStatesService.getState(
                         $scope.stateName);
 
                       isAddressedResults = visualizationInfo.data.map(
                         function(datum) {
-                          return SolutionVerificationService.verifySolution(
-                            explorationId, stateName, datum.answer);
-                        });
+                          var interactionId = state.interaction.id;
+                          var rulesServiceName = (
+                            AngularNameService.getNameOfInteractionRulesService(
+                              interactionId));
+                          var rulesService = $injector.get(rulesServiceName);
+                          return (
+                            AnswerClassificationService
+                              .isClassifiedExplicitlyOrGoesToNewState(
+                                explorationId, state.name, state,
+                                datum.answer, rulesService
+                              )
+                          );
+                        }
+                      );
                     }
 
                     var escapedData = HtmlEscaperService.objToEscapedJson(
