@@ -22,6 +22,7 @@ from core.domain import exp_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import stats_jobs_continuous
+from core.domain import stats_services
 from core.platform import models
 import feconf
 import utils
@@ -549,21 +550,42 @@ class UserStatsMRJobManager(
         else:
             calculate_exploration_impact_score = False
 
-        statistics = (
-            stats_jobs_continuous.StatisticsAggregator.get_statistics(
-                item.id, stats_jobs_continuous.VERSION_ALL))
-        answer_count = 0
-        # Find number of users per state (card), and subtract no answer
-        # This will not count people who have been back to a state twice
-        # but did not give an answer the second time, but is probably the
-        # closest we can get with current statistics to "number of users
-        # who gave an answer" since it is "number of users who always gave
-        # an answer".
-        for state_name in statistics['state_hit_counts']:
-            state_stats = statistics['state_hit_counts'][state_name]
-            first_entry_count = state_stats.get('first_entry_count', 0)
-            no_answer_count = state_stats.get('no_answer_count', 0)
-            answer_count += first_entry_count - no_answer_count
+        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            exploration_stats = stats_services.get_exploration_stats(
+                item.id, item.version)
+            answer_count = 0
+            # For each state, multiply the total answer count with the ratio of
+            # first entry count to the total entry count.
+            for state_name in exploration_stats.state_stats_mapping:
+                state_stats = exploration_stats.state_stats_mapping[state_name]
+                total_answers_count = (
+                    state_stats.total_answers_count_v1 +
+                    state_stats.total_answers_count_v2)
+                first_hit_count = (
+                    state_stats.first_hit_count_v1 +
+                    state_stats.first_hit_count_v2)
+                total_hit_count = (
+                    state_stats.first_hit_count_v1 +
+                    state_stats.first_hit_count_v2)
+                answer_count += total_answers_count * (
+                    first_hit_count/total_hit_count)
+        else:
+            statistics = (
+                stats_jobs_continuous.StatisticsAggregator.get_statistics(
+                    item.id, stats_jobs_continuous.VERSION_ALL))
+            answer_count = 0
+            # Find number of users per state (card), and subtract no answer
+            # This will not count people who have been back to a state twice
+            # but did not give an answer the second time, but is probably the
+            # closest we can get with current statistics to "number of users
+            # who gave an answer" since it is "number of users who always gave
+            # an answer".
+            for state_name in statistics['state_hit_counts']:
+                state_stats = statistics['state_hit_counts'][state_name]
+                first_entry_count = state_stats.get('first_entry_count', 0)
+                no_answer_count = state_stats.get('no_answer_count', 0)
+                answer_count += first_entry_count - no_answer_count
+
         # Turn answer count into reach
         reach = answer_count**exponent
 
