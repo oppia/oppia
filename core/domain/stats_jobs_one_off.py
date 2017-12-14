@@ -139,12 +139,15 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         exp_domain.DEFAULT_OUTCOME_CLASSIFICATION):
                     useful_feedback_count += 1
                 else:
-                    exploration = exp_services.get_exploration_by_id(
-                        item.exploration_id, item.exploration_version)
-                    answer_group = exploration.states[
-                        unicode_state_name].interaction.answer_groups[
-                            answer['answer_group_index']]
-                    if answer_group.outcome.dest != unicode_state_name:
+                    try:
+                        exploration = exp_services.get_exploration_by_id(
+                            item.exploration_id, item.exploration_version)
+                    except Exception:
+                        # Exploration does not exist.
+                        return
+                    dest_state = exploration.states[
+                        unicode_state_name].interaction.default_outcome.dest
+                    if dest_state != unicode_state_name:
                         useful_feedback_count += 1
             value = {
                 'event_type': GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS,
