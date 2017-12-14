@@ -88,10 +88,6 @@ exports.config = {
       'protractor/learnerDashboard.js',
     ],
 
-    collectionEditor: [
-      'protractor/nodeCount.js'
-    ],
-
     users: [
       'protractor/userManagement.js',
       'protractor/loginFlow.js',
