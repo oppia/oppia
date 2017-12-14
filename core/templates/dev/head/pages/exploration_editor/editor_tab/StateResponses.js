@@ -317,8 +317,7 @@ oppia.controller('StateResponses', [
 
               var classificationResult = (
                 AnswerClassificationService.getMatchingClassificationResult(
-                  _explorationId, _stateName, _state, answer, true,
-                  rulesService));
+                  _explorationId, _stateName, _state, answer, rulesService));
               var feedback = 'Nothing';
               var dest = classificationResult.outcome.dest;
               if (classificationResult.outcome.feedback.length > 0) {
