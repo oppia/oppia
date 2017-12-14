@@ -27,23 +27,23 @@ var CreatorDashboardPage =
 describe('Collections', function() {
   var adminPage = null;
   var creatorDashboardPage = null;
-  var COLLECTION_ID = null;
+  var collectionId = null;
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    var USERNAME = 'aliceCollections';
-    var USERNAME_TWO = 'playerCollections';
-    users.createUser('player@collections.com', USERNAME_TWO);
-    users.createUser('alice@collections.com', USERNAME);
+    var EDITOR_USERNAME = 'aliceCollections';
+    var PLAYER_USERNAME = 'playerCollections';
+    users.createUser('player@collections.com', PLAYER_USERNAME);
+    users.createUser('alice@collections.com', EDITOR_USERNAME);
     users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
     adminPage.get();
     adminPage.reloadCollection();
     general.acceptAlert();
     browser.waitForAngular();
     adminPage.reloadAllExplorations();
-    adminPage.updateRole(USERNAME, 'collection editor');
-    adminPage.updateRole(USERNAME_TWO, 'collection editor');
+    adminPage.updateRole(EDITOR_USERNAME, 'collection editor');
+    adminPage.updateRole(PLAYER_USERNAME, 'collection editor');
     users.logout();
 
     users.login('player@collections.com');
@@ -54,6 +54,11 @@ describe('Collections', function() {
     browser.waitForAngular();
     creatorDashboardPage.clickCreateActivityButton();
     creatorDashboardPage.clickCreateCollectionButton();
+    browser.getCurrentUrl().then(function(url) {
+      var pathname = url.split('/');
+      //in the url a # is added at the end that is not part of collection ID
+      collectionId = pathname[5].slice(0, -1);
+    });
     browser.waitForAngular();
     // Add existing explorations.
     collectionEditor.addExistingExploration('0');
@@ -112,91 +117,57 @@ describe('Collections', function() {
 
   it('checks for console errors in a collection with one node', function() {
     users.login('player@collections.com');
-    browser.get('/search/find?q=');
+    browser.get('/collection/' + collectionId);
     browser.waitForAngular();
-    element.all(by.css(
-      '.protractor-test-collection-summary-tile-title')
-    ).filter(function (elem) {
-      return elem.getText().then(function (text) {
-        return text === 'Test Collection 2';
-      });
-    }).first().click();
-    browser.waitForAngular();
-    general.waitForSystem();
-    browser.getCurrentUrl().then(function(url) {
-      var pathname = url.split('/');
-      COLLECTION_ID = pathname[4];
-    });
     users.logout();
   });
 
   it('checks for console errors in a collection with two nodes', function() {
     users.login('player@collections.com');
-    creatorDashboardPage.get();
+    browser.get('/collection_editor/create/' + collectionId);
     browser.waitForAngular();
-    element.all(by.css(
-      '.protractor-test-collection-card')).first().click();
-    browser.waitForAngular();
-    general.waitForSystem();
     collectionEditor.addExistingExploration('4');
     collectionEditor.saveDraft();
     collectionEditor.setCommitMessage('Add Exploration');
     collectionEditor.closeSaveModal();
     browser.waitForAngular();
 
-    browser.get('/collection/' + COLLECTION_ID);
+    browser.get('/collection/' + collectionId);
     browser.waitForAngular();
     users.logout();
   });
 
   it('checks for console errors in a collection with three nodes', function() {
     users.login('player@collections.com');
-    creatorDashboardPage.get();
+    browser.get('/collection_editor/create/' + collectionId);
     browser.waitForAngular();
-    element.all(by.css(
-      '.protractor-test-collection-card')).first().click();
-    browser.waitForAngular();
-    general.waitForSystem();
     collectionEditor.addExistingExploration('13');
     collectionEditor.saveDraft();
     collectionEditor.setCommitMessage('Add Exploration');
     collectionEditor.closeSaveModal();
     browser.waitForAngular();
 
-    browser.get('/collection/' + COLLECTION_ID);
+    browser.get('/collection/' + collectionId);
     browser.waitForAngular();
     users.logout();
   });
 
   it('checks for console errors in a collection with four nodes', function() {
     users.login('player@collections.com');
-    creatorDashboardPage.get();
+    browser.get('/collection_editor/create/' + collectionId);
     browser.waitForAngular();
-    element.all(by.css(
-      '.protractor-test-collection-card')).first().click();
-    browser.waitForAngular();
-    general.waitForSystem();
     collectionEditor.addExistingExploration('10');
     collectionEditor.saveDraft();
     collectionEditor.setCommitMessage('Add Exploration');
     collectionEditor.closeSaveModal();
     browser.waitForAngular();
 
-    browser.get('/collection/' + COLLECTION_ID);
+    browser.get('/collection/' + collectionId);
     browser.waitForAngular();
     users.logout();
   });
 
   afterEach(function() {
-    browser.manage().logs().get('browser').then(function(browserLog) {
-      var i = 0, severWarnings = false, errors = 0;
-      for (i; i <= browserLog.length - 1; i++) {
-        // Check only for console errors and not warnings
-        if (browserLog[i].level.name_ === 'SEVERE') {
-          errors = errors + 1;
-        }
-      }
-      expect(errors).toBe(0);
-    });
+    general.checkForConsoleErrors([]);
   });
 });
