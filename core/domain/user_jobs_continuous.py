@@ -551,24 +551,26 @@ class UserStatsMRJobManager(
             calculate_exploration_impact_score = False
 
         if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            exploration_stats = stats_services.get_exploration_stats(
+            exploration_stats_dict = stats_services.get_exploration_stats(
                 item.id, item.version)
+            # The domain object is passed in always. In the tests, we pass the
+            # dict directly instead.
+            if not isinstance(exploration_stats_dict, dict):
+                exploration_stats_dict = exploration_stats_dict.to_dict()
             answer_count = 0
-            # For each state, multiply the total answer count with the ratio of
-            # first entry count to the total entry count.
-            for state_name in exploration_stats.state_stats_mapping:
-                state_stats = exploration_stats.state_stats_mapping[state_name]
-                total_answers_count = (
-                    state_stats.total_answers_count_v1 +
-                    state_stats.total_answers_count_v2)
+            # For each state, find the number of first entries to the state.
+            # This is approximately considered to be equal to number of users
+            # who answered the state because very few users enter a state and
+            # leave without answering.
+            for state_name in exploration_stats_dict['state_stats_mapping']:
+                state_stats = exploration_stats_dict['state_stats_mapping'][
+                    state_name]
                 first_hit_count = (
-                    state_stats.first_hit_count_v1 +
-                    state_stats.first_hit_count_v2)
-                total_hit_count = (
-                    state_stats.first_hit_count_v1 +
-                    state_stats.first_hit_count_v2)
-                answer_count += total_answers_count * (
-                    first_hit_count/total_hit_count)
+                    state_stats.get('first_hit_count_v1', 0) +
+                    state_stats.get('first_hit_count_v2', 0))
+                answer_count += first_hit_count
+            num_starts = exploration_stats_dict.get('num_starts_v1', 0) + (
+                exploration_stats_dict.get('num_starts_v2', 0))
         else:
             statistics = (
                 stats_jobs_continuous.StatisticsAggregator.get_statistics(
@@ -585,6 +587,7 @@ class UserStatsMRJobManager(
                 first_entry_count = state_stats.get('first_entry_count', 0)
                 no_answer_count = state_stats.get('no_answer_count', 0)
                 answer_count += first_entry_count - no_answer_count
+            num_starts = statistics.get('start_exploration_count')
 
         # Turn answer count into reach
         reach = answer_count**exponent
@@ -619,8 +622,7 @@ class UserStatsMRJobManager(
                 mapped_owner_ids.append(contrib_id)
                 # Get num starts (total plays) for the exploration
                 exploration_data.update({
-                    'total_plays_for_owned_exp': (
-                        statistics['start_exploration_count']),
+                    'total_plays_for_owned_exp': num_starts,
                 })
                 # Update data with average rating only if it is not None.
                 if average_rating is not None:
@@ -635,8 +637,7 @@ class UserStatsMRJobManager(
                 mapped_owner_ids.append(owner_id)
                 # Get num starts (total plays) for the exploration
                 exploration_data = {
-                    'total_plays_for_owned_exp': (
-                        statistics['start_exploration_count']),
+                    'total_plays_for_owned_exp': num_starts,
                 }
                 # Update data with average rating only if it is not None.
                 if average_rating is not None:
