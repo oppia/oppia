@@ -249,6 +249,9 @@ def camelcase_to_hyphenated(camelcase_str):
     intermediate_str = re.sub('(.)([A-Z][a-z]+)', r'\1-\2', camelcase_str)
     return re.sub('([a-z0-9])([A-Z])', r'\1-\2', intermediate_str).lower()
 
+def camelcase_to_snakecase(camelcase_str):
+    intermediate_str = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', camelcase_str)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', intermediate_str).lower()
 
 def set_url_query_parameter(url, param_name, param_value):
     """Set or replace a query parameter, and return the modified URL."""

@@ -17,8 +17,8 @@
  */
 
 oppia.controller('DashboardNotifications', [
-  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
-  function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
+  '$scope', '$http', '$rootScope', 'DateTimeFormatService',
+  function($scope, $http, $rootScope, DateTimeFormatService) {
     $scope.getItemUrl = function(activityId, notificationType) {
       return (
         '/create/' + activityId + (
@@ -31,7 +31,7 @@ oppia.controller('DashboardNotifications', [
     };
 
     $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-      return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+      return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
         millisSinceEpoch);
     };
 

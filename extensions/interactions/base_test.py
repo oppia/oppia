@@ -34,7 +34,7 @@ import utils
 
 # File names ending in any of these suffixes will be ignored when checking the
 # validity of interaction definitions.
-IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store']
+IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store', '.swp']
 # Expected dimensions for an interaction thumbnail PNG image.
 INTERACTION_THUMBNAIL_WIDTH_PX = 178
 INTERACTION_THUMBNAIL_HEIGHT_PX = 146
@@ -107,7 +107,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
     def _validate_answer_visualization_specs(self, answer_visualization_specs):
         _ANSWER_VISUALIZATIONS_SPECS_SCHEMA = [
             ('id', basestring), ('options', dict),
-            ('calculation_id', basestring)]
+            ('calculation_id', basestring), ('show_addressed_info', bool)]
         _ANSWER_VISUALIZATION_KEYS = [
             item[0] for item in _ANSWER_VISUALIZATIONS_SPECS_SCHEMA]
 
@@ -212,47 +212,24 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 feconf.INTERACTIONS_DIR, interaction_id)
             self.assertTrue(os.path.isdir(interaction_dir))
 
-            # In this directory there should only be the following files:
+            # The interaction directory should contain the following files:
             #  Required:
             #    * A python file called {InteractionName}.py.
             #    * An html file called {InteractionName}.html.
-            #    * A JS file called {InteractionName}.js.
-            #    * A JS file called {InteractionName}ValidationService.js
+            #    * A directory name 'directives' containing JS and HTML files
+            #      for directives
             #    * A directory named 'static' containing at least a .png file.
             #  Optional:
-            #    * A JS file called {InteractionName}ValidationServiceSpecs.js
-            #    * A JS file called {InteractionName}RulesServiceSpecs.js
             #    * A JS file called protractor.js.
-            dir_contents = self._listdir_omit_ignored(interaction_dir)
+            interaction_dir_contents = (
+                self._listdir_omit_ignored(interaction_dir))
 
-            optional_dirs_and_files_count = 0
-
-            try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir, '%sSpec.js' % interaction_id)))
-                optional_dirs_and_files_count += 1
-            except Exception:
-                pass
-
-            try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir,
-                    '%sValidationServiceSpec.js' % interaction_id)))
-                optional_dirs_and_files_count += 1
-            except Exception:
-                pass
-
-            try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir, '%sRulesServiceSpec.js' % interaction_id)))
-                optional_dirs_and_files_count += 1
-            except Exception:
-                pass
+            interaction_dir_optional_dirs_and_files_count = 0
 
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
                     interaction_dir, 'protractor.js')))
-                optional_dirs_and_files_count += 1
+                interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
 
@@ -260,7 +237,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(os.path.isfile(os.path.join(
                     interaction_dir,
                     '%sPredictionService.js' % interaction_id)))
-                optional_dirs_and_files_count += 1
+                interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
 
@@ -268,25 +245,62 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 self.assertTrue(os.path.isfile(os.path.join(
                     interaction_dir,
                     '%sPredictionServiceSpec.js' % interaction_id)))
-                optional_dirs_and_files_count += 1
+                interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
 
             self.assertEqual(
-                optional_dirs_and_files_count + 5, len(dir_contents),
-                dir_contents
+                interaction_dir_optional_dirs_and_files_count + 4,
+                len(interaction_dir_contents)
             )
 
             py_file = os.path.join(interaction_dir, '%s.py' % interaction_id)
             html_file = os.path.join(
                 interaction_dir, '%s.html' % interaction_id)
-            js_file = os.path.join(interaction_dir, '%s.js' % interaction_id)
-            validation_service_js_file = os.path.join(
-                interaction_dir, '%sValidationService.js' % interaction_id)
 
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_file))
+
+            # Check that the directives subdirectory exists.
+            directives_dir = os.path.join(
+                interaction_dir, 'directives')
+            self.assertTrue(os.path.isdir(directives_dir))
+
+            # The directives directory should contain the following files:
+            #  Required:
+            #    * A JS file called {InteractionName}.js.
+            #    * A JS file called {InteractionName}ValidationService.js
+            #    * A HTML file called
+            #      {InteractionName}_interaction_directive.html
+            #    * A HTML file called
+            #      {InteractionName}_response_directive.html
+            #    * A HTML file called
+            #      {InteractionName}_short_response_directive.html
+            #  Optional:
+            #    * A JS file called {InteractionName}ValidationServiceSpecs.js
+            #    * A JS file called {InteractionName}RulesServiceSpecs.js
+
+            snakecase_interaction_id = (
+                utils.camelcase_to_snakecase(interaction_id))
+
+            js_file = os.path.join(directives_dir, '%s.js' % interaction_id)
+            validation_service_js_file = os.path.join(
+                directives_dir, '%sValidationService.js' % interaction_id)
+            interaction_directive_html = os.path.join(
+                directives_dir,
+                '%s_interaction_directive.html' % snakecase_interaction_id)
+            response_directive_html = os.path.join(
+                directives_dir,
+                '%s_response_directive.html' % snakecase_interaction_id)
+            short_response_directive_html = os.path.join(
+                directives_dir,
+                '%s_short_response_directive.html' % snakecase_interaction_id)
+
             self.assertTrue(os.path.isfile(js_file))
+            self.assertTrue(os.path.isfile(validation_service_js_file))
+            self.assertTrue(os.path.isfile(interaction_directive_html))
+            self.assertTrue(os.path.isfile(response_directive_html))
+            self.assertTrue(os.path.isfile(short_response_directive_html))
 
             # Check that the PNG thumbnail image has the correct dimensions.
             static_dir = os.path.join(interaction_dir, 'static')
@@ -309,22 +323,16 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertIn(
                 'oppiaInteractive%s' % interaction_id, js_file_content)
             self.assertIn('oppiaResponse%s' % interaction_id, js_file_content)
-            directive_prefix = '<script type="text/ng-template"'
-            self.assertIn(
-                '%s id="interaction/%s"' % (directive_prefix, interaction_id),
-                html_file_content)
-            self.assertIn(
-                '%s id="response/%s"' % (directive_prefix, interaction_id),
-                html_file_content)
             # Check that the html template includes js script for the
             # interaction.
             self.assertIn(
-                '<script src="{{cache_slug}}/extensions/interactions/%s/%s.js">'
+                '<script src="{{cache_slug}}/extensions/interactions/%s/'
+                'directives/%s.js">'
                 '</script>' % (interaction_id, interaction_id),
                 html_file_content)
             self.assertIn(
                 '<script src="{{cache_slug}}/extensions/interactions/%s/'
-                '%sValidationService.js"></script>' % (
+                'directives/%sValidationService.js"></script>' % (
                     interaction_id, interaction_id),
                 html_file_content)
             self.assertNotIn('<script>', js_file_content)

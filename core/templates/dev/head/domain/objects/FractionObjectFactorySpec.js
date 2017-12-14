@@ -28,14 +28,25 @@
      }));
 
      it('should convert itself to a string in fraction format', function() {
-       expect(new Fraction(true, 1, 2 ,3).toString()).toBe('-1 2/3');
-       expect(new Fraction(false, 1, 2 ,3).toString()).toBe('1 2/3');
-       expect(new Fraction(true, 0, 2 ,3).toString()).toBe('-2/3');
-       expect(new Fraction(false, 0, 2 ,3).toString()).toBe('2/3');
+       expect(new Fraction(true, 1, 2, 3).toString()).toBe('-1 2/3');
+       expect(new Fraction(false, 1, 2, 3).toString()).toBe('1 2/3');
+       expect(new Fraction(true, 0, 2, 3).toString()).toBe('-2/3');
+       expect(new Fraction(false, 0, 2, 3).toString()).toBe('2/3');
        expect(new Fraction(true, 1, 0, 3).toString()).toBe('-1');
        expect(new Fraction(false, 1, 0, 3).toString()).toBe('1');
        expect(new Fraction(true, 0, 0, 3).toString()).toBe('0');
        expect(new Fraction(false, 0, 0, 3).toString()).toBe('0');
+     });
+
+     it('should return the correct integer part', function() {
+       expect(new Fraction(true, 1, 2, 3).getIntegerPart()).toBe(-1);
+       expect(new Fraction(false, 1, 2, 3).getIntegerPart()).toBe(1);
+       expect(new Fraction(true, 0, 2, 3).getIntegerPart()).toBe(0);
+       expect(new Fraction(false, 0, 2, 3).getIntegerPart()).toBe(0);
+       expect(new Fraction(true, 1, 0, 3).getIntegerPart()).toBe(-1);
+       expect(new Fraction(false, 1, 0, 3).getIntegerPart()).toBe(1);
+       expect(new Fraction(true, 0, 0, 3).getIntegerPart()).toBe(0);
+       expect(new Fraction(false, 0, 0, 3).getIntegerPart()).toBe(0);
      });
 
      it('should parse valid strings', function() {

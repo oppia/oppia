@@ -370,23 +370,40 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
             # Ignore latest version since we already have corresponding
             # exploration.
             versions = range(1, exploration.version)
+
             # Get all exploration versions for current exploration id.
-            explorations = exp_services.get_multiple_explorations_by_version(
-                exploration.id, versions)
+            try:
+                explorations = (
+                    exp_services.get_multiple_explorations_by_version(
+                        exploration.id, versions))
+            except Exception as e:
+                yield ('ERROR with exp_id %s' % item.id, str(e))
+                return
 
         # Append latest exploration to the list of explorations.
         explorations.append(exploration)
 
-        # Get all commit cmds for all versions of exploration.
-        commit_log_models = (
-            exp_models.ExplorationCommitLogEntryModel.get_all_exploration_commits( # pylint: disable=line-too-long
-                exploration.id, exploration.version))
-        change_lists = [commit.commit_cmds for commit in commit_log_models]
+        # Retrieve list of snapshot models representing each version of the
+        # exploration.
+        versions = range(1, exploration.version + 1)
+        snapshots_by_version = (
+            exp_models.ExplorationModel.get_snapshots_metadata(
+                exploration.id, versions))
 
         # Create and save state id mapping model for all exploration versions.
-        for exploration, change_list in zip(explorations, change_lists):
+        for exploration, snapshot in zip(explorations, snapshots_by_version):
+            if snapshot is None:
+                yield (
+                    'ERROR with exp_id %s' % item.id,
+                    'Error: No exploration snapshot metadata model instance '
+                    'found for exploration %s, version %d' % (
+                        exploration.id, exploration.version))
+                return
+
+            change_list = snapshot['commit_cmds']
             # Check if commit is to revert the exploration.
-            if change_list[0]['cmd'].endswith('revert_version_number'):
+            if change_list and change_list[0]['cmd'].endswith(
+                    'revert_version_number'):
                 reverted_version = change_list[0]['version_number']
                 exp_services.create_and_save_state_id_mapping_model_for_reverted_exploration( # pylint: disable=line-too-long
                     exploration.id, exploration.version - 1, reverted_version)

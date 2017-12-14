@@ -19,14 +19,14 @@
 oppia.directive('solutionEditor', [
   '$modal', 'UrlInterpolationService', 'stateSolutionService',
   'EditorStateService', 'explorationStatesService',
-  'explorationWarningsService', 'AlertsService',
+  'ExplorationWarningsService', 'AlertsService',
   'SolutionObjectFactory', 'SolutionVerificationService',
   'ExplorationContextService', 'ExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateCustomizationArgsService',
   'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function($modal, UrlInterpolationService, stateSolutionService,
            EditorStateService, explorationStatesService,
-           explorationWarningsService, AlertsService,
+           ExplorationWarningsService, AlertsService,
            SolutionObjectFactory, SolutionVerificationService,
            ExplorationContextService, ExplorationHtmlFormatterService,
            stateInteractionIdService, stateCustomizationArgsService,
@@ -121,23 +121,16 @@ oppia.directive('solutionEditor', [
               var correctAnswer = result.solution.correctAnswer;
               var currentStateName = EditorStateService.getActiveStateName();
               var state = explorationStatesService.getState(currentStateName);
-              SolutionVerificationService.verifySolution(
-                ExplorationContextService.getExplorationId(),
-                state,
-                correctAnswer,
-                function () {
-                  explorationStatesService.updateSolutionValidity(
-                    currentStateName, true);
-                  explorationWarningsService.updateWarnings();
-                },
-                function () {
-                  explorationStatesService.updateSolutionValidity(
-                    currentStateName, false);
-                  explorationWarningsService.updateWarnings();
-                  AlertsService.addInfoMessage(
-                    INFO_MESSAGE_SOLUTION_IS_INVALID);
-                }
-              );
+              var solutionIsValid = SolutionVerificationService.verifySolution(
+                ExplorationContextService.getExplorationId(), state,
+                correctAnswer);
+
+              explorationStatesService.updateSolutionValidity(
+                currentStateName, solutionIsValid);
+              ExplorationWarningsService.updateWarnings();
+              if (!solutionIsValid) {
+                AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+              }
 
               stateSolutionService.displayed = result.solution;
               stateSolutionService.saveDisplayedValue();

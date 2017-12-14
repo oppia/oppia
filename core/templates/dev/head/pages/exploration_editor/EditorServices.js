@@ -258,150 +258,6 @@ oppia.factory('changeListService', [
   }
 ]);
 
-// A data service that stores data about the rights for this exploration.
-oppia.factory('explorationRightsService', [
-  '$http', '$q', 'ExplorationDataService', 'AlertsService',
-  function($http, $q, ExplorationDataService, AlertsService) {
-    return {
-      init: function(
-          ownerNames, editorNames, viewerNames, status, clonedFrom,
-          isCommunityOwned, viewableIfPrivate) {
-        this.ownerNames = ownerNames;
-        this.editorNames = editorNames;
-        this.viewerNames = viewerNames;
-        this._status = status;
-        // This is null if the exploration was not cloned from anything,
-        // otherwise it is the exploration ID of the source exploration.
-        this._clonedFrom = clonedFrom;
-        this._isCommunityOwned = isCommunityOwned;
-        this._viewableIfPrivate = viewableIfPrivate;
-      },
-      clonedFrom: function() {
-        return this._clonedFrom;
-      },
-      isPrivate: function() {
-        return this._status === GLOBALS.ACTIVITY_STATUS_PRIVATE;
-      },
-      isPublic: function() {
-        return this._status === GLOBALS.ACTIVITY_STATUS_PUBLIC;
-      },
-      isCloned: function() {
-        return Boolean(this._clonedFrom);
-      },
-      isCommunityOwned: function() {
-        return this._isCommunityOwned;
-      },
-      viewableIfPrivate: function() {
-        return this._viewableIfPrivate;
-      },
-      makeCommunityOwned: function() {
-        var whenCommunityOwnedSet = $q.defer();
-        var that = this;
-
-        var requestUrl = (
-          '/createhandler/rights/' + ExplorationDataService.explorationId);
-        $http.put(requestUrl, {
-          version: ExplorationDataService.data.version,
-          make_community_owned: true
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
-          whenCommunityOwnedSet.resolve();
-        });
-        return whenCommunityOwnedSet.promise;
-      },
-      setViewability: function(viewableIfPrivate) {
-        var whenViewabilityChanged = $q.defer();
-        var that = this;
-
-        var requestUrl = (
-            '/createhandler/rights/' + ExplorationDataService.explorationId);
-        $http.put(requestUrl, {
-          version: ExplorationDataService.data.version,
-          viewable_if_private: viewableIfPrivate
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
-          whenViewabilityChanged.resolve();
-        });
-        return whenViewabilityChanged.promise;
-      },
-      saveRoleChanges: function(newMemberUsername, newMemberRole) {
-        var whenRolesSaved = $q.defer();
-        var that = this;
-
-        var requestUrl = (
-            '/createhandler/rights/' + ExplorationDataService.explorationId);
-        $http.put(requestUrl, {
-          version: ExplorationDataService.data.version,
-          new_member_role: newMemberRole,
-          new_member_username: newMemberUsername
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
-          whenRolesSaved.resolve();
-        });
-        return whenRolesSaved.promise;
-      },
-      publish: function() {
-        var whenPublishStatusChanged = $q.defer();
-        var that = this;
-
-        var requestUrl = (
-          '/createhandler/status/' + ExplorationDataService.explorationId);
-        $http.put(requestUrl, {
-          make_public: true
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
-          whenPublishStatusChanged.resolve();
-        });
-        return whenPublishStatusChanged.promise;
-      },
-      saveModeratorChangeToBackend: function(action, emailBody) {
-        var that = this;
-
-        var explorationModeratorRightsUrl = (
-          '/createhandler/moderatorrights/' +
-          ExplorationDataService.explorationId);
-        $http.put(explorationModeratorRightsUrl, {
-          action: action,
-          email_body: emailBody,
-          version: ExplorationDataService.data.version
-        }).then(function(response) {
-          var data = response.data;
-          AlertsService.clearWarnings();
-          that.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
-        });
-      }
-    };
-  }
-]);
-
 oppia.factory('explorationPropertyService', [
   '$rootScope', '$log', 'changeListService', 'AlertsService',
   function($rootScope, $log, changeListService, AlertsService) {
@@ -504,16 +360,16 @@ oppia.factory('explorationPropertyService', [
 // displayed and edited in multiple places in the UI.
 oppia.factory('explorationTitleService', [
   'explorationPropertyService', '$filter', 'ValidatorsService',
-  'explorationRightsService',
+  'ExplorationRightsService',
   function(
     explorationPropertyService, $filter, ValidatorsService,
-    explorationRightsService) {
+    ExplorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'title';
     child._normalize = $filter('normalizeWhitespace');
     child._isValid = function(value) {
       return ValidatorsService.isValidEntityName(
-        value, true, explorationRightsService.isPrivate());
+        value, true, ExplorationRightsService.isPrivate());
     };
     return child;
   }
@@ -523,16 +379,16 @@ oppia.factory('explorationTitleService', [
 // displayed and edited in multiple places in the UI.
 oppia.factory('explorationCategoryService', [
   'explorationPropertyService', '$filter', 'ValidatorsService',
-  'explorationRightsService',
+  'ExplorationRightsService',
   function(
     explorationPropertyService, $filter, ValidatorsService,
-    explorationRightsService) {
+    ExplorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'category';
     child._normalize = $filter('normalizeWhitespace');
     child._isValid = function(value) {
       return ValidatorsService.isValidEntityName(
-        value, true, explorationRightsService.isPrivate());
+        value, true, ExplorationRightsService.isPrivate());
     };
     return child;
   }
@@ -542,16 +398,16 @@ oppia.factory('explorationCategoryService', [
 // be displayed and edited in multiple places in the UI.
 oppia.factory('explorationObjectiveService', [
   'explorationPropertyService', '$filter', 'ValidatorsService',
-  'explorationRightsService',
+  'ExplorationRightsService',
   function(
     explorationPropertyService, $filter, ValidatorsService,
-    explorationRightsService) {
+    ExplorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'objective';
     child._normalize = $filter('normalizeWhitespace');
     child._isValid = function(value) {
       return (
-        explorationRightsService.isPrivate() ||
+        ExplorationRightsService.isPrivate() ||
         ValidatorsService.isNonempty(value, false));
     };
     return child;
@@ -806,7 +662,6 @@ oppia.factory('explorationStatesService', [
               stateName,
               _states.getState(stateName),
               solution.correctAnswer,
-              true,
               $injector.get(
                 AngularNameService.getNameOfInteractionRulesService(
                   _states.getState(stateName).interaction.id))));
@@ -1154,58 +1009,13 @@ oppia.factory('stateSolutionService', [
   }
 ]);
 
-
-oppia.factory('computeGraphService', [
-  'INTERACTION_SPECS', function(INTERACTION_SPECS) {
-    var _computeGraphData = function(initStateId, states) {
-      var nodes = {};
-      var links = [];
-      var finalStateIds = states.getFinalStateNames();
-
-      states.getStateNames().forEach(function(stateName) {
-        var interaction = states.getState(stateName).interaction;
-        nodes[stateName] = stateName;
-        if (interaction.id) {
-          var groups = interaction.answerGroups;
-          for (var h = 0; h < groups.length; h++) {
-            links.push({
-              source: stateName,
-              target: groups[h].outcome.dest,
-            });
-          }
-
-          if (interaction.defaultOutcome) {
-            links.push({
-              source: stateName,
-              target: interaction.defaultOutcome.dest,
-            });
-          }
-        }
-      });
-
-      return {
-        finalStateIds: finalStateIds,
-        initStateId: initStateId,
-        links: links,
-        nodes: nodes
-      };
-    };
-
-    return {
-      compute: function(initStateId, states) {
-        return _computeGraphData(initStateId, states);
-      }
-    };
-  }
-]);
-
 // Service for computing graph data.
 oppia.factory('graphDataService', [
   'explorationStatesService', 'explorationInitStateNameService',
-  'computeGraphService',
+  'ComputeGraphService',
   function(
       explorationStatesService, explorationInitStateNameService,
-      computeGraphService) {
+      ComputeGraphService) {
     var _graphData = null;
 
     // Returns an object which can be treated as the input to a visualization
@@ -1224,7 +1034,7 @@ oppia.factory('graphDataService', [
 
       var states = explorationStatesService.getStates();
       var initStateId = explorationInitStateNameService.savedMemento;
-      _graphData = computeGraphService.compute(initStateId, states);
+      _graphData = ComputeGraphService.compute(initStateId, states);
     };
 
     return {
@@ -1233,43 +1043,6 @@ oppia.factory('graphDataService', [
       },
       getGraphData: function() {
         return angular.copy(_graphData);
-      }
-    };
-  }
-]);
-
-// Service for the state editor tutorial.
-oppia.factory('stateEditorTutorialFirstTimeService', [
-  '$http', '$rootScope', 'editorFirstTimeEventsService',
-  function($http, $rootScope, editorFirstTimeEventsService) {
-    // Whether this is the first time the tutorial has been seen by this user.
-    var _currentlyInFirstVisit = true;
-
-    var STARTED_TUTORIAL_EVENT_URL = '/createhandler/started_tutorial_event';
-
-    return {
-      // After the first call to it in a client session, this does nothing.
-      init: function(firstTime, expId) {
-        if (!firstTime || !_currentlyInFirstVisit) {
-          _currentlyInFirstVisit = false;
-        }
-
-        if (_currentlyInFirstVisit) {
-          $rootScope.$broadcast('enterEditorForTheFirstTime');
-          editorFirstTimeEventsService.initRegisterEvents(expId);
-          $http.post(STARTED_TUTORIAL_EVENT_URL + '/' + expId).error(
-            function() {
-              console.error('Warning: could not record tutorial start event.');
-            });
-        }
-      },
-      markTutorialFinished: function() {
-        if (_currentlyInFirstVisit) {
-          $rootScope.$broadcast('openPostTutorialHelpPopover');
-          editorFirstTimeEventsService.registerEditorFirstEntryEvent();
-        }
-
-        _currentlyInFirstVisit = false;
       }
     };
   }
@@ -1291,309 +1064,6 @@ oppia.constant('STATE_ERROR_MESSAGES', {
   INCORRECT_SOLUTION: (
     'The current solution does not lead to another card.')
 });
-
-// Service for the list of exploration warnings.
-oppia.factory('explorationWarningsService', [
-  '$injector', 'graphDataService', 'explorationStatesService',
-  'ExpressionInterpolationService', 'explorationParamChangesService',
-  'ParameterMetadataService', 'INTERACTION_SPECS',
-  'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
-  function(
-      $injector, graphDataService, explorationStatesService,
-      ExpressionInterpolationService, explorationParamChangesService,
-      ParameterMetadataService, INTERACTION_SPECS,
-      WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
-    var _warningsList = [];
-    var stateWarnings = {};
-    var hasCriticalStateWarning = false;
-
-    var _getStatesWithoutInteractionIds = function() {
-      var statesWithoutInteractionIds = [];
-
-      var states = explorationStatesService.getStates();
-
-      states.getStateNames().forEach(function(stateName) {
-        if (!states.getState(stateName).interaction.id) {
-          statesWithoutInteractionIds.push(stateName);
-        }
-      });
-
-      return statesWithoutInteractionIds;
-    };
-
-    var _getStatesWithIncorrectSolution = function() {
-      var statesWithIncorrectSolution = [];
-
-      var states = explorationStatesService.getStates();
-      states.getStateNames().forEach(function(stateName) {
-        if (states.getState(stateName).interaction.solution &&
-            !explorationStatesService.isSolutionValid(stateName)) {
-          statesWithIncorrectSolution.push(stateName);
-        }
-      });
-      return statesWithIncorrectSolution;
-    };
-
-    // Returns a list of names of all nodes which are unreachable from the
-    // initial node.
-    //
-    // Args:
-    // - initNodeIds: a list of initial node ids
-    // - nodes: an object whose keys are node ids, and whose values are node
-    //     names
-    // - edges: a list of edges, each of which is an object with keys 'source',
-    //     and 'target'.
-    var _getUnreachableNodeNames = function(
-        initNodeIds, nodes, edges) {
-      var queue = initNodeIds;
-      var seen = {};
-      for (var i = 0; i < initNodeIds.length; i++) {
-        seen[initNodeIds[i]] = true;
-      }
-      while (queue.length > 0) {
-        var currNodeId = queue.shift();
-        edges.forEach(function(edge) {
-          if (edge.source === currNodeId && !seen.hasOwnProperty(edge.target)) {
-            seen[edge.target] = true;
-            queue.push(edge.target);
-          }
-        });
-      }
-
-      var unreachableNodeNames = [];
-      for (var nodeId in nodes) {
-        if (!(seen.hasOwnProperty(nodes[nodeId]))) {
-          unreachableNodeNames.push(nodes[nodeId]);
-        }
-      }
-
-      return unreachableNodeNames;
-    };
-
-    // Given an array of objects with two keys 'source' and 'target', returns
-    // an array with the same objects but with the values of 'source' and
-    // 'target' switched. (The objects represent edges in a graph, and this
-    // operation amounts to reversing all the edges.)
-    var _getReversedLinks = function(links) {
-      return links.map(function(link) {
-        return {
-          source: link.target,
-          target: link.source,
-        };
-      });
-    };
-
-    // Verify that all parameters referred to in a state are guaranteed to
-    // have been set beforehand.
-    var _verifyParameters = function(initNodeIds) {
-      var unsetParametersInfo = (
-        ParameterMetadataService.getUnsetParametersInfo(initNodeIds));
-
-      var paramWarningsList = [];
-      unsetParametersInfo.forEach(function(unsetParameterData) {
-        if (!unsetParameterData.stateName) {
-          // The parameter value is required in the initial list of parameter
-          // changes.
-          paramWarningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: (
-              'Please ensure the value of parameter "' +
-              unsetParameterData.paramName +
-              '" is set before it is referred to in the initial list of ' +
-              'parameter changes.')
-          });
-        } else {
-          // The parameter value is required in a subsequent state.
-          paramWarningsList.push({
-            type: WARNING_TYPES.CRITICAL,
-            message: (
-              'Please ensure the value of parameter "' +
-              unsetParameterData.paramName +
-              '" is set before using it in "' + unsetParameterData.stateName +
-              '".')
-          });
-        }
-      });
-
-      return paramWarningsList;
-    };
-
-    var _getAnswerGroupIndexesWithEmptyClassifiers = function(state) {
-      var indexes = [];
-      var answerGroups = state.interaction.answerGroups;
-      for (var i = 0; i < answerGroups.length; i++) {
-        var group = answerGroups[i];
-        if (group.rules.length === 1 &&
-            group.rules[0].type === RULE_TYPE_CLASSIFIER &&
-            group.rules[0].inputs.training_data.length === 0) {
-          indexes.push(i);
-        }
-      }
-      return indexes;
-    };
-
-    var _getStatesAndAnswerGroupsWithEmptyClassifiers = function() {
-      var results = [];
-
-      var states = explorationStatesService.getStates();
-
-      states.getStateNames().forEach(function(stateName) {
-        var groupIndexes = _getAnswerGroupIndexesWithEmptyClassifiers(
-          states.getState(stateName));
-        if (groupIndexes.length > 0) {
-          results.push({
-            groupIndexes: groupIndexes,
-            stateName: stateName
-          });
-        }
-      });
-
-      return results;
-    };
-
-    var _updateWarningsList = function() {
-      _warningsList = [];
-      stateWarnings = {};
-      hasCriticalStateWarning = false;
-
-      graphDataService.recompute();
-      var _graphData = graphDataService.getGraphData();
-
-      var _states = explorationStatesService.getStates();
-      _states.getStateNames().forEach(function(stateName) {
-        var interaction = _states.getState(stateName).interaction;
-        if (interaction.id) {
-          var validatorServiceName =
-            _states.getState(stateName).interaction.id + 'ValidationService';
-          var validatorService = $injector.get(validatorServiceName);
-          var interactionWarnings = validatorService.getAllWarnings(
-            stateName, interaction.customizationArgs,
-            interaction.answerGroups, interaction.defaultOutcome);
-
-          for (var j = 0; j < interactionWarnings.length; j++) {
-            if (stateWarnings.hasOwnProperty(stateName)) {
-              stateWarnings[stateName].push(interactionWarnings[j].message);
-            } else {
-              stateWarnings[stateName] = [interactionWarnings[j].message];
-            }
-
-            if (interactionWarnings[j].type === WARNING_TYPES.CRITICAL) {
-              hasCriticalStateWarning = true;
-            }
-          }
-        }
-      });
-
-      var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
-      angular.forEach(statesWithoutInteractionIds, function(
-        stateWithoutInteractionIds) {
-        if (stateWarnings.hasOwnProperty(stateWithoutInteractionIds)) {
-          stateWarnings[stateWithoutInteractionIds].push(
-            STATE_ERROR_MESSAGES.ADD_INTERACTION);
-        } else {
-          stateWarnings[stateWithoutInteractionIds] = [
-            STATE_ERROR_MESSAGES.ADD_INTERACTION];
-        }
-      });
-
-      var statesWithIncorrectSolution = _getStatesWithIncorrectSolution();
-      angular.forEach(statesWithIncorrectSolution, function(state) {
-        if (stateWarnings.hasOwnProperty(state)) {
-          stateWarnings[state].push(STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
-        } else {
-          stateWarnings[state] = [STATE_ERROR_MESSAGES.INCORRECT_SOLUTION];
-        }
-      });
-
-      if (_graphData) {
-        var unreachableStateNames = _getUnreachableNodeNames(
-          [_graphData.initStateId], _graphData.nodes, _graphData.links, true);
-
-        if (unreachableStateNames.length) {
-          angular.forEach(unreachableStateNames, function(
-            unreachableStateName) {
-            if (stateWarnings.hasOwnProperty(unreachableStateName)) {
-              stateWarnings[unreachableStateName].push(
-                STATE_ERROR_MESSAGES.STATE_UNREACHABLE);
-            } else {
-              stateWarnings[unreachableStateName] =
-                [STATE_ERROR_MESSAGES.STATE_UNREACHABLE];
-            }
-          });
-        } else {
-          // Only perform this check if all states are reachable.
-          var deadEndStates = _getUnreachableNodeNames(
-            _graphData.finalStateIds, _graphData.nodes,
-            _getReversedLinks(_graphData.links), false);
-          if (deadEndStates.length) {
-            angular.forEach(deadEndStates, function(deadEndState) {
-              if (stateWarnings.hasOwnProperty(deadEndState)) {
-                stateWarnings[deadEndState].push(
-                  STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION);
-              } else {
-                stateWarnings[deadEndState] = [
-                  STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION];
-              }
-            });
-          }
-        }
-
-        _warningsList = _warningsList.concat(_verifyParameters([
-          _graphData.initStateId]));
-      }
-
-      if (Object.keys(stateWarnings).length) {
-        var errorString = (
-          Object.keys(stateWarnings).length > 1 ? 'cards have' : 'card has');
-        _warningsList.push({
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'The following ' + errorString + ' errors: ' +
-            Object.keys(stateWarnings).join(', ') + '.')
-        });
-      }
-
-      var statesWithAnswerGroupsWithEmptyClassifiers = (
-        _getStatesAndAnswerGroupsWithEmptyClassifiers());
-      statesWithAnswerGroupsWithEmptyClassifiers.forEach(function(result) {
-        var warningMessage = 'In \'' + result.stateName + '\'';
-        if (result.groupIndexes.length !== 1) {
-          warningMessage += ', the following answer groups have classifiers ';
-          warningMessage += 'with no training data: ';
-        } else {
-          warningMessage += ', the following answer group has a classifier ';
-          warningMessage += 'with no training data: ';
-        }
-        warningMessage += result.groupIndexes.join(', ');
-
-        _warningsList.push({
-          message: warningMessage,
-          type: WARNING_TYPES.ERROR
-        });
-      });
-    };
-
-    return {
-      countWarnings: function() {
-        return _warningsList.length;
-      },
-      getAllStateRelatedWarnings: function() {
-        return stateWarnings;
-      },
-      getWarnings: function() {
-        return _warningsList;
-      },
-      hasCriticalWarnings: function() {
-        return hasCriticalStateWarning || _warningsList.some(function(warning) {
-          return warning.type === WARNING_TYPES.CRITICAL;
-        });
-      },
-      updateWarnings: function() {
-        _updateWarningsList();
-      }
-    };
-  }
-]);
 
 oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
   var CMD_ADD_STATE = 'add_state';
@@ -1962,88 +1432,6 @@ oppia.factory('autosaveInfoModalsService', [
         });
 
         _isModalOpen = true;
-      }
-    };
-  }
-]);
-
-// Service registering analytics events for the editor for events which are
-// only logged when they happen after the editor is opened for the first time
-// for an exploration.
-oppia.factory('editorFirstTimeEventsService', [
-  'siteAnalyticsService',
-  function(siteAnalyticsService) {
-    var explorationId = null;
-    var shouldRegisterEvents = false;
-    var alreadyRegisteredEvents = {};
-    return {
-      initRegisterEvents: function(expId) {
-        shouldRegisterEvents = true;
-        explorationId = expId;
-      },
-      registerEditorFirstEntryEvent: function() {
-        if (shouldRegisterEvents &&
-            !alreadyRegisteredEvents.hasOwnProperty('EditorFirstEntryEvent')) {
-          siteAnalyticsService.registerEditorFirstEntryEvent(explorationId);
-          alreadyRegisteredEvents.EditorFirstEntryEvent = true;
-        }
-      },
-      registerFirstOpenContentBoxEvent: function() {
-        if (shouldRegisterEvents &&
-            !alreadyRegisteredEvents.hasOwnProperty(
-              'FirstOpenContentBoxEvent')) {
-          siteAnalyticsService.registerFirstOpenContentBoxEvent(explorationId);
-          alreadyRegisteredEvents.FirstOpenContentBoxEvent = true;
-        }
-      },
-      registerFirstSaveContentEvent: function() {
-        if (shouldRegisterEvents &&
-            !alreadyRegisteredEvents.hasOwnProperty('FirstSaveContentEvent')) {
-          siteAnalyticsService.registerFirstSaveContentEvent(explorationId);
-          alreadyRegisteredEvents.FirstSaveContentEvent = true;
-        }
-      },
-      registerFirstClickAddInteractionEvent: function() {
-        if (shouldRegisterEvents &&
-            !alreadyRegisteredEvents.hasOwnProperty(
-              'FirstClickAddInteractionEvent')) {
-          siteAnalyticsService.registerFirstClickAddInteractionEvent(
-            explorationId);
-          alreadyRegisteredEvents.FirstClickAddInteractionEvent = true;
-        }
-      },
-      registerFirstSelectInteractionTypeEvent: function() {
-        if (shouldRegisterEvents &&
-            !alreadyRegisteredEvents.hasOwnProperty(
-              'FirstSelectInteractionTypeEvent')) {
-          siteAnalyticsService.registerFirstSelectInteractionTypeEvent(
-            explorationId);
-          alreadyRegisteredEvents.FirstSelectInteractionTypeEvent = true;
-        }
-      },
-      registerFirstSaveInteractionEvent: function() {
-        if (shouldRegisterEvents &&
-            !alreadyRegisteredEvents.hasOwnProperty(
-              'FirstSaveInteractionEvent')) {
-          siteAnalyticsService.registerFirstSaveInteractionEvent(explorationId);
-          alreadyRegisteredEvents.FirstSaveInteractionEvent = true;
-        }
-      },
-      registerFirstSaveRuleEvent: function() {
-        if (shouldRegisterEvents &&
-            !alreadyRegisteredEvents.hasOwnProperty('FirstSaveRuleEvent')) {
-          siteAnalyticsService.registerFirstSaveRuleEvent(explorationId);
-          alreadyRegisteredEvents.FirstSaveRuleEvent = true;
-        }
-      },
-      registerFirstCreateSecondStateEvent: function() {
-        if (shouldRegisterEvents &&
-            !alreadyRegisteredEvents.hasOwnProperty(
-              'FirstCreateSecondStateEvent')) {
-          siteAnalyticsService.registerFirstCreateSecondStateEvent(
-            explorationId);
-          alreadyRegisteredEvents.FirstCreateSecondStateEvent = true;
-        }
       }
     };
   }

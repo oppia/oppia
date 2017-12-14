@@ -18,13 +18,13 @@
 
 oppia.controller('FeedbackTab', [
   '$scope', '$http', '$modal', '$timeout', '$rootScope', 'AlertsService',
-  'oppiaDatetimeFormatter', 'ThreadStatusDisplayService',
+  'DateTimeFormatService', 'ThreadStatusDisplayService',
   'ThreadDataService', 'explorationStatesService', 'ExplorationDataService',
   'changeListService', 'StateObjectFactory', 'UrlInterpolationService',
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
     $scope, $http, $modal, $timeout, $rootScope, AlertsService,
-    oppiaDatetimeFormatter, ThreadStatusDisplayService,
+    DateTimeFormatService, ThreadStatusDisplayService,
     ThreadDataService, explorationStatesService, ExplorationDataService,
     changeListService, StateObjectFactory, UrlInterpolationService,
     ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
@@ -34,9 +34,10 @@ oppia.controller('FeedbackTab', [
     $scope.getHumanReadableStatus = (
       ThreadStatusDisplayService.getHumanReadableStatus);
     $scope.getLocaleAbbreviatedDatetimeString = (
-      oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
+      DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
     $scope.activeThread = null;
+    $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
     $rootScope.loadingMessage = 'Loading';
     $scope.tmpMessage = {
       status: null,

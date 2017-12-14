@@ -317,8 +317,7 @@ oppia.controller('StateResponses', [
 
               var classificationResult = (
                 AnswerClassificationService.getMatchingClassificationResult(
-                  _explorationId, _stateName, _state, answer, true,
-                  rulesService));
+                  _explorationId, _stateName, _state, answer, rulesService));
               var feedback = 'Nothing';
               var dest = classificationResult.outcome.dest;
               if (classificationResult.outcome.feedback.length > 0) {
@@ -365,11 +364,11 @@ oppia.controller('StateResponses', [
         backdrop: 'static',
         controller: [
           '$scope', '$modalInstance', 'ResponsesService',
-          'EditorStateService', 'editorFirstTimeEventsService',
+          'EditorStateService', 'EditorFirstTimeEventsService',
           'RuleObjectFactory', 'OutcomeObjectFactory',
           function(
               $scope, $modalInstance, ResponsesService,
-              EditorStateService, editorFirstTimeEventsService,
+              EditorStateService, EditorFirstTimeEventsService,
               RuleObjectFactory, OutcomeObjectFactory) {
             $scope.feedbackEditorIsOpen = false;
             $scope.openFeedbackEditor = function() {
@@ -406,7 +405,7 @@ oppia.controller('StateResponses', [
                 $scope.tmpOutcome.feedback = [];
               }
 
-              editorFirstTimeEventsService.registerFirstSaveRuleEvent();
+              EditorFirstTimeEventsService.registerFirstSaveRuleEvent();
 
               // Close the modal and save it afterwards.
               $modalInstance.close({
