@@ -115,15 +115,14 @@ describe('Collections', function() {
     users.logout();
   });
 
-  it('checks for console errors in a collection with one node', function() {
+  it('checks for errors in a collection with varying node count', function() {
+    //Checking in a collection with one node
     users.login('player@collections.com');
     browser.get('/collection/' + collectionId);
     browser.waitForAngular();
-    users.logout();
-  });
+    general.checkForConsoleErrors([]);
 
-  it('checks for console errors in a collection with two nodes', function() {
-    users.login('player@collections.com');
+    //Checking in a collection with two nodes
     browser.get('/collection_editor/create/' + collectionId);
     browser.waitForAngular();
     collectionEditor.addExistingExploration('4');
@@ -131,14 +130,11 @@ describe('Collections', function() {
     collectionEditor.setCommitMessage('Add Exploration');
     collectionEditor.closeSaveModal();
     browser.waitForAngular();
-
     browser.get('/collection/' + collectionId);
     browser.waitForAngular();
-    users.logout();
-  });
+    general.checkForConsoleErrors([]);
 
-  it('checks for console errors in a collection with three nodes', function() {
-    users.login('player@collections.com');
+    //Checking in a collection with three nodes
     browser.get('/collection_editor/create/' + collectionId);
     browser.waitForAngular();
     collectionEditor.addExistingExploration('13');
@@ -146,14 +142,11 @@ describe('Collections', function() {
     collectionEditor.setCommitMessage('Add Exploration');
     collectionEditor.closeSaveModal();
     browser.waitForAngular();
-
     browser.get('/collection/' + collectionId);
     browser.waitForAngular();
-    users.logout();
-  });
+    general.checkForConsoleErrors([]);
 
-  it('checks for console errors in a collection with four nodes', function() {
-    users.login('player@collections.com');
+    //Checking in a collection with four nodes
     browser.get('/collection_editor/create/' + collectionId);
     browser.waitForAngular();
     collectionEditor.addExistingExploration('10');
@@ -161,9 +154,9 @@ describe('Collections', function() {
     collectionEditor.setCommitMessage('Add Exploration');
     collectionEditor.closeSaveModal();
     browser.waitForAngular();
-
     browser.get('/collection/' + collectionId);
     browser.waitForAngular();
+    general.checkForConsoleErrors([]);
     users.logout();
   });
 
