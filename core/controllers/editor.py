@@ -411,7 +411,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
             intent = 'unpublish_exploration'
             for owner_id in exp_rights.owner_ids:
                 email_manager.send_moderator_action_email(
-                    self.user_id, owner_id, unpublish_exploration,
+                    self.user_id, owner_id, 'unpublish_exploration',
                     exploration.title, email_body)
 
         self.render_json({
