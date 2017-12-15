@@ -16,6 +16,7 @@
 
 """Tests for Oppia statistics models."""
 
+from core.domain import exp_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -180,19 +181,9 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
             'exp_id2', 1, 0, 0, 0, 0, 0, 0, {})
 
         exp_version_reference_dicts = [
-            {
-                'exp_id': 'exp_id1',
-                'version': 1
-            },
-            {
-                'exp_id': 'exp_id1',
-                'version': 2
-            },
-            {
-                'exp_id': 'exp_id2',
-                'version': 1
-            }
-        ]
+            exp_domain.ExpVersionReference('exp_id1', 1),
+            exp_domain.ExpVersionReference('exp_id1', 2),
+            exp_domain.ExpVersionReference('exp_id2', 1)]
 
         stats_models = stat_models.ExplorationStatsModel.get_multi_stats_models(
             exp_version_reference_dicts)

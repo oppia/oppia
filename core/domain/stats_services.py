@@ -305,13 +305,9 @@ def get_exploration_stats_multi(exp_version_references):
     Returns:
         list(ExplorationStats). The list of exploration stats domain objects.
     """
-    exp_version_reference_dicts = [
-        exp_version_reference.to_dict()
-        for exp_version_reference in exp_version_references]
-
     exploration_stats_models = (
         stats_models.ExplorationStatsModel.get_multi_stats_models(
-            exp_version_reference_dicts))
+            exp_version_references))
 
     exploration_stats_list = [
         get_exploration_stats_from_model(exploration_stats_model)
