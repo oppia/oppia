@@ -49,23 +49,21 @@ oppia.factory('UserEmailPreferencesService', [
         });
       },
       saveChangeToBackend: function(requestParams) {
-        var whenPreferencesSaved = $q.defer();
         var that = this;
-
         var emailPreferencesUrl = UrlInterpolationService.interpolateUrl(
           '/createhandler/notificationpreferences/<exploration_id>', {
             exploration_id: ExplorationDataService.explorationId
-          });
-        $http.put(emailPreferencesUrl, requestParams).then(
+          }
+        );
+        return $http.put(emailPreferencesUrl, requestParams).then(
           function(response) {
             var data = response.data;
             AlertsService.clearWarnings();
             that.init(
               data.email_preferences.mute_feedback_notifications,
               data.email_preferences.mute_suggestion_notifications);
-            whenPreferencesSaved.resolve();
-          });
-        return whenPreferencesSaved.promise;
+          }
+        );
       }
     };
   }

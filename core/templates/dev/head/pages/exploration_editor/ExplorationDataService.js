@@ -89,10 +89,7 @@ oppia.factory('ExplorationDataService', [
       getData: function(errorCallback) {
         if (explorationData.data) {
           $log.info('Found exploration data in cache.');
-
-          var deferred = $q.defer();
-          deferred.resolve(explorationData.data);
-          return deferred.promise;
+          return $q.resolve(explorationData.data);
         } else {
           // Retrieve data from the server.
           // WARNING: Note that this is a version of the exploration with draft
