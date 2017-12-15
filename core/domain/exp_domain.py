@@ -442,7 +442,7 @@ class ExpVersionReference(object):
     """Value object representing an exploration ID and a version number."""
 
     def __init__(self, exp_id, version):
-        """Initializes a ExpVersionReference domain object.
+        """Initializes an ExpVersionReference domain object.
 
         Args:
             exp_id: str. ID of the exploration.
