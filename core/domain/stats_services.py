@@ -295,26 +295,29 @@ def save_stats_model_transactional(exploration_stats):
         _save_stats_model, exploration_stats)
 
 
-def get_view_multi(exploration_ids, version_numbers):
-    """Retrieves the view counts for the given exploration IDs.
+def get_exploration_stats_multi(exp_version_references):
+    """Retrieves the exploration stats for the given explorations.
 
-        Args:
-            exploration_ids: list(str). The list of exploration IDs to get view
-                counts for.
-            version_numbers: list(int). List of version numbers of explorations.
+    Args:
+        exp_version_references: list(ExpVersionReference). List of exploration
+            version reference domain objects.
 
-        Returns:
-            list(int). The number of times each exploration in exploration_ids
-                has been viewed.
+    Returns:
+        list(ExplorationStats). The list of exploration stats domain objects.
     """
+    exp_version_reference_dicts = [
+        exp_version_reference.to_dict()
+        for exp_version_reference in exp_version_references]
+
     exploration_stats_models = (
         stats_models.ExplorationStatsModel.get_multi_stats_models(
-            exploration_ids, version_numbers))
+            exp_version_reference_dicts))
 
-    return [
-        exploration_stats_models[i].num_starts_v1 if (
-            exploration_stats_models[i] is not None) else 0
-        for i in range(len(exploration_ids))]
+    exploration_stats_list = [
+        get_exploration_stats_from_model(exploration_stats_model)
+        for exploration_stats_model in exploration_stats_models]
+
+    return exploration_stats_list
 
 
 def get_visualizations_info(exp_id, state_name, interaction_id):

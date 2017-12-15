@@ -19,6 +19,7 @@
 from constants import constants
 from core.domain import activity_services
 from core.domain import collection_services
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -376,11 +377,13 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
         for exploration_summary in exploration_summaries]
 
     if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-        version_numbers = [
-            exploration_summary.version
-            for exploration_summary in exploration_summaries]
-        view_counts = stats_services.get_view_multi(
-            exploration_ids, version_numbers)
+        exp_version_references = [
+            exp_domain.ExpVersionReference(exp_summary.id, exp_summary.version)
+            for exp_summary in exploration_summaries]
+        exp_stats_list = stats_services.get_exploration_stats_multi(
+            exp_version_references)
+        view_counts = [
+            exp_stats.num_starts for exp_stats in exp_stats_list]
     else:
         view_counts = (
             stats_jobs_continuous.StatisticsAggregator.get_views_multi(

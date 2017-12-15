@@ -27,6 +27,7 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rating_services
 from core.domain import rights_manager
+from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_jobs_continuous
 from core.domain import user_services
@@ -606,37 +607,24 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def _mock_get_statistics(self, exp_id, unused_version):
         current_completions = {
-            self.EXP_ID_1: {
-                'num_starts_v1': 5,
-                'num_starts_v2': 2,
-                'state_stats_mapping': {
-                    'state1': {
-                        'first_hit_count_v1': 3,
-                        'first_hit_count_v2': 1
-                    },
-                    'state2': {
-                        'first_hit_count_v1': 7,
-                        'first_hit_count_v2': 1
-                    },
+            self.EXP_ID_1: stats_domain.ExplorationStats(
+                self.EXP_ID_1, self.EXP_DEFAULT_VERSION, 5, 2, 0, 0, 0, 0, {
+                    'state1': stats_domain.StateStats(
+                        0, 0, 0, 0, 0, 0, 3, 1, 0, 0, 0),
+                    'state2': stats_domain.StateStats(
+                        0, 0, 0, 0, 0, 0, 7, 1, 0, 0, 0),
                 }
-            },
-            self.EXP_ID_2: {
-                'num_starts_v1': 5,
-                'num_starts_v2': 2,
-                'state_stats_mapping': {
-                    'state1': {
-                        'first_hit_count_v1': 3,
-                        'first_hit_count_v2': 1
-                    },
-                    'state2': {
-                        'first_hit_count_v1': 7,
-                        'first_hit_count_v2': 1
-                    },
+            ),
+            self.EXP_ID_2: stats_domain.ExplorationStats(
+                self.EXP_ID_2, self.EXP_DEFAULT_VERSION, 5, 2, 0, 0, 0, 0, {
+                    'state1': stats_domain.StateStats(
+                        0, 0, 0, 0, 0, 0, 3, 1, 0, 0, 0),
+                    'state2': stats_domain.StateStats(
+                        0, 0, 0, 0, 0, 0, 7, 1, 0, 0, 0),
                 }
-            },
-            self.EXP_ID_3: {
-                'state_stats_mapping': {}
-            }
+            ),
+            self.EXP_ID_3: stats_domain.ExplorationStats(
+                self.EXP_ID_3, self.EXP_DEFAULT_VERSION, 0, 0, 0, 0, 0, 0, {})
         }
         return current_completions[exp_id]
 
@@ -724,7 +712,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         avg_rating = 4
         self._rate_exploration(exploration.id, 5, avg_rating)
 
-        # See state counts in _mock_get_statistics(), above.
+        # The expected answer count is the sum of the first hit counts in the
+        # statistics defined in _get_mock_statistics() method above.
         expected_answer_count = 15
         reach = expected_answer_count ** self.EXPONENT
         expected_user_impact_score = round(
@@ -743,7 +732,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         self._rate_exploration(exploration.id, 5, avg_rating)
         exp_services.update_exploration(self.user_b_id, self.EXP_ID_1, [], '')
 
-        # See state counts in _mock_get_statistics(), above.
+        # The expected answer count is the sum of the first hit counts in the
+        # statistics defined in _get_mock_statistics() method above.
         expected_answer_count = 15
         reach = expected_answer_count ** self.EXPONENT
         contrib = 0.5
@@ -766,7 +756,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         self._rate_exploration(exploration_1.id, 2, avg_rating)
         self._rate_exploration(exploration_2.id, 2, avg_rating)
 
-        # See state counts in _mock_get_statistics(), above.
+        # The expected answer count is the sum of the first hit counts in the
+        # statistics defined in _get_mock_statistics() method above.
         expected_answer_count = 15
         reach = expected_answer_count ** self.EXPONENT
         impact_per_exp = ((avg_rating - 2) * reach) # * 1 for contribution
@@ -971,6 +962,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         # Run the computation and check data from batch job.
         self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
+        # The total plays is the sum of the number of starts of both the
+        # exploration_1 and exploration_2 as defined in the
+        # _mock_get_statistics() method above.
         self.assertEqual(user_stats_model.total_plays, 14)
         self.assertEqual(user_stats_model.num_ratings, 6)
         self.assertEqual(user_stats_model.average_ratings, 20/6.0)
@@ -986,6 +980,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
+        # After recording two start events, the total plays is now increased by
+        # two.
         self.assertEquals(user_stats['total_plays'], 16)
         self.assertEquals(user_stats['num_ratings'], 10)
         self.assertEquals(user_stats['average_ratings'], 32/10.0)

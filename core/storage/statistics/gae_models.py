@@ -825,21 +825,23 @@ class ExplorationStatsModel(base_models.BaseModel):
         return exploration_stats_models
 
     @classmethod
-    def get_multi_stats_models(cls, exp_ids, version_numbers):
+    def get_multi_stats_models(cls, exp_version_reference_dicts):
         """Gets stats model instances for each exploration and the corresponding
         version number.
 
         Args:
-            exp_ids: list(str). IDs of the exploration.
-            version_numbers: list(int). List of version numbers.
+            exp_version_reference_dicts: list(dict). List of dicts where each
+                dict reprensents an exploration ID and a version number.
 
         Returns:
             list(ExplorationStatsModel|None). Model instances representing the
                 given versions.
         """
-        entity_ids = [cls.get_entity_id(
-            exp_id, version) for exp_id, version in zip(
-                exp_ids, version_numbers)]
+        entity_ids = [
+            cls.get_entity_id(
+                exp_version_reference_dict['exp_id'],
+                exp_version_reference_dict['version'])
+            for exp_version_reference_dict in exp_version_reference_dicts]
         exploration_stats_models = cls.get_multi(entity_ids)
         return exploration_stats_models
 
