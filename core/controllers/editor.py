@@ -383,8 +383,8 @@ class ExplorationModeratorRightsHandler(EditorHandler):
 
     @acl_decorators.can_access_moderator_page
     def put(self, exploration_id):
-        """Updates the publication status of the given exploration, and sends
-        an email to all its owners.
+        """Unpublishes the given exploration, and sends an email to all its
+        owners.
         """
         exploration = exp_services.get_exploration_by_id(exploration_id)
         email_body = self.payload.get('email_body')
@@ -402,8 +402,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
 
         # Unpublish exploration.
         rights_manager.unpublish_exploration(self.user, exploration_id)
-        search_services.delete_explorations_from_search_index([
-            exploration_id])
+        search_services.delete_explorations_from_search_index([exploration_id])
         exp_rights = rights_manager.get_exploration_rights(exploration_id)
 
         # If moderator emails can be sent, send an email to the all owners of
@@ -412,8 +411,7 @@ class ExplorationModeratorRightsHandler(EditorHandler):
             intent = 'unpublish_exploration'
             for owner_id in exp_rights.owner_ids:
                 email_manager.send_moderator_action_email(
-                    self.user_id, owner_id,
-                    feconf.VALID_MODERATOR_ACTIONS[intent]['email_intent'],
+                    self.user_id, owner_id, unpublish_exploration,
                     exploration.title, email_body)
 
         self.render_json({

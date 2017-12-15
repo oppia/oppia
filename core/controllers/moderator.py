@@ -79,5 +79,5 @@ class EmailDraftHandler(base.BaseHandler):
         """Handles GET requests."""
         self.render_json({
             'draft_email_body': (
-                email_manager.moderator_unpublish_exploration_email()),
+                email_manager.get_moderator_unpublish_exploration_email()),
         })

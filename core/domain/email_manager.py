@@ -361,45 +361,21 @@ def send_post_signup_email(user_id):
         email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
-def require_valid_intent(intent):
-    """Checks if the given intent is valid, and raises an exception if it is
-    not.
-
-    Raises:
-        Exception: The given intent did not match an entry in
-            feconf.VALID_MODERATOR_ACTIONS.
-    """
-
-    if intent not in feconf.VALID_MODERATOR_ACTIONS:
-        raise Exception('Unrecognized email intent: %s' % intent)
-
-
-def _get_email_config():
-    """Return the default body for the email.
-
-    Returns:
-        str. The default body for the email.
-    """
-
-    intent = feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION
-    require_valid_intent(intent)
-    return config_domain.Registry.get_config_property(
-        feconf.VALID_MODERATOR_ACTIONS[intent]['email_config'])
-
-
-def moderator_unpublish_exploration_email():
+def get_moderator_unpublish_exploration_email():
     """Returns a draft of the text of the body for an email sent immediately
     when a moderator unpublishes an exploration. An empty body is a signal to
     the frontend that no email will be sent.
 
     Returns:
         str. Draft of the email body for an email sent after the moderator
-            unpublishes an, or an empty string if no email should be sent.
+            unpublishes an exploration, or an empty string if no email should
+            be sent.
     """
 
     try:
         require_moderator_email_prereqs_are_satisfied()
-        return _get_email_config().value
+        return config_domain.Registry.get_config_property(
+            'unpublish_exploration_email_html_body').value
     except Exception:
         return ''
 
