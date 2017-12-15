@@ -481,7 +481,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(exp_stats_list[0].exp_id, self.exp_id)
         self.assertEqual(exp_stats_list[0].exp_version, self.exp_version)
         self.assertEqual(exp_stats_list[1].exp_id, 'exp_id2')
-        self.assertEqual(exp_stats_list[0].exp_version, 2)
+        self.assertEqual(exp_stats_list[1].exp_version, 2)
 
 
 class ModifiedStatisticsAggregator(stats_jobs_continuous.StatisticsAggregator):

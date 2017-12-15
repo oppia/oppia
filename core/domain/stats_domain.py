@@ -142,20 +142,23 @@ class ExplorationStats(object):
             exp_version: int. Version of the exploration.
             state_stats_mapping: dict. A dict mapping state names to their
                 corresponding StateStats.
+
+        Returns:
+            ExplorationStats. The exploration stats domain object.
         """
         return cls(exp_id, exp_version, 0, 0, 0, 0, 0, 0, state_stats_mapping)
 
-    def compute_answer_count(self):
-        """Compute the answer count for the exploration stats."""
-        answer_count = 0
-        # For each state, find the number of first entries to the state.
-        # This is approximately considered to be equal to number of users
-        # who answered the state because very few users enter a state and
-        # leave without answering.
+    def get_sum_of_first_hit_counts(self):
+        """Compute the sum of first hit counts for the exploration stats.
+
+        Returns:
+            int. Sum of first hit counts.
+        """
+        sum_first_hits = 0
         for state_name in self.state_stats_mapping:
             state_stats = self.state_stats_mapping[state_name]
-            answer_count += state_stats.first_hit_count
-        return answer_count
+            sum_first_hits += state_stats.first_hit_count
+        return sum_first_hits
 
     def validate(self):
         """Validates the ExplorationStats domain object."""

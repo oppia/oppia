@@ -553,7 +553,11 @@ class UserStatsMRJobManager(
         if feconf.ENABLE_NEW_STATS_FRAMEWORK:
             exploration_stats = stats_services.get_exploration_stats(
                 item.id, item.version)
-            answer_count = exploration_stats.compute_answer_count()
+            # For each state, find the number of first entries to the state.
+            # This is approximately considered to be equal to number of users
+            # who answered the state because very few users enter a state and
+            # leave without answering.
+            answer_count = exploration_stats.get_sum_of_first_hit_counts()
             num_starts = exploration_stats.num_starts
         else:
             statistics = (
