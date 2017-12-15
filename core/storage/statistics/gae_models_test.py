@@ -170,3 +170,37 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.num_actual_starts_v2, 0)
         self.assertEqual(model.num_completions_v2, 0)
         self.assertEqual(model.state_stats_mapping, {})
+
+    def test_get_multi_stats_models(self):
+        stat_models.ExplorationStatsModel.create(
+            'exp_id1', 1, 0, 0, 0, 0, 0, 0, {})
+        stat_models.ExplorationStatsModel.create(
+            'exp_id1', 2, 0, 0, 0, 0, 0, 0, {})
+        stat_models.ExplorationStatsModel.create(
+            'exp_id2', 1, 0, 0, 0, 0, 0, 0, {})
+
+        exp_version_reference_dicts = [
+            {
+                'exp_id': 'exp_id1',
+                'version': 1
+            },
+            {
+                'exp_id': 'exp_id1',
+                'version': 2
+            },
+            {
+                'exp_id': 'exp_id2',
+                'version': 1
+            }
+        ]
+
+        stats_models = stat_models.ExplorationStatsModel.get_multi_stats_models(
+            exp_version_reference_dicts)
+
+        self.assertEqual(len(stats_models), 3)
+        self.assertEqual(stats_models[0].exp_id, 'exp_id1')
+        self.assertEqual(stats_models[0].exp_version, 1)
+        self.assertEqual(stats_models[1].exp_id, 'exp_id1')
+        self.assertEqual(stats_models[1].exp_version, 2)
+        self.assertEqual(stats_models[2].exp_id, 'exp_id2')
+        self.assertEqual(stats_models[2].exp_version, 1)
