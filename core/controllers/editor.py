@@ -408,7 +408,6 @@ class ExplorationModeratorRightsHandler(EditorHandler):
         # If moderator emails can be sent, send an email to the all owners of
         # the exploration notifying them of the change.
         if feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
-            intent = 'unpublish_exploration'
             for owner_id in exp_rights.owner_ids:
                 email_manager.send_moderator_action_email(
                     self.user_id, owner_id, 'unpublish_exploration',
