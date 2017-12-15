@@ -115,8 +115,6 @@ BAD_PATTERNS_JS_REGEXP = [
         'regexp': r"templateUrl: \'",
         'message': "The directives must be directly referenced.",
         'excluded_files': (
-            'core/templates/dev/head/pages/exploration_editor/'
-            'editor_tab/StateResponses.js',
             'core/templates/dev/head/pages/exploration_player/'
             'FeedbackPopupDirective.js'
         ),
@@ -129,8 +127,6 @@ BAD_PATTERNS_HTML_REGEXP = [
         'regexp': r"text\/ng-template",
         'message': "The directives must be directly referenced.",
         'excluded_files': (
-            'core/templates/dev/head/pages/exploration_editor/'
-            'editor_tab/state_editor_responses.html',
             'core/templates/dev/head/pages/exploration_player/'
             'feedback_popup_container_directive.html',
             'core/templates/dev/head/pages/exploration_player/'
@@ -556,7 +552,6 @@ def _check_bad_pattern_in_file(filename, content, pattern):
                 for excluded_dir in pattern['excluded_dirs'])
             or filename in pattern['excluded_files']):
         if re.search(regexp, content):
-            failed = True
             print '%s --> %s' % (
                 filename, pattern['message'])
             return True
@@ -591,11 +586,13 @@ def _check_bad_patterns(all_files):
             if filename.endswith('.js'):
                 for regexp in BAD_PATTERNS_JS_REGEXP:
                     if _check_bad_pattern_in_file(filename, content, regexp):
+                        failed = True
                         total_error_count += 1
     
             if filename.endswith('.html'):
                 for regexp in BAD_PATTERNS_HTML_REGEXP:
                     if _check_bad_pattern_in_file(filename, content, regexp):
+                        failed = True
                         total_error_count += 1
 
             if filename == 'app.yaml':
