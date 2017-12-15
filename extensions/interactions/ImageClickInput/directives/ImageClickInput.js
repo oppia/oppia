@@ -21,9 +21,9 @@
  */
 
 oppia.directive('oppiaInteractiveImageClickInput', [
-  '$sce', 'HtmlEscaperService', 'explorationContextService',
+  '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
-  function($sce, HtmlEscaperService, explorationContextService,
+  function($sce, HtmlEscaperService, ExplorationContextService,
            imageClickInputRulesService, UrlInterpolationService) {
     return {
       restrict: 'E',
