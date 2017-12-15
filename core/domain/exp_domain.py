@@ -438,6 +438,47 @@ class AudioTranslation(object):
                 self.needs_update)
 
 
+class ExpVersionReference(object):
+    """Value object representing an exploration ID and a version number."""
+
+    def __init__(self, exp_id, version):
+        """Initializes an ExpVersionReference domain object.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            version: int. Version of the exploration.
+        """
+        self.exp_id = exp_id
+        self.version = version
+        self.validate()
+
+    def to_dict(self):
+        """Returns a dict representing this ExpVersionReference domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of ExpVersionReference instance.
+        """
+        return {
+            'exp_id': self.exp_id,
+            'version': self.version
+        }
+
+    def validate(self):
+        """Validates properties of the ExpVersionReference.
+
+        Raises:
+            ValidationError: One or more attributes of the ExpVersionReference
+            are invalid.
+        """
+        if not isinstance(self.exp_id, str):
+            raise utils.ValidationError(
+                'Expected exp_id to be a str, received %s' % self.exp_id)
+
+        if not isinstance(self.version, int):
+            raise utils.ValidationError(
+                'Expected version to be an int, received %s' % self.version)
+
+
 class SubtitledHtml(object):
     """Value object representing subtitled HTML."""
 
