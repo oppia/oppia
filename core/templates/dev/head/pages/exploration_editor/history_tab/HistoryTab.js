@@ -17,7 +17,7 @@
  */
 
 oppia.controller('HistoryTab', [
-  '$scope', '$http', '$rootScope', '$log', 
+  '$scope', '$http', '$rootScope', '$log',
   '$modal', 'ExplorationDataService',
   'VersionTreeService', 'CompareVersionsService', 'graphDataService',
   'oppiaDatetimeFormatter', 'UrlInterpolationService',
@@ -52,6 +52,10 @@ oppia.controller('HistoryTab', [
     var explorationSnapshots = null;
     var versionTreeParents = null;
     var nodesData = null;
+    $scope.versionCheckboxArrayToDisplay = [];
+    $scope.currentPage = 1;
+    $scope.versionsPerPage = 2;
+    //$scope.pagerMaxSize = 1;
 
     $scope.$on('refreshVersionHistory', function(evt, data) {
       // Uncheck all checkboxes when page is refreshed
@@ -134,7 +138,8 @@ oppia.controller('HistoryTab', [
           // when history is refreshed.
           $scope.versionCheckboxArray = [];
           $scope.explorationVersionMetadata = {};
-          var lowestVersionIndex = Math.max(0, currentVersion - 30);
+          //var lowestVersionIndex = Math.max(0, currentVersion - 30);
+          var lowestVersionIndex = 0;
           for (var i = currentVersion - 1; i >= lowestVersionIndex; i--) {
             var versionNumber = explorationSnapshots[i].version_number;
             $scope.explorationVersionMetadata[versionNumber] = {
@@ -151,6 +156,8 @@ oppia.controller('HistoryTab', [
             });
           }
           $rootScope.loadingMessage = '';
+          $scope.computeVersionsToDisplay();
+          //$scope.pagerMaxSize = Math.ceil($scope.versionCheckboxArray.length / $scope.versionsPerPage);
         });
       });
     };
@@ -236,7 +243,7 @@ oppia.controller('HistoryTab', [
 
             $scope.getExplorationUrl = function(version) {
               return (
-                '/explore/' + ExplorationDataService.explorationId + 
+                '/explore/' + ExplorationDataService.explorationId +
                 '?v=' + version);
             };
 
@@ -257,6 +264,17 @@ oppia.controller('HistoryTab', [
           location.reload();
         });
       });
+    };
+
+    $scope.computeVersionsToDisplay = function() {
+      var begin = (($scope.currentPage - 1) * $scope.versionsPerPage);
+      var end = begin + $scope.versionsPerPage;
+      $scope.versionCheckboxArrayToDisplay = $scope.versionCheckboxArray.slice(begin, end);
+    };
+
+
+    $scope.pageChanged = function() {
+      $scope.computeVersionsToDisplay();
     };
   }
 ]);
