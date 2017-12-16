@@ -270,16 +270,16 @@ body {
 
 .oppia-creator-dashboard-main-content .stats-card .stat-description {
   line-height: 1.646;
-  margin-bottom: 35px;
+  margin-bottom: 3em;
 }
 
 .oppia-creator-dashboard-main-content .stats-card .stat-value-with-rating {
-  top: 15px;
+  top: 0.75em;
   position: absolute;
 }
 
 .oppia-creator-dashboard-main-content .stats-card .stat-value-without-rating {
-  bottom: -20%;
+  bottom: -0.7em;
   position: absolute;
 }
 
