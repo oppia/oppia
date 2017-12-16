@@ -101,22 +101,6 @@ def _require_valid_version(version_from_payload, exploration_version):
             % (exploration_version, version_from_payload))
 
 
-class EditorLogoutHandler(base.LogoutPage):
-    """Handles logout from editor page."""
-
-    def get(self):
-        """Checks if exploration is published and redirects accordingly."""
-
-        return_url = str(self.request.get('return_url'))
-        if return_url:
-            exploration_id = return_url.split('/')[-1]
-            exp_summary = exp_services.get_exploration_summary_by_id(
-                exploration_id)
-            if exp_summary.status == 'private':
-                self.request.GET['return_url'] = '/library'
-        super(EditorLogoutHandler, self).get()
-
-
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
     pass

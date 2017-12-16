@@ -32,6 +32,7 @@ from google.appengine.api import users
 
 from core.domain import config_domain
 from core.domain import config_services
+from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import user_services
@@ -89,6 +90,13 @@ class LogoutPage(webapp2.RequestHandler):
         # 'unicode' will result.
         url_to_redirect_to = str(self.request.get('return_url') or '/')
         _clear_login_cookies(self.response.headers)
+
+        if feconf.EDITOR_URL_PREFIX in url_to_redirect_to:
+            exploration_id = url_to_redirect_to.split('/')[-1]
+            exp_summary = exp_services.get_exploration_summary_by_id(
+                exploration_id)
+            if exp_summary.status == feconf.ACTIVITY_STATUS_PRIVATE:
+                url_to_redirect_to = '/library'
 
         if feconf.DEV_MODE:
             self.redirect(users.create_logout_url(url_to_redirect_to))
