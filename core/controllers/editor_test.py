@@ -1177,21 +1177,10 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             self.assertEqual(response.status_int, 200)
             csrf_token = self.get_csrf_token_from_response(response)
 
-            # Submit an invalid action. This should cause an error.
-            response_dict = self.put_json(
-                '/createhandler/moderatorrights/%s' % self.EXP_ID, {
-                    'action': 'random_action',
-                    'email_body': None,
-                    'version': 1,
-                }, csrf_token, expect_errors=True, expected_status_int=400)
-            self.assertEqual(
-                response_dict['error'], 'Invalid moderator action.')
-
             # Try to unpublish the exploration without an email body. This
             # should cause an error.
             response_dict = self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID, {
-                    'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
                     'email_body': None,
                     'version': 1,
                 }, csrf_token, expect_errors=True, expected_status_int=400)
@@ -1201,7 +1190,6 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
 
             response_dict = self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID, {
-                    'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
                     'email_body': '',
                     'version': 1,
                 }, csrf_token, expect_errors=True, expected_status_int=400)
