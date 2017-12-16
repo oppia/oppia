@@ -93,16 +93,16 @@ oppia.directive('trainingPanel', [
         answerFeedback: '=',
         answerOutcomeDest: '=',
         // The classification input is an object with two keys:
-        //   -answerGroupIndex: This refers to which answer group the answer being
-        //      trained has been classified to (for displaying feedback to the
-        //      creator). If answerGroupIndex is equal to the number of answer
-        //      groups, then it represents the default outcome feedback. This
-        //      index is changed by the panel when the creator specifies which
-        //      feedback should be associated with the answer.
-        //   -newOutcome: This refers to an outcome structure (containing a list
-        //      of feedback and a destination state name) which is non-null if,
-        //      and only if, the creator has specified that a new response should
-        //      be created for the trained answer.
+        //   -answerGroupIndex: This refers to which answer group the answer
+        //      being trained has been classified to (for displaying feedback
+        //      to the creator). If answerGroupIndex is equal to the number of
+        //      answer groups, then it represents the default outcome feedback.
+        //      This index is changed by the panel when the creator specifies
+        //      which feedback should be associated with the answer.
+        //   -newOutcome: This refers to an outcome structure (containing a
+        //      list of feedback and a destination state name) which is
+        //      non-null if, and only if, the creator has specified that a new
+        //      response should be created for the trained answer.
         classification: '=',
         onFinishTraining: '&'
       },
