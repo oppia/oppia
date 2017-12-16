@@ -197,15 +197,6 @@ oppia.factory('UrlInterpolationService', [
         return GLOBALS.TEMPLATE_DIR_PREFIX + getUrlWithSlug(path);
       },
 
-      /**
-       * Given a json path relative to assets folder,
-       * returns the complete url path to that json.
-       */
-      getTranslateJsonUrl: function(jsonPath) {
-        validateResourcePath(jsonPath);
-        return getCompleteUrl('/assets', jsonPath);
-      },
-
       getExtensionResourceUrl: getExtensionResourceUrl,
 
       _getUrlWithSlug: getUrlWithSlug,
