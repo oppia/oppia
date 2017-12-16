@@ -148,7 +148,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         return
 
                     state = exploration.states[unicode_state_name]
-                    if state.interaction.default_outcome:
+                    if state.interaction.default_outcome is not None:
                         dest_state = state.interaction.default_outcome.dest
                         if dest_state != unicode_state_name:
                             useful_feedback_count += 1
