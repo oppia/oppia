@@ -32,11 +32,14 @@ def create_login_url(slug):
 
 
 def create_logout_url(slug):
-    """Creates a logout url. Logout from exploration editor is handled separately."""
+    """Creates a logout url.
+    Logout from exploration editor is handled separately."""
     if 'create' in slug.split('/'):
-        logout_url = utils.set_url_query_parameter('/exploration_editor_logout', 'return_url', slug)
+        logout_url = utils.set_url_query_parameter(
+            '/exploration_editor_logout', 'return_url', slug)
     else:
-        logout_url = utils.set_url_query_parameter('/logout', 'return_url', slug)
+        logout_url = utils.set_url_query_parameter(
+            '/logout', 'return_url', slug)
     return logout_url
 
 
