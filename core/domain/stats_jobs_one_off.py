@@ -141,7 +141,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 else:
                     try:
                         exploration = exp_services.get_exploration_by_id(
-                            item.exploration_id, item.exploration_version)
+                            item.exploration_id,
+                            version=item.exploration_version)
                     except Exception:
                         # Exploration does not exist.
                         return
