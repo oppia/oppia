@@ -157,7 +157,8 @@ oppia.controller('HistoryTab', [
           }
           $rootScope.loadingMessage = '';
           $scope.computeVersionsToDisplay();
-          //$scope.pagerMaxSize = Math.ceil($scope.versionCheckboxArray.length / $scope.versionsPerPage);
+          /*$scope.pagerMaxSize = Math.ceil(
+              $scope.versionCheckboxArray.length / $scope.versionsPerPage);*/
         });
       });
     };
@@ -269,7 +270,8 @@ oppia.controller('HistoryTab', [
     $scope.computeVersionsToDisplay = function() {
       var begin = (($scope.currentPage - 1) * $scope.versionsPerPage);
       var end = begin + $scope.versionsPerPage;
-      $scope.versionCheckboxArrayToDisplay = $scope.versionCheckboxArray.slice(begin, end);
+      $scope.versionCheckboxArrayToDisplay =
+        $scope.versionCheckboxArray.slice(begin, end);
     };
 
 
