@@ -62,4 +62,5 @@ oppia.factory('HintAndSolutionModalService', [
         });
       }
     }
-  }]);
+  }
+]);
