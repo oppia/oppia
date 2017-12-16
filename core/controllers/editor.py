@@ -104,7 +104,8 @@ class EditorLogoutHandler(base.LogoutPage):
     """Handles logout from editor page."""
 
     def get(self):
-        """Checks if exploration is published and redirects accordingly."""        
+        """Checks if exploration is published and redirects accordingly."""
+        
         return_url = str(self.request.get('return_url'))
         if return_url:
             exploration_id = return_url.split('/')[-1]
