@@ -57,6 +57,11 @@ oppia.controller('SettingsTab', [
 
     $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
+    $scope.can_modify_roles = GLOBALS.can_modify_roles;
+    $scope.can_release_ownership = GLOBALS.can_release_ownership;
+    $scope.can_delete = GLOBALS.can_delete;
+    $scope.can_unpublish = GLOBALS.can_unpublish;
+
     var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
     var EXPLORE_PAGE_PREFIX = '/explore/';
 
