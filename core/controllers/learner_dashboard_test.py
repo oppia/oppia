@@ -55,6 +55,7 @@ class LearnerDashboardHandlerTest(test_utils.GenericTestBase):
 
         self.save_new_default_exploration(
             self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
 
         learner_progress_services.mark_exploration_as_completed(
             self.viewer_id, self.EXP_ID_1)
@@ -72,6 +73,7 @@ class LearnerDashboardHandlerTest(test_utils.GenericTestBase):
 
         self.save_new_default_collection(
             self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1)
+        self.publish_collection(self.owner_id, self.COL_ID_1)
 
         learner_progress_services.mark_collection_as_completed(
             self.viewer_id, self.COL_ID_1)
@@ -89,6 +91,7 @@ class LearnerDashboardHandlerTest(test_utils.GenericTestBase):
 
         self.save_new_default_exploration(
             self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
 
         state_name = 'state_name'
         version = 1
@@ -109,6 +112,7 @@ class LearnerDashboardHandlerTest(test_utils.GenericTestBase):
 
         self.save_new_default_collection(
             self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1)
+        self.publish_collection(self.owner_id, self.COL_ID_1)
 
         learner_progress_services.mark_collection_as_incomplete(
             self.viewer_id, self.COL_ID_1)
@@ -126,6 +130,7 @@ class LearnerDashboardHandlerTest(test_utils.GenericTestBase):
 
         self.save_new_default_exploration(
             self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
 
         learner_progress_services.add_exp_to_learner_playlist(
             self.viewer_id, self.EXP_ID_1)
@@ -143,6 +148,7 @@ class LearnerDashboardHandlerTest(test_utils.GenericTestBase):
 
         self.save_new_default_collection(
             self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1)
+        self.publish_collection(self.owner_id, self.COL_ID_1)
 
         learner_progress_services.add_collection_to_learner_playlist(
             self.viewer_id, self.COL_ID_1)
@@ -172,17 +178,23 @@ class LearnerDashboardHandlerTest(test_utils.GenericTestBase):
 
         self.save_new_default_exploration(
             self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
         self.save_new_default_exploration(
             self.EXP_ID_2, self.owner_id, title=self.EXP_TITLE_2)
+        self.publish_exploration(self.owner_id, self.EXP_ID_2)
         self.save_new_default_exploration(
             self.EXP_ID_3, self.owner_id, title=self.EXP_TITLE_3)
+        self.publish_exploration(self.owner_id, self.EXP_ID_3)
 
         self.save_new_default_collection(
             self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1)
+        self.publish_collection(self.owner_id, self.COL_ID_1)
         self.save_new_default_collection(
             self.COL_ID_2, self.owner_id, title=self.COL_TITLE_2)
+        self.publish_collection(self.owner_id, self.COL_ID_2)
         self.save_new_default_collection(
             self.COL_ID_3, self.owner_id, title=self.COL_TITLE_3)
+        self.publish_collection(self.owner_id, self.COL_ID_3)
 
         state_name = 'state_name'
         version = 1

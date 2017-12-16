@@ -108,12 +108,13 @@ oppia.factory('StatesObjectFactory', [
     };
 
     States.prototype.getAllAudioTranslations = function(languageCode) {
-      var allAudioTranslations = [];
+      var allAudioTranslations = {};
       for (var stateName in this._states) {
         var audioTranslationsForState =
           this._states[stateName].content.getBindableAudioTranslations();
         if (audioTranslationsForState.hasOwnProperty(languageCode)) {
-          allAudioTranslations.push(audioTranslationsForState[languageCode]);
+          allAudioTranslations[stateName] =
+            audioTranslationsForState[languageCode];
         }
       }
       return allAudioTranslations;

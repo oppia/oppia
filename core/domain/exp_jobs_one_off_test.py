@@ -322,11 +322,13 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         # Have one user make two commits.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, user_a_id, title='Original Title')
-        exploration_model = exp_models.ExplorationModel.get(
-            self.EXP_ID, strict=True, version=None)
-        exploration_model.title = 'New title'
-        exploration_model.commit(
-            user_a_id, 'Changed title.', [])
+        change_list = [{
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'New title'
+        }]
+        exp_services.update_exploration(
+            user_a_id, self.EXP_ID, change_list, 'Changed title.')
 
         # Have the second user revert version 2 to version 1
         exp_services.revert_exploration(user_b_id, self.EXP_ID, 2, 1)
@@ -650,3 +652,104 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         # Ensure the exploration is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+
+class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
+    """Tests for the ExplorationStateIdMapping one off job."""
+
+    EXP_ID = 'eid'
+
+    def setUp(self):
+        """Initialize owner before each test case."""
+        super(ExplorationStateIdMappingJobTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_that_mapreduce_job_works_for_first_version_of_exploration(self):
+        """Tests that mapreduce job works correctly when the only first
+        exploration version exists."""
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', False):
+            exploration = self.save_new_valid_exploration(
+                self.EXP_ID, self.owner_id)
+
+        job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
+        exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
+
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
+            self.process_and_flush_pending_tasks()
+
+        expected_mapping = {
+            exploration.init_state_name: 0
+        }
+        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 1)
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 1)
+        self.assertEqual(mapping.largest_state_id_used, 0)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+    def test_that_mapreduce_job_works(self):
+        """Test that mapreduce job is working as expected."""
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', False):
+            exploration = self.save_new_valid_exploration(
+                self.EXP_ID, self.owner_id)
+
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'new state',
+                }], 'Add state name')
+
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'new state 2',
+                }, {
+                    'cmd': exp_domain.CMD_DELETE_STATE,
+                    'state_name': 'new state'
+                }], 'Modify states')
+
+            exp_services.revert_exploration(self.owner_id, self.EXP_ID, 3, 1)
+
+        job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
+        exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
+
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
+            self.process_and_flush_pending_tasks()
+
+        expected_mapping = {
+            exploration.init_state_name: 0
+        }
+        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 1)
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 1)
+        self.assertEqual(mapping.largest_state_id_used, 0)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+        expected_mapping = {
+            exploration.init_state_name: 0,
+            'new state': 1
+        }
+        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 2)
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 2)
+        self.assertEqual(mapping.largest_state_id_used, 1)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+        expected_mapping = {
+            exploration.init_state_name: 0,
+            'new state 2': 2
+        }
+        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 3)
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 3)
+        self.assertEqual(mapping.largest_state_id_used, 2)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+        expected_mapping = {
+            exploration.init_state_name: 0
+        }
+        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 4)
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 4)
+        self.assertEqual(mapping.largest_state_id_used, 2)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)

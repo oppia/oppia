@@ -35,11 +35,11 @@ oppia.directive('ruleEditor', [
         '/components/' +
         'rule_editor_directive.html'),
       controller: [
-        '$scope', '$timeout', 'editorContextService',
+        '$scope', '$timeout', 'EditorStateService',
         'explorationStatesService', 'RouterService', 'ValidatorsService',
         'ResponsesService', 'stateInteractionIdService', 'INTERACTION_SPECS',
         'RULE_TYPE_CLASSIFIER', function(
-            $scope, $timeout, editorContextService,
+            $scope, $timeout, EditorStateService,
             explorationStatesService, RouterService, ValidatorsService,
             ResponsesService, stateInteractionIdService, INTERACTION_SPECS,
             RULE_TYPE_CLASSIFIER) {

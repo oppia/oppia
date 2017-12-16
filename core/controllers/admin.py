@@ -41,27 +41,6 @@ import utils
 current_user_services = models.Registry.import_current_user_services()
 
 
-SSL_CHALLENGE_RESPONSES = config_domain.ConfigProperty(
-    'ssl_challenge_responses', {
-        'type': 'list',
-        'items': {
-            'type': 'dict',
-            'properties': [{
-                'name': 'challenge',
-                'schema': {
-                    'type': 'unicode'
-                }
-            }, {
-                'name': 'response',
-                'schema': {
-                    'type': 'unicode'
-                }
-            }]
-        },
-    },
-    'Challenge-response pairs for SSL validation.', [])
-
-
 class AdminPage(base.BaseHandler):
     """Admin page shown in the App Engine admin console."""
     @acl_decorators.can_access_admin_page
@@ -390,22 +369,3 @@ class DataExtractionQueryHandler(base.BaseHandler):
             'data': extracted_answers
         }
         self.render_json(response)
-
-
-class SslChallengeHandler(base.BaseHandler):
-    """Plaintext page for responding to LetsEncrypt SSL challenges."""
-
-    @acl_decorators.open_access
-    def get(self, challenge):
-        """Handles GET requests."""
-        challenge_responses = SSL_CHALLENGE_RESPONSES.value
-        response = None
-        for challenge_response_pair in challenge_responses:
-            if challenge_response_pair['challenge'] == challenge:
-                response = challenge_response_pair['response']
-
-        if response is None:
-            raise self.PageNotFoundException()
-
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write(response)

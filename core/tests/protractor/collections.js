@@ -18,21 +18,58 @@
 
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var admin = require('../protractor_utils/admin.js');
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var collectionEditor = require('../protractor_utils/collectionEditor.js');
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
+
 
 describe('Collections', function() {
+  var adminPage = null;
+  var creatorDashboardPage = null;
+  var collectionId = null;
+
   beforeAll(function() {
-    var USERNAME = 'aliceCollections';
-    users.createUser('alice@collections.com', USERNAME);
+    adminPage = new AdminPage.AdminPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    var EDITOR_USERNAME = 'aliceCollections';
+    var PLAYER_USERNAME = 'playerCollections';
+    users.createUser('player@collections.com', PLAYER_USERNAME);
+    users.createUser('alice@collections.com', EDITOR_USERNAME);
     users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
-    browser.get(general.ADMIN_URL_SUFFIX);
-    element.all(by.css(
-      '.protractor-test-reload-collection-button')).first().click();
+    adminPage.get();
+    adminPage.reloadCollection();
     general.acceptAlert();
     browser.waitForAngular();
-    admin.reloadAllExplorations();
-    admin.updateRole(USERNAME, 'collection editor');
+    adminPage.reloadAllExplorations();
+    adminPage.updateRole(EDITOR_USERNAME, 'collection editor');
+    adminPage.updateRole(PLAYER_USERNAME, 'collection editor');
+    users.logout();
+
+    users.login('player@collections.com');
+    browser.get(general.SERVER_URL_PREFIX);
+    var dropdown = element(by.css('.protractor-test-profile-dropdown'));
+    browser.actions().mouseMove(dropdown).perform();
+    dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+    browser.waitForAngular();
+    creatorDashboardPage.clickCreateActivityButton();
+    creatorDashboardPage.clickCreateCollectionButton();
+    browser.getCurrentUrl().then(function(url) {
+      var pathname = url.split('/');
+      //in the url a # is added at the end that is not part of collection ID
+      collectionId = pathname[5].slice(0, -1);
+    });
+    browser.waitForAngular();
+    // Add existing explorations.
+    collectionEditor.addExistingExploration('0');
+    collectionEditor.saveDraft();
+    collectionEditor.closeSaveModal();
+    collectionEditor.publishCollection();
+    collectionEditor.setTitle('Test Collection 2');
+    collectionEditor.setObjective('This is the second test collection.');
+    collectionEditor.setCategory('Algebra');
+    collectionEditor.saveChanges();
+    browser.waitForAngular();
     users.logout();
   });
 
@@ -43,9 +80,8 @@ describe('Collections', function() {
     browser.actions().mouseMove(dropdown).perform();
     dropdown.element(by.css('.protractor-test-dashboard-link')).click();
     browser.waitForAngular();
-    element(by.css('.protractor-test-create-activity')).click();
-    // Create new collection.
-    element(by.css('.protractor-test-create-collection')).click();
+    creatorDashboardPage.clickCreateActivityButton();
+    creatorDashboardPage.clickCreateCollectionButton();
     browser.waitForAngular();
     // Add existing explorations.
     collectionEditor.addExistingExploration('0');
@@ -76,6 +112,51 @@ describe('Collections', function() {
     users.login('alice@collections.com');
     browser.get('/collection/0');
     browser.waitForAngular();
+    users.logout();
+  });
+
+  it('checks for errors in a collection with varying node count', function() {
+    //Checking in a collection with one node
+    users.login('player@collections.com');
+    browser.get('/collection/' + collectionId);
+    browser.waitForAngular();
+    general.checkForConsoleErrors([]);
+
+    //Checking in a collection with two nodes
+    browser.get('/collection_editor/create/' + collectionId);
+    browser.waitForAngular();
+    collectionEditor.addExistingExploration('4');
+    collectionEditor.saveDraft();
+    collectionEditor.setCommitMessage('Add Exploration');
+    collectionEditor.closeSaveModal();
+    browser.waitForAngular();
+    browser.get('/collection/' + collectionId);
+    browser.waitForAngular();
+    general.checkForConsoleErrors([]);
+
+    //Checking in a collection with three nodes
+    browser.get('/collection_editor/create/' + collectionId);
+    browser.waitForAngular();
+    collectionEditor.addExistingExploration('13');
+    collectionEditor.saveDraft();
+    collectionEditor.setCommitMessage('Add Exploration');
+    collectionEditor.closeSaveModal();
+    browser.waitForAngular();
+    browser.get('/collection/' + collectionId);
+    browser.waitForAngular();
+    general.checkForConsoleErrors([]);
+
+    //Checking in a collection with four nodes
+    browser.get('/collection_editor/create/' + collectionId);
+    browser.waitForAngular();
+    collectionEditor.addExistingExploration('10');
+    collectionEditor.saveDraft();
+    collectionEditor.setCommitMessage('Add Exploration');
+    collectionEditor.closeSaveModal();
+    browser.waitForAngular();
+    browser.get('/collection/' + collectionId);
+    browser.waitForAngular();
+    general.checkForConsoleErrors([]);
     users.logout();
   });
 

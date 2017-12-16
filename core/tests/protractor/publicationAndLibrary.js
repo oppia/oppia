@@ -20,12 +20,21 @@
 var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
-var library = require('../protractor_utils/library.js');
-var player = require('../protractor_utils/player.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('Library index page', function() {
+  var libraryPage = null;
+  var explorationPlayerPage = null;
+
+  beforeEach(function() {
+    libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
+
   it('should display private and published explorations', function() {
     var EXPLORATION_SILMARILS = 'silmarils';
     var EXPLORATION_VINGILOT = 'Vingilot';
@@ -56,8 +65,8 @@ describe('Library index page', function() {
     users.logout();
 
     users.login('varda@publicationAndLibrary.com');
-    browser.get(general.LIBRARY_URL_SUFFIX);
-    library.playExploration(EXPLORATION_VINGILOT);
+    libraryPage.get();
+    libraryPage.playExploration(EXPLORATION_VINGILOT);
     general.moveToEditor();
     // Moderators can edit explorations.
     editor.setLanguage(LANGUAGE_FRANCAIS);
@@ -112,38 +121,38 @@ describe('Library index page', function() {
     // We now check explorations are visible under the right conditions.
     browser.get('/search/find?q=&language_code=("en")');
     // The initial language selection should be just English.
-    library.expectCurrentLanguageSelectionToBe([LANGUAGE_ENGLISH]);
+    libraryPage.expectCurrentLanguageSelectionToBe([LANGUAGE_ENGLISH]);
     // At the start, no categories are selected.
-    library.expectCurrentCategorySelectionToBe([]);
+    libraryPage.expectCurrentCategorySelectionToBe([]);
 
     // Reset the language selector.
-    library.deselectLanguages([LANGUAGE_ENGLISH]);
+    libraryPage.deselectLanguages([LANGUAGE_ENGLISH]);
 
     testCases.forEach(function(testCase) {
-      library.selectLanguages(testCase.languages);
-      library.selectCategories(testCase.categories);
+      libraryPage.selectLanguages(testCase.languages);
+      libraryPage.selectCategories(testCase.categories);
 
       for (var explorationTitle in ALL_PUBLIC_EXPLORATION_TITLES) {
         if (testCase.expectVisible.indexOf(explorationTitle) !== -1) {
-          library.expectExplorationToBeVisible(explorationTitle);
+          libraryPage.expectExplorationToBeVisible(explorationTitle);
         } else {
-          library.expectExplorationToBeHidden(explorationTitle);
+          libraryPage.expectExplorationToBeHidden(explorationTitle);
         }
       }
 
-      library.deselectLanguages(testCase.languages);
-      library.deselectCategories(testCase.categories);
+      libraryPage.deselectLanguages(testCase.languages);
+      libraryPage.deselectCategories(testCase.categories);
     });
 
     // Private explorations are not shown in the library.
-    library.expectExplorationToBeHidden('Vilya');
+    libraryPage.expectExplorationToBeHidden('Vilya');
 
     // The first letter of the objective is automatically capitalized.
-    expect(library.getExplorationObjective(EXPLORATION_VINGILOT)).toBe(
+    expect(libraryPage.getExplorationObjective(EXPLORATION_VINGILOT)).toBe(
       'Seek the aid of the Valar');
     general.waitForSystem();
-    library.playExploration(EXPLORATION_SILMARILS);
-    player.expectExplorationNameToBe('silmarils');
+    libraryPage.playExploration(EXPLORATION_SILMARILS);
+    explorationPlayerPage.expectExplorationNameToBe('silmarils');
 
     users.logout();
   });
@@ -164,12 +173,12 @@ describe('Library index page', function() {
       EXPLORATION_VINGILOT, CATEGORY_ENVIRONMENT, 'seek the aid of the Valar');
     users.logout();
 
-    browser.get('/library');
+    libraryPage.get();
     expect(browser.getTitle()).toEqual('Exploration Library - Oppia');
     general.ensurePageHasNoTranslationIds();
 
     // Filter library explorations
-    library.selectLanguages([LANGUAGE_FRANCAIS]);
+    libraryPage.selectLanguages([LANGUAGE_FRANCAIS]);
     general.ensurePageHasNoTranslationIds();
   });
 

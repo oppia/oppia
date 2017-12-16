@@ -30,7 +30,7 @@ oppia.directive('supplementalCard', [
       controller: [
         '$scope', '$timeout', '$window', 'HintManagerService',
         'ExplorationPlayerService', 'PlayerPositionService',
-        'PlayerTranscriptService', 'windowDimensionsService',
+        'PlayerTranscriptService', 'WindowDimensionsService',
         'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
         'EVENT_ACTIVE_CARD_CHANGED', 'CONTINUE_BUTTON_FOCUS_LABEL',
         'HINT_REQUEST_STRING_I18N_IDS', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
@@ -38,7 +38,7 @@ oppia.directive('supplementalCard', [
         function(
             $scope, $timeout, $window, HintManagerService,
             ExplorationPlayerService, PlayerPositionService,
-            PlayerTranscriptService, windowDimensionsService,
+            PlayerTranscriptService, WindowDimensionsService,
             CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
             EVENT_ACTIVE_CARD_CHANGED, CONTINUE_BUTTON_FOCUS_LABEL,
             HINT_REQUEST_STRING_I18N_IDS, DELAY_FOR_HINT_FEEDBACK_MSEC,
@@ -117,7 +117,7 @@ oppia.directive('supplementalCard', [
           };
 
           $scope.isViewportNarrow = function() {
-            return windowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
+            return WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
           };
 
           $scope.isWindowTall = function() {

@@ -18,10 +18,12 @@
  */
 
 oppia.factory('AssetsBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService',
+  '$http', '$q', 'UrlInterpolationService', 'AudioFileObjectFactory',
+  'FileDownloadRequestObjectFactory',
   function(
-      $http, $q, UrlInterpolationService) {
-    // List of filenames that have had been requested for but have
+      $http, $q, UrlInterpolationService, AudioFileObjectFactory,
+      FileDownloadRequestObjectFactory) {
+    // List of filenames that have been requested for but have
     // yet to return a response.
     var _filesCurrentlyBeingRequested = [];
 
@@ -37,15 +39,32 @@ oppia.factory('AssetsBackendApiService', [
     var assetsCache = {};
     var _fetchAudio = function(
         explorationId, filename, successCallback, errorCallback) {
-      _filesCurrentlyBeingRequested.push(filename);
+      var canceler = $q.defer();
+      _filesCurrentlyBeingRequested.push(
+        FileDownloadRequestObjectFactory.createNew(filename, canceler));
       $http({
         method: 'GET',
         responseType: 'blob',
         url: _getAudioDownloadUrl(explorationId, filename),
+        timeout: canceler.promise
       }).success(function(data) {
-        var audioBlob = new Blob([data]);
+        try {
+          var audioBlob = new Blob([data]);
+        } catch (exception) {
+          window.BlobBuilder = window.BlobBuilder ||
+                         window.WebKitBlobBuilder ||
+                         window.MozBlobBuilder ||
+                         window.MSBlobBuilder;
+          if (exception.name == 'TypeError' && window.BlobBuilder) {
+            var blobBuilder = new BlobBuilder();
+            blobBuilder.append(data);
+            var audioBlob = blobBuilder.getBlob('audio/*');
+          } else {
+            throw exception;
+          }
+        }
         assetsCache[filename] = audioBlob;
-        successCallback(audioBlob);
+        successCallback(AudioFileObjectFactory.createNew(filename, audioBlob));
       }).error(function() {
         errorCallback();
       })['finally'](function() {
@@ -53,11 +72,22 @@ oppia.factory('AssetsBackendApiService', [
       });
     };
 
+    var _abortAllCurrentDownloads = function() {
+      _filesCurrentlyBeingRequested.forEach(function(request) {
+        request.canceler.resolve();
+      });
+      _filesCurrentlyBeingRequested = [];
+    };
+
     var _removeFromFilesCurrentlyBeingRequested = function(filename) {
       if (_isCurrentlyBeingRequested(filename)) {
-        var fileToRemoveIndex =
-          _filesCurrentlyBeingRequested.indexOf(filename);
-        _filesCurrentlyBeingRequested.splice(fileToRemoveIndex, 1);
+        for (var index = 0; index <
+             _filesCurrentlyBeingRequested.length; index++) {
+          if (_filesCurrentlyBeingRequested[index].filename === filename) {
+            _filesCurrentlyBeingRequested.splice(index, 1);
+            break;
+          }
+        }
       }
     };
 
@@ -114,7 +144,9 @@ oppia.factory('AssetsBackendApiService', [
     };
 
     var _isCurrentlyBeingRequested = function(filename) {
-      return _filesCurrentlyBeingRequested.indexOf(filename) !== -1;
+      return _filesCurrentlyBeingRequested.some(function(request) {
+        return request.filename === filename;
+      });
     };
 
     var _isCached = function(filename) {
@@ -125,7 +157,8 @@ oppia.factory('AssetsBackendApiService', [
       loadAudio: function(explorationId, filename) {
         return $q(function(resolve, reject) {
           if (_isCached(filename)) {
-            resolve(assetsCache[filename]);
+            resolve(AudioFileObjectFactory.createNew(
+              filename, assetsCache[filename]));
           } else if (!_isCurrentlyBeingRequested(filename)) {
             _fetchAudio(explorationId, filename, resolve, reject);
           }
@@ -141,6 +174,12 @@ oppia.factory('AssetsBackendApiService', [
       },
       getAudioDownloadUrl: function(explorationId, filename) {
         return _getAudioDownloadUrl(explorationId, filename);
+      },
+      abortAllCurrentDownloads: function() {
+        _abortAllCurrentDownloads();
+      },
+      getFilesCurrentlyBeingRequested: function() {
+        return _filesCurrentlyBeingRequested;
       }
     };
   }

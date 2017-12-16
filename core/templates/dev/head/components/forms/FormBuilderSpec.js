@@ -61,7 +61,8 @@ describe('Normalizer tests', function() {
     'isFloat',
     'isAtLeast',
     'isAtMost',
-    'isNonempty'
+    'isNonempty',
+    'isInteger'
   ];
 
   beforeEach(module('oppia'));
@@ -135,10 +136,19 @@ describe('Normalizer tests', function() {
     expect(filter('a')).toBe(true);
     expect(filter('')).toBe(false);
   }));
+
+  it('should validate integers', inject(function($filter) {
+    var filter = $filter('isInteger');
+    expect(filter('3')).toBe(true);
+    expect(filter('-3')).toBe(true);
+    expect(filter('3.0')).toBe(true);
+    expect(filter('3.5')).toBe(false);
+  }));
 });
 
 describe('RTE helper service', function() {
-  var _DATA_URI = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///';
+  var _IMAGE_URL = '/rich_text_components/Some/Some.png';
+  var _INTERPOLATED_IMAGE_URL = '/extensions' + _IMAGE_URL;
   var rhs;
 
   beforeEach(module('oppia'));
@@ -146,11 +156,11 @@ describe('RTE helper service', function() {
   beforeEach(function() {
     module(function($provide) {
       $provide.constant('RTE_COMPONENT_SPECS', [{
-        frontend_name: 'image',
-        backend_name: 'Image',
+        frontend_id: 'image',
+        backend_id: 'Image',
         tooltip: 'Insert image',
-        icon_data_url: _DATA_URI,
-        preview_url_template: _DATA_URI
+        icon_data_url: _IMAGE_URL,
+        preview_url_template: _IMAGE_URL
       }]);
     });
   });
@@ -171,12 +181,13 @@ describe('RTE helper service', function() {
       '<div>abc<span>def</span></div><b>ghi</b>'
     ], [
       '<oppia-noninteractive-image></oppia-noninteractive-image>',
-      '<img src="' + _DATA_URI + '" class="oppia-noninteractive-image">'
+      '<img src="' + _INTERPOLATED_IMAGE_URL + '" ' +
+           'class="oppia-noninteractive-image">'
     ], [
       '<oppia-noninteractive-image ' +
         'image_id-with-value="&amp;quot;T&amp;quot;">' +
       '</oppia-noninteractive-image>',
-      '<img src="' + _DATA_URI + '" ' +
+      '<img src="' + _INTERPOLATED_IMAGE_URL + '" ' +
            'class="oppia-noninteractive-image" ' +
            'image_id-with-value="&amp;quot;T&amp;quot;">'
     ]];

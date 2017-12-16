@@ -18,16 +18,18 @@
  */
 
 oppia.controller('StateStatistics', [
-  '$rootScope', '$scope', '$modal', 'explorationData', 'editorContextService',
-  'explorationStatesService', 'TrainingDataService',
-  'stateCustomizationArgsService', 'oppiaExplorationHtmlFormatterService',
+  '$rootScope', '$scope', '$modal', 'ExplorationDataService',
+  'EditorStateService', 'explorationStatesService', 'TrainingDataService',
+  'stateCustomizationArgsService', 'ExplorationHtmlFormatterService',
   'TrainingModalService', 'INTERACTION_SPECS',
   function(
-      $rootScope, $scope, $modal, explorationData, editorContextService,
+      $rootScope, $scope, $modal, ExplorationDataService, EditorStateService,
       explorationStatesService, TrainingDataService,
-      stateCustomizationArgsService, oppiaExplorationHtmlFormatterService,
+      stateCustomizationArgsService, ExplorationHtmlFormatterService,
       TrainingModalService, INTERACTION_SPECS) {
     $scope.isInteractionTrainable = false;
+    $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS =
+      GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS;
 
     $scope.initStateStatistics = function(data) {
       $scope.isInteractionTrainable = (
@@ -44,7 +46,7 @@ oppia.controller('StateStatistics', [
           TrainingDataService.getTrainingDataFrequencies());
         for (var i = 0; i < trainingDataAnswers.length; i++) {
           var answerHtml = (
-            oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+            ExplorationHtmlFormatterService.getShortAnswerHtml(
               trainingDataAnswers[i], data.interaction.id,
               stateCustomizationArgsService.savedMemento));
           $scope.trainingDataButtonContentsList.push({
@@ -56,7 +58,7 @@ oppia.controller('StateStatistics', [
     };
 
     $scope.$on('refreshStateEditor', function() {
-      $scope.stateName = editorContextService.getActiveStateName();
+      $scope.stateName = EditorStateService.getActiveStateName();
       var stateData = explorationStatesService.getState($scope.stateName);
       $scope.initStateStatistics(stateData);
     });

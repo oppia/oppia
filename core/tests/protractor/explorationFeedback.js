@@ -27,8 +27,9 @@ var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
-var library = require('../protractor_utils/library.js');
-var player = require('../protractor_utils/player.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
@@ -38,9 +39,13 @@ describe('ExplorationFeedback', function() {
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_LANGUAGE = 'English';
   var creatorDashboardPage = null;
+  var libraryPage = null;
+  var explorationPlayerPage = null;
 
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   beforeEach(function() {
@@ -68,9 +73,9 @@ describe('ExplorationFeedback', function() {
 
     // Learner plays the exploration and submits a feedback
     users.login('user2@ExplorationFeedback.com');
-    browser.get(general.LIBRARY_URL_SUFFIX);
-    library.playExploration(EXPLORATION_TITLE);
-    player.submitFeedback(feedback);
+    libraryPage.get();
+    libraryPage.playExploration(EXPLORATION_TITLE);
+    explorationPlayerPage.submitFeedback(feedback);
     users.logout();
 
     // Creator reads the feedback and responds

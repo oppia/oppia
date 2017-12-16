@@ -21,8 +21,9 @@ var CreatorDashboardPage =
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var forms = require('../protractor_utils/forms.js');
-var player = require('../protractor_utils/player.js');
-var library = require('../protractor_utils/library.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
@@ -32,9 +33,13 @@ describe('Suggestions on Explorations', function() {
   var EXPLORATION_OBJECTIVE = 'To explore something new';
   var EXPLORATION_LANGUAGE = 'English';
   var creatorDashboardPage = null;
+  var libraryPage = null;
+  var explorationPlayerPage = null;
 
   beforeEach(function() {
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    libraryPage = new LibraryPage.LibraryPage();
   });
 
   beforeEach(function() {
@@ -57,13 +62,13 @@ describe('Suggestions on Explorations', function() {
 
     // Suggester plays the exploration and suggests a change
     users.login('user2@ExplorationSuggestions.com');
-    browser.get(general.LIBRARY_URL_SUFFIX);
-    library.playExploration(EXPLORATION_TITLE);
+    libraryPage.get();
+    libraryPage.playExploration(EXPLORATION_TITLE);
 
     var suggestion = 'New Exploration';
     var suggestionDescription = 'Uppercased the first letter';
 
-    player.submitSuggestion(suggestion, suggestionDescription);
+    explorationPlayerPage.submitSuggestion(suggestion, suggestionDescription);
     users.logout();
 
     // Exploration author reviews the suggestion and accepts it
@@ -77,14 +82,14 @@ describe('Suggestions on Explorations', function() {
     editor.acceptSuggestion(suggestionDescription);
 
     editor.navigateToPreviewTab();
-    player.expectContentToMatch(forms.toRichText(suggestion));
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
     users.logout();
 
     // Student logs in and plays the exploration, finds the updated content
     users.login('user3@ExplorationSuggestions.com');
-    browser.get(general.LIBRARY_URL_SUFFIX);
-    library.playExploration(EXPLORATION_TITLE);
-    player.expectContentToMatch(forms.toRichText(suggestion));
+    libraryPage.get();
+    libraryPage.playExploration(EXPLORATION_TITLE);
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
     users.logout();
   });
 

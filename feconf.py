@@ -58,6 +58,8 @@ INTERACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
+RTE_EXTENSIONS_DEFINITIONS_PATH = (
+    os.path.join('assets', 'rich_text_components_definitions.js'))
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
@@ -73,7 +75,7 @@ DEPENDENCIES_TEMPLATES_DIR = (
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
-    'extensions', 'interactions', 'object_defaults.json')
+    'extensions', 'objects', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
 
@@ -192,6 +194,10 @@ DEFAULT_EXPLORATION_OBJECTIVE = ''
 DEFAULT_INIT_STATE_NAME = 'Introduction'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
+
+# Whether new explorations should have automatic text-to-speech enabled
+# by default.
+DEFAULT_AUTO_TTS_ENABLED = True
 
 # Default title for a newly-minted collection.
 DEFAULT_COLLECTION_TITLE = ''
@@ -430,6 +436,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
 }, {
     'name': 'Math',
     'interaction_ids': [
+        'FractionInput',
         'GraphInput',
         'LogicProof',
         'NumericInput',
@@ -488,6 +495,9 @@ DEMO_EXPLORATIONS = {
     u'16': 'all_interactions',
     u'17': 'audio_test',
     u'18': 'code_classifier_test.yaml',
+    u'19': 'example_exploration_in_collection1.yaml',
+    u'20': 'example_exploration_in_collection2.yaml',
+    u'21': 'example_exploration_in_collection3.yaml',
 }
 
 DEMO_COLLECTIONS = {
@@ -600,6 +610,7 @@ NAV_MODE_TEACH = 'teach'
 NAV_MODE_THANKS = 'thanks'
 
 # Event types.
+EVENT_TYPE_ALL_STATS = 'all_stats'
 EVENT_TYPE_STATE_HIT = 'state_hit'
 EVENT_TYPE_STATE_COMPLETED = 'state_complete'
 EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
@@ -638,8 +649,12 @@ OPEN_FEEDBACK_COUNT_DASHBOARD = 3
 ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
+# Whether state id mapping model should be generated and stored when exploration
+# is created or updated.
+ENABLE_STATE_ID_MAPPING = False
 
 # Bool to enable update of analytics models.
+# NOTE TO DEVELOPERS: This should be synchronized with app.js
 ENABLE_NEW_STATS_FRAMEWORK = False
 # Current event models schema version. All event models with
 # event_schema_version as 1 are the events collected before the rework of the

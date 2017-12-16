@@ -219,6 +219,7 @@ class ExplorationHandler(EditorHandler):
             user_services.get_email_preferences_for_exploration(
                 self.user_id, exploration_id))
         editor_dict = {
+            'auto_tts_enabled': exploration.auto_tts_enabled,
             'category': exploration.category,
             'draft_change_list_id': draft_change_list_id,
             'exploration_id': exploration_id,
@@ -676,7 +677,7 @@ class ExplorationRevertHandler(EditorHandler):
         self.render_json({})
 
 
-class ExplorationStatisticsHandler(EditorHandler):
+class OldExplorationStatisticsHandler(EditorHandler):
     """Returns statistics for an exploration."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -693,6 +694,26 @@ class ExplorationStatisticsHandler(EditorHandler):
         self.render_json(stats_services_old.get_exploration_stats(
             current_exploration.id, exploration_version,
             current_exploration.states))
+
+
+class ExplorationStatisticsHandler(EditorHandler):
+    """Returns statistics for an exploration. This is the handler for the new
+    statistics framework.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_view_exploration_stats
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        try:
+            current_exploration = exp_services.get_exploration_by_id(
+                exploration_id)
+        except:
+            raise self.PageNotFoundException
+
+        self.render_json(stats_services.get_exploration_stats(
+            exploration_id, current_exploration.version).to_frontend_dict())
 
 
 class ExplorationStatsVersionsHandler(EditorHandler):

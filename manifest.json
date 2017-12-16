@@ -272,6 +272,17 @@
           "js": ["hammer.js"]
         }
       },
+      "headroomJs": {
+        "version": "0.9.4",
+        "downloadFormat": "files",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4",
+        "rootDirPrefix": "headroom-js-",
+        "targetDirPrefix": "headroom-js-",
+        "files": ["angular.headroom.min.js", "headroom.min.js"],
+        "bundle": {
+          "js": []
+        }
+      },
       "jquery": {
         "version": "3.0.0",
         "downloadFormat": "files",
@@ -395,14 +406,14 @@
         }
       },
       "uiBootstrap": {
-        "version": "0.13.4",
+        "version": "0.14.3",
         "downloadFormat": "files",
         "url": "https://raw.githubusercontent.com/angular-ui/bootstrap/gh-pages",
         "rootDirPrefix": "ui-bootstrap-",
         "targetDirPrefix": "ui-bootstrap-",
-        "files": ["ui-bootstrap-tpls-0.13.4.js", "ui-bootstrap-tpls-0.13.4.min.js"],
+        "files": ["ui-bootstrap-tpls-0.14.3.js", "ui-bootstrap-tpls-0.14.3.min.js"],
         "bundle": {
-          "js": ["ui-bootstrap-tpls-0.13.4.js"]
+          "js": ["ui-bootstrap-tpls-0.14.3.js"]
         }
       },
       "uiCodemirror": {

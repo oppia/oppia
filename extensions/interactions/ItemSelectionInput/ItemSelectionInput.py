@@ -70,3 +70,14 @@ class ItemSelectionInput(base.BaseInteraction):
         },
         'default_value': [''],
     }]
+
+    _answer_visualization_specs = [{
+        # Table with keyed answer counts for top N answers.
+        'id': 'EnumeratedFrequencyTable',
+        'options': {
+            'column_headers': ['Answer (click to expand/collapse)', 'Count'],
+            'title': 'Top answers',
+        },
+        'calculation_id': 'Top10AnswerFrequencies',
+        'show_addressed_info': True,
+    }]

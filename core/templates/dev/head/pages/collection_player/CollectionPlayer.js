@@ -34,11 +34,11 @@ oppia.controller('CollectionPlayer', [
   '$scope', '$anchorScroll', '$location', '$http',
   'ReadOnlyCollectionBackendApiService',
   'CollectionObjectFactory', 'CollectionPlaythroughObjectFactory',
-  'alertsService', 'UrlInterpolationService',
+  'AlertsService', 'UrlInterpolationService',
   function($scope, $anchorScroll, $location, $http,
            ReadOnlyCollectionBackendApiService,
            CollectionObjectFactory, CollectionPlaythroughObjectFactory,
-           alertsService, UrlInterpolationService) {
+           AlertsService, UrlInterpolationService) {
     $scope.collection = null;
     $scope.collectionPlaythrough = null;
     $scope.collectionId = GLOBALS.collectionId;
@@ -77,7 +77,7 @@ oppia.controller('CollectionPlayer', [
       var collectionNode = (
         $scope.collection.getCollectionNodeByExplorationId(explorationId));
       if (!collectionNode) {
-        alertsService.addWarning('There was an error loading the collection.');
+        AlertsService.addWarning('There was an error loading the collection.');
       }
       return collectionNode;
     };
@@ -160,7 +160,9 @@ oppia.controller('CollectionPlayer', [
           sParameterExtension += 250 + ' ' + y + ', ';
           y += 200;
         }
-        $scope.pathSvgParameters += ' S ' + sParameterExtension;
+        if (sParameterExtension !== '') {
+          $scope.pathSvgParameters += ' S ' + sParameterExtension;
+        }
       }
       if (collectionNodeCount % 2 === 0) {
         if (collectionNodeCount === 2) {
@@ -241,7 +243,7 @@ oppia.controller('CollectionPlayer', [
         $scope.collectionSummary = response.data.summaries[0];
       },
       function() {
-        alertsService.addWarning(
+        AlertsService.addWarning(
           'There was an error while fetching the collection summary.');
       }
     );
@@ -268,7 +270,7 @@ oppia.controller('CollectionPlayer', [
         // NOTE TO DEVELOPERS: Check the backend console for an indication as to
         // why this error occurred; sometimes the errors are noisy, so they are
         // not shown to the user.
-        alertsService.addWarning(
+        AlertsService.addWarning(
           'There was an error loading the collection.');
       }
     );

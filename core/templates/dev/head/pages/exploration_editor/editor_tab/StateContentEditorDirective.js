@@ -35,12 +35,12 @@ oppia.directive('stateContentEditor', [
         'state_content_editor_directive.html'),
       controller: [
         '$scope', '$modal', 'stateContentService', 'editabilityService',
-        'editorFirstTimeEventsService', 'explorationInitStateNameService',
-        'editorContextService',
+        'EditorFirstTimeEventsService', 'explorationInitStateNameService',
+        'EditorStateService',
         function(
             $scope, $modal, stateContentService, editabilityService,
-            editorFirstTimeEventsService, explorationInitStateNameService,
-            editorContextService) {
+            EditorFirstTimeEventsService, explorationInitStateNameService,
+            EditorStateService) {
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
@@ -88,19 +88,19 @@ oppia.directive('stateContentEditor', [
 
           $scope.isCurrentStateInitialState = function() {
             return (
-              editorContextService.getActiveStateName() ===
+              EditorStateService.getActiveStateName() ===
               explorationInitStateNameService.savedMemento);
           };
 
           $scope.openStateContentEditor = function() {
             if ($scope.isEditable()) {
-              editorFirstTimeEventsService.registerFirstOpenContentBoxEvent();
+              EditorFirstTimeEventsService.registerFirstOpenContentBoxEvent();
               $scope.contentEditorIsOpen = true;
             }
           };
 
           $scope.onSaveContentButtonClicked = function() {
-            editorFirstTimeEventsService.registerFirstSaveContentEvent();
+            EditorFirstTimeEventsService.registerFirstSaveContentEvent();
             saveContent();
 
             var savedContent = stateContentService.savedMemento;

@@ -27,7 +27,8 @@ oppia.filter('convertHtmlToUnicode', [function() {
 }]);
 
 oppia.filter('convertUnicodeToHtml', [
-  '$sanitize', 'HtmlEscaperService', function($sanitize, HtmlEscaperService) {
+  '$sanitize', 'HtmlEscaperService',
+  function($sanitize, HtmlEscaperService) {
     return function(text) {
       return $sanitize(HtmlEscaperService.unescapedStrToEscapedStr(text));
     };
@@ -60,13 +61,11 @@ oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
     var currentFragmentIsParam = false;
     for (var i = 0; i < text.length; i++) {
       if (text[i] === '\\') {
-        assert(
-          !currentFragmentIsParam && text.length > i + 1 &&
-          {
-            '{': true,
-            '}': true,
-            '\\': true
-          }[text[i + 1]]);
+        assert(!currentFragmentIsParam && text.length > i + 1 && {
+          '{': true,
+          '}': true,
+          '\\': true
+        }[text[i + 1]]);
         currentFragment += text[i + 1];
         i++;
       } else if (text[i] === '{') {
@@ -107,7 +106,8 @@ oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
       result += (
         fragment.type === 'text' ?
         $filter('convertUnicodeToHtml')(fragment.data) :
-        '<oppia-parameter>' + fragment.data + '</oppia-parameter>');
+        '<oppia-parameter>' + fragment.data +
+        '</oppia-parameter>');
     });
     return result;
   };
@@ -175,7 +175,7 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
         var attr = attrs[j];
         // Reinstate the sanitized widget attributes.
         if (attr.name.indexOf('-with-value') !== -1 &&
-            !el.hasAttribute(attr.name)) {
+          !el.hasAttribute(attr.name)) {
           el.setAttribute(attr.name, attr.value);
         }
       }
@@ -222,11 +222,12 @@ oppia.directive('textAngularRte', [
         rteHelperService.getRichTextComponents().forEach(
           function(componentDefn) {
             if (!($scope.uiConfig() &&
-                  $scope.uiConfig().hide_complex_extensions &&
-                  componentDefn.isComplex)) {
-              toolbarOptions[2].push(componentDefn.name);
+                $scope.uiConfig().hide_complex_extensions &&
+                componentDefn.isComplex)) {
+              toolbarOptions[2].push(componentDefn.id);
             }
-            var imgClassName = 'oppia-noninteractive-' + componentDefn.name;
+            var imgClassName = 'oppia-noninteractive-' +
+              componentDefn.id;
             whitelistedImgClasses.push(imgClassName);
           }
         );
@@ -255,7 +256,8 @@ oppia.directive('textAngularRte', [
 
         $scope.$on('focusOn', function(evt, label) {
           if (label === $scope.labelForFocusTarget()) {
-            var editorScope = textAngularManager.retrieveEditor(label).scope;
+            var editorScope = textAngularManager.retrieveEditor(
+              label).scope;
             $timeout(function() {
               editorScope.displayElements.text[0].focus();
             });
@@ -265,7 +267,8 @@ oppia.directive('textAngularRte', [
         $scope.$watch('tempContent', function(newVal) {
           // Sanitizing while a modal is open would delete the markers that
           // save and restore the cursor's position in the RTE.
-          var displayedContent = $scope.isCustomizationModalOpen ? newVal :
+          var displayedContent = $scope.isCustomizationModalOpen ?
+            newVal :
             $filter('sanitizeHtmlForRte')(newVal);
           $scope.htmlContent = rteHelperService.convertRteToHtml(
             displayedContent);
@@ -304,6 +307,12 @@ oppia.filter('isNonempty', [function() {
     return Boolean(input);
   };
 }]);
+
+oppia.filter('isInteger', [function() {
+  return function(input) {
+    return Number.isInteger(Number(input));
+  };
+}])
 
 oppia.filter('isFloat', [function() {
   return function(input) {
@@ -361,14 +370,15 @@ oppia.directive('applyValidation', ['$filter', function($filter) {
           var filterArgs = {};
           for (key in validatorSpec) {
             if (key !== 'id') {
-              filterArgs[$filter('underscoresToCamelCase')(key)] = angular.copy(
-                validatorSpec[key]);
+              filterArgs[$filter('underscoresToCamelCase')(key)] =
+                angular.copy(validatorSpec[key]);
             }
           }
 
           var customValidator = function(viewValue) {
             ctrl.$setValidity(
-              frontendName, $filter(frontendName)(viewValue, filterArgs));
+              frontendName, $filter(frontendName)(viewValue,
+                filterArgs));
             return viewValue;
           };
 

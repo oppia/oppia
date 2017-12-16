@@ -326,6 +326,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorehandler/exploration_maybe_leave_event/<exploration_id>',
         reader.ExplorationMaybeLeaveHandler),
     get_redirect_route(
+        r'/explorehandler/stats_events/<exploration_id>',
+        reader.StatsEventsHandler),
+    get_redirect_route(
         r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler),
     get_redirect_route(
         r'/explorehandler/rating/<exploration_id>', reader.RatingHandler),
@@ -379,7 +382,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/statisticsversion/<exploration_id>',
         editor.ExplorationStatsVersionsHandler),
     get_redirect_route(
-        r'/createhandler/statistics/<exploration_id>/<exploration_version>',
+        r'/createhandler/statistics_old/<exploration_id>/<exploration_version>',
+        editor.OldExplorationStatisticsHandler),
+    get_redirect_route(
+        r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler),
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
@@ -480,9 +486,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/ml/trainedclassifierhandler', classifier.TrainedClassifierHandler),
     get_redirect_route(
         r'/ml/nextjobhandler', classifier.NextJobHandler),
-    get_redirect_route(
-        r'/.well-known/acme-challenge/<challenge>',
-        admin.SslChallengeHandler),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),

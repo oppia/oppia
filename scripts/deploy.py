@@ -70,7 +70,9 @@ APP_NAME_OPPIATESTSERVER = 'oppiatestserver'
 PARSED_ARGS = _PARSER.parse_args()
 if PARSED_ARGS.app_name:
     APP_NAME = PARSED_ARGS.app_name
-    if APP_NAME not in [APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER]:
+    if APP_NAME not in [
+            APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER] and (
+                'migration' not in APP_NAME):
         raise Exception('Invalid app name: %s' % APP_NAME)
 else:
     raise Exception('No app name specified.')
@@ -100,41 +102,6 @@ IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
 # Denotes length for cache slug used in production mode. It consists of
 # lowercase alphanumeric characters.
 CACHE_SLUG_PROD_LENGTH = 6
-
-
-def _ensure_release_scripts_folder_exists_and_is_up_to_date():
-    """Checks that the release-scripts folder exists and is up-to-date."""
-    parent_dirpath = os.path.join(os.getcwd(), os.pardir)
-    release_scripts_dirpath = os.path.join(parent_dirpath, 'release-scripts')
-
-    # If the release-scripts folder does not exist, set it up.
-    if not os.path.isdir(release_scripts_dirpath):
-        with common.CD(parent_dirpath):
-            # Taken from the "Check your SSH section" at
-            # https://help.github.com/articles/error-repository-not-found/
-            _, stderr = subprocess.Popen(
-                ['ssh', '-T', 'git@github.com'],
-                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE).communicate()
-            if 'You\'ve successfully authenticated' not in stderr:
-                raise Exception(
-                    'You need SSH access to GitHub. See the '
-                    '"Check your SSH access" section here and follow the '
-                    'instructions: '
-                    'https://help.github.com/articles/'
-                    'error-repository-not-found/#check-your-ssh-access')
-            subprocess.call([
-                'git', 'clone',
-                'git@github.com:oppia/release-scripts.git'])
-
-    with common.CD(release_scripts_dirpath):
-        common.verify_local_repo_is_clean()
-        common.verify_current_branch_name('master')
-
-        # Update the local repo.
-        remote_alias = common.get_remote_alias(
-            'git@github.com:oppia/release-scripts.git')
-        subprocess.call(['git', 'pull', remote_alias])
 
 
 def preprocess_release():
@@ -189,16 +156,42 @@ def preprocess_release():
             shutil.copyfile(src, dst)
 
 
+def _get_served_version():
+    """Retrieves the default version being served on the specified application
+    being served on app engine.
+
+    Returns:
+        (str): The current serving version.
+    """
+    listed_versions = subprocess.check_output(
+        [APPCFG_PATH, '--application=%s' % APP_NAME, 'list_versions'])
+    default_version_line_start_str = 'default: ['
+    listed_versions = listed_versions[
+        listed_versions.index(default_version_line_start_str) + len(
+            default_version_line_start_str):]
+    return listed_versions[:listed_versions.index(',')].replace('-', '.')
+
+
+def _get_current_release_version():
+    """Retrieves the current branch's release version.
+
+    Returns:
+        (str): The current (local) Oppia release version.
+    """
+    release_branch_name_prefix = 'release-'
+    if not CURRENT_BRANCH_NAME.startswith(release_branch_name_prefix):
+        raise Exception('Deploy script must be run from a release branch.')
+    return CURRENT_BRANCH_NAME[len(
+        release_branch_name_prefix):].replace('-', '.')
+
+
 def _execute_deployment():
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
-    _ensure_release_scripts_folder_exists_and_is_up_to_date()
+    common.ensure_release_scripts_folder_exists_and_is_up_to_date()
 
     current_git_revision = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD']).strip()
-
-    print ''
-    print 'Starting deployment process.'
 
     if not os.path.exists(THIRD_PARTY_DIR):
         raise Exception(
@@ -243,9 +236,11 @@ def _execute_deployment():
 
         print 'Returning to oppia/ root directory.'
 
-    # If this is a test server deployment, open the library page (for sanity
-    # checking) and the GAE error logs.
-    if APP_NAME == APP_NAME_OPPIATESTSERVER:
+    # If this is a test server deployment and the current release version is
+    # already serving, open the library page (for sanity checking) and the GAE
+    # error logs.
+    if (APP_NAME == APP_NAME_OPPIATESTSERVER or 'migration' in APP_NAME) and (
+            _get_served_version() == _get_current_release_version()):
         common.open_new_tab_in_browser_if_possible(
             'https://console.cloud.google.com/logs/viewer?'
             'project=%s&key1=default&minLogLevel=500'
