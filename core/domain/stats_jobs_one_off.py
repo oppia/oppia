@@ -150,8 +150,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     state = exploration.states[unicode_state_name]
                     if state.interaction.default_outcome is None:
                         yield (
-                            'LOG: Default outcome does not exist for state %s '
-                            'of exploration %s.' % (
+                            'ERROR: Default outcome does not exist for state '
+                            '%s of exploration %s.' % (
                                 unicode_state_name, item.exploration_id))
                         continue
 
