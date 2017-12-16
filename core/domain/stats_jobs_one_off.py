@@ -141,12 +141,21 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 else:
                     try:
                         exploration = exp_services.get_exploration_by_id(
-                            item.exploration_id, item.exploration_version)
+                            item.exploration_id,
+                            version=item.exploration_version)
                     except Exception:
                         # Exploration does not exist.
                         return
-                    dest_state = exploration.states[
-                        unicode_state_name].interaction.default_outcome.dest
+
+                    state = exploration.states[unicode_state_name]
+                    if state.interaction.default_outcome is None:
+                        yield (
+                            'ERROR: Default outcome does not exist for state '
+                            '%s of exploration %s.' % (
+                                unicode_state_name, item.exploration_id))
+                        continue
+
+                    dest_state = state.interaction.default_outcome.dest
                     if dest_state != unicode_state_name:
                         useful_feedback_count += 1
             value = {
