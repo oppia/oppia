@@ -92,6 +92,7 @@ var hashes = {
   '/hash_test.min.js': 'zyx12345',
   '/assets_test/hash_test.json': '987654321',
   '/pages_test/hash_test.html': 'abcd12345',
+  '/hash_test.json': 'xjf3kslsd',
   '/images/hash_test.png': '98765fghij',
   '/interactions/interTest/static/interTest.png' : '123654789'
 };

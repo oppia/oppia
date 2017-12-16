@@ -167,6 +167,15 @@ oppia.factory('UrlInterpolationService', [
       },
 
       /**
+       * Given a path relative to /assets folder, returns the complete url path
+       * to that asset.
+       */
+      getStaticAssetUrl: function(assetPath) {
+        validateResourcePath(assetPath);
+        return getCompleteUrl('/assets', assetPath);
+      },
+
+      /**
        * Given an interaction id, returns the complete url path to
        * the thumbnail image for the interaction.
        */

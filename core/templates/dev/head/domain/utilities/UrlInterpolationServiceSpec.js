@@ -287,6 +287,16 @@ describe('URL Interpolation Service', function() {
       hashes['/path_test/hash_test.html'] + '.html');
   });
 
+  it('should interpolate correct path', function() {
+    expect(uis.getStaticAssetUrl('/test.png')).toBe(
+      GLOBALS.ASSET_DIR_PREFIX + '/assets/test.png');
+    expect(uis.getStaticAssetUrl('/test_url/test.png')).toBe(
+      GLOBALS.ASSET_DIR_PREFIX + '/assets/test_url/test.png');
+    expect(uis.getStaticAssetUrl('/hash_test.json')).toBe(
+      GLOBALS.ASSET_DIR_PREFIX + '/assets/hash_test.' +
+      hashes['/hash_test.json'] + '.json');
+  });
+
   it('should throw an error for empty path', function() {
     expect(uis.getStaticImageUrl.bind(null, null)).toThrow(
       new Error(
