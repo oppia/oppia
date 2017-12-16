@@ -118,7 +118,13 @@ BAD_PATTERNS_JS_REGEXP = [
             'core/templates/dev/head/pages/exploration_player/'
             'FeedbackPopupDirective.js'
         ),
-        'excluded_dirs': ('extensions/',)
+        'excluded_dirs': (
+            'extensions/answer_summarizers/',
+            'extensions/classifiers/',
+            'extensions/dependencies/',
+            'extensions/objects/',
+            'extensions/value_generators/',
+            'extensions/visualizations/')
     }
 ]
 
@@ -132,7 +138,13 @@ BAD_PATTERNS_HTML_REGEXP = [
             'core/templates/dev/head/pages/exploration_player/'
             'input_response_pair_directive.html'
         ),
-        'excluded_dirs': ('extensions/',)
+        'excluded_dirs': (
+            'extensions/answer_summarizers/',
+            'extensions/classifiers/',
+            'extensions/dependencies/',
+            'extensions/objects/',
+            'extensions/value_generators/',
+            'extensions/visualizations/')
     }
 ]
 
