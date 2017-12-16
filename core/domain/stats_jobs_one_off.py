@@ -146,10 +146,12 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     except Exception:
                         # Exploration does not exist.
                         return
-                    dest_state = exploration.states[
-                        unicode_state_name].interaction.default_outcome.dest
-                    if dest_state != unicode_state_name:
-                        useful_feedback_count += 1
+
+                    state = exploration.states[unicode_state_name]
+                    if state.interaction.default_outcome:
+                        dest_state = state.interaction.default_outcome.dest
+                        if dest_state != unicode_state_name:
+                            useful_feedback_count += 1
             value = {
                 'event_type': GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS,
                 'version': item.exploration_version,
