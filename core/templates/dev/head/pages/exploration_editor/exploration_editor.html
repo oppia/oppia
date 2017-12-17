@@ -13,7 +13,16 @@
   <script type="text/javascript">
     GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
       '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
-    GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.canDelete = JSON.parse(
+      '{{can_delete|js_string}}');
+    GLOBALS.can_edit = JSON.parse(
+      '{{can_edit|js_string}}');
+    GLOBALS.canModifyRoles = JSON.parse(
+      '{{can_modify_roles|js_string}}');
+    GLOBALS.canReleaseOwnership = JSON.parse(
+      '{{can_release_ownership|js_string}}');
+    GLOBALS.canUnpublish = JSON.parse(
+      '{{can_unpublish|js_string}}');
     GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse(
       '{{DEFAULT_OBJECT_VALUES|js_string}}');
     GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = JSON.parse(
@@ -25,11 +34,8 @@
       '{{NEW_STATE_TEMPLATE|js_string}}');
     GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse(
       '{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
-    GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
-    GLOBALS.canModifyRoles = JSON.parse('{{can_modify_roles|js_string}}');
-    GLOBALS.canReleaseOwnership = JSON.parse('{{can_release_ownership|js_string}}');
-    GLOBALS.canDelete = JSON.parse('{{can_delete|js_string}}');
-    GLOBALS.canUnpublish = JSON.parse('{{can_unpublish|js_string}}');
+    GLOBALS.TAG_REGEX = JSON.parse(
+      '{{TAG_REGEX|js_string}}');
   </script>
 
   <!-- Updated previous version to current version of google charts

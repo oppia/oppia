@@ -42,6 +42,11 @@ oppia.controller('SettingsTab', [
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
       EditableExplorationBackendApiService, UrlInterpolationService,
       explorationAutomaticTextToSpeechService) {
+    $scope.canDelete = GLOBALS.canDelete;
+    $scope.canModifyRoles = GLOBALS.canModifyRoles;
+    $scope.canReleaseOwnership = GLOBALS.canReleaseOwnership;
+    $scope.canUnpublish = GLOBALS.canUnpublish;
+
     $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
@@ -56,11 +61,6 @@ oppia.controller('SettingsTab', [
     $scope.isRolesFormOpen = false;
 
     $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
-
-    $scope.canModifyRoles = GLOBALS.canModifyRoles;
-    $scope.canReleaseOwnership = GLOBALS.canReleaseOwnership;
-    $scope.canDelete = GLOBALS.canDelete;
-    $scope.canUnpublish = GLOBALS.canUnpublish;
 
     var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
     var EXPLORE_PAGE_PREFIX = '/explore/';
