@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,21 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for generic services.
+ * @fileoverview Object factory for creating audio files.
  */
 
-describe('Constants Generating', function() {
-  beforeEach(module('oppia'));
+oppia.factory('FileDownloadRequestObjectFactory', function() {
+  var FileDownloadRequest = function(filename, canceler) {
+    this.filename = filename;
+    this.canceler = canceler;
+  };
 
-  var $injector = null;
-  beforeEach(inject(function(_$injector_) {
-    $injector = _$injector_.get('$injector');
-  }));
+  FileDownloadRequest.createNew = function(filename, canceler) {
+    return new FileDownloadRequest(filename, canceler);
+  };
 
-  it('should transform all key value pairs to angular constants', function() {
-    for (var constantName in constants) {
-      expect($injector.has(constantName)).toBe(true);
-      expect($injector.get(constantName)).toBe(constants[constantName]);
-    }
-  });
+  return FileDownloadRequest;
 });

@@ -48,6 +48,12 @@ var shiftNodeLeft = function(number) {
   ).get(number).click();
 };
 
+var setCommitMessage = function(message) {
+  element(by.css(
+    '.protractor-test-commit-message-input')
+  ).sendKeys(message);
+};
+
 // Shift a node right in the node graph.
 var shiftNodeRight = function(number) {
   element.all(
@@ -114,6 +120,7 @@ exports.saveDraft = saveDraft;
 exports.closeSaveModal = closeSaveModal;
 exports.publishCollection = publishCollection;
 exports.setTitle = setTitle;
+exports.setCommitMessage = setCommitMessage;
 exports.setObjective = setObjective;
 exports.setCategory = setCategory;
 exports.saveChanges = saveChanges;
