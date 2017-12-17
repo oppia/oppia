@@ -68,7 +68,7 @@ var ExplorationPlayerPage = function() {
     viewSolutionButton.click();
   };
 
-  this.gotIt = function() {
+  this.clickGotItButton = function() {
     gotItButton.click();
   };
 
