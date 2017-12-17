@@ -228,13 +228,13 @@
           </div>
 
 
-          <div ng-if="can_modify_roles" ng-hide="isRolesFormOpen">
+          <div ng-if="canModifyRoles" ng-hide="isRolesFormOpen">
             <button type="button" class="btn btn-default protractor-test-edit-roles" ng-click="openEditRolesForm()">
               Edit Roles
             </button>
           </div>
 
-          <div ng-if="can_modify_roles" ng-show="isRolesFormOpen">
+          <div ng-if="canModifyRoles" ng-show="isRolesFormOpen">
             <strong>Add or Change Role</strong>
             <div class="form-group">
               <form ng-submit="editRole(newMemberUsername, newMemberRole.value)">
@@ -376,7 +376,7 @@
       <div class="col-lg-6 col-md-6 col-sm-6">
         <h3>Controls</h3>
 
-        <p ng-if="can_release_ownership" class="oppia-exploration-ctrl" ng-hide="ExplorationRightsService.isCommunityOwned()">
+        <p ng-if="canReleaseOwnership" class="oppia-exploration-ctrl" ng-hide="ExplorationRightsService.isCommunityOwned()">
           <button type="button" class="btn btn-default" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
             Transfer ownership to the community
           </button>
@@ -386,7 +386,7 @@
           </span>
         </p>
 
-        <p ng-if="can_delete" class="oppia-exploration-ctrl">
+        <p ng-if="canDelete" class="oppia-exploration-ctrl">
           <button type="button" ng-if="ExplorationRightsService.isPrivate()"
                   class="btn btn-danger" ng-click="deleteExploration()"
                   title="Delete this exploration">
@@ -398,7 +398,7 @@
       <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
         <h3>Admin Controls</h3>
 
-        <p ng-if="can_unpublish" class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="ExplorationRightsService.isPublic()">
+        <p ng-if="canUnpublish" class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="ExplorationRightsService.isPublic()">
           <button type="button" class="btn btn-default" ng-click="unpublishExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
             Unpublish
             <span ng-if="currentUserIsAdmin">(as admin)</span>
