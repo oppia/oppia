@@ -141,12 +141,21 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 else:
                     try:
                         exploration = exp_services.get_exploration_by_id(
-                            item.exploration_id, item.exploration_version)
+                            item.exploration_id,
+                            version=item.exploration_version)
                     except Exception:
                         # Exploration does not exist.
                         return
-                    dest_state = exploration.states[
-                        unicode_state_name].interaction.default_outcome.dest
+
+                    state = exploration.states[unicode_state_name]
+                    if state.interaction.default_outcome is None:
+                        yield (
+                            'ERROR: Default outcome does not exist for state '
+                            '%s of exploration %s.' % (
+                                unicode_state_name, item.exploration_id))
+                        continue
+
+                    dest_state = state.interaction.default_outcome.dest
                     if dest_state != unicode_state_name:
                         useful_feedback_count += 1
             value = {
@@ -354,10 +363,8 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                     if change_dict['cmd'] == (
                             'migrate_states_schema_to_latest_version'):
                         pseudo_end_state_name = 'END'
-                        if change_dict['from_version'] < 2 <= change_dict[
-                                'to_version']:
-                            prev_exploration = explorations_by_version[
-                                version - 2]
+                        if int(change_dict['from_version']) < 2 <= int(
+                                change_dict['to_version']):
                             # The explicit end state is created only if there is
                             # some state that used to refer to an implicit 'END'
                             # state. This is confirmed by checking that there is
@@ -366,13 +373,12 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                             if pseudo_end_state_name in (
                                     versioned_exploration.states) and (
                                         pseudo_end_state_name not in (
-                                            prev_exploration.states)):
+                                            state_stats_mapping)):
                                 state_stats_mapping[pseudo_end_state_name] = (
                                     stats_domain.StateStats.create_default())
-                    if change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
-                        state_stats_mapping[change_dict[
-                            'state_name']] = (
-                                stats_domain.StateStats.create_default())
+                    elif change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
+                        state_stats_mapping[change_dict['state_name']] = (
+                            stats_domain.StateStats.create_default())
                     elif change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
                         if change_dict['state_name'] not in state_stats_mapping:
                             yield (
@@ -381,8 +387,7 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                                 ' %s and version %s' % (
                                     change_dict['state_name'], exp_id, version))
                             return
-                        state_stats_mapping.pop(
-                            change_dict['state_name'])
+                        state_stats_mapping.pop(change_dict['state_name'])
                     elif change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
                         if change_dict['old_state_name'] not in (
                                 state_stats_mapping):
@@ -393,10 +398,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                                     change_dict['old_state_name'], exp_id,
                                     version))
                             return
-                        state_stats_mapping[change_dict[
-                            'new_state_name']] = (
-                                state_stats_mapping.pop(
-                                    change_dict['old_state_name']))
+                        state_stats_mapping[change_dict['new_state_name']] = (
+                            state_stats_mapping.pop(
+                                change_dict['old_state_name']))
                     elif change_dict['cmd'] == 'AUTO_revert_version_number':
                         revert_to_version = change_dict['version_number']
 
