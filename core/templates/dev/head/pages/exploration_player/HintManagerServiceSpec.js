@@ -28,17 +28,17 @@ describe('Hint manager service', function() {
 
   it('should consume hints correctly', function() {
     hms.reset([hof.createFromBackendDict({
-      hint_text: {
+      hint_content: {
         html: 'one',
         audio_translations: {}
       }
     }), hof.createFromBackendDict({
-      hint_text: {
+      hint_content: {
         html: 'two',
         audio_translations: {}
       }
     }), hof.createFromBackendDict({
-      hint_text: {
+      hint_content: {
         html: 'three',
         audio_translations: {}
       }
@@ -55,17 +55,17 @@ describe('Hint manager service', function() {
 
   it('should be displayed correctly', function() {
     hms.reset([hof.createFromBackendDict({
-      hint_text: {
+      hint_content: {
         html: 'one',
         audio_translations: {}
       }
     }), hof.createFromBackendDict({
-      hint_text: {
+      hint_content: {
         html: 'two',
         audio_translations: {}
       }
     }), hof.createFromBackendDict({
-      hint_text: {
+      hint_content: {
         html: 'three',
         audio_translations: {}
       }

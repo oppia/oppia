@@ -31,7 +31,10 @@ describe('SetInputValidationService', function() {
 
     goodDefaultOutcome = {
       dest: 'Second State',
-      feedback: null
+      feedback: {
+        html: '',
+        audio_translations: {}
+      }
     };
 
     goodAnswerGroups = [{

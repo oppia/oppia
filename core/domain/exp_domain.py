@@ -487,8 +487,6 @@ class SubtitledHtml(object):
         Returns:
             SubtitledHtml. The corresponding SubtitledHtml domain object.
         """
-        print '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
-        print subtitled_html_dict
         return cls(subtitled_html_dict['html'], {
             language_code: AudioTranslation.from_dict(audio_translation_dict)
             for language_code, audio_translation_dict in
@@ -544,6 +542,11 @@ class SubtitledHtml(object):
                 'dict, received %s' % params)
 
         return html_cleaner.clean(jinja_utils.parse_string(self.html, params))
+
+    @classmethod
+    def create_default_subtitled_html(cls):
+        """Create a default SubtitledHtml domain object."""
+        return cls('', {})
 
 
 class RuleSpec(object):
@@ -703,7 +706,7 @@ class Outcome(object):
 
         Args:
             dest: str. The name of the destination state.
-            feedback: list(str). List of feedback to show the user if this rule
+            feedback: SubtitledHtml. Feedback to give to the user if this rule
                 is triggered.
             param_changes: list(ParamChange). List of exploration-level
                 parameter changes to make if this rule is triggered.
@@ -855,13 +858,13 @@ class AnswerGroup(object):
 class Hint(object):
     """Value object representing a hint."""
 
-    def __init__(self, hint_text):
+    def __init__(self, hint_content):
         """Constructs a Hint domain object.
 
         Args:
-            hint_text: str. The hint text.
+            hint_content: SubtitledHtml. The hint text and audio translations.
         """
-        self.hint_text = hint_text
+        self.hint_content = hint_content
 
     def to_dict(self):
         """Returns a dict representing this Hint domain object.
@@ -870,7 +873,7 @@ class Hint(object):
             dict. A dict mapping the field of Hint instance.
         """
         return {
-            'hint_text': self.hint_text.to_dict(),
+            'hint_content': self.hint_content.to_dict(),
         }
 
     @classmethod
@@ -883,15 +886,11 @@ class Hint(object):
         Returns:
             Hint. The corresponding Hint domain object.
         """
-        return cls(SubtitledHtml.from_dict(hint_dict['hint_text']))
+        return cls(SubtitledHtml.from_dict(hint_dict['hint_content']))
 
     def validate(self):
-        """Validates all properties of Hint.
-
-        Raises:
-            ValidationError: 'hint_text' is not a string.
-        """
-        self.hint_text.validate()
+        """Validates all properties of Hint."""
+        self.hint_content.validate()
 
 
 class Solution(object):
@@ -914,8 +913,8 @@ class Solution(object):
                 False if is one of possible answer.
             correct_answer: str. The correct answer; this answer enables the
                 learner to progress to the next card.
-            explanation: str. HTML string containing an explanation for the
-                solution.
+            explanation: SubtitledHtml. Contains text and audio translations for
+                the solution's explanation.
         """
         self.answer_is_exclusive = answer_is_exclusive
         self.correct_answer = (
@@ -1174,7 +1173,8 @@ class InteractionInstance(object):
             cls._DEFAULT_INTERACTION_ID,
             {}, [],
             Outcome(
-                default_dest_state_name, SubtitledHtml('', {}), {}), [], [], {}
+                default_dest_state_name,
+                SubtitledHtml.create_default_subtitled_html(), {}), [], [], {}
         )
 
 
@@ -1472,13 +1472,13 @@ class State(object):
         else:
             self.interaction.solution = None
 
-    def add_hint(self, hint_text):
+    def add_hint(self, hint_content):
         """Add a new hint to the list of hints.
 
         Args:
-            hint_text: str. The hint text.
+            hint_content: str. The hint text.
         """
-        self.interaction.hints.append(Hint(hint_text))
+        self.interaction.hints.append(Hint(hint_content))
 
     def delete_hint(self, index):
         """Delete a hint from the list of hints.
@@ -2798,31 +2798,29 @@ class Exploration(object):
         audio translations to feedback, hints, and solutions.
         """
         for state_dict in states_dict.values():
-            if (state_dict['interaction']['default_outcome'] is not None and
-                    len(state_dict['interaction']['default_outcome']
-                        ['feedback'])) > 0:
-                default_outcome_feedback = (
-                    state_dict['interaction']['default_outcome']['feedback'][0])
-            else:
-                default_outcome_feedback = ''
             if state_dict['interaction']['default_outcome'] is not None:
+                old_feedback_list = state_dict['interaction']['default_outcome']['feedback']
+                default_feedback_html = (
+                    old_feedback_list[0] if len(old_feedback_list) > 0 else '')
                 state_dict['interaction']['default_outcome']['feedback'] = {
-                    'html': default_outcome_feedback,
+                    'html': default_feedback_html,
                     'audio_translations': {}
                 }
             for answer_group_dict in state_dict['interaction']['answer_groups']:
-                if len(answer_group_dict['outcome']['feedback']) > 0:
-                    feedback = answer_group_dict['outcome']['feedback'][0]
-                else:
-                    feedback = ''
+                old_answer_group_feedback_list = (
+                    answer_group_dict['outcome']['feedback'])
+                feedback_html = (
+                    old_answer_group_feedback_list[0]
+                    if len(old_answer_group_feedback_list) > 0 else '')
                 answer_group_dict['outcome']['feedback'] = {
-                    'html': feedback,
+                    'html': feedback_html,
                     'audio_translations': {}
                 }
             for hint_dict in state_dict['interaction']['hints']:
-                hint_text = hint_dict['hint_text']
-                hint_dict['hint_text'] = {
-                    'html': hint_text,
+                hint_content = hint_dict['hint_text']
+                del hint_dict['hint_text']
+                hint_dict['hint_content'] = {
+                    'html': hint_content,
                     'audio_translations': {}
                 }
             if state_dict['interaction']['solution']:

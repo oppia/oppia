@@ -7,7 +7,7 @@
   <div class="oppia-rule-details-header">
     <strong>Oppia tells the learner...</strong>
   </div>
-  <span ng-if="feedback.getHtml() === ''">
+  <span ng-if="!outcome.hasNonemptyFeedback()">
     <em>No feedback specified.</em>
   </span>
 

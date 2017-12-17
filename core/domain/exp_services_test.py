@@ -1051,7 +1051,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'dest': self.init_state_name,
             'feedback': {
                 'audio_translations': {},
-                'html': 'Incorrect'
+                'html': '<b>Incorrect</b>'
             },
             'param_changes': []
         }

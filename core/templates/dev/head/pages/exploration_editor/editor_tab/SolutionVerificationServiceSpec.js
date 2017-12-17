@@ -93,9 +93,9 @@ describe('Solution Verification Service', function() {
             param_changes: []
           },
           hints: [{
-            hint_text: 'one'
+            hint_content: 'one'
           }, {
-            hint_text: 'two'
+            hint_content: 'two'
           }]
         },
         param_changes: []

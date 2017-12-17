@@ -45,9 +45,9 @@ oppia.factory('SolutionObjectFactory', [
     };
 
     Solution.createNew = function(
-        answerIsExclusive, correctAnswer, explanationText) {
+        answerIsExclusive, correctAnswer, explanationHtml) {
       return new Solution(answerIsExclusive, correctAnswer, 
-        SubtitledHtmlObjectFactory.createDefault(explanationText));
+        SubtitledHtmlObjectFactory.createDefault(explanationHtml));
     };
 
     Solution.prototype.getSummary = function(interactionId) {

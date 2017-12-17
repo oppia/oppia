@@ -27,7 +27,7 @@ oppia.factory('HintManagerService', [
     var timeout = null;
     var hints = [];
     var _getCurrentHint = function() {
-      return hints[numHintsConsumed].hintText;
+      return hints[numHintsConsumed].hintContent;
     };
 
     return {

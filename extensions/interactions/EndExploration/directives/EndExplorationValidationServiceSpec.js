@@ -31,7 +31,10 @@ describe('EndExplorationValidationService', function() {
 
     badOutcome = {
       dest: currentState,
-      feedback: null
+      feedback: {
+        html: '',
+        audio_translations: {}
+      }
     };
 
     customizationArguments = {
@@ -45,7 +48,10 @@ describe('EndExplorationValidationService', function() {
         rules: [],
         outcome: {
           dest: 'Second State',
-          feedback: null
+          feedback: {
+            html: '',
+            audio_translations: {}
+          }
         },
         correct: false
       }

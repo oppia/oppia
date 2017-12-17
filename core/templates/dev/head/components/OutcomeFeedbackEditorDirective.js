@@ -31,10 +31,6 @@ oppia.directive('outcomeFeedbackEditor', [
         $scope.OUTCOME_FEEDBACK_SCHEMA = {
           type: 'html'
         };
-
-        $scope.$on('saveOutcomeFeedbackDetails', function() {
-
-        });
       }]
     };
   }]);

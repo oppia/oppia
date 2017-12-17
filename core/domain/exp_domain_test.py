@@ -445,7 +445,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         init_state.update_interaction_hints([{
-            'hint_text': {
+            'hint_content': {
                 'html': 'hint one',
                 'audio_translations': {}
             },
@@ -466,7 +466,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Add hint and delete hint
         init_state.add_hint(exp_domain.SubtitledHtml('new hint', {}))
         self.assertEquals(
-            init_state.interaction.hints[1].hint_text.html,
+            init_state.interaction.hints[1].hint_content.html,
             'new hint')
         init_state.add_hint(exp_domain.SubtitledHtml('hint three', {}))
         init_state.delete_hint(1)
@@ -2620,7 +2620,7 @@ title: Title
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v19(self):
-        """Test direct laoding from a v19 yaml file."""
+        """Test direct loading from a v19 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V19)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
@@ -2650,10 +2650,8 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'customization_args': {},
                     'default_outcome': {
                         'dest': dest_name,
-                        'feedback': {
-                            'html': '',
-                            'audio_translations': {}
-                        },
+                        'feedback': copy.deepcopy(
+                            SubtitledHtml.DEFAULT_SUBTITLED_HTML_DICT),
                         'param_changes': [],
                     },
                     'hints': [],

@@ -20,25 +20,25 @@
 oppia.factory('HintObjectFactory', [
   'SubtitledHtmlObjectFactory',
   function(SubtitledHtmlObjectFactory) {
-    var Hint = function(hintText) {
-      this.hintText = hintText;
+    var Hint = function(hintContent) {
+      this.hintContent = hintContent;
     };
 
     Hint.prototype.toBackendDict = function() {
       return {
-        hint_text: this.hintText.toBackendDict()
+        hint_content: this.hintContent.toBackendDict()
       };
     };
 
     Hint.createFromBackendDict = function(hintBackendDict) {
       return new Hint(
         SubtitledHtmlObjectFactory.createFromBackendDict(
-          hintBackendDict.hint_text));
+          hintBackendDict.hint_content));
     };
 
-    Hint.createNew = function(hintText) {
+    Hint.createNew = function(hintContent) {
       return new Hint(
-        SubtitledHtmlObjectFactory.createDefault(hintText));
+        SubtitledHtmlObjectFactory.createDefault(hintContent));
     };
 
     return Hint;

@@ -128,8 +128,7 @@ oppia.controller('StateResponses', [
       if (!outcome) {
         return false;
       }
-      var hasFeedback = outcome.feedback.getHtml() !== '';
-      return isSelfLoop(outcome) && !hasFeedback;
+      return isSelfLoop(outcome) && !outcome.hasNonemptyFeedback();
     };
 
     $scope.changeActiveAnswerGroupIndex = function(newIndex) {
@@ -165,8 +164,8 @@ oppia.controller('StateResponses', [
       if (!outcome) {
         return false;
       }
-      var hasFeedback = outcome.feedback != null;
-      return $scope.isCurrentInteractionLinear() && !hasFeedback;
+      return $scope.isCurrentInteractionLinear() &&
+        !outcome.hasNonemptyFeedback();
     };
 
     $scope.getOutcomeTooltip = function(outcome) {
@@ -317,7 +316,7 @@ oppia.controller('StateResponses', [
                   rulesService));
               var feedback = 'Nothing';
               var dest = classificationResult.outcome.dest;
-              if (classificationResult.outcome.feedback != null) {
+              if (!classificationResult.outcome.feedback.getHtml().isEmpty()) {
                 feedback = classificationResult.outcome.feedback.getHtml();
               }
               if (dest === _stateName) {
@@ -376,10 +375,9 @@ oppia.controller('StateResponses', [
               EditorStateService.getActiveStateName(), '', []);
 
             $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
-              var hasFeedback = tmpOutcome.feedback != null;
               return (
                 tmpOutcome.dest === EditorStateService.getActiveStateName() &&
-                !hasFeedback);
+                !tmpOutcome.hasNonemptyFeedback());
             };
 
             $scope.addAnswerGroupForm = {};
@@ -518,7 +516,7 @@ oppia.filter('summarizeAnswerGroup', [
     return function(answerGroup, interactionId, answerChoices, shortenRule) {
       var summary = '';
       var outcome = answerGroup.outcome;
-      var hasFeedback = outcome.feedback != null;
+      var hasFeedback = outcome.hasNonemptyFeedback();
 
       if (answerGroup.rules) {
         var firstRule = $filter('convertToPlainText')(
@@ -554,8 +552,7 @@ oppia.filter('summarizeDefaultOutcome', [
       }
 
       var summary = '';
-      var feedback = defaultOutcome.feedback;
-      var hasFeedback = feedback != null;
+      var hasFeedback = defaultOutcome.hasNonemptyFeedback();
 
       if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
         summary = INTERACTION_SPECS[interactionId].default_outcome_heading;

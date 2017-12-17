@@ -30,7 +30,10 @@ describe('MusicNotesInputValidationService', function() {
     currentState = 'First State';
     goodDefaultOutcome = {
       dest: 'Second State',
-      feedback: null
+      feedback: {
+        html: '',
+        audio_translations: {}
+      }
     };
     goodAnswerGroups = [{
       rules: [],

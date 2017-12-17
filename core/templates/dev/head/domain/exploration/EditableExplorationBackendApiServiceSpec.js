@@ -55,7 +55,10 @@ describe('Editable exploration backend API service', function() {
             default_outcome: {
               param_changes: [],
               dest: 'Introduction',
-              feedback: null
+              feedback: {
+                html: '',
+                audio_translations: {}
+              }
             },
             confirmed_unclassified_answers: [],
             id: null
