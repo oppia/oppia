@@ -167,6 +167,15 @@ oppia.factory('UrlInterpolationService', [
       },
 
       /**
+       * Given a path relative to /assets folder, returns the complete url path
+       * to that asset.
+       */
+      getStaticAssetUrl: function(assetPath) {
+        validateResourcePath(assetPath);
+        return getCompleteUrl('/assets', assetPath);
+      },
+
+      /**
        * Given an interaction id, returns the complete url path to
        * the thumbnail image for the interaction.
        */
@@ -186,15 +195,6 @@ oppia.factory('UrlInterpolationService', [
       getDirectiveTemplateUrl: function(path) {
         validateResourcePath(path);
         return GLOBALS.TEMPLATE_DIR_PREFIX + getUrlWithSlug(path);
-      },
-
-      /**
-       * Given a json path relative to assets folder,
-       * returns the complete url path to that json.
-       */
-      getTranslateJsonUrl: function(jsonPath) {
-        validateResourcePath(jsonPath);
-        return getCompleteUrl('/assets', jsonPath);
       },
 
       getExtensionResourceUrl: getExtensionResourceUrl,

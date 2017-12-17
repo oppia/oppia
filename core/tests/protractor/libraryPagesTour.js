@@ -19,7 +19,8 @@
 
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
@@ -31,9 +32,11 @@ describe('Library pages tour', function() {
   var EXPLORATION_RATING = 4;
   var SEARCH_TERM = 'python';
   var libraryPage = null;
+  var explorationPlayerPage = null;
 
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   var visitLibraryPage = function() {
@@ -42,7 +45,16 @@ describe('Library pages tour', function() {
 
   var visitRecentlyPublishedPage = function() {
     browser.get('library/recently_published');
-  }
+  };
+
+  it('visits the search page', function() {
+    visitLibraryPage();
+    element(by.css('.protractor-test-search-input')).sendKeys(SEARCH_TERM);
+    // It takes a while for the URL to change.
+    general.waitForSystem();
+    general.waitForSystem();
+    expect(browser.getCurrentUrl()).toContain('search/find?q=python');
+  });
 
   it('visits the library index page', function() {
     visitLibraryPage();
@@ -61,7 +73,7 @@ describe('Library pages tour', function() {
     );
     visitLibraryPage();
     libraryPage.playExploration(EXPLORATION_TITLE);
-    player.rateExploration(EXPLORATION_RATING);
+    explorationPlayerPage.rateExploration(EXPLORATION_RATING);
 
     visitLibraryPage();
     element(by.css('.protractor-test-library-top-rated')).click();
@@ -72,17 +84,6 @@ describe('Library pages tour', function() {
   it('visits the recent explorations page', function() {
     visitRecentlyPublishedPage();
     expect(browser.getCurrentUrl()).toContain('library/recently_published');
-  });
-
-  it('visits the search page', function() {
-    visitLibraryPage();
-    element(by.css('.protractor-test-search-input')).sendKeys(SEARCH_TERM);
-    browser.driver.wait(function() {
-      return browser.getCurrentUrl().then(function(url) {
-        return /search/.test(url);
-      });
-    });
-    expect(browser.getCurrentUrl()).toContain('search/find?q=python');
   });
 
   afterEach(function() {

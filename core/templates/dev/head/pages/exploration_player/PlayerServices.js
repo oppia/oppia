@@ -33,7 +33,7 @@ oppia.factory('ExplorationPlayerService', [
   'StatsReportingService', 'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
-  'LanguageUtilService', 'NumberAttemptsService',
+  'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       AlertsService, AnswerClassificationService, ExplorationContextService,
@@ -43,7 +43,7 @@ oppia.factory('ExplorationPlayerService', [
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService,
-      LanguageUtilService, NumberAttemptsService) {
+      LanguageUtilService, NumberAttemptsService, AudioPreloaderService) {
     var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
       ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -204,6 +204,8 @@ oppia.factory('ExplorationPlayerService', [
                 null,
                 exploration.getLanguageCode(),
                 data.auto_tts_enabled);
+              AudioPreloaderService.init(exploration);
+              AudioPreloaderService.kickOffAudioPreloader(initStateName);
               _loadInitialState(successCallback);
               NumberAttemptsService.reset();
             });
@@ -234,7 +236,9 @@ oppia.factory('ExplorationPlayerService', [
               data.preferred_audio_language_code,
               exploration.getLanguageCode(),
               data.auto_tts_enabled);
-
+            AudioPreloaderService.init(exploration);
+            AudioPreloaderService.kickOffAudioPreloader(
+              exploration.getInitialState().name);
             _loadInitialState(successCallback);
             $rootScope.$broadcast('playerServiceInitialized');
           });
@@ -260,9 +264,6 @@ oppia.factory('ExplorationPlayerService', [
       },
       getStateContentAudioTranslation: function(stateName, languageCode) {
         return exploration.getAudioTranslation(stateName, languageCode);
-      },
-      getAllAudioTranslations: function() {
-        return exploration.getAllAudioTranslations();
       },
       isContentAudioTranslationAvailable: function(stateName) {
         return Object.keys(
@@ -315,17 +316,22 @@ oppia.factory('ExplorationPlayerService', [
         var oldState = exploration.getState(oldStateName);
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
-            _explorationId, oldStateName, oldState, answer, false,
+            _explorationId, oldStateName, oldState, answer,
             interactionRulesService));
 
         if (!_editorPreviewMode) {
+          var feedbackIsUseful = (
+            AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+              _explorationId, oldStateName, oldState, answer,
+              interactionRulesService));
           StatsReportingService.recordAnswerSubmitted(
             oldStateName,
             LearnerParamsService.getAllParams(),
             answer,
             classificationResult.answerGroupIndex,
             classificationResult.ruleIndex,
-            classificationResult.classificationCategorization);
+            classificationResult.classificationCategorization,
+            feedbackIsUseful);
         }
 
         // Use angular.copy() to clone the object

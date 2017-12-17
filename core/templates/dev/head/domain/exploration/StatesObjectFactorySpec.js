@@ -190,18 +190,18 @@ describe('States object factory', function() {
     it('should correctly get all audio translations in states', function() {
       var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
       expect(statesWithAudio.getAllAudioTranslations('hi-en'))
-        .toEqual([
-          atof.createFromBackendDict({
+        .toEqual({
+          'first state': atof.createFromBackendDict({
             filename: 'myfile3.mp3',
             file_size_bytes: 0.8,
             needs_update: false
           }), 
-          atof.createFromBackendDict({
+          'second state': atof.createFromBackendDict({
             filename: 'myfile2.mp3',
             file_size_bytes: 0.8,
             needs_update: false
           })
-        ]);
+        });
     });
   });
 });

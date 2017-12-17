@@ -249,7 +249,9 @@ oppia.controller('StateResponses', [
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
-        templateUrl: 'modals/teachOppia',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/' +
+          'teach_oppia_modal_directive.html'),
         backdrop: false,
         controller: [
           '$scope', '$injector', '$modalInstance',
@@ -317,8 +319,7 @@ oppia.controller('StateResponses', [
 
               var classificationResult = (
                 AnswerClassificationService.getMatchingClassificationResult(
-                  _explorationId, _stateName, _state, answer, true,
-                  rulesService));
+                  _explorationId, _stateName, _state, answer, rulesService));
               var feedback = 'Nothing';
               var dest = classificationResult.outcome.dest;
               if (classificationResult.outcome.feedback.length > 0) {

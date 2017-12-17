@@ -55,9 +55,9 @@ oppia.controller('LearnerViewInfo', [
           }
         },
         controller: [
-          '$scope', '$window', '$modalInstance', 'oppiaDatetimeFormatter',
+          '$scope', '$window', '$modalInstance', 'DateTimeFormatService',
           'RatingComputationService', 'expInfo', 'UrlInterpolationService',
-          function($scope, $window, $modalInstance, oppiaDatetimeFormatter,
+          function($scope, $window, $modalInstance, DateTimeFormatService,
                    RatingComputationService, expInfo, UrlInterpolationService) {
             var getExplorationTagsSummary = function(arrayOfTags) {
               var tagsToShow = [];
@@ -82,7 +82,7 @@ oppia.controller('LearnerViewInfo', [
             };
 
             var getLastUpdatedString = function(millisSinceEpoch) {
-              return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+              return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
                 millisSinceEpoch);
             };
 

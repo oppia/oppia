@@ -100,6 +100,10 @@ oppia.factory('ExplorationObjectFactory', [
           INTERACTION_DISPLAY_MODE_INLINE);
     };
 
+    Exploration.prototype.getStates = function() {
+      return angular.copy(this.states);
+    };
+
     Exploration.prototype.getState = function(stateName) {
       return this.states.getState(stateName);
     };
@@ -135,9 +139,10 @@ oppia.factory('ExplorationObjectFactory', [
         var totalFileSizeMB = 0;
         var allAudioTranslations =
           this.states.getAllAudioTranslations(languageCode);
-        allAudioTranslations.map(function(audioTranslation) {
-          totalFileSizeMB += audioTranslation.getFileSizeMB();
-        });
+        for (var audioTranslationStateName in allAudioTranslations) {
+          totalFileSizeMB += 
+            allAudioTranslations[audioTranslationStateName].getFileSizeMB();
+        }
         return totalFileSizeMB;
       };
 

@@ -21,7 +21,7 @@ oppia.factory('ExplorationSaveService', [
   'AlertsService', 'ExplorationDataService', 'explorationStatesService',
   'explorationTagsService', 'explorationTitleService',
   'explorationObjectiveService', 'explorationCategoryService',
-  'explorationLanguageCodeService', 'explorationRightsService',
+  'explorationLanguageCodeService', 'ExplorationRightsService',
   'ExplorationWarningsService', 'ExplorationDiffService',
   'explorationInitStateNameService', 'RouterService',
   'FocusManagerService', 'changeListService', 'siteAnalyticsService',
@@ -31,7 +31,7 @@ oppia.factory('ExplorationSaveService', [
       AlertsService, ExplorationDataService, explorationStatesService,
       explorationTagsService, explorationTitleService,
       explorationObjectiveService, explorationCategoryService,
-      explorationLanguageCodeService, explorationRightsService,
+      explorationLanguageCodeService, ExplorationRightsService,
       ExplorationWarningsService, ExplorationDiffService,
       explorationInitStateNameService, RouterService,
       FocusManagerService, changeListService, siteAnalyticsService,
@@ -124,7 +124,7 @@ oppia.factory('ExplorationSaveService', [
           onStartSaveCallback();
         }
 
-        explorationRightsService.publish().then(
+        ExplorationRightsService.publish().then(
           function() {
             if (onSaveDoneCallback) {
               onSaveDoneCallback();
@@ -147,7 +147,7 @@ oppia.factory('ExplorationSaveService', [
 
       var changeList = changeListService.getChangeList();
 
-      if (explorationRightsService.isPrivate()) {
+      if (ExplorationRightsService.isPrivate()) {
         siteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
           ExplorationDataService.explorationId);
       } else {
@@ -192,9 +192,9 @@ oppia.factory('ExplorationSaveService', [
         return (
           changeListService.isExplorationLockedForEditing() &&
           !saveIsInProgress && (
-            (explorationRightsService.isPrivate() &&
+            (ExplorationRightsService.isPrivate() &&
               !ExplorationWarningsService.hasCriticalWarnings()) ||
-            (!explorationRightsService.isPrivate() &&
+            (!ExplorationRightsService.isPrivate() &&
               ExplorationWarningsService.countWarnings() === 0)
           )
         );
@@ -447,7 +447,7 @@ oppia.factory('ExplorationSaveService', [
 
         RouterService.savePendingChanges();
 
-        if (!explorationRightsService.isPrivate() &&
+        if (!ExplorationRightsService.isPrivate() &&
             ExplorationWarningsService.countWarnings() > 0) {
           // If the exploration is not private, warnings should be fixed before
           // it can be saved.
@@ -493,7 +493,7 @@ oppia.factory('ExplorationSaveService', [
             backdrop: true,
             resolve: {
               isExplorationPrivate: function() {
-                return explorationRightsService.isPrivate();
+                return ExplorationRightsService.isPrivate();
               },
               diffData: function() {
                 return diffData;
