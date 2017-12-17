@@ -41,7 +41,7 @@ oppia.factory('HintManagerService', [
         timeout = $timeout(function() {
           currentHintIsAvailable = true;
         }, WAIT_FOR_HINT_MSEC);
-        return currentHint;
+        return currentHint.getHtml();
       },
       isCurrentHintAvailable: function() {
         return currentHintIsAvailable;

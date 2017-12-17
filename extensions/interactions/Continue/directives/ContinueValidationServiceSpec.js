@@ -30,7 +30,7 @@ describe('ContinueValidationService', function() {
     currentState = 'First State';
     goodDefaultOutcome = {
       dest: 'Second State',
-      feedback: []
+      feedback: null
     };
 
     goodAnswerGroups = [{

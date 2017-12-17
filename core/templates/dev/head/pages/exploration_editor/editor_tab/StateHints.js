@@ -46,15 +46,16 @@ oppia.controller('StateHints', [
 
     $scope.getHintSummary = function(hint) {
       var hintAsPlainText = (
-        hint.hintText.length ?
-          $filter('convertToPlainText')(hint.hintText) : '');
+        hint.hintText.getHtml() ?
+          $filter('convertToPlainText')(hint.hintText.getHtml()) : '');
       return hintAsPlainText;
     };
 
     $scope.changeActiveHintIndex = function(newIndex) {
       var currentActiveIndex = $scope.activeHintIndex;
       if (currentActiveIndex !== null && (
-          !stateHintsService.displayed[currentActiveIndex].hintText)) {
+          !stateHintsService.displayed[currentActiveIndex]
+            .hintText.getHtml())) {
         if (stateSolutionService.savedMemento &&
           stateHintsService.displayed.length === 1) {
           openDeleteLastHintModal();

@@ -31,7 +31,7 @@ describe('EndExplorationValidationService', function() {
 
     badOutcome = {
       dest: currentState,
-      feedback: []
+      feedback: null
     };
 
     customizationArguments = {
@@ -45,7 +45,7 @@ describe('EndExplorationValidationService', function() {
         rules: [],
         outcome: {
           dest: 'Second State',
-          feedback: []
+          feedback: null
         },
         correct: false
       }

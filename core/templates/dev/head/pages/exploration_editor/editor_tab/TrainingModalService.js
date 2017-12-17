@@ -79,7 +79,7 @@ oppia.factory('TrainingModalService', [
                 var feedback = 'Nothing';
                 var dest = classificationResult.outcome.dest;
                 if (classificationResult.outcome.feedback.length > 0) {
-                  feedback = classificationResult.outcome.feedback[0];
+                  feedback = classificationResult.outcome.feedback.getHtml();
                 }
                 if (dest === currentStateName) {
                   dest = '<em>(try again)</em>';

@@ -30,12 +30,12 @@ describe('LogicProofValidationService', function() {
 
     goodDefaultOutcome = {
       dest: 'Second State',
-      feedback: []
+      feedback: null
     };
 
     badOutcome = {
       dest: currentState,
-      feedback: []
+      feedback: null
     };
 
     goodAnswerGroups = [{

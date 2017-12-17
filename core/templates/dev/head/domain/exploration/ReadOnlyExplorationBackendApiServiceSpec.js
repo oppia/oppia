@@ -54,7 +54,7 @@ describe('Read only exploration backend API service', function() {
               default_outcome: {
                 param_changes: [],
                 dest: 'Introduction',
-                feedback: []
+                feedback: null
               },
               confirmed_unclassified_answers: [],
               id: null

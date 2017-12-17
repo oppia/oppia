@@ -144,9 +144,7 @@ oppia.filter('isOutcomeConfusing', [function() {
   return function(outcome, currentStateName) {
     return (
       outcome.dest === currentStateName &&
-      !outcome.feedback.some(function(feedbackItem) {
-        return feedbackItem.trim().length > 0;
-      })
+      !outcome.feedback.getHtml().trim().length > 0
     );
   };
 }]);

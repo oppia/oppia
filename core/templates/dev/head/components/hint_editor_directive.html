@@ -14,7 +14,7 @@
         </div>
 
         <strong>Hint #<[getIndex()]> is...</strong>
-        <span class="oppia-rte-editor" angular-html-bind="hint.hintText"></span>
+        <span class="oppia-rte-editor" angular-html-bind="hint.hintText.getHtml()"></span>
       </div>
     </div>
   </div>
@@ -26,8 +26,9 @@
           ng-submit="saveThisHint()">
       <div class="oppia-rule-details-header">
         <strong>Hint #<[getIndex()]> is...</strong>
+        <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
         <schema-based-editor schema="HINT_FORM_SCHEMA"
-                             local-value="hint.hintText">
+                             local-value="hint.hintText._html">
         </schema-based-editor>
       </div>
     </form>
@@ -41,7 +42,7 @@
         </button>
         <button type="button"
                 class="btn btn-success protractor-test-save-hint-edit"
-                ng-disabled="!hint.hintText || editHintForm.$invalid"
+                ng-disabled="!hint.hintText.getHtml() || editHintForm.$invalid"
                 ng-click="saveThisHint()">
           Save
         </button>

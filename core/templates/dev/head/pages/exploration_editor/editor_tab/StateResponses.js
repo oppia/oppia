@@ -128,9 +128,7 @@ oppia.controller('StateResponses', [
       if (!outcome) {
         return false;
       }
-      var hasFeedback = outcome.feedback.some(function(feedbackItem) {
-        return Boolean(feedbackItem);
-      });
+      var hasFeedback = outcome.feedback.getHtml() !== '';
       return isSelfLoop(outcome) && !hasFeedback;
     };
 
@@ -167,9 +165,7 @@ oppia.controller('StateResponses', [
       if (!outcome) {
         return false;
       }
-      var hasFeedback = outcome.feedback.some(function(feedbackItem) {
-        return Boolean(feedbackItem);
-      });
+      var hasFeedback = outcome.feedback != null;
       return $scope.isCurrentInteractionLinear() && !hasFeedback;
     };
 
@@ -321,8 +317,8 @@ oppia.controller('StateResponses', [
                   rulesService));
               var feedback = 'Nothing';
               var dest = classificationResult.outcome.dest;
-              if (classificationResult.outcome.feedback.length > 0) {
-                feedback = classificationResult.outcome.feedback[0];
+              if (classificationResult.outcome.feedback != null) {
+                feedback = classificationResult.outcome.feedback.getHtml();
               }
               if (dest === _stateName) {
                 dest = '<em>(try again)</em>';
@@ -377,17 +373,10 @@ oppia.controller('StateResponses', [
             };
             $scope.tmpRule = RuleObjectFactory.createNew(null, {});
             $scope.tmpOutcome = OutcomeObjectFactory.createNew(
-              EditorStateService.getActiveStateName(), [''], []);
+              EditorStateService.getActiveStateName(), '', []);
 
             $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
-              var hasFeedback = false;
-              for (var i = 0; i < tmpOutcome.feedback.length; i++) {
-                if (tmpOutcome.feedback[i]) {
-                  hasFeedback = true;
-                  break;
-                }
-              }
-
+              var hasFeedback = tmpOutcome.feedback != null;
               return (
                 tmpOutcome.dest === EditorStateService.getActiveStateName() &&
                 !hasFeedback);
@@ -398,13 +387,6 @@ oppia.controller('StateResponses', [
             $scope.saveResponse = function(reopen) {
               $scope.$broadcast('saveOutcomeFeedbackDetails');
               $scope.$broadcast('saveOutcomeDestDetails');
-
-              // If the feedback editor is never opened, replace the feedback
-              // with an empty array.
-              if ($scope.tmpOutcome.feedback.length === 1 &&
-                  $scope.tmpOutcome.feedback[0] === '') {
-                $scope.tmpOutcome.feedback = [];
-              }
 
               EditorFirstTimeEventsService.registerFirstSaveRuleEvent();
 
@@ -536,7 +518,7 @@ oppia.filter('summarizeAnswerGroup', [
     return function(answerGroup, interactionId, answerChoices, shortenRule) {
       var summary = '';
       var outcome = answerGroup.outcome;
-      var hasFeedback = outcome.feedback.length > 0 && outcome.feedback[0];
+      var hasFeedback = outcome.feedback != null;
 
       if (answerGroup.rules) {
         var firstRule = $filter('convertToPlainText')(
@@ -554,8 +536,8 @@ oppia.filter('summarizeAnswerGroup', [
       if (hasFeedback) {
         summary += (
           shortenRule ?
-          $filter('truncate')(outcome.feedback[0], 30) :
-          $filter('convertToPlainText')(outcome.feedback[0]));
+          $filter('truncate')(outcome.feedback.getHtml(), 30) :
+          $filter('convertToPlainText')(outcome.feedback.getHtml()));
       }
       return summary;
     };
@@ -573,7 +555,7 @@ oppia.filter('summarizeDefaultOutcome', [
 
       var summary = '';
       var feedback = defaultOutcome.feedback;
-      var hasFeedback = feedback.length > 0 && feedback[0];
+      var hasFeedback = feedback != null;
 
       if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
         summary = INTERACTION_SPECS[interactionId].default_outcome_heading;
@@ -590,7 +572,8 @@ oppia.filter('summarizeDefaultOutcome', [
       summary = '[' + summary + '] ';
 
       if (hasFeedback) {
-        summary += $filter('convertToPlainText')(defaultOutcome.feedback[0]);
+        summary +=
+          $filter('convertToPlainText')(defaultOutcome.feedback.getHtml());
       }
       return summary;
     };

@@ -94,9 +94,7 @@ oppia.directive('outcomeEditor', [
             if (!outcome) {
               return false;
             }
-            var hasFeedback = outcome.feedback.some(function(feedbackItem) {
-              return Boolean(feedbackItem);
-            });
+            var hasFeedback = outcome.feedback.getHtml() !== '';
             return $scope.isSelfLoop(outcome) && !hasFeedback;
           };
 

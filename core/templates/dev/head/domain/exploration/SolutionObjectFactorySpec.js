@@ -27,7 +27,10 @@ describe('Solution object factory', function() {
       solution = sof.createFromBackendDict({
         answer_is_exclusive: false,
         correct_answer: 'This is a correct answer!',
-        explanation: 'This is the explanation to the answer.'
+        explanation: {
+          html: 'This is the explanation to the answer',
+          audio_translations: {}
+        }
       });
     }));
 
@@ -36,7 +39,10 @@ describe('Solution object factory', function() {
       expect(solution.toBackendDict()).toEqual({
         answer_is_exclusive: false,
         correct_answer: 'This is a correct answer!',
-        explanation: 'This is the explanation to the answer.'
+        explanation: {
+          html: 'This is the explanation to the answer',
+          audio_translations: {}
+        }
       });
     });
 

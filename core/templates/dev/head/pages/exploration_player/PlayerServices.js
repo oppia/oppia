@@ -68,8 +68,7 @@ oppia.factory('ExplorationPlayerService', [
     };
 
     // Evaluate feedback.
-    var makeFeedback = function(feedbacks, envs) {
-      var feedbackHtml = feedbacks.length > 0 ? feedbacks[0] : '';
+    var makeFeedback = function(feedbackHtml, envs) {
       return ExpressionInterpolationService.processHtml(feedbackHtml, envs);
     };
 
@@ -340,7 +339,8 @@ oppia.factory('ExplorationPlayerService', [
         // Compute the data for the next state.
         var oldParams = LearnerParamsService.getAllParams();
         oldParams.answer = answer;
-        var feedbackHtml = makeFeedback(outcome.feedback, [oldParams]);
+        var feedbackHtml =
+          makeFeedback(outcome.feedback.getHtml(), [oldParams]);
         if (feedbackHtml === null) {
           answerIsBeingProcessed = false;
           AlertsService.addWarning('Expression parsing error.');

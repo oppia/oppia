@@ -20,18 +20,29 @@ describe('Hint manager service', function() {
   beforeEach(module('oppia'));
 
   var hms;
+  var hof;
   beforeEach(inject(function($injector) {
     hms = $injector.get('HintManagerService');
+    hof = $injector.get('HintObjectFactory');
   }));
 
   it('should consume hints correctly', function() {
-    hms.reset([{
-      hintText: 'one'
-    }, {
-      hintText: 'two'
-    }, {
-      hintText: 'three'
-    }]);
+    hms.reset([hof.createFromBackendDict({
+      hint_text: {
+        html: 'one',
+        audio_translations: {}
+      }
+    }), hof.createFromBackendDict({
+      hint_text: {
+        html: 'two',
+        audio_translations: {}
+      }
+    }), hof.createFromBackendDict({
+      hint_text: {
+        html: 'three',
+        audio_translations: {}
+      }
+    })]);
 
     hms.consumeHint();
     hms.consumeHint();
@@ -43,13 +54,22 @@ describe('Hint manager service', function() {
   });
 
   it('should be displayed correctly', function() {
-    hms.reset([{
-      hintText: 'one'
-    }, {
-      hintText: 'two'
-    }, {
-      hintText: 'three'
-    }]);
+    hms.reset([hof.createFromBackendDict({
+      hint_text: {
+        html: 'one',
+        audio_translations: {}
+      }
+    }), hof.createFromBackendDict({
+      hint_text: {
+        html: 'two',
+        audio_translations: {}
+      }
+    }), hof.createFromBackendDict({
+      hint_text: {
+        html: 'three',
+        audio_translations: {}
+      }
+    })]);
 
     expect(hms.isCurrentHintAvailable()).toBe(false);
     hms.consumeHint();
