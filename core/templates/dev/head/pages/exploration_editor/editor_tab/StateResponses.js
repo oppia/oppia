@@ -249,7 +249,9 @@ oppia.controller('StateResponses', [
       $rootScope.$broadcast('externalSave');
 
       $uibModal.open({
-        templateUrl: 'modals/teachOppia',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/' +
+          'teach_oppia_modal_directive.html'),
         backdrop: false,
         controller: [
           '$scope', '$injector', '$uibModalInstance',

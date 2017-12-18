@@ -19,17 +19,18 @@
  */
 
 oppia.factory('TrainingModalService', [
-  '$rootScope', '$uibModal', 'AlertsService',
-  function($rootScope, $uibModal, AlertsService) {
+  '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
+  function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {
     return {
       openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave) {
         AlertsService.clearWarnings();
         if (externalSave) {
           $rootScope.$broadcast('externalSave');
         }
-
         $uibModal.open({
-          templateUrl: 'modals/trainUnresolvedAnswer',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/editor_tab/' +
+            'training_unresolved_answer_modal_directive.html'),
           backdrop: true,
           controller: [
             '$scope', '$injector', '$uibModalInstance',

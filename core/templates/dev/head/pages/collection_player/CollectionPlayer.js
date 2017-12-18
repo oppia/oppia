@@ -160,7 +160,9 @@ oppia.controller('CollectionPlayer', [
           sParameterExtension += 250 + ' ' + y + ', ';
           y += 200;
         }
-        $scope.pathSvgParameters += ' S ' + sParameterExtension;
+        if (sParameterExtension !== '') {
+          $scope.pathSvgParameters += ' S ' + sParameterExtension;
+        }
       }
       if (collectionNodeCount % 2 === 0) {
         if (collectionNodeCount === 2) {

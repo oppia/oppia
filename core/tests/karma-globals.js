@@ -107,9 +107,7 @@ var hashes = {
 GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS = function($provide, $translateProvider) {
   $provide.factory('customLoader', function($q) {
     return function() {
-      var deferred = $q.defer();
-      deferred.resolve({});
-      return deferred.promise;
+      return $q.resolve({});
     };
   });
   $translateProvider.useLoader('customLoader');

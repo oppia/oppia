@@ -131,8 +131,8 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
               '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
             ready_callback: function() {
               Guppy.get_symbols(
-                GLOBALS.ASSET_DIR_PREFIX +
-                '/assets/overrides/guppy/oppia_symbols.json');
+                UrlInterpolationService.getStaticAssetUrl(
+                  '/overrides/guppy/oppia_symbols.json'));
 
               if (DeviceInfoService.isMobileUserAgent() &&
                 DeviceInfoService.hasTouchEvents()) {
