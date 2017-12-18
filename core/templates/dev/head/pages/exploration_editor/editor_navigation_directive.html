@@ -90,8 +90,8 @@
   </li>
 
   <div ng-if="userIsLoggedIn" class="nav navbar-nav oppia-navbar-nav oppia-help-dropdown pull-right ng-cloak">
-    <li uib-dropdown class="uib-dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
-        popover-placement="bottom" popover-trigger="none"
+    <li uib-dropdown class="uib-dropdown" popover-is-open="popoverControlObject.postTutorialHelpPopoverIsShown"
+        popover-placement="bottom" popover-trigger="'none'"
         uib-popover="To get help in the future, click here!">
       <a href="#" uib-tooltip="Help" tooltip-placement="bottom"
          class="oppia-editor-navbar-tab-anchor" ng-click="showUserHelpModal()">

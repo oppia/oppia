@@ -27,7 +27,7 @@ from core.platform import models
 import feconf
 import utils
 
-from oppia.core.domain.google.appengine.ext import ndb
+from google.appengine.ext import ndb
 
 (exp_models, collection_models, feedback_models, user_models) = (
     models.Registry.import_models([

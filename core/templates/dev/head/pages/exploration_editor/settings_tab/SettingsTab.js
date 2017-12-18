@@ -339,9 +339,6 @@ oppia.controller('SettingsTab', [
           controller: [
             '$scope', '$uibModalInstance', 'draftEmailBody',
             function($scope, $uibModalInstance, draftEmailBody) {
-              $scope.action = action;
-            '$scope', '$uibModalInstance', 'draftEmailBody',
-            function($scope, $uibModalInstance, draftEmailBody) {
               $scope.willEmailBeSent = Boolean(draftEmailBody);
               $scope.emailBody = draftEmailBody;
 

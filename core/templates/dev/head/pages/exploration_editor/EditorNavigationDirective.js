@@ -37,20 +37,19 @@ oppia.directive('editorNavigation', [
             StateEditorTutorialFirstTimeService,
             ThreadDataService, siteAnalyticsService,
             ExplorationContextService, WindowDimensionsService) {
-          $scope.postTutorialHelpPopoverIsShown = false;
+          $scope.popoverControlObject = {
+            postTutorialHelpPopoverIsShown: false
+          };
           $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
 
           $scope.$on('openPostTutorialHelpPopover', function() {
             if ($scope.isLargeScreen) {
-              $scope.postTutorialHelpPopoverIsShown = true;
-              console.log($scope.postTutorialHelpPopoverIsShown);
+              $scope.popoverControlObject.postTutorialHelpPopoverIsShown = true;
               $timeout(function() {
-                $scope.postTutorialHelpPopoverIsShown = false;
-                console.log($scope.postTutorialHelpPopoverIsShown);
-                $scope.$apply();
+                $scope.popoverControlObject.postTutorialHelpPopoverIsShown = false;
               }, 5000);
             } else {
-              $scope.postTutorialHelpPopoverIsShown = false;
+              $scope.popoverControlObject.postTutorialHelpPopoverIsShown = false;
             }
           });
 
