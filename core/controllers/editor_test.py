@@ -414,10 +414,10 @@ class EditorTest(BaseEditorControllerTest):
 
 
 class ExplorationEditorLogoutTest(BaseEditorControllerTest):
-	"""Test handler for logout from exploration editor page."""
+    """Test handler for logout from exploration editor page."""
 
     def test_logout_from_unpublished_exploration_editor(self):
-    	"""Logout from unpublished exploration should redirect
+        """Logout from unpublished exploration should redirect
         to library page."""
 
         unpublished_exp_id = 'unpublished_eid'
@@ -430,14 +430,14 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
         response = self.testapp.get(current_page, expect_errors=False)
         self.assertEqual(response.status_int, 200)
 
-        response = self.testapp.get(current_user_services.create_logout_url(
-            current_page))
+        response = self.testapp.get(
+        	'/exploration_editor_logout?return_url=%s' % current_page)
         self.assertEqual(response.status_int, 302)
         self.assertIn('library', response.headers['location'])
         self.logout()
 
     def test_logout_from_published_exploration_editor(self):
-        """Logout from unpublished exploration should redirect
+        """Logout from published exploration should redirect
         to same page."""
 
         published_exp_id = 'published_eid'
@@ -452,8 +452,8 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
 
         rights_manager.publish_exploration(self.owner, published_exp_id)
 
-        response = self.testapp.get(current_user_services.create_logout_url(
-            current_page))
+        response = self.testapp.get(
+            '/exploration_editor_logout?return_url=%s' % current_page)
         self.assertEqual(response.status_int, 302)
         self.assertIn(current_page, response.headers['location'])
         self.logout()

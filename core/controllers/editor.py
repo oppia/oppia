@@ -101,9 +101,30 @@ def _require_valid_version(version_from_payload, exploration_version):
             % (exploration_version, version_from_payload))
 
 
+class EditorLogoutHandler(base.LogoutPage):
+    """Handles logout from editor page."""
+
+    def get(self):
+        """Checks if exploration is published and redirects accordingly."""
+
+        return_url = str(self.request.get('return_url'))
+        if return_url:
+            exploration_id = return_url.split('/')[-1]
+            exp_summary = exp_services.get_exploration_summary_by_id(
+                exploration_id)
+            if exp_summary.status == feconf.ACTIVITY_STATUS_PRIVATE:
+                self.request.GET['return_url'] = '/library'
+        super(EditorLogoutHandler, self).get()
+
+
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
-    pass
+
+    def get_logout_url(self, redirect_url_on_logout):
+        """Returns logout url for exploration editor."""
+        logout_url = utils.set_url_query_parameter(
+            '/exploration_editor_logout', 'return_url', redirect_url_on_logout)
+        return logout_url
 
 
 class ExplorationPage(EditorHandler):
