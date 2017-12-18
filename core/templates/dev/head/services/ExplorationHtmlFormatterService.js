@@ -33,6 +33,7 @@ oppia.factory('ExplorationHtmlFormatterService', [
           extensionTagAssemblerService.formatCustomizationArgAttrs(
             element, interactionCustomizationArgSpecs));
         element.attr('on-submit', 'submitAnswer(answer, rulesService);');
+        element.attr('current-card', 'activeCard');
         if (labelForFocusTarget) {
           element.attr('label-for-focus-target', labelForFocusTarget);
         }

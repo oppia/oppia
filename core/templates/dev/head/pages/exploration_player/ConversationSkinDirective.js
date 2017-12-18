@@ -358,7 +358,6 @@ oppia.directive('conversationSkin', [
           // 'show previous responses' setting.
           var _navigateToActiveCard = function() {
             $scope.$broadcast(EVENT_ACTIVE_CARD_CHANGED);
-
             var index = PlayerPositionService.getActiveCardIndex();
             $scope.activeCard = PlayerTranscriptService.getCard(index);
             tutorCardIsDisplayedIfNarrow = true;
@@ -561,7 +560,6 @@ oppia.directive('conversationSkin', [
                     // the feedback, and display a 'Continue' button.
                     FatigueDetectionService.reset();
                     NumberAttemptsService.reset();
-
                     _nextFocusLabel = FocusManagerService.generateFocusLabel();
 
                     PlayerTranscriptService.setDestination(newStateName);
@@ -595,7 +593,7 @@ oppia.directive('conversationSkin', [
                           hasContinueButton: true
                         });
                       }
-
+                      $scope.$broadcast('newCardAvailable', true);
                       _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
                       FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
                       scrollToBottom();
@@ -608,7 +606,6 @@ oppia.directive('conversationSkin', [
                         ExplorationPlayerService.getRandomSuffix());
                     }
                   }
-
                   _answerIsBeingProcessed = false;
                 }, millisecsLeftToWait);
               }
