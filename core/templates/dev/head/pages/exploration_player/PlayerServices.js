@@ -420,22 +420,18 @@ oppia.factory('ExplorationPlayerService', [
           UrlInterpolationService.getStaticImageUrl(
             '/avatar/user_blue_72px.png'));
 
-        var deferred = $q.defer();
         if (_isLoggedIn && !_editorPreviewMode) {
-          $http.get(
+          return $http.get(
             '/preferenceshandler/profile_picture'
           ).then(function(response) {
             var profilePictureDataUrl = response.data.profile_picture_data_url;
-            if (profilePictureDataUrl) {
-              deferred.resolve(profilePictureDataUrl);
-            } else {
-              deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
-            }
+            return (
+              profilePictureDataUrl ? profilePictureDataUrl :
+              DEFAULT_PROFILE_IMAGE_PATH);
           });
         } else {
-          deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
+          return $q.resolve(DEFAULT_PROFILE_IMAGE_PATH);
         }
-        return deferred.promise;
       },
       recordSolutionHit: function(stateName) {
         if (!_editorPreviewMode) {

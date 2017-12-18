@@ -223,7 +223,8 @@ describe('State editor', function() {
   });
 
   it('should add/modify/delete a hint', function() {
-    users.login('stateEditorUser1@example.com');
+    users.createUser('stateEditorUser2@example.com', 'stateEditorUser2');
+    users.login('stateEditorUser2@example.com');
     workflow.createExploration();
     editor.setContent(forms.toRichText('some content'));
 
@@ -239,6 +240,7 @@ describe('State editor', function() {
     editor.addHint('hint one');
     editor.HintEditor(0).setHint('modified hint one');
     editor.HintEditor(0).deleteHint();
+    general.waitForSystem();
     editor.saveChanges();
     users.logout();
   });

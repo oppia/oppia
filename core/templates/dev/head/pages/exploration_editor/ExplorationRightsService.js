@@ -18,8 +18,8 @@
  */
 
 oppia.factory('ExplorationRightsService', [
-  '$http', '$q', 'ExplorationDataService', 'AlertsService',
-  function($http, $q, ExplorationDataService, AlertsService) {
+  '$http', 'ExplorationDataService', 'AlertsService',
+  function($http, ExplorationDataService, AlertsService) {
     return {
       init: function(
           ownerNames, editorNames, viewerNames, status, clonedFrom,
@@ -53,12 +53,11 @@ oppia.factory('ExplorationRightsService', [
         return this._viewableIfPrivate;
       },
       makeCommunityOwned: function() {
-        var whenCommunityOwnedSet = $q.defer();
         var that = this;
-
         var requestUrl = (
           '/createhandler/rights/' + ExplorationDataService.explorationId);
-        $http.put(requestUrl, {
+
+        return $http.put(requestUrl, {
           version: ExplorationDataService.data.version,
           make_community_owned: true
         }).then(function(response) {
@@ -69,17 +68,14 @@ oppia.factory('ExplorationRightsService', [
             data.rights.viewer_names, data.rights.status,
             data.rights.cloned_from, data.rights.community_owned,
             data.rights.viewable_if_private);
-          whenCommunityOwnedSet.resolve();
         });
-        return whenCommunityOwnedSet.promise;
       },
       setViewability: function(viewableIfPrivate) {
-        var whenViewabilityChanged = $q.defer();
         var that = this;
-
         var requestUrl = (
-            '/createhandler/rights/' + ExplorationDataService.explorationId);
-        $http.put(requestUrl, {
+          '/createhandler/rights/' + ExplorationDataService.explorationId);
+
+        return $http.put(requestUrl, {
           version: ExplorationDataService.data.version,
           viewable_if_private: viewableIfPrivate
         }).then(function(response) {
@@ -90,17 +86,14 @@ oppia.factory('ExplorationRightsService', [
             data.rights.viewer_names, data.rights.status,
             data.rights.cloned_from, data.rights.community_owned,
             data.rights.viewable_if_private);
-          whenViewabilityChanged.resolve();
         });
-        return whenViewabilityChanged.promise;
       },
       saveRoleChanges: function(newMemberUsername, newMemberRole) {
-        var whenRolesSaved = $q.defer();
         var that = this;
-
         var requestUrl = (
-            '/createhandler/rights/' + ExplorationDataService.explorationId);
-        $http.put(requestUrl, {
+          '/createhandler/rights/' + ExplorationDataService.explorationId);
+
+        return $http.put(requestUrl, {
           version: ExplorationDataService.data.version,
           new_member_role: newMemberRole,
           new_member_username: newMemberUsername
@@ -112,17 +105,14 @@ oppia.factory('ExplorationRightsService', [
             data.rights.viewer_names, data.rights.status,
             data.rights.cloned_from, data.rights.community_owned,
             data.rights.viewable_if_private);
-          whenRolesSaved.resolve();
         });
-        return whenRolesSaved.promise;
       },
       publish: function() {
-        var whenPublishStatusChanged = $q.defer();
         var that = this;
-
         var requestUrl = (
           '/createhandler/status/' + ExplorationDataService.explorationId);
-        $http.put(requestUrl, {
+
+        return $http.put(requestUrl, {
           make_public: true
         }).then(function(response) {
           var data = response.data;
@@ -132,16 +122,14 @@ oppia.factory('ExplorationRightsService', [
             data.rights.viewer_names, data.rights.status,
             data.rights.cloned_from, data.rights.community_owned,
             data.rights.viewable_if_private);
-          whenPublishStatusChanged.resolve();
         });
-        return whenPublishStatusChanged.promise;
       },
       saveModeratorChangeToBackend: function(action, emailBody) {
         var that = this;
-
         var explorationModeratorRightsUrl = (
           '/createhandler/moderatorrights/' +
           ExplorationDataService.explorationId);
+
         $http.put(explorationModeratorRightsUrl, {
           action: action,
           email_body: emailBody,
