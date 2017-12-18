@@ -2799,7 +2799,8 @@ class Exploration(object):
         """
         for state_dict in states_dict.values():
             if state_dict['interaction']['default_outcome'] is not None:
-                old_feedback_list = state_dict['interaction']['default_outcome']['feedback']
+                old_feedback_list = (
+                    state_dict['interaction']['default_outcome']['feedback'])
                 default_feedback_html = (
                     old_feedback_list[0] if len(old_feedback_list) > 0 else '')
                 state_dict['interaction']['default_outcome']['feedback'] = {

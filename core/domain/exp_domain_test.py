@@ -2651,6 +2651,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'default_outcome': {
                         'dest': dest_name,
                         'feedback': copy.deepcopy(
+                            exp_domain.
                             SubtitledHtml.DEFAULT_SUBTITLED_HTML_DICT),
                         'param_changes': [],
                     },
