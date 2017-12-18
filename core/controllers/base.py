@@ -276,7 +276,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
     def get_logout_url(self, redirect_url_on_logout):
-    	"""Returns logout url."""
+        """Returns logout url."""
         return current_user_services.create_logout_url(redirect_url_on_logout)
 
     def render_template(

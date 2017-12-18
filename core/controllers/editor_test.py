@@ -431,7 +431,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
         self.assertEqual(response.status_int, 200)
 
         response = self.testapp.get(
-        	'/exploration_editor_logout?return_url=%s' % current_page)
+            '/exploration_editor_logout?return_url=%s' % current_page)
         self.assertEqual(response.status_int, 302)
         self.assertIn('library', response.headers['location'])
         self.logout()
