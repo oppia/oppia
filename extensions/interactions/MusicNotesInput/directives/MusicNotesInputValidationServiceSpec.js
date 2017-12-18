@@ -17,6 +17,7 @@ describe('MusicNotesInputValidationService', function() {
 
   var currentState;
   var goodAnswerGroups, goodDefaultOutcome;
+  var oof, agof;
 
   beforeEach(function() {
     module('oppia');
@@ -27,19 +28,19 @@ describe('MusicNotesInputValidationService', function() {
 
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
+    oof = $injector.get('OutcomeObjectFactory');
+    agof = $injector.get('AnswerGroupObjectFactory');
+
     currentState = 'First State';
-    goodDefaultOutcome = {
+    goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
         audio_translations: {}
-      }
-    };
-    goodAnswerGroups = [{
-      rules: [],
-      outcome: goodDefaultOutcome,
-      correct: false
-    }];
+      },
+      param_changes: []
+    });
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false)];
   }));
 
   it('should be able to perform basic validation', function() {

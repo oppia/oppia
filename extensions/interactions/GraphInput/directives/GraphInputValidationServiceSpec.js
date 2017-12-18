@@ -23,15 +23,18 @@ describe('GraphInputValidationService', function() {
   beforeEach(inject(function($rootScope, $controller, $injector) {
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     validatorService = $injector.get('GraphInputValidationService');
-
+    oof = $injector.get('OutcomeObjectFactory');
+    agof = $injector.get('AnswerGroupObjectFactory');
+    rof = $injector.get('RuleObjectFactory');
     currentState = 'First State';
-    goodDefaultOutcome = {
+    goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
         audio_translations: {}
-      }
-    };
+      },
+      param_changes: []
+    });
 
     customizationArguments = {
       graph: {
@@ -49,25 +52,25 @@ describe('GraphInputValidationService', function() {
       }
     };
 
-    var answerGroup = {
-      outcome: goodDefaultOutcome,
-      rules: [{
+    var answerGroup = agof.createNew(
+      [rof.createFromBackendDict({
         inputs: {
           g: {
             vertices: new Array(10)
           }
         },
-        type: 'IsIsomorphicTo'
-      }, {
+        rule_type: 'IsIsomorphicTo'
+      }), rof.createFromBackendDict({
         inputs: {
           g: {
             vertices: new Array(10)
           }
         },
-        type: 'IsIsomorphicTo'
-      }],
-      correct: false
-    };
+        rule_type: 'IsIsomorphicTo'
+      })],
+      goodDefaultOutcome,
+      false
+    );
     answerGroups = [answerGroup, angular.copy(answerGroup)];
   }));
 

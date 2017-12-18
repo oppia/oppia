@@ -18,6 +18,7 @@ describe('ContinueValidationService', function() {
   var currentState;
   var goodAnswerGroups, goodDefaultOutcome;
   var customizationArguments;
+  var oof, agof;
 
   beforeEach(function() {
     module('oppia');
@@ -26,21 +27,19 @@ describe('ContinueValidationService', function() {
   beforeEach(inject(function($rootScope, $controller, $injector) {
     validatorService = $injector.get('ContinueValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
-
+    oof = $injector.get('OutcomeObjectFactory');
+    agof = $injector.get('AnswerGroupObjectFactory');
     currentState = 'First State';
-    goodDefaultOutcome = {
+    goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
       feedback: {
         html: '',
         audio_translations: {}
-      }
-    };
+      },
+      param_changes: []
+    });
 
-    goodAnswerGroups = [{
-      rules: [],
-      outcome: goodDefaultOutcome,
-      correct: false
-    }];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false)];
     customizationArguments = {
       buttonText: {
         value: 'Some Button Text'

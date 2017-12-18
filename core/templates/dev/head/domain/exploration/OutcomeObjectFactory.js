@@ -34,6 +34,7 @@ oppia.factory('OutcomeObjectFactory', [
         param_changes: this.paramChanges
       };
     };
+
     /** Returns true iff an outcome has a self-loop and no feedback. */
     Outcome.prototype.isConfusing = function(currentStateName) {
       return (
