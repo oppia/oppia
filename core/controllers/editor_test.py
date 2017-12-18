@@ -36,6 +36,7 @@ from core.tests import test_utils
 import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+current_user_services = models.Registry.import_current_user_services()
 
 
 class BaseEditorControllerTest(test_utils.GenericTestBase):
@@ -410,6 +411,52 @@ class EditorTest(BaseEditorControllerTest):
             self.assertEqual(response_dict['unhandled_answers'], [])
 
             self.logout()
+
+
+class ExplorationEditorLogoutTest(BaseEditorControllerTest):
+	"""Test handler for logout from exploration editor page."""
+
+    def test_logout_from_unpublished_exploration_editor(self):
+    	"""Logout from unpublished exploration should redirect
+        to library page."""
+
+        unpublished_exp_id = 'unpublished_eid'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            unpublished_exp_id)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        current_page = '%s/%s' % (feconf.EDITOR_URL_PREFIX, unpublished_exp_id)
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(current_page, expect_errors=False)
+        self.assertEqual(response.status_int, 200)
+
+        response = self.testapp.get(current_user_services.create_logout_url(
+            current_page))
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('library', response.headers['location'])
+        self.logout()
+
+    def test_logout_from_published_exploration_editor(self):
+        """Logout from unpublished exploration should redirect
+        to same page."""
+
+        published_exp_id = 'published_eid'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            published_exp_id)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        current_page = '%s/%s' % (feconf.EDITOR_URL_PREFIX, published_exp_id)
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(current_page, expect_errors=False)
+        self.assertEqual(response.status_int, 200)
+
+        rights_manager.publish_exploration(self.owner, published_exp_id)
+
+        response = self.testapp.get(current_user_services.create_logout_url(
+            current_page))
+        self.assertEqual(response.status_int, 302)
+        self.assertIn(current_page, response.headers['location'])
+        self.logout()
 
 
 class DownloadIntegrationTest(BaseEditorControllerTest):
