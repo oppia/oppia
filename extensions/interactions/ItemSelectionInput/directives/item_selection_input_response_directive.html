@@ -2,12 +2,19 @@
   <em>No choices selected.</em>
 </div>
 
-<div ng-if="answer.length === 1">
+<div ng-if="answer.length === 1" class="item-selection-input-response-content">
   <div angular-html-bind="answer[0]"></div>
 </div>
 
-<ul ng-if="answer.length > 1">
+<ul ng-if="answer.length > 1" class="item-selection-input-response-content">
   <li ng-repeat="response in answer track by $index">
     <div angular-html-bind="response"></div>
   </li>
 </ul>
+
+
+<style>
+  .item-selection-input-response-content img {
+    max-height: 150px;
+  }
+</style>
