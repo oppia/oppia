@@ -24,7 +24,7 @@
   }
 </style>
 <ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak" style="margin-left: 20px;">
-  <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}">
+  <li ng-class="{'active': getTabStatuses().active === 'main', 'uib-dropdown': countWarnings()}" ng-attr-uib-dropdown="<[countWarnings()]>">
     <a href="#" uib-tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
        class="oppia-editor-navbar-tab-anchor protractor-test-main-tab">
       <i class="material-icons">&#xE254;</i>
