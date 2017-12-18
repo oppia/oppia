@@ -89,11 +89,11 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             };
           };
           $scope.getRegionDisplay = function(label) {
-              if ($scope.currentlyHoveredRegions.indexOf(label) === -1) {
-                return 'none';
-              } else {
-                return 'inline';
-              }
+            if ($scope.currentlyHoveredRegions.indexOf(label) === -1) {
+              return 'none';
+            } else {
+              return 'inline';
+            }
           };
           $scope.onMousemoveImage = function(event) {
             $scope.$on('newCardAvailable', function(evt, data) {
@@ -103,8 +103,10 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             });
             if(!$scope.deactivate) {
               var image = $($element).find('.oppia-image-click-img');
-              $scope.mouseX = (event.pageX - image.offset().left) / image.width();
-              $scope.mouseY = (event.pageY - image.offset().top) / image.height();
+              $scope.mouseX =
+                (event.pageX - image.offset().left) / image.width();
+              $scope.mouseY =
+                (event.pageY - image.offset().top) / image.height();
               $scope.currentlyHoveredRegions = [];
               for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
                 var labeledRegion = imageAndRegions.labeledRegions[i];
