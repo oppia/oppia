@@ -963,7 +963,8 @@ p {
   container's width.
 */
 img, video, canvas {
-  max-width: 100%;
+  max-width: 300px;
+  max-height: 300px;
 }
 
 textarea {
