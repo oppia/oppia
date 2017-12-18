@@ -18,13 +18,13 @@
  */
 
 oppia.controller('StateResponses', [
-  '$scope', '$rootScope', '$modal', '$filter', 'stateInteractionIdService',
+  '$scope', '$rootScope', '$uibModal', '$filter', 'stateInteractionIdService',
   'EditorStateService', 'AlertsService', 'ResponsesService', 'RouterService',
   'ExplorationContextService', 'TrainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
   'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
   function(
-      $scope, $rootScope, $modal, $filter, stateInteractionIdService,
+      $scope, $rootScope, $uibModal, $filter, stateInteractionIdService,
       EditorStateService, AlertsService, ResponsesService, RouterService,
       ExplorationContextService, TrainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
@@ -248,11 +248,11 @@ oppia.controller('StateResponses', [
       AlertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
-      $modal.open({
+      $uibModal.open({
         templateUrl: 'modals/teachOppia',
         backdrop: false,
         controller: [
-          '$scope', '$injector', '$modalInstance',
+          '$scope', '$injector', '$uibModalInstance',
           'ExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'ExplorationContextService', 'EditorStateService',
@@ -260,7 +260,7 @@ oppia.controller('StateResponses', [
           'AnswerClassificationService', 'FocusManagerService',
           'angularNameService', 'RULE_TYPE_CLASSIFIER',
           function(
-              $scope, $injector, $modalInstance,
+              $scope, $injector, $uibModalInstance,
               ExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
               ExplorationContextService, EditorStateService,
@@ -304,7 +304,7 @@ oppia.controller('StateResponses', [
             FocusManagerService.setFocus('testInteractionInput');
 
             $scope.finishTeaching = function(reopen) {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 reopen: reopen
               });
             };
@@ -356,18 +356,18 @@ oppia.controller('StateResponses', [
       AlertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
           'add_answer_group_modal_directive.html'),
         // Clicking outside this modal should not dismiss it.
         backdrop: 'static',
         controller: [
-          '$scope', '$modalInstance', 'ResponsesService',
+          '$scope', '$uibModalInstance', 'ResponsesService',
           'EditorStateService', 'EditorFirstTimeEventsService',
           'RuleObjectFactory', 'OutcomeObjectFactory',
           function(
-              $scope, $modalInstance, ResponsesService,
+              $scope, $uibModalInstance, ResponsesService,
               EditorStateService, EditorFirstTimeEventsService,
               RuleObjectFactory, OutcomeObjectFactory) {
             $scope.feedbackEditorIsOpen = false;
@@ -408,7 +408,7 @@ oppia.controller('StateResponses', [
               EditorFirstTimeEventsService.registerFirstSaveRuleEvent();
 
               // Close the modal and save it afterwards.
-              $modalInstance.close({
+              $uibModalInstance.close({
                 tmpRule: angular.copy($scope.tmpRule),
                 tmpOutcome: angular.copy($scope.tmpOutcome),
                 reopen: reopen
@@ -416,7 +416,7 @@ oppia.controller('StateResponses', [
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               AlertsService.clearWarnings();
             };
           }
@@ -462,19 +462,19 @@ oppia.controller('StateResponses', [
       evt.stopPropagation();
 
       AlertsService.clearWarnings();
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
           'delete_answer_group_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.reallyDelete = function() {
-              $modalInstance.close();
+              $uibModalInstance.close();
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               AlertsService.clearWarnings();
             };
           }

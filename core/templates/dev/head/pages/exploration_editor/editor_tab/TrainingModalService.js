@@ -19,8 +19,8 @@
  */
 
 oppia.factory('TrainingModalService', [
-  '$rootScope', '$modal', 'AlertsService',
-  function($rootScope, $modal, AlertsService) {
+  '$rootScope', '$uibModal', 'AlertsService',
+  function($rootScope, $uibModal, AlertsService) {
     return {
       openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave) {
         AlertsService.clearWarnings();
@@ -28,15 +28,15 @@ oppia.factory('TrainingModalService', [
           $rootScope.$broadcast('externalSave');
         }
 
-        $modal.open({
+        $uibModal.open({
           templateUrl: 'modals/trainUnresolvedAnswer',
           backdrop: true,
           controller: [
-            '$scope', '$injector', '$modalInstance',
+            '$scope', '$injector', '$uibModalInstance',
             'explorationStatesService', 'EditorStateService',
             'AnswerClassificationService', 'ExplorationContextService',
             'stateInteractionIdService', 'AngularNameService',
-            function($scope, $injector, $modalInstance,
+            function($scope, $injector, $uibModalInstance,
                 explorationStatesService, EditorStateService,
                 AnswerClassificationService, ExplorationContextService,
                 stateInteractionIdService, AngularNameService) {
@@ -52,7 +52,7 @@ oppia.factory('TrainingModalService', [
               };
 
               $scope.finishTraining = function() {
-                $modalInstance.close();
+                $uibModalInstance.close();
               };
 
               $scope.init = function() {

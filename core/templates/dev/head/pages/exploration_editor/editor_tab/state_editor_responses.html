@@ -17,7 +17,7 @@
               <img ng-if="editabilityService.isEditable()" ng-src="<[dragDotsImgUrl]>" width="10">
             </span>
             <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(answerGroup.outcome)" ng-click="changeActiveAnswerGroupIndex($index)"
-                 tooltip="<[getOutcomeTooltip(answerGroup.outcome)]>" tooltip-placement="bottom">
+                 uib-tooltip="<[getOutcomeTooltip(answerGroup.outcome)]>" tooltip-placement="bottom">
               <div class="oppia-rule-header-warning-style" >
                 ⚠
               </div>
@@ -56,7 +56,7 @@
         <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
           <li ng-class="{'active': activeAnswerGroupIndex === answerGroups.length}" class="oppia-rule-block">
             <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(defaultOutcome) && !suppressDefaultAnswerGroupWarnings()" ng-click="changeActiveAnswerGroupIndex(answerGroups.length)"
-                 tooltip="<[getOutcomeTooltip(defaultOutcome)]>" tooltip-placement="bottom">
+                 uib-tooltip="<[getOutcomeTooltip(defaultOutcome)]>" tooltip-placement="bottom">
               <div class="oppia-rule-header-warning-style" >
                 ⚠
               </div>

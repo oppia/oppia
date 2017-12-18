@@ -33,11 +33,11 @@ oppia.directive('audioTranslationsEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/audio_translations_editor_directive.html'),
       controller: [
-        '$scope', '$modal', '$sce', 'stateContentService', 'editabilityService',
+        '$scope', '$uibModal', '$sce', 'stateContentService', 'editabilityService',
         'LanguageUtilService', 'AlertsService', 'ExplorationContextService',
         'AssetsBackendApiService',
         function(
-            $scope, $modal, $sce, stateContentService, editabilityService,
+            $scope, $uibModal, $sce, stateContentService, editabilityService,
             LanguageUtilService, AlertsService, ExplorationContextService,
             AssetsBackendApiService) {
           $scope.isEditable = editabilityService.isEditable;
@@ -73,7 +73,7 @@ oppia.directive('audioTranslationsEditor', [
             }
 
             $scope.getOnStartEditFn()();
-            $modal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/forms/' +
                 'add_audio_translation_modal_directive.html'),
@@ -84,11 +84,11 @@ oppia.directive('audioTranslationsEditor', [
                 }
               },
               controller: [
-                '$scope', '$modalInstance', 'LanguageUtilService',
+                '$scope', '$uibModalInstance', 'LanguageUtilService',
                 'allowedAudioLanguageCodes', 'AlertsService',
                 'ExplorationContextService', 'IdGenerationService',
                 function(
-                    $scope, $modalInstance, LanguageUtilService,
+                    $scope, $uibModalInstance, LanguageUtilService,
                     allowedAudioLanguageCodes, AlertsService,
                     ExplorationContextService, IdGenerationService) {
                   var ERROR_MESSAGE_BAD_FILE_UPLOAD = (
@@ -149,7 +149,7 @@ oppia.directive('audioTranslationsEditor', [
                       AssetsBackendApiService.saveAudio(
                         explorationId, generatedFilename, uploadedFile
                       ).then(function() {
-                        $modalInstance.close({
+                        $uibModalInstance.close({
                           languageCode: $scope.languageCode,
                           filename: generatedFilename,
                           fileSizeBytes: uploadedFile.size
@@ -165,7 +165,7 @@ oppia.directive('audioTranslationsEditor', [
                   };
 
                   $scope.cancel = function() {
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                     AlertsService.clearWarnings();
                   };
                 }
@@ -180,7 +180,7 @@ oppia.directive('audioTranslationsEditor', [
           $scope.openDeleteAudioTranslationModal = function(languageCode) {
             $scope.getOnStartEditFn()();
 
-            $modal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/forms/' +
                 'delete_audio_translation_modal_directive.html'),
@@ -191,21 +191,21 @@ oppia.directive('audioTranslationsEditor', [
                 }
               },
               controller: [
-                '$scope', '$modalInstance', 'LanguageUtilService',
+                '$scope', '$uibModalInstance', 'LanguageUtilService',
                 'languageCode',
                 function(
-                    $scope, $modalInstance, LanguageUtilService,
+                    $scope, $uibModalInstance, LanguageUtilService,
                     languageCode) {
                   $scope.languageDescription = (
                     LanguageUtilService.getAudioLanguageDescription(
                       languageCode));
 
                   $scope.reallyDelete = function() {
-                    $modalInstance.close();
+                    $uibModalInstance.close();
                   };
 
                   $scope.cancel = function() {
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                     AlertsService.clearWarnings();
                   };
                 }

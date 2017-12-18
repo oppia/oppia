@@ -33,7 +33,7 @@ oppia.directive('imageWithRegionsEditor', [
       scope: true,
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: [
-        '$scope', '$element', '$modal', function($scope, $element, $modal) {
+        '$scope', '$element', '$uibModal', function($scope, $element, $uibModal) {
           $scope.alwaysEditable = true;
 
           // Dynamically defines the CSS style for the region rectangle.
@@ -492,18 +492,18 @@ oppia.directive('imageWithRegionsEditor', [
             return 'crosshair';
           };
           $scope.resetEditor = function() {
-            $modal.open({
+            $uibModal.open({
               templateUrl: 'modals/imageRegionsResetConfirmation',
               backdrop: 'static',
               keyboard: false,
               controller: [
-                '$scope', '$modalInstance', function($scope, $modalInstance) {
+                '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
                   $scope.cancel = function() {
-                    $modalInstance.dismiss();
+                    $uibModalInstance.dismiss();
                   };
 
                   $scope.confirmClear = function() {
-                    $modalInstance.close();
+                    $uibModalInstance.close();
                   };
                 }]
             }).result.then(function() {

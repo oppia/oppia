@@ -20,26 +20,26 @@ oppia.constant(
   'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
 
 oppia.controller('LearnerLocalNav', [
-  '$scope', '$modal', '$http', 'ExplorationPlayerService', 'AlertsService',
+  '$scope', '$uibModal', '$http', 'ExplorationPlayerService', 'AlertsService',
   'FocusManagerService', 'UrlInterpolationService',
   'FLAG_EXPLORATION_URL_TEMPLATE',
   function(
-    $scope, $modal, $http, ExplorationPlayerService, AlertsService,
+    $scope, $uibModal, $http, ExplorationPlayerService, AlertsService,
     FocusManagerService, UrlInterpolationService,
     FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = ExplorationPlayerService.getExplorationId();
     $scope.showLearnerSuggestionModal = function() {
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_player/' +
           'learner_view_suggestion_modal_directive.html'),
         backdrop: 'static',
         resolve: {},
         controller: [
-          '$scope', '$modalInstance', '$timeout', 'PlayerPositionService',
+          '$scope', '$uibModalInstance', '$timeout', 'PlayerPositionService',
           'ExplorationPlayerService',
           function(
-              $scope, $modalInstance, $timeout, PlayerPositionService,
+              $scope, $uibModalInstance, $timeout, PlayerPositionService,
               ExplorationPlayerService) {
             var stateName = PlayerPositionService.getCurrentStateName();
             $scope.originalHtml = ExplorationPlayerService.getStateContentHtml(
@@ -53,11 +53,11 @@ oppia.controller('LearnerLocalNav', [
             }, 500);
 
             $scope.cancelSuggestion = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
 
             $scope.submitSuggestion = function() {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 id: ExplorationPlayerService.getExplorationId(),
                 version: ExplorationPlayerService.getExplorationVersion(),
                 stateName: stateName,
@@ -75,17 +75,17 @@ oppia.controller('LearnerLocalNav', [
         }).error(function(res) {
           AlertsService.addWarning(res);
         });
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/' +
             'learner_suggestion_submitted_modal_directive.html'),
           backdrop: true,
           resolve: {},
           controller: [
-            '$scope', '$modalInstance',
-            function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
               $scope.close = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
               };
             }
           ]
@@ -94,13 +94,13 @@ oppia.controller('LearnerLocalNav', [
     };
 
     $scope.showFlagExplorationModal = function() {
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/flag_exploration_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'PlayerPositionService',
-          function($scope, $modalInstance, PlayerPositionService) {
+          '$scope', '$uibModalInstance', 'PlayerPositionService',
+          function($scope, $uibModalInstance, PlayerPositionService) {
             $scope.flagMessageTextareaIsShown = false;
             var stateName = PlayerPositionService.getCurrentStateName();
 
@@ -113,7 +113,7 @@ oppia.controller('LearnerLocalNav', [
 
             $scope.submitReport = function() {
               if ($scope.flagMessage) {
-                $modalInstance.close({
+                $uibModalInstance.close({
                   report_type: $scope.flag,
                   report_text: $scope.flagMessage,
                   state: stateName
@@ -122,7 +122,7 @@ oppia.controller('LearnerLocalNav', [
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
           }
         ]
@@ -140,16 +140,16 @@ oppia.controller('LearnerLocalNav', [
         }).error(function(error) {
           AlertsService.addWarning(error);
         });
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/' +
             'exploration_successfully_flagged_modal_directive.html'),
           backdrop: true,
           controller: [
-            '$scope', '$modalInstance',
-            function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
               $scope.close = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
               };
             }
           ]

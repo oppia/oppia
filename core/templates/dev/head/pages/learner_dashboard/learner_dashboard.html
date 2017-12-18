@@ -247,7 +247,7 @@
                  ng-show="showRemoveIcon"
                  aria-hidden="true"
                  ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
-                 tooltip="Remove"
+                 uib-tooltip="Remove"
                  tooltip-placement="top"></i>
               <exploration-summary-tile
                                       exploration-id="tile.id"
@@ -357,7 +357,7 @@
                    aria-hidden="true"
                    style="color: black;"
                    ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
-                   tooltip="Remove"
+                   uib-tooltip="Remove"
                    tooltip-placement="top"></i>
                 <exploration-summary-tile style="height: 145px; display: block;"
                                           exploration-id="tile.id"
@@ -407,7 +407,7 @@
                  ng-show="showRemoveIcon"
                  aria-hidden="true"
                  ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
-                 tooltip="Remove"
+                 uib-tooltip="Remove"
                  tooltip-placement="top"></i>
               <collection-summary-tile
                                        collection-id="tile.id"
@@ -467,7 +467,7 @@
                    style="color: black;"
                    aria-hidden="true"
                    ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
-                   tooltip="Remove"
+                   uib-tooltip="Remove"
                    tooltip-placement="top"></i>
                 <collection-summary-tile style="height: 145px; display: block;"
                                          collection-id="tile.id"
@@ -567,7 +567,7 @@
                     <strong class="protractor-test-subscription-name"
                             popover-append-to-body
                             popover-trigger="<[showUsernamePopover(subscription.creator_username)]>"
-                            ng-attr-popover="<[subscription.creator_username]>">
+                            ng-attr-uib-popover="<[subscription.creator_username]>">
                       <[subscription.creator_username| truncate:10]>
                     </strong>
                   </div>
