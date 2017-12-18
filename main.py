@@ -287,7 +287,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
     get_redirect_route(
-        r'/moderatorhandler/email_draft/<action>', moderator.EmailDraftHandler),
+        r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,

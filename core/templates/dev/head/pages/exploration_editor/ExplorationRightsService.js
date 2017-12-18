@@ -124,14 +124,13 @@ oppia.factory('ExplorationRightsService', [
             data.rights.viewable_if_private);
         });
       },
-      saveModeratorChangeToBackend: function(action, emailBody) {
+      saveModeratorChangeToBackend: function(emailBody) {
         var that = this;
         var explorationModeratorRightsUrl = (
           '/createhandler/moderatorrights/' +
           ExplorationDataService.explorationId);
 
         $http.put(explorationModeratorRightsUrl, {
-          action: action,
           email_body: emailBody,
           version: ExplorationDataService.data.version
         }).then(function(response) {
