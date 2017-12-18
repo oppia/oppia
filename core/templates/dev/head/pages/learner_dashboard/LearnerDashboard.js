@@ -377,7 +377,8 @@ oppia.controller('LearnerDashboard', [
           }
         },
         controller: [
-          '$scope', '$uibModalInstance', 'newContent', 'oldContent', 'description',
+          '$scope', '$uibModalInstance', 'newContent', 'oldContent',
+          'description',
           function($scope, $uibModalInstance, newContent, oldContent,
             description) {
             $scope.newContent = newContent;

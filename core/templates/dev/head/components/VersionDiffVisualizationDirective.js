@@ -248,9 +248,10 @@ oppia.directive('versionDiffVisualization', [
               }
             },
             controller: [
-              '$scope', '$http', '$uibModalInstance', '$timeout', 'newStateName',
-              'oldStateName', 'newState', 'oldState', 'headers',
-              'ExplorationContextService', 'UrlInterpolationService',
+              '$scope', '$http', '$uibModalInstance', '$timeout', 
+              'newStateName', 'oldStateName', 'newState', 'oldState', 
+              'headers', 'ExplorationContextService', 
+              'UrlInterpolationService',
               function(
                   $scope, $http, $uibModalInstance, $timeout, newStateName,
                   oldStateName, newState, oldState, headers,

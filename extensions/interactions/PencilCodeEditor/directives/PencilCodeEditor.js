@@ -79,7 +79,8 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
               backdrop: 'static',
               keyboard: false,
               controller: [
-                '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss();
                   };

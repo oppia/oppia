@@ -33,7 +33,8 @@ oppia.directive('imageWithRegionsEditor', [
       scope: true,
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: [
-        '$scope', '$element', '$uibModal', function($scope, $element, $uibModal) {
+        '$scope', '$element', '$uibModal', 
+        function($scope, $element, $uibModal) {
           $scope.alwaysEditable = true;
 
           // Dynamically defines the CSS style for the region rectangle.
@@ -497,7 +498,8 @@ oppia.directive('imageWithRegionsEditor', [
               backdrop: 'static',
               keyboard: false,
               controller: [
-                '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss();
                   };
