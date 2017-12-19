@@ -23,13 +23,16 @@
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
-  function($sce, HtmlEscaperService, ExplorationContextService,
-           imageClickInputRulesService, UrlInterpolationService) {
+  'NEW_CARD_AVAILABLE',
+  function(
+      $sce, HtmlEscaperService, ExplorationContextService,
+      imageClickInputRulesService, UrlInterpolationService,
+      NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
         onSubmit: '&',
-        currentCard: '='
+        lastAnswer: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ImageClickInput/directives/' +
@@ -48,18 +51,12 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               '/' + encodeURIComponent($scope.filepath)) : null);
           $scope.mouseX = 0;
           $scope.mouseY = 0;
-          $scope.deactivate = false;
-          if ($scope.currentCard.destStateName) {
-            $scope.deactivate = true;
-            $scope.currentlyHoveredRegions = [];
-            /*Following lines to permanently highlight the learner's previous
-              answer. */
-            $scope.mouseX = $scope.currentCard.inputResponsePairs[
-                              $scope.currentCard.inputResponsePairs.length - 1]
-                                .learnerInput.clickPosition[0];
-            $scope.mouseY = $scope.currentCard.inputResponsePairs[
-                              $scope.currentCard.inputResponsePairs.length - 1]
-                                .learnerInput.clickPosition[1];
+          $scope.interactionIsActive = true;
+          $scope.currentlyHoveredRegions = [];
+          $scope.previousInput = $scope.lastAnswer();
+          $scope.allRegions = imageAndRegions.labeledRegions;
+
+          $scope.checkPointerInRegion = function() {
             for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
               var labeledRegion = imageAndRegions.labeledRegions[i];
               var regionArea = labeledRegion.region.area;
@@ -70,11 +67,15 @@ oppia.directive('oppiaInteractiveImageClickInput', [
                 $scope.currentlyHoveredRegions.push(labeledRegion.label);
               }
             }
+          };
+          if ($scope.previousInput) {
+            $scope.interactionIsActive = false;
+            /*Following lines to permanently highlight the learner's previous
+              answer. */
+            $scope.mouseX = $scope.previousInput.clickPosition[0];
+            $scope.mouseY = $scope.previousInput.clickPosition[1];
+            $scope.checkPointerInRegion();
           }
-          else {
-            $scope.currentlyHoveredRegions = [];
-          }
-          $scope.allRegions = imageAndRegions.labeledRegions;
           $scope.getRegionDimensions = function(index) {
             var image = $($element).find('.oppia-image-click-img');
             var labeledRegion = imageAndRegions.labeledRegions[index];
@@ -95,29 +96,20 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               return 'inline';
             }
           };
+          $scope.$on(NEW_CARD_AVAILABLE, function(evt, data) {
+            if (data) {
+              $scope.interactionIsActive = false;
+            }
+          });
           $scope.onMousemoveImage = function(event) {
-            $scope.$on('newCardAvailable', function(evt, data) {
-              if(data) {
-                $scope.deactivate = true;
-              }
-            });
-            if(!$scope.deactivate) {
+            if ($scope.interactionIsActive) {
               var image = $($element).find('.oppia-image-click-img');
               $scope.mouseX =
                 (event.pageX - image.offset().left) / image.width();
               $scope.mouseY =
                 (event.pageY - image.offset().top) / image.height();
               $scope.currentlyHoveredRegions = [];
-              for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
-                var labeledRegion = imageAndRegions.labeledRegions[i];
-                var regionArea = labeledRegion.region.area;
-                if (regionArea[0][0] <= $scope.mouseX &&
-                    $scope.mouseX <= regionArea[1][0] &&
-                    regionArea[0][1] <= $scope.mouseY &&
-                    $scope.mouseY <= regionArea[1][1]) {
-                  $scope.currentlyHoveredRegions.push(labeledRegion.label);
-                }
-              }
+              $scope.checkPointerInRegion();
             }
           };
           $scope.onClickImage = function() {
