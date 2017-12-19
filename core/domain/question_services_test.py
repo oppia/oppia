@@ -171,7 +171,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question.question_id, collection_id, skill_id, owner_id)
         collection = collection_services.get_collection_by_id(collection_id)
         self.assertIn(question.question_id,
-            collection.skills[skill_id].question_ids)
+                      collection.skills[skill_id].question_ids)
 
     def test_remove_question_id_from_skill(self):
         """Tests to verify remove_question_id_from_skill method."""
@@ -211,7 +211,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         collection = collection_services.get_collection_by_id(
             collection_id)
         self.assertIn(question.question_id,
-            collection.skills[skill_id].question_ids)
+                      collection.skills[skill_id].question_ids)
         skill_id = collection.get_skill_id_from_skill_name('skill0')
         question_services.remove_question_id_from_skill(
             question.question_id, collection_id, skill_id, owner_id)
