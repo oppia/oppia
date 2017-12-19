@@ -24,29 +24,35 @@
 {% block content %}
   <background-banner></background-banner>
   <div class="oppia-dashboard-container" ng-controller="CreatorDashboard" style="position: relative;">
-    <div class="oppia-dashboard-aggregated-stats" ng-if="explorationsList.length > 0 || collectionsList.length > 0">
+    <div class="oppia-dashboard-aggregated-stats oppia-creator-dashboard-main-content"
+         style="margin: auto;" ng-if="explorationsList.length > 0 || collectionsList.length > 0"
+         ng-class="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}">
       <md-card layout="row">
         <div class="average-ratings stats-card">
           <p class="stat-description" translate="I18N_DASHBOARD_STATS_AVERAGE_RATING"></p>
-          <h1 class="stat-value"><[dashboardStats.average_ratings || 'N/A']></h1>
+          <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.average_ratings || 'N/A']></h1>
+          <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.average_ratings || 'N/A']></h1>
           <p ng-hide="!dashboardStats.num_ratings">
             (by <[dashboardStats.num_ratings]> users)
           </p>
         </div>
         <div class="total-plays stats-card">
           <p class="stat-description" translate="I18N_DASHBOARD_STATS_TOTAL_PLAYS"></p>
-          <h1 class="stat-value"><[dashboardStats.total_plays]></h1>
+          <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_plays]></h1>
+          <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_plays]></h1>
           <p ng-hide="!relativeChangeInTotalPlays">
             (+<[relativeChangeInTotalPlays]> from last week)
           </p>
         </div>
         <div class="total-open-feedback stats-card">
           <p class="stat-description" translate="I18N_DASHBOARD_STATS_OPEN_FEEDBACK"></p>
-          <h1 class="stat-value"><[dashboardStats.total_open_feedback]></h1>
+          <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_open_feedback]></h1>
+          <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_open_feedback]></h1>
         </div>
         <div class="total-open-feedback stats-card">
           <p class="stat-description" translate="I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS"></p>
-          <h1 class="stat-value"><[subscribersList.length]></h1>
+          <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[subscribersList.length]></h1>
+          <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[subscribersList.length]></h1>
         </div>
       </md-card>
     </div>

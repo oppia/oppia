@@ -315,17 +315,22 @@ oppia.factory('ExplorationPlayerService', [
         var oldState = exploration.getState(oldStateName);
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
-            _explorationId, oldStateName, oldState, answer, false,
+            _explorationId, oldStateName, oldState, answer,
             interactionRulesService));
 
         if (!_editorPreviewMode) {
+          var feedbackIsUseful = (
+            AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+              _explorationId, oldStateName, oldState, answer,
+              interactionRulesService));
           StatsReportingService.recordAnswerSubmitted(
             oldStateName,
             LearnerParamsService.getAllParams(),
             answer,
             classificationResult.answerGroupIndex,
             classificationResult.ruleIndex,
-            classificationResult.classificationCategorization);
+            classificationResult.classificationCategorization,
+            feedbackIsUseful);
         }
 
         // Use angular.copy() to clone the object
@@ -415,22 +420,18 @@ oppia.factory('ExplorationPlayerService', [
           UrlInterpolationService.getStaticImageUrl(
             '/avatar/user_blue_72px.png'));
 
-        var deferred = $q.defer();
         if (_isLoggedIn && !_editorPreviewMode) {
-          $http.get(
+          return $http.get(
             '/preferenceshandler/profile_picture'
           ).then(function(response) {
             var profilePictureDataUrl = response.data.profile_picture_data_url;
-            if (profilePictureDataUrl) {
-              deferred.resolve(profilePictureDataUrl);
-            } else {
-              deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
-            }
+            return (
+              profilePictureDataUrl ? profilePictureDataUrl :
+              DEFAULT_PROFILE_IMAGE_PATH);
           });
         } else {
-          deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
+          return $q.resolve(DEFAULT_PROFILE_IMAGE_PATH);
         }
-        return deferred.promise;
       },
       recordSolutionHit: function(stateName) {
         if (!_editorPreviewMode) {

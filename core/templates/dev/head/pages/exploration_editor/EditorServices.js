@@ -662,7 +662,6 @@ oppia.factory('explorationStatesService', [
               stateName,
               _states.getState(stateName),
               solution.correctAnswer,
-              true,
               $injector.get(
                 AngularNameService.getNameOfInteractionRulesService(
                   _states.getState(stateName).interaction.id))));

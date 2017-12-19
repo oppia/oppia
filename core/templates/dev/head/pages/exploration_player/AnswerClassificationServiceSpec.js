@@ -127,8 +127,7 @@ describe('Answer classification service with string classifier disabled',
 
     it('should fail if no frontend rules are provided', function() {
       expect(function() {
-        acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 0, false)
+        acs.getMatchingClassificationResult(explorationId, stateName, state, 0)
       }).toThrow();
     });
 
@@ -136,21 +135,21 @@ describe('Answer classification service with string classifier disabled',
        'spec', function() {
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 10, false, rules)
+          explorationId, stateName, state, 10, rules)
       ).toEqual(acrof.createNew(
         oof.createNew('outcome 1', '', []), 0, 0, EXPLICIT_CLASSIFICATION
       ));
 
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 5, false, rules)
+          explorationId, stateName, state, 5, rules)
       ).toEqual(acrof.createNew(
         oof.createNew('outcome 2', '', []), 1, 0, EXPLICIT_CLASSIFICATION
       ));
 
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 6, false, rules)
+          explorationId, stateName, state, 6, rules)
       ).toEqual(acrof.createNew(
         oof.createNew('outcome 2', '', []), 1, 1, EXPLICIT_CLASSIFICATION
       ));
@@ -159,7 +158,7 @@ describe('Answer classification service with string classifier disabled',
     it('should return the default rule if no answer group matches', function() {
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 7, false, rules)
+          explorationId, stateName, state, 7, rules)
       ).toEqual(acrof.createNew(
         oof.createNew('default', '', []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
       ));
@@ -206,7 +205,7 @@ describe('Answer classification service with string classifier disabled',
 
       expect(function() {
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 0, false)
+          explorationId, stateName, state, 0)
       }).toThrow();
     });
   });
@@ -354,7 +353,7 @@ describe('Answer classification service with string classifier enabled',
       // in PredictionAlgorithmRegistryService.
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 0, false, rules)
+          explorationId, stateName, state, 0, rules)
       ).toEqual(
         acrof.createNew(
           state.interaction.answerGroups[1].outcome, 1, 2,
@@ -366,7 +365,7 @@ describe('Answer classification service with string classifier enabled',
        'interaction is not trainable', function() {
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state2, 0, false, rules)
+          explorationId, stateName, state2, 0, rules)
       ).toEqual(acrof.createNew(
         oof.createNew('default', '', []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
       ));
