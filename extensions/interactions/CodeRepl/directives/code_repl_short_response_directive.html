@@ -1,0 +1,10 @@
+<span><pre><[answer.code]></pre></span>
+
+<span ng-if="answer.output">
+  <h5>Output</h5>
+  <pre><[answer.output | truncateAtFirstLine]></pre>
+</span>
+
+<span ng-if="answer.error" focus-on="<[errorFocusLabel]>">
+  <font color=red>Error: <[answer.error]></font><br>
+</span>

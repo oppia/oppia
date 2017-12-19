@@ -21,9 +21,16 @@ var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 
 describe('Exploration history', function() {
+  var explorationPlayerPage = null;
+
+  beforeEach(function() {
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
+
   it('should display the history', function() {
     users.createUser('user@historyTab.com', 'userHistoryTab');
     users.login('user@historyTab.com');
@@ -335,13 +342,15 @@ describe('Exploration history', function() {
     // Check that reverting works
     editor.revertToVersion(2);
     general.moveToPlayer();
-    player.expectContentToMatch(forms.toRichText('enter 6 to continue'));
-    player.submitAnswer('NumericInput', 6);
-    player.expectExplorationToNotBeOver();
-    player.expectContentToMatch(forms.toRichText('this is card 2'));
-    player.expectInteractionToMatch('Continue', 'CONTINUE');
-    player.submitAnswer('Continue', null);
-    player.expectExplorationToBeOver();
+    explorationPlayerPage.expectContentToMatch(
+      forms.toRichText('enter 6 to continue'));
+    explorationPlayerPage.submitAnswer('NumericInput', 6);
+    explorationPlayerPage.expectExplorationToNotBeOver();
+    explorationPlayerPage.expectContentToMatch(
+      forms.toRichText('this is card 2'));
+    explorationPlayerPage.expectInteractionToMatch('Continue', 'CONTINUE');
+    explorationPlayerPage.submitAnswer('Continue', null);
+    explorationPlayerPage.expectExplorationToBeOver();
 
     general.moveToEditor();
     editor.expectGraphComparisonOf(4, 6).toBe([{

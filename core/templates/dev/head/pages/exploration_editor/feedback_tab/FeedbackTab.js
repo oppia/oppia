@@ -17,15 +17,15 @@
  */
 
 oppia.controller('FeedbackTab', [
-  '$scope', '$http', '$modal', '$timeout', '$rootScope', 'alertsService',
-  'oppiaDatetimeFormatter', 'ThreadStatusDisplayService',
-  'ThreadDataService', 'explorationStatesService', 'explorationData',
+  '$scope', '$http', '$modal', '$timeout', '$rootScope', 'AlertsService',
+  'DateTimeFormatService', 'ThreadStatusDisplayService',
+  'ThreadDataService', 'explorationStatesService', 'ExplorationDataService',
   'changeListService', 'StateObjectFactory', 'UrlInterpolationService',
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
-    $scope, $http, $modal, $timeout, $rootScope, alertsService,
-    oppiaDatetimeFormatter, ThreadStatusDisplayService,
-    ThreadDataService, explorationStatesService, explorationData,
+    $scope, $http, $modal, $timeout, $rootScope, AlertsService,
+    DateTimeFormatService, ThreadStatusDisplayService,
+    ThreadDataService, explorationStatesService, ExplorationDataService,
     changeListService, StateObjectFactory, UrlInterpolationService,
     ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
     $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
@@ -34,9 +34,10 @@ oppia.controller('FeedbackTab', [
     $scope.getHumanReadableStatus = (
       ThreadStatusDisplayService.getHumanReadableStatus);
     $scope.getLocaleAbbreviatedDatetimeString = (
-      oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
+      DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
     $scope.activeThread = null;
+    $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
     $rootScope.loadingMessage = 'Loading';
     $scope.tmpMessage = {
       status: null,
@@ -68,11 +69,11 @@ oppia.controller('FeedbackTab', [
 
           $scope.create = function(newThreadSubject, newThreadText) {
             if (!newThreadSubject) {
-              alertsService.addWarning('Please specify a thread subject.');
+              AlertsService.addWarning('Please specify a thread subject.');
               return;
             }
             if (!newThreadText) {
-              alertsService.addWarning('Please specify a message.');
+              AlertsService.addWarning('Please specify a message.');
               return;
             }
 
@@ -90,7 +91,7 @@ oppia.controller('FeedbackTab', [
         ThreadDataService.createNewThread(
           result.newThreadSubject, result.newThreadText, function() {
             $scope.clearActiveThread();
-            alertsService.addSuccessMessage('Feedback thread created.');
+            AlertsService.addSuccessMessage('Feedback thread created.');
           });
       });
     };
@@ -223,14 +224,14 @@ oppia.controller('FeedbackTab', [
             if (result.action === ACTION_ACCEPT_SUGGESTION) {
               var suggestion = $scope.activeThread.suggestion;
               var stateName = suggestion.state_name;
-              var stateDict = explorationData.data.states[stateName];
+              var stateDict = ExplorationDataService.data.states[stateName];
               var state = StateObjectFactory.createFromBackendDict(
                 stateName, stateDict);
               state.content.setHtml(suggestion.suggestion_html);
               if (result.audioUpdateRequired) {
                 state.content.markAllAudioAsNeedingUpdate();
               }
-              explorationData.data.version += 1;
+              ExplorationDataService.data.version += 1;
               explorationStatesService.setState(stateName, state);
               $rootScope.$broadcast('refreshVersionHistory', {
                 forceRefresh: true
@@ -245,11 +246,11 @@ oppia.controller('FeedbackTab', [
 
     $scope.addNewMessage = function(threadId, tmpText, tmpStatus) {
       if (threadId === null) {
-        alertsService.addWarning('Cannot add message to thread with ID: null.');
+        AlertsService.addWarning('Cannot add message to thread with ID: null.');
         return;
       }
       if (!tmpStatus) {
-        alertsService.addWarning('Invalid message status: ' + tmpStatus);
+        AlertsService.addWarning('Invalid message status: ' + tmpStatus);
         return;
       }
 

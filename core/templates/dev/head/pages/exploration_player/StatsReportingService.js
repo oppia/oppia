@@ -46,12 +46,12 @@ oppia.factory('StatsReportingService', [
   '$http', '$interval', 'StopwatchObjectFactory', 'MessengerService',
   'UrlInterpolationService', 'STATS_REPORTING_URLS', 'siteAnalyticsService',
   'ENABLE_NEW_STATS_FRAMEWORK', 'STATS_EVENT_TYPES',
-  'explorationContextService', 'PAGE_CONTEXT', 'DEFAULT_OUTCOME_CLASSIFICATION',
+  'ExplorationContextService', 'PAGE_CONTEXT', 'DEFAULT_OUTCOME_CLASSIFICATION',
   function(
       $http, $interval, StopwatchObjectFactory, MessengerService,
       UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService,
       ENABLE_NEW_STATS_FRAMEWORK, STATS_EVENT_TYPES,
-      explorationContextService, PAGE_CONTEXT, DEFAULT_OUTCOME_CLASSIFICATION) {
+      ExplorationContextService, PAGE_CONTEXT, DEFAULT_OUTCOME_CLASSIFICATION) {
     var explorationId = null;
     var explorationTitle = null;
     var explorationVersion = null;
@@ -63,7 +63,7 @@ oppia.factory('StatsReportingService', [
     var explorationIsComplete = false;
 
     var _editorPreviewMode = (
-      explorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+      ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
 
     // The following dict will contain all stats data accumulated over the
     // interval time and will be reset when the dict is sent to backend for
@@ -270,14 +270,14 @@ oppia.factory('StatsReportingService', [
       },
       recordAnswerSubmitted: function(
           stateName, params, answer, answerGroupIndex, ruleIndex,
-          classificationCategorization) {
+          classificationCategorization, feedbackIsUseful) {
         if (ENABLE_NEW_STATS_FRAMEWORK) {
           if (!aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
             createDefaultStateStatsMapping(stateName);
           }
           aggregatedStats.state_stats_mapping[
             stateName].total_answers_count += 1
-          if (classificationCategorization !== DEFAULT_OUTCOME_CLASSIFICATION) {
+          if (feedbackIsUseful) {
             aggregatedStats.state_stats_mapping[
               stateName].useful_feedback_count += 1
           }

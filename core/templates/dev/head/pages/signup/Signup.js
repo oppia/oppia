@@ -17,10 +17,10 @@
  */
 
 oppia.controller('Signup', [
-  '$scope', '$http', '$rootScope', '$modal', 'alertsService', 'urlService',
+  '$scope', '$http', '$rootScope', '$modal', 'AlertsService', 'UrlService',
   'FocusManagerService', 'siteAnalyticsService', 'UrlInterpolationService',
   function(
-      $scope, $http, $rootScope, $modal, alertsService, urlService,
+      $scope, $http, $rootScope, $modal, AlertsService, UrlService,
       FocusManagerService, siteAnalyticsService, UrlInterpolationService) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
@@ -70,7 +70,7 @@ oppia.controller('Signup', [
       if ($scope.hasUsername) {
         return;
       }
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $scope.blurredAtLeastOnce = true;
       $scope.updateWarningText(username);
       if (!$scope.warningI18nCode) {
@@ -115,7 +115,7 @@ oppia.controller('Signup', [
     $scope.submitPrerequisitesForm = function(
         agreedToTerms, username, canReceiveEmailUpdates) {
       if (!agreedToTerms) {
-        alertsService.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
+        AlertsService.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
         return;
       }
 
@@ -130,7 +130,7 @@ oppia.controller('Signup', [
 
       var defaultDashboard = constants.DASHBOARD_TYPE_LEARNER;
       var returnUrl = window.decodeURIComponent(
-        urlService.getUrlParams().return_url);
+        UrlService.getUrlParams().return_url);
 
       if (returnUrl.indexOf('creator_dashboard') !== -1) {
         defaultDashboard = constants.DASHBOARD_TYPE_CREATOR;
@@ -169,7 +169,7 @@ oppia.controller('Signup', [
       $scope.submissionInProcess = true;
       $http.post(_SIGNUP_DATA_URL, requestParams).then(function() {
         window.location = window.decodeURIComponent(
-          urlService.getUrlParams().return_url);
+          UrlService.getUrlParams().return_url);
       }, function() {
         $scope.submissionInProcess = false;
       });

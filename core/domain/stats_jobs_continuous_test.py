@@ -104,10 +104,16 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             time.sleep(1)
             stats_jobs_continuous._STATE_COUNTER_CUTOFF_DATE = (  # pylint: disable=protected-access
                 datetime.datetime.utcnow())
-            original_init_state = exploration.init_state_name
             new_init_state_name = 'New init state'
-            exploration.rename_state(original_init_state, new_init_state_name)
-            exp_services._save_exploration('owner', exploration, '', [])  # pylint: disable=protected-access
+            original_init_state = exploration.init_state_name
+            change_list = [{
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': original_init_state,
+                'new_state_name': new_init_state_name
+            }]
+            exp_services.update_exploration(
+                'owner', exploration.id, change_list, '')
+            exploration = exp_services.get_exploration_by_id(exp_id)
             exp_version = 2
             state2_name = 'sid2'
 
@@ -508,6 +514,58 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             }]
 
             self.assertEqual(calculation_output, expected_calculation_output)
+
+    def test_one_answer_ignored_for_deleted_exploration(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS):
+
+            # setup example exploration
+            exp_id = 'eid'
+            exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
+            first_state_name = exp.init_state_name
+            exp_services.update_exploration('fake@user.com', exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': first_state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': 'MultipleChoiceInput',
+            }], 'Update interaction type')
+            exp = exp_services.get_exploration_by_id(exp_id)
+            exp_version = exp.version
+
+            time_spent = 5.0
+            params = {}
+
+            self._record_start(
+                exp_id, exp_version, first_state_name, 'session1')
+            self.process_and_flush_pending_tasks()
+
+            # Add an answer.
+            event_services.AnswerSubmissionEventHandler.record(
+                exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
+                0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
+                params, 'answer1')
+
+            # Delete the exploration.
+            exp_services.delete_exploration('fake@user.com', exp_id)
+
+            # Now run the job.
+            ModifiedInteractionAnswerSummariesAggregator.start_computation()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+
+            # There should be no job output corresponding to all versions since
+            # the exploration was deleted before the job could run. Note that
+            # this applies regardless of whether the job runs before or after
+            # deletion of the exploration.
+            calc_output_model = self._get_calc_output_model(
+                exp_id, first_state_name, 'AnswerFrequencies')
+            self.assertIsNone(calc_output_model)
 
     def test_answers_across_multiple_exploration_versions(self):
         with self.swap(
@@ -953,15 +1011,16 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             }]
 
             # Only includes versions 3-4 since version 2 has a different
-            # interaction ID.
+            # interaction ID. Note that the output is dependent on the order of
+            # submission (verb submitted before 2 -> verb ranked higher).
             expected_calculation_all_versions_output = [{
                 'answer': 'noun',
                 'frequency': 2
             }, {
-                'answer': '2',
+                'answer': 'verb',
                 'frequency': 1
             }, {
-                'answer': 'verb',
+                'answer': '2',
                 'frequency': 1
             }]
 

@@ -18,20 +18,20 @@
 
 oppia.controller('StateInteraction', [
   '$scope', '$http', '$rootScope', '$modal', '$injector', '$filter',
-  'alertsService', 'editorContextService', 'HtmlEscaperService',
+  'AlertsService', 'EditorStateService', 'HtmlEscaperService',
   'INTERACTION_SPECS', 'stateInteractionIdService',
   'stateCustomizationArgsService', 'editabilityService',
-  'explorationStatesService', 'graphDataService', 
+  'explorationStatesService', 'graphDataService',
   'InteractionDetailsCacheService',
-  'oppiaExplorationHtmlFormatterService', 'UrlInterpolationService',
+  'ExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
   function($scope, $http, $rootScope, $modal, $injector, $filter,
-      alertsService, editorContextService, HtmlEscaperService,
+      AlertsService, EditorStateService, HtmlEscaperService,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
       explorationStatesService, graphDataService,
       InteractionDetailsCacheService,
-      oppiaExplorationHtmlFormatterService, UrlInterpolationService,
+      ExplorationHtmlFormatterService, UrlInterpolationService,
       SubtitledHtmlObjectFactory, stateSolutionService, stateContentService) {
     var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
 
@@ -66,7 +66,7 @@ oppia.controller('StateInteraction', [
       if (!stateInteractionIdService.savedMemento) {
         return '';
       }
-      return oppiaExplorationHtmlFormatterService.getInteractionHtml(
+      return ExplorationHtmlFormatterService.getInteractionHtml(
         stateInteractionIdService.savedMemento, interactionCustomizationArgs);
     };
 
@@ -75,7 +75,7 @@ oppia.controller('StateInteraction', [
 
       InteractionDetailsCacheService.reset();
 
-      $scope.stateName = editorContextService.getActiveStateName();
+      $scope.stateName = EditorStateService.getActiveStateName();
 
       stateInteractionIdService.init(
         $scope.stateName, stateData.interaction.id);
@@ -83,7 +83,7 @@ oppia.controller('StateInteraction', [
         $scope.stateName, stateData.interaction.customizationArgs);
 
       stateSolutionService.init(
-        editorContextService.getActiveStateName(),
+        EditorStateService.getActiveStateName(),
         stateData.interaction.solution);
 
       $rootScope.$broadcast('initializeAnswerGroups', {
@@ -104,7 +104,7 @@ oppia.controller('StateInteraction', [
     // active state is a terminal one.
     var updateDefaultTerminalStateContentIfEmpty = function() {
       // Get current state.
-      var stateName = editorContextService.getActiveStateName();
+      var stateName = EditorStateService.getActiveStateName();
 
       // Check if the content is currently empty, as expected.
       var previousContent = stateContentService.savedMemento;
@@ -149,7 +149,7 @@ oppia.controller('StateInteraction', [
 
     $scope.openInteractionCustomizerModal = function() {
       if (editabilityService.isEditable()) {
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
         $modal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -161,13 +161,13 @@ oppia.controller('StateInteraction', [
             '$scope', '$modalInstance', '$injector', 'stateSolutionService',
             'stateInteractionIdService', 'stateCustomizationArgsService',
             'InteractionDetailsCacheService', 'INTERACTION_SPECS',
-            'UrlInterpolationService', 'editorFirstTimeEventsService',
+            'UrlInterpolationService', 'EditorFirstTimeEventsService',
             function(
                 $scope, $modalInstance, $injector, stateSolutionService,
                 stateInteractionIdService, stateCustomizationArgsService,
                 InteractionDetailsCacheService, INTERACTION_SPECS,
-                UrlInterpolationService, editorFirstTimeEventsService) {
-              editorFirstTimeEventsService
+                UrlInterpolationService, EditorFirstTimeEventsService) {
+              EditorFirstTimeEventsService
                 .registerFirstClickAddInteractionEvent();
 
               // This binds the services to the HTML template, so that their
@@ -229,7 +229,7 @@ oppia.controller('StateInteraction', [
               }
 
               $scope.onChangeInteractionId = function(newInteractionId) {
-                editorFirstTimeEventsService
+                EditorFirstTimeEventsService
                   .registerFirstSelectInteractionTypeEvent();
 
                 var interactionSpec = INTERACTION_SPECS[newInteractionId];
@@ -303,7 +303,7 @@ oppia.controller('StateInteraction', [
               };
 
               $scope.save = function() {
-                editorFirstTimeEventsService
+                EditorFirstTimeEventsService
                   .registerFirstSaveInteractionEvent();
                 $modalInstance.close();
               };
@@ -325,7 +325,7 @@ oppia.controller('StateInteraction', [
     };
 
     $scope.deleteInteraction = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
       $modal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
@@ -339,7 +339,7 @@ oppia.controller('StateInteraction', [
 
             $scope.cancel = function() {
               $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              AlertsService.clearWarnings();
             };
           }
         ]
@@ -417,11 +417,11 @@ oppia.directive('testInteractionPanel', [
         '/pages/exploration_editor/editor_tab/' +
         'test_interaction_modal_directive.html'),
       controller: [
-        '$scope', 'editorContextService', 'explorationStatesService',
+        '$scope', 'EditorStateService', 'explorationStatesService',
         'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-        function($scope, editorContextService, explorationStatesService,
+        function($scope, EditorStateService, explorationStatesService,
             INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE) {
-          var _stateName = editorContextService.getActiveStateName();
+          var _stateName = EditorStateService.getActiveStateName();
           var _state = explorationStatesService.getState(_stateName);
           $scope.interactionIsInline = (
             INTERACTION_SPECS[_state.interaction.id].display_mode ===

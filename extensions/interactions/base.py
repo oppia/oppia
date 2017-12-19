@@ -136,7 +136,10 @@ class BaseInteraction(object):
             factory_cls = (
                 visualization_registry.Registry.get_visualization_class(
                     spec['id']))
-            result.append(factory_cls(spec['calculation_id'], spec['options']))
+            result.append(
+                factory_cls(
+                    spec['calculation_id'], spec['options'],
+                    spec['show_addressed_info']))
         return result
 
     @property

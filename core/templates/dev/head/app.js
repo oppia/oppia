@@ -24,7 +24,7 @@ var oppia = angular.module(
     'ngMaterial', 'ngAnimate', 'ngAudio', 'ngSanitize', 'ngTouch', 'ngResource',
     'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
     'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
-    'toastr'
+    'toastr', 'headroom'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
@@ -77,13 +77,13 @@ oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
     '$delegate', '$document', '$modal', '$timeout', 'FocusManagerService',
-    'taRegisterTool', 'rteHelperService', 'alertsService',
-    'explorationContextService', 'PAGE_CONTEXT',
+    'taRegisterTool', 'rteHelperService', 'AlertsService',
+    'ExplorationContextService', 'PAGE_CONTEXT',
     'UrlInterpolationService',
     function(
       taOptions, $document, $modal, $timeout, FocusManagerService,
-      taRegisterTool, rteHelperService, alertsService,
-      explorationContextService, PAGE_CONTEXT,
+      taRegisterTool, rteHelperService, AlertsService,
+      ExplorationContextService, PAGE_CONTEXT,
       UrlInterpolationService) {
       taOptions.disableSanitizer = true;
       taOptions.forceTextAngularSanitize = false;
@@ -163,7 +163,7 @@ oppia.config(['$provide', function($provide) {
 
       rteHelperService.getRichTextComponents().forEach(function(componentDefn) {
         var buttonDisplay = rteHelperService.createToolbarIcon(componentDefn);
-        var canUseFs = explorationContextService.getPageContext() ===
+        var canUseFs = ExplorationContextService.getPageContext() ===
           PAGE_CONTEXT.EDITOR;
 
         taRegisterTool(componentDefn.id, {
@@ -185,7 +185,7 @@ oppia.config(['$provide', function($provide) {
               if (!canUseFs && componentDefn.requiresFs) {
                 var FS_UNAUTHORIZED_WARNING = 'Unfortunately, only ' +
                   'exploration authors can make changes involving files.';
-                alertsService.addWarning(FS_UNAUTHORIZED_WARNING);
+                AlertsService.addWarning(FS_UNAUTHORIZED_WARNING);
                 // Without this, the view will not update to show the warning.
                 textAngular.$editor().$parent.$apply();
                 return;
@@ -302,7 +302,7 @@ oppia.config([
     // Add an interceptor to convert requests to strings and to log and show
     // warnings for error responses.
     $httpProvider.interceptors.push([
-      '$q', '$log', 'alertsService', function($q, $log, alertsService) {
+      '$q', '$log', 'AlertsService', function($q, $log, AlertsService) {
         return {
           request: function(config) {
             if (config.data) {
@@ -327,7 +327,7 @@ oppia.config([
               if (rejection.data && rejection.data.error) {
                 warningMessage = rejection.data.error;
               }
-              alertsService.addWarning(warningMessage);
+              AlertsService.addWarning(warningMessage);
             }
             return $q.reject(rejection);
           }
@@ -377,22 +377,6 @@ oppia.config(['toastrConfig', function(toastrConfig) {
   });
 }]);
 
-// Returns true if the user is on a mobile device.
-// See: http://stackoverflow.com/a/14301832/5020618
-oppia.factory('deviceInfoService', ['$window', function($window) {
-  return {
-    isMobileDevice: function() {
-      return typeof $window.orientation !== 'undefined';
-    },
-    isMobileUserAgent: function() {
-      return /Mobi/.test(navigator.userAgent);
-    },
-    hasTouchEvents: function() {
-      return 'ontouchstart' in $window;
-    }
-  };
-}]);
-
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
 oppia.factory('$exceptionHandler', ['$log', function($log) {
@@ -431,46 +415,11 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
   };
 }]);
 
-// Service for converting dates in milliseconds since the Epoch to
-// human-readable dates.
-oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
-  return {
-    // Returns just the time if the local datetime representation has the
-    // same date as the current date. Otherwise, returns just the date if the
-    // local datetime representation has the same year as the current date.
-    // Otherwise, returns the full date (with the year abbreviated).
-    getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
-      var date = new Date(millisSinceEpoch);
-      if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
-        return date.toLocaleTimeString([], {
-          hour: 'numeric',
-          minute: 'numeric',
-          hour12: true
-        });
-      } else if (date.getFullYear() === new Date().getFullYear()) {
-        return $filter('date')(date, 'MMM d');
-      } else {
-        return $filter('date')(date, 'shortDate');
-      }
-    },
-    // Returns just the date.
-    getLocaleDateString: function(millisSinceEpoch) {
-      var date = new Date(millisSinceEpoch);
-      return date.toLocaleDateString();
-    },
-    // Returns whether the date is at most one week before the current date.
-    isRecent: function(millisSinceEpoch) {
-      var ONE_WEEK_IN_MILLIS = 7 * 24 * 60 * 60 * 1000;
-      return new Date().getTime() - millisSinceEpoch < ONE_WEEK_IN_MILLIS;
-    }
-  };
-}]);
-
 oppia.factory('rteHelperService', [
-  '$filter', '$log', '$interpolate', 'explorationContextService',
+  '$filter', '$log', '$interpolate', 'ExplorationContextService',
   'RTE_COMPONENT_SPECS', 'HtmlEscaperService', 'UrlInterpolationService',
   function(
-      $filter, $log, $interpolate, explorationContextService,
+      $filter, $log, $interpolate, ExplorationContextService,
       RTE_COMPONENT_SPECS, HtmlEscaperService, UrlInterpolationService) {
     var _RICH_TEXT_COMPONENTS = [];
 
@@ -525,7 +474,7 @@ oppia.factory('rteHelperService', [
       // Returns a DOM node.
       createRteElement: function(componentDefn, customizationArgsDict) {
         var el = $('<img/>');
-        if (explorationContextService.isInExplorationContext()) {
+        if (ExplorationContextService.isInExplorationContext()) {
           // TODO(sll): This extra key was introduced in commit
           // 19a934ce20d592a3fc46bd97a2f05f41d33e3d66 in order to retrieve an
           // image for RTE previews. However, it has had the unfortunate side-
@@ -534,7 +483,7 @@ oppia.factory('rteHelperService', [
           // convertRteToHtml(), but we need to find a less invasive way to
           // handle previews.
           customizationArgsDict = angular.extend(customizationArgsDict, {
-            explorationId: explorationContextService.getExplorationId()
+            explorationId: ExplorationContextService.getExplorationId()
           });
         }
         var componentPreviewUrlTemplate = componentDefn.previewUrlTemplate;
@@ -659,30 +608,6 @@ oppia.factory('urlService', ['$window', function($window) {
     },
     getPathname: function() {
       return window.location.pathname;
-    }
-  };
-}]);
-
-// Service for computing the window dimensions.
-oppia.factory('windowDimensionsService', ['$window', function($window) {
-  var onResizeHooks = [];
-  angular.element($window).bind('resize', function() {
-    onResizeHooks.forEach(function(hookFn) {
-      hookFn();
-    });
-  });
-  return {
-    getWidth: function() {
-      return (
-        $window.innerWidth || document.documentElement.clientWidth ||
-        document.body.clientWidth);
-    },
-    registerOnResizeHook: function(hookFn) {
-      onResizeHooks.push(hookFn);
-    },
-    isWindowNarrow: function() {
-      var NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
-      return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
     }
   };
 }]);
@@ -862,19 +787,6 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
   };
 }]);
 
-// Shim service for functions on $window that allows these functions to be
-// mocked in unit tests.
-oppia.factory('currentLocationService', ['$window', function($window) {
-  return {
-    getHash: function() {
-      return $window.location.hash;
-    },
-    getPathname: function() {
-      return $window.location.pathname;
-    }
-  };
-}]);
-
 // Service for assembling extension tags (for interactions).
 oppia.factory('extensionTagAssemblerService', [
   '$filter', 'HtmlEscaperService', function($filter, HtmlEscaperService) {
@@ -918,3 +830,10 @@ if (typeof Object.create !== 'function') {
     };
   })();
 }
+
+// Add a Number.isInteger() polyfill for IE.
+Number.isInteger = Number.isInteger || function(value) {
+  return (
+    typeof value === 'number' && isFinite(value) &&
+    Math.floor(value) === value);
+};

@@ -97,6 +97,7 @@ class ConfigProperty(object):
     - splash_page_exploration_id
     - splash_page_exploration_version
     - splash_page_youtube_video_id
+    - ssl_challenge_responses
     - whitelisted_email_senders
     """
 

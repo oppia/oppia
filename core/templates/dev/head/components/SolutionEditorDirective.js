@@ -18,17 +18,17 @@
 
 oppia.directive('solutionEditor', [
   '$modal', 'UrlInterpolationService', 'stateSolutionService',
-  'editorContextService', 'explorationStatesService',
-  'explorationWarningsService', 'alertsService',
+  'EditorStateService', 'explorationStatesService',
+  'ExplorationWarningsService', 'AlertsService',
   'SolutionObjectFactory', 'SolutionVerificationService',
-  'explorationContextService', 'oppiaExplorationHtmlFormatterService',
+  'ExplorationContextService', 'ExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateCustomizationArgsService',
   'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function($modal, UrlInterpolationService, stateSolutionService,
-           editorContextService, explorationStatesService,
-           explorationWarningsService, alertsService,
+           EditorStateService, explorationStatesService,
+           ExplorationWarningsService, AlertsService,
            SolutionObjectFactory, SolutionVerificationService,
-           explorationContextService, oppiaExplorationHtmlFormatterService,
+           ExplorationContextService, ExplorationHtmlFormatterService,
            stateInteractionIdService, stateCustomizationArgsService,
            INFO_MESSAGE_SOLUTION_IS_INVALID) {
     return {
@@ -50,7 +50,7 @@ oppia.directive('solutionEditor', [
           };
 
           $scope.getAnswerHtml = function () {
-            return oppiaExplorationHtmlFormatterService.getAnswerHtml(
+            return ExplorationHtmlFormatterService.getAnswerHtml(
               stateSolutionService.savedMemento.correctAnswer,
               stateInteractionIdService.savedMemento,
               stateCustomizationArgsService.savedMemento);
@@ -64,22 +64,22 @@ oppia.directive('solutionEditor', [
               backdrop: 'static',
               controller: [
                 '$scope', '$modalInstance', 'stateInteractionIdService',
-                'stateSolutionService', 'editorContextService',
-                'oppiaExplorationHtmlFormatterService',
+                'stateSolutionService', 'EditorStateService',
+                'ExplorationHtmlFormatterService',
                 'explorationStatesService',
                 function($scope, $modalInstance, stateInteractionIdService,
-                         stateSolutionService, editorContextService,
-                         oppiaExplorationHtmlFormatterService,
+                         stateSolutionService, EditorStateService,
+                         ExplorationHtmlFormatterService,
                          explorationStatesService) {
                   $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
                     'currentCorrectAnswerEditorHtmlForSolutionEditor');
                   $scope.correctAnswer = null;
                   $scope.correctAnswerEditorHtml = (
-                    oppiaExplorationHtmlFormatterService.getInteractionHtml(
+                    ExplorationHtmlFormatterService.getInteractionHtml(
                       stateInteractionIdService.savedMemento,
                       /* eslint-disable max-len */
                       explorationStatesService.getInteractionCustomizationArgsMemento(
-                        editorContextService.getActiveStateName()),
+                        EditorStateService.getActiveStateName()),
                       /* eslint-enable max-len */
                       $scope.SOLUTION_EDITOR_FOCUS_LABEL));
                   $scope.EXPLANATION_FORM_SCHEMA = {
@@ -113,31 +113,24 @@ oppia.directive('solutionEditor', [
 
                   $scope.cancel = function() {
                     $modalInstance.dismiss('cancel');
-                    alertsService.clearWarnings();
+                    AlertsService.clearWarnings();
                   };
                 }
               ]
             }).result.then(function(result) {
               var correctAnswer = result.solution.correctAnswer;
-              var currentStateName = editorContextService.getActiveStateName();
+              var currentStateName = EditorStateService.getActiveStateName();
               var state = explorationStatesService.getState(currentStateName);
-              SolutionVerificationService.verifySolution(
-                explorationContextService.getExplorationId(),
-                state,
-                correctAnswer,
-                function () {
-                  explorationStatesService.updateSolutionValidity(
-                    currentStateName, true);
-                  explorationWarningsService.updateWarnings();
-                },
-                function () {
-                  explorationStatesService.updateSolutionValidity(
-                    currentStateName, false);
-                  explorationWarningsService.updateWarnings();
-                  alertsService.addInfoMessage(
-                    INFO_MESSAGE_SOLUTION_IS_INVALID);
-                }
-              );
+              var solutionIsValid = SolutionVerificationService.verifySolution(
+                ExplorationContextService.getExplorationId(), state,
+                correctAnswer);
+
+              explorationStatesService.updateSolutionValidity(
+                currentStateName, solutionIsValid);
+              ExplorationWarningsService.updateWarnings();
+              if (!solutionIsValid) {
+                AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+              }
 
               stateSolutionService.displayed = result.solution;
               stateSolutionService.saveDisplayedValue();

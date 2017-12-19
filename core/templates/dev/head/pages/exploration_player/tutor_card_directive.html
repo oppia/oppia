@@ -39,7 +39,8 @@
         <div ng-if="!$last || !isInteractionInline">
           <input-response-pair data="responsePair"
                                 profile-picture="profilePicture"
-                                oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL">
+                                oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
+                                input-response-pair-id="getInputResponsePairId($index)">
           </input-response-pair>
         </div>
       </div>
@@ -49,7 +50,8 @@
     <div class="conversation-skin-tutor-card-bottom-section" ng-if="isInteractionInline && activeCard.inputResponsePairs.length > 0">
       <input-response-pair data="activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1]"
                             profile-picture="profilePicture"
-                            oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL">
+                            oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
+                            input-response-pair-id="getInputResponsePairId(activeCard.inputResponsePairs.length - 1)">
       </input-response-pair>
     </div>
 
@@ -67,7 +69,7 @@
     (!isOnTerminalCard() || !isIframed || activeCard.destStateName)">
       <div class="conversation-skin-inline-interaction">
         <div ng-if="activeCard.destStateName && activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1].oppiaResponse">
-          <md-button class="oppia-learner-continue-button protractor-test-continue-to-next-card-button"
+          <md-button class="oppia-learner-confirm-button protractor-test-continue-to-next-card-button"
                      ng-if="!isIframed"
                      focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
                      ng-click="onClickContinueButton()"
@@ -82,10 +84,11 @@
                angular-html-bind="activeCard.interactionHtml">
           </div>
           <div ng-if="hintsExist" style="text-align: right">
-            <hint-button ng-if="!areAllHintsExhausted()"
+            <hint-button ng-show="!areAllHintsExhausted() || (areAllHintsExhausted() && !solutionExists)"
                          on-click-hint-button="consumeHint()"
                          current-hint-is-available="isHintAvailable()"
-                         all-hints-are-exhausted="areAllHintsExhausted()">
+                         all-hints-are-exhausted="areAllHintsExhausted()"
+                         is-supplemental-card="false">
             </hint-button>
             <solution-button ng-if="areAllHintsExhausted()"
                              on-click-solution-button="viewSolution()"

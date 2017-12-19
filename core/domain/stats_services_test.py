@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import operator
 import os
 
 from core import jobs_registry
@@ -465,6 +466,22 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_starts_v2, 15)
         self.assertEqual(exploration_stats.num_actual_starts_v2, 5)
         self.assertEqual(exploration_stats.num_completions_v2, 2)
+
+    def test_get_exploration_stats_multi(self):
+        """Test the get_exploration_stats_multi method."""
+        stats_models.ExplorationStatsModel.create(
+            'exp_id2', 2, 10, 0, 0, 0, 0, 0, {})
+        exp_version_references = [
+            exp_domain.ExpVersionReference(self.exp_id, self.exp_version),
+            exp_domain.ExpVersionReference('exp_id2', 2)]
+
+        exp_stats_list = stats_services.get_exploration_stats_multi(
+            exp_version_references)
+        self.assertEqual(len(exp_stats_list), 2)
+        self.assertEqual(exp_stats_list[0].exp_id, self.exp_id)
+        self.assertEqual(exp_stats_list[0].exp_version, self.exp_version)
+        self.assertEqual(exp_stats_list[1].exp_id, 'exp_id2')
+        self.assertEqual(exp_stats_list[1].exp_version, 2)
 
 
 class ModifiedStatisticsAggregator(stats_jobs_continuous.StatisticsAggregator):
@@ -1107,6 +1124,9 @@ class SampleAnswerTests(test_utils.GenericTestBase):
 # TODO(bhenning): Either add tests for multiple visualizations for one state or
 # disallow stats from having multiple visualizations (no interactions currently
 # seem to use more than one visualization ID).
+
+# TODO(bhenning): Add tests for each possible visualization
+# (TopAnswersByCategorization is not currently used yet by any interactions).
 class AnswerVisualizationsTests(test_utils.GenericTestBase):
     """Tests for functionality related to retrieving visualization information
     for answers.
@@ -1258,14 +1278,15 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             visualization = visualizations[0]
             self.assertEqual(visualization['id'], 'FrequencyTable')
+            # Ties will appear in same order they are submitted in.
             self.assertEqual(visualization['data'], [{
                 'answer': 'Answer A',
                 'frequency': 3
             }, {
-                'answer': 'Answer B',
+                'answer': 'Answer C',
                 'frequency': 1
             }, {
-                'answer': 'Answer C',
+                'answer': 'Answer B',
                 'frequency': 1
             }])
 
@@ -1278,8 +1299,9 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self._record_answer(['A'], exp_id=self.SET_INPUT_EXP_ID)
             self._record_answer(['A', 'B'], exp_id=self.SET_INPUT_EXP_ID)
             self._run_answer_summaries_aggregator()
-            visualizations = sorted(self._get_visualizations(
-                exp_id=self.SET_INPUT_EXP_ID))
+            visualizations = sorted(
+                self._get_visualizations(exp_id=self.SET_INPUT_EXP_ID),
+                key=operator.itemgetter('data'))
             self.assertEqual(len(visualizations), 2)
 
             # Use options to distinguish between the two visualizations, since
@@ -1306,7 +1328,10 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self.assertEqual(
                 common_elements_visualization['options']['column_headers'],
                 ['Element', 'Count'])
-            self.assertEqual(common_elements_visualization['data'], [{
+
+            common_visualization_data = (
+                common_elements_visualization['data'])
+            self.assertEqual(common_visualization_data, [{
                 'answer': 'A',
                 'frequency': 6
             }, {
