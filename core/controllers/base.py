@@ -275,8 +275,16 @@ class BaseHandler(webapp2.RequestHandler):
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
-    def get_logout_url(self, redirect_url_on_logout):
-        """Returns logout url."""
+    def _get_logout_url(self, redirect_url_on_logout):
+        """Prepares and returns logout url which will be handled
+        by LogoutPage handler.
+
+        Args:
+            redirect_url_on_logout: string. URL to redirect to on logout.
+
+        Returns:
+            string. logout url.
+        """
         return current_user_services.create_logout_url(redirect_url_on_logout)
 
     def render_template(
@@ -360,7 +368,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         if self.user_id:
             values['login_url'] = None
-            values['logout_url'] = self.get_logout_url(redirect_url_on_logout)
+            values['logout_url'] = self._get_logout_url(redirect_url_on_logout)
         else:
             target_url = (
                 '/' if self.request.uri.endswith(feconf.SPLASH_URL)

@@ -522,11 +522,6 @@ class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
                     handler.__name__ == 'Error404Handler'):
                 continue
 
-            # Following handler is present in editor.py where acl_decorators
-            # cannot be imported.
-            if handler.__name__ == 'EditorLogoutHandler':
-                continue
-
             if handler.get != base.BaseHandler.get:
                 handler_is_decorated = hasattr(handler.get, '__wrapped__')
                 handlers_checked.append(

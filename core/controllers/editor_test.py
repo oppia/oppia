@@ -415,46 +415,69 @@ class EditorTest(BaseEditorControllerTest):
 class ExplorationEditorLogoutTest(BaseEditorControllerTest):
     """Test handler for logout from exploration editor page."""
 
+    def test_logout_from_invalid_url(self):
+        """Logout from invalid exploration id should should result
+        in 404 error.
+        """
+
+        invalid_current_page = '%s/%s' % (
+            feconf.EDITOR_URL_PREFIX, 'invalid_eid')
+        invalid_logout_url = (
+            '/exploration_editor_logout?return_url=%s' % invalid_current_page)
+
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(invalid_logout_url, expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+        self.logout()
+
     def test_logout_from_unpublished_exploration_editor(self):
         """Logout from unpublished exploration should redirect
-        to library page."""
+        to library page.
+        """
 
         unpublished_exp_id = 'unpublished_eid'
         exploration = exp_domain.Exploration.create_default_exploration(
             unpublished_exp_id)
         exp_services.save_new_exploration(self.owner_id, exploration)
 
-        current_page = '%s/%s' % (feconf.EDITOR_URL_PREFIX, unpublished_exp_id)
+        current_page_url = '%s/%s' % (
+            feconf.EDITOR_URL_PREFIX, unpublished_exp_id)
         self.login(self.OWNER_EMAIL)
-        response = self.testapp.get(current_page, expect_errors=False)
+        response = self.testapp.get(current_page_url, expect_errors=False)
         self.assertEqual(response.status_int, 200)
 
         response = self.testapp.get(
-            '/exploration_editor_logout?return_url=%s' % current_page)
+            '/exploration_editor_logout?return_url=%s' % current_page_url)
+        self.assertEqual(response.status_int, 302)
+        response = response.follow()
         self.assertEqual(response.status_int, 302)
         self.assertIn('library', response.headers['location'])
         self.logout()
 
     def test_logout_from_published_exploration_editor(self):
         """Logout from published exploration should redirect
-        to same page."""
+        to same page.
+        """
 
         published_exp_id = 'published_eid'
         exploration = exp_domain.Exploration.create_default_exploration(
             published_exp_id)
         exp_services.save_new_exploration(self.owner_id, exploration)
 
-        current_page = '%s/%s' % (feconf.EDITOR_URL_PREFIX, published_exp_id)
+        current_page_url = '%s/%s' % (
+            feconf.EDITOR_URL_PREFIX, published_exp_id)
         self.login(self.OWNER_EMAIL)
-        response = self.testapp.get(current_page, expect_errors=False)
+        response = self.testapp.get(current_page_url, expect_errors=False)
         self.assertEqual(response.status_int, 200)
 
         rights_manager.publish_exploration(self.owner, published_exp_id)
 
         response = self.testapp.get(
-            '/exploration_editor_logout?return_url=%s' % current_page)
+            '/exploration_editor_logout?return_url=%s' % current_page_url)
         self.assertEqual(response.status_int, 302)
-        self.assertIn(current_page, response.headers['location'])
+        response = response.follow()
+        self.assertEqual(response.status_int, 302)
+        self.assertIn(current_page_url, response.headers['location'])
         self.logout()
 
 
