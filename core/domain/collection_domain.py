@@ -1083,7 +1083,8 @@ class Collection(object):
                 raise ValueError(
                     'Skill with name "%s" already exists.' % skill_name)
 
-        skill_id = CollectionSkill.get_skill_id_from_index(self.next_skill_index)
+        skill_id = CollectionSkill.get_skill_id_from_index(
+            self.next_skill_index)
         self.skills[skill_id] = CollectionSkill(skill_id, skill_name, [])
         self.next_skill_index += 1
         return skill_id

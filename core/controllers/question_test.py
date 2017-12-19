@@ -79,12 +79,13 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         collection_services.record_played_exploration_in_collection_context(
             self.new_user_id, self.collection_id, self.exp_id)
+        self.payload = {}
 
     def test_get(self):
         """Test to verify the get method."""
-        self.payload = {}
         self.payload['collection_id'] = self.collection_id
-        self.payload['stringified_skill_ids'] = json.dumps([self.skill_id, 'test'])
+        self.payload['stringified_skill_ids'] = json.dumps(
+            [self.skill_id, 'test'])
 
         self.login(self.NEW_USER_EMAIL)
         response_json = self.get_json(

@@ -170,7 +170,7 @@ def apply_change_list(question_id, change_list):
                         change.user_id)
                 elif (change.cmd ==
                       question_domain.QUESTION_PROPERTY_DELETE_SKILL):
-                    remove_skill(
+                    remove_question_id_from_skill(
                         question.id, question.collection_id, change.skill_id,
                         change.user_id)
 
@@ -253,7 +253,8 @@ def add_question_id_to_skill(question_id, collection_id, skill_id, user_id):
             question_id, skill_id))
 
 
-def remove_question_id_from_skill(question_id, collection_id, skill_id, user_id):
+def remove_question_id_from_skill(
+        question_id, collection_id, skill_id, user_id):
     """Removes the question id from the question list of the appropriate
     skill.
 

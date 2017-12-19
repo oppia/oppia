@@ -16,7 +16,6 @@
 
 """Domain objects relating to questions."""
 
-from core.domain import collection_services
 from core.domain import exp_domain
 from core.platform import models
 from constants import constants

@@ -160,7 +160,8 @@ def get_collection_from_model(collection_model, run_conversion=True):
             versioned_collection_contents[
                 'collection_contents']['skills'].iteritems()
         },
-        versioned_collection_contents['collection_contents']['next_skill_index'],
+        versioned_collection_contents[
+            'collection_contents']['next_skill_index'],
         collection_model.version, collection_model.created_on,
         collection_model.last_updated)
 

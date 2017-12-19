@@ -16,11 +16,8 @@
 
 """Tests for question domain objects."""
 
-from core.domain import collection_domain
-from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import question_domain
-from core.domain import question_services
 from core.tests import test_utils
 import utils
 
