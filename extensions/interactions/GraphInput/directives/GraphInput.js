@@ -331,6 +331,8 @@ oppia.directive('graphViz', [
             initButtons();
             if ($scope.buttons.length > 0) {
               $scope.state.currentMode = $scope.buttons[0].mode;
+            } else {
+              $scope.interactionIsActive = false;
             }
           };
 
@@ -600,6 +602,9 @@ oppia.directive('graphViz', [
           var SELECT_COLOR = 'orange';
           var DEFAULT_COLOR = 'black';
           $scope.getEdgeColor = function(index) {
+            if (!$scope.interactionIsActive) {
+              return DEFAULT_COLOR;
+            }
             if ($scope.state.currentMode === _MODES.DELETE &&
                 index === $scope.state.hoveredEdge &&
                 $scope.canDeleteEdge) {
@@ -613,6 +618,9 @@ oppia.directive('graphViz', [
             }
           };
           $scope.getVertexColor = function(index) {
+            if (!$scope.interactionIsActive) {
+              return DEFAULT_COLOR;
+            }
             if ($scope.state.currentMode === _MODES.DELETE &&
                 index === $scope.state.hoveredVertex &&
                 $scope.canDeleteVertex) {
