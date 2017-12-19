@@ -34,17 +34,16 @@ oppia.factory('OutcomeObjectFactory', [
         param_changes: this.paramChanges
       };
     };
-
     /** Returns true iff an outcome has a self-loop and no feedback. */
     Outcome.prototype.isConfusing = function(currentStateName) {
       return (
         this.dest === currentStateName &&
-        !this.feedback.getHtml().trim().length > 0
+        !this.hasNonemptyFeedback()
       );
     };
 
     Outcome.prototype.hasNonemptyFeedback = function() {
-      return !this.feedback.isEmpty();
+      return this.feedback.getHtml().trim() !== '';
     };
 
     Outcome.createNew = function(dest, feedbackText, paramChanges) {

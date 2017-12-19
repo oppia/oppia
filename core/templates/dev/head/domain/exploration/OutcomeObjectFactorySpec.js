@@ -31,10 +31,12 @@ describe('Outcome object factory', function() {
       var testOutcome2 = oof.createNew('B', '', []);
       var testOutcome3 = oof.createNew('A', 'feedback', []);
       var testOutcome4 = oof.createNew('A', '', []);
+      var testOutcome5 = oof.createNew('A', '   ', []);
       expect(testOutcome1.isConfusing(currentState)).toBe(false);
       expect(testOutcome2.isConfusing(currentState)).toBe(false);
       expect(testOutcome3.isConfusing(currentState)).toBe(false);
       expect(testOutcome4.isConfusing(currentState)).toBe(true);
+      expect(testOutcome5.isConfusing(currentState)).toBe(true);
     }
   );
 
@@ -42,8 +44,10 @@ describe('Outcome object factory', function() {
     function() {
       var testOutcome1 = oof.createNew('A', 'feedback', []);
       var testOutcome2 = oof.createNew('A', '', []);
+      var testOutcome3 = oof.createNew('A', '   ', []);
       expect(testOutcome1.hasNonemptyFeedback()).toBe(true);
       expect(testOutcome2.hasNonemptyFeedback()).toBe(false); 
+      expect(testOutcome3.hasNonemptyFeedback()).toBe(false);
     }
   );
 });

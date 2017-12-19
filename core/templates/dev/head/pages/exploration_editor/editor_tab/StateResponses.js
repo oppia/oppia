@@ -120,15 +120,10 @@ oppia.controller('StateResponses', [
     };
 
     $scope.isSelfLoopWithNoFeedback = function(outcome) {
-      var isSelfLoop = function(outcome) {
-        return (
-          outcome &&
-          outcome.dest === EditorStateService.getActiveStateName());
-      };
       if (!outcome) {
         return false;
       }
-      return isSelfLoop(outcome) && !outcome.hasNonemptyFeedback();
+      return outcome.isConfusing(EditorStateService.getActiveStateName());
     };
 
     $scope.changeActiveAnswerGroupIndex = function(newIndex) {
@@ -314,16 +309,16 @@ oppia.controller('StateResponses', [
                 AnswerClassificationService.getMatchingClassificationResult(
                   _explorationId, _stateName, _state, answer, true,
                   rulesService));
-              var feedback = 'Nothing';
+              var feedbackHtml = 'Nothing';
               var dest = classificationResult.outcome.dest;
-              if (!classificationResult.outcome.feedback.getHtml().isEmpty()) {
-                feedback = classificationResult.outcome.feedback.getHtml();
+              if (classificationResult.outcome.hasNonemptyFeedback()) {
+                feedbackHtml = classificationResult.outcome.feedback.getHtml();
               }
               if (dest === _stateName) {
                 dest = '<em>(try again)</em>';
               }
               $scope.trainingDataAnswer = answer;
-              $scope.trainingDataFeedback = feedback;
+              $scope.trainingDataFeedback = feedbackHtml;
               $scope.trainingDataOutcomeDest = dest;
 
               var answerGroupIndex =

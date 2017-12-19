@@ -2818,10 +2818,10 @@ class Exploration(object):
                     'audio_translations': {}
                 }
             for hint_dict in state_dict['interaction']['hints']:
-                hint_content = hint_dict['hint_text']
+                hint_content_html = hint_dict['hint_text']
                 del hint_dict['hint_text']
                 hint_dict['hint_content'] = {
-                    'html': hint_content,
+                    'html': hint_content_html,
                     'audio_translations': {}
                 }
             if state_dict['interaction']['solution']:
