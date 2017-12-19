@@ -28,16 +28,16 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 
 oppia.controller('Library', [
   '$scope', '$http', '$modal', '$rootScope', '$window', '$timeout',
-  'i18nIdService', 'urlService', 'ALL_CATEGORIES', 'SearchService',
-  'windowDimensionsService', 'UrlInterpolationService', 'LIBRARY_PAGE_MODES',
-  'LIBRARY_TILE_WIDTH_PX', 'alertsService',
+  'ConstructTranslationIdsService', 'UrlService', 'ALL_CATEGORIES',
+  'SearchService', 'WindowDimensionsService', 'UrlInterpolationService',
+  'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX', 'AlertsService',
   'LearnerDashboardIdsBackendApiService',
   'LearnerDashboardActivityIdsObjectFactory', 'LearnerPlaylistService',
   function(
       $scope, $http, $modal, $rootScope, $window, $timeout,
-      i18nIdService, urlService, ALL_CATEGORIES, SearchService,
-      windowDimensionsService, UrlInterpolationService, LIBRARY_PAGE_MODES,
-      LIBRARY_TILE_WIDTH_PX, alertsService,
+      ConstructTranslationIdsService, UrlService, ALL_CATEGORIES,
+      SearchService, WindowDimensionsService, UrlInterpolationService,
+      LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX, AlertsService,
       LearnerDashboardIdsBackendApiService,
       LearnerDashboardActivityIdsObjectFactory, LearnerPlaylistService) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
@@ -250,11 +250,11 @@ oppia.controller('Library', [
 
     var libraryWindowCutoffPx = 530;
     $scope.libraryWindowIsNarrow = (
-      windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+      WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
 
-    windowDimensionsService.registerOnResizeHook(function() {
+    WindowDimensionsService.registerOnResizeHook(function() {
       $scope.libraryWindowIsNarrow = (
-        windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+        WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
       $scope.$apply();
     });
   }

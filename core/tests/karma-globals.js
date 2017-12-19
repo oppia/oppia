@@ -82,7 +82,7 @@ var GLOBALS = {
   GCS_RESOURCE_BUCKET_NAME: null,
   // This prefix is needed to correctly interpolate directive template URLs in
   // Karma tests. It is referenced by UrlInterpolationService.
-  TEMPLATE_DIR_PREFIX: 'core/templates/dev/head'
+  TEMPLATE_DIR_PREFIX: '/core/templates/dev/head'
 };
 
 /* hashes for UrlInterpolationService tests */
@@ -107,9 +107,7 @@ var hashes = {
 GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS = function($provide, $translateProvider) {
   $provide.factory('customLoader', function($q) {
     return function() {
-      var deferred = $q.defer();
-      deferred.resolve({});
-      return deferred.promise;
+      return $q.resolve({});
     };
   });
   $translateProvider.useLoader('customLoader');

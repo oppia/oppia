@@ -21,7 +21,7 @@ oppia.constant('FRACTION_PARSING_ERRORS', {
   INVALID_CHARS:
     'Please only use numerical digits, spaces or forward slashes (/)',
   INVALID_FORMAT:
-    'Please enter answer in fraction format (e.g. 5/3 or 1 2/3)',
+    'Please enter a valid fraction (e.g., 5/3 or 1 2/3)',
   DIVISION_BY_ZERO: 'Please do not put 0 in the denominator'
 });
 
@@ -58,6 +58,27 @@ oppia.factory('FractionObjectFactory', [
         numerator: this.numerator,
         denominator: this.denominator
       };
+    };
+
+    Fraction.prototype.toFloat = function () {
+      var totalParts = (this.wholeNumber * this.denominator) + this.numerator;
+      var floatVal = (totalParts / this.denominator);
+      return this.isNegative ? -floatVal : floatVal;
+    };
+
+    Fraction.prototype.getIntegerPart = function () {
+      return this.isNegative ? -this.wholeNumber : this.wholeNumber;
+    };
+
+    Fraction.prototype.convertToSimplestForm = function () {
+      var gcd = function(x, y) {
+        return y === 0 ? x : gcd(y, x % y);
+      };
+      var g = gcd(this.numerator, this.denominator);
+      var numerator = this.numerator / g;
+      var denominator = this.denominator / g;
+      return new Fraction(
+        this.isNegative, this.wholeNumber, numerator, denominator);
     };
 
     Fraction.fromRawInputString = function(rawInput) {

@@ -17,11 +17,11 @@
  */
 
 oppia.factory('CompareVersionsService', [
-  '$http', '$q','VersionTreeService', 'explorationData',
+  '$http', '$q','VersionTreeService', 'ExplorationDataService',
   'ExplorationDiffService', 'StateObjectFactory', 'StatesObjectFactory',
   'ReadOnlyExplorationBackendApiService',
   function(
-      $http, $q, VersionTreeService, explorationData,
+      $http, $q, VersionTreeService, ExplorationDataService,
       ExplorationDiffService, StateObjectFactory, StatesObjectFactory,
       ReadOnlyExplorationBackendApiService) {
     /**
@@ -87,9 +87,9 @@ oppia.factory('CompareVersionsService', [
         }
         return $q.all({
           v1Data: ReadOnlyExplorationBackendApiService.loadExploration(
-            explorationData.explorationId, v1),
+            ExplorationDataService.explorationId, v1),
           v2Data: ReadOnlyExplorationBackendApiService.loadExploration(
-            explorationData.explorationId, v2)
+            ExplorationDataService.explorationId, v2)
         }).then(function(response) {
           var v1StatesDict = response.v1Data.exploration.states;
           var v2StatesDict = response.v2Data.exploration.states;

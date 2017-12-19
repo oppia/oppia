@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -171,7 +173,7 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
         # Update exploration to version 2.
         change_list = [{
             'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'New state',
+            'state_name': u'Klüft',
         }]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
@@ -186,7 +188,7 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
             self.exp_id, self.exploration.version, 'Home', 'session_id3',
             {}, feconf.PLAY_TYPE_NORMAL)
         stats_models.StateHitEventLogEntryModel.create(
-            self.exp_id, self.exploration.version, 'New state',
+            self.exp_id, self.exploration.version, u'Klüft',
             'session_id3', {}, feconf.PLAY_TYPE_NORMAL)
         stats_models.StateHitEventLogEntryModel.create(
             self.exp_id, self.exploration.version, 'End', 'session_id3',
@@ -199,11 +201,11 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
             'TextInput', 0, 0, exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
             'session_id3', 0, {}, 'answer2')
         event_services.AnswerSubmissionEventHandler.record(
-            self.exp_id, self.exploration.version, 'New state',
+            self.exp_id, self.exploration.version, u'Klüft',
             'TextInput', 0, 0, exp_domain.EXPLICIT_CLASSIFICATION,
             'session_id3', 0, {}, 'answer3')
         event_services.AnswerSubmissionEventHandler.record(
-            self.exp_id, self.exploration.version, 'New state',
+            self.exp_id, self.exploration.version, u'Klüft',
             'TextInput', 0, 0, exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
             'session_id3', 0, {}, 'answer4')
 
@@ -226,7 +228,7 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping['End'].first_hit_count_v1, 2)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'New state'].first_hit_count_v1, 1)
+                u'Klüft'].first_hit_count_v1, 1)
 
         self.assertEqual(
             exploration_stats.state_stats_mapping['Home'].total_hit_count_v1, 4)
@@ -234,7 +236,7 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping['End'].total_hit_count_v1, 2)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'New state'].total_hit_count_v1, 1)
+                u'Klüft'].total_hit_count_v1, 1)
 
         self.assertEqual(
             exploration_stats.state_stats_mapping['Home'].num_completions_v1, 3)
@@ -242,7 +244,7 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping['End'].num_completions_v1, 2)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'New state'].num_completions_v1, 1)
+                u'Klüft'].num_completions_v1, 1)
 
         self.assertEqual(
             exploration_stats.state_stats_mapping[
@@ -252,7 +254,7 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
             0)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'New state'].total_answers_count_v1, 2)
+                u'Klüft'].total_answers_count_v1, 2)
 
         self.assertEqual(
             exploration_stats.state_stats_mapping[
@@ -262,7 +264,7 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
                 'End'].useful_feedback_count_v1, 0)
         self.assertEqual(
             exploration_stats.state_stats_mapping[
-                'New state'].useful_feedback_count_v1, 1)
+                u'Klüft'].useful_feedback_count_v1, 1)
 
     def test_creation_of_stats_model_for_deletion(self):
         # Update exploration to version 2.
@@ -393,3 +395,125 @@ class GenerateV1StatisticsJobTest(test_utils.GenericTestBase):
         # Since exploration is deleted, ExplorationStatsModel instance is not
         # created.
         self.assertEqual(exploration_stats, None)
+
+    def test_state_name_sign_replacement_works(self):
+        # Update exploration to version 2.
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': u'New + day',
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        self.exploration = exp_services.get_exploration_by_id(self.exp_id)
+
+        stats_models.StateHitEventLogEntryModel.create(
+            self.exp_id, self.exploration.version, u'New + day',
+            'session_id4', {}, feconf.PLAY_TYPE_NORMAL)
+
+        job_id = stats_jobs_one_off.GenerateV1StatisticsJob.create_new()
+        stats_jobs_one_off.GenerateV1StatisticsJob.enqueue(job_id)
+
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exploration.version)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'New + day'].total_hit_count_v1, 1)
+
+    def test_none_version_uses_snapshot_timestamp(self):
+        # Update exploration to version 2.
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': u'New',
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        stats_models.StateHitEventLogEntryModel.create(
+            self.exp_id, None, u'New',
+            'session_id4', {}, feconf.PLAY_TYPE_NORMAL)
+
+        # Update exploration to version 3.
+        change_list = [{
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': u'New 2',
+        }]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        stats_models.StateHitEventLogEntryModel.create(
+            self.exp_id, None, u'New 2',
+            'session_id4', {}, feconf.PLAY_TYPE_NORMAL)
+
+        job_id = stats_jobs_one_off.GenerateV1StatisticsJob.create_new()
+        stats_jobs_one_off.GenerateV1StatisticsJob.enqueue(job_id)
+
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        # Test the exploration stats for version 2.
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, 2)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'New'].total_hit_count_v1, 1)
+        self.assertFalse('New 2' in exploration_stats.state_stats_mapping)
+
+        # Test the exploration stats for version 3.
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, 3)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'New 2'].total_hit_count_v1, 1)
+
+    def test_higher_completions_over_actual_starts_refreshes_stats(self):
+        stats_models.CompleteExplorationEventLogEntryModel.create(
+            self.exp_id, self.exploration.version, 'End', 'session_id3',
+            10, {}, feconf.PLAY_TYPE_NORMAL)
+
+        job_id = stats_jobs_one_off.GenerateV1StatisticsJob.create_new()
+        stats_jobs_one_off.GenerateV1StatisticsJob.enqueue(job_id)
+
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            self.exp_id, self.exploration.version)
+        self.assertEqual(exploration_stats.num_starts_v1, 0)
+        self.assertEqual(exploration_stats.num_completions_v1, 0)
+        self.assertEqual(exploration_stats.num_actual_starts_v1, 0)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].first_hit_count_v1, 0)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['End'].first_hit_count_v1, 0)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].total_hit_count_v1, 0)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['End'].total_hit_count_v1, 0)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['Home'].num_completions_v1, 0)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['End'].num_completions_v1, 0)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Home'].total_answers_count_v1, 0)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping['End'].total_answers_count_v1,
+            0)
+
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'Home'].useful_feedback_count_v1, 0)
+        self.assertEqual(
+            exploration_stats.state_stats_mapping[
+                'End'].useful_feedback_count_v1, 0)

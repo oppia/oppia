@@ -28,17 +28,17 @@ oppia.directive('outcomeDestinationEditor', [
         '/components/' +
         'outcome_destination_editor_directive.html'),
       controller: [
-        '$scope', 'editorContextService', 'explorationStatesService',
+        '$scope', 'EditorStateService', 'explorationStatesService',
         'StateGraphLayoutService', 'PLACEHOLDER_OUTCOME_DEST',
-        'FocusManagerService', 'editorFirstTimeEventsService',
+        'FocusManagerService', 'EditorFirstTimeEventsService',
         function(
-            $scope, editorContextService, explorationStatesService,
+            $scope, EditorStateService, explorationStatesService,
             StateGraphLayoutService, PLACEHOLDER_OUTCOME_DEST,
-            FocusManagerService, editorFirstTimeEventsService) {
+            FocusManagerService, EditorFirstTimeEventsService) {
           $scope.$on('saveOutcomeDestDetails', function() {
             // Create new state if specified.
             if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
-              editorFirstTimeEventsService
+              EditorFirstTimeEventsService
                 .registerFirstCreateSecondStateEvent();
 
               var newStateName = $scope.outcome.newStateName;
@@ -62,7 +62,7 @@ oppia.directive('outcomeDestinationEditor', [
           $scope.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
           $scope.destChoices = [];
           $scope.$watch(explorationStatesService.getStates, function() {
-            var currentStateName = editorContextService.getActiveStateName();
+            var currentStateName = EditorStateService.getActiveStateName();
 
             // This is a list of objects, each with an ID and name. These
             // represent all states, as well as an option to create a

@@ -98,14 +98,14 @@ md-input-group.md-default-theme label
   color: #009688;
 }
 
-.md-button.oppia-learner-continue-button {
+.md-button.oppia-learner-confirm-button {
   background: #0D48A1;
   color: #ffffff;
   padding: 6px 12px;
 }
 
-.md-button.md-default-theme.oppia-learner-continue-button:focus,
-.md-button.md-default-theme.oppia-learner-continue-button:hover {
+.md-button.md-default-theme.oppia-learner-confirm-button:focus,
+.md-button.md-default-theme.oppia-learner-confirm-button:hover {
   background-color: #115FD4;
   text-decoration: none;
 }
@@ -255,6 +255,37 @@ body {
   border-bottom: 1px solid #C0C0C0;
   height: 145px;
   margin: 0;
+  width: 100%;
+}
+
+.oppia-creator-dashboard-main-content {
+  padding: 0;
+  width: 100%;
+}
+
+.oppia-creator-dashboard-main-content .stats-card {
+  min-height: 63px;
+  position: relative;
+}
+
+.oppia-creator-dashboard-main-content .stats-card .stat-description {
+  line-height: 1.646;
+  margin-bottom: 3em;
+  padding-right: 10px;
+}
+
+.oppia-creator-dashboard-main-content .stats-card .stat-value-with-rating {
+  top: 0.75em;
+  position: absolute;
+}
+
+.oppia-creator-dashboard-main-content .stats-card .stat-value-without-rating {
+  bottom: -0.7em;
+  position: absolute;
+}
+
+.oppia-creator-dashboard-mobile-mode {
+  margin: auto;
   width: 100%;
 }
 
@@ -505,6 +536,19 @@ body {
 
   .oppia-learner-dashboard-feedback-section .feedback-thread-message-body {
     margin-left: 43px;
+  }
+
+  .headroom {
+    will-change: transform;
+    transition: transform 200ms linear;
+  }
+
+  .headroom--pinned {
+    transform: translateY(0%);
+  }
+
+  .headroom--unpinned {
+    transform: translateY(-100%);
   }
 }
 
@@ -2115,28 +2159,19 @@ pre.oppia-pre-wrapped-text {
    .conversation-skin-help-card-content > p' selectors specifying
     the same line-height, margin-top and margin-bottom attributes)
 */
-.oppia-state-content-display-html > p,
-.oppia-feedback-display-html > p,
-.oppia-hint-display-html > p,
-.oppia-solution-display-html > p,
+.oppia-rte-editor > p,
 .form-control.oppia-rte-content > div > p {
   line-height: 28px;
   margin-bottom: 18px;
   margin-top: 18px;
 }
 
-.oppia-state-content-display-html > p:first-child,
-.oppia-feedback-display-html > p:first-child,
-.oppia-hint-display-html > p:first-child,
-.oppia-solution-display-html > p:first-child,
+.oppia-rte-editor > p:first-child,
 .form-control.oppia-rte-content > div > p:first-child {
   margin-top: 0;
 }
 
-.oppia-state-content-display-html > p:last-child,
-.oppia-feedback-display-html > p:last-child,
-.oppia-hint-display-html > p:first-child,
-.oppia-solution-display-html > p:first-child,
+.oppia-rte-editor > p:last-child,
 .form-control.oppia-rte-content > div > p:last-child {
   margin-bottom: 0;
 }

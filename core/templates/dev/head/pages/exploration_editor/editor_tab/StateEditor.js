@@ -17,11 +17,11 @@
  */
 
 oppia.controller('StateEditor', [
-  '$scope', '$rootScope', 'editorContextService', 'explorationStatesService',
+  '$scope', '$rootScope', 'EditorStateService', 'explorationStatesService',
   'INTERACTION_SPECS', 'ExplorationAdvancedFeaturesService',
   'UrlInterpolationService', 'stateContentService',
   function(
-      $scope, $rootScope, editorContextService, explorationStatesService,
+      $scope, $rootScope, EditorStateService, explorationStatesService,
       INTERACTION_SPECS, ExplorationAdvancedFeaturesService,
       UrlInterpolationService, stateContentService) {
     $scope.areParametersEnabled = (
@@ -49,11 +49,11 @@ oppia.controller('StateEditor', [
     });
 
     $scope.initStateEditor = function() {
-      var stateName = editorContextService.getActiveStateName();
+      var stateName = EditorStateService.getActiveStateName();
       var stateData = explorationStatesService.getState(stateName);
       if (stateName && stateData) {
         stateContentService.init(
-          editorContextService.getActiveStateName(), stateData.content);
+          EditorStateService.getActiveStateName(), stateData.content);
 
         $rootScope.$broadcast('stateEditorInitialized', stateData);
         var interactionId = explorationStatesService.getInteractionIdMemento(
@@ -96,13 +96,13 @@ oppia.directive('trainingPanel', [
         //   -answerGroupIndex: This refers to which answer group the answer
         //      being trained has been classified to (for displaying feedback
         //      to the creator). If answerGroupIndex is equal to the number of
-        //      of answer groups, then it represents the default outcome
-        //      feedback. This index is changed by the panel when the creator
-        //      specifies which feedback should be associated with the answer.
-        //   -newOutcome: This refers to an outcome structure (containing a list
-        //      of feedback and a destination state name) which is non-null if,
-        //      and only if, the creator has specified that a new response
-        //      should be created for the trained answer.
+        //      answer groups, then it represents the default outcome feedback.
+        //      This index is changed by the panel when the creator specifies
+        //      which feedback should be associated with the answer.
+        //   -newOutcome: This refers to an outcome structure (containing a
+        //      list of feedback and a destination state name) which is
+        //      non-null if, and only if, the creator has specified that a new
+        //      response should be created for the trained answer.
         classification: '=',
         onFinishTraining: '&'
       },
@@ -110,27 +110,27 @@ oppia.directive('trainingPanel', [
         '/pages/exploration_editor/editor_tab/' +
         'training_answer_modal_directive.html'),
       controller: [
-        '$scope', 'oppiaExplorationHtmlFormatterService',
-        'editorContextService', 'explorationStatesService',
-        'TrainingDataService', 'responsesService', 'stateInteractionIdService',
+        '$scope', 'ExplorationHtmlFormatterService',
+        'EditorStateService', 'explorationStatesService',
+        'trainingDataService', 'responsesService', 'stateInteractionIdService',
         'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
         'OutcomeObjectFactory',
-        function($scope, oppiaExplorationHtmlFormatterService,
-            editorContextService, explorationStatesService,
-            TrainingDataService, responsesService, stateInteractionIdService,
+        function($scope, ExplorationHtmlFormatterService,
+            EditorStateService, explorationStatesService,
+            trainingDataService, responsesService, stateInteractionIdService,
             stateCustomizationArgsService, AnswerGroupObjectFactory,
             OutcomeObjectFactory) {
           $scope.changingAnswerGroupIndex = false;
           $scope.addingNewResponse = false;
 
-          var _stateName = editorContextService.getActiveStateName();
+          var _stateName = EditorStateService.getActiveStateName();
           var _state = explorationStatesService.getState(_stateName);
-          $scope.allOutcomes = TrainingDataService.getAllPotentialOutcomes(
+          $scope.allOutcomes = trainingDataService.getAllPotentialOutcomes(
             _state);
 
           var _updateAnswerTemplate = function() {
             $scope.answerTemplate = (
-              oppiaExplorationHtmlFormatterService.getAnswerHtml(
+              ExplorationHtmlFormatterService.getAnswerHtml(
                 $scope.answer, stateInteractionIdService.savedMemento,
                 stateCustomizationArgsService.savedMemento));
           };
@@ -139,7 +139,7 @@ oppia.directive('trainingPanel', [
           _updateAnswerTemplate();
 
           $scope.getCurrentStateName = function() {
-            return editorContextService.getActiveStateName();
+            return EditorStateService.getActiveStateName();
           };
 
           $scope.beginChangingAnswerGroupIndex = function() {
@@ -148,7 +148,7 @@ oppia.directive('trainingPanel', [
 
           $scope.beginAddingNewResponse = function() {
             $scope.classification.newOutcome = OutcomeObjectFactory.createNew(
-              editorContextService.getActiveStateName(), [''], []);
+              EditorStateService.getActiveStateName(), [''], []);
             $scope.addingNewResponse = true;
           };
 
@@ -156,9 +156,9 @@ oppia.directive('trainingPanel', [
             $scope.classification.answerGroupIndex = index;
 
             if (index === responsesService.getAnswerGroupCount()) {
-              TrainingDataService.trainDefaultResponse($scope.answer);
+              trainingDataService.trainDefaultResponse($scope.answer);
             } else {
-              TrainingDataService.trainAnswerGroup(index, $scope.answer);
+              trainingDataService.trainAnswerGroup(index, $scope.answer);
             }
 
             $scope.onFinishTraining();
@@ -174,7 +174,7 @@ oppia.directive('trainingPanel', [
 
               // Train the group with the answer.
               var index = responsesService.getAnswerGroupCount() - 1;
-              TainingDataService.trainAnswerGroup(index, $scope.answer);
+              trainingDataService.trainAnswerGroup(index, $scope.answer);
             }
 
             $scope.onFinishTraining();
@@ -182,5 +182,5 @@ oppia.directive('trainingPanel', [
         }
       ]
     };
-  }
-]);
+  }]
+);

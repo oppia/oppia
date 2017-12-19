@@ -1,0 +1,13 @@
+<div>
+  <[answer.displayed_question]>
+  <div ng-if="answer.correct">
+    <pre><[answer.displayed_proof[0]]></pre>
+  </div>
+
+  <div ng-if="!answer.correct">
+    <div>
+      <pre><[answer.displayed_proof[0]]><div class="logic-proof-erroneous-line"><[answer.displayed_proof[1]]></div><[answer.displayed_proof[2]]></pre>
+    </div>
+    <p class="logic-proof-error-message"><[answer.displayed_message]></p>
+  </div>
+</div>
