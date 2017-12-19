@@ -76,8 +76,7 @@ var CollectionEditorPage = function() {
    
     // Selects the exploration from dropdown.
     addExplorationInput.sendKeys(protractor.Key.TAB);
-    addExplorationButton.click();
-    
+    addExplorationButton.click();   
   };
 
   // Shift a node left in the node graph.
