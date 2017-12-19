@@ -26,7 +26,7 @@ var CollectionEditorPage = function() {
   var addExplorationButton = 
     element(by.css('.protractor-test-add-exploration-button'));
   
-  var addExistingInput = 
+  var addExplorationInput = 
     element(by.css('.protractor-test-add-exploration-input'));
 
   var editorShiftLeft =
