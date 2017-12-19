@@ -29,7 +29,8 @@ oppia.directive('oppiaInteractiveGraphInput', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        lastAnswer: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
@@ -45,7 +46,6 @@ oppia.directive('oppiaInteractiveGraphInput', [
             isWeighted: false,
             isLabeled: false
           };
-
           $scope.submitGraph = function() {
             // Here, angular.copy is needed to strip $$hashkey from the graph.
             $scope.onSubmit({
@@ -62,16 +62,28 @@ oppia.directive('oppiaInteractiveGraphInput', [
             var stringToBool = function(str) {
               return (str === 'true');
             };
-            $scope.canAddVertex = stringToBool($attrs.canAddVertexWithValue);
-            $scope.canDeleteVertex = stringToBool(
-              $attrs.canDeleteVertexWithValue);
-            $scope.canEditVertexLabel = stringToBool(
-              $attrs.canEditVertexLabelWithValue);
-            $scope.canMoveVertex = stringToBool($attrs.canMoveVertexWithValue);
-            $scope.canAddEdge = stringToBool($attrs.canAddEdgeWithValue);
-            $scope.canDeleteEdge = stringToBool($attrs.canDeleteEdgeWithValue);
-            $scope.canEditEdgeWeight = stringToBool(
-              $attrs.canEditEdgeWeightWithValue);
+            if (!$scope.lastAnswer()) {
+              $scope.canAddVertex = stringToBool($attrs.canAddVertexWithValue);
+              $scope.canDeleteVertex = stringToBool(
+                $attrs.canDeleteVertexWithValue);
+              $scope.canEditVertexLabel = stringToBool(
+                $attrs.canEditVertexLabelWithValue);
+              $scope.canMoveVertex = stringToBool(
+                $attrs.canMoveVertexWithValue);
+              $scope.canAddEdge = stringToBool($attrs.canAddEdgeWithValue);
+              $scope.canDeleteEdge = stringToBool(
+                $attrs.canDeleteEdgeWithValue);
+              $scope.canEditEdgeWeight = stringToBool(
+                $attrs.canEditEdgeWeightWithValue);
+            } else {
+              $scope.canAddVertex = false;
+              $scope.canDeleteVertex = false;
+              $scope.canEditVertexLabel = false;
+              $scope.canMoveVertex = false;
+              $scope.canAddEdge = false;
+              $scope.canDeleteEdge = false;
+              $scope.canEditEdgeWeight = false;
+            }
           };
 
           // TODO(czxcjx): Write this function
@@ -81,6 +93,9 @@ oppia.directive('oppiaInteractiveGraphInput', [
 
           var updateGraphFromJSON = function(jsonGraph) {
             var newGraph = HtmlEscaperService.escapedJsonToObj(jsonGraph);
+            if ($scope.lastAnswer()) {
+              newGraph = $scope.lastAnswer();
+            }
             if (checkValidGraph(newGraph)) {
               $scope.graph = newGraph;
             } else {
@@ -217,9 +232,9 @@ oppia.directive('graphViz', [
         'graph_viz_directive.html'),
       controller: [
         '$scope', '$element', '$attrs', '$document', 'FocusManagerService',
-        'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
+        'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN', 'NEW_CARD_AVAILABLE',
         function($scope, $element, $attrs, $document, FocusManagerService,
-            graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
+            graphDetailService, GRAPH_INPUT_LEFT_MARGIN, NEW_CARD_AVAILABLE) {
           var _MODES = {
             MOVE: 0,
             ADD_EDGE: 1,
@@ -255,49 +270,68 @@ oppia.directive('graphViz', [
 
           $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
           $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
-
+          $scope.interactionIsActive = true;
+          $scope.$on(NEW_CARD_AVAILABLE, function( evt, data) {
+            if (data) {
+              $scope.interactionIsActive = false;
+              $scope.canAddVertex = false;
+              $scope.canDeleteVertex = false;
+              $scope.canEditVertexLabel = false;
+              $scope.canMoveVertex = false;
+              $scope.canAddEdge = false;
+              $scope.canDeleteEdge = false;
+              $scope.canEditEdgeWeight = false;
+              $scope.state.currentMode = null;
+            }
+          });
           var vizContainer = $($element).find('.oppia-graph-viz-svg');
           $scope.vizWidth = vizContainer.width();
           $scope.mousemoveGraphSVG = function(event) {
-            $scope.state.mouseX = event.pageX - vizContainer.offset().left;
-            $scope.state.mouseY = event.pageY - vizContainer.offset().top;
-            // We use vertexDragStartX/Y and mouseDragStartX/Y to make
-            // mouse-dragging by label more natural, by moving the vertex
-            // according to the difference from the original position.
-            // Otherwise, mouse-dragging by label will make the vertex
-            // awkwardly jump to the mouse.
-            if ($scope.state.currentlyDraggedVertex !== null &&
-                ($scope.state.mouseX > GRAPH_INPUT_LEFT_MARGIN)) {
-              $scope.graph.vertices[$scope.state.currentlyDraggedVertex].x =
-                $scope.state.vertexDragStartX + (
-                  $scope.state.mouseX - $scope.state.mouseDragStartX);
-              $scope.graph.vertices[$scope.state.currentlyDraggedVertex].y =
-                $scope.state.vertexDragStartY + (
-                  $scope.state.mouseY - $scope.state.mouseDragStartY);
+            if ($scope.interactionIsActive) {
+              $scope.state.mouseX = event.pageX - vizContainer.offset().left;
+              $scope.state.mouseY = event.pageY - vizContainer.offset().top;
+              // We use vertexDragStartX/Y and mouseDragStartX/Y to make
+              // mouse-dragging by label more natural, by moving the vertex
+              // according to the difference from the original position.
+              // Otherwise, mouse-dragging by label will make the vertex
+              // awkwardly jump to the mouse.
+              if ($scope.state.currentlyDraggedVertex !== null &&
+                  ($scope.state.mouseX > GRAPH_INPUT_LEFT_MARGIN)) {
+                $scope.graph.vertices[$scope.state.currentlyDraggedVertex].x =
+                  $scope.state.vertexDragStartX + (
+                    $scope.state.mouseX - $scope.state.mouseDragStartX);
+                $scope.graph.vertices[$scope.state.currentlyDraggedVertex].y =
+                  $scope.state.vertexDragStartY + (
+                    $scope.state.mouseY - $scope.state.mouseDragStartY);
+              }
             }
           };
 
           $scope.onClickGraphSVG = function() {
-            if ($scope.state.currentMode === _MODES.ADD_VERTEX &&
-                $scope.canAddVertex) {
-              $scope.graph.vertices.push({
-                x: $scope.state.mouseX,
-                y: $scope.state.mouseY,
-                label: ''
-              });
-              setMode(_MODES.MOVE);
-            }
-            if ($scope.state.hoveredVertex === null) {
-              $scope.state.selectedVertex = null;
-            }
-            if ($scope.state.hoveredEdge === null) {
-              $scope.state.selectedEdge = null;
+            if ($scope.interactionIsActive) {
+              if ($scope.state.currentMode === _MODES.ADD_VERTEX &&
+                  $scope.canAddVertex) {
+                $scope.graph.vertices.push({
+                  x: $scope.state.mouseX,
+                  y: $scope.state.mouseY,
+                  label: ''
+                });
+                setMode(_MODES.MOVE);
+              }
+              if ($scope.state.hoveredVertex === null) {
+                $scope.state.selectedVertex = null;
+              }
+              if ($scope.state.hoveredEdge === null) {
+                $scope.state.selectedEdge = null;
+              }
             }
           };
 
           $scope.init = function() {
             initButtons();
-            $scope.state.currentMode = $scope.buttons[0].mode;
+            if ($scope.buttons.length > 0) {
+              $scope.state.currentMode = $scope.buttons[0].mode;
+            }
           };
 
           var initButtons = function() {
@@ -359,9 +393,11 @@ oppia.directive('graphViz', [
             $scope.state.selectedEdge = null;
           };
           $scope.onClickModeButton = function(mode, $event) {
-            $event.preventDefault();
-            $event.stopPropagation();
-            setMode(mode);
+            if ($scope.interactionIsActive) {
+              $event.preventDefault();
+              $event.stopPropagation();
+              setMode(mode);
+            }
           };
 
           // TODO(czx): Consider if there's a neat way to write a reset()
