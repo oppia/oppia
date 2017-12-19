@@ -38,7 +38,7 @@ describe('Collection object factory', function() {
       version: '1',
       nodes: [],
       skills: {},
-      next_skill_id: 0
+      next_skill_index: 0
     };
     _sampleCollection = CollectionObjectFactory.create(
       sampleCollectionBackendObject);
@@ -317,7 +317,7 @@ describe('Collection object factory', function() {
         skills: {
           skill0: collectionSkillBackendObject
         },
-        next_skill_id: 1
+        next_skill_index: 1
       });
       expect(collection.containsCollectionSkill('skill0')).toBe(true);
       expect(collection.containsCollectionSkill('fake skill')).toBe(false);
@@ -456,7 +456,7 @@ describe('Collection object factory', function() {
       version: '15',
       nodes: [],
       skills: {},
-      next_skill_id: 0
+      next_skill_index: 0
     });
     secondCollection.addCollectionNode(CollectionNodeObjectFactory.create({
       exploration_id: 'exp_id5',

@@ -44,8 +44,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             exp_domain.State.create_default_state('ABC').to_dict(),
             1, 'col1', 'en')
 
-        question_model = question_services.add_question(self.owner_id, question)
-        question = question_services.get_question_by_id(question_model.id)
+        question_id = question_services.add_question(self.owner_id, question)
+        question = question_services.get_question_by_id(question_id)
 
         self.assertEqual(question.title, 'A Question')
 
@@ -55,20 +55,20 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             exp_domain.State.create_default_state('ABC').to_dict(),
             1, 'col1', 'en')
 
-        question1_model = question_services.add_question(
+        question1_id = question_services.add_question(
             self.owner_id, question)
         question = question_domain.Question(
             'dummy2', 'A Question2',
             exp_domain.State.create_default_state('ABC').to_dict(),
             1, 'col2', 'en')
 
-        question2_model = question_services.add_question(
+        question2_id = question_services.add_question(
             self.owner_id, question)
         questions = question_services.get_questions_by_ids(
-            [question1_model.id, question2_model.id])
+            [question1_id, question2_id])
         self.assertEqual(len(questions), 2)
-        self.assertEqual(questions[0].title, question1_model.title)
-        self.assertEqual(questions[1].title, question2_model.title)
+        self.assertEqual(questions[0].title, 'A Question')
+        self.assertEqual(questions[1].title, 'A Question2')
 
     def test_add_question(self):
         state = exp_domain.State.create_default_state('ABC')
@@ -82,8 +82,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_id, title, question_data, question_data_schema_version,
             collection_id, language_code)
 
-        question_model = question_services.add_question(self.owner_id, question)
-        model = question_models.QuestionModel.get(question_model.id)
+        question_id = question_services.add_question(self.owner_id, question)
+        model = question_models.QuestionModel.get(question_id)
 
         self.assertEqual(model.title, title)
         self.assertEqual(model.question_data, question_data)
@@ -98,13 +98,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             exp_domain.State.create_default_state('ABC').to_dict(),
             1, 'col1', 'en')
 
-        question_model = question_services.add_question(self.owner_id, question)
-        question_services.delete_question(self.owner_id, question_model.id)
+        question_id = question_services.add_question(self.owner_id, question)
+        question_services.delete_question(self.owner_id, question_id)
 
         with self.assertRaisesRegexp(Exception, (
             'Entity for class QuestionModel with id %s not found' %(
-                question_model.id))):
-            question_models.QuestionModel.get(question_model.id)
+                question_id))):
+            question_models.QuestionModel.get(question_id)
 
     def test_update_question(self):
         state = exp_domain.State.create_default_state('ABC')
@@ -118,16 +118,16 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_id, title, question_data, question_data_schema_version,
             collection_id, language_code)
 
-        question_model = question_services.add_question(self.owner_id, question)
+        question_id = question_services.add_question(self.owner_id, question)
         change_dict = {'cmd': 'update_question_property',
                        'property_name': 'title',
                        'new_value': 'ABC',
                        'old_value': 'A Question'}
         change_list = [question_domain.QuestionChange(change_dict)]
         question_services.update_question(
-            self.owner_id, question_model.id, change_list, 'updated title')
+            self.owner_id, question_id, change_list, 'updated title')
 
-        model = question_models.QuestionModel.get(question_model.id)
+        model = question_models.QuestionModel.get(question_id)
         self.assertEqual(model.title, 'ABC')
         self.assertEqual(model.question_data, question_data)
         self.assertEqual(model.question_data_schema_version,
@@ -169,11 +169,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question = question_domain.Question.from_dict(question_dict)
         question_services.add_question_id_to_skill(
             question.question_id, collection_id, skill_id, owner_id)
-        skills = question.get_skills()
-        self.assertEqual(len(skills), 1)
-        self.assertEqual(skills[0].name, u'skill0')
+        collection = collection_services.get_collection_by_id(collection_id)
+        self.assertIn(question.question_id, collection.skills[skill_id].question_ids)
 
-    def test_remove_skill(self):
+    def test_remove_question_id_from_skill(self):
         """Tests to verify remove_skill method."""
         collection_id = 'col1'
         exp_id = '0_exploration_id'
@@ -208,16 +207,14 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         question_services.add_question_id_to_skill(
             question.question_id, collection_id, skill_id, owner_id)
-        skills = question.get_skills()
-        self.assertEqual(len(skills), 1)
-        self.assertEqual(skills[0].name, u'skill0')
         collection = collection_services.get_collection_by_id(
             collection_id)
+        self.assertIn(question.question_id, collection.skills[skill_id].question_ids)
         skill_id = collection.get_skill_id_from_skill_name('skill0')
-        question_services.remove_skill(
+        question_services.remove_question_id_from_skill(
             question.question_id, collection_id, skill_id, owner_id)
-        skills = question.get_skills()
-        self.assertEqual(len(skills), 0)
+        collection = collection_services.get_collection_by_id(collection_id)
+        self.assertEqual(len(collection.skills[skill_id].question_ids), 0)
 
     def test_get_question_batch(self):
         coll_id_0 = '0_collection_id'
@@ -254,8 +251,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             exp_domain.State.create_default_state('ABC').to_dict(),
             1, coll_id_0, 'en')
 
-        question_model = question_services.add_question(self.owner_id, question)
-        question = question_services.get_question_by_id(question_model.id)
+        question_id = question_services.add_question(self.owner_id, question)
+        question = question_services.get_question_by_id(question_id)
         question_services.add_question_id_to_skill(
             question.question_id, coll_id_0, skill_id, self.owner_id)
         collection_services.record_played_exploration_in_collection_context(

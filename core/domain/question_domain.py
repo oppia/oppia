@@ -37,7 +37,7 @@ QUESTION_PROPERTY_QUESTION_DATA = 'question_data'
 CMD_UPDATE_QUESTION_PROPERTY = 'update_question_property'
 
 CMD_ADD_QUESTION_SKILL = 'add_question_skill'
-CMD_REMOVE_QUESTION_SKILL = 'reomve_question_skill'
+CMD_REMOVE_QUESTION_SKILL = 'remove_question_skill'
 
 class QuestionChange(object):
     """Domain object for changes made to question object."""
@@ -236,39 +236,3 @@ class Question(object):
             question_data: dict. A dict representing the question data.
         """
         self.question_data = question_data
-
-    def get_skills(self):
-        """Fetches the skills associated with the question.
-
-        Returns:
-            list(CollectionSkill). A list of CollectionSkill domain objects.
-        """
-        collection = collection_services.get_collection_by_id(
-            self.collection_id)
-        skills = collection.skills
-
-        question_skills = []
-        for skill_id in skills:
-            if self.question_id in collection.skills[skill_id].question_ids:
-                question_skills.append(collection.skills[skill_id])
-        return question_skills
-
-    def can_user_answer_question(self, user_id, collection_id):
-        """Verifies if the given user has the acquired
-        skills to answer the question.
-
-        Args:
-            user_id: str. The id of the user.
-            collection_id: str. The id of the collection.
-
-        Returns:
-            bool. A boolean representing True or False.
-        """
-        question_skills = self.get_skills()
-        user_skills = (
-            collection_services.get_acquired_skills_of_user_given_collection_id(
-                user_id, collection_id))
-        for question_skill in question_skills:
-            if question_skill.id not in user_skills:
-                return False
-        return True

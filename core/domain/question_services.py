@@ -19,8 +19,8 @@
 import logging
 import random
 
-from core.domain import collection_services
 from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import question_domain
 from core.platform import models
 import feconf
@@ -31,7 +31,7 @@ import feconf
 CMD_CREATE_NEW = 'create_new'
 
 
-def _create_question(committer_id, question, commit_message):
+def _create_new_question(committer_id, question, commit_message):
     """Creates a new question.
 
     Args:
@@ -51,7 +51,7 @@ def _create_question(committer_id, question, commit_message):
         'cmd': CMD_CREATE_NEW,
         'title': question.title
     }])
-    return model
+    return model.id
 
 
 def add_question(committer_id, question):
@@ -64,9 +64,9 @@ def add_question(committer_id, question):
     question.validate()
     commit_message = (
         'New question created with title \'%s\'.' % question.title)
-    question_model = _create_question(committer_id, question, commit_message)
+    question_id = _create_new_question(committer_id, question, commit_message)
 
-    return question_model
+    return question_id
 
 
 def delete_question(committer_id, question_id, force_deletion=False):
@@ -128,7 +128,7 @@ def get_questions_by_ids(question_ids):
         question_ids: list(str). List of question ids.
 
     Returns:
-        list(Question) or None. A list of domain objects representing questions
+        list(Question|None). A list of domain objects representing questions
         with the given ids or None when the id is not valid.
     """
     question_model_list = question_models.QuestionModel.get_multi(question_ids)
@@ -253,7 +253,7 @@ def add_question_id_to_skill(question_id, collection_id, skill_id, user_id):
             question_id, skill_id))
 
 
-def remove_skill(question_id, collection_id, skill_id, user_id):
+def remove_question_id_from_skill(question_id, collection_id, skill_id, user_id):
     """Removes the question id from the question list of the appropriate
     skill.
 
@@ -284,10 +284,10 @@ def get_questions_batch(
         batch_size: int. The intended number of questions to be returned.
 
     Returns:
-        list(dict). A list of Question object dicts.
+        list(Question). A list of Question objects.
     """
     user_skill_ids = (
-        collection_services.get_acquired_skills_of_user_given_collection_id(
+        collection_services.get_acquired_skill_ids_of_user_given_collection_id(
             user_id, collection_id))
 
     question_skill_ids = list(set(user_skill_ids) & set(skill_ids))

@@ -31,7 +31,7 @@ import utils
 
 SAMPLE_YAML_CONTENT = ("""category: A category
 language_code: en
-next_skill_id: 2
+next_skill_index: 2
 nodes:
 - acquired_skill_ids:
   - skill0
@@ -173,14 +173,14 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             collection_domain.CollectionSkill.get_skill_id_from_index(123),
             'skill123')
 
-    def test_next_skill_id(self):
-        self.collection.next_skill_id = 'abc'
+    def test_next_skill_index(self):
+        self.collection.next_skill_index = 'abc'
         self._assert_validation_error(
-            'Expected next_skill_id to be an int, received abc')
+            'Expected next_skill_index to be an int, received abc')
 
-        self.collection.next_skill_id = -1
+        self.collection.next_skill_index = -1
         self._assert_validation_error(
-            'Expected next_skill_id to be nonnegative, received -1')
+            'Expected next_skill_index to be nonnegative, received -1')
 
     def test_skill_ids_validation(self):
         self.collection.skills = 'abc'
@@ -216,7 +216,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected skill ID to end with a number, received skilla')
 
-        self.collection.next_skill_id = 1
+        self.collection.next_skill_index = 1
         self.collection.skills = {
             'skill1': collection_domain.CollectionSkill.from_dict(
                 'test_skill', {
@@ -228,7 +228,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'Expected skill ID number to be less than 1, received skill1')
 
     def test_skills_validation(self):
-        self.collection.next_skill_id = 1
+        self.collection.next_skill_index = 1
         self.collection.skills = {
             'skill0': collection_domain.CollectionSkill.from_dict(
                 'skill0', {
@@ -587,17 +587,42 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.add_skill('skillname1')
         collection.add_skill('skillname2')
         skill_id = collection.get_skill_id_from_skill_name('skillname1')
-        skills = collection.skills.keys()
-        self.assertEqual(skills[1], skill_id)
+        self.assertIn(skill_id, collection.skills)
 
         collection.delete_skill(skill_id)
         skill_id = collection.get_skill_id_from_skill_name('skillname1')
-        skills = collection.skills.keys()
         self.assertEqual(skill_id, None)
 
+    def test_add_question_id_to_skill(self):
+        """Test to verify add_question_id_to_skill method."""
+        collection = collection_domain.Collection.create_default_collection(
+            'exp_id')
+        collection.add_skill('skillname')
+        skill_id = collection.get_skill_id_from_skill_name('skillname')
+        collection.add_question_id_to_skill(skill_id, 'question0')
+        self.assertIn('question0', collection.skills[skill_id].question_ids)
 
+    def test_remove_question_id_from_skill(self):
+        """Test to verify remove_question_id_from_skill method."""
+        collection = collection_domain.Collection.create_default_collection(
+            'exp_id')
+        collection.add_skill('skillname')
+        skill_id = collection.get_skill_id_from_skill_name('skillname')
+        collection.add_question_id_to_skill(skill_id, 'question0')
+        collection.remove_question_id_from_skill(skill_id, 'question0')
+        self.assertEqual(len(collection.skills[skill_id].question_ids), 0)
 
-
+    def test_get_acquired_skill_ids_from_exploration_ids(self):
+        """Test get_acquired_skill_ids_from_exploration_ids method."""
+        collection = collection_domain.Collection.create_default_collection(
+            'collection_id')
+        collection.add_node('exp_id_0')
+        collection.get_node('exp_id_0').update_acquired_skill_ids(
+            ['skill0a'])
+        self.assertIn(
+            'skill0a',
+            collection.get_acquired_skill_ids_from_exploration_ids(
+                ['exp_id_0']))
 
 class ExplorationGraphUnitTests(test_utils.GenericTestBase):
     """Test the skill graph structure within a collection."""
@@ -926,7 +951,7 @@ title: A title
 """)
     YAML_CONTENT_V4 = ("""category: A category
 language_code: en
-next_skill_id: 2
+next_skill_index: 2
 nodes:
 - acquired_skill_ids:
   - skill0

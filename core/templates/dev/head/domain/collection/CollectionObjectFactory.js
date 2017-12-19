@@ -31,7 +31,7 @@ oppia.factory('CollectionObjectFactory', [
       this._nodes = [];
       // Maps skill IDs to skill objects.
       this._skills = {};
-      this._nextSkillId = Number(collectionBackendObject.next_skill_id);
+      this._nextSkillId = Number(collectionBackendObject.next_skill_index);
 
       // This map acts as a fast way of looking up a collection node for a given
       // exploration ID.
@@ -331,7 +331,7 @@ oppia.factory('CollectionObjectFactory', [
       return new Collection({
         nodes: [],
         skills: {},
-        next_skill_id: 0
+        next_skill_index: 0
       });
     };
 

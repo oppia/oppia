@@ -50,9 +50,9 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
             }], 'Add a new skill')
         collection = collection_services.get_collection_by_id(
             self.collection_id)
-        skill_id = collection.get_skill_id_from_skill_name('test')
+        self.skill_id = collection.get_skill_id_from_skill_name('test')
         collection_node = collection.get_node(self.exp_id)
-        collection_node.update_acquired_skill_ids([skill_id])
+        collection_node.update_acquired_skill_ids([self.skill_id])
 
         # Update the acquired skill IDs for the exploration.
         collection_services.update_collection(
@@ -61,7 +61,7 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
                 'property_name': (
                     collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS), # pylint: disable=line-too-long
                 'exploration_id': self.exp_id,
-                'new_value': [skill_id]
+                'new_value': [self.skill_id]
             }], 'Update skill')
 
         question = question_domain.Question(
@@ -69,28 +69,31 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
             exp_domain.State.create_default_state('ABC').to_dict(), 1,
             self.collection_id, 'en')
 
-        question_model = question_services.add_question(self.owner_id, question)
-        self.question = question_services.get_question_by_id(question_model.id)
+        question_id = question_services.add_question(self.owner_id, question)
+        self.question = question_services.get_question_by_id(question_id)
         question_services.add_question_id_to_skill(
             self.question.question_id, self.question.collection_id,
-            skill_id, self.owner_id)
-        collection_services.record_played_exploration_in_collection_context(
-            self.owner_id, self.collection_id, self.exp_id)
+            self.skill_id, self.owner_id)
 
-        self.payload = {}
-        self.payload['collection_id'] = self.collection_id
-        self.payload['user_id'] = self.owner_id
-        self.payload['skill_ids'] = json.dumps([skill_id, 'test'])
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        collection_services.record_played_exploration_in_collection_context(
+            self.new_user_id, self.collection_id, self.exp_id)
 
     def test_get(self):
         """Test to verify the get method."""
-        response_json = self.get_json(
-            '%s/batch'%feconf.QUESTION_DATA_URL, self.payload,
-            expect_errors=False)
-        self.assertEqual(response_json[0], self.question.to_dict())
+        self.payload = {}
+        self.payload['collection_id'] = self.collection_id
+        self.payload['stringified_skill_ids'] = json.dumps([self.skill_id, 'test'])
 
-        self.payload['user_id'] = self.viewer_id
+        self.login(self.NEW_USER_EMAIL)
         response_json = self.get_json(
             '%s/batch'%feconf.QUESTION_DATA_URL, self.payload,
             expect_errors=False)
-        self.assertEqual(len(response_json), 0)
+        self.assertIn(self.question.to_dict(), response_json['questions_dict'])
+
+        self.logout()
+        response_json = self.get_json(
+            '%s/batch'%feconf.QUESTION_DATA_URL, self.payload,
+            expect_errors=False)
+        self.assertEqual(len(response_json['questions_dict']), 0)

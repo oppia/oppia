@@ -1,5 +1,5 @@
 category: Welcome
-next_skill_id: 5
+next_skill_index: 5
 nodes:
 - acquired_skill_ids:
   - skill0

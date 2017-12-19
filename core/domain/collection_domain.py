@@ -453,7 +453,7 @@ class Collection(object):
 
     def __init__(self, collection_id, title, category, objective,
                  language_code, tags, schema_version, nodes, skills,
-                 next_skill_id, version, created_on=None, last_updated=None):
+                 next_skill_index, version, created_on=None, last_updated=None):
         """Constructs a new collection given all the information necessary to
         represent a collection.
 
@@ -495,7 +495,7 @@ class Collection(object):
         self.schema_version = schema_version
         self.nodes = nodes
         self.skills = skills
-        self.next_skill_id = next_skill_id
+        self.next_skill_index = next_skill_index
         self.version = version
         self.created_on = created_on
         self.last_updated = last_updated
@@ -517,7 +517,7 @@ class Collection(object):
             'nodes': [
                 node.to_dict() for node in self.nodes
             ],
-            'next_skill_id': self.next_skill_id,
+            'next_skill_index': self.next_skill_index,
             'skills': {
                 skill_id: skill.to_dict()
                 for skill_id, skill in self.skills.iteritems()
@@ -579,7 +579,7 @@ class Collection(object):
                 for skill_id, skill_dict in
                 collection_dict['skills'].iteritems()
             },
-            collection_dict['next_skill_id'], collection_version,
+            collection_dict['next_skill_index'], collection_version,
             collection_created_on, collection_last_updated)
 
         return collection
@@ -647,8 +647,8 @@ class Collection(object):
                 collection_dict))
         collection_dict['nodes'] = new_collection_dict['nodes']
         collection_dict['skills'] = new_collection_dict['skills']
-        collection_dict['next_skill_id'] = (
-            new_collection_dict['next_skill_id'])
+        collection_dict['next_skill_index'] = (
+            new_collection_dict['next_skill_index'])
 
         collection_dict['schema_version'] = 4
         return collection_dict
@@ -780,7 +780,7 @@ class Collection(object):
             for skill_name, skill_id in skill_names_to_ids.iteritems()
         }
 
-        collection_contents['next_skill_id'] = len(skill_names)
+        collection_contents['next_skill_index'] = len(skill_names)
 
         return collection_contents
 
@@ -1083,9 +1083,9 @@ class Collection(object):
                 raise ValueError(
                     'Skill with name "%s" already exists.' % skill_name)
 
-        skill_id = CollectionSkill.get_skill_id_from_index(self.next_skill_id)
+        skill_id = CollectionSkill.get_skill_id_from_index(self.next_skill_index)
         self.skills[skill_id] = CollectionSkill(skill_id, skill_name, [])
-        self.next_skill_id += 1
+        self.next_skill_index += 1
         return skill_id
 
     def get_skill_id_from_skill_name(self, skill_name):
@@ -1141,15 +1141,14 @@ class Collection(object):
         Raises:
             Exception: question_id is already present in skill.
         """
-        if skill_id is not None:
-            question_ids = self.skills[skill_id].question_ids
-            if question_id not in question_ids:
-                self.skills[skill_id].question_ids.append(
-                    question_id)
-            else:
-                raise Exception(
-                    'Question ID %s is already present in %s' % (
-                        self.question_id, skill_id))
+        question_ids = self.skills[skill_id].question_ids
+        if question_id not in question_ids:
+            self.skills[skill_id].question_ids.append(
+                question_id)
+        else:
+            raise Exception(
+                'Question ID %s is already present in skill %s' % (
+                    self.question_id, skill_id))
 
     def remove_question_id_from_skill(self, skill_id, question_id):
         """Removes question id from the question list of the appropriate skill.
@@ -1163,7 +1162,7 @@ class Collection(object):
         """
         if question_id not in self.skills[skill_id].question_ids:
             raise Exception(
-                'Question ID %s is not present in %s' % (
+                'Question ID %s is not present in skill %s' % (
                     question_id, self.skills[skill_id].name))
         else:
             self.skills[skill_id].question_ids.remove(question_id)
@@ -1286,24 +1285,24 @@ class Collection(object):
             raise utils.ValidationError(
                 'Expected skills to be a dict, received %s' % self.skills)
 
-        if not isinstance(self.next_skill_id, int):
+        if not isinstance(self.next_skill_index, int):
             raise utils.ValidationError(
-                'Expected next_skill_id to be an int, received %s' %
-                self.next_skill_id)
+                'Expected next_skill_index to be an int, received %s' %
+                self.next_skill_index)
 
-        if self.next_skill_id < 0:
+        if self.next_skill_index < 0:
             raise utils.ValidationError(
-                'Expected next_skill_id to be nonnegative, received %s' %
-                self.next_skill_id)
+                'Expected next_skill_index to be nonnegative, received %s' %
+                self.next_skill_index)
 
         # Validate all skills.
         for skill_id, skill in self.skills.iteritems():
             CollectionSkill.validate_skill_id(skill_id)
 
-            if int(skill_id[5:]) >= self.next_skill_id:
+            if int(skill_id[5:]) >= self.next_skill_index:
                 raise utils.ValidationError(
                     'Expected skill ID number to be less than %s, received %s' %
-                    (self.next_skill_id, skill_id))
+                    (self.next_skill_index, skill_id))
 
             skill.validate()
 
