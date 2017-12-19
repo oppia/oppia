@@ -1,0 +1,12 @@
+<div class="oppia-learner-hint-title"><[isHint ? "Hint" : "Solution"]></div>
+
+<div class="modal-body">
+  <span ng-if="isHint" class="oppia-learner-hint-and-solution-modal-body"
+        angular-html-bind="hint"></span>
+  <span ng-if="!isHint" class="oppia-learner-hint-and-solution-modal-body"
+        angular-html-bind="solution"></span>
+</div>
+
+<button class="oppia-learner-got-it-button md-button md-default-theme pull-right"
+        ng-click="gotIt()">GOT IT</button>
+<span class="clearfix"></span>
