@@ -1,7 +1,7 @@
 <div class="logic-proof-container">
   <span translate="<[questionString]>" translate-values="<[questionStringData]>"></span>
   <div class="logic-proof-input-box">
-    <div ui-codemirror="{onLoad: codeEditor}">
+    <div ui-codemirror="{onLoad: codeEditor, readOnly: !interactionIsActive}">
       <textarea ng-trim="false" rows="10"></textarea>
     </div>
   </div>
