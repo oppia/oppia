@@ -416,7 +416,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
     """Test handler for logout from exploration editor page."""
 
     def test_logout_from_invalid_url(self):
-        """Logout from invalid exploration id should should result
+        """Logout from invalid exploration id should result
         in 404 error.
         """
 

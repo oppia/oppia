@@ -136,7 +136,8 @@ class EditorHandler(base.BaseHandler):
 
     def _get_logout_url(self, redirect_url_on_logout):
         """This overrides the method in base.BaseHandler.
-        Returns logout url for exploration editor.
+        Returns logout url which will be handled by
+        EditorLogoutHandler.
 
         Args:
             redirect_url_on_logout: string. URL to redirect to on logout.
