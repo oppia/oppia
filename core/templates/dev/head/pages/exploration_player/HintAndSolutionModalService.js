@@ -27,7 +27,7 @@ oppia.factory('HintAndSolutionModalService', [
       displayHintModal: function() {
         $modal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_player/hint_and_solution_modal.html'),
+            '/pages/exploration_player/hint_and_solution_modal_directive.html'),
           backdrop: 'static',
           controller: [
             '$scope', '$modalInstance',
@@ -44,7 +44,7 @@ oppia.factory('HintAndSolutionModalService', [
       displaySolutionModal: function() {
         $modal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_player/hint_and_solution_modal.html'),
+            '/pages/exploration_player/hint_and_solution_modal_directive.html'),
           backdrop: 'static',
           controller: [
             '$scope', '$modalInstance',
