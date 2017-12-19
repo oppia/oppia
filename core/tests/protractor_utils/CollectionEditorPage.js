@@ -20,7 +20,6 @@
 // Add existing exploration to the node graph.
 
 var CollectionEditorPage = function() {
-  
   var addExplorationCount = 
     element(by.css('.protractor-test-add-exploration-input'));
 
@@ -60,8 +59,7 @@ var CollectionEditorPage = function() {
   var saveChangesButton = 
     element(by.css('.protractor-test-collection-save-changes-button'));
   
-  this.addExistingExploration = function(explorationId) {
-    
+  this.addExistingExploration = function(explorationId) { 
     addExplorationInput.sendKeys(explorationId);  
    
     // Waits until the button becomes active after debouncing.
@@ -71,7 +69,6 @@ var CollectionEditorPage = function() {
 
   // Search and add existing exploration to the node graph.
   this.searchForAndAddExistingExploration = function(query) {
-    
     addExplorationInput.sendKeys(query);
    
     // Waits until the button becomes active after debouncing.
@@ -115,7 +112,7 @@ var CollectionEditorPage = function() {
 
   // Set collection title.
   this.setTitle = function(title) {
-   editorTitleInput.sendKeys(title);
+    editorTitleInput.sendKeys(title);
   };
 
   // Set collection objective.
