@@ -62,96 +62,65 @@ var CollectionEditorPage = function() {
   
   this.addExistingExploration = function(explorationId) {
     
-    addExplorationInput.sendKeys(explorationId);
-    //element(
-      //by.css('.protractor-test-add-exploration-input')
-    //).sendKeys(explorationId);
+    addExplorationInput.sendKeys(explorationId);  
+   
     // Waits until the button becomes active after debouncing.
     browser.driver.sleep(300);
     addExplorationButton.click();
-
-    //element(by.css('.protractor-test-add-exploration-button')).click();
   };
 
   // Search and add existing exploration to the node graph.
   this.searchForAndAddExistingExploration = function(query) {
     
     addExplorationInput.sendKeys(query);
-    //element(
-     // by.css('.protractor-test-add-exploration-input')
-    //).sendKeys(query);
+   
     // Waits until the button becomes active after debouncing.
     browser.driver.sleep(300);
+   
     // Selects the exploration from dropdown.
-    
     addExplorationInput.sendKeys(protractor.Key.TAB);
-    /*element(
-      by.css('.protractor-test-add-exploration-input')
-    ).sendKeys(protractor.Key.TAB);*/
-    
     addExplorationButton.click();
-    //element(by.css('.protractor-test-add-exploration-button')).click();
+    
   };
 
   // Shift a node left in the node graph.
   this.shiftNodeLeft = function(number) {
-   
     editorShiftLeft.get(number).click();
-
-    /*element.all(
-      by.css('.protractor-test-editor-shift-left')
-    ).get(number).click();*/
   };
 
   // Shift a node right in the node graph.
   this.shiftNodeRight = function(number) {
     editorShiftRight.get(number).click();
-
-    element.all(
-      by.css('.protractor-test-editor-shift-right')
-    ).get(number).click();
   };
 
   // Delete a node in the node graph.
   this.deleteNode = function(number) {
-    
     editorDeleteNode.get(number).click();
-    element.all(
-      by.css('.protractor-test-editor-delete-node')
-    ).get(number).click();
   };
 
   // Save draft of the collection.
   this.saveDraft = function() {
     saveDraftButton.click();
-    element(by.css('.protractor-test-save-draft-button')).click();
   };
 
   // Closes the save modal.
   this.closeSaveModal = function() {
-   
     closeSaveModal.click();
-    //element(by.css('.protractor-test-close-save-modal')).click();
   };
 
   // Click on publish collection.
   this.publishCollection = function() {
     editorPublishButton.click();
-    //element(by.css('.protractor-test-editor-publish-button')).click();
   };
 
   // Set collection title.
   this.setTitle = function(title) {
    editorTitleInput.sendKeys(title);
-   /* element(by.css('.protractor-collection-editor-title-input'))
-      .sendKeys(title);*/
   };
 
   // Set collection objective.
   this.setObjective = function(objective) {
     editorObjectiveInput.sendKeys(objective);
-    /*element(by.css('.protractor-collection-editor-objective-input'))
-      .sendKeys(objective);*/
   };
 
   // Set collection category.
@@ -161,12 +130,8 @@ var CollectionEditorPage = function() {
   };
 
   // Saves changes and publishes collection.
-  this.saveChanges = function () {
-    
+  this.saveChanges = function () {  
     saveChangesButton.click();
-    /*element(
-      by.css('.protractor-test-collection-save-changes-button')
-    ).click();*/
   };
 };
 
