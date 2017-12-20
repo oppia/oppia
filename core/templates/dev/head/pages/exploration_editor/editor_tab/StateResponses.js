@@ -120,18 +120,10 @@ oppia.controller('StateResponses', [
     };
 
     $scope.isSelfLoopWithNoFeedback = function(outcome) {
-      var isSelfLoop = function(outcome) {
-        return (
-          outcome &&
-          outcome.dest === EditorStateService.getActiveStateName());
-      };
       if (!outcome) {
         return false;
       }
-      var hasFeedback = outcome.feedback.some(function(feedbackItem) {
-        return Boolean(feedbackItem);
-      });
-      return isSelfLoop(outcome) && !hasFeedback;
+      return outcome.isConfusing(EditorStateService.getActiveStateName());
     };
 
     $scope.changeActiveAnswerGroupIndex = function(newIndex) {
@@ -167,10 +159,8 @@ oppia.controller('StateResponses', [
       if (!outcome) {
         return false;
       }
-      var hasFeedback = outcome.feedback.some(function(feedbackItem) {
-        return Boolean(feedbackItem);
-      });
-      return $scope.isCurrentInteractionLinear() && !hasFeedback;
+      return $scope.isCurrentInteractionLinear() &&
+        !outcome.hasNonemptyFeedback();
     };
 
     $scope.getOutcomeTooltip = function(outcome) {
@@ -249,7 +239,9 @@ oppia.controller('StateResponses', [
       $rootScope.$broadcast('externalSave');
 
       $modal.open({
-        templateUrl: 'modals/teachOppia',
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/' +
+          'teach_oppia_modal_directive.html'),
         backdrop: false,
         controller: [
           '$scope', '$injector', '$modalInstance',
@@ -317,18 +309,17 @@ oppia.controller('StateResponses', [
 
               var classificationResult = (
                 AnswerClassificationService.getMatchingClassificationResult(
-                  _explorationId, _stateName, _state, answer, true,
-                  rulesService));
-              var feedback = 'Nothing';
+                  _explorationId, _stateName, _state, answer, rulesService));
+              var feedbackHtml = 'Nothing';
               var dest = classificationResult.outcome.dest;
-              if (classificationResult.outcome.feedback.length > 0) {
-                feedback = classificationResult.outcome.feedback[0];
+              if (classificationResult.outcome.hasNonemptyFeedback()) {
+                feedbackHtml = classificationResult.outcome.feedback.getHtml();
               }
               if (dest === _stateName) {
                 dest = '<em>(try again)</em>';
               }
               $scope.trainingDataAnswer = answer;
-              $scope.trainingDataFeedback = feedback;
+              $scope.trainingDataFeedback = feedbackHtml;
               $scope.trainingDataOutcomeDest = dest;
 
               var answerGroupIndex =
@@ -377,20 +368,12 @@ oppia.controller('StateResponses', [
             };
             $scope.tmpRule = RuleObjectFactory.createNew(null, {});
             $scope.tmpOutcome = OutcomeObjectFactory.createNew(
-              EditorStateService.getActiveStateName(), [''], []);
+              EditorStateService.getActiveStateName(), '', []);
 
             $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
-              var hasFeedback = false;
-              for (var i = 0; i < tmpOutcome.feedback.length; i++) {
-                if (tmpOutcome.feedback[i]) {
-                  hasFeedback = true;
-                  break;
-                }
-              }
-
               return (
                 tmpOutcome.dest === EditorStateService.getActiveStateName() &&
-                !hasFeedback);
+                !tmpOutcome.hasNonemptyFeedback());
             };
 
             $scope.addAnswerGroupForm = {};
@@ -398,13 +381,6 @@ oppia.controller('StateResponses', [
             $scope.saveResponse = function(reopen) {
               $scope.$broadcast('saveOutcomeFeedbackDetails');
               $scope.$broadcast('saveOutcomeDestDetails');
-
-              // If the feedback editor is never opened, replace the feedback
-              // with an empty array.
-              if ($scope.tmpOutcome.feedback.length === 1 &&
-                  $scope.tmpOutcome.feedback[0] === '') {
-                $scope.tmpOutcome.feedback = [];
-              }
 
               EditorFirstTimeEventsService.registerFirstSaveRuleEvent();
 
@@ -536,7 +512,7 @@ oppia.filter('summarizeAnswerGroup', [
     return function(answerGroup, interactionId, answerChoices, shortenRule) {
       var summary = '';
       var outcome = answerGroup.outcome;
-      var hasFeedback = outcome.feedback.length > 0 && outcome.feedback[0];
+      var hasFeedback = outcome.hasNonemptyFeedback();
 
       if (answerGroup.rules) {
         var firstRule = $filter('convertToPlainText')(
@@ -554,8 +530,8 @@ oppia.filter('summarizeAnswerGroup', [
       if (hasFeedback) {
         summary += (
           shortenRule ?
-          $filter('truncate')(outcome.feedback[0], 30) :
-          $filter('convertToPlainText')(outcome.feedback[0]));
+          $filter('truncate')(outcome.feedback.getHtml(), 30) :
+          $filter('convertToPlainText')(outcome.feedback.getHtml()));
       }
       return summary;
     };
@@ -572,8 +548,7 @@ oppia.filter('summarizeDefaultOutcome', [
       }
 
       var summary = '';
-      var feedback = defaultOutcome.feedback;
-      var hasFeedback = feedback.length > 0 && feedback[0];
+      var hasFeedback = defaultOutcome.hasNonemptyFeedback();
 
       if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
         summary = INTERACTION_SPECS[interactionId].default_outcome_heading;
@@ -590,7 +565,8 @@ oppia.filter('summarizeDefaultOutcome', [
       summary = '[' + summary + '] ';
 
       if (hasFeedback) {
-        summary += $filter('convertToPlainText')(defaultOutcome.feedback[0]);
+        summary +=
+          $filter('convertToPlainText')(defaultOutcome.feedback.getHtml());
       }
       return summary;
     };

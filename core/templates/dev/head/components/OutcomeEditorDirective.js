@@ -94,10 +94,8 @@ oppia.directive('outcomeEditor', [
             if (!outcome) {
               return false;
             }
-            var hasFeedback = outcome.feedback.some(function(feedbackItem) {
-              return Boolean(feedbackItem);
-            });
-            return $scope.isSelfLoop(outcome) && !hasFeedback;
+            return $scope.isSelfLoop(outcome) &&
+              !outcome.hasNonemptyFeedback();
           };
 
           $scope.invalidStateAfterFeedbackSave = function() {
@@ -113,9 +111,6 @@ oppia.directive('outcomeEditor', [
           $scope.openFeedbackEditor = function() {
             if ($scope.isEditable()) {
               $scope.feedbackEditorIsOpen = true;
-              if ($scope.outcome.feedback.length === 0) {
-                $scope.outcome.feedback.push('');
-              }
             }
           };
 

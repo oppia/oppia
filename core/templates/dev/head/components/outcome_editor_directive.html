@@ -25,12 +25,12 @@
             Please give Oppia something useful to say here.
           </span>
         </span>
-        <span ng-if="(!isSelfLoopWithNoFeedback(outcome) && outcome.feedback.length === 0) || (isSelfLoopWithNoFeedback(outcome) && suppressWarnings())"
+        <span ng-if="(!isSelfLoopWithNoFeedback(outcome) && !outcome.hasNonemptyFeedback()) || (isSelfLoopWithNoFeedback(outcome) && suppressWarnings())"
               style="color: #888">
           <em>Nothing</em>
         </span>
-        <span ng-if="outcome.feedback.length > 0" style="word-wrap: break-word;">
-          <span class="oppia-rte-editor" angular-html-bind="outcome.feedback[0]"></span>
+        <span ng-if="outcome.hasNonemptyFeedback()" style="word-wrap: break-word;">
+          <span class="oppia-rte-editor" angular-html-bind="outcome.feedback.getHtml()"></span>
         </span>
       </div>
     </div>

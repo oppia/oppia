@@ -19,8 +19,8 @@
  */
 
 oppia.factory('TrainingModalService', [
-  '$rootScope', '$modal', 'AlertsService',
-  function($rootScope, $modal, AlertsService) {
+  '$rootScope', '$modal', 'AlertsService', 'UrlInterpolationService',
+  function($rootScope, $modal, AlertsService, UrlInterpolationService) {
     return {
       openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave) {
         AlertsService.clearWarnings();
@@ -29,7 +29,9 @@ oppia.factory('TrainingModalService', [
         }
 
         $modal.open({
-          templateUrl: 'modals/trainUnresolvedAnswer',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/editor_tab/' +
+            'training_unresolved_answer_modal_directive.html'),
           backdrop: true,
           controller: [
             '$scope', '$injector', '$modalInstance',
@@ -75,11 +77,11 @@ oppia.factory('TrainingModalService', [
                 var classificationResult = (
                   AnswerClassificationService.getMatchingClassificationResult(
                     explorationId, currentStateName, state, unhandledAnswer,
-                    true, rulesService));
+                    rulesService));
                 var feedback = 'Nothing';
                 var dest = classificationResult.outcome.dest;
                 if (classificationResult.outcome.feedback.length > 0) {
-                  feedback = classificationResult.outcome.feedback[0];
+                  feedback = classificationResult.outcome.feedback.getHtml();
                 }
                 if (dest === currentStateName) {
                   dest = '<em>(try again)</em>';
