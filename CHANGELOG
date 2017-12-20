@@ -2,6 +2,161 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://github.com/oppia/oppia/commits/master
 
+v2.5.7 (17 Dec 2017)
+--------------------
+Learner View:
+* Fix #4076: Update end exploration (within collection) headers to better illustrate that the user should return to the collection (#4130)
+* Fix #4090: limit number of progress dots for narrow window (#4129)
+* Fix #4102: Auto Hide of Navbar (#4108)
+* Scroll down to latest Oppia response in learner card when in mobile view (#4110)
+* Remove feedback button from mobile learner view. (#4093)
+* Added underline to 'Back to collection' link (#4096)
+* Prevent hint tooltip from going offscreen on mobile (#4087)
+* Various learner view improvements for ItemSelectionInput. (#4083)
+* Stop cards from going offscreen in mobile learner view. (#4084)
+
+Exploration Editor:
+* Fix #3906: Show Addressed column in State Stats Modal (#4147)
+* Check for empty change_list before proceeding. (#4136)
+* Fixed part of #3826 - editorFirstTimeEventsService (#4124)
+* Log error when ExplorationCommitLogEntry model instance is not found for (#4126)
+* Fix exploration graph directive URL. (#4098)
+* Fix #4055: Replaced redundant CSS selectors. (#4059)
+* Fixed #3146 : Reset Button functionality in preview mode (#4078)
+
+Learner Dashboard:
+* Fix #4001: Learner Dashboard Unpublished exploration issue fixed (#4039)
+
+Library:
+* Remove globe from exploration summary cards. (#4132)
+* Fixed Adjust the tooltip displayed when a user hovers over the globe icon on the library page (#4043)
+
+Infrastructure and Refactoring:
+* Move isInteger polyfill to app.js. (#4134)
+* Fix part of #3826: Extract stateEditorTutorialFirstTimeService into individual file (#4137)
+* Fix part of #3826: Extract services from i18n.js  (#4118)
+* Fix part of #3826: Extract ExplorationWarningsService into individual file. (#4106)
+* Fix part of #3826: extract from EditorServices.js (#3970)
+* Fix part of #3826: Extract services from app.js (#4079)
+* Fix part of #3825: Rename angular services in Group 5 (#4111)
+* Renamed RTC_specs to RTC_definitions and removed useless __init__.py file. (#4101)
+* Remove dead code. (#4064)
+* Fix part of #2394: Add docstrings to core.domain.subscription_services.py (#4054)
+
+Statistics:
+* Fix bugs in GenerateV1StatisticsJob (#4125)
+* Fix error in GenerateV1StatisticsJob (#4120)
+* Fix ExplorationStateIdMapping job: Yield errors rather than raising Exception in ExplorationStateIdMapping (#4128)
+* Fix ExplorationStateIdMapping MapReduce job. (#4113)
+* Refactor extensions.answer_summarizers.models logic (#4092)
+* Fix 3946: Add visualization for Item selection inputs (#4080)
+* Fix #3289: Introduce domain objects for answer calculation output (#4036)
+* Fix error in one off stats migration job. (#4068)
+* Add state id mapping mapreduce job to the job registry (#4099)
+* Implement one off MapRreduce job to generate state id mapping model for explorations. (#4088)
+* Implement state id mapping model. (#3963)
+* Fixed #3288: Add tests for stats_visualizations_info (#4035)
+* Fix errors in the one-off job for stats migration (#4061)
+* Fix one last error in the GenerateStatsV1Job (#4215)
+* Convert str versions to int (#4210)
+* Fix error in GenerateV1StatisticsJob (#4208)
+* Fix part of #4195: Modify the references to the continuous stats aggregator (#4201)
+* Modified recording of useful feedback count for both v1 and v2 stats (#4198)
+* Fix #4179: update calculation for 'addressed' status; make some UI fixes. (#4196)
+* Fix #4167: Update answer summarizers job to properly handle answers corresponding to deleted explorations (#4168)
+* Handle state migrations in GenerateV1StatisticsJobV1 (#4193)
+* Fix #4153: Optional addressed column (#4186)
+* Fix #4188: Fixes for the GenerateV1StatisticsJob (#4189)
+* Fix part of #4182: make yielded value in map a tuple. (#4183)
+* Fix part of #4182: Handle None version events (#4184)
+* Fix #4169: Fixes Key error due to plus sign replacements (#4172)
+* Catch Exception when failing to retrieve explorations. (#4157)
+* Fix #4152: fix bug in solution verification service. (#4154)
+* UI fixes to the stats tab (#4150)
+
+Speed:
+* Fixed part of #3950: Replace Jinja templates in feedback_tab.html with Angular (#4123)
+
+Interactions:
+* Fix remainder of #3794: Add a fraction input interaction (#4100)
+* Fix part of #2575: Interactions refactor first milestone (#4115)
+* Fix part of #3794: Complete milestone 2 of fraction interaction (#4067)
+* Fix #4216 and #4218: link correctly to static assets in interactions. (#4219)
+* Fixed error with Clickable image (#4207)
+* Fix #4180: bug with the fractions interaction checking integer parts. (#4181)
+* Fix #4180: bug with the fractions interaction checking integer parts.
+
+Misc:
+* Fix #4140: correctly generalize permissions for creating collections. (#4142)
+* Update PULL_REQUEST_TEMPLATE.md (#4117)
+* Minor updates to CHANGELOG v2.5.6 after proofreading (#4097)
+* Update Authors, Contributors, Changelog, Credits for Release 2.5.6. (#4095)
+* Routine update of translations. (#4082)
+* Fix part of #3954: Created a Page Object for Thanks Page (#4085)
+* Upgrade SSL library version; remove obsolete challenge-response handler. (#4081)
+* Simplify karma coverage specification. (#4066)
+* Update deploy script (#4156)
+
+
+v2.5.6 (20 Nov 2017)
+--------------------
+Learner View:
+* Have the tutor card appear directly above the supplemental card on mobile (#3936)
+
+Exploration Editor:
+* Fix #3794: Complete milestone one of introducing the new fraction interaction. (#3967)
+* Replaced the correct CSS styling for md-checkbox
+* Fix #3997: Added proper css for CodeRepl preview (#4053)
+* Shorten answer group header summaries so that the existence of multiple rules can be seen. (#4030)
+* Fix #3975: Removed repeated warnings for non-alphanumeric strings.
+
+Creator Dashboard:
+* Fix #3257: Remember list/grid display preference in the creator dashboard.(#3803)
+
+Site Navigation:
+* Text tweak for Teach page. (#4032)
+* Fix typo in Donations paragraph (#4040)
+
+Embedding:
+* Fix #3976: Show supplemental interactions in embedded explorations (#4052)
+
+Infrastructure and Refactoring:
+* Fix part of #3950: Replace Jinja templates in frontend with Angular (#4050)
+* Fix part of #3950: Replace Jinja templates in frontend with Angular (#4019)
+* Fix part of #3950: Replace Jinja templates in frontend with Angular (#4037)
+* Fix #3954: Add AdminPage page object (#3974)
+* Fix #3891: Changes made for remaining directives.
+
+Statistics:
+* Fix #3987: Reworked Stats tab (#3992)
+* Fix #3958: One-off job to use existing stats data to create new ExplorationStatsModels (#3959)
+* Only record stats for solutions if not in preview mode. (#4049)
+* Fix #3422: Fix answer summarizer job interaction updating (#3955)
+* Introduce event model schema version and modify ExplorationStatsModel (#3960)
+* Fix #3912: Introduce incremental statistics update and event recording functionality (#3916)
+
+Audio:
+* Add fallback for browsers which do not support speech synthesis. (#4028)
+* Add fallback to blob-builder on low-end devices (#3937)
+* Allow creators to optionally disable automatic text-to-speech for an exploration. (#3918)
+* Fix #3993: Standardize check for whether autogenerated translations are shown. (#4002)
+
+Hints:
+* Show a tooltip over hint button to suggest that the learner use a hint after a few attempts.
+* Fix #4015: Added e2e tests for hints/solutions (#4033)
+* Fix #3805: On mobile, the tooltip for the hint button is cutoff on the right edge of the screen.
+
+Speed:
+* Fix #3254: Load MathJax only where needed (#4042)
+
+Misc:
+* Fix #3791: Paragraph spacing fix (#4048)
+* Reformat frontend error message so that StackDriver hopefully catches it. (#4045)
+* Fix #4046: SITE_NAME replacement error fixed in license explanation page (#4051)
+* Fix part of #2575: Remove load errors from the frontend tests (#4041)
+* Fix errors in production due to parameters not working correctly. (#4029)
+* Fix issue with lastComputedArrangement occasionally being undefined when calculating the destination state lists.
+
 
 v2.5.5 (20 Oct 2017)
 --------------------

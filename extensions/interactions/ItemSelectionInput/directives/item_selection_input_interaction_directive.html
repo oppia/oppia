@@ -1,0 +1,51 @@
+<div class="item-selection-input-form-container">
+  <form ng-submit="submitAnswer()">
+    <small ng-if="displayCheckboxes">
+      <span ng-if="notEnoughSelections">
+        <span translate="I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH" translate-values="{minChoiceNumber:<[minAllowableSelectionCount]>}" translate-interpolation="messageformat"></span>
+      </span>
+
+      <span ng-if="preventAdditionalSelections">
+        <span translate="I18N_INTERACTIONS_ITEM_SELECTION_PREVENT_MORE" translate-values="{maxAllowableSelectionCount:<[maxAllowableSelectionCount]>}" translate-interpolation="messageformat">
+        </span>
+      </span>
+
+      <span ng-if="!notEnoughSelections && !preventAdditionalSelections">
+        <span translate="I18N_INTERACTIONS_ITEM_SELECTION_MORE"></span>
+      </span>
+    </small>
+    <div class="item-selection-input-container" ng-repeat="choice in choices track by $index">
+      <div ng-if="displayCheckboxes">
+        <label class="item-selection-input-item">
+          <md-checkbox class="item-selection-input-checkbox" ng-model="userSelections[choice]" ng-checked="userSelections[choice]"
+            ng-change="onToggleCheckbox()" ng-disabled="preventAdditionalSelections && !userSelections[choice]" tabindex="0">
+            <span angular-html-bind="choice"></span>
+          </md-checkbox>
+        </label>
+      </div>
+
+      <div ng-if="!displayCheckboxes">
+        <button class="multiple-choice-option" ng-click="submitMultipleChoiceAnswer($index)">
+          <div class="multiple-choice-radio-button-container">
+            <span class="multiple-choice-outer-radio-button">
+            <span class="multiple-choice-inner-radio-button"></span>
+            </span>
+          </div>
+          <div class="multiple-choice-content-container">
+            <span class="protractor-test-multiple-choice-option" angular-html-bind="choice"></span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- The following div will only show if maxAllowableSelectionCount is at
+      least 2. If maxAllowableSelectionCount is 1, the choices will be buttons
+      rather than checkboxes. -->
+    <div ng-if="displayCheckboxes">
+      <md-button class="oppia-learner-confirm-button"
+                 ng-click="submitAnswer(userSelections)" aria-label="Submit"
+                 ng-disabled="notEnoughSelections" translate="I18N_INTERACTIONS_ITEM_SELECTION_SUBMIT">
+      </md-button>
+    </div>
+  </form>
+</div>

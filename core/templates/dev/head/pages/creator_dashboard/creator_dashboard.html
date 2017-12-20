@@ -24,29 +24,35 @@
 {% block content %}
   <background-banner></background-banner>
   <div class="oppia-dashboard-container" ng-controller="CreatorDashboard" style="position: relative;">
-    <div class="oppia-dashboard-aggregated-stats" ng-if="explorationsList.length > 0 || collectionsList.length > 0">
+    <div class="oppia-dashboard-aggregated-stats oppia-creator-dashboard-main-content"
+         style="margin: auto;" ng-if="explorationsList.length > 0 || collectionsList.length > 0"
+         ng-class="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}">
       <md-card layout="row">
         <div class="average-ratings stats-card">
           <p class="stat-description" translate="I18N_DASHBOARD_STATS_AVERAGE_RATING"></p>
-          <h1 class="stat-value"><[dashboardStats.average_ratings || 'N/A']></h1>
+          <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.average_ratings || 'N/A']></h1>
+          <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.average_ratings || 'N/A']></h1>
           <p ng-hide="!dashboardStats.num_ratings">
             (by <[dashboardStats.num_ratings]> users)
           </p>
         </div>
         <div class="total-plays stats-card">
           <p class="stat-description" translate="I18N_DASHBOARD_STATS_TOTAL_PLAYS"></p>
-          <h1 class="stat-value"><[dashboardStats.total_plays]></h1>
+          <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_plays]></h1>
+          <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_plays]></h1>
           <p ng-hide="!relativeChangeInTotalPlays">
             (+<[relativeChangeInTotalPlays]> from last week)
           </p>
         </div>
         <div class="total-open-feedback stats-card">
           <p class="stat-description" translate="I18N_DASHBOARD_STATS_OPEN_FEEDBACK"></p>
-          <h1 class="stat-value"><[dashboardStats.total_open_feedback]></h1>
+          <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_open_feedback]></h1>
+          <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_open_feedback]></h1>
         </div>
         <div class="total-open-feedback stats-card">
           <p class="stat-description" translate="I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS"></p>
-          <h1 class="stat-value"><[subscribersList.length]></h1>
+          <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[subscribersList.length]></h1>
+          <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[subscribersList.length]></h1>
         </div>
       </md-card>
     </div>
@@ -60,19 +66,15 @@
              translate="I18N_DASHBOARD_EXPLORATIONS">
           </a>
         </li>
-        {% if not can_create_collections %}
-          <!-- A layout fix when the 'My Collections' tab is absent. -->
-          <li ng-if="collectionsList.length === 0 && subscribersList.length === 0"></li>
-        {% endif %}
-        {% if can_create_collections %}
-          <li ng-if="collectionsList.length > 0"
-              ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
-            <a class="oppia-dashboard-tabs-text"
-               ng-click="setActiveTab('myCollections')"
-               translate="I18N_DASHBOARD_COLLECTIONS">
-            </a>
-          </li>
-        {% endif %}
+        <!-- A layout fix when the 'My Collections' tab is absent. -->
+        <li ng-if="!canCreateCollections && collectionsList.length === 0 && subscribersList.length === 0"></li>
+        <li ng-if="canCreateCollections && collectionsList.length > 0"
+            ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
+          <a class="oppia-dashboard-tabs-text"
+              ng-click="setActiveTab('myCollections')"
+              translate="I18N_DASHBOARD_COLLECTIONS">
+          </a>
+        </li>
         <li ng-if="subscribersList.length > 0"
             class="protractor-test-subscription-tab"
             ng-class="{'oppia-dashboard-tabs-active': activeTab === 'mySubscribers'}">
@@ -352,29 +354,27 @@
       </md-card>
     </div>
 
-    {% if can_create_collections %}
-      <div ng-if="activeTab === 'myCollections'">
-        <div ng-if="collectionsList.length === 0" class="oppia-dashboard-empty-text">
-          <em>There are no collections to display.</em>
-        </div>
-
-        <ul class="oppia-dashboard-tiles"
-            ng-if="activeTab === 'myCollections' && collectionsList.length > 0">
-          <span ng-repeat="collection in collectionsList">
-            <collection-summary-tile class="protractor-test-collection-card"
-                                     collection-id="collection.id"
-                                     collection-title="collection.title"
-                                     last-updated-msec="collection.last_updated"
-                                     node-count="collection.node_count"
-                                     objective="collection.objective"
-                                     thumbnail-icon-url="collection.thumbnail_icon_url"
-                                     thumbnail-bg-color="collection.thumbnail_bg_color"
-                                     is-linked-to-editor-page="true">
-            </collection-summary-tile>
-          </span>
-        </ul>
+    <div ng-if="canCreateCollections && activeTab === 'myCollections'">
+      <div ng-if="collectionsList.length === 0" class="oppia-dashboard-empty-text">
+        <em>There are no collections to display.</em>
       </div>
-    {% endif %}
+
+      <ul class="oppia-dashboard-tiles"
+          ng-if="activeTab === 'myCollections' && collectionsList.length > 0">
+        <span ng-repeat="collection in collectionsList">
+          <collection-summary-tile class="protractor-test-collection-card"
+                                   collection-id="collection.id"
+                                   collection-title="collection.title"
+                                   last-updated-msec="collection.last_updated"
+                                   node-count="collection.node_count"
+                                   objective="collection.objective"
+                                   thumbnail-icon-url="collection.thumbnail_icon_url"
+                                   thumbnail-bg-color="collection.thumbnail_bg_color"
+                                   is-linked-to-editor-page="true">
+          </collection-summary-tile>
+        </span>
+      </ul>
+    </div>
   </div>
 
 {% endblock %}

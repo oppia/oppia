@@ -14,7 +14,7 @@
      tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
      tooltip-append-to-body="true"></i>
 </div>
-<span ng-if="audioIsLoading" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_LOADING_AUDIO"></span>
+<span ng-if="audioLoadingIndicatorIsShown" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_LOADING_AUDIO"></span>
 <span ng-if="audioSettingsButtonIsShown && isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT"></span>
 
 <style>

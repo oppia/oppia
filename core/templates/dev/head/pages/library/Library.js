@@ -28,16 +28,16 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 
 oppia.controller('Library', [
   '$scope', '$http', '$modal', '$rootScope', '$window', '$timeout',
-  'i18nIdService', 'UrlService', 'ALL_CATEGORIES', 'SearchService',
-  'WindowDimensionsService', 'UrlInterpolationService', 'LIBRARY_PAGE_MODES',
-  'LIBRARY_TILE_WIDTH_PX', 'alertsService',
+  'ConstructTranslationIdsService', 'UrlService', 'ALL_CATEGORIES',
+  'SearchService', 'WindowDimensionsService', 'UrlInterpolationService',
+  'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX', 'AlertsService',
   'LearnerDashboardIdsBackendApiService',
   'LearnerDashboardActivityIdsObjectFactory', 'LearnerPlaylistService',
   function(
       $scope, $http, $modal, $rootScope, $window, $timeout,
-      i18nIdService, UrlService, ALL_CATEGORIES, SearchService,
-      WindowDimensionsService, UrlInterpolationService, LIBRARY_PAGE_MODES,
-      LIBRARY_TILE_WIDTH_PX, alertsService,
+      ConstructTranslationIdsService, UrlService, ALL_CATEGORIES,
+      SearchService, WindowDimensionsService, UrlInterpolationService,
+      LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX, AlertsService,
       LearnerDashboardIdsBackendApiService,
       LearnerDashboardActivityIdsObjectFactory, LearnerPlaylistService) {
     $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';

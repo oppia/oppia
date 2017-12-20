@@ -33,9 +33,10 @@ class BaseVisualization(object):
     def id(self):
         return self.__class__.__name__
 
-    def __init__(self, calculation_id, options_dict):
+    def __init__(self, calculation_id, options_dict, show_addressed_info):
         self.options = options_dict
         self.calculation_id = calculation_id
+        self.show_addressed_info = show_addressed_info
 
     def validate(self):
         """Validates a visualization object.
@@ -60,6 +61,12 @@ class BaseVisualization(object):
             schema_utils.normalize_against_schema(
                 self.options[spec['name']], spec['schema'])
 
+        # Check that show_addressed_info is valid.
+        if not isinstance(self.show_addressed_info, bool):
+            raise utils.ValidationError(
+                'For visualization %s, expected a bool value for '
+                'show_addressed_info; received %s' % self.show_addressed_info)
+
 
 class BarChart(BaseVisualization):
     """A visualization representing a bar chart."""
@@ -81,6 +88,31 @@ class BarChart(BaseVisualization):
 
 class FrequencyTable(BaseVisualization):
     """A visualization representing a two-column table with answer counts."""
+
+    _OPTIONS_SPECS = [{
+        'name': 'column_headers',
+        'description': 'The headers for the columns.',
+        'schema': {
+            'type': 'list',
+            'items': {
+                'type': 'unicode',
+            },
+            'len': 2,
+        },
+    }, {
+        'name': 'title',
+        'description': 'The title of the visualization.',
+        'schema': {'type': 'unicode'}
+    }]
+
+
+class EnumeratedFrequencyTable(BaseVisualization):
+    """A visualization representing a two-column table with answer counts. The
+    answer column is made up of a clickable ranking, which toggles the
+    visibility of the answer's content below it.
+
+    The #1 entry is shown by default, all others start hidden.
+    """
 
     _OPTIONS_SPECS = [{
         'name': 'column_headers',

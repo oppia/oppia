@@ -67,22 +67,22 @@ oppia.constant('FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS', {
 });
 
 oppia.controller('LearnerDashboard', [
-  '$scope', '$rootScope', '$window', '$http', '$modal', 'alertsService',
+  '$scope', '$rootScope', '$window', '$http', '$modal', 'AlertsService',
   'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
   'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
   'LearnerDashboardBackendApiService', 'UrlInterpolationService',
   'LEARNER_DASHBOARD_SECTION_I18N_IDS',
   'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'ThreadStatusDisplayService',
-  'oppiaDatetimeFormatter', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
+  'DateTimeFormatService', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
   'FeedbackThreadSummaryObjectFactory', 'FeedbackMessageSummaryObjectFactory',
   function(
-      $scope, $rootScope, $window, $http, $modal, alertsService,
+      $scope, $rootScope, $window, $http, $modal, AlertsService,
       EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
       SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
       LearnerDashboardBackendApiService, UrlInterpolationService,
       LEARNER_DASHBOARD_SECTION_I18N_IDS,
       LEARNER_DASHBOARD_SUBSECTION_I18N_IDS, ThreadStatusDisplayService,
-      oppiaDatetimeFormatter, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
+      DateTimeFormatService, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
       FeedbackThreadSummaryObjectFactory, FeedbackMessageSummaryObjectFactory) {
     $scope.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
       EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
@@ -109,7 +109,7 @@ oppia.controller('LearnerDashboard', [
     $scope.getHumanReadableStatus = (
       ThreadStatusDisplayService.getHumanReadableStatus);
     $scope.getLocaleAbbreviatedDatetimeString = (
-      oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
+      DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
     $scope.setActiveSection = function(newActiveSectionName) {
       $scope.activeSection = newActiveSectionName;
@@ -570,7 +570,7 @@ oppia.controller('LearnerDashboard', [
       },
       function(errorResponse) {
         if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-          alertsService.addWarning('Failed to get learner dashboard data');
+          AlertsService.addWarning('Failed to get learner dashboard data');
         }
       }
     );
