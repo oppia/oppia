@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the AnswerClassificationResultObjectFactory.
+ * @fileoverview Unit tests for the ClassifierObjectFactory.
  */
  
 describe('Classifier Object Factory', function() {
@@ -23,9 +23,9 @@ describe('Classifier Object Factory', function() {
 
   beforeEach(inject(function($injector) {
     ClassifierObjectFactory = $injector.get('ClassifierObjectFactory');
-    }));
+  }));
 
-    it('should create a new result', function() {
+  it('should create a new result', function() {
     var classifierObject = (
      ClassifierObjectFactory.create(
         0, 'classifierData', 'dataSchemaVersion'));
