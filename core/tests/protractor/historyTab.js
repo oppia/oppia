@@ -102,10 +102,11 @@ describe('Exploration history', function() {
       },
       11: {
         text: '        audio_translations: {}',
-        highlighted: false
+        highlighted: true
       },
       12: {
-        text: '        html: \'\''
+        text: '        html: \'\'',
+        highlighted: true
       },
       13: {
         text: '      param_changes: []',
