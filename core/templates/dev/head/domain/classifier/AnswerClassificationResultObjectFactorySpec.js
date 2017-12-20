@@ -17,15 +17,16 @@
  */
  
 describe('Answer Classification Object Factory', function() {
-	var AnswerClassificationResultFactory;
+  var AnswerClassificationResultFactory;
 
-	beforeEach(module('oppia'));
+  beforeEach(module('oppia'));
 
-	beforeEach(inject(function($injector) {
-    AnswerClassificationResultFactory = $injector.get('AnswerClassificationResultFactory');
+  beforeEach(inject(function($injector) {
+    AnswerClassificationResultFactory = $injector.get(
+        'AnswerClassificationResultFactory');
     }));
 
-    it('should create a new result', function() {
+  it('should create a new result', function() {
     var answerClassificationResult = (
      AnswerClassificationResultFactory.createNew(
         0, 0, 0, 'classificationCategorization'));
