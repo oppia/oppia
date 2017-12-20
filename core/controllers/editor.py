@@ -115,7 +115,7 @@ class EditorLogoutHandler(base.BaseHandler):
                 exploration_id, strict=False)
 
             if exploration_rights is None or exploration_rights.is_private():
-            	url_to_redirect_to = feconf.LIBRARY_INDEX_URL
+                url_to_redirect_to = feconf.LIBRARY_INDEX_URL
         else:
             url_to_redirect_to = feconf.LIBRARY_INDEX_URL
 
