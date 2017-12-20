@@ -21,12 +21,14 @@
  */
 
 oppia.directive('oppiaInteractivePencilCodeEditor', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
+  function(HtmlEscaperService, UrlInterpolationService,
+      EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/PencilCodeEditor/directives/' +
@@ -36,11 +38,26 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
         'FocusManagerService', 'pencilCodeEditorRulesService',
         function($scope, $attrs, $element, $timeout, $modal,
           FocusManagerService, pencilCodeEditorRulesService) {
-          $scope.initialCode = HtmlEscaperService.escapedJsonToObj(
-            $attrs.initialCodeWithValue);
+          if ($scope.getLastAnswer()) {
+            $scope.interactionIsActive = false;
+            $scope.initialCode = $scope.getLastAnswer().code;
+          } else {
+            $scope.interactionIsActive = true;
+            $scope.initialCode = HtmlEscaperService.escapedJsonToObj(
+              $attrs.initialCodeWithValue);
+          }
+
           var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
           var pce = new PencilCodeEmbed(iframeDiv);
           pce.beginLoad($scope.initialCode);
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function( evt, data) {
+            if (data) {
+              $scope.interactionIsActive = false;
+              pce.hideMiddleButton();
+              pce.hideToggleButton();
+              pce.setReadOnly();
+            }
+          });
           pce.on('load', function() {
             // Hides the error console at the bottom right, and prevents it
             // from showing up even if the code has an error. Also, hides the
@@ -62,9 +79,15 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
               type: 'text/javascript'
             }]);
 
-            pce.hideToggleButton();
-            pce.setEditable();
             pce.showEditor();
+            if ($scope.interactionIsActive) {
+              pce.hideToggleButton();
+              pce.setEditable();
+            } else {
+              pce.hideMiddleButton();
+              pce.hideToggleButton();
+              pce.setReadOnly();
+            }
 
             // Pencil Code automatically takes the focus on load, so we clear
             // it.
