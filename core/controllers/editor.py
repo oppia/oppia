@@ -221,6 +221,8 @@ class ExplorationHandler(EditorHandler):
         editor_dict = {
             'auto_tts_enabled': exploration.auto_tts_enabled,
             'category': exploration.category,
+            'correctness_feedback_enabled': (
+                exploration.correctness_feedback_enabled),
             'draft_change_list_id': draft_change_list_id,
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,

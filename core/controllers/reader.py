@@ -284,7 +284,9 @@ class ExplorationHandler(base.BaseHandler):
             'version': exploration.version,
             'preferred_audio_language_code': preferred_audio_language_code,
             'state_classifier_mapping': state_classifier_mapping,
-            'auto_tts_enabled': exploration.auto_tts_enabled
+            'auto_tts_enabled': exploration.auto_tts_enabled,
+            'correctness_feedback_enabled': (
+                exploration.correctness_feedback_enabled),
         })
         self.render_json(self.values)
 
