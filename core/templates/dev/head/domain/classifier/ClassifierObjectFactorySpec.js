@@ -25,7 +25,7 @@ describe('Classifier Object Factory', function() {
     ClassifierObjectFactory = $injector.get('ClassifierObjectFactory');
   }));
 
-  it('should create a new result', function() {
+  it('should create a new classifier', function() {
     var classifierObject = (
      ClassifierObjectFactory.create(
         0, 'classifierData', 'dataSchemaVersion'));
@@ -36,4 +36,3 @@ describe('Classifier Object Factory', function() {
       'dataSchemaVersion');
   });
 });
- 
