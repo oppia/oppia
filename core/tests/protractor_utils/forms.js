@@ -280,7 +280,7 @@ var MultiSelectEditor = function(elem) {
         filteredElements[i].click();
         // Reopen the dropdown menu, since it closes after an item is
         // toggled.
-        elem.element(by.css('.uib-dropdown-toggle')).click();
+        //elem.element(by.css('.uib-dropdown-toggle')).click();
       }
 
       // Close the dropdown menu at the end.
