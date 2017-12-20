@@ -28,7 +28,7 @@ describe('Answer Classification Object Factory', function() {
 
   it('should create a new result', function() {
     var answerClassificationResult = (
-     AnswerClassificationResultFactory.createNew(
+      AnswerClassificationResultFactory.createNew(
         0, 0, 0, 'classificationCategorization'));
 
     expect(answerClassificationResult.outcome).toEqual(0);
@@ -38,4 +38,3 @@ describe('Answer Classification Object Factory', function() {
       'classificationCategorization');
   });
 });
- 
