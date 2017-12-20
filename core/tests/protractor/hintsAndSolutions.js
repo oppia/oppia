@@ -63,8 +63,10 @@ describe('HintsAndSolutions', function() {
       forms.toRichText('What language is Oppia?'));
     explorationPlayerPage.submitAnswer('TextInput', 'Roman');
     explorationPlayerPage.viewHint();
+    explorationPlayerPage.clickGotItButton();
     explorationPlayerPage.submitAnswer('TextInput', 'Greek');
     explorationPlayerPage.viewSolution();
+    explorationPlayerPage.clickGotItButton();
     explorationPlayerPage.expectExplorationToNotBeOver();
     explorationPlayerPage.submitAnswer('TextInput', 'Finnish');
     explorationPlayerPage.clickThroughToNextCard();

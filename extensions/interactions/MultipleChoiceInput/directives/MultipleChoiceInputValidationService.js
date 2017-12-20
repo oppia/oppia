@@ -98,8 +98,7 @@ oppia.factory('MultipleChoiceInputValidationService', [
         // Only require a default rule if some choices have not been taken care
         // of by rules.
         if (selectedEqualsChoices.length < numChoices) {
-          if (!defaultOutcome ||
-              $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
+          if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
             warningsList.push({
               type: WARNING_TYPES.ERROR,
               message: 'Please add something for Oppia to say in the ' +

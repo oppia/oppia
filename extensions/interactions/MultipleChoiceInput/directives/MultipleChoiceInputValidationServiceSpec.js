@@ -18,6 +18,7 @@ describe('MultipleChoiceInputValidationService', function() {
   var currentState, goodOutcomeDest;
   var badOutcome, goodAnswerGroups, goodDefaultOutcome;
   var validatorService, customizationArguments;
+  var oof;
 
   beforeEach(function() {
     module('oppia');
@@ -25,20 +26,27 @@ describe('MultipleChoiceInputValidationService', function() {
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
     validatorService = $injector.get('MultipleChoiceInputValidationService');
-
     WARNING_TYPES = $injector.get('WARNING_TYPES');
-
+    oof = $injector.get('OutcomeObjectFactory');
     currentState = 'First State';
 
-    goodDefaultOutcome = {
+    goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
-      feedback: []
-    };
+      feedback: {
+        html: '',
+        audio_translations: {}
+      },
+      param_changes: []
+    });
 
-    badOutcome = {
+    badOutcome = oof.createFromBackendDict({
       dest: currentState,
-      feedback: []
-    };
+      feedback: {
+        html: '',
+        audio_translations: {}
+      },
+      param_changes: []
+    });
 
     customizationArguments = {
       choices: {
