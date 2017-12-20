@@ -21,16 +21,29 @@
  */
 oppia.directive('oppiaInteractiveCodeRepl', [
   'HtmlEscaperService', 'codeReplRulesService', 'UrlInterpolationService',
-  function(HtmlEscaperService, codeReplRulesService, UrlInterpolationService) {
+  'EVENT_NEW_CARD_AVAILABLE',
+  function(HtmlEscaperService, codeReplRulesService, UrlInterpolationService,
+      EVENT_NEW_CARD_AVAILABLE ) {
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/CodeRepl/directives/' +
         'code_repl_interaction_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
+        if ($scope.getLastAnswer()) {
+          $scope.interactionIsActive = false;
+        } else {
+          $scope.interactionIsActive = true;
+        }
+        $scope.$on(EVENT_NEW_CARD_AVAILABLE, function( evt, data) {
+          if (data) {
+            $scope.interactionIsActive = false;
+          }
+        });
         $scope.language = HtmlEscaperService.escapedJsonToObj(
           $attrs.languageWithValue);
         $scope.placeholder = HtmlEscaperService.escapedJsonToObj(
@@ -56,9 +69,14 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 
         // Keep the code string given by the user and the stdout from the
         // evaluation until sending them back to the server.
-        $scope.code = (
-          $scope.preCode + $scope.placeholder + $scope.postCode);
         $scope.output = '';
+        if ($scope.interactionIsActive) {
+          $scope.code = (
+            $scope.preCode + $scope.placeholder + $scope.postCode);
+        } else {
+          $scope.code = ($scope.getLastAnswer().code);
+          $scope.output = ($scope.getLastAnswer().output);
+        }
 
         $scope.initCodeEditor = function(editor) {
           editor.setValue($scope.code);
