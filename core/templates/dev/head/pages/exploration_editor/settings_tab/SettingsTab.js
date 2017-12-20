@@ -56,7 +56,6 @@ oppia.controller('SettingsTab', [
     $scope.isRolesFormOpen = false;
 
     $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
-
     $scope.canDelete = GLOBALS.canDelete;
     $scope.canModifyRoles = GLOBALS.canModifyRoles;
     $scope.canReleaseOwnership = GLOBALS.canReleaseOwnership;
