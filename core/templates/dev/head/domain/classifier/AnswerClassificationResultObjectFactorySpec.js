@@ -24,7 +24,7 @@ describe('Answer Classification Object Factory', function() {
   beforeEach(inject(function($injector) {
     AnswerClassificationResultFactory = $injector.get(
         'AnswerClassificationResultFactory');
-    }));
+  }));
 
   it('should create a new result', function() {
     var answerClassificationResult = (
@@ -36,6 +36,6 @@ describe('Answer Classification Object Factory', function() {
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(
       'classificationCategorization');
-    });
+  });
 });
  

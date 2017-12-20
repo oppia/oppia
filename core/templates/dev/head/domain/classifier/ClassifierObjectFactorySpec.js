@@ -34,6 +34,6 @@ describe('Classifier Object Factory', function() {
     expect(classifierObject.classifierData).toEqual('classifierData');
     expect(classifierObject.dataSchemaVersion).toEqual(
       'dataSchemaVersion');
-    });
+  });
 });
  
