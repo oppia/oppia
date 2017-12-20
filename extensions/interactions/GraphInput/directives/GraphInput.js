@@ -232,9 +232,11 @@ oppia.directive('graphViz', [
         'graph_viz_directive.html'),
       controller: [
         '$scope', '$element', '$attrs', '$document', 'FocusManagerService',
-        'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN', 'EVENT_NEW_CARD_AVAILABLE',
+        'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
+        'EVENT_NEW_CARD_AVAILABLE',
         function($scope, $element, $attrs, $document, FocusManagerService,
-            graphDetailService, GRAPH_INPUT_LEFT_MARGIN, EVENT_NEW_CARD_AVAILABLE) {
+            graphDetailService, GRAPH_INPUT_LEFT_MARGIN,
+            EVENT_NEW_CARD_AVAILABLE) {
           var _MODES = {
             MOVE: 0,
             ADD_EDGE: 1,
