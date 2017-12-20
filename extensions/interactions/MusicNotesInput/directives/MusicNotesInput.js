@@ -331,7 +331,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                         tolerance: 'intersect',
                         revert: function() {
                           var draggableOptions = $(this);
-                          // If note is out of droppable or off staff, remove it.
+                          // If note is out of droppable or off staff, remove it
                           if (isCloneOffStaff(draggableOptions)) {
                             scope._removeNotesFromNoteSequenceWithId(
                               draggableOptions.data('noteId'));
@@ -343,15 +343,15 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                     }
                   }
                 });
-             } else {
-               var innerDiv = $('<div></div>')
-                 .data('noteType', NOTE_TYPES[i])
-                 .addClass(function() {
-                   if ($(this).data('noteType') === NOTE_TYPE_NATURAL) {
-                     $(this).addClass('oppia-music-input-natural-note');
-                   }
-                 });
-              }
+            } else {
+              var innerDiv = $('<div></div>')
+               .data('noteType', NOTE_TYPES[i])
+               .addClass(function() {
+                 if ($(this).data('noteType') === NOTE_TYPE_NATURAL) {
+                   $(this).addClass('oppia-music-input-natural-note');
+                 }
+               });
+            }
             noteChoicesDiv.append(innerDiv);
           }
         };
@@ -704,7 +704,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                 note.noteId
               );
             }
-        }
+          }
         };
 
         var _getCorrespondingNoteName = function(midiNumber) {
