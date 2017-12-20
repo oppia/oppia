@@ -46,7 +46,7 @@
       <form>
         <div class="trained-feedback-selection-container" ng-repeat="outcome in allOutcomes track by $index">
           <button class="trained-feedback-selection" ng-click="confirmAnswerGroupIndex($index)">
-            <span ng-if="outcome.feedback.length > 0" angular-html-bind="outcome.feedback[0]">
+            <span ng-if="outcome.feedback.length > 0" angular-html-bind="outcome.feedback.getHtml()">
             </span>
             <span ng-if="outcome.feedback.length == 0">
               <em>(No feedback)</em>

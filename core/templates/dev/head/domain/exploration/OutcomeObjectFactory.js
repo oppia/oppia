@@ -17,31 +17,47 @@
  * domain objects.
  */
 
-oppia.factory('OutcomeObjectFactory', [function() {
-  var Outcome = function(dest, feedback, paramChanges) {
-    this.dest = dest;
-    this.feedback = feedback;
-    this.paramChanges = paramChanges;
-  };
-
-  Outcome.prototype.toBackendDict = function() {
-    return {
-      dest: this.dest,
-      feedback: this.feedback,
-      param_changes: this.paramChanges
+oppia.factory('OutcomeObjectFactory', [
+  'SubtitledHtmlObjectFactory',
+  function(
+    SubtitledHtmlObjectFactory) {
+    var Outcome = function(dest, feedback, paramChanges) {
+      this.dest = dest;
+      this.feedback = feedback;
+      this.paramChanges = paramChanges;
     };
-  };
 
-  Outcome.createNew = function(dest, feedback, paramChanges) {
-    return new Outcome(dest, feedback, paramChanges);
-  };
+    Outcome.prototype.toBackendDict = function() {
+      return {
+        dest: this.dest,
+        feedback: this.feedback.toBackendDict(),
+        param_changes: this.paramChanges
+      };
+    };
+    /** Returns true iff an outcome has a self-loop and no feedback. */
+    Outcome.prototype.isConfusing = function(currentStateName) {
+      return (
+        this.dest === currentStateName &&
+        !this.hasNonemptyFeedback()
+      );
+    };
 
-  Outcome.createFromBackendDict = function(outcomeDict) {
-    return new Outcome(
-      outcomeDict.dest,
-      outcomeDict.feedback,
-      outcomeDict.param_changes);
-  };
+    Outcome.prototype.hasNonemptyFeedback = function() {
+      return this.feedback.getHtml().trim() !== '';
+    };
 
-  return Outcome;
-}]);
+    Outcome.createNew = function(dest, feedbackText, paramChanges) {
+      return new Outcome(dest,
+        SubtitledHtmlObjectFactory.createDefault(feedbackText), paramChanges);
+    };
+
+    Outcome.createFromBackendDict = function(outcomeDict) {
+      return new Outcome(
+        outcomeDict.dest,
+        SubtitledHtmlObjectFactory.createFromBackendDict(outcomeDict.feedback),
+        outcomeDict.param_changes);
+    };
+
+    return Outcome;
+  }
+]);

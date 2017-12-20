@@ -73,7 +73,10 @@ describe('Solution Verification Service', function() {
             correct: false,
             outcome: {
               dest: 'End State',
-              feedback: [],
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
               param_changes: []
             },
             rule_specs: [{
@@ -83,13 +86,16 @@ describe('Solution Verification Service', function() {
           }],
           default_outcome: {
             dest: 'First State',
-            feedback: [],
+            feedback: {
+              html: '',
+              audio_translations: {}
+            },
             param_changes: []
           },
           hints: [{
-            hint_text: 'one'
+            hint_content: 'one'
           }, {
-            hint_text: 'two'
+            hint_content: 'two'
           }]
         },
         param_changes: []
@@ -103,12 +109,22 @@ describe('Solution Verification Service', function() {
           id: 'TextInput',
           answer_groups: [{
             rule_specs: [],
-            outcome: {},
+            outcome: {
+              dest: 'default',
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
+              param_changes: []
+            },
             correct: false
           }],
           default_outcome: {
             dest: 'default',
-            feedback: [],
+            feedback: {
+              html: '',
+              audio_translations: {}
+            },
             param_changes: []
           },
           hints: []

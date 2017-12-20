@@ -49,6 +49,7 @@ var ExplorationPlayerPage = function() {
       element(by.css('.protractor-test-continue-to-next-card-button'));
   var viewHintButton = element(by.css('.protractor-test-view-hint'));
   var viewSolutionButton = element(by.css('.protractor-test-view-solution'));
+  var gotItButton = element(by.css('.oppia-learner-got-it-button'));
 
   var feedbackPopupLink =
     element(by.css('.protractor-test-exploration-feedback-popup-link'));
@@ -65,6 +66,10 @@ var ExplorationPlayerPage = function() {
 
   this.viewSolution = function() {
     viewSolutionButton.click();
+  };
+
+  this.clickGotItButton = function() {
+    gotItButton.click();
   };
 
   // This verifies the question just asked, including formatting and
