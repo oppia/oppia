@@ -14,7 +14,8 @@
 
 oppia.directive('oppiaInteractiveLogicProof', [
   'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
-  function(HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
+  function(
+      HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
