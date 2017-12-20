@@ -23,16 +23,16 @@
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
-  'NEW_CARD_AVAILABLE',
+  'EVENT_NEW_CARD_AVAILABLE',
   function(
       $sce, HtmlEscaperService, ExplorationContextService,
       imageClickInputRulesService, UrlInterpolationService,
-      NEW_CARD_AVAILABLE) {
+      EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
         onSubmit: '&',
-        lastAnswer: '&'
+        getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ImageClickInput/directives/' +
@@ -53,7 +53,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           $scope.mouseY = 0;
           $scope.interactionIsActive = true;
           $scope.currentlyHoveredRegions = [];
-          $scope.previousInput = $scope.lastAnswer();
+          $scope.previousInput = $scope.getLastAnswer();
           $scope.allRegions = imageAndRegions.labeledRegions;
 
           $scope.checkPointerInRegion = function() {
@@ -70,7 +70,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           };
           if ($scope.previousInput) {
             $scope.interactionIsActive = false;
-            /*Following lines to permanently highlight the learner's previous
+            /*The following lines permanently highlight the learner's previous
               answer. */
             $scope.mouseX = $scope.previousInput.clickPosition[0];
             $scope.mouseY = $scope.previousInput.clickPosition[1];
@@ -96,7 +96,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               return 'inline';
             }
           };
-          $scope.$on(NEW_CARD_AVAILABLE, function(evt, data) {
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             if (data) {
               $scope.interactionIsActive = false;
             }

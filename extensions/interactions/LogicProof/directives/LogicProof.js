@@ -13,13 +13,13 @@
 // limitations under the License.
 
 oppia.directive('oppiaInteractiveLogicProof', [
-  'HtmlEscaperService', 'UrlInterpolationService', 'NEW_CARD_AVAILABLE',
-  function(HtmlEscaperService, UrlInterpolationService, NEW_CARD_AVAILABLE) {
+  'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
+  function(HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
         onSubmit: '&',
-        lastAnswer: '&'
+        getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/LogicProof/directives/' +
@@ -35,10 +35,10 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // the dependencies.
           $scope.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
           $scope.interactionIsActive = true;
-          if ($scope.lastAnswer()) {
+          if ($scope.getLastAnswer()) {
             $scope.interactionIsActive = false;
           }
-          $scope.$on(NEW_CARD_AVAILABLE, function(evt, data) {
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             if (data) {
               $scope.interactionIsActive = false;
             }
@@ -101,7 +101,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // http://github.com/angular-ui/ui-codemirror
           $scope.codeEditor = function(editor) {
             if (!$scope.interactionIsActive) {
-              editor.setValue($scope.lastAnswer().proof_string)
+              editor.setValue($scope.getLastAnswer().proof_string)
             } else {
               editor.setValue($scope.localQuestionData.default_proof_string);
             }

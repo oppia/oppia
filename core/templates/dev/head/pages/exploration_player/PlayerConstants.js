@@ -22,7 +22,7 @@ oppia.constant('TWO_CARD_THRESHOLD_PX', 960);
 
 oppia.constant('CONTINUE_BUTTON_FOCUS_LABEL', 'continueButton');
 
-oppia.constant('NEW_CARD_AVAILABLE','newCardAvailable');
+oppia.constant('EVENT_NEW_CARD_AVAILABLE','newCardAvailable');
 
 // The enforced waiting period between successive hint requests.
 oppia.constant('WAIT_FOR_HINT_MSEC', 30000);

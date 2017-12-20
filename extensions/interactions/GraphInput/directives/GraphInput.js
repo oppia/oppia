@@ -30,7 +30,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
       restrict: 'E',
       scope: {
         onSubmit: '&',
-        lastAnswer: '&'
+        getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
@@ -62,7 +62,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
             var stringToBool = function(str) {
               return (str === 'true');
             };
-            if (!$scope.lastAnswer()) {
+            if (!$scope.getLastAnswer()) {
               $scope.canAddVertex = stringToBool($attrs.canAddVertexWithValue);
               $scope.canDeleteVertex = stringToBool(
                 $attrs.canDeleteVertexWithValue);
@@ -93,8 +93,8 @@ oppia.directive('oppiaInteractiveGraphInput', [
 
           var updateGraphFromJSON = function(jsonGraph) {
             var newGraph = HtmlEscaperService.escapedJsonToObj(jsonGraph);
-            if ($scope.lastAnswer()) {
-              newGraph = $scope.lastAnswer();
+            if ($scope.getLastAnswer()) {
+              newGraph = $scope.getLastAnswer();
             }
             if (checkValidGraph(newGraph)) {
               $scope.graph = newGraph;
@@ -232,9 +232,9 @@ oppia.directive('graphViz', [
         'graph_viz_directive.html'),
       controller: [
         '$scope', '$element', '$attrs', '$document', 'FocusManagerService',
-        'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN', 'NEW_CARD_AVAILABLE',
+        'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN', 'EVENT_NEW_CARD_AVAILABLE',
         function($scope, $element, $attrs, $document, FocusManagerService,
-            graphDetailService, GRAPH_INPUT_LEFT_MARGIN, NEW_CARD_AVAILABLE) {
+            graphDetailService, GRAPH_INPUT_LEFT_MARGIN, EVENT_NEW_CARD_AVAILABLE) {
           var _MODES = {
             MOVE: 0,
             ADD_EDGE: 1,
@@ -271,7 +271,7 @@ oppia.directive('graphViz', [
           $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
           $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
           $scope.interactionIsActive = true;
-          $scope.$on(NEW_CARD_AVAILABLE, function( evt, data) {
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function( evt, data) {
             if (data) {
               $scope.interactionIsActive = false;
               $scope.canAddVertex = false;
