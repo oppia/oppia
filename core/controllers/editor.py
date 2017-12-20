@@ -104,31 +104,23 @@ def _require_valid_version(version_from_payload, exploration_version):
 class EditorLogoutHandler(base.BaseHandler):
     """Handles logout from editor page."""
 
-    @acl_decorators.can_play_exploration
-    def is_valid_exploration_id(self, exp_id):
-        """This is to check if exploration id is valid."""
-        pass
-
     @acl_decorators.open_access
     def get(self):
         """Checks if exploration is published and redirects accordingly."""
 
-        return_url = str(self.request.get('return_url'))
-        if return_url:
-            exploration_id = return_url.split('/')[-1]
-            self.is_valid_exploration_id(exploration_id)
-            exp_summary = exp_services.get_exploration_summary_by_id(
-                exploration_id)
+        url_to_redirect_to = str(self.request.get('return_url'))
+        if url_to_redirect_to:
+            exploration_id = url_to_redirect_to.split('/')[-1]
+            exploration_rights = rights_manager.get_exploration_rights(
+                exploration_id, strict=False)
 
-            if exp_summary.status == feconf.ACTIVITY_STATUS_PRIVATE:
-                self.redirect(super(EditorLogoutHandler, self)._get_logout_url(
-                    feconf.LIBRARY_INDEX_URL))
-            else:
-                self.redirect(super(EditorLogoutHandler, self)._get_logout_url(
-                    return_url))
+            if exploration_rights is None or exploration_rights.is_private():
+            	url_to_redirect_to = feconf.LIBRARY_INDEX_URL
         else:
-            self.redirect(super(EditorLogoutHandler, self)._get_logout_url(
-                feconf.LIBRARY_INDEX_URL))
+            url_to_redirect_to = feconf.LIBRARY_INDEX_URL
+
+        self.redirect(super(EditorLogoutHandler, self)._get_logout_url(
+            url_to_redirect_to))
 
 
 class EditorHandler(base.BaseHandler):
@@ -140,10 +132,10 @@ class EditorHandler(base.BaseHandler):
         EditorLogoutHandler.
 
         Args:
-            redirect_url_on_logout: string. URL to redirect to on logout.
+            redirect_url_on_logout: str. URL to redirect to on logout.
 
         Returns:
-            string. logout url.
+            str. logout url.
         """
         logout_url = utils.set_url_query_parameter(
             '/exploration_editor_logout', 'return_url', redirect_url_on_logout)

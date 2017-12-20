@@ -280,10 +280,10 @@ class BaseHandler(webapp2.RequestHandler):
         by LogoutPage handler.
 
         Args:
-            redirect_url_on_logout: string. URL to redirect to on logout.
+            redirect_url_on_logout: str. URL to redirect to on logout.
 
         Returns:
-            string. logout url.
+            str. logout url.
         """
         return current_user_services.create_logout_url(redirect_url_on_logout)
 

@@ -415,9 +415,24 @@ class EditorTest(BaseEditorControllerTest):
 class ExplorationEditorLogoutTest(BaseEditorControllerTest):
     """Test handler for logout from exploration editor page."""
 
+    def test_logout_from_empty_url(self):
+        """Logout from empty exploration id should redirect
+        to library page.
+        """
+        empty_redirect_logout_url = '/exploration_editor_logout?return_url='
+
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(empty_redirect_logout_url)
+        self.assertEqual(response.status_int, 302)
+
+        response.follow()
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('library', response.headers['location'])
+        self.logout()
+
     def test_logout_from_invalid_url(self):
-        """Logout from invalid exploration id should result
-        in 404 error.
+        """Logout from invalid exploration id should redirect
+        to library page.
         """
 
         invalid_current_page = '%s/%s' % (
@@ -426,8 +441,11 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
             '/exploration_editor_logout?return_url=%s' % invalid_current_page)
 
         self.login(self.OWNER_EMAIL)
-        response = self.testapp.get(invalid_logout_url, expect_errors=True)
-        self.assertEqual(response.status_int, 404)
+        response = self.testapp.get(invalid_logout_url, expect_errors=False)
+        self.assertEqual(response.status_int, 302)
+        response.follow()
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('library', response.headers['location'])
         self.logout()
 
     def test_logout_from_unpublished_exploration_editor(self):
