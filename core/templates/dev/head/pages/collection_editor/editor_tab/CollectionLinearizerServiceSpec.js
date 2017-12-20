@@ -98,7 +98,7 @@ describe('Collection linearizer service', function() {
     collection.addCollectionNode(thirdCollectionNode);
     collection.addCollectionNode(secondCollectionNode);
     collection.addCollectionNode(firstCollectionNode);
-    collection.setNextSkillId(3);
+    collection.setNextSkillIndex(3);
     collection.addCollectionSkill(thirdCollectionSkill);
     collection.addCollectionSkill(secondCollectionSkill);
     collection.addCollectionSkill(firstCollectionSkill);
@@ -159,7 +159,7 @@ describe('Collection linearizer service', function() {
         var collection = CollectionObjectFactory.createEmptyCollection();
         collection.addCollectionNode(firstCollectionNode);
         firstCollectionNode.addAcquiredSkillId('skill0');
-        collection.setNextSkillId(1);
+        collection.setNextSkillIndex(1);
         collection.addCollectionSkill(firstCollectionSkill);
         expect(collection.containsCollectionNode('exp_id0')).toBe(true);
         expect(collection.containsCollectionSkill('skill0')).toBe(true);
