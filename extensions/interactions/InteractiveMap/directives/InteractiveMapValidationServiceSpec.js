@@ -18,6 +18,7 @@ describe('InteractiveMapValidationService', function() {
   var currentState;
   var goodAnswerGroups, goodDefaultOutcome;
   var customizationArguments;
+  var oof, agof, rof;
 
   beforeEach(function() {
     module('oppia');
@@ -26,12 +27,18 @@ describe('InteractiveMapValidationService', function() {
   beforeEach(inject(function($rootScope, $controller, $injector) {
     validatorService = $injector.get('InteractiveMapValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
-
+    oof = $injector.get('OutcomeObjectFactory');
+    agof = $injector.get('AnswerGroupObjectFactory');
+    rof = $injector.get('RuleObjectFactory');
     currentState = 'First State';
-    goodDefaultOutcome = {
+    goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
-      feedback: []
-    };
+      feedback: {
+        html: '',
+        audio_translations: {}
+      },
+      param_changes: []
+    });
 
     customizationArguments = {
       latitude: {
@@ -41,21 +48,21 @@ describe('InteractiveMapValidationService', function() {
         value: 0
       }
     };
-    goodAnswerGroups = [{
-      rules: [{
-        type: 'Within',
+    goodAnswerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'Within',
         inputs: {
           d: 100
         }
-      }, {
-        type: 'NotWithin',
+      }), rof.createFromBackendDict({
+        rule_type: 'NotWithin',
         inputs: {
           d: 50
         }
-      }],
-      outcome: goodDefaultOutcome,
-      correct: false
-    }];
+      })],
+      goodDefaultOutcome,
+      false
+    )];
   }));
 
   it('should be able to perform basic validation', function() {

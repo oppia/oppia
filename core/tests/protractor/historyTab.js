@@ -97,70 +97,86 @@ describe('Exploration history', function() {
         highlighted: true
       },
       10: {
-        text: '      feedback: []',
+        text: '      feedback:',
         highlighted: true
       },
       11: {
-        text: '      param_changes: []',
+        text: '        audio_translations: {}',
         highlighted: true
       },
       12: {
-        text: '    rule_specs:',
+        text: '        html: \'\'',
         highlighted: true
       },
       13: {
-        text: '    - inputs:',
+        text: '      param_changes: []',
         highlighted: true
       },
       14: {
-        text: '        x: 6',
+        text: '    rule_specs:',
         highlighted: true
       },
       15: {
-        text: '      rule_type: Equals',
+        text: '    - inputs:',
         highlighted: true
       },
       16: {
+        text: '        x: 6',
+        highlighted: true
+      },
+      17: {
+        text: '      rule_type: Equals',
+        highlighted: true
+      },
+      18: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: false
       },
-      17: {
+      19: {
         text: '  customization_args: {}',
         highlighted: false
       },
-      18: {
+      20: {
         text: '  default_outcome:',
         highlighted: false
       },
-      19: {
+      21: {
         text: '    dest: first',
         highlighted: true
       },
-      20: {
-        text: '    feedback: []',
-        highlighted: false
-      },
-      21: {
-        text: '    param_changes: []',
-        highlighted: false
-      },
       22: {
-        text: '  hints: []',
+        text: '    feedback:',
         highlighted: false
       },
       23: {
-        text: '  id: NumericInput',
-        highlighted: true
+        text: '      audio_translations: {}',
+        highlighted: false
       },
       24: {
-        text: '  solution: null',
+        text: '      html: \'\'',
         highlighted: false
       },
       25: {
-        text: 'param_changes: []',
+        text: '    param_changes: []',
         highlighted: false
       },
       26: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      27: {
+        text: '  id: NumericInput',
+        highlighted: true
+      },
+      28: {
+        text: '  solution: null',
+        highlighted: false
+      },
+      29: {
+        text: 'param_changes: []',
+        highlighted: false
+      },
+      30: {
         text: ' ',
         highlighted: false
       }
@@ -210,30 +226,38 @@ describe('Exploration history', function() {
         highlighted: true
       },
       11: {
-        text: '    feedback: []',
+        text: '    feedback:',
         highlighted: false
       },
       12: {
-        text: '    param_changes: []',
+        text: '      audio_translations: {}',
         highlighted: false
       },
       13: {
-        text: '  hints: []',
+        text: '      html: \'\'',
         highlighted: false
       },
       14: {
-        text: '  id: null',
-        highlighted: true
+        text: '    param_changes: []',
+        highlighted: false
       },
       15: {
-        text: '  solution: null',
+        text: '  hints: []',
         highlighted: false
       },
       16: {
+        text: '  id: null',
+        highlighted: true
+      },
+      17: {
+        text: '  solution: null',
+        highlighted: false
+      },
+      18: {
         text: 'param_changes: []',
         highlighted: false
       },
-      17: {
+      19: {
         text: ' ',
         highlighted: false
       }
@@ -252,7 +276,9 @@ describe('Exploration history', function() {
       '      value: Continue\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
-      '    feedback: []\n' +
+      '    feedback:\n' +
+      '      audio_translations: {}\n' +
+      '      html: \'\'\n' +
       '    param_changes: []\n' +
       '  hints: []\n' +
       '  id: Continue\n' +
