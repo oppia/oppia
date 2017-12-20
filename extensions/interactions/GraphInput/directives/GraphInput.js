@@ -24,8 +24,10 @@ oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
 
 oppia.directive('oppiaInteractiveGraphInput', [
   'HtmlEscaperService', 'graphInputRulesService', 'UrlInterpolationService',
+  'EVENT_NEW_CARD_AVAILABLE',
   function(
-      HtmlEscaperService, graphInputRulesService, UrlInterpolationService) {
+      HtmlEscaperService, graphInputRulesService, UrlInterpolationService,
+      EVENT_NEW_CARD_AVAILABLE ) {
     return {
       restrict: 'E',
       scope: {
@@ -53,6 +55,15 @@ oppia.directive('oppiaInteractiveGraphInput', [
               rulesService: graphInputRulesService
             });
           };
+          $scope.interactionIsActive = true;
+          if ($scope.getLastAnswer()) {
+            $scope.interactionIsActive = false;
+          }
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function( evt, data) {
+            if (data) {
+              $scope.interactionIsActive = false;
+            }
+          });
           $scope.resetGraph = function() {
             updateGraphFromJSON($attrs.graphWithValue);
           };
@@ -62,7 +73,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
             var stringToBool = function(str) {
               return (str === 'true');
             };
-            if (!$scope.getLastAnswer()) {
+            if ($scope.interactionIsActive) {
               $scope.canAddVertex = stringToBool($attrs.canAddVertexWithValue);
               $scope.canDeleteVertex = stringToBool(
                 $attrs.canDeleteVertexWithValue);
@@ -93,7 +104,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
 
           var updateGraphFromJSON = function(jsonGraph) {
             var newGraph = HtmlEscaperService.escapedJsonToObj(jsonGraph);
-            if ($scope.getLastAnswer()) {
+            if (!$scope.interactionIsActive) {
               newGraph = $scope.getLastAnswer();
             }
             if (checkValidGraph(newGraph)) {
