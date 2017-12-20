@@ -18,6 +18,7 @@ describe('ImageClickInputValidationService', function() {
   var currentState;
   var badOutcome, goodAnswerGroups, goodDefaultOutcome;
   var customizationArguments;
+  var oof;
 
   beforeEach(function() {
     module('oppia');
@@ -26,18 +27,27 @@ describe('ImageClickInputValidationService', function() {
   beforeEach(inject(function($rootScope, $controller, $injector) {
     var filter = $injector.get('$filter');
     validatorService = $injector.get('ImageClickInputValidationService');
+    oof = $injector.get('OutcomeObjectFactory');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
     currentState = 'First State';
-    goodDefaultOutcome = {
+    goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
-      feedback: []
-    };
+      feedback: {
+        html: '',
+        audio_translations: {}
+      },
+      param_changes: []
+    });
 
-    badOutcome = {
+    badOutcome = oof.createFromBackendDict({
       dest: currentState,
-      feedback: []
-    };
+      feedback: {
+        html: '',
+        audio_translations: {}
+      },
+      param_changes: []
+    });
 
     customizationArguments = {
       imageAndRegions: {
