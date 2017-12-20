@@ -430,7 +430,9 @@ interaction:
       value: 1
   default_outcome:
     dest: State A
-    feedback: []
+    feedback:
+      audio_translations: {}
+      html: ''
     param_changes: []
   hints: []
   id: TextInput
@@ -451,7 +453,9 @@ interaction:
       value: 1
   default_outcome:
     dest: State B
-    feedback: []
+    feedback:
+      audio_translations: {}
+      html: ''
     param_changes: []
   hints: []
   id: TextInput
@@ -472,7 +476,9 @@ interaction:
       value: 1
   default_outcome:
     dest: %s
-    feedback: []
+    feedback:
+      audio_translations: {}
+      html: ''
     param_changes: []
   hints: []
   id: TextInput
@@ -495,7 +501,9 @@ interaction:
       value: 1
   default_outcome:
     dest: State A
-    feedback: []
+    feedback:
+      audio_translations: {}
+      html: ''
     param_changes: []
   hints: []
   id: TextInput

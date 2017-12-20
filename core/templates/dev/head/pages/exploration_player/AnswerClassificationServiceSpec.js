@@ -55,7 +55,10 @@ describe('Answer classification service with string classifier disabled',
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
-              feedback: [''],
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
               param_changes: []
             },
             rule_specs: [{
@@ -68,7 +71,10 @@ describe('Answer classification service with string classifier disabled',
           }, {
             outcome: {
               dest: 'outcome 2',
-              feedback: [''],
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
               param_changes: []
             },
             rule_specs: [{
@@ -96,7 +102,10 @@ describe('Answer classification service with string classifier disabled',
           }],
           default_outcome: {
             dest: 'default',
-            feedback: [],
+            feedback: {
+              html: '',
+              audio_translations: {}
+            },
             param_changes: []
           },
           hints: []
@@ -128,21 +137,21 @@ describe('Answer classification service with string classifier disabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 10, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('outcome 1', [''], []), 0, 0, EXPLICIT_CLASSIFICATION
+        oof.createNew('outcome 1', '', []), 0, 0, EXPLICIT_CLASSIFICATION
       ));
 
       expect(
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 5, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('outcome 2', [''], []), 1, 0, EXPLICIT_CLASSIFICATION
+        oof.createNew('outcome 2', '', []), 1, 0, EXPLICIT_CLASSIFICATION
       ));
 
       expect(
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 6, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('outcome 2', [''], []), 1, 1, EXPLICIT_CLASSIFICATION
+        oof.createNew('outcome 2', '', []), 1, 1, EXPLICIT_CLASSIFICATION
       ));
     });
 
@@ -151,7 +160,7 @@ describe('Answer classification service with string classifier disabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 7, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('default', [], []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
+        oof.createNew('default', '', []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
       ));
     });
 
@@ -167,7 +176,10 @@ describe('Answer classification service with string classifier disabled',
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
-              feedback: [''],
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
               param_changes: []
             },
             rule_specs: [{
@@ -180,7 +192,10 @@ describe('Answer classification service with string classifier disabled',
           }],
           default_outcome: {
             dest: 'default',
-            feedback: [],
+            feedback: {
+              html: '',
+              audio_translations: {}
+            },
             param_changes: []
           },
           hints: []
@@ -249,7 +264,10 @@ describe('Answer classification service with string classifier enabled',
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
-              feedback: [''],
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
               param_changes: []
             },
             rule_specs: [{
@@ -262,7 +280,10 @@ describe('Answer classification service with string classifier enabled',
           }, {
             outcome: {
               dest: 'outcome 2',
-              feedback: [''],
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
               param_changes: []
             },
             rule_specs: [{
@@ -285,7 +306,10 @@ describe('Answer classification service with string classifier enabled',
           }],
           default_outcome: {
             dest: 'default',
-            feedback: [],
+            feedback: {
+              html: '',
+              audio_translations: {}
+            },
             param_changes: []
           },
           hints: []
@@ -343,7 +367,7 @@ describe('Answer classification service with string classifier enabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state2, 0, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('default', [], []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
+        oof.createNew('default', '', []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
       ));
     });
   }
