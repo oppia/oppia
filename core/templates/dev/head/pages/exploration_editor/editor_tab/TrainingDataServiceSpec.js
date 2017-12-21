@@ -86,7 +86,7 @@ describe('TrainingDataService', function() {
               dest: 'State',
               param_changes: []
             },
-            correct: false
+            labelled_as_correct: false
           }],
           default_outcome: {
             feedback: {

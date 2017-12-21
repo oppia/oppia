@@ -308,7 +308,7 @@ oppia.factory('CollectionUpdateService', [
        * undo/redo service.
        */
       addCollectionSkill: function(collection, skillName) {
-        var oldNextSkillId = collection.getNextSkillId();
+        var oldNextSkillIndex = collection.getNextSkillIndex();
         _applyChange(
           collection, CMD_ADD_COLLECTION_SKILL, {
             name: skillName
@@ -325,7 +325,7 @@ oppia.factory('CollectionUpdateService', [
             var skillName = _getSkillNameFromChangeDict(changeDict);
             var skillId = collection.getSkillIdFromName(skillName);
             collection.deleteCollectionSkill(skillId);
-            collection.setNextSkillId(oldNextSkillId);
+            collection.setNextSkillIndex(oldNextSkillIndex);
           });
       },
 

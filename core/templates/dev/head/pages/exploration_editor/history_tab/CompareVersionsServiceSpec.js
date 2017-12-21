@@ -81,7 +81,7 @@ describe('Compare versions service', function() {
                 param_changes: []
               },
               rule_specs: [],
-              correct: false
+              labelled_as_correct: false
             };
           });
         statesData[stateName] = newStateData;

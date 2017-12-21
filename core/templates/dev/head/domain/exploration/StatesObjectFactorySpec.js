@@ -74,7 +74,7 @@ describe('States object factory', function() {
                 },
                 rule_type: 'Equals'
               }],
-              correct: false
+              labelled_as_correct: false
             }],
             default_outcome: {
               dest: 'default',
@@ -195,7 +195,7 @@ describe('States object factory', function() {
             filename: 'myfile3.mp3',
             file_size_bytes: 0.8,
             needs_update: false
-          }), 
+          }),
           'second state': atof.createFromBackendDict({
             filename: 'myfile2.mp3',
             file_size_bytes: 0.8,

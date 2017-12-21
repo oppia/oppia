@@ -633,6 +633,7 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
 auto_tts_enabled: true
 blurb: ''
 category: A category
+correctness_feedback_enabled: false
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -700,6 +701,7 @@ title: A title
 auto_tts_enabled: true
 blurb: ''
 category: A category
+correctness_feedback_enabled: false
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -1044,7 +1046,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 },
                 'param_changes': []
             },
-            'correct': False,
+            'labelled_as_correct': False,
         }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
@@ -2265,6 +2267,7 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
 auto_tts_enabled: true
 blurb: ''
 category: category
+correctness_feedback_enabled: false
 init_state_name: %s
 language_code: en
 objective: Old objective
