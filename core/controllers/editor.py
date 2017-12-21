@@ -16,6 +16,7 @@
 
 """Controllers for the editor view."""
 
+import re
 import datetime
 import imghdr
 import logging
@@ -108,9 +109,13 @@ class EditorLogoutHandler(base.BaseHandler):
     def get(self):
         """Checks if exploration is published and redirects accordingly."""
 
-        url_to_redirect_to = str(self.request.get('return_url'))
-        if url_to_redirect_to:
-            exploration_id = url_to_redirect_to.split('/')[-1]
+        url_to_redirect_to = str(self.request.get('return_url'))        
+        url_to_redirect_to_regex = (
+        	r'%s/(?P<explotation_id>[\w-]+)$' % feconf.EDITOR_URL_PREFIX)
+        is_valid_path = re.match(url_to_redirect_to_regex, url_to_redirect_to)
+
+        if is_valid_path:
+            exploration_id = is_valid_path.group(1)
             exploration_rights = rights_manager.get_exploration_rights(
                 exploration_id, strict=False)
 
@@ -215,7 +220,8 @@ class ExplorationPage(EditorHandler):
         })
 
         self.render_template(
-            'pages/exploration_editor/exploration_editor.html')
+            'pages/exploration_editor/exploration_editor.html',
+            redirect_url_on_logout = ('%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id)))
 
 
 class ExplorationHandler(EditorHandler):
