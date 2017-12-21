@@ -92,8 +92,9 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
             '%s/batch'%feconf.QUESTION_DATA_URL, self.payload,
             expect_errors=False)
         self.assertIn(self.question.to_dict(), response_json['questions_dict'])
-
+        self.assertEqual(len(response_json['questions_dict']), 1)
         self.logout()
+
         response_json = self.get_json(
             '%s/batch'%feconf.QUESTION_DATA_URL, self.payload,
             expect_errors=False)

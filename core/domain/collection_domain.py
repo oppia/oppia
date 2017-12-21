@@ -1078,8 +1078,8 @@ class Collection(object):
         Returns
             str. The id of the new skill.
         """
-        for _, skill in self.skills.iteritems():
-            if skill.name == skill_name:
+        if any(
+            [skill_name == skill.name for skill in self.skills.itervalues()]):
                 raise ValueError(
                     'Skill with name "%s" already exists.' % skill_name)
 

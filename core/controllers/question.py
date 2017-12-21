@@ -35,4 +35,4 @@ class QuestionsBatchHandler(base.BaseHandler):
                 collection_id, skill_ids, self.user_id, batch_size))]
         return self.render_json({
             'questions_dict': questions_dict
-            })
+        })
