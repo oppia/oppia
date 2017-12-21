@@ -31,11 +31,11 @@ oppia.animation('.oppia-collection-animate-slide', function() {
 });
 
 oppia.controller('CollectionPlayer', [
-  '$scope', '$anchorScroll', '$location', '$http', '$rootScope',
+  '$scope', '$anchorScroll', '$location', '$http',
   'ReadOnlyCollectionBackendApiService',
   'CollectionObjectFactory', 'CollectionPlaythroughObjectFactory',
   'AlertsService', 'UrlInterpolationService',
-  function($scope, $anchorScroll, $location, $http, $rootScope,
+  function($scope, $anchorScroll, $location, $http,
            ReadOnlyCollectionBackendApiService,
            CollectionObjectFactory, CollectionPlaythroughObjectFactory,
            AlertsService, UrlInterpolationService) {
@@ -43,7 +43,7 @@ oppia.controller('CollectionPlayer', [
     $scope.collectionPlaythrough = null;
     $scope.collectionId = GLOBALS.collectionId;
     $scope.showingAllExplorations = !GLOBALS.isLoggedIn;
-    $rootScope.explorationCardIsShown = false;
+    $scope.explorationCardIsShown = false;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     // The pathIconParameters is an array containing the co-ordinates,
     // background color and icon url for the icons generated on the path.
@@ -70,7 +70,7 @@ oppia.controller('CollectionPlayer', [
     };
 
     $scope.togglePreviewCard = function() {
-      $rootScope.explorationCardIsShown = !$rootScope.explorationCardIsShown;
+      $scope.explorationCardIsShown = !$scope.explorationCardIsShown;
     };
 
     $scope.getCollectionNodeForExplorationId = function(explorationId) {
@@ -128,7 +128,7 @@ oppia.controller('CollectionPlayer', [
     };
 
     $scope.updateExplorationPreview = function(explorationId) {
-      $rootScope.explorationCardIsShown = true;
+      $scope.explorationCardIsShown = true;
       $scope.currentExplorationId = explorationId;
       $scope.summaryToPreview = $scope.getCollectionNodeForExplorationId(
         explorationId).getExplorationSummaryObject();
@@ -283,10 +283,21 @@ oppia.controller('CollectionPlayer', [
       $location.hash(id);
       $anchorScroll();
     };
+
+    $scope.closeOnClickingOutside = function($evt) {
+      explorationTile = $evt.currentTarget.childNodes[2];
+      console.log(explorationTile);
+      console.log($evt.currentTarget);
+      console.log($evt.target.children[0]);
+      if($evt.target.children[0] == explorationTile) {
+        $scope.explorationCardIsShown = false;
+      }
+    };
+
     // Touching anywhere outside the mobile preview should hide it.
     document.addEventListener('touchstart', function() {
-      if ($rootScope.explorationCardIsShown === true) {
-        $rootScope.explorationCardIsShown = false;
+      if ($scope.explorationCardIsShown === true) {
+        $scope.explorationCardIsShown = false;
       }
     });
   }

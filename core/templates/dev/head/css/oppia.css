@@ -3819,24 +3819,14 @@ md-card.preview-conversation-skin-supplemental-card {
   background-color: #fff;
   cursor: pointer;
   display: inline-block;
-  height: fit-content;
+  height: inherit;
   margin: 8px 5.5px;
   padding: 0 0 20px 0;
   position: relative;
   text-align: left;
+  vertical-align: top;
   white-space: normal;
   width: 250px;
-}
-
-.oppia-activity-summary-tile-mobile-background-mask {
-  width: 200vw;
-  height: 200vh;
-  background: rgba(0,0,0,0.25);
-  z-index: -1;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  transform: translate(-41%,-34%);
 }
 
 @media only screen and (max-width: 500px) {
