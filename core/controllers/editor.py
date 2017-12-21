@@ -111,7 +111,7 @@ class EditorLogoutHandler(base.BaseHandler):
 
         url_to_redirect_to = str(self.request.get('return_url'))
         url_to_redirect_to_regex = (
-        	r'%s/(?P<explotation_id>[\w-]+)$' % feconf.EDITOR_URL_PREFIX)
+            r'%s/(?P<explotation_id>[\w-]+)$' % feconf.EDITOR_URL_PREFIX)
         is_valid_path = re.match(url_to_redirect_to_regex, url_to_redirect_to)
 
         if is_valid_path:
