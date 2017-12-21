@@ -67,7 +67,7 @@ describe('Answer classification service with string classifier disabled',
               },
               rule_type: 'Equals'
             }],
-            correct: false
+            labelled_as_correct: false
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -98,7 +98,7 @@ describe('Answer classification service with string classifier disabled',
               },
               rule_type: 'FuzzyMatches'
             }],
-            correct: false
+            labelled_as_correct: false
           }],
           default_outcome: {
             dest: 'default',
@@ -188,7 +188,7 @@ describe('Answer classification service with string classifier disabled',
               },
               rule_type: 'Equals'
             }],
-            correct: false
+            labelled_as_correct: false
           }],
           default_outcome: {
             dest: 'default',
@@ -276,7 +276,7 @@ describe('Answer classification service with string classifier enabled',
               },
               rule_type: 'Equals'
             }],
-            correct: false
+            labelled_as_correct: false
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -302,7 +302,7 @@ describe('Answer classification service with string classifier enabled',
               },
               rule_type: 'FuzzyMatches'
             }],
-            correct: false
+            labelled_as_correct: false
           }],
           default_outcome: {
             dest: 'default',

@@ -80,7 +80,8 @@ oppia.factory('changeListService', [
       param_specs: true,
       tags: true,
       title: true,
-      auto_tts_enabled: true
+      auto_tts_enabled: true,
+      correctness_feedback_enabled: true
     };
 
     var ALLOWED_STATE_BACKEND_NAMES = {
@@ -510,6 +511,19 @@ oppia.factory('explorationAutomaticTextToSpeechService', [
     child.toggleAutomaticTextToSpeech = function() {
       child.displayed = !child.displayed;
       child.saveDisplayedValue();
+    };
+
+    return child;
+  }
+]);
+
+oppia.factory('explorationCorrectnessFeedbackService', [
+  'explorationPropertyService', function(explorationPropertyService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'correctness_feedback_enabled';
+
+    child._isValid = function(value) {
+      return (typeof value === 'boolean');
     };
 
     return child;

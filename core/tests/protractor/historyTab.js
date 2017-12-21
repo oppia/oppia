@@ -85,7 +85,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       7: {
-        text: '  - correct: false',
+        text: '  - labelled_as_correct: false',
         highlighted: true
       },
       8: {
