@@ -156,30 +156,3 @@ oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
     }
   };
 }]);
-
-oppia.directive('closeOnClickingOutside', ['$document', function($document) {
-  return {
-    restrict: 'A',
-    link: function(scope, element, attrs) {
-      element.click(function(evt){
-        mdCard = element[0].childNodes[1];
-        if(evt.target.children[0] == mdCard) {
-          angular.element($document[0].getElementsByClassName(
-            'background-mask')).css({display:'none'});
-        }
-      });
-    }
-  }
-}]);
-
-oppia.directive('onClickViewMdCard',['$document', function($document) {
-  return {
-    restrict: 'A',
-    link: function(scope, element, attrs) {
-      element.click(function(evt){
-        angular.element($document[0].getElementsByClassName('background-mask'))
-          .css({display:'flex'});
-      });
-    }
-  }
-}]);

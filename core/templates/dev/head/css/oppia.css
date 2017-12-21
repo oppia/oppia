@@ -3819,7 +3819,7 @@ md-card.preview-conversation-skin-supplemental-card {
   background-color: #fff;
   cursor: pointer;
   display: inline-block;
-  height: 321px;
+  height: fit-content;
   margin: 8px 5.5px;
   padding: 0 0 20px 0;
   position: relative;
@@ -3828,7 +3828,7 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 250px;
 }
 
-.background-mask {
+.oppia-activity-summary-tile-mobile-background-mask {
   width: 200vw;
   height: 200vh;
   background: rgba(0,0,0,0.25);

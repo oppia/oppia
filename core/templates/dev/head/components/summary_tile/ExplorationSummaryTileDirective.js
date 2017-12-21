@@ -78,11 +78,11 @@ oppia.directive('explorationSummaryTile', [
         );
       },
       controller: [
-        '$scope', '$http',
+        '$scope', '$http', '$rootScope',
         'oppiaDatetimeFormatter', 'RatingComputationService',
         'WindowDimensionsService',
         function(
-          $scope, $http,
+          $scope, $http, $rootScope,
           oppiaDatetimeFormatter, RatingComputationService,
           WindowDimensionsService) {
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
@@ -151,6 +151,15 @@ oppia.directive('explorationSummaryTile', [
           $scope.getCompleteThumbnailIconUrl = function () {
             return UrlInterpolationService.getStaticImageUrl(
               $scope.getThumbnailIconUrl());
+          };
+
+          $scope.closeOnClickingOutside = function($evt) {
+            mdCard = $evt.currentTarget.childNodes[1];
+            console.log(mdCard);
+            console.log($evt.target.children[0]);
+            if($evt.target.children[0] == mdCard) {
+              $rootScope.explorationCardIsShown = false;
+            }
           };
         }
       ]
