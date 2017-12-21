@@ -41,20 +41,10 @@
             role="menu">
           <li><a class="protractor-test-about-link oppia-navbar-tab-content" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
           <li><a class="protractor-test-get-started-link oppia-navbar-tab-content" href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
-          <li><a class="protractor-test-teach-link oppia-navbar-tab-content" href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
-          <li><a href="https://medium.com/oppia-org" target="_blank" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_BLOG"></a></li>
-          <li><a href="/forum" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_FORUM"></a></li>
-          <li><a class="protractor-test-contact-link oppia-navbar-tab-content" href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
-          <li><a href="/foundation" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_OPPIA_FOUNDATION"></a></li>
+          <li><a class="oppia-navbar-tab-teach" href="/teach#playbook" translate="I18N_TOPNAV_PARTICIPATION_PLAYBOOK"></a></li>
+          <li><a href="http://oppiafoundation.org" target="_blank" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_OPPIA_FOUNDATION"></a></li>
+          <li><a class="oppia-navbar-tab-content" href="http://oppiafoundation.org/get-involved" target="_blank" translate="I18N_TOPNAV_GET_INVOLVED"></a></li>
         </ul>
-      </li>
-      <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_DONATE">
-        <div class="oppia-navbar-button-container">
-          <a href="/donate"
-             class="btn oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200">
-            <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_DONATE"></span>
-          </a>
-        </div>
       </li>
       <create-activity-button ng-show="navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE"></create-activity-button>
     </ul>
