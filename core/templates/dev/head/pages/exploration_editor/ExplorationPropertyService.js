@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores data
- * about the rights for this exploration.
+ * @fileoverview Service for exploration property.
  */
 
  oppia.factory('ExplorationPropertyService', [
