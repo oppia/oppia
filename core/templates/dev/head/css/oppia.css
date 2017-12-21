@@ -3750,6 +3750,7 @@ md-card.preview-conversation-skin-supplemental-card {
     padding-top: 80px;
   }
 }
+
 @media (max-width: 768px) {
   .oppia-splash-button-browse {
     left: 50%;
@@ -3775,6 +3776,16 @@ md-card.preview-conversation-skin-supplemental-card {
 
   .oppia-splash-section-two-content {
     padding-top: 160px;
+  }
+}
+
+@media (max-width: 365px) {
+  .oppia-splash-button-container {
+    margin-left: -1.5%;
+    text-align: center;
+  }
+  .oppia-splash-button {
+    min-width: 90%;
   }
 }
 
