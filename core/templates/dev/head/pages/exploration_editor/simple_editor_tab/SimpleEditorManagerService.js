@@ -190,8 +190,9 @@ oppia.factory('SimpleEditorManagerService', [
           lastStateName, OutcomeObjectFactory.createEmpty(lastStateName));
 
         var stateData = SimpleEditorShimService.getState(lastStateName);
-        data.questionList.addQuestion(QuestionObjectFactory.create(
-          lastStateName, stateData.interaction, ''));
+        var question = QuestionObjectFactory.create(
+          lastStateName, stateData.interaction, '');
+        data.questionList.addQuestion(question);
       },
       changeQuestionType: function(newInteractionId, index) {
         var currentStateName = data.questionList.getAllStateNames()[index];
@@ -284,6 +285,69 @@ oppia.factory('SimpleEditorManagerService', [
         } else {
           return data.questionList.getLastQuestion().hasAnswerGroups();
         }
+      },
+      move: function(oldIndex,newIndex) {
+        // Create temp question with same the property.
+        // Delete the question from old index.
+        // Insert temp question at the index.
+        var stateNamesInOrder = data.questionList.getAllStateNames();
+        var tempQuestion = SimpleEditorShimService.getState(stateNamesInOrder[oldIndex]);
+        var question = data.questionList._questions[oldIndex];
+        this.deleteQuestion(question);
+        this.insertQuestion(tempQuestion, newIndex);
+      },
+      insertQuestion: function(question, index) {
+        // Create question at the same index.
+        // Point the answer group destination in question to index+1.
+        // Point the index-1 answer group to new question.
+       var stateNamesInOrder = data.questionList.getAllStateNames();
+       var questionName = question.name;
+
+       // Save Interaction ID.
+       var interactionId = question.interaction.id;
+       SimpleEditorShimService.addState(questionName);
+       SimpleEditorShimService.saveInteractionId(
+        questionName, interactionId);
+
+       // Save Customization Args.
+       var customizationArgs = question.interaction.customizationArgs;
+       SimpleEditorShimService.saveCustomizationArgs(
+         questionName, customizationArgs);
+
+        // If question is inserted at first position then set it initial/
+       if (index===0) {
+         explorationInitStateNameService.displayed = questionName;
+         explorationInitStateNameService.saveDisplayedValue(questionName);
+       } else {
+         var previousState = SimpleEditorShimService
+           .getState(stateNamesInOrder[index - 1]);
+         var previousStateName = SimpleEditorShimService
+           .getState(stateNamesInOrder[index - 1]).name;
+         var previousStateAnswerGroups = previousState.interaction.answerGroups;
+         previousStateAnswerGroups[0].outcome.dest = questionName;
+         SimpleEditorShimService.saveDefaultOutcome(
+           previousStateName, OutcomeObjectFactory.createEmpty(questionName));
+         SimpleEditorShimService.saveAnswerGroups(previousStateName, previousStateAnswerGroups);
+       }
+
+       var nextQuestion= stateNamesInOrder[index];
+       var answerGroups = question.interaction.answerGroups;
+       var questionCount = data.questionList.getQuestionCount();
+
+       // If last question, make it terminal
+       if (index !== questionCount) {
+         SimpleEditorShimService.saveDefaultOutcome(
+           questionName, OutcomeObjectFactory.createEmpty(nextQuestion));
+         answerGroups[0].outcome.dest = SimpleEditorShimService
+           .getState(nextQuestion).name;
+         SimpleEditorShimService.saveAnswerGroups(questionName, answerGroups);
+       } else {
+         makeStateTerminal(questionName);
+       }
+       var questions = StatesToQuestionsService.getQuestions();
+       for (i=0; i<questions.length; i++) {
+         data.questionList.updateQuestion(i, questions[i]);
+       }
       },
       canTryToFinishExploration: function() {
         return (
