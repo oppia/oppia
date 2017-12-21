@@ -81,6 +81,18 @@ class ExplorationStats(object):
         self.num_completions_v2 = num_completions_v2
         self.state_stats_mapping = state_stats_mapping
 
+    @property
+    def num_starts(self):
+        return self.num_starts_v1 + self.num_starts_v2
+
+    @property
+    def num_actual_starts(self):
+        return self.num_actual_starts_v1 + self.num_actual_starts_v2
+
+    @property
+    def num_completions(self):
+        return self.num_completions_v1 + self.num_completions_v2
+
     def to_dict(self):
         """Returns a dict representation of the domain object."""
         state_stats_mapping_dict = {}
@@ -113,11 +125,9 @@ class ExplorationStats(object):
         exploration_stats_dict = {
             'exp_id': self.exp_id,
             'exp_version': self.exp_version,
-            'num_starts': self.num_starts_v1 + self.num_starts_v2,
-            'num_actual_starts': (
-                self.num_actual_starts_v1 + self.num_actual_starts_v2),
-            'num_completions': (
-                self.num_completions_v1 + self.num_completions_v2),
+            'num_starts': self.num_starts,
+            'num_actual_starts': self.num_actual_starts,
+            'num_completions': self.num_completions,
             'state_stats_mapping': state_stats_mapping_dict
         }
         return exploration_stats_dict
@@ -132,8 +142,23 @@ class ExplorationStats(object):
             exp_version: int. Version of the exploration.
             state_stats_mapping: dict. A dict mapping state names to their
                 corresponding StateStats.
+
+        Returns:
+            ExplorationStats. The exploration stats domain object.
         """
         return cls(exp_id, exp_version, 0, 0, 0, 0, 0, 0, state_stats_mapping)
+
+    def get_sum_of_first_hit_counts(self):
+        """Compute the sum of first hit counts for the exploration stats.
+
+        Returns:
+            int. Sum of first hit counts.
+        """
+        sum_first_hits = 0
+        for state_name in self.state_stats_mapping:
+            state_stats = self.state_stats_mapping[state_name]
+            sum_first_hits += state_stats.first_hit_count
+        return sum_first_hits
 
     def validate(self):
         """Validates the ExplorationStats domain object."""
@@ -221,6 +246,30 @@ class StateStats(object):
         self.num_completions_v1 = num_completions_v1
         self.num_completions_v2 = num_completions_v2
 
+    @property
+    def total_answers_count(self):
+        return self.total_answers_count_v1 + self.total_answers_count_v2
+
+    @property
+    def useful_feedback_count(self):
+        return self.useful_feedback_count_v1 + self.useful_feedback_count_v2
+
+    @property
+    def total_hit_count(self):
+        return self.total_hit_count_v1 + self.total_hit_count_v2
+
+    @property
+    def first_hit_count(self):
+        return self.first_hit_count_v1 + self.first_hit_count_v2
+
+    @property
+    def num_completions(self):
+        return self.num_completions_v1 + self.num_completions_v2
+
+    @property
+    def num_times_solution_viewed(self):
+        return self.num_times_solution_viewed_v2
+
     @classmethod
     def create_default(cls):
         """Creates a StateStats domain object and sets all properties to 0."""
@@ -249,16 +298,12 @@ class StateStats(object):
         frontend.
         """
         state_stats_dict = {
-            'total_answers_count': (
-                self.total_answers_count_v1 + self.total_answers_count_v2),
-            'useful_feedback_count': (
-                self.useful_feedback_count_v1 + self.useful_feedback_count_v2),
-            'total_hit_count': (
-                self.total_hit_count_v1 + self.total_hit_count_v2),
-            'first_hit_count': (
-                self.first_hit_count_v1 + self.first_hit_count_v2),
-            'num_times_solution_viewed': self.num_times_solution_viewed_v2,
-            'num_completions': self.num_completions_v1 + self.num_completions_v2
+            'total_answers_count': self.total_answers_count,
+            'useful_feedback_count': self.useful_feedback_count,
+            'total_hit_count': self.total_hit_count,
+            'first_hit_count': self.first_hit_count,
+            'num_times_solution_viewed': self.num_times_solution_viewed,
+            'num_completions': self.num_completions
         }
         return state_stats_dict
 
@@ -559,7 +604,7 @@ class AnswerCalculationOutput(object):
 
 
 class AnswerFrequencyList(AnswerCalculationOutput):
-    """Domain object that represents a list of AnswerOccurrences."""
+    """Domain object that represents an output list of AnswerOccurrences."""
     def __init__(self, answer_occurrences=None):
         """Initialize domain object for answer frequency list for a given list
         of AnswerOccurrence objects (default is empty list).
@@ -568,10 +613,6 @@ class AnswerFrequencyList(AnswerCalculationOutput):
             CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
         self.answer_occurrences = (
             answer_occurrences if answer_occurrences else [])
-
-    def add_answer(self, answer_occurrence):
-        """Adds a new AnswerOccurrence object."""
-        self.answer_occurrences.append(answer_occurrence)
 
     def to_raw_type(self):
         return [

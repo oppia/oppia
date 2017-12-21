@@ -31,7 +31,7 @@ oppia.factory('CollectionObjectFactory', [
       this._nodes = [];
       // Maps skill IDs to skill objects.
       this._skills = {};
-      this._nextSkillId = Number(collectionBackendObject.next_skill_index);
+      this._nextSkillIndex = Number(collectionBackendObject.next_skill_index);
 
       // This map acts as a fast way of looking up a collection node for a given
       // exploration ID.
@@ -103,16 +103,15 @@ oppia.factory('CollectionObjectFactory', [
       return this._version;
     };
 
-    // This gets the next skill ID number. It is the smallest integer not
-    // already used for a skill ID in this collection node, including deleted
-    // skills.
-    Collection.prototype.getNextSkillId = function() {
-      return this._nextSkillId;
+    // This gets the next skill index. It is the smallest integer not already
+    // used for a skill ID in this collection node, including deleted skills.
+    Collection.prototype.getNextSkillIndex = function() {
+      return this._nextSkillIndex;
     };
 
-    // This sets the next skill ID number.
-    Collection.prototype.setNextSkillId = function(nextSkillId) {
-      this._nextSkillId = nextSkillId;
+    // This sets the next skill index.
+    Collection.prototype.setNextSkillIndex = function(nextSkillIndex) {
+      this._nextSkillIndex = nextSkillIndex;
     };
 
     // Adds a new frontend collection node domain object to this collection.
@@ -214,10 +213,10 @@ oppia.factory('CollectionObjectFactory', [
 
     // Gets a new ID for a skill. This should be of the same form as in the
     // backend, in collection_domain.CollectionSkill.get_skill_id_from_index.
-    // This increments nextSkillId.
+    // This increments nextSkillIndex.
     Collection.prototype.getNewSkillId = function() {
-      var newId = 'skill' + String(this._nextSkillId);
-      this._nextSkillId++;
+      var newId = 'skill' + String(this._nextSkillIndex);
+      this._nextSkillIndex++;
       return newId;
     };
 
@@ -247,12 +246,6 @@ oppia.factory('CollectionObjectFactory', [
         return true;
       }
       return false;
-    };
-
-    // Deletes all collection skills within this collection.
-    Collection.prototype.clearCollectionSkills = function() {
-      this._skills = {};
-      this.setNextSkillId(0);
     };
 
     // Returns a dict mapping ids to collection skill objects for this
@@ -301,8 +294,8 @@ oppia.factory('CollectionObjectFactory', [
       this.setTags(otherCollection.getTags());
       this._version = otherCollection.getVersion();
       this.clearCollectionNodes();
-      this.clearCollectionSkills();
-      this.setNextSkillId(otherCollection.getNextSkillId());
+      this._skills = {};
+      this.setNextSkillIndex(otherCollection.getNextSkillIndex());
 
       var nodes = otherCollection.getCollectionNodes();
       for (var i = 0; i < nodes.length; i++) {
@@ -311,10 +304,7 @@ oppia.factory('CollectionObjectFactory', [
 
       var skills = otherCollection.getCollectionSkills();
       for (var skillId in skills) {
-        if (skills.hasOwnProperty(skillId)) {
-          this.addCollectionSkill(angular.copy(
-            skills[skillId]));
-        }
+        this.addCollectionSkill(angular.copy(skills[skillId]));
       }
     };
 

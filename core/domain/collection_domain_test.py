@@ -974,11 +974,33 @@ skills:
 tags: []
 title: A title
 """)
+    YAML_CONTENT_V5 = ("""category: A category
+language_code: en
+next_skill_index: 2
+nodes:
+- acquired_skill_ids:
+  - skill0
+  - skill1
+  exploration_id: Exp1
+  prerequisite_skill_ids: []
+- acquired_skill_ids: []
+  exploration_id: Exp2
+  prerequisite_skill_ids:
+  - skill0
+objective: ''
+schema_version: 5
+skills:
+  skill0:
+    name: Skill1
+    question_ids: []
+  skill1:
+    name: Skill2
+    question_ids: []
+tags: []
+title: A title
+""")
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V1
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V2
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V3
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V4
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V5
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -1010,4 +1032,12 @@ title: A title
             'Exp1', 'user@example.com', end_state_name='End')
         collection = collection_domain.Collection.from_yaml(
             'cid', self.YAML_CONTENT_V4)
+        self.assertEqual(collection.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v5(self):
+        """Test direct loading from a v5 yaml file."""
+        self.save_new_valid_exploration(
+            'Exp1', 'user@example.com', end_state_name='End')
+        collection = collection_domain.Collection.from_yaml(
+            'cid', self.YAML_CONTENT_V5)
         self.assertEqual(collection.to_yaml(), self._LATEST_YAML_CONTENT)

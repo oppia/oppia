@@ -75,7 +75,7 @@ describe('Collection object factory', function() {
     expect(collection.getTags()).toBeUndefined();
     expect(collection.getVersion()).toBeUndefined();
     expect(collection.getCollectionNodes()).toEqual([]);
-    expect(collection.getNextSkillId()).toEqual(0);
+    expect(collection.getNextSkillIndex()).toEqual(0);
     expect(collection.getCollectionSkills()).toEqual({});
   });
 
@@ -340,7 +340,7 @@ describe('Collection object factory', function() {
         name: 'skill01',
         question_ids: []
       };
-      _sampleCollection.setNextSkillId(1);
+      _sampleCollection.setNextSkillIndex(1);
       expect(_sampleCollection.addCollectionSkill(
         CollectionSkillObjectFactory.create(
           'skill0', collectionSkillBackendObject))).toBe(true);
@@ -429,23 +429,6 @@ describe('Collection object factory', function() {
     expect(_sampleCollection.getCollectionSkills()).toEqual(expectedSkills);
   });
 
-  it('should be able to clear skills', function() {
-    expect(_addCollectionSkill('skill01')).toBe(true);
-    var skillId1 = _sampleCollection.getSkillIdFromName('skill01');
-    expect(_addCollectionSkill('skill02')).toBe(true);
-    var skillId2 = _sampleCollection.getSkillIdFromName('skill02');
-
-    // Clear skills.
-    _sampleCollection.clearCollectionSkills();
-    expect(_sampleCollection.getCollectionSkills()).toEqual({});
-
-    // Check that IDs reset.
-    expect(_addCollectionSkill('new skill')).toBe(true);
-    var newSkillId = _sampleCollection.getSkillIdFromName('new skill');
-    expect(newSkillId).toEqual('skill0');
-    expect(_sampleCollection.containsCollectionSkill(newSkillId)).toBe(true);
-  });
-
   it('should be able to copy from another collection', function() {
     var secondCollection = CollectionObjectFactory.create({
       id: 'col_id0',
@@ -464,7 +447,7 @@ describe('Collection object factory', function() {
       acquired_skill_ids: [],
       exploration: {}
     }));
-    secondCollection.setNextSkillId(1);
+    secondCollection.setNextSkillIndex(1);
     secondCollection.addCollectionSkill(
       CollectionSkillObjectFactory.createFromIdAndName('skill0', 'skill'));
 

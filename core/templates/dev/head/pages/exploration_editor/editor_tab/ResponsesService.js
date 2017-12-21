@@ -21,16 +21,16 @@ oppia.factory('ResponsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
   'AnswerGroupsCacheService', 'EditorStateService', 'changeListService',
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
-  'stateSolutionService', 'SolutionVerificationService', 'alertsService',
-  'explorationContextService', 'explorationWarningsService',
+  'stateSolutionService', 'SolutionVerificationService', 'AlertsService',
+  'ExplorationContextService', 'ExplorationWarningsService',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       AnswerGroupsCacheService, EditorStateService, changeListService,
       explorationStatesService, graphDataService, OutcomeObjectFactory,
-      stateSolutionService, SolutionVerificationService, alertsService,
-      explorationContextService, explorationWarningsService,
+      stateSolutionService, SolutionVerificationService, AlertsService,
+      ExplorationContextService, ExplorationWarningsService,
       INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
@@ -71,30 +71,24 @@ oppia.factory('ResponsesService', [
           var solutionWasPreviouslyValid = (
             explorationStatesService.isSolutionValid(
               EditorStateService.getActiveStateName()));
-          SolutionVerificationService.verifySolution(
-            explorationContextService.getExplorationId(),
-            explorationStatesService.getState(currentStateName),
-            stateSolutionService.savedMemento.correctAnswer,
-            function() {
-              explorationStatesService.updateSolutionValidity(
-                currentStateName, true);
-              explorationWarningsService.updateWarnings();
-              if (!solutionWasPreviouslyValid) {
-                alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
-              }
-            },
-            function() {
-              explorationStatesService.updateSolutionValidity(
-                currentStateName, false);
-              explorationWarningsService.updateWarnings();
-              if (solutionWasPreviouslyValid) {
-                alertsService.addInfoMessage(
-                  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
-              } else {
-                alertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
-              }
-            }
-          );
+          var solutionIsCurrentlyValid = (
+            SolutionVerificationService.verifySolution(
+              ExplorationContextService.getExplorationId(),
+              explorationStatesService.getState(currentStateName),
+              stateSolutionService.savedMemento.correctAnswer));
+
+          explorationStatesService.updateSolutionValidity(
+            currentStateName, solutionIsCurrentlyValid);
+          ExplorationWarningsService.updateWarnings();
+
+          if (solutionIsCurrentlyValid && !solutionWasPreviouslyValid) {
+            AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_VALID);
+          } else if (!solutionIsCurrentlyValid && solutionWasPreviouslyValid) {
+            AlertsService.addInfoMessage(
+              INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
+          } else if (!solutionIsCurrentlyValid && !solutionWasPreviouslyValid) {
+            AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+          }
         }
 
         graphDataService.recompute();

@@ -18,8 +18,10 @@
  */
 
 oppia.factory('SolutionObjectFactory', [
-  '$filter', 'HtmlEscaperService', 'oppiaExplorationHtmlFormatterService',
-  function($filter, HtmlEscaperService, oppiaExplorationHtmlFormatterService) {
+  '$filter', 'HtmlEscaperService', 'ExplorationHtmlFormatterService',
+  'SubtitledHtmlObjectFactory',
+  function($filter, HtmlEscaperService, ExplorationHtmlFormatterService,
+    SubtitledHtmlObjectFactory) {
     var Solution = function(answerIsExclusive, correctAnswer, explanation) {
       this.answerIsExclusive = answerIsExclusive;
       this.correctAnswer = correctAnswer;
@@ -30,7 +32,7 @@ oppia.factory('SolutionObjectFactory', [
       return {
         answer_is_exclusive: this.answerIsExclusive,
         correct_answer: this.correctAnswer,
-        explanation: this.explanation
+        explanation: this.explanation.toBackendDict()
       };
     };
 
@@ -38,12 +40,14 @@ oppia.factory('SolutionObjectFactory', [
       return new Solution(
         solutionBackendDict.answer_is_exclusive,
         solutionBackendDict.correct_answer,
-        solutionBackendDict.explanation);
+        SubtitledHtmlObjectFactory.createFromBackendDict(
+          solutionBackendDict.explanation));
     };
 
     Solution.createNew = function(
-        answerIsExclusive, correctAnswer, explanation) {
-      return new Solution(answerIsExclusive, correctAnswer, explanation);
+        answerIsExclusive, correctAnswer, explanationHtml) {
+      return new Solution(answerIsExclusive, correctAnswer, 
+        SubtitledHtmlObjectFactory.createDefault(explanationHtml));
     };
 
     Solution.prototype.getSummary = function(interactionId) {
@@ -66,9 +70,10 @@ oppia.factory('SolutionObjectFactory', [
           HtmlEscaperService.objToEscapedJson(this.correctAnswer));
       }
       var explanation = (
-        $filter('convertToPlainText')(this.explanation));
+        $filter('convertToPlainText')(this.explanation.getHtml()));
       return (
-        solutionType + ' solution is "' + correctAnswer + '". ' + explanation);
+        solutionType + ' solution is "' + correctAnswer +
+        '". ' + explanation + '.');
     };
 
     Solution.prototype.setCorrectAnswer = function(correctAnswer) {
@@ -82,9 +87,9 @@ oppia.factory('SolutionObjectFactory', [
     Solution.prototype.getOppiaResponseHtml = function(interaction) {
       return (
         (this.answerIsExclusive ? 'The only' : 'One') + ' answer is:<br>' +
-        oppiaExplorationHtmlFormatterService.getShortAnswerHtml(
+        ExplorationHtmlFormatterService.getShortAnswerHtml(
           this.correctAnswer, interaction.id, interaction.customizationArgs) +
-        '. ' + this.explanation);
+        '. ' + this.explanation.getHtml());
     };
 
     return Solution;

@@ -64,6 +64,10 @@ CMD_ADD_QUESTION_ID_TO_SKILL = 'add_question_id_to_skill'
 # This takes additional 'question_id' and 'skill_id' parameters.
 CMD_REMOVE_QUESTION_ID_FROM_SKILL = 'remove_question_id_from_skill'
 
+# Prefix for skill IDs. This should not be changed -- doing so will result in
+# backwards-compatibility issues.
+_SKILL_ID_PREFIX = 'skill'
+
 
 class CollectionChange(object):
     """Domain object class for a change to a collection.
@@ -398,7 +402,7 @@ class CollectionSkill(object):
             raise utils.ValidationError(
                 'Expected index to be nonnegative, received %s' % index)
 
-        return 'skill%s' % index
+        return '%s%s' % (_SKILL_ID_PREFIX, index)
 
     @staticmethod
     def validate_skill_id(skill_id):
@@ -411,12 +415,12 @@ class CollectionSkill(object):
                 'Expected skill ID to have length at least 6, received %s' %
                 skill_id)
 
-        if skill_id[0:5] != 'skill':
+        if skill_id[:5] != _SKILL_ID_PREFIX:
             raise utils.ValidationError(
-                'Expected skill ID to begin with \'skill\', received %s' %
-                skill_id)
+                'Expected skill ID to begin with \'%s\', received %s' %
+                (_SKILL_ID_PREFIX, skill_id))
 
-        if not skill_id[5:].isdigit():
+        if not skill_id[len(_SKILL_ID_PREFIX):].isdigit():
             raise utils.ValidationError(
                 'Expected skill ID to end with a number, received %s' %
                 skill_id)
@@ -480,6 +484,9 @@ class Collection(object):
             schema_version: int. The schema version for the collection.
             nodes: list(CollectionNode). The list of nodes present in the
                 collection.
+            skills: dict. A dict mapping skill IDs to skill objects.
+            next_skill_index: int. The index to use for the next new skill
+                added to the collection.
             version: int. The version of the collection.
             created_on: datetime.datetime. Date and time when the collection is
                 created.
@@ -654,6 +661,18 @@ class Collection(object):
         return collection_dict
 
     @classmethod
+    def _convert_v4_dict_to_v5_dict(cls, collection_dict):
+        """Converts a v4 collection dict into a v5 collection dict.
+
+        This changes the field name of next_skill_id to next_skill_index.
+        """
+        cls._convert_collection_contents_v4_dict_to_v5_dict(
+            collection_dict)
+
+        collection_dict['schema_version'] = 5
+        return collection_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the collection in the latest schema
         format.
@@ -719,11 +738,11 @@ class Collection(object):
         changes the language code.
 
         Args:
-            collection_contents: Collection. The Collection domain object to
-                convert.
+            collection_contents: dict. A dict representing the collection
+                contents object to convert.
 
         Returns:
-            Collection. The new Collection domain object.
+            dict. The updated collection_contents dict.
         """
         return collection_contents
 
@@ -734,11 +753,11 @@ class Collection(object):
         handled while loading the collection.
 
         Args:
-            collection_contents: Collection. The Collection domain object to
-                convert.
+            collection_contents: dict. A dict representing the collection
+                contents object to convert.
 
         Returns:
-            Collection. The new Collection domain object.
+            dict. The updated collection_contents dict.
         """
         return collection_contents
 
@@ -750,7 +769,14 @@ class Collection(object):
         Adds a skills dict and skill id counter. Migrates prerequisite_skills
         and acquired_skills to prerequistite_skill_ids and acquired_skill_ids.
         Then, gets skills in prerequisite_skill_ids and acquired_skill_ids in
-        nodes, and assigns them integer IDs.
+        nodes, and assigns them IDs.
+
+        Args:
+            collection_contents: dict. A dict representing the collection
+                contents object to convert.
+
+        Returns:
+            dict. The updated collection_contents dict.
         """
 
         skill_names = set()
@@ -781,6 +807,27 @@ class Collection(object):
         }
 
         collection_contents['next_skill_index'] = len(skill_names)
+
+        return collection_contents
+
+    @classmethod
+    def _convert_collection_contents_v4_dict_to_v5_dict(
+            cls, collection_contents):
+        """Converts from version 4 to 5.
+
+        Converts next_skill_id to next_skill_index, since next_skill_id isn't
+        actually a skill ID.
+
+        Args:
+            collection_contents: dict. A dict representing the collection
+                contents object to convert.
+
+        Returns:
+            dict. The updated collection_contents dict.
+        """
+        collection_contents['next_skill_index'] = collection_contents[
+            'next_skill_id']
+        del collection_contents['next_skill_id']
 
         return collection_contents
 
@@ -1300,7 +1347,7 @@ class Collection(object):
         for skill_id, skill in self.skills.iteritems():
             CollectionSkill.validate_skill_id(skill_id)
 
-            if int(skill_id[5:]) >= self.next_skill_index:
+            if int(skill_id[len(_SKILL_ID_PREFIX):]) >= self.next_skill_index:
                 raise utils.ValidationError(
                     'Expected skill ID number to be less than %s, received %s' %
                     (self.next_skill_index, skill_id))

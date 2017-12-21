@@ -38,32 +38,32 @@ oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
   'ExplorationDataService', 'EditorStateService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService',
-  'explorationLanguageCodeService', 'explorationRightsService',
+  'explorationLanguageCodeService', 'ExplorationRightsService',
   'explorationInitStateNameService', 'explorationTagsService',
   'editabilityService', 'explorationStatesService', 'RouterService',
-  'graphDataService', 'stateEditorTutorialFirstTimeService',
+  'graphDataService', 'StateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
-  'explorationWarningsService', '$templateCache', 'explorationContextService',
+  'ExplorationWarningsService', '$templateCache', 'ExplorationContextService',
   'ExplorationAdvancedFeaturesService', '$modal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'ParamSpecsObjectFactory', 'explorationAutomaticTextToSpeechService',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'explorationCorrectnessFeedbackService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       ExplorationDataService, EditorStateService, explorationTitleService,
       explorationCategoryService, explorationObjectiveService,
-      explorationLanguageCodeService, explorationRightsService,
+      explorationLanguageCodeService, ExplorationRightsService,
       explorationInitStateNameService, explorationTagsService,
       editabilityService, explorationStatesService, RouterService,
-      graphDataService, stateEditorTutorialFirstTimeService,
+      graphDataService, StateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
-      explorationWarningsService, $templateCache, explorationContextService,
+      ExplorationWarningsService, $templateCache, ExplorationContextService,
       ExplorationAdvancedFeaturesService, $modal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, explorationAutomaticTextToSpeechService,
-      UrlInterpolationService) {
+      UrlInterpolationService, explorationCorrectnessFeedbackService) {
     $scope.editabilityService = editabilityService;
     $scope.EditorStateService = EditorStateService;
 
@@ -72,7 +72,7 @@ oppia.controller('ExplorationEditor', [
      *********************************************************/
     $rootScope.loadingMessage = 'Loading';
 
-    $scope.explorationId = explorationContextService.getExplorationId();
+    $scope.explorationId = ExplorationContextService.getExplorationId();
     $scope.explorationUrl = '/create/' + $scope.explorationId;
     $scope.explorationDownloadUrl = (
       '/createhandler/download/' + $scope.explorationId);
@@ -92,7 +92,7 @@ oppia.controller('ExplorationEditor', [
 
     $scope.$on('refreshGraph', function() {
       graphDataService.recompute();
-      explorationWarningsService.updateWarnings();
+      ExplorationWarningsService.updateWarnings();
     });
 
     $scope.getExplorationUrl = function(explorationId) {
@@ -121,11 +121,13 @@ oppia.controller('ExplorationEditor', [
         explorationParamChangesService.init(
           ParamChangesObjectFactory.createFromBackendList(data.param_changes));
         explorationAutomaticTextToSpeechService.init(data.auto_tts_enabled);
+        explorationCorrectnessFeedbackService.init(
+          data.correctness_feedback_enabled);
 
         $scope.explorationTitleService = explorationTitleService;
         $scope.explorationCategoryService = explorationCategoryService;
         $scope.explorationObjectiveService = explorationObjectiveService;
-        $scope.explorationRightsService = explorationRightsService;
+        $scope.ExplorationRightsService = ExplorationRightsService;
         $scope.explorationInitStateNameService = (
           explorationInitStateNameService);
 
@@ -136,7 +138,7 @@ oppia.controller('ExplorationEditor', [
         $scope.currentVersion = data.version;
 
         ExplorationAdvancedFeaturesService.init(data);
-        explorationRightsService.init(
+        ExplorationRightsService.init(
           data.rights.owner_names, data.rights.editor_names,
           data.rights.viewer_names, data.rights.status,
           data.rights.cloned_from, data.rights.community_owned,
@@ -164,7 +166,7 @@ oppia.controller('ExplorationEditor', [
           RouterService.navigateToMainTab();
         }
 
-        explorationWarningsService.updateWarnings();
+        ExplorationWarningsService.updateWarnings();
 
         // Initialize changeList by draft changes if they exist.
         if (data.draft_changes !== null) {
@@ -195,7 +197,7 @@ oppia.controller('ExplorationEditor', [
           successCallback();
         }
 
-        stateEditorTutorialFirstTimeService.init(
+        StateEditorTutorialFirstTimeService.init(
           data.show_state_editor_tutorial_on_load, $scope.explorationId);
       });
     };
@@ -345,7 +347,7 @@ oppia.controller('ExplorationEditor', [
     var leaveTutorial = function() {
       editabilityService.onEndTutorial();
       $scope.$apply();
-      stateEditorTutorialFirstTimeService.markTutorialFinished();
+      StateEditorTutorialFirstTimeService.markTutorialFinished();
       $scope.tutorialInProgress = false;
     };
 
@@ -379,10 +381,10 @@ oppia.controller('ExplorationEditor', [
         backdrop: true,
         controller: [
           '$scope', '$modalInstance', 'siteAnalyticsService',
-          'explorationContextService',
+          'ExplorationContextService',
           function($scope, $modalInstance, siteAnalyticsService,
-          explorationContextService) {
-            var explorationId = explorationContextService.getExplorationId();
+          ExplorationContextService) {
+            var explorationId = ExplorationContextService.getExplorationId();
 
             siteAnalyticsService.registerTutorialModalOpenEvent(explorationId);
 
@@ -409,7 +411,7 @@ oppia.controller('ExplorationEditor', [
       modalInstance.result.then(function() {
         $scope.startTutorial();
       }, function() {
-        stateEditorTutorialFirstTimeService.markTutorialFinished();
+        StateEditorTutorialFirstTimeService.markTutorialFinished();
       });
     };
 

@@ -75,7 +75,7 @@ DEPENDENCIES_TEMPLATES_DIR = (
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
-    'extensions', 'interactions', 'object_defaults.json')
+    'extensions', 'objects', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
     os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
 
@@ -156,13 +156,13 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 13
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 15
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
-CURRENT_COLLECTION_SCHEMA_VERSION = 4
+CURRENT_COLLECTION_SCHEMA_VERSION = 5
 
 # The current version of the question schema.
 CURRENT_QUESTION_SCHEMA_VERSION = 1
@@ -436,6 +436,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
 }, {
     'name': 'Math',
     'interaction_ids': [
+        'FractionInput',
         'GraphInput',
         'LogicProof',
         'NumericInput',
@@ -494,6 +495,9 @@ DEMO_EXPLORATIONS = {
     u'16': 'all_interactions',
     u'17': 'audio_test',
     u'18': 'code_classifier_test.yaml',
+    u'19': 'example_exploration_in_collection1.yaml',
+    u'20': 'example_exploration_in_collection2.yaml',
+    u'21': 'example_exploration_in_collection3.yaml',
 }
 
 DEMO_COLLECTIONS = {

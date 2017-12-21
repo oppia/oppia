@@ -19,26 +19,28 @@
  */
 
 oppia.factory('TrainingModalService', [
-  '$rootScope', '$modal', 'alertsService',
-  function($rootScope, $modal, alertsService) {
+  '$rootScope', '$modal', 'AlertsService', 'UrlInterpolationService',
+  function($rootScope, $modal, AlertsService, UrlInterpolationService) {
     return {
       openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave) {
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
         if (externalSave) {
           $rootScope.$broadcast('externalSave');
         }
 
         $modal.open({
-          templateUrl: 'modals/trainUnresolvedAnswer',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/editor_tab/' +
+            'training_unresolved_answer_modal_directive.html'),
           backdrop: true,
           controller: [
             '$scope', '$injector', '$modalInstance',
             'explorationStatesService', 'EditorStateService',
-            'AnswerClassificationService', 'explorationContextService',
+            'AnswerClassificationService', 'ExplorationContextService',
             'stateInteractionIdService', 'AngularNameService',
             function($scope, $injector, $modalInstance,
                 explorationStatesService, EditorStateService,
-                AnswerClassificationService, explorationContextService,
+                AnswerClassificationService, ExplorationContextService,
                 stateInteractionIdService, AngularNameService) {
               $scope.trainingDataAnswer = '';
               $scope.trainingDataFeedback = '';
@@ -57,7 +59,7 @@ oppia.factory('TrainingModalService', [
 
               $scope.init = function() {
                 var explorationId =
-                  explorationContextService.getExplorationId();
+                  ExplorationContextService.getExplorationId();
                 var currentStateName =
                   EditorStateService.getActiveStateName();
                 var state = explorationStatesService.getState(currentStateName);
@@ -75,11 +77,11 @@ oppia.factory('TrainingModalService', [
                 var classificationResult = (
                   AnswerClassificationService.getMatchingClassificationResult(
                     explorationId, currentStateName, state, unhandledAnswer,
-                    true, rulesService));
+                    rulesService));
                 var feedback = 'Nothing';
                 var dest = classificationResult.outcome.dest;
                 if (classificationResult.outcome.feedback.length > 0) {
-                  feedback = classificationResult.outcome.feedback[0];
+                  feedback = classificationResult.outcome.feedback.getHtml();
                 }
                 if (dest === currentStateName) {
                   dest = '<em>(try again)</em>';

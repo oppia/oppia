@@ -35,7 +35,7 @@ describe('Solution Verification Service', function() {
     });
   });
 
-  var ecs, ess, siis, scas, idc, sof, svs, IS, mockFunctions;
+  var ess, siis, scas, idc, sof, svs, IS, mockFunctions;
   var rootScope;
   var mockExplorationData;
   var successCallbackSpy, errorCallbackSpy;
@@ -52,7 +52,6 @@ describe('Solution Verification Service', function() {
   });
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
-    ecs = $injector.get('EditorStateService');
     ess = $injector.get('explorationStatesService');
     siis = $injector.get('stateInteractionIdService');
     scas = $injector.get('stateCustomizationArgsService');
@@ -71,10 +70,13 @@ describe('Solution Verification Service', function() {
         interaction: {
           id: 'TextInput',
           answer_groups: [{
-            correct: false,
+            labelled_as_correct: false,
             outcome: {
               dest: 'End State',
-              feedback: [],
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
               param_changes: []
             },
             rule_specs: [{
@@ -84,13 +86,16 @@ describe('Solution Verification Service', function() {
           }],
           default_outcome: {
             dest: 'First State',
-            feedback: [],
+            feedback: {
+              html: '',
+              audio_translations: {}
+            },
             param_changes: []
           },
           hints: [{
-            hint_text: 'one'
+            hint_content: 'one'
           }, {
-            hint_text: 'two'
+            hint_content: 'two'
           }]
         },
         param_changes: []
@@ -104,12 +109,22 @@ describe('Solution Verification Service', function() {
           id: 'TextInput',
           answer_groups: [{
             rule_specs: [],
-            outcome: {},
-            correct: false
+            outcome: {
+              dest: 'default',
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
+              param_changes: []
+            },
+            labelled_as_correct: false
           }],
           default_outcome: {
             dest: 'default',
-            feedback: [],
+            feedback: {
+              html: '',
+              audio_translations: {}
+            },
             param_changes: []
           },
           hints: []
@@ -120,82 +135,40 @@ describe('Solution Verification Service', function() {
   }));
 
   describe('Success case', function() {
-    it('should verify a correct solution',
-      function(done) {
-        mockFunctions = {
-          successCallback: function() {
-            done();
-          },
-          errorCallback: function() {
-            done();
-          }
-        };
+    it('should verify a correct solution', function() {
+      var state = ess.getState('First State');
+      siis.init(
+        'First State', state.interaction.id, state.interaction, 'widget_id');
+      scas.init(
+        'First State', state.interaction.customizationArgs,
+        state.interaction, 'widget_customization_args');
 
-        successCallbackSpy = spyOn(
-          mockFunctions, 'successCallback').and.callThrough();
-        errorCallbackSpy = spyOn(
-          mockFunctions, 'errorCallback').and.callThrough();
+      siis.savedMemento = 'TextInput';
+      ess.saveSolution('First State', sof.createNew(false, 'abc', 'nothing'));
 
-        ecs.setActiveStateName('First State');
-        var state = ess.getState('First State');
-        siis.init(
-          'First State', state.interaction.id, state.interaction, 'widget_id');
-        scas.init(
-          'First State', state.interaction.customizationArgs,
-          state.interaction, 'widget_customization_args');
-
-        siis.savedMemento = 'TextInput';
-        ess.saveSolution('First State', sof.createNew(false, 'abc', 'nothing'));
-
+      expect(
         svs.verifySolution(0, state,
-          ess.getState('First State').interaction.solution.correctAnswer,
-          mockFunctions.successCallback, mockFunctions.errorCallback);
-      }
-    );
-
-    afterEach(function() {
-      expect(successCallbackSpy).toHaveBeenCalled();
-      expect(errorCallbackSpy).not.toHaveBeenCalled();
+          ess.getState('First State').interaction.solution.correctAnswer)
+      ).toBe(true);
     });
   });
 
   describe('Failure case', function() {
-    it('should verify an incorrect solution',
-      function(done) {
-        mockFunctions = {
-          successCallback: function() {
-            done();
-          },
-          errorCallback: function() {
-            done();
-          }
-        };
+    it('should verify an incorrect solution', function() {
+      var state = ess.getState('First State');
+      siis.init(
+        'First State', state.interaction.id, state.interaction, 'widget_id');
+      scas.init(
+        'First State', state.interaction.customizationArgs,
+        state.interaction, 'widget_customization_args');
 
-        successCallbackSpy = spyOn(
-          mockFunctions, 'successCallback').and.callThrough();
-        errorCallbackSpy = spyOn(
-          mockFunctions, 'errorCallback').and.callThrough();
+      siis.savedMemento = 'TextInput';
+      ess.saveSolution('First State', sof.createNew(false, 'xyz', 'nothing'));
 
-        ecs.setActiveStateName('First State');
-        var state = ess.getState('First State');
-        siis.init(
-          'First State', state.interaction.id, state.interaction, 'widget_id');
-        scas.init(
-          'First State', state.interaction.customizationArgs,
-          state.interaction, 'widget_customization_args');
-
-        siis.savedMemento = 'TextInput';
-        ess.saveSolution('First State', sof.createNew(false, 'xyz', 'nothing'));
-
+      expect(
         svs.verifySolution(0, state,
-          ess.getState('First State').interaction.solution.correctAnswer,
-          mockFunctions.successCallback, mockFunctions.errorCallback)
-      }
-    );
-
-    afterEach(function() {
-      expect(successCallbackSpy).not.toHaveBeenCalled();
-      expect(errorCallbackSpy).toHaveBeenCalled();
+          ess.getState('First State').interaction.solution.correctAnswer)
+      ).toBe(false);
     });
   });
 });

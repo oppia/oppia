@@ -22,6 +22,7 @@ describe('Read only exploration backend API service', function() {
   var $rootScope = null;
   var $scope = null;
   var $httpBackend = null;
+  var shof;
 
   beforeEach(module('oppia'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -32,6 +33,7 @@ describe('Read only exploration backend API service', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
+    shof = $injector.get('SubtitledHtmlObjectFactory');
 
     // Sample exploration object returnable from the backend
     sampleDataResults = {
@@ -54,7 +56,10 @@ describe('Read only exploration backend API service', function() {
               default_outcome: {
                 param_changes: [],
                 dest: 'Introduction',
-                feedback: []
+                feedback: {
+                  html: '',
+                  audio_translations: {}
+                }
               },
               confirmed_unclassified_answers: [],
               id: null

@@ -26,13 +26,13 @@ oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier')
 oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
 
 oppia.factory('AnswerClassificationService', [
-  '$http', 'LearnerParamsService', 'alertsService',
+  '$http', 'LearnerParamsService', 'AlertsService',
   'AnswerClassificationResultObjectFactory',
   'PredictionAlgorithmRegistryService', 'StateClassifierMappingService',
   'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION', 'STATISTICAL_CLASSIFICATION',
   'RULE_TYPE_CLASSIFIER',
-  function($http, LearnerParamsService, alertsService,
+  function($http, LearnerParamsService, AlertsService,
       AnswerClassificationResultObjectFactory,
       PredictionAlgorithmRegistryService, StateClassifierMappingService,
       INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
@@ -73,7 +73,7 @@ oppia.factory('AnswerClassificationService', [
           defaultOutcome, answerGroups.length, 0, DEFAULT_OUTCOME_CLASSIFICATION
         );
       } else {
-        alertsService.addWarning('Something went wrong with the exploration.');
+        AlertsService.addWarning('Something went wrong with the exploration.');
       }
     };
 
@@ -105,8 +105,6 @@ oppia.factory('AnswerClassificationService', [
        * @param {object} oldState - The state where the user submitted the
        *   answer.
        * @param {*} answer - The answer that the user has submitted.
-       * @param {boolean} isInEditorMode - Whether the function is being called
-       *   in editor mode.
        * @param {function} interactionRulesService - The service which contains
        *   the explicit rules of that interaction.
        *
@@ -114,8 +112,7 @@ oppia.factory('AnswerClassificationService', [
        *   AnswerClassificationResult domain object.
        */
       getMatchingClassificationResult: function(
-          explorationId, stateName, oldState, answer, isInEditorMode,
-          interactionRulesService) {
+          explorationId, stateName, oldState, answer, interactionRulesService) {
         var answerClassificationResult = null;
 
         var answerGroups = oldState.interaction.answerGroups;
@@ -124,7 +121,7 @@ oppia.factory('AnswerClassificationService', [
           answerClassificationResult = classifyAnswer(
             answer, answerGroups, defaultOutcome, interactionRulesService);
         } else {
-          alertsService.addWarning(
+          AlertsService.addWarning(
             'Something went wrong with the exploration: no ' +
             'interactionRulesService was available.');
           throw Error(
@@ -162,6 +159,15 @@ oppia.factory('AnswerClassificationService', [
         }
 
         return answerClassificationResult;
+      },
+      isClassifiedExplicitlyOrGoesToNewState: function(
+          explorationId, stateName, state, answer, interactionRulesService) {
+        var result = this.getMatchingClassificationResult(
+          explorationId, stateName, state, answer, interactionRulesService);
+        return (
+          result.outcome.dest !== state.name ||
+          result.classificationCategorization !==
+            DEFAULT_OUTCOME_CLASSIFICATION);
       }
     };
   }

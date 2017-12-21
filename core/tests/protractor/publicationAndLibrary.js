@@ -21,15 +21,18 @@ var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('Library index page', function() {
   var libraryPage = null;
+  var explorationPlayerPage = null;
 
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   it('should display private and published explorations', function() {
@@ -149,7 +152,7 @@ describe('Library index page', function() {
       'Seek the aid of the Valar');
     general.waitForSystem();
     libraryPage.playExploration(EXPLORATION_SILMARILS);
-    player.expectExplorationNameToBe('silmarils');
+    explorationPlayerPage.expectExplorationNameToBe('silmarils');
 
     users.logout();
   });
