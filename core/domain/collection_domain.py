@@ -60,7 +60,8 @@ CMD_ADD_COLLECTION_SKILL = 'add_collection_skill'
 # This takes an additional 'skill_id' parameter.
 CMD_DELETE_COLLECTION_SKILL = 'delete_collection_skill'
 
-
+# Prefix for skill IDs. This should not be changed -- doing so will result in
+# backwards-compatibility issues.
 _SKILL_ID_PREFIX = 'skill'
 
 
@@ -406,8 +407,8 @@ class CollectionSkill(object):
 
         if skill_id[:5] != _SKILL_ID_PREFIX:
             raise utils.ValidationError(
-                'Expected skill ID to begin with \'skill\', received %s' %
-                skill_id)
+                'Expected skill ID to begin with \'%s\', received %s' %
+                (_SKILL_ID_PREFIX, skill_id))
 
         if not skill_id[len(_SKILL_ID_PREFIX):].isdigit():
             raise utils.ValidationError(
@@ -727,11 +728,11 @@ class Collection(object):
         changes the language code.
 
         Args:
-            collection_contents: Collection. The Collection domain object to
-                convert.
+            collection_contents: dict. A dict representing the collection
+                contents object to convert.
 
         Returns:
-            Collection. The new Collection domain object.
+            dict. The updated collection_contents dict.
         """
         return collection_contents
 
@@ -742,11 +743,11 @@ class Collection(object):
         handled while loading the collection.
 
         Args:
-            collection_contents: Collection. The Collection domain object to
-                convert.
+            collection_contents: dict. A dict representing the collection
+                contents object to convert.
 
         Returns:
-            Collection. The new Collection domain object.
+            dict. The updated collection_contents dict.
         """
         return collection_contents
 
@@ -761,11 +762,11 @@ class Collection(object):
         nodes, and assigns them IDs.
 
         Args:
-            collection_contents: Collection. The Collection domain object to
-                convert.
+            collection_contents: dict. A dict representing the collection
+                contents object to convert.
 
         Returns:
-            Collection. The new Collection domain object.
+            dict. The updated collection_contents dict.
         """
 
         skill_names = set()
@@ -808,11 +809,11 @@ class Collection(object):
         actually a skill ID.
 
         Args:
-            collection_contents: Collection. The Collection domain object to
-                convert.
+            collection_contents: dict. A dict representing the collection
+                contents object to convert.
 
         Returns:
-            Collection. The new Collection domain object.
+            dict. The updated collection_contents dict.
         """
         collection_contents['next_skill_index'] = collection_contents[
             'next_skill_id']
