@@ -22,7 +22,8 @@ oppia.controller('HistoryTab', [
   'VersionTreeService', 'CompareVersionsService',
   'DateTimeFormatService', 'UrlInterpolationService',
   function(
-      $scope, $http, $rootScope, $log, $uibModal, ExplorationDataService,
+      $scope, $http, $rootScope, $log, 
+      $uibModal, ExplorationDataService,
       VersionTreeService, CompareVersionsService,
       DateTimeFormatService, UrlInterpolationService) {
     $scope.explorationId = ExplorationDataService.explorationId;

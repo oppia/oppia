@@ -412,7 +412,8 @@ oppia.controller('LearnerDashboard', [
         },
         controller: [
           '$scope', '$uibModalInstance', '$http', 'sectionNameI18nId',
-          'subsectionName', function(
+          'subsectionName', 
+          function(
               $scope, $uibModalInstance, $http, sectionNameI18nId,
               subsectionName) {
             $scope.sectionNameI18nId = sectionNameI18nId;

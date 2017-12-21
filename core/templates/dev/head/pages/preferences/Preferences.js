@@ -21,9 +21,9 @@ oppia.controller('Preferences', [
   'AlertsService', 'UrlInterpolationService', 'UtilsService',
   'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
   function(
-      $scope, $http, $rootScope, $uibModal, $timeout, $translate, AlertsService,
-      UrlInterpolationService, UtilsService, DASHBOARD_TYPE_CREATOR,
-      DASHBOARD_TYPE_LEARNER) {
+      $scope, $http, $rootScope, $uibModal, $timeout, $translate, 
+      AlertsService, UrlInterpolationService, UtilsService, 
+      DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
     $rootScope.loadingMessage = 'Loading';
     $scope.profilePictureDataUrl = '';
