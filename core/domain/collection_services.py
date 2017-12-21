@@ -160,7 +160,8 @@ def get_collection_from_model(collection_model, run_conversion=True):
             versioned_collection_contents[
                 'collection_contents']['skills'].iteritems()
         },
-        versioned_collection_contents['collection_contents']['next_skill_id'],
+        versioned_collection_contents[
+            'collection_contents']['next_skill_index'],
         collection_model.version, collection_model.created_on,
         collection_model.last_updated)
 
@@ -768,7 +769,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
             skill_id: skill.to_dict()
             for skill_id, skill in collection.skills.iteritems()
         },
-        'next_skill_id': collection.next_skill_id
+        'next_skill_index': collection.next_skill_index
     }
     collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
@@ -811,7 +812,7 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
                 skill_id: skill.to_dict()
                 for skill_id, skill in collection.skills.iteritems()
             },
-            'next_skill_id': collection.next_skill_id
+            'next_skill_index': collection.next_skill_index
         },
     )
     model.commit(committer_id, commit_message, commit_cmds)
