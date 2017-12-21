@@ -44,7 +44,7 @@ oppia.factory('SimpleEditorManagerService', [
         FIRST_ANSWER_GROUP_RULE: {
           type: 'Equals',
           value: {
-            x: 9.0
+            x: 0
           }
         }
       },
