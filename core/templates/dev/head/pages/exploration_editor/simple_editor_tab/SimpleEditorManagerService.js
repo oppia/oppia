@@ -316,11 +316,10 @@ oppia.factory('SimpleEditorManagerService', [
          questionName, customizationArgs);
 
         // If question is inserted at first position then set it initial/
-       if(index===0){
+       if (index===0) {
          explorationInitStateNameService.displayed = questionName;
          explorationInitStateNameService.saveDisplayedValue(questionName);
-       }
-       else{
+       } else {
          var previousState = SimpleEditorShimService
            .getState(stateNamesInOrder[index - 1]);
          var previousStateName = SimpleEditorShimService
@@ -337,18 +336,17 @@ oppia.factory('SimpleEditorManagerService', [
        var questionCount = data.questionList.getQuestionCount();
 
        // If last question, make it terminal
-       if(index !== questionCount){
+       if (index !== questionCount) {
          SimpleEditorShimService.saveDefaultOutcome(
            questionName, OutcomeObjectFactory.createEmpty(nextQuestion));
          answerGroups[0].outcome.dest = SimpleEditorShimService
            .getState(nextQuestion).name;
          SimpleEditorShimService.saveAnswerGroups(questionName, answerGroups);
-       }
-       else{
+       } else {
          makeStateTerminal(questionName);
        }
        var questions = StatesToQuestionsService.getQuestions();
-       for( i=0; i<questions.length; i++) {
+       for (i=0; i<questions.length; i++) {
          data.questionList.updateQuestion(i, questions[i]);
        }
       },
