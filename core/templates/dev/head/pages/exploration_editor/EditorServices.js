@@ -526,15 +526,6 @@ oppia.factory('explorationCorrectnessFeedbackService', [
       return (typeof value === 'boolean');
     };
 
-    child.isAutomaticTextToSpeechEnabled = function() {
-      return child.savedMemento;
-    };
-
-    child.toggleAutomaticTextToSpeech = function() {
-      child.displayed = !child.displayed;
-      child.saveDisplayedValue();
-    };
-
     return child;
   }
 ]);

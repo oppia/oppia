@@ -2931,7 +2931,7 @@ class Exploration(object):
     def _convert_states_v14_dict_to_v15_dict(cls, states_dict):
         """Converts from version 14 to 15. Version 15 renames the "correct"
         field in answer groups to "labelled_as_correct" and (for safety) resets
-        all "correct" values to False.
+        all "labelled_as_correct" values to False.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
