@@ -415,6 +415,49 @@ class EditorTest(BaseEditorControllerTest):
 class ExplorationEditorLogoutTest(BaseEditorControllerTest):
     """Test handler for logout from exploration editor page."""
 
+    def test_logout_from_invalid_url(self):
+        """Logour from invalid url should redirect to library."""
+
+        published_exp_id = '_published_exp_id-1200'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            published_exp_id)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        rights_manager.publish_exploration(self.owner, published_exp_id)
+
+        invalid_current_page = '/doesnotexit/%s' % published_exp_id
+        invalid_logout_url = ('/exploration_editor_logout?return_url=%s' % (
+            invalid_current_page))
+
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(invalid_logout_url, expect_errors=False)
+        self.assertEqual(response.status_int, 302)
+        response.follow()
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('library', response.headers['location'])
+        self.logout()
+
+    def test_logout_from_invalid_extra_url(self):
+        """Logour from invalid url should redirect to library."""
+
+        published_exp_id = '123-published_exp_id'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            published_exp_id)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        rights_manager.publish_exploration(self.owner, published_exp_id)
+
+        invalid_current_page = '%s/%s/extra' % (
+            feconf.EDITOR_URL_PREFIX, published_exp_id)
+        invalid_logout_url = ('/exploration_editor_logout?return_url=%s' % (
+            invalid_current_page))
+
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(invalid_logout_url, expect_errors=False)
+        self.assertEqual(response.status_int, 302)
+        response.follow()
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('library', response.headers['location'])
+        self.logout()
+
     def test_logout_from_empty_url(self):
         """Logout from empty exploration id should redirect
         to library page.
@@ -430,7 +473,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
         self.assertIn('library', response.headers['location'])
         self.logout()
 
-    def test_logout_from_invalid_url(self):
+    def test_logout_from_invalid_exploration_id(self):
         """Logout from invalid exploration id should redirect
         to library page.
         """
@@ -453,7 +496,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
         to library page.
         """
 
-        unpublished_exp_id = 'unpublished_eid'
+        unpublished_exp_id = '_unpublished_eid123'
         exploration = exp_domain.Exploration.create_default_exploration(
             unpublished_exp_id)
         exp_services.save_new_exploration(self.owner_id, exploration)
@@ -477,7 +520,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTest):
         to same page.
         """
 
-        published_exp_id = 'published_eid'
+        published_exp_id = 'published_eid-123'
         exploration = exp_domain.Exploration.create_default_exploration(
             published_exp_id)
         exp_services.save_new_exploration(self.owner_id, exploration)
