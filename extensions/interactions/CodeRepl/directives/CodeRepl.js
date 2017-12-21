@@ -34,12 +34,8 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         '/interactions/CodeRepl/directives/' +
         'code_repl_interaction_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        if ($scope.getLastAnswer()) {
-          $scope.interactionIsActive = false;
-        } else {
-          $scope.interactionIsActive = true;
-        }
-        $scope.$on(EVENT_NEW_CARD_AVAILABLE, function( evt, data) {
+        $scope.interactionIsActive = !$scope.getLastAnswer();
+        $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
           if (data) {
             $scope.interactionIsActive = false;
           }
@@ -69,10 +65,10 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 
         // Keep the code string given by the user and the stdout from the
         // evaluation until sending them back to the server.
-        $scope.output = '';
         if ($scope.interactionIsActive) {
           $scope.code = (
             $scope.preCode + $scope.placeholder + $scope.postCode);
+          $scope.output = '';
         } else {
           $scope.code = ($scope.getLastAnswer().code);
           $scope.output = ($scope.getLastAnswer().output);

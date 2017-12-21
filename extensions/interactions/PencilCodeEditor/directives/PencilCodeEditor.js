@@ -38,14 +38,10 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
         'FocusManagerService', 'pencilCodeEditorRulesService',
         function($scope, $attrs, $element, $timeout, $modal,
           FocusManagerService, pencilCodeEditorRulesService) {
-          if ($scope.getLastAnswer()) {
-            $scope.interactionIsActive = false;
-            $scope.initialCode = $scope.getLastAnswer().code;
-          } else {
-            $scope.interactionIsActive = true;
-            $scope.initialCode = HtmlEscaperService.escapedJsonToObj(
-              $attrs.initialCodeWithValue);
-          }
+          $scope.interactionIsActive = !$scope.getLastAnswer();
+          $scope.initialCode = $scope.interactionIsActive ?
+            HtmlEscaperService.escapedJsonToObj($attrs.initialCodeWithValue) :
+            $scope.initialSequence = $scope.getLastAnswer().code;
 
           var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
           var pce = new PencilCodeEmbed(iframeDiv);
@@ -80,12 +76,11 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
             }]);
 
             pce.showEditor();
+            pce.hideToggleButton();
             if ($scope.interactionIsActive) {
-              pce.hideToggleButton();
               pce.setEditable();
             } else {
               pce.hideMiddleButton();
-              pce.hideToggleButton();
               pce.setReadOnly();
             }
 

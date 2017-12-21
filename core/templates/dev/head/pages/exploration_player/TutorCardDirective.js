@@ -78,10 +78,13 @@ oppia.directive('tutorCard', [
 
             $scope.arePreviousResponsesShown = false;
             $scope.activeCard = PlayerTranscriptService.getCard(index);
-            if ($scope.activeCard.inputResponsePairs.length == 0) {
-              $scope.interactionIsActive = true;
+            $scope.interactionIsActive =
+              PlayerTranscriptService.isLastCard(index);
+            if (PlayerTranscriptService.isLastCard(index)) {
+              $scope.getLastAnswer = false;
             } else {
-              $scope.interactionIsActive = false;
+              $scope.getLastAnswer = $scope.activeCard.
+                inputResponsePairs.slice(-1)[0].learnerInput;
             }
             $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
               if (data) {

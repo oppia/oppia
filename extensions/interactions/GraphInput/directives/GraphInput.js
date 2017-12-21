@@ -55,11 +55,9 @@ oppia.directive('oppiaInteractiveGraphInput', [
               rulesService: graphInputRulesService
             });
           };
-          $scope.interactionIsActive = true;
-          if ($scope.getLastAnswer()) {
-            $scope.interactionIsActive = false;
-          }
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function( evt, data) {
+          $scope.interactionIsActive = !$scope.getLastAnswer();
+
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             if (data) {
               $scope.interactionIsActive = false;
             }
@@ -73,28 +71,21 @@ oppia.directive('oppiaInteractiveGraphInput', [
             var stringToBool = function(str) {
               return (str === 'true');
             };
-            if ($scope.interactionIsActive) {
-              $scope.canAddVertex = stringToBool($attrs.canAddVertexWithValue);
-              $scope.canDeleteVertex = stringToBool(
-                $attrs.canDeleteVertexWithValue);
-              $scope.canEditVertexLabel = stringToBool(
-                $attrs.canEditVertexLabelWithValue);
-              $scope.canMoveVertex = stringToBool(
-                $attrs.canMoveVertexWithValue);
-              $scope.canAddEdge = stringToBool($attrs.canAddEdgeWithValue);
-              $scope.canDeleteEdge = stringToBool(
-                $attrs.canDeleteEdgeWithValue);
-              $scope.canEditEdgeWeight = stringToBool(
-                $attrs.canEditEdgeWeightWithValue);
-            } else {
-              $scope.canAddVertex = false;
-              $scope.canDeleteVertex = false;
-              $scope.canEditVertexLabel = false;
-              $scope.canMoveVertex = false;
-              $scope.canAddEdge = false;
-              $scope.canDeleteEdge = false;
-              $scope.canEditEdgeWeight = false;
-            }
+            $scope.canAddVertex = $scope.interactionIsActive ?
+              stringToBool($attrs.canAddVertexWithValue) : false;
+            $scope.canDeleteVertex = $scope.interactionIsActive ?
+              stringToBool($attrs.canDeleteVertexWithValue) : false
+            $scope.canEditVertexLabel = $scope.interactionIsActive ?
+              stringToBool($attrs.canEditVertexLabelWithValue) : false
+            $scope.canMoveVertex = $scope.interactionIsActive ?
+              stringToBool($attrs.canMoveVertexWithValue) : false
+            $scope.canAddEdge = $scope.interactionIsActive ?
+              stringToBool($attrs.canAddEdgeWithValue) : false
+            $scope.canDeleteEdge = $scope.interactionIsActive ?
+              stringToBool($attrs.canDeleteEdgeWithValue) : false
+            $scope.canEditEdgeWeight = $scope.interactionIsActive ?
+              stringToBool($attrs.canEditEdgeWeightWithValue) : false
+            $scope.canEditGraph = $scope.interactionIsActive;
           };
 
           // TODO(czxcjx): Write this function
@@ -103,10 +94,9 @@ oppia.directive('oppiaInteractiveGraphInput', [
           };
 
           var updateGraphFromJSON = function(jsonGraph) {
-            var newGraph = HtmlEscaperService.escapedJsonToObj(jsonGraph);
-            if (!$scope.interactionIsActive) {
-              newGraph = $scope.getLastAnswer();
-            }
+            var newGraph = $scope.interactionIsActive ?
+              HtmlEscaperService.escapedJsonToObj(jsonGraph) :
+              $scope.getLastAnswer();
             if (checkValidGraph(newGraph)) {
               $scope.graph = newGraph;
             } else {
@@ -236,7 +226,8 @@ oppia.directive('graphViz', [
         canAddEdge: '=',
         canDeleteEdge: '=',
         canEditEdgeWeight: '=',
-        canEditOptions: '='
+        canEditOptions: '=',
+        canEditGraph: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
@@ -283,8 +274,15 @@ oppia.directive('graphViz', [
 
           $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
           $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
-          $scope.interactionIsActive = true;
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function( evt, data) {
+
+          if ($scope.canEditGraph === undefined ||
+              $scope.canEditGraph === true) {
+            $scope.interactionIsActive = true;
+          } else {
+            $scope.interactionIsActive = false;
+          }
+
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             if (data) {
               $scope.interactionIsActive = false;
               $scope.canAddVertex = false;
@@ -297,56 +295,55 @@ oppia.directive('graphViz', [
               $scope.state.currentMode = null;
             }
           });
+
           var vizContainer = $($element).find('.oppia-graph-viz-svg');
           $scope.vizWidth = vizContainer.width();
           $scope.mousemoveGraphSVG = function(event) {
-            if ($scope.interactionIsActive) {
-              $scope.state.mouseX = event.pageX - vizContainer.offset().left;
-              $scope.state.mouseY = event.pageY - vizContainer.offset().top;
-              // We use vertexDragStartX/Y and mouseDragStartX/Y to make
-              // mouse-dragging by label more natural, by moving the vertex
-              // according to the difference from the original position.
-              // Otherwise, mouse-dragging by label will make the vertex
-              // awkwardly jump to the mouse.
-              if ($scope.state.currentlyDraggedVertex !== null &&
-                  ($scope.state.mouseX > GRAPH_INPUT_LEFT_MARGIN)) {
-                $scope.graph.vertices[$scope.state.currentlyDraggedVertex].x =
-                  $scope.state.vertexDragStartX + (
-                    $scope.state.mouseX - $scope.state.mouseDragStartX);
-                $scope.graph.vertices[$scope.state.currentlyDraggedVertex].y =
-                  $scope.state.vertexDragStartY + (
-                    $scope.state.mouseY - $scope.state.mouseDragStartY);
-              }
+            if (!$scope.interactionIsActive) {
+              return;
+            }
+            $scope.state.mouseX = event.pageX - vizContainer.offset().left;
+            $scope.state.mouseY = event.pageY - vizContainer.offset().top;
+            // We use vertexDragStartX/Y and mouseDragStartX/Y to make
+            // mouse-dragging by label more natural, by moving the vertex
+            // according to the difference from the original position.
+            // Otherwise, mouse-dragging by label will make the vertex
+            // awkwardly jump to the mouse.
+            if ($scope.state.currentlyDraggedVertex !== null &&
+                ($scope.state.mouseX > GRAPH_INPUT_LEFT_MARGIN)) {
+              $scope.graph.vertices[$scope.state.currentlyDraggedVertex].x =
+                $scope.state.vertexDragStartX + (
+                  $scope.state.mouseX - $scope.state.mouseDragStartX);
+              $scope.graph.vertices[$scope.state.currentlyDraggedVertex].y =
+                $scope.state.vertexDragStartY + (
+                  $scope.state.mouseY - $scope.state.mouseDragStartY);
             }
           };
 
           $scope.onClickGraphSVG = function() {
-            if ($scope.interactionIsActive) {
-              if ($scope.state.currentMode === _MODES.ADD_VERTEX &&
-                  $scope.canAddVertex) {
-                $scope.graph.vertices.push({
-                  x: $scope.state.mouseX,
-                  y: $scope.state.mouseY,
-                  label: ''
-                });
-                setMode(_MODES.MOVE);
-              }
-              if ($scope.state.hoveredVertex === null) {
-                $scope.state.selectedVertex = null;
-              }
-              if ($scope.state.hoveredEdge === null) {
-                $scope.state.selectedEdge = null;
-              }
+            if (!$scope.interactionIsActive) {
+              return;
+            }
+            if ($scope.state.currentMode === _MODES.ADD_VERTEX &&
+                $scope.canAddVertex) {
+              $scope.graph.vertices.push({
+                x: $scope.state.mouseX,
+                y: $scope.state.mouseY,
+                label: ''
+              });
+              setMode(_MODES.MOVE);
+            }
+            if ($scope.state.hoveredVertex === null) {
+              $scope.state.selectedVertex = null;
+            }
+            if ($scope.state.hoveredEdge === null) {
+              $scope.state.selectedEdge = null;
             }
           };
 
           $scope.init = function() {
             initButtons();
-            if ($scope.buttons.length > 0) {
-              $scope.state.currentMode = $scope.buttons[0].mode;
-            } else {
-              $scope.interactionIsActive = false;
-            }
+            $scope.state.currentMode = $scope.buttons[0].mode;
           };
 
           var initButtons = function() {
@@ -408,9 +405,9 @@ oppia.directive('graphViz', [
             $scope.state.selectedEdge = null;
           };
           $scope.onClickModeButton = function(mode, $event) {
+            $event.preventDefault();
+            $event.stopPropagation();
             if ($scope.interactionIsActive) {
-              $event.preventDefault();
-              $event.stopPropagation();
               setMode(mode);
             }
           };
@@ -655,8 +652,9 @@ oppia.directive('graphViz', [
           $scope.getEdgeCentre = function(index) {
             return graphDetailService.getEdgeCentre($scope.graph, index);
           };
-
-          $scope.init();
+          if ($scope.interactionIsActive) {
+            $scope.init();
+          }
         }
       ]
     };

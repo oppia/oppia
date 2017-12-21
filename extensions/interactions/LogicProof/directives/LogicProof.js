@@ -35,10 +35,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // permited line templates) that is stored in defaultData.js within
           // the dependencies.
           $scope.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
-          $scope.interactionIsActive = true;
-          if ($scope.getLastAnswer()) {
-            $scope.interactionIsActive = false;
-          }
+          $scope.interactionIsActive = !$scope.getLastAnswer();
+
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             if (data) {
               $scope.interactionIsActive = false;
@@ -101,11 +99,10 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // NOTE: for information on integrating angular and code-mirror see
           // http://github.com/angular-ui/ui-codemirror
           $scope.codeEditor = function(editor) {
-            if (!$scope.interactionIsActive) {
-              editor.setValue($scope.getLastAnswer().proof_string)
-            } else {
-              editor.setValue($scope.localQuestionData.default_proof_string);
-            }
+            var proofString = ($scope.interactionIsActive ?
+              $scope.localQuestionData.default_proof_string :
+              $scope.getLastAnswer().proof_string);
+            editor.setValue(proofString);
             $scope.proofString = editor.getValue();
             var cursorPosition = editor.doc.getCursor();
 

@@ -23,10 +23,12 @@ oppia.constant('TWO_CARD_THRESHOLD_PX', 960);
 oppia.constant('CONTINUE_BUTTON_FOCUS_LABEL', 'continueButton');
 
 /* New card is available but user hasn't gone to it yet (when oppia
-   gives a feedback and waits for user to press 'continue'). */
+   gives a feedback and waits for user to press 'continue').
+   Not called when a card is selected by clicking progress dots */
 oppia.constant('EVENT_NEW_CARD_AVAILABLE','newCardAvailable');
 
-// Called always when learner moves to a new card. 
+/* Called always when learner moves to a new card. 
+   Also called when card is selected by clicking on progress dots */
 oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
 
 // The enforced waiting period between successive hint requests.

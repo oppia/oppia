@@ -102,9 +102,9 @@
     <div ng-if="!isInteractionInline"
         class="conversation-skin-inline-interaction" style="opacity: 0.8;">
       <div style="padding: 6px 12px;">
-        <span ng-class="{'color-gray': !interactionIsActive}"> <[interactionInstructions]> </span>
-        <i ng-if="!isViewportNarrow()" ng-class="{'color-gray': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
-        <i ng-if="isViewportNarrow()" ng-class="{'color-gray': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
+        <span ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}"> <[interactionInstructions]> </span>
+        <i ng-if="!isViewportNarrow()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
+        <i ng-if="isViewportNarrow()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
       </div>
     </div>
 
@@ -124,7 +124,7 @@
     padding-bottom: 18px;
   }
 
-  .color-gray {
+  .conversation-skin-instruction-disabled {
     color: gray;
   }
 
