@@ -192,7 +192,6 @@ oppia.factory('SimpleEditorManagerService', [
         var stateData = SimpleEditorShimService.getState(lastStateName);
         var question = QuestionObjectFactory.create(
           lastStateName, stateData.interaction, '');
-        console.log(question);
         data.questionList.addQuestion(question);
       },
       changeQuestionType: function(newInteractionId, index) {
