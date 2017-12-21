@@ -85,7 +85,7 @@ oppia.directive('simpleEditorSidebar', [
               ui.item.addClass('selected');
             },
             update: function(e, ui) {
-              SimpleEditorManagerService.alternativeMove(
+              SimpleEditorManagerService.move(
                 ui.item.sortable.index, ui.item.sortable.dropindex);
             },
             stop: function(e, ui) {

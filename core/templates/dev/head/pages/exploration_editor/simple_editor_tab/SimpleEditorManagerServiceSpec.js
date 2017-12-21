@@ -459,4 +459,15 @@ describe('Simple Editor Manager Service', function() {
       .toEqual(END_EXPLORATION_INTERACTION.CUSTOMIZATION_ARGS);
     expect(newState.interaction.defaultOutcome).toEqual(null);
   });
+
+  it('should move the question', function() {
+
+  });
+	it('should move the question to starting position', function() {
+
+	});
+	it('should move the question to last position', function() {
+
+	});
+
 });
