@@ -1127,7 +1127,7 @@ class Collection(object):
         """
         if any([
                 skill_name == skill.name
-                for skill in (self.skills.itervalues())]):
+                for skill in self.skills.itervalues()]):
             raise ValueError(
                 'Skill with name "%s" already exists.' % skill_name)
 
@@ -1150,7 +1150,7 @@ class Collection(object):
         skill_id = None
         if any([
                 skill_name == skill.name
-                for skill in (self.skills.itervalues())]):
+                for skill in self.skills.itervalues()]):
             skill_id = skill.id
         return skill_id
 
@@ -1162,7 +1162,7 @@ class Collection(object):
 
         if any([
                 new_skill_name == skill.name
-                for skill in (self.skills.itervalues())]):
+                for skill in self.skills.itervalues()]):
             raise ValueError('Skill with name "%s" already exists.'
                              % new_skill_name)
 
