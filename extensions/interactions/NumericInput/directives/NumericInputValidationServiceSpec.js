@@ -18,6 +18,7 @@ describe('NumericInputValidationService', function() {
   var currentState;
   var answerGroups, goodDefaultOutcome;
   var betweenNegativeOneAndOneRule, equalsZeroRule, lessThanOneRule;
+  var oof, agof, rof;
 
   beforeEach(function() {
     module('oppia');
@@ -27,36 +28,43 @@ describe('NumericInputValidationService', function() {
     validatorService = $injector.get('NumericInputValidationService');
 
     WARNING_TYPES = $injector.get('WARNING_TYPES');
+    oof = $injector.get('OutcomeObjectFactory');
+    agof = $injector.get('AnswerGroupObjectFactory');
+    rof = $injector.get('RuleObjectFactory');
 
     currentState = 'First State';
-    goodDefaultOutcome = {
+    goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
-      feedback: []
-    };
-    equalsZeroRule = {
-      type: 'Equals',
+      feedback: {
+        audio_translations: {},
+        html: ''
+      },
+      param_changes: []
+    });
+    equalsZeroRule = rof.createFromBackendDict({
+      rule_type: 'Equals',
       inputs: {
         x: 0
       }
-    };
-    betweenNegativeOneAndOneRule = {
-      type: 'IsInclusivelyBetween',
+    });
+    betweenNegativeOneAndOneRule = rof.createFromBackendDict({
+      rule_type: 'IsInclusivelyBetween',
       inputs: {
         a: -1,
         b: 1
       }
-    };
-    lessThanOneRule = {
-      type: 'IsLessThan',
+    });
+    lessThanOneRule = rof.createFromBackendDict({
+      rule_type: 'IsLessThan',
       inputs: {
         x: 1
       }
-    };
-    answerGroups = [{
-      rules: [equalsZeroRule, betweenNegativeOneAndOneRule],
-      outcome: goodDefaultOutcome,
-      correct: false
-    }];
+    });
+    answerGroups = [agof.createNew(
+      [equalsZeroRule, betweenNegativeOneAndOneRule],
+      goodDefaultOutcome,
+      false
+    )];
   }));
 
   it('should be able to perform basic validation', function() {

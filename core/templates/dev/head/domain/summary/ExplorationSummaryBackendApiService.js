@@ -29,13 +29,11 @@ oppia.factory('ExplorationSummaryBackendApiService', [
       if (!explorationIds.every(ValidatorsService.isValidExplorationId)) {
         AlertsService.addWarning('Please enter a valid exploration ID.');
 
-        var deferred = $q.defer();
         var returnValue = [];
         for (var i = 0; i < explorationIds.length; i++) {
           returnValue.push(null);
         }
-        deferred.resolve(returnValue);
-        return deferred.promise;
+        return $q.resolve(returnValue);
       }
 
       var explorationSummaryDataUrl = EXPLORATION_SUMMARY_DATA_URL_TEMPLATE;

@@ -130,7 +130,7 @@ describe('Learner dashboard functionality', function() {
       '.protractor-test-collection-summary-tile-title')).first().click();
     // Go to the first and only exploration.
     element.all(by.css(
-      '.protractor-test-collection-node')).first().click();
+      '.protractor-test-collection-exploration')).first().click();
     // Leave the exploration inbetween. The collection should be found in the
     // 'In Progress' section.
     explorationPlayerPage.submitAnswer('Continue', null);
@@ -152,7 +152,7 @@ describe('Learner dashboard functionality', function() {
     general.waitForSystem();
     // Go to the first and only exploration.
     element.all(by.css(
-      '.protractor-test-collection-node')).first().click();
+      '.protractor-test-collection-exploration')).first().click();
     // Complete the exploration. The collection should be found in the
     // 'Completed' section as the collection is also completed.
     explorationPlayerPage.submitAnswer('Continue', null);

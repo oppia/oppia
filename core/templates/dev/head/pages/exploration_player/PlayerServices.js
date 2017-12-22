@@ -68,8 +68,7 @@ oppia.factory('ExplorationPlayerService', [
     };
 
     // Evaluate feedback.
-    var makeFeedback = function(feedbacks, envs) {
-      var feedbackHtml = feedbacks.length > 0 ? feedbacks[0] : '';
+    var makeFeedback = function(feedbackHtml, envs) {
       return ExpressionInterpolationService.processHtml(feedbackHtml, envs);
     };
 
@@ -345,7 +344,8 @@ oppia.factory('ExplorationPlayerService', [
         // Compute the data for the next state.
         var oldParams = LearnerParamsService.getAllParams();
         oldParams.answer = answer;
-        var feedbackHtml = makeFeedback(outcome.feedback, [oldParams]);
+        var feedbackHtml =
+          makeFeedback(outcome.feedback.getHtml(), [oldParams]);
         if (feedbackHtml === null) {
           answerIsBeingProcessed = false;
           AlertsService.addWarning('Expression parsing error.');
@@ -420,22 +420,18 @@ oppia.factory('ExplorationPlayerService', [
           UrlInterpolationService.getStaticImageUrl(
             '/avatar/user_blue_72px.png'));
 
-        var deferred = $q.defer();
         if (_isLoggedIn && !_editorPreviewMode) {
-          $http.get(
+          return $http.get(
             '/preferenceshandler/profile_picture'
           ).then(function(response) {
             var profilePictureDataUrl = response.data.profile_picture_data_url;
-            if (profilePictureDataUrl) {
-              deferred.resolve(profilePictureDataUrl);
-            } else {
-              deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
-            }
+            return (
+              profilePictureDataUrl ? profilePictureDataUrl :
+              DEFAULT_PROFILE_IMAGE_PATH);
           });
         } else {
-          deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
+          return $q.resolve(DEFAULT_PROFILE_IMAGE_PATH);
         }
-        return deferred.promise;
       },
       recordSolutionHit: function(stateName) {
         if (!_editorPreviewMode) {

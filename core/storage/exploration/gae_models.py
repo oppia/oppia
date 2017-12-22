@@ -81,6 +81,10 @@ class ExplorationModel(base_models.VersionedModel):
     # A boolean indicating whether automatic text-to-speech is enabled in
     # this exploration.
     auto_tts_enabled = ndb.BooleanProperty(default=True, indexed=True)
+    # A boolean indicating whether correctness feedback is enabled in this
+    # exploration.
+    correctness_feedback_enabled = ndb.BooleanProperty(
+        default=False, indexed=True)
 
     # DEPRECATED in v2.0.0.rc.2. Do not use. Retaining it here because deletion
     # caused GAE to raise an error on fetching a specific version of the

@@ -80,7 +80,8 @@ oppia.factory('changeListService', [
       param_specs: true,
       tags: true,
       title: true,
-      auto_tts_enabled: true
+      auto_tts_enabled: true,
+      correctness_feedback_enabled: true
     };
 
     var ALLOWED_STATE_BACKEND_NAMES = {
@@ -510,6 +511,19 @@ oppia.factory('explorationAutomaticTextToSpeechService', [
     child.toggleAutomaticTextToSpeech = function() {
       child.displayed = !child.displayed;
       child.saveDisplayedValue();
+    };
+
+    return child;
+  }
+]);
+
+oppia.factory('explorationCorrectnessFeedbackService', [
+  'explorationPropertyService', function(explorationPropertyService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'correctness_feedback_enabled';
+
+    child._isValid = function(value) {
+      return (typeof value === 'boolean');
     };
 
     return child;
@@ -1217,7 +1231,7 @@ oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
                 answerGroupHtml += (
                   '<div class="sub-edit"><i>Feedback: </i>' +
                     '<div class="feedback">' +
-                    newValue.outcome.feedback + '</div></div>');
+                    newValue.outcome.feedback.getHtml() + '</div></div>');
                 var rulesList = makeRulesListHumanReadable(newValue);
                 if (rulesList.length > 0) {
                   answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';
@@ -1240,10 +1254,12 @@ oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
                       newValue.outcome.dest + '</p>');
                 }
                 if (!angular.equals(
-                    newValue.outcome.feedback, oldValue.outcome.feedback)) {
+                    newValue.outcome.feedback.getHtml(),
+                    oldValue.outcome.feedback.getHtml())) {
                   answerGroupHtml += (
                     '<div class="sub-edit"><i>Feedback: </i>' +
-                      '<div class="feedback">' + newValue.outcome.feedback +
+                      '<div class="feedback">' +
+                      newValue.outcome.feedback.getHtml() +
                       '</div></div>');
                 }
                 if (!angular.equals(newValue.rules, oldValue.rules)) {
@@ -1279,7 +1295,7 @@ oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
                     newValue.dest + '</p>');
                 defaultOutcomeHtml += (
                   '<div class="sub-edit"><i>Feedback: </i>' +
-                    '<div class="feedback">' + newValue.feedback +
+                    '<div class="feedback">' + newValue.feedback.getHtml() +
                     '</div></div>');
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div>Added default outcome: </div>')
@@ -1291,7 +1307,8 @@ oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
                     '<p class="sub-edit"><i>Destination: </i>' + newValue.dest +
                       '</p>');
                 }
-                if (!angular.equals(newValue.feedback, oldValue.feedback)) {
+                if (!angular.equals(newValue.feedback.getHtml(),
+                  oldValue.feedback.getHtml())) {
                   defaultOutcomeHtml += (
                     '<div class="sub-edit"><i>Feedback: </i>' +
                       '<div class="feedback">' + newValue.feedback +

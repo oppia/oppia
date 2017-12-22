@@ -26,6 +26,11 @@
     GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse(
       '{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
     GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
+    GLOBALS.canDelete = JSON.parse('{{can_delete|js_string}}');
+    GLOBALS.canModifyRoles = JSON.parse('{{can_modify_roles|js_string}}');
+    GLOBALS.canReleaseOwnership = JSON.parse(
+      '{{can_release_ownership|js_string}}');
+    GLOBALS.canUnpublish = JSON.parse('{{can_unpublish|js_string}}');
   </script>
 
   <!-- Updated previous version to current version of google charts
@@ -318,6 +323,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationRecommendationsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/HintManagerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/HintButtonDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/HintAndSolutionModalService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerParamsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewRatingService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerPositionService.js"></script>

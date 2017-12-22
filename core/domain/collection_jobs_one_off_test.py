@@ -206,5 +206,5 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
             new_model.collection_contents, {
                 'nodes': [node.to_dict()],
                 'skills': {},
-                'next_skill_id': 0
+                'next_skill_index': 0
             })
