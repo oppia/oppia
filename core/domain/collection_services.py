@@ -1216,7 +1216,7 @@ def index_collections_given_ids(collection_ids):
         if collection_summary is not None])
 
 
-def get_acquired_skill_ids_of_user_given_collection_id(user_id, collection_id):
+def get_acquired_skill_ids_of_user(user_id, collection_id):
     """Returns the acquired skills of the user identified by user_id
     for a given collection.
 

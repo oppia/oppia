@@ -602,6 +602,9 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.add_question_id_to_skill(skill_id, 'question0')
         self.assertIn('question0', collection.skills[skill_id].question_ids)
 
+        with self.assertRaises(Exception):
+            collection.add_question_id_to_skill(skill_id, 'question0')
+
     def test_remove_question_id_from_skill(self):
         """Test to verify remove_question_id_from_skill method."""
         collection = collection_domain.Collection.create_default_collection(
@@ -609,6 +612,8 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.add_skill('skillname')
         skill_id = collection.get_skill_id_from_skill_name('skillname')
         collection.add_question_id_to_skill(skill_id, 'question0')
+        with self.assertRaises(Exception):
+            collection.remove_question_id_from_skill(skill_id, 'random')
         collection.remove_question_id_from_skill(skill_id, 'question0')
         self.assertEqual(len(collection.skills[skill_id].question_ids), 0)
 
@@ -951,7 +956,7 @@ title: A title
 """)
     YAML_CONTENT_V4 = ("""category: A category
 language_code: en
-next_skill_index: 2
+next_skill_id: 2
 nodes:
 - acquired_skill_ids:
   - skill0

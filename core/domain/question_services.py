@@ -288,7 +288,7 @@ def get_questions_batch(
         list(Question). A list of Question objects.
     """
     user_skill_ids = (
-        collection_services.get_acquired_skill_ids_of_user_given_collection_id(
+        collection_services.get_acquired_skill_ids_of_user(
             user_id, collection_id))
 
     question_skill_ids = list(set(user_skill_ids) & set(skill_ids))

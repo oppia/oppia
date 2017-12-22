@@ -654,7 +654,7 @@ class Collection(object):
                 collection_dict))
         collection_dict['nodes'] = new_collection_dict['nodes']
         collection_dict['skills'] = new_collection_dict['skills']
-        collection_dict['next_skill_index'] = (
+        collection_dict['next_skill_id'] = (
             new_collection_dict['next_skill_index'])
 
         collection_dict['schema_version'] = 4
@@ -1147,9 +1147,9 @@ class Collection(object):
                 present.
         """
         skill_id = None
-        for _, skill in self.skills.iteritems():
-            if skill.name == skill_name:
-                skill_id = skill.id
+        if any(
+            [skill_name == skill.name for skill in self.skills.itervalues()]):
+            skill_id = skill.id
         return skill_id
 
     def update_skill(self, skill_id, new_skill_name):
@@ -1158,9 +1158,10 @@ class Collection(object):
             raise ValueError(
                 'Skill with ID "%s" does not exist.' % skill_id)
 
-        for skill in self.skills.values():
-            if skill.name == new_skill_name:
-                raise ValueError('Skill with name "%s" already exists.'
+        if any(
+            [new_skill_name == skill.name for skill in (
+                self.skills.itervalues())]):
+            raise ValueError('Skill with name "%s" already exists.'
                                  % new_skill_name)
 
         self.skills[skill_id].name = new_skill_name

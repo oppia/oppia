@@ -116,8 +116,8 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
                     }
                 })
 
-    def test_get_acquired_skill_ids_of_user_given_collection_id(self):
-        """Tests get_acquired_skill_ids_of_user_given_collection_id method."""
+    def test_get_acquired_skill_ids_of_user(self):
+        """Tests get_acquired_skill_ids_of_user method."""
         collection_id = 'col1'
         exp_id = '0_exploration_id'
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -149,14 +149,14 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             }], 'Update skill')
 
         acquired_skills = (
-            collection_services.get_acquired_skill_ids_of_user_given_collection_id( # pylint: disable=line-too-long
+            collection_services.get_acquired_skill_ids_of_user(
                 owner_id, collection_id))
         self.assertEqual(len(acquired_skills), 0)
 
         collection_services.record_played_exploration_in_collection_context(
             owner_id, collection_id, exp_id)
         acquired_skill_ids = (
-            collection_services.get_acquired_skill_ids_of_user_given_collection_id( # pylint: disable=line-too-long
+            collection_services.get_acquired_skill_ids_of_user(
                 owner_id, collection_id))
         self.assertIn(skill_id, acquired_skill_ids)
 
