@@ -3780,12 +3780,17 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 @media (max-width: 365px) {
-  .oppia-splash-button-container {
-    margin-left: -1.5%;
-    text-align: center;
-  }
   .oppia-splash-button {
-    min-width: 90%;
+    min-width: 95%;
+  }
+}
+
+@media (min-width: 575px) {
+  .oppia-splash-button {
+    left: -webkit-calc(130px + 15%);
+    left: -moz-calc(130px + 15%);
+    left: -o-calc(130px + 15%);
+    left: calc(130px + 15%);
   }
 }
 
