@@ -316,9 +316,9 @@
           </a>
           <img ng-src="<[getStaticImageUrl('/general/mobile_path_segment.svg')]>">
           <div style="position: fixed; z-index: 100; top: 100px; left: 50%; transform: translate(-130px);">
-            <div ng-class="{'oppia-activity-summary-tile-mobile-background-mask': explorationCardIsShown}" ng-click="closeOnClickingOutside($event)" >
+            <div ng-class="{'oppia-activity-summary-tile-mobile-background-mask': explorationCardIsShown}" ng-click="closeOnClickingOutside()">
               <exploration-summary-tile ng-if="explorationCardIsShown"
-                                        ng-click="onClickStopPropogation($event)"
+                                        ng-click="onClickStopPropagation($event)"
                                         collection-id="getCollectionId()"
                                         exploration-id="currentExplorationId"
                                         exploration-title="summaryToPreview.title"

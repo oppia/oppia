@@ -288,9 +288,9 @@ oppia.controller('CollectionPlayer', [
       $scope.explorationCardIsShown = false;
     };
 
-    $scope.onClickStopPropogation = function($event) {
-      $event.stopPropagation();
-    }
+    $scope.onClickStopPropagation = function($evt) {
+      $evt.stopPropagation();
+    };
 
     // Touching anywhere outside the mobile preview should hide it.
     document.addEventListener('touchstart', function() {
