@@ -23,7 +23,7 @@ oppia.directive('numericEditor', [
   'QuestionIdService', 'AnswerGroupObjectFactory', 'RuleObjectFactory',
   'StatusObjectFactory', 'OutcomeObjectFactory', 'UrlInterpolationService',
   function(QuestionIdService, AnswerGroupObjectFactory, RuleObjectFactory,
-    StatusObjectFactory, OutcomeObjectFactory,UrlInterpolationService) {
+    StatusObjectFactory, OutcomeObjectFactory, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -66,8 +66,14 @@ oppia.directive('numericEditor', [
 
           $scope.saveAnswer = function(newAnswer) {
             var newAnswerGroups = answerGroups;
-            var validValue = /^-?[0-9]\d*(\.\d+)?$/;
-            if (newAnswer.match(validValue)) {
+            var validValue = /^-?\d+\.?\d*$/;
+            alertsService.clearWarnings();
+            if (!newAnswer) {
+              alertsService.addWarning('Answer cannot be empty.');
+              return StatusObjectFactory.createFailure(
+                'Answer cannot be empty.'
+              );
+            } else if (newAnswer.match(validValue)) {
               if (newAnswerGroups.length === 0) {
                 var newStateName = $scope.addState();
                 newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
