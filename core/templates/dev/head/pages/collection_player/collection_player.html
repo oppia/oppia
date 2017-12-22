@@ -82,10 +82,9 @@
           align-items: center;
           background: rgba(0,0,0,0.25);
           display: flex;
-          height: 200vh;
+          height: 100vh;
           justify-content: space-around;
-          transform: translate(-41%,-34%);
-          width: 200vw;
+          width: 100vw;
           z-index: -1;
         }
       }
@@ -315,7 +314,7 @@
             </svg>
           </a>
           <img ng-src="<[getStaticImageUrl('/general/mobile_path_segment.svg')]>">
-          <div style="position: fixed; z-index: 100; top: 100px; left: 50%; transform: translate(-130px);">
+          <div style="position: fixed; z-index: 100; top: 0; left: 0;">
             <div ng-class="{'oppia-activity-summary-tile-mobile-background-mask': explorationCardIsShown}" ng-click="closeOnClickingOutside()">
               <exploration-summary-tile ng-if="explorationCardIsShown"
                                         ng-click="onClickStopPropagation($event)"
