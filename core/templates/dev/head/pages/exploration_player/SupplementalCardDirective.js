@@ -50,12 +50,8 @@ oppia.directive('supplementalCard', [
             }
             $scope.activeCard = PlayerTranscriptService.getCard(index);
             $scope.clearHelpCard();
-            if (PlayerTranscriptService.isLastCard(index)) {
-              $scope.getLastAnswer = false;
-            } else {
-              $scope.getLastAnswer = $scope.activeCard.
-                inputResponsePairs.slice(-1)[0].learnerInput;
-            }
+            $scope.lastAnswer =
+              PlayerTranscriptService.getLastAnswerOnActiveCard(index);
             HintManagerService.reset(ExplorationPlayerService.getInteraction(
               $scope.activeCard.stateName).hints);
 

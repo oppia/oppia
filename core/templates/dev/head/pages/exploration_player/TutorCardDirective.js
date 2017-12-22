@@ -80,16 +80,8 @@ oppia.directive('tutorCard', [
             $scope.activeCard = PlayerTranscriptService.getCard(index);
             $scope.interactionIsActive =
               PlayerTranscriptService.isLastCard(index);
-            if (PlayerTranscriptService.isLastCard(index)) {
-              $scope.getLastAnswer = false;
-            } else {
-              $scope.getLastAnswer = $scope.activeCard.
-                inputResponsePairs.slice(-1)[0].learnerInput;
-            }
             $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
-              if (data) {
-                $scope.interactionIsActive = false;
-              }
+              $scope.interactionIsActive = false;
             });
             $scope.isInteractionInline = (
               ExplorationPlayerStateService.isInteractionInline(

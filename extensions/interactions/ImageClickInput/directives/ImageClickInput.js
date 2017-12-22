@@ -51,7 +51,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               '/' + encodeURIComponent($scope.filepath)) : null);
           $scope.mouseX = 0;
           $scope.mouseY = 0;
-          $scope.interactionIsActive = !$scope.getLastAnswer();
+          $scope.interactionIsActive = ($scope.getLastAnswer() === null) ||
+            ($scope.getLastAnswer() === undefined);
           $scope.currentlyHoveredRegions = [];
           $scope.allRegions = imageAndRegions.labeledRegions;
           $scope.updateCurrentlyHoveredRegions = function() {
@@ -66,9 +67,11 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               }
             }
           };
-          if ($scope.getLastAnswer()) {
-            /*The following lines permanently highlight the learner's previous
-              answer. */
+          if (!$scope.interactionIsActive) {
+            /*The following lines highlight the learner's last answer for this
+              card. This need only be done at the beginning as if he submits
+              an answer, based on EVENT_NEW_CARD_AVAILABLE, the image is made
+              inactive, so his last selection would be higlighted.*/
             $scope.mouseX = $scope.getLastAnswer().clickPosition[0];
             $scope.mouseY = $scope.getLastAnswer().clickPosition[1];
             $scope.updateCurrentlyHoveredRegions();
@@ -94,9 +97,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             }
           };
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
-            if (data) {
-              $scope.interactionIsActive = false;
-            }
+            $scope.interactionIsActive = false;
           });
           $scope.onMousemoveImage = function(event) {
             if (!$scope.interactionIsActive) {

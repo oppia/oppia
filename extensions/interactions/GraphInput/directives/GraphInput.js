@@ -55,19 +55,27 @@ oppia.directive('oppiaInteractiveGraphInput', [
               rulesService: graphInputRulesService
             });
           };
-          $scope.interactionIsActive = !$scope.getLastAnswer();
-
+          $scope.interactionIsActive = ($scope.getLastAnswer() === null) ||
+            ($scope.getLastAnswer() === undefined);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
-            if (data) {
-              $scope.interactionIsActive = false;
-            }
+            $scope.interactionIsActive = false;
           });
           $scope.resetGraph = function() {
-            updateGraphFromJSON($attrs.graphWithValue);
+            var newGraph =
+              HtmlEscaperService.escapedJsonToObj($attrs.graphWithValue);
+            if (checkValidGraph(newGraph)) {
+              $scope.graph = newGraph;
+            } else {
+              $scope.errorMessage = 'I18N_INTERACTIONS_GRAPH_ERROR_INVALID';
+            }
           };
 
           var init = function() {
-            updateGraphFromJSON($attrs.graphWithValue);
+            if ($scope.interactionIsActive) {
+              $scope.resetGraph();
+            } else {
+              $scope.graph = $scope.getLastAnswer();
+            }
             var stringToBool = function(str) {
               return (str === 'true');
             };
@@ -85,23 +93,11 @@ oppia.directive('oppiaInteractiveGraphInput', [
               stringToBool($attrs.canDeleteEdgeWithValue) : false
             $scope.canEditEdgeWeight = $scope.interactionIsActive ?
               stringToBool($attrs.canEditEdgeWeightWithValue) : false
-            $scope.canEditGraph = $scope.interactionIsActive;
           };
 
           // TODO(czxcjx): Write this function
           var checkValidGraph = function(graph) {
             return Boolean(graph);
-          };
-
-          var updateGraphFromJSON = function(jsonGraph) {
-            var newGraph = $scope.interactionIsActive ?
-              HtmlEscaperService.escapedJsonToObj(jsonGraph) :
-              $scope.getLastAnswer();
-            if (checkValidGraph(newGraph)) {
-              $scope.graph = newGraph;
-            } else {
-              $scope.errorMessage = 'I18N_INTERACTIONS_GRAPH_ERROR_INVALID';
-            }
           };
 
           init();
@@ -227,7 +223,7 @@ oppia.directive('graphViz', [
         canDeleteEdge: '=',
         canEditEdgeWeight: '=',
         canEditOptions: '=',
-        canEditGraph: '='
+        interactionIsActive: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
@@ -245,7 +241,6 @@ oppia.directive('graphViz', [
             ADD_VERTEX: 2,
             DELETE: 3
           };
-
           // The current state of the UI and stuff like that
           $scope.state = {
             currentMode: _MODES.MOVE,
@@ -275,25 +270,16 @@ oppia.directive('graphViz', [
           $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
           $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
 
-          if ($scope.canEditGraph === undefined ||
-              $scope.canEditGraph === true) {
-            $scope.interactionIsActive = true;
-          } else {
-            $scope.interactionIsActive = false;
-          }
-
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
-            if (data) {
-              $scope.interactionIsActive = false;
-              $scope.canAddVertex = false;
-              $scope.canDeleteVertex = false;
-              $scope.canEditVertexLabel = false;
-              $scope.canMoveVertex = false;
-              $scope.canAddEdge = false;
-              $scope.canDeleteEdge = false;
-              $scope.canEditEdgeWeight = false;
-              $scope.state.currentMode = null;
-            }
+            $scope.interactionIsActive = false;
+            $scope.canAddVertex = false;
+            $scope.canDeleteVertex = false;
+            $scope.canEditVertexLabel = false;
+            $scope.canMoveVertex = false;
+            $scope.canAddEdge = false;
+            $scope.canDeleteEdge = false;
+            $scope.canEditEdgeWeight = false;
+            $scope.state.currentMode = null;
           });
 
           var vizContainer = $($element).find('.oppia-graph-viz-svg');

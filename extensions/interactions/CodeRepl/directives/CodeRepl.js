@@ -34,11 +34,10 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         '/interactions/CodeRepl/directives/' +
         'code_repl_interaction_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.interactionIsActive = !$scope.getLastAnswer();
+        $scope.interactionIsActive = ($scope.getLastAnswer() === null) ||
+          ($scope.getLastAnswer() === undefined);
         $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
-          if (data) {
-            $scope.interactionIsActive = false;
-          }
+          $scope.interactionIsActive = false;
         });
         $scope.language = HtmlEscaperService.escapedJsonToObj(
           $attrs.languageWithValue);
@@ -70,8 +69,8 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             $scope.preCode + $scope.placeholder + $scope.postCode);
           $scope.output = '';
         } else {
-          $scope.code = ($scope.getLastAnswer().code);
-          $scope.output = ($scope.getLastAnswer().output);
+          $scope.code = $scope.getLastAnswer().code;
+          $scope.output = $scope.getLastAnswer().output;
         }
 
         $scope.initCodeEditor = function(editor) {

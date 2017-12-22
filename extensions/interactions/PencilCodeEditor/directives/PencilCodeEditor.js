@@ -38,7 +38,8 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
         'FocusManagerService', 'pencilCodeEditorRulesService',
         function($scope, $attrs, $element, $timeout, $modal,
           FocusManagerService, pencilCodeEditorRulesService) {
-          $scope.interactionIsActive = !$scope.getLastAnswer();
+          $scope.interactionIsActive = ($scope.getLastAnswer() === null) ||
+            ($scope.getLastAnswer() === undefined);
           $scope.initialCode = $scope.interactionIsActive ?
             HtmlEscaperService.escapedJsonToObj($attrs.initialCodeWithValue) :
             $scope.initialSequence = $scope.getLastAnswer().code;
@@ -46,13 +47,11 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
           var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
           var pce = new PencilCodeEmbed(iframeDiv);
           pce.beginLoad($scope.initialCode);
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function( evt, data) {
-            if (data) {
-              $scope.interactionIsActive = false;
-              pce.hideMiddleButton();
-              pce.hideToggleButton();
-              pce.setReadOnly();
-            }
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+            $scope.interactionIsActive = false;
+            pce.hideMiddleButton();
+            pce.hideToggleButton();
+            pce.setReadOnly();
           });
           pce.on('load', function() {
             // Hides the error console at the bottom right, and prevents it

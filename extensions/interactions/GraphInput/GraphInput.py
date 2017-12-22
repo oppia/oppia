@@ -108,6 +108,13 @@ class GraphInput(base.BaseInteraction):
         },
         'default_value': True
     }, {
+        'name': 'interactionIsActive',
+        'description': 'Makes the interaction editable',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': True
+    }, {
         'name': 'canEditEdgeWeight',
         'description': 'Allow learner to edit edge weights',
         'schema': {
