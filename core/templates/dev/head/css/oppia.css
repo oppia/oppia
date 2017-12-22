@@ -3779,18 +3779,18 @@ md-card.preview-conversation-skin-supplemental-card {
   }
 }
 
-@media (max-width: 365px) {
-  .oppia-splash-button {
-    min-width: 95%;
-  }
-}
-
 @media (min-width: 575px) {
   .oppia-splash-button {
     left: -webkit-calc(130px + 15%);
     left: -moz-calc(130px + 15%);
     left: -o-calc(130px + 15%);
     left: calc(130px + 15%);
+  }
+}
+
+@media (max-width: 365px) {
+  .oppia-splash-button {
+    min-width: 95%;
   }
 }
 
