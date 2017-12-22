@@ -655,7 +655,7 @@ class Collection(object):
         collection_dict['nodes'] = new_collection_dict['nodes']
         collection_dict['skills'] = new_collection_dict['skills']
         collection_dict['next_skill_id'] = (
-            new_collection_dict['next_skill_index'])
+            new_collection_dict['next_skill_id'])
 
         collection_dict['schema_version'] = 4
         return collection_dict
@@ -806,7 +806,7 @@ class Collection(object):
             for skill_name, skill_id in skill_names_to_ids.iteritems()
         }
 
-        collection_contents['next_skill_index'] = len(skill_names)
+        collection_contents['next_skill_id'] = len(skill_names)
 
         return collection_contents
 
@@ -1125,9 +1125,9 @@ class Collection(object):
         Returns
             str. The id of the new skill.
         """
-        if any(
-                [skill_name == skill.name for skill in (
-                    self.skills.itervalues())]):
+        if any([
+                skill_name == skill.name
+                for skill in (self.skills.itervalues())]):
             raise ValueError(
                 'Skill with name "%s" already exists.' % skill_name)
 
@@ -1148,9 +1148,9 @@ class Collection(object):
                 present.
         """
         skill_id = None
-        if any(
-                [skill_name == skill.name for skill in (
-                    self.skills.itervalues())]):
+        if any([
+                skill_name == skill.name
+                for skill in (self.skills.itervalues())]):
             skill_id = skill.id
         return skill_id
 
@@ -1160,9 +1160,9 @@ class Collection(object):
             raise ValueError(
                 'Skill with ID "%s" does not exist.' % skill_id)
 
-        if any(
-                [new_skill_name == skill.name for skill in (
-                    self.skills.itervalues())]):
+        if any([
+                new_skill_name == skill.name
+                for skill in (self.skills.itervalues())]):
             raise ValueError('Skill with name "%s" already exists.'
                              % new_skill_name)
 
