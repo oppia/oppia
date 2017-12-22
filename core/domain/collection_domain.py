@@ -1164,7 +1164,7 @@ class Collection(object):
                 [new_skill_name == skill.name for skill in (
                     self.skills.itervalues())]):
             raise ValueError('Skill with name "%s" already exists.'
-                % new_skill_name)
+                             % new_skill_name)
 
         self.skills[skill_id].name = new_skill_name
 
