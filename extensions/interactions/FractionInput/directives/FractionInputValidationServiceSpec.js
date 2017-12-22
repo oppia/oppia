@@ -20,13 +20,16 @@ describe('FractionInputValidationService', function() {
   var greaterThanMinusOneRule, equalsOneRule, equivalentToOneRule,
     lessThanTwoRule;
   var createFractionDict;
+  var oof, agof, rof;
   beforeEach(function() {
     module('oppia');
   });
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
     validatorService = $injector.get('FractionInputValidationService');
-
+    oof = $injector.get('OutcomeObjectFactory');
+    agof = $injector.get('AnswerGroupObjectFactory');
+    rof = $injector.get('RuleObjectFactory');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
     createFractionDict = function(
@@ -46,72 +49,76 @@ describe('FractionInputValidationService', function() {
     };
 
     currentState = 'First State';
-    goodDefaultOutcome = {
+    goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
-      feedback: []
-    };
+      feedback: {
+        html: '',
+        audio_translations: {}
+      },
+      param_changes: []
+    });
 
-    equalsOneRule = {
-      type: 'IsExactlyEqualTo',
+    equalsOneRule = rof.createFromBackendDict({
+      rule_type: 'IsExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 0, 1, 1)
       }
-    };
+    });
 
-    greaterThanMinusOneRule = {
-      type: 'IsGreaterThan',
+    greaterThanMinusOneRule = rof.createFromBackendDict({
+      rule_type: 'IsGreaterThan',
       inputs: {
         f: createFractionDict(true, 0, 1, 1)
       }
-    };
+    });
 
-    lessThanTwoRule = {
-      type: 'IsLessThan',
+    lessThanTwoRule = rof.createFromBackendDict({
+      rule_type: 'IsLessThan',
       inputs: {
         f: createFractionDict(false, 0, 2, 1)
       }
-    };
+    });
 
-    equivalentToOneRule = {
-      type: 'IsEquivalentTo',
+    equivalentToOneRule = rof.createFromBackendDict({
+      rule_type: 'IsEquivalentTo',
       inputs: {
         f: createFractionDict(false, 0, 10, 10)
       }
-    };
+    });
 
-    equivalentToOneAndSimplestFormRule = {
-      type: 'IsEquivalentToAndInSimplestForm',
+    equivalentToOneAndSimplestFormRule = rof.createFromBackendDict({
+      rule_type: 'IsEquivalentToAndInSimplestForm',
       inputs: {
         f: createFractionDict(false, 0, 10, 10)
       }
-    };
+    });
 
-    exactlyEqualToOneAndNotInSimplestFormRule = {
-      type: 'IsExactlyEqualTo',
+    exactlyEqualToOneAndNotInSimplestFormRule = rof.createFromBackendDict({
+      rule_type: 'IsExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 0, 10, 10)
       }
-    };
+    });
 
-    nonIntegerRule = {
-      type: 'HasNumeratorEqualTo',
+    nonIntegerRule = rof.createFromBackendDict({
+      rule_type: 'HasNumeratorEqualTo',
       inputs: {
         x: 0.5
       }
-    };
+    });
 
-    zeroDenominatorRule = {
-      type: 'HasDenominatorEqualTo',
+    zeroDenominatorRule = rof.createFromBackendDict({
+      rule_type: 'HasDenominatorEqualTo',
       inputs: {
         x: 0
       }
-    };
+    });
 
-    answerGroups = [{
-      rules: [equalsOneRule, lessThanTwoRule],
-      outcome: goodDefaultOutcome,
-      correct: false
-    }];
+    answerGroups = [agof.createNew(
+      [equalsOneRule, lessThanTwoRule],
+      goodDefaultOutcome,
+      false
+    )];
   }));
 
   it('should be able to perform basic validation', function() {

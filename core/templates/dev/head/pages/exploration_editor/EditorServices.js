@@ -80,7 +80,8 @@ oppia.factory('changeListService', [
       param_specs: true,
       tags: true,
       title: true,
-      auto_tts_enabled: true
+      auto_tts_enabled: true,
+      correctness_feedback_enabled: true
     };
 
     var ALLOWED_STATE_BACKEND_NAMES = {
@@ -516,6 +517,19 @@ oppia.factory('explorationAutomaticTextToSpeechService', [
   }
 ]);
 
+oppia.factory('explorationCorrectnessFeedbackService', [
+  'explorationPropertyService', function(explorationPropertyService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'correctness_feedback_enabled';
+
+    child._isValid = function(value) {
+      return (typeof value === 'boolean');
+    };
+
+    return child;
+  }
+]);
+
 // Data service for keeping track of the exploration's states. Note that this
 // is unlike the other exploration property services, in that it keeps no
 // mementos.
@@ -662,7 +676,6 @@ oppia.factory('explorationStatesService', [
               stateName,
               _states.getState(stateName),
               solution.correctAnswer,
-              true,
               $injector.get(
                 AngularNameService.getNameOfInteractionRulesService(
                   _states.getState(stateName).interaction.id))));
@@ -1010,57 +1023,13 @@ oppia.factory('stateSolutionService', [
   }
 ]);
 
-oppia.factory('computeGraphService', [
-  'INTERACTION_SPECS', function(INTERACTION_SPECS) {
-    var _computeGraphData = function(initStateId, states) {
-      var nodes = {};
-      var links = [];
-      var finalStateIds = states.getFinalStateNames();
-
-      states.getStateNames().forEach(function(stateName) {
-        var interaction = states.getState(stateName).interaction;
-        nodes[stateName] = stateName;
-        if (interaction.id) {
-          var groups = interaction.answerGroups;
-          for (var h = 0; h < groups.length; h++) {
-            links.push({
-              source: stateName,
-              target: groups[h].outcome.dest,
-            });
-          }
-
-          if (interaction.defaultOutcome) {
-            links.push({
-              source: stateName,
-              target: interaction.defaultOutcome.dest,
-            });
-          }
-        }
-      });
-
-      return {
-        finalStateIds: finalStateIds,
-        initStateId: initStateId,
-        links: links,
-        nodes: nodes
-      };
-    };
-
-    return {
-      compute: function(initStateId, states) {
-        return _computeGraphData(initStateId, states);
-      }
-    };
-  }
-]);
-
 // Service for computing graph data.
 oppia.factory('graphDataService', [
   'explorationStatesService', 'explorationInitStateNameService',
-  'computeGraphService',
+  'ComputeGraphService',
   function(
       explorationStatesService, explorationInitStateNameService,
-      computeGraphService) {
+      ComputeGraphService) {
     var _graphData = null;
 
     // Returns an object which can be treated as the input to a visualization
@@ -1079,7 +1048,7 @@ oppia.factory('graphDataService', [
 
       var states = explorationStatesService.getStates();
       var initStateId = explorationInitStateNameService.savedMemento;
-      _graphData = computeGraphService.compute(initStateId, states);
+      _graphData = ComputeGraphService.compute(initStateId, states);
     };
 
     return {
@@ -1262,7 +1231,7 @@ oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
                 answerGroupHtml += (
                   '<div class="sub-edit"><i>Feedback: </i>' +
                     '<div class="feedback">' +
-                    newValue.outcome.feedback + '</div></div>');
+                    newValue.outcome.feedback.getHtml() + '</div></div>');
                 var rulesList = makeRulesListHumanReadable(newValue);
                 if (rulesList.length > 0) {
                   answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';
@@ -1285,10 +1254,12 @@ oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
                       newValue.outcome.dest + '</p>');
                 }
                 if (!angular.equals(
-                    newValue.outcome.feedback, oldValue.outcome.feedback)) {
+                    newValue.outcome.feedback.getHtml(),
+                    oldValue.outcome.feedback.getHtml())) {
                   answerGroupHtml += (
                     '<div class="sub-edit"><i>Feedback: </i>' +
-                      '<div class="feedback">' + newValue.outcome.feedback +
+                      '<div class="feedback">' +
+                      newValue.outcome.feedback.getHtml() +
                       '</div></div>');
                 }
                 if (!angular.equals(newValue.rules, oldValue.rules)) {
@@ -1324,7 +1295,7 @@ oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
                     newValue.dest + '</p>');
                 defaultOutcomeHtml += (
                   '<div class="sub-edit"><i>Feedback: </i>' +
-                    '<div class="feedback">' + newValue.feedback +
+                    '<div class="feedback">' + newValue.feedback.getHtml() +
                     '</div></div>');
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div>Added default outcome: </div>')
@@ -1336,7 +1307,8 @@ oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
                     '<p class="sub-edit"><i>Destination: </i>' + newValue.dest +
                       '</p>');
                 }
-                if (!angular.equals(newValue.feedback, oldValue.feedback)) {
+                if (!angular.equals(newValue.feedback.getHtml(),
+                  oldValue.feedback.getHtml())) {
                   defaultOutcomeHtml += (
                     '<div class="sub-edit"><i>Feedback: </i>' +
                       '<div class="feedback">' + newValue.feedback +

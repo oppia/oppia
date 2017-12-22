@@ -50,7 +50,7 @@ describe('Collection update service', function() {
         acquired_skill_ids: [],
         exploration: {}
       }],
-      next_skill_id: 1,
+      next_skill_index: 1,
       skills: {
         skill0: {
           id: 'skill0',

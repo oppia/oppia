@@ -18,6 +18,7 @@ describe('ItemSelectionInputValidationService', function() {
   var currentState;
   var goodAnswerGroups, goodDefaultOutcome;
   var customizationArguments;
+  var oof, agof, rof;
 
   beforeEach(function() {
     module('oppia');
@@ -27,12 +28,20 @@ describe('ItemSelectionInputValidationService', function() {
     validatorService = $injector.get('ItemSelectionInputValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
+    oof = $injector.get('OutcomeObjectFactory');
+    agof = $injector.get('AnswerGroupObjectFactory');
+    rof = $injector.get('RuleObjectFactory');
+
     currentState = 'First State';
 
-    goodDefaultOutcome = {
+    goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
-      feedback: ['Feedback']
-    };
+      feedback: {
+        html: 'Feedback',
+        audio_translations: {}
+      },
+      param_changes: []
+    });
 
     customizationArguments = {
       choices: {
@@ -45,16 +54,16 @@ describe('ItemSelectionInputValidationService', function() {
         value: 1
       }
     };
-    goodAnswerGroups = [{
-      rules: [{
-        type: 'Equals',
+    goodAnswerGroups = [agof.createNew(
+      [rof.createFromBackendDict({
+        rule_type: 'Equals',
         inputs: {
           x: ['Selection 1', 'Selection 2']
         }
-      }],
-      outcome: goodDefaultOutcome,
-      correct: false
-    }];
+      })],
+      goodDefaultOutcome,
+      false)
+    ];
   }));
 
   it('should be able to perform basic validation', function() {

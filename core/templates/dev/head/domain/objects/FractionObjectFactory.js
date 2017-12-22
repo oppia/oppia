@@ -66,6 +66,10 @@ oppia.factory('FractionObjectFactory', [
       return this.isNegative ? -floatVal : floatVal;
     };
 
+    Fraction.prototype.getIntegerPart = function () {
+      return this.isNegative ? -this.wholeNumber : this.wholeNumber;
+    };
+
     Fraction.prototype.convertToSimplestForm = function () {
       var gcd = function(x, y) {
         return y === 0 ? x : gcd(y, x % y);

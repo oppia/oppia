@@ -48,6 +48,7 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.GenerateV1StatisticsJob,
     stats_jobs_one_off.StatisticsAuditV1,
     stats_jobs_one_off.StatisticsAudit,
+    stats_jobs_one_off.GenerateMissingStatsModelsOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
     user_jobs_one_off.UserContributionsOneOffJob,

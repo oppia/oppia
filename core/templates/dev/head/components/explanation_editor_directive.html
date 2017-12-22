@@ -12,7 +12,7 @@
           </i>
         </div>
         <strong>Explanation:</strong>
-        <span class="oppia-rte-editor" angular-html-bind="stateSolutionService.savedMemento.explanation"></span>
+        <span class="oppia-rte-editor" angular-html-bind="stateSolutionService.savedMemento.explanation.getHtml()"></span>
       </div>
     </div>
   </div>
@@ -20,8 +20,9 @@
   <div ng-if="isEditable && explanationEditorIsOpen">
     <div class="oppia-rule-details-header">
       <strong>Explanation:</strong>
+      <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
       <schema-based-editor schema="EXPLANATION_FORM_SCHEMA"
-                           local-value="stateSolutionService.displayed.explanation">
+                           local-value="stateSolutionService.displayed.explanation._html">
       </schema-based-editor>
     </div>
 
@@ -34,7 +35,7 @@
         </button>
         <button type="button"
                 class="btn btn-success"
-                ng-disabled="!stateSolutionService.displayed.explanation"
+                ng-disabled="!stateSolutionService.displayed.explanation.getHtml()"
                 ng-click="saveThisExplanation()">
           Save
         </button>

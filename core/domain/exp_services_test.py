@@ -633,6 +633,7 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
 auto_tts_enabled: true
 blurb: ''
 category: A category
+correctness_feedback_enabled: false
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -655,7 +656,9 @@ states:
           value: 1
       default_outcome:
         dest: %s
-        feedback: []
+        feedback:
+          audio_translations: {}
+          html: ''
         param_changes: []
       hints: []
       id: TextInput
@@ -676,7 +679,9 @@ states:
           value: 1
       default_outcome:
         dest: New state
-        feedback: []
+        feedback:
+          audio_translations: {}
+          html: ''
         param_changes: []
       hints: []
       id: TextInput
@@ -696,6 +701,7 @@ title: A title
 auto_tts_enabled: true
 blurb: ''
 category: A category
+correctness_feedback_enabled: false
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -718,7 +724,9 @@ states:
           value: 1
       default_outcome:
         dest: %s
-        feedback: []
+        feedback:
+          audio_translations: {}
+          html: ''
         param_changes: []
       hints: []
       id: TextInput
@@ -739,7 +747,9 @@ states:
           value: 1
       default_outcome:
         dest: Renamed state
-        feedback: []
+        feedback:
+          audio_translations: {}
+          html: ''
         param_changes: []
       hints: []
       id: TextInput
@@ -867,7 +877,9 @@ interaction:
       value: 1
   default_outcome:
     dest: %s
-    feedback: []
+    feedback:
+      audio_translations: {}
+      html: ''
     param_changes: []
   hints: []
   id: TextInput
@@ -891,7 +903,9 @@ interaction:
       value: 1
   default_outcome:
     dest: New state
-    feedback: []
+    feedback:
+      audio_translations: {}
+      html: ''
     param_changes: []
   hints: []
   id: TextInput
@@ -916,7 +930,9 @@ interaction:
       value: 1
   default_outcome:
     dest: Renamed state
-    feedback: []
+    feedback:
+      audio_translations: {}
+      html: ''
     param_changes: []
   hints: []
   id: TextInput
@@ -1024,15 +1040,21 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             }],
             'outcome': {
                 'dest': self.init_state_name,
-                'feedback': ['Try again'],
+                'feedback': {
+                    'audio_translations': {},
+                    'html': 'Try again'
+                },
                 'param_changes': []
             },
-            'correct': False,
+            'labelled_as_correct': False,
         }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
             'dest': self.init_state_name,
-            'feedback': ['Incorrect', '<b>Wrong answer</b>'],
+            'feedback': {
+                'audio_translations': {},
+                'html': '<b>Incorrect</b>'
+            },
             'param_changes': []
         }
 
@@ -1236,7 +1258,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         outcome = init_interaction.answer_groups[0].outcome
         self.assertEqual(rule_specs[0].rule_type, 'Equals')
         self.assertEqual(rule_specs[0].inputs, {'x': 0})
-        self.assertEqual(outcome.feedback, ['Try again'])
+        self.assertEqual(outcome.feedback.html, 'Try again')
         self.assertEqual(outcome.dest, self.init_state_name)
         self.assertEqual(init_interaction.default_outcome.dest, 'State 2')
 
@@ -2245,6 +2267,7 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
 auto_tts_enabled: true
 blurb: ''
 category: category
+correctness_feedback_enabled: false
 init_state_name: %s
 language_code: en
 objective: Old objective
@@ -2281,7 +2304,9 @@ states:
           value: Continue
       default_outcome:
         dest: END
-        feedback: []
+        feedback:
+          audio_translations: {}
+          html: ''
         param_changes: []
       hints: []
       id: Continue

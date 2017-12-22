@@ -56,6 +56,10 @@ oppia.controller('SettingsTab', [
     $scope.isRolesFormOpen = false;
 
     $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
+    $scope.canDelete = GLOBALS.canDelete;
+    $scope.canModifyRoles = GLOBALS.canModifyRoles;
+    $scope.canReleaseOwnership = GLOBALS.canReleaseOwnership;
+    $scope.canUnpublish = GLOBALS.canUnpublish;
 
     var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
     var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -316,10 +320,10 @@ oppia.controller('SettingsTab', [
       });
     };
 
-    var openModalForModeratorAction = function(action) {
+    $scope.unpublishExplorationAsModerator = function() {
       AlertsService.clearWarnings();
 
-      var moderatorEmailDraftUrl = '/moderatorhandler/email_draft/' + action;
+      var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
 
       $http.get(moderatorEmailDraftUrl).then(function(response) {
         // If the draft email body is empty, email functionality will not be
@@ -329,7 +333,7 @@ oppia.controller('SettingsTab', [
         $modal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/settings_tab/' +
-            'take_moderator_action_modal_directive.html'),
+            'moderator_unpublish_exploration_modal_directive.html'),
           backdrop: true,
           resolve: {
             draftEmailBody: function() {
@@ -339,7 +343,6 @@ oppia.controller('SettingsTab', [
           controller: [
             '$scope', '$modalInstance', 'draftEmailBody',
             function($scope, $modalInstance, draftEmailBody) {
-              $scope.action = action;
               $scope.willEmailBeSent = Boolean(draftEmailBody);
               $scope.emailBody = draftEmailBody;
 
@@ -366,13 +369,9 @@ oppia.controller('SettingsTab', [
           ]
         }).result.then(function(result) {
           ExplorationRightsService.saveModeratorChangeToBackend(
-            action, result.emailBody);
+            result.emailBody);
         });
       });
-    };
-
-    $scope.unpublishExplorationAsModerator = function() {
-      openModalForModeratorAction('unpublish_exploration');
     };
 
     $scope.isExplorationLockedForEditing = function() {
