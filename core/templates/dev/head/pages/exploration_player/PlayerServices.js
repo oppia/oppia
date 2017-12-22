@@ -34,6 +34,7 @@ oppia.factory('ExplorationPlayerService', [
   'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
   'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
+  'GuestCollectionProgressService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       AlertsService, AnswerClassificationService, ExplorationContextService,
@@ -43,7 +44,8 @@ oppia.factory('ExplorationPlayerService', [
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService,
-      LanguageUtilService, NumberAttemptsService, AudioPreloaderService) {
+      LanguageUtilService, NumberAttemptsService, AudioPreloaderService,
+      GuestCollectionProgressService) {
     var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
       ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -157,6 +159,13 @@ oppia.factory('ExplorationPlayerService', [
       if (!_editorPreviewMode && exploration.isStateTerminal(newStateName)) {
         StatsReportingService.recordExplorationCompleted(
           newStateName, LearnerParamsService.getAllParams());
+
+        // If the user is a guest and has completed this exploration within the
+        // context of a collection, record their temporary progress.
+        if (GLOBALS.collectionId && !_isLoggedIn) {
+          GuestCollectionProgressService.recordExplorationCompletedInCollection(
+            GLOBALS.collectionId, _explorationId);
+        }
       }
     });
 
