@@ -20,13 +20,13 @@
 oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
-  '$scope', '$http', '$modal', 'AlertsService', 'explorationStatesService',
+  '$scope', '$http', '$uibModal', 'AlertsService', 'explorationStatesService',
   'ExplorationDataService', 'ComputeGraphService', 'DateTimeFormatService',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
   'IMPROVE_TYPE_INCOMPLETE', 'ENABLE_NEW_STATS_FRAMEWORK',
   function(
-      $scope, $http, $modal, AlertsService, explorationStatesService,
+      $scope, $http, $uibModal, AlertsService, explorationStatesService,
       ExplorationDataService, ComputeGraphService, DateTimeFormatService,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
@@ -175,7 +175,7 @@ oppia.controller('StatisticsTab', [
         '/createhandler/state_rules_stats/' + $scope.explorationId + '/' +
         encodeURIComponent(stateName)
       ).then(function(response) {
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/statistics_tab/' +
             'state_stats_modal_directive.html'),
@@ -195,11 +195,11 @@ oppia.controller('StatisticsTab', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', '$filter', '$injector', 'stateName',
+            '$scope', '$uibModalInstance', '$filter', '$injector', 'stateName',
             'stateStats', 'improvementType', 'visualizationsInfo',
             'HtmlEscaperService', 'AngularNameService',
             'AnswerClassificationService', 'ENABLE_NEW_STATS_FRAMEWORK',
-            function($scope, $modalInstance, $filter, $injector, stateName,
+            function($scope, $uibModalInstance, $filter, $injector, stateName,
                 stateStats, improvementType, visualizationsInfo,
                 HtmlEscaperService, AngularNameService,
                 AnswerClassificationService, ENABLE_NEW_STATS_FRAMEWORK) {
@@ -303,7 +303,7 @@ oppia.controller('StatisticsTab', [
               $scope.visualizationsHtml = _getVisualizationsHtml();
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
                 AlertsService.clearWarnings();
               };
             }

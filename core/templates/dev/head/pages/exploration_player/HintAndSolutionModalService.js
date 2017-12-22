@@ -17,45 +17,45 @@
  */
 
 oppia.factory('HintAndSolutionModalService', [
-  '$modal', 'UrlInterpolationService', 'HintManagerService',
+  '$uibModal', 'UrlInterpolationService', 'HintManagerService',
   'SolutionManagerService', 'ExplorationPlayerService',
   'PlayerPositionService',
-  function($modal, UrlInterpolationService, HintManagerService,
+  function($uibModal, UrlInterpolationService, HintManagerService,
            SolutionManagerService, ExplorationPlayerService,
            PlayerPositionService) {
     return {
       displayHintModal: function() {
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/hint_and_solution_modal_directive.html'),
           backdrop: 'static',
           controller: [
-            '$scope', '$modalInstance',
-            function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
               $scope.isHint = true;
               $scope.hint = HintManagerService.consumeHint();
               $scope.gotIt = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
               };
             }
           ]
         });
       },
       displaySolutionModal: function() {
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/hint_and_solution_modal_directive.html'),
           backdrop: 'static',
           controller: [
-            '$scope', '$modalInstance',
-            function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
               $scope.isHint = false;
               var solution = SolutionManagerService.viewSolution();
               var interaction = ExplorationPlayerService.getInteraction(
                 PlayerPositionService.getCurrentStateName());
               $scope.solution = solution.getOppiaResponseHtml(interaction);
               $scope.gotIt = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
               };
             }
           ]

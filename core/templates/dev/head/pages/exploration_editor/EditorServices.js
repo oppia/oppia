@@ -534,14 +534,14 @@ oppia.factory('explorationCorrectnessFeedbackService', [
 // is unlike the other exploration property services, in that it keeps no
 // mementos.
 oppia.factory('explorationStatesService', [
-  '$log', '$modal', '$filter', '$location', '$rootScope', '$injector', '$q',
+  '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
   'explorationInitStateNameService', 'AlertsService', 'changeListService',
   'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'AngularNameService',
   'AnswerClassificationService', 'ExplorationContextService',
   'UrlInterpolationService',
   function(
-      $log, $modal, $filter, $location, $rootScope, $injector, $q,
+      $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
       explorationInitStateNameService, AlertsService, changeListService,
       EditorStateService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, AngularNameService,
@@ -812,7 +812,7 @@ oppia.factory('explorationStatesService', [
           return;
         }
 
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/editor_tab/' +
             'confirm_delete_state_modal_directive.html'),
@@ -823,18 +823,18 @@ oppia.factory('explorationStatesService', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', 'deleteStateName',
-            function($scope, $modalInstance, deleteStateName) {
+            '$scope', '$uibModalInstance', 'deleteStateName',
+            function($scope, $uibModalInstance, deleteStateName) {
               $scope.deleteStateWarningText = (
                 'Are you sure you want to delete the card "' +
                 deleteStateName + '"?');
 
               $scope.reallyDelete = function() {
-                $modalInstance.close(deleteStateName);
+                $uibModalInstance.close(deleteStateName);
               };
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
                 AlertsService.clearWarnings();
               };
             }
@@ -1347,11 +1347,11 @@ oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
 // Service for displaying different types of modals depending on the type of
 // response received as a result of the autosaving request.
 oppia.factory('autosaveInfoModalsService', [
-  '$log', '$modal', '$timeout', '$window',
+  '$log', '$uibModal', '$timeout', '$window',
   'ExplorationDataService', 'LocalStorageService', 'lostChangesService',
   'UrlInterpolationService',
   function(
-      $log, $modal, $timeout, $window,
+      $log, $uibModal, $timeout, $window,
       ExplorationDataService, LocalStorageService, lostChangesService,
       UrlInterpolationService) {
     var _isModalOpen = false;
@@ -1363,16 +1363,16 @@ oppia.factory('autosaveInfoModalsService', [
 
     return {
       showNonStrictValidationFailModal: function() {
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/' +
             'save_validation_fail_modal_directive.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: [
-            '$scope', '$modalInstance', function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.closeAndRefresh = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
                 _refreshPage(20);
               };
             }
@@ -1389,7 +1389,7 @@ oppia.factory('autosaveInfoModalsService', [
         return _isModalOpen;
       },
       showVersionMismatchModal: function(lostChanges) {
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/' +
             'save_version_mismatch_modal_directive.html'),
@@ -1423,18 +1423,18 @@ oppia.factory('autosaveInfoModalsService', [
         _isModalOpen = true;
       },
       showLostChangesModal: function(lostChanges, explorationId) {
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/lost_changes_modal_directive.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
-          controller: ['$scope', '$modalInstance', function(
-            $scope, $modalInstance) {
+          controller: ['$scope', '$uibModalInstance', function(
+            $scope, $uibModalInstance) {
             // When the user clicks on discard changes button, signal backend
             // to discard the draft and reload the page thereafter.
             $scope.close = function() {
               LocalStorageService.removeExplorationDraft(explorationId);
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
 
             $scope.lostChangesHtml = (

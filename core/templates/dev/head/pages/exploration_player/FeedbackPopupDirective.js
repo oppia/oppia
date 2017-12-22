@@ -20,7 +20,7 @@
 // follows:
 //
 // <some-html-element popover-placement="bottom"
-//                    popover-template="popover/feedback"
+//                    uib-popover-template="popover/feedback"
 //                    popover-trigger="click" state-name="<[STATE_NAME]>">
 // </some-html-element>
 //
@@ -91,7 +91,7 @@ oppia.directive('feedbackPopup', [
             var childElts = popoverElt.children();
             for (var i = 0; i < childElts.length; i++) {
               var childElt = $(childElts[i]);
-              if (childElt.attr('popover-template')) {
+              if (childElt.attr('uib-popover-template')) {
                 triggerElt = childElt;
                 break;
               }

@@ -26,8 +26,8 @@
 
     <div ng-cloak class="navbar-header pull-right">
       <ul class="nav oppia-navbar-nav oppia-navbar-profile-admin">
-        <li class="dropdown pull-right">
-          <a class="dropdown-toggle oppia-navbar-dropdown-toggle"
+        <li uib-dropdown class="uib-dropdown pull-right">
+          <a uib-dropdown-toggle class="uib-dropdown-toggle oppia-navbar-dropdown-toggle"
              data-toggle="dropdown"
              ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
              ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
@@ -47,7 +47,7 @@
               </div>
             </div>
           </a>
-          <ul class="dropdown-menu ng-cloak oppia-navbar-dropdown"
+          <ul uib-dropdown-menu class="uib-dropdown-menu ng-cloak oppia-navbar-dropdown"
               role="menu"
               ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
               ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)"
@@ -110,7 +110,7 @@
             <a class="oppia-navbar-tab"
                ng-click="showTab(ADMIN_TAB_URLS.MISC)"
                ng-href="<[::ADMIN_TAB_URLS.MISC]>"
-               tooltip="Miscellaneous"
+               uib-tooltip="Miscellaneous"
                tooltip-placement="bottom">
               Misc
             </a>
@@ -119,7 +119,7 @@
             <a class="oppia-navbar-tab protractor-test-admin-roles-tab"
                ng-click="showTab(ADMIN_TAB_URLS.ROLES)"
                ng-href="<[::ADMIN_TAB_URLS.ROLES]>"
-               tooltip="Roles"
+               uib-tooltip="Roles"
                tooltip-placemnt="bottom">
               Roles
             </a>
@@ -128,7 +128,7 @@
             <a class="oppia-navbar-tab protractor-test-admin-config-tab"
                ng-click="showTab(ADMIN_TAB_URLS.CONFIG)"
                ng-href="<[::ADMIN_TAB_URLS.CONFIG]>"
-               tooltip="Config"
+               uib-tooltip="Config"
                tooltip-placement="bottom">
               Config
             </a>
@@ -137,7 +137,7 @@
             <a class="oppia-navbar-tab"
                ng-click="showTab(ADMIN_TAB_URLS.JOBS)"
                ng-href="<[::ADMIN_TAB_URLS.JOBS]>"
-               tooltip="Jobs"
+               uib-tooltip="Jobs"
                tooltip-placement="bottom">
               Jobs
             </a>
@@ -146,7 +146,7 @@
             <a class="oppia-navbar-tab"
                ng-click="showTab(ADMIN_TAB_URLS.ACTIVITIES)"
                ng-href="<[::ADMIN_TAB_URLS.ACTIVITIES]>"
-               tooltip="Activities"
+               uib-tooltip="Activities"
                tooltip-placement="bottom">
               Activities
             </a>

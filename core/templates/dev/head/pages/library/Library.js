@@ -27,14 +27,14 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 });
 
 oppia.controller('Library', [
-  '$scope', '$http', '$modal', '$rootScope', '$window', '$timeout',
+  '$scope', '$http', '$uibModal', '$rootScope', '$window', '$timeout',
   'ConstructTranslationIdsService', 'UrlService', 'ALL_CATEGORIES',
   'SearchService', 'WindowDimensionsService', 'UrlInterpolationService',
   'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX', 'AlertsService',
   'LearnerDashboardIdsBackendApiService',
   'LearnerDashboardActivityIdsObjectFactory', 'LearnerPlaylistService',
   function(
-      $scope, $http, $modal, $rootScope, $window, $timeout,
+      $scope, $http, $uibModal, $rootScope, $window, $timeout,
       ConstructTranslationIdsService, UrlService, ALL_CATEGORIES,
       SearchService, WindowDimensionsService, UrlInterpolationService,
       LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX, AlertsService,
