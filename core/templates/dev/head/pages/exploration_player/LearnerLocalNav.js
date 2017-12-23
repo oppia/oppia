@@ -92,7 +92,6 @@ oppia.controller('LearnerLocalNav', [
         });
       });
     };
-
     $scope.showFlagExplorationModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -158,3 +157,5 @@ oppia.controller('LearnerLocalNav', [
     };
   }
 ]);
+$scope.canEdit = GLOBALS.canEdit;
+$scope.username = GLOBALS.username;
