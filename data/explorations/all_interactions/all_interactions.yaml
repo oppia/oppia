@@ -214,8 +214,6 @@ states:
           value: true
         canAddVertex:
           value: true
-        interactionIsActive:
-          value: true
         canDeleteEdge:
           value: true
         canDeleteVertex:

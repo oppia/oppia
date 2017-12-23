@@ -38,8 +38,8 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
         'FocusManagerService', 'pencilCodeEditorRulesService',
         function($scope, $attrs, $element, $timeout, $modal,
           FocusManagerService, pencilCodeEditorRulesService) {
-          $scope.interactionIsActive = ($scope.getLastAnswer() === null) ||
-            ($scope.getLastAnswer() === undefined);
+          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+
           $scope.initialCode = $scope.interactionIsActive ?
             HtmlEscaperService.escapedJsonToObj($attrs.initialCodeWithValue) :
             $scope.initialSequence = $scope.getLastAnswer().code;

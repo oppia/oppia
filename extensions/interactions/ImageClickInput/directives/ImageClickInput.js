@@ -51,8 +51,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               '/' + encodeURIComponent($scope.filepath)) : null);
           $scope.mouseX = 0;
           $scope.mouseY = 0;
-          $scope.interactionIsActive = ($scope.getLastAnswer() === null) ||
-            ($scope.getLastAnswer() === undefined);
+          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+
           $scope.currentlyHoveredRegions = [];
           $scope.allRegions = imageAndRegions.labeledRegions;
           $scope.updateCurrentlyHoveredRegions = function() {

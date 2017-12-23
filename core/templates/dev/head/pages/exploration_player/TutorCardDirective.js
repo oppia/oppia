@@ -86,7 +86,8 @@ oppia.directive('tutorCard', [
             $scope.isInteractionInline = (
               ExplorationPlayerStateService.isInteractionInline(
                 $scope.activeCard.stateName));
-
+            $scope.lastAnswer =
+              PlayerTranscriptService.getLastAnswerOnActiveCard(index);
             $scope.interactionInstructions = (
               ExplorationPlayerStateService.getInteractionInstructions(
                 $scope.activeCard.stateName));

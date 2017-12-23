@@ -97,8 +97,6 @@ states:
           value: false
         canDeleteEdge:
           value: true
-        interactionIsActive:
-          value: true
         canDeleteVertex:
           value: false
         canEditEdgeWeight:
@@ -232,8 +230,6 @@ states:
         canAddVertex:
           value: false
         canDeleteEdge:
-          value: true
-        interactionIsActive:
           value: true
         canDeleteVertex:
           value: false
@@ -406,8 +402,6 @@ states:
         canAddVertex:
           value: false
         canDeleteEdge:
-          value: true
-        interactionIsActive:
           value: true
         canDeleteVertex:
           value: false

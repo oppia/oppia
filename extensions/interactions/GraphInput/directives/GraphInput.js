@@ -55,10 +55,16 @@ oppia.directive('oppiaInteractiveGraphInput', [
               rulesService: graphInputRulesService
             });
           };
-          $scope.interactionIsActive = ($scope.getLastAnswer() === null) ||
-            ($scope.getLastAnswer() === undefined);
+          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             $scope.interactionIsActive = false;
+            $scope.canAddVertex = false;
+            $scope.canDeleteVertex = false;
+            $scope.canEditVertexLabel = false;
+            $scope.canMoveVertex = false;
+            $scope.canAddEdge = false;
+            $scope.canDeleteEdge = false;
+            $scope.canEditEdgeWeight = false;
           });
           $scope.resetGraph = function() {
             var newGraph =
@@ -99,7 +105,6 @@ oppia.directive('oppiaInteractiveGraphInput', [
           var checkValidGraph = function(graph) {
             return Boolean(graph);
           };
-
           init();
         }]
     };
@@ -223,7 +228,7 @@ oppia.directive('graphViz', [
         canDeleteEdge: '=',
         canEditEdgeWeight: '=',
         canEditOptions: '=',
-        interactionIsActive: '='
+        isInteractionActive: '&interactionIsActive'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
@@ -271,21 +276,13 @@ oppia.directive('graphViz', [
           $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
 
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
-            $scope.interactionIsActive = false;
-            $scope.canAddVertex = false;
-            $scope.canDeleteVertex = false;
-            $scope.canEditVertexLabel = false;
-            $scope.canMoveVertex = false;
-            $scope.canAddEdge = false;
-            $scope.canDeleteEdge = false;
-            $scope.canEditEdgeWeight = false;
             $scope.state.currentMode = null;
           });
 
           var vizContainer = $($element).find('.oppia-graph-viz-svg');
           $scope.vizWidth = vizContainer.width();
           $scope.mousemoveGraphSVG = function(event) {
-            if (!$scope.interactionIsActive) {
+            if (!$scope.isInteractionActive()) {
               return;
             }
             $scope.state.mouseX = event.pageX - vizContainer.offset().left;
@@ -307,7 +304,7 @@ oppia.directive('graphViz', [
           };
 
           $scope.onClickGraphSVG = function() {
-            if (!$scope.interactionIsActive) {
+            if (!$scope.isInteractionActive()) {
               return;
             }
             if ($scope.state.currentMode === _MODES.ADD_VERTEX &&
@@ -393,7 +390,7 @@ oppia.directive('graphViz', [
           $scope.onClickModeButton = function(mode, $event) {
             $event.preventDefault();
             $event.stopPropagation();
-            if ($scope.interactionIsActive) {
+            if ($scope.isInteractionActive()) {
               setMode(mode);
             }
           };
@@ -598,7 +595,7 @@ oppia.directive('graphViz', [
           var SELECT_COLOR = 'orange';
           var DEFAULT_COLOR = 'black';
           $scope.getEdgeColor = function(index) {
-            if (!$scope.interactionIsActive) {
+            if (!$scope.isInteractionActive()) {
               return DEFAULT_COLOR;
             }
             if ($scope.state.currentMode === _MODES.DELETE &&
@@ -614,7 +611,7 @@ oppia.directive('graphViz', [
             }
           };
           $scope.getVertexColor = function(index) {
-            if (!$scope.interactionIsActive) {
+            if (!$scope.isInteractionActive()) {
               return DEFAULT_COLOR;
             }
             if ($scope.state.currentMode === _MODES.DELETE &&
@@ -638,7 +635,7 @@ oppia.directive('graphViz', [
           $scope.getEdgeCentre = function(index) {
             return graphDetailService.getEdgeCentre($scope.graph, index);
           };
-          if ($scope.interactionIsActive) {
+          if ($scope.isInteractionActive()) {
             $scope.init();
           }
         }

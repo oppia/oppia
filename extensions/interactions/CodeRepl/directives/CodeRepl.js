@@ -34,8 +34,8 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         '/interactions/CodeRepl/directives/' +
         'code_repl_interaction_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.interactionIsActive = ($scope.getLastAnswer() === null) ||
-          ($scope.getLastAnswer() === undefined);
+        $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+
         $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
           $scope.interactionIsActive = false;
         });

@@ -246,8 +246,6 @@ states:
           value: true
         canDeleteEdge:
           value: true
-        interactionIsActive:
-          value: true
         canDeleteVertex:
           value: true
         canEditEdgeWeight:

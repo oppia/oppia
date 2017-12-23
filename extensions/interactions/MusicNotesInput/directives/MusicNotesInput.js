@@ -103,11 +103,10 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         scope.sequenceToGuess = HtmlEscaperService.escapedJsonToObj(
           attrs.sequenceToGuessWithValue);
 
-        scope.interactionIsActive = (scope.getLastAnswer() === null) ||
-          (scope.getLastAnswer() === undefined);
+        scope.interactionIsActive = (scope.getLastAnswer() === null);
         scope.initialSequence = scope.interactionIsActive ?
           HtmlEscaperService.escapedJsonToObj(attrs.initialSequenceWithValue) :
-          scope.initialSequence = scope.getLastAnswer();
+          scope.getLastAnswer();
 
         scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
           scope.interactionIsActive = false;
