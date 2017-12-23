@@ -605,8 +605,7 @@ def apply_change_list(collection_id, change_list):
         collection_id: str. ID of the given collection.
         change_list: list(dict). A change list to be applied to the given
             collection. Each entry in change_list is a dict that represents an
-            CollectionChange.
-    object.
+            CollectionChange object.
 
     Returns:
       Collection. The resulting collection domain object.
@@ -687,6 +686,40 @@ def validate_exps_in_collection_are_public(collection):
                 'collection, exploration ID: %s' % exploration_id)
 
 
+def _get_sorted_nodes_in_dict(collection_nodes):
+    """Manipulates CollectionNode data to make the collection path linear and
+    ordered.
+
+    Args:
+        collection_nodes: list(CollectionNode). A list of CollectionNode domain
+            object of the collection.
+
+    Return:
+        list(dict). The resulting sorted ordered collection node's list in dict.
+    """
+    accumulated_skill_ids = set()
+    sorted_nodes = []
+    last_acquired_skill_ids = []
+
+    for index, node in enumerate(collection_nodes):
+        node_dict = node.to_dict()
+        prerequisite_skill_ids = set(node_dict['prerequisite_skill_ids'])
+        acquired_skill_ids = set(node_dict['acquired_skill_ids'])
+
+        if index == 0 and node_dict['prerequisite_skill_ids'] != []:
+            node_dict['prerequisite_skill_ids'] = []
+
+        elif not(accumulated_skill_ids >= prerequisite_skill_ids) or (
+                prerequisite_skill_ids == set()):
+            node_dict['prerequisite_skill_ids'] = last_acquired_skill_ids
+
+        last_acquired_skill_ids = node_dict['acquired_skill_ids']
+        accumulated_skill_ids.update(acquired_skill_ids)
+        sorted_nodes.append(node_dict)
+
+    return sorted_nodes
+
+
 def _save_collection(committer_id, collection, commit_message, change_list):
     """Validates a collection and commits it to persistent storage. If
     successful, increments the version number of the incoming collection domain
@@ -762,9 +795,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.tags = collection.tags
     collection_model.schema_version = collection.schema_version
     collection_model.collection_contents = {
-        'nodes': [
-            collection_node.to_dict() for collection_node in collection.nodes
-        ],
+        'nodes': _get_sorted_nodes_in_dict(collection.nodes),
         'skills': {
             skill_id: skill.to_dict()
             for skill_id, skill in collection.skills.iteritems()
