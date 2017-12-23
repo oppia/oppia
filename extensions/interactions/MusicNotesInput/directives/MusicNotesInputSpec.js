@@ -37,7 +37,8 @@ describe('MusicNotesInput interaction', function() {
 
       var TAG_NAME = 'oppia-interactive-music-notes-input';
       scope = $rootScope.$new();
-      elt = angular.element('<' + TAG_NAME + ' last-answer="null"></' + TAG_NAME + '>');
+      elt = angular.element(
+        '<' + TAG_NAME + ' last-answer="null"></' + TAG_NAME + '>');
       $compile(elt)(scope);
       scope.$digest();
       ctrlScope = elt[0].isolateScope();
