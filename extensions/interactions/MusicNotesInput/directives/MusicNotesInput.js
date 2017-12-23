@@ -79,7 +79,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
   'HtmlEscaperService', 'NOTE_NAMES_TO_MIDI_VALUES',
   'musicNotesInputRulesService', 'musicPhrasePlayerService',
   'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
-  function(HtmlEscaperService, NOTE_NAMES_TO_MIDI_VALUES,
+  function(
+      HtmlEscaperService, NOTE_NAMES_TO_MIDI_VALUES,
       musicNotesInputRulesService, musicPhrasePlayerService,
       UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
     return {
@@ -325,7 +326,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                       tolerance: 'intersect',
                       revert: function() {
                         var draggableOptions = $(this);
-                        // If note is out of droppable or off staff, remove it
+                        // If note is out of droppable or off staff, remove it.
                         if (isCloneOffStaff(draggableOptions)) {
                           scope._removeNotesFromNoteSequenceWithId(
                             draggableOptions.data('noteId'));
@@ -364,27 +365,26 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                 position: 'absolute'
               });
             if (scope.interactionIsActive) {
-              innerDiv
-                .draggable({
-                  // Keeps note from being placed on top of the clef.
-                  containment: '.oppia-music-input-valid-note-area',
-                  cursor: 'pointer',
-                  stack: '.oppia-music-input-note-choices div',
-                  grid: [scope.HORIZONTAL_GRID_SPACING, 1],
-                  start: function() {
-                    $(this).data('leftPosBeforeDrag', $(this).position().left);
-                  },
-                  revert: function() {
-                    var draggableOptions = $(this);
-                    // If note is out of droppable or off staff, remove it.
-                    if (isCloneOffStaff(draggableOptions)) {
-                      scope._removeNotesFromNoteSequenceWithId(
-                        draggableOptions.data('noteId'));
-                      scope._sortNoteSequence();
-                      draggableOptions.remove();
-                    }
+              innerDiv.draggable({
+                // Keeps note from being placed on top of the clef.
+                containment: '.oppia-music-input-valid-note-area',
+                cursor: 'pointer',
+                stack: '.oppia-music-input-note-choices div',
+                grid: [scope.HORIZONTAL_GRID_SPACING, 1],
+                start: function() {
+                  $(this).data('leftPosBeforeDrag', $(this).position().left);
+                },
+                revert: function() {
+                  var draggableOptions = $(this);
+                  // If note is out of droppable or off staff, remove it.
+                  if (isCloneOffStaff(draggableOptions)) {
+                    scope._removeNotesFromNoteSequenceWithId(
+                      draggableOptions.data('noteId'));
+                    scope._sortNoteSequence();
+                    draggableOptions.remove();
                   }
-                });
+                }
+              });
             }
             noteChoicesDiv.append(innerDiv);
           }

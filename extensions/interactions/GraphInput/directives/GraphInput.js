@@ -58,6 +58,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             $scope.interactionIsActive = false;
+            
             $scope.canAddVertex = false;
             $scope.canDeleteVertex = false;
             $scope.canEditVertexLabel = false;
@@ -66,9 +67,10 @@ oppia.directive('oppiaInteractiveGraphInput', [
             $scope.canDeleteEdge = false;
             $scope.canEditEdgeWeight = false;
           });
+
           $scope.resetGraph = function() {
-            var newGraph =
-              HtmlEscaperService.escapedJsonToObj($attrs.graphWithValue);
+            var newGraph = HtmlEscaperService.escapedJsonToObj(
+              $attrs.graphWithValue);
             if (checkValidGraph(newGraph)) {
               $scope.graph = newGraph;
             } else {
@@ -237,7 +239,8 @@ oppia.directive('graphViz', [
         '$scope', '$element', '$attrs', '$document', 'FocusManagerService',
         'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
         'EVENT_NEW_CARD_AVAILABLE',
-        function($scope, $element, $attrs, $document, FocusManagerService,
+        function(
+            $scope, $element, $attrs, $document, FocusManagerService,
             graphDetailService, GRAPH_INPUT_LEFT_MARGIN,
             EVENT_NEW_CARD_AVAILABLE) {
           var _MODES = {

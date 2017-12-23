@@ -35,12 +35,12 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // permited line templates) that is stored in defaultData.js within
           // the dependencies.
           $scope.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
+          
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
-
-
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             $scope.interactionIsActive = false;
           });
+
           $scope.questionData.assumptions =
             $scope.localQuestionData.assumptions;
           $scope.questionData.results = $scope.localQuestionData.results;

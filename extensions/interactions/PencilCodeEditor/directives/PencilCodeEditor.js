@@ -22,8 +22,8 @@
 
 oppia.directive('oppiaInteractivePencilCodeEditor', [
   'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
-  function(HtmlEscaperService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE) {
+  function(
+      HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
@@ -42,7 +42,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
 
           $scope.initialCode = $scope.interactionIsActive ?
             HtmlEscaperService.escapedJsonToObj($attrs.initialCodeWithValue) :
-            $scope.initialSequence = $scope.getLastAnswer().code;
+            $scope.getLastAnswer().code;
 
           var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
           var pce = new PencilCodeEmbed(iframeDiv);
