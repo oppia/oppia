@@ -86,12 +86,7 @@ describe('Player transcript service', function() {
       a: 'b'
     }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
     lastAnswer = pts.getLastAnswerOnActiveCard(0);
-    var firstCard = pts.getCard(0);
-    expect(firstCard.inputResponsePairs).toEqual([{
-      learnerInput: 'first answer',
-      oppiaResponse: null,
-      isHint: false
-    }]);
+    expect(lastAnswer).toEqual('first answer');
   });
 
   it('should record answer/feedback pairs in the correct order', function() {
