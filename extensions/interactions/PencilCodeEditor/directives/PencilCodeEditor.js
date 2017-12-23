@@ -32,9 +32,9 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
         '/interactions/PencilCodeEditor/directives/' +
         'pencil_code_editor_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', '$element', '$timeout', '$modal',
+        '$scope', '$attrs', '$element', '$timeout', '$uibModal',
         'FocusManagerService', 'pencilCodeEditorRulesService',
-        function($scope, $attrs, $element, $timeout, $modal,
+        function($scope, $attrs, $element, $timeout, $uibModal,
           FocusManagerService, pencilCodeEditorRulesService) {
           $scope.initialCode = HtmlEscaperService.escapedJsonToObj(
             $attrs.initialCodeWithValue);
@@ -72,20 +72,21 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
           });
 
           $scope.reset = function() {
-            $modal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getExtensionResourceUrl(
                 '/interactions/PencilCodeEditor/directives/' +
                 'pencil_code_reset_confirmation_directive.html'),
               backdrop: 'static',
               keyboard: false,
               controller: [
-                '$scope', '$modalInstance', function($scope, $modalInstance) {
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
                   $scope.cancel = function() {
-                    $modalInstance.dismiss();
+                    $uibModalInstance.dismiss();
                   };
 
                   $scope.resetCode = function() {
-                    $modalInstance.close();
+                    $uibModalInstance.close();
                   };
                 }]
             }).result.then(function() {

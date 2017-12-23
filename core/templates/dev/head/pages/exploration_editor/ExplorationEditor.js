@@ -44,7 +44,7 @@ oppia.controller('ExplorationEditor', [
   'graphDataService', 'StateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'ExplorationWarningsService', '$templateCache', 'ExplorationContextService',
-  'ExplorationAdvancedFeaturesService', '$modal', 'changeListService',
+  'ExplorationAdvancedFeaturesService', '$uibModal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'ParamSpecsObjectFactory', 'explorationAutomaticTextToSpeechService',
@@ -59,7 +59,7 @@ oppia.controller('ExplorationEditor', [
       graphDataService, StateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       ExplorationWarningsService, $templateCache, ExplorationContextService,
-      ExplorationAdvancedFeaturesService, $modal, changeListService,
+      ExplorationAdvancedFeaturesService, $uibModal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, explorationAutomaticTextToSpeechService,
@@ -374,15 +374,15 @@ oppia.controller('ExplorationEditor', [
     };
 
     $scope.showWelcomeExplorationModal = function() {
-      var modalInstance = $modal.open({
+      var modalInstance = $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/' +
           'welcome_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'siteAnalyticsService',
+          '$scope', '$uibModalInstance', 'siteAnalyticsService',
           'ExplorationContextService',
-          function($scope, $modalInstance, siteAnalyticsService,
+          function($scope, $uibModalInstance, siteAnalyticsService,
           ExplorationContextService) {
             var explorationId = ExplorationContextService.getExplorationId();
 
@@ -391,13 +391,13 @@ oppia.controller('ExplorationEditor', [
             $scope.beginTutorial = function() {
               siteAnalyticsService.registerAcceptTutorialModalEvent(
                 explorationId);
-              $modalInstance.close();
+              $uibModalInstance.close();
             };
 
             $scope.cancel = function() {
               siteAnalyticsService.registerDeclineTutorialModalEvent(
                 explorationId);
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
 
             $scope.editorWelcomeImgUrl = (

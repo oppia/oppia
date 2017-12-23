@@ -23,14 +23,15 @@ oppia.directive('collectionEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/collection_editor_navbar_directive.html'),
       controller: [
-        '$scope', '$modal', 'AlertsService', 'RouterService', 'UndoRedoService',
-        'CollectionEditorStateService', 'CollectionValidationService',
+        '$scope', '$uibModal', 'AlertsService', 'RouterService', 
+        'UndoRedoService', 'CollectionEditorStateService', 
+        'CollectionValidationService',
         'CollectionRightsBackendApiService',
         'EditableCollectionBackendApiService',
         'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
-            $scope, $modal, AlertsService, RouterService, UndoRedoService,
+            $scope, $uibModal, AlertsService, RouterService, UndoRedoService,
             CollectionEditorStateService, CollectionValidationService,
             CollectionRightsBackendApiService,
             EditableCollectionBackendApiService,
@@ -109,20 +110,21 @@ oppia.directive('collectionEditorNavbar', [
 
           $scope.saveChanges = function() {
             var isPrivate = $scope.collectionRights.isPrivate();
-            var modalInstance = $modal.open({
+            var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/collection_editor/' +
                 'collection_editor_save_modal_directive.html'),
               backdrop: true,
               controller: [
-                '$scope', '$modalInstance', function($scope, $modalInstance) {
+                '$scope', '$uibModalInstance', 
+                function($scope, $uibModalInstance) {
                   $scope.isCollectionPrivate = isPrivate;
 
                   $scope.save = function(commitMessage) {
-                    $modalInstance.close(commitMessage);
+                    $uibModalInstance.close(commitMessage);
                   };
                   $scope.cancel = function() {
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]
@@ -140,16 +142,16 @@ oppia.directive('collectionEditorNavbar', [
               !$scope.collection.getCategory());
 
             if (additionalMetadataNeeded) {
-              $modal.open({
+              $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/collection_editor/' +
                   'collection_editor_pre_publish_modal_directive.html'),
                 backdrop: true,
                 controller: [
-                  '$scope', '$modalInstance', 'CollectionEditorStateService',
+                  '$scope', '$uibModalInstance', 'CollectionEditorStateService',
                   'CollectionUpdateService', 'ALL_CATEGORIES',
                   function(
-                      $scope, $modalInstance, CollectionEditorStatesService,
+                      $scope, $uibModalInstance, CollectionEditorStatesService,
                       CollectionUpdateService, ALL_CATEGORIES) {
                     var collection = (
                       CollectionEditorStateService.getCollection());
@@ -210,11 +212,11 @@ oppia.directive('collectionEditorNavbar', [
                           collection, $scope.newCategory);
                       }
 
-                      $modalInstance.close(metadataList);
+                      $uibModalInstance.close(metadataList);
                     };
 
                     $scope.cancel = function() {
-                      $modalInstance.dismiss('cancel');
+                      $uibModalInstance.dismiss('cancel');
                     };
                   }
                 ]

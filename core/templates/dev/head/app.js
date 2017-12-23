@@ -76,12 +76,12 @@ oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
-    '$delegate', '$document', '$modal', '$timeout', 'FocusManagerService',
+    '$delegate', '$document', '$uibModal', '$timeout', 'FocusManagerService',
     'taRegisterTool', 'rteHelperService', 'AlertsService',
     'ExplorationContextService', 'PAGE_CONTEXT',
     'UrlInterpolationService',
     function(
-      taOptions, $document, $modal, $timeout, FocusManagerService,
+      taOptions, $document, $uibModal, $timeout, FocusManagerService,
       taRegisterTool, rteHelperService, AlertsService,
       ExplorationContextService, PAGE_CONTEXT,
       UrlInterpolationService) {
@@ -101,14 +101,14 @@ oppia.config(['$provide', function($provide) {
         customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
         onDismissCallback, refocusFn) {
         $document[0].execCommand('enableObjectResizing', false, false);
-        var modalDialog = $modal.open({
+        var modalDialog = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/forms/customize_rte_component_modal_directive.html'),
           backdrop: 'static',
           resolve: {},
           controller: [
-            '$scope', '$modalInstance', '$timeout',
-            function($scope, $modalInstance, $timeout) {
+            '$scope', '$uibModalInstance', '$timeout',
+            function($scope, $uibModalInstance, $timeout) {
               $scope.customizationArgSpecs = customizationArgSpecs;
 
               // Without this code, the focus will remain in the background RTE
@@ -136,7 +136,7 @@ oppia.config(['$provide', function($provide) {
               }
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
               };
 
               $scope.save = function() {
@@ -149,7 +149,7 @@ oppia.config(['$provide', function($provide) {
                     $scope.tmpCustomizationArgs[i].value);
                 }
 
-                $modalInstance.close(customizationArgsDict);
+                $uibModalInstance.close(customizationArgsDict);
               };
             }
           ]

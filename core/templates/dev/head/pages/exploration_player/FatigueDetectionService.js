@@ -17,8 +17,8 @@
  */
 
 oppia.factory('FatigueDetectionService', [
-  '$modal', 'UrlInterpolationService',
-  function($modal, UrlInterpolationService) {
+  '$uibModal', 'UrlInterpolationService',
+  function($uibModal, UrlInterpolationService) {
     // 4 submissions in under 10 seconds triggers modal.
     var SPAM_COUNT_THRESHOLD = 4;
     var SPAM_WINDOW_MSEC = 10000;
@@ -40,16 +40,16 @@ oppia.factory('FatigueDetectionService', [
         return false;
       },
       displayTakeBreakMessage: function() {
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/take_break_modal_directive.html'),
           backdrop: 'static',
           resolve: {},
           controller: [
-            '$scope', '$modalInstance',
-            function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
               $scope.okay = function() {
-                $modalInstance.close('okay');
+                $uibModalInstance.close('okay');
               };
             }]
         });

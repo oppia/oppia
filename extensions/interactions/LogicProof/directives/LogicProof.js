@@ -24,8 +24,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
         '/interactions/LogicProof/directives/' +
         'logic_proof_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', '$modal', 'logicProofRulesService',
-        function($scope, $attrs, $modal, logicProofRulesService) {
+        '$scope', '$attrs', '$uibModal', 'logicProofRulesService',
+        function($scope, $attrs, $uibModal, logicProofRulesService) {
           $scope.localQuestionData = HtmlEscaperService.escapedJsonToObj(
             $attrs.questionWithValue);
 
@@ -244,16 +244,16 @@ oppia.directive('oppiaInteractiveLogicProof', [
           };
 
           $scope.showHelp = function() {
-            $modal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getExtensionResourceUrl(
                 '/interactions/LogicProof/directives/' +
                 'logic_proof_help_modal_directive.html'),
               backdrop: true,
               controller: [
-                '$scope', '$modalInstance',
-                function($scope, $modalInstance) {
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
                   $scope.close = function() {
-                    $modalInstance.close();
+                    $uibModalInstance.close();
                   };
                 }
               ]
