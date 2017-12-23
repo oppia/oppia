@@ -28,11 +28,10 @@ describe('Classifier Object Factory', function() {
   it('should create a new classifier', function() {
     var classifierObject = (
      ClassifierObjectFactory.create(
-        0, 'classifierData', 'dataSchemaVersion'));
+        'LDAStringClassifier', {}, 1));
 
-    expect(classifierObject.algorithmId).toEqual(0);
-    expect(classifierObject.classifierData).toEqual('classifierData');
-    expect(classifierObject.dataSchemaVersion).toEqual(
-      'dataSchemaVersion');
+    expect(classifierObject.algorithmId).toEqual('LDAStringClassifier');
+    expect(classifierObject.classifierData).toEqual({});
+    expect(classifierObject.dataSchemaVersion).toEqual(1);
   });
 });
