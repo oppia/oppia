@@ -26,7 +26,7 @@ oppia.directive('correctEditor', [
       scope: {
         isEditable: '&isEditable',
         onSaveCorrect: '&',
-        labelled_as_correct: '='
+        labelledAsCorrect: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/' +
@@ -34,7 +34,7 @@ oppia.directive('correctEditor', [
       controller: [
         '$scope', 'ResponsesService', 'stateInteractionIdService', function(
             $scope, ResponsesService, stateInteractionIdService) {
-          $scope.savedCorrect = angular.copy($scope.labelled_as_correct);
+          $scope.savedCorrect = angular.copy($scope.labelledAsCorrect);
           $scope.correctEditorIsOpen = false;
           $scope.currentInteractionId = stateInteractionIdService.savedMemento;
           
@@ -45,12 +45,12 @@ oppia.directive('correctEditor', [
             // $scope.savedCorrect is set above. Until then, $scope.savedOutcome
             // is undefined.
             if ($scope.savedCorrect === undefined) {
-              $scope.savedCorrect = angular.copy($scope.labelled_as_correct);
+              $scope.savedCorrect = angular.copy($scope.labelledAsCorrect);
             }
 
             if ($scope.correctEditorIsOpen) {
               if ($scope.editCorrectForm.$valid) {
-                $scope.saveThisCorrect($scope.labelled_as_correct);
+                $scope.saveThisCorrect($scope.labelledAsCorrect);
               } else {
                 $scope.cancelThisCorrect();
               }
@@ -71,7 +71,7 @@ oppia.directive('correctEditor', [
             }
           };
           $scope.cancelThisCorrect = function() {
-            $scope.labelled_as_correct = angular.copy(
+            $scope.labelledAsCorrect = angular.copy(
               $scope.savedCorrect);
             $scope.correctEditorIsOpen = false;
             $scope.onCancelCorrectEdit();
@@ -87,8 +87,8 @@ oppia.directive('correctEditor', [
 
           $scope.init = function() {
             // Select a default correct value, if one isn't already there.
-            if ($scope.labelled_as_correct === null) {
-              $scope.labelled_as_correct = false;
+            if ($scope.labelledAsCorrect === null) {
+              $scope.labelledAsCorrect = false;
             }
           };
 

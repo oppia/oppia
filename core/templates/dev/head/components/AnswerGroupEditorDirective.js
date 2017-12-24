@@ -29,7 +29,7 @@ oppia.directive('answerGroupEditor', [
         getOnSaveAnswerGroupCorrectFn: '&onSaveAnswerGroupCorrect',
         outcome: '=',
         suppressWarnings: '&',
-        labelled_as_correct: '=',
+        labelledAsCorrect: '=',
         rules: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

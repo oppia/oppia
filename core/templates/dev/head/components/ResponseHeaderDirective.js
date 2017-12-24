@@ -27,7 +27,7 @@ oppia.directive('responseHeader', [
         getShortSummary: '&shortSummary',
         isActive: '&isActive',
         getOnDeleteFn: '&onDeleteFn',
-        getCorrect: '&labelled_as_correct',
+        getCorrect: '&labelledAsCorrect',
         getNumRules: '&numRules'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

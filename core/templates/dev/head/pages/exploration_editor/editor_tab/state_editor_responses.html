@@ -29,7 +29,7 @@
                                is-active="$index === activeAnswerGroupIndex"
                                on-delete-fn="deleteAnswerGroup"
                                outcome="answerGroup.outcome"
-                               labelled_as_correct="answerGroup.labelled_as_correct"
+                               labelled-as-correct="answerGroup.labelledAsCorrect"
                                num-rules="answerGroup.rules.length">
               </response-header>
             </a>
@@ -45,7 +45,7 @@
                                        on-save-answer-group-correct="saveActiveAnswerGroupCorrect"
                                        is-editable="editabilityService.isEditable()"
                                        display-feedback="!isLinearWithNoFeedback(answerGroup.outcome)"
-                                       labelled_as_correct="answerGroup.labelled_as_correct"
+                                       labelled-as-correct="answerGroup.labelledAsCorrect"
                                        class="protractor-test-response-body">
                   </answer-group-editor>
                 </div>
@@ -69,7 +69,7 @@
                                is-active="$index === activeAnswerGroupIndex"
                                summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:false"
                                short-summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:true"
-                               labelled_as_correct="false"
+                               labelled-as-correct="false"
                                outcome="defaultOutcome">
               </response-header>
             </a>
