@@ -108,9 +108,10 @@ oppia.directive('feedbackPopup', [
 
           $scope.saveFeedback = function() {
             if ($scope.feedbackText) {
-              var feedbackSubject = $scope.feedbackText.split(' ', 7).join(' ');
-              if (!feedbackSubject.includes(' ')) {
-                feedbackSubject = $scope.feedbackText.substr(0, 50);
+              var feedbackSubject = $scope.feedbackText.substr(0, 60);
+              if (feedbackSubject.includes(' ')) {
+                feedbackSubject = feedbackSubject.split(' ', 8).slice(0, -1)
+                                  .join(' ');
               }
               $http.post(feedbackUrl, {
                 subject: feedbackSubject,
