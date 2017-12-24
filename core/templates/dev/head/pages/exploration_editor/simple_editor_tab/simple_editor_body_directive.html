@@ -22,6 +22,7 @@
         </anchor-header>
         <ul class="dropdown-menu oppia-question-list-menu" >
           <li ng-click="changeQuestionType('MultipleChoiceInput', $index)">Multiple Choice Input</li>
+          <li ng-click="changeQuestionType('NumericInput', $index)">Numeric Input</li>
           <li ng-click="changeQuestionType('TextInput', $index)">Text Input</li>
           <li ng-click="changeQuestionType('ItemSelectionInput', $index)">Checkbox Input</li>
         </ul>
@@ -38,6 +39,17 @@
                               add-state="addState()">
       </multiple-choice-editor>
 
+      <numeric-editor ng-if="question.getInteractionId() === 'NumericInput'"
+                      unique-id="question.getId()"
+                      customization-args="question.getInteractionCustomizationArgs()"
+                      answer-groups="question.getAnswerGroups()"
+                      default-outcome="question.getDefaultOutcome()"
+                      save-customization-args="saveCustomizationArgs(question.getStateName(), newValue)"
+                      save-answer-groups="saveAnswerGroups(question.getStateName(), newValue)"
+                      save-default-outcome="saveDefaultOutcome(question.getStateName(), newValue)"
+                      add-state="addState()">
+      </numeric-editor>
+    
       <checkbox-editor ng-if="question.getInteractionId() === 'ItemSelectionInput'"
                        unique-id="question.getId()"
                        customization-args="question.getInteractionCustomizationArgs()"

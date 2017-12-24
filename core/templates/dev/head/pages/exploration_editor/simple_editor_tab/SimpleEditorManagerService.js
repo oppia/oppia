@@ -48,6 +48,15 @@ oppia.factory('SimpleEditorManagerService', [
           }
         }
       },
+      NumericInput: {
+        CUSTOMIZATION_ARGS:  {},
+        FIRST_ANSWER_GROUP_RULE: {
+          type: 'Equals',
+          value: {
+            x: 0
+          }
+        }
+      },
       ItemSelectionInput: {
         CUSTOMIZATION_ARGS:  {
           choices: {
@@ -209,10 +218,9 @@ oppia.factory('SimpleEditorManagerService', [
             currentStateName,
             DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
               CUSTOMIZATION_ARGS);
-          // Don't save answer group when it's the last question and doesn't
-          // have a answer group.
-          if (index !== questionCount - 1 || doesLastQuestionHaveAnswerGroups) {
-            var newAnswerGroups = [];
+          var newAnswerGroups = [];
+          // - Keep destination of answer groups to next state.
+          if (index !== questionCount - 1) {
             newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
               RuleObjectFactory.createNew(
                 DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
@@ -221,6 +229,24 @@ oppia.factory('SimpleEditorManagerService', [
                   FIRST_ANSWER_GROUP_RULE.value
               )
             ], OutcomeObjectFactory.createEmpty(nextStateName), false));
+            SimpleEditorShimService.saveAnswerGroups(
+              currentStateName, newAnswerGroups);
+          }
+          // - Set destination of last question to itself if answer group
+          // already exist.
+          if (index === questionCount - 1 && doesLastQuestionHaveAnswerGroups) {
+            var lastStateName = (
+              data.questionList.isEmpty() ?
+              SimpleEditorShimService.getInitStateName() :
+              data.questionList.getLastQuestion().getDestinationStateName());
+            newAnswerGroups.push(AnswerGroupObjectFactory.createNew([
+              RuleObjectFactory.createNew(
+                DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
+                  FIRST_ANSWER_GROUP_RULE.type,
+                DEFAULT_INTERACTION_PROPERTIES[newInteractionId].
+                  FIRST_ANSWER_GROUP_RULE.value
+              )
+            ], OutcomeObjectFactory.createEmpty(lastStateName), false));
             SimpleEditorShimService.saveAnswerGroups(
               currentStateName, newAnswerGroups);
           }
