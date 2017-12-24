@@ -100,6 +100,6 @@ oppia.directive('oppiaShortResponseRedirectExploration', [function() {
   };
 }]);
 
-oppia.factory('endExplorationRulesService', [function() {
+oppia.factory('redirectExplorationRulesService', [function() {
   return {};
 }]);
