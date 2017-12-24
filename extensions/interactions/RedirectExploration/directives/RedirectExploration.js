@@ -35,7 +35,8 @@ oppia.directive('oppiaInteractiveRedirectExploration', [
             $scope, $http, $attrs, $q, UrlService,
             ExplorationContextService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT,
             HtmlEscaperService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
-          var redirectExplorationId = (
+          var redirectExplorationId = [];
+          redirectExplorationId.push(
             HtmlEscaperService.escapedJsonToObj(
               $attrs.redirectExplorationIdWithValue));
           $scope.isIframed = UrlService.isIframed();
@@ -61,8 +62,7 @@ oppia.directive('oppiaInteractiveRedirectExploration', [
             var explorationId = ExplorationContextService.getExplorationId();
             $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
               params: {
-                stringified_exp_ids: JSON.stringify(
-                  redirectExplorationId)
+                stringified_exp_ids: JSON.stringify(redirectExplorationId)
               }
             }).then(function(response) {
               var data = response.data;
