@@ -154,7 +154,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             'default_outcome_heading', 'can_have_solution'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(interaction_dict['continue_type'],
-          base.CONTINUES_TO_NEXT_STATE)
+                         base.CONTINUES_TO_NEXT_STATE)
         self.assertEqual(interaction_dict['customization_arg_specs'], [{
             'name': 'placeholder',
             'description': 'Placeholder text (optional)',
