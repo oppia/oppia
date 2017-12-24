@@ -57,8 +57,8 @@ oppia.directive('tutorCard', [
         'AudioPreloaderService', 'TWO_CARD_THRESHOLD_PX',
         'CONTENT_FOCUS_LABEL_PREFIX', 'CONTINUE_BUTTON_FOCUS_LABEL',
         'EVENT_ACTIVE_CARD_CHANGED', 'HINT_REQUEST_STRING_I18N_IDS',
-        'DELAY_FOR_HINT_FEEDBACK_MSEC', 'SolutionManagerService',
-        'DeviceInfoService',
+        'DELAY_FOR_HINT_FEEDBACK_MSEC', 'EVENT_NEW_CARD_AVAILABLE',
+        'SolutionManagerService', 'DeviceInfoService',
         function(
           $scope, $timeout, $anchorScroll, ExplorationPlayerService,
           HintManagerService, PlayerPositionService,
@@ -68,8 +68,8 @@ oppia.directive('tutorCard', [
           AudioPreloaderService, TWO_CARD_THRESHOLD_PX,
           CONTENT_FOCUS_LABEL_PREFIX, CONTINUE_BUTTON_FOCUS_LABEL,
           EVENT_ACTIVE_CARD_CHANGED, HINT_REQUEST_STRING_I18N_IDS,
-          DELAY_FOR_HINT_FEEDBACK_MSEC, SolutionManagerService,
-          DeviceInfoService) {
+          DELAY_FOR_HINT_FEEDBACK_MSEC, EVENT_NEW_CARD_AVAILABLE,
+          SolutionManagerService, DeviceInfoService) {
           var updateActiveCard = function() {
             var index = PlayerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -78,11 +78,16 @@ oppia.directive('tutorCard', [
 
             $scope.arePreviousResponsesShown = false;
             $scope.activeCard = PlayerTranscriptService.getCard(index);
-
+            $scope.interactionIsActive =
+              PlayerTranscriptService.isLastCard(index);
+            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+              $scope.interactionIsActive = false;
+            });
             $scope.isInteractionInline = (
               ExplorationPlayerStateService.isInteractionInline(
                 $scope.activeCard.stateName));
-
+            $scope.lastAnswer =
+              PlayerTranscriptService.getLastAnswerOnActiveCard(index);
             $scope.interactionInstructions = (
               ExplorationPlayerStateService.getInteractionInstructions(
                 $scope.activeCard.stateName));
