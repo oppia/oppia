@@ -90,7 +90,7 @@ oppia.directive('numericEditor', [
             } else {
               alertsService.addWarning('Cannot save a non numeric answer.');
               return StatusObjectFactory.createFailure(
-                'Cannot save a non numeric answer'
+                'Cannot save a non numeric answer.'
               );
             }
           };
