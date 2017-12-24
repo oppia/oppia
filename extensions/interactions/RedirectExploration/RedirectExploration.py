@@ -17,21 +17,20 @@
 from extensions.interactions import base
 
 
-class EndExploration(base.BaseInteraction):
-    """Interaction that allows the exploration to end.
+class RedirectExploration(base.BaseInteraction):
+    """Interaction that pauses the exploratiom and redirects to a prerequisite
+    exploration.
 
-    This interaction is unusual in that there is no way for the learner to
-    submit an answer, so the exploration effectively terminates at the state
-    containing it.
+    This interaction is like EndExploration, just that, it pauses an exploration
+    instead of ending it and redirects to another exploration.
     """
 
-    name = 'End Exploration'
+    name = 'Redirect Exploration'
     description = (
-        'Ends the exploration, and suggests recommendations for explorations '
-        'to try next.')
+        'Pauses the exploration and redirects to a previous exploration.')
     display_mode = base.DISPLAY_MODE_INLINE
     is_terminal = True
-    continue_type = base.ENDS_EXPLORATION_WITH_SUCCESS
+    continue_type = base.ENDS_EXPLORATION_WITH_FAILURE
     _dependency_ids = []
     instructions = None
     narrow_instructions = None
@@ -40,19 +39,20 @@ class EndExploration(base.BaseInteraction):
     can_have_solution = False
 
     _customization_arg_specs = [{
-        'name': 'recommendedExplorationIds',
+        'name': 'redirectExplorationId',
         'description': (
-            'IDs of explorations to recommend to the learner (at most 3 are '
-            'shown). The ID of an exploration is the string of characters '
-            'appearing after \'/explore/\' in the URL bar.'),
+            'ID of a prerequisite exploration to be completed '
+            'before proceeding further in current exploration. The ID of an '
+            'exploration is the string of characters appearing after '
+            ' \'/explore/\' in the URL bar.'),
         'schema': {
             'type': 'list',
             'items': {
                 'type': 'unicode',
             },
             'ui_config': {
-                'add_element_text': 'Add exploration ID',
+                'add_element_text': 'Enter Exploration ID',
             }
-        },
+         },
         'default_value': [],
     }]

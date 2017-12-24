@@ -39,6 +39,10 @@ oppia.constant(
 oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
 oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
 oppia.constant('RULE_TYPE_CLASSIFIER', 'FuzzyMatches');
+oppia.constant('ENDS_EXPLORATION_WITH_SUCCESS', 'endExploration');
+oppia.constant('ENDS_EXPLORATION_WITH_FAILURE', 'redirectExploration');
+oppia.constant('CONTINUES_TO_NEXT_STATE', 'continueExploration');
+
 oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // Feature still in development.
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.

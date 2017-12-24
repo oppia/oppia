@@ -428,6 +428,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
     'interaction_ids': [
         'Continue',
         'EndExploration',
+        'RedirectExploration',
         'ImageClickInput',
         'ItemSelectionInput',
         'MultipleChoiceInput',
