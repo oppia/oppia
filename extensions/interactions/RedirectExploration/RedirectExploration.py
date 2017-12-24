@@ -53,6 +53,6 @@ class RedirectExploration(base.BaseInteraction):
             'ui_config': {
                 'add_element_text': 'Enter Exploration ID',
             }
-         },
+        },
         'default_value': [],
     }]
