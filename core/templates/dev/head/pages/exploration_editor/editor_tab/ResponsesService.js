@@ -107,7 +107,13 @@ oppia.factory('ResponsesService', [
       if (updates.dest) {
         answerGroup.outcome.dest = updates.dest;
       }
-      answerGroup.correct = false;
+      if (updates.labelled_as_correct == true) {
+        answerGroup.labelled_as_correct = updates.labelled_as_correct;
+        alert("updates.labelled_as_correct  is "+updates.labelled_as_correct);
+        }   
+      else {
+        answerGroup.labelled_as_correct = false;
+        }
       _saveAnswerGroups(_answerGroups);
     };
 

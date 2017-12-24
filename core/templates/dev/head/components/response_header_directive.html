@@ -38,6 +38,7 @@
 </style>
 <div class="oppia-response-header-block">
   <div class="oppia-response-header">
+    <i class="material-icons md-18" ng-if='getCorrect()'>&#10004;</i>
     <span ng-if="!isActive()" ng-attr-title="<[getSummary()]>">
       <[getShortSummary()]>
       <span ng-if="getNumRules() > 1" class="label label-primary" style="position: relative; bottom: 4px;">

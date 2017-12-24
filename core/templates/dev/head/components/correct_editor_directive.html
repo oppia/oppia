@@ -1,0 +1,42 @@
+<div ng-if="!correctEditorIsOpen"
+title="<[isEditable() ? 'Edit labelled_as_correct' : '']>"
+style="height: 100%;">
+	<div class="oppia-readonly-rule-tile protractor-test-edit-outcome-feedback-button"
+  	ng-class="{'oppia-editable-section': isEditable()}">
+		<div class="oppia-rule-preview oppia-transition-200">
+ 			<div class="oppia-click-to-start-editing protractor-test-open-outcome-feedback-editor"
+      	ng-if="isEditable()" ng-click="openCorrectEditor()">
+   			<i ng-if="isEditable()" class="material-icons oppia-editor-edit-icon pull-right"
+      		title="Edit Correct">&#xE254;
+   			</i>
+ 			</div>
+
+ 			<strong>The answers falling under this answer group are</strong>
+			<div style="position: relative;">
+   			<span ng-if="labelled_as_correct" style="color: rgb(20, 180, 15)">
+     			Correct
+   			</span>
+   			<span ng-if="!labelled_as_correct"
+        	style="color: rgb(243, 13, 13)">
+     			Incorrect
+   			</span>
+ 			</div>
+		</div>
+<!-- This is a dummy div created to mask the contents when hovored above outcome editor contents -->
+		<div class="oppia-rule-preview-section-mask"></div>
+	</div>
+</div>
+
+<div style="position: relative;" ng-if="isEditable() && correctEditorIsOpen">
+    <strong>The answers falling under this answer group are correct if ticked else incorrect</strong>
+    <form class="form-inline" role="form" name="editCorrectform">
+            <input type="checkbox" ng-model="labelled_as_correct" ng-disabled="isDisabled()">
+    </form>
+    <div class="oppia-rule-save-cancel-buttons">
+        <div class="pull-right">
+            <button type="button" class="btn btn-default" ng-click="cancelThisCorrect()">Cancel</button>
+            <button type="button" class="btn btn-success protractor-test-save-answer" ng-disabled="editCorrectform.$invalid" ng-click="saveThisCorrect(labelled_as_correct)">Save</button>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+</div>

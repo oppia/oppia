@@ -92,4 +92,10 @@
                   outcome="outcome"
                   suppress-warnings="suppressWarnings()">
   </outcome-editor>
+
+  <div ng-if="activeAnswerGroupIndex !== AnswerGroupCount">
+      <br>
+        <correct-editor is-editable="isEditable" on-save-correct="getOnSaveAnswerGroupCorrectFn()" labelled_as_correct="labelled_as_correct">
+        </correct-editor>
+  </div>
 </div>
