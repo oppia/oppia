@@ -86,7 +86,7 @@ class BaseInteraction(object):
     is_terminal = False
     # Whether it redirects to another exploration, ends exploration or
     # just continues the exploration
-    continue_type = ''
+    continue_type = CONTINUES_TO_NEXT_STATE
     # Whether the interaction has only one possible answer.
     is_linear = False
     # Whether this interaction supports machine learning classification.

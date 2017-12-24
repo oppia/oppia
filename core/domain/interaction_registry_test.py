@@ -20,7 +20,8 @@ from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
 
-EXPECTED_TERMINAL_INTERACTIONS_COUNT = 1
+# Both EndExploration and RedirectExploration
+EXPECTED_TERMINAL_INTERACTIONS_COUNT = 2
 
 
 class InteractionDependencyTests(test_utils.GenericTestBase):

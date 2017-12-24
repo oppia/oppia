@@ -46,7 +46,7 @@ class RedirectExploration(base.BaseInteraction):
             'exploration is the string of characters appearing after '
             ' \'/explore/\' in the URL bar.'),
         'schema': {
-            'type': 'list',
+            'type': 'unicode',
             'items': {
                 'type': 'unicode',
             },

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the EndExploration 'interaction'.
+ * Directive for the RedirectExploration 'interaction'.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
