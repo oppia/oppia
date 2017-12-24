@@ -1,0 +1,12 @@
+<div ng-if="hasNext() || hasPrevious()" layout="row" layout-align="space-between center" style="background-color: white;">
+  <!-- Wrapping div on first button keeps the second button right-aligned
+    even when the first button is not present. -->
+  <div>
+    <md-button ng-if="hasPrevious()" ng-click="changeCard(currentCardIndex-1)" style="margin: 0px 0px 12px 12px;">
+      <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
+    </md-button>
+  </div>
+  <md-button ng-if="hasNext()" ng-click="changeCard(currentCardIndex+1)" style="margin: 0px 12px 12px 0px">
+    <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
+  </md-button>
+</div>
