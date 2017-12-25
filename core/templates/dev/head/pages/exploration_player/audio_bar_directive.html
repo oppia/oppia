@@ -1,22 +1,22 @@
-<div style="margin-top: -66px; position: fixed; z-index: 1000; background-color: #a8cfea; height: 50px; width: 100%">
-  <div class="audio-controls">
-    <i class="fa fa-cog audio-controls-button-icon"
-       ng-if="audioSettingsButtonIsShown"
-       ng-click="openAudioTranslationSettings()"></i>
-    <img class="audio-controls-button-image"
-         style="margin-top: 2px"
-         ng-if="rewindButtonIsShown"
-         ng-src="<[IMAGE_URL_REWIND_AUDIO_BUTTON]>"
-         ng-click="rewindAudioFiveSec()">
+<div class="audio-header" style="position: fixed; z-index: 10000; width: 100%; transition: margin-top 0.2s ease-in-out; left: 0; top: 184px;">
+  <div ng-if="isAudioBarExpanded" class="audio-controls" style="display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center; align-items: center; background-color: #0D48A1; height: 44px; padding: 0 14px;">
     <i class="fa audio-controls-button-icon"
-       style="min-width: 24px; text-align: left;"
+       style="min-width: 24px; text-align: right; color: white; "
        ng-click="onSpeakerIconClicked()"
-       ng-class="{'fa-volume-off': !isAudioPlaying(), 'fa-volume-up': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
+       ng-class="{'fa-play': !isAudioPlaying(), 'fa-pause': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
        uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
        tooltip-append-to-body="true"></i>
+    <div ng-if="hasPressedPlayButtonOnce" style="width:84%; margin: 0 auto; display: inline-block; min-height: 20px">
+      <md-progress-linear md-mode="determinate" value="<[AudioPlayerService.getProgress() * 100]>"></md-progress-linear>
+      <span ng-if="audioLoadingIndicatorIsShown" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_LOADING_AUDIO"></span>
+      <span ng-if="isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT"></span>
+    </div>
+    <i class="fa fa-cog audio-controls-button-icon audio-settings-button"
+       style="color: white;" 
+       ng-click="openAudioTranslationSettings()"></i>
   </div>
-  <span ng-if="audioLoadingIndicatorIsShown" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_LOADING_AUDIO"></span>
-  <span ng-if="audioSettingsButtonIsShown && isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT"></span>
+  <img ng-if="isAudioBarExpanded" ng-src="<[IMAGE_URL_COLLAPSE_AUDIO_BUTTON]>" ng-click="collapseAudioBar()" style="margin: 0 auto; display: block;">
+  <img ng-if="!isAudioBarExpanded" ng-src="<[IMAGE_URL_EXPAND_AUDIO_BUTTON]>" ng-click="expandAudioBar()" style="margin: 0 auto; display: block;">
 </div>
 
 <style>
@@ -39,16 +39,25 @@
   }
 
   .audio-controls {
-    float: right;
-    text-align: right;
+    text-align: left;
     width: 100%;
   }
 
   .audio-controls-message {
-    clear: right;
-    float: right;
     font-size: 12px;
     font-style: italic;
+  }
+
+  .audio-settings-button {
+    
+  }
+
+  .audio-header {
+    margin-top: -128px;
+  }
+
+  .nav-up {
+    margin-top: -186px;
   }
 
 </style>

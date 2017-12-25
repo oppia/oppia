@@ -108,6 +108,12 @@ oppia.factory('AudioPlayerService', [
       rewind: function(seconds) {
         _rewind(seconds);
       },
+      getProgress: function() {
+        if (!_currentTrack) {
+          return 0;
+        }
+        return _currentTrack.progress;
+      },
       isPlaying: function() {
         return (_currentTrack && !_currentTrack.paused);
       },
