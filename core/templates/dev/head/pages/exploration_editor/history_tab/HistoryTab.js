@@ -266,10 +266,12 @@ oppia.controller('HistoryTab', [
 
     $scope.computeVersionsToDisplay = function() {
       var begin = (($scope.currentPage - 1) * $scope.versionsPerPage);
-      var end = Math.min(begin + $scope.versionsPerPage, $scope.versionCheckboxArray.length);
+      var end = Math.min(
+        begin + $scope.versionsPerPage, $scope.versionCheckboxArray.length);
       $scope.versionNumbersToDisplay = [];
       for (var i = begin; i < end; i++) {
-        $scope.versionNumbersToDisplay.push($scope.versionCheckboxArray[i].vnum);
+        $scope.versionNumbersToDisplay.push(
+          $scope.versionCheckboxArray[i].vnum);
       }
     };
 
