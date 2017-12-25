@@ -81,7 +81,6 @@ oppia.directive('correctEditor', [
             $scope.correctEditorIsOpen = false;
             $scope.savedCorrect = angular.copy(
               tempCorrect);
-              alert($scope.savedCorrect);
             $scope.onSaveCorrect()($scope.savedCorrect);
           };
 

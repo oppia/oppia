@@ -23,6 +23,7 @@ oppia.directive('answerGroupEditor', [
       scope: {
         isEditable: '=',
         displayFeedback: '=',
+        defaultAnswerGroup: '=',
         getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
@@ -46,9 +47,6 @@ oppia.directive('answerGroupEditor', [
           $scope.rulesMemento = null;
           $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           $scope.editAnswerGroupForm = {};
-          $scope.activeAnswerGroupIndex = ResponsesService.getActiveAnswerGroupIndex();
-          $scope.AnswerGroupCount = ResponsesService.getAnswerGroupCount();
-          
           $scope.getAnswerChoices = function() {
             return ResponsesService.getAnswerChoices();
           };

@@ -46,6 +46,7 @@
                                        is-editable="editabilityService.isEditable()"
                                        display-feedback="!isLinearWithNoFeedback(answerGroup.outcome)"
                                        labelled-as-correct="answerGroup.labelledAsCorrect"
+                                       default-answer-group=false
                                        class="protractor-test-response-body">
                   </answer-group-editor>
                 </div>
@@ -84,6 +85,7 @@
                                        is-editable="editabilityService.isEditable()"
                                        suppress-warnings="suppressDefaultAnswerGroupWarnings()"
                                        display-feedback="!isLinearWithNoFeedback(defaultOutcome)"
+                                       default-answer-group=true
                                        class="protractor-test-response-body">
                   </answer-group-editor>
                 </div>
