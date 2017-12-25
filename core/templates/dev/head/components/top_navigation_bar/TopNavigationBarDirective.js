@@ -182,7 +182,7 @@ oppia.directive('topNavigationBar', [
             // height of the navbar (56px) in Chrome's inspector and rounding
             // up. If the height of the navbar is changed in the future this
             // will need to be updated.
-            if (document.querySelector('div.uib-collapse.navbar-collapse')
+            if (document.querySelector('div.collapse.navbar-collapse')
               .clientHeight > 60) {
               for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
                 if (

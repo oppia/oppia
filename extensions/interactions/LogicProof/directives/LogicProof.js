@@ -13,12 +13,14 @@
 // limitations under the License.
 
 oppia.directive('oppiaInteractiveLogicProof', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
+  function(
+      HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/LogicProof/directives/' +
@@ -33,6 +35,11 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // permited line templates) that is stored in defaultData.js within
           // the dependencies.
           $scope.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
+          
+          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+            $scope.interactionIsActive = false;
+          });
 
           $scope.questionData.assumptions =
             $scope.localQuestionData.assumptions;
@@ -91,7 +98,10 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // NOTE: for information on integrating angular and code-mirror see
           // http://github.com/angular-ui/ui-codemirror
           $scope.codeEditor = function(editor) {
-            editor.setValue($scope.localQuestionData.default_proof_string);
+            var proofString = ($scope.interactionIsActive ?
+              $scope.localQuestionData.default_proof_string :
+              $scope.getLastAnswer().proof_string);
+            editor.setValue(proofString);
             $scope.proofString = editor.getValue();
             var cursorPosition = editor.doc.getCursor();
 
