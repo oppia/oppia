@@ -412,7 +412,7 @@ oppia.controller('LearnerDashboard', [
         },
         controller: [
           '$scope', '$uibModalInstance', '$http', 'sectionNameI18nId',
-          'subsectionName', 
+          'subsectionName',
           function(
               $scope, $uibModalInstance, $http, sectionNameI18nId,
               subsectionName) {
@@ -561,11 +561,14 @@ oppia.controller('LearnerDashboard', [
           LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS);
         $scope.feedbackThreadActive = false;
 
+        $scope.noExplorationActivity = (
+            ($scope.completedExplorationsList.length === 0) &&
+            ($scope.incompleteExplorationsList.length === 0));
+        $scope.noCollectionActivity = (
+            ($scope.completedCollectionsList.length === 0) &&
+            ($scope.incompleteCollectionsList.length === 0));
         $scope.noActivity = (
-          ($scope.completedExplorationsList.length === 0) &&
-          ($scope.completedCollectionsList.length === 0) &&
-          ($scope.incompleteExplorationsList.length === 0) &&
-          ($scope.incompleteCollectionsList.length === 0) &&
+          ($scope.noExplorationActivity) && ($scope.noCollectionActivity) &&
           ($scope.explorationPlaylist.length === 0) &&
           ($scope.collectionPlaylist.length === 0));
         $rootScope.loadingMessage = '';
