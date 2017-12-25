@@ -16,7 +16,9 @@
  * @fileoverview Service to get changes in human readable form
  * to human readable form and making necessary 
  */
- oppia.factory('ChangesInHumanReadableFormService', ['UtilsService', function(UtilsService) {
+oppia.factory('ChangesInHumanReadableFormService', [
+  'UtilsService', 
+  function(UtilsService) {
   var CMD_ADD_STATE = 'add_state';
   var CMD_RENAME_STATE = 'rename_state';
   var CMD_DELETE_STATE = 'delete_state';

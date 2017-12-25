@@ -39,7 +39,6 @@ var checkConsoleErrorsExist = function(expectedErrors) {
     // that have a unique value for their message attribute.
     var uniqueLogMessages = getUniqueLogMessages(browserLogs);
     expect(uniqueLogMessages.length).toBe(expectedErrors.length);
-
     for (var i = 0; i < expectedErrors.length; i++) {
       var errorPresent = false;
       for (var j = 0; j < uniqueLogMessages.length; j++) {
@@ -56,8 +55,7 @@ describe('Cache Slugs', function() {
   it('should check that errors get logged for missing resources', function() {
     browser.get(ERROR_PAGE_URL_SUFFIX);
     var expectedErrors = [
-      'http://localhost:9001/build/fail/logo/288x128_logo_white.png',
-      '\\$modal is now deprecated. Use \\$uibModal instead.'
+      'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
     ];
     checkConsoleErrorsExist(expectedErrors);
   });

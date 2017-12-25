@@ -226,7 +226,7 @@ class ExplorationChange(object):
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'init_state_name', 'auto_tts_enabled')
+        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
 
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
@@ -802,7 +802,7 @@ class AnswerGroup(object):
             'rule_specs': [rule_spec.to_dict()
                            for rule_spec in self.rule_specs],
             'outcome': self.outcome.to_dict(),
-            'correct': self.correct,
+            'labelled_as_correct': self.labelled_as_correct,
         }
 
     @classmethod
@@ -819,24 +819,24 @@ class AnswerGroup(object):
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
             [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
-            answer_group_dict['correct'],
+            answer_group_dict['labelled_as_correct'],
         )
 
-    def __init__(self, outcome, rule_specs, correct):
+    def __init__(self, outcome, rule_specs, labelled_as_correct):
         """Initializes a AnswerGroup domain object.
 
         Args:
             outcome: Outcome. The outcome corresponding to the answer group.
             rule_specs: list(RuleSpec). List of rule specifications.
-            correct: bool. Whether this answer group represents a "correct"
-                answer.
+            labelled_as_correct: bool. Whether this answer group has been
+                labelled by the creator as a "correct" answer.
         """
         self.rule_specs = [RuleSpec(
             rule_spec.rule_type, rule_spec.inputs
         ) for rule_spec in rule_specs]
 
         self.outcome = outcome
-        self.correct = correct
+        self.labelled_as_correct = labelled_as_correct
 
     def validate(self, interaction, exp_param_specs_dict):
         """Verifies that all rule classes are valid, and that the AnswerGroup
@@ -860,10 +860,10 @@ class AnswerGroup(object):
         if len(self.rule_specs) < 1:
             raise utils.ValidationError(
                 'There must be at least one rule for each answer group.')
-        if not isinstance(self.correct, bool):
+        if not isinstance(self.labelled_as_correct, bool):
             raise utils.ValidationError(
-                'The "correct" field should be a boolean, received %s'
-                % self.correct)
+                'The "labelled_as_correct" field should be a boolean, received '
+                '%s' % self.labelled_as_correct)
 
         seen_classifier_rule = False
         for rule_spec in self.rule_specs:
@@ -1402,8 +1402,9 @@ class State(object):
                     'Expected answer group rule specs to be a list, '
                     'received %s' % rule_specs_list)
 
-            answer_group = AnswerGroup(Outcome.from_dict(
-                answer_group_dict['outcome']), [], answer_group_dict['correct'])
+            answer_group = AnswerGroup(
+                Outcome.from_dict(answer_group_dict['outcome']), [],
+                answer_group_dict['labelled_as_correct'])
             for rule_dict in rule_specs_list:
                 rule_spec = RuleSpec.from_dict(rule_dict)
 
@@ -1597,7 +1598,8 @@ class Exploration(object):
                  language_code, tags, blurb, author_notes,
                  states_schema_version, init_state_name, states_dict,
                  param_specs_dict, param_changes_list, version,
-                 auto_tts_enabled, created_on=None, last_updated=None):
+                 auto_tts_enabled, correctness_feedback_enabled,
+                 created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
         Args:
@@ -1627,6 +1629,8 @@ class Exploration(object):
                 was last updated.
             auto_tts_enabled: bool. True if automatic text-to-speech is
                 enabled.
+            correctness_feedback_enabled: bool. True if correctness feedback is
+                enabled.
         """
         self.id = exploration_id
         self.title = title
@@ -1655,6 +1659,7 @@ class Exploration(object):
         self.created_on = created_on
         self.last_updated = last_updated
         self.auto_tts_enabled = auto_tts_enabled
+        self.correctness_feedback_enabled = correctness_feedback_enabled
 
     @classmethod
     def create_default_exploration(
@@ -1692,7 +1697,7 @@ class Exploration(object):
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
             feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0,
-            feconf.DEFAULT_AUTO_TTS_ENABLED)
+            feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
     @classmethod
     def from_dict(
@@ -1725,6 +1730,8 @@ class Exploration(object):
         exploration.blurb = exploration_dict['blurb']
         exploration.author_notes = exploration_dict['author_notes']
         exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
+        exploration.correctness_feedback_enabled = exploration_dict[
+            'correctness_feedback_enabled']
 
         exploration.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val) for
@@ -1771,7 +1778,7 @@ class Exploration(object):
                         'inputs': rule_spec['inputs'],
                         'rule_type': rule_spec['rule_type'],
                     } for rule_spec in group['rule_specs']],
-                    'correct': False,
+                    'labelled_as_correct': group['labelled_as_correct'],
                 })
                 for group in idict['answer_groups']]
 
@@ -1920,6 +1927,11 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Expected auto_tts_enabled to be a bool, received %s'
                 % self.auto_tts_enabled)
+
+        if not isinstance(self.correctness_feedback_enabled, bool):
+            raise utils.ValidationError(
+                'Expected correctness_feedback_enabled to be a bool, received '
+                '%s' % self.correctness_feedback_enabled)
 
         for param_name in self.param_specs:
             if not isinstance(param_name, basestring):
@@ -2264,6 +2276,15 @@ class Exploration(object):
                 is enabled or not.
         """
         self.auto_tts_enabled = auto_tts_enabled
+
+    def update_correctness_feedback_enabled(self, correctness_feedback_enabled):
+        """Update whether correctness feedback is enabled.
+
+        Args:
+            correctness_feedback_enabled: bool. Whether correctness feedback
+                is enabled or not.
+        """
+        self.correctness_feedback_enabled = correctness_feedback_enabled
 
     # Methods relating to states.
     def add_states(self, state_names):
@@ -2795,6 +2816,14 @@ class Exploration(object):
     def _convert_states_v10_dict_to_v11_dict(cls, states_dict):
         """Converts from version 10 to 11. Version 11 refactors the content to
         be an HTML string with audio translations.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             content_html = state_dict['content'][0]['value']
@@ -2808,6 +2837,14 @@ class Exploration(object):
     def _convert_states_v11_dict_to_v12_dict(cls, states_dict):
         """Converts from version 11 to 12. Version 12 refactors audio
         translations from a list to a dict keyed by language code.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             old_audio_translations = state_dict['content']['audio_translations']
@@ -2825,6 +2862,14 @@ class Exploration(object):
     def _convert_states_v12_dict_to_v13_dict(cls, states_dict):
         """Converts from version 12 to 13. Version 13 sets empty
         solutions to None and removes fallbacks.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             if 'fallbacks' in state_dict['interaction']:
@@ -2837,6 +2882,14 @@ class Exploration(object):
     def _convert_states_v13_dict_to_v14_dict(cls, states_dict):
         """Converts from version 13 to 14. Version 14 adds
         audio translations to feedback, hints, and solutions.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
             if state_dict['interaction']['default_outcome'] is not None:
@@ -2875,6 +2928,27 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v14_dict_to_v15_dict(cls, states_dict):
+        """Converts from version 14 to 15. Version 15 renames the "correct"
+        field in answer groups to "labelled_as_correct" and (for safety) resets
+        all "labelled_as_correct" values to False.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['labelled_as_correct'] = False
+                del answer_group['correct']
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -2905,7 +2979,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 19
+    CURRENT_EXP_SCHEMA_VERSION = 20
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3283,8 +3357,24 @@ class Exploration(object):
 
         exploration_dict['states'] = cls._convert_states_v13_dict_to_v14_dict(
             exploration_dict['states'])
-
         exploration_dict['states_schema_version'] = 14
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v19_dict_to_v20_dict(cls, exploration_dict):
+        """ Converts a v19 exploration dict into a v20 exploration dict.
+
+        Introduces a correctness property at the top level, and changes each
+        answer group's "correct" field to "labelled_as_correct" instead.
+        """
+        exploration_dict['schema_version'] = 20
+
+        exploration_dict['states'] = cls._convert_states_v14_dict_to_v15_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 15
+
+        exploration_dict['correctness_feedback_enabled'] = False
 
         return exploration_dict
 
@@ -3415,6 +3505,11 @@ class Exploration(object):
                 exploration_dict)
             exploration_schema_version = 19
 
+        if exploration_schema_version == 19:
+            exploration_dict = cls._convert_v19_dict_to_v20_dict(
+                exploration_dict)
+            exploration_schema_version = 20
+
         return (exploration_dict, initial_schema_version)
 
     @classmethod
@@ -3514,6 +3609,7 @@ class Exploration(object):
             'param_specs': self.param_specs_dict,
             'tags': self.tags,
             'auto_tts_enabled': self.auto_tts_enabled,
+            'correctness_feedback_enabled': self.correctness_feedback_enabled,
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.iteritems()}
         })
@@ -3536,6 +3632,8 @@ class Exploration(object):
                     representation of State domain object.
                 - title: str. The exploration title.
                 - language_code: str. The language code of the exploration.
+                - correctness_feedback_enabled: str. Whether to show correctness
+                    feedback.
         """
         return {
             'init_state_name': self.init_state_name,
@@ -3547,6 +3645,7 @@ class Exploration(object):
             },
             'title': self.title,
             'language_code': self.language_code,
+            'correctness_feedback_enabled': self.correctness_feedback_enabled,
         }
 
     def get_interaction_ids(self):

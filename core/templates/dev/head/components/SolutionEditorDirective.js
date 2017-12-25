@@ -17,14 +17,14 @@
  */
 
 oppia.directive('solutionEditor', [
-  '$modal', 'UrlInterpolationService', 'stateSolutionService',
+  '$uibModal', 'UrlInterpolationService', 'stateSolutionService',
   'EditorStateService', 'explorationStatesService',
   'ExplorationWarningsService', 'AlertsService',
   'SolutionObjectFactory', 'SolutionVerificationService',
   'ExplorationContextService', 'ExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateCustomizationArgsService',
   'INFO_MESSAGE_SOLUTION_IS_INVALID',
-  function($modal, UrlInterpolationService, stateSolutionService,
+  function($uibModal, UrlInterpolationService, stateSolutionService,
            EditorStateService, explorationStatesService,
            ExplorationWarningsService, AlertsService,
            SolutionObjectFactory, SolutionVerificationService,
@@ -57,17 +57,17 @@ oppia.directive('solutionEditor', [
           };
 
           $scope.openSolutionEditor = function() {
-            $modal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/editor_tab/' +
                 'add_or_update_solution_modal_directive.html'),
               backdrop: 'static',
               controller: [
-                '$scope', '$modalInstance', 'stateInteractionIdService',
+                '$scope', '$uibModalInstance', 'stateInteractionIdService',
                 'stateSolutionService', 'EditorStateService',
                 'ExplorationHtmlFormatterService',
                 'explorationStatesService',
-                function($scope, $modalInstance, stateInteractionIdService,
+                function($scope, $uibModalInstance, stateInteractionIdService,
                          stateSolutionService, EditorStateService,
                          ExplorationHtmlFormatterService,
                          explorationStatesService) {
@@ -102,7 +102,7 @@ oppia.directive('solutionEditor', [
                     if (typeof $scope.data.answerIsExclusive === 'boolean' &&
                         $scope.data.correctAnswer !== null &&
                         $scope.data.explanation !== '') {
-                      $modalInstance.close({
+                      $uibModalInstance.close({
                         solution: SolutionObjectFactory.createNew(
                           $scope.data.answerIsExclusive,
                           $scope.data.correctAnswer,
@@ -112,7 +112,7 @@ oppia.directive('solutionEditor', [
                   };
 
                   $scope.cancel = function() {
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                     AlertsService.clearWarnings();
                   };
                 }

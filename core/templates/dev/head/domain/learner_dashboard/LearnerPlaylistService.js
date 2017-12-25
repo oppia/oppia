@@ -17,8 +17,8 @@
  */
 
  oppia.factory('LearnerPlaylistService', [
-  '$http', '$modal', 'AlertsService', 'UrlInterpolationService',
-  function($http, $modal, AlertsService, UrlInterpolationService) {
+  '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
+  function($http, $uibModal, AlertsService, UrlInterpolationService) {
     var _addToLearnerPlaylist = function(activityId, activityType) {
       var successfullyAdded = true;
       var addToLearnerPlaylistUrl = (
@@ -57,7 +57,7 @@
 
     var _removeFromLearnerPlaylist = function(
       activityId, activityTitle, activityType, learnerDashboardActivityIds) {
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/learner_dashboard/' +
           'remove_activity_from_learner_dashboard_modal_directive.html'),
@@ -71,8 +71,8 @@
           }
         },
         controller: [
-          '$scope', '$modalInstance', '$http', 'UrlInterpolationService',
-          function($scope, $modalInstance, $http, UrlInterpolationService) {
+          '$scope', '$uibModalInstance', '$http', 'UrlInterpolationService',
+          function($scope, $uibModalInstance, $http, UrlInterpolationService) {
             $scope.sectionNameI18nId = (
               'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION');
             $scope.activityTitle = activityTitle;
@@ -85,11 +85,11 @@
                 }));
             $scope.remove = function() {
               $http['delete'](removeFromLearnerPlaylistUrl);
-              $modalInstance.close();
+              $uibModalInstance.close();
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
           }
         ]

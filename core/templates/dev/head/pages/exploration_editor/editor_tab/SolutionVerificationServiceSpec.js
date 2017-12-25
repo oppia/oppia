@@ -70,7 +70,7 @@ describe('Solution Verification Service', function() {
         interaction: {
           id: 'TextInput',
           answer_groups: [{
-            correct: false,
+            labelled_as_correct: false,
             outcome: {
               dest: 'End State',
               feedback: {
@@ -117,7 +117,7 @@ describe('Solution Verification Service', function() {
               },
               param_changes: []
             },
-            correct: false
+            labelled_as_correct: false
           }],
           default_outcome: {
             dest: 'default',

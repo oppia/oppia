@@ -285,6 +285,15 @@ oppia.controller('CollectionPlayer', [
       $location.hash(id);
       $anchorScroll();
     };
+
+    $scope.closeOnClickingOutside = function() {
+      $scope.explorationCardIsShown = false;
+    };
+
+    $scope.onClickStopPropagation = function($evt) {
+      $evt.stopPropagation();
+    };
+
     // Touching anywhere outside the mobile preview should hide it.
     document.addEventListener('touchstart', function() {
       if ($scope.explorationCardIsShown === true) {
