@@ -52,10 +52,9 @@ oppia.controller('HistoryTab', [
     var explorationSnapshots = null;
     var versionTreeParents = null;
     var nodesData = null;
-    $scope.versionCheckboxArrayToDisplay = [];
+    $scope.versionNumbersToDisplay = [];
     $scope.currentPage = 1;
-    $scope.versionsPerPage = 2;
-    //$scope.pagerMaxSize = 1;
+    $scope.versionsPerPage = 30;
 
     $scope.$on('refreshVersionHistory', function(evt, data) {
       // Uncheck all checkboxes when page is refreshed
@@ -138,7 +137,6 @@ oppia.controller('HistoryTab', [
           // when history is refreshed.
           $scope.versionCheckboxArray = [];
           $scope.explorationVersionMetadata = {};
-          //var lowestVersionIndex = Math.max(0, currentVersion - 30);
           var lowestVersionIndex = 0;
           for (var i = currentVersion - 1; i >= lowestVersionIndex; i--) {
             var versionNumber = explorationSnapshots[i].version_number;
@@ -157,8 +155,6 @@ oppia.controller('HistoryTab', [
           }
           $rootScope.loadingMessage = '';
           $scope.computeVersionsToDisplay();
-          /*$scope.pagerMaxSize = Math.ceil(
-              $scope.versionCheckboxArray.length / $scope.versionsPerPage);*/
         });
       });
     };
@@ -269,11 +265,12 @@ oppia.controller('HistoryTab', [
 
     $scope.computeVersionsToDisplay = function() {
       var begin = (($scope.currentPage - 1) * $scope.versionsPerPage);
-      var end = begin + $scope.versionsPerPage;
-      $scope.versionCheckboxArrayToDisplay =
-        $scope.versionCheckboxArray.slice(begin, end);
+      var end = Math.min(begin + $scope.versionsPerPage, $scope.versionCheckboxArray.length);
+      $scope.versionNumbersToDisplay = [];
+      for (var i = begin; i < end; i++) {
+        $scope.versionNumbersToDisplay.push($scope.versionCheckboxArray[i].vnum);
+      }
     };
-
 
     $scope.pageChanged = function() {
       $scope.computeVersionsToDisplay();

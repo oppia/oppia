@@ -649,10 +649,12 @@ class ExplorationSnapshotsHandler(EditorHandler):
             raise self.PageNotFoundException
 
         # Patch `snapshots` to use the editor's display name.
+        snapshots_committer_ids = [
+            snapshot['committer_id'] for snapshot in snapshots]
+        committer_usernames = user_services.get_usernames(
+            snapshots_committer_ids)
         for snapshot in snapshots:
-            if snapshot['committer_id'] != feconf.SYSTEM_COMMITTER_ID:
-                snapshot['committer_id'] = user_services.get_username(
-                    snapshot['committer_id'])
+            snapshot['committer_id'] = committer_usernames.pop(0)
 
         self.render_json({
             'snapshots': snapshots,
