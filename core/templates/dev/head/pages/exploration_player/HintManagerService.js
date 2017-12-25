@@ -27,7 +27,7 @@ oppia.factory('HintManagerService', [
     var timeout = null;
     var hints = [];
     var _getCurrentHint = function() {
-      return hints[numHintsConsumed].hintText;
+      return hints[numHintsConsumed].hintContent;
     };
 
     return {
@@ -41,7 +41,7 @@ oppia.factory('HintManagerService', [
         timeout = $timeout(function() {
           currentHintIsAvailable = true;
         }, WAIT_FOR_HINT_MSEC);
-        return currentHint;
+        return currentHint.getHtml();
       },
       isCurrentHintAvailable: function() {
         return currentHintIsAvailable;

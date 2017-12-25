@@ -287,7 +287,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
     get_redirect_route(
-        r'/moderatorhandler/email_draft/<action>', moderator.EmailDraftHandler),
+        r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
@@ -481,6 +481,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
+    get_redirect_route(
+        r'/exploration_editor_logout', editor.EditorLogoutHandler),
 
     get_redirect_route(
         r'/ml/trainedclassifierhandler', classifier.TrainedClassifierHandler),

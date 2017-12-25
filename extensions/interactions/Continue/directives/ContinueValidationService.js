@@ -45,8 +45,7 @@ oppia.factory('ContinueValidationService', [
           });
         }
 
-        if (!defaultOutcome ||
-            $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
+        if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
           warningsList.push({
             type: WARNING_TYPES.ERROR,
             message: ('Please specify what Oppia should do after the button' +

@@ -25,7 +25,7 @@
       <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY" class="oppia-clickable-navbar-element">
         <a class="oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
       </li>
-      <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="dropdown oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
+      <li uib-dropdown ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="uib-dropdown oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
         <a class="oppia-navbar-tab"
            role="menuitem"
            aria-haspopup="true"
@@ -35,7 +35,7 @@
           <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_ABOUT"></span>
           <span class="caret"></span>
         </a>
-        <ul class="dropdown-menu oppia-navbar-dropdown"
+        <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown"
             ng-mouseover="onMouseoverDropdownMenu($event)"
             ng-mouseleave="onMouseoutDropdownMenu($event)"
             role="menu">
@@ -60,8 +60,8 @@
     </ul>
   </ul>
   <ul class="nav oppia-navbar-nav oppia-navbar-profile">
-    <li ng-if="username" class="dropdown protractor-test-profile-dropdown">
-      <a class="dropdown-toggle oppia-navbar-dropdown-toggle"
+    <li uib-dropdown ng-if="username" class="uib-dropdown protractor-test-profile-dropdown">
+      <a uib-dropdown-toggle class="uib-dropdown-toggle oppia-navbar-dropdown-toggle"
          ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
          ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)"
          role="menuitem"
@@ -92,13 +92,13 @@
              from appearing off-center because 'A' is slightly thinner than 'M' in
              this font.
             -->
-            <span ng-if="isAdmin" class="oppia-navbar-role-text" style="right: 4px;">A</span>
+            <span ng-if="isAdmin" class="oppia-navbar-role-text" style="right: 4px; font-size: 11px;">A</span>
             <span ng-if="isModerator && !isAdmin" class="oppia-navbar-role-text">M</span>
           </div>
         </div>
       </a>
 
-      <ul class="dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu"
+      <ul uib-dropdown-menu class="uib-dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu"
           ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
           ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)"
           ng-show="profileDropdownIsActive">
@@ -157,7 +157,7 @@
       </ul>
     </li>
 
-    <li ng-if="!username" class="dropdown oppia-navbar-clickable-dropdown">
+    <li uib-dropdown ng-if="!username" class="uib-dropdown oppia-navbar-clickable-dropdown">
       <div class="oppia-navbar-button-container" style="margin-right: 10px;">
         <button class="btn oppia-navbar-button"
                 ng-click="onLoginButtonClicked()">
@@ -165,7 +165,7 @@
           <span class="caret"></span>
         </button>
       </div>
-      <ul class="dropdown-menu oppia-navbar-dropdown" role="menu"
+      <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown" role="menu"
           style="margin-right: 15px; padding: 0;"
           ng-mouseover="onMouseoverDropdownMenu($event)"
           ng-mouseleave="onMouseoutDropdownMenu($event)">
@@ -227,10 +227,10 @@
     position: absolute;
     right: 4px;
   }
-  top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.dropdown-menu {
+  top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.uib-dropdown-menu {
     display: block;
   }
-  top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.dropdown-menu {
+  top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.uib-dropdown-menu {
     display: inline-block;
   }
   top-navigation-bar .oppia-navbar-role-text {

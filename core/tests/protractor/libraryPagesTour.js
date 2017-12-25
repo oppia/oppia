@@ -45,7 +45,16 @@ describe('Library pages tour', function() {
 
   var visitRecentlyPublishedPage = function() {
     browser.get('library/recently_published');
-  }
+  };
+
+  it('visits the search page', function() {
+    visitLibraryPage();
+    element(by.css('.protractor-test-search-input')).sendKeys(SEARCH_TERM);
+    // It takes a while for the URL to change.
+    general.waitForSystem();
+    general.waitForSystem();
+    expect(browser.getCurrentUrl()).toContain('search/find?q=python');
+  });
 
   it('visits the library index page', function() {
     visitLibraryPage();
@@ -75,17 +84,6 @@ describe('Library pages tour', function() {
   it('visits the recent explorations page', function() {
     visitRecentlyPublishedPage();
     expect(browser.getCurrentUrl()).toContain('library/recently_published');
-  });
-
-  it('visits the search page', function() {
-    visitLibraryPage();
-    element(by.css('.protractor-test-search-input')).sendKeys(SEARCH_TERM);
-    browser.driver.wait(function() {
-      return browser.getCurrentUrl().then(function(url) {
-        return /search/.test(url);
-      });
-    });
-    expect(browser.getCurrentUrl()).toContain('search/find?q=python');
   });
 
   afterEach(function() {

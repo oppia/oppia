@@ -75,9 +75,9 @@ class EmailDraftHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_send_moderator_emails
-    def get(self, action):
+    def get(self):
         """Handles GET requests."""
         self.render_json({
             'draft_email_body': (
-                email_manager.get_draft_moderator_action_email(action)),
+                email_manager.get_moderator_unpublish_exploration_email()),
         })

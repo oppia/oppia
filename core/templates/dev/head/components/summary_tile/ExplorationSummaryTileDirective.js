@@ -79,11 +79,11 @@ oppia.directive('explorationSummaryTile', [
       },
       controller: [
         '$scope', '$http',
-        'oppiaDatetimeFormatter', 'RatingComputationService',
+        'DateTimeFormatService', 'RatingComputationService',
         'WindowDimensionsService',
         function(
           $scope, $http,
-          oppiaDatetimeFormatter, RatingComputationService,
+          DateTimeFormatService, RatingComputationService,
           WindowDimensionsService) {
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.ACTIVITY_TYPE_EXPLORATION = (
@@ -120,7 +120,7 @@ oppia.directive('explorationSummaryTile', [
             if (!$scope.getLastUpdatedMsec()) {
               return null;
             }
-            return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               $scope.getLastUpdatedMsec());
           };
 
