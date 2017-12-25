@@ -1083,12 +1083,12 @@ oppia.constant('STATE_ERROR_MESSAGES', {
 // response received as a result of the autosaving request.
 oppia.factory('autosaveInfoModalsService', [
   '$log', '$modal', '$timeout', '$window',
-  'ExplorationDataService', 'LocalStorageService', 'ChangesInHumanReadableFormService',
-  'UrlInterpolationService',
+  'ExplorationDataService', 'LocalStorageService', 
+  'ChangesInHumanReadableFormService', 'UrlInterpolationService',
   function(
       $log, $modal, $timeout, $window,
-      ExplorationDataService, LocalStorageService, ChangesInHumanReadableFormService,
-      UrlInterpolationService) {
+      ExplorationDataService, LocalStorageService, 
+      ChangesInHumanReadableFormService, UrlInterpolationService) {
     var _isModalOpen = false;
     var _refreshPage = function(delay) {
       $timeout(function() {
@@ -1173,7 +1173,8 @@ oppia.factory('autosaveInfoModalsService', [
             };
 
             $scope.lostChangesHtml = (
-              ChangesInHumanReadableFormService.makeHumanReadable(lostChanges).html());
+              ChangesInHumanReadableFormService.makeHumanReadable(lostChanges).
+              html());
             $log.error('Lost changes: ' + JSON.stringify(lostChanges));
           }],
           windowClass: 'oppia-lost-changes-modal'

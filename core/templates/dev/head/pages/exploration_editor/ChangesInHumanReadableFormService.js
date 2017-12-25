@@ -19,10 +19,10 @@
 oppia.factory('ChangesInHumanReadableFormService', [
   'UtilsService', 
   function(UtilsService) {
-  var CMD_ADD_STATE = 'add_state';
-  var CMD_RENAME_STATE = 'rename_state';
-  var CMD_DELETE_STATE = 'delete_state';
-  var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
+   var CMD_ADD_STATE = 'add_state';
+   var CMD_RENAME_STATE = 'rename_state';
+   var CMD_DELETE_STATE = 'delete_state';
+   var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
 
   var makeRulesListHumanReadable = function(answerGroupValue) {
     var rulesList = [];
@@ -43,7 +43,7 @@ oppia.factory('ChangesInHumanReadableFormService', [
 
   // An edit is represented either as an object or an array. If it's an object,
   // then simply return that object. In case of an array, return the last item.
-  var getStatePropertyValue = function(statePropertyValue) {
+   var getStatePropertyValue = function(statePropertyValue) {
     return angular.isArray(statePropertyValue) ?
       statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
   };
@@ -51,7 +51,7 @@ oppia.factory('ChangesInHumanReadableFormService', [
   // Detects whether an object of the type 'answer_group' or 'default_outcome'
   // has been added, edited or deleted. Returns - 'addded', 'edited' or
   // 'deleted' accordingly.
-  var getRelativeChangeToGroups = function(changeObject) {
+   var getRelativeChangeToGroups = function(changeObject) {
     var newValue = changeObject.new_value;
     var oldValue = changeObject.old_value;
     var result = '';
@@ -74,7 +74,7 @@ oppia.factory('ChangesInHumanReadableFormService', [
     return result;
   };
 
-  var makeHumanReadable = function(lostChanges) {
+   var makeHumanReadable = function(lostChanges) {
     var outerHtml = angular.element('<ul></ul>');
     var stateWiseEditsMapping = {};
     // The variable stateWiseEditsMapping stores the edits grouped by state.
@@ -275,8 +275,8 @@ oppia.factory('ChangesInHumanReadableFormService', [
     return outerHtml;
   };
 
-  return {
+   return {
     
     makeHumanReadable: makeHumanReadable
   };
-}]);
+    }]);
