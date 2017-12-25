@@ -43,11 +43,17 @@ var PreferencesPage = function() {
   this.isEditorRoleEmailsCheckboxSelected = function() {
     return editorRoleEmailsCheckBox.isSelected();
   };
-
+  
+  // This function only compares the text displayed on the subscription (which
+  // might be abbreviated), rather than the text on the popover that appears
+  // when hovering over the tile.
   this.expectDisplayedFirstSubscriptionToBe = function(name) {
     expect(subscriptions.first().getText()).toMatch(name);
   };
 
+  // This function only compares the text displayed on the subscription (which
+  // might be abbreviated), rather than the text on the popover that appears
+  // when hovering over the tile.
   this.expectDisplayedLastSubscriptionToBe = function(name) {
     expect(subscriptions.last().getText()).toMatch(name);
   };
