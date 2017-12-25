@@ -141,7 +141,7 @@ oppia.controller('StateSolution', [
       });
     };
 
-    $scope.deleteSolution = function(evt) {
+    $scope.deleteSolution = function(index, evt) {
       evt.stopPropagation();
 
       AlertsService.clearWarnings();
