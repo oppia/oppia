@@ -16,9 +16,10 @@
  * @fileoverview Directive for the correct editor.
  */
 
-// This directive controls an editor for selecting whether the answers which fall under this
-// answer group are correct or not. It also includes 'Cancel' and 'Save' buttons which call
-// respective 'onCancelCorrectEdit' and 'onSaveRule' callbacks when called.
+// This directive controls an editor for selecting whether the answers
+// which fall under this answer group are correct or not. It also includes
+// 'Cancel' and 'Save' buttons which call respective 'onCancelCorrectEdit'
+// and 'onSaveRule' callbacks when called.
 oppia.directive('correctEditor', [
   '$log', 'UrlInterpolationService', function($log, UrlInterpolationService) {
     return {
