@@ -27,7 +27,7 @@
 </div>
 
 <div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
-  <progress-dots num-dots="numProgressDots" class="conversation-skin-progress-dots">
+  <progress-dots ng-if="!isViewportNarrow()" num-dots="numProgressDots" class="conversation-skin-progress-dots">
   </progress-dots>
 
   <div class="conversation-skin-cards-container conversation-skin-animate-cards"
@@ -47,6 +47,7 @@
                            on-submit-answer="submitAnswer(answer, rulesService)">
         </supplemental-card>
       </div>
+      <progress-nav ng-if="isViewportNarrow()"></progress-nav>
     </div>
 
     <div ng-if="isCurrentSupplementalCardNonempty() && !isViewportNarrow()"

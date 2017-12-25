@@ -255,7 +255,8 @@ oppia.directive('conversationSkin', [
         'siteAnalyticsService', 'ExplorationPlayerStateService',
         'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'AlertsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
-        'FatigueDetectionService', 'NumberAttemptsService',
+        'EVENT_NEW_CARD_AVAILABLE', 'FatigueDetectionService',
+        'NumberAttemptsService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             MessengerService, ExplorationPlayerService, UrlService,
@@ -266,7 +267,8 @@ oppia.directive('conversationSkin', [
             siteAnalyticsService, ExplorationPlayerStateService,
             TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, AlertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-            FatigueDetectionService, NumberAttemptsService) {
+            EVENT_NEW_CARD_AVAILABLE, FatigueDetectionService,
+            NumberAttemptsService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -358,7 +360,6 @@ oppia.directive('conversationSkin', [
           // 'show previous responses' setting.
           var _navigateToActiveCard = function() {
             $scope.$broadcast(EVENT_ACTIVE_CARD_CHANGED);
-
             var index = PlayerPositionService.getActiveCardIndex();
             $scope.activeCard = PlayerTranscriptService.getCard(index);
             tutorCardIsDisplayedIfNarrow = true;
@@ -561,7 +562,6 @@ oppia.directive('conversationSkin', [
                     // the feedback, and display a 'Continue' button.
                     FatigueDetectionService.reset();
                     NumberAttemptsService.reset();
-
                     _nextFocusLabel = FocusManagerService.generateFocusLabel();
 
                     PlayerTranscriptService.setDestination(newStateName);
@@ -595,7 +595,7 @@ oppia.directive('conversationSkin', [
                           hasContinueButton: true
                         });
                       }
-
+                      $scope.$broadcast(EVENT_NEW_CARD_AVAILABLE);
                       _nextFocusLabel = $scope.CONTINUE_BUTTON_FOCUS_LABEL;
                       FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
                       scrollToBottom();
@@ -608,7 +608,6 @@ oppia.directive('conversationSkin', [
                         ExplorationPlayerService.getRandomSuffix());
                     }
                   }
-
                   _answerIsBeingProcessed = false;
                 }, millisecsLeftToWait);
               }

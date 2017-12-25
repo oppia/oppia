@@ -230,7 +230,8 @@
                      class="oppia-learner-dashboard-no-activity-card"
                      ng-if="incompleteExplorationsList.length === 0">
               <div>
-                <p translate="I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_EXPLORATIONS"></p>
+                <p ng-if="noExplorationActivity" translate="I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION"></p>
+                <p ng-if="!noExplorationActivity" translate="I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_EXPLORATIONS"></p>
 
                 <a class="btn oppia-dashboard-intro-button oppia-transition-200"
                    translate="I18N_ACTION_BROWSE_LESSONS"
@@ -390,7 +391,8 @@
                      class="oppia-learner-dashboard-no-activity-card"
                      ng-if="incompleteCollectionsList.length === 0">
               <div>
-                <p translate="I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_COLLECTIONS"></p>
+                <p ng-if="noCollectionActivity" translate="I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_COLLECTION"></p>
+                <p ng-if="!noCollectionActivity" translate="I18N_LEARNER_DASHBOARD_EMPTY_INCOMPLETE_COLLECTIONS"></p>
 
                 <a class="btn oppia-dashboard-intro-button oppia-transition-200"
                    translate="I18N_ACTION_BROWSE_LESSONS"

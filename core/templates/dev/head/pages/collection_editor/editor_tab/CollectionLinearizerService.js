@@ -202,6 +202,7 @@ oppia.factory('CollectionLinearizerService', [
           var lastNode = linearNodeList[linearNodeList.length - 1];
           addAfter(collection, lastNode.getExplorationId(), explorationId);
         }
+        console.error(collection)
       },
 
       /**
