@@ -43,7 +43,7 @@ oppia.directive('correctEditor', [
             // The reason for this guard is because, when the editor page for an
             // exploration is first opened, the 'initializeAnswerGroups' event
             // (which fires an 'externalSave' event) only fires after the
-            // $scope.savedCorrect is set above. Until then, $scope.savedOutcome
+            // $scope.savedCorrect is set above. Until then, $scope.savedCorrect
             // is undefined.
             if ($scope.savedCorrect === undefined) {
               $scope.savedCorrect = angular.copy($scope.labelledAsCorrect);

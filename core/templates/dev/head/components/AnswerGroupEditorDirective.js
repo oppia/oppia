@@ -47,6 +47,7 @@ oppia.directive('answerGroupEditor', [
           $scope.rulesMemento = null;
           $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           $scope.editAnswerGroupForm = {};
+          
           $scope.getAnswerChoices = function() {
             return ResponsesService.getAnswerChoices();
           };
