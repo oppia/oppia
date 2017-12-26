@@ -107,9 +107,9 @@ oppia.factory('ResponsesService', [
       if (updates.dest) {
         answerGroup.outcome.dest = updates.dest;
       }
-      if (updates.labelledAsCorrect == true) {
+      if (updates.hasOwnProperty('labelledAsCorrect')) {
         answerGroup.labelledAsCorrect = updates.labelledAsCorrect;
-      }   
+      }
       else {  
         answerGroup.labelledAsCorrect = false;
       }

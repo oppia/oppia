@@ -93,10 +93,10 @@
                   suppress-warnings="suppressWarnings()">
   </outcome-editor>
 
-  <br ng-if="!defaultAnswerGroup">
+  <br ng-if="answerGroupIsDefault">
   
-  <div ng-if="!defaultAnswerGroup">
-        <correct-editor is-editable="isEditable" on-save-correct="getOnSaveAnswerGroupCorrectFn()" labelled-as-correct="labelledAsCorrect">
-        </correct-editor>
+  <div ng-if="answerGroupIsDefault">
+    <correctness-label-editor is-editable="isEditable" on-save-correctness-label="getOnSaveAnswerGroupCorrectnessLabelFn()" labelled-as-correct="labelledAsCorrect">
+    </correctness-label-editor>
   </div>
 </div>

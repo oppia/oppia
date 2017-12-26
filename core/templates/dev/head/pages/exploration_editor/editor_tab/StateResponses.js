@@ -479,9 +479,9 @@ oppia.controller('StateResponses', [
       });
     };
 
-    $scope.saveActiveAnswerGroupCorrect = function(updatedCorrect) {
+    $scope.saveActiveAnswerGroupCorrect = function(updatedCorrectnessLabel) {
       ResponsesService.updateActiveAnswerGroup({
-        labelledAsCorrect : updatedCorrect
+        labelledAsCorrect: updatedCorrectnessLabel
       });
     }
 

@@ -42,11 +42,10 @@
                                        on-save-answer-group-feedback="saveActiveAnswerGroupFeedback"
                                        on-save-answer-group-dest="saveActiveAnswerGroupDest"
                                        on-save-answer-group-rules="saveActiveAnswerGroupRules"
-                                       on-save-answer-group-correct="saveActiveAnswerGroupCorrect"
+                                       on-save-answer-group-correctness-label="saveActiveAnswerGroupCorrect"
                                        is-editable="editabilityService.isEditable()"
                                        display-feedback="!isLinearWithNoFeedback(answerGroup.outcome)"
                                        labelled-as-correct="answerGroup.labelledAsCorrect"
-                                       default-answer-group=false
                                        class="protractor-test-response-body">
                   </answer-group-editor>
                 </div>
@@ -85,7 +84,6 @@
                                        is-editable="editabilityService.isEditable()"
                                        suppress-warnings="suppressDefaultAnswerGroupWarnings()"
                                        display-feedback="!isLinearWithNoFeedback(defaultOutcome)"
-                                       default-answer-group=true
                                        class="protractor-test-response-body">
                   </answer-group-editor>
                 </div>

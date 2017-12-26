@@ -13,47 +13,46 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the correct editor.
+ * @fileoverview Directive for the correctness label editor for answer groups.
  */
 
 // This directive controls an editor for selecting whether the answers
 // which fall under this answer group are correct or not. It also includes
-// 'Cancel' and 'Save' buttons which call respective 'onCancelCorrectEdit'
-// and 'onSaveCorrect' callbacks when called.
-oppia.directive('correctEditor', [
+// 'Cancel' and 'Save' buttons. The 'Save' button calls 'onSaveCallback'  
+// when clicked.
+oppia.directive('correctnessLabelEditor', [
   '$log', 'UrlInterpolationService', function($log, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
         isEditable: '&isEditable',
-        onSaveCorrect: '&',
+        onSaveCorrectnessLabel: '&',
         labelledAsCorrect: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/' +
-        'correct_editor_directive.html'),
+        '/components/' + 'correct_editor_directive.html'),
       controller: [
-        '$scope', 'ResponsesService', 'stateInteractionIdService', function(
-            $scope, ResponsesService, stateInteractionIdService) {
-          $scope.savedCorrect = angular.copy($scope.labelledAsCorrect);
-          $scope.correctEditorIsOpen = false;
-          $scope.currentInteractionId = stateInteractionIdService.savedMemento;
-          
+        '$scope', 'ResponsesService', function(
+            $scope, ResponsesService) {
+          $scope.savedCorrectnessLabel = angular.copy($scope.labelledAsCorrect);
+          $scope.correctnessLabelEditorIsOpen = false;
+          $scope.editCorrectnessLabelForm = {};
+
           var onExternalSave = function() {
             // The reason for this guard is because, when the editor page for an
             // exploration is first opened, the 'initializeAnswerGroups' event
             // (which fires an 'externalSave' event) only fires after the
-            // $scope.savedCorrect is set above. Until then, $scope.savedCorrect
-            // is undefined.
-            if ($scope.savedCorrect === undefined) {
-              $scope.savedCorrect = angular.copy($scope.labelledAsCorrect);
+            // $scope.savedCorrectnessLabel is set above. Until then, 
+            // $scope.savedCorrectnessLabel is undefined.
+            if ($scope.savedCorrectnessLabel === undefined) {
+              $scope.savedCorrectnessLabel = angular.copy($scope.labelledAsCorrect);
             }
 
-            if ($scope.correctEditorIsOpen) {
-              if ($scope.editCorrectForm.$valid) {
-                $scope.saveThisCorrect($scope.labelledAsCorrect);
+            if ($scope.correctnessLabelEditorIsOpen) {
+              if ($scope.editCorrectnessLabelForm.form.$valid) {
+                $scope.saveCorrectnessLabel($scope.labelledAsCorrect);
               } else {
-                $scope.cancelThisCorrect();
+                $scope.cancelEdit();
               }
             }
           };
@@ -66,23 +65,22 @@ oppia.directive('correctEditor', [
             onExternalSave();
           });
           
-          $scope.openCorrectEditor = function() {
+          $scope.openCorrectnessLabelEditor = function() {
             if ($scope.isEditable()) {
-              $scope.correctEditorIsOpen = true;
+              $scope.correctnessLabelEditorIsOpen = true;
             }
           };
-          $scope.cancelThisCorrect = function() {
+          $scope.cancelEdit = function() {
             $scope.labelledAsCorrect = angular.copy(
-              $scope.savedCorrect);
-            $scope.correctEditorIsOpen = false;
-            $scope.onCancelCorrectEdit();
+              $scope.savedCorrectnessLabel);
+            $scope.correctnessLabelEditorIsOpen = false;
           };
 
-          $scope.saveThisCorrect = function(tempCorrect) {
-            $scope.correctEditorIsOpen = false;
-            $scope.savedCorrect = angular.copy(
+          $scope.saveCorrectnessLabel = function(tempCorrect) {
+            $scope.correctnessLabelEditorIsOpen = false;
+            $scope.savedCorrectnessLabel = angular.copy(
               tempCorrect);
-            $scope.onSaveCorrect()($scope.savedCorrect);
+            $scope.onSaveCorrectnessLabel()($scope.savedCorrectnessLabel);
           };
 
           $scope.init = function() {
