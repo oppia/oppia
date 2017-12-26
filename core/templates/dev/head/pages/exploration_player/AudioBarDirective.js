@@ -58,6 +58,14 @@ oppia.directive('audioBar', [
             }
           });
 
+          $scope.getProgressBarMode = function() {
+            if ($scope.audioLoadingIndicatorIsShown) {
+              return 'indeterminate';
+            } else {
+              return 'determinate';
+            }
+          };
+
           $scope.languageSelected = function() {
             AudioTranslationManagerService.setCurrentAudioLanguageCode(
               $scope.selectedLanguage.value);
