@@ -26,7 +26,8 @@ oppia.directive('answerGroupEditor', [
         getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
-        getOnSaveAnswerGroupCorrectnessLabelFn: '&onSaveAnswerGroupCorrectnessLabel',
+        getOnSaveAnswerGroupCorrectnessLabelFn: 
+          '&onSaveAnswerGroupCorrectnessLabel',
         outcome: '=',
         suppressWarnings: '&',
         labelledAsCorrect: '=',

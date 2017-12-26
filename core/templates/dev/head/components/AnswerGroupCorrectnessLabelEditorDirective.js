@@ -41,7 +41,8 @@ oppia.directive('correctnessLabelEditor', [
             // $scope.savedCorrectnessLabel is set above. Until then, 
             // $scope.savedCorrectnessLabel is undefined.
             if ($scope.savedCorrectnessLabel === undefined) {
-              $scope.savedCorrectnessLabel = angular.copy($scope.labelledAsCorrect);
+              $scope.savedCorrectnessLabel = angular.copy(
+                $scope.labelledAsCorrect);
             }
 
             if ($scope.correctnessLabelEditorIsOpen) {
@@ -80,7 +81,8 @@ oppia.directive('correctnessLabelEditor', [
           };
 
           $scope.init = function() {
-            $scope.savedCorrectnessLabel = angular.copy($scope.labelledAsCorrect);
+            $scope.savedCorrectnessLabel = angular.copy(
+              $scope.labelledAsCorrect);
             $scope.correctnessLabelEditorIsOpen = false;
             $scope.editCorrectnessLabelForm = {};
             
