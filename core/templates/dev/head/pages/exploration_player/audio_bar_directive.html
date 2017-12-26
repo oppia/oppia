@@ -15,7 +15,7 @@
       </div>
       <select class="audio-language-select" 
               ng-model="selectedLanguage.value"
-              ng-options="o.value as o.displayed for o in AudioTranslationManagerService.getLanguageOptionsForDropdown()"
+              ng-options="o.value as o.displayed for o in languagesInExploration"
               ng-change="languageSelected()"></select>
     </div>
   </div>
