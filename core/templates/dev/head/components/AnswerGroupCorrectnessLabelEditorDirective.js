@@ -34,10 +34,6 @@ oppia.directive('correctnessLabelEditor', [
       controller: [
         '$scope', 'ResponsesService', function(
             $scope, ResponsesService) {
-          $scope.savedCorrectnessLabel = angular.copy($scope.labelledAsCorrect);
-          $scope.correctnessLabelEditorIsOpen = false;
-          $scope.editCorrectnessLabelForm = {};
-
           var onExternalSave = function() {
             // The reason for this guard is because, when the editor page for an
             // exploration is first opened, the 'initializeAnswerGroups' event
@@ -84,6 +80,10 @@ oppia.directive('correctnessLabelEditor', [
           };
 
           $scope.init = function() {
+            $scope.savedCorrectnessLabel = angular.copy($scope.labelledAsCorrect);
+            $scope.correctnessLabelEditorIsOpen = false;
+            $scope.editCorrectnessLabelForm = {};
+            
             // Select a default correct value, if one isn't already there.
             if ($scope.labelledAsCorrect === null) {
               $scope.labelledAsCorrect = false;
