@@ -19,9 +19,10 @@
 
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
-  var editorRoleEmailsCheckBox = element(by.model('canReceiveEditorRoleEmail'));
+  var editorRoleEmailsCheckBox = element(
+    by.css('.protractor-test-canReceiveEditorRoleEmail'));
   var feedbackMessageEmailsCheckBox = element(
-    by.model('canReceiveFeedbackMessageEmail'));
+    by.css('.protractor-test-canReceiveFeedbackMessageEmail'));
   var subscriptions = element.all(by.css('.protractor-test-subscription-name'));
 
   this.get = function() {
