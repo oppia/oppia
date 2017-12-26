@@ -1,27 +1,26 @@
-<div class="audio-header" style="position: fixed; z-index: 100; width: 100%; transition: margin-top 0.2s ease-in-out; left: 0; top: 184px;">
-  <div ng-if="isAudioBarExpanded" class="audio-controls" style="display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center; align-items: center; background-color: #0D48A1; height: 44px; padding: 0 4px;">
+<div class="audio-header" style="">
+  <div ng-if="isAudioBarExpanded" class="audio-controls" style="">
     <div style="width: 560px;">
       <i class="fa audio-controls-button-icon"
-         style="min-width: 6%; text-align: right; color: white; "
          ng-click="onSpeakerIconClicked()"
-         ng-class="{'fa-play': !isAudioPlaying(), 'fa-pause': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
+         ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play': !isAudioPlaying(), 'fa-pause': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
          uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
          tooltip-append-to-body="true" tooltip-placement="right"></i>
-      <div ng-if="hasPressedPlayButtonOnce" style="width:50%; margin: 0 auto; display: inline-block; padding: 0 4px; transform: translateY(10px);">
+      <div class="progress-bar-section" ng-if="hasPressedPlayButtonOnce" style="">
         <md-progress-linear md-mode="<[getProgressBarMode()]>" value="<[AudioPlayerService.getProgress() * 100]>"></md-progress-linear>
         <span ng-if="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_LOADING_AUDIO"></span>
         <span ng-if="isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT"></span>
         <!--Filler space for message-->
         <span class="audio-controls-message">&zwnj;</span>
       </div>
-      <select ng-model="selectedLanguage.value"
-        ng-options="o.value as o.displayed for o in AudioTranslationManagerService.getLanguageOptionsForDropdown()"
-        ng-change="languageSelected()"
-        style="border-radius: 50px; width: 36%; align-self: center;"></select>
+      <select class="audio-language-select" 
+              ng-model="selectedLanguage.value"
+              ng-options="o.value as o.displayed for o in AudioTranslationManagerService.getLanguageOptionsForDropdown()"
+              ng-change="languageSelected()"></select>
     </div>
   </div>
-  <img ng-if="isAudioBarExpanded" ng-src="<[IMAGE_URL_COLLAPSE_AUDIO_BUTTON]>" ng-click="collapseAudioBar()" style="margin: 0 auto; display: block;">
-  <img ng-if="!isAudioBarExpanded" ng-src="<[IMAGE_URL_EXPAND_AUDIO_BUTTON]>" ng-click="expandAudioBar()" style="margin: 0 auto; display: block;">
+  <img class="audio-toggle-button" ng-if="isAudioBarExpanded" ng-src="<[IMAGE_URL_COLLAPSE_AUDIO_BUTTON]>" ng-click="collapseAudioBar()">
+  <img class="audio-toggle-button" ng-if="!isAudioBarExpanded" ng-src="<[IMAGE_URL_EXPAND_AUDIO_BUTTON]>" ng-click="expandAudioBar()">
 </div>
 
 <style>
@@ -30,8 +29,16 @@
     background-color: #009688;
   }
 
+  .audio-toggle-button {
+    display: block;
+    margin: 0 auto;
+  }
+
   .audio-controls-button-icon {
+    color: white;
     font-size: 1.5em;
+    min-width: 6%;
+    text-align: right;
     vertical-align: middle;
   }
 
@@ -49,7 +56,14 @@
   }
 
   .audio-controls {
-    text-align: left;
+    align-items: center;
+    background-color: #0D48A1;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    height: 44px;
+    justify-content: center;
+    padding: 0 4px;
     width: 100%;
   }
 
@@ -59,12 +73,27 @@
     color: white;    
   }
 
-  .audio-settings-button {
-    
+  .audio-header {
+    left: 0;
+    margin-top: -128px;
+    position: fixed;
+    top: 184px;
+    transition: margin-top 0.2s ease-in-out;
+    width: 100%;
+    z-index: 100;
   }
 
-  .audio-header {
-    margin-top: -128px;
+  .audio-language-select {
+    border-radius: 50px;
+    width: 36%;
+  }
+
+  .progress-bar-section {
+    display: inline-block;
+    margin: 0 auto;
+    padding: 0 4px;
+    transform: translateY(10px);
+    width: 50%;
   }
 
   .nav-up {
