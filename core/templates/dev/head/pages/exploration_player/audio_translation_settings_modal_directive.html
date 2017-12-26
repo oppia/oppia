@@ -6,8 +6,9 @@
 <div class="modal-body">
   <p translate="I18N_PLAYER_AUDIO_LANGUAGE">
   </p>
-  <select ng-model="selectedLanguage"
-          ng-options="o.value as o.displayed for o in languagesInExploration">
+  <select ng-model="selectedLanguage.value"
+          ng-options="o.value as o.displayed for o in languagesInExploration"
+          ng-change="languageSelected()">
   </select>
 </div>
 

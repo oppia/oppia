@@ -27,6 +27,7 @@ oppia.factory('AudioPlayerService', [
     var _currentAudioControlsDirectiveId = null;
     var _currentTrackFilename = null;
     var _currentTrack = null;
+    var _isActivated = false;
 
     var _load = function(
         filename, directiveId, successCallback, errorCallback) {
@@ -126,6 +127,15 @@ oppia.factory('AudioPlayerService', [
       },
       getCurrentAudioControlsDirectiveId: function() {
         return _currentAudioControlsDirectiveId;
+      },
+      isActivated: function() {
+        return _isActivated;
+      },
+      activate: function() {
+        _isActivated = true;
+      },
+      deactivate: function() {
+        _isActivated = false;
       }
     };
   }
