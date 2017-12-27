@@ -479,11 +479,12 @@ oppia.controller('StateResponses', [
       });
     };
 
-    $scope.saveActiveAnswerGroupCorrect = function(updatedCorrectnessLabel) {
+    $scope.saveActiveAnswerGroupCorrectnessLabel = function(
+      updatedCorrectnessLabel) {
       ResponsesService.updateActiveAnswerGroup({
         labelledAsCorrect: updatedCorrectnessLabel
       });
-    }
+    };
 
     $scope.saveDefaultOutcomeFeedback = function(updatedOutcome) {
       ResponsesService.updateDefaultOutcome({
