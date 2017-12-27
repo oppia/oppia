@@ -29,6 +29,8 @@ describe('State Editor controller', function() {
 
       ess.init({
         'First State': {
+          auxiliary_exploration_id: null,
+          classifier_model_id: null,
           content: {
             html: 'First State Content',
             audio_translations: {}
@@ -54,6 +56,8 @@ describe('State Editor controller', function() {
           param_changes: []
         },
         'Second State': {
+          auxiliary_exploration_id: null,
+          classifier_model_id: null,
           content: {
             html: 'Second State Content',
             audio_translations: {}
@@ -79,6 +83,8 @@ describe('State Editor controller', function() {
           param_changes: []
         },
         'Third State': {
+          auxiliary_exploration_id: null,
+          classifier_model_id: null,
           content: {
             html: 'This is some content.',
             audio_translations: {}
