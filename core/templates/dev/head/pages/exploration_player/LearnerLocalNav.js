@@ -28,6 +28,8 @@ oppia.controller('LearnerLocalNav', [
     FocusManagerService, UrlInterpolationService,
     FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = ExplorationPlayerService.getExplorationId();
+    $scope.canEdit = GLOBALS.canEdit;
+    $scope.username = GLOBALS.username;
     $scope.showLearnerSuggestionModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -92,7 +94,6 @@ oppia.controller('LearnerLocalNav', [
         });
       });
     };
-
     $scope.showFlagExplorationModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
