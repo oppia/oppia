@@ -293,6 +293,10 @@ def get_questions_batch(
 
     question_skill_ids = list(set(user_skill_ids) & set(skill_ids))
     collection = collection_services.get_collection_by_id(collection_id)
+    if collection is None:
+        raise Exception(
+            'Collection with collection_id: %s does not exits.' % (
+                collection_id))
     question_ids = []
 
     for skill_id in question_skill_ids:

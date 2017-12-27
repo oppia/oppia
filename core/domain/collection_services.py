@@ -1230,7 +1230,9 @@ def get_acquired_skill_ids_of_user(user_id, collection_id):
     completed_exploration_ids = get_completed_exploration_ids(
         user_id, collection_id)
     collection = get_collection_by_id(collection_id)
-    acquired_skills = (
-        collection.get_acquired_skill_ids_from_exploration_ids(
-            completed_exploration_ids))
-    return acquired_skills
+    acquired_skills_ids = set()
+    if collection is not None:
+        acquired_skills_ids = (
+            collection.get_acquired_skill_ids_from_exploration_ids(
+                completed_exploration_ids))
+    return acquired_skills_ids

@@ -99,3 +99,9 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
             '%s/batch'%feconf.QUESTION_DATA_URL, self.payload,
             expect_errors=False)
         self.assertEqual(len(response_json['questions_dict']), 0)
+
+        response = self.testapp.get(
+            '%s/batch'%feconf.QUESTION_DATA_URL,
+            expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
