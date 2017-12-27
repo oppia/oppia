@@ -27,16 +27,16 @@ oppia.factory('ChangesInHumanReadableFormService', [
     var makeRulesListHumanReadable = function(answerGroupValue) {
       var rulesList = [];
       answerGroupValue.rules.forEach(function(rule) {
-       var ruleElm = angular.element('<li></li>');
-       ruleElm.html('<p>Type: ' + rule.type + '</p>');
-       ruleElm.append(
+        var ruleElm = angular.element('<li></li>');
+        ruleElm.html('<p>Type: ' + rule.type + '</p>');
+        ruleElm.append(
         '<p>Value: ' + (
           Object.keys(rule.inputs).map(function(input) {
             return rule.inputs[input];
           })
         ).toString() + '</p>');
-       rulesList.push(ruleElm);
-     });
+        rulesList.push(ruleElm);
+      });
 
       return rulesList;
     };
@@ -62,14 +62,14 @@ oppia.factory('ChangesInHumanReadableFormService', [
         'edited' : 'deleted';
       } else {
         if (!UtilsService.isEmpty(oldValue)) {
-         if (!UtilsService.isEmpty(newValue)) {
-          result = 'edited';
-        } else {
-          result = 'deleted';
-        }
-       } else if (!UtilsService.isEmpty(newValue)) {
-        result = 'added';
-      }
+          if (!UtilsService.isEmpty(newValue)) {
+           result = 'edited';
+         } else {
+           result = 'deleted';
+         }
+        } else if (!UtilsService.isEmpty(newValue)) {
+           result = 'added';
+       }
       }
       return result;
     };
@@ -92,33 +92,33 @@ oppia.factory('ChangesInHumanReadableFormService', [
 
       lostChanges.forEach(function(lostChange) {
         switch (lostChange.cmd) {
-         case CMD_ADD_STATE:
-           outerHtml.append(
+          case CMD_ADD_STATE:
+            outerHtml.append(
             angular.element('<li></li>').html(
               'Added state: ' + lostChange.state_name));
-           break;
-         case CMD_RENAME_STATE:
-           outerHtml.append(
+            break;
+          case CMD_RENAME_STATE:
+            outerHtml.append(
             angular.element('<li></li>').html(
               'Renamed state: ' + lostChange.old_state_name + ' to ' +
                 lostChange.new_state_name));
-           break;
-         case CMD_DELETE_STATE:
-           outerHtml.append(
+            break;
+          case CMD_DELETE_STATE:
+            outerHtml.append(
             angular.element('<li></li>').html(
               'Deleted state: ' + lostChange.state_name));
-           break;
-         case CMD_EDIT_STATE_PROPERTY:
-           var newValue = getStatePropertyValue(lostChange.new_value);
-           var oldValue = getStatePropertyValue(lostChange.old_value);
-           var stateName = lostChange.state_name;
-           if (!stateWiseEditsMapping[stateName]) {
-            stateWiseEditsMapping[stateName] = [];
-          }
+            break;
+          case CMD_EDIT_STATE_PROPERTY:
+            var newValue = getStatePropertyValue(lostChange.new_value);
+            var oldValue = getStatePropertyValue(lostChange.old_value);
+            var stateName = lostChange.state_name;
+            if (!stateWiseEditsMapping[stateName]) {
+             stateWiseEditsMapping[stateName] = [];
+           }
 
-           switch (lostChange.property_name) {
-            case 'content':
-              if (newValue !== null) {
+            switch (lostChange.property_name) {
+             case 'content':
+               if (newValue !== null) {
                 // TODO(sll): Also add display of audio translations here.
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div></div>').html(
@@ -126,11 +126,11 @@ oppia.factory('ChangesInHumanReadableFormService', [
                       newValue.html + '</div>')
                     .addClass('state-edit-desc'));
               }
-              break;
+               break;
 
-            case 'widget_id':
-              var lostChangeValue = '';
-              if (oldValue === null) {
+             case 'widget_id':
+               var lostChangeValue = '';
+               if (oldValue === null) {
                 if (newValue !== 'EndExploration') {
                   lostChangeValue = ('<strong>Added Interaction: </strong>' +
                                      newValue);
@@ -141,29 +141,29 @@ oppia.factory('ChangesInHumanReadableFormService', [
                 lostChangeValue = ('<strong>Deleted Interaction: </strong>' +
                                    oldValue);
               }
-              stateWiseEditsMapping[stateName].push(
+               stateWiseEditsMapping[stateName].push(
                 angular.element('<div></div>').html(lostChangeValue)
                   .addClass('state-edit-desc'));
-              break;
+               break;
 
-            case 'widget_customization_args':
-              var lostChangeValue = '';
-              if (UtilsService.isEmpty(oldValue)) {
+             case 'widget_customization_args':
+               var lostChangeValue = '';
+               if (UtilsService.isEmpty(oldValue)) {
                 lostChangeValue = 'Added Interaction Customizations';
               } else if (UtilsService.isEmpty(newValue)) {
                 lostChangeValue = 'Removed Interaction Customizations';
               } else {
                 lostChangeValue = 'Edited Interaction Customizations';
               }
-              stateWiseEditsMapping[stateName].push(
+               stateWiseEditsMapping[stateName].push(
                 angular.element('<div></div>').html(lostChangeValue)
                   .addClass('state-edit-desc'));
-              break;
+               break;
 
-            case 'answer_groups':
-              var answerGroupChanges = getRelativeChangeToGroups(lostChange);
-              var answerGroupHtml = '';
-              if (answerGroupChanges === 'added') {
+             case 'answer_groups':
+               var answerGroupChanges = getRelativeChangeToGroups(lostChange);
+               var answerGroupHtml = '';
+               if (answerGroupChanges === 'added') {
                 answerGroupHtml += (
                   '<p class="sub-edit"><i>Destination: </i>' +
                     newValue.outcome.dest + '</p>');
@@ -221,12 +221,12 @@ oppia.factory('ChangesInHumanReadableFormService', [
                   angular.element('<div>Deleted answer group</div>')
                     .addClass('state-edit-desc'));
               }
-              break;
+               break;
 
-            case 'default_outcome':
-              var defaultOutcomeChanges = getRelativeChangeToGroups(lostChange);
-              var defaultOutcomeHtml = '';
-              if (defaultOutcomeChanges === 'added') {
+             case 'default_outcome':
+               var defaultOutcomeChanges = getRelativeChangeToGroups(lostChange);
+               var defaultOutcomeHtml = '';
+               if (defaultOutcomeChanges === 'added') {
                 defaultOutcomeHtml += (
                   '<p class="sub-edit"><i>Destination: </i>' +
                     newValue.dest + '</p>');
@@ -259,16 +259,16 @@ oppia.factory('ChangesInHumanReadableFormService', [
                   angular.element('<div>Deleted default outcome</div>')
                     .addClass('state-edit-desc'));
               }
+           }
           }
-       }
       });
 
       for (var stateName in stateWiseEditsMapping) {
-       var stateChangesEl = angular.element(
+        var stateChangesEl = angular.element(
         '<li>Edits to state: ' + stateName + '</li>');
         for (var stateEdit in stateWiseEditsMapping[stateName]) {
-         stateChangesEl.append(stateWiseEditsMapping[stateName][stateEdit]);
-       }
+          stateChangesEl.append(stateWiseEditsMapping[stateName][stateEdit]);
+        }
         outerHtml.append(stateChangesEl);
       }
 
