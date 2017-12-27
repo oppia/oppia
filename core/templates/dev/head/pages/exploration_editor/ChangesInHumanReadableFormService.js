@@ -16,7 +16,7 @@
  * @fileoverview Service to get changes in human readable form
  * to human readable form and making necessary 
  */
-oppia.factory('ChangesInHumanReadableFormService', [
+ oppia.factory('ChangesInHumanReadableFormService', [
   'UtilsService', 
   function(UtilsService) {
     var CMD_ADD_STATE = 'add_state';
@@ -24,19 +24,19 @@ oppia.factory('ChangesInHumanReadableFormService', [
     var CMD_DELETE_STATE = 'delete_state';
     var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
 
-   var makeRulesListHumanReadable = function(answerGroupValue) {
+    var makeRulesListHumanReadable = function(answerGroupValue) {
      var rulesList = [];
      answerGroupValue.rules.forEach(function(rule) {
-      var ruleElm = angular.element('<li></li>');
-      ruleElm.html('<p>Type: ' + rule.type + '</p>');
-      ruleElm.append(
+       var ruleElm = angular.element('<li></li>');
+       ruleElm.html('<p>Type: ' + rule.type + '</p>');
+       ruleElm.append(
         '<p>Value: ' + (
           Object.keys(rule.inputs).map(function(input) {
             return rule.inputs[input];
           })
         ).toString() + '</p>');
-      rulesList.push(ruleElm);
-    });
+       rulesList.push(ruleElm);
+     });
 
      return rulesList;
    };
@@ -44,24 +44,24 @@ oppia.factory('ChangesInHumanReadableFormService', [
   // An edit is represented either as an object or an array. If it's an object,
   // then simply return that object. In case of an array, return the last item.
     var getStatePropertyValue = function(statePropertyValue) {
-     return angular.isArray(statePropertyValue) ?
+      return angular.isArray(statePropertyValue) ?
       statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
-   };
+    };
 
   // Detects whether an object of the type 'answer_group' or 'default_outcome'
   // has been added, edited or deleted. Returns - 'addded', 'edited' or
   // 'deleted' accordingly.
     var getRelativeChangeToGroups = function(changeObject) {
-     var newValue = changeObject.new_value;
-     var oldValue = changeObject.old_value;
-     var result = '';
+      var newValue = changeObject.new_value;
+      var oldValue = changeObject.old_value;
+      var result = '';
 
-     if (angular.isArray(newValue) && angular.isArray(oldValue)) {
-      result = (newValue.length > oldValue.length) ?
+      if (angular.isArray(newValue) && angular.isArray(oldValue)) {
+       result = (newValue.length > oldValue.length) ?
         'added' : (newValue.length === oldValue.length) ?
         'edited' : 'deleted';
-    } else {
-      if (!UtilsService.isEmpty(oldValue)) {
+     } else {
+       if (!UtilsService.isEmpty(oldValue)) {
         if (!UtilsService.isEmpty(newValue)) {
           result = 'edited';
         } else {
@@ -70,13 +70,13 @@ oppia.factory('ChangesInHumanReadableFormService', [
       } else if (!UtilsService.isEmpty(newValue)) {
         result = 'added';
       }
-    }
-     return result;
-   };
+     }
+      return result;
+    };
 
     var makeHumanReadable = function(lostChanges) {
-     var outerHtml = angular.element('<ul></ul>');
-     var stateWiseEditsMapping = {};
+      var outerHtml = angular.element('<ul></ul>');
+      var stateWiseEditsMapping = {};
     // The variable stateWiseEditsMapping stores the edits grouped by state.
     // For instance, you made the following edits:
     // 1. Changed content to 'Welcome!' instead of '' in 'Introduction'.
@@ -90,8 +90,8 @@ oppia.factory('ChangesInHumanReadableFormService', [
     //   - 'Added interaction customizations']
     // - 'End': ['Ended exploration']
 
-     lostChanges.forEach(function(lostChange) {
-      switch (lostChange.cmd) {
+      lostChanges.forEach(function(lostChange) {
+       switch (lostChange.cmd) {
         case CMD_ADD_STATE:
           outerHtml.append(
             angular.element('<li></li>').html(
@@ -261,22 +261,22 @@ oppia.factory('ChangesInHumanReadableFormService', [
               }
           }
       }
-    });
+     });
 
-     for (var stateName in stateWiseEditsMapping) {
-      var stateChangesEl = angular.element(
+      for (var stateName in stateWiseEditsMapping) {
+       var stateChangesEl = angular.element(
         '<li>Edits to state: ' + stateName + '</li>');
-      for (var stateEdit in stateWiseEditsMapping[stateName]) {
+       for (var stateEdit in stateWiseEditsMapping[stateName]) {
         stateChangesEl.append(stateWiseEditsMapping[stateName][stateEdit]);
       }
-      outerHtml.append(stateChangesEl);
-    }
+       outerHtml.append(stateChangesEl);
+     }
 
-     return outerHtml;
-  };
+      return outerHtml;
+    };
 
     return {
     
-     makeHumanReadable: makeHumanReadable
-   };
+      makeHumanReadable: makeHumanReadable
+    };
   }]);
