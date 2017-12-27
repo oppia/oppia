@@ -24,7 +24,7 @@ oppia.factory('ChangesInHumanReadableFormService', [
    var CMD_DELETE_STATE = 'delete_state';
    var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
 
-  var makeRulesListHumanReadable = function(answerGroupValue) {
+   var makeRulesListHumanReadable = function(answerGroupValue) {
     var rulesList = [];
     answerGroupValue.rules.forEach(function(rule) {
       var ruleElm = angular.element('<li></li>');
@@ -279,4 +279,4 @@ oppia.factory('ChangesInHumanReadableFormService', [
     
     makeHumanReadable: makeHumanReadable
   };
-    }]);
+ }]);
