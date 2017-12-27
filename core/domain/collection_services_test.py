@@ -160,6 +160,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
                 owner_id, collection_id))
         self.assertIn(skill_id, acquired_skill_ids)
 
+
 class CollectionProgressUnitTests(CollectionServicesUnitTests):
     """Tests functions which deal with any progress a user has made within a
     collection, including query and recording methods related to explorations

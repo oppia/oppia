@@ -89,18 +89,24 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.NEW_USER_EMAIL)
         response_json = self.get_json(
-            '%s/batch'%feconf.QUESTION_DATA_URL, self.payload,
+            '%s/batch' % feconf.QUESTION_DATA_URL, self.payload,
             expect_errors=False)
         self.assertIn(self.question.to_dict(), response_json['questions_dict'])
         self.assertEqual(len(response_json['questions_dict']), 1)
         self.logout()
 
         response_json = self.get_json(
-            '%s/batch'%feconf.QUESTION_DATA_URL, self.payload,
+            '%s/batch' % feconf.QUESTION_DATA_URL, self.payload,
             expect_errors=False)
         self.assertEqual(len(response_json['questions_dict']), 0)
 
         response = self.testapp.get(
-            '%s/batch'%feconf.QUESTION_DATA_URL,
+            '%s/batch' % feconf.QUESTION_DATA_URL,
+            expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+        del self.payload['stringified_skill_ids']
+        response = self.testapp.get(
+            '%s/batch' % feconf.QUESTION_DATA_URL, self.payload,
             expect_errors=True)
         self.assertEqual(response.status_int, 404)

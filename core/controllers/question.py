@@ -30,10 +30,9 @@ class QuestionsBatchHandler(base.BaseHandler):
         collection_id = self.request.get('collection_id')
         if not collection_id:
             raise self.PageNotFoundException
-        if self.request.get('stringified_skill_ids'):
-            skill_ids = json.loads(self.request.get('stringified_skill_ids'))
-        else:
-            skill_ids = []
+        if not self.request.get('stringified_skill_ids'):
+            raise self.PageNotFoundException
+        skill_ids = json.loads(self.request.get('stringified_skill_ids'))
         batch_size = feconf.QUESTION_BATCH_SIZE
         questions_dict = [question.to_dict() for question in (
             question_services.get_questions_batch(
