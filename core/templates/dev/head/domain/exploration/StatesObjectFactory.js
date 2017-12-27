@@ -18,12 +18,17 @@
  */
 
 oppia.factory('StatesObjectFactory', [
-  'StateObjectFactory', 'INTERACTION_SPECS',
-  function(StateObjectFactory, INTERACTION_SPECS) {
+  '$log', 'StateObjectFactory', 'INTERACTION_SPECS',
+  function($log, StateObjectFactory, INTERACTION_SPECS) {
     var States = function(states) {
       this._states = states;
     };
     States.prototype.getState = function(stateName) {
+      if (!this._states.hasOwnProperty(stateName)) {
+        $log.error('Missing state with name ' + stateName);
+        return null;
+      }
+
       return angular.copy(this._states[stateName]);
     };
 
