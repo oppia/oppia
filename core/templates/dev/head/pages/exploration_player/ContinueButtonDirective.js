@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the continue button in exploration player and editor
+ * @fileoverview Directive for the Continue button in exploration player and
+ * editor.
  */
 
  oppia.directive('continueButton', [
@@ -29,4 +30,4 @@
         'continue_button_directive.html')
     };
   }
-]);
+ ]);
