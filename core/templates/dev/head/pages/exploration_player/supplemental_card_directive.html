@@ -9,7 +9,11 @@
     </button>
     <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml"></div>
     <br>
-    <md-button class="oppia-learner-confirm-button protractor-test-continue-to-next-card-button"
+    <continue-button ng-if="helpCardHasContinueButton"
+                     focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
+                     ng-click="onClickContinueButton()">
+    </continue-button>
+    <!-- <md-button class="oppia-learner-confirm-button protractor-test-continue-to-next-card-button"
                focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
                ng-click="onClickContinueButton()"
                ng-if="helpCardHasContinueButton"
@@ -18,7 +22,7 @@
       <span translate="I18N_PLAYER_CONTINUE_BUTTON"></span>
       <i class="fa fa-arrow-right"
          style="font-size: 19px; padding-top: 1.5px;"></i>
-    </md-button>
+    </md-button> -->
   </div>
 
   <div class="protractor-test-conversation-input"
