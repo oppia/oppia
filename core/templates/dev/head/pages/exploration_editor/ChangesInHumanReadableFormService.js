@@ -19,14 +19,14 @@
 oppia.factory('ChangesInHumanReadableFormService', [
   'UtilsService', 
   function(UtilsService) {
-   var CMD_ADD_STATE = 'add_state';
-   var CMD_RENAME_STATE = 'rename_state';
-   var CMD_DELETE_STATE = 'delete_state';
-   var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
+    var CMD_ADD_STATE = 'add_state';
+    var CMD_RENAME_STATE = 'rename_state';
+    var CMD_DELETE_STATE = 'delete_state';
+    var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
 
    var makeRulesListHumanReadable = function(answerGroupValue) {
-    var rulesList = [];
-    answerGroupValue.rules.forEach(function(rule) {
+     var rulesList = [];
+     answerGroupValue.rules.forEach(function(rule) {
       var ruleElm = angular.element('<li></li>');
       ruleElm.html('<p>Type: ' + rule.type + '</p>');
       ruleElm.append(
@@ -38,25 +38,25 @@ oppia.factory('ChangesInHumanReadableFormService', [
       rulesList.push(ruleElm);
     });
 
-    return rulesList;
-  };
+     return rulesList;
+   };
 
   // An edit is represented either as an object or an array. If it's an object,
   // then simply return that object. In case of an array, return the last item.
-   var getStatePropertyValue = function(statePropertyValue) {
-    return angular.isArray(statePropertyValue) ?
+    var getStatePropertyValue = function(statePropertyValue) {
+     return angular.isArray(statePropertyValue) ?
       statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
-  };
+   };
 
   // Detects whether an object of the type 'answer_group' or 'default_outcome'
   // has been added, edited or deleted. Returns - 'addded', 'edited' or
   // 'deleted' accordingly.
-   var getRelativeChangeToGroups = function(changeObject) {
-    var newValue = changeObject.new_value;
-    var oldValue = changeObject.old_value;
-    var result = '';
+    var getRelativeChangeToGroups = function(changeObject) {
+     var newValue = changeObject.new_value;
+     var oldValue = changeObject.old_value;
+     var result = '';
 
-    if (angular.isArray(newValue) && angular.isArray(oldValue)) {
+     if (angular.isArray(newValue) && angular.isArray(oldValue)) {
       result = (newValue.length > oldValue.length) ?
         'added' : (newValue.length === oldValue.length) ?
         'edited' : 'deleted';
@@ -71,12 +71,12 @@ oppia.factory('ChangesInHumanReadableFormService', [
         result = 'added';
       }
     }
-    return result;
-  };
+     return result;
+   };
 
-   var makeHumanReadable = function(lostChanges) {
-    var outerHtml = angular.element('<ul></ul>');
-    var stateWiseEditsMapping = {};
+    var makeHumanReadable = function(lostChanges) {
+     var outerHtml = angular.element('<ul></ul>');
+     var stateWiseEditsMapping = {};
     // The variable stateWiseEditsMapping stores the edits grouped by state.
     // For instance, you made the following edits:
     // 1. Changed content to 'Welcome!' instead of '' in 'Introduction'.
@@ -90,7 +90,7 @@ oppia.factory('ChangesInHumanReadableFormService', [
     //   - 'Added interaction customizations']
     // - 'End': ['Ended exploration']
 
-    lostChanges.forEach(function(lostChange) {
+     lostChanges.forEach(function(lostChange) {
       switch (lostChange.cmd) {
         case CMD_ADD_STATE:
           outerHtml.append(
@@ -263,7 +263,7 @@ oppia.factory('ChangesInHumanReadableFormService', [
       }
     });
 
-    for (var stateName in stateWiseEditsMapping) {
+     for (var stateName in stateWiseEditsMapping) {
       var stateChangesEl = angular.element(
         '<li>Edits to state: ' + stateName + '</li>');
       for (var stateEdit in stateWiseEditsMapping[stateName]) {
@@ -272,11 +272,11 @@ oppia.factory('ChangesInHumanReadableFormService', [
       outerHtml.append(stateChangesEl);
     }
 
-    return outerHtml;
+     return outerHtml;
   };
 
-   return {
+    return {
     
-    makeHumanReadable: makeHumanReadable
-  };
- }]);
+     makeHumanReadable: makeHumanReadable
+   };
+  }]);
