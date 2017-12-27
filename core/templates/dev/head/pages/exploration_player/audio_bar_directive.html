@@ -1,12 +1,12 @@
-<div class="audio-header" style="">
-  <div ng-if="isAudioBarExpanded" class="audio-controls" style="">
+<div class="audio-header">
+  <div ng-if="audioBarIsExpanded" class="audio-controls">
     <div style="width: 560px;">
       <i class="fa audio-controls-button-icon"
-         ng-click="onSpeakerIconClicked()"
+         ng-click="onPlayButtonClicked()"
          ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play': !isAudioPlaying(), 'fa-pause': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
          uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
          tooltip-append-to-body="true" tooltip-placement="right"></i>
-      <div class="progress-bar-section" ng-if="hasPressedPlayButtonOnce" style="">
+      <div class="progress-bar-section" ng-if="hasPressedPlayButtonAtLeastOnce">
         <md-progress-linear md-mode="<[getProgressBarMode()]>" value="<[AudioPlayerService.getProgress() * 100]>"></md-progress-linear>
         <span ng-if="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_LOADING_AUDIO"></span>
         <span ng-if="isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT"></span>
@@ -16,11 +16,11 @@
       <select class="audio-language-select" 
               ng-model="selectedLanguage.value"
               ng-options="o.value as o.displayed for o in languagesInExploration"
-              ng-change="languageSelected()"></select>
+              ng-change="onNewLanguageSelected()"></select>
     </div>
   </div>
-  <img class="audio-toggle-button" ng-if="isAudioBarExpanded" ng-src="<[IMAGE_URL_COLLAPSE_AUDIO_BUTTON]>" ng-click="collapseAudioBar()">
-  <img class="audio-toggle-button" ng-if="!isAudioBarExpanded" ng-src="<[IMAGE_URL_EXPAND_AUDIO_BUTTON]>" ng-click="expandAudioBar()">
+  <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()"><i class="fa fa-sort-up"></i></div>
+  <div class="audio-expand-button audio-toggle-button" ng-if="!audioBarIsExpanded" ng-click="expandAudioBar()">AUDIO <i class="fa fa-sort-down"></i></div>
 </div>
 
 <style>
@@ -29,9 +29,29 @@
     background-color: #009688;
   }
 
-  .audio-toggle-button {
+  .fa-sort-up, .fa-sort-down {
+    transform: translateY(-2px);
+  }
+
+  .audio-expand-button {
+    width: 80px;
+    height: 20px;
+  }
+
+  .audio-collapse-button {
+    width: 30px;
+    height: 10px;
+  }
+
+  .audio-toggle-button {  
+    background-color: #0D48A1;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    color: white;
     display: block;
+    font-size: 12px;
     margin: 0 auto;
+    text-align: center;
   }
 
   .audio-controls-button-icon {
