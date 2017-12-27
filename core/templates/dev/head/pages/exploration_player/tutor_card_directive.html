@@ -69,15 +69,10 @@
     (!isOnTerminalCard() || !isIframed || activeCard.destStateName)">
       <div class="conversation-skin-inline-interaction">
         <div ng-if="activeCard.destStateName && activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1].oppiaResponse">
-          <md-button class="oppia-learner-confirm-button protractor-test-continue-to-next-card-button"
-                     ng-if="!isIframed"
-                     focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
-                     ng-click="onClickContinueButton()"
-                     aria-label="Continue">
-            <span translate="I18N_PLAYER_CONTINUE_BUTTON"></span>
-            <i class="fa fa-arrow-right"
-               style="font-size: 19px; padding-top: 1.5px;"></i>
-          </md-button>
+          <continue-button ng-if="!isIframed"
+                           focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
+                           ng-click="onClickContinueButton()">
+          </continue-button>
         </div>
         <div ng-if="activeCard.interactionHtml && !activeCard.destStateName">
           <div class="protractor-test-conversation-input"
