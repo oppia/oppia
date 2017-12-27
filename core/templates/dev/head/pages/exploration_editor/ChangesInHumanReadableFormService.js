@@ -25,8 +25,8 @@ oppia.factory('ChangesInHumanReadableFormService', [
     var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
 
     var makeRulesListHumanReadable = function(answerGroupValue) {
-     var rulesList = [];
-     answerGroupValue.rules.forEach(function(rule) {
+      var rulesList = [];
+      answerGroupValue.rules.forEach(function(rule) {
        var ruleElm = angular.element('<li></li>');
        ruleElm.html('<p>Type: ' + rule.type + '</p>');
        ruleElm.append(
@@ -38,8 +38,8 @@ oppia.factory('ChangesInHumanReadableFormService', [
        rulesList.push(ruleElm);
      });
 
-     return rulesList;
-   };
+      return rulesList;
+    };
 
   // An edit is represented either as an object or an array. If it's an object,
   // then simply return that object. In case of an array, return the last item.
@@ -57,20 +57,20 @@ oppia.factory('ChangesInHumanReadableFormService', [
       var result = '';
 
       if (angular.isArray(newValue) && angular.isArray(oldValue)) {
-       result = (newValue.length > oldValue.length) ?
+        result = (newValue.length > oldValue.length) ?
         'added' : (newValue.length === oldValue.length) ?
         'edited' : 'deleted';
-     } else {
-       if (!UtilsService.isEmpty(oldValue)) {
-        if (!UtilsService.isEmpty(newValue)) {
+      } else {
+        if (!UtilsService.isEmpty(oldValue)) {
+         if (!UtilsService.isEmpty(newValue)) {
           result = 'edited';
         } else {
           result = 'deleted';
         }
-      } else if (!UtilsService.isEmpty(newValue)) {
+       } else if (!UtilsService.isEmpty(newValue)) {
         result = 'added';
       }
-     }
+      }
       return result;
     };
 
@@ -91,32 +91,32 @@ oppia.factory('ChangesInHumanReadableFormService', [
     // - 'End': ['Ended exploration']
 
       lostChanges.forEach(function(lostChange) {
-       switch (lostChange.cmd) {
-        case CMD_ADD_STATE:
-          outerHtml.append(
+        switch (lostChange.cmd) {
+         case CMD_ADD_STATE:
+           outerHtml.append(
             angular.element('<li></li>').html(
               'Added state: ' + lostChange.state_name));
-          break;
-        case CMD_RENAME_STATE:
-          outerHtml.append(
+           break;
+         case CMD_RENAME_STATE:
+           outerHtml.append(
             angular.element('<li></li>').html(
               'Renamed state: ' + lostChange.old_state_name + ' to ' +
                 lostChange.new_state_name));
-          break;
-        case CMD_DELETE_STATE:
-          outerHtml.append(
+           break;
+         case CMD_DELETE_STATE:
+           outerHtml.append(
             angular.element('<li></li>').html(
               'Deleted state: ' + lostChange.state_name));
-          break;
-        case CMD_EDIT_STATE_PROPERTY:
-          var newValue = getStatePropertyValue(lostChange.new_value);
-          var oldValue = getStatePropertyValue(lostChange.old_value);
-          var stateName = lostChange.state_name;
-          if (!stateWiseEditsMapping[stateName]) {
+           break;
+         case CMD_EDIT_STATE_PROPERTY:
+           var newValue = getStatePropertyValue(lostChange.new_value);
+           var oldValue = getStatePropertyValue(lostChange.old_value);
+           var stateName = lostChange.state_name;
+           if (!stateWiseEditsMapping[stateName]) {
             stateWiseEditsMapping[stateName] = [];
           }
 
-          switch (lostChange.property_name) {
+           switch (lostChange.property_name) {
             case 'content':
               if (newValue !== null) {
                 // TODO(sll): Also add display of audio translations here.
@@ -260,17 +260,17 @@ oppia.factory('ChangesInHumanReadableFormService', [
                     .addClass('state-edit-desc'));
               }
           }
-      }
-     });
+       }
+      });
 
       for (var stateName in stateWiseEditsMapping) {
        var stateChangesEl = angular.element(
         '<li>Edits to state: ' + stateName + '</li>');
-       for (var stateEdit in stateWiseEditsMapping[stateName]) {
-        stateChangesEl.append(stateWiseEditsMapping[stateName][stateEdit]);
+        for (var stateEdit in stateWiseEditsMapping[stateName]) {
+         stateChangesEl.append(stateWiseEditsMapping[stateName][stateEdit]);
+       }
+        outerHtml.append(stateChangesEl);
       }
-       outerHtml.append(stateChangesEl);
-     }
 
       return outerHtml;
     };
