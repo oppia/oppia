@@ -263,5 +263,5 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             coll_id_0, [skill_id], self.owner_id, 1)
         self.assertEqual(question_batch[0].title, question.title)
         with self.assertRaises(Exception):
-            question_services.get_questions_batch('random', [skill_id],
-                self.owner_id, 1)
+            question_services.get_questions_batch(
+                'random', [skill_id], self.owner_id, 1)

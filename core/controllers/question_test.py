@@ -104,4 +104,3 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
             '%s/batch'%feconf.QUESTION_DATA_URL,
             expect_errors=True)
         self.assertEqual(response.status_int, 404)
-
