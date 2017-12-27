@@ -18,10 +18,10 @@
  */
 
 oppia.factory('ExplorationCreationService', [
-  '$http', '$modal', '$timeout', '$rootScope', '$window',
+  '$http', '$uibModal', '$timeout', '$rootScope', '$window',
   'AlertsService', 'siteAnalyticsService', 'UrlInterpolationService',
   function(
-      $http, $modal, $timeout, $rootScope, $window,
+      $http, $uibModal, $timeout, $rootScope, $window,
       AlertsService, siteAnalyticsService, UrlInterpolationService) {
     var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
@@ -57,13 +57,13 @@ oppia.factory('ExplorationCreationService', [
       showUploadExplorationModal: function() {
         AlertsService.clearWarnings();
 
-        $modal.open({
+        $uibModal.open({
           backdrop: true,
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/creator_dashboard/' +
             'upload_activity_modal_directive.html'),
           controller: [
-            '$scope', '$modalInstance', function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.save = function() {
                 var returnObj = {};
                 var file = document.getElementById('newFileInput').files[0];
@@ -73,11 +73,11 @@ oppia.factory('ExplorationCreationService', [
                 }
                 returnObj.yamlFile = file;
 
-                $modalInstance.close(returnObj);
+                $uibModalInstance.close(returnObj);
               };
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
                 AlertsService.clearWarnings();
               };
             }

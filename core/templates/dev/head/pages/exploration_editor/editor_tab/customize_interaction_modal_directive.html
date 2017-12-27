@@ -10,8 +10,8 @@
 
 <div class="modal-body">
   <div ng-if="!stateInteractionIdService.displayed" ng-cloak>
-    <tabset>
-      <tab ng-repeat="category in ALLOWED_INTERACTION_CATEGORIES"
+    <uib-tabset>
+      <uib-tab ng-repeat="category in ALLOWED_INTERACTION_CATEGORIES"
            heading="<[category.name]>" active="category.active"
            class="protractor-test-interaction-tab-<[category.name]>">
         <br>
@@ -23,8 +23,8 @@
             <[INTERACTION_SPECS[interactionId].name]>
           </div>
         </div>
-      </tab>
-    </tabset>
+      </uib-tab>
+    </uib-tabset>
   </div>
 
   <form ng-if="stateInteractionIdService.displayed && hasCustomizationArgs" name="form.schemaForm" class="protractor-test-interaction-editor">
@@ -54,7 +54,7 @@
        popover-append-to-body
        popover-placement="bottom"
        popover-trigger="<[isSaveInteractionButtonEnabled() ? 'none' : 'mouseenter']>"
-       ng-attr-popover="<[getSaveInteractionButtonTooltip()]>">
+       ng-attr-uib-popover="<[getSaveInteractionButtonTooltip()]>">
     <button class="btn btn-success protractor-test-save-interaction"
             ng-click="save()"
             ng-disabled="!isSaveInteractionButtonEnabled()">

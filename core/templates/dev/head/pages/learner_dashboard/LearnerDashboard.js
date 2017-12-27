@@ -67,7 +67,7 @@ oppia.constant('FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS', {
 });
 
 oppia.controller('LearnerDashboard', [
-  '$scope', '$rootScope', '$window', '$http', '$modal', 'AlertsService',
+  '$scope', '$rootScope', '$window', '$http', '$uibModal', 'AlertsService',
   'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
   'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',
   'LearnerDashboardBackendApiService', 'UrlInterpolationService',
@@ -76,7 +76,7 @@ oppia.controller('LearnerDashboard', [
   'DateTimeFormatService', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
   'FeedbackThreadSummaryObjectFactory', 'FeedbackMessageSummaryObjectFactory',
   function(
-      $scope, $rootScope, $window, $http, $modal, AlertsService,
+      $scope, $rootScope, $window, $http, $uibModal, AlertsService,
       EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
       SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS, FATAL_ERROR_CODES,
       LearnerDashboardBackendApiService, UrlInterpolationService,
@@ -360,7 +360,7 @@ oppia.controller('LearnerDashboard', [
     };
 
     $scope.showSuggestionModal = function(newContent, oldContent, description) {
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/learner_dashboard/' +
           'learner_view_suggestion_modal_directive.html'),
@@ -377,14 +377,15 @@ oppia.controller('LearnerDashboard', [
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'newContent', 'oldContent', 'description',
-          function($scope, $modalInstance, newContent, oldContent,
+          '$scope', '$uibModalInstance', 'newContent', 'oldContent',
+          'description',
+          function($scope, $uibModalInstance, newContent, oldContent,
             description) {
             $scope.newContent = newContent;
             $scope.oldContent = oldContent;
             $scope.description = description;
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
           }
         ]
@@ -393,7 +394,7 @@ oppia.controller('LearnerDashboard', [
 
     $scope.openRemoveActivityModal = function(
       sectionNameI18nId, subsectionName, activity) {
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/learner_dashboard/' +
           'remove_activity_from_learner_dashboard_modal_directive.html'),
@@ -410,9 +411,10 @@ oppia.controller('LearnerDashboard', [
           }
         },
         controller: [
-          '$scope', '$modalInstance', '$http', 'sectionNameI18nId',
-          'subsectionName', function(
-              $scope, $modalInstance, $http, sectionNameI18nId,
+          '$scope', '$uibModalInstance', '$http', 'sectionNameI18nId',
+          'subsectionName',
+          function(
+              $scope, $uibModalInstance, $http, sectionNameI18nId,
               subsectionName) {
             $scope.sectionNameI18nId = sectionNameI18nId;
             $scope.subsectionName = subsectionName;
@@ -448,11 +450,11 @@ oppia.controller('LearnerDashboard', [
                   }));
 
               $http['delete'](removeActivityUrl);
-              $modalInstance.close();
+              $uibModalInstance.close();
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
           }
         ]
@@ -559,11 +561,14 @@ oppia.controller('LearnerDashboard', [
           LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS);
         $scope.feedbackThreadActive = false;
 
+        $scope.noExplorationActivity = (
+            ($scope.completedExplorationsList.length === 0) &&
+            ($scope.incompleteExplorationsList.length === 0));
+        $scope.noCollectionActivity = (
+            ($scope.completedCollectionsList.length === 0) &&
+            ($scope.incompleteCollectionsList.length === 0));
         $scope.noActivity = (
-          ($scope.completedExplorationsList.length === 0) &&
-          ($scope.completedCollectionsList.length === 0) &&
-          ($scope.incompleteExplorationsList.length === 0) &&
-          ($scope.incompleteCollectionsList.length === 0) &&
+          ($scope.noExplorationActivity) && ($scope.noCollectionActivity) &&
           ($scope.explorationPlaylist.length === 0) &&
           ($scope.collectionPlaylist.length === 0));
         $rootScope.loadingMessage = '';

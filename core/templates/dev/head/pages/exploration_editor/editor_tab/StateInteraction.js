@@ -17,7 +17,7 @@
  */
 
 oppia.controller('StateInteraction', [
-  '$scope', '$http', '$rootScope', '$modal', '$injector', '$filter',
+  '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
   'AlertsService', 'EditorStateService', 'HtmlEscaperService',
   'INTERACTION_SPECS', 'stateInteractionIdService',
   'stateCustomizationArgsService', 'editabilityService',
@@ -25,7 +25,7 @@ oppia.controller('StateInteraction', [
   'InteractionDetailsCacheService',
   'ExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
-  function($scope, $http, $rootScope, $modal, $injector, $filter,
+  function($scope, $http, $rootScope, $uibModal, $injector, $filter,
       AlertsService, EditorStateService, HtmlEscaperService,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, editabilityService,
@@ -151,19 +151,19 @@ oppia.controller('StateInteraction', [
       if (editabilityService.isEditable()) {
         AlertsService.clearWarnings();
 
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/editor_tab/' +
             'customize_interaction_modal_directive.html'),
           backdrop: true,
           resolve: {},
           controller: [
-            '$scope', '$modalInstance', '$injector', 'stateSolutionService',
+            '$scope', '$uibModalInstance', '$injector', 'stateSolutionService',
             'stateInteractionIdService', 'stateCustomizationArgsService',
             'InteractionDetailsCacheService', 'INTERACTION_SPECS',
             'UrlInterpolationService', 'EditorFirstTimeEventsService',
             function(
-                $scope, $modalInstance, $injector, stateSolutionService,
+                $scope, $uibModalInstance, $injector, stateSolutionService,
                 stateInteractionIdService, stateCustomizationArgsService,
                 InteractionDetailsCacheService, INTERACTION_SPECS,
                 UrlInterpolationService, EditorFirstTimeEventsService) {
@@ -305,15 +305,15 @@ oppia.controller('StateInteraction', [
               $scope.save = function() {
                 EditorFirstTimeEventsService
                   .registerFirstSaveInteractionEvent();
-                $modalInstance.close();
+                $uibModalInstance.close();
               };
 
               $scope.okay = function() {
-                $modalInstance.close('okay');
+                $uibModalInstance.close('okay');
               };
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
               };
             }
           ]
@@ -326,19 +326,19 @@ oppia.controller('StateInteraction', [
 
     $scope.deleteInteraction = function() {
       AlertsService.clearWarnings();
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
           'delete_interaction_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.reallyDelete = function() {
-              $modalInstance.close();
+              $uibModalInstance.close();
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               AlertsService.clearWarnings();
             };
           }

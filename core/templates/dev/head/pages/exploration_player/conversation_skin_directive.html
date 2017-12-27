@@ -27,7 +27,7 @@
 </div>
 
 <div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
-  <progress-dots num-dots="numProgressDots" class="conversation-skin-progress-dots">
+  <progress-dots ng-if="!isViewportNarrow()" num-dots="numProgressDots" class="conversation-skin-progress-dots">
   </progress-dots>
 
   <div class="conversation-skin-cards-container conversation-skin-animate-cards"
@@ -47,6 +47,7 @@
                            on-submit-answer="submitAnswer(answer, rulesService)">
         </supplemental-card>
       </div>
+      <progress-nav ng-if="isViewportNarrow()"></progress-nav>
     </div>
 
     <div ng-if="isCurrentSupplementalCardNonempty() && !isViewportNarrow()"
@@ -63,7 +64,7 @@
   <div ng-if="isLoggedIn && !isInPreviewMode" class="conversation-skin-final-ratings">
     <div class="conversation-skin-final-ratings-header" translate="I18N_PLAYER_RATE_EXPLORATION">
     </div>
-    <div popover-placement="bottom" popover-template="'popover/feedback'" popover-trigger="click">
+    <div popover-placement="bottom" uib-popover-template="'popover/feedback'" popover-trigger="click">
       <rating-display rating-value="userRating" is-editable="true" on-edit="submitUserRating"
                       class="conversation-skin-final-ratings-display">
       </rating-display>

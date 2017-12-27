@@ -17,14 +17,14 @@
  */
 
 oppia.controller('StateSolution', [
-  '$scope', '$rootScope', '$modal', 'EditorStateService', 'AlertsService',
+  '$scope', '$rootScope', '$uibModal', 'EditorStateService', 'AlertsService',
   'INTERACTION_SPECS', 'stateSolutionService', 'explorationStatesService',
   'SolutionVerificationService', 'ExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
   'SolutionObjectFactory', 'ExplorationContextService',
   'ExplorationWarningsService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function(
-    $scope, $rootScope, $modal, EditorStateService, AlertsService,
+    $scope, $rootScope, $uibModal, EditorStateService, AlertsService,
     INTERACTION_SPECS, stateSolutionService, explorationStatesService,
     SolutionVerificationService, ExplorationHtmlFormatterService,
     stateInteractionIdService, stateHintsService, UrlInterpolationService,
@@ -76,15 +76,15 @@ oppia.controller('StateSolution', [
       $rootScope.$broadcast('externalSave');
       $scope.inlineSolutionEditorIsActive = false;
 
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
           'add_or_update_solution_modal_directive.html'),
         backdrop: 'static',
         controller: [
-          '$scope', '$modalInstance', 'stateSolutionService',
+          '$scope', '$uibModalInstance', 'stateSolutionService',
           function(
-            $scope, $modalInstance, stateSolutionService) {
+            $scope, $uibModalInstance, stateSolutionService) {
             $scope.stateSolutionService = stateSolutionService;
             $scope.correctAnswerEditorHtml = (
               ExplorationHtmlFormatterService.getInteractionHtml(
@@ -108,7 +108,7 @@ oppia.controller('StateSolution', [
             };
 
             $scope.saveSolution = function() {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 solution: SolutionObjectFactory.createNew(
                   $scope.data.answerIsExclusive,
                   $scope.data.correctAnswer,
@@ -117,7 +117,7 @@ oppia.controller('StateSolution', [
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               AlertsService.clearWarnings();
             };
           }
@@ -145,20 +145,20 @@ oppia.controller('StateSolution', [
       evt.stopPropagation();
 
       AlertsService.clearWarnings();
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
           'delete_solution_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance',
-          function($scope, $modalInstance) {
+          '$scope', '$uibModalInstance',
+          function($scope, $uibModalInstance) {
             $scope.reallyDelete = function() {
-              $modalInstance.close();
+              $uibModalInstance.close();
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               AlertsService.clearWarnings();
             };
           }

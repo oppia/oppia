@@ -2,7 +2,7 @@
   <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture()]>" alt="">
   <div ng-if="!data.isHint">
     <div ng-if="getShortAnswerHtml()"
-         popover-placement="bottom" popover-template="'popover/answer'"
+         popover-placement="bottom" uib-popover-template="'popover/answer'"
          popover-trigger="click" style="cursor: pointer;">
       <div class="conversation-skin-learner-answer-content" angular-html-bind="getShortAnswerHtml()">
       </div>
