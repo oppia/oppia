@@ -19,30 +19,30 @@
 
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
-  var editorRoleEmailsCheckBox = element(
-    by.css('.protractor-test-canReceiveEditorRoleEmail'));
-  var feedbackMessageEmailsCheckBox = element(
-    by.css('.protractor-test-canReceiveFeedbackMessageEmail'));
+  var editorRoleEmailsCheckbox = element(
+    by.css('.protractor-test-editor-role-email-checkbox'));
+  var feedbackMessageEmailsCheckbox = element(
+    by.css('.protractor-test-feedback-message-email-checkbox'));
   var subscriptions = element.all(by.css('.protractor-test-subscription-name'));
 
   this.get = function() {
     return browser.get(USER_PREFERENCES_URL);
   };
 
-  this.toggleEditorRoleEmailsCheckBox = function() {
-    editorRoleEmailsCheckBox.click();
+  this.toggleEditorRoleEmailsCheckbox = function() {
+    editorRoleEmailsCheckbox.click();
   };
   
-  this.toggleFeedbackEmailsCheckBox = function() {
-    feedbackMessageEmailsCheckBox.click();
+  this.toggleFeedbackEmailsCheckbox = function() {
+    feedbackMessageEmailsCheckbox.click();
   };
 
   this.isFeedbackEmailsCheckboxSelected = function() {
-    return feedbackMessageEmailsCheckBox.isSelected();
+    return feedbackMessageEmailsCheckbox.isSelected();
   };
 
   this.isEditorRoleEmailsCheckboxSelected = function() {
-    return editorRoleEmailsCheckBox.isSelected();
+    return editorRoleEmailsCheckbox.isSelected();
   };
   
   // This function only compares the text displayed on the subscription (which

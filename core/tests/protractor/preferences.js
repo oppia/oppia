@@ -33,7 +33,7 @@ describe('Preferences', function() {
     users.login('alice@preferences.com');
     preferencesPage.get();
     expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(true);
-    preferencesPage.toggleEditorRoleEmailsCheckBox();
+    preferencesPage.toggleEditorRoleEmailsCheckbox();
     expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(false);
     browser.refresh();
     expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(false);
@@ -44,7 +44,7 @@ describe('Preferences', function() {
     users.login('bob@preferences.com');
     preferencesPage.get();
     expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(true);
-    preferencesPage.toggleFeedbackEmailsCheckBox();
+    preferencesPage.toggleFeedbackEmailsCheckbox();
     expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
     browser.refresh();
     expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
