@@ -14,8 +14,10 @@
 
 oppia.directive('oppiaInteractiveLogicProof', [
   'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
+  'ExplorationContextService', 'PAGE_CONTEXT',
   function(
-      HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
+      HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE,
+      ExplorationContextService, PAGE_CONTEXT) {
     return {
       restrict: 'E',
       scope: {
@@ -35,8 +37,14 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // permited line templates) that is stored in defaultData.js within
           // the dependencies.
           $scope.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
-          
-          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+
+          $scope.isInEditorPage = (
+            ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+          if ($scope.isInEditorPage) {
+            $scope.interactionIsActive = true;
+          } else {
+            $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+          }
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             $scope.interactionIsActive = false;
           });

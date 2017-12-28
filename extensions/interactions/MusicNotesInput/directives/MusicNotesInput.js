@@ -79,10 +79,12 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
   'HtmlEscaperService', 'NOTE_NAMES_TO_MIDI_VALUES',
   'musicNotesInputRulesService', 'musicPhrasePlayerService',
   'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
+  'ExplorationContextService', 'PAGE_CONTEXT',
   function(
       HtmlEscaperService, NOTE_NAMES_TO_MIDI_VALUES,
       musicNotesInputRulesService, musicPhrasePlayerService,
-      UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
+      UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE,
+      ExplorationContextService, PAGE_CONTEXT) {
     return {
       restrict: 'E',
       scope: {
@@ -104,7 +106,13 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         scope.sequenceToGuess = HtmlEscaperService.escapedJsonToObj(
           attrs.sequenceToGuessWithValue);
 
-        scope.interactionIsActive = (scope.getLastAnswer() === null);
+        scope.isInEditorPage = (
+          ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+        if (scope.isInEditorPage) {
+          scope.interactionIsActive = true;
+        } else {
+          scope.interactionIsActive = ($scope.getLastAnswer() === null);
+        }
         scope.initialSequence = scope.interactionIsActive ?
           HtmlEscaperService.escapedJsonToObj(attrs.initialSequenceWithValue) :
           scope.getLastAnswer();

@@ -22,8 +22,10 @@
 
 oppia.directive('oppiaInteractivePencilCodeEditor', [
   'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
+  'ExplorationContextService', 'PAGE_CONTEXT',
   function(
-      HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
+      HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE,
+      ExplorationContextService, PAGE_CONTEXT) {
     return {
       restrict: 'E',
       scope: {
@@ -38,7 +40,13 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
         'FocusManagerService', 'pencilCodeEditorRulesService',
         function($scope, $attrs, $element, $timeout, $uibModal,
           FocusManagerService, pencilCodeEditorRulesService) {
-          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+          $scope.isInEditorPage = (
+            ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+          if ($scope.isInEditorPage) {
+            $scope.interactionIsActive = true;
+          } else {
+            $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+          }
 
           $scope.initialCode = $scope.interactionIsActive ?
             HtmlEscaperService.escapedJsonToObj($attrs.initialCodeWithValue) :

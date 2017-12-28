@@ -24,10 +24,10 @@ oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
 
 oppia.directive('oppiaInteractiveGraphInput', [
   'HtmlEscaperService', 'graphInputRulesService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE',
+  'ExplorationContextService', 'EVENT_NEW_CARD_AVAILABLE', 'PAGE_CONTEXT',
   function(
       HtmlEscaperService, graphInputRulesService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE ) {
+      ExplorationContextService, EVENT_NEW_CARD_AVAILABLE, PAGE_CONTEXT) {
     return {
       restrict: 'E',
       scope: {
@@ -55,10 +55,16 @@ oppia.directive('oppiaInteractiveGraphInput', [
               rulesService: graphInputRulesService
             });
           };
-          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+          $scope.isInEditorPage = (
+            ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+          if ($scope.isInEditorPage) {
+            $scope.interactionIsActive = true;
+          } else {
+            $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+          }
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             $scope.interactionIsActive = false;
-            
+
             $scope.canAddVertex = false;
             $scope.canDeleteVertex = false;
             $scope.canEditVertexLabel = false;
