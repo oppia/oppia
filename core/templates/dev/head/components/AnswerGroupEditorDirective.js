@@ -30,6 +30,7 @@ oppia.directive('answerGroupEditor', [
           '&onSaveAnswerGroupCorrectnessLabel',
         outcome: '=',
         suppressWarnings: '&',
+        isCorrectnessFeedbackEnabled: '=',
         labelledAsCorrect: '=',
         rules: '='
       },

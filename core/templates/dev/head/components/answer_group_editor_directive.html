@@ -93,9 +93,9 @@
                   suppress-warnings="suppressWarnings()">
   </outcome-editor>
 
-  <br ng-if="answerGroupIsDefault">
+  <br ng-if="answerGroupIsDefault && isCorrectnessFeedbackEnabled">
   
-  <div ng-if="answerGroupIsDefault">
+  <div ng-if="answerGroupIsDefault && isCorrectnessFeedbackEnabled">
     <correctness-label-editor is-editable="isEditable" on-save-correctness-label="getOnSaveAnswerGroupCorrectnessLabelFn()" labelled-as-correct="labelledAsCorrect">
     </correctness-label-editor>
   </div>

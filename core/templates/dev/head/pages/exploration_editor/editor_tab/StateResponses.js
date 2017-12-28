@@ -23,12 +23,14 @@ oppia.controller('StateResponses', [
   'ExplorationContextService', 'TrainingDataService',
   'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
   'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
+  'explorationCorrectnessFeedbackService',
   function(
       $scope, $rootScope, $uibModal, $filter, stateInteractionIdService,
       EditorStateService, AlertsService, ResponsesService, RouterService,
       ExplorationContextService, TrainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
-      INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
+      INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory,
+      explorationCorrectnessFeedbackService) {
     $scope.EditorStateService = EditorStateService;
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
@@ -117,6 +119,12 @@ oppia.controller('StateResponses', [
           return areAllChoicesCovered;
         }
       }
+    };
+
+    $scope.isCorrectnessFeedbackEnabled = function() {
+      $scope.temp =
+        explorationCorrectnessFeedbackService.isCorrectnessFeedbackEnabled();
+      return $scope.temp;
     };
 
     $scope.isSelfLoopWithNoFeedback = function(outcome) {

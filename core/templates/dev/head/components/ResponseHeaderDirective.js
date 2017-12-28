@@ -27,6 +27,7 @@ oppia.directive('responseHeader', [
         getShortSummary: '&shortSummary',
         isActive: '&isActive',
         getOnDeleteFn: '&onDeleteFn',
+        isCorrectnessFeedbackEnabled: '=',
         getCorrect: '&labelledAsCorrect',
         getNumRules: '&numRules'
       },
