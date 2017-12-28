@@ -63,13 +63,12 @@ oppia.controller('StateSolution', [
 
     $scope.getSolutionSummary = function() {
       var solution = stateSolutionService.savedMemento;
-      if(solution.answerIsExclusive){
+      if(solution.answerIsExclusive) {
         var solutionAsPlainText = 'The only solution is "' +
           solution.correctAnswer + '".';
-      }
-      else {
-        var solutionAsPlainText = 'One solution is "' + solution.correctAnswer
-        + '".';
+      } else {
+        var solutionAsPlainText = 'One solution is "' +
+          solution.correctAnswer + '".';
       }
       solutionAsPlainText += $filter('convertToPlainText')(
         solution.explanation.getHtml());
