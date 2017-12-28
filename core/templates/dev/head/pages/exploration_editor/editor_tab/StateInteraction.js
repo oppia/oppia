@@ -25,6 +25,7 @@ oppia.controller('StateInteraction', [
   'InteractionDetailsCacheService',
   'ExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
+  'ENDS_EXPLORATION_WITH_FAILURE',
   function($scope, $http, $rootScope, $uibModal, $injector, $filter,
       AlertsService, EditorStateService, HtmlEscaperService,
       INTERACTION_SPECS, stateInteractionIdService,
@@ -32,8 +33,14 @@ oppia.controller('StateInteraction', [
       explorationStatesService, graphDataService,
       InteractionDetailsCacheService,
       ExplorationHtmlFormatterService, UrlInterpolationService,
-      SubtitledHtmlObjectFactory, stateSolutionService, stateContentService) {
-    var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
+      SubtitledHtmlObjectFactory, stateSolutionService, stateContentService,
+      ENDS_EXPLORATION_WITH_FAILURE) {
+    var DEFAULT_END_EXPLORATION_STATE_CONTENT =
+      'Congratulations, you have finished!';
+    var DEFAULT_REDIRECT_EXPLORATION_STATE_CONTENT =
+      'Please click on following link to redirect to a prerequisite ' +
+      'exploration which needs to be completed for proceeding further in ' +
+      'this exploration.';
 
     // Declare dummy submitAnswer() and adjustPageHeight() methods for the
     // interaction preview.
@@ -102,7 +109,7 @@ oppia.controller('StateInteraction', [
     // function sets the content to DEFAULT_TERMINAL_STATE_CONTENT.
     // NOTE TO DEVELOPERS: Callers of this function must ensure that the current
     // active state is a terminal one.
-    var updateDefaultTerminalStateContentIfEmpty = function() {
+    var updateDefaultTerminalStateContentIfEmpty = function(continueType) {
       // Get current state.
       var stateName = EditorStateService.getActiveStateName();
 
@@ -113,8 +120,13 @@ oppia.controller('StateInteraction', [
       }
 
       // Update the state's content.
-      stateContentService.displayed = SubtitledHtmlObjectFactory.createDefault(
-        DEFAULT_TERMINAL_STATE_CONTENT);
+      if (continueType === ENDS_EXPLORATION_WITH_FAILURE) {
+        stateContentService.displayed = SubtitledHtmlObjectFactory
+        .createDefault(DEFAULT_REDIRECT_EXPLORATION_STATE_CONTENT);
+      } else {
+        stateContentService.displayed = SubtitledHtmlObjectFactory
+        .createDefault(DEFAULT_END_EXPLORATION_STATE_CONTENT);
+      }
       stateContentService.saveDisplayedValue();
     };
 
@@ -125,7 +137,9 @@ oppia.controller('StateInteraction', [
       if (hasInteractionIdChanged) {
         if (INTERACTION_SPECS[stateInteractionIdService.displayed]
           .is_terminal) {
-          updateDefaultTerminalStateContentIfEmpty();
+          updateDefaultTerminalStateContentIfEmpty(
+            INTERACTION_SPECS[stateInteractionIdService.displayed]
+              .continue_type);
         }
         stateInteractionIdService.saveDisplayedValue();
       }

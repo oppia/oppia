@@ -20,11 +20,11 @@
 oppia.factory('ExplorationObjectFactory', [
   'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE', 'StateObjectFactory',
   'StatesObjectFactory', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'ENDS_EXPLORATION_WITH_FAILURE',
   function(
       INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE, StateObjectFactory,
       StatesObjectFactory, ParamChangesObjectFactory, ParamSpecsObjectFactory,
-      UrlInterpolationService) {
+      UrlInterpolationService, ENDS_EXPLORATION_WITH_FAILURE) {
     var Exploration = function(
         initStateName, paramChanges, paramSpecs, states, title, languageCode) {
       this.initStateName = initStateName;
@@ -42,6 +42,13 @@ oppia.factory('ExplorationObjectFactory', [
         INTERACTION_SPECS[this.getInteractionId(stateName)].is_terminal);
     };
 
+    Exploration.prototype.isStateRedirect = function(stateName) {
+      return (
+        stateName && this.getInteractionId(stateName) &&
+        (INTERACTION_SPECS[this.getInteractionId(stateName)].continue_type ===
+         ENDS_EXPLORATION_WITH_FAILURE));
+    };
+
     Exploration.prototype.getAuthorRecommendedExpIds = function(stateName) {
       if (!this.isStateTerminal(stateName)) {
         throw Error(
@@ -51,6 +58,16 @@ oppia.factory('ExplorationObjectFactory', [
 
       return this.getInteractionCustomizationArgs(
         stateName).recommendedExplorationIds.value;
+    };
+
+    Exploration.prototype.getRedirectExplorationId = function(stateName) {
+      if (!this.isStateTerminal(stateName)) {
+        throw Error(
+          'Tried to get recommendations for a non-terminal state: ' +
+          stateName);
+      }
+      return this.getInteractionCustomizationArgs(
+        stateName).redirectExplorationId.value;
     };
 
     Exploration.prototype.getInteraction = function(stateName) {
@@ -140,7 +157,7 @@ oppia.factory('ExplorationObjectFactory', [
         var allAudioTranslations =
           this.states.getAllAudioTranslations(languageCode);
         for (var audioTranslationStateName in allAudioTranslations) {
-          totalFileSizeMB += 
+          totalFileSizeMB +=
             allAudioTranslations[audioTranslationStateName].getFileSizeMB();
         }
         return totalFileSizeMB;

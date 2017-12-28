@@ -52,6 +52,12 @@ DISPLAY_MODE_INLINE = 'inline'
 # Indicates that the learner view of the interaction should be displayed as a
 # separate object from the conversation.
 DISPLAY_MODE_SUPPLEMENTAL = 'supplemental'
+# Terminates the exploration.
+ENDS_EXPLORATION_WITH_SUCCESS = 'endExploration'
+# Pauses exploration and redirects to another one.
+ENDS_EXPLORATION_WITH_FAILURE = 'redirectExploration'
+# Non-terminal explorations
+CONTINUES_TO_NEXT_STATE = 'continueExploration'
 
 ALLOWED_DISPLAY_MODES = [DISPLAY_MODE_SUPPLEMENTAL, DISPLAY_MODE_INLINE]
 
@@ -78,6 +84,9 @@ class BaseInteraction(object):
     # Whether this interaction should be considered terminal, i.e. it ends
     # the exploration. Defaults to False.
     is_terminal = False
+    # Whether it redirects to another exploration, ends exploration or
+    # just continues the exploration
+    continue_type = CONTINUES_TO_NEXT_STATE
     # Whether the interaction has only one possible answer.
     is_linear = False
     # Whether this interaction supports machine learning classification.
@@ -215,6 +224,7 @@ class BaseInteraction(object):
             'description': self.description,
             'display_mode': self.display_mode,
             'is_terminal': self.is_terminal,
+            'continue_type': self.continue_type,
             'is_trainable': self.is_trainable,
             'is_linear': self.is_linear,
             'needs_summary': self.needs_summary,

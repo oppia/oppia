@@ -1,0 +1,105 @@
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * Directive for the RedirectExploration 'interaction'.
+ *
+ * IMPORTANT NOTE: The naming convention for customization args that are passed
+ * into the directive is: the name of the parameter, followed by 'With',
+ * followed by the name of the arg.
+ */
+oppia.directive('oppiaInteractiveRedirectExploration', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/interactions/RedirectExploration/directives/' +
+        'redirect_exploration_interaction_directive.html'),
+      controller: [
+        '$scope', '$http', '$attrs', '$q', 'UrlService',
+        'ExplorationContextService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
+        'HtmlEscaperService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+        function(
+            $scope, $http, $attrs, $q, UrlService,
+            ExplorationContextService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT,
+            HtmlEscaperService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
+          var redirectExplorationId = [];
+          redirectExplorationId.push(
+            HtmlEscaperService.escapedJsonToObj(
+              $attrs.redirectExplorationIdWithValue));
+          $scope.isIframed = UrlService.isIframed();
+          $scope.isInEditorPage = (
+            ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+          $scope.isInEditorPreviewMode = $scope.isInEditorPage && (
+            ExplorationContextService.getEditorTabContext() ===
+              EDITOR_TAB_CONTEXT.PREVIEW);
+          $scope.isInEditorMainTab = $scope.isInEditorPage && (
+            ExplorationContextService.getEditorTabContext() ===
+              EDITOR_TAB_CONTEXT.EDITOR);
+
+          $scope.collectionId = GLOBALS.collectionId;
+          $scope.getCollectionTitle = function() {
+            return GLOBALS.collectionTitle;
+          };
+
+          $scope.errorMessage = '';
+
+          if ($scope.isInEditorPage) {
+            // Display a message if any author-recommended explorations are
+            // invalid.
+            var explorationId = ExplorationContextService.getExplorationId();
+            $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
+              params: {
+                stringified_exp_ids: JSON.stringify(redirectExplorationId)
+              }
+            }).then(function(response) {
+              var data = response.data;
+              if (data.summaries.length > 0) {
+                $scope.errorMessage = '';
+              } else {
+                $scope.errorMessage = (
+                  'Warning: exploration with the ID "' + redirectExplorationId +
+                  '" will ' + 'not be shown as recommendations because they ' +
+                  'either do not exist, or are not publicly viewable.');
+              }
+            });
+          } else {
+            $scope.redirectUrl = '/explore/' + redirectExplorationId;
+          }
+        }
+      ]
+    };
+  }
+]);
+
+oppia.directive('oppiaResponseRedirectExploration', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    template: ''
+  };
+}]);
+
+oppia.directive('oppiaShortResponseRedirectExploration', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    template: ''
+  };
+}]);
+
+oppia.factory('redirectExplorationRulesService', [function() {
+  return {};
+}]);

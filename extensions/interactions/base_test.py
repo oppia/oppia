@@ -43,7 +43,8 @@ TEXT_INPUT_ID = 'TextInput'
 _INTERACTION_CONFIG_SCHEMA = [
     ('name', basestring), ('display_mode', basestring),
     ('description', basestring), ('_customization_arg_specs', list),
-    ('is_terminal', bool), ('needs_summary', bool)]
+    ('is_terminal', bool), ('continue_type', basestring),
+    ('needs_summary', bool)]
 
 
 class InteractionAnswerUnitTests(test_utils.GenericTestBase):
@@ -148,10 +149,12 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(interaction_dict.keys(), [
             'id', 'name', 'description', 'display_mode',
             'customization_arg_specs', 'is_trainable', 'is_terminal',
-            'is_linear', 'rule_descriptions', 'instructions',
+            'continue_type', 'is_linear', 'rule_descriptions', 'instructions',
             'narrow_instructions', 'needs_summary',
             'default_outcome_heading', 'can_have_solution'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
+        self.assertEqual(interaction_dict['continue_type'],
+                         base.CONTINUES_TO_NEXT_STATE)
         self.assertEqual(interaction_dict['customization_arg_specs'], [{
             'name': 'placeholder',
             'description': 'Placeholder text (optional)',

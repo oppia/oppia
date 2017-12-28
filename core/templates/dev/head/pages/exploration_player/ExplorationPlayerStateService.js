@@ -39,8 +39,16 @@ oppia.factory('ExplorationPlayerStateService', [function() {
       return exploration.isStateTerminal(stateName);
     },
 
+    isStateRedirect: function(stateName) {
+      return exploration.isStateRedirect(stateName);
+    },
+
     getAuthorRecommendedExpIds: function(stateName) {
       return exploration.getAuthorRecommendedExpIds(stateName);
+    },
+
+    getRedirectExplorationId: function(stateName) {
+      return exploration.getRedirectExplorationId(stateName);
     },
 
     getLanguageCode: function() {
