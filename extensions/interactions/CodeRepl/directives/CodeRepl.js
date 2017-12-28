@@ -21,10 +21,10 @@
  */
 oppia.directive('oppiaInteractiveCodeRepl', [
   'HtmlEscaperService', 'codeReplRulesService', 'UrlInterpolationService',
-  'ExplorationContextService', 'PAGE_CONTEXT', 'EVENT_NEW_CARD_AVAILABLE',
+  'EVENT_NEW_CARD_AVAILABLE',
   function(
       HtmlEscaperService, codeReplRulesService, UrlInterpolationService,
-      ExplorationContextService, PAGE_CONTEXT, EVENT_NEW_CARD_AVAILABLE) {
+      EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
@@ -35,13 +35,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         '/interactions/CodeRepl/directives/' +
         'code_repl_interaction_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.isInEditorPage = (
-          ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
-        if ($scope.isInEditorPage) {
-          $scope.interactionIsActive = true;
-        } else {
-          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
-        }
+        $scope.interactionIsActive = ($scope.getLastAnswer() === null);
 
         $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
           $scope.interactionIsActive = false;

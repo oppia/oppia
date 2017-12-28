@@ -14,10 +14,8 @@
 
 oppia.directive('oppiaInteractiveLogicProof', [
   'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
-  'ExplorationContextService', 'PAGE_CONTEXT',
-  function(
-      HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE,
-      ExplorationContextService, PAGE_CONTEXT) {
+   function(
+      HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
@@ -38,13 +36,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // the dependencies.
           $scope.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
 
-          $scope.isInEditorPage = (
-            ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
-          if ($scope.isInEditorPage) {
-            $scope.interactionIsActive = true;
-          } else {
-            $scope.interactionIsActive = ($scope.getLastAnswer() === null);
-          }
+          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             $scope.interactionIsActive = false;
           });

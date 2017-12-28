@@ -24,10 +24,10 @@ oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
 
 oppia.directive('oppiaInteractiveGraphInput', [
   'HtmlEscaperService', 'graphInputRulesService', 'UrlInterpolationService',
-  'ExplorationContextService', 'EVENT_NEW_CARD_AVAILABLE', 'PAGE_CONTEXT',
+  'EVENT_NEW_CARD_AVAILABLE',
   function(
       HtmlEscaperService, graphInputRulesService, UrlInterpolationService,
-      ExplorationContextService, EVENT_NEW_CARD_AVAILABLE, PAGE_CONTEXT) {
+      EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
@@ -55,13 +55,8 @@ oppia.directive('oppiaInteractiveGraphInput', [
               rulesService: graphInputRulesService
             });
           };
-          $scope.isInEditorPage = (
-            ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
-          if ($scope.isInEditorPage) {
-            $scope.interactionIsActive = true;
-          } else {
-            $scope.interactionIsActive = ($scope.getLastAnswer() === null);
-          }
+
+          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             $scope.interactionIsActive = false;
 

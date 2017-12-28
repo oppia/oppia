@@ -23,11 +23,11 @@
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
-  'PAGE_CONTEXT', 'EVENT_NEW_CARD_AVAILABLE',
+  'EVENT_NEW_CARD_AVAILABLE',
   function(
       $sce, HtmlEscaperService, ExplorationContextService,
       imageClickInputRulesService, UrlInterpolationService,
-      PAGE_CONTEXT, EVENT_NEW_CARD_AVAILABLE) {
+      EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
@@ -51,13 +51,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               '/' + encodeURIComponent($scope.filepath)) : null);
           $scope.mouseX = 0;
           $scope.mouseY = 0;
-          $scope.isInEditorPage = (
-            ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
-          if ($scope.isInEditorPage) {
-            $scope.interactionIsActive = true;
-          } else {
-            $scope.interactionIsActive = ($scope.getLastAnswer() === null);
-          }
+          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
 
           $scope.currentlyHoveredRegions = [];
           $scope.allRegions = imageAndRegions.labeledRegions;
