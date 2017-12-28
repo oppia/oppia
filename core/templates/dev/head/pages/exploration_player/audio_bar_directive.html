@@ -20,7 +20,7 @@
     </div>
   </div>
   <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()"><i class="fa fa-sort-up"></i></div>
-  <div class="audio-expand-button audio-toggle-button" ng-if="!audioBarIsExpanded" ng-click="expandAudioBar()">AUDIO <i class="fa fa-sort-down"></i></div>
+  <div class="audio-expand-button audio-toggle-button" ng-if="!audioBarIsExpanded" ng-click="expandAudioBar()"><span translate="I18N_PLAYER_AUDIO_EXPAND_TEXT"></span> <i class="fa fa-sort-down"></i></div>
 </div>
 
 <style>
@@ -29,18 +29,19 @@
     background-color: #009688;
   }
 
-  .fa-sort-up, .fa-sort-down {
+  .audio-header .fa-sort-up, .audio-header .fa-sort-down {
     transform: translateY(-2px);
   }
 
   .audio-expand-button {
-    width: 80px;
     height: 20px;
+    width: 80px;
+    text-transform: uppercase;
   }
 
   .audio-collapse-button {
-    width: 30px;
     height: 10px;
+    width: 30px;
   }
 
   .audio-toggle-button {  

@@ -106,7 +106,6 @@ oppia.directive('audioBar', [
 
           var updateAudioHeaderPosition = function() {
             var scrollTop = $(this).scrollTop();
-            console.log(scrollTop);
             var audioHeader = angular.element(
               document.querySelector('.audio-header'));
             if (scrollTop > lastScrollTop) {
