@@ -1144,7 +1144,8 @@ oppia.factory('autosaveInfoModalsService', [
               // TODO(sll): This should also include changes to exploration
               // properties (such as the exploration title, category, etc.).
               $scope.lostChangesHtml = (
-                ChangesInHumanReadableFormService.makeHumanReadable(lostChanges).html());
+                ChangesInHumanReadableFormService.makeHumanReadable(
+                  lostChanges).html());
               $log.error('Lost changes: ' + JSON.stringify(lostChanges));
             }
           }],
