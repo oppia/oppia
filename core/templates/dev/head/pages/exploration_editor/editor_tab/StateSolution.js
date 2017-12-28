@@ -27,9 +27,9 @@ oppia.controller('StateSolution', [
     $scope, $rootScope, $uibModal, EditorStateService, AlertsService,
     INTERACTION_SPECS, stateSolutionService, explorationStatesService,
     SolutionVerificationService, ExplorationHtmlFormatterService,
-    stateInteractionIdService, stateHintsService,
-    UrlInterpolationService, SolutionObjectFactory, ExplorationContextService,
-    ExplorationWarningsService,INFO_MESSAGE_SOLUTION_IS_INVALID) {
+    stateInteractionIdService, stateHintsService, UrlInterpolationService,
+    SolutionObjectFactory, ExplorationContextService,
+    ExplorationWarningsService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
     $scope.correctAnswer = null;
     $scope.correctAnswerEditorHtml = '';
     $scope.inlineSolutionEditorIsActive = false;
