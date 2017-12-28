@@ -33,7 +33,6 @@ oppia.directive('hintAndSolutionButtons', [
           ExplorationPlayerService, SolutionManagerService,
           PlayerTranscriptService, HintAndSolutionModalService,
           DeviceInfoService, WindowDimensionsService) {
-
           $scope.defaultHintUrl = UrlInterpolationService.getStaticImageUrl(
             '/icons/default_hint.svg');
 
@@ -79,17 +78,16 @@ oppia.directive('hintAndSolutionButtons', [
             var promise = (
               HintAndSolutionModalService.displayHintModalForIndex(index));
             promise.result.then(null, function() {
-                $scope.activeModalIndex = null;
-              });
-
+              $scope.activeModalIndex = null;
+            });
           };
 
           $scope.displaySolutionModal = function() {
             $scope.activeModalIndex = -1;
             HintAndSolutionModalService.displaySolutionModal().result.then(null,
               function() {
-              $scope.activeModalIndex = null;
-            });
+                $scope.activeModalIndex = null;
+              });
           };
         }
       ]
