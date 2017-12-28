@@ -658,6 +658,13 @@ def apply_change_list(collection_id, change_list):
                 continue
             elif change.cmd == collection_domain.CMD_ADD_COLLECTION_SKILL:
                 collection.add_skill(change.name)
+            elif change.cmd == collection_domain.CMD_ADD_QUESTION_ID_TO_SKILL:
+                collection.add_question_id_to_skill(
+                    change.skill_id, change.question_id)
+            elif (change.cmd ==
+                  collection_domain.CMD_REMOVE_QUESTION_ID_FROM_SKILL):
+                collection.remove_question_id_from_skill(
+                    change.skill_id, change.question_id)
             elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_SKILL:
                 collection.delete_skill(change.skill_id)
         return collection
@@ -1207,3 +1214,26 @@ def index_collections_given_ids(collection_ids):
     search_services.index_collection_summaries([
         collection_summary for collection_summary in collection_summaries
         if collection_summary is not None])
+
+
+def get_acquired_skill_ids_of_user(user_id, collection_id):
+    """Returns the acquired skills of the user identified by user_id
+    for a given collection.
+
+    Args:
+        user_id: str. The id of the user.
+        collection_id: str. The id of the collection.
+
+    Returns:
+        list(str). A list of skill ids acquired by the user.
+
+    Raises:
+        Exception: Collection with given ID does not exist.
+    """
+    completed_exploration_ids = get_completed_exploration_ids(
+        user_id, collection_id)
+    collection = get_collection_by_id(collection_id)
+    acquired_skill_ids = (
+        collection.get_acquired_skill_ids_from_exploration_ids(
+            completed_exploration_ids))
+    return acquired_skill_ids
