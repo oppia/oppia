@@ -583,6 +583,57 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             collection.get_node('exp_id_1').prerequisite_skill_ids, [])
 
+    def test_get_skill_id_from_skill_name(self):
+        """Test to verify get_skill_id_from_skill_name works."""
+        collection = collection_domain.Collection.create_default_collection(
+            'exp_id')
+        self.assertEqual(collection.skills, {})
+
+        collection.add_skill('skillname1')
+        collection.add_skill('skillname2')
+        skill_id = collection.get_skill_id_from_skill_name('skillname1')
+        self.assertIn(skill_id, collection.skills)
+
+        collection.delete_skill(skill_id)
+        skill_id = collection.get_skill_id_from_skill_name('skillname1')
+        self.assertEqual(skill_id, None)
+
+    def test_add_question_id_to_skill(self):
+        """Test to verify add_question_id_to_skill method."""
+        collection = collection_domain.Collection.create_default_collection(
+            'exp_id')
+        collection.add_skill('skillname')
+        skill_id = collection.get_skill_id_from_skill_name('skillname')
+        collection.add_question_id_to_skill(skill_id, 'question0')
+        self.assertIn('question0', collection.skills[skill_id].question_ids)
+
+        with self.assertRaises(Exception):
+            collection.add_question_id_to_skill(skill_id, 'question0')
+
+    def test_remove_question_id_from_skill(self):
+        """Test to verify remove_question_id_from_skill method."""
+        collection = collection_domain.Collection.create_default_collection(
+            'exp_id')
+        collection.add_skill('skillname')
+        skill_id = collection.get_skill_id_from_skill_name('skillname')
+        collection.add_question_id_to_skill(skill_id, 'question0')
+        with self.assertRaises(Exception):
+            collection.remove_question_id_from_skill(skill_id, 'random')
+        collection.remove_question_id_from_skill(skill_id, 'question0')
+        self.assertEqual(len(collection.skills[skill_id].question_ids), 0)
+
+    def test_get_acquired_skill_ids_from_exploration_ids(self):
+        """Test get_acquired_skill_ids_from_exploration_ids method."""
+        collection = collection_domain.Collection.create_default_collection(
+            'collection_id')
+        collection.add_node('exp_id_0')
+        collection.get_node('exp_id_0').update_acquired_skill_ids(
+            ['skill0a'])
+        self.assertIn(
+            'skill0a',
+            collection.get_acquired_skill_ids_from_exploration_ids(
+                ['exp_id_0']))
+
 class ExplorationGraphUnitTests(test_utils.GenericTestBase):
     """Test the skill graph structure within a collection."""
 

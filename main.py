@@ -34,6 +34,7 @@ from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
 from core.controllers import profile
+from core.controllers import question
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
@@ -458,6 +459,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_UNPUBLISH_PREFIX,
         collection_editor.CollectionUnpublishHandler),
+
+    get_redirect_route(
+        r'%s/batch' % feconf.QUESTION_DATA_URL,
+        question.QuestionsBatchHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
