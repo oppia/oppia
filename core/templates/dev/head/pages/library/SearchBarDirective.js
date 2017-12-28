@@ -43,13 +43,18 @@ oppia.directive('searchBar', [
               }
             )
           );
-          $scope.ALL_LANGUAGE_CODES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(
+          // TODO(sll): Remove the filter once the App Engine Search API
+          // supports 3-letter language codes.
+          $scope.ALL_LANGUAGE_CODES = GLOBALS.LANGUAGE_CODES_AND_NAMES.filter(
             function(languageItem) {
-              return {
-                id: languageItem.code,
-                text: languageItem.name
-              };
-            });
+              return languageItem.code.length === 2;
+            }
+          ).map(function(languageItem) {
+            return {
+              id: languageItem.code,
+              text: languageItem.name
+            };
+          });
 
           $scope.searchQuery = '';
           $scope.selectionDetails = {
