@@ -251,7 +251,7 @@ describe('Audio preloader service', function() {
       $httpBackend.expect('GET', requestUrl4).respond(201, 'audio data 4');
       var exploration = eof.createFromBackendDict(explorationDict);
       aps.init(exploration);
-      atms.init('en', 'en', 'en');
+      atms.init(['en'], 'en', 'en');
       aps.kickOffAudioPreloader(exploration.getInitialState().name);
 
       expect(aps.getFilenamesOfAudioCurrentlyDownloading().length).toBe(3);
@@ -276,7 +276,7 @@ describe('Audio preloader service', function() {
   it('should properly restart pre-loading from a new state', function() {
     var exploration = eof.createFromBackendDict(explorationDict);
     aps.init(exploration);
-    atms.init('en', 'en', 'en');
+    atms.init(['en'], 'en', 'en');
     aps.kickOffAudioPreloader(exploration.getInitialState().name);
     expect(aps.getFilenamesOfAudioCurrentlyDownloading().length).toBe(3);
     aps.restartAudioPreloader('State 3');
