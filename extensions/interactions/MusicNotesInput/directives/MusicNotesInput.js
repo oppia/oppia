@@ -111,7 +111,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         if (scope.isInEditorPage) {
           scope.interactionIsActive = true;
         } else {
-          scope.interactionIsActive = ($scope.getLastAnswer() === null);
+          scope.interactionIsActive = (scope.getLastAnswer() === null);
         }
         scope.initialSequence = scope.interactionIsActive ?
           HtmlEscaperService.escapedJsonToObj(attrs.initialSequenceWithValue) :
