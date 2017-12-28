@@ -41,8 +41,25 @@ oppia.factory('HintAndSolutionModalService', [
           ]
         });
       },
+      displayHintModalForIndex: function(index) {
+        return $modal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_player/hint_and_solution_modal_directive.html'),
+          backdrop: 'static',
+          controller: [
+            '$scope', '$modalInstance',
+            function($scope, $modalInstance) {
+              $scope.isHint = true;
+              $scope.hint = HintManagerService.getHintAtIndex(index);
+              $scope.gotIt = function() {
+                $modalInstance.dismiss('cancel');
+              };
+            }
+          ]
+        });
+      },
       displaySolutionModal: function() {
-        $modal.open({
+        return $modal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/hint_and_solution_modal_directive.html'),
           backdrop: 'static',
