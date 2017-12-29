@@ -29,7 +29,7 @@ describe('HistoryTab controller', function() {
 
     it('should get version number of revisions to be displayed',
     function() {
-      $scope.currentPage = 1;
+      $scope.currentPageDisplay = 1;
       $scope.versionsPerPage = 2;
       $scope.versionCheckboxArray = [
         {vnum: 5, selected: false},
@@ -40,10 +40,10 @@ describe('HistoryTab controller', function() {
       ];
       $scope.computeVersionsToDisplay();
       expect($scope.versionNumbersToDisplay).toEqual([5, 4]);
-      $scope.currentPage = 2;
+      $scope.currentPageDisplay = 2;
       $scope.computeVersionsToDisplay();
       expect($scope.versionNumbersToDisplay).toEqual([3, 2]);
-      $scope.currentPage = 3;
+      $scope.currentPageDisplay = 3;
       $scope.computeVersionsToDisplay();
       expect($scope.versionNumbersToDisplay).toEqual([1]);
     });
