@@ -687,8 +687,8 @@ class ExplorationSnapshotsHandler(EditorHandler):
             snapshot['committer_id'] for snapshot in snapshots]
         committer_usernames = user_services.get_usernames(
             snapshots_committer_ids)
-        for snapshot in snapshots:
-            snapshot['committer_id'] = committer_usernames.pop(0)
+        for index, snapshot in enumerate(snapshots):
+            snapshot['committer_id'] = committer_usernames[index]
 
         self.render_json({
             'snapshots': snapshots,

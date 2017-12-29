@@ -47,11 +47,5 @@ describe('HistoryTab controller', function() {
       $scope.computeVersionsToDisplay();
       expect($scope.versionNumbersToDisplay).toEqual([1]);
     });
-
-    it('should handle a page change displaying correct versions', function() {
-      spyOn($scope, 'computeVersionsToDisplay');
-      $scope.pageChanged();
-      expect($scope.computeVersionsToDisplay).toHaveBeenCalled();
-    });
   });
 });

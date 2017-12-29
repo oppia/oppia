@@ -687,6 +687,21 @@ def create_new_user(user_id, email):
     return user_settings
 
 
+def get_system_username(system_user_id):
+    """Gets system username corresponding to the given system user_id.
+
+    Args:
+        system_user_id: str. The system user id.
+
+    Returns:
+        str. System username corresponding to the given system user_id.
+    """
+    if system_user_id == feconf.SYSTEM_COMMITTER_ID:
+        return feconf.SYSTEM_COMMITTER_ID
+    elif system_user_id == feconf.MIGRATION_BOT_USER_ID:
+        return feconf.MIGRATION_BOT_USERNAME
+
+
 def get_username(user_id):
     """Gets username corresponding to the given user_id.
 
@@ -696,10 +711,11 @@ def get_username(user_id):
     Returns:
         str. Username corresponding to the given user_id.
     """
-    if user_id == feconf.MIGRATION_BOT_USER_ID:
-        return feconf.MIGRATION_BOT_USERNAME
-    else:
-        return get_user_settings(user_id, strict=True).username
+    if (user_id == feconf.SYSTEM_COMMITTER_ID or
+            user_id == feconf.MIGRATION_BOT_USER_ID):
+        return get_system_username(user_id)
+
+    return get_user_settings(user_id, strict=True).username
 
 
 def get_usernames(user_ids):
@@ -713,8 +729,22 @@ def get_usernames(user_ids):
         If a user_id does not exist, the corresponding entry in the
         returned list is None.
     """
+    usernames = [''] * len(user_ids)
+    for index, user_id in enumerate(user_ids):
+        if (user_id == feconf.SYSTEM_COMMITTER_ID or
+                user_id == feconf.MIGRATION_BOT_USER_ID):
+            usernames[index] = get_system_username(user_id)
+
     users_settings = get_users_settings(user_ids)
-    return [us.username if us else None for us in users_settings]
+
+    for index, user_settings in enumerate(users_settings):
+        if usernames[index] == '':
+            if user_settings:
+                usernames[index] = user_settings.username
+            else:
+                usernames[index] = None
+
+    return usernames
 
 
 # NB: If we ever allow usernames to change, update the

@@ -1,7 +1,7 @@
 <div ng-controller="HistoryTab" class="container-fluid" style="word-wrap: break-word;">
   <md-card class="oppia-editor-card">
     <h3>List of Changes</h3>
-    <div ng-repeat="versionNumber in versionNumbersToDisplay " class="row">
+    <div ng-repeat="versionNumber in versionNumbersToDisplay" class="row">
       <div class="col-sm-4 col-md-4 col-lg-4">
         <input type="checkbox" name="compareVer" ng-model="versionCheckboxArray[versionNumber].selected" ng-init="init()" ng-click="changeSelectedVersions($event, versionNumber)" ng-disabled="isCheckboxDisabled(versionNumber)" ng-hide="comparisonsAreDisabled" class='protractor-test-history-checkbox-selector'>
         [<[versionNumber]>]
@@ -31,8 +31,10 @@
         <[versionCountPrompt]>
       </div>
     </div>
+
     <br>
-      <pagination boundary-links="true" class="pagination-sm" max-size="5" items-per-page="versionsPerPage" total-items="versionCheckboxArray.length" ng-model="currentPage" ng-change="pageChanged()"></pagination>
+
+    <div uib-pagination boundary-links="true" class="pagination-sm" max-size="5" items-per-page="versionsPerPage" total-items="versionCheckboxArray.length" ng-model="currentPageDisplay" ng-change="computeVersionsToDisplay()"></div>
   </md-card>
 
   <md-card class="oppia-editor-card" style="position: relative;"
