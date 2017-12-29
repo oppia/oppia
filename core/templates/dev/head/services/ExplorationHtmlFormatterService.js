@@ -38,15 +38,10 @@ oppia.factory('ExplorationHtmlFormatterService', [
           extensionTagAssemblerService.formatCustomizationArgAttrs(
             element, interactionCustomizationArgSpecs));
         element.attr('on-submit', 'submitAnswer(answer, rulesService);');
-        if (!canAcceptAnswers) {
-          element.attr('last-answer', 'null');
-        } else {
-          element.attr('last-answer', 'lastAnswer');
-        }
+        element.attr('last-answer', canAcceptAnswers ? 'lastAnswer' : 'null');
         if (labelForFocusTarget) {
           element.attr('label-for-focus-target', labelForFocusTarget);
         }
-
         return element.get(0).outerHTML;
       },
 
