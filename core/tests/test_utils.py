@@ -78,14 +78,14 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
         calls to the urlfetch mock.
 
         Args:
-            content: str. The content to return in subsequent call to the
-            urlfetch mock.
+            content: str. The content to return in subsequent calls to the
+                urlfetch mock.
             status_code: int. The status_code to return in subsequent calls to
-            the urlfetch mock.
+                the urlfetch mock.
             headers: dict. The headers to return in subsequent calls to the
-            urlfetch mock. The keys of this dict are strings that represent
-            the header name and the value represents corresponding value of
-            that header.
+                urlfetch mock. The keys of this dict are strings that represent
+                the header name and each value represents the corresponding
+                value of that header.
         """
         self.return_values['content'] = content
         self.return_values['status_code'] = status_code
@@ -163,14 +163,14 @@ class TestBase(unittest.TestCase):
     }
 
     def _get_unicode_test_string(self, suffix):
-        """Tests if unicode string are working properly.
+        """Returns the complete unicode string with suffix.
 
         Args:
-            suffix: str. the suffix pattern to the UNICODE_TEST_STRING.
+            suffix: str. The suffix to append to the UNICODE_TEST_STRING.
 
         Returns:
-            str. string with UNICODE_TEST_STRING appended to the value
-            passed in `suffix` variable.
+            str. A string that contains unicode characters and ends with the
+                given suffix.
         """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
@@ -347,7 +347,7 @@ class TestBase(unittest.TestCase):
         """Complete the signup process for the user with the given username.
 
         Args:
-            email: str. Email of the given user
+            email: str. Email of the given user.
             username: str. Username of the given user.
         """
         self.login(email)
@@ -449,7 +449,8 @@ class TestBase(unittest.TestCase):
         """Gets the user_id of the current logged-in user.
 
         Returns:
-            str. Value of USER_ID env variable.
+            str. The user_id of the currently logged-in user. In tests, we
+                simulate this using a USER_ID env variable.
         """
         return os.environ['USER_ID']
 
@@ -457,10 +458,10 @@ class TestBase(unittest.TestCase):
         """Gets the user_id corresponding to the given email.
 
         Args:
-            email: str. valid email id stored in the App Engine database.
+            email: str. A valid email stored in the App Engine database.
 
         Returns:
-            user_id: str. Id of user possessing the given email.
+            user_id: str. ID of the user possessing the given email.
         """
         return current_user_services.get_user_id_from_email(email)
 
@@ -536,7 +537,7 @@ class TestBase(unittest.TestCase):
         *current* states schema version.
 
         Args:
-            exp_id: str. The exploration Id.
+            exp_id: str. The exploration ID.
             user_id: str. The user_id of the creator.
             title: str. The title of the exploration.
         """
@@ -587,7 +588,7 @@ class TestBase(unittest.TestCase):
         exp_services.create_and_save_state_id_mapping_model(exploration, [])
 
     def publish_exploration(self, owner_id, exploration_id):
-        """Publish the exploration of given exploration_id.
+        """Publish the exploration with the given exploration_id.
 
         Args:
             collection_id: str. The id of the new collection.
@@ -629,18 +630,18 @@ class TestBase(unittest.TestCase):
         exploration details.
 
         Args:
-            collection_id: str. Id for the collection to be created.
-            owner_id: str. user_id for owner to be linked to the collection.
-            title: str. title for the collection.
-            category: str. category of the exploration.
-            objective: str. objective for the exploration.
+            collection_id: str. ID for the collection to be created.
+            owner_id: str. The user_id of the creator of the collection.
+            title: str. Title for the collection.
+            category: str. The category of the exploration.
+            objective: str. Objective for the exploration.
             language_code: str. The language code for the exploration.
-            exploration_id: str. exploration_id for the Oppia exploration.
+            exploration_id: str. The exploration_id for the Oppia exploration.
             end_state_name: str. The name of the end state for the exploration.
 
         Returns:
-            Collection. Newly created collection containing corresponding
-            exploration details.
+            Collection. A newly-created collection containing the corresponding
+                exploration details.
         """
         collection = collection_domain.Collection.create_default_collection(
             collection_id, title, category, objective,
@@ -659,11 +660,11 @@ class TestBase(unittest.TestCase):
         return collection
 
     def publish_collection(self, owner_id, collection_id):
-        """Publish the collection of given collection_id.
+        """Publish the collection with the given collection_id.
 
         Args:
-            owner_id: str. user_id for the owner of the collection.
-            collection_id: str. Id for the collection to be published.
+            owner_id: str. user_id of the owner of the collection.
+            collection_id: str. ID of the collection to be published.
         """
         committer = user_services.UserActionsInfo(owner_id)
         rights_manager.publish_collection(committer, collection_id)
@@ -789,7 +790,11 @@ class AppEngineTestBase(TestBase):
         self.testbed.deactivate()
 
     def _get_all_queue_names(self):
-        """Returns all the queue names."""
+        """Returns all the queue names.
+
+        Returns:
+            list(str). All the queue names.
+        """
         return [q['name'] for q in self.taskqueue_stub.GetQueues()]
 
     @contextlib.contextmanager
@@ -806,9 +811,9 @@ class AppEngineTestBase(TestBase):
             content: str. Response content or body.
             status_code: int. Response status code.
             headers: dict. The headers in subsequent calls to the
-            urlfetch mock. The keys of this dict are strings that represent
-            the header name and the value represents corresponding value of
-            that header.
+                urlfetch mock. The keys of this dict are strings that represent
+                the header name and the value represents corresponding value of
+                that header.
         """
         if headers is None:
             response_headers = {}
@@ -904,17 +909,17 @@ class FunctionWrapper(object):
 
         Args:
             func: a callable, or data descriptor. If it's a descriptor, its
-            __get__ should return a bound method. For example, func can be a
-            function, a method, a static or class method, but not a @property.
+                __get__ should return a bound method. For example, func can be
+                a function, a method, a static or class method, but not a
+                @property.
         """
         self._func = func
         self._instance = None
 
     def __call__(self, *args, **kwargs):
         """Overrides the call method for the function to call pre_call_hook
-        method which would be called (for parity with your description of
-        post_call_hook) before the function is executed and post_call_hook
-        which would be called after the function is executed.
+        method which would be called before the function is executed and
+        post_call_hook which would be called after the function is executed.
         """
         if self._instance is not None:
             args = [self._instance] + list(args)
@@ -941,7 +946,7 @@ class FunctionWrapper(object):
         actual function call.
 
         Args:
-            args: Set of arguments that the function accepts.
+            args: list(str). Set of arguments that the function accepts.
         """
         pass
 
@@ -950,8 +955,8 @@ class FunctionWrapper(object):
         actual function call.
 
         Args:
-            args: Set of arguments that the function accepts.
-            result: Result returned from the function.
+            args: list(str). Set of arguments that the function accepts.
+            result: str. Result returned from the function.
         """
         pass
 
@@ -971,17 +976,21 @@ class CallCounter(FunctionWrapper):
 
     @property
     def times_called(self):
-        """Property that returns the number of times a function is called.
+        """Property that returns the number of times the wrapped function has
+        been called.
+
+        Returns:
+            int. The number of times the wrapped function has been called.
         """
         return self._times_called
 
     def pre_call_hook(self, args):
         """Method that is called before each function call to increment the
         counter tracking the number of times a function is called. This
-        would also be called even when the function raises an exception.
+        will also be called even when the function raises an exception.
 
         Args:
-            args: Set of arguments that the function accepts.
+            args: list(str). Set of arguments that the function accepts.
         """
         self._times_called += 1
 
@@ -997,11 +1006,12 @@ class FailingFunction(FunctionWrapper):
         """Create a new Failing function.
 
         Args:
-            f: func. see FunctionWrapper.
-            exception: str. the exception to be raised.
-            num_tries_before_success: int. the number of times to raise an
-            exception, before a call succeeds. If this is 0, all calls will
-            succeed, if it is FailingFunction.INFINITY, all calls will fail.
+            f: func. See FunctionWrapper.
+            exception: str. The exception to be raised.
+            num_tries_before_success: int. The number of times to raise an
+                exception, before a call succeeds. If this is 0, all calls will
+                succeed, if it is FailingFunction. INFINITY, all calls will
+                fail.
         """
         super(FailingFunction, self).__init__(f)
         self._exception = exception
@@ -1022,7 +1032,7 @@ class FailingFunction(FunctionWrapper):
         tries before success.
 
         Args:
-            args: Set of arguments this function accepts.
+            args: list(str). Set of arguments this function accepts.
         """
         self._times_called += 1
         call_should_fail = (
