@@ -23,6 +23,11 @@ oppia.factory('ExplorationHtmlFormatterService', [
   '$filter', 'extensionTagAssemblerService', 'HtmlEscaperService',
   function($filter, extensionTagAssemblerService, HtmlEscaperService) {
     return {
+      /**
+      * @param {boolean} canAcceptAnswers - Whether or not last answer is
+      * displayed when returning to the interaction. Set to false when called
+      * from editor tab.
+      */
       getInteractionHtml: function(
           interactionId, interactionCustomizationArgSpecs, canAcceptAnswers,
           labelForFocusTarget) {
