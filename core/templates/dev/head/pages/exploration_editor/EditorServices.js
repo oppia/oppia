@@ -526,7 +526,7 @@ oppia.factory('explorationCorrectnessFeedbackService', [
       return (typeof value === 'boolean');
     };
 
-    child.isCorrectnessFeedbackEnabled = function() {
+    child.isEnabled = function() {
       return child.savedMemento;
     };
 

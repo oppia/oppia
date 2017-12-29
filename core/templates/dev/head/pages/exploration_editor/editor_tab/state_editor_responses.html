@@ -30,8 +30,7 @@
                                on-delete-fn="deleteAnswerGroup"
                                outcome="answerGroup.outcome"
                                labelled-as-correct="answerGroup.labelledAsCorrect"
-                               num-rules="answerGroup.rules.length"
-                               is-correctness-feedback-enabled="isCorrectnessFeedbackEnabled()">
+                               num-rules="answerGroup.rules.length">
               </response-header>
             </a>
 
@@ -47,8 +46,7 @@
                                        is-editable="editabilityService.isEditable()"
                                        display-feedback="!isLinearWithNoFeedback(answerGroup.outcome)"
                                        labelled-as-correct="answerGroup.labelledAsCorrect"
-                                       class="protractor-test-response-body"
-                                       is-correctness-feedback-enabled="isCorrectnessFeedbackEnabled()">
+                                       class="protractor-test-response-body">
                   </answer-group-editor>
                 </div>
               </div>
@@ -72,8 +70,7 @@
                                summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:false"
                                short-summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:true"
                                labelled-as-correct="false"
-                               outcome="defaultOutcome"
-                               is-correctness-feedback-enabled="isCorrectnessFeedbackEnabled()">
+                               outcome="defaultOutcome">
               </response-header>
             </a>
 
@@ -87,8 +84,7 @@
                                        is-editable="editabilityService.isEditable()"
                                        suppress-warnings="suppressDefaultAnswerGroupWarnings()"
                                        display-feedback="!isLinearWithNoFeedback(defaultOutcome)"
-                                       class="protractor-test-response-body"
-                                       is-correctness-feedback-enabled="isCorrectnessFeedbackEnabled()">
+                                       class="protractor-test-response-body">
                   </answer-group-editor>
                 </div>
               </div>

@@ -184,7 +184,7 @@ oppia.controller('SettingsTab', [
       explorationAutomaticTextToSpeechService.toggleAutomaticTextToSpeech);
 
     $scope.isCorrectnessFeedbackEnabled = (
-      explorationCorrectnessFeedbackService.isCorrectnessFeedbackEnabled);
+      explorationCorrectnessFeedbackService.isEnabled);
     $scope.toggleCorrectnessFeedback = (
       explorationCorrectnessFeedbackService.toggleCorrectnessFeedback);
 

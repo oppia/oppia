@@ -27,7 +27,6 @@ oppia.directive('responseHeader', [
         getShortSummary: '&shortSummary',
         isActive: '&isActive',
         getOnDeleteFn: '&onDeleteFn',
-        isCorrectnessFeedbackEnabled: '=',
         getCorrect: '&labelledAsCorrect',
         getNumRules: '&numRules'
       },
@@ -36,16 +35,21 @@ oppia.directive('responseHeader', [
         'response_header_directive.html'),
       controller: [
         '$scope', 'editabilityService', 'EditorStateService', 'RouterService',
-        'PLACEHOLDER_OUTCOME_DEST',
+        'PLACEHOLDER_OUTCOME_DEST', 'explorationCorrectnessFeedbackService',
         function(
             $scope, editabilityService, EditorStateService, RouterService,
-            PLACEHOLDER_OUTCOME_DEST) {
+            PLACEHOLDER_OUTCOME_DEST, explorationCorrectnessFeedbackService) {
           $scope.editabilityService = editabilityService;
 
           $scope.isOutcomeLooping = function() {
             var outcome = $scope.getOutcome();
             var activeStateName = EditorStateService.getActiveStateName();
             return outcome && (outcome.dest === activeStateName);
+          };
+
+          $scope.isCorrectnessFeedbackEnabled = function() {
+            return (
+              explorationCorrectnessFeedbackService.isEnabled());
           };
 
           $scope.isCreatingNewState = function() {
