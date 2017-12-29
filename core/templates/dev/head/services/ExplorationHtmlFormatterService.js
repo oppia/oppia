@@ -24,20 +24,21 @@ oppia.factory('ExplorationHtmlFormatterService', [
   function($filter, extensionTagAssemblerService, HtmlEscaperService) {
     return {
       /**
-      * @param {string} interactionId - The id of interaction in camel case.
-      * @param {object} interactionCustomizationArgSpecs - The various
-      * attributes that the interaction depends on.
-      * @param {boolean} canAcceptAnswers - Whether or not last answer is
-      * displayed permanently after learner has submitted an answer for
-      * non-inline interactions.
-      * If called from editor tab, set this to false.
-      * If interaction is non-inline and if last answer submitted by user is to
-      * be displayed permanently (in player view), set this to true,
-      * @param {string} labelForFocusTarget - The label for setting focus on the
-      * interaction.
-      */
+       * @param {string} interactionId - The id of interaction in camel case.
+       * @param {object} interactionCustomizationArgSpecs - The various
+       *   attributes that the interaction depends on.
+       * @param {boolean} parentRecordsLastSubmittedAnswer - If this function is
+       *   called in the exploration_player view (including the preview mode),
+       *   callers should ensure that parentRecordsLastSubmittedAnswer is set to
+       *   true and $scope.lastAnswer =
+       *   PlayerTranscriptService.getLastAnswerOnActiveCard(index) is set on
+       *   the parent controller of the returned tag.
+       *   Otherwise, parentRecordsLastSubmittedAnswer should be set to false.
+       * @param {string} labelForFocusTarget - The label for setting focus on
+       *   the interaction.
+       */
       getInteractionHtml: function(
-          interactionId, interactionCustomizationArgSpecs, canAcceptAnswers,
+          interactionId, interactionCustomizationArgSpecs, parentRecordsLastSubmittedAnswer,
           labelForFocusTarget) {
         var htmlInteractionId = $filter('camelCaseToHyphens')(interactionId);
         var element = $('<oppia-interactive-' + htmlInteractionId + '>');
@@ -46,7 +47,8 @@ oppia.factory('ExplorationHtmlFormatterService', [
           extensionTagAssemblerService.formatCustomizationArgAttrs(
             element, interactionCustomizationArgSpecs));
         element.attr('on-submit', 'submitAnswer(answer, rulesService);');
-        element.attr('last-answer', canAcceptAnswers ? 'lastAnswer' : 'null');
+        element.attr('last-answer', parentRecordsLastSubmittedAnswer ?
+          'lastAnswer' : 'null');
         if (labelForFocusTarget) {
           element.attr('label-for-focus-target', labelForFocusTarget);
         }
