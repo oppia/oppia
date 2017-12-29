@@ -50,6 +50,8 @@ oppia.directive('supplementalCard', [
             }
             $scope.activeCard = PlayerTranscriptService.getCard(index);
             $scope.clearHelpCard();
+            $scope.lastAnswer =
+              PlayerTranscriptService.getLastAnswerOnActiveCard(index);
             HintManagerService.reset(ExplorationPlayerService.getInteraction(
               $scope.activeCard.stateName).hints);
 
@@ -66,6 +68,7 @@ oppia.directive('supplementalCard', [
           $scope.OPPIA_AVATAR_IMAGE_URL = (
             UrlInterpolationService.getStaticImageUrl(
               '/avatar/oppia_avatar_100px.svg'));
+
 
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
 

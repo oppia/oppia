@@ -44,11 +44,11 @@ oppia.controller('ExplorationEditor', [
   'graphDataService', 'StateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'ExplorationWarningsService', '$templateCache', 'ExplorationContextService',
-  'ExplorationAdvancedFeaturesService', '$modal', 'changeListService',
+  'ExplorationAdvancedFeaturesService', '$uibModal', 'changeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'ParamSpecsObjectFactory', 'explorationAutomaticTextToSpeechService',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'explorationCorrectnessFeedbackService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       ExplorationDataService, EditorStateService, explorationTitleService,
@@ -59,11 +59,11 @@ oppia.controller('ExplorationEditor', [
       graphDataService, StateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       ExplorationWarningsService, $templateCache, ExplorationContextService,
-      ExplorationAdvancedFeaturesService, $modal, changeListService,
+      ExplorationAdvancedFeaturesService, $uibModal, changeListService,
       autosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, explorationAutomaticTextToSpeechService,
-      UrlInterpolationService) {
+      UrlInterpolationService, explorationCorrectnessFeedbackService) {
     $scope.editabilityService = editabilityService;
     $scope.EditorStateService = EditorStateService;
 
@@ -121,6 +121,8 @@ oppia.controller('ExplorationEditor', [
         explorationParamChangesService.init(
           ParamChangesObjectFactory.createFromBackendList(data.param_changes));
         explorationAutomaticTextToSpeechService.init(data.auto_tts_enabled);
+        explorationCorrectnessFeedbackService.init(
+          data.correctness_feedback_enabled);
 
         $scope.explorationTitleService = explorationTitleService;
         $scope.explorationCategoryService = explorationCategoryService;
@@ -372,15 +374,15 @@ oppia.controller('ExplorationEditor', [
     };
 
     $scope.showWelcomeExplorationModal = function() {
-      var modalInstance = $modal.open({
+      var modalInstance = $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/' +
           'welcome_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'siteAnalyticsService',
+          '$scope', '$uibModalInstance', 'siteAnalyticsService',
           'ExplorationContextService',
-          function($scope, $modalInstance, siteAnalyticsService,
+          function($scope, $uibModalInstance, siteAnalyticsService,
           ExplorationContextService) {
             var explorationId = ExplorationContextService.getExplorationId();
 
@@ -389,13 +391,13 @@ oppia.controller('ExplorationEditor', [
             $scope.beginTutorial = function() {
               siteAnalyticsService.registerAcceptTutorialModalEvent(
                 explorationId);
-              $modalInstance.close();
+              $uibModalInstance.close();
             };
 
             $scope.cancel = function() {
               siteAnalyticsService.registerDeclineTutorialModalEvent(
                 explorationId);
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
 
             $scope.editorWelcomeImgUrl = (

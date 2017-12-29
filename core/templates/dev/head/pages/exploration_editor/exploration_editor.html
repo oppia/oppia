@@ -26,6 +26,11 @@
     GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse(
       '{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
     GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
+    GLOBALS.canDelete = JSON.parse('{{can_delete|js_string}}');
+    GLOBALS.canModifyRoles = JSON.parse('{{can_modify_roles|js_string}}');
+    GLOBALS.canReleaseOwnership = JSON.parse(
+      '{{can_release_ownership|js_string}}');
+    GLOBALS.canUnpublish = JSON.parse('{{can_unpublish|js_string}}');
   </script>
 
   <!-- Updated previous version to current version of google charts
@@ -62,7 +67,7 @@
     <div class="container-fluid oppia-editor-page-container" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onFinishTutorial()" on-skip="onSkipTutorial()">
       <div class="row" ng-if="ExplorationRightsService.isCloned()">
         <div class="col-lg-12 col-md-12 col-sm-12">
-          <div class="oppia-align-center alert alert-warning" style="padding: 2px; width: 90%;">
+          <div class="oppia-align-center uib-alert alert-warning" style="padding: 2px; width: 90%;">
             <strong>Note:</strong> This is a private, unpublishable copy of a
             <a ng-href="<[getExplorationUrl(ExplorationRightsService.clonedFrom())]>" target="_blank">public exploration</a>.
           </div>
@@ -314,6 +319,7 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/InputResponsePairDirective.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ContinueButtonDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationRecommendationsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/HintManagerService.js"></script>
@@ -325,13 +331,14 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerTranscriptService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressDotsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressNavDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/SolutionButtonDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/SolutionManagerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FatigueDetectionService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/NumberAttemptsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioTranslationManagerService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioControlsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioBarDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioPreloaderService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionSyntaxTreeService.js"></script>

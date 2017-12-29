@@ -35,7 +35,7 @@ describe('Audio preloader service', function() {
       });
     });
   });
-  
+
   var aps, atms, eof, ecs;
   var $httpBackend = null;
   var $rootScope = null;
@@ -64,7 +64,7 @@ describe('Audio preloader service', function() {
           param_changes: [],
           content: {
             html: '<p>State 1 Content</p>',
-            audio_translations: {        
+            audio_translations: {
               en: {
                 filename: 'en-1.mp3',
                 file_size_bytes: 120000,
@@ -95,7 +95,7 @@ describe('Audio preloader service', function() {
           param_changes: [],
           content: {
             html: 'Congratulations, you have finished!',
-            audio_translations: {        
+            audio_translations: {
               en: {
                 filename: 'en-3.mp3',
                 file_size_bytes: 120000,
@@ -122,7 +122,7 @@ describe('Audio preloader service', function() {
           param_changes: [],
           content: {
             html: '<p>State 2 Content</p>',
-            audio_translations: {        
+            audio_translations: {
               en: {
                 filename: 'en-2.mp3',
                 file_size_bytes: 120000,
@@ -153,7 +153,7 @@ describe('Audio preloader service', function() {
           param_changes: [],
           content: {
             html: '<p>Introduction Content</p>',
-            audio_translations: {        
+            audio_translations: {
               en: {
                 filename: 'en-0.mp3',
                 file_size_bytes: 120000,
@@ -180,44 +180,37 @@ describe('Audio preloader service', function() {
               }
             },
             solution: null,
-            answer_groups: [
-              {
-                rule_specs: [
-                  {
-                    inputs: {
-                      x: '1'
-                    },
-                    rule_type: 'Contains'
-                  }
+            answer_groups: [{
+              rule_specs: [{
+                inputs: {
+                  x: '1'
+                },
+                rule_type: 'Contains'
+              }],
+              labelled_as_correct:false,
+              outcome: {
+                feedback: [
+                  "<p>Let's go to State 1</p>"
                 ],
-                correct: false,
-                outcome: {
-                  feedback: [
-                    "<p>Let's go to State 1</p>"
-                  ],
-                  dest: 'State 1',
-                  param_changes: []
-                }
-              },
-              {
-                rule_specs: [
-                  {
-                    inputs: {
-                      x: '2'
-                    },
-                    rule_type: 'Contains'
-                  }
-                ],
-                correct: false,
-                outcome: {
-                  feedback: [
-                    "<p>Let's go to State 2</p>"
-                  ],
-                  dest: 'State 2',
-                  param_changes: []
-                }
+                dest: 'State 1',
+                param_changes: []
               }
-            ],
+            }, {
+              rule_specs: [{
+                inputs: {
+                  x: '2'
+                },
+                rule_type: 'Contains'
+              }],
+              labelled_as_correct: false,
+              outcome: {
+                feedback: [
+                  "<p>Let's go to State 2</p>"
+                ],
+                dest: 'State 2',
+                param_changes: []
+              }
+            }],
             hints: []
           },
           classifier_model_id: null
@@ -258,7 +251,7 @@ describe('Audio preloader service', function() {
       $httpBackend.expect('GET', requestUrl4).respond(201, 'audio data 4');
       var exploration = eof.createFromBackendDict(explorationDict);
       aps.init(exploration);
-      atms.init('en', 'en', 'en');
+      atms.init(['en'], 'en', 'en');
       aps.kickOffAudioPreloader(exploration.getInitialState().name);
 
       expect(aps.getFilenamesOfAudioCurrentlyDownloading().length).toBe(3);
@@ -283,7 +276,7 @@ describe('Audio preloader service', function() {
   it('should properly restart pre-loading from a new state', function() {
     var exploration = eof.createFromBackendDict(explorationDict);
     aps.init(exploration);
-    atms.init('en', 'en', 'en');
+    atms.init(['en'], 'en', 'en');
     aps.kickOffAudioPreloader(exploration.getInitialState().name);
     expect(aps.getFilenamesOfAudioCurrentlyDownloading().length).toBe(3);
     aps.restartAudioPreloader('State 3');

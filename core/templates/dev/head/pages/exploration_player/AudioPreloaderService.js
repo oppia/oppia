@@ -17,11 +17,11 @@
  */
 
 oppia.factory('AudioPreloaderService', [
-  '$modal', 'ExplorationContextService', 'AssetsBackendApiService',
+  '$uibModal', 'ExplorationContextService', 'AssetsBackendApiService',
   'ExplorationPlayerStateService', 'UrlInterpolationService',
   'AudioTranslationManagerService', 'LanguageUtilService',
   'ComputeGraphService',
-  function($modal, ExplorationContextService, AssetsBackendApiService,
+  function($uibModal, ExplorationContextService, AssetsBackendApiService,
       ExplorationPlayerStateService, UrlInterpolationService,
       AudioTranslationManagerService, LanguageUtilService,
       ComputeGraphService) {

@@ -19,6 +19,7 @@
 import datetime
 import imghdr
 import logging
+import re
 import StringIO
 
 import jinja2
@@ -101,9 +102,49 @@ def _require_valid_version(version_from_payload, exploration_version):
             % (exploration_version, version_from_payload))
 
 
+class EditorLogoutHandler(base.BaseHandler):
+    """Handles logout from editor page."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Checks if exploration is published and redirects accordingly."""
+
+        url_to_redirect_to = str(self.request.get('return_url'))
+        url_to_redirect_to_regex = (
+            r'%s/(?P<exploration_id>[\w-]+)$' % feconf.EDITOR_URL_PREFIX)
+        is_valid_path = re.match(url_to_redirect_to_regex, url_to_redirect_to)
+
+        if is_valid_path:
+            exploration_id = is_valid_path.group(1)
+            exploration_rights = rights_manager.get_exploration_rights(
+                exploration_id, strict=False)
+
+            if exploration_rights is None or exploration_rights.is_private():
+                url_to_redirect_to = feconf.LIBRARY_INDEX_URL
+        else:
+            url_to_redirect_to = feconf.LIBRARY_INDEX_URL
+
+        self.redirect(super(EditorLogoutHandler, self)._get_logout_url(
+            url_to_redirect_to))
+
+
 class EditorHandler(base.BaseHandler):
     """Base class for all handlers for the editor page."""
-    pass
+
+    def _get_logout_url(self, redirect_url_on_logout):
+        """This overrides the method in base.BaseHandler.
+        Returns logout url which will be handled by
+        EditorLogoutHandler.
+
+        Args:
+            redirect_url_on_logout: str. URL to redirect to on logout.
+
+        Returns:
+            str. logout url.
+        """
+        logout_url = utils.set_url_query_parameter(
+            '/exploration_editor_logout', 'return_url', redirect_url_on_logout)
+        return logout_url
 
 
 class ExplorationPage(EditorHandler):
@@ -179,7 +220,9 @@ class ExplorationPage(EditorHandler):
         })
 
         self.render_template(
-            'pages/exploration_editor/exploration_editor.html')
+            'pages/exploration_editor/exploration_editor.html',
+            redirect_url_on_logout=(
+                '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id)))
 
 
 class ExplorationHandler(EditorHandler):
@@ -221,6 +264,8 @@ class ExplorationHandler(EditorHandler):
         editor_dict = {
             'auto_tts_enabled': exploration.auto_tts_enabled,
             'category': exploration.category,
+            'correctness_feedback_enabled': (
+                exploration.correctness_feedback_enabled),
             'draft_change_list_id': draft_change_list_id,
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,

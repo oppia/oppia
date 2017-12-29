@@ -30,10 +30,9 @@ describe('Oppia static pages tour', function() {
 
   it('visits the links in About dropdown', function() {
     var LINKS_CLASS_NAMES = [
-      '.protractor-test-about-link',
-      '.protractor-test-get-started-link',
-      '.protractor-test-teach-link',
-      '.protractor-test-contact-link'
+    '.protractor-test-about-link',
+    '.protractor-test-get-started-link',
+    '.protractor-test-playbook-link'
     ];
 
     LINKS_CLASS_NAMES.forEach(function(className) {

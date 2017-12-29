@@ -49,7 +49,7 @@ describe('StateImprovementSuggestionService', function() {
               },
               rule_type: 'Equals'
             }],
-            correct: false
+            labelled_as_correct: false
           }],
           default_outcome: {
             dest: 'state',
@@ -83,7 +83,7 @@ describe('StateImprovementSuggestionService', function() {
               },
               rule_type: 'Equals'
             }],
-            correct: false
+            labelled_as_correct: false
           }],
           default_outcome: {
             dest: 'end',
@@ -113,7 +113,7 @@ describe('StateImprovementSuggestionService', function() {
               },
               rule_type: 'Equals'
             }],
-            correct: false
+            labelled_as_correct: false
           }],
           default_outcome: {
             dest: null,
@@ -147,7 +147,7 @@ describe('StateImprovementSuggestionService', function() {
               },
               rule_type: 'Equals'
             }],
-            correct: false
+            labelled_as_correct: false
           }],
           default_outcome: {
             dest: 'State 1',
@@ -177,7 +177,7 @@ describe('StateImprovementSuggestionService', function() {
               },
               rule_type: 'Equals'
             }],
-            correct: false
+            labelled_as_correct: false
           }],
           default_outcome: {
             dest: 'State 2',
