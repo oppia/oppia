@@ -48,8 +48,7 @@ oppia.directive('responseHeader', [
           };
 
           $scope.isCorrectnessFeedbackEnabled = function() {
-            return (
-              explorationCorrectnessFeedbackService.isEnabled());
+            return explorationCorrectnessFeedbackService.isEnabled();
           };
 
           $scope.isCreatingNewState = function() {

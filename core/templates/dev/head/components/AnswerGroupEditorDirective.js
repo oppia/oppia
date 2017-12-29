@@ -52,8 +52,7 @@ oppia.directive('answerGroupEditor', [
           $scope.answerGroupIsDefault = ($scope.rules !== null);
           
           $scope.isCorrectnessFeedbackEnabled = function() {
-            return (
-              explorationCorrectnessFeedbackService.isEnabled());
+            return explorationCorrectnessFeedbackService.isEnabled();
           };
 
           $scope.getAnswerChoices = function() {
