@@ -17,13 +17,13 @@
  */
  
 describe('Answer Classification Object Factory', function() {
-  var AnswerClassificationResultFactory;
+  var AnswerClassificationResultObjectFactory;
   var EXPLICIT_CLASSIFICATION,oof;
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    AnswerClassificationResultFactory = $injector.get(
-        'AnswerClassificationResultFactory');
+    AnswerClassificationResultObjectFactory = $injector.get(
+        'AnswerClassificationResultObjectFactory');
     EXPLICIT_CLASSIFICATION = $injector.get(
         'EXPLICIT_CLASSIFICATION');
     oof = $injector.get('OutcomeObjectFactory');
@@ -31,7 +31,7 @@ describe('Answer Classification Object Factory', function() {
 
   it('should create a new result', function() {
     var answerClassificationResult = (
-      AnswerClassificationResultFactory.createNew(
+      AnswerClassificationResultObjectFactory.createNew(
          oof, 1, 0, EXPLICIT_CLASSIFICATION));
 
     expect(answerClassificationResult.outcome).toEqual(oof);
