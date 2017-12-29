@@ -225,29 +225,17 @@ def _is_filename_excluded_for_bad_patterns_check(pattern, filename):
             or filename in BAD_PATTERNS[pattern]['excluded_files'])
 
 
-def _get_untracked_filenames():
-    """Returns a list of untracked/newly added files. This excludes all
-    files listed in .gitignore.
+def _get_changed_filenames():
+    """Returns a list of modified files and newly added files
+    (staged, unstaged and untracked).
 
     Returns:
-        A list of filenames of untracked/newly added files.
+        list: A list of filenames of modified and newly created files.
     """
     gitignore_path = os.path.join(os.getcwd(), '.gitignore')
-    untracked_files = subprocess.check_output([
-        'git', 'ls-files', '--others',
-        '--exclude-from=%s' % gitignore_path]).splitlines()
-    return untracked_files
-
-
-def _get_changed_filenames():
-    """Returns a list of modified files (both staged and unstaged)
-
-    Returns:
-        a list of filenames of modified files.
-    """
     unstaged_files = subprocess.check_output([
-        'git', 'diff', '--name-only',
-        '--diff-filter=ACM']).splitlines()
+        'git', 'ls-files', '--modified',
+        '--others', '--exclude-from=%s' % gitignore_path]).splitlines()
     staged_files = subprocess.check_output([
         'git', 'diff', '--cached', '--name-only',
         '--diff-filter=ACM']).splitlines()
@@ -429,7 +417,7 @@ def _get_all_files():
             sys.exit(1)
         all_files = valid_filepaths
     else:
-        all_files = _get_changed_filenames() + _get_untracked_filenames()
+        all_files = _get_changed_filenames()
     all_files = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
