@@ -24,9 +24,14 @@ oppia.factory('ExplorationHtmlFormatterService', [
   function($filter, extensionTagAssemblerService, HtmlEscaperService) {
     return {
       /**
+      * @param {string} interactionId - The id of interaction in camel case.
+      * @param {array} interactionCustomizationArgSpecs - The various attributes
+      * that depends on interaction.
       * @param {boolean} canAcceptAnswers - Whether or not last answer is
       * displayed when returning to the interaction. Set to false when called
       * from editor tab.
+      * @param {string} labelForFocusTarget - The label for setting focus on the
+      * interaction.
       */
       getInteractionHtml: function(
           interactionId, interactionCustomizationArgSpecs, canAcceptAnswers,
