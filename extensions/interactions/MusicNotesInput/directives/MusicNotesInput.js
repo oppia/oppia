@@ -79,12 +79,12 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
   'HtmlEscaperService', 'NOTE_NAMES_TO_MIDI_VALUES',
   'musicNotesInputRulesService', 'musicPhrasePlayerService',
   'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
-  'WindowDimensionsService',
+  'EVENT_PROGRESS_NAV_SUBMITTED', 'WindowDimensionsService',
   function(
       HtmlEscaperService, NOTE_NAMES_TO_MIDI_VALUES,
       musicNotesInputRulesService, musicPhrasePlayerService,
       UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE,
-      WindowDimensionsService) {
+      EVENT_PROGRESS_NAV_SUBMITTED, WindowDimensionsService) {
     return {
       restrict: 'E',
       scope: {
@@ -782,7 +782,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           });
         };
 
-        scope.$on('progress-nav-submit', scope.submitAnswer);
+        scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, scope.submitAnswer);
 
         /*******************************************************************
          * Functions involving MIDI playback.

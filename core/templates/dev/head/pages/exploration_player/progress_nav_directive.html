@@ -10,13 +10,13 @@
     <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
   </md-button>
   <div ng-if="!hasNext" style="margin: 0 12px 12px 0">
-    <div ng-if="!showContinueButton() && !helpCardHasContinueButton">
+    <div ng-if="!shouldShowContinueButton() && !helpCardHasContinueButton">
       <!-- TODO(allan): Look at using ng-switch once we upgrade
         to >=angular-1.5.10, which supports "ng-switch-when-separator".
         However, the current approach is cleaner in angular-1.5.8.
       -->
       <md-button ng-if="interaction.id === 'Continue'"
-        class="oppia-learner-confirm-button" ng-click="submitFn()">
+                 class="oppia-learner-confirm-button" ng-click="submitFn()">
         <[interaction.customizationArgs.buttonText.value]>
         <i class="fa fa-arrow-right" style="font-size: 19px; padding-top: 1.5px;"></i>
       </md-button>
@@ -30,11 +30,9 @@
         Submit
       </md-button>
     </div>
-    <div ng-if="showContinueButton()">
-      <continue-button ng-if="!isIframed"
-                       focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
-                       ng-click="onClickContinueButton()">
-      </continue-button>
-    </div>
+    <continue-button ng-if="!isIframed && shouldShowContinueButton()"
+                      focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
+                      ng-click="onClickContinueButton()">
+    </continue-button>
   </div>
 </div>

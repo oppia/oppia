@@ -39,7 +39,9 @@ oppia.directive('oppiaInteractiveGraphInput', [
         'graph_input_interaction_directive.html'),
       controller: [
         '$scope', '$element', '$attrs', 'WindowDimensionsService',
-        function($scope, $element, $attrs, WindowDimensionsService) {
+        'EVENT_PROGRESS_NAV_SUBMITTED',
+        function($scope, $element, $attrs, WindowDimensionsService,
+          EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.isWindowNarrow = function() {
             return WindowDimensionsService.isWindowNarrow();
           };
@@ -59,7 +61,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
               rulesService: graphInputRulesService
             });
           };
-          $scope.$on('progress-nav-submit', $scope.submitGraph);
+          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitGraph);
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             $scope.interactionIsActive = false;

@@ -32,9 +32,9 @@ oppia.directive('oppiaInteractiveTextInput', [
         'text_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'FocusManagerService', 'textInputRulesService',
-        'WindowDimensionsService',
+        'WindowDimensionsService', 'EVENT_PROGRESS_NAV_SUBMITTED',
         function($scope, $attrs, FocusManagerService, textInputRulesService,
-          WindowDimensionsService) {
+          WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.isWindowNarrow = function() {
             return WindowDimensionsService.isWindowNarrow();
           };
@@ -68,7 +68,7 @@ oppia.directive('oppiaInteractiveTextInput', [
             });
           };
 
-          $scope.$on('progress-nav-submit', function() {
+          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
             $scope.submitAnswer($scope.answer);
           });
         }
