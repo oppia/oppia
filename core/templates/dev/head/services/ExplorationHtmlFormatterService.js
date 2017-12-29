@@ -38,8 +38,8 @@ oppia.factory('ExplorationHtmlFormatterService', [
        *   the interaction.
        */
       getInteractionHtml: function(
-          interactionId, interactionCustomizationArgSpecs, parentRecordsLastSubmittedAnswer,
-          labelForFocusTarget) {
+          interactionId, interactionCustomizationArgSpecs,
+          parentRecordsLastSubmittedAnswer, labelForFocusTarget) {
         var htmlInteractionId = $filter('camelCaseToHyphens')(interactionId);
         var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
