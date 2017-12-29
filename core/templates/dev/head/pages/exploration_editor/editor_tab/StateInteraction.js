@@ -67,7 +67,8 @@ oppia.controller('StateInteraction', [
         return '';
       }
       return ExplorationHtmlFormatterService.getInteractionHtml(
-        stateInteractionIdService.savedMemento, interactionCustomizationArgs);
+        stateInteractionIdService.savedMemento, interactionCustomizationArgs,
+        false);
     };
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {

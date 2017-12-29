@@ -21,24 +21,19 @@
 // editor and player.
 oppia.factory('ExplorationHtmlFormatterService', [
   '$filter', 'extensionTagAssemblerService', 'HtmlEscaperService',
-  'ExplorationContextService', 'EDITOR_TAB_CONTEXT',
-  function($filter, extensionTagAssemblerService, HtmlEscaperService,
-      ExplorationContextService, EDITOR_TAB_CONTEXT) {
+  function($filter, extensionTagAssemblerService, HtmlEscaperService) {
     return {
       getInteractionHtml: function(
-          interactionId, interactionCustomizationArgSpecs,
+          interactionId, interactionCustomizationArgSpecs, canAcceptAnswers,
           labelForFocusTarget) {
         var htmlInteractionId = $filter('camelCaseToHyphens')(interactionId);
         var element = $('<oppia-interactive-' + htmlInteractionId + '>');
-        var isInEditorTab = (
-          ExplorationContextService.getEditorTabContext() ===
-          EDITOR_TAB_CONTEXT.EDITOR);
 
         element = (
           extensionTagAssemblerService.formatCustomizationArgAttrs(
             element, interactionCustomizationArgSpecs));
         element.attr('on-submit', 'submitAnswer(answer, rulesService);');
-        if (isInEditorTab) {
+        if (!canAcceptAnswers) {
           element.attr('last-answer', 'null');
         } else {
           element.attr('last-answer', 'lastAnswer');

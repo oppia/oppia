@@ -277,7 +277,7 @@ oppia.factory('ExplorationPlayerService', [
 
         return ExplorationHtmlFormatterService.getInteractionHtml(
           interactionId,
-          exploration.getInteractionCustomizationArgs(stateName),
+          exploration.getInteractionCustomizationArgs(stateName),true,
           labelForFocusTarget);
       },
       getInteraction: function(stateName) {
