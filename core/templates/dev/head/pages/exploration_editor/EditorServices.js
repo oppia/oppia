@@ -1088,11 +1088,11 @@ oppia.constant('STATE_ERROR_MESSAGES', {
 // Service for displaying different types of modals depending on the type of
 // response received as a result of the autosaving request.
 oppia.factory('autosaveInfoModalsService', [
-  '$log', '$modal', '$timeout', '$window',
+  '$log', '$uibModal', '$timeout', '$window',
   'ExplorationDataService', 'LocalStorageService', 
   'ChangesInHumanReadableFormService', 'UrlInterpolationService',
   function(
-      $log, $modal, $timeout, $window,
+      $log, $uibModal, $timeout, $window,
       ExplorationDataService, LocalStorageService, 
       ChangesInHumanReadableFormService, UrlInterpolationService) {
     var _isModalOpen = false;
