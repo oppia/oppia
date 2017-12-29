@@ -21,7 +21,7 @@ oppia.directive('progressNav', [
     return {
       restrict: 'E',
       scope: {
-        submitFn: '&',
+        onSubmit: '&',
         onClickContinueButton: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -38,12 +38,13 @@ oppia.directive('progressNav', [
 
           var transcriptLength, isInteractionInline;
           var updateActiveCardInfo = function() {
-            var index = PlayerPositionService.getActiveCardIndex();
-            $scope.activeCardIndex = index;
+            $scope.activeCardIndex = PlayerPositionService.getActiveCardIndex();
             transcriptLength = PlayerTranscriptService.getNumCards();
-            $scope.activeCard = PlayerTranscriptService.getCard(index);
+            $scope.activeCard = PlayerTranscriptService.getCard(
+              $scope.activeCardIndex);
             $scope.hasPrevious = $scope.activeCardIndex > 0;
-            $scope.hasNext = !PlayerTranscriptService.isLastCard(index);
+            $scope.hasNext = !PlayerTranscriptService.isLastCard(
+              $scope.activeCardIndex);
             $scope.interaction = ExplorationPlayerService.getInteraction(
               $scope.activeCard.stateName);
             isInteractionInline = (
@@ -68,7 +69,7 @@ oppia.directive('progressNav', [
             }
           };
 
-          $scope.shouldShowContinueButton = function() {
+          $scope.shouldContinueButtonBeShown = function() {
             var lastPair = $scope.activeCard.inputResponsePairs[
               $scope.activeCard.inputResponsePairs.length - 1];
             return Boolean(isInteractionInline &&
