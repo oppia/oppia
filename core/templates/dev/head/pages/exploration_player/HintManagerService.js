@@ -47,9 +47,6 @@ oppia.factory('HintManagerService', [
         return currentHint.getHtml();
       },
       getHintAtIndex: function(index) {
-        if (index === numHintsConsumed) {
-          return this.consumeHint();
-        }
         return _getHintAtIndex(index).getHtml();
       },
       getCurrentHintIndex: function() {

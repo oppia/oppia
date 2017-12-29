@@ -38,7 +38,6 @@ oppia.directive('hintButton', [
         function($scope, $timeout, NumberAttemptsService,
             WindowDimensionsService, TWO_CARD_THRESHOLD_PX) {
           $scope.isShowingHintTooltip = false;
-          $scope.isWindowNarrow = WindowDimensionsService.isWindowNarrow();
 
           var viewportIsNarrow =
             WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;

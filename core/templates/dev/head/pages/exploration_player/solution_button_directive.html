@@ -1,10 +1,8 @@
-<div ng-if="!isWindowNarrow">
-  <span ng-if="solutionIsAvailable()" uib-tooltip="<['I18N_PLAYER_GIVE_UP_TOOLTIP' | translate]>" tooltip-placement="left">
-    <md-button class="solution-button protractor-test-view-solution"
-               ng-click="onClickSolutionButton()"
-               aria-label="Give up?">
-      <span translate="I18N_PLAYER_GIVE_UP"></span>
-      <i class="fa fa-frown-o"></i>
-    </md-button>
-  </span>
-</div>
+<span ng-if="solutionIsAvailable()" uib-tooltip="<['I18N_PLAYER_GIVE_UP_TOOLTIP' | translate]>" tooltip-placement="left">
+  <md-button class="solution-button protractor-test-view-solution"
+             ng-click="onClickSolutionButton()"
+             aria-label="Give up?">
+    <span translate="I18N_PLAYER_GIVE_UP"></span>
+    <i class="fa fa-frown-o"></i>
+  </md-button>
+</span>

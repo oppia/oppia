@@ -1,11 +1,11 @@
-<div ng-if="isWindowNarrow && isHintButtonVisibleAtIndex(0)" class="oppia-hint-and-solution-buttons pull-left">
+<div ng-if="windowDimensionsService.isWindowNarrow() && isHintButtonVisibleAtIndex(0)" class="oppia-hint-and-solution-buttons pull-left">
   <span class="pull-left footer-hints-label">HINTS</span>
   <ul class="list-inline pull-right">
-    <li ng-repeat="hintPosition in hintPositions">
-      <img class="oppia-hint-button" ng-if="isHintButtonVisibleAtIndex(hintPosition)" ng-src="<[activeModalIndex === hintPosition ? activeHintUrl : defaultHintUrl]>" ng-click="displayHintModalForIndex(hintPosition)">
+    <li ng-repeat="hintIndex in hintIndexes">
+      <img class="oppia-hint-button" ng-if="isHintButtonVisibleAtIndex(hintIndex)" ng-src="<[activeHintIndex === hintIndex ? activeHintUrl : defaultHintUrl]>" ng-click="displayHintModalForIndex(hintIndex)">
     </li>
     <li ng-if="isSolutionButtonVisible()">
-      <img class="oppia-solution-button" ng-src="<[activeModalIndex === -1 ? activeSolutionUrl : defaultSolutionUrl]>" ng-click="displaySolutionModal()">
+      <img class="oppia-solution-button" ng-src="<[solutionModalIsActive ? activeSolutionUrl : defaultSolutionUrl]>" ng-click="displaySolutionModal()">
     </li>
   </ul>
 </div>

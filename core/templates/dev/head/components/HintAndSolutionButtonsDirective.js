@@ -43,16 +43,18 @@ oppia.directive('hintAndSolutionButtons', [
             '/icons/default_solution.svg');
 
           $scope.activeSolutionUrl = UrlInterpolationService.getStaticImageUrl(
-            '/icons/active_hint.svg');
+            '/icons/active_solution.svg');
 
-          $scope.hintPositions = [];
+          $scope.hintIndexes = [];
           $scope.solutionExists = null;
-          $scope.isWindowNarrow = WindowDimensionsService.isWindowNarrow();
-          $scope.activeModalIndex = null;
+          $scope.windowDimensionsService = WindowDimensionsService;
+          // Represents the index of the currently viewed hint.
+          $scope.activeHintIndex = null;
+          $scope.solutionModalIsActive = false;
 
           $rootScope.$on('hintsAndSolutionReset', function(evt, data) {
-            for(var index = 0; index < data.numOfHints; index++) {
-              $scope.hintPositions.push(index);
+            for (var index = 0; index < data.numOfHints; index++) {
+              $scope.hintIndexes.push(index);
             }
             $scope.solutionExists = data.solutionExists;
           });
@@ -74,20 +76,20 @@ oppia.directive('hintAndSolutionButtons', [
           };
 
           $scope.displayHintModalForIndex = function(index) {
-            $scope.activeModalIndex = index;
+            $scope.activeHintIndex = index;
             var promise = (
               HintAndSolutionModalService.displayHintModalForIndex(index));
             promise.result.then(null, function() {
-              $scope.activeModalIndex = null;
+              $scope.activeHintIndex = null;
             });
           };
 
           $scope.displaySolutionModal = function() {
-            $scope.activeModalIndex = -1;
-            HintAndSolutionModalService.displaySolutionModal().result.then(null,
-              function() {
-                $scope.activeModalIndex = null;
-              });
+            $scope.solutionModalIsActive = true;
+            var promise = HintAndSolutionModalService.displaySolutionModal();
+            promise.result.then(null, function() {
+              $scope.solutionModalIsActive = false;
+            });
           };
         }
       ]

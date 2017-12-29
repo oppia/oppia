@@ -34,15 +34,35 @@ oppia.factory('HintAndSolutionModalService', [
             function($scope, $uibModalInstance) {
               $scope.isHint = true;
               $scope.hint = HintManagerService.consumeHint();
-              $scope.gotIt = function() {
+              $scope.closeModal = function() {
                 $uibModalInstance.dismiss('cancel');
               };
             }
           ]
         });
       },
+      displayHintModalForIndex: function(index) {
+        return $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_player/hint_and_solution_modal_directive.html'),
+          backdrop: 'static',
+          controller: [
+            '$scope', '$modalInstance',
+            function($scope, $modalInstance) {
+              $scope.isHint = true;
+              $scope.hint = (
+                index === HintManagerService.getCurrentHintIndex() ?
+                  HintManagerService.consumeHint() :
+                  HintManagerService.getHintAtIndex(index));
+              $scope.closeModal = function() {
+                $modalInstance.dismiss('cancel');
+              };
+            }
+          ]
+        });
+      },
       displaySolutionModal: function() {
-        $uibModal.open({
+        return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/hint_and_solution_modal_directive.html'),
           backdrop: 'static',
@@ -54,7 +74,7 @@ oppia.factory('HintAndSolutionModalService', [
               var interaction = ExplorationPlayerService.getInteraction(
                 PlayerPositionService.getCurrentStateName());
               $scope.solution = solution.getOppiaResponseHtml(interaction);
-              $scope.gotIt = function() {
+              $scope.closeModal = function() {
                 $uibModalInstance.dismiss('cancel');
               };
             }

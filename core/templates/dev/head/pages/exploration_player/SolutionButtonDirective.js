@@ -26,11 +26,6 @@ oppia.directive('solutionButton', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
-        'solution_button_directive.html'),
-      controller: [
-        '$scope', 'WindowDimensionsService',
-        function($scope, WindowDimensionsService) {
-          $scope.isWindowNarrow = WindowDimensionsService.isWindowNarrow();
-        }]
+        'solution_button_directive.html')
     };
   }]);

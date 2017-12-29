@@ -125,6 +125,8 @@ oppia.directive('tutorCard', [
 
           $scope.waitingForOppiaFeedback = false;
 
+          $scope.windowDimensionsService = WindowDimensionsService;
+
           $scope.consumeHint = function() {
             if (!HintManagerService.areAllHintsExhausted()) {
               HintAndSolutionModalService.displayHintModal();
