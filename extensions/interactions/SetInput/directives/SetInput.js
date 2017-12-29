@@ -32,7 +32,10 @@ oppia.directive('oppiaInteractiveSetInput', [
         'set_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$translate', 'setInputRulesService',
-        function($scope, $attrs, $translate, setInputRulesService) {
+        'WindowDimensionsService',
+        function(
+          $scope, $attrs, $translate, setInputRulesService,
+          WindowDimensionsService) {
           $scope.schema = {
             type: 'list',
             items: {
@@ -71,6 +74,14 @@ oppia.directive('oppiaInteractiveSetInput', [
               });
             }
           };
+
+          $scope.isWindowNarrow = function() {
+            return WindowDimensionsService.isWindowNarrow();
+          };
+
+          $scope.$on('progress-nav-submit', function() {
+            $scope.submitAnswer($scope.answer);
+          });
         }
       ]
     };

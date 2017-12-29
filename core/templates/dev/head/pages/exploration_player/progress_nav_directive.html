@@ -1,12 +1,40 @@
-<div ng-if="hasNext() || hasPrevious()" layout="row" layout-align="space-between center" style="background-color: white;">
+<div layout="row" layout-align="space-between center" style="background-color: white;">
   <!-- Wrapping div on first button keeps the second button right-aligned
     even when the first button is not present. -->
   <div>
-    <md-button ng-if="hasPrevious()" ng-click="changeCard(currentCardIndex-1)" class="md-raised" style="margin: 0 0 12px 12px;">
+    <md-button ng-if="hasPrevious" ng-click="changeCard(activeCardIndex-1)" class="md-raised" style="margin: 0 0 12px 12px;">
       <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
     </md-button>
   </div>
-  <md-button ng-if="hasNext()" ng-click="changeCard(currentCardIndex+1)" class="md-raised" style="margin: 0 12px 12px 0">
+  <md-button ng-if="hasNext" ng-click="changeCard(activeCardIndex+1)" class="md-raised" style="margin: 0 12px 12px 0">
     <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
   </md-button>
+  <div ng-if="!hasNext" style="margin: 0 12px 12px 0">
+    <div ng-if="!showContinueButton() && !helpCardHasContinueButton">
+      <!-- TODO(allan): Look at using ng-switch once we upgrade
+        to >=angular-1.5.10, which supports "ng-switch-when-separator".
+        However, the current approach is cleaner in angular-1.5.8.
+      -->
+      <md-button ng-if="interaction.id === 'Continue'"
+        class="oppia-learner-confirm-button" ng-click="submitFn()">
+        <[interaction.customizationArgs.buttonText.value]>
+        <i class="fa fa-arrow-right" style="font-size: 19px; padding-top: 1.5px;"></i>
+      </md-button>
+      <md-button ng-if="interaction.id === 'TextInput' ||
+                        interaction.id === 'SetInput' ||
+                        interaction.id === 'NumericInput' ||
+                        interaction.id === 'GraphInput' ||
+                        interaction.id === 'CodeRepl' ||
+                        interaction.id === 'MusicNotesInput'"
+                class="oppia-learner-confirm-button" ng-click="submitFn()">
+        Submit
+      </md-button>
+    </div>
+    <div ng-if="showContinueButton()">
+      <continue-button ng-if="!isIframed"
+                       focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
+                       ng-click="onClickContinueButton()">
+      </continue-button>
+    </div>
+  </div>
 </div>

@@ -47,7 +47,10 @@
                            on-submit-answer="submitAnswer(answer, rulesService)">
         </supplemental-card>
       </div>
-      <progress-nav ng-if="isViewportNarrow()"></progress-nav>
+      <progress-nav ng-if="isViewportNarrow()"
+                    submit-fn="progressNavSubmit()"
+                    on-click-continue-button="showUpcomingCard()">
+      </progress-nav>
     </div>
 
     <div ng-if="isCurrentSupplementalCardNonempty() && !isViewportNarrow()"

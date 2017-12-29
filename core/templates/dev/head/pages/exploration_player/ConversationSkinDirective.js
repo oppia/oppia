@@ -777,6 +777,10 @@ oppia.directive('conversationSkin', [
             siteAnalyticsService.registerVisitOppiaFromIframeEvent(
               $scope.explorationId);
           };
+
+          $scope.progressNavSubmit = function() {
+            $scope.$broadcast('progress-nav-submit');
+          }
         }
       ]
     };

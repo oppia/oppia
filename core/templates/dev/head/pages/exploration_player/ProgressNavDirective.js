@@ -23,20 +23,41 @@ oppia.directive('progressNav', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
         'progress_nav_directive.html'),
+      scope: {
+        submitFn: '&',
+        onClickContinueButton: '&'
+      },
       controller: [
         '$scope', '$rootScope', 'PlayerPositionService',
-        'PlayerTranscriptService',
+        'PlayerTranscriptService', 'ExplorationPlayerService',
+        'ExplorationPlayerStateService', 'CONTINUE_BUTTON_FOCUS_LABEL',
         function($scope, $rootScope, PlayerPositionService,
-          PlayerTranscriptService) {
-          $scope.currentCardIndex = PlayerPositionService.getActiveCardIndex();
-          $scope.transcriptLength = PlayerTranscriptService.getNumCards();
+          PlayerTranscriptService, ExplorationPlayerService,
+          ExplorationPlayerStateService, CONTINUE_BUTTON_FOCUS_LABEL) {
+          $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
+
+          var update = function() {
+            var index = PlayerPositionService.getActiveCardIndex();
+            $scope.activeCardIndex = index;
+            $scope.activeCard = PlayerTranscriptService.getCard(index);
+            $scope.transcriptLength = PlayerTranscriptService.getNumCards();
+            $scope.hasPrevious = $scope.activeCardIndex > 0;
+            $scope.hasNext = (
+              $scope.activeCardIndex < $scope.transcriptLength - 1);
+            $scope.interaction = ExplorationPlayerService.getInteraction(
+              $scope.activeCard.stateName);
+            $scope.isInteractionInline = (
+              ExplorationPlayerStateService.isInteractionInline(
+                $scope.activeCard.stateName));
+            $scope.helpCardHasContinueButton = false;
+          }
 
           $scope.$watch(function() {
             return PlayerPositionService.getActiveCardIndex();
-          }, function() {
-            $scope.currentCardIndex = (
-              PlayerPositionService.getActiveCardIndex());
-            $scope.transcriptLength = PlayerTranscriptService.getNumCards();
+          }, update);
+
+          $scope.$on('helpCardAvailable', function(event, helpCard) {
+            $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
           });
 
           $scope.changeCard = function(index) {
@@ -47,13 +68,12 @@ oppia.directive('progressNav', [
             }
           };
 
-          $scope.hasPrevious = function() {
-            return $scope.currentCardIndex > 0;
-          };
-
-          $scope.hasNext = function() {
-            return $scope.currentCardIndex < $scope.transcriptLength - 1;
-          };
+          $scope.showContinueButton = function() {
+            var lastPair = $scope.activeCard.inputResponsePairs[
+              $scope.activeCard.inputResponsePairs.length - 1];
+            return $scope.isInteractionInline &&
+              $scope.activeCard.destStateName && lastPair.oppiaResponse;
+          }
         }
       ]
     };

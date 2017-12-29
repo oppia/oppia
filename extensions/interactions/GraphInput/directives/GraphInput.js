@@ -38,8 +38,12 @@ oppia.directive('oppiaInteractiveGraphInput', [
         '/interactions/GraphInput/directives/' +
         'graph_input_interaction_directive.html'),
       controller: [
-        '$scope', '$element', '$attrs',
-        function($scope, $element, $attrs) {
+        '$scope', '$element', '$attrs', 'WindowDimensionsService',
+        function($scope, $element, $attrs, WindowDimensionsService) {
+          $scope.isWindowNarrow = function() {
+            return WindowDimensionsService.isWindowNarrow();
+          };
+
           $scope.errorMessage = '';
           $scope.graph = {
             vertices: [],
@@ -55,6 +59,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
               rulesService: graphInputRulesService
             });
           };
+          $scope.$on('progress-nav-submit', $scope.submitGraph);
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             $scope.interactionIsActive = false;
