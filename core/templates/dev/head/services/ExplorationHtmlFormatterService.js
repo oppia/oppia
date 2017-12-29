@@ -28,8 +28,11 @@ oppia.factory('ExplorationHtmlFormatterService', [
       * @param {array} interactionCustomizationArgSpecs - The various attributes
       * that depends on interaction.
       * @param {boolean} canAcceptAnswers - Whether or not last answer is
-      * displayed when returning to the interaction. Set to false when called
-      * from editor tab.
+      * displayed permanently after learner has submitted an answer for
+      * non-inline interactions.
+      * If called from editor tab, set this to false.
+      * If interaction is non-inline and if last answer submitted by user is to
+      * be displayed permenantly (in player view), set this to true,
       * @param {string} labelForFocusTarget - The label for setting focus on the
       * interaction.
       */
