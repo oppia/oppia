@@ -32,7 +32,7 @@ describe('Exploration Html Formatter Service', function() {
         'last-answer="lastAnswer"></oppia-interactive-sample-id>';
       expect(ehfs.getInteractionHtml(interactionId, null, true, null))
         .toBe(expectedHtmlTag);
-  });
+    });
 
   it('should correctly set interaction HTML when it is in player mode',
     function() {
@@ -44,37 +44,37 @@ describe('Exploration Html Formatter Service', function() {
         '"></oppia-interactive-sample-id>';
       expect(ehfs.getInteractionHtml(interactionId, null, false, focusLabel)
       ).toBe(expectedHtmlTag);
-  });
+    });
 
   it('should set answer HTML correctly', function() {
-      var interactionId = 'sampleId';
-      var answer = 'sampleAnswer';
-      var interactionCustomizationArgs = {};
-      interactionCustomizationArgs.choices = {
-        value: 'sampleChoice'
-      };
-      var expectedHtmlTag = '<oppia-response-sample-id ' +
-        'answer="&amp;quot;' + answer + '&amp;quot;" ' +
-        'choices="&amp;quot;' + interactionCustomizationArgs.choices.value +
-        '&amp;quot;"></oppia-response-sample-id>';
-      expect(ehfs.getAnswerHtml(answer, interactionId,
-        interactionCustomizationArgs)
-      ).toBe(expectedHtmlTag);
+    var interactionId = 'sampleId';
+    var answer = 'sampleAnswer';
+    var interactionCustomizationArgs = {};
+    interactionCustomizationArgs.choices = {
+      value: 'sampleChoice'
+    };
+    var expectedHtmlTag = '<oppia-response-sample-id ' +
+      'answer="&amp;quot;' + answer + '&amp;quot;" ' +
+      'choices="&amp;quot;' + interactionCustomizationArgs.choices.value +
+      '&amp;quot;"></oppia-response-sample-id>';
+    expect(ehfs.getAnswerHtml(answer, interactionId,
+      interactionCustomizationArgs)
+    ).toBe(expectedHtmlTag);
   });
 
   it('should set short answer HTML correctly', function() {
-      var interactionId = 'sampleId';
-      var answer = 'sampleAnswer';
-      var interactionCustomizationArgs = {};
-      interactionCustomizationArgs.choices = {
-        value: 'sampleChoice'
-      };
-      var expectedHtmlTag = '<oppia-short-response-sample-id ' +
-        'answer="&amp;quot;' + answer + '&amp;quot;" ' +
-        'choices="&amp;quot;' + interactionCustomizationArgs.choices.value +
-        '&amp;quot;"></oppia-short-response-sample-id>';
-      expect(ehfs.getShortAnswerHtml(answer, interactionId,
-        interactionCustomizationArgs)
-      ).toBe(expectedHtmlTag);
+    var interactionId = 'sampleId';
+    var answer = 'sampleAnswer';
+    var interactionCustomizationArgs = {};
+    interactionCustomizationArgs.choices = {
+      value: 'sampleChoice'
+    };
+    var expectedHtmlTag = '<oppia-short-response-sample-id ' +
+      'answer="&amp;quot;' + answer + '&amp;quot;" ' +
+      'choices="&amp;quot;' + interactionCustomizationArgs.choices.value +
+      '&amp;quot;"></oppia-short-response-sample-id>';
+    expect(ehfs.getShortAnswerHtml(answer, interactionId,
+      interactionCustomizationArgs)
+    ).toBe(expectedHtmlTag);
   });
 });
