@@ -30,7 +30,6 @@ oppia.controller('StateEditor', [
     $scope.currentStateIsTerminal = false;
     $scope.interactionIdIsSet = false;
     $scope.interactionIsShown = false;
-    $scope.lastAnswer = null;
 
     $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/avatar/oppia_avatar_100px.svg');
