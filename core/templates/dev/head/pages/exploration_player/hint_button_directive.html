@@ -1,5 +1,24 @@
 <div ng-if="!isWindowNarrow">
-  <span ng-if="allHintsAreExhausted()" tooltip="<['I18N_PLAYER_HINTS_EXHAUSTED' | translate]>" tooltip-placement="<[getTooltipPlacement()]>">
+<span ng-if="allHintsAreExhausted()" uib-tooltip="<['I18N_PLAYER_HINTS_EXHAUSTED' | translate]>" tooltip-placement="<[getTooltipPlacement()]>">
+  <md-button class="hint-button"
+             ng-click="onClickHintButton()"
+             ng-disabled="!currentHintIsAvailable()"
+             aria-label="Hint">
+    <span translate="I18N_PLAYER_HINT"></span>
+    <i class="fa fa-lightbulb-o"></i>
+  </md-button>
+</span>
+<span ng-if="!allHintsAreExhausted()">
+  <span ng-if="currentHintIsAvailable()" tooltip-is-open="isShowingHintTooltip" uib-tooltip="<[isShowingNeedHintMessage ? ('I18N_PLAYER_HINT_NEED_A_HINT' | translate) : ('I18N_PLAYER_HINT_IS_AVAILABLE' | translate)]>" tooltip-placement="<[getTooltipPlacement()]>" ng-mouseover="hideNeedHintMessage()">
+    <md-button class="hint-button protractor-test-view-hint"
+               ng-click="onClickHintButton()"
+               ng-disabled="!currentHintIsAvailable()"
+               aria-label="Hint">
+      <span translate="I18N_PLAYER_HINT"></span>
+      <i class="fa fa-lightbulb-o"></i>
+    </md-button>
+  </span>
+  <span ng-if="!currentHintIsAvailable()" uib-tooltip="<['I18N_PLAYER_HINT_NOT_AVAILABLE' | translate]>" tooltip-placement="<[getTooltipPlacement()]>">
     <md-button class="hint-button"
                ng-click="onClickHintButton()"
                ng-disabled="!currentHintIsAvailable()"
@@ -8,24 +27,5 @@
       <i class="fa fa-lightbulb-o"></i>
     </md-button>
   </span>
-  <span ng-if="!allHintsAreExhausted()">
-    <span ng-if="currentHintIsAvailable()" tooltip-is-open="isShowingHintTooltip" tooltip="<[isShowingNeedHintMessage ? ('I18N_PLAYER_HINT_NEED_A_HINT' | translate) : ('I18N_PLAYER_HINT_IS_AVAILABLE' | translate)]>" tooltip-placement="<[getTooltipPlacement()]>" ng-mouseover="hideNeedHintMessage()">
-      <md-button class="hint-button protractor-test-view-hint"
-                 ng-click="onClickHintButton()"
-                 ng-disabled="!currentHintIsAvailable()"
-                 aria-label="Hint">
-        <span translate="I18N_PLAYER_HINT"></span>
-        <i class="fa fa-lightbulb-o"></i>
-      </md-button>
-    </span>
-    <span ng-if="!currentHintIsAvailable()" tooltip="<['I18N_PLAYER_HINT_NOT_AVAILABLE' | translate]>" tooltip-placement="<[getTooltipPlacement()]>">
-      <md-button class="hint-button"
-                 ng-click="onClickHintButton()"
-                 ng-disabled="!currentHintIsAvailable()"
-                 aria-label="Hint">
-        <span translate="I18N_PLAYER_HINT"></span>
-        <i class="fa fa-lightbulb-o"></i>
-      </md-button>
-    </span>
-  </span>
+</span>
 </div>

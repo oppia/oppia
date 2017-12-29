@@ -1,7 +1,7 @@
 <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" style="margin-left: 20px;">
   <!-- Editor -->
-  <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': getWarningsCount()}">
-    <a href="#" tooltip="Editor" ng-click="selectMainTab()" class="protractor-test-main-tab">
+  <li ng-class="{'active': getTabStatuses().active === 'main', 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>">
+    <a href="#" uib-tooltip="Editor" ng-click="selectMainTab()" class="protractor-test-main-tab">
       <i class="material-icons">&#xE254;</i>
     </a>
     <div ng-show="getWarningsCount()"
@@ -11,7 +11,7 @@
         <[getWarningsCount()]>
       </span>
     </div>
-    <ul class="dropdown-menu oppia-editor-warnings-box">
+    <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
       <span class="oppia-editor-warnings-header">Warnings</span>
       <li class="oppia-editor-warnings-text"
           ng-repeat="issue in validationIssues track by $index">
@@ -23,14 +23,14 @@
 
   <!-- Settings -->
   <li ng-class="{'active': getTabStatuses().active === 'settings'}">
-    <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()" class="protractor-test-settings-tab">
+    <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()" class="protractor-test-settings-tab">
       <i class="material-icons">&#xE8B8;</i>
     </a>
   </li>
 
   <!-- Player -->
   <li>
-    <a ng-href="/collection/<[collectionId]>" target="_blank" tooltip="Player (new tab)" tooltip-placement="bottom">
+    <a ng-href="/collection/<[collectionId]>" target="_blank" uib-tooltip="Player (new tab)" tooltip-placement="bottom">
       <i class="material-icons">&#xE037;</i>
     </a>
   </li>

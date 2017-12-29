@@ -67,7 +67,7 @@
     <div class="container-fluid oppia-editor-page-container" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onFinishTutorial()" on-skip="onSkipTutorial()">
       <div class="row" ng-if="ExplorationRightsService.isCloned()">
         <div class="col-lg-12 col-md-12 col-sm-12">
-          <div class="oppia-align-center alert alert-warning" style="padding: 2px; width: 90%;">
+          <div class="oppia-align-center uib-alert alert-warning" style="padding: 2px; width: 90%;">
             <strong>Note:</strong> This is a private, unpublishable copy of a
             <a ng-href="<[getExplorationUrl(ExplorationRightsService.clonedFrom())]>" target="_blank">public exploration</a>.
           </div>
@@ -320,6 +320,7 @@
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/InputResponsePairDirective.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ContinueButtonDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationRecommendationsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/HintManagerService.js"></script>
@@ -331,13 +332,14 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerTranscriptService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressDotsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressNavDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/SolutionButtonDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/SolutionManagerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FatigueDetectionService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/NumberAttemptsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioTranslationManagerService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioControlsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioBarDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioPreloaderService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionSyntaxTreeService.js"></script>

@@ -69,7 +69,7 @@ describe('ImageClickInputValidationService', function() {
         }
       }],
       outcome: goodDefaultOutcome,
-      correct: false
+      labelled_as_correct: false
     }];
   }));
 
