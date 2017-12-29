@@ -25,14 +25,14 @@ oppia.factory('ExplorationHtmlFormatterService', [
     return {
       /**
       * @param {string} interactionId - The id of interaction in camel case.
-      * @param {array} interactionCustomizationArgSpecs - The various attributes
-      * that depends on interaction.
+      * @param {object} interactionCustomizationArgSpecs - The various
+      * attributes that the interaction depends on.
       * @param {boolean} canAcceptAnswers - Whether or not last answer is
       * displayed permanently after learner has submitted an answer for
       * non-inline interactions.
       * If called from editor tab, set this to false.
       * If interaction is non-inline and if last answer submitted by user is to
-      * be displayed permenantly (in player view), set this to true,
+      * be displayed permanently (in player view), set this to true,
       * @param {string} labelForFocusTarget - The label for setting focus on the
       * interaction.
       */
