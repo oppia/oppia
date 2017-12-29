@@ -160,7 +160,9 @@ oppia.controller('CollectionPlayer', [
           sParameterExtension += 250 + ' ' + y + ', ';
           y += 200;
         }
-        $scope.pathSvgParameters += ' S ' + sParameterExtension;
+        if (sParameterExtension !== '') {
+          $scope.pathSvgParameters += ' S ' + sParameterExtension;
+        }
       }
       if (collectionNodeCount % 2 === 0) {
         if (collectionNodeCount === 2) {
@@ -283,6 +285,15 @@ oppia.controller('CollectionPlayer', [
       $location.hash(id);
       $anchorScroll();
     };
+
+    $scope.closeOnClickingOutside = function() {
+      $scope.explorationCardIsShown = false;
+    };
+
+    $scope.onClickStopPropagation = function($evt) {
+      $evt.stopPropagation();
+    };
+
     // Touching anywhere outside the mobile preview should hide it.
     document.addEventListener('touchstart', function() {
       if ($scope.explorationCardIsShown === true) {

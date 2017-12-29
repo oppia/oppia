@@ -44,7 +44,7 @@ describe('Collection validation service', function() {
       version: '1',
       nodes: [],
       skills: {},
-      next_skill_id: 0
+      next_skill_index: 0
     };
     _sampleCollection = CollectionObjectFactory.create(
       sampleCollectionBackendObject);

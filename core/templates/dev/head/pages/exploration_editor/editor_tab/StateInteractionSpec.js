@@ -75,12 +75,22 @@ describe('State Interaction controller', function() {
             id: 'TextInput',
             answer_groups: [{
               rule_specs: [],
-              outcome: {},
-              correct: false
+              outcome: {
+                dest: 'default',
+                feedback: {
+                  html: '',
+                  audio_translations: {}
+                },
+                param_changes: []
+              },
+              labelled_as_correct: false
             }],
             default_outcome: {
               dest: 'default',
-              feedback: [],
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
               param_changes: []
             },
             hints: []
@@ -96,12 +106,22 @@ describe('State Interaction controller', function() {
             id: 'TextInput',
             answer_groups: [{
               rule_specs: [],
-              outcome: {},
-              correct: false
+              outcome: {
+                dest: 'default',
+                feedback: {
+                  html: '',
+                  audio_translations: {}
+                },
+                param_changes: []
+              },
+              labelled_as_correct: false
             }],
             default_outcome: {
               dest: 'default',
-              feedback: [],
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
               param_changes: []
             },
             hints: []

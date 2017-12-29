@@ -160,7 +160,8 @@ def get_collection_from_model(collection_model, run_conversion=True):
             versioned_collection_contents[
                 'collection_contents']['skills'].iteritems()
         },
-        versioned_collection_contents['collection_contents']['next_skill_id'],
+        versioned_collection_contents[
+            'collection_contents']['next_skill_index'],
         collection_model.version, collection_model.created_on,
         collection_model.last_updated)
 
@@ -657,6 +658,13 @@ def apply_change_list(collection_id, change_list):
                 continue
             elif change.cmd == collection_domain.CMD_ADD_COLLECTION_SKILL:
                 collection.add_skill(change.name)
+            elif change.cmd == collection_domain.CMD_ADD_QUESTION_ID_TO_SKILL:
+                collection.add_question_id_to_skill(
+                    change.skill_id, change.question_id)
+            elif (change.cmd ==
+                  collection_domain.CMD_REMOVE_QUESTION_ID_FROM_SKILL):
+                collection.remove_question_id_from_skill(
+                    change.skill_id, change.question_id)
             elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_SKILL:
                 collection.delete_skill(change.skill_id)
         return collection
@@ -768,7 +776,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
             skill_id: skill.to_dict()
             for skill_id, skill in collection.skills.iteritems()
         },
-        'next_skill_id': collection.next_skill_id
+        'next_skill_index': collection.next_skill_index
     }
     collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
@@ -811,7 +819,7 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
                 skill_id: skill.to_dict()
                 for skill_id, skill in collection.skills.iteritems()
             },
-            'next_skill_id': collection.next_skill_id
+            'next_skill_index': collection.next_skill_index
         },
     )
     model.commit(committer_id, commit_message, commit_cmds)
@@ -1206,3 +1214,26 @@ def index_collections_given_ids(collection_ids):
     search_services.index_collection_summaries([
         collection_summary for collection_summary in collection_summaries
         if collection_summary is not None])
+
+
+def get_acquired_skill_ids_of_user(user_id, collection_id):
+    """Returns the acquired skills of the user identified by user_id
+    for a given collection.
+
+    Args:
+        user_id: str. The id of the user.
+        collection_id: str. The id of the collection.
+
+    Returns:
+        list(str). A list of skill ids acquired by the user.
+
+    Raises:
+        Exception: Collection with given ID does not exist.
+    """
+    completed_exploration_ids = get_completed_exploration_ids(
+        user_id, collection_id)
+    collection = get_collection_by_id(collection_id)
+    acquired_skill_ids = (
+        collection.get_acquired_skill_ids_from_exploration_ids(
+            completed_exploration_ids))
+    return acquired_skill_ids

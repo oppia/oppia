@@ -888,7 +888,7 @@ def get_collection_summary_dicts(collection_summaries):
             'category': collection_summary.category,
             'objective': collection_summary.objective,
             'language_code': collection_summary.language_code,
-            'last_updated': utils.get_time_in_millisecs(
+            'last_updated_msec': utils.get_time_in_millisecs(
                 collection_summary.collection_model_last_updated),
             'created_on': utils.get_time_in_millisecs(
                 collection_summary.collection_model_created_on),

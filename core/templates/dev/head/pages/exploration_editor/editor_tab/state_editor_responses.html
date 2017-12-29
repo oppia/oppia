@@ -17,7 +17,7 @@
               <img ng-if="editabilityService.isEditable()" ng-src="<[dragDotsImgUrl]>" width="10">
             </span>
             <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(answerGroup.outcome)" ng-click="changeActiveAnswerGroupIndex($index)"
-                 tooltip="<[getOutcomeTooltip(answerGroup.outcome)]>" tooltip-placement="bottom">
+                 uib-tooltip="<[getOutcomeTooltip(answerGroup.outcome)]>" tooltip-placement="bottom">
               <div class="oppia-rule-header-warning-style" >
                 ⚠
               </div>
@@ -56,7 +56,7 @@
         <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
           <li ng-class="{'active': activeAnswerGroupIndex === answerGroups.length}" class="oppia-rule-block">
             <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(defaultOutcome) && !suppressDefaultAnswerGroupWarnings()" ng-click="changeActiveAnswerGroupIndex(answerGroups.length)"
-                 tooltip="<[getOutcomeTooltip(defaultOutcome)]>" tooltip-placement="bottom">
+                 uib-tooltip="<[getOutcomeTooltip(defaultOutcome)]>" tooltip-placement="bottom">
               <div class="oppia-rule-header-warning-style" >
                 ⚠
               </div>
@@ -108,63 +108,3 @@
     </div>
   </md-card>
 </div>
-
-{% if SHOW_TRAINABLE_UNRESOLVED_ANSWERS %}
-  <script type="text/ng-template" id="modals/teachOppia">
-    <div class="modal-header">
-      <h3>Enter a Sample Answer</h3>
-    </div>
-
-    <div class="modal-body">
-      <div class="oppia-rule-details-header">
-        <test-interaction-panel state-content="stateContent" input-template="inputTemplate" on-submit-answer="submitAnswer(answer)">
-        </test-interaction-panel>
-
-        <div ng-if="trainingDataAnswer" style="padding-top: 10px; border-top: 1px solid #e5e5e5;">
-          <form name="testOppiaForm" class="form-inline">
-            <training-panel ng-if="classification.answerGroupIndex >= 0" answer="trainingDataAnswer" answer-feedback="trainingDataFeedback" answer-outcome-dest="trainingDataOutcomeDest" classification="classification" on-finish-training="finishTeaching(true)">
-            </training-panel>
-          </form>
-          <div ng-if="classification.answerGroupIndex === -1">
-            <div>
-              <span><strong>If Oppia encounters the answer:</strong></span>
-            </div>
-
-            <div>
-              <div angular-html-bind="answerTemplate">
-              </div>
-            </div>
-
-            <br>
-
-            <div>
-              <span><strong>it will reply with:</strong></span>
-            </div>
-
-            <div>
-              <div angular-html-bind="trainingDataFeedback">
-              </div>
-            </div>
-
-            <br>
-
-            <div>
-              <span><strong>and then direct the learner to: </strong></span>
-              <span angular-html-bind="trainingDataOutcomeDest"></span>
-            </div>
-
-            <br>
-
-            <div>
-              <span><strong>This is due to a specific rule and therefore cannot be trained. If you do not think this is right, you should change the rule directly referring to this answer.</strong></span>
-            </div>
-          </div>
-        </div>
-      <div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-default" ng-click="finishTeaching(false)">Exit</button>
-    </div>
-  </script>
-{% endif %}

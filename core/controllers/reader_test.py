@@ -164,7 +164,7 @@ class ClassifyHandlerTest(test_utils.GenericTestBase):
                                  {'params' : params,
                                   'old_state' : old_state_dict,
                                   'answer' : answer})
-            self.assertEqual(res['outcome']['feedback'][0],
+            self.assertEqual(res['outcome']['feedback']['html'],
                              '<p>Detected permutation.</p>')
 
 
