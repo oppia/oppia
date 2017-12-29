@@ -24,7 +24,7 @@ oppia.factory('ExplorationHtmlFormatterService', [
   function($filter, extensionTagAssemblerService, HtmlEscaperService) {
     return {
       /**
-       * @param {string} interactionId - The id of interaction in camel case.
+       * @param {string} interactionId - The interaction id.
        * @param {object} interactionCustomizationArgSpecs - The various
        *   attributes that the interaction depends on.
        * @param {boolean} parentHasLastAnswerProperty - If this function is
