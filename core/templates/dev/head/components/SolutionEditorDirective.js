@@ -81,6 +81,7 @@ oppia.directive('solutionEditor', [
                       explorationStatesService.getInteractionCustomizationArgsMemento(
                         EditorStateService.getActiveStateName()),
                       /* eslint-enable max-len */
+                      false,
                       $scope.SOLUTION_EDITOR_FOCUS_LABEL));
                   $scope.EXPLANATION_FORM_SCHEMA = {
                     type: 'html',

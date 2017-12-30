@@ -105,6 +105,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           attrs.sequenceToGuessWithValue);
 
         scope.interactionIsActive = (scope.getLastAnswer() === null);
+
         scope.initialSequence = scope.interactionIsActive ?
           HtmlEscaperService.escapedJsonToObj(attrs.initialSequenceWithValue) :
           scope.getLastAnswer();
