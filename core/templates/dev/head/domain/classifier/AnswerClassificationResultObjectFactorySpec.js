@@ -18,25 +18,22 @@
  
 describe('Answer Classification Object Factory', function() {
   var AnswerClassificationResultObjectFactory;
-  var EXPLICIT_CLASSIFICATION,oof;
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
     AnswerClassificationResultObjectFactory = $injector.get(
         'AnswerClassificationResultObjectFactory');
-    EXPLICIT_CLASSIFICATION = $injector.get(
-        'EXPLICIT_CLASSIFICATION');
   }));
 
   it('should create a new result', function() {
     var answerClassificationResult = (
       AnswerClassificationResultObjectFactory.createNew(
-         false, 1, 0, EXPLICIT_CLASSIFICATION));
+         false, 1, 0, 'EXPLICIT_CLASSIFICATION'));
 
     expect(answerClassificationResult.outcome).toEqual(false);
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(
-      EXPLICIT_CLASSIFICATION);
+      'EXPLICIT_CLASSIFICATION');
   });
 });
