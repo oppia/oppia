@@ -421,7 +421,11 @@ oppia.factory('explorationLanguageCodeService', [
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'language_code';
     child.getAllLanguageCodes = function() {
-      return constants.ALL_LANGUAGE_CODES;
+      // TODO(sll): Update this once the App Engine search service supports
+      // 3-letter language codes.
+      return constants.ALL_LANGUAGE_CODES.filter(function(languageCodeDict) {
+        return languageCodeDict.code.length === 2;
+      });
     };
     child.getCurrentLanguageDescription = function() {
       for (var i = 0; i < constants.ALL_LANGUAGE_CODES.length; i++) {
@@ -432,7 +436,9 @@ oppia.factory('explorationLanguageCodeService', [
     };
     child._isValid = function(value) {
       return constants.ALL_LANGUAGE_CODES.some(function(elt) {
-        return elt.code === value;
+        // TODO(sll): Remove the second clause once the App Engine search
+        // service supports 3-letter language codes.
+        return elt.code === value && elt.code.length === 2;
       });
     };
     return child;
@@ -524,6 +530,15 @@ oppia.factory('explorationCorrectnessFeedbackService', [
 
     child._isValid = function(value) {
       return (typeof value === 'boolean');
+    };
+
+    child.isEnabled = function() {
+      return child.savedMemento;
+    };
+
+    child.toggleCorrectnessFeedback = function() {
+      child.displayed = !child.displayed;
+      child.saveDisplayedValue();
     };
 
     return child;

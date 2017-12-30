@@ -1,0 +1,38 @@
+<div ng-if="!correctnessLabelEditorIsOpen"
+     title="<[isEditable() ? 'Edit correctness setting' : '']>"
+     style="height: 100%;">
+  <div class="oppia-readonly-rule-tile"
+       ng-class="{'oppia-editable-section': isEditable()}">
+    <div class="oppia-rule-details-header">
+      <div class="oppia-click-to-start-editing"
+           ng-if="isEditable()" ng-click="openCorrectnessLabelEditor()">
+        <i ng-if="isEditable()" class="material-icons oppia-editor-edit-icon pull-right"
+           title="Edit Correctness setting">&#xE254;
+        </i>
+      </div>
+
+      <strong>The answers falling under this group are
+        <span ng-if="labelledAsCorrect" style="color: rgb(20, 180, 15)">
+          correct
+        </span>
+        <span ng-if="!labelledAsCorrect" style="color: rgb(243, 13, 13)">
+          incorrect
+        </span>
+      </strong>
+    </div>
+  </div>
+</div>
+
+<div style="position: relative;" ng-if="isEditable() && correctnessLabelEditorIsOpen">
+  <strong>Answers caught by this answer group should be considered correct</strong>
+  <form class="form-inline" role="form" name="editCorrectnessLabelForm.form">
+    <input type="checkbox" ng-model="labelledAsCorrect" ng-disabled="isDisabled()">
+  </form>
+  <div class="oppia-rule-save-cancel-buttons">
+    <div class="pull-right">
+      <button type="button" class="btn btn-default" ng-click="cancelEdit()">Cancel</button>
+      <button type="button" class="btn btn-success" ng-disabled="editCorrectnessLabelForm.form.$invalid" ng-click="saveCorrectnessLabel(labelledAsCorrect)">Save</button>
+    </div>
+    <div style="clear: both;"></div>
+  </div>
+</div>

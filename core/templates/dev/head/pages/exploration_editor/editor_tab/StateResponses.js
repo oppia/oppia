@@ -268,6 +268,7 @@ oppia.controller('StateResponses', [
               ExplorationHtmlFormatterService.getInteractionHtml(
                 stateInteractionIdService.savedMemento,
                 stateCustomizationArgsService.savedMemento,
+                false,
                 'testInteractionInput'));
             $scope.answerTemplate = '';
 
@@ -476,6 +477,13 @@ oppia.controller('StateResponses', [
     $scope.saveActiveAnswerGroupRules = function(updatedRules) {
       ResponsesService.updateActiveAnswerGroup({
         rules: updatedRules
+      });
+    };
+
+    $scope.saveActiveAnswerGroupCorrectnessLabel = function(
+      updatedCorrectnessLabel) {
+      ResponsesService.updateActiveAnswerGroup({
+        labelledAsCorrect: updatedCorrectnessLabel
       });
     };
 
