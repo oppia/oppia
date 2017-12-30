@@ -22,15 +22,16 @@ oppia.directive('hintEditor', [
       restrict: 'E',
       scope: {
         hint: '=',
-        getIndex: '&index',
+        getIndexPlusOne: '&index',
         getOnSaveFn: '&onSave'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/hint_editor_directive.html'),
       controller: [
-        '$scope', 'editabilityService', function($scope, editabilityService) {
+        '$scope', 'editabilityService', 'stateHintsService',
+        function($scope, editabilityService, stateHintsService) {
           $scope.isEditable = editabilityService.isEditable();
-
+          $scope.stateHintsService = stateHintsService;
           $scope.editHintForm = {};
           $scope.hintEditorIsOpen = false;
 
@@ -58,6 +59,18 @@ oppia.directive('hintEditor', [
             $scope.hint = angular.copy($scope.hintMemento);
             $scope.hintMemento = null;
             $scope.hintEditorIsOpen = false;
+          };
+
+          $scope.onAudioTranslationsStartEditAction = function() {
+            // Close the content editor and save all existing changes to the
+            // HTML.
+            if ($scope.hintEditorIsOpen) {
+              $scope.saveThisHint();
+            }
+          };
+
+          $scope.onAudioTranslationsEdited = function() {
+            stateHintsService.saveDisplayedValue();
           };
 
           $scope.$on('externalSave', function() {
