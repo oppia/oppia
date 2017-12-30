@@ -19,9 +19,13 @@
 
 oppia.factory('UrlService', ['$window', function($window) {
   return {
+    // This function is for testing purposes (to mock $window.location)
+    getCurrentUrl: function() {
+      return $window.location;
+    },
     getUrlParams: function() {
       var params = {};
-      var parts = $window.location.href.replace(
+      var parts = this.getCurrentUrl().href.replace(
         /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
           params[key] = value;
         }
@@ -30,7 +34,7 @@ oppia.factory('UrlService', ['$window', function($window) {
     },
     getParentExplorationId: function() {
       var params = {};
-      var parts = $window.location.href.replace(
+      var parts = this.getCurrentUrl().href.replace(
         /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
           params[key] = value;
         }
@@ -43,13 +47,13 @@ oppia.factory('UrlService', ['$window', function($window) {
       return urlParts[1] === 'embed';
     },
     getPathname: function() {
-      return $window.location.pathname;
+      return this.getCurrentUrl().pathname;
     },
     getParameters: function() {
-      return $window.location.search;
+      return this.getCurrentUrl().search;
     },
     getHash: function() {
-      return $window.location.hash;
+      return this.getCurrentUrl().hash;
     }
   };
 }]);
