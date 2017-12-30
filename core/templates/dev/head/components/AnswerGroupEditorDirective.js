@@ -26,8 +26,11 @@ oppia.directive('answerGroupEditor', [
         getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
+        getOnSaveAnswerGroupCorrectnessLabelFn: 
+          '&onSaveAnswerGroupCorrectnessLabel',
         outcome: '=',
         suppressWarnings: '&',
+        labelledAsCorrect: '=',
         rules: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -36,13 +39,20 @@ oppia.directive('answerGroupEditor', [
         '$scope', 'stateInteractionIdService', 'ResponsesService',
         'EditorStateService', 'AlertsService', 'INTERACTION_SPECS',
         'RULE_TYPE_CLASSIFIER', 'RuleObjectFactory',
+        'explorationCorrectnessFeedbackService',
         function(
             $scope, stateInteractionIdService, ResponsesService,
             EditorStateService, AlertsService, INTERACTION_SPECS,
-            RULE_TYPE_CLASSIFIER, RuleObjectFactory) {
+            RULE_TYPE_CLASSIFIER, RuleObjectFactory,
+            explorationCorrectnessFeedbackService) {
           $scope.rulesMemento = null;
           $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           $scope.editAnswerGroupForm = {};
+          $scope.answerGroupIsDefault = ($scope.rules !== null);
+          
+          $scope.isCorrectnessFeedbackEnabled = function() {
+            return explorationCorrectnessFeedbackService.isEnabled();
+          };
 
           $scope.getAnswerChoices = function() {
             return ResponsesService.getAnswerChoices();

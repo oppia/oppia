@@ -532,6 +532,15 @@ oppia.factory('explorationCorrectnessFeedbackService', [
       return (typeof value === 'boolean');
     };
 
+    child.isEnabled = function() {
+      return child.savedMemento;
+    };
+
+    child.toggleCorrectnessFeedback = function() {
+      child.displayed = !child.displayed;
+      child.saveDisplayedValue();
+    };
+
     return child;
   }
 ]);
