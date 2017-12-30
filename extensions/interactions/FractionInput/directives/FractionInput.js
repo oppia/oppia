@@ -27,9 +27,11 @@ oppia.directive('oppiaInteractiveFractionInput', [
         '$scope', '$attrs', 'FocusManagerService',
         'fractionInputRulesService',
         'FractionObjectFactory', 'FRACTION_PARSING_ERRORS',
+        'WindowDimensionsService', 'EVENT_PROGRESS_NAV_SUBMITTED',
         function($scope, $attrs, FocusManagerService,
           fractionInputRulesService,
-          FractionObjectFactory, FRACTION_PARSING_ERRORS) {
+          FractionObjectFactory, FRACTION_PARSING_ERRORS,
+          WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
           var requireSimplestForm =
@@ -104,6 +106,14 @@ oppia.directive('oppiaInteractiveFractionInput', [
               $scope.FractionInputForm.answer.$setValidity(
                 FORM_ERROR_TYPE, false);
             }
+          };
+
+          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
+            $scope.submitAnswer($scope.answer);
+          });
+
+          $scope.isWindowNarrow = function() {
+            return WindowDimensionsService.isWindowNarrow();
           };
         }
       ]

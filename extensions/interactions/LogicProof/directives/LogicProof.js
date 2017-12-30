@@ -27,7 +27,9 @@ oppia.directive('oppiaInteractiveLogicProof', [
         'logic_proof_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$uibModal', 'logicProofRulesService',
-        function($scope, $attrs, $uibModal, logicProofRulesService) {
+        'WindowDimensionsService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        function($scope, $attrs, $uibModal, logicProofRulesService,
+          WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.localQuestionData = HtmlEscaperService.escapedJsonToObj(
             $attrs.questionWithValue);
 
@@ -251,6 +253,12 @@ oppia.directive('oppiaInteractiveLogicProof', [
               answer: submission,
               rulesService: logicProofRulesService
             });
+          };
+
+          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitProof);
+
+          $scope.isWindowNarrow = function() {
+            return WindowDimensionsService.isWindowNarrow();
           };
 
           $scope.showHelp = function() {

@@ -82,8 +82,8 @@ oppia.directive('progressNav', [
               $scope.activeCard.inputResponsePairs.length - 1];
             return Boolean(isInteractionInline &&
               $scope.activeCard.destStateName &&
-              (lastPair.oppiaResponse !== undefined));
-          }
+              lastPair.oppiaResponse);
+          };
         }
       ]
     };

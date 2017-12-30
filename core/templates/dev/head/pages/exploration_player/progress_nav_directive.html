@@ -20,6 +20,11 @@
         <[interactionCustomizationArgs.buttonText.value]>
         <i class="fa fa-arrow-right" style="font-size: 19px; padding-top: 1.5px;"></i>
       </md-button>
+      <md-button ng-if="interactionId === 'ItemSelectionInput' &&
+                        interactionCustomizationArgs.maxAllowableSelectionCount.value > 1"
+                 class="oppia-learner-confirm-button" ng-click="onSubmit()">
+        Submit
+      </md-button>
       <md-button ng-if="showGenericSubmitButtonInNav"
                 class="oppia-learner-confirm-button" ng-click="onSubmit()">
         Submit
