@@ -6,8 +6,7 @@
     <md-card class="oppia-editor-card-with-avatar">
       <div class="oppia-editor-card-body">
         <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist"
-            ng-if="stateSolutionService.savedMemento &&
-                   stateSolutionService.savedMemento.explanation">
+            ng-if="stateSolutionService.savedMemento">
           <li ng-class="!inlineSolutionEditorIsActive"
               class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection"
               style="margin-top: 0;">
@@ -37,7 +36,8 @@
             <div ng-if="inlineSolutionEditorIsActive">
               <div class="oppia-editor-card-section protractor-test-oppia-solution-body">
                 <solution-editor interaction-id="stateInteractionIdService.savedMemento"
-                                 correct-answer-editor-html="correctAnswerEditorHtml">
+                                 correct-answer-editor-html="correctAnswerEditorHtml"
+                                 on-open-solution-editor="openAddOrUpdateSolutionModal()">
                 </solution-editor>
               </div>
             </div>
