@@ -111,6 +111,10 @@ class BaseInteraction(object):
     default_outcome_heading = None
     # Whether the solution feature supports this interaction.
     can_have_solution = None
+    # Whether to show a Submit button in the progress navigation area when the
+    # window width is narrow. The interaction JS must handle the
+    # EVENT_PROGRESS_NAV_SUBMITTED event broadcast by the nav Submit button.
+    show_nav_submit_button = False
 
     # Temporary cache for the rule definitions.
     _cached_rules_dict = None
@@ -229,6 +233,7 @@ class BaseInteraction(object):
             'default_outcome_heading': self.default_outcome_heading,
             'rule_descriptions': self._rule_description_strings,
             'can_have_solution': self.can_have_solution,
+            'show_nav_submit_button': self.show_nav_submit_button,
         }
 
     def get_rule_description(self, rule_name):

@@ -31,25 +31,33 @@ oppia.directive('progressNav', [
         '$scope', '$rootScope', 'PlayerPositionService',
         'PlayerTranscriptService', 'ExplorationPlayerService',
         'ExplorationPlayerStateService', 'CONTINUE_BUTTON_FOCUS_LABEL',
+        'INTERACTION_SPECS',
         function($scope, $rootScope, PlayerPositionService,
           PlayerTranscriptService, ExplorationPlayerService,
-          ExplorationPlayerStateService, CONTINUE_BUTTON_FOCUS_LABEL) {
+          ExplorationPlayerStateService, CONTINUE_BUTTON_FOCUS_LABEL,
+          INTERACTION_SPECS) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
 
-          var transcriptLength, isInteractionInline;
+          var transcriptLength, isInteractionInline, interaction;
           var updateActiveCardInfo = function() {
-            $scope.activeCardIndex = PlayerPositionService.getActiveCardIndex();
             transcriptLength = PlayerTranscriptService.getNumCards();
+            $scope.activeCardIndex = PlayerPositionService.getActiveCardIndex();
             $scope.activeCard = PlayerTranscriptService.getCard(
               $scope.activeCardIndex);
             $scope.hasPrevious = $scope.activeCardIndex > 0;
             $scope.hasNext = !PlayerTranscriptService.isLastCard(
               $scope.activeCardIndex);
-            $scope.interaction = ExplorationPlayerService.getInteraction(
+
+            interaction = ExplorationPlayerService.getInteraction(
               $scope.activeCard.stateName);
             isInteractionInline = (
               ExplorationPlayerStateService.isInteractionInline(
                 $scope.activeCard.stateName));
+            $scope.interactionCustomizationArgs = interaction.customizationArgs;
+            $scope.interactionId = interaction.id;
+            $scope.showGenericSubmitButtonInNav = INTERACTION_SPECS[
+              interaction.id].show_nav_submit_button;
+
             $scope.helpCardHasContinueButton = false;
           };
 

@@ -15,17 +15,12 @@
         to >=angular-1.5.10, which supports "ng-switch-when-separator".
         However, the current approach is cleaner in angular-1.5.8.
       -->
-      <md-button ng-if="interaction.id === 'Continue'"
+      <md-button ng-if="interactionId === 'Continue'"
                  class="oppia-learner-confirm-button" ng-click="onSubmit()">
-        <[interaction.customizationArgs.buttonText.value]>
+        <[interactionCustomizationArgs.buttonText.value]>
         <i class="fa fa-arrow-right" style="font-size: 19px; padding-top: 1.5px;"></i>
       </md-button>
-      <md-button ng-if="interaction.id === 'TextInput' ||
-                        interaction.id === 'SetInput' ||
-                        interaction.id === 'NumericInput' ||
-                        interaction.id === 'GraphInput' ||
-                        interaction.id === 'CodeRepl' ||
-                        interaction.id === 'MusicNotesInput'"
+      <md-button ng-if="showGenericSubmitButtonInNav"
                 class="oppia-learner-confirm-button" ng-click="onSubmit()">
         Submit
       </md-button>
