@@ -75,7 +75,7 @@ oppia.directive('hintAndSolutionButtons', [
                 HintManagerService.areAllHintsExhausted();
           };
 
-          $scope.displayHintModalForIndex = function(index) {
+          $scope.displayHintModal = function(index) {
             $scope.activeHintIndex = index;
             var promise = (
               HintAndSolutionModalService.displayHintModalForIndex(index));

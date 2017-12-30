@@ -47,15 +47,15 @@ oppia.factory('HintAndSolutionModalService', [
             '/pages/exploration_player/hint_and_solution_modal_directive.html'),
           backdrop: 'static',
           controller: [
-            '$scope', '$modalInstance',
-            function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
               $scope.isHint = true;
               $scope.hint = (
                 index === HintManagerService.getCurrentHintIndex() ?
                   HintManagerService.consumeHint() :
                   HintManagerService.getHintAtIndex(index));
               $scope.closeModal = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
               };
             }
           ]
