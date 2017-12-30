@@ -84,8 +84,7 @@ oppia.controller('StateSolution', [
         backdrop: 'static',
         controller: [
           '$scope', '$uibModalInstance', 'stateSolutionService',
-          function(
-            $scope, $uibModalInstance, stateSolutionService) {
+          function($scope, $uibModalInstance, stateSolutionService) {
             $scope.stateSolutionService = stateSolutionService;
             $scope.correctAnswerEditorHtml = (
               ExplorationHtmlFormatterService.getInteractionHtml(
@@ -99,23 +98,37 @@ oppia.controller('StateSolution', [
               ui_config: {}
             };
 
-            $scope.data = {
+            var EMPTY_SOLUTION_DATA = {
               answerIsExclusive: false,
               correctAnswer: null,
-              explanation: ''
+              explanationHtml: ''
             };
+
+            $scope.data = stateSolutionService.savedMemento ? {
+              answerIsExclusive: (
+                stateSolutionService.savedMemento.answerIsExclusive),
+              correctAnswer: null,
+              explanationHtml: (
+                stateSolutionService.savedMemento.explanation.getHtml())
+            } : angular.copy(EMPTY_SOLUTION_DATA);
 
             $scope.submitAnswer = function(answer) {
               $scope.data.correctAnswer = answer;
             };
 
             $scope.saveSolution = function() {
-              $uibModalInstance.close({
-                solution: SolutionObjectFactory.createNew(
-                  $scope.data.answerIsExclusive,
-                  $scope.data.correctAnswer,
-                  $scope.data.explanation)
-              });
+              if (typeof $scope.data.answerIsExclusive === 'boolean' &&
+                  $scope.data.correctAnswer !== null &&
+                  $scope.data.explanation !== '') {
+                $uibModalInstance.close({
+                  solution: SolutionObjectFactory.createNew(
+                    $scope.data.answerIsExclusive,
+                    $scope.data.correctAnswer,
+                    $scope.data.explanationHtml)
+                });
+              } else {
+                throw Error('Cannot save invalid solution');
+              }
             };
 
             $scope.cancel = function() {
