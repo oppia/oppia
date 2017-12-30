@@ -44,4 +44,12 @@
       <div style="clear: both;"></div>
     </div>
   </div>
+
+  <div ng-if="stateSolutionService.savedMemento.explanation && !stateSolutionService.savedMemento.explanation.isEmpty()">
+    <audio-translations-editor component-name="solution"
+                               subtitled-html="stateSolutionService.displayed.explanation"
+                               on-start-edit="onAudioTranslationsStartEditAction"
+                               on-change="onAudioTranslationsEdited">
+    </audio-translations-editor>
+  </div>
 </div>

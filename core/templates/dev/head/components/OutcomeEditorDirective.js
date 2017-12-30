@@ -145,6 +145,19 @@ oppia.directive('outcomeEditor', [
             $scope.outcome.dest = angular.copy($scope.savedOutcome.dest);
             $scope.destinationEditorIsOpen = false;
           };
+
+
+          $scope.onAudioTranslationsStartEditAction = function() {
+            // Close the content editor and save all existing changes to the
+            // HTML.
+            if ($scope.feedbackEditorIsOpen) {
+              $scope.saveThisFeedback();
+            }
+          };
+
+          $scope.onAudioTranslationsEdited = function() {
+            $scope.saveThisFeedback();
+          };
         }
       ]
     };
