@@ -71,7 +71,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # Return empty list when no user id passed.
         self.assertEqual([], user_services.get_usernames([]))
 
-        # Return None for usernames that don't exist.
+        # Return None for usernames that don't exists.
         self.assertEqual(
             [None, 'name1'],
             user_services.get_usernames(['fakeUser', 'test1']))
