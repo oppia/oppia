@@ -27,7 +27,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
   'EVENT_NEW_CARD_AVAILABLE',
   function(
       HtmlEscaperService, graphInputRulesService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE ) {
+      EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
@@ -55,10 +55,11 @@ oppia.directive('oppiaInteractiveGraphInput', [
               rulesService: graphInputRulesService
             });
           };
+
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             $scope.interactionIsActive = false;
-            
+
             $scope.canAddVertex = false;
             $scope.canDeleteVertex = false;
             $scope.canEditVertexLabel = false;
