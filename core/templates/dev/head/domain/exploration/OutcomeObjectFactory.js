@@ -19,8 +19,7 @@
 
 oppia.factory('OutcomeObjectFactory', [
   'SubtitledHtmlObjectFactory',
-  function(
-    SubtitledHtmlObjectFactory) {
+  function(SubtitledHtmlObjectFactory) {
     var Outcome = function(dest, feedback, paramChanges) {
       this.dest = dest;
       this.feedback = feedback;
@@ -47,8 +46,10 @@ oppia.factory('OutcomeObjectFactory', [
     };
 
     Outcome.createNew = function(dest, feedbackText, paramChanges) {
-      return new Outcome(dest,
-        SubtitledHtmlObjectFactory.createDefault(feedbackText), paramChanges);
+      return new Outcome(
+        dest,
+        SubtitledHtmlObjectFactory.createDefault(feedbackText),
+        paramChanges);
     };
 
     Outcome.createFromBackendDict = function(outcomeDict) {

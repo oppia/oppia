@@ -23,7 +23,7 @@ oppia.directive('solutionExplanationEditor', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/explanation_editor_directive.html'),
+        '/components/solution_explanation_editor_directive.html'),
       controller: [
         '$scope', 'editabilityService', 'stateSolutionService',
         function($scope, editabilityService, stateSolutionService) {
