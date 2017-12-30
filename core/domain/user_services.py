@@ -716,7 +716,7 @@ def get_usernames(user_ids):
         If a user_id does not exist, the corresponding entry in the
         returned list is None.
     """
-    usernames = [''] * len(user_ids)
+    usernames = [None] * len(user_ids)
     non_system_user_indices = []
     non_system_user_ids = []
     for index, user_id in enumerate(user_ids):
@@ -726,15 +726,11 @@ def get_usernames(user_ids):
             non_system_user_indices.append(index)
             non_system_user_ids.append(user_id)
 
-    user_settings = get_users_settings(non_system_user_ids)
+    non_system_users_settings = get_users_settings(non_system_user_ids)
 
-    user_settings_index = 0
-    for index in non_system_user_indices:
-        if user_settings[user_settings_index]:
-            usernames[index] = user_settings[user_settings_index].username
-        else:
-            usernames[index] = None
-        user_settings_index += 1
+    for index, user_settings in enumerate(non_system_users_settings):
+        if user_settings:
+            usernames[non_system_user_indices[index]] = user_settings.username
 
     return usernames
 
