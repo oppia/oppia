@@ -47,6 +47,25 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.set_username(user_id, username)
         self.assertEquals(username, user_services.get_username(user_id))
 
+    def test_get_username_for_system_user(self):
+        self.assertEqual(
+            feconf.SYSTEM_COMMITTER_ID,
+            user_services.get_username(feconf.SYSTEM_COMMITTER_ID))
+        self.assertEqual(
+            feconf.MIGRATION_BOT_USERNAME,
+            user_services.get_username(feconf.MIGRATION_BOT_USER_ID))
+
+    def test_get_usernames(self):
+        user_ids = ['test1', feconf.SYSTEM_COMMITTER_ID, 'test2']
+        usernames = ['name1', feconf.SYSTEM_COMMITTER_ID, 'name2']
+        user_emails = [
+            'test1@email.com', feconf.SYSTEM_EMAIL_ADDRESS, 'test2@email.com']
+
+        for uid, email, name in zip(user_ids, user_emails, usernames):
+            user_services.create_new_user(uid, email)
+            user_services.set_username(uid, name)
+        self.assertEqual(usernames, user_services.get_usernames(user_ids))
+
     def test_get_username_for_nonexistent_user(self):
         with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.get_username('fakeUser')

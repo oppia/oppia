@@ -54,9 +54,9 @@ oppia.controller('HistoryTab', [
     var versionTreeParents = null;
     var nodesData = null;
     var currentPage = 0;
-    $scope.currentPageDisplay = currentPage + 1;
+    $scope.displayedCurrentPageNumber = currentPage + 1;
     $scope.versionNumbersToDisplay = [];
-    $scope.VERSIONS_PER_PAGE = 30;
+    $scope.VERSIONS_PER_PAGE = 2;
 
     $scope.$on('refreshVersionHistory', function(evt, data) {
       // Uncheck all checkboxes when page is refreshed
@@ -266,7 +266,7 @@ oppia.controller('HistoryTab', [
     };
 
     $scope.computeVersionsToDisplay = function() {
-      currentPage = $scope.currentPageDisplay - 1;
+      currentPage = $scope.displayedCurrentPageNumber - 1;
       var begin = (currentPage * $scope.VERSIONS_PER_PAGE);
       var end = Math.min(
         begin + $scope.VERSIONS_PER_PAGE, $scope.versionCheckboxArray.length);
