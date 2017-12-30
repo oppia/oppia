@@ -56,7 +56,7 @@ oppia.controller('HistoryTab', [
     var currentPage = 0;
     $scope.displayedCurrentPageNumber = currentPage + 1;
     $scope.versionNumbersToDisplay = [];
-    $scope.VERSIONS_PER_PAGE = 2;
+    $scope.VERSIONS_PER_PAGE = 30;
 
     $scope.$on('refreshVersionHistory', function(evt, data) {
       // Uncheck all checkboxes when page is refreshed
