@@ -28,16 +28,12 @@ oppia.factory('BrowserCheckerService', function() {
     // For details on the reliability of this check, see
     // https://stackoverflow.com/questions/4565112/
     // javascript-how-to-find-out-if-the-user-browser-is-chrome
-    if (isIOSChrome ||
+    return !!(isIOSChrome ||
         (isChromium !== null &&
-        isChromium !== undefined &&
-        vendorName === 'Google Inc.' &&
-        isOpera == false &&
-        isIEedge == false)) {
-      return true;
-    } else {
-      return false;
-    }
+            isChromium !== undefined &&
+            vendorName === 'Google Inc.' &&
+            isOpera === false &&
+            isIEedge === false));
   };
 
   return {
