@@ -75,6 +75,8 @@ oppia.directive('supplementalCard', [
           $scope.helpCardHtml = null;
           $scope.helpCardHasContinueButton = false;
 
+          $scope.windowDimensionsService = WindowDimensionsService;
+
           $scope.clearHelpCard = function() {
             $scope.helpCardHtml = null;
             $scope.helpCardHasContinueButton = false;

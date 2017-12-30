@@ -1,0 +1,25 @@
+<svg width="40" height="40" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<title>Active-Solution</title>
+<desc>Created using Figma</desc>
+<g id="Canvas" transform="translate(-3070 73)">
+<g id="Button/Hint/Active-Solution">
+<g id="BG">
+<use xlink:href="#path0_fill" transform="translate(3070 -73)" fill="#009688"/>
+<mask id="mask0_outline_ins">
+<use xlink:href="#path0_fill" fill="white" transform="translate(3070 -73)"/>
+</mask>
+<g mask="url(#mask0_outline_ins)">
+<use xlink:href="#path1_stroke_2x" transform="translate(3070 -73)" fill="#FFFFFF" fill-opacity="0.5"/>
+</g>
+</g>
+<g id="Vector">
+<use xlink:href="#path2_fill" transform="translate(3081 -65)" fill="#FFFFFF"/>
+</g>
+</g>
+</g>
+<defs>
+<path id="path0_fill" d="M 40 20C 40 31.0457 31.0457 40 20 40C 8.9543 40 0 31.0457 0 20C 0 8.9543 8.9543 0 20 0C 31.0457 0 40 8.9543 40 20Z"/>
+<path id="path1_stroke_2x" d="M 38 20C 38 29.9411 29.9411 38 20 38L 20 42C 32.1503 42 42 32.1503 42 20L 38 20ZM 20 38C 10.0589 38 2 29.9411 2 20L -2 20C -2 32.1503 7.84974 42 20 42L 20 38ZM 2 20C 2 10.0589 10.0589 2 20 2L 20 -2C 7.84974 -2 -2 7.84974 -2 20L 2 20ZM 20 2C 29.9411 2 38 10.0589 38 20L 42 20C 42 7.84974 32.1503 -2 20 -2L 20 2Z"/>
+<path id="path2_fill" d="M 5.14286 22.8C 5.14286 23.46 5.72143 24 6.42857 24L 11.5714 24C 12.2786 24 12.8571 23.46 12.8571 22.8L 12.8571 21.6L 5.14286 21.6L 5.14286 22.8ZM 9 0C 4.03714 0 0 3.768 0 8.4C 0 11.256 1.53 13.764 3.85714 15.288L 3.85714 18C 3.85714 18.66 4.43571 19.2 5.14286 19.2L 12.8571 19.2C 13.5643 19.2 14.1429 18.66 14.1429 18L 14.1429 15.288C 16.47 13.764 18 11.256 18 8.4C 18 3.768 13.9629 0 9 0ZM 12.6643 13.32L 11.5714 14.04L 11.5714 16.8L 6.42857 16.8L 6.42857 14.04L 5.33571 13.32C 3.6 12.192 2.57143 10.356 2.57143 8.4C 2.57143 5.088 5.45143 2.4 9 2.4C 12.5486 2.4 15.4286 5.088 15.4286 8.4C 15.4286 10.356 14.4 12.192 12.6643 13.32Z"/>
+</defs>
+</svg>
