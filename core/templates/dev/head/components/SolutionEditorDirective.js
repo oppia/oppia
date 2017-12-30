@@ -59,4 +59,5 @@ oppia.directive('solutionEditor', [
         }
       ]
     };
-  }]);
+  }
+]);

@@ -268,6 +268,7 @@ oppia.controller('StateResponses', [
               ExplorationHtmlFormatterService.getInteractionHtml(
                 stateInteractionIdService.savedMemento,
                 stateCustomizationArgsService.savedMemento,
+                false,
                 'testInteractionInput'));
             $scope.answerTemplate = '';
 

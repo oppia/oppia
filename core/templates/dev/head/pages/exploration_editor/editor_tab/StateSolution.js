@@ -52,6 +52,7 @@ oppia.controller('StateSolution', [
         stateInteractionIdService.savedMemento,
         explorationStatesService.getInteractionCustomizationArgsMemento(
           EditorStateService.getActiveStateName()),
+        false,
         $scope.SOLUTION_EDITOR_FOCUS_LABEL));
 
     $scope.toggleInlineSolutionEditorIsActive = function() {
@@ -90,6 +91,7 @@ oppia.controller('StateSolution', [
                 stateInteractionIdService.savedMemento,
                 explorationStatesService.getInteractionCustomizationArgsMemento(
                   EditorStateService.getActiveStateName()),
+                false,
                 $scope.SOLUTION_EDITOR_FOCUS_LABEL));
             $scope.EXPLANATION_FORM_SCHEMA = {
               type: 'html',
