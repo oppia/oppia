@@ -27,7 +27,7 @@ describe('HistoryTab controller', function() {
       historyTabCtrl = $controller('HistoryTab', {$scope: $scope});
     }));
 
-    it('should get version number of revisions to be displayed',
+    it('should get version numbers of revisions to be displayed',
     function() {
       $scope.displayedCurrentPageNumber = 1;
       $scope.versionCheckboxArray = [
