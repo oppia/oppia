@@ -28,6 +28,15 @@ oppia.factory('UrlService', ['$window', function($window) {
       );
       return params;
     },
+    getParentExplorationId: function() {
+      var params = {};
+      var parts = $window.location.href.replace(
+        /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+          params[key] = value;
+        }
+      );
+      return params.parent ? params.parent : null;
+    },
     isIframed: function() {
       var pathname = this.getPathname();
       var urlParts = pathname.split('/');
@@ -35,6 +44,9 @@ oppia.factory('UrlService', ['$window', function($window) {
     },
     getPathname: function() {
       return $window.location.pathname;
+    },
+    getParameters: function() {
+      return $window.location.search;
     },
     getHash: function() {
       return $window.location.hash;

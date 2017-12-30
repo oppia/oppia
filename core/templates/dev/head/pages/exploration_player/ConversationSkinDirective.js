@@ -436,16 +436,16 @@ oppia.directive('conversationSkin', [
             }
 
             if (ExplorationPlayerStateService.isStateTerminal(stateName)) {
-              var lastParameter = UrlService.getUrlParams();
-              if (lastParameter.parent) {
-                var parent = [];
-                parent.push(lastParameter.parent);
+              var parentExplorationId = UrlService.getParentExplorationId();
+              if (parentExplorationId) {
+                $scope.parameters = UrlService.getParameters();
                 ExplorationRecommendationsService.getRecommendedSummaryDicts(
-                  parent,
+                  [parentExplorationId],
                   function(summaries) {
                     $scope.recommendedExplorationSummaries = summaries;
                   });
               } else {
+                $scope.parameters = null;
                 ExplorationRecommendationsService.getRecommendedSummaryDicts(
                   ExplorationPlayerStateService.getAuthorRecommendedExpIds(
                     stateName),
