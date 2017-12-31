@@ -24,10 +24,10 @@ oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
 
 oppia.directive('oppiaInteractiveGraphInput', [
   'HtmlEscaperService', 'graphInputRulesService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE',
+  'UrlService', 'EVENT_NEW_CARD_AVAILABLE',
   function(
       HtmlEscaperService, graphInputRulesService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE) {
+      UrlService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
@@ -42,8 +42,9 @@ oppia.directive('oppiaInteractiveGraphInput', [
         'EVENT_PROGRESS_NAV_SUBMITTED',
         function($scope, $element, $attrs, WindowDimensionsService,
           EVENT_PROGRESS_NAV_SUBMITTED) {
-          $scope.isWindowNarrow = function() {
-            return WindowDimensionsService.isWindowNarrow();
+          $scope.isSubmitHidden = function() {
+            return (!UrlService.isIframed() &&
+              WindowDimensionsService.isWindowNarrow());
           };
 
           $scope.errorMessage = '';

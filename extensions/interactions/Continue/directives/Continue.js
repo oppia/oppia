@@ -32,9 +32,9 @@ oppia.directive('oppiaInteractiveContinue', [
         'continue_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'WindowDimensionsService',
-        'EVENT_PROGRESS_NAV_SUBMITTED',
+        'UrlService', 'EVENT_PROGRESS_NAV_SUBMITTED',
         function($scope, $attrs, WindowDimensionsService,
-          EVENT_PROGRESS_NAV_SUBMITTED) {
+          UrlService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.buttonText = HtmlEscaperService.escapedJsonToObj(
             $attrs.buttonTextWithValue);
 
@@ -58,8 +58,9 @@ oppia.directive('oppiaInteractiveContinue', [
             });
           };
 
-          $scope.isWindowNarrow = function() {
-            return WindowDimensionsService.isWindowNarrow();
+          $scope.isSubmitHidden = function() {
+            return (!UrlService.isIframed() &&
+              WindowDimensionsService.isWindowNarrow());
           };
 
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitAnswer);

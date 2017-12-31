@@ -5,7 +5,7 @@
       <textarea ng-trim="false" rows="10"></textarea>
     </div>
   </div>
-  <button class="btn btn-default" ng-if="!isWindowNarrow()" ng-click="submitProof()" ng-disabled="!interactionIsActive" translate="I18N_INTERACTIONS_LOGIC_PROOF_SUBMIT"></button>
+  <button class="btn btn-default" ng-if="!isSubmitHidden()" ng-click="submitProof()" ng-disabled="!interactionIsActive" translate="I18N_INTERACTIONS_LOGIC_PROOF_SUBMIT"></button>
   <button class="btn btn-default" ng-click="showHelp()" ng-disabled="!interactionIsActive" translate="I18N_INTERACTIONS_LOGIC_PROOF_POSSIBLE_LINES"></button>
   <p class="logic-proof-error-message"> <[errorMessage]>  </p>
 </div>

@@ -31,10 +31,12 @@ oppia.directive('oppiaInteractiveNumericInput', [
         'numeric_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'FocusManagerService', 'numericInputRulesService',
-        'WindowDimensionsService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'WindowDimensionsService', 'UrlService',
+        'EVENT_PROGRESS_NAV_SUBMITTED',
         function(
             $scope, $attrs, FocusManagerService, numericInputRulesService,
-            WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            WindowDimensionsService, UrlService,
+            EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
@@ -52,8 +54,9 @@ oppia.directive('oppiaInteractiveNumericInput', [
             }
           };
 
-          $scope.isWindowNarrow = function() {
-            return WindowDimensionsService.isWindowNarrow();
+          $scope.isSubmitHidden = function() {
+            return (!UrlService.isIframed() &&
+              WindowDimensionsService.isWindowNarrow());
           };
 
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {

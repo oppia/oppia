@@ -32,11 +32,14 @@ oppia.directive('oppiaInteractiveTextInput', [
         'text_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'FocusManagerService', 'textInputRulesService',
-        'WindowDimensionsService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'WindowDimensionsService', 'UrlService',
+        'EVENT_PROGRESS_NAV_SUBMITTED',
         function($scope, $attrs, FocusManagerService, textInputRulesService,
-          WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
-          $scope.isWindowNarrow = function() {
-            return WindowDimensionsService.isWindowNarrow();
+          WindowDimensionsService, UrlService,
+          EVENT_PROGRESS_NAV_SUBMITTED) {
+          $scope.isSubmitHidden = function() {
+            return (!UrlService.isIframed() &&
+              WindowDimensionsService.isWindowNarrow());
           };
 
           $scope.placeholder = HtmlEscaperService.escapedJsonToObj(

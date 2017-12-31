@@ -32,10 +32,12 @@ oppia.directive('oppiaInteractiveSetInput', [
         'set_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$translate', 'setInputRulesService',
-        'WindowDimensionsService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'WindowDimensionsService', 'UrlService',
+        'EVENT_PROGRESS_NAV_SUBMITTED',
         function(
           $scope, $attrs, $translate, setInputRulesService,
-          WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
+          WindowDimensionsService, UrlService,
+          EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.schema = {
             type: 'list',
             items: {
@@ -75,8 +77,9 @@ oppia.directive('oppiaInteractiveSetInput', [
             }
           };
 
-          $scope.isWindowNarrow = function() {
-            return WindowDimensionsService.isWindowNarrow();
+          $scope.isSubmitHidden = function() {
+            return (!UrlService.isIframed() &&
+              WindowDimensionsService.isWindowNarrow());
           };
 
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {

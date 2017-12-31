@@ -36,10 +36,10 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
       controller: [
         '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
         'DebouncerService', 'DeviceInfoService', 'WindowDimensionsService',
-        'EVENT_PROGRESS_NAV_SUBMITTED',
+        'UrlService', 'EVENT_PROGRESS_NAV_SUBMITTED',
         function($scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS,
           DebouncerService, DeviceInfoService, WindowDimensionsService,
-          EVENT_PROGRESS_NAV_SUBMITTED) {
+          UrlService, EVENT_PROGRESS_NAV_SUBMITTED) {
           var guppyDivElt = $element[0].querySelector('.guppy-div');
 
           /**
@@ -200,8 +200,9 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
           };
 
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitAnswer);
-          $scope.isWindowNarrow = function() {
-            return WindowDimensionsService.isWindowNarrow();
+          $scope.isSubmitHidden = function() {
+            return (!UrlService.isIframed() &&
+              WindowDimensionsService.isWindowNarrow());
           };
         }
       ]
