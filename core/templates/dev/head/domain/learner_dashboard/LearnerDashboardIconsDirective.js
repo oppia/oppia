@@ -34,10 +34,19 @@ oppia.directive('learnerDashboardIcons', [
         'LearnerDashboardActivityIdsObjectFactory',
         'LearnerPlaylistService',
         function(
-            $scope, LearnerDashboardIdsBackendApiService,
-            LearnerDashboardActivityIdsObjectFactory,
-            LearnerPlaylistService) {
+          $scope, LearnerDashboardIdsBackendApiService,
+          LearnerDashboardActivityIdsObjectFactory,
+          LearnerPlaylistService) {
           $scope.activityIsCurrentlyHoveredOver = true;
+          $scope.Flag = false;
+
+          $scope.$watch('Flag', function () {
+            console.log($scope.Flag);
+          });
+
+          $scope.enableToolTip = function (state) {
+            $scope.Flag = state;
+          };
 
           $scope.$watch('activityActive', function(value) {
             $scope.activityIsCurrentlyHoveredOver = $scope.activityActive;
@@ -53,6 +62,7 @@ oppia.directive('learnerDashboardIcons', [
 
           $scope.setHoverState = function(hoverState) {
             $scope.activityIsCurrentlyHoveredOver = hoverState;
+            $scope.enableToolTip(false);
           };
 
           $scope.canActivityBeAddedToLearnerPlaylist = function(activityId) {
