@@ -19,6 +19,7 @@
 """Tests for one off statistics jobs."""
 
 import os
+import types
 
 import feconf
 import utils
@@ -32,6 +33,8 @@ from core.domain import stats_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
+
+import core.storage.base_model.gae_models as base_models
 
 (exp_models, stats_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.statistics])
@@ -115,45 +118,23 @@ class RecomputeStateCompleteStatisticsTest(test_utils.GenericTestBase):
                 self.state_a: state_stats_dict
             })
 
-        exp_models.ExplorationCommitLogEntryModel(
-            id=('exploration-%s-%s' % (self.exp_id, 2)),
-            user_id='user_id',
-            username='username',
-            exploration_id=self.exp_id,
-            commit_type='commit_type',
-            commit_message='commit_message',
-            commit_cmds=[],
-            version=2,
-            post_commit_status=feconf.ACTIVITY_STATUS_PRIVATE,
-            post_commit_community_owned=True,
-            post_commit_is_private=True
-        ).put_async()
-        # Change state_a to state_b in version 3
-        exp_models.ExplorationCommitLogEntryModel(
-            id=('exploration-%s-%s' % (self.exp_id, 3)),
-            user_id='user_id',
-            username='username',
-            exploration_id=self.exp_id,
-            commit_type='commit_type',
-            commit_message='commit_message',
-            commit_cmds=[{'cmd': exp_domain.CMD_RENAME_STATE,
-                          'old_state_name': self.state_a,
-                          'new_state_name': self.state_b}],
-            version=3,
-            post_commit_status=feconf.ACTIVITY_STATUS_PRIVATE,
-            post_commit_community_owned=True,
-            post_commit_is_private=True
-        ).put_async()
-
     def test_standard_operation(self):
-        job_id = (
-            stats_jobs_one_off.RecomputeStatistics.create_new())
-        stats_jobs_one_off.RecomputeStatistics.enqueue(job_id)
+        def mock(x, y, z): #pylint: disable=unused-argument,invalid-name
+            return [{'commit_cmds':[]}, {'commit_cmds':[]}, {
+                'commit_cmds': [{'cmd': exp_domain.CMD_RENAME_STATE,
+                                 'old_state_name': self.state_a,
+                                 'new_state_name': self.state_b}]}]
+        with self.swap(
+            base_models.VersionedModel, 'get_snapshots_metadata',
+            types.MethodType(mock, base_models.VersionedModel)):
+            job_id = (
+                stats_jobs_one_off.RecomputeStatistics.create_new())
+            stats_jobs_one_off.RecomputeStatistics.enqueue(job_id)
 
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+            self.process_and_flush_pending_tasks()
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             self.exp_id, '1')
@@ -259,31 +240,23 @@ class RecomputeAnswerSubmittedStatisticsTest(test_utils.GenericTestBase):
                 self.state: state_stats_dict
             })
 
-        exp_models.ExplorationCommitLogEntryModel(
-            id=('exploration-%s-%s' % (self.exp_id, 2)),
-            user_id='user_id',
-            username='username',
-            exploration_id=self.exp_id,
-            commit_type='commit_type',
-            commit_message='commit_message',
-            commit_cmds=[{'cmd': exp_domain.CMD_RENAME_STATE,
-                          'old_state_name': self.state,
-                          'new_state_name': 'b'}],
-            version=2,
-            post_commit_status=feconf.ACTIVITY_STATUS_PRIVATE,
-            post_commit_community_owned=True,
-            post_commit_is_private=True
-        ).put_async()
-
     def test_standard_operation(self):
-        job_id = (
-            stats_jobs_one_off.RecomputeStatistics.create_new())
-        stats_jobs_one_off.RecomputeStatistics.enqueue(job_id)
+        def mock(x, y, z): #pylint: disable=unused-argument,invalid-name
+            return [{'commit_cmds':[]}, {
+                'commit_cmds': [{'cmd': exp_domain.CMD_RENAME_STATE,
+                                 'old_state_name': self.state,
+                                 'new_state_name': 'b'}]}]
+        with self.swap(
+            base_models.VersionedModel, 'get_snapshots_metadata',
+            types.MethodType(mock, base_models.VersionedModel)):
+            job_id = (
+                stats_jobs_one_off.RecomputeStatistics.create_new())
+            stats_jobs_one_off.RecomputeStatistics.enqueue(job_id)
 
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+            self.process_and_flush_pending_tasks()
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             self.exp_id, str(self.exp_version))
@@ -385,31 +358,23 @@ class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
                 self.state: state_stats_dict
             })
 
-        exp_models.ExplorationCommitLogEntryModel(
-            id=('exploration-%s-%s' % (self.exp_id, 2)),
-            user_id='user_id',
-            username='username',
-            exploration_id=self.exp_id,
-            commit_type='commit_type',
-            commit_message='commit_message',
-            commit_cmds=[{'cmd': exp_domain.CMD_RENAME_STATE,
-                          'old_state_name': self.state,
-                          'new_state_name': 'b'}],
-            version=2,
-            post_commit_status=feconf.ACTIVITY_STATUS_PRIVATE,
-            post_commit_community_owned=True,
-            post_commit_is_private=True
-        ).put_async()
-
     def test_standard_operation(self):
-        job_id = (
-            stats_jobs_one_off.RecomputeStatistics.create_new())
-        stats_jobs_one_off.RecomputeStatistics.enqueue(job_id)
+        def mock(x, y, z): #pylint: disable=unused-argument,invalid-name
+            return [{'commit_cmds':[]}, {
+                'commit_cmds': [{'cmd': exp_domain.CMD_RENAME_STATE,
+                                 'old_state_name': self.state,
+                                 'new_state_name': 'b'}]}]
+        with self.swap(
+            base_models.VersionedModel, 'get_snapshots_metadata',
+            types.MethodType(mock, base_models.VersionedModel)):
+            job_id = (
+                stats_jobs_one_off.RecomputeStatistics.create_new())
+            stats_jobs_one_off.RecomputeStatistics.enqueue(job_id)
 
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+            self.process_and_flush_pending_tasks()
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             self.exp_id, str(self.exp_version))
@@ -509,31 +474,23 @@ class RecomputeSolutionHitStatisticsTest(test_utils.GenericTestBase):
                 self.state: state_stats_dict
             })
 
-        exp_models.ExplorationCommitLogEntryModel(
-            id=('exploration-%s-%s' % (self.exp_id, 2)),
-            user_id='user_id',
-            username='username',
-            exploration_id=self.exp_id,
-            commit_type='commit_type',
-            commit_message='commit_message',
-            commit_cmds=[{'cmd': exp_domain.CMD_RENAME_STATE,
-                          'old_state_name': self.state,
-                          'new_state_name': 'b'}],
-            version=2,
-            post_commit_status=feconf.ACTIVITY_STATUS_PRIVATE,
-            post_commit_community_owned=True,
-            post_commit_is_private=True
-        ).put_async()
-
     def test_standard_operation(self):
-        job_id = (
-            stats_jobs_one_off.RecomputeStatistics.create_new())
-        stats_jobs_one_off.RecomputeStatistics.enqueue(job_id)
+        def mock(x, y, z): #pylint: disable=unused-argument,invalid-name
+            return [{'commit_cmds':[]}, {
+                'commit_cmds': [{'cmd': exp_domain.CMD_RENAME_STATE,
+                                 'old_state_name': self.state,
+                                 'new_state_name': 'b'}]}]
+        with self.swap(
+            base_models.VersionedModel, 'get_snapshots_metadata',
+            types.MethodType(mock, base_models.VersionedModel)):
+            job_id = (
+                stats_jobs_one_off.RecomputeStatistics.create_new())
+            stats_jobs_one_off.RecomputeStatistics.enqueue(job_id)
 
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+            self.process_and_flush_pending_tasks()
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             self.exp_id, str(self.exp_version))
@@ -606,29 +563,21 @@ class RecomputeActualStartStatisticsTest(test_utils.GenericTestBase):
             self.exp_id, self.exp_version, 0, 0, 0, 0, 0, 0, {
                 self.state: state_stats_dict
                 })
-        exp_models.ExplorationCommitLogEntryModel(
-            id=('exploration-%s-%s' % (self.exp_id, 2)),
-            user_id='user_id',
-            username='username',
-            exploration_id=self.exp_id,
-            commit_type='commit_type',
-            commit_message='commit_message',
-            commit_cmds=[],
-            version=2,
-            post_commit_status=feconf.ACTIVITY_STATUS_PRIVATE,
-            post_commit_community_owned=True,
-            post_commit_is_private=True
-        ).put_async()
 
     def test_standard_operation(self):
-        job_id = (
-            stats_jobs_one_off.RecomputeStatistics.create_new())
-        stats_jobs_one_off.RecomputeStatistics.enqueue(job_id)
+        def mock(x, y, z): #pylint: disable=unused-argument,invalid-name
+            return [{'commit_cmds':[]}, {'commit_cmds': []}]
+        with self.swap(
+            base_models.VersionedModel, 'get_snapshots_metadata',
+            types.MethodType(mock, base_models.VersionedModel)):
+            job_id = (
+                stats_jobs_one_off.RecomputeStatistics.create_new())
+            stats_jobs_one_off.RecomputeStatistics.enqueue(job_id)
 
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+            self.process_and_flush_pending_tasks()
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             self.exp_id, str(self.exp_version))
@@ -719,14 +668,19 @@ class RecomputeCompleteEventStatisticsTest(test_utils.GenericTestBase):
         ).put_async()
 
     def test_standard_operation(self):
-        job_id = (
-            stats_jobs_one_off.RecomputeStatistics.create_new())
-        stats_jobs_one_off.RecomputeStatistics.enqueue(job_id)
+        def mock(x, y, z): #pylint: disable=unused-argument,invalid-name
+            return [{'commit_cmds':[]}, {'commit_cmds': []}]
+        with self.swap(
+            base_models.VersionedModel, 'get_snapshots_metadata',
+            types.MethodType(mock, base_models.VersionedModel)):
+            job_id = (
+                stats_jobs_one_off.RecomputeStatistics.create_new())
+            stats_jobs_one_off.RecomputeStatistics.enqueue(job_id)
 
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+            self.process_and_flush_pending_tasks()
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
             self.exp_id, str(self.exp_version))

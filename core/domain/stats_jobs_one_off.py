@@ -19,9 +19,8 @@
 import ast
 import collections
 import copy
-import itertools
-import logging
 import datetime
+import itertools
 
 import feconf
 import utils
@@ -118,6 +117,10 @@ class RecomputeStatistics(jobs.BaseMapReduceOneOffJobManager):
         # Get a copy of the uncorrupted *_v1 statistics
         old_stats = stats_services.get_multiple_exploration_stats_by_version(
             exp_id, versions)
+        # Get list of snapshot models for each version of the exploration
+        snapshots_by_version = (
+            exp_models.ExplorationModel.get_snapshots_metadata(
+                exp_id, versions))
 
         exp_stats_dicts = []
         for version, events in itertools.groupby(values,
@@ -139,9 +142,7 @@ class RecomputeStatistics(jobs.BaseMapReduceOneOffJobManager):
                     exp_id, version, events, v1_stats.to_dict())
                 exp_stats_dicts.append(exp_stats_dict)
             else:
-                change_list = exp_models.ExplorationCommitLogEntryModel.get(
-                    'exploration-%s-%s' % (exp_id, version)).commit_cmds
-
+                change_list = snapshots_by_version[version - 1]['commit_cmds']
                 # Copy recomputed v2 events from previous version
                 prev_version = copy.deepcopy(exp_stats_dicts[-1])
 
