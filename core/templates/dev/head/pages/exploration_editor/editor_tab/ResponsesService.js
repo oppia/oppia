@@ -178,7 +178,7 @@ oppia.factory('ResponsesService', [
               _defaultOutcome = null;
             } else if (!_defaultOutcome) {
               _defaultOutcome = OutcomeObjectFactory.createNew(
-                EditorStateService.getActiveStateName(), [], []);
+                EditorStateService.getActiveStateName(), '', []);
             }
           }
         }
