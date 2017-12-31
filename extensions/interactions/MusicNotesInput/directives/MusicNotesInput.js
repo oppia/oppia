@@ -105,7 +105,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         };
 
         scope.isSubmitHidden = function() {
-          return (!UrlService.isIframed() &&
+          return (
+            !UrlService.isIframed() &&
             WindowDimensionsService.isWindowNarrow());
         };
 

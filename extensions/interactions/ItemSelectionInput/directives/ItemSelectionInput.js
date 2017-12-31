@@ -37,8 +37,9 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
       controller: [
         '$scope', '$attrs', 'WindowDimensionsService',
         'UrlService', 'EVENT_PROGRESS_NAV_SUBMITTED',
-        function($scope, $attrs, WindowDimensionsService,
-          UrlService, EVENT_PROGRESS_NAV_SUBMITTED) {
+        function(
+            $scope, $attrs, WindowDimensionsService,
+            UrlService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.choices = HtmlEscaperService.escapedJsonToObj(
             $attrs.choicesWithValue);
           $scope.maxAllowableSelectionCount = (
@@ -98,7 +99,8 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
 
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitAnswer);
           $scope.isSubmitHidden = function() {
-            return (!UrlService.isIframed() &&
+            return (
+              !UrlService.isIframed() &&
               WindowDimensionsService.isWindowNarrow());
           };
         }

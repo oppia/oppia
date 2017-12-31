@@ -34,11 +34,13 @@ oppia.directive('oppiaInteractiveTextInput', [
         '$scope', '$attrs', 'FocusManagerService', 'textInputRulesService',
         'WindowDimensionsService', 'UrlService',
         'EVENT_PROGRESS_NAV_SUBMITTED',
-        function($scope, $attrs, FocusManagerService, textInputRulesService,
-          WindowDimensionsService, UrlService,
-          EVENT_PROGRESS_NAV_SUBMITTED) {
+        function(
+            $scope, $attrs, FocusManagerService, textInputRulesService,
+            WindowDimensionsService, UrlService,
+            EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.isSubmitHidden = function() {
-            return (!UrlService.isIframed() &&
+            return (
+              !UrlService.isIframed() &&
               WindowDimensionsService.isWindowNarrow());
           };
 

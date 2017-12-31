@@ -40,10 +40,12 @@ oppia.directive('oppiaInteractiveGraphInput', [
       controller: [
         '$scope', '$element', '$attrs', 'WindowDimensionsService',
         'EVENT_PROGRESS_NAV_SUBMITTED',
-        function($scope, $element, $attrs, WindowDimensionsService,
-          EVENT_PROGRESS_NAV_SUBMITTED) {
+        function(
+            $scope, $element, $attrs, WindowDimensionsService,
+            EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.isSubmitHidden = function() {
-            return (!UrlService.isIframed() &&
+            return (
+              !UrlService.isIframed() &&
               WindowDimensionsService.isWindowNarrow());
           };
 

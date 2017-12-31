@@ -43,7 +43,8 @@ TEXT_INPUT_ID = 'TextInput'
 _INTERACTION_CONFIG_SCHEMA = [
     ('name', basestring), ('display_mode', basestring),
     ('description', basestring), ('_customization_arg_specs', list),
-    ('is_terminal', bool), ('needs_summary', bool)]
+    ('is_terminal', bool), ('needs_summary', bool),
+    ('show_nav_submit_button', bool)]
 
 
 class InteractionAnswerUnitTests(test_utils.GenericTestBase):

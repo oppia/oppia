@@ -38,10 +38,11 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         '$scope', '$attrs', 'WindowDimensionsService',
         'UrlService', 'EVENT_PROGRESS_NAV_SUBMITTED',
         function(
-          $scope, $attrs, WindowDimensionsService,
-          UrlService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            $scope, $attrs, WindowDimensionsService,
+            UrlService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.isSubmitHidden = function() {
-            return (!UrlService.isIframed() &&
+            return (
+              !UrlService.isIframed() &&
               WindowDimensionsService.isWindowNarrow());
           };
 
