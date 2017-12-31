@@ -62,34 +62,34 @@ describe('Full exploration editor', function() {
   });
 
   it('should redirect back to parent exploration correctly when parent id is ' +
-     'given as query parameter', function() {
-        browser.get('/explore/' + refresherExplorationId + '?parent=' +
-          parentId1 + '&parent=' + parentId2);
-        browser.waitForAngular();
+      'given as query parameter', function() {
+    browser.get('/explore/' + refresherExplorationId + '?parent=' +
+      parentId1 + '&parent=' + parentId2);
+    browser.waitForAngular();
 
-        /* The summary tile for redirection has to be scrolled down in the
-           chrome window to be in view of the automated test,
-           hence the scrollTo. */
-        browser.executeScript('window.scrollTo(571,700);').then(function() {
-          element(by.css('.protractor-test-exp-summary-tile-title')).click();
-        });
-        browser.waitForAngular();
-        browser.getCurrentUrl().then(function(url) {
-          currentExplorationId = url.split('/')[4].split('?')[0];
-          expect(currentExplorationId).toBe(parentId2);
-        });
+    /* The summary tile for redirection has to be scrolled down in the
+       chrome window to be in view of the automated test,
+       hence the scrollTo. */
+    browser.executeScript('window.scrollTo(571,700);').then(function() {
+      element(by.css('.protractor-test-exp-summary-tile-title')).click();
+    });
+    browser.waitForAngular();
+    browser.getCurrentUrl().then(function(url) {
+      currentExplorationId = url.split('/')[4].split('?')[0];
+      expect(currentExplorationId).toBe(parentId2);
+    });
 
-        browser.executeScript('window.scrollTo(571,700);').then(function() {
-          element(by.css('.protractor-test-exp-summary-tile-title')).click();
-        });
-        browser.waitForAngular();
-        browser.getCurrentUrl().then(function(url) {
-          currentExplorationId = url.split('/')[4];
-          expect(currentExplorationId).toBe(parentId1);
-        });
+    browser.executeScript('window.scrollTo(571,700);').then(function() {
+      element(by.css('.protractor-test-exp-summary-tile-title')).click();
+    });
+    browser.waitForAngular();
+    browser.getCurrentUrl().then(function(url) {
+      currentExplorationId = url.split('/')[4];
+      expect(currentExplorationId).toBe(parentId1);
+    });
 
-        users.logout();
-     });
+    users.logout();
+  });
 
   it('should navigate multiple states correctly, with parameters', function() {
     users.createUser('user4@editorAndPlayer.com', 'user4EditorAndPlayer');
