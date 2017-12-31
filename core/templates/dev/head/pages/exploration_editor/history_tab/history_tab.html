@@ -1,23 +1,23 @@
 <div ng-controller="HistoryTab" class="container-fluid" style="word-wrap: break-word;">
   <md-card class="oppia-editor-card">
     <h3>List of Changes</h3>
-    <div ng-repeat="versionCheckbox in versionCheckboxArray " class="row">
+    <div ng-repeat="versionNumber in versionNumbersToDisplay" class="row">
       <div class="col-sm-4 col-md-4 col-lg-4">
-        <input type="checkbox" name="compareVer" ng-model="versionCheckbox.selected" ng-init="init()" ng-click="changeSelectedVersions($event, versionCheckbox.vnum)" ng-disabled="isCheckboxDisabled(versionCheckbox.vnum)" ng-hide="comparisonsAreDisabled" class='protractor-test-history-checkbox-selector'>
-        [<[versionCheckbox.vnum]>]
-        <strong><profile-link-text username="explorationVersionMetadata[versionCheckbox.vnum].committerId"></profile-link-text></strong>
+        <input type="checkbox" name="compareVer" ng-model="versionCheckboxArray[versionNumber].selected" ng-init="init()" ng-click="changeSelectedVersions($event, versionNumber)" ng-disabled="isCheckboxDisabled(versionNumber)" ng-hide="comparisonsAreDisabled" class='protractor-test-history-checkbox-selector'>
+        [<[versionNumber]>]
+        <strong><profile-link-text username="explorationVersionMetadata[versionNumber].committerId"></profile-link-text></strong>
       </div>
       <div class="col-sm-4 col-md-4 col-lg-4">
-        <[explorationVersionMetadata[versionCheckbox.vnum].commitMessage]>
+        <[explorationVersionMetadata[versionNumber].commitMessage]>
       </div>
       <div class="col-sm-4 col-md-4 col-lg-4">
         <span>
-          <em><[explorationVersionMetadata[versionCheckbox.vnum].createdOnStr]></em>
-          <span ng-if="versionCheckbox.vnum !== currentVersion && editabilityService.isEditable()">
-            | <a href="#" class='protractor-test-revert-version' ng-click="showRevertExplorationModal(versionCheckbox.vnum)">Revert</a>
+          <em><[explorationVersionMetadata[versionNumber].createdOnStr]></em>
+          <span ng-if="versionNumber !== currentVersion && editabilityService.isEditable()">
+            | <a href="#" class='protractor-test-revert-version' ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
           </span>
           <span>
-            | <a href="#" ng-click="downloadExplorationWithVersion(versionCheckbox.vnum)" title="Download exploration as a zip file.">Download</a>
+            | <a href="#" ng-click="downloadExplorationWithVersion(versionNumber)" title="Download exploration as a zip file.">Download</a>
           </span>
         </span>
       </div>
@@ -31,6 +31,8 @@
         <[versionCountPrompt]>
       </div>
     </div>
+
+    <div style="margin-top: 30px" uib-pagination boundary-links="true" class="pagination-sm" max-size="5" items-per-page="VERSIONS_PER_PAGE" total-items="versionCheckboxArray.length" ng-model="displayedCurrentPageNumber" ng-change="computeVersionsToDisplay()"></div>
   </md-card>
 
   <md-card class="oppia-editor-card" style="position: relative;"

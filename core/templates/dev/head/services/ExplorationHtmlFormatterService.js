@@ -23,9 +23,23 @@ oppia.factory('ExplorationHtmlFormatterService', [
   '$filter', 'extensionTagAssemblerService', 'HtmlEscaperService',
   function($filter, extensionTagAssemblerService, HtmlEscaperService) {
     return {
+      /**
+       * @param {string} interactionId - The interaction id.
+       * @param {object} interactionCustomizationArgSpecs - The various
+       *   attributes that the interaction depends on.
+       * @param {boolean} parentHasLastAnswerProperty - If this function is
+       *   called in the exploration_player view (including the preview mode),
+       *   callers should ensure that parentHasLastAnswerProperty is set to
+       *   true and $scope.lastAnswer =
+       *   PlayerTranscriptService.getLastAnswerOnActiveCard(index) is set on
+       *   the parent controller of the returned tag.
+       *   Otherwise, parentHasLastAnswerProperty should be set to false.
+       * @param {string} labelForFocusTarget - The label for setting focus on
+       *   the interaction.
+       */
       getInteractionHtml: function(
           interactionId, interactionCustomizationArgSpecs,
-          labelForFocusTarget) {
+          parentHasLastAnswerProperty, labelForFocusTarget) {
         var htmlInteractionId = $filter('camelCaseToHyphens')(interactionId);
         var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
@@ -33,11 +47,11 @@ oppia.factory('ExplorationHtmlFormatterService', [
           extensionTagAssemblerService.formatCustomizationArgAttrs(
             element, interactionCustomizationArgSpecs));
         element.attr('on-submit', 'submitAnswer(answer, rulesService);');
-        element.attr('last-answer', 'lastAnswer');
+        element.attr('last-answer', parentHasLastAnswerProperty ?
+          'lastAnswer' : 'null');
         if (labelForFocusTarget) {
           element.attr('label-for-focus-target', labelForFocusTarget);
         }
-
         return element.get(0).outerHTML;
       },
 
