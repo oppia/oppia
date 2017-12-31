@@ -113,70 +113,78 @@ describe('Exploration history', function() {
         highlighted: true
       },
       14: {
-        text: '    rule_specs:',
+        text: '      refresher_exploration_id: null',
         highlighted: true
       },
       15: {
-        text: '    - inputs:',
+        text: '    rule_specs:',
         highlighted: true
       },
       16: {
-        text: '        x: 6',
+        text: '    - inputs:',
         highlighted: true
       },
       17: {
-        text: '      rule_type: Equals',
+        text: '        x: 6',
         highlighted: true
       },
       18: {
+        text: '      rule_type: Equals',
+        highlighted: true
+      },
+      19: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: false
       },
-      19: {
+      20: {
         text: '  customization_args: {}',
         highlighted: false
       },
-      20: {
+      21: {
         text: '  default_outcome:',
         highlighted: false
       },
-      21: {
+      22: {
         text: '    dest: first',
         highlighted: true
       },
-      22: {
+      23: {
         text: '    feedback:',
         highlighted: false
       },
-      23: {
+      24: {
         text: '      audio_translations: {}',
         highlighted: false
       },
-      24: {
+      25: {
         text: '      html: \'\'',
         highlighted: false
       },
-      25: {
+      26: {
         text: '    param_changes: []',
         highlighted: false
       },
-      26: {
+      27: {
+        text: '    refresher_exploration_id: null',
+        highlighted: false
+      },
+      28: {
         text: '  hints: []',
         highlighted: false
       },
-      27: {
+      29: {
         text: '  id: NumericInput',
         highlighted: true
       },
-      28: {
+      30: {
         text: '  solution: null',
         highlighted: false
       },
-      29: {
+      31: {
         text: 'param_changes: []',
         highlighted: false
       },
-      30: {
+      32: {
         text: ' ',
         highlighted: false
       }
@@ -242,22 +250,26 @@ describe('Exploration history', function() {
         highlighted: false
       },
       15: {
-        text: '  hints: []',
+        text: '    refresher_exploration_id: null',
         highlighted: false
       },
       16: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      17: {
         text: '  id: null',
         highlighted: true
       },
-      17: {
+      18: {
         text: '  solution: null',
         highlighted: false
       },
-      18: {
+      19: {
         text: 'param_changes: []',
         highlighted: false
       },
-      19: {
+      20: {
         text: ' ',
         highlighted: false
       }
@@ -280,6 +292,7 @@ describe('Exploration history', function() {
       '      audio_translations: {}\n' +
       '      html: \'\'\n' +
       '    param_changes: []\n' +
+      '    refresher_exploration_id: null\n' +
       '  hints: []\n' +
       '  id: Continue\n' +
       '  solution: null\n' +

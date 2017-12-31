@@ -51,7 +51,8 @@ describe('Interaction validator', function() {
         html: '',
         audio_translations: {}
       },
-      param_changes: []
+      param_changes: [],
+      refresher_exploration_id: null
     });
     goodOutcomeFeedback = oof.createFromBackendDict({
       dest: currentState,
@@ -59,7 +60,8 @@ describe('Interaction validator', function() {
         html: 'Feedback',
         audio_translations: {}
       },
-      param_changes: []
+      param_changes: [],
+      refresher_exploration_id: null
     });
     badOutcome = oof.createFromBackendDict({
       dest: currentState,
@@ -67,7 +69,8 @@ describe('Interaction validator', function() {
         html: '',
         audio_translations: {}
       },
-      param_changes: []
+      param_changes: [],
+      refresher_exploration_id: null
     });
 
     goodAnswerGroups = [

@@ -139,7 +139,6 @@ class TestBase(unittest.TestCase):
                     }]
                 }]
             },
-            'classifier_model_id': None,
         }
     }
 
