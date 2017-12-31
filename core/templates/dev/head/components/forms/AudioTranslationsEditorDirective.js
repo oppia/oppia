@@ -143,10 +143,9 @@ oppia.directive('audioTranslationsEditor', [
                   };
 
                   var generateNewFilename = function() {
-                    var newFilename = componentName + '-' + $scope.languageCode + '-' +
+                    return componentName + '-' +
+                      $scope.languageCode + '-' +
                       IdGenerationService.generateNewId() + '.mp3';
-                    console.log(newFilename);
-                    return newFilename;
                   };
 
                   $scope.save = function() {
