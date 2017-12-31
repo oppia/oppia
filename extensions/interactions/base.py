@@ -112,7 +112,9 @@ class BaseInteraction(object):
     # Whether the solution feature supports this interaction.
     can_have_solution = None
     # Whether to show a Submit button in the progress navigation area when the
-    # window width is narrow. The interaction JS must handle the
+    # window width is narrow. The navigation Submit button is only
+    # a generic submit button so do not use this if special interaction-specific
+    # behavior is required. The interaction JS must also handle the
     # EVENT_PROGRESS_NAV_SUBMITTED event broadcast by the nav Submit button.
     show_nav_submit_button = False
 
