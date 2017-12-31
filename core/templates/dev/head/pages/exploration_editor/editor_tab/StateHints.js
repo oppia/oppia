@@ -44,7 +44,7 @@ oppia.controller('StateHints', [
       $scope.activeHintIndex = null;
     });
 
-    $scope.itemsTest = ["One", "Two", "Three", "Four"];
+    $scope.itemsTest = ['One', 'Two', 'Three', 'Four'];
     
     $scope.getHintSummary = function(hint) {
       var hintAsPlainText = (
