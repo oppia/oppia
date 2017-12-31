@@ -22,18 +22,18 @@ describe('Answer Classification Object Factory', function() {
 
   beforeEach(inject(function($injector) {
     AnswerClassificationResultObjectFactory = $injector.get(
-        'AnswerClassificationResultObjectFactory');
+      'AnswerClassificationResultObjectFactory');
   }));
 
   it('should create a new result', function() {
     var answerClassificationResult = (
       AnswerClassificationResultObjectFactory.createNew(
-         false, 1, 0, 'EXPLICIT_CLASSIFICATION'));
+        false, 1, 0, {}));
 
     expect(answerClassificationResult.outcome).toEqual(false);
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(
-      'EXPLICIT_CLASSIFICATION');
+    {});
   });
 });
