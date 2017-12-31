@@ -34,6 +34,6 @@ describe('Answer Classification Object Factory', function() {
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(
-    {});
+      {});
   });
 });
