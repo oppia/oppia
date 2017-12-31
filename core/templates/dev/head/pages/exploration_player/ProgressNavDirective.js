@@ -55,7 +55,7 @@ oppia.directive('progressNav', [
                 $scope.activeCard.stateName));
             $scope.interactionCustomizationArgs = interaction.customizationArgs;
             $scope.interactionId = interaction.id;
-            $scope.showGenericSubmitButtonInNav = INTERACTION_SPECS[
+            $scope.shouldGenericSubmitButtonBeShown = INTERACTION_SPECS[
               interaction.id].show_nav_submit_button;
 
             $scope.helpCardHasContinueButton = false;
