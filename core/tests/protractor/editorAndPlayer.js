@@ -26,10 +26,70 @@ var ExplorationPlayerPage =
 
 describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
+  var parentId2 = null;
+  var refresherExplorationId = null;
+  var currentExplorationId = null;
+  var pathname = null;
+  var parentId1 = null;
 
   beforeAll(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    users.createUser('user4@editorAndPlayer.com', 'user4EditorAndPlayer');
+    users.login('user4@editorAndPlayer.com');
+
+    workflow.createAndPublishExploration('Title 1', 'Algebra',
+      'It is a sample exploration.');
+    browser.getCurrentUrl().then(function(url) {
+      pathname = url.split('/');
+      /* In the url a # is added at the end that is not part of exploration
+         ID */
+      parentId1 = pathname[4].slice(0, -1);
+    });
+
+    workflow.createAndPublishExploration('Title 2', 'Algebra',
+      'It is a sample exploration.');
+    browser.getCurrentUrl().then(function(url) {
+      pathname = url.split('/');
+      parentId2 = pathname[4].slice(0, -1);
+    });
+
+    workflow.createAndPublishExploration('Title 3', 'Algebra',
+      'It is a sample exploration.');
+    browser.getCurrentUrl().then(function(url) {
+      pathname = url.split('/');
+      refresherExplorationId = pathname[4].slice(0, -1);
+    });
   });
+
+  it('should redirect back to parent exploration correctly when parent id is ' +
+     'given as query parameter', function() {
+        browser.get('/explore/' + refresherExplorationId + '?parent=' +
+          parentId1 + '&parent=' + parentId2);
+        browser.waitForAngular();
+
+        /* The summary tile for redirection has to be scrolled down in the
+           chrome window to be in view of the automated test,
+           hence the scrollTo. */
+        browser.executeScript('window.scrollTo(571,700);').then(function() {
+          element(by.css('.protractor-test-exp-summary-tile-title')).click();
+        });
+        browser.waitForAngular();
+        browser.getCurrentUrl().then(function(url) {
+          currentExplorationId = url.split('/')[4].split('?')[0];
+          expect(currentExplorationId).toBe(parentId2);
+        });
+
+        browser.executeScript('window.scrollTo(571,700);').then(function() {
+          element(by.css('.protractor-test-exp-summary-tile-title')).click();
+        });
+        browser.waitForAngular();
+        browser.getCurrentUrl().then(function(url) {
+          currentExplorationId = url.split('/')[4];
+          expect(currentExplorationId).toBe(parentId1);
+        });
+
+        users.logout();
+     });
 
   it('should navigate multiple states correctly, with parameters', function() {
     users.createUser('user4@editorAndPlayer.com', 'user4EditorAndPlayer');
