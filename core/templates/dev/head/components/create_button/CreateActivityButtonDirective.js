@@ -23,10 +23,11 @@ oppia.directive('createActivityButton', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/create_button/create_activity_button_directive.html'),
       controller: [
-        '$scope', '$timeout', '$window', '$modal', 'ExplorationCreationService',
-        'CollectionCreationService', 'siteAnalyticsService', 'UrlService',
+        '$scope', '$timeout', '$window', '$uibModal',
+        'ExplorationCreationService', 'CollectionCreationService',
+        'siteAnalyticsService', 'UrlService',
         function(
-            $scope, $timeout, $window, $modal, ExplorationCreationService,
+            $scope, $timeout, $window, $uibModal, ExplorationCreationService,
             CollectionCreationService, siteAnalyticsService, UrlService) {
           $scope.creationInProgress = false;
 
@@ -59,22 +60,22 @@ oppia.directive('createActivityButton', [
             } else if (UrlService.getPathname() !== '/creator_dashboard') {
               $window.location.replace('/creator_dashboard?mode=create');
             } else {
-              $modal.open({
+              $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/creator_dashboard/' +
                   'create_activity_modal_directive.html'),
                 backdrop: true,
                 controller: [
-                  '$scope', '$modalInstance',
-                  function($scope, $modalInstance) {
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
                     $scope.chooseExploration = function() {
                       ExplorationCreationService.createNewExploration();
-                      $modalInstance.close();
+                      $uibModalInstance.close();
                     };
 
                     $scope.chooseCollection = function() {
                       CollectionCreationService.createNewCollection();
-                      $modalInstance.close();
+                      $uibModalInstance.close();
                     };
 
                     $scope.canCreateCollections = (
@@ -82,7 +83,7 @@ oppia.directive('createActivityButton', [
                     );
 
                     $scope.cancel = function() {
-                      $modalInstance.dismiss('cancel');
+                      $uibModalInstance.dismiss('cancel');
                     };
 
                     $scope.explorationImgUrl = (

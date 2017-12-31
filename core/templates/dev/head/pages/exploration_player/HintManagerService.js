@@ -27,7 +27,10 @@ oppia.factory('HintManagerService', [
     var timeout = null;
     var hints = [];
     var _getCurrentHint = function() {
-      return hints[numHintsConsumed].hintText;
+      return hints[numHintsConsumed].hintContent;
+    };
+    var _getHintAtIndex = function(index) {
+      return hints[index].hintContent;
     };
 
     return {
@@ -41,7 +44,13 @@ oppia.factory('HintManagerService', [
         timeout = $timeout(function() {
           currentHintIsAvailable = true;
         }, WAIT_FOR_HINT_MSEC);
-        return currentHint;
+        return currentHint.getHtml();
+      },
+      getHintAtIndex: function(index) {
+        return _getHintAtIndex(index).getHtml();
+      },
+      getCurrentHintIndex: function() {
+        return numHintsConsumed;
       },
       isCurrentHintAvailable: function() {
         return currentHintIsAvailable;

@@ -192,6 +192,28 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div role="form" class="form-horizontal">
+            <label for="enableCorrectnessFeedback" class="col-lg-2 col-md-2 col-sm-2">
+              Correctness Feedback
+            </label>
+            <span class="col-lg-2 col-md-2 col-sm-2">
+              <button type="button" class="btn btn-default" ng-click="toggleCorrectnessFeedback()" style="margin-top: 16px">
+                <span ng-if="!isCorrectnessFeedbackEnabled()">
+                  Enable
+                </span>
+                <span ng-if="isCorrectnessFeedbackEnabled()">
+                  Disable
+                </span>
+              </button>
+            </span>
+            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              This allows the user to categorise answer groups as correct or incorrect.
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   </md-card>
 
@@ -228,40 +250,38 @@
           </div>
 
 
-          {% if can_modify_roles %}
-            <div ng-hide="isRolesFormOpen">
-              <button type="button" class="btn btn-default protractor-test-edit-roles" ng-click="openEditRolesForm()">
-                Edit Roles
-              </button>
-            </div>
+          <div ng-if="canModifyRoles" ng-hide="isRolesFormOpen">
+            <button type="button" class="btn btn-default protractor-test-edit-roles" ng-click="openEditRolesForm()">
+              Edit Roles
+            </button>
+          </div>
 
-            <div ng-show="isRolesFormOpen">
-              <strong>Add or Change Role</strong>
-              <div class="form-group">
-                <form ng-submit="editRole(newMemberUsername, newMemberRole.value)">
-                  <label for="newMemberUsername">Username of invited user</label>
-                  <div>
-                    <input type="text" id="newMemberUsername" class="form-control protractor-test-role-username" ng-model="newMemberUsername" placeholder="{{username}}">
-                  </div>
-                  <br>
-                  <label for="newMemberRole">Role of invited user</label>
-                  <div>
-                    <select ng-model="newMemberRole" class="form-control protractor-test-role-select" ng-options="r.name for r in ROLES" style="width: 250px;">
-                    </select>
-                    <span class="help-block">
-                      Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).
-                    </span>
-                  </div>
+          <div ng-if="canModifyRoles" ng-show="isRolesFormOpen">
+            <strong>Add or Change Role</strong>
+            <div class="form-group">
+              <form ng-submit="editRole(newMemberUsername, newMemberRole.value)">
+                <label for="newMemberUsername">Username of invited user</label>
+                <div>
+                  <input type="text" id="newMemberUsername" class="form-control protractor-test-role-username" ng-model="newMemberUsername" placeholder="{{username}}">
+                </div>
+                <br>
+                <label for="newMemberRole">Role of invited user</label>
+                <div>
+                  <select ng-model="newMemberRole" class="form-control protractor-test-role-select" ng-options="r.name for r in ROLES" style="width: 250px;">
+                  </select>
+                  <span class="help-block">
+                    Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).
+                  </span>
+                </div>
 
-                  <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
-                  <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
-                    ng-show="isRolesFormOpen">
-                    Cancel
-                  </button>
-                </form>
-              </div>
+                <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
+                <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
+                  ng-show="isRolesFormOpen">
+                  Cancel
+                </button>
+              </form>
             </div>
-          {% endif %}
+          </div>
         </div>
 
         <div class="col-lg-7 col-md-7 col-sm-7">
@@ -378,41 +398,35 @@
       <div class="col-lg-6 col-md-6 col-sm-6">
         <h3>Controls</h3>
 
-        {% if can_release_ownership %}
-          <p class="oppia-exploration-ctrl" ng-hide="ExplorationRightsService.isCommunityOwned()">
-            <button type="button" class="btn btn-default" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
-              Transfer ownership to the community
-            </button>
-            <span ng-if="isExplorationLockedForEditing()">
-              <br>
-              Please save your changes first.
-            </span>
-          </p>
-        {% endif %}
+        <p ng-if="canReleaseOwnership" class="oppia-exploration-ctrl" ng-hide="ExplorationRightsService.isCommunityOwned()">
+          <button type="button" class="btn btn-default" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
+            Transfer ownership to the community
+          </button>
+          <span ng-if="isExplorationLockedForEditing()">
+            <br>
+            Please save your changes first.
+          </span>
+        </p>
 
-        {% if can_delete %}
-          <p class="oppia-exploration-ctrl">
-            <button type="button" ng-if="ExplorationRightsService.isPrivate()"
-                    class="btn btn-danger" ng-click="deleteExploration()"
-                    title="Delete this exploration">
-              Delete Exploration
-            </button>
-          </p>
-        {% endif %}
+        <p ng-if="canDelete" class="oppia-exploration-ctrl">
+          <button type="button" ng-if="ExplorationRightsService.isPrivate()"
+                  class="btn btn-danger" ng-click="deleteExploration()"
+                  title="Delete this exploration">
+            Delete Exploration
+          </button>
+        </p>
       </div>
 
       <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
         <h3>Admin Controls</h3>
 
-        {% if can_unpublish %}
-          <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="ExplorationRightsService.isPublic()">
-            <button type="button" class="btn btn-default" ng-click="unpublishExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
-              Unpublish
-              <span ng-if="currentUserIsAdmin">(as admin)</span>
-              <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
-            </button>
-          </p>
-        {% endif %}
+        <p ng-if="canUnpublish" class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="ExplorationRightsService.isPublic()">
+          <button type="button" class="btn btn-default" ng-click="unpublishExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
+            Unpublish
+            <span ng-if="currentUserIsAdmin">(as admin)</span>
+            <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
+          </button>
+        </p>
 
         <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="ExplorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
           <button type="button" class="btn btn-danger protractor-test-delete-exploration-button"
@@ -444,7 +458,7 @@
 
     <h3>
       Initial parameter changes
-      <i class="material-icons md-18" tooltip="These changes are applied before the learner begins the exploration."
+      <i class="material-icons md-18" uib-tooltip="These changes are applied before the learner begins the exploration."
          tooltip-placement="right" style="padding-left: 4px; vertical-align: text-top;">&#xE88E;</i>
     </h3>
 

@@ -33,9 +33,9 @@ oppia.directive('hintButton', [
         '/pages/exploration_player/' +
         'hint_button_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$timeout', 'NumberAttemptsService',
+        '$scope', '$timeout', 'NumberAttemptsService',
         'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
-        function($scope, $rootScope, $timeout, NumberAttemptsService,
+        function($scope, $timeout, NumberAttemptsService,
             WindowDimensionsService, TWO_CARD_THRESHOLD_PX) {
           $scope.isShowingHintTooltip = false;
 

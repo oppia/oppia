@@ -24,12 +24,15 @@ oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
 
 oppia.directive('oppiaInteractiveGraphInput', [
   'HtmlEscaperService', 'graphInputRulesService', 'UrlInterpolationService',
+  'EVENT_NEW_CARD_AVAILABLE',
   function(
-      HtmlEscaperService, graphInputRulesService, UrlInterpolationService) {
+      HtmlEscaperService, graphInputRulesService, UrlInterpolationService,
+      EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
@@ -45,7 +48,6 @@ oppia.directive('oppiaInteractiveGraphInput', [
             isWeighted: false,
             isLabeled: false
           };
-
           $scope.submitGraph = function() {
             // Here, angular.copy is needed to strip $$hashkey from the graph.
             $scope.onSubmit({
@@ -53,34 +55,23 @@ oppia.directive('oppiaInteractiveGraphInput', [
               rulesService: graphInputRulesService
             });
           };
+
+          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+            $scope.interactionIsActive = false;
+
+            $scope.canAddVertex = false;
+            $scope.canDeleteVertex = false;
+            $scope.canEditVertexLabel = false;
+            $scope.canMoveVertex = false;
+            $scope.canAddEdge = false;
+            $scope.canDeleteEdge = false;
+            $scope.canEditEdgeWeight = false;
+          });
+
           $scope.resetGraph = function() {
-            updateGraphFromJSON($attrs.graphWithValue);
-          };
-
-          var init = function() {
-            updateGraphFromJSON($attrs.graphWithValue);
-            var stringToBool = function(str) {
-              return (str === 'true');
-            };
-            $scope.canAddVertex = stringToBool($attrs.canAddVertexWithValue);
-            $scope.canDeleteVertex = stringToBool(
-              $attrs.canDeleteVertexWithValue);
-            $scope.canEditVertexLabel = stringToBool(
-              $attrs.canEditVertexLabelWithValue);
-            $scope.canMoveVertex = stringToBool($attrs.canMoveVertexWithValue);
-            $scope.canAddEdge = stringToBool($attrs.canAddEdgeWithValue);
-            $scope.canDeleteEdge = stringToBool($attrs.canDeleteEdgeWithValue);
-            $scope.canEditEdgeWeight = stringToBool(
-              $attrs.canEditEdgeWeightWithValue);
-          };
-
-          // TODO(czxcjx): Write this function
-          var checkValidGraph = function(graph) {
-            return Boolean(graph);
-          };
-
-          var updateGraphFromJSON = function(jsonGraph) {
-            var newGraph = HtmlEscaperService.escapedJsonToObj(jsonGraph);
+            var newGraph = HtmlEscaperService.escapedJsonToObj(
+              $attrs.graphWithValue);
             if (checkValidGraph(newGraph)) {
               $scope.graph = newGraph;
             } else {
@@ -88,6 +79,35 @@ oppia.directive('oppiaInteractiveGraphInput', [
             }
           };
 
+          var init = function() {
+            if ($scope.interactionIsActive) {
+              $scope.resetGraph();
+            } else {
+              $scope.graph = $scope.getLastAnswer();
+            }
+            var stringToBool = function(str) {
+              return (str === 'true');
+            };
+            $scope.canAddVertex = $scope.interactionIsActive ?
+              stringToBool($attrs.canAddVertexWithValue) : false;
+            $scope.canDeleteVertex = $scope.interactionIsActive ?
+              stringToBool($attrs.canDeleteVertexWithValue) : false
+            $scope.canEditVertexLabel = $scope.interactionIsActive ?
+              stringToBool($attrs.canEditVertexLabelWithValue) : false
+            $scope.canMoveVertex = $scope.interactionIsActive ?
+              stringToBool($attrs.canMoveVertexWithValue) : false
+            $scope.canAddEdge = $scope.interactionIsActive ?
+              stringToBool($attrs.canAddEdgeWithValue) : false
+            $scope.canDeleteEdge = $scope.interactionIsActive ?
+              stringToBool($attrs.canDeleteEdgeWithValue) : false
+            $scope.canEditEdgeWeight = $scope.interactionIsActive ?
+              stringToBool($attrs.canEditEdgeWeightWithValue) : false
+          };
+
+          // TODO(czxcjx): Write this function
+          var checkValidGraph = function(graph) {
+            return Boolean(graph);
+          };
           init();
         }]
     };
@@ -210,7 +230,8 @@ oppia.directive('graphViz', [
         canAddEdge: '=',
         canDeleteEdge: '=',
         canEditEdgeWeight: '=',
-        canEditOptions: '='
+        canEditOptions: '=',
+        isInteractionActive: '&interactionIsActive'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
@@ -218,15 +239,17 @@ oppia.directive('graphViz', [
       controller: [
         '$scope', '$element', '$attrs', '$document', 'FocusManagerService',
         'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
-        function($scope, $element, $attrs, $document, FocusManagerService,
-            graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
+        'EVENT_NEW_CARD_AVAILABLE',
+        function(
+            $scope, $element, $attrs, $document, FocusManagerService,
+            graphDetailService, GRAPH_INPUT_LEFT_MARGIN,
+            EVENT_NEW_CARD_AVAILABLE) {
           var _MODES = {
             MOVE: 0,
             ADD_EDGE: 1,
             ADD_VERTEX: 2,
             DELETE: 3
           };
-
           // The current state of the UI and stuff like that
           $scope.state = {
             currentMode: _MODES.MOVE,
@@ -256,9 +279,16 @@ oppia.directive('graphViz', [
           $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
           $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
 
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+            $scope.state.currentMode = null;
+          });
+
           var vizContainer = $($element).find('.oppia-graph-viz-svg');
           $scope.vizWidth = vizContainer.width();
           $scope.mousemoveGraphSVG = function(event) {
+            if (!$scope.isInteractionActive()) {
+              return;
+            }
             $scope.state.mouseX = event.pageX - vizContainer.offset().left;
             $scope.state.mouseY = event.pageY - vizContainer.offset().top;
             // We use vertexDragStartX/Y and mouseDragStartX/Y to make
@@ -278,6 +308,9 @@ oppia.directive('graphViz', [
           };
 
           $scope.onClickGraphSVG = function() {
+            if (!$scope.isInteractionActive()) {
+              return;
+            }
             if ($scope.state.currentMode === _MODES.ADD_VERTEX &&
                 $scope.canAddVertex) {
               $scope.graph.vertices.push({
@@ -361,7 +394,9 @@ oppia.directive('graphViz', [
           $scope.onClickModeButton = function(mode, $event) {
             $event.preventDefault();
             $event.stopPropagation();
-            setMode(mode);
+            if ($scope.isInteractionActive()) {
+              setMode(mode);
+            }
           };
 
           // TODO(czx): Consider if there's a neat way to write a reset()
@@ -564,6 +599,9 @@ oppia.directive('graphViz', [
           var SELECT_COLOR = 'orange';
           var DEFAULT_COLOR = 'black';
           $scope.getEdgeColor = function(index) {
+            if (!$scope.isInteractionActive()) {
+              return DEFAULT_COLOR;
+            }
             if ($scope.state.currentMode === _MODES.DELETE &&
                 index === $scope.state.hoveredEdge &&
                 $scope.canDeleteEdge) {
@@ -577,6 +615,9 @@ oppia.directive('graphViz', [
             }
           };
           $scope.getVertexColor = function(index) {
+            if (!$scope.isInteractionActive()) {
+              return DEFAULT_COLOR;
+            }
             if ($scope.state.currentMode === _MODES.DELETE &&
                 index === $scope.state.hoveredVertex &&
                 $scope.canDeleteVertex) {
@@ -598,8 +639,9 @@ oppia.directive('graphViz', [
           $scope.getEdgeCentre = function(index) {
             return graphDetailService.getEdgeCentre($scope.graph, index);
           };
-
-          $scope.init();
+          if ($scope.isInteractionActive()) {
+            $scope.init();
+          }
         }
       ]
     };

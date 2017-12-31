@@ -45,8 +45,7 @@ oppia.factory('baseInteractionValidationService', [
 
         // This does not check the default outcome.
         for (var i = 0; i < answerGroups.length; i++) {
-          if (
-            $filter('isOutcomeConfusing')(answerGroups[i].outcome, stateName)) {
+          if (answerGroups[i].outcome.isConfusing(stateName)) {
             partialWarningsList.push({
               type: WARNING_TYPES.ERROR,
               message: (
@@ -59,8 +58,7 @@ oppia.factory('baseInteractionValidationService', [
       },
       getDefaultOutcomeWarnings: function(defaultOutcome, stateName) {
         var partialWarningsList = [];
-        if (defaultOutcome &&
-            $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
+        if (defaultOutcome && defaultOutcome.isConfusing(stateName)) {
           partialWarningsList.push({
             type: WARNING_TYPES.ERROR,
             message: (

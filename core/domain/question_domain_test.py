@@ -120,8 +120,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertDictEqual(expected_object, question.to_dict())
 
     def test_create_default_question(self):
-        """Test to verify create_default_question method of Question domain
-        object."""
+        """Test to verify create_default_question method of the Question domain
+        object.
+        """
 
         question_id = 'col1.random'
         collection_id = 'col1'

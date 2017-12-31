@@ -138,10 +138,9 @@
         <div class="oppia-content-container">
           <div id="wrapper">
             <div class="oppia-main-body">
-              <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation" headroom tolerance="3" offset="0">
+              <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation" headroom tolerance="0" offset="0">
                 <div class="navbar-container">
                   <top-navigation-bar></top-navigation-bar>
-
                   <div class="collapse navbar-collapse oppia-navbar-collapse ng-cloak">
                     {% block navbar_breadcrumb %}
                     {% endblock navbar_breadcrumb %}
@@ -151,7 +150,7 @@
                   </div>
                 </div>
               </nav>
-              
+
               <div class="oppia-top-of-page-padding">
               </div>
 
@@ -207,6 +206,7 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/ExplorationContextService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/UtilsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/DebouncerService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/DateTimeFormatService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/IdGenerationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/ValidatorsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>

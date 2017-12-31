@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """Contains routines which will add a backup cron job to prepare Oppia for a
-deployment push to https://oppia.org/.
+deployment push to https://www.oppia.org/.
 """
 import sys
 import utils

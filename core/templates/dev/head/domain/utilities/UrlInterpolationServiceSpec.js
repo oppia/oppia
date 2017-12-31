@@ -270,11 +270,11 @@ describe('URL Interpolation Service', function() {
       GLOBALS.TEMPLATE_DIR_PREFIX + '/pages_test/hash_test.' +
       hashes['/pages_test/hash_test.html'] + '.html');
 
-    expect(uis.getTranslateJsonUrl('/test.json')).toBe(
+    expect(uis.getStaticAssetUrl('/test.json')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/assets/test.json');
-    expect(uis.getTranslateJsonUrl('/test_url/test.json')).toBe(
+    expect(uis.getStaticAssetUrl('/test_url/test.json')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/assets/test_url/test.json');
-    expect(uis.getTranslateJsonUrl('/assets_test/hash_test.json')).toBe(
+    expect(uis.getStaticAssetUrl('/assets_test/hash_test.json')).toBe(
       GLOBALS.ASSET_DIR_PREFIX + '/assets/assets_test/hash_test.' +
       hashes['/assets_test/hash_test.json'] + '.json');
 
@@ -307,9 +307,9 @@ describe('URL Interpolation Service', function() {
     expect(uis.getDirectiveTemplateUrl.bind(null, '')).toThrow(
       new Error('Empty path passed in method.'));
 
-    expect(uis.getTranslateJsonUrl.bind(null, null)).toThrow(
+    expect(uis.getStaticAssetUrl.bind(null, null)).toThrow(
       new Error('Empty path passed in method.'));
-    expect(uis.getTranslateJsonUrl.bind(null, '')).toThrow(
+    expect(uis.getStaticAssetUrl.bind(null, '')).toThrow(
       new Error('Empty path passed in method.'));
 
     expect(uis.getExtensionResourceUrl.bind(null, null)).toThrow(
@@ -335,10 +335,10 @@ describe('URL Interpolation Service', function() {
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
 
-      expect(uis.getTranslateJsonUrl.bind(null, 'test_fail.html')).toThrow(
+      expect(uis.getStaticAssetUrl.bind(null, 'test_fail.html')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
-      expect(uis.getTranslateJsonUrl.bind(null, 'test_url/fail.html')).toThrow(
+      expect(uis.getStaticAssetUrl.bind(null, 'test_url/fail.html')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
 

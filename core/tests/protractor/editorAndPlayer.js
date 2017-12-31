@@ -102,6 +102,7 @@ describe('Full exploration editor', function() {
       editor.expectCurrentStateToBe(general.FIRST_STATE_DEFAULT_NAME);
       editor.setStateName('first');
       editor.expectCurrentStateToBe('first');
+      editor.setContent(forms.toRichText('card1 content'));
 
       // Check deletion of states and changing the first state
       editor.setInteraction('TextInput');

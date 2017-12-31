@@ -1,3 +1,6 @@
+<audio-bar audio-translations="contentAudioTranslations"
+           content-html="activeCard.contentHtml">
+</audio-bar>
 <div class="conversation-skin-tutor-card"
      ng-class="{'animate-card-width': startCardChangeAnimation}">
   <div class="conversation-skin-tutor-card-content conversation-skin-animate-tutor-card-content"
@@ -12,9 +15,6 @@
         </div>
         <div ng-if="isContentAudioTranslationAvailable()"
              class="conversation-skin-audio-controls">
-          <audio-controls audio-translations="contentAudioTranslations"
-                          content-html="activeCard.contentHtml">
-          </audio-controls>
         </div>
       </div>
     </div>
@@ -69,21 +69,16 @@
     (!isOnTerminalCard() || !isIframed || activeCard.destStateName)">
       <div class="conversation-skin-inline-interaction">
         <div ng-if="activeCard.destStateName && activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1].oppiaResponse">
-          <md-button class="oppia-learner-confirm-button protractor-test-continue-to-next-card-button"
-                     ng-if="!isIframed"
-                     focus-on="<[CONTINUE_BUTTON_FOCUS_LABEL]>"
-                     ng-click="onClickContinueButton()"
-                     aria-label="Continue">
-            <span translate="I18N_PLAYER_CONTINUE_BUTTON"></span>
-            <i class="fa fa-arrow-right"
-               style="font-size: 19px; padding-top: 1.5px;"></i>
-          </md-button>
+          <continue-button ng-if="!isIframed"
+                           focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
+                           ng-click="onClickContinueButton()">
+          </continue-button>
         </div>
         <div ng-if="activeCard.interactionHtml && !activeCard.destStateName">
           <div class="protractor-test-conversation-input"
                angular-html-bind="activeCard.interactionHtml">
           </div>
-          <div ng-if="hintsExist" style="text-align: right">
+          <div ng-if="hintsExist && !windowDimensionsService.isWindowNarrow()" style="text-align: right">
             <hint-button ng-show="!areAllHintsExhausted() || (areAllHintsExhausted() && !solutionExists)"
                          on-click-hint-button="consumeHint()"
                          current-hint-is-available="isHintAvailable()"
@@ -102,9 +97,9 @@
     <div ng-if="!isInteractionInline"
         class="conversation-skin-inline-interaction" style="opacity: 0.8;">
       <div style="padding: 6px 12px;">
-        <[interactionInstructions]>
-        <i ng-if="!isViewportNarrow()" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
-        <i ng-if="isViewportNarrow()" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
+        <span ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}"> <[interactionInstructions]> </span>
+        <i ng-if="!isViewportNarrow()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
+        <i ng-if="isViewportNarrow()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
       </div>
     </div>
 
@@ -122,6 +117,10 @@
   .conversation-skin-tutor-card {
     max-width: 100vw;
     padding-bottom: 18px;
+  }
+
+  .conversation-skin-instruction-disabled {
+    color: gray;
   }
 
   .conversation-skin-tutor-card-top-section .conversation-skin-oppia-avatar {

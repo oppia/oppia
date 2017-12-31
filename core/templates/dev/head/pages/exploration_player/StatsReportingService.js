@@ -270,14 +270,14 @@ oppia.factory('StatsReportingService', [
       },
       recordAnswerSubmitted: function(
           stateName, params, answer, answerGroupIndex, ruleIndex,
-          classificationCategorization) {
+          classificationCategorization, feedbackIsUseful) {
         if (ENABLE_NEW_STATS_FRAMEWORK) {
           if (!aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
             createDefaultStateStatsMapping(stateName);
           }
           aggregatedStats.state_stats_mapping[
             stateName].total_answers_count += 1
-          if (classificationCategorization !== DEFAULT_OUTCOME_CLASSIFICATION) {
+          if (feedbackIsUseful) {
             aggregatedStats.state_stats_mapping[
               stateName].useful_feedback_count += 1
           }

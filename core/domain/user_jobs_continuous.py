@@ -22,6 +22,7 @@ from core.domain import exp_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import stats_jobs_continuous
+from core.domain import stats_services
 from core.platform import models
 import feconf
 import utils
@@ -550,21 +551,33 @@ class UserStatsMRJobManager(
         else:
             calculate_exploration_impact_score = False
 
-        statistics = (
-            stats_jobs_continuous.StatisticsAggregator.get_statistics(
-                item.id, stats_jobs_continuous.VERSION_ALL))
-        answer_count = 0
-        # Find number of users per state (card), and subtract no answer
-        # This will not count people who have been back to a state twice
-        # but did not give an answer the second time, but is probably the
-        # closest we can get with current statistics to "number of users
-        # who gave an answer" since it is "number of users who always gave
-        # an answer".
-        for state_name in statistics['state_hit_counts']:
-            state_stats = statistics['state_hit_counts'][state_name]
-            first_entry_count = state_stats.get('first_entry_count', 0)
-            no_answer_count = state_stats.get('no_answer_count', 0)
-            answer_count += first_entry_count - no_answer_count
+        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
+            exploration_stats = stats_services.get_exploration_stats(
+                item.id, item.version)
+            # For each state, find the number of first entries to the state.
+            # This is considered to be approximately equal to the number of
+            # users who answered the state because very few users enter a state
+            # and leave without answering anything at all.
+            answer_count = exploration_stats.get_sum_of_first_hit_counts()
+            num_starts = exploration_stats.num_starts
+        else:
+            statistics = (
+                stats_jobs_continuous.StatisticsAggregator.get_statistics(
+                    item.id, stats_jobs_continuous.VERSION_ALL))
+            answer_count = 0
+            # Find number of users per state (card), and subtract no answer
+            # This will not count people who have been back to a state twice
+            # but did not give an answer the second time, but is probably the
+            # closest we can get with current statistics to "number of users
+            # who gave an answer" since it is "number of users who always gave
+            # an answer".
+            for state_name in statistics['state_hit_counts']:
+                state_stats = statistics['state_hit_counts'][state_name]
+                first_entry_count = state_stats.get('first_entry_count', 0)
+                no_answer_count = state_stats.get('no_answer_count', 0)
+                answer_count += first_entry_count - no_answer_count
+            num_starts = statistics['start_exploration_count']
+
         # Turn answer count into reach
         reach = answer_count**exponent
 
@@ -598,8 +611,7 @@ class UserStatsMRJobManager(
                 mapped_owner_ids.append(contrib_id)
                 # Get num starts (total plays) for the exploration
                 exploration_data.update({
-                    'total_plays_for_owned_exp': (
-                        statistics['start_exploration_count']),
+                    'total_plays_for_owned_exp': num_starts,
                 })
                 # Update data with average rating only if it is not None.
                 if average_rating is not None:
@@ -614,8 +626,7 @@ class UserStatsMRJobManager(
                 mapped_owner_ids.append(owner_id)
                 # Get num starts (total plays) for the exploration
                 exploration_data = {
-                    'total_plays_for_owned_exp': (
-                        statistics['start_exploration_count']),
+                    'total_plays_for_owned_exp': num_starts,
                 }
                 # Update data with average rating only if it is not None.
                 if average_rating is not None:

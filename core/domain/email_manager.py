@@ -361,52 +361,21 @@ def send_post_signup_email(user_id):
         email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
-def require_valid_intent(intent):
-    """Checks if the given intent is valid, and raises an exception if it is
-    not.
-
-    Raises:
-        Exception: The given intent did not match an entry in
-            feconf.VALID_MODERATOR_ACTIONS.
-    """
-
-    if intent not in feconf.VALID_MODERATOR_ACTIONS:
-        raise Exception('Unrecognized email intent: %s' % intent)
-
-
-def _get_email_config(intent):
-    """Return the default body for the email type matching the given moderator
-    action intent.
-
-    Args:
-        intent: str. The intent string (cause/purpose) of the email.
-
-    Returns:
-        str. The default body for the email type matching the given moderator
-            action intent.
-    """
-
-    require_valid_intent(intent)
-    return config_domain.Registry.get_config_property(
-        feconf.VALID_MODERATOR_ACTIONS[intent]['email_config'])
-
-
-def get_draft_moderator_action_email(intent):
+def get_moderator_unpublish_exploration_email():
     """Returns a draft of the text of the body for an email sent immediately
-    following a moderator action. An empty body is a signal to the frontend
-    that no email will be sent.
-
-    Args:
-        intent: str. The intent string (cause/purpose) of the email.
+    when a moderator unpublishes an exploration. An empty body is a signal to
+    the frontend that no email will be sent.
 
     Returns:
-        str. Draft of the email body for an email sent after a moderator action,
-            or an empty string if no email should be sent.
+        str. Draft of the email body for an email sent after the moderator
+            unpublishes an exploration, or an empty string if no email should
+            be sent.
     """
 
     try:
         require_moderator_email_prereqs_are_satisfied()
-        return _get_email_config(intent).value
+        return config_domain.Registry.get_config_property(
+            'unpublish_exploration_email_html_body').value
     except Exception:
         return ''
 
@@ -500,12 +469,12 @@ def send_role_notification_email(
         'Hi %s,<br>'
         '<br>'
         '<b>%s</b> has granted you %s to their exploration, '
-        '"<a href="http://www.oppia.org/create/%s">%s</a>", on Oppia.org.<br>'
+        '"<a href="https://www.oppia.org/create/%s">%s</a>", on Oppia.org.<br>'
         '<br>'
         'This allows you to:<br>'
         '<ul>%s</ul>'
         'You can find the exploration '
-        '<a href="http://www.oppia.org/create/%s">here</a>.<br>'
+        '<a href="https://www.oppia.org/create/%s">here</a>.<br>'
         '<br>'
         'Thanks, and happy collaborating!<br>'
         '<br>'

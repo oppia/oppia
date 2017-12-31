@@ -69,19 +69,17 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 // displayed.
 oppia.constant('FATAL_ERROR_CODES', [400, 401, 404, 500]);
 
-oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
-
 oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
 
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
-    '$delegate', '$document', '$modal', '$timeout', 'FocusManagerService',
+    '$delegate', '$document', '$uibModal', '$timeout', 'FocusManagerService',
     'taRegisterTool', 'rteHelperService', 'AlertsService',
     'ExplorationContextService', 'PAGE_CONTEXT',
     'UrlInterpolationService',
     function(
-      taOptions, $document, $modal, $timeout, FocusManagerService,
+      taOptions, $document, $uibModal, $timeout, FocusManagerService,
       taRegisterTool, rteHelperService, AlertsService,
       ExplorationContextService, PAGE_CONTEXT,
       UrlInterpolationService) {
@@ -101,14 +99,14 @@ oppia.config(['$provide', function($provide) {
         customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
         onDismissCallback, refocusFn) {
         $document[0].execCommand('enableObjectResizing', false, false);
-        var modalDialog = $modal.open({
+        var modalDialog = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/forms/customize_rte_component_modal_directive.html'),
           backdrop: 'static',
           resolve: {},
           controller: [
-            '$scope', '$modalInstance', '$timeout',
-            function($scope, $modalInstance, $timeout) {
+            '$scope', '$uibModalInstance', '$timeout',
+            function($scope, $uibModalInstance, $timeout) {
               $scope.customizationArgSpecs = customizationArgSpecs;
 
               // Without this code, the focus will remain in the background RTE
@@ -136,7 +134,7 @@ oppia.config(['$provide', function($provide) {
               }
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
               };
 
               $scope.save = function() {
@@ -149,7 +147,7 @@ oppia.config(['$provide', function($provide) {
                     $scope.tmpCustomizationArgs[i].value);
                 }
 
-                $modalInstance.close(customizationArgsDict);
+                $uibModalInstance.close(customizationArgsDict);
               };
             }
           ]
@@ -412,41 +410,6 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
     }
 
     $log.error.apply($log, arguments);
-  };
-}]);
-
-// Service for converting dates in milliseconds since the Epoch to
-// human-readable dates.
-oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
-  return {
-    // Returns just the time if the local datetime representation has the
-    // same date as the current date. Otherwise, returns just the date if the
-    // local datetime representation has the same year as the current date.
-    // Otherwise, returns the full date (with the year abbreviated).
-    getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
-      var date = new Date(millisSinceEpoch);
-      if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
-        return date.toLocaleTimeString([], {
-          hour: 'numeric',
-          minute: 'numeric',
-          hour12: true
-        });
-      } else if (date.getFullYear() === new Date().getFullYear()) {
-        return $filter('date')(date, 'MMM d');
-      } else {
-        return $filter('date')(date, 'shortDate');
-      }
-    },
-    // Returns just the date.
-    getLocaleDateString: function(millisSinceEpoch) {
-      var date = new Date(millisSinceEpoch);
-      return date.toLocaleDateString();
-    },
-    // Returns whether the date is at most one week before the current date.
-    isRecent: function(millisSinceEpoch) {
-      var ONE_WEEK_IN_MILLIS = 7 * 24 * 60 * 60 * 1000;
-      return new Date().getTime() - millisSinceEpoch < ONE_WEEK_IN_MILLIS;
-    }
   };
 }]);
 

@@ -110,7 +110,7 @@ describe('Collection editor state service', function() {
         prerequisite_skill_ids: ['skill0'],
         acquired_skill_ids: ['skill1']
       }],
-      next_skill_id: 2,
+      next_skill_index: 2,
       skills: {
         skill0: {
           name: '0',
@@ -136,7 +136,7 @@ describe('Collection editor state service', function() {
         prerequisite_skill_ids: [],
         acquired_skill_ids: ['skill0']
       }],
-      next_skill_id: 1,
+      next_skill_index: 1,
       skills: {
         skill0: {
           name: '0',

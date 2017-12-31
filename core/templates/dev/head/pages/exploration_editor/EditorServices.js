@@ -80,7 +80,8 @@ oppia.factory('changeListService', [
       param_specs: true,
       tags: true,
       title: true,
-      auto_tts_enabled: true
+      auto_tts_enabled: true,
+      correctness_feedback_enabled: true
     };
 
     var ALLOWED_STATE_BACKEND_NAMES = {
@@ -420,7 +421,11 @@ oppia.factory('explorationLanguageCodeService', [
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'language_code';
     child.getAllLanguageCodes = function() {
-      return constants.ALL_LANGUAGE_CODES;
+      // TODO(sll): Update this once the App Engine search service supports
+      // 3-letter language codes.
+      return constants.ALL_LANGUAGE_CODES.filter(function(languageCodeDict) {
+        return languageCodeDict.code.length === 2;
+      });
     };
     child.getCurrentLanguageDescription = function() {
       for (var i = 0; i < constants.ALL_LANGUAGE_CODES.length; i++) {
@@ -431,7 +436,9 @@ oppia.factory('explorationLanguageCodeService', [
     };
     child._isValid = function(value) {
       return constants.ALL_LANGUAGE_CODES.some(function(elt) {
-        return elt.code === value;
+        // TODO(sll): Remove the second clause once the App Engine search
+        // service supports 3-letter language codes.
+        return elt.code === value && elt.code.length === 2;
       });
     };
     return child;
@@ -516,18 +523,40 @@ oppia.factory('explorationAutomaticTextToSpeechService', [
   }
 ]);
 
+oppia.factory('explorationCorrectnessFeedbackService', [
+  'explorationPropertyService', function(explorationPropertyService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'correctness_feedback_enabled';
+
+    child._isValid = function(value) {
+      return (typeof value === 'boolean');
+    };
+
+    child.isEnabled = function() {
+      return child.savedMemento;
+    };
+
+    child.toggleCorrectnessFeedback = function() {
+      child.displayed = !child.displayed;
+      child.saveDisplayedValue();
+    };
+
+    return child;
+  }
+]);
+
 // Data service for keeping track of the exploration's states. Note that this
 // is unlike the other exploration property services, in that it keeps no
 // mementos.
 oppia.factory('explorationStatesService', [
-  '$log', '$modal', '$filter', '$location', '$rootScope', '$injector', '$q',
+  '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
   'explorationInitStateNameService', 'AlertsService', 'changeListService',
   'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'AngularNameService',
   'AnswerClassificationService', 'ExplorationContextService',
   'UrlInterpolationService',
   function(
-      $log, $modal, $filter, $location, $rootScope, $injector, $q,
+      $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
       explorationInitStateNameService, AlertsService, changeListService,
       EditorStateService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, AngularNameService,
@@ -662,7 +691,6 @@ oppia.factory('explorationStatesService', [
               stateName,
               _states.getState(stateName),
               solution.correctAnswer,
-              true,
               $injector.get(
                 AngularNameService.getNameOfInteractionRulesService(
                   _states.getState(stateName).interaction.id))));
@@ -799,7 +827,7 @@ oppia.factory('explorationStatesService', [
           return;
         }
 
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/editor_tab/' +
             'confirm_delete_state_modal_directive.html'),
@@ -810,18 +838,18 @@ oppia.factory('explorationStatesService', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', 'deleteStateName',
-            function($scope, $modalInstance, deleteStateName) {
+            '$scope', '$uibModalInstance', 'deleteStateName',
+            function($scope, $uibModalInstance, deleteStateName) {
               $scope.deleteStateWarningText = (
                 'Are you sure you want to delete the card "' +
                 deleteStateName + '"?');
 
               $scope.reallyDelete = function() {
-                $modalInstance.close(deleteStateName);
+                $uibModalInstance.close(deleteStateName);
               };
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
                 AlertsService.clearWarnings();
               };
             }
@@ -1010,57 +1038,13 @@ oppia.factory('stateSolutionService', [
   }
 ]);
 
-oppia.factory('computeGraphService', [
-  'INTERACTION_SPECS', function(INTERACTION_SPECS) {
-    var _computeGraphData = function(initStateId, states) {
-      var nodes = {};
-      var links = [];
-      var finalStateIds = states.getFinalStateNames();
-
-      states.getStateNames().forEach(function(stateName) {
-        var interaction = states.getState(stateName).interaction;
-        nodes[stateName] = stateName;
-        if (interaction.id) {
-          var groups = interaction.answerGroups;
-          for (var h = 0; h < groups.length; h++) {
-            links.push({
-              source: stateName,
-              target: groups[h].outcome.dest,
-            });
-          }
-
-          if (interaction.defaultOutcome) {
-            links.push({
-              source: stateName,
-              target: interaction.defaultOutcome.dest,
-            });
-          }
-        }
-      });
-
-      return {
-        finalStateIds: finalStateIds,
-        initStateId: initStateId,
-        links: links,
-        nodes: nodes
-      };
-    };
-
-    return {
-      compute: function(initStateId, states) {
-        return _computeGraphData(initStateId, states);
-      }
-    };
-  }
-]);
-
 // Service for computing graph data.
 oppia.factory('graphDataService', [
   'explorationStatesService', 'explorationInitStateNameService',
-  'computeGraphService',
+  'ComputeGraphService',
   function(
       explorationStatesService, explorationInitStateNameService,
-      computeGraphService) {
+      ComputeGraphService) {
     var _graphData = null;
 
     // Returns an object which can be treated as the input to a visualization
@@ -1079,7 +1063,7 @@ oppia.factory('graphDataService', [
 
       var states = explorationStatesService.getStates();
       var initStateId = explorationInitStateNameService.savedMemento;
-      _graphData = computeGraphService.compute(initStateId, states);
+      _graphData = ComputeGraphService.compute(initStateId, states);
     };
 
     return {
@@ -1262,7 +1246,7 @@ oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
                 answerGroupHtml += (
                   '<div class="sub-edit"><i>Feedback: </i>' +
                     '<div class="feedback">' +
-                    newValue.outcome.feedback + '</div></div>');
+                    newValue.outcome.feedback.getHtml() + '</div></div>');
                 var rulesList = makeRulesListHumanReadable(newValue);
                 if (rulesList.length > 0) {
                   answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';
@@ -1285,10 +1269,12 @@ oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
                       newValue.outcome.dest + '</p>');
                 }
                 if (!angular.equals(
-                    newValue.outcome.feedback, oldValue.outcome.feedback)) {
+                    newValue.outcome.feedback.getHtml(),
+                    oldValue.outcome.feedback.getHtml())) {
                   answerGroupHtml += (
                     '<div class="sub-edit"><i>Feedback: </i>' +
-                      '<div class="feedback">' + newValue.outcome.feedback +
+                      '<div class="feedback">' +
+                      newValue.outcome.feedback.getHtml() +
                       '</div></div>');
                 }
                 if (!angular.equals(newValue.rules, oldValue.rules)) {
@@ -1324,7 +1310,7 @@ oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
                     newValue.dest + '</p>');
                 defaultOutcomeHtml += (
                   '<div class="sub-edit"><i>Feedback: </i>' +
-                    '<div class="feedback">' + newValue.feedback +
+                    '<div class="feedback">' + newValue.feedback.getHtml() +
                     '</div></div>');
                 stateWiseEditsMapping[stateName].push(
                   angular.element('<div>Added default outcome: </div>')
@@ -1336,7 +1322,8 @@ oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
                     '<p class="sub-edit"><i>Destination: </i>' + newValue.dest +
                       '</p>');
                 }
-                if (!angular.equals(newValue.feedback, oldValue.feedback)) {
+                if (!angular.equals(newValue.feedback.getHtml(),
+                  oldValue.feedback.getHtml())) {
                   defaultOutcomeHtml += (
                     '<div class="sub-edit"><i>Feedback: </i>' +
                       '<div class="feedback">' + newValue.feedback +
@@ -1375,11 +1362,11 @@ oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
 // Service for displaying different types of modals depending on the type of
 // response received as a result of the autosaving request.
 oppia.factory('autosaveInfoModalsService', [
-  '$log', '$modal', '$timeout', '$window',
+  '$log', '$uibModal', '$timeout', '$window',
   'ExplorationDataService', 'LocalStorageService', 'lostChangesService',
   'UrlInterpolationService',
   function(
-      $log, $modal, $timeout, $window,
+      $log, $uibModal, $timeout, $window,
       ExplorationDataService, LocalStorageService, lostChangesService,
       UrlInterpolationService) {
     var _isModalOpen = false;
@@ -1391,16 +1378,16 @@ oppia.factory('autosaveInfoModalsService', [
 
     return {
       showNonStrictValidationFailModal: function() {
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/' +
             'save_validation_fail_modal_directive.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: [
-            '$scope', '$modalInstance', function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.closeAndRefresh = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
                 _refreshPage(20);
               };
             }
@@ -1417,7 +1404,7 @@ oppia.factory('autosaveInfoModalsService', [
         return _isModalOpen;
       },
       showVersionMismatchModal: function(lostChanges) {
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/' +
             'save_version_mismatch_modal_directive.html'),
@@ -1451,18 +1438,18 @@ oppia.factory('autosaveInfoModalsService', [
         _isModalOpen = true;
       },
       showLostChangesModal: function(lostChanges, explorationId) {
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/lost_changes_modal_directive.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
-          controller: ['$scope', '$modalInstance', function(
-            $scope, $modalInstance) {
+          controller: ['$scope', '$uibModalInstance', function(
+            $scope, $uibModalInstance) {
             // When the user clicks on discard changes button, signal backend
             // to discard the draft and reload the page thereafter.
             $scope.close = function() {
               LocalStorageService.removeExplorationDraft(explorationId);
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
 
             $scope.lostChangesHtml = (

@@ -34,11 +34,11 @@ oppia.directive('stateContentEditor', [
         '/pages/exploration_editor/editor_tab/' +
         'state_content_editor_directive.html'),
       controller: [
-        '$scope', '$modal', 'stateContentService', 'editabilityService',
+        '$scope', '$uibModal', 'stateContentService', 'editabilityService',
         'EditorFirstTimeEventsService', 'explorationInitStateNameService',
         'EditorStateService',
         function(
-            $scope, $modal, stateContentService, editabilityService,
+            $scope, $uibModal, stateContentService, editabilityService,
             EditorFirstTimeEventsService, explorationInitStateNameService,
             EditorStateService) {
           $scope.HTML_SCHEMA = {
@@ -55,21 +55,21 @@ oppia.directive('stateContentEditor', [
           };
 
           var openMarkAllAudioAsNeedingUpdateModal = function() {
-            $modal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/forms/' +
                 'mark_all_audio_as_needing_update_modal_directive.html'),
               backdrop: true,
               resolve: {},
               controller: [
-                '$scope', '$modalInstance',
-                function($scope, $modalInstance) {
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
                   $scope.flagAll = function() {
-                    $modalInstance.close();
+                    $uibModalInstance.close();
                   };
 
                   $scope.cancel = function() {
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]

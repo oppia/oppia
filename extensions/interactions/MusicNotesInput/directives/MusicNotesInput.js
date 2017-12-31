@@ -78,14 +78,16 @@ oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
 oppia.directive('oppiaInteractiveMusicNotesInput', [
   'HtmlEscaperService', 'NOTE_NAMES_TO_MIDI_VALUES',
   'musicNotesInputRulesService', 'musicPhrasePlayerService',
-  'UrlInterpolationService',
-  function(HtmlEscaperService, NOTE_NAMES_TO_MIDI_VALUES,
+  'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
+  function(
+      HtmlEscaperService, NOTE_NAMES_TO_MIDI_VALUES,
       musicNotesInputRulesService, musicPhrasePlayerService,
-      UrlInterpolationService) {
+      UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MusicNotesInput/directives/' +
@@ -101,8 +103,18 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
         scope.sequenceToGuess = HtmlEscaperService.escapedJsonToObj(
           attrs.sequenceToGuessWithValue);
-        scope.initialSequence = HtmlEscaperService.escapedJsonToObj(
-          attrs.initialSequenceWithValue);
+
+        scope.interactionIsActive = (scope.getLastAnswer() === null);
+
+        scope.initialSequence = scope.interactionIsActive ?
+          HtmlEscaperService.escapedJsonToObj(attrs.initialSequenceWithValue) :
+          scope.getLastAnswer();
+
+        scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+          scope.interactionIsActive = false;
+          scope.initialSequence = scope.getLastAnswer();
+          scope.reinitStaff();
+        });
 
         /**
          * A note Object has a baseNoteMidiNumber and an offset property. For
@@ -284,8 +296,9 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                 if ($(this).data('noteType') === NOTE_TYPE_NATURAL) {
                   $(this).addClass('oppia-music-input-natural-note');
                 }
-              })
-              .draggable({
+              });
+            if (scope.interactionIsActive) {
+              innerDiv.draggable({
                 // Keeps note from being placed on top of the clef.
                 containment: validNoteArea,
                 cursor: 'pointer',
@@ -326,6 +339,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                   }
                 }
               });
+            }
             noteChoicesDiv.append(innerDiv);
           }
         };
@@ -339,7 +353,20 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
               .data('noteId', scope.noteSequence[i].note.noteId)
               .addClass('oppia-music-input-natural-note')
               .addClass('oppia-music-input-on-staff')
-              .draggable({
+              // Position notes horizontally by their noteStart positions and
+              // vertically by the midi value they hold.
+              .css({
+                top:
+                  getVerticalPosition(
+                    scope.noteSequence[i].note.baseNoteMidiNumber) -
+                  scope.VERTICAL_GRID_SPACING / 2.0,
+                left:
+                  getHorizontalPosition(getNoteStartAsFloat(
+                    scope.noteSequence[i].note)),
+                position: 'absolute'
+              });
+            if (scope.interactionIsActive) {
+              innerDiv.draggable({
                 // Keeps note from being placed on top of the clef.
                 containment: '.oppia-music-input-valid-note-area',
                 cursor: 'pointer',
@@ -358,19 +385,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                     draggableOptions.remove();
                   }
                 }
-              })
-              // Position notes horizontally by their noteStart positions and
-              // vertically by the midi value they hold.
-              .css({
-                top:
-                  getVerticalPosition(
-                    scope.noteSequence[i].note.baseNoteMidiNumber) -
-                  scope.VERTICAL_GRID_SPACING / 2.0,
-                left:
-                  getHorizontalPosition(getNoteStartAsFloat(
-                    scope.noteSequence[i].note)),
-                position: 'absolute'
               });
+            }
             noteChoicesDiv.append(innerDiv);
           }
           repaintLedgerLines();

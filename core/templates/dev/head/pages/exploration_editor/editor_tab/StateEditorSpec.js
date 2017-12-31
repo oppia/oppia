@@ -42,7 +42,7 @@ describe('State Editor controller', function() {
                 feedback: [],
                 param_changes: []
               },
-              correct: false
+              labelled_as_correct: false
             }],
             default_outcome: {
               dest: 'default',
@@ -67,7 +67,7 @@ describe('State Editor controller', function() {
                 feedback: [],
                 param_changes: []
               },
-              correct: false
+              labelled_as_correct: false
             }],
             default_outcome: {
               dest: 'default',
@@ -92,7 +92,7 @@ describe('State Editor controller', function() {
                 feedback: [],
                 param_changes: []
               },
-              correct: false
+              labelled_as_correct: false
             }],
             default_outcome: {
               dest: 'default',
