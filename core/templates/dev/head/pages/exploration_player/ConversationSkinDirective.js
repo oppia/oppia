@@ -436,8 +436,8 @@ oppia.directive('conversationSkin', [
             }
 
             if (ExplorationPlayerStateService.isStateTerminal(stateName)) {
-              $scope.parentExplorationIds = UrlService.
-                getParentExplorationIds();
+              $scope.parentExplorationIds = UrlService.getParamValuesAsList(
+                'parent');
               if ($scope.parentExplorationIds) {
                 var parentExplorationId = $scope.parentExplorationIds[
                   $scope.parentExplorationIds.length - 1];

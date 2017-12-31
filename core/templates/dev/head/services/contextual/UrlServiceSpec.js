@@ -18,11 +18,10 @@
 
 describe('Url Service', function() {
   var UrlService = null;
-  var parameterList = '#?parent=parent1&parent=parent2';
-  var location = null;
+  var parameterList = '?parent=parent1&parent=parent2';
   var sampleHash = 'sampleHash';
   var window = {
-    href: 'http://sample.com/embed',
+    href: 'http://sample.com/embed' + parameterList,
     pathname: 'sample.com/embed',
     hash: sampleHash
   };
@@ -30,7 +29,6 @@ describe('Url Service', function() {
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
     UrlService = $injector.get('UrlService');
-    location = $injector.get('$location');
     spyOn(UrlService, 'getCurrentUrl').and.returnValue(window);
   }));
 
@@ -39,38 +37,21 @@ describe('Url Service', function() {
     expect(UrlService.getUrlParams()).toEqual({parent: 'parent2'});
   });
 
-  it('should correctly get parent id list when list has more than 1 elements',
-    function() {
-      var parentList = ['parent1', 'parent2'];
-      spyOn(location, 'search').and.returnValue({parent: parentList});
-      expect(UrlService.getParentExplorationIds()).toEqual(parentList);
-    });
+  it('should correctly parameter list based on key value', function() {
+    var expectedList = ['parent1', 'parent2'];
+    expect(UrlService.getParamValuesAsList('parent')).toEqual(expectedList);
+    window.href = 'http://sample.com/embed';
+    expect(UrlService.getParamValuesAsList('parent')).toBe(null);
+  });
 
-  it('should correctly get a single element array when a single string of ' +
-     'parent id is present',
-    function() {
-      spyOn(location, 'search').and.returnValue({parent: 'parent1'});
-      expect(UrlService.getParentExplorationIds()).toEqual(['parent1']);
-    });
-
-  it('should correctly return null when list has no elements',
-    function() {
-      spyOn(location, 'search').and.returnValue([]);
-      expect(UrlService.getParentExplorationIds()).toBe(null);
-    });
-
-  it('should pop last parent id and return correct parameter string',
-    function() {
-      var parameterList = ['parent1', 'parent2'];
-      var expectedString = '#?parent=parent1';
-      expect(UrlService.updateParameterList(parameterList)).toBe(
-        expectedString);
-    });
-
-  it('should correctly push a parent id to url stack', function() {
-    spyOn(location, 'search');
-    UrlService.pushParentIdToUrl('parent1');
-    expect(location.search).toHaveBeenCalledWith({parent: 'parent1'});
+  it('should correctly add parameter values to url', function() {
+    expect(UrlService.addParams('/sample', 'parent', 'parent1')).toBe(
+      '/sample?parent=parent1'
+    );
+    expect(UrlService.addParams(
+      '/sample?parent=parent1', 'parent', 'parent2')).toBe(
+      '/sample?parent=parent1&parent=parent2'
+    );
   });
 
   it('should correctly return true if embed present in pathname', function() {

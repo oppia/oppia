@@ -45,7 +45,7 @@ oppia.directive('explorationSummaryTile', [
         // desktop version of the summary tile is always displayed.
         mobileCutoffPx: '@mobileCutoffPx',
         isPlaylistTile: '&isPlaylistTile',
-        parentExplorationIds: '&parentExplorationIds',
+        getParentExplorationIds: '&parentExplorationIds',
         showLearnerDashboardIconsIfPossible: (
           '&showLearnerDashboardIconsIfPossible')
       },
@@ -131,13 +131,17 @@ oppia.directive('explorationSummaryTile', [
             } else {
               var result = '/explore/' + $scope.getExplorationId();
               if ($scope.getCollectionId()) {
-                result += ('?collection_id=' + $scope.getCollectionId());
+                result = UrlService.addParams(result, 'collection_id',
+                  $scope.getCollectionId())
               }
-              if ($scope.parentExplorationIds()) {
-                var parameterList = $scope.parentExplorationIds();
-                if (parameterList.length > 1) {
-                  result += UrlService.updateParameterList(parameterList);
+              if ($scope.getParentExplorationIds()) {
+                var parentExplorationIds = $scope.getParentExplorationIds();
+                var i = 0;
+                for (var i = 0; i < parentExplorationIds.length - 1; i++ ) {
+                  result = UrlService.addParams(result, 'parent',
+                    parentExplorationIds[i]);
                 }
+                return result;
               }
             }
             return result;
