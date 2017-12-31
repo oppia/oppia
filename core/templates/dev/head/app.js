@@ -587,29 +587,6 @@ oppia.factory('rteHelperService', [
 
 oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
 
-// Service for manipulating the page URL.
-oppia.factory('urlService', ['$window', function($window) {
-  return {
-    getUrlParams: function() {
-      var params = {};
-      var parts = $window.location.href.replace(
-        /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-          params[key] = value;
-        }
-      );
-      return params;
-    },
-    isIframed: function() {
-      var pathname = this.getPathname();
-      var urlParts = pathname.split('/');
-      return urlParts[1] === 'embed';
-    },
-    getPathname: function() {
-      return window.location.pathname;
-    }
-  };
-}]);
-
 // Service for sending events to Google Analytics.
 //
 // Note that events are only sent if the CAN_SEND_ANALYTICS_EVENTS flag is

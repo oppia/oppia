@@ -45,7 +45,7 @@ oppia.directive('explorationSummaryTile', [
         // desktop version of the summary tile is always displayed.
         mobileCutoffPx: '@mobileCutoffPx',
         isPlaylistTile: '&isPlaylistTile',
-        parameters: '=',
+        parentExplorationIds: '&parentExplorationIds',
         showLearnerDashboardIconsIfPossible: (
           '&showLearnerDashboardIconsIfPossible')
       },
@@ -81,11 +81,11 @@ oppia.directive('explorationSummaryTile', [
       controller: [
         '$scope', '$http',
         'DateTimeFormatService', 'RatingComputationService',
-        'WindowDimensionsService',
+        'WindowDimensionsService', 'UrlService',
         function(
           $scope, $http,
           DateTimeFormatService, RatingComputationService,
-          WindowDimensionsService) {
+          WindowDimensionsService, UrlService) {
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.ACTIVITY_TYPE_EXPLORATION = (
             constants.ACTIVITY_TYPE_EXPLORATION);
@@ -133,14 +133,10 @@ oppia.directive('explorationSummaryTile', [
               if ($scope.getCollectionId()) {
                 result += ('?collection_id=' + $scope.getCollectionId());
               }
-              if ($scope.parameters) {
-                var parameterList = $scope.parameters.split('&');
-                parameterList.splice(-1,1);
-                for (var i = 0; i < parameterList.length; i++) {
-                  result += parameterList[i] + '&';
-                }
-                if (parameterList.length > 0) {
-                  result = result.slice(0,-1);
+              if ($scope.parentExplorationIds()) {
+                var parameterList = $scope.parentExplorationIds();
+                if (parameterList.length > 1) {
+                  result += UrlService.updateParameterList(parameterList);
                 }
               }
             }
