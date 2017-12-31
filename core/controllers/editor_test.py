@@ -574,7 +574,8 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
     """Test handler for exploration and state download."""
 
     SAMPLE_JSON_CONTENT = {
-        'State A': ("""classifier_model_id: null
+        'State A': ("""auxiliary_exploration_id: null
+classifier_model_id: null
 content:
   audio_translations: {}
   html: ''
@@ -597,7 +598,8 @@ interaction:
   solution: null
 param_changes: []
 """),
-        'State B': ("""classifier_model_id: null
+        'State B': ("""auxiliary_exploration_id: null
+classifier_model_id: null
 content:
   audio_translations: {}
   html: ''
@@ -620,7 +622,8 @@ interaction:
   solution: null
 param_changes: []
 """),
-        feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
+        feconf.DEFAULT_INIT_STATE_NAME: ("""auxiliary_exploration_id: null
+classifier_model_id: null
 content:
   audio_translations: {}
   html: ''
@@ -645,7 +648,8 @@ param_changes: []
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
-    SAMPLE_STATE_STRING = ("""classifier_model_id: null
+    SAMPLE_STATE_STRING = ("""auxiliary_exploration_id: null
+classifier_model_id: null
 content:
   audio_translations: {}
   html: ''

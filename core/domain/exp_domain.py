@@ -1120,6 +1120,18 @@ class InteractionInstance(object):
         return self.id and interaction_registry.Registry.get_interaction_by_id(
             self.id).is_terminal
 
+    @property
+    def admits_multiple_answers(self):
+        """Determines if this interaction type admits multiple answers. If no
+        ID is set for this interaction, False is returned.
+
+        Returns:
+            bool. Whether the interaction admits multiple answers.
+        """
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            self.id)
+        return self.id and not interaction.is_linear
+
     def get_all_outcomes(self):
         """Returns a list of all outcomes of this interaction, taking into
         consideration every answer group and the default outcome.
@@ -1237,7 +1249,7 @@ class State(object):
     }
 
     def __init__(self, content, param_changes, interaction,
-                 classifier_model_id=None):
+                 auxiliary_exploration_id, classifier_model_id):
         """Initializes a State domain object.
 
         Args:
@@ -1247,6 +1259,8 @@ class State(object):
                 this state.
             interaction: InteractionInstance. The interaction instance
                 associated with this state.
+            auxiliary_exploration_id: str or None. The exploration ID to refer
+                the student to if more support is needed.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
         """
@@ -1263,6 +1277,7 @@ class State(object):
             interaction.answer_groups, interaction.default_outcome,
             interaction.confirmed_unclassified_answers,
             interaction.hints, interaction.solution)
+        self.auxiliary_exploration_id = auxiliary_exploration_id
         self.classifier_model_id = classifier_model_id
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
@@ -1294,6 +1309,20 @@ class State(object):
                 'This state does not have any interaction specified.')
         elif self.interaction.id is not None:
             self.interaction.validate(exp_param_specs_dict)
+
+        if self.auxiliary_exploration_id is not None:
+            if not isinstance(self.auxiliary_exploration_id, basestring):
+                raise utils.ValidationError(
+                    'Expected auxiliary_exploration_id to be a string or None, '
+                    'received %s' % self.auxiliary_exploration_id)
+            if self.interaction.id is None:
+                raise utils.ValidationError(
+                    'An auxiliary_exploration_id was specified, but the '
+                    'interaction is null.')
+            if not self.interaction.admits_multiple_answers:
+                raise utils.ValidationError(
+                    'An auxiliary_exploration_id was specified, but the '
+                    'interaction admits just one answer.')
 
     def get_training_data(self):
         """Retrieves training data from the State domain object."""
@@ -1358,6 +1387,15 @@ class State(object):
         self.param_changes = [
             param_domain.ParamChange.from_dict(param_change_dict)
             for param_change_dict in param_change_dicts]
+
+    def update_auxiliary_exploration_id(self, auxiliary_exploration_id):
+        """Update the param_changes dict attribute.
+
+        Args:
+            auxiliary_exploration_id. str or None. The ID of the new auxiliary
+                exploration for this state.
+        """
+        self.auxiliary_exploration_id = auxiliary_exploration_id
 
     def update_interaction_id(self, interaction_id):
         """Update the interaction id attribute.
@@ -1549,6 +1587,7 @@ class State(object):
                               for param_change in self.param_changes],
             'interaction': self.interaction.to_dict(),
             'classifier_model_id': self.classifier_model_id,
+            'auxiliary_exploration_id': self.auxiliary_exploration_id,
         }
 
     @classmethod
@@ -1566,6 +1605,7 @@ class State(object):
             [param_domain.ParamChange.from_dict(param)
              for param in state_dict['param_changes']],
             InteractionInstance.from_dict(state_dict['interaction']),
+            state_dict['auxiliary_exploration_id'],
             state_dict['classifier_model_id'],
         )
 
@@ -1588,7 +1628,9 @@ class State(object):
             SubtitledHtml(content_html, {}),
             [],
             InteractionInstance.create_default_interaction(
-                default_dest_state_name))
+                default_dest_state_name),
+            None,
+            None)
 
 
 class Exploration(object):
@@ -1796,6 +1838,9 @@ class Exploration(object):
                 idict['confirmed_unclassified_answers'],
                 [Hint.from_dict(h) for h in idict['hints']],
                 solution)
+
+            state.auxiliary_exploration_id = sdict['auxiliary_exploration_id']
+            state.classifier_model_id = sdict['classifier_model_id']
 
             exploration.states[state_name] = state
 
@@ -2955,6 +3000,24 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v15_dict_to_v16_dict(cls, states_dict):
+        """Converts from version 15 to 16. Version 16 adds an
+        auxiliary_exploration_id field to each state whose value defaults to
+        None.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            state_dict['auxiliary_exploration_id'] = None
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -2985,7 +3048,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 20
+    CURRENT_EXP_SCHEMA_VERSION = 21
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3385,6 +3448,21 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v20_dict_to_v21_dict(cls, exploration_dict):
+        """ Converts a v20 exploration dict into a v21 exploration dict.
+
+        Introduces a correctness property at the top level, and changes each
+        answer group's "correct" field to "labelled_as_correct" instead.
+        """
+        exploration_dict['schema_version'] = 21
+
+        exploration_dict['states'] = cls._convert_states_v15_dict_to_v16_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 16
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3515,6 +3593,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v19_dict_to_v20_dict(
                 exploration_dict)
             exploration_schema_version = 20
+
+        if exploration_schema_version == 20:
+            exploration_dict = cls._convert_v20_dict_to_v21_dict(
+                exploration_dict)
+            exploration_schema_version = 21
 
         return (exploration_dict, initial_schema_version)
 

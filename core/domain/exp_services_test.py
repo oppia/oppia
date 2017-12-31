@@ -642,6 +642,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
+    auxiliary_exploration_id: null
     classifier_model_id: null
     content:
       audio_translations: {}
@@ -665,6 +666,7 @@ states:
       solution: null
     param_changes: []
   New state:
+    auxiliary_exploration_id: null
     classifier_model_id: null
     content:
       audio_translations: {}
@@ -710,6 +712,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
+    auxiliary_exploration_id: null
     classifier_model_id: null
     content:
       audio_translations: {}
@@ -733,6 +736,7 @@ states:
       solution: null
     param_changes: []
   Renamed state:
+    auxiliary_exploration_id: null
     classifier_model_id: null
     content:
       audio_translations: {}
@@ -863,7 +867,8 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as a dict whose keys
     are state names and whose values are YAML strings representing the state's
     contents."""
-    _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
+    _SAMPLE_INIT_STATE_CONTENT = ("""auxiliary_exploration_id: null
+classifier_model_id: null
 content:
   audio_translations: {}
   html: ''
@@ -889,7 +894,8 @@ param_changes: []
 
     SAMPLE_EXPORTED_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'New state': ("""classifier_model_id: null
+        'New state': ("""auxiliary_exploration_id: null
+classifier_model_id: null
 content:
   audio_translations: {}
   html: ''
@@ -916,7 +922,8 @@ param_changes: []
 
     UPDATED_SAMPLE_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'Renamed state': ("""classifier_model_id: null
+        'Renamed state': ("""auxiliary_exploration_id: null
+classifier_model_id: null
 content:
   audio_translations: {}
   html: ''
@@ -2276,6 +2283,7 @@ param_specs: {}
 schema_version: %d
 states:
   END:
+    auxiliary_exploration_id: null
     classifier_model_id: null
     content:
       audio_translations: {}
@@ -2292,6 +2300,7 @@ states:
       solution: null
     param_changes: []
   %s:
+    auxiliary_exploration_id: null
     classifier_model_id: null
     content:
       audio_translations: {}
