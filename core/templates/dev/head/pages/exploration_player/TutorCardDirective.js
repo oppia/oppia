@@ -167,6 +167,10 @@ oppia.directive('tutorCard', [
              !$scope.arePreviousResponsesShown;
           };
 
+          $scope.isWindowNarrow = function() {
+            return WindowDimensionsService.isWindowNarrow();
+          };
+
           $scope.isViewportNarrow = function() {
             return WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
           };

@@ -68,7 +68,7 @@
     ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
     (!isOnTerminalCard() || !isIframed || activeCard.destStateName)">
       <div class="conversation-skin-inline-interaction">
-        <div ng-if="!isViewportNarrow() && activeCard.destStateName && activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1].oppiaResponse">
+        <div ng-if="!isWindowNarrow() && activeCard.destStateName && activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1].oppiaResponse">
           <continue-button ng-if="!isIframed"
                            focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
                            ng-click="onClickContinueButton()">

@@ -27,17 +27,19 @@
       </md-button>
       <md-button ng-if="interactionId === 'ItemSelectionInput' &&
                         interactionCustomizationArgs.maxAllowableSelectionCount.value > 1"
-                 class="oppia-learner-confirm-button" ng-click="onSubmit()">
+                 class="oppia-learner-confirm-button" ng-click="onSubmit()"
+                 translate="I18N_INTERACTIONS_SUBMIT">
         Submit
       </md-button>
       <md-button ng-if="shouldGenericSubmitButtonBeShown"
-                class="oppia-learner-confirm-button" ng-click="onSubmit()">
+                 class="oppia-learner-confirm-button" ng-click="onSubmit()"
+                 translate="I18N_INTERACTIONS_SUBMIT">
         Submit
       </md-button>
     </div>
     <continue-button ng-if="!isIframed && shouldContinueButtonBeShown()"
-                      focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
-                      ng-click="onClickContinueButton()">
+                     focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
+                     ng-click="onClickContinueButton()">
     </continue-button>
   </div>
 </div>
