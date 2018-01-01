@@ -1180,7 +1180,7 @@ oppia.factory('autosaveInfoModalsService', [
             };
 
             $scope.lostChangesHtml = (
-              ChangesInHumanReadableFormService.makeHumanReadable(
+            ChangesInHumanReadableFormService.makeHumanReadable(
                   lostChanges).html());
             $log.error('Lost changes: ' + JSON.stringify(lostChanges));
           }],
