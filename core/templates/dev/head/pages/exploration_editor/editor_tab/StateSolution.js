@@ -17,19 +17,21 @@
  */
 
 oppia.controller('StateSolution', [
-  '$scope', '$rootScope', '$uibModal', 'EditorStateService', 'AlertsService',
-  'INTERACTION_SPECS', 'stateSolutionService', 'explorationStatesService',
-  'SolutionVerificationService', 'ExplorationHtmlFormatterService',
-  'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
-  'SolutionObjectFactory', 'ExplorationContextService',
-  'ExplorationWarningsService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
+  'AlertsService', 'INTERACTION_SPECS', 'stateSolutionService',
+  'explorationStatesService', 'SolutionVerificationService',
+  'ExplorationHtmlFormatterService', 'stateInteractionIdService',
+  'stateHintsService', 'UrlInterpolationService', 'SolutionObjectFactory',
+  'ExplorationContextService', 'ExplorationWarningsService',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function(
-    $scope, $rootScope, $uibModal, EditorStateService, AlertsService,
-    INTERACTION_SPECS, stateSolutionService, explorationStatesService,
-    SolutionVerificationService, ExplorationHtmlFormatterService,
-    stateInteractionIdService, stateHintsService, UrlInterpolationService,
-    SolutionObjectFactory, ExplorationContextService,
-    ExplorationWarningsService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
+    $scope, $rootScope, $uibModal, $filter, EditorStateService,
+    AlertsService, INTERACTION_SPECS, stateSolutionService,
+    explorationStatesService, SolutionVerificationService,
+    ExplorationHtmlFormatterService, stateInteractionIdService,
+    stateHintsService, UrlInterpolationService, SolutionObjectFactory,
+    ExplorationContextService, ExplorationWarningsService,
+    INFO_MESSAGE_SOLUTION_IS_INVALID) {
     $scope.correctAnswer = null;
     $scope.correctAnswerEditorHtml = '';
     $scope.inlineSolutionEditorIsActive = false;
@@ -63,7 +65,7 @@ oppia.controller('StateSolution', [
       var solution = stateSolutionService.savedMemento;
       var solutionAsPlainText =
         solution.getSummary(stateInteractionIdService.savedMemento);
-      solutionAsPlainText = solutionAsPlainText.replace(/&quot;/g,'');
+      solutionAsPlainText = $filter('convertToPlainText')(solutionAsPlainText);
       return solutionAsPlainText;
     };
 
