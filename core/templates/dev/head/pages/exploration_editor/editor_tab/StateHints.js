@@ -43,7 +43,7 @@ oppia.controller('StateHints', [
 
       $scope.activeHintIndex = null;
     });
-    
+
     $scope.getHintSummary = function(hint) {
       var hintAsPlainText = (
         hint.hintContent.getHtml() ?
