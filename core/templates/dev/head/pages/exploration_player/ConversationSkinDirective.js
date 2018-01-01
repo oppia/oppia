@@ -436,24 +436,23 @@ oppia.directive('conversationSkin', [
             }
 
             if (ExplorationPlayerStateService.isStateTerminal(stateName)) {
-              $scope.parentExplorationIds = UrlService.getParamValuesAsList(
-                'parent');
-              if ($scope.parentExplorationIds) {
+              $scope.parentExplorationIds =
+                UrlService.getQueryFieldValuesAsList('parent');
+              var recommendedExploration = [];
+              if ($scope.parentExplorationIds.length > 0) {
                 var parentExplorationId = $scope.parentExplorationIds[
                   $scope.parentExplorationIds.length - 1];
-                ExplorationRecommendationsService.getRecommendedSummaryDicts(
-                  [parentExplorationId],
-                  function(summaries) {
-                    $scope.recommendedExplorationSummaries = summaries;
-                  });
+                recommendedExploration.push(parentExplorationId);
               } else {
-                ExplorationRecommendationsService.getRecommendedSummaryDicts(
+                recommendedExploration =
                   ExplorationPlayerStateService.getAuthorRecommendedExpIds(
-                    stateName),
-                  function(summaries) {
-                    $scope.recommendedExplorationSummaries = summaries;
-                  });
+                    stateName);
               }
+              ExplorationRecommendationsService.getRecommendedSummaryDicts(
+                recommendedExploration,
+                function(summaries) {
+                  $scope.recommendedExplorationSummaries = summaries;
+                });
             }
           };
 

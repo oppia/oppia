@@ -34,60 +34,58 @@ describe('Full exploration editor', function() {
 
   beforeAll(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-    users.createUser('user4@editorAndPlayer.com', 'user4EditorAndPlayer');
-    users.login('user4@editorAndPlayer.com');
-
-    workflow.createAndPublishExploration('Title 1', 'Algebra',
-      'It is a sample exploration.');
-    browser.getCurrentUrl().then(function(url) {
-      pathname = url.split('/');
-      /* In the url a # is added at the end that is not part of exploration
-         ID */
-      parentId1 = pathname[4].slice(0, -1);
-    });
-
-    workflow.createAndPublishExploration('Title 2', 'Algebra',
-      'It is a sample exploration.');
-    browser.getCurrentUrl().then(function(url) {
-      pathname = url.split('/');
-      parentId2 = pathname[4].slice(0, -1);
-    });
-
-    workflow.createAndPublishExploration('Title 3', 'Algebra',
-      'It is a sample exploration.');
-    browser.getCurrentUrl().then(function(url) {
-      pathname = url.split('/');
-      refresherExplorationId = pathname[4].slice(0, -1);
-    });
   });
 
   it('should redirect back to parent exploration correctly when parent id is ' +
       'given as query parameter', function() {
-    browser.get('/explore/' + refresherExplorationId + '?parent=' +
-      parentId1 + '&parent=' + parentId2);
-    browser.waitForAngular();
+    users.createUser('user1@editorAndPlayer.com', 'user1EditorAndPlayer');
+    users.login('user1@editorAndPlayer.com');
 
-    /* The summary tile for redirection has to be scrolled down in the
-       chrome window to be in view of the automated test,
-       hence the scrollTo. */
-    browser.executeScript('window.scrollTo(571,700);').then(function() {
-      element(by.css('.protractor-test-exp-summary-tile-title')).click();
-    });
-    browser.waitForAngular();
-    browser.getCurrentUrl().then(function(url) {
-      currentExplorationId = url.split('/')[4].split('?')[0];
-      expect(currentExplorationId).toBe(parentId2);
-    });
+    workflow.createAndPublishExploration(
+      'Parent Exploration 1',
+      'Algebra',
+      'This is the topmost parent exploration.');
+    general.getExplorationIdFromEditor().then(function(explorationId) {
+      parentId1 = explorationId;
 
-    browser.executeScript('window.scrollTo(571,700);').then(function() {
-      element(by.css('.protractor-test-exp-summary-tile-title')).click();
-    });
-    browser.waitForAngular();
-    browser.getCurrentUrl().then(function(url) {
-      currentExplorationId = url.split('/')[4];
-      expect(currentExplorationId).toBe(parentId1);
-    });
+      workflow.createAndPublishExploration(
+        'Parent Exploration 1',
+        'Algebra',
+        'This is the second parent exploration to which refresher ' +
+        'exploration redirects.');
+      general.getExplorationIdFromEditor().then(function(explorationId) {
+        parentId2 = explorationId;
 
+        workflow.createAndPublishExploration(
+          'Refresher Exploration',
+          'Algebra',
+          'This is the most basic refresher exploration');
+        general.getExplorationIdFromEditor().then(function(explorationId) {
+          refresherExplorationId = explorationId;
+
+          browser.get('/explore/' + refresherExplorationId + '?parent=' +
+            parentId1 + '&parent=' + parentId2);
+          browser.waitForAngular();
+
+          /* The summary tile for redirection has to be scrolled down in the
+             chrome window to be in view of the automated test,
+             hence the scrollTo. */
+          explorationPlayerPage.clickOnSummaryTileAtEnd();
+
+          browser.getCurrentUrl().then(function(url) {
+            currentExplorationId = url.split('/')[4].split('?')[0];
+            expect(currentExplorationId).toBe(parentId2);
+          });
+
+          explorationPlayerPage.clickOnSummaryTileAtEnd();
+
+          browser.getCurrentUrl().then(function(url) {
+            currentExplorationId = url.split('/')[4];
+            expect(currentExplorationId).toBe(parentId1);
+          });
+        });
+      });
+    });
     users.logout();
   });
 

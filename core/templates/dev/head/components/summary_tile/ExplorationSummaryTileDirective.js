@@ -131,14 +131,13 @@ oppia.directive('explorationSummaryTile', [
             } else {
               var result = '/explore/' + $scope.getExplorationId();
               if ($scope.getCollectionId()) {
-                result = UrlService.addParams(result, 'collection_id',
-                  $scope.getCollectionId())
+                result = UrlService.addField(
+                  result, 'collection_id', $scope.getCollectionId());
               }
               if ($scope.getParentExplorationIds()) {
                 var parentExplorationIds = $scope.getParentExplorationIds();
-                var i = 0;
                 for (var i = 0; i < parentExplorationIds.length - 1; i++ ) {
-                  result = UrlService.addParams(result, 'parent',
+                  result = UrlService.addField(result, 'parent',
                     parentExplorationIds[i]);
                 }
                 return result;

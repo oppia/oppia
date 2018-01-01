@@ -20,12 +20,15 @@
 oppia.factory('UrlService', ['$window', function($window) {
   return {
     // This function is for testing purposes (to mock $window.location)
-    getCurrentUrl: function() {
+    queryUrlParams: function() {
       return $window.location;
     },
+    /* As params[key] is overwritten, if query string has multiple fieldValues
+       for same fieldName, use getQueryFieldValuesAsList(fieldName) to get it
+       in array form. */
     getUrlParams: function() {
       var params = {};
-      var parts = this.getCurrentUrl().href.replace(
+      var parts = this.queryUrlParams().href.replace(
         /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
           params[key] = value;
         }
@@ -38,28 +41,29 @@ oppia.factory('UrlService', ['$window', function($window) {
       return urlParts[1] === 'embed';
     },
     getPathname: function() {
-      return this.getCurrentUrl().pathname;
+      return this.queryUrlParams().pathname;
     },
-    getParamValuesAsList: function(queryTag) {
-      var url = this.getCurrentUrl().href.slice(
-        this.getCurrentUrl().href.indexOf('?') + 1).split('&');
-      var parentIdArray = [];
-      for (var i = 0; i < url.length; i++) {
-        var urlparam = url[i].split('=');
-        if (urlparam[0] === queryTag) {
-          parentIdArray.push(urlparam[1]);
+    getQueryFieldValuesAsList: function(fieldName) {
+      var fieldValues = [];
+      if (this.queryUrlParams().href.indexOf('?') > -1) {
+        var url = this.queryUrlParams().href.slice(
+          this.queryUrlParams().href.indexOf('?') + 1).split('&');
+        for (var i = 0; i < url.length; i++) {
+          var currentFieldName = url[i].split('=')[0];
+          var currentFieldValue = url[i].split('=')[1];
+          if (currentFieldName === fieldName) {
+            fieldValues.push(currentFieldValue);
+          }
         }
       }
-      return parentIdArray.length > 0 ? parentIdArray : null;
+      return fieldValues;
     },
-    /* Use UrlService.pushParentIdToUrl(url, explorationId); at the state which
-       redirects to push current exploration id to url stack. */
-    addParams: function(url, queryTag, queryValue) {
-      return url + (url.indexOf('?') != -1 ? '&' : '?') + queryTag + '=' +
-        queryValue;
+    addField: function(url, fieldName, fieldValue) {
+      return url + (url.indexOf('?') != -1 ? '&' : '?') + fieldName + '=' +
+        fieldValue;
     },
     getHash: function() {
-      return this.getCurrentUrl().hash;
+      return this.queryUrlParams().hash;
     }
   };
 }]);

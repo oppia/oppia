@@ -18,37 +18,69 @@
 
 describe('Url Service', function() {
   var UrlService = null;
-  var parameterList = '?parent=parent1&parent=parent2';
+  var queryString = '?parent=parent1&parent=parent2';
   var sampleHash = 'sampleHash';
+  var pathname = 'sample.com/embed';
   var window = {
-    href: 'http://sample.com/embed' + parameterList,
-    pathname: 'sample.com/embed',
+    href: 'http://' + pathname + queryString,
+    pathname: pathname,
     hash: sampleHash
   };
 
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
     UrlService = $injector.get('UrlService');
-    spyOn(UrlService, 'getCurrentUrl').and.returnValue(window);
+    spyOn(UrlService, 'queryUrlParams').and.returnValue(window);
   }));
 
-  it('should correctly get last url parameter', function() {
-    window.href = 'http://sample.com' + parameterList;
-    expect(UrlService.getUrlParams()).toEqual({parent: 'parent2'});
+  it('should correctly get query values as a single object', function() {
+    window.href = 'http://' + pathname + '?field1=value1&field2=value2';
+    var expectedObject = {
+      field1: 'value1',
+      field2: 'value2'
+    };
+    expect(UrlService.getUrlParams()).toEqual(expectedObject);
   });
 
-  it('should correctly parameter list based on key value', function() {
+  it('should add query fields and return correct object after decoding it',
+    function() {
+      window.href = 'http://' + pathname;
+      window.href = UrlService.addField(window.href, 'field1', 'value1');
+      expect(UrlService.getUrlParams()).toEqual({
+        field1: 'value1'
+      });
+      window.href = UrlService.addField(window.href, 'field2', 'value2');
+      expect(UrlService.getUrlParams()).toEqual({
+        field1: 'value1',
+        field2: 'value2'
+      });
+      window.href = UrlService.addField(window.href, 'field1', 'value3');
+      window.href = UrlService.addField(window.href, 'field1', 'value4');
+      window.href = UrlService.addField(window.href, 'field2', 'value5');
+      window.href = UrlService.addField(window.href, 'field1', 'value6');
+      window.href = UrlService.addField(window.href, 'field1', 'value6');
+      var expectedList = ['value1', 'value3', 'value4', 'value6', 'value6'];
+      expect(
+        UrlService.getQueryFieldValuesAsList('field1')).toEqual(expectedList);
+      expectedList = ['value2', 'value5'];
+      expect(
+        UrlService.getQueryFieldValuesAsList('field2')).toEqual(expectedList);
+    });
+
+  it('should correctly get parameter list based on key value', function() {
     var expectedList = ['parent1', 'parent2'];
-    expect(UrlService.getParamValuesAsList('parent')).toEqual(expectedList);
-    window.href = 'http://sample.com/embed';
-    expect(UrlService.getParamValuesAsList('parent')).toBe(null);
+    window.href = 'http://' + pathname + queryString;
+    expect(
+      UrlService.getQueryFieldValuesAsList('parent')).toEqual(expectedList);
+    window.href = 'http://' + pathname;
+    expect(UrlService.getQueryFieldValuesAsList('parent')).toEqual([]);
   });
 
   it('should correctly add parameter values to url', function() {
-    expect(UrlService.addParams('/sample', 'parent', 'parent1')).toBe(
+    expect(UrlService.addField('/sample', 'parent', 'parent1')).toBe(
       '/sample?parent=parent1'
     );
-    expect(UrlService.addParams(
+    expect(UrlService.addField(
       '/sample?parent=parent1', 'parent', 'parent2')).toBe(
       '/sample?parent=parent1&parent=parent2'
     );
