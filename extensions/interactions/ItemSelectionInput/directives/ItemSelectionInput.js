@@ -29,7 +29,8 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ItemSelectionInput/directives/' +
@@ -65,6 +66,9 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
           // The following indicates that the number of answers is less than
           // minAllowableSelectionCount.
           $scope.notEnoughSelections = ($scope.minAllowableSelectionCount > 0);
+          $scope.setAnswerValidity({
+            answerValidity: !$scope.notEnoughSelections
+          });
 
           $scope.onToggleCheckbox = function() {
             $scope.newQuestion = false;
@@ -77,6 +81,9 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
               $scope.selectionCount >= $scope.maxAllowableSelectionCount);
             $scope.notEnoughSelections = (
               $scope.selectionCount < $scope.minAllowableSelectionCount);
+            $scope.setAnswerValidity({
+              answerValidity: !$scope.notEnoughSelections
+            });
           };
 
           $scope.submitMultipleChoiceAnswer = function(index) {

@@ -52,6 +52,12 @@ oppia.factory('ExplorationHtmlFormatterService', [
         if (labelForFocusTarget) {
           element.attr('label-for-focus-target', labelForFocusTarget);
         }
+        // We cannot restrict this attr to interactions with
+        // show_nav_submit_button because of special cases such
+        // as ItemSelectionInput.
+        element.attr(
+          'set-answer-validity',
+          'setInteractionAnswerValidity(answerValidity)');
         return element.get(0).outerHTML;
       },
 

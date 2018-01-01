@@ -783,6 +783,11 @@ oppia.directive('conversationSkin', [
               $scope.explorationId);
           };
 
+          $scope.interactionAnswerIsValid = true;
+          $scope.setInteractionAnswerValidity = function(answerValidity) {
+            $scope.interactionAnswerIsValid = answerValidity;
+          }
+
           $scope.submitAnswerFromProgressNav = function() {
             $scope.$broadcast(EVENT_PROGRESS_NAV_SUBMITTED);
           };

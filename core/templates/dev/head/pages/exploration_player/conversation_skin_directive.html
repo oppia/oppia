@@ -40,7 +40,8 @@
                       isViewportNarrow() && !isCurrentSupplementalCardNonempty()}">
       <tutor-card on-click-continue-button="showUpcomingCard()"
                   on-submit-answer="submitAnswer(answer, rulesService)"
-                  start-card-change-animation="startCardChangeAnimation">
+                  start-card-change-animation="startCardChangeAnimation"
+                  on-change-interaction-answer-validity="setInteractionAnswerValidity(answerValidity)">
       </tutor-card>
       <div ng-if="isCurrentSupplementalCardNonempty() && isViewportNarrow()">
         <supplemental-card on-click-continue-button="showUpcomingCard()"
@@ -49,6 +50,7 @@
       </div>
       <progress-nav ng-if="isWindowNarrow()"
                     on-submit="submitAnswerFromProgressNav()"
+                    submit-is-disabled="!interactionAnswerIsValid"
                     on-click-continue-button="showUpcomingCard()">
       </progress-nav>
     </div>

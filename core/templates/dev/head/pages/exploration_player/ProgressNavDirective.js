@@ -22,7 +22,8 @@ oppia.directive('progressNav', [
       restrict: 'E',
       scope: {
         onSubmit: '&',
-        onClickContinueButton: '&'
+        onClickContinueButton: '&',
+        submitIsDisabled: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
