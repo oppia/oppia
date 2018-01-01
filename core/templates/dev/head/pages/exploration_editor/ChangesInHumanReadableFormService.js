@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to get changes in human readable form
- *  
+ * @fileoverview Service to get changes in human readable form.  
  */
 oppia.factory('ChangesInHumanReadableFormService', [
   'UtilsService', function(UtilsService) {
