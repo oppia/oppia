@@ -163,7 +163,9 @@ class TestBase(unittest.TestCase):
     }
 
     def _get_unicode_test_string(self, suffix):
-        """Returns the complete unicode string with suffix.
+        """Returns a string that contains unicode characters and ends with the
+        given suffix. This is used to test that functions behave correctly
+        when handling strings with unicode characters.
 
         Args:
             suffix: str. The suffix to append to the UNICODE_TEST_STRING.
@@ -591,8 +593,8 @@ class TestBase(unittest.TestCase):
         """Publish the exploration with the given exploration_id.
 
         Args:
-            collection_id: str. The id of the new collection.
-            owner_id: str. The user_id for the owner of the collection.
+            collection_id: str. The ID of the new collection.
+            owner_id: str. The user_id of the owner of the collection.
         """
         committer = user_services.UserActionsInfo(owner_id)
         rights_manager.publish_exploration(committer, exploration_id)
@@ -663,7 +665,7 @@ class TestBase(unittest.TestCase):
         """Publish the collection with the given collection_id.
 
         Args:
-            owner_id: str. user_id of the owner of the collection.
+            owner_id: str. The user_id of the owner of the collection.
             collection_id: str. ID of the collection to be published.
         """
         committer = user_services.UserActionsInfo(owner_id)
@@ -946,7 +948,7 @@ class FunctionWrapper(object):
         actual function call.
 
         Args:
-            args: list(str). Set of arguments that the function accepts.
+            args: list(*). Set of arguments that the function accepts.
         """
         pass
 
@@ -955,8 +957,8 @@ class FunctionWrapper(object):
         actual function call.
 
         Args:
-            args: list(str). Set of arguments that the function accepts.
-            result: str. Result returned from the function.
+            args: list(*). Set of arguments that the function accepts.
+            result: *. Result returned from the function.
         """
         pass
 
@@ -990,7 +992,7 @@ class CallCounter(FunctionWrapper):
         will also be called even when the function raises an exception.
 
         Args:
-            args: list(str). Set of arguments that the function accepts.
+            args: list(*). Set of arguments that the function accepts.
         """
         self._times_called += 1
 
@@ -1007,7 +1009,7 @@ class FailingFunction(FunctionWrapper):
 
         Args:
             f: func. See FunctionWrapper.
-            exception: str. The exception to be raised.
+            exception: Exception. The exception to be raised.
             num_tries_before_success: int. The number of times to raise an
                 exception, before a call succeeds. If this is 0, all calls will
                 succeed, if it is FailingFunction. INFINITY, all calls will
@@ -1032,7 +1034,7 @@ class FailingFunction(FunctionWrapper):
         tries before success.
 
         Args:
-            args: list(str). Set of arguments this function accepts.
+            args: list(*). Set of arguments this function accepts.
         """
         self._times_called += 1
         call_should_fail = (
