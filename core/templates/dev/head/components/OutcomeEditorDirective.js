@@ -33,15 +33,17 @@ oppia.directive('outcomeEditor', [
         'outcome_editor_directive.html'),
       controller: [
         '$scope', 'EditorStateService',
-        'stateInteractionIdService',
+        'stateInteractionIdService', 'COMPONENT_NAME_FEEDBACK',
         function($scope, EditorStateService,
-          stateInteractionIdService) {
+          stateInteractionIdService, COMPONENT_NAME_FEEDBACK) {
           $scope.editOutcomeForm = {};
           $scope.feedbackEditorIsOpen = false;
           $scope.destinationEditorIsOpen = false;
           // TODO(sll): Investigate whether this line can be removed, due to
           // $scope.savedOutcome now being set in onExternalSave().
           $scope.savedOutcome = angular.copy($scope.outcome);
+
+          $scope.COMPONENT_NAME_FEEDBACK = COMPONENT_NAME_FEEDBACK;
 
           var onExternalSave = function() {
             // The reason for this guard is because, when the editor page for an

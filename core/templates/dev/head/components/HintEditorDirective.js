@@ -22,18 +22,22 @@ oppia.directive('hintEditor', [
       restrict: 'E',
       scope: {
         hint: '=',
-        getIndexPlusOne: '&index',
+        getIndexPlusOne: '&indexPlusOne',
         getOnSaveFn: '&onSave'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/hint_editor_directive.html'),
       controller: [
         '$scope', 'editabilityService', 'stateHintsService',
-        function($scope, editabilityService, stateHintsService) {
+        'COMPONENT_NAME_HINT',
+        function($scope, editabilityService, stateHintsService,
+            COMPONENT_NAME_HINT) {
           $scope.isEditable = editabilityService.isEditable();
           $scope.stateHintsService = stateHintsService;
           $scope.editHintForm = {};
           $scope.hintEditorIsOpen = false;
+
+          $scope.COMPONENT_NAME_HINT = COMPONENT_NAME_HINT;
 
           $scope.HINT_FORM_SCHEMA = {
             type: 'html',

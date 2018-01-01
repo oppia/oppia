@@ -36,11 +36,11 @@ oppia.directive('stateContentEditor', [
       controller: [
         '$scope', '$uibModal', 'stateContentService', 'editabilityService',
         'EditorFirstTimeEventsService', 'explorationInitStateNameService',
-        'EditorStateService',
+        'EditorStateService', 'COMPONENT_NAME_CONTENT',
         function(
             $scope, $uibModal, stateContentService, editabilityService,
             EditorFirstTimeEventsService, explorationInitStateNameService,
-            EditorStateService) {
+            EditorStateService, COMPONENT_NAME_CONTENT) {
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
@@ -48,6 +48,7 @@ oppia.directive('stateContentEditor', [
           $scope.stateContentService = stateContentService;
           $scope.contentEditorIsOpen = false;
           $scope.isEditable = editabilityService.isEditable;
+          $scope.COMPONENT_NAME_CONTENT = COMPONENT_NAME_CONTENT;
 
           var saveContent = function() {
             stateContentService.saveDisplayedValue();
