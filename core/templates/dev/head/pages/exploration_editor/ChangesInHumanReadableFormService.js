@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Service to get changes in human readable form
- * to human readable form and making necessary 
+ *  
  */
 oppia.factory('ChangesInHumanReadableFormService', [
   'UtilsService', function(UtilsService) {
