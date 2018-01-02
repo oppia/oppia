@@ -126,6 +126,16 @@ if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
   rm webtest-download.zip
 fi
 
+# Install isort.
+echo Checking if isort is installed in third_party
+if [ ! -d "$TOOLS_DIR/isort-4.2.15" ]; then
+  echo Installing isort
+  # Note that the github URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl -o isort-4.2.15.tar.gz -L https://pypi.python.org/packages/4d/d5/7c8657126a43bcd3b0173e880407f48be4ac91b4957b51303eab744824cf/isort-4.2.15.tar.gz
+  tar xzf isort-4.2.15.tar.gz -C $TOOLS_DIR
+  rm isort-4.2.15.tar.gz
+fi
+
 # Python API for browsermob-proxy.
 echo Checking if browsermob-proxy is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
