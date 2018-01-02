@@ -23,9 +23,17 @@ oppia.directive('angularHtmlBind', ['$compile', function($compile) {
   return {
     restrict: 'A',
     link: function(scope, elm, attrs) {
+      // Clean up old scopes if the html changes.
+      // Reference: https://stackoverflow.com/a/42927814
+      var newScope;
       scope.$watch(attrs.angularHtmlBind, function(newValue) {
+        if (newScope) {
+          newScope.$destroy();
+        }
+        elm.empty();
+        newScope = scope.$new();
         elm.html(newValue);
-        $compile(elm.contents())(scope);
+        $compile(elm.contents())(newScope);
       });
     }
   };
