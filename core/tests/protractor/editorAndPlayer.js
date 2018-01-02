@@ -290,6 +290,23 @@ describe('Full exploration editor', function() {
     });
   });
 
+  it('should delete interactions cleanly', function() {
+    users.createUser('user8@editorAndPlayer.com', 'user8EditorAndPlayer');
+    users.login('user8@editorAndPlayer.com');
+    workflow.createExploration();
+
+    general.getExplorationIdFromEditor().then(function(explorationId) {
+      editor.setContent(forms.toRichText('How are you feeling?'));
+      editor.setInteraction('EndExploration');
+      editor.setInteraction('TextInput');
+      editor.addResponse(
+        'TextInput', forms.toRichText('Happy!'), null, false, 'Equals',
+        'happy');
+      editor.setInteraction('EndExploration');
+      users.logout();
+    });
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
   });
