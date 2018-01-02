@@ -18,11 +18,10 @@
 
 describe('Url Service', function() {
   var UrlService = null;
-  var queryString = '?parent=parent1&parent=parent2';
   var sampleHash = 'sampleHash';
   var pathname = 'sample.com/embed';
-  var window = {
-    href: 'http://' + pathname + queryString,
+  var mockLocation = {
+    href: 'http://' + pathname,
     pathname: pathname,
     hash: sampleHash
   };
@@ -30,78 +29,61 @@ describe('Url Service', function() {
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
     UrlService = $injector.get('UrlService');
-    spyOn(UrlService, 'getCurrentLocation').and.returnValue(window);
+    spyOn(UrlService, 'getCurrentLocation').and.returnValue(mockLocation);
   }));
 
-  it('should add query fields and return correct object after decoding it',
-    function() {
-      window.href = 'http://' + pathname;
-      window.href = UrlService.addField(window.href, 'field1', 'value1');
-      expect(UrlService.getUrlParams()).toEqual({
-        field1: 'value1'
-      });
-      window.href = UrlService.addField(window.href, 'field2', 'value2');
-      expect(UrlService.getUrlParams()).toEqual({
-        field1: 'value1',
-        field2: 'value2'
-      });
-      window.href = UrlService.addField(window.href, 'field1', 'value3');
-      window.href = UrlService.addField(window.href, 'field1', 'value4');
-      window.href = UrlService.addField(window.href, 'field2', 'value5');
-      window.href = UrlService.addField(window.href, 'field1', 'value6');
-      window.href = UrlService.addField(window.href, 'field1', 'value6');
-      var expectedList = ['value1', 'value3', 'value4', 'value6', 'value6'];
-      expect(
-        UrlService.getQueryFieldValuesAsList('field1')).toEqual(expectedList);
-      expectedList = ['value2', 'value5'];
-      expect(
-        UrlService.getQueryFieldValuesAsList('field2')).toEqual(expectedList);
-    });
+  it('should return correct query value list for each query field', function() {
+    expect(UrlService.getQueryFieldValuesAsList('field1')).toEqual([]);
 
-  it('should correctly encode and encode special characters in URI',
+    mockLocation.href = 'http://' + pathname + '?field1=value1&' +
+      'field2=value2&field1=value3&field1=value4&field2=value5&' +
+      'field1=value6&field1=' + encodeURIComponent('value?= &6');
+    var expectedList1 = ['value1', 'value3', 'value4', 'value6', 'value?= &6'];
+    var expectedList2 = ['value2', 'value5'];
+    expect(
+      UrlService.getQueryFieldValuesAsList('field1')).toEqual(expectedList1);
+    expect(
+      UrlService.getQueryFieldValuesAsList('field2')).toEqual(expectedList2);
+  });
+
+  it('should correctly decode special characters in query value in url',
     function() {
-      window.href = 'http://' + pathname;
       var expectedObject = {
-        field1: '?value=1'
-      };
-      window.href = UrlService.addField(window.href, 'field1', '?value=1');
-      expect(UrlService.getUrlParams()).toEqual(expectedObject);
-      window.href = UrlService.addField(window.href, 'field2', '?value&1');
-      expectedObject = {
         field1: '?value=1',
         field2: '?value&1'
       };
+      var queryValue1 = encodeURIComponent(expectedObject.field1);
+      var queryValue2 = encodeURIComponent(expectedObject.field2);
+      mockLocation.href = 'http://' + pathname + '?field1=' + queryValue1 +
+        '&field2=' + queryValue2;
       expect(UrlService.getUrlParams()).toEqual(expectedObject);
-      window.href = UrlService.addField(window.href, 'field2','=&?value 1');
-      var expectedList = ['?value&1','=&?value 1'];
-      expect(
-        UrlService.getQueryFieldValuesAsList('field2')).toEqual(expectedList);
     });
 
-  it('should correctly get empty array when parameter list is empty',
+  it('should correctly encode and add query field and value to url',
     function() {
-      window.href = 'http://' + pathname;
-      expect(UrlService.getQueryFieldValuesAsList('parent')).toEqual([]);
-    });
+      var queryValue = '&value=1?';
+      var queryField = 'field 1';
+      var baseUrl = '/sample';
+      expect(
+        UrlService.addField(baseUrl, queryField, queryValue)).toBe(
+          baseUrl + '?' + encodeURIComponent(queryField) + '=' +
+          encodeURIComponent(queryValue)
+      );
 
-  it('should correctly add parameter values to url', function() {
-    expect(
-      UrlService.addField('/sample', 'field1', 'value')).toBe(
-      '/sample?field1=value'
-    );
-    expect(
-      UrlService.addField(
-        '/sample?field1=value', 'field2', 'value')).toBe(
-          '/sample?field1=value&field2=value'
-    );
-  });
+      baseUrl = '/sample?field=value';
+      expect(
+        UrlService.addField(baseUrl, queryField, queryValue)).toBe(
+          baseUrl + '&' + encodeURIComponent(queryField) + '=' +
+          encodeURIComponent(queryValue)
+      );
+    });
 
   it('should correctly return true if embed present in pathname', function() {
     expect(UrlService.isIframed()).toBe(true);
   });
 
   it('should correctly return false if embed not in pathname', function() {
-    window.pathname = '/sample.com';
+    mockLocation.pathname = '/sample.com';
     expect(UrlService.isIframed()).toBe(false);
   });
 
