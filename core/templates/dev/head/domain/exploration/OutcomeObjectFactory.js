@@ -20,24 +20,31 @@
 oppia.factory('OutcomeObjectFactory', [
   'SubtitledHtmlObjectFactory',
   function(SubtitledHtmlObjectFactory) {
-    var Outcome = function(dest, feedback, paramChanges) {
+    var Outcome = function(
+        dest, feedback, paramChanges, refresherExplorationId) {
       this.dest = dest;
       this.feedback = feedback;
       this.paramChanges = paramChanges;
+      this.refresherExplorationId = refresherExplorationId;
     };
 
     Outcome.prototype.toBackendDict = function() {
       return {
         dest: this.dest,
         feedback: this.feedback.toBackendDict(),
-        param_changes: this.paramChanges
+        param_changes: this.paramChanges,
+        refresher_exploration_id: this.refresherExplorationId
       };
     };
-    /** Returns true iff an outcome has a self-loop and no feedback. */
+    /**
+     * Returns true iff an outcome has a self-loop, no feedback, and no
+     * refresher exploration.
+     */
     Outcome.prototype.isConfusing = function(currentStateName) {
       return (
         this.dest === currentStateName &&
-        !this.hasNonemptyFeedback()
+        !this.hasNonemptyFeedback() &&
+        this.refresherExplorationId === null
       );
     };
 
@@ -49,14 +56,16 @@ oppia.factory('OutcomeObjectFactory', [
       return new Outcome(
         dest,
         SubtitledHtmlObjectFactory.createDefault(feedbackText),
-        paramChanges);
+        paramChanges,
+        null);
     };
 
     Outcome.createFromBackendDict = function(outcomeDict) {
       return new Outcome(
         outcomeDict.dest,
         SubtitledHtmlObjectFactory.createFromBackendDict(outcomeDict.feedback),
-        outcomeDict.param_changes);
+        outcomeDict.param_changes,
+        outcomeDict.refresher_exploration_id);
     };
 
     return Outcome;

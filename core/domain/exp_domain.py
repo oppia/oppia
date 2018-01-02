@@ -719,8 +719,9 @@ class Outcome(object):
         return {
             'dest': self.dest,
             'feedback': self.feedback.to_dict(),
-            'param_changes': [param_change.to_dict()
-                              for param_change in self.param_changes],
+            'param_changes': [
+                param_change.to_dict() for param_change in self.param_changes],
+            'refresher_exploration_id': self.refresher_exploration_id,
         }
 
     @classmethod
@@ -740,9 +741,10 @@ class Outcome(object):
                 param_change['name'], param_change['generator_id'],
                 param_change['customization_args'])
              for param_change in outcome_dict['param_changes']],
+            outcome_dict['refresher_exploration_id'],
         )
 
-    def __init__(self, dest, feedback, param_changes):
+    def __init__(self, dest, feedback, param_changes, refresher_exploration_id):
         """Initializes a Outcome domain object.
 
         Args:
@@ -751,6 +753,10 @@ class Outcome(object):
                 is triggered.
             param_changes: list(ParamChange). List of exploration-level
                 parameter changes to make if this rule is triggered.
+            refresher_exploration_id: str or None. An optional exploration ID
+                to redirect the learner to if they seem to lack understanding
+                of a prerequisite concept. This should only exist if the
+                destination state for this outcome is a self-loop.
         """
         # Id of the destination state.
         # TODO(sll): Check that this state actually exists.
@@ -760,6 +766,10 @@ class Outcome(object):
         # Exploration-level parameter changes to make if this rule is
         # triggered.
         self.param_changes = param_changes or []
+        # An optional exploration ID to redirect the learner to if they lack
+        # understanding of a prerequisite concept. This should only exist if
+        # the destination state for this outcome is a self-loop.
+        self.refresher_exploration_id = refresher_exploration_id
 
     def validate(self):
         """Validates various properties of the Outcome.
@@ -783,6 +793,12 @@ class Outcome(object):
                 % self.param_changes)
         for param_change in self.param_changes:
             param_change.validate()
+
+        if self.refresher_exploration_id is not None:
+            if not isinstance(self.refresher_exploration_id, basestring):
+                raise utils.ValidationError(
+                    'Expected outcome refresher_exploration_id to be a string, '
+                    'received %s' % self.refresher_exploration_id)
 
 
 class AnswerGroup(object):
@@ -1210,13 +1226,11 @@ class InteractionInstance(object):
             InteractionInstance. The corresponding InteractionInstance domain
             object with default values.
         """
+        default_outcome = Outcome(
+            default_dest_state_name,
+            SubtitledHtml.create_default_subtitled_html(), {}, None)
         return cls(
-            cls._DEFAULT_INTERACTION_ID,
-            {}, [],
-            Outcome(
-                default_dest_state_name,
-                SubtitledHtml.create_default_subtitled_html(), {}), [], [], {}
-        )
+            cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], {})
 
 
 class State(object):
@@ -1230,6 +1244,7 @@ class State(object):
             'dest': feconf.DEFAULT_INIT_STATE_NAME,
             'feedback': SubtitledHtml.DEFAULT_SUBTITLED_HTML_DICT,
             'param_changes': [],
+            'refresher_exploration_id': None,
         },
         'confirmed_unclassified_answers': [],
         'hints': [],
@@ -1750,7 +1765,7 @@ class Exploration(object):
             state = exploration.states[state_name]
 
             state.content = SubtitledHtml(
-                html_cleaner.clean(sdict['content']['html']), {
+                sdict['content']['html'], {
                     language_code: AudioTranslation.from_dict(translation)
                     for language_code, translation in
                     sdict['content']['audio_translations'].iteritems()
@@ -1768,18 +1783,7 @@ class Exploration(object):
 
             idict = sdict['interaction']
             interaction_answer_groups = [
-                AnswerGroup.from_dict({
-                    'outcome': {
-                        'dest': group['outcome']['dest'],
-                        'feedback': group['outcome']['feedback'],
-                        'param_changes': group['outcome']['param_changes'],
-                    },
-                    'rule_specs': [{
-                        'inputs': rule_spec['inputs'],
-                        'rule_type': rule_spec['rule_type'],
-                    } for rule_spec in group['rule_specs']],
-                    'labelled_as_correct': group['labelled_as_correct'],
-                })
+                AnswerGroup.from_dict(group)
                 for group in idict['answer_groups']]
 
             default_outcome = (
@@ -1990,15 +1994,24 @@ class Exploration(object):
 
         # Check that all answer groups, outcomes, and param_changes are valid.
         all_state_names = self.states.keys()
-        for state in self.states.values():
+        for state_name, state in self.states.iteritems():
             interaction = state.interaction
+            default_outcome = interaction.default_outcome
 
-            # Check the default destination, if any
-            if (interaction.default_outcome is not None and
-                    interaction.default_outcome.dest not in all_state_names):
-                raise utils.ValidationError(
-                    'The destination %s is not a valid state.'
-                    % interaction.default_outcome.dest)
+            if default_outcome is not None:
+                # Check the default destination, if any.
+                if default_outcome.dest not in all_state_names:
+                    raise utils.ValidationError(
+                        'The destination %s is not a valid state.'
+                        % default_outcome.dest)
+
+                # Check that, if the outcome is a non-self-loop, then the
+                # refresher_exploration_id is None.
+                if (default_outcome.refresher_exploration_id is not None and
+                        default_outcome.dest != state_name):
+                    raise utils.ValidationError(
+                        'The default outcome for state %s has a refresher '
+                        'exploration ID, but is not a self-loop.' % state_name)
 
             for group in interaction.answer_groups:
                 # Check group destinations.
@@ -2006,6 +2019,15 @@ class Exploration(object):
                     raise utils.ValidationError(
                         'The destination %s is not a valid state.'
                         % group.outcome.dest)
+
+                # Check that, if the outcome is a non-self-loop, then the
+                # refresher_exploration_id is None.
+                if (group.outcome.refresher_exploration_id is not None and
+                        group.outcome.dest != state_name):
+                    raise utils.ValidationError(
+                        'The outcome for an answer group in state %s has a '
+                        'refresher exploration ID, but is not a self-loop.'
+                        % state_name)
 
                 for param_change in group.outcome.param_changes:
                     if param_change.name not in self.param_specs:
@@ -2955,6 +2977,29 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v15_dict_to_v16_dict(cls, states_dict):
+        """Converts from version 15 to 16. Version 16 adds a
+        refresher_exploration_id field to each outcome.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['outcome']['refresher_exploration_id'] = None
+
+            if state_dict['interaction']['default_outcome'] is not None:
+                default_outcome = state_dict['interaction']['default_outcome']
+                default_outcome['refresher_exploration_id'] = None
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -2985,7 +3030,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 20
+    CURRENT_EXP_SCHEMA_VERSION = 21
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3385,6 +3430,21 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v20_dict_to_v21_dict(cls, exploration_dict):
+        """ Converts a v20 exploration dict into a v21 exploration dict.
+
+        Adds a refresher_exploration_id field to each answer group outcome, and
+        to the default outcome (if it exists).
+        """
+        exploration_dict['schema_version'] = 21
+
+        exploration_dict['states'] = cls._convert_states_v15_dict_to_v16_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 16
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3515,6 +3575,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v19_dict_to_v20_dict(
                 exploration_dict)
             exploration_schema_version = 20
+
+        if exploration_schema_version == 20:
+            exploration_dict = cls._convert_v20_dict_to_v21_dict(
+                exploration_dict)
+            exploration_schema_version = 21
 
         return (exploration_dict, initial_schema_version)
 
