@@ -16,7 +16,7 @@
     can-edit-edge-weight="canEditEdgeWeight"
     interaction-is-active="interactionIsActive">
   </graph-viz>
-  <md-button class="md-raised" ng-click="submitGraph()" ng-disabled="!interactionIsActive" translate="I18N_INTERACTIONS_GRAPH_SUBMIT_BUTTON"></md-button>
+  <md-button class="md-raised" ng-if="!isSubmitHidden()" ng-click="submitGraph()" ng-disabled="!interactionIsActive" translate="I18N_INTERACTIONS_SUBMIT"></md-button>
   <md-button class="md-raised" ng-click="resetGraph()" ng-disabled="!interactionIsActive" translate="I18N_INTERACTIONS_GRAPH_RESET_BUTTON"></md-button>
   <span ng-show="errorMessage" style="color: red; margin-left: 30px;" aria-live="assertive">
     <[errorMessage | translate]>
