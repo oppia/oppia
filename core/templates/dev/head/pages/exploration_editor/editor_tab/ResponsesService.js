@@ -168,20 +168,22 @@ oppia.factory('ResponsesService', [
         if (AnswerGroupsCacheService.contains(newInteractionId)) {
           _answerGroups = AnswerGroupsCacheService.get(newInteractionId);
         } else {
-          // Preserve the default outcome unless the interaction is terminal.
-          // Recreate the default outcome if switching away from a terminal
-          // interaction.
           _answerGroups = [];
-          _confirmedUnclassifiedAnswers = [];
-          if (newInteractionId) {
-            if (INTERACTION_SPECS[newInteractionId].is_terminal) {
-              _defaultOutcome = null;
-            } else if (!_defaultOutcome) {
-              _defaultOutcome = OutcomeObjectFactory.createNew(
-                EditorStateService.getActiveStateName(), '', []);
-            }
+        }
+
+        // Preserve the default outcome unless the interaction is terminal.
+        // Recreate the default outcome if switching away from a terminal
+        // interaction.
+        if (newInteractionId) {
+          if (INTERACTION_SPECS[newInteractionId].is_terminal) {
+            _defaultOutcome = null;
+          } else if (!_defaultOutcome) {
+            _defaultOutcome = OutcomeObjectFactory.createNew(
+              EditorStateService.getActiveStateName(), '', []);
           }
         }
+
+        _confirmedUnclassifiedAnswers = [];
 
         _saveAnswerGroups(_answerGroups);
         _saveDefaultOutcome(_defaultOutcome);

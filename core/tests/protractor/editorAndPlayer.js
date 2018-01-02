@@ -302,6 +302,7 @@ describe('Full exploration editor', function() {
       editor.addResponse(
         'TextInput', forms.toRichText('Happy!'), null, false, 'Equals',
         'happy');
+      editor.setInteraction('EndExploration');
       users.logout();
     });
   });
