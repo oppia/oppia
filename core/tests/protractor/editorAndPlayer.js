@@ -31,6 +31,56 @@ describe('Full exploration editor', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
+  it('should redirect back to parent exploration correctly when parent id is ' +
+      'given as query parameter', function() {
+    users.createUser('user1@editorAndPlayer.com', 'user1EditorAndPlayer');
+    users.login('user1@editorAndPlayer.com');
+
+    workflow.createAndPublishExploration(
+      'Parent Exploration 1',
+      'Algebra',
+      'This is the topmost parent exploration.');
+    general.getExplorationIdFromEditor().then(function(explorationId) {
+      var parentId1 = explorationId;
+
+      workflow.createAndPublishExploration(
+        'Parent Exploration 2',
+        'Algebra',
+        'This is the second parent exploration to which refresher ' +
+        'exploration redirects.');
+      general.getExplorationIdFromEditor().then(function(explorationId) {
+        var parentId2 = explorationId;
+
+        workflow.createAndPublishExploration(
+          'Refresher Exploration',
+          'Algebra',
+          'This is the most basic refresher exploration');
+        general.getExplorationIdFromEditor().then(function(explorationId) {
+          var refresherExplorationId = explorationId;
+
+          browser.get('/explore/' + refresherExplorationId + '?parent=' +
+            parentId1 + '&parent=' + parentId2);
+          browser.waitForAngular();
+
+          explorationPlayerPage.clickOnSummaryTileAtEnd();
+
+          browser.getCurrentUrl().then(function(url) {
+            var currentExplorationId = url.split('/')[4].split('?')[0];
+            expect(currentExplorationId).toBe(parentId2);
+          });
+
+          explorationPlayerPage.clickOnSummaryTileAtEnd();
+
+          browser.getCurrentUrl().then(function(url) {
+            currentExplorationId = url.split('/')[4];
+            expect(currentExplorationId).toBe(parentId1);
+          });
+        });
+      });
+    });
+    users.logout();
+  });
+
   it('should navigate multiple states correctly, with parameters', function() {
     users.createUser('user4@editorAndPlayer.com', 'user4EditorAndPlayer');
     users.login('user4@editorAndPlayer.com');
