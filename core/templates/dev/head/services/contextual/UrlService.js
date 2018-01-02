@@ -65,10 +65,10 @@ oppia.factory('UrlService', ['$window', function($window) {
       return fieldValues;
     },
     addField: function(url, fieldName, fieldValue) {
-      fieldValue = encodeURIComponent(fieldValue);
-      fieldName = encodeURIComponent(fieldName);
-      return url + (url.indexOf('?') != -1 ? '&' : '?') + fieldName + '=' +
-        fieldValue;
+      encodedFieldValue = encodeURIComponent(fieldValue);
+      encodedFieldName = encodeURIComponent(fieldName);
+      return url + (url.indexOf('?') != -1 ? '&' : '?') + encodedFieldName +
+        '=' + encodedFieldValue;
     },
     getHash: function() {
       return this.getCurrentLocation().hash;

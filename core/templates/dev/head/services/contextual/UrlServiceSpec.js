@@ -64,17 +64,17 @@ describe('Url Service', function() {
       var queryValue = '&value=1?';
       var queryField = 'field 1';
       var baseUrl = '/sample';
+      var encodedQueryField = encodeURIComponent(queryField);
+      var encodedQueryValue = encodeURIComponent(queryValue);
       expect(
         UrlService.addField(baseUrl, queryField, queryValue)).toBe(
-          baseUrl + '?' + encodeURIComponent(queryField) + '=' +
-          encodeURIComponent(queryValue)
+          baseUrl + '?' + encodedQueryField + '=' + encodedQueryValue
       );
 
       baseUrl = '/sample?field=value';
       expect(
         UrlService.addField(baseUrl, queryField, queryValue)).toBe(
-          baseUrl + '&' + encodeURIComponent(queryField) + '=' +
-          encodeURIComponent(queryValue)
+          baseUrl + '&' + encodedQueryField + '=' + encodedQueryValue
       );
     });
 

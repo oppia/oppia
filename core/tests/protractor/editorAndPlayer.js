@@ -26,11 +26,6 @@ var ExplorationPlayerPage =
 
 describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
-  var parentId2 = null;
-  var refresherExplorationId = null;
-  var currentExplorationId = null;
-  var pathname = null;
-  var parentId1 = null;
 
   beforeAll(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
@@ -46,7 +41,7 @@ describe('Full exploration editor', function() {
       'Algebra',
       'This is the topmost parent exploration.');
     general.getExplorationIdFromEditor().then(function(explorationId) {
-      parentId1 = explorationId;
+      var parentId1 = explorationId;
 
       workflow.createAndPublishExploration(
         'Parent Exploration 2',
@@ -54,14 +49,14 @@ describe('Full exploration editor', function() {
         'This is the second parent exploration to which refresher ' +
         'exploration redirects.');
       general.getExplorationIdFromEditor().then(function(explorationId) {
-        parentId2 = explorationId;
+        var parentId2 = explorationId;
 
         workflow.createAndPublishExploration(
           'Refresher Exploration',
           'Algebra',
           'This is the most basic refresher exploration');
         general.getExplorationIdFromEditor().then(function(explorationId) {
-          refresherExplorationId = explorationId;
+          var refresherExplorationId = explorationId;
 
           browser.get('/explore/' + refresherExplorationId + '?parent=' +
             parentId1 + '&parent=' + parentId2);
@@ -70,7 +65,7 @@ describe('Full exploration editor', function() {
           explorationPlayerPage.clickOnSummaryTileAtEnd();
 
           browser.getCurrentUrl().then(function(url) {
-            currentExplorationId = url.split('/')[4].split('?')[0];
+            var currentExplorationId = url.split('/')[4].split('?')[0];
             expect(currentExplorationId).toBe(parentId2);
           });
 
