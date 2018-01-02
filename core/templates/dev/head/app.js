@@ -71,6 +71,12 @@ oppia.constant('FATAL_ERROR_CODES', [400, 401, 404, 500]);
 
 oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
 
+// Do not modify these, for backwards-compatibility reasons.
+oppia.constant('COMPONENT_NAME_CONTENT', 'content');
+oppia.constant('COMPONENT_NAME_HINT', 'hint');
+oppia.constant('COMPONENT_NAME_SOLUTION', 'solution');
+oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
+
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [

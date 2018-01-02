@@ -22,7 +22,7 @@ oppia.controller('HistoryTab', [
   'VersionTreeService', 'CompareVersionsService',
   'DateTimeFormatService', 'UrlInterpolationService',
   function(
-      $scope, $http, $rootScope, $log, 
+      $scope, $http, $rootScope, $log,
       $uibModal, ExplorationDataService,
       VersionTreeService, CompareVersionsService,
       DateTimeFormatService, UrlInterpolationService) {
@@ -53,6 +53,10 @@ oppia.controller('HistoryTab', [
     var explorationSnapshots = null;
     var versionTreeParents = null;
     var nodesData = null;
+    var currentPage = 0;
+    $scope.displayedCurrentPageNumber = currentPage + 1;
+    $scope.versionNumbersToDisplay = [];
+    $scope.VERSIONS_PER_PAGE = 30;
 
     $scope.$on('refreshVersionHistory', function(evt, data) {
       // Uncheck all checkboxes when page is refreshed
@@ -135,7 +139,7 @@ oppia.controller('HistoryTab', [
           // when history is refreshed.
           $scope.versionCheckboxArray = [];
           $scope.explorationVersionMetadata = {};
-          var lowestVersionIndex = Math.max(0, currentVersion - 30);
+          var lowestVersionIndex = 0;
           for (var i = currentVersion - 1; i >= lowestVersionIndex; i--) {
             var versionNumber = explorationSnapshots[i].version_number;
             $scope.explorationVersionMetadata[versionNumber] = {
@@ -152,6 +156,7 @@ oppia.controller('HistoryTab', [
             });
           }
           $rootScope.loadingMessage = '';
+          $scope.computeVersionsToDisplay();
         });
       });
     };
@@ -258,6 +263,18 @@ oppia.controller('HistoryTab', [
           location.reload();
         });
       });
+    };
+
+    $scope.computeVersionsToDisplay = function() {
+      currentPage = $scope.displayedCurrentPageNumber - 1;
+      var begin = (currentPage * $scope.VERSIONS_PER_PAGE);
+      var end = Math.min(
+        begin + $scope.VERSIONS_PER_PAGE, $scope.versionCheckboxArray.length);
+      $scope.versionNumbersToDisplay = [];
+      for (var i = begin; i < end; i++) {
+        $scope.versionNumbersToDisplay.push(
+          $scope.versionCheckboxArray[i].vnum);
+      }
     };
   }
 ]);
