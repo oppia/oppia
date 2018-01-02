@@ -875,24 +875,6 @@ class ExplorationStatsModel(base_models.BaseModel):
             exploration_stats_models.append(stats_instance)
         cls.put_multi(exploration_stats_models)
 
-    def to_dict(self):
-        """Creates a dict representation of the ExplorationStatsModel.
-
-        Returns:
-            dict. A dictionary representation on the ExplorationStatsModel.
-            Each key is an attribute of the model.
-        """
-        return {'exp_id': self.exp_id,
-                'exp_version': self.exp_version,
-                'num_starts_v1': self.num_starts_v1,
-                'num_starts_v2': self.num_starts_v2,
-                'num_actual_starts_v1': self.num_actual_starts_v1,
-                'num_actual_starts_v2': self.num_actual_starts_v2,
-                'num_completions_v1': self.num_completions_v1,
-                'num_completions_v2': self.num_completions_v2,
-                'state_stats_mapping': self.state_stats_mapping
-               }
-
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
