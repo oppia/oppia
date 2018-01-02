@@ -23,8 +23,8 @@ oppia.directive('oppiaInteractiveFractionInput', [
         setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-      '/interactions/FractionInput/directives/' +
-      'fraction_input_interaction_directive.html'),
+        '/interactions/FractionInput/directives/' +
+        'fraction_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'FocusManagerService',
         'fractionInputRulesService',
