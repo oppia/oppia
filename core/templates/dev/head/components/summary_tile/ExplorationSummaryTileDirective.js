@@ -137,8 +137,8 @@ oppia.directive('explorationSummaryTile', [
               if ($scope.getParentExplorationIds()) {
                 var parentExplorationIds = $scope.getParentExplorationIds();
                 for (var i = 0; i < parentExplorationIds.length - 1; i++ ) {
-                  result = UrlService.addField(result, 'parent',
-                    parentExplorationIds[i]);
+                  result = UrlService.addField(
+                    result, 'parent', parentExplorationIds[i]);
                 }
                 return result;
               }

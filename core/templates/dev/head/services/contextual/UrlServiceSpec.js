@@ -30,17 +30,8 @@ describe('Url Service', function() {
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
     UrlService = $injector.get('UrlService');
-    spyOn(UrlService, 'queryUrlParams').and.returnValue(window);
+    spyOn(UrlService, 'getCurrentLocation').and.returnValue(window);
   }));
-
-  it('should correctly get query values as a single object', function() {
-    window.href = 'http://' + pathname + '?field1=value1&field2=value2';
-    var expectedObject = {
-      field1: 'value1',
-      field2: 'value2'
-    };
-    expect(UrlService.getUrlParams()).toEqual(expectedObject);
-  });
 
   it('should add query fields and return correct object after decoding it',
     function() {
@@ -67,22 +58,41 @@ describe('Url Service', function() {
         UrlService.getQueryFieldValuesAsList('field2')).toEqual(expectedList);
     });
 
-  it('should correctly get parameter list based on key value', function() {
-    var expectedList = ['parent1', 'parent2'];
-    window.href = 'http://' + pathname + queryString;
-    expect(
-      UrlService.getQueryFieldValuesAsList('parent')).toEqual(expectedList);
-    window.href = 'http://' + pathname;
-    expect(UrlService.getQueryFieldValuesAsList('parent')).toEqual([]);
-  });
+  it('should correctly encode and encode special characters in URI',
+    function() {
+      window.href = 'http://' + pathname;
+      var expectedObject = {
+        field1: '?value=1'
+      };
+      window.href = UrlService.addField(window.href, 'field1', '?value=1');
+      expect(UrlService.getUrlParams()).toEqual(expectedObject);
+      window.href = UrlService.addField(window.href, 'field2', '?value&1');
+      expectedObject = {
+        field1: '?value=1',
+        field2: '?value&1'
+      };
+      expect(UrlService.getUrlParams()).toEqual(expectedObject);
+      window.href = UrlService.addField(window.href, 'field2','=&?value 1');
+      var expectedList = ['?value&1','=&?value 1'];
+      expect(
+        UrlService.getQueryFieldValuesAsList('field2')).toEqual(expectedList);
+    });
+
+  it('should correctly get empty array when parameter list is empty',
+    function() {
+      window.href = 'http://' + pathname;
+      expect(UrlService.getQueryFieldValuesAsList('parent')).toEqual([]);
+    });
 
   it('should correctly add parameter values to url', function() {
-    expect(UrlService.addField('/sample', 'parent', 'parent1')).toBe(
-      '/sample?parent=parent1'
+    expect(
+      UrlService.addField('/sample', 'field1', 'value')).toBe(
+      '/sample?field1=value'
     );
-    expect(UrlService.addField(
-      '/sample?parent=parent1', 'parent', 'parent2')).toBe(
-      '/sample?parent=parent1&parent=parent2'
+    expect(
+      UrlService.addField(
+        '/sample?field1=value', 'field2', 'value')).toBe(
+          '/sample?field1=value&field2=value'
     );
   });
 

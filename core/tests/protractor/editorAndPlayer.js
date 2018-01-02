@@ -49,7 +49,7 @@ describe('Full exploration editor', function() {
       parentId1 = explorationId;
 
       workflow.createAndPublishExploration(
-        'Parent Exploration 1',
+        'Parent Exploration 2',
         'Algebra',
         'This is the second parent exploration to which refresher ' +
         'exploration redirects.');
@@ -67,9 +67,6 @@ describe('Full exploration editor', function() {
             parentId1 + '&parent=' + parentId2);
           browser.waitForAngular();
 
-          /* The summary tile for redirection has to be scrolled down in the
-             chrome window to be in view of the automated test,
-             hence the scrollTo. */
           explorationPlayerPage.clickOnSummaryTileAtEnd();
 
           browser.getCurrentUrl().then(function(url) {

@@ -438,18 +438,18 @@ oppia.directive('conversationSkin', [
             if (ExplorationPlayerStateService.isStateTerminal(stateName)) {
               $scope.parentExplorationIds =
                 UrlService.getQueryFieldValuesAsList('parent');
-              var recommendedExploration = [];
+              var recommendedExplorationIds = [];
               if ($scope.parentExplorationIds.length > 0) {
                 var parentExplorationId = $scope.parentExplorationIds[
                   $scope.parentExplorationIds.length - 1];
-                recommendedExploration.push(parentExplorationId);
+                recommendedExplorationIds.push(parentExplorationId);
               } else {
-                recommendedExploration =
+                recommendedExplorationIds =
                   ExplorationPlayerStateService.getAuthorRecommendedExpIds(
                     stateName);
               }
               ExplorationRecommendationsService.getRecommendedSummaryDicts(
-                recommendedExploration,
+                recommendedExplorationIds,
                 function(summaries) {
                   $scope.recommendedExplorationSummaries = summaries;
                 });

@@ -236,7 +236,8 @@ oppia.controller('CollectionPlayer', [
 
     $http.get('/collectionsummarieshandler/data', {
       params: {
-        stringified_collection_ids: JSON.stringify([$scope.collectionId])
+        stringified_collection_ids: JSON.stringify(
+          [decodeURIComponent($scope.collectionId)])
       }
     }).then(
       function(response) {

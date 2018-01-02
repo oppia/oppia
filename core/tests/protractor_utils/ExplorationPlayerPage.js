@@ -75,6 +75,9 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickOnSummaryTileAtEnd = function() {
+    /* The summary tile for redirection has to be scrolled down in the
+       chrome window to be in view of the automated test,
+       hence the scrollTo. */
     browser.executeScript('window.scrollTo(571,700);').then(function() {
       explorationSummaryTile.click();
     });

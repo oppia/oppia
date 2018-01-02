@@ -20,17 +20,20 @@
 oppia.factory('UrlService', ['$window', function($window) {
   return {
     // This function is for testing purposes (to mock $window.location)
-    queryUrlParams: function() {
+    getCurrentLocation: function() {
       return $window.location;
+    },
+    getCurrentHref: function() {
+      return this.getCurrentLocation().href;
     },
     /* As params[key] is overwritten, if query string has multiple fieldValues
        for same fieldName, use getQueryFieldValuesAsList(fieldName) to get it
        in array form. */
     getUrlParams: function() {
       var params = {};
-      var parts = this.queryUrlParams().href.replace(
+      var parts = this.getCurrentHref().replace(
         /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-          params[key] = value;
+          params[decodeURIComponent(key)] = decodeURIComponent(value);
         }
       );
       return params;
@@ -41,16 +44,19 @@ oppia.factory('UrlService', ['$window', function($window) {
       return urlParts[1] === 'embed';
     },
     getPathname: function() {
-      return this.queryUrlParams().pathname;
+      return this.getCurrentLocation().pathname;
     },
     getQueryFieldValuesAsList: function(fieldName) {
       var fieldValues = [];
-      if (this.queryUrlParams().href.indexOf('?') > -1) {
-        var url = this.queryUrlParams().href.slice(
-          this.queryUrlParams().href.indexOf('?') + 1).split('&');
-        for (var i = 0; i < url.length; i++) {
-          var currentFieldName = url[i].split('=')[0];
-          var currentFieldValue = url[i].split('=')[1];
+      if (this.getCurrentHref().indexOf('?') > -1) {
+        // Each queryItem return one field-value pair in the url.
+        var queryItems = this.getCurrentHref().slice(
+          this.getCurrentHref().indexOf('?') + 1).split('&');
+        for (var i = 0; i < queryItems.length; i++) {
+          var currentFieldName = decodeURIComponent(
+            queryItems[i].split('=')[0]);
+          var currentFieldValue = decodeURIComponent(
+            queryItems[i].split('=')[1]);
           if (currentFieldName === fieldName) {
             fieldValues.push(currentFieldValue);
           }
@@ -59,11 +65,13 @@ oppia.factory('UrlService', ['$window', function($window) {
       return fieldValues;
     },
     addField: function(url, fieldName, fieldValue) {
+      fieldValue = encodeURIComponent(fieldValue);
+      fieldName = encodeURIComponent(fieldName);
       return url + (url.indexOf('?') != -1 ? '&' : '?') + fieldName + '=' +
         fieldValue;
     },
     getHash: function() {
-      return this.queryUrlParams().hash;
+      return this.getCurrentLocation().hash;
     }
   };
 }]);
