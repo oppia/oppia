@@ -51,6 +51,7 @@ Note that the root folder MUST be named 'oppia'.
 # pylint: disable=wrong-import-order
 import argparse
 import fnmatch
+import isort
 import multiprocessing
 import os
 import re
@@ -631,6 +632,20 @@ def _check_bad_patterns(all_files):
         print summary_message
 
     return summary_messages
+
+
+def _check_import_order(all_files):
+    """This function is used to check that each file
+    has imports placed in alphabetical order.
+    """
+    print 'Starting import-order checks'
+    print '----------------------------------------'
+    all_files = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+    for filename in all_files:
+        isort.SortImports(filename, check=True)
+    print '----------------------------------------'
 
 
 def main():
