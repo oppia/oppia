@@ -15,14 +15,14 @@
 </form>
 
 <div uib-dropdown class="navbar-left oppia-navbar-button-container oppia-search-bar-category-selector protractor-test-search-bar-category-selector">
-  <button uib-dropdown-toggle type="button" class="btn uib-dropdown-toggle oppia-search-bar-input ng-cloak"
+  <button uib-dropdown-toggle type="button" class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input ng-cloak"
           title="<[selectionDetails.categories.description | translate]>"
           style="max-width: 130px;">
     <[categoryButtonText|truncate:14]>
     <span class="caret"></span>
   </button>
   <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
-  <ul uib-dropdown-menu class="uib-dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
+  <ul uib-dropdown-menu class="protractor-test-search-bar-dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
     <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
         ng-if="selectionDetails.categories.selections[item.id]">
       <a href ng-click="toggleSelection('categories', item.id)">
@@ -45,14 +45,14 @@
 </div>
 
 <div uib-dropdown class="navbar-left oppia-navbar-button-container oppia-search-bar-language-selector protractor-test-search-bar-language-selector">
-  <button uib-dropdown-toggle type="button" class="btn uib-dropdown-toggle oppia-search-bar-input ng-cloak"
+  <button uib-dropdown-toggle type="button" class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input ng-cloak"
           style="border-bottom-right-radius: 4px; border-top-right-radius: 4px; max-width: 130px;"
           title="<[selectionDetails.languageCodes.description | translate]>">
     <[languageButtonText|truncate:14]>
     <span class="caret"></span>
   </button>
   <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
-  <ul uib-dropdown-menu class="uib-dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
+  <ul uib-dropdown-menu class="protractor-test-search-bar-dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
     <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
         ng-if="selectionDetails.languageCodes.selections[item.id]">
       <a href ng-click="toggleSelection('languageCodes', item.id)">

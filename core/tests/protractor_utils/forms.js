@@ -258,9 +258,9 @@ var MultiSelectEditor = function(elem) {
   var _toggleElementStatusesAndVerifyExpectedClass = function(
       texts, expectedClassBeforeToggle) {
     // Open the dropdown menu.
-    elem.element(by.css('.uib-dropdown-toggle')).click();
+    elem.element(by.css('.protractor-test-search-bar-dropdown-toggle')).click();
 
-    elem.element(by.css('.uib-dropdown-menu')).all(by.tagName('span')).filter(
+    elem.element(by.css('.protractor-test-search-bar-dropdown-menu')).all(by.tagName('span')).filter(
       function(choiceElem) {
         return choiceElem.getText().then(function(choiceText) {
           return texts.indexOf(choiceText) !== -1;
@@ -281,7 +281,7 @@ var MultiSelectEditor = function(elem) {
       }
 
       // Close the dropdown menu at the end.
-      elem.element(by.css('.uib-dropdown-toggle')).click();
+      elem.element(by.css('.protractor-test-search-bar-dropdown-toggle')).click();
     });
   };
 
@@ -296,17 +296,17 @@ var MultiSelectEditor = function(elem) {
     },
     expectCurrentSelectionToBe: function(expectedCurrentSelection) {
       // Open the dropdown menu.
-      elem.element(by.css('.uib-dropdown-toggle')).click();
+      elem.element(by.css('.protractor-test-search-bar-dropdown-toggle')).click();
 
       // Find the selected elements.
-      elem.element(by.css('.uib-dropdown-menu'))
+      elem.element(by.css('.protractor-test-search-bar-dropdown-menu'))
         .all(by.css('.protractor-test-selected')).map(function(selectedElem) {
           return selectedElem.getText();
         }).then(function(actualSelection) {
           expect(actualSelection).toEqual(expectedCurrentSelection);
 
           // Close the dropdown menu at the end.
-          elem.element(by.css('.uib-dropdown-toggle')).click();
+          elem.element(by.css('.protractor-test-search-bar-dropdown-toggle')).click();
         }
       );
     }
