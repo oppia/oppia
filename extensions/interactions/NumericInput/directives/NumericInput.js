@@ -24,7 +24,8 @@ oppia.directive('oppiaInteractiveNumericInput', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        setAnswerValidity: '&' // Must call whenever the answer changes.
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumericInput/directives/' +

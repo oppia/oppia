@@ -20,7 +20,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
       restrict: 'E',
       scope: {
         onSubmit: '&',
-        getLastAnswer: '&lastAnswer'
+        getLastAnswer: '&lastAnswer',
+        setAnswerValidity: '&' // Must call whenever the answer changes.
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/LogicProof/directives/' +

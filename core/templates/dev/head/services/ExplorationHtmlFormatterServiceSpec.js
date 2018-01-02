@@ -21,6 +21,14 @@ describe('Exploration Html Formatter Service', function() {
   beforeEach(module('oppia'));
   var ehfs = null;
 
+  beforeEach(module(function($provide) {
+    $provide.constant('INTERACTION_SPECS', {
+      sampleId: {
+        show_nav_submit_button: true
+      },
+    });
+  }));
+
   beforeEach(inject(function($injector) {
     ehfs = $injector.get('ExplorationHtmlFormatterService');
   }));

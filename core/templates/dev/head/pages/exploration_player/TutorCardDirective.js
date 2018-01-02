@@ -188,7 +188,7 @@ oppia.directive('tutorCard', [
             $scope.onChangeInteractionAnswerValidity({
               answerValidity: answerValidity
             });
-          }
+          };
 
           $scope.isContentAudioTranslationAvailable = function() {
             return ExplorationPlayerService.isContentAudioTranslationAvailable(

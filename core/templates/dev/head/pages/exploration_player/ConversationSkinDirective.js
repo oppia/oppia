@@ -783,10 +783,14 @@ oppia.directive('conversationSkin', [
               $scope.explorationId);
           };
 
+          // Interaction answer validity is used to enable/disable 
+          // the progress-nav's Submit button. This logic is here because
+          // Interactions and the progress-nav are both descendants
+          // of ConversationSkinDirective.
           $scope.interactionAnswerIsValid = true;
           $scope.setInteractionAnswerValidity = function(answerValidity) {
             $scope.interactionAnswerIsValid = answerValidity;
-          }
+          };
 
           $scope.submitAnswerFromProgressNav = function() {
             $scope.$broadcast(EVENT_PROGRESS_NAV_SUBMITTED);

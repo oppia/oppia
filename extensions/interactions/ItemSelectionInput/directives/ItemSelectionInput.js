@@ -30,7 +30,7 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
       restrict: 'E',
       scope: {
         onSubmit: '&',
-        setAnswerValidity: '&'
+        setAnswerValidity: '&' // Must call whenever the answer changes.
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ItemSelectionInput/directives/' +

@@ -91,7 +91,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
       restrict: 'E',
       scope: {
         onSubmit: '&',
-        getLastAnswer: '&lastAnswer'
+        getLastAnswer: '&lastAnswer',
+        setAnswerValidity: '&' // Must call whenever the answer changes.
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MusicNotesInput/directives/' +

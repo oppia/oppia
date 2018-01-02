@@ -25,7 +25,8 @@ oppia.directive('oppiaInteractiveTextInput', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        setAnswerValidity: '&' // Must call whenever the answer changes.
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/TextInput/directives/' +
@@ -75,6 +76,14 @@ oppia.directive('oppiaInteractiveTextInput', [
 
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
             $scope.submitAnswer($scope.answer);
+          });
+
+          $scope.$watch(function() {
+            return $scope.answer;
+          }, function(answer) {
+            $scope.setAnswerValidity({
+              answerValidity: (answer.length > 0)
+            });
           });
         }
       ]
