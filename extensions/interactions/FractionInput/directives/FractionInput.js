@@ -19,11 +19,12 @@ oppia.directive('oppiaInteractiveFractionInput', [
       restrict: 'E',
       scope: {
         onSubmit: '&',
-        setAnswerValidity: '&' // Must call whenever the answer changes.
+        // This should be called whenever the answer changes.
+        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/FractionInput/directives/' +
-        'fraction_input_interaction_directive.html'),
+      '/interactions/FractionInput/directives/' +
+      'fraction_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'FocusManagerService',
         'fractionInputRulesService',

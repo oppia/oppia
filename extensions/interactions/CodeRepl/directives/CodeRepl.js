@@ -30,7 +30,8 @@ oppia.directive('oppiaInteractiveCodeRepl', [
       scope: {
         onSubmit: '&',
         getLastAnswer: '&lastAnswer',
-        setAnswerValidity: '&' // Must call whenever the answer changes.
+        // Must call whenever the answer changes.
+        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/CodeRepl/directives/' +
