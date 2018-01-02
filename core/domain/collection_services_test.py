@@ -41,6 +41,40 @@ def _count_at_least_editable_collection_summaries(user_id):
         collection_models.CollectionSummaryModel.get_at_least_editable(
             user_id=user_id)))
 
+def _get_node_change_list(exploration_id, property_name, new_value):
+    """Generates a change list for a single collection node change."""
+    return [{
+        'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+        'exploration_id': exploration_id,
+        'property_name': property_name,
+        'new_value': new_value
+    }]
+
+
+def _get_collection_change_list(property_name, new_value):
+    """Generates a change list for a single collection property change."""
+    return [{
+        'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+        'property_name': property_name,
+        'new_value': new_value
+    }]
+
+
+def _get_added_exploration_change_list(exploration_id):
+    """Generates a change list for adding an exploration to a collection."""
+    return [{
+        'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+        'exploration_id': exploration_id
+    }]
+
+
+def _get_deleted_exploration_change_list(exploration_id):
+    """Generates a change list for deleting an exploration from a collection."""
+    return [{
+        'cmd': collection_domain.CMD_DELETE_COLLECTION_NODE,
+        'exploration_id': exploration_id
+    }]
+
 
 class CollectionServicesUnitTests(test_utils.GenericTestBase):
     """Test the collection services module."""
@@ -191,10 +225,9 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         for exp_id in [self.EXP_ID_1, self.EXP_ID_2]:
             self.save_new_valid_exploration(exp_id, self.owner_id)
             collection_services.update_collection(
-                self.owner_id, self.COL_ID_0, [{
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': exp_id
-                }], 'Added new exploration')
+                self.owner_id, self.COL_ID_0,
+                _get_added_exploration_change_list(exp_id),
+                'Added new exploration')
 
     def test_get_completed_exploration_ids(self):
         # There should be no exception if the user or collection do not exist;
@@ -256,7 +289,7 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         # suggested.
         self.assertEqual(
             collection_services.get_next_exploration_ids_to_complete_by_user(
-                'Fake', self.COL_ID_0), [self.EXP_ID_0, self.EXP_ID_1])
+                'Fake', self.COL_ID_0), [self.EXP_ID_0])
 
         # There should be an exception if the collection does not exist.
         with self.assertRaises(Exception):
@@ -268,10 +301,10 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         self.assertEqual(
             collection_services.get_collection_by_id(
                 self.COL_ID_0).init_exploration_ids,
-            [self.EXP_ID_0, self.EXP_ID_1])
+            [self.EXP_ID_0])
         self.assertEqual(
             collection_services.get_next_exploration_ids_to_complete_by_user(
-                self.owner_id, self.COL_ID_0), [self.EXP_ID_0, self.EXP_ID_1])
+                self.owner_id, self.COL_ID_0), [self.EXP_ID_0])
 
         # If the user completes the first exploration, a new one should be
         # recommended and the old one should no longer be recommended.
@@ -773,10 +806,9 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         new_exp_id = 'new_exploration_id'
         self.save_new_valid_exploration(new_exp_id, self.owner_id)
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                'exploration_id': new_exp_id
-            }], 'Added new exploration')
+            self.owner_id, self.COLLECTION_ID,
+            _get_added_exploration_change_list(new_exp_id),
+            'Added new exploration')
 
         # Verify the new exploration was added.
         collection = collection_services.get_collection_by_id(
@@ -790,10 +822,9 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
             utils.ValidationError,
             'Expected collection to only reference valid explorations'):
             collection_services.update_collection(
-                self.owner_id, self.COLLECTION_ID, [{
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': non_existent_exp_id
-                }], 'Added non-existent exploration')
+                self.owner_id, self.COLLECTION_ID,
+                _get_added_exploration_change_list(non_existent_exp_id),
+                'Added non-existent exploration')
 
     def test_add_node_with_private_exploration_in_public_collection(self):
         """Ensures public collections cannot reference private explorations."""
@@ -810,10 +841,9 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
             'Cannot reference a private exploration within a public '
             'collection'):
             collection_services.update_collection(
-                self.owner_id, self.COLLECTION_ID, [{
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                    'exploration_id': private_exp_id
-                }], 'Added private exploration')
+                self.owner_id, self.COLLECTION_ID,
+                _get_added_exploration_change_list(private_exp_id),
+                'Added private exploration')
 
     def test_add_node_with_public_exploration_in_private_collection(self):
         """Ensures private collections can reference public and private
@@ -832,13 +862,13 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         # No exception should be raised for either insertion.
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                'exploration_id': public_exp_id
-            }, {
-                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-                'exploration_id': private_exp_id
-            }], 'Added public and private explorations')
+            self.owner_id, self.COLLECTION_ID,
+            _get_added_exploration_change_list(public_exp_id),
+            'Added public exploration')
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID,
+            _get_added_exploration_change_list(private_exp_id),
+            'Added private exploration')
 
     def test_delete_node(self):
         # Verify the initial collection only has 1 exploration in it.
@@ -847,10 +877,9 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertEqual(collection.exploration_ids, [self.EXPLORATION_ID])
 
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_DELETE_COLLECTION_NODE,
-                'exploration_id': self.EXPLORATION_ID,
-            }], 'Deleted exploration')
+            self.owner_id, self.COLLECTION_ID,
+            _get_deleted_exploration_change_list(self.EXPLORATION_ID),
+            'Deleted exploration')
 
         # Verify the exploration was deleted (the collection is now empty).
         collection = collection_services.get_collection_by_id(
@@ -865,11 +894,9 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         # Update the title.
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'Some new title'
-            }], 'Changed the title')
+            self.owner_id, self.COLLECTION_ID,
+            _get_collection_change_list('title', 'Some new title'),
+            'Changed the title')
 
         # Verify the title is different.
         collection = collection_services.get_collection_by_id(
@@ -884,11 +911,9 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         # Update the category.
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                'property_name': 'category',
-                'new_value': 'Some new category'
-            }], 'Changed the category')
+            self.owner_id, self.COLLECTION_ID,
+            _get_collection_change_list('category', 'Some new category'),
+            'Changed the category')
 
         # Verify the category is different.
         collection = collection_services.get_collection_by_id(
@@ -903,11 +928,9 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         # Update the objective.
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                'property_name': 'objective',
-                'new_value': 'Some new objective'
-            }], 'Changed the objective')
+            self.owner_id, self.COLLECTION_ID,
+            _get_collection_change_list('objective', 'Some new objective'),
+            'Changed the objective')
 
         # Verify the objective is different.
         collection = collection_services.get_collection_by_id(
@@ -922,11 +945,9 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         # Update the language code.
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                'property_name': 'language_code',
-                'new_value': 'fi'
-            }], 'Changed the language to Finnish')
+            self.owner_id, self.COLLECTION_ID,
+            _get_collection_change_list('language_code', 'fi'),
+            'Changed the language to Finnish')
 
         # Verify the language is different.
         collection = collection_services.get_collection_by_id(
@@ -941,11 +962,9 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         # Update the tags.
         collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                'property_name': 'tags',
-                'new_value': ['test']
-            }], 'Add a new tag')
+            self.owner_id, self.COLLECTION_ID,
+            _get_collection_change_list('tags', ['test']),
+            'Add a new tag')
 
         # Verify that the tags are different.
         collection = collection_services.get_collection_by_id(
@@ -957,11 +976,9 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
             utils.ValidationError,
             'Expected tags to be unique, but found duplicates'):
             collection_services.update_collection(
-                self.owner_id, self.COLLECTION_ID, [{
-                    'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-                    'property_name': 'tags',
-                    'new_value': ['duplicate', 'duplicate']
-                }], 'Add a new tag')
+                self.owner_id, self.COLLECTION_ID,
+                _get_collection_change_list('tags', ['duplicate', 'duplicate']),
+                'Add a new tag')
 
     def test_add_collection_skill(self):
         # Verify skills table is initially empty.
@@ -1019,10 +1036,22 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
 
     def test_update_collection_node_prerequisite_skill_ids(self):
+
+        # Creating and publishing new exploration
+        new_exploration_id = 'new_exp'
+        self.save_new_valid_exploration(new_exploration_id, self.owner_id)
+        rights_manager.publish_exploration(self.owner, new_exploration_id)
+
+        # Add expxloration
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID,
+            _get_added_exploration_change_list(new_exploration_id),
+            'Add an exploration')
+
         # Verify initial prerequisite skill ids are empty.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        collection_node = collection.get_node(self.EXPLORATION_ID)
+        collection_node = collection.get_node(new_exploration_id)
         self.assertEqual(collection_node.prerequisite_skill_ids, [])
 
         # Add skills
@@ -1037,11 +1066,17 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
                 'name': 'new skill 2'
             }], 'Add a new skill')
 
+
         # Update the prerequisite skills.
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_ID, [{
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
                 'exploration_id': self.EXPLORATION_ID,
+                'property_name': 'acquired_skill_ids',
+                'new_value': ['skill0', 'skill1']
+            }, {
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'exploration_id': new_exploration_id,
                 'property_name': 'prerequisite_skill_ids',
                 'new_value': ['skill0', 'skill1']
             }], 'Changed the prerequisite skill ids of a collection node')
@@ -1049,7 +1084,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         # Verify the prerequisites are different.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
-        collection_node = collection.get_node(self.EXPLORATION_ID)
+        collection_node = collection.get_node(new_exploration_id)
         self.assertEqual(
             collection_node.prerequisite_skill_ids, ['skill0', 'skill1'])
 
@@ -1088,40 +1123,95 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         self.assertEqual(
             collection_node.acquired_skill_ids, ['skill0', 'skill1'])
 
+    def test_sorted_collection_nodes(self):
+        # Creating and publishing explorations
+        self.save_new_valid_exploration('exp_id_0', self.owner_id)
+        self.save_new_valid_exploration('exp_id_1', self.owner_id)
+        self.save_new_valid_exploration('exp_id_2', self.owner_id)
+        rights_manager.publish_exploration(self.owner, 'exp_id_0')
+        rights_manager.publish_exploration(self.owner, 'exp_id_1')
+        rights_manager.publish_exploration(self.owner, 'exp_id_2')
 
-def _get_node_change_list(exploration_id, property_name, new_value):
-    """Generates a change list for a single collection node change."""
-    return [{
-        'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
-        'exploration_id': exploration_id,
-        'property_name': property_name,
-        'new_value': new_value
-    }]
+        # Adding skills to collection
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'skill0'
+            }, {
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'skill1'
+            }, {
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'skill2'
+            }], 'Add 3 skills')
 
+        # Adding expxlorations/nodes in collection
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID,
+            _get_added_exploration_change_list('exp_id_1'),
+            'Add an exploration')
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID,
+            _get_added_exploration_change_list('exp_id_2'),
+            'Add an exploration')
 
-def _get_collection_change_list(property_name, new_value):
-    """Generates a change list for a single collection property change."""
-    return [{
-        'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-        'property_name': property_name,
-        'new_value': new_value
-    }]
+        # Add prerequisite and acquired skill ids in nodes
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'exploration_id': 'exp_id_0',
+                'property_name': 'acquired_skill_ids',
+                'new_value': ['skill0']
+            }, {
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'exploration_id': 'exp_id_0',
+                'property_name': 'prerequisite_skill_ids',
+                'new_value': ['skill1']
+            }], 'Changed the collection node property of exp_id_0')
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'exploration_id': 'exp_id_1',
+                'property_name': 'acquired_skill_ids',
+                'new_value': ['skill1']
+            }, {
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'exploration_id': 'exp_id_1',
+                'property_name': 'prerequisite_skill_ids',
+                'new_value': []
+            }], 'Changed the collection node property of exp_id_1')
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'exploration_id': 'exp_id_2',
+                'property_name': 'acquired_skill_ids',
+                'new_value': ['skill2']
+            }, {
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'exploration_id': 'exp_id_2',
+                'property_name': 'prerequisite_skill_ids',
+                'new_value': ['skill1']
+            }], 'Changed the collection node property of exp_id_2')
 
+        expected_nodes_in_dict = [{
+            'prerequisite_skill_ids': [],
+            'exploration_id': 'exp_id_0',
+            'acquired_skill_ids': ['skill0']
+        }, {
+            'prerequisite_skill_ids': ['skill0'],
+            'exploration_id': 'exp_id_1',
+            'acquired_skill_ids': ['skill1']
+        }, {
+            'prerequisite_skill_ids': ['skill1'],
+            'exploration_id': 'exp_id_2',
+            'acquired_skill_ids': ['skill2']
+        }]
 
-def _get_added_exploration_change_list(exploration_id):
-    """Generates a change list for adding an exploration to a collection."""
-    return [{
-        'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-        'exploration_id': exploration_id
-    }]
-
-
-def _get_deleted_exploration_change_list(exploration_id):
-    """Generates a change list for deleting an exploration from a collection."""
-    return [{
-        'cmd': collection_domain.CMD_DELETE_COLLECTION_NODE,
-        'exploration_id': exploration_id
-    }]
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID)
+        for index, node in enumerate(collection.nodes):
+            self.assertDictContainsSubset(
+                expected_nodes_in_dict[index], node.to_dict())
 
 
 class CommitMessageHandlingTests(CollectionServicesUnitTests):
@@ -1659,11 +1749,8 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         # Have Albert create a collection.
         self.save_new_valid_collection(self.COLLECTION_ID, albert_id)
         # Have Bob edit the collection.
-        changelist_cmds = [{
-            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-            'property_name': 'title',
-            'new_value': 'Collection Bob title'
-        }]
+        changelist_cmds = _get_collection_change_list(
+            'title', 'Collection Bob title')
         collection_services.update_collection(
             bob_id, self.COLLECTION_ID, changelist_cmds,
             'Changed title to Bob title.')
@@ -1696,11 +1783,9 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         # Have Albert create a new collection. Version 1
         self.save_new_valid_collection(self.COLLECTION_ID, albert_id)
         self._check_contributors_summary(self.COLLECTION_ID, {albert_id: 1})
-        changelist_cmds = [{
-            'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
-            'property_name': 'title',
-            'new_value': 'Collection Bob title'
-        }]
+        changelist_cmds = _get_collection_change_list(
+            'title', 'Collection Bob title')
+
          # Have Bob update that collection. Version 2
         collection_services.update_collection(
             bob_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
