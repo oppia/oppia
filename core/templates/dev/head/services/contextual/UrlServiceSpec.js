@@ -64,18 +64,18 @@ describe('Url Service', function() {
       var queryValue = '&value=1?';
       var queryField = 'field 1';
       var baseUrl = '/sample';
-      var encodedQueryField = encodeURIComponent(queryField);
-      var encodedQueryValue = encodeURIComponent(queryValue);
+      var expectedUrl1 = baseUrl + '?' + encodeURIComponent(queryField) + '=' +
+        encodeURIComponent(queryValue);
       expect(
         UrlService.addField(baseUrl, queryField, queryValue)).toBe(
-          baseUrl + '?' + encodedQueryField + '=' + encodedQueryValue
-      );
+          expectedUrl1);
 
       baseUrl = '/sample?field=value';
+      var expectedUrl2 = baseUrl + '&' + encodeURIComponent(queryField) + '=' +
+        encodeURIComponent(queryValue);
       expect(
         UrlService.addField(baseUrl, queryField, queryValue)).toBe(
-          baseUrl + '&' + encodedQueryField + '=' + encodedQueryValue
-      );
+          expectedUrl2);
     });
 
   it('should correctly return true if embed present in pathname', function() {
