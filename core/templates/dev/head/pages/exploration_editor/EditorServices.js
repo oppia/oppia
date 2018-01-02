@@ -16,7 +16,6 @@
  * @fileoverview Standalone services for the exploration editor page.
  */
 
-
 // A service that maintains a provisional list of changes to be committed to
 // the server.
 oppia.factory('changeListService', [
