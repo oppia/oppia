@@ -1131,10 +1131,10 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                         sum_state_hit[state_name]),)
 
 
-class GenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """Generates state stats models for explorations which do not have events
-    recorded. This should be run after GenerateV1StatisticsJob has completed a
-    successful run.
+class GenerateAllStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Generates default state stats models for all explorations. This should be
+    run before GenerateV1StatisticsJob. If there are existing stats models,
+    their values are refreshed.
     """
 
     @classmethod
@@ -1167,29 +1167,6 @@ class GenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     exp_id, version_numbers))
         except Exception as e:
             yield (exp_id, str(e))
-            return
-
-        exp_stats_by_version = (
-            stats_services.get_multiple_exploration_stats_by_version(
-                exp_id, version_numbers))
-        versions_with_no_stats = []
-        versions_with_stats = []
-        for index, per_version_stats in enumerate(exp_stats_by_version):
-            if per_version_stats is None:
-                versions_with_no_stats.append(index + 1)
-            else:
-                versions_with_stats.append(index + 1)
-        if versions_with_no_stats and versions_with_stats:
-            yield (
-                exp_id,
-                'ERROR: Stats models incompletely generated, has stats %s, '
-                'has no stats %s' % (
-                    versions_with_stats, versions_with_no_stats))
-            return
-
-        if versions_with_stats:
-            # All stats models have been generated for this exploration.
-            # Nothing further needs to be done.
             return
 
         yield (exp_id, 'Stats initial generation started')

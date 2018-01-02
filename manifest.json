@@ -284,9 +284,9 @@
         }
       },
       "jquery": {
-        "version": "3.0.0",
+        "version": "3.2.1",
         "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.0.0",
+        "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1",
         "rootDirPrefix": "jquery-",
         "targetDirPrefix": "jquery-",
         "files": ["jquery.js", "jquery.min.js", "jquery.min.js.map"],
@@ -295,9 +295,9 @@
         }
       },
       "jqueryUI": {
-        "version": "1.10.3",
+        "version": "1.12.1",
         "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3",
+        "url": "https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1",
         "rootDirPrefix": "jqueryui-",
         "targetDirPrefix": "jqueryui-",
         "files": ["jquery-ui.min.js"],
@@ -431,9 +431,9 @@
         "targetDirPrefix": "ui-map-"
       },
       "uiSortable": {
-        "version": "0.12.6",
+        "version": "0.17.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-sortable/archive/src0.12.6.zip",
+        "url": "https://github.com/angular-ui/ui-sortable/archive/src0.17.1.zip",
         "rootDirPrefix": "ui-sortable-src",
         "targetDirPrefix": "ui-sortable-",
         "bundle": {

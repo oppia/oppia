@@ -57,3 +57,6 @@ oppia.constant(
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
+
+
+oppia.constant('EVENT_PROGRESS_NAV_SUBMITTED', 'progress-nav-submit')

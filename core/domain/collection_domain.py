@@ -1148,10 +1148,10 @@ class Collection(object):
                 present.
         """
         skill_id = None
-        if any([
-                skill_name == skill.name
-                for skill in self.skills.itervalues()]):
-            skill_id = skill.id
+        for skill in self.skills.itervalues():
+            if skill_name == skill.name:
+                skill_id = skill.id
+                break
         return skill_id
 
     def update_skill(self, skill_id, new_skill_name):

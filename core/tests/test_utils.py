@@ -65,7 +65,7 @@ def empty_environ():
         os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
 
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
-    """Mock for google.appengine.api.urlfetch"""
+    """Mock for google.appengine.api.urlfetch."""
 
     def __init__(self, service_name='urlfetch'):
         super(URLFetchServiceMock, self).__init__(service_name)
@@ -74,11 +74,30 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
         self.request = None
 
     def set_return_values(self, content='', status_code=200, headers=None):
+        """Set the content, status_code and headers to return in subsequent
+        calls to the urlfetch mock.
+
+        Args:
+            content: str. The content to return in subsequent calls to the
+                urlfetch mock.
+            status_code: int. The status_code to return in subsequent calls to
+                the urlfetch mock.
+            headers: dict. The headers to return in subsequent calls to the
+                urlfetch mock. The keys of this dict are strings that represent
+                the header name and each value represents the corresponding
+                value of that header.
+        """
         self.return_values['content'] = content
         self.return_values['status_code'] = status_code
         self.return_values['headers'] = headers
 
     def _Dynamic_Fetch(self, request, response): # pylint: disable=invalid-name
+        """Simulates urlfetch mock by setting request & response object.
+
+        Args:
+            request: dict. Request object for the URLMock.
+            response: dict. Response object for the URLMock.
+        """
         return_values = self.return_values
         response.set_content(return_values.get('content', ''))
         response.set_statuscode(return_values.get('status_code', 200))
@@ -144,12 +163,29 @@ class TestBase(unittest.TestCase):
     }
 
     def _get_unicode_test_string(self, suffix):
+        """Returns a string that contains unicode characters and ends with the
+        given suffix. This is used to test that functions behave correctly
+        when handling strings with unicode characters.
+
+        Args:
+            suffix: str. The suffix to append to the UNICODE_TEST_STRING.
+
+        Returns:
+            str. A string that contains unicode characters and ends with the
+                given suffix.
+        """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
     def setUp(self):
+        """Initializes the fixture for the test suite. Subclasses of TestBase
+        should override this method.
+        """
         raise NotImplementedError
 
     def tearDown(self):
+        """Cleans up the fixture after the test runs. Subclasses of
+        TestBase should override this method.
+        """
         raise NotImplementedError
 
     def _assert_validation_error(self, item, error_substring):
@@ -169,6 +205,9 @@ class TestBase(unittest.TestCase):
         print '%s%s' % (LOG_LINE_PREFIX, line)
 
     def _delete_all_models(self):
+        """Deletes all keys from the NDB datastore. Subclasses of TestBase
+        should override this method.
+        """
         raise NotImplementedError
 
     def _stash_current_user_env(self):
@@ -198,11 +237,18 @@ class TestBase(unittest.TestCase):
         self.stashed_user_env = None  # pylint: disable=attribute-defined-outside-init
 
     def login(self, email, is_super_admin=False):
+        """Sets the environment variables to simulate a login.
+
+        Args:
+            email: str. The email of the user who is to be logged in.
+            is_super_admin: bool. Whether the user is a super admin.
+       """
         os.environ['USER_EMAIL'] = email
         os.environ['USER_ID'] = self.get_user_id_from_email(email)
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
 
     def logout(self):
+        """Simulates a logout by resetting the environment variables."""
         os.environ['USER_EMAIL'] = ''
         os.environ['USER_ID'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
@@ -300,7 +346,12 @@ class TestBase(unittest.TestCase):
         return re.search(CSRF_REGEX, response.body).group(1)
 
     def signup(self, email, username):
-        """Complete the signup process for the user with the given username."""
+        """Complete the signup process for the user with the given username.
+
+        Args:
+            email: str. Email of the given user.
+            username: str. Username of the given user.
+        """
         self.login(email)
         # Signup uses a custom urlfetch mock (URLFetchServiceMock), instead
         # of the stub provided by testbed. This custom mock is disabled
@@ -397,16 +448,36 @@ class TestBase(unittest.TestCase):
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def get_current_logged_in_user_id(self):
+        """Gets the user_id of the current logged-in user.
+
+        Returns:
+            str. The user_id of the currently logged-in user. In tests, we
+                simulate this using a USER_ID env variable.
+        """
         return os.environ['USER_ID']
 
     def get_user_id_from_email(self, email):
+        """Gets the user_id corresponding to the given email.
+
+        Args:
+            email: str. A valid email stored in the App Engine database.
+
+        Returns:
+            user_id: str. ID of the user possessing the given email.
+        """
         return current_user_services.get_user_id_from_email(email)
 
     def save_new_default_exploration(
             self, exploration_id, owner_id, title='A title'):
         """Saves a new default exploration written by owner_id.
 
-        Returns the exploration domain object.
+        Args:
+            exploration_id: str. The id of the new validated exploration.
+            owner_id: str. The user_id of the creator of the exploration.
+            title: str. The title of the exploration.
+
+        Returns:
+            Exploration. The exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, category='A category')
@@ -421,7 +492,16 @@ class TestBase(unittest.TestCase):
             interaction_id='TextInput'):
         """Saves a new strictly-validated exploration.
 
-        Returns the exploration domain object.
+        Args:
+            exploration_id: str. The id of the new validated exploration.
+            owner_id: str. The user_id of the creator of the exploration.
+            title: str. The title of the exploration.
+            category: str. The category this exploration belongs to.
+            objective: str. The objective of this exploration.
+            language_code: str. The language_code of this exploration.
+
+        Returns:
+            Exploration. The exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, category=category,
@@ -457,6 +537,11 @@ class TestBase(unittest.TestCase):
         the usual functions for updating and creating explorations. This is
         because the latter approach would result in an exploration with the
         *current* states schema version.
+
+        Args:
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            title: str. The title of the exploration.
         """
         exp_model = exp_models.ExplorationModel(
             id=exp_id,
@@ -505,7 +590,12 @@ class TestBase(unittest.TestCase):
         exp_services.create_and_save_state_id_mapping_model(exploration, [])
 
     def publish_exploration(self, owner_id, exploration_id):
-        """Publish the exploration of given exploration_id."""
+        """Publish the exploration with the given exploration_id.
+
+        Args:
+            exploration_id: str. The ID of the new exploration.
+            owner_id: str. The user_id of the owner of the exploration.
+        """
         committer = user_services.UserActionsInfo(owner_id)
         rights_manager.publish_exploration(committer, exploration_id)
 
@@ -515,7 +605,16 @@ class TestBase(unittest.TestCase):
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default collection written by owner_id.
 
-        Returns the collection domain object.
+        Args:
+            collection_id: str. The id of the new default collection.
+            owner_id: str. The user_id of the creator of the collection.
+            title: str. The title of the collection.
+            category: str. The category this collection belongs to.
+            objective: str. The objective of this collection.
+            language_code: str. The language_code of this collection.
+
+        Returns:
+            Collection. The collection domain object.
         """
         collection = collection_domain.Collection.create_default_collection(
             collection_id, title=title, category=category, objective=objective,
@@ -529,6 +628,23 @@ class TestBase(unittest.TestCase):
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             exploration_id='an_exploration_id',
             end_state_name=DEFAULT_END_STATE_NAME):
+        """Creates an Oppia collection and adds a node saving the
+        exploration details.
+
+        Args:
+            collection_id: str. ID for the collection to be created.
+            owner_id: str. The user_id of the creator of the collection.
+            title: str. Title for the collection.
+            category: str. The category of the exploration.
+            objective: str. Objective for the exploration.
+            language_code: str. The language code for the exploration.
+            exploration_id: str. The exploration_id for the Oppia exploration.
+            end_state_name: str. The name of the end state for the exploration.
+
+        Returns:
+            Collection. A newly-created collection containing the corresponding
+                exploration details.
+        """
         collection = collection_domain.Collection.create_default_collection(
             collection_id, title, category, objective,
             language_code=language_code)
@@ -546,7 +662,12 @@ class TestBase(unittest.TestCase):
         return collection
 
     def publish_collection(self, owner_id, collection_id):
-        """Publish the collection of given collection_id."""
+        """Publish the collection with the given collection_id.
+
+        Args:
+            owner_id: str. The user_id of the owner of the collection.
+            collection_id: str. ID of the collection to be published.
+        """
         committer = user_services.UserActionsInfo(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 
@@ -624,6 +745,7 @@ class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
     def _delete_all_models(self):
+        """Deletes all models from the NDB datastore."""
         from google.appengine.ext import ndb
         ndb.delete_multi(ndb.Query().iter(keys_only=True))
 
@@ -670,6 +792,11 @@ class AppEngineTestBase(TestBase):
         self.testbed.deactivate()
 
     def _get_all_queue_names(self):
+        """Returns all the queue names.
+
+        Returns:
+            list(str). All the queue names.
+        """
         return [q['name'] for q in self.taskqueue_stub.GetQueues()]
 
     @contextlib.contextmanager
@@ -682,10 +809,13 @@ class AppEngineTestBase(TestBase):
         requests to fetch the Gravatar profile picture for new users while the
         backend tests are being run.
 
-        args:
-          - content: Response content or body.
-          - status_code: Response status code.
-          - headers: Response headers.
+        Args:
+            content: str. Response content or body.
+            status_code: int. Response status code.
+            headers: dict. The headers in subsequent calls to the
+                urlfetch mock. The keys of this dict are strings that represent
+                the header name and the value represents corresponding value of
+                that header.
         """
         if headers is None:
             response_headers = {}
@@ -779,15 +909,20 @@ class FunctionWrapper(object):
     def __init__(self, func):
         """Creates a new FunctionWrapper instance.
 
-        args:
-          - func: a callable, or data descriptor. If it's a descriptor, its
-            __get__ should return a bound method. For example, func can be a
-            function, a method, a static or class method, but not a @property.
+        Args:
+            func: a callable, or data descriptor. If it's a descriptor, its
+                __get__ should return a bound method. For example, func can be
+                a function, a method, a static or class method, but not a
+                @property.
         """
         self._func = func
         self._instance = None
 
     def __call__(self, *args, **kwargs):
+        """Overrides the call method for the function to call pre_call_hook
+        method which would be called before the function is executed and
+        post_call_hook which would be called after the function is executed.
+        """
         if self._instance is not None:
             args = [self._instance] + list(args)
 
@@ -809,9 +944,22 @@ class FunctionWrapper(object):
         return self
 
     def pre_call_hook(self, args):
+        """Override this to do tasks that should be executed before the
+        actual function call.
+
+        Args:
+            args: list(*). Set of arguments that the function accepts.
+        """
         pass
 
     def post_call_hook(self, args, result):
+        """Override this to do tasks that should be executed after the
+        actual function call.
+
+        Args:
+            args: list(*). Set of arguments that the function accepts.
+            result: *. Result returned from the function.
+        """
         pass
 
 
@@ -830,9 +978,22 @@ class CallCounter(FunctionWrapper):
 
     @property
     def times_called(self):
+        """Property that returns the number of times the wrapped function has
+        been called.
+
+        Returns:
+            int. The number of times the wrapped function has been called.
+        """
         return self._times_called
 
     def pre_call_hook(self, args):
+        """Method that is called before each function call to increment the
+        counter tracking the number of times a function is called. This
+        will also be called even when the function raises an exception.
+
+        Args:
+            args: list(*). Set of arguments that the function accepts.
+        """
         self._times_called += 1
 
 
@@ -846,12 +1007,13 @@ class FailingFunction(FunctionWrapper):
     def __init__(self, f, exception, num_tries_before_success):
         """Create a new Failing function.
 
-        args:
-          - f: see FunctionWrapper.
-          - exception: the exception to be raised.
-          - num_tries_before_success: the number of times to raise an
-            exception, before a call succeeds. If this is 0, all calls will
-            succeed, if it is FailingFunction.INFINITY, all calls will fail.
+        Args:
+            f: func. See FunctionWrapper.
+            exception: Exception. The exception to be raised.
+            num_tries_before_success: int. The number of times to raise an
+                exception, before a call succeeds. If this is 0, all calls will
+                succeed, if it is FailingFunction. INFINITY, all calls will
+                fail.
         """
         super(FailingFunction, self).__init__(f)
         self._exception = exception
@@ -867,6 +1029,13 @@ class FailingFunction(FunctionWrapper):
                 'or FailingFunction.INFINITY')
 
     def pre_call_hook(self, args):
+        """Method that is called each time before the actual function call
+        to check if the exception is to be raised based on the number of
+        tries before success.
+
+        Args:
+            args: list(*). Set of arguments this function accepts.
+        """
         self._times_called += 1
         call_should_fail = (
             self._num_tries_before_success >= self._times_called)
