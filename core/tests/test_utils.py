@@ -477,7 +477,7 @@ class TestBase(unittest.TestCase):
             title: str. The title of the exploration.
 
         Returns:
-            Collection. The exploration domain object.
+            Exploration. The exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, category='A category')
@@ -501,7 +501,7 @@ class TestBase(unittest.TestCase):
             language_code: str. The language_code of this exploration.
 
         Returns:
-            Collection. The exploration domain object.
+            Exploration. The exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, category=category,
@@ -593,8 +593,8 @@ class TestBase(unittest.TestCase):
         """Publish the exploration with the given exploration_id.
 
         Args:
-            collection_id: str. The ID of the new collection.
-            owner_id: str. The user_id of the owner of the collection.
+            exploration_id: str. The ID of the new exploration.
+            owner_id: str. The user_id of the owner of the exploration.
         """
         committer = user_services.UserActionsInfo(owner_id)
         rights_manager.publish_exploration(committer, exploration_id)
