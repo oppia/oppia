@@ -28,12 +28,12 @@ describe('Answer Classification Object Factory', function() {
   it('should create a new result', function() {
     var answerClassificationResult = (
       AnswerClassificationResultObjectFactory.createNew(
-        false, 1, 0, {}));
+        {}, 1, 0, 'default_outcome'));
 
-    expect(answerClassificationResult.outcome).toEqual(false);
+    expect(answerClassificationResult.outcome).toEqual({});
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(
-      {});
+      'default_outcome');
   });
 });
