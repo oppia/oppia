@@ -260,9 +260,8 @@ var MultiSelectEditor = function(elem) {
     // Open the dropdown menu.
     elem.element(by.css('.protractor-test-search-bar-dropdown-toggle')).click();
 
-    elem.element(by.css(
-      '.protractor-test-search-bar-dropdown-menu')).all(by.tagName('span')).filter(
-      function(choiceElem) {
+    elem.element(by.css('.protractor-test-search-bar-dropdown-menu'))
+      .all(by.tagName('span')).filter(function(choiceElem) {
         return choiceElem.getText().then(function(choiceText) {
           return texts.indexOf(choiceText) !== -1;
         });
