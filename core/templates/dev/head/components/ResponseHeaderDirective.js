@@ -34,12 +34,12 @@ oppia.directive('responseHeader', [
         '/components/' +
         'response_header_directive.html'),
       controller: [
-        '$scope', 'editabilityService', 'EditorStateService', 'RouterService',
+        '$scope', 'EditabilityService', 'EditorStateService', 'RouterService',
         'PLACEHOLDER_OUTCOME_DEST', 'explorationCorrectnessFeedbackService',
         function(
-            $scope, editabilityService, EditorStateService, RouterService,
+            $scope, EditabilityService, EditorStateService, RouterService,
             PLACEHOLDER_OUTCOME_DEST, explorationCorrectnessFeedbackService) {
-          $scope.editabilityService = editabilityService;
+          $scope.EditabilityService = EditabilityService;
 
           $scope.isOutcomeLooping = function() {
             var outcome = $scope.getOutcome();

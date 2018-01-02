@@ -29,14 +29,14 @@ oppia.directive('paramChangesEditor', [
         '/pages/exploration_editor/' +
         'param_changes_editor_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'editabilityService',
+        '$scope', '$rootScope', 'EditabilityService',
         'explorationParamSpecsService', 'AlertsService',
         'ParamChangeObjectFactory',
         function(
-            $scope, $rootScope, editabilityService,
+            $scope, $rootScope, EditabilityService,
             explorationParamSpecsService, AlertsService,
             ParamChangeObjectFactory) {
-          $scope.editabilityService = editabilityService;
+          $scope.EditabilityService = EditabilityService;
           $scope.isParamChangesEditorOpen = false;
           $scope.warningText = '';
           $scope.PREAMBLE_TEXT = {
@@ -85,7 +85,7 @@ oppia.directive('paramChangesEditor', [
           };
 
           $scope.openParamChangesEditor = function() {
-            if (!editabilityService.isEditable()) {
+            if (!EditabilityService.isEditable()) {
               return;
             }
 
