@@ -29,8 +29,7 @@ oppia.directive('outcomeEditor', [
         suppressWarnings: '&suppressWarnings'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/' +
-        'outcome_editor_directive.html'),
+        '/components/outcome_editor_directive.html'),
       controller: [
         '$scope', 'EditorStateService',
         'stateInteractionIdService', 'COMPONENT_NAME_FEEDBACK',
@@ -134,6 +133,12 @@ oppia.directive('outcomeEditor', [
             $scope.$broadcast('saveOutcomeDestDetails');
             $scope.destinationEditorIsOpen = false;
             $scope.savedOutcome.dest = angular.copy($scope.outcome.dest);
+            if (!$scope.isSelfLoop($scope.outcome)) {
+              $scope.outcome.refresherExplorationId = null;
+            }
+            $scope.savedOutcome.refresherExplorationId = (
+              $scope.outcome.refresherExplorationId);
+
             $scope.getOnSaveDestFn()($scope.savedOutcome);
           };
 
@@ -145,6 +150,8 @@ oppia.directive('outcomeEditor', [
 
           $scope.cancelThisDestinationEdit = function() {
             $scope.outcome.dest = angular.copy($scope.savedOutcome.dest);
+            $scope.outcome.refresherExplorationId = (
+              $scope.savedOutcome.refresherExplorationId);
             $scope.destinationEditorIsOpen = false;
           };
 
