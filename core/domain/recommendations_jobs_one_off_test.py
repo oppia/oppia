@@ -22,8 +22,7 @@ from core.domain import recommendations_services
 from core.domain import recommendations_services_test
 from core.domain import rights_manager
 from core.platform import models
-from core.platform.taskqueue import \
-    gae_taskqueue_services as taskqueue_services
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 
 (recommendations_models,) = models.Registry.import_models([
     models.NAMES.recommendations])

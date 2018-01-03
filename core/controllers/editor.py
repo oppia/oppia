@@ -42,10 +42,11 @@ from core.domain import value_generators_domain
 from core.domain import visualization_registry
 from core.platform import models
 import feconf
+import utils
+
 import jinja2
 import mutagen
 from mutagen import mp3
-import utils
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()

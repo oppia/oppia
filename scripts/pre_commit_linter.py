@@ -640,29 +640,37 @@ def _check_import_order(all_files):
     """
     print 'Starting import-order checks'
     print '----------------------------------------'
+    summary_messages = []
     all_files = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
     failed = False
     for filename in all_files:
-        if isort.SortImports(filename, check=True).incorrectly_sorted:
+        if isort.SortImports(filename, check=False).incorrectly_sorted:
             failed = True
     print ''
     print '----------------------------------------'
     print ''
-    return failed
+    if failed:
+        summary_message = '%s   Import order failed' % _MESSAGE_TYPE_FAILED
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s   Import order passed' % _MESSAGE_TYPE_SUCCESS
+        summary_messages.append(summary_message)
 
+    return summary_messages
 
 def main():
     all_files = _get_all_files()
-    import_order_message = _check_import_order(all_files)
+    import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
-        linter_messages + newline_messages + pattern_messages)
+        import_order_messages + linter_messages + newline_messages
+        + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
-            all_messages]) or import_order_message:
+            all_messages]):
         sys.exit(1)
 
 

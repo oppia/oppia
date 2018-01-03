@@ -32,9 +32,9 @@ from core.tests import test_utils
 import feconf
 import main
 import utils
-import webtest
 
 import webapp2
+import webtest
 
 current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])

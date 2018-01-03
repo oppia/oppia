@@ -22,17 +22,12 @@ it from the command line by running
 from the oppia/ root folder.
 """
 
-# Pylint has issues with import order of argparse.
-#pylint: disable=wrong-import-order
 import argparse
 import os
 import sys
 import unittest
 
 import feconf
-
-#pylint: enable=wrong-import-order
-
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')

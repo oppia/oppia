@@ -38,8 +38,9 @@ from core.domain import rights_manager
 from core.domain import summary_services
 from core.domain import user_services
 import feconf
-import jinja2
 import utils
+
+import jinja2
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 

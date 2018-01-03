@@ -20,8 +20,9 @@ import copy
 
 from core.domain.base_classifier import BaseClassifier
 import feconf
-import numpy
 import utils
+
+import numpy
 
 
 class LDAStringClassifier(BaseClassifier):

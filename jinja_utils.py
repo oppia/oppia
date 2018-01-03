@@ -20,9 +20,10 @@ import logging
 import math
 import os
 
+import utils  # pylint: disable=relative-import
+
 import jinja2
 from jinja2 import meta
-import utils  # pylint: disable=relative-import
 
 
 def _js_string_filter(value):

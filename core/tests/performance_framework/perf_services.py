@@ -20,11 +20,12 @@ import os
 import time
 import urlparse
 
-import browsermobproxy
 from core.tests.performance_framework import perf_domain
 from core.tests.performance_tests import test_config
 import feconf
 from selenium import webdriver
+
+import browsermobproxy
 
 CHROMEDRIVER_PATH = os.path.join(
     '..', 'node_modules', 'protractor', 'node_modules', 'webdriver-manager',

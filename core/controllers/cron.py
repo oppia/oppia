@@ -24,8 +24,9 @@ from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off
 from core.domain import user_jobs_one_off
 from core.platform import models
-from pipeline import pipeline
 import utils
+
+from pipeline import pipeline
 
 (job_models,) = models.Registry.import_models([models.NAMES.job])
 
