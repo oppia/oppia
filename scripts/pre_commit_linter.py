@@ -226,14 +226,16 @@ def _is_filename_excluded_for_bad_patterns_check(pattern, filename):
 
 
 def _get_changed_filenames():
-    """Returns a list of modified files (both staged and unstaged)
+    """Returns a list of modified files and newly added files
+    (staged, unstaged and untracked).
 
     Returns:
-        a list of filenames of modified files.
+        list: A list of filenames of modified and newly created files.
     """
+    gitignore_path = os.path.join(os.getcwd(), '.gitignore')
     unstaged_files = subprocess.check_output([
-        'git', 'diff', '--name-only',
-        '--diff-filter=ACM']).splitlines()
+        'git', 'ls-files', '--modified',
+        '--others', '--exclude-from=%s' % gitignore_path]).splitlines()
     staged_files = subprocess.check_output([
         'git', 'diff', '--cached', '--name-only',
         '--diff-filter=ACM']).splitlines()
