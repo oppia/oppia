@@ -258,6 +258,7 @@ oppia.directive('conversationSkin', [
         'EVENT_NEW_CARD_AVAILABLE', 'EVENT_PROGRESS_NAV_SUBMITTED',
         'FatigueDetectionService', 'NumberAttemptsService',
         'RefresherExplorationConfirmationModalService',
+        'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             MessengerService, ExplorationPlayerService, UrlService,
@@ -270,7 +271,8 @@ oppia.directive('conversationSkin', [
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_AVAILABLE, EVENT_PROGRESS_NAV_SUBMITTED,
             FatigueDetectionService, NumberAttemptsService,
-            RefresherExplorationConfirmationModalService) {
+            RefresherExplorationConfirmationModalService,
+            EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -567,8 +569,19 @@ oppia.directive('conversationSkin', [
                           newStateName, _nextFocusLabel) +
                         ExplorationPlayerService.getRandomSuffix());
                     }
-                    RefresherExplorationConfirmationModalService.
-                      displayRedirectConfirmation(refresherExplorationId);
+
+                    $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
+                      params: {
+                        stringified_exp_ids: JSON.stringify(
+                          [refresherExplorationId])
+                      }
+                    }).then(function(response) {
+                      if (response.data.summaries.length > 0) {
+                        RefresherExplorationConfirmationModalService.
+                          displayRedirectConfirmationModal(
+                            refresherExplorationId);
+                      }
+                    });
                     FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
                     scrollToBottom();
                   } else {

@@ -122,10 +122,6 @@ md-input-group.md-default-theme label
   word-wrap: break-word;
 }
 
-.oppia-learner-refresher-exploration-confirmation-body {
-  word-wrap: break-word;
-}
-
 /* Attributes for material-icons. */
 .material-icons {
   vertical-align: middle;
@@ -656,15 +652,6 @@ body {
   color: #00786D;
   font-family: 'Capriola', 'Roboto', 'Arial', 'sans-serif';
   font-size: 1.75em;
-  font-weight: bold;
-  padding-top: 20px;
-  text-align: center;
-}
-
-.oppia-learner-refresher-exploration-confirmation-title {
-  color: #00786D;
-  font-family: 'Capriola', 'Roboto', 'Arial', 'sans-serif';
-  font-size: 1.25em;
   font-weight: bold;
   padding-top: 20px;
   text-align: center;

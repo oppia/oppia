@@ -23,7 +23,7 @@ oppia.factory('RefresherExplorationConfirmationModalService', [
   function($uibModal, UrlInterpolationService, UrlService,
       ExplorationPlayerService) {
     return {
-      displayRedirectConfirmation: function(refresherExplorationId) {
+      displayRedirectConfirmationModal: function(refresherExplorationId) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/' +
