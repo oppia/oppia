@@ -98,14 +98,18 @@ oppia.factory('ResponsesService', [
 
     var _updateAnswerGroup = function(index, updates) {
       var answerGroup = _answerGroups[index];
-      if (updates.rules) {
+      if (updates.hasOwnProperty('rules')) {
         answerGroup.rules = updates.rules;
       }
-      if (updates.feedback) {
+      if (updates.hasOwnProperty('feedback')) {
         answerGroup.outcome.feedback = updates.feedback;
       }
-      if (updates.dest) {
+      if (updates.hasOwnProperty('dest')) {
         answerGroup.outcome.dest = updates.dest;
+      }
+      if (updates.hasOwnProperty('refresherExplorationId')) {
+        answerGroup.outcome.refresherExplorationId = (
+          updates.refresherExplorationId);
       }
       if (updates.hasOwnProperty('labelledAsCorrect')) {
         answerGroup.labelledAsCorrect = updates.labelledAsCorrect;
@@ -237,11 +241,14 @@ oppia.factory('ResponsesService', [
       },
       updateDefaultOutcome: function(updates) {
         var outcome = _defaultOutcome;
-        if (updates.feedback) {
+        if (updates.hasOwnProperty('feedback')) {
           outcome.feedback = updates.feedback;
         }
-        if (updates.dest) {
+        if (updates.hasOwnProperty('dest')) {
           outcome.dest = updates.dest;
+        }
+        if (updates.hasOwnProperty('refresherExplorationId')) {
+          outcome.refresherExplorationId = updates.refresherExplorationId;
         }
         _saveDefaultOutcome(outcome);
       },

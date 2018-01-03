@@ -17,19 +17,21 @@
  */
 
 oppia.controller('StateSolution', [
-  '$scope', '$rootScope', '$uibModal', 'EditorStateService', 'AlertsService',
-  'INTERACTION_SPECS', 'stateSolutionService', 'explorationStatesService',
-  'SolutionVerificationService', 'ExplorationHtmlFormatterService',
-  'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
-  'SolutionObjectFactory', 'ExplorationContextService',
-  'ExplorationWarningsService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
+  'AlertsService', 'INTERACTION_SPECS', 'stateSolutionService',
+  'explorationStatesService', 'SolutionVerificationService',
+  'ExplorationHtmlFormatterService', 'stateInteractionIdService',
+  'stateHintsService', 'UrlInterpolationService', 'SolutionObjectFactory',
+  'ExplorationContextService', 'ExplorationWarningsService',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function(
-    $scope, $rootScope, $uibModal, EditorStateService, AlertsService,
-    INTERACTION_SPECS, stateSolutionService, explorationStatesService,
-    SolutionVerificationService, ExplorationHtmlFormatterService,
-    stateInteractionIdService, stateHintsService, UrlInterpolationService,
-    SolutionObjectFactory, ExplorationContextService,
-    ExplorationWarningsService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
+    $scope, $rootScope, $uibModal, $filter, EditorStateService,
+    AlertsService, INTERACTION_SPECS, stateSolutionService,
+    explorationStatesService, SolutionVerificationService,
+    ExplorationHtmlFormatterService, stateInteractionIdService,
+    stateHintsService, UrlInterpolationService, SolutionObjectFactory,
+    ExplorationContextService, ExplorationWarningsService,
+    INFO_MESSAGE_SOLUTION_IS_INVALID) {
     $scope.correctAnswer = null;
     $scope.correctAnswerEditorHtml = '';
     $scope.inlineSolutionEditorIsActive = false;
@@ -62,7 +64,10 @@ oppia.controller('StateSolution', [
 
     $scope.getSolutionSummary = function() {
       var solution = stateSolutionService.savedMemento;
-      return solution.getSummary(stateInteractionIdService.savedMemento);
+      var solutionAsPlainText =
+        solution.getSummary(stateInteractionIdService.savedMemento);
+      solutionAsPlainText = $filter('convertToPlainText')(solutionAsPlainText);
+      return solutionAsPlainText;
     };
 
     // This returns false if the current interaction ID is null.
@@ -156,7 +161,7 @@ oppia.controller('StateSolution', [
       });
     };
 
-    $scope.deleteSolution = function(evt) {
+    $scope.deleteSolution = function(index, evt) {
       evt.stopPropagation();
 
       AlertsService.clearWarnings();
