@@ -646,7 +646,7 @@ def _check_import_order(all_files):
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
     failed = False
     for filename in all_files:
-        if isort.SortImports(filename, check=False).incorrectly_sorted:
+        if isort.SortImports(filename, check=True).incorrectly_sorted:
             failed = True
     print ''
     print '----------------------------------------'
