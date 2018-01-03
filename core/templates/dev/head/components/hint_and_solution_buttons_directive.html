@@ -2,10 +2,10 @@
   <span class="pull-left footer-hints-label">HINTS</span>
   <ul class="list-inline pull-right">
     <li ng-repeat="hintIndex in hintIndexes">
-      <img class="oppia-hint-button" ng-if="isHintButtonVisible(hintIndex)" ng-src="<[activeHintIndex === hintIndex ? activeHintUrl : defaultHintUrl]>" ng-click="displayHintModal(hintIndex)">
+      <img class="oppia-hint-button protractor-test-view-hint" ng-if="isHintButtonVisible(hintIndex)" ng-src="<[activeHintIndex === hintIndex ? activeHintUrl : defaultHintUrl]>" ng-click="displayHintModal(hintIndex)">
     </li>
     <li ng-if="isSolutionButtonVisible()">
-      <img class="oppia-solution-button" ng-src="<[solutionModalIsActive ? activeSolutionUrl : defaultSolutionUrl]>" ng-click="displaySolutionModal()">
+      <img class="oppia-solution-button protractor-test-view-solution" ng-src="<[solutionModalIsActive ? activeSolutionUrl : defaultSolutionUrl]>" ng-click="displaySolutionModal()">
     </li>
   </ul>
 </div>
