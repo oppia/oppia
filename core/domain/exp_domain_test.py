@@ -63,6 +63,7 @@ states:
           audio_translations: {}
           html: ''
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: null
       solution: null
@@ -82,6 +83,7 @@ states:
           audio_translations: {}
           html: ''
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: null
       solution: null
@@ -117,6 +119,7 @@ states:
         dest: %s
         feedback: []
         param_changes: []
+        refresher_exploration_id: null
       fallbacks: []
       id: null
     param_changes: []
@@ -131,6 +134,7 @@ states:
         dest: New state
         feedback: []
         param_changes: []
+        refresher_exploration_id: null
       fallbacks: []
       id: null
     param_changes: []
@@ -216,6 +220,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'audio_translations': {}
                     },
                     'param_changes': [],
+                    'refresher_exploration_id': None,
                 },
                 'rule_specs': [{
                     'inputs': {
@@ -256,6 +261,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'audio_translations': {}
                     },
                     'param_changes': [],
+                    'refresher_exploration_id': None,
                 },
                 'rule_specs': [{
                     'inputs': {
@@ -336,6 +342,31 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         outcome.param_changes = []
         exploration.validate()
+
+        outcome.refresher_exploration_id = 12345
+        self._assert_validation_error(
+            exploration,
+            'Expected outcome refresher_exploration_id to be a string')
+
+        outcome.refresher_exploration_id = None
+        exploration.validate()
+
+        outcome.refresher_exploration_id = 'valid_string'
+        exploration.validate()
+
+        # Test that refresher_exploration_id must be None for non-self-loops.
+        new_state_name = 'New state'
+        exploration.add_states([new_state_name])
+
+        outcome.dest = new_state_name
+        outcome.refresher_exploration_id = 'another_string'
+        self._assert_validation_error(
+            exploration,
+            'has a refresher exploration ID, but is not a self-loop')
+
+        outcome.refresher_exploration_id = None
+        exploration.validate()
+        exploration.delete_state(new_state_name)
 
         # Validate InteractionInstance.
         interaction.id = 15
@@ -907,7 +938,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             old_states, new_to_old_state_names)
         self.assertEqual(actual_dict, expected_dict)
 
-
     def test_is_demo_property(self):
         """Test the is_demo property."""
         demo = exp_domain.Exploration.create_default_exploration('0')
@@ -965,6 +995,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                         'audio_translations': {}
                     },
                     'param_changes': [],
+                    'refresher_exploration_id': None,
                 },
                 'hints': [],
                 'id': None,
@@ -2604,7 +2635,100 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V20
+    YAML_CONTENT_V21 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 21
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - labelled_as_correct: false
+        outcome:
+          dest: END
+          feedback:
+            audio_translations: {}
+            html: Correct!
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          audio_translations: {}
+          html: ''
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          audio_translations: {}
+          html: ''
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 16
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V21
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -2726,6 +2850,12 @@ title: Title
             'eid', self.YAML_CONTENT_V20)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v21(self):
+        """Test direct loading from a v21 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V21)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
@@ -2755,6 +2885,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                             exp_domain.
                             SubtitledHtml.DEFAULT_SUBTITLED_HTML_DICT),
                         'param_changes': [],
+                        'refresher_exploration_id': None,
                     },
                     'hints': [],
                     'id': None,
