@@ -59,7 +59,8 @@ describe('Answer classification service with string classifier disabled',
                 html: '',
                 audio_translations: {}
               },
-              param_changes: []
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {
@@ -75,7 +76,8 @@ describe('Answer classification service with string classifier disabled',
                 html: '',
                 audio_translations: {}
               },
-              param_changes: []
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {
@@ -106,7 +108,8 @@ describe('Answer classification service with string classifier disabled',
               html: '',
               audio_translations: {}
             },
-            param_changes: []
+            param_changes: [],
+            refresher_exploration_id: null
           },
           hints: []
         },
@@ -180,7 +183,8 @@ describe('Answer classification service with string classifier disabled',
                 html: '',
                 audio_translations: {}
               },
-              param_changes: []
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {
@@ -196,7 +200,8 @@ describe('Answer classification service with string classifier disabled',
               html: '',
               audio_translations: {}
             },
-            param_changes: []
+            param_changes: [],
+            refresher_exploration_id: null
           },
           hints: []
         },
@@ -268,7 +273,8 @@ describe('Answer classification service with string classifier enabled',
                 html: '',
                 audio_translations: {}
               },
-              param_changes: []
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {
@@ -284,7 +290,8 @@ describe('Answer classification service with string classifier enabled',
                 html: '',
                 audio_translations: {}
               },
-              param_changes: []
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {
@@ -310,7 +317,8 @@ describe('Answer classification service with string classifier enabled',
               html: '',
               audio_translations: {}
             },
-            param_changes: []
+            param_changes: [],
+            refresher_exploration_id: null
           },
           hints: []
         },

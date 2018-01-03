@@ -43,7 +43,8 @@ TEXT_INPUT_ID = 'TextInput'
 _INTERACTION_CONFIG_SCHEMA = [
     ('name', basestring), ('display_mode', basestring),
     ('description', basestring), ('_customization_arg_specs', list),
-    ('is_terminal', bool), ('needs_summary', bool)]
+    ('is_terminal', bool), ('needs_summary', bool),
+    ('show_nav_submit_button', bool)]
 
 
 class InteractionAnswerUnitTests(test_utils.GenericTestBase):
@@ -150,7 +151,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             'customization_arg_specs', 'is_trainable', 'is_terminal',
             'is_linear', 'rule_descriptions', 'instructions',
             'narrow_instructions', 'needs_summary',
-            'default_outcome_heading', 'can_have_solution'])
+            'default_outcome_heading', 'can_have_solution',
+            'show_nav_submit_button'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(interaction_dict['customization_arg_specs'], [{
             'name': 'placeholder',

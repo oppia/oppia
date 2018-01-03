@@ -50,6 +50,8 @@ var ExplorationPlayerPage = function() {
   var viewHintButton = element(by.css('.protractor-test-view-hint'));
   var viewSolutionButton = element(by.css('.protractor-test-view-solution'));
   var gotItButton = element(by.css('.oppia-learner-got-it-button'));
+  var explorationSummaryTile = element(
+    by.css('.protractor-test-exp-summary-tile-title'))
 
   var feedbackPopupLink =
     element(by.css('.protractor-test-exploration-feedback-popup-link'));
@@ -70,6 +72,16 @@ var ExplorationPlayerPage = function() {
 
   this.clickGotItButton = function() {
     gotItButton.click();
+  };
+
+  this.clickOnSummaryTileAtEnd = function() {
+    /* The summary tile for redirection has to be scrolled down in the
+       chrome window to be in view of the automated test,
+       hence the scrollTo. */
+    browser.executeScript('window.scrollTo(571,700);').then(function() {
+      explorationSummaryTile.click();
+    });
+    browser.waitForAngular();
   };
 
   // This verifies the question just asked, including formatting and

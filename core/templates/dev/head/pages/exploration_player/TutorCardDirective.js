@@ -43,7 +43,8 @@ oppia.directive('tutorCard', [
         onClickContinueButton: '&',
         onSubmitAnswer: '&',
         onDismiss: '&',
-        startCardChangeAnimation: '='
+        startCardChangeAnimation: '=',
+        onChangeInteractionAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
@@ -178,6 +179,10 @@ oppia.directive('tutorCard', [
              !$scope.arePreviousResponsesShown;
           };
 
+          $scope.isWindowNarrow = function() {
+            return WindowDimensionsService.isWindowNarrow();
+          };
+
           $scope.isViewportNarrow = function() {
             return WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
           };
@@ -187,6 +192,12 @@ oppia.directive('tutorCard', [
             $scope.onSubmitAnswer({
               answer: answer,
               rulesService: interactionRulesService
+            });
+          };
+
+          $scope.setInteractionAnswerValidity = function(answerValidity) {
+            $scope.onChangeInteractionAnswerValidity({
+              answerValidity: answerValidity
             });
           };
 

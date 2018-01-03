@@ -18,7 +18,9 @@ oppia.directive('oppiaInteractiveFractionInput', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        // This should be called whenever the answer changes.
+        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/FractionInput/directives/' +
@@ -27,9 +29,14 @@ oppia.directive('oppiaInteractiveFractionInput', [
         '$scope', '$attrs', 'FocusManagerService',
         'fractionInputRulesService',
         'FractionObjectFactory', 'FRACTION_PARSING_ERRORS',
-        function($scope, $attrs, FocusManagerService,
-          fractionInputRulesService,
-          FractionObjectFactory, FRACTION_PARSING_ERRORS) {
+        'WindowDimensionsService', 'UrlService',
+        'EVENT_PROGRESS_NAV_SUBMITTED',
+        function(
+            $scope, $attrs, FocusManagerService,
+            fractionInputRulesService,
+            FractionObjectFactory, FRACTION_PARSING_ERRORS,
+            WindowDimensionsService, UrlService,
+            EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
           var requireSimplestForm =
@@ -104,6 +111,16 @@ oppia.directive('oppiaInteractiveFractionInput', [
               $scope.FractionInputForm.answer.$setValidity(
                 FORM_ERROR_TYPE, false);
             }
+          };
+
+          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
+            $scope.submitAnswer($scope.answer);
+          });
+
+          $scope.isSubmitHidden = function() {
+            return (
+              !UrlService.isIframed() &&
+              WindowDimensionsService.isWindowNarrow());
           };
         }
       ]

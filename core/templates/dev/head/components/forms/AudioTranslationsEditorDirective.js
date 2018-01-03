@@ -34,18 +34,17 @@ oppia.directive('audioTranslationsEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/audio_translations_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', '$sce', 'stateContentService', 
-        'editabilityService', 'LanguageUtilService', 'AlertsService', 
+        '$scope', '$uibModal', '$sce', 'stateContentService',
+        'editabilityService', 'LanguageUtilService', 'AlertsService',
         'ExplorationContextService', 'AssetsBackendApiService',
         function(
             $scope, $uibModal, $sce, stateContentService, editabilityService,
             LanguageUtilService, AlertsService, ExplorationContextService,
             AssetsBackendApiService) {
           $scope.isEditable = editabilityService.isEditable;
-          if ($scope.subtitledHtml) {
-            $scope.audioTranslations = (
-              $scope.subtitledHtml.getBindableAudioTranslations());
-          }
+
+          $scope.audioTranslations = (
+            $scope.subtitledHtml.getBindableAudioTranslations());
 
           var explorationId = ExplorationContextService.getExplorationId();
 
