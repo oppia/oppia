@@ -123,6 +123,11 @@ oppia.directive('audioBar', [
             return AudioTranslationManagerService.getCurrentAudioLanguageCode();
           };
 
+          $scope.isAudioLanguageCodeAvailable = function(){
+            return AudioTranslationManagerService
+              .isCurrentAudioLanguageCodeSet();
+          }
+
           $scope.getCurrentAudioLanguageDescription = function() {
             return AudioTranslationManagerService
               .getCurrentAudioLanguageDescription();
