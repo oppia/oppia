@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for the audio translation manager service.
  */
 
-describe('Audio translation manager service', function() {
+describe('Audio translation language service', function() {
   beforeEach(module('oppia'));
   
   var atms;
   beforeEach(inject(function($injector) {
-    atms = $injector.get('AudioTranslationManagerService');
+    atms = $injector.get('AudioTranslationLanguageService');
   }));
 
   it('should properly initialize the current audio language when ' +

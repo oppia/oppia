@@ -19,11 +19,11 @@
 oppia.factory('AudioPreloaderService', [
   '$uibModal', 'ExplorationContextService', 'AssetsBackendApiService',
   'ExplorationPlayerStateService', 'UrlInterpolationService',
-  'AudioTranslationManagerService', 'LanguageUtilService',
+  'AudioTranslationLanguageService', 'LanguageUtilService',
   'ComputeGraphService',
   function($uibModal, ExplorationContextService, AssetsBackendApiService,
       ExplorationPlayerStateService, UrlInterpolationService,
-      AudioTranslationManagerService, LanguageUtilService,
+      AudioTranslationLanguageService, LanguageUtilService,
       ComputeGraphService) {
     var MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
@@ -38,7 +38,7 @@ oppia.factory('AudioPreloaderService', [
     };
 
     var _getAudioFilenamesInBfsOrder = function(sourceStateName) {
-      var languageCode = AudioTranslationManagerService
+      var languageCode = AudioTranslationLanguageService
         .getCurrentAudioLanguageCode();
       var stateNamesInBfsOrder =
         ComputeGraphService.computeBfsTraversalOfStates(
