@@ -25,24 +25,19 @@ oppia.directive('supplementalCard', [
         onSubmitAnswer: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/' +
-        'supplemental_card_directive.html'),
+        '/pages/exploration_player/supplemental_card_directive.html'),
       controller: [
-        '$scope', '$timeout', '$window', 'HintManagerService',
-        'HintAndSolutionModalService', 'ExplorationPlayerService',
+        '$scope', '$timeout', '$window', 'ExplorationPlayerService',
         'PlayerPositionService', 'PlayerTranscriptService',
         'WindowDimensionsService', 'CONTENT_FOCUS_LABEL_PREFIX',
         'TWO_CARD_THRESHOLD_PX', 'EVENT_ACTIVE_CARD_CHANGED',
-        'CONTINUE_BUTTON_FOCUS_LABEL', 'HINT_REQUEST_STRING_I18N_IDS',
-        'DELAY_FOR_HINT_FEEDBACK_MSEC', 'SolutionManagerService',
+        'CONTINUE_BUTTON_FOCUS_LABEL',
         function(
-            $scope, $timeout, $window, HintManagerService,
-            HintAndSolutionModalService, ExplorationPlayerService,
+            $scope, $timeout, $window, ExplorationPlayerService,
             PlayerPositionService, PlayerTranscriptService,
             WindowDimensionsService, CONTENT_FOCUS_LABEL_PREFIX,
             TWO_CARD_THRESHOLD_PX, EVENT_ACTIVE_CARD_CHANGED,
-            CONTINUE_BUTTON_FOCUS_LABEL, HINT_REQUEST_STRING_I18N_IDS,
-            DELAY_FOR_HINT_FEEDBACK_MSEC, SolutionManagerService) {
+            CONTINUE_BUTTON_FOCUS_LABEL) {
           var updateActiveCard = function() {
             var index = PlayerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -52,23 +47,11 @@ oppia.directive('supplementalCard', [
             $scope.clearHelpCard();
             $scope.lastAnswer =
               PlayerTranscriptService.getLastAnswerOnActiveCard(index);
-            HintManagerService.reset(ExplorationPlayerService.getInteraction(
-              $scope.activeCard.stateName).hints);
-
-            $scope.hintsExist = Boolean(ExplorationPlayerService.getInteraction(
-              $scope.activeCard.stateName).hints.length);
-
-            var solution = ExplorationPlayerService.getSolution(
-              $scope.activeCard.stateName);
-
-            SolutionManagerService.reset(solution);
-            $scope.solutionExists = Boolean(solution);
           };
 
           $scope.OPPIA_AVATAR_IMAGE_URL = (
             UrlInterpolationService.getStaticImageUrl(
               '/avatar/oppia_avatar_100px.svg'));
-
 
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
 
@@ -80,31 +63,6 @@ oppia.directive('supplementalCard', [
           $scope.clearHelpCard = function() {
             $scope.helpCardHtml = null;
             $scope.helpCardHasContinueButton = false;
-          };
-
-          $scope.consumeHint = function() {
-            if (!HintManagerService.areAllHintsExhausted()) {
-              HintAndSolutionModalService.displayHintModal();
-            }
-          };
-
-          $scope.viewSolution = function() {
-            HintAndSolutionModalService.displaySolutionModal();
-          };
-
-          $scope.isHintAvailable = function() {
-            var hintIsAvailable = (
-              HintManagerService.isCurrentHintAvailable() &&
-              !HintManagerService.areAllHintsExhausted());
-            return hintIsAvailable;
-          };
-
-          $scope.areAllHintsExhausted = function() {
-            return HintManagerService.areAllHintsExhausted();
-          };
-
-          $scope.isCurrentSolutionAvailable = function () {
-            return SolutionManagerService.isCurrentSolutionAvailable();
           };
 
           $scope.isViewportNarrow = function() {

@@ -2,9 +2,9 @@
 
 <div class="modal-body">
   <span ng-if="isHint" class="oppia-learner-hint-and-solution-modal-body"
-        angular-html-bind="hint"></span>
+        angular-html-bind="hint.getHtml()"></span>
   <span ng-if="!isHint" class="oppia-learner-hint-and-solution-modal-body"
-        angular-html-bind="solution"></span>
+        angular-html-bind="solutionHtml"></span>
 </div>
 
 <button class="oppia-learner-got-it-button md-button md-default-theme pull-right"

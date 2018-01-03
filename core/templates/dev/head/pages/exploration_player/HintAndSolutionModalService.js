@@ -17,31 +17,13 @@
  */
 
 oppia.factory('HintAndSolutionModalService', [
-  '$uibModal', 'UrlInterpolationService', 'HintManagerService',
-  'SolutionManagerService', 'ExplorationPlayerService',
-  'PlayerPositionService',
-  function($uibModal, UrlInterpolationService, HintManagerService,
-           SolutionManagerService, ExplorationPlayerService,
-           PlayerPositionService) {
+  '$uibModal', 'UrlInterpolationService', 'HintsAndSolutionManagerService',
+  'ExplorationPlayerService', 'PlayerPositionService',
+  function(
+      $uibModal, UrlInterpolationService, HintsAndSolutionManagerService,
+      ExplorationPlayerService, PlayerPositionService) {
     return {
-      displayHintModal: function() {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_player/hint_and_solution_modal_directive.html'),
-          backdrop: 'static',
-          controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
-              $scope.isHint = true;
-              $scope.hint = HintManagerService.consumeHint();
-              $scope.closeModal = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
-            }
-          ]
-        });
-      },
-      displayHintModalForIndex: function(index) {
+      displayHintModal: function(index) {
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/hint_and_solution_modal_directive.html'),
@@ -50,10 +32,7 @@ oppia.factory('HintAndSolutionModalService', [
             '$scope', '$uibModalInstance',
             function($scope, $uibModalInstance) {
               $scope.isHint = true;
-              $scope.hint = (
-                index === HintManagerService.getCurrentHintIndex() ?
-                  HintManagerService.consumeHint() :
-                  HintManagerService.getHintAtIndex(index));
+              $scope.hint = HintsAndSolutionManagerService.displayHint(index);
               $scope.closeModal = function() {
                 $uibModalInstance.dismiss('cancel');
               };
@@ -70,10 +49,10 @@ oppia.factory('HintAndSolutionModalService', [
             '$scope', '$uibModalInstance',
             function($scope, $uibModalInstance) {
               $scope.isHint = false;
-              var solution = SolutionManagerService.viewSolution();
+              var solution = HintsAndSolutionManagerService.getSolution();
               var interaction = ExplorationPlayerService.getInteraction(
                 PlayerPositionService.getCurrentStateName());
-              $scope.solution = solution.getOppiaResponseHtml(interaction);
+              $scope.solutionHtml = solution.getOppiaResponseHtml(interaction);
               $scope.closeModal = function() {
                 $uibModalInstance.dismiss('cancel');
               };
