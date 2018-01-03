@@ -16,27 +16,27 @@
  * @fileoverview Service to track the information about Help Card
  */
 
- oppia.factory('HelpCardService', [
-    function() {
-     var localHelpCard = {
-       helpCardHtml: null,
-       hasContinueButton: false
-     }
+oppia.factory('HelpCardService', [
+  function() {
+    var localHelpCard = {
+      helpCardHtml: null,
+      hasContinueButton: false
+    }
 
-     return {
-       getHtmlHelpCard: function() {
-         return localHelpCard;
-       },
-       setHtmlHelpCard: function(helpCard) {
-         localHelpCard.helpCardHtml = helpCard.helpCardHtml;
-         localHelpCard.hasContinueButton = helpCard.hasContinueButton;
-       },
-       clearHelpCard: function() {
-         localHelpCard = {
-           helpCardHtml: null,
-           hasContinueButton: false
-         }
-       }
-     };
-   }
- ]);
+    return {
+      getHtmlHelpCard: function() {
+        return localHelpCard;
+      },
+      setHtmlHelpCard: function(helpCard) {
+        localHelpCard.helpCardHtml = helpCard.helpCardHtml;
+        localHelpCard.hasContinueButton = helpCard.hasContinueButton;
+      },
+      clearHelpCard: function() {
+        localHelpCard = {
+          helpCardHtml: null,
+          hasContinueButton: false
+        }
+      }
+    };
+  }
+]);
