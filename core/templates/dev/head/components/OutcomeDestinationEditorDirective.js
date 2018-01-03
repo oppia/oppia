@@ -35,6 +35,8 @@ oppia.directive('outcomeDestinationEditor', [
             $scope, EditorStateService, explorationStatesService,
             StateGraphLayoutService, PLACEHOLDER_OUTCOME_DEST,
             FocusManagerService, EditorFirstTimeEventsService) {
+          var currentStateName = null;
+
           $scope.$on('saveOutcomeDestDetails', function() {
             // Create new state if specified.
             if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
@@ -49,6 +51,17 @@ oppia.directive('outcomeDestinationEditor', [
             }
           });
 
+          // We restrict editing of refresher exploration IDs to
+          // admins/moderators for now, since the feature is still in
+          // development.
+          $scope.canEditRefresherExplorationId = (
+            GLOBALS.isAdmin || GLOBALS.isModerator);
+          $scope.explorationIdPattern = /^[a-zA-Z0-9.-]+$/;
+
+          $scope.isSelfLoop = function() {
+            return $scope.outcome.dest === currentStateName;
+          };
+
           $scope.onDestSelectorChange = function() {
             if ($scope.outcome.dest === PLACEHOLDER_OUTCOME_DEST) {
               FocusManagerService.setFocus('newStateNameInputField');
@@ -62,7 +75,7 @@ oppia.directive('outcomeDestinationEditor', [
           $scope.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
           $scope.destChoices = [];
           $scope.$watch(explorationStatesService.getStates, function() {
-            var currentStateName = EditorStateService.getActiveStateName();
+            currentStateName = EditorStateService.getActiveStateName();
 
             // This is a list of objects, each with an ID and name. These
             // represent all states, as well as an option to create a

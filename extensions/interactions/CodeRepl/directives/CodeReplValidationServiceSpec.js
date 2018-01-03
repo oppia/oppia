@@ -34,7 +34,8 @@ describe('CodeReplValidationService', function() {
         html: '',
         audio_translations: {}
       },
-      param_changes: []
+      param_changes: [],
+      refresher_exploration_id: null
     });
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false)];
   }));

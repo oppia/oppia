@@ -21,16 +21,10 @@
             </div>
             <a ng-click="toggleInlineSolutionEditorIsActive()"
                class="oppia-rule-tab protractor-test-oppia-solution-tab">
-              <div class="oppia-response-header-block">
-                <div class="oppia-response-header">
-                  <span angular-html-bind="getSolutionSummary()"></span>
-                  <span class="pull-right oppia-transition-200"
-                        ng-click="deleteSolution($event)"
-                        style="cursor: pointer; opacity: 0.5;">
-                    <i class="material-icons md-18">&#xE5CD;</i>
-                  </span>
-                </div>
-              </div>
+              <response-header summary="getSolutionSummary()"
+                               short-summary="getSolutionSummary()"
+                               on-delete-fn="deleteSolution">
+              </response-header>
             </a>
 
             <div ng-if="inlineSolutionEditorIsActive">

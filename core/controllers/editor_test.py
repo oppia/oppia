@@ -592,6 +592,7 @@ interaction:
       audio_translations: {}
       html: ''
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -615,6 +616,7 @@ interaction:
       audio_translations: {}
       html: ''
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -638,6 +640,7 @@ interaction:
       audio_translations: {}
       html: ''
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -663,6 +666,7 @@ interaction:
       audio_translations: {}
       html: ''
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
