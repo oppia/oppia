@@ -203,6 +203,7 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
+import isort             # pylint: disable=wrong-import-position
 from pylint import lint  # pylint: disable=wrong-import-position
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
@@ -381,6 +382,7 @@ def _lint_py_files(config_pylint, files_to_lint, result):
 
     print 'Python linting finished.'
 
+
 def _get_all_files():
     """This function is used to check if this script is ran from
     root directory and to return a list of all the files for linting and
@@ -411,7 +413,7 @@ def _get_all_files():
                 invalid_filepaths.append(f)
         if invalid_filepaths:
             print ('The following file(s) do not exist: %s\n'
-                   'Exiting.' % invalid_filepaths)
+                  'Exiting.' % invalid_filepaths)
             sys.exit(1)
         all_files = valid_filepaths
     else:
@@ -470,7 +472,6 @@ def _pre_commit_linter(all_files):
         # Require timeout parameter to prevent against endless waiting for the
         # linting function to return.
         process.join(timeout=600)
-
 
     js_messages = []
     while not js_stdout.empty():
@@ -598,7 +599,7 @@ def _check_bad_patterns(all_files):
                     if _check_bad_pattern_in_file(filename, content, regexp):
                         failed = True
                         total_error_count += 1
-    
+
             if filename.endswith('.html'):
                 for regexp in BAD_PATTERNS_HTML_REGEXP:
                     if _check_bad_pattern_in_file(filename, content, regexp):
@@ -633,15 +634,35 @@ def _check_bad_patterns(all_files):
     return summary_messages
 
 
+def _check_import_order(all_files):
+    """This function is used to check that each file
+    has imports placed in alphabetical order.
+    """
+    print 'Starting import-order checks'
+    print '----------------------------------------'
+    all_files = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+    failed = False
+    for filename in all_files:
+        if(isort.SortImports(filename, check=False).incorrectly_sorted == True):
+            failed = True
+    print ''
+    print '----------------------------------------'
+    print ''
+    return failed
+
+
 def main():
     all_files = _get_all_files()
+    import_order_message = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
         linter_messages + newline_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
-            all_messages]):
+            all_messages]) or import_order_message:
         sys.exit(1)
 
 
