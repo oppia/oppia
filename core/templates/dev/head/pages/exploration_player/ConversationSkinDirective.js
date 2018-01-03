@@ -579,7 +579,11 @@ oppia.directive('conversationSkin', [
                       if (response.data.summaries.length > 0) {
                         RefresherExplorationConfirmationModalService.
                           displayRedirectConfirmationModal(
-                            refresherExplorationId);
+                            refresherExplorationId, function(
+                              refresherExplorationIdAvailable) {
+                                $scope.refresherExplorationIdAvailable =
+                                  refresherExplorationIdAvailable;
+                              });
                       }
                     });
                     FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
@@ -724,6 +728,9 @@ oppia.directive('conversationSkin', [
           });
 
           $window.addEventListener('beforeunload', function(e) {
+            if ($scope.refresherExplorationIdAvailable) {
+              return;
+            }
             if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&
                 !ExplorationPlayerStateService.isStateTerminal(
                   PlayerTranscriptService.getLastCard().stateName)) {
