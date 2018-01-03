@@ -664,8 +664,9 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.showUpcomingCard = function() {
-            if(HelpCardService.getHtmlHelpCard().hasContinueButton)
+            if(HelpCardService.getHtmlHelpCard().hasContinueButton) {
               HelpCardService.getHtmlHelpCard().hasContinueButton = false;
+            }
             $scope.showPendingCard(
               $scope.upcomingStateName, $scope.upcomingParams,
               $scope.upcomingContentHtml);
