@@ -349,6 +349,7 @@ oppia.factory('ExplorationPlayerService', [
         var outcome = angular.copy(classificationResult.outcome);
 
         var newStateName = outcome.dest;
+        var refresherExplorationId = outcome.refresherExplorationId;
         var newState = exploration.getState(newStateName);
 
         // Compute the data for the next state.
@@ -417,7 +418,7 @@ oppia.factory('ExplorationPlayerService', [
         $rootScope.$broadcast('playerStateChange', newStateName);
         successCallback(
           newStateName, refreshInteraction, feedbackHtml, questionHtml,
-          newParams);
+          newParams, refresherExplorationId);
       },
       isAnswerBeingProcessed: function() {
         return answerIsBeingProcessed;
