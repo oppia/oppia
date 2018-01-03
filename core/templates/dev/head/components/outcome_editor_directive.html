@@ -97,7 +97,10 @@
           <[outcome.dest]>
         </span>
         <span ng-if="isSelfLoop(outcome)" style="position: relative;">
-          (try again)
+          <span ng-if="!outcome.refresherExplorationId">(try again)</span>
+          <span ng-if="outcome.refresherExplorationId">
+            (try again, with refresher exploration "<[outcome.refresherExplorationId]>")
+          </span>
         </span>
       </div>
     </div>
