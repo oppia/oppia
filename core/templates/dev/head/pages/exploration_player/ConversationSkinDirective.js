@@ -579,11 +579,13 @@ oppia.directive('conversationSkin', [
                       if (response.data.summaries.length > 0) {
                         RefresherExplorationConfirmationModalService.
                           displayRedirectConfirmationModal(
-                            refresherExplorationId, function(
+                            refresherExplorationId,
+                            function(
                               refresherExplorationIdAvailable) {
-                                $scope.refresherExplorationIdAvailable =
-                                  refresherExplorationIdAvailable;
-                              });
+                              $scope.refresherExplorationIdAvailable =
+                                refresherExplorationIdAvailable;
+                            }
+                          );
                       }
                     });
                     FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
