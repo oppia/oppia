@@ -356,7 +356,9 @@ oppia.factory('ExplorationPlayerService', [
         oldParams.answer = answer;
         var feedbackHtml =
           makeFeedback(outcome.feedback.getHtml(), [oldParams]);
-        if (feedbackHtml === null) {
+        var feedbackAudioTranslations =
+          outcome.feedback.getBindableAudioTranslations();
+         if (feedbackHtml === null) {
           answerIsBeingProcessed = false;
           AlertsService.addWarning('Expression parsing error.');
           return;
@@ -416,8 +418,8 @@ oppia.factory('ExplorationPlayerService', [
         $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
         $rootScope.$broadcast('playerStateChange', newStateName);
         successCallback(
-          newStateName, refreshInteraction, feedbackHtml, questionHtml,
-          newParams);
+          newStateName, refreshInteraction, feedbackHtml, 
+          feedbackAudioTranslations, questionHtml, newParams);
       },
       isAnswerBeingProcessed: function() {
         return answerIsBeingProcessed;

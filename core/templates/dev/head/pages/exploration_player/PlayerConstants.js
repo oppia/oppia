@@ -31,6 +31,10 @@ oppia.constant('EVENT_NEW_CARD_AVAILABLE','newCardAvailable');
    Also called when card is selected by clicking on progress dots */
 oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
 
+/* Called when a new audio-equippable component is loaded and displayed 
+   to the user, allowing for the automatic playing of audio if necessary. */
+oppia.constant('EVENT_AUTOPLAY_AUDIO', 'autoPlayAudio');
+
 // The enforced waiting period between successive hint requests.
 oppia.constant('WAIT_FOR_HINT_MSEC', 30000);
 

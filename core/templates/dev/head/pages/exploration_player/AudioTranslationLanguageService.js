@@ -59,7 +59,7 @@ oppia.factory('AudioTranslationLanguageService', [
       _allAudioLanguageCodesInExploration = allAudioLanguageCodesInExploration;
       _explorationLanguageCode = explorationLanguageCode;
       _automaticTextToSpeechEnabled = automaticTextToSpeechEnabled;
-
+      _languagesInExploration = [];
       // Set the audio language that is chosen initially.
       // Use the following priority (highest to lowest):
       // 1. If the learner has a preferred audio language set, then set it to

@@ -49,9 +49,10 @@ oppia.factory('AudioPreloaderService', [
       allAudioTranslations = _exploration.getAllAudioTranslations(
         languageCode);
       stateNamesInBfsOrder.forEach(function(stateName) {
-        if (allAudioTranslations.hasOwnProperty(stateName)) {
-          audioFilenames.push(allAudioTranslations[stateName].filename);
-        }
+        var allAudioTranslationsForState = allAudioTranslations[stateName];
+        allAudioTranslationsForState.forEach(function(audioTranslation) {
+          audioFilenames.push(audioTranslation.filename);
+        });
       });
       return audioFilenames;
     };

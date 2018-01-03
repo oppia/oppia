@@ -257,6 +257,7 @@ oppia.directive('conversationSkin', [
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'EVENT_NEW_CARD_AVAILABLE', 'EVENT_PROGRESS_NAV_SUBMITTED',
         'FatigueDetectionService', 'NumberAttemptsService',
+        'AudioTranslationManagerService', 'EVENT_AUTOPLAY_AUDIO',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             MessengerService, ExplorationPlayerService, UrlService,
@@ -268,7 +269,8 @@ oppia.directive('conversationSkin', [
             TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, AlertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_AVAILABLE, EVENT_PROGRESS_NAV_SUBMITTED,
-            FatigueDetectionService, NumberAttemptsService) {
+            FatigueDetectionService, NumberAttemptsService,
+            AudioTranslationManagerService, EVENT_AUTOPLAY_AUDIO) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -360,6 +362,7 @@ oppia.directive('conversationSkin', [
           // 'show previous responses' setting.
           var _navigateToActiveCard = function() {
             $scope.$broadcast(EVENT_ACTIVE_CARD_CHANGED);
+            $scope.$broadcast(EVENT_AUTOPLAY_AUDIO);
             var index = PlayerPositionService.getActiveCardIndex();
             $scope.activeCard = PlayerTranscriptService.getCard(index);
             tutorCardIsDisplayedIfNarrow = true;
@@ -527,8 +530,8 @@ oppia.directive('conversationSkin', [
 
             ExplorationPlayerService.submitAnswer(
               answer, interactionRulesService, function(
-                  newStateName, refreshInteraction, feedbackHtml, contentHtml,
-                  newParams) {
+                  newStateName, refreshInteraction, feedbackHtml,
+                  feedbackAudioTranslations, contentHtml, newParams) {
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.
                 var millisecsLeftToWait = (
@@ -543,6 +546,9 @@ oppia.directive('conversationSkin', [
                   var pairs = (
                     PlayerTranscriptService.getLastCard().inputResponsePairs);
                   var lastAnswerFeedbackPair = pairs[pairs.length - 1];
+                  AudioTranslationManagerService.setPrimaryAudioTranslations(
+                    feedbackAudioTranslations);
+                  $scope.$broadcast(EVENT_AUTOPLAY_AUDIO);
 
                   if (_oldStateName === newStateName) {
                     // Stay on the same card.
