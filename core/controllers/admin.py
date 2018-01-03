@@ -17,8 +17,6 @@
 import logging
 import random
 
-import jinja2
-
 from core import jobs
 from core import jobs_registry
 from core.controllers import base
@@ -36,6 +34,7 @@ from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import jinja2
 import utils
 
 current_user_services = models.Registry.import_current_user_services()

@@ -25,6 +25,7 @@ import logging
 import traceback
 
 from core.platform import models
+from pipeline import pipeline
 import utils
 
 from google.appengine.api import app_identity
@@ -33,10 +34,9 @@ from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
 from mapreduce import mapreduce_pipeline
-from mapreduce import model as mapreduce_model
 from mapreduce import output_writers
+from mapreduce import model as mapreduce_model
 from mapreduce import util as mapreduce_util
-from pipeline import pipeline
 
 (base_models, job_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.job])

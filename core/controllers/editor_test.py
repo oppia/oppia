@@ -14,10 +14,10 @@
 
 """Tests for the exploration editor page."""
 
+import StringIO
 import datetime
 import logging
 import os
-import StringIO
 import zipfile
 
 from core import jobs_registry
@@ -27,11 +27,12 @@ from core.domain import config_services
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import stats_jobs_continuous_test
 from core.domain import rights_manager
+from core.domain import stats_jobs_continuous_test
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
+from core.platform.taskqueue import \
+    gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 

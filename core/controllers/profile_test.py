@@ -15,7 +15,6 @@
 """Tests for the profile page."""
 
 from constants import constants
-
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import subscription_services

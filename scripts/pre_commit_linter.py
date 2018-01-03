@@ -413,7 +413,7 @@ def _get_all_files():
                 invalid_filepaths.append(f)
         if invalid_filepaths:
             print ('The following file(s) do not exist: %s\n'
-                  'Exiting.' % invalid_filepaths)
+                   'Exiting.' % invalid_filepaths)
             sys.exit(1)
         all_files = valid_filepaths
     else:
@@ -645,7 +645,7 @@ def _check_import_order(all_files):
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
     failed = False
     for filename in all_files:
-        if(isort.SortImports(filename, check=False).incorrectly_sorted == True):
+        if isort.SortImports(filename, check=True).incorrectly_sorted:
             failed = True
     print ''
     print '----------------------------------------'

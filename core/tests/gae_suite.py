@@ -28,9 +28,11 @@ import argparse
 import os
 import sys
 import unittest
-#pylint: enable=wrong-import-order
 
 import feconf
+
+#pylint: enable=wrong-import-order
+
 
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')

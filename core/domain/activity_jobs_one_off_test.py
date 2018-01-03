@@ -15,15 +15,16 @@
 # limitations under the License.
 
 from core.domain import activity_jobs_one_off
-from core.domain import collection_services
 from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
+from core.platform.taskqueue import \
+    gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 
 gae_search_services = models.Registry.import_search_services()

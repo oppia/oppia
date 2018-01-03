@@ -17,13 +17,12 @@
 import copy
 import json
 import logging
-import os
 import math
+import os
 
 import jinja2
 from jinja2 import meta
-
-import utils # pylint: disable=relative-import
+import utils  # pylint: disable=relative-import
 
 
 def _js_string_filter(value):

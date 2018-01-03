@@ -20,7 +20,6 @@ import logging
 import os
 
 import cloudstorage
-
 from core.platform import models
 import feconf
 import utils

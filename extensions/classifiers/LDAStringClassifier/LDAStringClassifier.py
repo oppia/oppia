@@ -17,11 +17,11 @@
 """Classifier for free-form text answers."""
 
 import copy
-import numpy
-import utils
 
 from core.domain.base_classifier import BaseClassifier
 import feconf
+import numpy
+import utils
 
 
 class LDAStringClassifier(BaseClassifier):

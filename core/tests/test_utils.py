@@ -24,8 +24,6 @@ import os
 import re
 import unittest
 
-import webtest
-
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -39,6 +37,7 @@ import main
 import main_mail
 import main_taskqueue
 import utils
+import webtest
 
 from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map

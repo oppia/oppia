@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import StringIO
 import copy
 import datetime
 import os
-import StringIO
 import zipfile
 
 from core.domain import exp_domain

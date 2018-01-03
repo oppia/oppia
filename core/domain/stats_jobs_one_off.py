@@ -27,7 +27,6 @@ from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.platform import models
-
 import feconf
 import utils
 

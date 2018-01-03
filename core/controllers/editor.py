@@ -16,15 +16,11 @@
 
 """Controllers for the editor view."""
 
+import StringIO
 import datetime
 import imghdr
 import logging
 import re
-import StringIO
-
-import jinja2
-import mutagen
-from mutagen import mp3
 
 from constants import constants
 from core.controllers import base
@@ -45,8 +41,10 @@ from core.domain import user_services
 from core.domain import value_generators_domain
 from core.domain import visualization_registry
 from core.platform import models
-
 import feconf
+import jinja2
+import mutagen
+from mutagen import mp3
 import utils
 
 app_identity_services = models.Registry.import_app_identity_services()
