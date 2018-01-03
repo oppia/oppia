@@ -30,7 +30,7 @@ oppia.directive('supplementalCard', [
       controller: [
         '$scope', '$timeout', '$window', 'HintManagerService',
         'HintAndSolutionModalService', 'ExplorationPlayerService',
-        'PlayerPositionService', 'PlayerTranscriptService',
+        'PlayerPositionService', 'PlayerTranscriptService', 'HelpCardService',
         'WindowDimensionsService', 'CONTENT_FOCUS_LABEL_PREFIX',
         'TWO_CARD_THRESHOLD_PX', 'EVENT_ACTIVE_CARD_CHANGED',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'HINT_REQUEST_STRING_I18N_IDS',
@@ -38,7 +38,7 @@ oppia.directive('supplementalCard', [
         function(
             $scope, $timeout, $window, HintManagerService,
             HintAndSolutionModalService, ExplorationPlayerService,
-            PlayerPositionService, PlayerTranscriptService,
+            PlayerPositionService, PlayerTranscriptService, HelpCardService,
             WindowDimensionsService, CONTENT_FOCUS_LABEL_PREFIX,
             TWO_CARD_THRESHOLD_PX, EVENT_ACTIVE_CARD_CHANGED,
             CONTINUE_BUTTON_FOCUS_LABEL, HINT_REQUEST_STRING_I18N_IDS,
@@ -49,7 +49,6 @@ oppia.directive('supplementalCard', [
               return;
             }
             $scope.activeCard = PlayerTranscriptService.getCard(index);
-            $scope.clearHelpCard();
             $scope.lastAnswer =
               PlayerTranscriptService.getLastAnswerOnActiveCard(index);
             HintManagerService.reset(ExplorationPlayerService.getInteraction(
@@ -72,14 +71,18 @@ oppia.directive('supplementalCard', [
 
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
 
-          $scope.helpCardHtml = null;
-          $scope.helpCardHasContinueButton = false;
+          $scope.helpCardHtml = HelpCardService.getHtmlHelpCard().helpCardHtml;
+          $scope.helpCardHasContinueButton =
+            HelpCardService.getHtmlHelpCard().hasContinueButton;
 
           $scope.windowDimensionsService = WindowDimensionsService;
 
           $scope.clearHelpCard = function() {
-            $scope.helpCardHtml = null;
-            $scope.helpCardHasContinueButton = false;
+            HelpCardService.clearHelpCard();
+            $scope.helpCardHtml = 
+              HelpCardService.getHtmlHelpCard().helpCardHtml;
+            $scope.helpCardHasContinueButton =
+              HelpCardService.getHtmlHelpCard().hasContinueButton;
           };
 
           $scope.consumeHint = function() {
@@ -125,7 +128,6 @@ oppia.directive('supplementalCard', [
             if ($scope.activeCard.destStateName) {
               return;
             }
-
             $scope.clearHelpCard();
             $scope.onSubmitAnswer({
               answer: answer,
@@ -140,6 +142,7 @@ oppia.directive('supplementalCard', [
           $scope.$on('helpCardAvailable', function(event, helpCard) {
             $scope.helpCardHtml = helpCard.helpCardHtml;
             $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
+            HelpCardService.setHtmlHelpCard(helpCard);
           });
 
           updateActiveCard();
