@@ -51,7 +51,7 @@ oppia.controller('StateHints', [
         }
       }
       return hintButtonText;
-    }
+    };
 
     $scope.getHintSummary = function(hint) {
       var hintAsPlainText = (
