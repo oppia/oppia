@@ -581,9 +581,9 @@ oppia.directive('conversationSkin', [
                           displayRedirectConfirmationModal(
                             refresherExplorationId,
                             function(
-                              refresherExplorationIdAvailable) {
-                              $scope.refresherExplorationIdAvailable =
-                                refresherExplorationIdAvailable;
+                              redirectConfirmed) {
+                              $scope.redirectToRefresherExplorationConfirmed =
+                                redirectConfirmed;
                             }
                           );
                       }
@@ -730,7 +730,7 @@ oppia.directive('conversationSkin', [
           });
 
           $window.addEventListener('beforeunload', function(e) {
-            if ($scope.refresherExplorationIdAvailable) {
+            if ($scope.redirectToRefresherExplorationConfirmed) {
               return;
             }
             if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&
