@@ -27,9 +27,6 @@
 </div>
 
 <div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
-  <progress-dots ng-if="!isViewportNarrow()" num-dots="numProgressDots" class="conversation-skin-progress-dots">
-  </progress-dots>
-
   <div class="conversation-skin-cards-container conversation-skin-animate-cards"
        ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
 
@@ -38,8 +35,7 @@
                       isViewportNarrow() && isCurrentSupplementalCardNonempty(),
                     'conversation-skin-tutor-card-alone':
                       isViewportNarrow() && !isCurrentSupplementalCardNonempty()}">
-      <tutor-card on-click-continue-button="showUpcomingCard()"
-                  on-submit-answer="submitAnswer(answer, rulesService)"
+      <tutor-card on-submit-answer="submitAnswer(answer, rulesService)"
                   start-card-change-animation="startCardChangeAnimation"
                   on-change-interaction-answer-validity="setInteractionAnswerValidity(answerValidity)">
       </tutor-card>
@@ -48,8 +44,7 @@
                            on-submit-answer="submitAnswer(answer, rulesService)">
         </supplemental-card>
       </div>
-      <progress-nav ng-if="isWindowNarrow()"
-                    on-submit="submitAnswerFromProgressNav()"
+      <progress-nav on-submit="submitAnswerFromProgressNav()"
                     submit-is-disabled="!interactionAnswerIsValid"
                     on-click-continue-button="showUpcomingCard()">
       </progress-nav>

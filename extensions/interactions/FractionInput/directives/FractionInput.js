@@ -118,9 +118,7 @@ oppia.directive('oppiaInteractiveFractionInput', [
           });
 
           $scope.isSubmitHidden = function() {
-            return (
-              !UrlService.isIframed() &&
-              WindowDimensionsService.isWindowNarrow());
+            return !UrlService.isIframed();
           };
         }
       ]

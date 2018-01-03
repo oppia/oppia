@@ -41,14 +41,18 @@ oppia.directive('oppiaInteractiveGraphInput', [
         'graph_input_interaction_directive.html'),
       controller: [
         '$scope', '$element', '$attrs', 'WindowDimensionsService',
-        'EVENT_PROGRESS_NAV_SUBMITTED',
+        'EVENT_PROGRESS_NAV_SUBMITTED', 'TWO_CARD_THRESHOLD_PX',
         function(
             $scope, $element, $attrs, WindowDimensionsService,
-            EVENT_PROGRESS_NAV_SUBMITTED) {
+            EVENT_PROGRESS_NAV_SUBMITTED, TWO_CARD_THRESHOLD_PX) {
+          var isViewportNarrow = function() {
+            return (
+              WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX);
+          };
           $scope.isSubmitHidden = function() {
             return (
               !UrlService.isIframed() &&
-              WindowDimensionsService.isWindowNarrow());
+              isViewportNarrow());
           };
 
           $scope.errorMessage = '';

@@ -758,11 +758,6 @@ oppia.directive('conversationSkin', [
             return $scope.windowWidth < TWO_CARD_THRESHOLD_PX;
           };
 
-          $scope.isWindowNarrow = function() {
-            // TODO(allan): Resolve discrepancy with isViewportNarrow.
-            return WindowDimensionsService.isWindowNarrow();
-          }
-
           $scope.initializePage();
           LearnerViewRatingService.init(function(userRating) {
             $scope.userRating = userRating;

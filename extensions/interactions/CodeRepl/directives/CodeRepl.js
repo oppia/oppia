@@ -39,13 +39,19 @@ oppia.directive('oppiaInteractiveCodeRepl', [
       controller: [
         '$scope', '$attrs', 'WindowDimensionsService',
         'UrlService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'TWO_CARD_THRESHOLD_PX',
         function(
             $scope, $attrs, WindowDimensionsService,
-            UrlService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            UrlService, EVENT_PROGRESS_NAV_SUBMITTED,
+            TWO_CARD_THRESHOLD_PX) {
+          var isViewportNarrow = function() {
+            return (
+              WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX);
+          };
           $scope.isSubmitHidden = function() {
             return (
               !UrlService.isIframed() &&
-              WindowDimensionsService.isWindowNarrow());
+              isViewportNarrow());
           };
 
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
