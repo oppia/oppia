@@ -34,6 +34,7 @@ oppia.factory('ExplorationPlayerService', [
   'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
   'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
+  'footerCorrectnessService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       AlertsService, AnswerClassificationService, ExplorationContextService,
@@ -43,7 +44,8 @@ oppia.factory('ExplorationPlayerService', [
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService,
-      LanguageUtilService, NumberAttemptsService, AudioPreloaderService) {
+      LanguageUtilService, NumberAttemptsService, AudioPreloaderService,
+      footerCorrectnessService) {
     var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
       ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -62,6 +64,11 @@ oppia.factory('ExplorationPlayerService', [
     var manualParamChanges = null;
     var initialStateName = null;
     var version = GLOBALS.explorationVersion;
+
+    var setCorrectnessFeedbackValue = function(correctnessfeedbackvalue) {
+      footerCorrectnessService.init(correctnessfeedbackvalue);
+      return;
+    };
 
     var randomFromArray = function(arr) {
       return arr[Math.floor(Math.random() * arr.length)];
@@ -214,6 +221,7 @@ oppia.factory('ExplorationPlayerService', [
                 data.auto_tts_enabled);
               AudioPreloaderService.init(exploration);
               AudioPreloaderService.kickOffAudioPreloader(initStateName);
+              setCorrectnessFeedbackValue(data.correctness_feedback_enabled);
               _loadInitialState(successCallback);
               NumberAttemptsService.reset();
             });
@@ -247,6 +255,7 @@ oppia.factory('ExplorationPlayerService', [
             AudioPreloaderService.init(exploration);
             AudioPreloaderService.kickOffAudioPreloader(
               exploration.getInitialState().name);
+            setCorrectnessFeedbackValue(data.correctness_feedback_enabled);
             _loadInitialState(successCallback);
             $rootScope.$broadcast('playerServiceInitialized');
           });
