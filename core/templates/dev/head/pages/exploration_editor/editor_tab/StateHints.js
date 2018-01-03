@@ -31,7 +31,6 @@ oppia.controller('StateHints', [
     $scope.EditorStateService = EditorStateService;
     $scope.stateHintsService = stateHintsService;
     $scope.activeHintIndex = null;
-    $scope.hintCount = 0;
     $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
@@ -41,7 +40,6 @@ oppia.controller('StateHints', [
       stateHintsService.init(
         EditorStateService.getActiveStateName(),
           stateData.interaction.hints);
-      $scope.hintCount = stateData.interaction.hints.length;
       $scope.activeHintIndex = null;
     });
 
@@ -82,7 +80,7 @@ oppia.controller('StateHints', [
     };
 
     $scope.openAddHintModal = function() {
-      if ($scope.hintCount === 5) {
+      if ($scope.stateHintsService.displayed.length === 5) {
         return;
       }
       AlertsService.clearWarnings();
@@ -123,7 +121,6 @@ oppia.controller('StateHints', [
         ]
       }).result.then(function(result) {
         stateHintsService.displayed.push(result.hint);
-        $scope.hintCount = $scope.hintCount + 1;
         stateHintsService.saveDisplayedValue();
       });
     };
@@ -174,7 +171,6 @@ oppia.controller('StateHints', [
         stateSolutionService.displayed = null;
         stateSolutionService.saveDisplayedValue();
         stateHintsService.displayed = [];
-        $scope.hintCount = 0;
         stateHintsService.saveDisplayedValue();
       });
     };
@@ -208,7 +204,6 @@ oppia.controller('StateHints', [
           openDeleteLastHintModal();
         } else {
           stateHintsService.displayed.splice(index, 1);
-          $scope.hintCount = $scope.hintCount - 1;
           stateHintsService.saveDisplayedValue();
         }
       });
