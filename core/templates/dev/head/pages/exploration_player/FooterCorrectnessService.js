@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview CorrectnessFooter service in learner's view if the answer submitted is correct.
+ * @fileoverview CorrectnessFooter service in learner's view if the answer
+ *  submitted is correct.
  */
 
 oppia.factory('footerCorrectnessService', [function() {
