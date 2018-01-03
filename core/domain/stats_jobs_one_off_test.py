@@ -134,14 +134,14 @@ class RecomputeStateCompleteStatisticsTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.exp_id, '1')
+            self.exp_id, 1)
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping[self.exp.init_state_name]
         # Check the old event schema version was not counted.
         self.assertEqual(state_stats['num_completions_v2'], 2)
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.exp_id, '2')
+            self.exp_id, 2)
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping[self.exp.init_state_name]
         # Check that the new version counts events for the previous
@@ -149,7 +149,7 @@ class RecomputeStateCompleteStatisticsTest(test_utils.GenericTestBase):
         self.assertEqual(state_stats['num_completions_v2'], 3)
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.exp_id, '3')
+            self.exp_id, 3)
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping[self.state_b]
         # Check that the new version with a renamed state still
@@ -273,6 +273,8 @@ class RecomputeAnswerSubmittedStatisticsTest(test_utils.GenericTestBase):
 
 class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
     exp_id = 'exp_id'
+    # Start on version 2 as the update from version 1 to 2 is only to
+    # setup states for testing
     exp_version = 1
     session_id_1 = 'session_id_1'
     session_id_2 = 'session_id_2'
@@ -282,6 +284,9 @@ class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
         self.exp = self.save_new_valid_exploration(self.exp_id, 'owner')
         self.state = self.exp.init_state_name
 
+        change_list = []
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
         change_list = [{'cmd': exp_domain.CMD_RENAME_STATE,
                         'old_state_name': self.state,
                         'new_state_name': 'b'}]
@@ -333,11 +338,22 @@ class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
             event_type=feconf.EVENT_TYPE_STATE_HIT,
             exploration_id=self.exp_id,
             exploration_version=2,
+            state_name='a',
+            session_id=self.session_id_2,
+            params={},
+            play_type=feconf.PLAY_TYPE_NORMAL,
+            event_schema_version=2).put()
+        stats_models.StateHitEventLogEntryModel(
+            id='id6',
+            event_type=feconf.EVENT_TYPE_STATE_HIT,
+            exploration_id=self.exp_id,
+            exploration_version=3,
             state_name='b',
             session_id=self.session_id_2,
             params={},
             play_type=feconf.PLAY_TYPE_NORMAL,
             event_schema_version=2).put()
+
 
         state_stats_dict = {
             'total_answers_count_v1': 3,
@@ -353,13 +369,21 @@ class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
             'num_completions_v2': 0
         }
         stats_models.ExplorationStatsModel.create(
-            self.exp_id, self.exp_version, 0, 0, 0, 0, 0, 0,
+            self.exp_id, 1, 0, 0, 0, 0, 0, 0,
             {
+                'a': state_stats_dict,
                 self.state: state_stats_dict
             })
         stats_models.ExplorationStatsModel.create(
             self.exp_id, 2, 0, 0, 0, 0, 0, 0,
             {
+                'a': state_stats_dict,
+                self.state: state_stats_dict
+            })
+        stats_models.ExplorationStatsModel.create(
+            self.exp_id, 3, 0, 0, 0, 0, 0, 0,
+            {
+                'a': state_stats_dict,
                 'b': state_stats_dict
             })
 
@@ -374,18 +398,36 @@ class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.exp_id, str(self.exp_version))
+            self.exp_id, self.exp_version)
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping[self.state]
         self.assertEqual(state_stats['first_hit_count_v2'], 2)
         self.assertEqual(state_stats['total_hit_count_v2'], 3)
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.exp_id, 2)
+            self.exp_id, 3)
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping['b']
         self.assertEqual(state_stats['first_hit_count_v2'], 3)
         self.assertEqual(state_stats['total_hit_count_v2'], 4)
+
+    def test_session_hitting_multiple_states(self):
+        job_id = (
+            stats_jobs_one_off.RecomputeStatisticsOneOffJob.create_new())
+        stats_jobs_one_off.RecomputeStatisticsOneOffJob.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            self.exp_id, 2)
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        state_stats = model.state_stats_mapping['a']
+        self.assertEqual(state_stats['first_hit_count_v2'], 1)
+        self.assertEqual(state_stats['total_hit_count_v2'], 1)
+
 
 
 class RecomputeSolutionHitStatisticsTest(test_utils.GenericTestBase):
@@ -490,13 +532,13 @@ class RecomputeSolutionHitStatisticsTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.exp_id, str(self.exp_version))
+            self.exp_id, self.exp_version)
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping[self.state]
         self.assertEqual(state_stats['num_times_solution_viewed_v2'], 3)
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.exp_id, '2')
+            self.exp_id, 2)
         model = stats_models.ExplorationStatsModel.get(model_id)
         state_stats = model.state_stats_mapping['b']
         self.assertEqual(state_stats['num_times_solution_viewed_v2'], 4)
@@ -688,7 +730,7 @@ class RecomputeCompleteEventStatisticsTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.exp_id, str(self.exp_version))
+            self.exp_id, self.exp_version)
         model = stats_models.ExplorationStatsModel.get(model_id)
         self.assertEqual(model.num_completions_v2, 2)
 

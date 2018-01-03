@@ -33,7 +33,6 @@ from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.platform import models
 
-
 (exp_models, stats_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics
 ])
@@ -110,7 +109,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(exp_id, values):
         values = map(ast.literal_eval, values)
-        values = sorted(values, key=lambda x: x['version'])
+        sorted_events_dicts = sorted(values, key=lambda x: x['version'])
 
         # Find the latest version number
         exploration = exp_services.get_exploration_by_id(exp_id)
@@ -127,15 +126,15 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 exp_id, versions))
 
         exp_stats_dicts = []
-        event_idx = 0
-        event = values[event_idx]
+        event_dict_idx = 0
+        event_dict = sorted_events_dicts[event_dict_idx]
         for version in versions:
             datastore_stats_for_version = old_stats[version-1]
             if version == 1:
                 # Reset the possibly corrupted stats
                 datastore_stats_for_version.num_starts_v2 = 0
                 datastore_stats_for_version.num_completions_v2 = 0
-                datastore_stats_for_version.num_starts_v2 = 0
+                datastore_stats_for_version.num_actual_starts_v2 = 0
                 for state_stats in (datastore_stats_for_version.
                                     state_stats_mapping.values()):
                     state_stats.total_answers_count_v2 = 0
@@ -180,41 +179,44 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
             # Compute the statistics for events corresponding to this version
             state_hit_session_ids, solution_hit_session_ids = set(), set()
-            while event['version'] == version:
+            while event_dict['version'] == version:
                 state_stats = (exp_stats_dict['state_stats_mapping'][
-                    event['state_name']])
-                if event['event_type'] == (
+                    event_dict['state_name']])
+                if event_dict['event_type'] == (
                         feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION):
                     exp_stats_dict['num_actual_starts_v2'] += 1
-                elif event['event_type'] == (
+                elif event_dict['event_type'] == (
                         feconf.EVENT_TYPE_COMPLETE_EXPLORATION):
                     exp_stats_dict['num_completions_v2'] += 1
-                elif event['event_type'] == (
+                elif event_dict['event_type'] == (
                         feconf.EVENT_TYPE_ANSWER_SUBMITTED):
                     state_stats['total_answers_count_v2'] += 1
-                    if event['is_feedback_useful']:
+                    if event_dict['is_feedback_useful']:
                         state_stats['useful_feedback_count_v2'] += 1
-                elif event['event_type'] == feconf.EVENT_TYPE_STATE_HIT:
+                elif event_dict['event_type'] == feconf.EVENT_TYPE_STATE_HIT:
                     state_stats['total_hit_count_v2'] += 1
-                    if event['session_id'] not in state_hit_session_ids:
+                    state_hit_key = (
+                        event_dict['session_id'] + event_dict['state_name'])
+                    if state_hit_key not in state_hit_session_ids:
                         state_stats['first_hit_count_v2'] += 1
-                        state_hit_session_ids.add(event['session_id'])
-                elif event['event_type'] == feconf.EVENT_TYPE_SOLUTION_HIT:
-                    if event['session_id'] not in solution_hit_session_ids:
+                        state_hit_session_ids.add(state_hit_key)
+                elif event_dict['event_type'] == feconf.EVENT_TYPE_SOLUTION_HIT:
+                    solution_hit_key = (
+                        event_dict['session_id'] + event_dict['state_name'])
+                    if solution_hit_key not in solution_hit_session_ids:
                         state_stats['num_times_solution_viewed_v2'] += 1
-                        solution_hit_session_ids.add(event['session_id'])
-                elif event['event_type'] == (
+                        solution_hit_session_ids.add(solution_hit_key)
+                elif event_dict['event_type'] == (
                         feconf.EVENT_TYPE_STATE_COMPLETED):
                     state_stats['num_completions_v2'] += 1
-                event_idx += 1
-                if event_idx < len(values):
-                    event = values[event_idx]
+                event_dict_idx += 1
+                if event_dict_idx < len(sorted_events_dicts):
+                    event_dict = sorted_events_dicts[event_dict_idx]
                 else:
                     break
 
             exp_stats_dicts.append(copy.deepcopy(exp_stats_dict))
         stats_models.ExplorationStatsModel.save_multi(exp_stats_dicts)
-
 
     @classmethod
     def _apply_state_name_changes(cls, prev_stats_dict, change_list):
