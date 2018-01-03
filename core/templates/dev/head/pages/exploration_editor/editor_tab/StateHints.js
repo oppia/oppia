@@ -43,6 +43,16 @@ oppia.controller('StateHints', [
       $scope.activeHintIndex = null;
     });
 
+    $scope.getHintButtonText = function() {
+      var hintButtonText = '+ Add Hint';
+      if ($scope.stateHintsService.displayed) {
+        if ($scope.stateHintsService.displayed.length >= 5) {
+          hintButtonText = 'Limit Reached';
+        }
+      }
+      return hintButtonText;
+    }
+
     $scope.getHintSummary = function(hint) {
       var hintAsPlainText = (
         hint.hintContent.getHtml() ?

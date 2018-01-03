@@ -52,10 +52,10 @@
     <md-card style="margin: 0; padding: 0;">
       <div ng-if="editabilityService.isEditableOutsideTutorialMode()">
         <button type="button"
-                class="btn btn-default btn-lg oppia-add-hint-button protractor-test-oppia-add-hint-button"
+                class="btn btn-primary btn-lg oppia-add-hint-button protractor-test-oppia-add-hint-button"
                 ng-click="openAddHintModal()"
-                ng-if="stateHintsService.displayed.length < 5">
-          + Add Hint
+                ng-disabled="stateHintsService.displayed.length >= 5">
+          <[getHintButtonText()]>
         </button>
       </div>
     </md-card>
