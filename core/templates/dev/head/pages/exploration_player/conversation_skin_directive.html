@@ -62,6 +62,9 @@
       </supplemental-card>
     </div>
   </div>
+  <div class="conversation-skin-correctness-footer-container" ng-if="isCorrectnessFooterEnabled()">
+    <correctness-footer></correctness-footer>
+  </div>
 </div>
 
 <div ng-if="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
@@ -149,6 +152,10 @@ otherwise they will interfere with the iframed conversation skin directive.
   }
 
   /* All classes below should start with .conversation-skin */
+  .conversation-skin-correctness-footer-container {
+    position:relative;
+  }
+
   .conversation-skin-back-to-collection-container {
     margin-bottom: 92px;
     margin-top: 25px;

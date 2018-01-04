@@ -257,6 +257,7 @@ oppia.directive('conversationSkin', [
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'EVENT_NEW_CARD_AVAILABLE', 'EVENT_PROGRESS_NAV_SUBMITTED',
         'FatigueDetectionService', 'NumberAttemptsService',
+        'PlayerCorrectnessFeedbackEnabledService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             MessengerService, ExplorationPlayerService, UrlService,
@@ -268,7 +269,8 @@ oppia.directive('conversationSkin', [
             TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, AlertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_AVAILABLE, EVENT_PROGRESS_NAV_SUBMITTED,
-            FatigueDetectionService, NumberAttemptsService) {
+            FatigueDetectionService, NumberAttemptsService,
+            PlayerCorrectnessFeedbackEnabledService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -289,6 +291,15 @@ oppia.directive('conversationSkin', [
           $rootScope.loadingMessage = 'Loading';
           $scope.hasFullyLoaded = false;
           $scope.recommendedExplorationSummaries = null;
+          $scope.answerIsCorrect = false;
+          $scope.isCorrectnessFeedbackEnabled = function() {
+            return PlayerCorrectnessFeedbackEnabledService.isEnabled();
+          };
+
+          $scope.isCorrectnessFooterEnabled = function() {
+            return (
+              $scope.answerIsCorrect && $scope.isCorrectnessFeedbackEnabled());
+          };
 
           $scope.OPPIA_AVATAR_IMAGE_URL = (
             UrlInterpolationService.getStaticImageUrl(
@@ -525,7 +536,7 @@ oppia.directive('conversationSkin', [
 
             var timeAtServerCall = new Date().getTime();
 
-            ExplorationPlayerService.submitAnswer(
+            $scope.answerIsCorrect = ExplorationPlayerService.submitAnswer(
               answer, interactionRulesService, function(
                   newStateName, refreshInteraction, feedbackHtml, contentHtml,
                   newParams) {
@@ -664,6 +675,7 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.showUpcomingCard = function() {
+            $scope.answerIsCorrect = false;
             $scope.showPendingCard(
               $scope.upcomingStateName, $scope.upcomingParams,
               $scope.upcomingContentHtml);
