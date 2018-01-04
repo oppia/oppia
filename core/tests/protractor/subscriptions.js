@@ -33,7 +33,8 @@ describe('Subscriptions functionality', function() {
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     preferencesPage = new PreferencesPage.PreferencesPage();
-    subscriptionDashboardPage = new SubscriptionDashboardPage.SubscriptionDashboardPage();
+    subscriptionDashboardPage = 
+    new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
   it('handle subscriptions to creators correctly', function() {
