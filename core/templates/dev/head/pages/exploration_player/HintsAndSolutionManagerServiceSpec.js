@@ -105,7 +105,9 @@ describe('HintsAndSolutionManager service', function() {
   });
 
   it('should correctly retrieve the solution', function() {
-    expect(hasms.getSolution().correctAnswer).toBe(
+    expect(hasms.isSolutionConsumed()).toBe(false);
+    expect(hasms.displaySolution().correctAnswer).toBe(
       'This is a correct answer!');
+    expect(hasms.isSolutionConsumed()).toBe(true);
   });
 });

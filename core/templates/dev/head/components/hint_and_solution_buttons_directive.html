@@ -5,7 +5,7 @@
       <img class="oppia-hint-button protractor-test-view-hint" ng-if="isHintButtonVisible(hintIndex)" ng-src="<[activeHintIndex === hintIndex ? activeHintUrl : defaultHintUrl]>" ng-click="displayHintModal(hintIndex)">
     </li>
     <li ng-if="isSolutionButtonVisible()">
-      <img class="oppia-solution-button protractor-test-view-solution" ng-src="<[solutionModalIsActive ? activeSolutionUrl : defaultSolutionUrl]>" ng-click="displaySolutionModal()">
+      <img class="oppia-solution-button protractor-test-view-solution" ng-src="<[solutionModalIsActive ? activeSolutionUrl : defaultSolutionUrl]>" ng-click="onClickSolutionButton()">
     </li>
   </ul>
 </div>

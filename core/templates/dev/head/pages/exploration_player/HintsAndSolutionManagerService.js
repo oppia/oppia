@@ -30,6 +30,7 @@ oppia.factory('HintsAndSolutionManagerService', [
     var numHintsReleased = 0;
     var numHintsConsumed = 0;
     var solutionReleased = false;
+    var solutionConsumed = false;
     var hintsForLatestCard = [];
     var solutionForLatestCard = null;
     var wrongAnswersSinceLastHintConsumed = 0;
@@ -79,6 +80,7 @@ oppia.factory('HintsAndSolutionManagerService', [
         numHintsReleased = 0;
         numHintsConsumed = 0;
         solutionReleased = false;
+        solutionConsumed = false;
         hintsForLatestCard = newHints;
         solutionForLatestCard = newSolution;
         wrongAnswersSinceLastHintConsumed = 0;
@@ -104,7 +106,8 @@ oppia.factory('HintsAndSolutionManagerService', [
         }
         return null;
       },
-      getSolution: function() {
+      displaySolution: function() {
+        solutionConsumed = true;
         return solutionForLatestCard;
       },
       getNumHints: function() {
@@ -116,6 +119,9 @@ oppia.factory('HintsAndSolutionManagerService', [
       isSolutionViewable: function() {
         return solutionReleased;
       },
+      isSolutionConsumed: function() {
+        return solutionConsumed;
+      },
       recordWrongAnswer: function() {
         if (isAHintWaitingToBeViewed()) {
           return;
@@ -124,10 +130,10 @@ oppia.factory('HintsAndSolutionManagerService', [
         wrongAnswersSinceLastHintConsumed++;
         if (!areAllHintsExhausted() && !isAHintWaitingToBeViewed()) {
           if (numHintsReleased === 0 &&
-              wrongAnswersSinceLastHintConsumed === 2) {
+              wrongAnswersSinceLastHintConsumed >= 2) {
             accelerateHintRelease();
           } else if (
-              numHintsReleased > 0 && wrongAnswersSinceLastHintConsumed === 1) {
+              numHintsReleased > 0 && wrongAnswersSinceLastHintConsumed >= 1) {
             accelerateHintRelease();
           }
         }

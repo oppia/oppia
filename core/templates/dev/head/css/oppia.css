@@ -86,9 +86,7 @@ md-input-group.long > input {
   height: 45px;
 }
 
-
-md-input-group.md-default-theme label
-{
+md-input-group.md-default-theme label {
   font-size: 16px;
   font-weight: 200;
   margin-bottom: 0;
@@ -116,10 +114,6 @@ md-input-group.md-default-theme label
 .oppia-learner-got-it-button {
   margin-bottom: 25px;
   margin-right: 20px;
-}
-
-.oppia-learner-hint-and-solution-modal-body {
-  word-wrap: break-word;
 }
 
 /* Attributes for material-icons. */
@@ -646,15 +640,6 @@ body {
   .oppia-learner-dashboard-intro-card:after {
     left: 15em;
   }
-}
-
-.oppia-learner-hint-title {
-  color: #00786D;
-  font-family: 'Capriola', 'Roboto', 'Arial', 'sans-serif';
-  font-size: 1.75em;
-  font-weight: bold;
-  padding-top: 20px;
-  text-align: center;
 }
 
 .oppia-profile-container {

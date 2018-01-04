@@ -77,11 +77,23 @@ oppia.directive('hintAndSolutionButtons', [
             });
           };
 
+          $scope.onClickSolutionButton = function() {
+            $scope.solutionModalIsActive = true;
+            if (HintsAndSolutionManagerService.isSolutionConsumed()) {
+              $scope.displaySolutionModal();
+            } else {
+              var interstitialModalPromise = (
+                HintAndSolutionModalService.displaySolutionInterstitialModal());
+              interstitialModalPromise.result.then(function() {
+                $scope.displaySolutionModal();
+              }, function() {
+                $scope.solutionModalIsActive = false;
+              });
+            }
+          };
+
           $scope.displaySolutionModal = function() {
             $scope.solutionModalIsActive = true;
-            // TODO(sll): Add interstitial modal here to check if the user is
-            // sure they want to see the solution, and move recordSolutionHit()
-            // to the correct location.
             ExplorationPlayerService.recordSolutionHit(latestStateName);
             var promise = HintAndSolutionModalService.displaySolutionModal();
             promise.result.then(null, function() {

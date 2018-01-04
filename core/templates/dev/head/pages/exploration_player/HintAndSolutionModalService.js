@@ -49,11 +49,31 @@ oppia.factory('HintAndSolutionModalService', [
             '$scope', '$uibModalInstance',
             function($scope, $uibModalInstance) {
               $scope.isHint = false;
-              var solution = HintsAndSolutionManagerService.getSolution();
+              var solution = HintsAndSolutionManagerService.displaySolution();
               var interaction = ExplorationPlayerService.getInteraction(
                 PlayerPositionService.getCurrentStateName());
               $scope.solutionHtml = solution.getOppiaResponseHtml(interaction);
               $scope.closeModal = function() {
+                $uibModalInstance.dismiss('cancel');
+              };
+            }
+          ]
+        });
+      },
+      displaySolutionInterstitialModal: function() {
+        return $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_player/' +
+            'solution_interstitial_modal_directive.html'),
+          backdrop: 'static',
+          controller: [
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
+              $scope.continueToSolution = function() {
+                $uibModalInstance.close();
+              };
+
+              $scope.cancel = function() {
                 $uibModalInstance.dismiss('cancel');
               };
             }
