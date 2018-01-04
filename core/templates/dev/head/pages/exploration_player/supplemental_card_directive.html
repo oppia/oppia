@@ -18,18 +18,6 @@
   <div class="protractor-test-conversation-input"
        angular-html-bind="activeCard.interactionHtml">
   </div>
-  <div ng-if="hintsExist && !windowDimensionsService.isWindowNarrow()" style="text-align: left; padding: 8px">
-    <hint-button ng-show="!areAllHintsExhausted() || (areAllHintsExhausted() && !solutionExists)"
-                 on-click-hint-button="consumeHint()"
-                 current-hint-is-available="isHintAvailable()"
-                 all-hints-are-exhausted="areAllHintsExhausted()"
-                 is-supplemental-card="true">
-    </hint-button>
-    <solution-button ng-if="areAllHintsExhausted()"
-                     on-click-solution-button="viewSolution()"
-                     solution-is-available="isCurrentSolutionAvailable()">
-    </solution-button>
-  </div>
 </div>
 
 <style>
@@ -90,26 +78,5 @@
 
   .conversation-skin-supplemental-card {
     background-color: #ffffff;
-  }
-  .conversation-skin-supplemental-card .hint-button {
-    background-color: #0D48A1;
-    border: none;
-    color: #ffffff;
-  }
-
-  .conversation-skin-supplemental-card .solution-button {
-    background-color: #d9534f;
-    border-color: #d43f3a;
-    color: #fff;
-  }
-
-  .conversation-skin-supplemental-card button.md-button.md-default-theme.hint-button:focus,
-  .conversation-skin-supplemental-card button.md-button.md-default-theme.hint-button:hover {
-    background-color: #115FD4;
-  }
-
-  .conversation-skin-supplemental-card button.md-button.md-default-theme.solution-button:focus,
-  .conversation-skin-supplemental-card button.md-button.md-default-theme.solution-button:hover {
-    background-color: #da190b;
   }
 </style>
