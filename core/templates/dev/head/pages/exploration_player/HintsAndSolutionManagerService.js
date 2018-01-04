@@ -116,6 +116,9 @@ oppia.factory('HintsAndSolutionManagerService', [
       isHintViewable: function(index) {
         return index < numHintsReleased;
       },
+      isHintConsumed: function(index) {
+        return index < numHintsConsumed;
+      },
       isSolutionViewable: function() {
         return solutionReleased;
       },

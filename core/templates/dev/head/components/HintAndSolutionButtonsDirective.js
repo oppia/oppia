@@ -35,15 +35,6 @@ oppia.directive('hintAndSolutionButtons', [
             HintAndSolutionModalService, DeviceInfoService,
             PlayerPositionService, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_OPENED) {
-          $scope.defaultHintUrl = UrlInterpolationService.getStaticImageUrl(
-            '/icons/default_hint.svg');
-          $scope.activeHintUrl = UrlInterpolationService.getStaticImageUrl(
-            '/icons/active_hint.svg');
-          $scope.defaultSolutionUrl = UrlInterpolationService.getStaticImageUrl(
-            '/icons/default_solution.svg');
-          $scope.activeSolutionUrl = UrlInterpolationService.getStaticImageUrl(
-            '/icons/active_solution.svg');
-
           // The state name of the latest card that's open. This is the state
           // name that the current hints and solution correspond to.
           var latestStateName = null;
@@ -52,6 +43,10 @@ oppia.directive('hintAndSolutionButtons', [
           $scope.activeHintIndex = null;
           $scope.solutionModalIsActive = false;
           $scope.currentlyOnLatestCard = true;
+
+          $scope.isHintConsumed = HintsAndSolutionManagerService.isHintConsumed;
+          $scope.isSolutionConsumed = (
+            HintsAndSolutionManagerService.isSolutionConsumed);
 
           var resetLocalHintsArray = function() {
             var numHints = HintsAndSolutionManagerService.getNumHints();

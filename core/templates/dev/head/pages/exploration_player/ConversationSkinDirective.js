@@ -498,8 +498,12 @@ oppia.directive('conversationSkin', [
               $window.scrollTo(0, 0);
               FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
 
-              $rootScope.$broadcast(EVENT_NEW_CARD_OPENED, {
-                stateName: exploration.initStateName
+              // The timeout is needed in order to give the recipient of the
+              // broadcast sufficient time to load.
+              $timeout(function() {
+                $rootScope.$broadcast(EVENT_NEW_CARD_OPENED, {
+                  stateName: exploration.initStateName
+                });
               });
             });
           };
