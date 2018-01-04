@@ -13,11 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Page object for the learner dashboard, for use in Protractor
+ * @fileoverview Page object for the Subscription Dashboard, for use in Protractor
  * tests.
  */
-
-var general = require('./general.js');
 
 var SubscriptionDashboardPage = function() {
   var subscriptionButton = 
@@ -38,13 +36,4 @@ var SubscriptionDashboardPage = function() {
 
 };
 
-exports.LearnerDashboardPage = LearnerDashboardPage;
-
-
-
-expect(element.all(by.css(
-      '.protractor-test-subscription-name')).last().getText()).toMatch(
-      'learner...');
-
-expect(element.all(by.css(
-      '.protractor-test-subscription-name')).count()).toEqual(1);
+exports.SubscriptionDashboardPage = SubscriptionDashboardPage;
