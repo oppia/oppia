@@ -34,7 +34,7 @@ oppia.factory('RefresherExplorationConfirmationModalService', [
             '$scope', '$uibModalInstance', '$window',
             function($scope, $uibModalInstance, $window) {
               $scope.confirmRedirect = function() {
-                redirectConfirmationCallback(true);
+                redirectConfirmationCallback();
                 var url = '/explore/' + refresherExplorationId;
                 url = UrlService.addField(
                   url, 'parent', ExplorationPlayerService.getExplorationId());
@@ -42,7 +42,6 @@ oppia.factory('RefresherExplorationConfirmationModalService', [
                 $uibModalInstance.dismiss('cancel');
               };
               $scope.cancelRedirect = function() {
-                redirectConfirmationCallback(false);
                 $uibModalInstance.dismiss('cancel');
               };
             }

@@ -570,24 +570,27 @@ oppia.directive('conversationSkin', [
                         ExplorationPlayerService.getRandomSuffix());
                     }
 
-                    $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
-                      params: {
-                        stringified_exp_ids: JSON.stringify(
-                          [refresherExplorationId])
-                      }
-                    }).then(function(response) {
-                      if (response.data.summaries.length > 0) {
-                        RefresherExplorationConfirmationModalService.
-                          displayRedirectConfirmationModal(
-                            refresherExplorationId,
-                            function(
-                              redirectConfirmed) {
-                              $scope.redirectToRefresherExplorationConfirmed =
-                                redirectConfirmed;
-                            }
-                          );
-                      }
-                    });
+                    $scope.redirectToRefresherExplorationConfirmed = false;
+
+                    if (refresherExplorationId) {
+                      $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
+                        params: {
+                          stringified_exp_ids: JSON.stringify(
+                            [refresherExplorationId])
+                        }
+                      }).then(function(response) {
+                        if (response.data.summaries.length > 0) {
+                          RefresherExplorationConfirmationModalService.
+                            displayRedirectConfirmationModal(
+                              refresherExplorationId,
+                              function() {
+                                $scope.redirectToRefresherExplorationConfirmed =
+                                  true;
+                              }
+                            );
+                        }
+                      });
+                    }
                     FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
                     scrollToBottom();
                   } else {
