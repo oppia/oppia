@@ -13,15 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the audio translation manager service.
+ * @fileoverview Unit tests for the audio translation language service.
  */
 
 describe('Audio translation language service', function() {
   beforeEach(module('oppia'));
   
-  var atms;
+  var atls;
   beforeEach(inject(function($injector) {
-    atms = $injector.get('AudioTranslationLanguageService');
+    atls = $injector.get('AudioTranslationLanguageService');
   }));
 
   it('should properly initialize the current audio language when ' +
@@ -29,25 +29,25 @@ describe('Audio translation language service', function() {
     var allAudioLanguageCodesInExploration = ['hi-en', 'en'];
     var preferredLanguageCode = 'hi-en';
     var explorationLanguageCode = 'hi';
-    atms.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
+    atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
       explorationLanguageCode);
-    expect(atms.getCurrentAudioLanguageCode()).toEqual('hi-en');
-    atms.clearCurrentAudioLanguageCode();
+    expect(atls.getCurrentAudioLanguageCode()).toEqual('hi-en');
+    atls.clearCurrentAudioLanguageCode();
 
     allAudioLanguageCodesInExploration = ['hi-en', 'en'];
     preferredLanguageCode = 'en';
     explorationLanguageCode = 'hi';
-    atms.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
+    atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
       explorationLanguageCode);
-    expect(atms.getCurrentAudioLanguageCode()).toEqual('en');
-    atms.clearCurrentAudioLanguageCode();
+    expect(atls.getCurrentAudioLanguageCode()).toEqual('en');
+    atls.clearCurrentAudioLanguageCode();
 
     allAudioLanguageCodesInExploration = ['hi-en'];
     preferredLanguageCode = 'en';
     explorationLanguageCode = 'hi';
-    atms.init(['hi-en'], preferredLanguageCode,
+    atls.init(['hi-en'], preferredLanguageCode,
       explorationLanguageCode);
-    expect(atms.getCurrentAudioLanguageCode()).toEqual('hi-en');
+    expect(atls.getCurrentAudioLanguageCode()).toEqual('hi-en');
   });
 
   it('should initialize the current audio language when ' +
@@ -57,9 +57,9 @@ describe('Audio translation language service', function() {
       var allAudioLanguageCodesInExploration = ['hi-en', 'en'];
       var preferredLanguageCode = null;
       var explorationLanguageCode = 'hi';
-      atms.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
+      atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
         explorationLanguageCode);
-      expect(atms.getCurrentAudioLanguageCode()).toEqual('hi-en');
+      expect(atls.getCurrentAudioLanguageCode()).toEqual('hi-en');
     }
   );
 
@@ -70,9 +70,9 @@ describe('Audio translation language service', function() {
       var allAudioLanguageCodesInExploration = ['hi-en', 'en'];
       var preferredLanguageCode = null;
       var explorationLanguageCode = 'en';
-      atms.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
+      atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
         explorationLanguageCode);
-      expect(atms.getCurrentAudioLanguageCode()).toEqual('en'); 
+      expect(atls.getCurrentAudioLanguageCode()).toEqual('en'); 
     }
   );
 });
