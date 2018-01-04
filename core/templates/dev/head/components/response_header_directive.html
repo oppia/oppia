@@ -16,7 +16,6 @@
     overflow: hidden;
     padding-left: 24px;
     white-space: nowrap;
-    width: 640px;
   }
 
   response-header .oppia-nested-link {
@@ -33,7 +32,15 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 500px;
+    width: 80%;
+  }
+
+  /* This is to break the line only when screen is too narrow to have both divs
+     in same line.*/
+  @media screen and (min-width: 370px) {
+    response-header .break-in-mobile {
+      display: none;
+    }
   }
 </style>
 <div class="oppia-response-header-block">
@@ -49,6 +56,7 @@
     <span ng-if="isActive()">&nbsp;</span>
   </div>
 
+  <br class="break-in-mobile">
   <span ng-if="getOutcome()">→</span>
   <span ng-if="getOutcome() && !isOutcomeLooping() && !isCreatingNewState()"
         ng-click="navigateToState(getOutcome().dest)" class="oppia-nested-link">
