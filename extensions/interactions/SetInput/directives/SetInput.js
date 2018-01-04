@@ -66,9 +66,9 @@ oppia.directive('oppiaInteractiveSetInput', [
             return false;
           };
 
-          var hasEmptyString = function(answer) {
-            for(option of $scope.answer) {
-              if(option === ''){
+          var hasEmptyString = function() {
+            for(var i = 0; i < $scope.answer.length; i++) {
+              if($scope.answer[i] === ''){
                 return true;
               }
             }

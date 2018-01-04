@@ -75,7 +75,7 @@ oppia.directive('oppiaInteractiveNumericInput', [
             return $scope.answer;
           }, function(answer) {
             $scope.setAnswerValidity({
-              answerValidity: $scope.isAnswerValid();
+              answerValidity: $scope.isAnswerValid()
             });
           });
         }
