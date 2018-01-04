@@ -33,4 +33,3 @@ oppia.factory('PlayerCorrectnessFeedbackEnabledService', [function() {
     }
   };
 }]);
-  

@@ -26,4 +26,3 @@ oppia.directive('correctnessFooter', [
           'correctness_footer_directive.html')
       };
     }]);
-  
