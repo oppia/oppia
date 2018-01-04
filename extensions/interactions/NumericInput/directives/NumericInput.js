@@ -65,6 +65,19 @@ oppia.directive('oppiaInteractiveNumericInput', [
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
             $scope.submitAnswer($scope.answer);
           });
+
+          $scope.isAnswerValid = function() {
+            return ($scope.answer !== undefined
+                && $scope.answer !== null && $scope.answer !== '');
+          };
+
+          $scope.$watch(function() {
+            return $scope.answer;
+          }, function(answer) {
+            $scope.setAnswerValidity({
+              answerValidity: $scope.isAnswerValid();
+            });
+          });
         }
       ]
     };

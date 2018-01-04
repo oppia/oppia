@@ -6,6 +6,7 @@
 <textarea ng-if="mobileOverlayIsShown" id="fakeInputForMathExpression" class="oppia-mathexpression-input-hidden-text"></textarea>
 <button ng-if="!isSubmitHidden()" type="button" class="btn btn-default"
         ng-click="submitAnswer()" style="margin-top: 10px;"
+        ng-disabled="!isAnswerValid()"
         translate="I18N_INTERACTIONS_SUBMIT">
   Submit
 </button>

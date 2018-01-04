@@ -9,7 +9,7 @@
   </div>
   <!-- This ng-click is needed for specifying solutions in the solution editor. -->
   <md-button ng-if="!isSubmitHidden()"
-             ng-disabled="FractionInputForm.$invalid"
+             ng-disabled="!isAnswerValid()"
              class="oppia-learner-confirm-button"
              ng-click="submitAnswer(answer)"
              style="margin-top: 15px;">
