@@ -23,12 +23,19 @@ var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
+  var creatorDashboardPage = null;
+  var libraryPage = null;
 
   beforeAll(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    libraryPage = new LibraryPage.LibraryPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
   });
 
   it('should redirect back to parent exploration correctly when parent id is ' +
@@ -81,6 +88,81 @@ describe('Full exploration editor', function() {
     users.logout();
   });
 
+  it('should give option for redirection when author has specified ' +
+      'a refresher exploration Id', function() {
+    users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
+
+    browser.get(general.SERVER_URL_PREFIX);
+    var dropdown = element(by.css('.protractor-test-profile-dropdown'));
+    browser.actions().mouseMove(dropdown).perform();
+    dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+    browser.waitForAngular();
+    creatorDashboardPage.clickCreateActivityButton();
+    creatorDashboardPage.clickCreateExplorationButton();
+    editor.exitTutorialIfNecessary();
+    editor.setTitle('Refresher Exploration');
+    editor.setCategory('Algebra');
+    editor.setObjective('This is the refresher exploration');
+    editor.setContent(forms.toRichText('Refresher Exploration Content'));
+    editor.setInteraction('EndExploration');
+    editor.saveChanges();
+    workflow.publishExploration();
+    general.waitForSystem();
+
+    general.getExplorationIdFromEditor().then(function(refresherExplorationId) {
+      browser.get(general.SERVER_URL_PREFIX);
+      dropdown = element(by.css('.protractor-test-profile-dropdown'));
+      browser.actions().mouseMove(dropdown).perform();
+      dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+      browser.waitForAngular();
+      creatorDashboardPage.clickCreateActivityButton();
+      creatorDashboardPage.clickCreateExplorationButton();
+      editor.exitTutorialIfNecessary();
+      editor.setTitle('Parent Exploration');
+      editor.setCategory('Algebra');
+      editor.setObjective('This is the parent exploration');
+      editor.setContent(forms.toRichText('Parent Exploration Content'));
+      editor.setInteraction(
+        'MultipleChoiceInput',
+        [forms.toRichText('Correct'), forms.toRichText('Incorrect')]);
+      editor.addResponse('MultipleChoiceInput', null, 'card 2', true,
+        'Equals', 'Correct');
+
+      editor.ResponseEditor(
+        'default').setFeedback(forms.toRichText('try again'));
+      editor.ResponseEditor(
+        'default').setDestination(null, false, refresherExplorationId);
+
+      editor.moveToState('card 2');
+      editor.setInteraction('EndExploration');
+      editor.saveChanges();
+      workflow.publishExploration();
+      browser.waitForAngular();
+
+      browser.get('/search/find?q=');
+      libraryPage.playExploration('Parent Exploration');
+      explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
+      general.waitForSystem();
+      explorationPlayerPage.clickConfirmRedirectionButton();
+      browser.waitForAngular();
+      general.getExplorationIdFromPlayer().then(function(currentId) {
+        expect(currentId).toMatch(refresherExplorationId);
+      });
+      general.waitForSystem();
+      explorationPlayerPage.clickOnSummaryTileAtEnd();
+      browser.waitForAngular();
+      explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
+      general.waitForSystem();
+      explorationPlayerPage.clickCancelRedirectionButton();
+      browser.waitForAngular();
+      explorationPlayerPage.expectContentToMatch(
+        forms.toRichText('Parent Exploration Content'));
+      explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Correct');
+      browser.waitForAngular();
+      users.logout();
+    });
+  });
+
   it('should navigate multiple states correctly, with parameters', function() {
     users.createUser('user4@editorAndPlayer.com', 'user4EditorAndPlayer');
     users.login('user4@editorAndPlayer.com');
@@ -89,8 +171,9 @@ describe('Full exploration editor', function() {
     editor.setStateName('card 1');
     editor.setContent(forms.toRichText('this is card 1'));
     editor.setInteraction('NumericInput');
-    editor.addResponse('NumericInput', null, 'final card', true, 'Equals', 21);
-    editor.ResponseEditor(0).setDestination('card 2', true);
+    editor.addResponse(
+      'NumericInput', null, 'final card', true, 'Equals', 21);
+    editor.ResponseEditor(0).setDestination('card 2', true, null);
 
     editor.moveToState('card 2');
     editor.setContent(forms.toRichText(
@@ -140,7 +223,7 @@ describe('Full exploration editor', function() {
       editor.setContent(forms.toRichText('card1 content'));
       editor.setInteraction('TextInput');
       editor.setDefaultOutcome(null, 'final card', true);
-      editor.ResponseEditor('default').setDestination('card2', true);
+      editor.ResponseEditor('default').setDestination('card2', true, null);
       editor.moveToState('card2');
       // NOTE: we must move to the state before checking state names to avoid
       // inexplicable failures of the protractor utility that reads state names
@@ -157,7 +240,7 @@ describe('Full exploration editor', function() {
       // Check deletion of states and changing the first state
       editor.setInteraction('TextInput');
       editor.setDefaultOutcome(null, 'final card', true);
-      editor.ResponseEditor('default').setDestination('second', true);
+      editor.ResponseEditor('default').setDestination('second', true, null);
       editor.moveToState('second');
       editor.expectStateNamesToBe(['final card', 'first', 'second']);
       editor.expectCurrentStateToBe('second');
@@ -196,7 +279,8 @@ describe('Full exploration editor', function() {
       editor.setDefaultOutcome(forms.toRichText('Farewell'), null, false);
       editor.ResponseEditor('default').
         expectAvailableDestinationsToBe(['second', 'final card']);
-      editor.ResponseEditor('default').setDestination('final card', false);
+      editor.ResponseEditor(
+        'default').setDestination('final card', false, null);
       editor.ResponseEditor('default').
         expectAvailableDestinationsToBe(['second', 'final card']);
       editor.addResponse('NumericInput', null, 'final card', false,
