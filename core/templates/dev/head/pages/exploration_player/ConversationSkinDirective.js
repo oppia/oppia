@@ -248,7 +248,7 @@ oppia.directive('conversationSkin', [
       controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$translate', '$http',
         'MessengerService', 'ExplorationPlayerService', 'UrlService',
-        'FocusManagerService', 'LearnerViewRatingService',
+        'FocusManagerService', 'LearnerViewRatingService', 'HelpCardService',
         'WindowDimensionsService', 'PlayerTranscriptService',
         'LearnerParamsService', 'PlayerPositionService',
         'ExplorationRecommendationsService', 'StatsReportingService',
@@ -260,7 +260,7 @@ oppia.directive('conversationSkin', [
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             MessengerService, ExplorationPlayerService, UrlService,
-            FocusManagerService, LearnerViewRatingService,
+            FocusManagerService, LearnerViewRatingService, HelpCardService,
             WindowDimensionsService, PlayerTranscriptService,
             LearnerParamsService, PlayerPositionService,
             ExplorationRecommendationsService, StatsReportingService,
@@ -664,6 +664,9 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.showUpcomingCard = function() {
+            if(HelpCardService.getHtmlHelpCard().hasContinueButton) {
+              HelpCardService.getHtmlHelpCard().hasContinueButton = false;
+            }
             $scope.showPendingCard(
               $scope.upcomingStateName, $scope.upcomingParams,
               $scope.upcomingContentHtml);
@@ -794,7 +797,7 @@ oppia.directive('conversationSkin', [
               $scope.explorationId);
           };
 
-          // Interaction answer validity is used to enable/disable 
+          // Interaction answer validity is used to enable/disable
           // the progress-nav's Submit button. This logic is here because
           // Interactions and the progress-nav are both descendants
           // of ConversationSkinDirective.
