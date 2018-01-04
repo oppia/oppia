@@ -30,14 +30,20 @@ oppia.directive('explorationFooter', [
       controller: [
         '$scope', '$http', '$log', 'ExplorationContextService',
         'ExplorationSummaryBackendApiService', 'WindowDimensionsService',
+        'footerCorrectnessService',
         function(
             $scope, $http, $log, ExplorationContextService,
-            ExplorationSummaryBackendApiService, WindowDimensionsService) {
+            ExplorationSummaryBackendApiService, WindowDimensionsService,
+            footerCorrectnessService) {
           $scope.explorationId = ExplorationContextService.getExplorationId();
 
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
           $scope.contributorNames = [];
+
+          $scope.isCorrectnessFooterEnabled = function() {
+            return footerCorrectnessService.isCorrectnessFooterEnabled();
+          };
 
           $scope.getTwitterText = function() {
             return $scope.twitterText;

@@ -131,7 +131,27 @@
     height: 56px;
     padding: 12px;
   }
-
+  .correctness-footer {
+    background: rgb(247, 243, 243);
+    border:1px;
+    text-align:center;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    font-size: 32px;
+    color: #00B269;
+    position:relative;
+    left:366px;
+    width:561px;
+    height:45px;
+  }
+  .correctness-footer-container {
+    position:fixed;
+    bottom:43px;
+    width:100%;
+    z-index:2;
+  }
   @media (max-width: 475px) {
     .oppia-exploration-footer-sharing-links {
       display: none;
@@ -156,7 +176,9 @@
     }
   }
 </style>
-
+<div class="correctness-footer-container" ng-if="isCorrectnessFooterEnabled()">
+  <div class="correctness-footer" >Correct!</div>
+</div>
 <div class="footer navbar-fixed-bottom oppia-exploration-footer">
   <div class="row">
     <div class="col-sm-5">

@@ -31,13 +31,13 @@ oppia.factory('AnswerClassificationService', [
   'PredictionAlgorithmRegistryService', 'StateClassifierMappingService',
   'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION', 'STATISTICAL_CLASSIFICATION',
-  'RULE_TYPE_CLASSIFIER',
+  'RULE_TYPE_CLASSIFIER', 'footerCorrectnessService',
   function($http, LearnerParamsService, AlertsService,
       AnswerClassificationResultObjectFactory,
       PredictionAlgorithmRegistryService, StateClassifierMappingService,
       INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
       DEFAULT_OUTCOME_CLASSIFICATION, STATISTICAL_CLASSIFICATION,
-      RULE_TYPE_CLASSIFIER) {
+      RULE_TYPE_CLASSIFIER, footerCorrectnessService) {
     /**
      * Finds the first answer group with a rule that returns true.
      *
@@ -60,6 +60,9 @@ oppia.factory('AnswerClassificationService', [
           if (rule.type !== RULE_TYPE_CLASSIFIER &&
               interactionRulesService[rule.type](
                 answer, rule.inputs)) {
+            if (answerGroups[i].labelledAsCorrect){
+              footerCorrectnessService.setSubmittedAnswerIsCorrect(true);
+            }
             return AnswerClassificationResultObjectFactory.createNew(
               answerGroups[i].outcome, i, j, EXPLICIT_CLASSIFICATION);
           }
@@ -69,6 +72,7 @@ oppia.factory('AnswerClassificationService', [
       // If no rule in any answer group returns true, the default 'group' is
       // returned. Throws an error if the default outcome is not defined.
       if (defaultOutcome) {
+        footerCorrectnessService.setSubmittedAnswerIsCorrect(false);
         return AnswerClassificationResultObjectFactory.createNew(
           defaultOutcome, answerGroups.length, 0, DEFAULT_OUTCOME_CLASSIFICATION
         );
