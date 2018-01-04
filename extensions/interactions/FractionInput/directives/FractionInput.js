@@ -120,6 +120,18 @@ oppia.directive('oppiaInteractiveFractionInput', [
           $scope.isSubmitHidden = function() {
             return !UrlService.isIframed();
           };
+
+          $scope.isAnswerValid = function() {
+            return (!$scope.FractionInputForm.$invalid && $scope.answer !== '');
+          };
+
+          $scope.$watch(function() {
+            return $scope.answer;
+          }, function() {
+            $scope.setAnswerValidity({
+              answerValidity: $scope.isAnswerValid()
+            });
+          });
         }
       ]
     };

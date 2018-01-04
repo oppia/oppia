@@ -10,6 +10,7 @@
       <!-- This ng-click is needed for specifying solutions in the solution editor -->
       <md-button ng-if="!isSubmitHidden()" class="oppia-learner-confirm-button"
                  ng-click="submitAnswer(answer)" style="margin-top: 15px;"
+                 ng-disabled="!isAnswerValid()"
                  translate="I18N_INTERACTIONS_SUBMIT">
         Submit
       </md-button>
