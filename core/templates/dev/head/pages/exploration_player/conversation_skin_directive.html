@@ -19,8 +19,8 @@
         class="conversation-skin-inline-interaction">
       <div style="padding: 6px 12px;">
         <[upcomingInteractionInstructions]>
-        <i ng-if="!isViewportNarrow()" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
-        <i ng-if="isViewportNarrow()" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
+        <i ng-if="canWindowShowTwoCards()" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
+        <i ng-if="!canWindowShowTwoCards()" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
       </div>
     </div>
   </div>
@@ -32,14 +32,14 @@
 
     <div class="conversation-skin-tutor-card-container"
          ng-class="{'conversation-skin-animate-tutor-card-on-narrow':
-                      isViewportNarrow() && isCurrentSupplementalCardNonempty(),
+                      !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty(),
                     'conversation-skin-tutor-card-alone':
-                      isViewportNarrow() && !isCurrentSupplementalCardNonempty()}">
+                      !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
       <tutor-card on-submit-answer="submitAnswer(answer, rulesService)"
                   start-card-change-animation="startCardChangeAnimation"
                   on-change-interaction-answer-validity="setInteractionAnswerValidity(answerValidity)">
       </tutor-card>
-      <div ng-if="isCurrentSupplementalCardNonempty() && isViewportNarrow()">
+      <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <supplemental-card on-click-continue-button="showUpcomingCard()"
                            on-submit-answer="submitAnswer(answer, rulesService)">
         </supplemental-card>
@@ -50,7 +50,7 @@
       </progress-nav>
     </div>
 
-    <div ng-if="isCurrentSupplementalCardNonempty() && !isViewportNarrow()"
+    <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
          class="conversation-skin-supplemental-card-container">
       <supplemental-card on-click-continue-button="showUpcomingCard()"
                          on-submit-answer="submitAnswer(answer, rulesService)">

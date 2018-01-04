@@ -33,12 +33,10 @@ oppia.directive('progressNav', [
         'PlayerTranscriptService', 'ExplorationPlayerService',
         'ExplorationPlayerStateService', 'WindowDimensionsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'INTERACTION_SPECS',
-        'TWO_CARD_THRESHOLD_PX',
         function($scope, $rootScope, PlayerPositionService,
           PlayerTranscriptService, ExplorationPlayerService,
           ExplorationPlayerStateService, WindowDimensionsService,
-          CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS,
-          TWO_CARD_THRESHOLD_PX) {
+          CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
 
           var transcriptLength = 0;
@@ -84,14 +82,10 @@ oppia.directive('progressNav', [
             }
           };
 
-          var isViewportNarrow = function() {
-            return (
-              WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX);
-          };
-
           $scope.shouldGenericSubmitButtonBeShown = function() {
             return (interactionHasNavSubmitButton && (
-              interactionIsInline || isViewportNarrow()));
+              interactionIsInline ||
+              !ExplorationPlayerService.canWindowShowTwoCards()));
           };
 
           $scope.shouldContinueButtonBeShown = function() {

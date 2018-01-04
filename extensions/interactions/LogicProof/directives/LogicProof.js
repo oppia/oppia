@@ -30,11 +30,11 @@ oppia.directive('oppiaInteractiveLogicProof', [
       controller: [
         '$scope', '$attrs', '$uibModal', 'logicProofRulesService',
         'WindowDimensionsService', 'UrlService',
-        'EVENT_PROGRESS_NAV_SUBMITTED', 'TWO_CARD_THRESHOLD_PX',
+        'ExplorationPlayerService', 'EVENT_PROGRESS_NAV_SUBMITTED',
         function(
             $scope, $attrs, $uibModal, logicProofRulesService,
             WindowDimensionsService, UrlService,
-            EVENT_PROGRESS_NAV_SUBMITTED, TWO_CARD_THRESHOLD_PX) {
+            ExplorationPlayerService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.localQuestionData = HtmlEscaperService.escapedJsonToObj(
             $attrs.questionWithValue);
 
@@ -262,14 +262,10 @@ oppia.directive('oppiaInteractiveLogicProof', [
 
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitProof);
 
-          var isViewportNarrow = function() {
-            return (
-              WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX);
-          };
           $scope.isSubmitHidden = function() {
             return (
               !UrlService.isIframed() &&
-              isViewportNarrow());
+              !ExplorationPlayerService.canWindowShowTwoCards());
           };
 
           $scope.showHelp = function() {
