@@ -57,7 +57,7 @@ exports.config = {
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
     full: [
-      'protractor/*.js'
+      'protractor/statisticsTab.js'
     ],
 
     mainEditor: [
@@ -69,7 +69,8 @@ exports.config = {
     editorFeatures: [
       'protractor/historyTab.js',
       'protractor/parameters.js',
-      'protractor/hintsAndSolutions.js'
+      'protractor/hintsAndSolutions.js',
+      'protractor/statisticsTab.js'
     ],
 
     extensions: [

@@ -6,7 +6,7 @@
         <pie-chart data="pieChartData"
                    options="COMPLETION_RATE_PIE_CHART_OPTIONS">
         </pie-chart>
-        <p style="text-align: center;"><span ng-if="numPassersby" style="font-weight: bold;"><[numPassersby]></span><span ng-if="!numPassersby" style="font-weight: bold;">0</span> learners browsed this exploration. They left before reaching the second card.</p>
+        <p style="text-align: center;"><span ng-if="numPassersby" style="font-weight: bold;" class="protractor-test-num-passersby"><[numPassersby]></span><span ng-if="!numPassersby" style="font-weight: bold;">0</span> learners browsed this exploration. They left before reaching the second card.</p>
 
         <h3>Card statistics</h3>
         <div style="font-size: smaller" ng-if="lastUpdated">
