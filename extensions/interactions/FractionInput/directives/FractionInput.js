@@ -129,7 +129,7 @@ oppia.directive('oppiaInteractiveFractionInput', [
 
           $scope.$watch(function() {
             return $scope.answer;
-          }, function(answer) {
+          }, function() {
             $scope.setAnswerValidity({
               answerValidity: $scope.isAnswerValid()
             });

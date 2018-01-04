@@ -208,22 +208,6 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
               !UrlService.isIframed() &&
               WindowDimensionsService.isWindowNarrow());
           };
-
-          $scope.isAnswerValid = function() {
-            return ($scope.isCurrentAnswerValid() && answer.latex !== '');
-          };
-
-          $scope.$watch(function() {
-            return {
-              ascii: Guppy.instances[guppyDivId].get_content('text'),
-              latex: Guppy.instances[guppyDivId].get_content('latex')
-            };
-          }, function(newAnswer) {
-            answer = newAnswer;
-            $scope.setAnswerValidity({
-              answerValidity: ($scope.isAnswerValid())
-            });
-          });
         }
       ]
     };
