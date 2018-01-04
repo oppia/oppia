@@ -53,6 +53,11 @@ var ExplorationPlayerPage = function() {
   var continueToSolutionButton = element(
     by.css('.protractor-test-continue-to-solution-btn'));
   var gotItButton = element(by.css('.oppia-learner-got-it-button'));
+  var confirmRedirectionButton =
+      element(by.css('.protractor-test-confirm-redirection-button'));
+  var cancelRedirectionButton = element(
+    by.css('.protractor-test-cancel-redirection-button'));
+
   var explorationSummaryTile = element(
     by.css('.protractor-test-exp-summary-tile-title'))
 
@@ -78,6 +83,14 @@ var ExplorationPlayerPage = function() {
 
   this.clickGotItButton = function() {
     gotItButton.click();
+  };
+
+  this.clickConfirmRedirectionButton = function() {
+    confirmRedirectionButton.click();
+  };
+
+  this.clickCancelRedirectionButton = function() {
+    cancelRedirectionButton.click();
   };
 
   this.clickOnSummaryTileAtEnd = function() {

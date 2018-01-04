@@ -256,8 +256,10 @@ oppia.directive('conversationSkin', [
         'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'AlertsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'EVENT_NEW_CARD_AVAILABLE', 'EVENT_PROGRESS_NAV_SUBMITTED',
-        'EVENT_NEW_CARD_OPENED', 'FatigueDetectionService',
-        'NumberAttemptsService', 'HintsAndSolutionManagerService',
+        'FatigueDetectionService', 'NumberAttemptsService',
+        'RefresherExplorationConfirmationModalService',
+        'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+        'EVENT_NEW_CARD_OPENED', 'HintsAndSolutionManagerService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             MessengerService, ExplorationPlayerService, UrlService,
@@ -269,8 +271,10 @@ oppia.directive('conversationSkin', [
             TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, AlertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_AVAILABLE, EVENT_PROGRESS_NAV_SUBMITTED,
-            EVENT_NEW_CARD_OPENED, FatigueDetectionService,
-            NumberAttemptsService, HintsAndSolutionManagerService) {
+            FatigueDetectionService, NumberAttemptsService,
+            RefresherExplorationConfirmationModalService,
+            EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
+            EVENT_NEW_CARD_OPENED, HintsAndSolutionManagerService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -537,7 +541,7 @@ oppia.directive('conversationSkin', [
             ExplorationPlayerService.submitAnswer(
               answer, interactionRulesService, function(
                   newStateName, refreshInteraction, feedbackHtml, contentHtml,
-                  newParams) {
+                  newParams, refresherExplorationId) {
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.
                 var millisecsLeftToWait = (
@@ -575,6 +579,28 @@ oppia.directive('conversationSkin', [
                         ExplorationPlayerService.getInteractionHtml(
                           newStateName, _nextFocusLabel) +
                         ExplorationPlayerService.getRandomSuffix());
+                    }
+
+                    $scope.redirectToRefresherExplorationConfirmed = false;
+
+                    if (refresherExplorationId) {
+                      $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
+                        params: {
+                          stringified_exp_ids: JSON.stringify(
+                            [refresherExplorationId])
+                        }
+                      }).then(function(response) {
+                        if (response.data.summaries.length > 0) {
+                          RefresherExplorationConfirmationModalService.
+                            displayRedirectConfirmationModal(
+                              refresherExplorationId,
+                              function() {
+                                $scope.redirectToRefresherExplorationConfirmed =
+                                  true;
+                              }
+                            );
+                        }
+                      });
                     }
                     FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
                     scrollToBottom();
@@ -722,6 +748,9 @@ oppia.directive('conversationSkin', [
           });
 
           $window.addEventListener('beforeunload', function(e) {
+            if ($scope.redirectToRefresherExplorationConfirmed) {
+              return;
+            }
             if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&
                 !ExplorationPlayerStateService.isStateTerminal(
                   PlayerTranscriptService.getLastCard().stateName)) {
