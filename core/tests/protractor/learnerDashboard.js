@@ -28,6 +28,8 @@ var ExplorationPlayerPage =
 var users = require('../protractor_utils/users.js');
 var LearnerDashboardPage =
   require('../protractor_utils/LearnerDashboardPage.js');
+var SubscriptionDashboardPage =
+  require('../protractor_utils/SubscriptionDashboardPage.js');
 
 describe('Learner dashboard functionality', function() {
   var creatorDashboardPage = null;
@@ -35,11 +37,13 @@ describe('Learner dashboard functionality', function() {
   var libraryPage = null;
   var learnerDashboardPage = null;
   var explorationPlayerPage = null;
+  var subscriptionDashboardPage = null;
 
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    subscriptionDashboardPage = new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
   beforeAll(function() {
@@ -203,10 +207,10 @@ describe('Learner dashboard functionality', function() {
     // Subscribe to both the creators.
     browser.get('/profile/creator1learnerDashboard');
     browser.waitForAngular();
-    element(by.css('.protractor-test-subscription-button')).click();
+    SubscriptionDashboardPage.navigateToSubscriptionButton();
     browser.get('/profile/creator2learnerDashboard');
     browser.waitForAngular();
-    element(by.css('.protractor-test-subscription-button')).click();
+    eSubscriptionDashboardPage.navigateToSubscriptionButton();
 
     // Both creators should be present in the subscriptions section of the
     // dashboard.
