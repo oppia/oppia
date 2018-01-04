@@ -29,69 +29,90 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        // This should be called whenever the answer changes.
+        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ItemSelectionInput/directives/' +
         'item_selection_input_interaction_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.choices = HtmlEscaperService.escapedJsonToObj(
-          $attrs.choicesWithValue);
-        $scope.maxAllowableSelectionCount = (
-          $attrs.maxAllowableSelectionCountWithValue);
-        $scope.minAllowableSelectionCount = (
-          $attrs.minAllowableSelectionCountWithValue);
+      controller: [
+        '$scope', '$attrs', 'WindowDimensionsService',
+        'UrlService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        function(
+            $scope, $attrs, WindowDimensionsService,
+            UrlService, EVENT_PROGRESS_NAV_SUBMITTED) {
+          $scope.choices = HtmlEscaperService.escapedJsonToObj(
+            $attrs.choicesWithValue);
+          $scope.maxAllowableSelectionCount = (
+            $attrs.maxAllowableSelectionCountWithValue);
+          $scope.minAllowableSelectionCount = (
+            $attrs.minAllowableSelectionCountWithValue);
 
-        // The following is an associative array where the key is a choice
-        // (html) and the value is a boolean value indicating whether the
-        // choice was selected by the user (default is false).
-        $scope.userSelections = {};
+          // The following is an associative array where the key is a choice
+          // (html) and the value is a boolean value indicating whether the
+          // choice was selected by the user (default is false).
+          $scope.userSelections = {};
 
-        for (var i = 0; i < $scope.choices.length; i++) {
-          $scope.userSelections[$scope.choices[i]] = false;
-        }
+          for (var i = 0; i < $scope.choices.length; i++) {
+            $scope.userSelections[$scope.choices[i]] = false;
+          }
 
-        $scope.displayCheckboxes = ($scope.maxAllowableSelectionCount > 1);
+          $scope.displayCheckboxes = ($scope.maxAllowableSelectionCount > 1);
 
-        // The following indicates that the number of answers is more than
-        // maxAllowableSelectionCount.
-        $scope.preventAdditionalSelections = false;
+          // The following indicates that the number of answers is more than
+          // maxAllowableSelectionCount.
+          $scope.preventAdditionalSelections = false;
 
-        // The following indicates that the number of answers is less than
-        // minAllowableSelectionCount.
-        $scope.notEnoughSelections = ($scope.minAllowableSelectionCount > 0);
-
-        $scope.onToggleCheckbox = function() {
-          $scope.newQuestion = false;
-          $scope.selectionCount = Object.keys($scope.userSelections).filter(
-            function(obj) {
-              return $scope.userSelections[obj];
-            }
-          ).length;
-          $scope.preventAdditionalSelections = (
-            $scope.selectionCount >= $scope.maxAllowableSelectionCount);
-          $scope.notEnoughSelections = (
-            $scope.selectionCount < $scope.minAllowableSelectionCount);
-        };
-
-        $scope.submitMultipleChoiceAnswer = function(index) {
-          $scope.userSelections[$scope.choices[index]] = true;
-          $scope.submitAnswer($scope.userSelections);
-        };
-
-        $scope.submitAnswer = function() {
-          var answers = Object.keys($scope.userSelections).filter(
-            function(obj) {
-              return $scope.userSelections[obj];
-            }
-          );
-
-          $scope.onSubmit({
-            answer: answers,
-            rulesService: itemSelectionInputRulesService
+          // The following indicates that the number of answers is less than
+          // minAllowableSelectionCount.
+          $scope.notEnoughSelections = ($scope.minAllowableSelectionCount > 0);
+          $scope.setAnswerValidity({
+            answerValidity: !$scope.notEnoughSelections
           });
-        };
-      }]
+
+          $scope.onToggleCheckbox = function() {
+            $scope.newQuestion = false;
+            $scope.selectionCount = Object.keys($scope.userSelections).filter(
+              function(obj) {
+                return $scope.userSelections[obj];
+              }
+            ).length;
+            $scope.preventAdditionalSelections = (
+              $scope.selectionCount >= $scope.maxAllowableSelectionCount);
+            $scope.notEnoughSelections = (
+              $scope.selectionCount < $scope.minAllowableSelectionCount);
+            $scope.setAnswerValidity({
+              answerValidity: !$scope.notEnoughSelections
+            });
+          };
+
+          $scope.submitMultipleChoiceAnswer = function(index) {
+            $scope.userSelections[$scope.choices[index]] = true;
+            $scope.submitAnswer($scope.userSelections);
+          };
+
+          $scope.submitAnswer = function() {
+            var answers = Object.keys($scope.userSelections).filter(
+              function(obj) {
+                return $scope.userSelections[obj];
+              }
+            );
+
+            $scope.onSubmit({
+              answer: answers,
+              rulesService: itemSelectionInputRulesService
+            });
+          };
+
+          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitAnswer);
+          $scope.isSubmitHidden = function() {
+            return (
+              !UrlService.isIframed() &&
+              WindowDimensionsService.isWindowNarrow());
+          };
+        }
+      ]
     };
   }
 ]);

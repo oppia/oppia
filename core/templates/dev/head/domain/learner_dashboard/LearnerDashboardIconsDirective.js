@@ -40,8 +40,12 @@ oppia.directive('learnerDashboardIcons', [
           $scope.activityIsCurrentlyHoveredOver = true;
           $scope.playlistTooltipIsEnabled = false;
 
-          $scope.changePlaylistTooltipState = function(playlistTooltipState) {
-            $scope.playlistTooltipIsEnabled = playlistTooltipState;
+          $scope.enablePlaylistTooltip = function() {
+            $scope.playlistTooltipIsEnabled = true;
+          };
+
+          $scope.disablePlaylistTooltip = function() {
+            $scope.playlistTooltipIsEnabled = false;
           };
 
           $scope.$watch('activityActive', function(value) {
@@ -138,7 +142,7 @@ oppia.directive('learnerDashboardIcons', [
                   activityId);
                 /* eslint-enable max-len */
               }
-              $scope.changePlaylistTooltipState(false);
+              $scope.disablePlaylistTooltip();
             }
           };
 

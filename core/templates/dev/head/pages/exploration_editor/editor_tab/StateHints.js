@@ -40,9 +40,18 @@ oppia.controller('StateHints', [
       stateHintsService.init(
         EditorStateService.getActiveStateName(),
           stateData.interaction.hints);
-
       $scope.activeHintIndex = null;
     });
+
+    $scope.getHintButtonText = function() {
+      var hintButtonText = '+ Add Hint';
+      if ($scope.stateHintsService.displayed) {
+        if ($scope.stateHintsService.displayed.length >= 5) {
+          hintButtonText = 'Limit Reached';
+        }
+      }
+      return hintButtonText;
+    };
 
     $scope.getHintSummary = function(hint) {
       var hintAsPlainText = (
@@ -81,6 +90,9 @@ oppia.controller('StateHints', [
     };
 
     $scope.openAddHintModal = function() {
+      if ($scope.stateHintsService.displayed.length === 5) {
+        return;
+      }
       AlertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 

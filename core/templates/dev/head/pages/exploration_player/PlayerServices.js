@@ -157,6 +157,15 @@ oppia.factory('ExplorationPlayerService', [
       if (!_editorPreviewMode && exploration.isStateTerminal(newStateName)) {
         StatsReportingService.recordExplorationCompleted(
           newStateName, LearnerParamsService.getAllParams());
+
+        // For single state explorations, when the exploration reaches the
+        // terminal state and explorationActuallyStarted is false, record
+        // exploration actual start event.
+        if (!explorationActuallyStarted) {
+          StatsReportingService.recordExplorationActuallyStarted(
+            newStateName);
+          explorationActuallyStarted = true;
+        }
       }
     });
 

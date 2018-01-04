@@ -255,8 +255,8 @@ oppia.directive('conversationSkin', [
         'siteAnalyticsService', 'ExplorationPlayerStateService',
         'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'AlertsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
-        'EVENT_NEW_CARD_AVAILABLE', 'FatigueDetectionService',
-        'NumberAttemptsService',
+        'EVENT_NEW_CARD_AVAILABLE', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'FatigueDetectionService', 'NumberAttemptsService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             MessengerService, ExplorationPlayerService, UrlService,
@@ -267,8 +267,8 @@ oppia.directive('conversationSkin', [
             siteAnalyticsService, ExplorationPlayerStateService,
             TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, AlertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
-            EVENT_NEW_CARD_AVAILABLE, FatigueDetectionService,
-            NumberAttemptsService) {
+            EVENT_NEW_CARD_AVAILABLE, EVENT_PROGRESS_NAV_SUBMITTED,
+            FatigueDetectionService, NumberAttemptsService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -436,9 +436,20 @@ oppia.directive('conversationSkin', [
             }
 
             if (ExplorationPlayerStateService.isStateTerminal(stateName)) {
+              $scope.parentExplorationIds =
+                UrlService.getQueryFieldValuesAsList('parent');
+              var recommendedExplorationIds = [];
+              if ($scope.parentExplorationIds.length > 0) {
+                var parentExplorationId = $scope.parentExplorationIds[
+                  $scope.parentExplorationIds.length - 1];
+                recommendedExplorationIds.push(parentExplorationId);
+              } else {
+                recommendedExplorationIds =
+                  ExplorationPlayerStateService.getAuthorRecommendedExpIds(
+                    stateName);
+              }
               ExplorationRecommendationsService.getRecommendedSummaryDicts(
-                ExplorationPlayerStateService.getAuthorRecommendedExpIds(
-                  stateName),
+                recommendedExplorationIds,
                 function(summaries) {
                   $scope.recommendedExplorationSummaries = summaries;
                 });
@@ -747,6 +758,11 @@ oppia.directive('conversationSkin', [
             return $scope.windowWidth < TWO_CARD_THRESHOLD_PX;
           };
 
+          $scope.isWindowNarrow = function() {
+            // TODO(allan): Resolve discrepancy with isViewportNarrow.
+            return WindowDimensionsService.isWindowNarrow();
+          }
+
           $scope.initializePage();
           LearnerViewRatingService.init(function(userRating) {
             $scope.userRating = userRating;
@@ -776,6 +792,19 @@ oppia.directive('conversationSkin', [
           $scope.onNavigateFromIframe = function() {
             siteAnalyticsService.registerVisitOppiaFromIframeEvent(
               $scope.explorationId);
+          };
+
+          // Interaction answer validity is used to enable/disable 
+          // the progress-nav's Submit button. This logic is here because
+          // Interactions and the progress-nav are both descendants
+          // of ConversationSkinDirective.
+          $scope.interactionAnswerIsValid = true;
+          $scope.setInteractionAnswerValidity = function(answerValidity) {
+            $scope.interactionAnswerIsValid = answerValidity;
+          };
+
+          $scope.submitAnswerFromProgressNav = function() {
+            $scope.$broadcast(EVENT_PROGRESS_NAV_SUBMITTED);
           };
         }
       ]
