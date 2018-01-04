@@ -122,6 +122,18 @@ oppia.directive('oppiaInteractiveFractionInput', [
               !UrlService.isIframed() &&
               WindowDimensionsService.isWindowNarrow());
           };
+
+          $scope.isAnswerValid = function() {
+            return (!$scope.FractionInputForm.$invalid && $scope.answer !== '');
+          };
+
+          $scope.$watch(function() {
+            return $scope.answer;
+          }, function() {
+            $scope.setAnswerValidity({
+              answerValidity: $scope.isAnswerValid()
+            });
+          });
         }
       ]
     };

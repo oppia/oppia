@@ -306,6 +306,9 @@ oppia.factory('ExplorationPlayerService', [
         }
         return randomSuffix;
       },
+      getHints: function(stateName) {
+        return exploration.getInteraction(stateName).hints;
+      },
       getSolution: function(stateName) {
         return exploration.getInteraction(stateName).solution;
       },
