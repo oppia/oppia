@@ -55,10 +55,10 @@ describe('Subscriptions functionality', function() {
     users.login('learner1@subscriptions.com');
     browser.get('/profile/creator1subscriptions');
     browser.waitForAngular();
-    SubscriptionDashboardPage.navigateToSubscriptionButton();   \\3
+    SubscriptionDashboardPage.navigateToSubscriptionButton();
     browser.get('/profile/creator2subscriptions');
     browser.waitForAngular();
-    SubscriptionDashboardPage.navigateToSubscriptionButton();    \\4
+    SubscriptionDashboardPage.navigateToSubscriptionButton();
     preferencesPage.get();
     preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
     preferencesPage.expectDisplayedLastSubscriptionToBe('creator...');
@@ -70,13 +70,13 @@ describe('Subscriptions functionality', function() {
     users.login('learner2@subscriptions.com');
     browser.get('/profile/creator1subscriptions');
     browser.waitForAngular();
-    SubscriptionDashboardPage.navigateToSubscriptionButton();   \\5
+    SubscriptionDashboardPage.navigateToSubscriptionButton();
     browser.get('/profile/creator2subscriptions');
     browser.waitForAngular();
     // Subscribe and then unsubscribe from the same user.
-    SubscriptionDashboardPage.navigateToSubscriptionButton();       \\ button
+    SubscriptionDashboardPage.navigateToSubscriptionButton();
     browser.waitForAngular();
-    SubscriptionDashboardPage.navigateToSubscriptionButton();     \\ button
+    SubscriptionDashboardPage.navigateToSubscriptionButton();
     preferencesPage.get();
     preferencesPage.expectSubscriptionCountToEqual(1);
     preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
@@ -86,8 +86,8 @@ describe('Subscriptions functionality', function() {
     creatorDashboardPage.get();
     browser.waitForAngular();
     creatorDashboardPage.navigateToSubscriptionDashboard();
-    subscriptionDashboardPage.expectSubscriptionFirstNameToMatch('learner...');   \\1
-    subscriptionDashboardPage.expectSubscriptionLastNameToMatch('learner...');    \\2
+    subscriptionDashboardPage.expectSubscriptionFirstNameToMatch('learner...');
+    subscriptionDashboardPage.expectSubscriptionLastNameToMatch('learner...');
     users.logout();
 
     users.login('creator2@subscriptions.com');
