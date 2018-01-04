@@ -67,8 +67,8 @@ oppia.directive('oppiaInteractiveNumericInput', [
           });
 
           $scope.isAnswerValid = function() {
-            return ($scope.answer !== undefined
-                && $scope.answer !== null && $scope.answer !== '');
+            return ($scope.answer !== undefined && 
+                $scope.answer !== null && $scope.answer !== '');
           };
 
           $scope.$watch(function() {
