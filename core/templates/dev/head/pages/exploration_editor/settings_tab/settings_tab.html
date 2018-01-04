@@ -192,6 +192,28 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div role="form" class="form-horizontal">
+            <label for="enableCorrectnessFeedback" class="col-lg-2 col-md-2 col-sm-2">
+              Correctness Feedback
+            </label>
+            <span class="col-lg-2 col-md-2 col-sm-2">
+              <button type="button" class="btn btn-default" ng-click="toggleCorrectnessFeedback()" style="margin-top: 16px">
+                <span ng-if="!isCorrectnessFeedbackEnabled()">
+                  Enable
+                </span>
+                <span ng-if="isCorrectnessFeedbackEnabled()">
+                  Disable
+                </span>
+              </button>
+            </span>
+            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              This allows the user to categorise answer groups as correct or incorrect.
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   </md-card>
 

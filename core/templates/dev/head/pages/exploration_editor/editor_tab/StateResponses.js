@@ -268,6 +268,7 @@ oppia.controller('StateResponses', [
               ExplorationHtmlFormatterService.getInteractionHtml(
                 stateInteractionIdService.savedMemento,
                 stateCustomizationArgsService.savedMemento,
+                false,
                 'testInteractionInput'));
             $scope.answerTemplate = '';
 
@@ -469,13 +470,21 @@ oppia.controller('StateResponses', [
 
     $scope.saveActiveAnswerGroupDest = function(updatedOutcome) {
       ResponsesService.updateActiveAnswerGroup({
-        dest: updatedOutcome.dest
+        dest: updatedOutcome.dest,
+        refresherExplorationId: updatedOutcome.refresherExplorationId
       });
     };
 
     $scope.saveActiveAnswerGroupRules = function(updatedRules) {
       ResponsesService.updateActiveAnswerGroup({
         rules: updatedRules
+      });
+    };
+
+    $scope.saveActiveAnswerGroupCorrectnessLabel = function(
+      updatedCorrectnessLabel) {
+      ResponsesService.updateActiveAnswerGroup({
+        labelledAsCorrect: updatedCorrectnessLabel
       });
     };
 
@@ -487,7 +496,8 @@ oppia.controller('StateResponses', [
 
     $scope.saveDefaultOutcomeDest = function(updatedOutcome) {
       ResponsesService.updateDefaultOutcome({
-        dest: updatedOutcome.dest
+        dest: updatedOutcome.dest,
+        refresherExplorationId: updatedOutcome.refresherExplorationId
       });
     };
 

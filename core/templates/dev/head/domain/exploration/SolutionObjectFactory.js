@@ -46,7 +46,9 @@ oppia.factory('SolutionObjectFactory', [
 
     Solution.createNew = function(
         answerIsExclusive, correctAnswer, explanationHtml) {
-      return new Solution(answerIsExclusive, correctAnswer, 
+      return new Solution(
+        answerIsExclusive,
+        correctAnswer,
         SubtitledHtmlObjectFactory.createDefault(explanationHtml));
     };
 

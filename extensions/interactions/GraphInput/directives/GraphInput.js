@@ -24,22 +24,33 @@ oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
 
 oppia.directive('oppiaInteractiveGraphInput', [
   'HtmlEscaperService', 'graphInputRulesService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE',
+  'UrlService', 'EVENT_NEW_CARD_AVAILABLE',
   function(
       HtmlEscaperService, graphInputRulesService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE ) {
+      UrlService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
         onSubmit: '&',
-        getLastAnswer: '&lastAnswer'
+        getLastAnswer: '&lastAnswer',
+        // This should be called whenever the answer changes.
+        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
         'graph_input_interaction_directive.html'),
       controller: [
-        '$scope', '$element', '$attrs',
-        function($scope, $element, $attrs) {
+        '$scope', '$element', '$attrs', 'WindowDimensionsService',
+        'EVENT_PROGRESS_NAV_SUBMITTED',
+        function(
+            $scope, $element, $attrs, WindowDimensionsService,
+            EVENT_PROGRESS_NAV_SUBMITTED) {
+          $scope.isSubmitHidden = function() {
+            return (
+              !UrlService.isIframed() &&
+              WindowDimensionsService.isWindowNarrow());
+          };
+
           $scope.errorMessage = '';
           $scope.graph = {
             vertices: [],
@@ -55,10 +66,11 @@ oppia.directive('oppiaInteractiveGraphInput', [
               rulesService: graphInputRulesService
             });
           };
+          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitGraph);
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             $scope.interactionIsActive = false;
-            
+
             $scope.canAddVertex = false;
             $scope.canDeleteVertex = false;
             $scope.canEditVertexLabel = false;

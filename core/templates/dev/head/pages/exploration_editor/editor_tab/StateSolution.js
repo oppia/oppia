@@ -17,19 +17,21 @@
  */
 
 oppia.controller('StateSolution', [
-  '$scope', '$rootScope', '$uibModal', 'EditorStateService', 'AlertsService',
-  'INTERACTION_SPECS', 'stateSolutionService', 'explorationStatesService',
-  'SolutionVerificationService', 'ExplorationHtmlFormatterService',
-  'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
-  'SolutionObjectFactory', 'ExplorationContextService',
-  'ExplorationWarningsService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
+  'AlertsService', 'INTERACTION_SPECS', 'stateSolutionService',
+  'explorationStatesService', 'SolutionVerificationService',
+  'ExplorationHtmlFormatterService', 'stateInteractionIdService',
+  'stateHintsService', 'UrlInterpolationService', 'SolutionObjectFactory',
+  'ExplorationContextService', 'ExplorationWarningsService',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function(
-    $scope, $rootScope, $uibModal, EditorStateService, AlertsService,
-    INTERACTION_SPECS, stateSolutionService, explorationStatesService,
-    SolutionVerificationService, ExplorationHtmlFormatterService,
-    stateInteractionIdService, stateHintsService, UrlInterpolationService,
-    SolutionObjectFactory, ExplorationContextService,
-    ExplorationWarningsService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
+    $scope, $rootScope, $uibModal, $filter, EditorStateService,
+    AlertsService, INTERACTION_SPECS, stateSolutionService,
+    explorationStatesService, SolutionVerificationService,
+    ExplorationHtmlFormatterService, stateInteractionIdService,
+    stateHintsService, UrlInterpolationService, SolutionObjectFactory,
+    ExplorationContextService, ExplorationWarningsService,
+    INFO_MESSAGE_SOLUTION_IS_INVALID) {
     $scope.correctAnswer = null;
     $scope.correctAnswerEditorHtml = '';
     $scope.inlineSolutionEditorIsActive = false;
@@ -52,6 +54,7 @@ oppia.controller('StateSolution', [
         stateInteractionIdService.savedMemento,
         explorationStatesService.getInteractionCustomizationArgsMemento(
           EditorStateService.getActiveStateName()),
+        false,
         $scope.SOLUTION_EDITOR_FOCUS_LABEL));
 
     $scope.toggleInlineSolutionEditorIsActive = function() {
@@ -61,7 +64,10 @@ oppia.controller('StateSolution', [
 
     $scope.getSolutionSummary = function() {
       var solution = stateSolutionService.savedMemento;
-      return solution.getSummary(stateInteractionIdService.savedMemento);
+      var solutionAsPlainText =
+        solution.getSummary(stateInteractionIdService.savedMemento);
+      solutionAsPlainText = $filter('convertToPlainText')(solutionAsPlainText);
+      return solutionAsPlainText;
     };
 
     // This returns false if the current interaction ID is null.
@@ -83,37 +89,51 @@ oppia.controller('StateSolution', [
         backdrop: 'static',
         controller: [
           '$scope', '$uibModalInstance', 'stateSolutionService',
-          function(
-            $scope, $uibModalInstance, stateSolutionService) {
+          function($scope, $uibModalInstance, stateSolutionService) {
             $scope.stateSolutionService = stateSolutionService;
             $scope.correctAnswerEditorHtml = (
               ExplorationHtmlFormatterService.getInteractionHtml(
                 stateInteractionIdService.savedMemento,
                 explorationStatesService.getInteractionCustomizationArgsMemento(
                   EditorStateService.getActiveStateName()),
+                false,
                 $scope.SOLUTION_EDITOR_FOCUS_LABEL));
             $scope.EXPLANATION_FORM_SCHEMA = {
               type: 'html',
               ui_config: {}
             };
 
-            $scope.data = {
+            var EMPTY_SOLUTION_DATA = {
               answerIsExclusive: false,
               correctAnswer: null,
-              explanation: ''
+              explanationHtml: ''
             };
+
+            $scope.data = stateSolutionService.savedMemento ? {
+              answerIsExclusive: (
+                stateSolutionService.savedMemento.answerIsExclusive),
+              correctAnswer: null,
+              explanationHtml: (
+                stateSolutionService.savedMemento.explanation.getHtml())
+            } : angular.copy(EMPTY_SOLUTION_DATA);
 
             $scope.submitAnswer = function(answer) {
               $scope.data.correctAnswer = answer;
             };
 
             $scope.saveSolution = function() {
-              $uibModalInstance.close({
-                solution: SolutionObjectFactory.createNew(
-                  $scope.data.answerIsExclusive,
-                  $scope.data.correctAnswer,
-                  $scope.data.explanation)
-              });
+              if (typeof $scope.data.answerIsExclusive === 'boolean' &&
+                  $scope.data.correctAnswer !== null &&
+                  $scope.data.explanation !== '') {
+                $uibModalInstance.close({
+                  solution: SolutionObjectFactory.createNew(
+                    $scope.data.answerIsExclusive,
+                    $scope.data.correctAnswer,
+                    $scope.data.explanationHtml)
+                });
+              } else {
+                throw Error('Cannot save invalid solution');
+              }
             };
 
             $scope.cancel = function() {
@@ -141,7 +161,7 @@ oppia.controller('StateSolution', [
       });
     };
 
-    $scope.deleteSolution = function(evt) {
+    $scope.deleteSolution = function(index, evt) {
       evt.stopPropagation();
 
       AlertsService.clearWarnings();

@@ -40,14 +40,19 @@
                       isViewportNarrow() && !isCurrentSupplementalCardNonempty()}">
       <tutor-card on-click-continue-button="showUpcomingCard()"
                   on-submit-answer="submitAnswer(answer, rulesService)"
-                  start-card-change-animation="startCardChangeAnimation">
+                  start-card-change-animation="startCardChangeAnimation"
+                  on-change-interaction-answer-validity="setInteractionAnswerValidity(answerValidity)">
       </tutor-card>
       <div ng-if="isCurrentSupplementalCardNonempty() && isViewportNarrow()">
         <supplemental-card on-click-continue-button="showUpcomingCard()"
                            on-submit-answer="submitAnswer(answer, rulesService)">
         </supplemental-card>
       </div>
-      <progress-nav ng-if="isViewportNarrow()"></progress-nav>
+      <progress-nav ng-if="isWindowNarrow()"
+                    on-submit="submitAnswerFromProgressNav()"
+                    submit-is-disabled="!interactionAnswerIsValid"
+                    on-click-continue-button="showUpcomingCard()">
+      </progress-nav>
     </div>
 
     <div ng-if="isCurrentSupplementalCardNonempty() && !isViewportNarrow()"
@@ -86,6 +91,7 @@
                                   collection-id="collectionId"
                                   exploration-id="exp.id"
                                   exploration-title="exp.title"
+                                  parent-exploration-ids="parentExplorationIds"
                                   last-updated-msec="exp.last_updated_msec"
                                   objective="exp.objective"
                                   category="exp.category"
@@ -195,7 +201,7 @@ otherwise they will interfere with the iframed conversation skin directive.
        below should be changed to match. */
     min-width: 360px;
     width: 100%;
-    z-index: 1;
+    z-index: 3;
   }
 
   /* Some mobile devices have CSS width below 360px, use a responsive min-width

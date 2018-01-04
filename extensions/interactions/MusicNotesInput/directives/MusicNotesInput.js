@@ -79,15 +79,21 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
   'HtmlEscaperService', 'NOTE_NAMES_TO_MIDI_VALUES',
   'musicNotesInputRulesService', 'musicPhrasePlayerService',
   'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
+  'EVENT_PROGRESS_NAV_SUBMITTED', 'WindowDimensionsService',
+  'UrlService',
   function(
       HtmlEscaperService, NOTE_NAMES_TO_MIDI_VALUES,
       musicNotesInputRulesService, musicPhrasePlayerService,
-      UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
+      UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE,
+      EVENT_PROGRESS_NAV_SUBMITTED, WindowDimensionsService,
+      UrlService) {
     return {
       restrict: 'E',
       scope: {
         onSubmit: '&',
-        getLastAnswer: '&lastAnswer'
+        getLastAnswer: '&lastAnswer',
+        // This should be called whenever the answer changes.
+        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MusicNotesInput/directives/' +
@@ -100,11 +106,18 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           return scope;
         };
 
+        scope.isSubmitHidden = function() {
+          return (
+            !UrlService.isIframed() &&
+            WindowDimensionsService.isWindowNarrow());
+        };
+
         scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
         scope.sequenceToGuess = HtmlEscaperService.escapedJsonToObj(
           attrs.sequenceToGuessWithValue);
 
         scope.interactionIsActive = (scope.getLastAnswer() === null);
+
         scope.initialSequence = scope.interactionIsActive ?
           HtmlEscaperService.escapedJsonToObj(attrs.initialSequenceWithValue) :
           scope.getLastAnswer();
@@ -775,6 +788,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
             rulesService: musicNotesInputRulesService
           });
         };
+
+        scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, scope.submitAnswer);
 
         /*******************************************************************
          * Functions involving MIDI playback.
