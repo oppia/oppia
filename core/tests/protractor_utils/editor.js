@@ -1215,10 +1215,6 @@ var readFeedbackMessages = function() {
   });
 };
 
-var retrieveStatsCompletionRate = function() {
-  element(by.css('.protractor-test-completion-rate')).all(by.tag('options'));
-};
-
 var sendResponseToLatestFeedback = function(feedbackResponse) {
   element(by.css('.protractor-test-feedback-tab')).click();
   element.all(by.css('.protractor-test-oppia-feedback-tab-row')).
