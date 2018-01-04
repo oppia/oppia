@@ -17,8 +17,7 @@
  * being played or paused.
  */
 
-oppia.factory('AudioTranslationManagerService', function() {
-  
+oppia.factory('AudioTranslationManagerService', function() {  
   // Audio translations in the main conversation flow, such as those for
   // content an feedback.
   var _primaryAudioTranslations = null;

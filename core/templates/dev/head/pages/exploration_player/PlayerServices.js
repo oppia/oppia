@@ -358,7 +358,7 @@ oppia.factory('ExplorationPlayerService', [
           makeFeedback(outcome.feedback.getHtml(), [oldParams]);
         var feedbackAudioTranslations =
           outcome.feedback.getBindableAudioTranslations();
-         if (feedbackHtml === null) {
+        if (feedbackHtml === null) {
           answerIsBeingProcessed = false;
           AlertsService.addWarning('Expression parsing error.');
           return;

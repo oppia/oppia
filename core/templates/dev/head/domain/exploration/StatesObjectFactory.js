@@ -170,7 +170,7 @@ oppia.factory('StatesObjectFactory', [
           if (audioTranslationsForAnswerGroup.hasOwnProperty(languageCode)) {
             allAudioTranslations[stateName].push(
               audioTranslationsForAnswerGroup[languageCode]);
-          };
+          }
         });
 
         if (state.interaction.defaultOutcome != null) {
