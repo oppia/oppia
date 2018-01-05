@@ -71,7 +71,7 @@ describe('Subscriptions functionality', function() {
     users.login('learner2@subscriptions.com');
     browser.get('/profile/creator1subscriptions');
     browser.waitForAngular();
-    SubscriptionDashboardPage.navigateToSubscriptionButton();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
     browser.get('/profile/creator2subscriptions');
     browser.waitForAngular();
     // Subscribe and then unsubscribe from the same user.
