@@ -204,9 +204,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
 
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitAnswer);
           $scope.isSubmitHidden = function() {
-            return (
-              !UrlService.isIframed() &&
-              WindowDimensionsService.isWindowNarrow());
+            return !UrlService.isIframed();
           };
         }
       ]

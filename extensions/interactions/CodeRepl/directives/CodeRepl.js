@@ -38,14 +38,16 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         'code_repl_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'WindowDimensionsService',
-        'UrlService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'UrlService', 'ExplorationPlayerService',
+        'EVENT_PROGRESS_NAV_SUBMITTED',
         function(
             $scope, $attrs, WindowDimensionsService,
-            UrlService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            UrlService, ExplorationPlayerService,
+            EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.isSubmitHidden = function() {
             return (
               !UrlService.isIframed() &&
-              WindowDimensionsService.isWindowNarrow());
+              !ExplorationPlayerService.canWindowShowTwoCards());
           };
 
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);

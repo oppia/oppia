@@ -22,20 +22,20 @@
          ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard, 'with-supplementary-card': isCurrentSupplementalCardNonempty()}">
 
       <div class="conversation-skin-main-tutor-card-embed"
-           ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': isViewportNarrow() && isCurrentSupplementalCardNonempty()}"
+           ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty()}"
            style="margin-bottom: 100px">
         <tutor-card on-click-continue-button="showUpcomingCard()"
                     on-submit-answer="submitAnswer(answer, rulesService)"
                     start-card-change-animation="startCardChangeAnimation">
         </tutor-card>
-        <div ng-if="isCurrentSupplementalCardNonempty() && isViewportNarrow()">
+        <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
           <supplemental-card on-click-continue-button="showUpcomingCard()"
                              on-submit-answer="submitAnswer(answer, rulesService)">
           </supplemental-card>
         </div>
       </div>
 
-      <div ng-if="isCurrentSupplementalCardNonempty() && !isViewportNarrow()"
+      <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
            class="conversation-skin-supplemental-card-container">
         <supplemental-card on-click-continue-button="showUpcomingCard()"
                            on-submit-answer="submitAnswer(answer, rulesService)">

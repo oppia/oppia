@@ -41,9 +41,7 @@ oppia.directive('oppiaInteractiveTextInput', [
             WindowDimensionsService, UrlService,
             EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.isSubmitHidden = function() {
-            return (
-              !UrlService.isIframed() &&
-              WindowDimensionsService.isWindowNarrow());
+            return !UrlService.isIframed();
           };
 
           $scope.placeholder = HtmlEscaperService.escapedJsonToObj(

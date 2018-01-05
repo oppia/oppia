@@ -31,16 +31,17 @@ oppia.directive('progressNav', [
       controller: [
         '$scope', '$rootScope', 'PlayerPositionService',
         'PlayerTranscriptService', 'ExplorationPlayerService',
-        'ExplorationPlayerStateService', 'CONTINUE_BUTTON_FOCUS_LABEL',
-        'INTERACTION_SPECS',
+        'ExplorationPlayerStateService', 'WindowDimensionsService',
+        'CONTINUE_BUTTON_FOCUS_LABEL', 'INTERACTION_SPECS',
         function($scope, $rootScope, PlayerPositionService,
           PlayerTranscriptService, ExplorationPlayerService,
-          ExplorationPlayerStateService, CONTINUE_BUTTON_FOCUS_LABEL,
-          INTERACTION_SPECS) {
+          ExplorationPlayerStateService, WindowDimensionsService,
+          CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
 
           var transcriptLength = 0;
           var interactionIsInline = true;
+          var interactionHasNavSubmitButton = false;
           var updateActiveCardInfo = function() {
             transcriptLength = PlayerTranscriptService.getNumCards();
             $scope.activeCardIndex = PlayerPositionService.getActiveCardIndex();
@@ -57,7 +58,7 @@ oppia.directive('progressNav', [
                 $scope.activeCard.stateName));
             $scope.interactionCustomizationArgs = interaction.customizationArgs;
             $scope.interactionId = interaction.id;
-            $scope.shouldGenericSubmitButtonBeShown = INTERACTION_SPECS[
+            interactionHasNavSubmitButton = INTERACTION_SPECS[
               interaction.id].show_nav_submit_button;
 
             $scope.helpCardHasContinueButton = false;
@@ -79,6 +80,12 @@ oppia.directive('progressNav', [
             } else {
               throw Error('Target card index out of bounds.');
             }
+          };
+
+          $scope.shouldGenericSubmitButtonBeShown = function() {
+            return (interactionHasNavSubmitButton && (
+              interactionIsInline ||
+              !ExplorationPlayerService.canWindowShowTwoCards()));
           };
 
           $scope.shouldContinueButtonBeShown = function() {

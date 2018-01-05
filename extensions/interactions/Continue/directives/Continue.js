@@ -60,9 +60,7 @@ oppia.directive('oppiaInteractiveContinue', [
           };
 
           $scope.isSubmitHidden = function() {
-            return (
-              !UrlService.isIframed() &&
-              WindowDimensionsService.isWindowNarrow());
+            return !UrlService.isIframed();
           };
 
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitAnswer);
