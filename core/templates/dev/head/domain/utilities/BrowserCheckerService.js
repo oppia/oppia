@@ -40,9 +40,28 @@ oppia.factory('BrowserCheckerService', function() {
     }
   };
 
+  var _supportsSpeechSynthesisInAudioLanguages = function(audioLanguageList) {
+    var audioLanguageCodeList = [];
+    audioLanguageList.forEach(function(audio){
+      audioLanguageCodeList.push(audio.speech_synthesis_code)
+    });
+    supportLang = false;
+    if(window.hasOwnProperty('speechSynthesis')){
+      speechSynthesis.getVoices().forEach(function(voice) {
+        if (audioLanguageCodeList.indexOf(voice.lang) >= 0) {
+          supportLang = true;
+        }
+      });
+    }
+    return supportLang;
+  };
+
   return {
     isChrome: function() {
       return _isChrome();
+    },
+    supportsSpeechSynthesis: function(audioLanguageList) {
+      return _supportsSpeechSynthesisInAudioLanguages(audioLanguageList);
     }
   };
 });
