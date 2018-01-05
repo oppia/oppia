@@ -23,7 +23,7 @@ oppia.controller('SettingsTab', [
   'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationTagsService', 'ExplorationRightsService',
   'explorationInitStateNameService', 'explorationParamSpecsService',
-  'changeListService', 'AlertsService', 'explorationStatesService',
+  'ChangeListService', 'AlertsService', 'explorationStatesService',
   'explorationParamChangesService', 'ExplorationWarningsService',
   'ExplorationAdvancedFeaturesService', 'ALL_CATEGORIES',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
@@ -37,7 +37,7 @@ oppia.controller('SettingsTab', [
       explorationObjectiveService, explorationLanguageCodeService,
       explorationTagsService, ExplorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService,
-      changeListService, AlertsService, explorationStatesService,
+      ChangeListService, AlertsService, explorationStatesService,
       explorationParamChangesService, ExplorationWarningsService,
       ExplorationAdvancedFeaturesService, ALL_CATEGORIES,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
@@ -382,7 +382,7 @@ oppia.controller('SettingsTab', [
     };
 
     $scope.isExplorationLockedForEditing = function() {
-      return changeListService.isExplorationLockedForEditing();
+      return ChangeListService.isExplorationLockedForEditing();
     };
 
     $scope.closeRolesForm = function() {
