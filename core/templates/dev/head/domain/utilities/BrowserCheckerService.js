@@ -24,6 +24,15 @@ oppia.factory('BrowserCheckerService', function() {
   var isIEedge = winNav.userAgent.indexOf('Edge') > -1;
   var isIOSChrome = winNav.userAgent.match('CriOS');
 
+  // For details on the reliability of this check, see
+  //https://stackoverflow.com/questions/9847580/
+  //how-to-detect-safari-chrome-ie-firefox-and-opera-browser#answer-9851769
+  var isSafari = /constructor/i.test(window.HTMLElement) ||
+    (function (p) {
+      return p.toString() === '[object SafariRemoteNotification]'; })(
+      !window.safari || (typeof safari !== 'undefined' &&
+      safari.pushNotification));
+
   var _isChrome = function() {
     // For details on the reliability of this check, see
     // https://stackoverflow.com/questions/4565112/
@@ -48,7 +57,7 @@ oppia.factory('BrowserCheckerService', function() {
     supportLang = false;
     if(window.hasOwnProperty('speechSynthesis')){
       speechSynthesis.getVoices().forEach(function(voice) {
-        if (audioLanguageCodeList.indexOf(voice.lang) >= 0) {
+        if (audioLanguageCodeList.indexOf(voice.lang) != -1) {
           supportLang = true;
         }
       });
@@ -62,6 +71,9 @@ oppia.factory('BrowserCheckerService', function() {
     },
     supportsSpeechSynthesis: function(audioLanguageList) {
       return _supportsSpeechSynthesisInAudioLanguages(audioLanguageList);
+    },
+    supportsAudioPlayback: function() {
+      return !isSafari;
     }
   };
 });
