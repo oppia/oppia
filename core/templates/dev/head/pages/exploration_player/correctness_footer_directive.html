@@ -1,60 +1,34 @@
 <style>
-  .inner-container {
-    background: rgb(221, 248, 233);
-    border:1px;
-    text-align:center;
+  correctness-footer .inner-container {
+    background: white;
+    border: 1px;
+    text-align: center;
     font-family: Roboto;
     font-style: normal;
-    font-weight: 500;
+    font-weight: 700;
     line-height: normal;
-    font-size: 28px;
+    font-size: 20px;
     color: #00B269;
-    position:fixed;
-    left:366px;
-    width:561px;
-    height:42px;
-    bottom:40px;
-    z-index:3;
+    margin: 0 auto;
+    max-width: 560px;
+    min-width: 360px;
+    height: 60px;
+    padding-top: 9px;
+    background-color: #fff;
+    border-radius: 3px;
+    position: relative;
   }
   
-  .circle_green { 
-    width:1%;
-    padding:17px 16px;
-    margin:0 auto;
-    border-radius:100%;
-    background-color: #00B269;
-    position:absolute;
-    left:180px;
-  }
-  
-  .tick-container {
-    position:absolute;
-    left:185px;
-    bottom:3px;
-    top:0px;
-    z-index:3;
-  }
-  
-  .tick-content {
-    color:white;
-    font-size:30px;
-  }
-  
-  .text-content {
-    position:relative;
-    left:10px;   
+  /* Some mobile devices have CSS width below 360px, use a responsive min-width
+     when under 360px to prevent pushing things offscreen. */
+  @media(max-width: 360px) {
+    correctness-footer .inner-container {
+      min-width: 100vw;
+    }
   }
 </style>
 
 <div class="inner-container">
-  <div class="tick-container">
-    <i class="tick-content">
-      &#10004;
-    </i>
-  </div>    
-  <div class="circle_green">
-  </div>   
-  <div class="text-content">
-    Correct!
-  </div>
+  <img ng-src="<[correctnessfooterUrl]>" alt="Correct">
+  <span style="padding-left:10px;">CORRECT!</span>
 </div>

@@ -333,8 +333,7 @@ oppia.factory('ExplorationPlayerService', [
           AnswerClassificationService.getMatchingClassificationResult(
             _explorationId, oldStateName, oldState, answer,
             interactionRulesService));
-        var answerIsCorrect =
-          angular.copy(classificationResult.answerIsCorrect);
+        var answerIsCorrect = classificationResult.answerIsCorrect;
 
         if (!_editorPreviewMode) {
           var feedbackIsUseful = (

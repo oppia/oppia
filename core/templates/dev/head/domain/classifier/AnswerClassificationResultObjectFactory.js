@@ -19,25 +19,20 @@
 
 oppia.factory('AnswerClassificationResultObjectFactory', [function() {
   var AnswerClassificationResult = function(
-      labelledAsCorrect, outcome, answerGroupIndex, ruleIndex,
+      answerIsCorrect, outcome, answerGroupIndex, ruleIndex,
       classificationCategorization) {
     this.outcome = outcome;
     this.answerGroupIndex = answerGroupIndex;
     this.ruleIndex = ruleIndex;
     this.classificationCategorization = classificationCategorization;
-    if (labelledAsCorrect) {
-      this.answerIsCorrect = true;
-    }
-    else {
-      this.answerIsCorrect = false;
-    }
+    this.answerIsCorrect = answerIsCorrect;
   };
 
   AnswerClassificationResult.createNew = function(
-      labelledAsCorrect, outcome, answerGroupIndex, ruleIndex,
+      answerIsCorrect, outcome, answerGroupIndex, ruleIndex,
       classificationCategorization) {
     return new AnswerClassificationResult(
-      labelledAsCorrect, outcome, answerGroupIndex, ruleIndex,
+      answerIsCorrect, outcome, answerGroupIndex, ruleIndex,
       classificationCategorization);
   };
 
