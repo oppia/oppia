@@ -7,6 +7,7 @@
       <img class="conversation-skin-oppia-avatar"
            ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
       <div class="conversation-skin-tutor-card-top-content"
+           ng-class="{'conversation-skin-audio-highlight': isContentAudioPlaying()}"
            focus-on="<[getContentFocusLabel($index)]>">
         <div class="protractor-test-conversation-content"
              angular-html-bind="activeCard.contentHtml">
@@ -151,6 +152,12 @@
 
   .conversation-skin-tutor-card-top-content {
     width: 100%;
+  }
+
+  .conversation-skin-audio-highlight {
+    border-style: solid;
+    border-width: 3px;
+    border-color: #f3d140
   }
 
   .conversation-skin-tutor-card,
