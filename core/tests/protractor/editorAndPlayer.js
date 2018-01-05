@@ -205,7 +205,11 @@ describe('Full exploration editor', function() {
       explorationPlayerPage.clickCancelRedirectionButton();
       browser.waitForAngular();
       explorationPlayerPage.expectContentToMatch(
-        forms.toRichText('Parent Exploration Content'));
+        forms.toRichTbrowser.getCurrentUrl().then(function(url) {
+        var pathname = url.split('/');
+        expect(
+          pathname[4].split('?')[1].split('=')[0]).toEqual('collection_id');
+      });ext('Parent Exploration Content'));
       explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Correct');
       browser.waitForAngular();
 
@@ -218,6 +222,8 @@ describe('Full exploration editor', function() {
       general.waitForSystem();
       explorationPlayerPage.clickConfirmRedirectionButton();
       browser.waitForAngular();
+      /* Checking the current url to see if collection_id is preserved in its
+         query string ( It would be the first query field) */
       browser.getCurrentUrl().then(function(url) {
         var pathname = url.split('/');
         expect(
