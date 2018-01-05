@@ -50,6 +50,7 @@ oppia.directive('hintAndSolutionButtons', [
             HintsAndSolutionManagerService.isSolutionConsumed);
 
           var resetLocalHintsArray = function() {
+            $scope.hintIndexes = [];
             var numHints = HintsAndSolutionManagerService.getNumHints();
             for (var index = 0; index < numHints; index++) {
               $scope.hintIndexes.push(index);
