@@ -261,6 +261,7 @@ oppia.directive('conversationSkin', [
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
         'EVENT_NEW_CARD_OPENED', 'HintsAndSolutionManagerService',
         'AudioTranslationManagerService', 'EVENT_AUTOPLAY_AUDIO',
+        'COMPONENT_NAME_FEEDBACK',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             MessengerService, ExplorationPlayerService, UrlService,
@@ -276,7 +277,8 @@ oppia.directive('conversationSkin', [
             RefresherExplorationConfirmationModalService,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
             EVENT_NEW_CARD_OPENED, HintsAndSolutionManagerService,
-            AudioTranslationManagerService, EVENT_AUTOPLAY_AUDIO) {
+            AudioTranslationManagerService, EVENT_AUTOPLAY_AUDIO,
+            COMPONENT_NAME_FEEDBACK) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -561,7 +563,7 @@ oppia.directive('conversationSkin', [
                     PlayerTranscriptService.getLastCard().inputResponsePairs);
                   var lastAnswerFeedbackPair = pairs[pairs.length - 1];
                   AudioTranslationManagerService.setPrimaryAudioTranslations(
-                    feedbackAudioTranslations,
+                    feedbackAudioTranslations, feedbackHtml,
                     COMPONENT_NAME_FEEDBACK);
                   $scope.$broadcast(EVENT_AUTOPLAY_AUDIO);
 

@@ -20,12 +20,14 @@ oppia.factory('HintAndSolutionModalService', [
   '$uibModal', 'UrlInterpolationService', 'HintsAndSolutionManagerService',
   'ExplorationPlayerService', 'PlayerPositionService',
   'AudioTranslationManagerService', 'AudioPlayerService',
-  'EVENT_AUTOPLAY_AUDIO',
+  'EVENT_AUTOPLAY_AUDIO', 'COMPONENT_NAME_HINT',
+  'COMPONENT_NAME_SOLUTION',
   function(
       $uibModal, UrlInterpolationService, HintsAndSolutionManagerService,
       ExplorationPlayerService, PlayerPositionService,
       AudioTranslationManagerService, AudioPlayerService,
-      EVENT_AUTOPLAY_AUDIO) {
+      EVENT_AUTOPLAY_AUDIO, COMPONENT_NAME_HINT,
+      COMPONENT_NAME_SOLUTION) {
     return {
       displayHintModal: function(index) {
         return $uibModal.open({
@@ -39,7 +41,8 @@ oppia.factory('HintAndSolutionModalService', [
               $scope.hint = HintsAndSolutionManagerService.displayHint(index);
               AudioTranslationManagerService.setSecondaryAudioTranslations(
                 $scope.hint.getBindableAudioTranslations(),
-                $scope.hint.getHtml());
+                $scope.hint.getHtml(),
+                COMPONENT_NAME_HINT);
               $rootScope.$broadcast(EVENT_AUTOPLAY_AUDIO);
               $scope.closeModal = function() {
                 AudioPlayerService.stop();
@@ -63,7 +66,8 @@ oppia.factory('HintAndSolutionModalService', [
               var solution = HintsAndSolutionManagerService.displaySolution();
               AudioTranslationManagerService.setSecondaryAudioTranslations(
                 solution.explanation.getBindableAudioTranslations(),
-                solution.explanation.getHtml());
+                solution.explanation.getHtml(),
+                COMPONENT_NAME_SOLUTION);
               $rootScope.$broadcast(EVENT_AUTOPLAY_AUDIO);
               var interaction = ExplorationPlayerService.getInteraction(
                 PlayerPositionService.getCurrentStateName());
