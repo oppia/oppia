@@ -20,11 +20,9 @@ describe('Url Service', function() {
   var UrlService = null;
   var sampleHash = 'sampleHash';
   var pathname = 'sample.com/embed';
-  var queryString = '?field=value';
   var mockLocation = {
     href: 'http://' + pathname,
     pathname: pathname,
-    search: queryString,
     hash: sampleHash
   };
 
@@ -75,10 +73,6 @@ describe('Url Service', function() {
         UrlService.addField(baseUrl, queryField, queryValue)).toBe(
           expectedUrl2);
     });
-
-  it('should correctly return query string', function() {
-    expect(UrlService.getCurrentQueryString()).toBe(queryString);
-  });
 
   it('should correctly return true if embed present in pathname', function() {
     expect(UrlService.isIframed()).toBe(true);
