@@ -57,7 +57,7 @@
               ng-disabled="!getChangeListLength()" uib-dropdown-toggle>
         <span class="caret"></span>
       </button>
-      <ul uib-dropdown-menu class="uib-dropdown-menu" role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
+      <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListLength() && !isPrivate() ? '150px' : '120px' }">
         <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListLength()}" class="protractor-test-discard-changes">Discard Draft</a></li>
       </ul>
     </div>

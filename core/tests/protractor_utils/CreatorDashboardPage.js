@@ -29,6 +29,9 @@ var CreatorDashboardPage = function() {
     element(by.css('.protractor-test-create-activity'));
   var createCollectionButton =
     element(by.css('.protractor-test-create-collection'));
+  var createExplorationButton =
+    element(by.css('.protractor-test-create-exploration'));
+
 
   this.get = function() {
     return browser.get(CREATOR_DASHBOARD_URL);
@@ -50,6 +53,10 @@ var CreatorDashboardPage = function() {
 
   this.clickCreateCollectionButton = function() {
     createCollectionButton.click();
+  };
+
+  this.clickCreateExplorationButton = function() {
+    createExplorationButton.click();
   };
 
   this.navigateToCollectionEditor = function() {

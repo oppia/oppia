@@ -36,7 +36,8 @@ describe('MultipleChoiceInputValidationService', function() {
         html: '',
         audio_translations: {}
       },
-      param_changes: []
+      param_changes: [],
+      refresher_exploration_id: null
     });
 
     badOutcome = oof.createFromBackendDict({
@@ -45,7 +46,8 @@ describe('MultipleChoiceInputValidationService', function() {
         html: '',
         audio_translations: {}
       },
-      param_changes: []
+      param_changes: [],
+      refresher_exploration_id: null
     });
 
     customizationArguments = {

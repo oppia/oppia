@@ -166,6 +166,15 @@ oppia.factory('ExplorationPlayerService', [
           GuestCollectionProgressService.recordExplorationCompletedInCollection(
             GLOBALS.collectionId, _explorationId);
         }
+
+        // For single state explorations, when the exploration reaches the
+        // terminal state and explorationActuallyStarted is false, record
+        // exploration actual start event.
+        if (!explorationActuallyStarted) {
+          StatsReportingService.recordExplorationActuallyStarted(
+            newStateName);
+          explorationActuallyStarted = true;
+        }
       }
     });
 
@@ -287,6 +296,7 @@ oppia.factory('ExplorationPlayerService', [
         return ExplorationHtmlFormatterService.getInteractionHtml(
           interactionId,
           exploration.getInteractionCustomizationArgs(stateName),
+          true,
           labelForFocusTarget);
       },
       getInteraction: function(stateName) {
@@ -304,6 +314,9 @@ oppia.factory('ExplorationPlayerService', [
           randomSuffix += ' ';
         }
         return randomSuffix;
+      },
+      getHints: function(stateName) {
+        return exploration.getInteraction(stateName).hints;
       },
       getSolution: function(stateName) {
         return exploration.getInteraction(stateName).solution;
@@ -348,6 +361,7 @@ oppia.factory('ExplorationPlayerService', [
         var outcome = angular.copy(classificationResult.outcome);
 
         var newStateName = outcome.dest;
+        var refresherExplorationId = outcome.refresherExplorationId;
         var newState = exploration.getState(newStateName);
 
         // Compute the data for the next state.
@@ -416,7 +430,7 @@ oppia.factory('ExplorationPlayerService', [
         $rootScope.$broadcast('playerStateChange', newStateName);
         successCallback(
           newStateName, refreshInteraction, feedbackHtml, questionHtml,
-          newParams);
+          newParams, refresherExplorationId);
       },
       isAnswerBeingProcessed: function() {
         return answerIsBeingProcessed;

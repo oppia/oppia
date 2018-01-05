@@ -18,15 +18,18 @@
 
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
+var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('Subscriptions functionality', function() {
   var creatorDashboardPage = null;
+  var preferencesPage = null;
 
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    preferencesPage = new PreferencesPage.PreferencesPage();
   });
 
   it('handle subscriptions to creators correctly', function() {
@@ -34,6 +37,8 @@ describe('Subscriptions functionality', function() {
     users.createUser('creator1@subscriptions.com', 'creator1subscriptions');
     users.login('creator1@subscriptions.com');
     workflow.createExploration();
+    general.waitForSystem();
+    general.waitForSystem();
     users.logout();
 
     users.createUser('creator2@subscriptions.com', 'creator2subscriptions');
@@ -50,13 +55,9 @@ describe('Subscriptions functionality', function() {
     browser.get('/profile/creator2subscriptions');
     browser.waitForAngular();
     element(by.css('.protractor-test-subscription-button')).click();
-    browser.get(general.USER_PREFERENCES_URL);
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).first().getText()).toMatch(
-      'creator...');
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).last().getText()).toMatch(
-      'creator...');
+    preferencesPage.get();
+    preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
+    preferencesPage.expectDisplayedLastSubscriptionToBe('creator...');
     users.logout();
 
     // Create a learner who subscribes to one creator and unsubscribes from the
@@ -72,12 +73,9 @@ describe('Subscriptions functionality', function() {
     element(by.css('.protractor-test-subscription-button')).click();
     browser.waitForAngular();
     element(by.css('.protractor-test-subscription-button')).click();
-    browser.get(general.USER_PREFERENCES_URL);
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).count()).toEqual(1);
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).first().getText()).toMatch(
-      'creator...');
+    preferencesPage.get();
+    preferencesPage.expectSubscriptionCountToEqual(1);
+    preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
     users.logout();
 
     users.login('creator1@subscriptions.com');

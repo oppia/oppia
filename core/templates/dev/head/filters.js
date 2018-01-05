@@ -305,7 +305,8 @@ oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
 oppia.filter('convertToPlainText', [function() {
   return function(input) {
     var strippedText = input.replace(/(<([^>]+)>)/ig, '');
-    strippedText = strippedText.replace('&nbsp;', ' ');
+    strippedText = strippedText.replace(/&nbsp;/ig, ' ');
+    strippedText = strippedText.replace(/&quot;/ig, '');
 
     var trimmedText = strippedText.trim();
     if (trimmedText.length === 0) {

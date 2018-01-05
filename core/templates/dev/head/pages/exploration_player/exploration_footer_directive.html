@@ -162,7 +162,8 @@
     <div class="col-sm-5">
       <ul class="author-profile" ng-if="!windowIsNarrow">
         <li>
-          <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="exploration-footer-img"
+          <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>"
+               class="exploration-footer-img"
                alt="">
         </li>
         <li class="hover-link"
@@ -171,8 +172,8 @@
             tabindex="0"
             aria-haspopup="true"
             aria-expanded="false">
-          <div class="dropup" ng-class="{'open':hovering}">
-            <a uib-dropdown-toggle id="dropdownMenu2" class="uib-dropdown-toggle"
+          <div uib-dropdown class="dropup" ng-class="{'open':hovering}">
+            <a uib-dropdown-toggle id="dropdownMenu2"
                ng-class="{'hovered-text':hovering}"
                data-toggle="dropdown"
                ng-if="contributorNames.length > 0"
@@ -182,7 +183,8 @@
               <h4 translate="I18N_FOOTER_AUTHOR_PROFILES" class="author-profile-text"
                   ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}"></h4>
             </a>
-            <ul uib-dropdown-menu class="author-profile-dropdown-menu uib-dropdown-menu" aria-labelledby="dropdownMenu2" role="menu">
+            <ul uib-dropdown-menu class="author-profile-dropdown-menu uib-dropdown-menu"
+                aria-labelledby="dropdownMenu2" role="menu">
               <li ng-repeat="name in contributorNames | limitTo: 5">
                 <a href="/profile/<[name]>" target="_blank"><[name]></a>
               </li>
@@ -190,27 +192,11 @@
           </div>
         </li>
       </ul>
+      <hint-and-solution-buttons ng-if="windowIsNarrow"></hint-and-solution-buttons>
     </div>
     <div class="col-sm-7">
       <div class="pull-right">
-        <ul class="author-profile" ng-controller="LearnerViewInfo">
-          <li ng-click="showInformationCard()" style="cursor: pointer;" class="oppia-exploration-footer-info-icon" tabindex="0">
-            <i class="material-icons oppia-navbar-footer-info-icon" style="font-size: 20px;">&#xE88E;</i>
-            <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_INFO_TOOLTIP' | translate]></span>
-          </li>
-          <li>
-            <h4 translate="I18N_PLAYER_SHARE_THIS_EXPLORATION" class="oppia-share-exploration-footer"></h4>
-          </li>
-          <li>
-            <sharing-links ng-if="explorationStatus !== 'private'"
-                           twitter-text="getTwitterText()"
-                           exploration-id="explorationId"
-                           layout-type="row"
-                           share-type="exploration"
-                           class="oppia-exploration-footer-sharing-links">
-            </sharing-links>
-          </li>
-        </ul>
+        <hint-and-solution-buttons ng-if="!windowIsNarrow"></hint-and-solution-buttons>
       </div>
     </div>
   </div>

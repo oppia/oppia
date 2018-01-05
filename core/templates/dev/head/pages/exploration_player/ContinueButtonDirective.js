@@ -13,19 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the solution button in the exploration player.
- */
+ * @fileoverview Directive for the Continue button in exploration player and
+ * editor.
+ */ 
 
-oppia.directive('solutionButton', [
+oppia.directive('continueButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
-        onClickSolutionButton: '&',
-        solutionIsAvailable: '&'
+        onClickContinueButton: '&',
+        focusLabel: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
-        'solution_button_directive.html')
+        'continue_button_directive.html')
     };
-  }]);
+  }
+]);

@@ -27,7 +27,7 @@
 </div>
 
 <div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
-  <progress-dots num-dots="numProgressDots" class="conversation-skin-progress-dots">
+  <progress-dots ng-if="!isViewportNarrow()" num-dots="numProgressDots" class="conversation-skin-progress-dots">
   </progress-dots>
 
   <div class="conversation-skin-cards-container conversation-skin-animate-cards"
@@ -40,13 +40,19 @@
                       isViewportNarrow() && !isCurrentSupplementalCardNonempty()}">
       <tutor-card on-click-continue-button="showUpcomingCard()"
                   on-submit-answer="submitAnswer(answer, rulesService)"
-                  start-card-change-animation="startCardChangeAnimation">
+                  start-card-change-animation="startCardChangeAnimation"
+                  on-change-interaction-answer-validity="setInteractionAnswerValidity(answerValidity)">
       </tutor-card>
       <div ng-if="isCurrentSupplementalCardNonempty() && isViewportNarrow()">
         <supplemental-card on-click-continue-button="showUpcomingCard()"
                            on-submit-answer="submitAnswer(answer, rulesService)">
         </supplemental-card>
       </div>
+      <progress-nav ng-if="isWindowNarrow()"
+                    on-submit="submitAnswerFromProgressNav()"
+                    submit-is-disabled="!interactionAnswerIsValid"
+                    on-click-continue-button="showUpcomingCard()">
+      </progress-nav>
     </div>
 
     <div ng-if="isCurrentSupplementalCardNonempty() && !isViewportNarrow()"
@@ -85,6 +91,7 @@
                                   collection-id="collectionId"
                                   exploration-id="exp.id"
                                   exploration-title="exp.title"
+                                  parent-exploration-ids="parentExplorationIds"
                                   last-updated-msec="exp.last_updated_msec"
                                   objective="exp.objective"
                                   category="exp.category"
@@ -158,7 +165,7 @@ otherwise they will interfere with the iframed conversation skin directive.
     margin: 0 auto;
     position: fixed;
     right: 0;
-    top: 56px;
+    top: 110px;
     z-index: 1;
   }
 
@@ -183,7 +190,7 @@ otherwise they will interfere with the iframed conversation skin directive.
     justify-content: center;
     margin: 0 auto 40px;
     max-width: 1400px;
-    padding: 56px 14px;
+    padding: 130px 14px;
     width: 100%;
   }
 
@@ -194,7 +201,7 @@ otherwise they will interfere with the iframed conversation skin directive.
        below should be changed to match. */
     min-width: 360px;
     width: 100%;
-    z-index: 1;
+    z-index: 3;
   }
 
   /* Some mobile devices have CSS width below 360px, use a responsive min-width
@@ -373,7 +380,7 @@ otherwise they will interfere with the iframed conversation skin directive.
   @media screen and (max-width: 959px) {
     .conversation-skin-cards-container {
       display: block;
-      padding: 65px 0px;
+      padding: 66px 0px;
       position: relative;
       width: 100%;
     }

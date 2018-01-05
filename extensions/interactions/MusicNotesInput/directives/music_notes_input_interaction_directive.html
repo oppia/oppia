@@ -13,10 +13,10 @@
     <button type="button" class="btn btn-default oppia-music-input-btn"
             ng-click="playSequenceToGuess()" translate="I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE"></button>
     <div class="pull-right">
-      <button type="button" class="btn btn-default oppia-music-input-btn"
+      <button type="button" class="btn btn-default oppia-music-input-btn" ng-disabled="!interactionIsActive"
               ng-click="clearSequence()" translate="I18N_INTERACTIONS_MUSIC_CLEAR"></button>
-      <button type="button" class="btn btn-default oppia-music-input-btn"
-              ng-click="submitAnswer(noteSequence)" translate="I18N_INTERACTIONS_MUSIC_SUBMIT"></button>
+      <button ng-if="!isSubmitHidden()" type="button" class="btn btn-default oppia-music-input-btn" ng-disabled="!interactionIsActive"
+              ng-click="submitAnswer(noteSequence)" translate="I18N_INTERACTIONS_SUBMIT"></button>
     </div>
   </div>
 </div>

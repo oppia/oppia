@@ -69,9 +69,13 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 // displayed.
 oppia.constant('FATAL_ERROR_CODES', [400, 401, 404, 500]);
 
-oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
-
 oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
+
+// Do not modify these, for backwards-compatibility reasons.
+oppia.constant('COMPONENT_NAME_CONTENT', 'content');
+oppia.constant('COMPONENT_NAME_HINT', 'hint');
+oppia.constant('COMPONENT_NAME_SOLUTION', 'solution');
+oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
 
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
@@ -588,29 +592,6 @@ oppia.factory('rteHelperService', [
 ]);
 
 oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
-
-// Service for manipulating the page URL.
-oppia.factory('urlService', ['$window', function($window) {
-  return {
-    getUrlParams: function() {
-      var params = {};
-      var parts = $window.location.href.replace(
-        /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-          params[key] = value;
-        }
-      );
-      return params;
-    },
-    isIframed: function() {
-      var pathname = this.getPathname();
-      var urlParts = pathname.split('/');
-      return urlParts[1] === 'embed';
-    },
-    getPathname: function() {
-      return window.location.pathname;
-    }
-  };
-}]);
 
 // Service for sending events to Google Analytics.
 //
