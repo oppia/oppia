@@ -29,6 +29,18 @@ var SubscriptionDashboardPage = function() {
     ).toMatch(name);
   };
 
+  this.expectSubscriptionLastNameToMatch = function(name) {
+    expect(
+      subscriptionName.last().getText()
+    ).toMatch(name);
+  };
+
+  this.expectSubscriptionCountToEqual = function(value) {
+    expect(
+      subscriptionName.count()
+    ).toEqual(value);
+  };
+
   this.navigateToSubscriptionButton = function(name)
   {
     subscriptionButton.click();

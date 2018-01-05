@@ -56,10 +56,10 @@ describe('Subscriptions functionality', function() {
     users.login('learner1@subscriptions.com');
     browser.get('/profile/creator1subscriptions');
     browser.waitForAngular();
-    SubscriptionDashboardPage.navigateToSubscriptionButton();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
     browser.get('/profile/creator2subscriptions');
     browser.waitForAngular();
-    SubscriptionDashboardPage.navigateToSubscriptionButton();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
     preferencesPage.get();
     preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
     preferencesPage.expectDisplayedLastSubscriptionToBe('creator...');
@@ -75,9 +75,9 @@ describe('Subscriptions functionality', function() {
     browser.get('/profile/creator2subscriptions');
     browser.waitForAngular();
     // Subscribe and then unsubscribe from the same user.
-    SubscriptionDashboardPage.navigateToSubscriptionButton();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
     browser.waitForAngular();
-    SubscriptionDashboardPage.navigateToSubscriptionButton();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
     preferencesPage.get();
     preferencesPage.expectSubscriptionCountToEqual(1);
     preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');

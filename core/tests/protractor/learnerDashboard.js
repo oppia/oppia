@@ -208,10 +208,10 @@ describe('Learner dashboard functionality', function() {
     // Subscribe to both the creators.
     browser.get('/profile/creator1learnerDashboard');
     browser.waitForAngular();
-    SubscriptionDashboardPage.navigateToSubscriptionButton();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
     browser.get('/profile/creator2learnerDashboard');
     browser.waitForAngular();
-    eSubscriptionDashboardPage.navigateToSubscriptionButton();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
 
     // Both creators should be present in the subscriptions section of the
     // dashboard.
