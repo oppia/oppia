@@ -253,7 +253,7 @@ oppia.directive('conversationSkin', [
         'LearnerParamsService', 'PlayerPositionService',
         'ExplorationRecommendationsService', 'StatsReportingService',
         'siteAnalyticsService', 'ExplorationPlayerStateService',
-        'TWO_CARD_THRESHOLD_PX', 'CONTENT_FOCUS_LABEL_PREFIX', 'AlertsService',
+        'CONTENT_FOCUS_LABEL_PREFIX', 'AlertsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'EVENT_NEW_CARD_AVAILABLE', 'EVENT_PROGRESS_NAV_SUBMITTED',
         'FatigueDetectionService', 'NumberAttemptsService',
@@ -268,7 +268,7 @@ oppia.directive('conversationSkin', [
             LearnerParamsService, PlayerPositionService,
             ExplorationRecommendationsService, StatsReportingService,
             siteAnalyticsService, ExplorationPlayerStateService,
-            TWO_CARD_THRESHOLD_PX, CONTENT_FOCUS_LABEL_PREFIX, AlertsService,
+            CONTENT_FOCUS_LABEL_PREFIX, AlertsService,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_AVAILABLE, EVENT_PROGRESS_NAV_SUBMITTED,
             FatigueDetectionService, NumberAttemptsService,
@@ -422,14 +422,16 @@ oppia.directive('conversationSkin', [
             var nextSupplementalCardIsNonempty = isSupplementalCardNonempty(
               PlayerTranscriptService.getLastCard());
 
-            if (totalNumCards > 1 && !$scope.isViewportNarrow() &&
+            if (totalNumCards > 1 &&
+                ExplorationPlayerService.canWindowShowTwoCards() &&
                 !previousSupplementalCardIsNonempty &&
                 nextSupplementalCardIsNonempty) {
               PlayerPositionService.setActiveCardIndex(
                   $scope.numProgressDots - 1);
               animateToTwoCards(function() {});
             } else if (
-                totalNumCards > 1 && !$scope.isViewportNarrow() &&
+                totalNumCards > 1 &&
+                ExplorationPlayerService.canWindowShowTwoCards() &&
                 previousSupplementalCardIsNonempty &&
                 !nextSupplementalCardIsNonempty) {
               animateToOneCard(function() {
@@ -765,10 +767,12 @@ oppia.directive('conversationSkin', [
             }
           });
 
-          $scope.windowWidth = WindowDimensionsService.getWidth();
+          $scope.canWindowShowTwoCards = function() {
+            return ExplorationPlayerService.canWindowShowTwoCards();
+          };
+
           $window.onresize = function() {
             $scope.adjustPageHeight(false, null);
-            $scope.windowWidth = WindowDimensionsService.getWidth();
           };
 
           $window.addEventListener('scroll', function() {
@@ -797,15 +801,6 @@ oppia.directive('conversationSkin', [
                 'conversation-skin-supplemental-card-fixed');
             }
           };
-
-          $scope.isViewportNarrow = function() {
-            return $scope.windowWidth < TWO_CARD_THRESHOLD_PX;
-          };
-
-          $scope.isWindowNarrow = function() {
-            // TODO(allan): Resolve discrepancy with isViewportNarrow.
-            return WindowDimensionsService.isWindowNarrow();
-          }
 
           $scope.initializePage();
           LearnerViewRatingService.init(function(userRating) {

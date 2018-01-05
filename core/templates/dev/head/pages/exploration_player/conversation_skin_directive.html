@@ -19,43 +19,38 @@
         class="conversation-skin-inline-interaction">
       <div style="padding: 6px 12px;">
         <[upcomingInteractionInstructions]>
-        <i ng-if="!isViewportNarrow()" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
-        <i ng-if="isViewportNarrow()" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
+        <i ng-if="canWindowShowTwoCards()" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
+        <i ng-if="!canWindowShowTwoCards()" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
       </div>
     </div>
   </div>
 </div>
 
 <div role="main" style="margin: 0 auto; position: relative;" ng-if="hasFullyLoaded">
-  <progress-dots ng-if="!isViewportNarrow()" num-dots="numProgressDots" class="conversation-skin-progress-dots">
-  </progress-dots>
-
   <div class="conversation-skin-cards-container conversation-skin-animate-cards"
        ng-class="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
 
     <div class="conversation-skin-tutor-card-container"
          ng-class="{'conversation-skin-animate-tutor-card-on-narrow':
-                      isViewportNarrow() && isCurrentSupplementalCardNonempty(),
+                      !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty(),
                     'conversation-skin-tutor-card-alone':
-                      isViewportNarrow() && !isCurrentSupplementalCardNonempty()}">
-      <tutor-card on-click-continue-button="showUpcomingCard()"
-                  on-submit-answer="submitAnswer(answer, rulesService)"
+                      !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
+      <tutor-card on-submit-answer="submitAnswer(answer, rulesService)"
                   start-card-change-animation="startCardChangeAnimation"
                   on-change-interaction-answer-validity="setInteractionAnswerValidity(answerValidity)">
       </tutor-card>
-      <div ng-if="isCurrentSupplementalCardNonempty() && isViewportNarrow()">
+      <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <supplemental-card on-click-continue-button="showUpcomingCard()"
                            on-submit-answer="submitAnswer(answer, rulesService)">
         </supplemental-card>
       </div>
-      <progress-nav ng-if="isWindowNarrow()"
-                    on-submit="submitAnswerFromProgressNav()"
+      <progress-nav on-submit="submitAnswerFromProgressNav()"
                     submit-is-disabled="!interactionAnswerIsValid"
                     on-click-continue-button="showUpcomingCard()">
       </progress-nav>
     </div>
 
-    <div ng-if="isCurrentSupplementalCardNonempty() && !isViewportNarrow()"
+    <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
          class="conversation-skin-supplemental-card-container">
       <supplemental-card on-click-continue-button="showUpcomingCard()"
                          on-submit-answer="submitAnswer(answer, rulesService)">
@@ -190,7 +185,7 @@ otherwise they will interfere with the iframed conversation skin directive.
     justify-content: center;
     margin: 0 auto 40px;
     max-width: 1400px;
-    padding: 130px 14px;
+    padding: 56px 14px;
     width: 100%;
   }
 
