@@ -23,21 +23,22 @@ oppia.directive('progressNav', [
       scope: {
         onSubmit: '&',
         onClickContinueButton: '&',
-        submitIsDisabled: '='
+        isSubmitButtonShown: '&submitButtonIsShown',
+        isSubmitButtonDisabled: '&submitButtonIsDisabled'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/' +
-        'progress_nav_directive.html'),
+        '/pages/exploration_player/progress_nav_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'PlayerPositionService',
+        '$scope', '$rootScope', 'PlayerPositionService', 'UrlService',
         'PlayerTranscriptService', 'ExplorationPlayerService',
         'ExplorationPlayerStateService', 'WindowDimensionsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'INTERACTION_SPECS',
-        function($scope, $rootScope, PlayerPositionService,
+        function($scope, $rootScope, PlayerPositionService, UrlService,
           PlayerTranscriptService, ExplorationPlayerService,
           ExplorationPlayerStateService, WindowDimensionsService,
           CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
+          $scope.isIframed = UrlService.isIframed();
 
           var transcriptLength = 0;
           var interactionIsInline = true;
@@ -60,7 +61,7 @@ oppia.directive('progressNav', [
             $scope.interactionId = interaction.id;
             interactionHasNavSubmitButton = (
               Boolean(interaction.id) &&
-              INTERACTION_SPECS[interaction.id].show_nav_submit_button);
+              INTERACTION_SPECS[interaction.id].show_generic_submit_button);
 
             $scope.helpCardHasContinueButton = false;
           };

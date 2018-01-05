@@ -15,8 +15,10 @@
       <div class="protractor-test-interaction-html"
            angular-html-bind="correctAnswerEditorHtml">
       </div>
+      <br>
       <md-button class="oppia-learner-confirm-button" ng-click="onSubmitFromSubmitButton()"
-                 ng-if="data.correctAnswer === null" ng-disabled="!answerIsValid">
+                 ng-if="data.correctAnswer === null && shouldAdditionalSubmitButtonBeShown()"
+                 ng-disabled="!answerIsValid">
         Submit
       </md-button>
       <br>

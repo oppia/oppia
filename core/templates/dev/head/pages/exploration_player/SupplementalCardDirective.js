@@ -99,6 +99,8 @@ oppia.directive('supplementalCard', [
           });
 
           updateActiveCard();
-        }]
+        }
+      ]
     };
-  }]);
+  }
+]);

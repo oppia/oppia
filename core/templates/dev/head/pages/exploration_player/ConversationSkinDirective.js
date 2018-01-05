@@ -258,7 +258,7 @@ oppia.directive('conversationSkin', [
         'EVENT_NEW_CARD_AVAILABLE', 'EVENT_PROGRESS_NAV_SUBMITTED',
         'FatigueDetectionService', 'NumberAttemptsService',
         'RefresherExplorationConfirmationModalService',
-        'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+        'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'INTERACTION_SPECS',
         'EVENT_NEW_CARD_OPENED', 'HintsAndSolutionManagerService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
@@ -273,7 +273,7 @@ oppia.directive('conversationSkin', [
             EVENT_NEW_CARD_AVAILABLE, EVENT_PROGRESS_NAV_SUBMITTED,
             FatigueDetectionService, NumberAttemptsService,
             RefresherExplorationConfirmationModalService,
-            EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
+            EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, INTERACTION_SPECS,
             EVENT_NEW_CARD_OPENED, HintsAndSolutionManagerService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
@@ -283,7 +283,7 @@ oppia.directive('conversationSkin', [
           var MIN_CARD_LOADING_DELAY_MSEC = 950;
 
           var hasInteractedAtLeastOnce = false;
-          var _answerIsBeingProcessed = false;
+          $scope.answerIsBeingProcessed = false;
           var _nextFocusLabel = null;
           // This variable is used only when viewport is narrow.
           // Indicates whether the tutor card is displayed.
@@ -360,6 +360,15 @@ oppia.directive('conversationSkin', [
           $scope.isCurrentSupplementalCardNonempty = function() {
             return $scope.activeCard && isSupplementalCardNonempty(
               $scope.activeCard);
+          };
+
+          $scope.isSupplementalNavShown = function() {
+            var interaction = ExplorationPlayerService.getInteraction(
+              $scope.activeCard.stateName);
+            return (
+              Boolean(interaction.id) &&
+              INTERACTION_SPECS[interaction.id].show_generic_submit_button &&
+              $scope.isCurrentCardAtEndOfTranscript());
           };
 
           // Navigates to the currently-active card, and resets the
@@ -513,7 +522,7 @@ oppia.directive('conversationSkin', [
 
           $scope.submitAnswer = function(answer, interactionRulesService) {
             // Safety check to prevent double submissions from occurring.
-            if (_answerIsBeingProcessed ||
+            if ($scope.answerIsBeingProcessed ||
               !$scope.isCurrentCardAtEndOfTranscript() ||
               $scope.activeCard.destStateName) {
               return;
@@ -529,7 +538,7 @@ oppia.directive('conversationSkin', [
             }
             NumberAttemptsService.submitAttempt();
 
-            _answerIsBeingProcessed = true;
+            $scope.answerIsBeingProcessed = true;
             hasInteractedAtLeastOnce = true;
 
             var _oldStateName = PlayerTranscriptService.getLastCard().stateName;
@@ -655,7 +664,7 @@ oppia.directive('conversationSkin', [
                         ExplorationPlayerService.getRandomSuffix());
                     }
                   }
-                  _answerIsBeingProcessed = false;
+                  $scope.answerIsBeingProcessed = false;
                 }, millisecsLeftToWait);
               }
             );

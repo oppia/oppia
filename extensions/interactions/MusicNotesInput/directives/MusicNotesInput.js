@@ -80,13 +80,11 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
   'musicNotesInputRulesService', 'musicPhrasePlayerService',
   'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
   'EVENT_PROGRESS_NAV_SUBMITTED', 'WindowDimensionsService',
-  'UrlService', 'ExplorationPlayerService',
   function(
       HtmlEscaperService, NOTE_NAMES_TO_MIDI_VALUES,
       musicNotesInputRulesService, musicPhrasePlayerService,
       UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE,
-      EVENT_PROGRESS_NAV_SUBMITTED, WindowDimensionsService,
-      UrlService, ExplorationPlayerService) {
+      EVENT_PROGRESS_NAV_SUBMITTED, WindowDimensionsService) {
     return {
       restrict: 'E',
       scope: {
@@ -104,12 +102,6 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         // details.
         element[0].isolateScope = function() {
           return scope;
-        };
-
-        scope.isSubmitHidden = function() {
-          return (
-            !UrlService.isIframed() &&
-            !ExplorationPlayerService.canWindowShowTwoCards());
         };
 
         scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';

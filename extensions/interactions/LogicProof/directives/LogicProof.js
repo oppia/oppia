@@ -262,12 +262,6 @@ oppia.directive('oppiaInteractiveLogicProof', [
 
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitProof);
 
-          $scope.isSubmitHidden = function() {
-            return (
-              !UrlService.isIframed() &&
-              !ExplorationPlayerService.canWindowShowTwoCards());
-          };
-
           $scope.showHelp = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getExtensionResourceUrl(

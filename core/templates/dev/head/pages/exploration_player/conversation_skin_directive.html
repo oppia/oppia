@@ -45,7 +45,8 @@
         </supplemental-card>
       </div>
       <progress-nav on-submit="submitAnswerFromProgressNav()"
-                    submit-is-disabled="!interactionAnswerIsValid"
+                    submit-button-is-disabled="!interactionAnswerIsValid"
+                    submit-button-is-shown="!answerIsBeingProcessed"
                     on-click-continue-button="showUpcomingCard()">
       </progress-nav>
     </div>
@@ -55,6 +56,13 @@
       <supplemental-card on-click-continue-button="showUpcomingCard()"
                          on-submit-answer="submitAnswer(answer, rulesService)">
       </supplemental-card>
+      <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown()">
+        <md-button type="submit" class="oppia-learner-confirm-button conversation-skin-supplemental-nav-submit-button"
+                   ng-click="submitAnswerFromProgressNav()"
+                   ng-disabled="!interactionAnswerIsValid"
+                   translate="I18N_INTERACTIONS_SUBMIT">
+        </md-button>
+      </div>
     </div>
   </div>
 </div>
@@ -361,6 +369,19 @@ otherwise they will interfere with the iframed conversation skin directive.
 
   .conversation-skin-recommended-activities-container {
     padding-top: 10px;
+  }
+
+  .conversation-skin-supplemental-nav {
+    background: white;
+    height: 32px;
+    position: relative;
+  }
+
+  .conversation-skin-supplemental-nav-submit-button {
+    margin-right: 10px;
+    position: absolute;
+    right: 0;
+    top: -10px;
   }
 
   @media screen and (max-width: 959px) {

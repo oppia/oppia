@@ -32,10 +32,10 @@ oppia.directive('oppiaInteractiveContinue', [
         'continue_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'WindowDimensionsService',
-        'UrlService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'EVENT_PROGRESS_NAV_SUBMITTED',
         function(
             $scope, $attrs, WindowDimensionsService,
-            UrlService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.buttonText = HtmlEscaperService.escapedJsonToObj(
             $attrs.buttonTextWithValue);
 
@@ -57,10 +57,6 @@ oppia.directive('oppiaInteractiveContinue', [
               answer: humanReadableAnswer,
               rulesService: continueRulesService
             });
-          };
-
-          $scope.isSubmitHidden = function() {
-            return !UrlService.isIframed();
           };
 
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitAnswer);

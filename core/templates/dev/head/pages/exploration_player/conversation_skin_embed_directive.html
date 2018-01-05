@@ -24,15 +24,20 @@
       <div class="conversation-skin-main-tutor-card-embed"
            ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty()}"
            style="margin-bottom: 100px">
-        <tutor-card on-click-continue-button="showUpcomingCard()"
-                    on-submit-answer="submitAnswer(answer, rulesService)"
-                    start-card-change-animation="startCardChangeAnimation">
+        <tutor-card on-submit-answer="submitAnswer(answer, rulesService)"
+                    start-card-change-animation="startCardChangeAnimation"
+                    on-change-interaction-answer-validity="setInteractionAnswerValidity(answerValidity)">
         </tutor-card>
         <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
           <supplemental-card on-click-continue-button="showUpcomingCard()"
                              on-submit-answer="submitAnswer(answer, rulesService)">
           </supplemental-card>
         </div>
+        <progress-nav on-submit="submitAnswerFromProgressNav()"
+                      submit-button-is-disabled="!interactionAnswerIsValid"
+                      submit-button-is-shown="!answerIsBeingProcessed"
+                      on-click-continue-button="showUpcomingCard()">
+        </progress-nav>
       </div>
 
       <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
@@ -47,13 +52,6 @@
   <footer class="grid-container">
     <nav class="bottom-nav-row">
       <div class="col-1-4 bottom-nav-left">
-        <div ng-if="activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1].oppiaResponse &&
-                    !isCurrentSupplementalCardNonempty() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback && activeCard.destStateName &&
-                    !isOnTerminalCard()">
-          <continue-button focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
-                           ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)">
-          </continue-button>
-        </div>
         <div ng-if="isOnTerminalCard()" class="nav-bar-bottom-replay-content">
           <i ng-click="reloadExploration()" class="material-icons replay-nav-icon">replay</i>
           <span class="oppia-restart-exploration"> Restart exploration? </span>
@@ -620,7 +618,7 @@ directive. -->
       /* TODO(tjiang11): Find a way to handle arbitrarily long/short content.
          in supplemental interactions.
       */
-      min-height: 1000px;
+      margin-top: 308px;
     }
 
     .conversation-skin-main-tutor-card {
