@@ -131,9 +131,9 @@ describe('Guest collection progress service', function() {
       function() {
         GuestCollectionProgressService.recordExplorationCompletedInCollection(
           _collectionId1, _expId0);
-      var hasProgress = (
-        GuestCollectionProgressService.hasCompletedSomeExploration(
-          _collectionId0));
+        var hasProgress = (
+          GuestCollectionProgressService.hasCompletedSomeExploration(
+            _collectionId0));
         expect(hasProgress).toBe(false);
       }
     );
