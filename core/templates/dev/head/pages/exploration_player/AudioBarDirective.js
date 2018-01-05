@@ -50,7 +50,7 @@ oppia.directive('audioBar', [
             value: AudioTranslationManagerService.getCurrentAudioLanguageCode()
           };
 
-          $scope.showAudioBar = function() {
+          $scope.isAudioBarAvailable = function() {
             return (
               BrowserCheckerService.supportsAudioPlayback() &&
               $scope.languagesInExploration.length > 0);
