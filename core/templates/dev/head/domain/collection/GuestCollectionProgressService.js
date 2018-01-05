@@ -18,60 +18,44 @@
  * user's progress when they create an account.
  */
 
-// TODO(bhenning): Move this to a shared service which stores state across the
+// TODO(bhenning): Move this to a service which stores shared state across the
 // frontend in a way that can be persisted in the backend upon account
-// creation.
+// creation, such as exploration progress.
 
 // TODO(bhenning): This should be reset upon login, otherwise the progress will
 // be different depending on the user's logged in/logged out state.
 
 oppia.factory('GuestCollectionProgressService', [
-  function() {
-    var COLLECTION_STORAGE_KEY = 'collectionProgressStore';
+  '$window', 'GuestCollectionProgressObjectFactory',
+  function($window, GuestCollectionProgressObjectFactory) {
+    var COLLECTION_STORAGE_KEY = 'collectionProgressStore_v1';
 
-    var setCollectionProgressStore = function(store) {
-      window.localStorage[COLLECTION_STORAGE_KEY] = JSON.stringify(store);
+    var storeGuestCollectionProgress = function(guestCollectionProgress) {
+      $window.localStorage[COLLECTION_STORAGE_KEY] = (
+        guestCollectionProgress.toJson());
     };
 
-    var getCollectionProgressStore = function() {
-      var store = window.localStorage[COLLECTION_STORAGE_KEY];
-      if (!store) {
-        store = {};
-        setCollectionProgressStore(store);
-        return store;
-      }
-      return JSON.parse(store);
-    };
-
-    var getCompletedExplorationIds = function(collectionId) {
-      var store = getCollectionProgressStore();
-      if (!store.hasOwnProperty(collectionId)) {
-        return [];
-      }
-      return store[collectionId];
-    };
-
-    var setCompletedExplorationIds = function(collectionId, explorationIds) {
-      var store = getCollectionProgressStore();
-      store[collectionId] = explorationIds;
-      setCollectionProgressStore(store);
+    var loadGuestCollectionProgress = function() {
+      return GuestCollectionProgressObjectFactory.createFromJson(
+        $window.localStorage[COLLECTION_STORAGE_KEY]);
     };
 
     var recordCompletedExploration = function(collectionId, explorationId) {
-      var completedIds = getCompletedExplorationIds(collectionId);
-      // Only register the exploration ID if it's not already in the list of
-      // completed IDs (to avoid duplication).
-      if (completedIds.indexOf(explorationId) === -1) {
-        completedIds.push(explorationId);
-        setCompletedExplorationIds(collectionId, completedIds);
+      var guestCollectionProgress = loadGuestCollectionProgress();
+      if (guestCollectionProgress.addCompletedExplorationId(
+          collectionId, explorationId)) {
+        storeGuestCollectionProgress(guestCollectionProgress);
       }
     };
 
     var getValidCompletedExplorationIds = function(collection) {
       var collectionId = collection.getId();
+      var guestCollectionProgress = loadGuestCollectionProgress();
+      var completedExplorationIds = (
+        guestCollectionProgress.getCompletedExplorationIds(collectionId));
       // Filter the exploration IDs by whether they are contained within the
       // specified collection structure.
-      return getCompletedExplorationIds(collectionId).filter(function(expId) {
+      return completedExplorationIds.filter(function(expId) {
         return collection.containsCollectionNode(expId);
       });
     };
@@ -120,7 +104,8 @@ oppia.factory('GuestCollectionProgressService', [
        * the specified collection.
        */
       hasMadeProgress: function(collectionId) {
-        return getCompletedExplorationIds(collectionId).length !== 0;
+        var guestCollectionProgress = loadGuestCollectionProgress();
+        return guestCollectionProgress.hasCompletionProgress(collectionId);
       },
 
       /**
