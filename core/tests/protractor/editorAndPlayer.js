@@ -205,11 +205,7 @@ describe('Full exploration editor', function() {
       explorationPlayerPage.clickCancelRedirectionButton();
       browser.waitForAngular();
       explorationPlayerPage.expectContentToMatch(
-        forms.toRichTbrowser.getCurrentUrl().then(function(url) {
-        var pathname = url.split('/');
-        expect(
-          pathname[4].split('?')[1].split('=')[0]).toEqual('collection_id');
-      });ext('Parent Exploration Content'));
+        forms.toRichText('Parent Exploration Content'));
       explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Correct');
       browser.waitForAngular();
 
