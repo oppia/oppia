@@ -218,7 +218,7 @@ describe('Full exploration editor', function() {
       general.waitForSystem();
       explorationPlayerPage.clickConfirmRedirectionButton();
       browser.waitForAngular();
-      // Checking the current url to see if collection_id is present in it.
+      // Check the current url to see if collection_id is present in it.
       browser.getCurrentUrl().then(function(url) {
         var pathname = url.split('/');
         expect(
