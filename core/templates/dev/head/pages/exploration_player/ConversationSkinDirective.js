@@ -303,7 +303,7 @@ oppia.directive('conversationSkin', [
             UrlInterpolationService.getStaticImageUrl);
 
           $scope.activeCard = null;
-          $scope.numProgressDots = 0;
+          var numVisibleCards = 0;
 
           $scope.upcomingStateName = null;
           $scope.upcomingContentHtml = null;
@@ -411,7 +411,7 @@ oppia.directive('conversationSkin', [
               LearnerParamsService.init(newParams);
             }
 
-            $scope.numProgressDots++;
+            numVisibleCards++;
 
             var totalNumCards = PlayerTranscriptService.getNumCards();
 
@@ -426,8 +426,7 @@ oppia.directive('conversationSkin', [
                 ExplorationPlayerService.canWindowShowTwoCards() &&
                 !previousSupplementalCardIsNonempty &&
                 nextSupplementalCardIsNonempty) {
-              PlayerPositionService.setActiveCardIndex(
-                  $scope.numProgressDots - 1);
+              PlayerPositionService.setActiveCardIndex(numVisibleCards - 1);
               animateToTwoCards(function() {});
             } else if (
                 totalNumCards > 1 &&
@@ -435,12 +434,10 @@ oppia.directive('conversationSkin', [
                 previousSupplementalCardIsNonempty &&
                 !nextSupplementalCardIsNonempty) {
               animateToOneCard(function() {
-                PlayerPositionService.setActiveCardIndex(
-                  $scope.numProgressDots - 1);
+                PlayerPositionService.setActiveCardIndex(numVisibleCards - 1);
               });
             } else {
-              PlayerPositionService.setActiveCardIndex(
-                $scope.numProgressDots - 1);
+              PlayerPositionService.setActiveCardIndex(numVisibleCards - 1);
             }
 
             if (ExplorationPlayerStateService.isStateTerminal(stateName)) {
@@ -776,19 +773,8 @@ oppia.directive('conversationSkin', [
           };
 
           $window.addEventListener('scroll', function() {
-            fadeDotsOnScroll();
             fixSupplementOnScroll();
           });
-
-          var fadeDotsOnScroll = function() {
-            var progressDots = $('.conversation-skin-progress-dots');
-            var progressDotsTop = progressDots.height();
-            var newOpacity = Math.max(
-              (progressDotsTop - $(window).scrollTop()) / progressDotsTop, 0);
-            progressDots.css({
-              opacity: newOpacity
-            });
-          };
 
           var fixSupplementOnScroll = function() {
             var supplementCard = $('div.conversation-skin-supplemental-card');

@@ -15,6 +15,10 @@
       <div class="protractor-test-interaction-html"
            angular-html-bind="correctAnswerEditorHtml">
       </div>
+      <md-button class="oppia-learner-confirm-button" ng-click="onSubmitFromSubmitButton()"
+                 ng-if="data.correctAnswer === null" ng-disabled="!answerIsValid">
+        Submit
+      </md-button>
       <br>
       <div ng-show="data.correctAnswer !== null">
         <strong>Explanation:</strong>
@@ -31,7 +35,7 @@
   <button class="btn btn-default" ng-click="cancel()">Cancel</button>
   <button class="btn btn-success protractor-test-submit-solution-button"
           ng-click="saveSolution()"
-          ng-disabled="data.correctAnswer === null || !data.explanationHtml">
+          ng-disabled="data.correctAnswer === null || !data.explanationHtml || !answerIsValid">
     Check and Save Solution
   </button>
 </div>

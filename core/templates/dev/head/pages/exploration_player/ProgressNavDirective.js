@@ -58,8 +58,9 @@ oppia.directive('progressNav', [
                 $scope.activeCard.stateName));
             $scope.interactionCustomizationArgs = interaction.customizationArgs;
             $scope.interactionId = interaction.id;
-            interactionHasNavSubmitButton = INTERACTION_SPECS[
-              interaction.id].show_nav_submit_button;
+            interactionHasNavSubmitButton = (
+              Boolean(interaction.id) &&
+              INTERACTION_SPECS[interaction.id].show_nav_submit_button);
 
             $scope.helpCardHasContinueButton = false;
           };
@@ -83,9 +84,16 @@ oppia.directive('progressNav', [
           };
 
           $scope.shouldGenericSubmitButtonBeShown = function() {
+            if ($scope.interactionId === 'ItemSelectionInput' &&
+                $scope.interactionCustomizationArgs
+                  .maxAllowableSelectionCount.value > 1) {
+              return true;
+            }
+
             return (interactionHasNavSubmitButton && (
               interactionIsInline ||
-              !ExplorationPlayerService.canWindowShowTwoCards()));
+              !ExplorationPlayerService.canWindowShowTwoCards()
+            ));
           };
 
           $scope.shouldContinueButtonBeShown = function() {

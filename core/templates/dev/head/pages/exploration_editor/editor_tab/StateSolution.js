@@ -89,7 +89,10 @@ oppia.controller('StateSolution', [
         backdrop: 'static',
         controller: [
           '$scope', '$uibModalInstance', 'stateSolutionService',
-          function($scope, $uibModalInstance, stateSolutionService) {
+          'EVENT_PROGRESS_NAV_SUBMITTED',
+          function(
+              $scope, $uibModalInstance, stateSolutionService,
+              EVENT_PROGRESS_NAV_SUBMITTED) {
             $scope.stateSolutionService = stateSolutionService;
             $scope.correctAnswerEditorHtml = (
               ExplorationHtmlFormatterService.getInteractionHtml(
@@ -102,6 +105,8 @@ oppia.controller('StateSolution', [
               type: 'html',
               ui_config: {}
             };
+
+            $scope.answerIsValid = false;
 
             var EMPTY_SOLUTION_DATA = {
               answerIsExclusive: false,
@@ -117,8 +122,16 @@ oppia.controller('StateSolution', [
                 stateSolutionService.savedMemento.explanation.getHtml())
             } : angular.copy(EMPTY_SOLUTION_DATA);
 
+            $scope.onSubmitFromSubmitButton = function() {
+              $scope.$broadcast(EVENT_PROGRESS_NAV_SUBMITTED);
+            };
+
             $scope.submitAnswer = function(answer) {
               $scope.data.correctAnswer = answer;
+            };
+
+            $scope.setInteractionAnswerValidity = function(answerValidity) {
+              $scope.answerIsValid = answerValidity;
             };
 
             $scope.saveSolution = function() {

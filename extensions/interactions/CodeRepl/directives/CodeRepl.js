@@ -160,7 +160,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
             $scope.runAndSubmitCode($scope.code);
-          })
+          });
 
           $scope.runCode = function(codeInput, onFinishRunCallback) {
             $scope.code = codeInput;
