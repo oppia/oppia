@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -101,9 +101,12 @@ oppia.factory('GuestCollectionProgressService', [
 
       /**
        * Returns whether the guest user has made any progress toward completing
-       * the specified collection.
+       * the specified collection by completing at least one exploration related
+       * to the collection. Note that this does not account for any completed
+       * explorations which are no longer referenced by the collection;
+       * getCompletedExplorationIds() should be used for that, instead.
        */
-      hasMadeProgress: function(collectionId) {
+      hasCompletedSomeExploration: function(collectionId) {
         var guestCollectionProgress = loadGuestCollectionProgress();
         return guestCollectionProgress.hasCompletionProgress(collectionId);
       },

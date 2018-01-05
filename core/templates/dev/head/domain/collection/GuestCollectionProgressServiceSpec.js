@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -110,18 +110,20 @@ describe('Guest collection progress service', function() {
     return collection;
   };
 
-  describe('hasMadeProgress', function() {
+  describe('hasCompletedSomeExploration', function() {
     it('should initially not have any stored progress', function() {
-      var hasProgress = GuestCollectionProgressService.hasMadeProgress(
-        _collectionId0);
+      var hasProgress = (
+        GuestCollectionProgressService.hasCompletedSomeExploration(
+          _collectionId0));
       expect(hasProgress).toBe(false);
     });
 
     it('should have progress after recording an exploration', function() {
       GuestCollectionProgressService.recordExplorationCompletedInCollection(
         _collectionId0, _expId0);
-      var hasProgress = GuestCollectionProgressService.hasMadeProgress(
-        _collectionId0);
+      var hasProgress = (
+        GuestCollectionProgressService.hasCompletedSomeExploration(
+          _collectionId0));
       expect(hasProgress).toBe(true);
     });
 
@@ -129,8 +131,9 @@ describe('Guest collection progress service', function() {
       function() {
         GuestCollectionProgressService.recordExplorationCompletedInCollection(
           _collectionId1, _expId0);
-        var hasProgress = GuestCollectionProgressService.hasMadeProgress(
-          _collectionId0);
+      var hasProgress = (
+        GuestCollectionProgressService.hasCompletedSomeExploration(
+          _collectionId0));
         expect(hasProgress).toBe(false);
       }
     );

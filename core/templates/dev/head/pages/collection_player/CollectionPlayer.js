@@ -256,7 +256,7 @@ oppia.controller('CollectionPlayer', [
         // guest, then either the defaults from the server will be used or the
         // user's local progress, if any has been made.
         if (!$scope.isLoggedIn &&
-            GuestCollectionProgressService.hasMadeProgress(
+            GuestCollectionProgressService.hasCompletedSomeExploration(
               $scope.collectionId)) {
           var completedExplorationIds = (
             GuestCollectionProgressService.getCompletedExplorationIds(
