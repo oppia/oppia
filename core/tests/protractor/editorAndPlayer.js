@@ -39,7 +39,7 @@ describe('Full exploration editor', function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
   });
 
-  /*it('should redirect back to parent exploration correctly when parent id is ' +
+  it('should redirect back to parent exploration correctly when parent id is ' +
       'given as query parameter', function() {
     users.createUser('user1@editorAndPlayer.com', 'user1EditorAndPlayer');
     users.login('user1@editorAndPlayer.com');
@@ -87,7 +87,7 @@ describe('Full exploration editor', function() {
       });
     });
     users.logout();
-  });*/
+  });
 
   it('should give option for redirection when author has specified ' +
       'a refresher exploration Id', function() {
