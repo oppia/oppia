@@ -40,9 +40,38 @@ oppia.factory('BrowserCheckerService', function() {
     }
   };
 
+  //www.sitepoint.com/community/t/detect-of-browser-is-safari/6761/2
+  //check above site for reference
+  var getBrowserName = function() {
+    var name = 'Unknown';
+    if (navigator.userAgent.indexOf('MSIE') != -1) {
+      name = 'MSIE';
+    }
+    else if (navigator.userAgent.indexOf('Firefox') != -1) {
+      name = 'Firefox';
+    }
+    else if (navigator.userAgent.indexOf('Opera') != -1) {
+      name = 'Opera';
+    }
+    else if (navigator.userAgent.indexOf('Chrome') != -1) {
+      name = 'Chrome';
+    }
+    else if (navigator.userAgent.indexOf('Safari') != -1) {
+      name = 'Safari';
+    }
+    return name;
+  };
+
+  var _isSafari = function() {
+    return (getBrowserName() === 'Safari');
+  };
+
   return {
     isChrome: function() {
       return _isChrome();
+    },
+    isSafari: function() {
+      return _isSafari();
     }
   };
 });
