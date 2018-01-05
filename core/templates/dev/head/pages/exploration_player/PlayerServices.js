@@ -306,6 +306,9 @@ oppia.factory('ExplorationPlayerService', [
         }
         return randomSuffix;
       },
+      getHints: function(stateName) {
+        return exploration.getInteraction(stateName).hints;
+      },
       getSolution: function(stateName) {
         return exploration.getInteraction(stateName).solution;
       },
@@ -349,6 +352,7 @@ oppia.factory('ExplorationPlayerService', [
         var outcome = angular.copy(classificationResult.outcome);
 
         var newStateName = outcome.dest;
+        var refresherExplorationId = outcome.refresherExplorationId;
         var newState = exploration.getState(newStateName);
 
         // Compute the data for the next state.
@@ -418,8 +422,9 @@ oppia.factory('ExplorationPlayerService', [
         $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
         $rootScope.$broadcast('playerStateChange', newStateName);
         successCallback(
-          newStateName, refreshInteraction, feedbackHtml, 
-          feedbackAudioTranslations, questionHtml, newParams);
+          newStateName, refreshInteraction, feedbackHtml,
+          feedbackAudioTranslations, questionHtml, newParams,
+          refresherExplorationId);
       },
       isAnswerBeingProcessed: function() {
         return answerIsBeingProcessed;

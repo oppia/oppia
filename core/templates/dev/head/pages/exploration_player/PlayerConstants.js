@@ -25,9 +25,10 @@ oppia.constant('CONTINUE_BUTTON_FOCUS_LABEL', 'continueButton');
 /* New card is available but user hasn't gone to it yet (when oppia
    gives a feedback and waits for user to press 'continue').
    Not called when a card is selected by clicking progress dots */
-oppia.constant('EVENT_NEW_CARD_AVAILABLE','newCardAvailable');
-
-/* Called always when learner moves to a new card. 
+oppia.constant('EVENT_NEW_CARD_AVAILABLE', 'newCardAvailable');
+/* Called when the learner moves to a new card that they haven't seen before. */
+oppia.constant('EVENT_NEW_CARD_OPENED', 'newCardOpened');
+/* Called always when learner moves to a new card.
    Also called when card is selected by clicking on progress dots */
 oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
 
@@ -35,8 +36,10 @@ oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
    to the user, allowing for the automatic playing of audio if necessary. */
 oppia.constant('EVENT_AUTOPLAY_AUDIO', 'autoPlayAudio');
 
-// The enforced waiting period between successive hint requests.
-oppia.constant('WAIT_FOR_HINT_MSEC', 30000);
+// The enforced waiting period before the first hint request.
+oppia.constant('WAIT_FOR_FIRST_HINT_MSEC', 60000);
+// The enforced waiting period before each of the subsequent hint requests.
+oppia.constant('WAIT_FOR_SUBSEQUENT_HINTS_MSEC', 30000);
 
 // The time delay between the learner clicking the hint button
 // and the appearance of the hint.

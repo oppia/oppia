@@ -257,6 +257,9 @@ oppia.directive('conversationSkin', [
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'EVENT_NEW_CARD_AVAILABLE', 'EVENT_PROGRESS_NAV_SUBMITTED',
         'FatigueDetectionService', 'NumberAttemptsService',
+        'RefresherExplorationConfirmationModalService',
+        'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
+        'EVENT_NEW_CARD_OPENED', 'HintsAndSolutionManagerService',
         'AudioTranslationManagerService', 'EVENT_AUTOPLAY_AUDIO',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
@@ -270,6 +273,9 @@ oppia.directive('conversationSkin', [
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_AVAILABLE, EVENT_PROGRESS_NAV_SUBMITTED,
             FatigueDetectionService, NumberAttemptsService,
+            RefresherExplorationConfirmationModalService,
+            EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
+            EVENT_NEW_CARD_OPENED, HintsAndSolutionManagerService,
             AudioTranslationManagerService, EVENT_AUTOPLAY_AUDIO) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
@@ -361,7 +367,7 @@ oppia.directive('conversationSkin', [
           // Navigates to the currently-active card, and resets the
           // 'show previous responses' setting.
           var _navigateToActiveCard = function() {
-            $scope.$broadcast(EVENT_ACTIVE_CARD_CHANGED);
+            $rootScope.$broadcast(EVENT_ACTIVE_CARD_CHANGED);
             $scope.$broadcast(EVENT_AUTOPLAY_AUDIO);
             var index = PlayerPositionService.getActiveCardIndex();
             $scope.activeCard = PlayerTranscriptService.getCard(index);
@@ -498,6 +504,14 @@ oppia.directive('conversationSkin', [
               $scope.adjustPageHeight(false, null);
               $window.scrollTo(0, 0);
               FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
+
+              // The timeout is needed in order to give the recipient of the
+              // broadcast sufficient time to load.
+              $timeout(function() {
+                $rootScope.$broadcast(EVENT_NEW_CARD_OPENED, {
+                  stateName: exploration.initStateName
+                });
+              });
             });
           };
 
@@ -508,7 +522,6 @@ oppia.directive('conversationSkin', [
               $scope.activeCard.destStateName) {
               return;
             }
-
 
             if (!$scope.isInPreviewMode) {
               FatigueDetectionService.recordSubmissionTimestamp();
@@ -531,7 +544,8 @@ oppia.directive('conversationSkin', [
             ExplorationPlayerService.submitAnswer(
               answer, interactionRulesService, function(
                   newStateName, refreshInteraction, feedbackHtml,
-                  feedbackAudioTranslations, contentHtml, newParams) {
+                  feedbackAudioTranslations, contentHtml, newParams,
+                  refresherExplorationId) {
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.
                 var millisecsLeftToWait = (
@@ -552,6 +566,8 @@ oppia.directive('conversationSkin', [
 
                   if (_oldStateName === newStateName) {
                     // Stay on the same card.
+                    HintsAndSolutionManagerService.recordWrongAnswer();
+
                     PlayerTranscriptService.addNewResponse(feedbackHtml);
                     if (feedbackHtml &&
                         !ExplorationPlayerStateService.isInteractionInline(
@@ -570,6 +586,28 @@ oppia.directive('conversationSkin', [
                         ExplorationPlayerService.getInteractionHtml(
                           newStateName, _nextFocusLabel) +
                         ExplorationPlayerService.getRandomSuffix());
+                    }
+
+                    $scope.redirectToRefresherExplorationConfirmed = false;
+
+                    if (refresherExplorationId) {
+                      $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
+                        params: {
+                          stringified_exp_ids: JSON.stringify(
+                            [refresherExplorationId])
+                        }
+                      }).then(function(response) {
+                        if (response.data.summaries.length > 0) {
+                          RefresherExplorationConfirmationModalService.
+                            displayRedirectConfirmationModal(
+                              refresherExplorationId,
+                              function() {
+                                $scope.redirectToRefresherExplorationConfirmed =
+                                  true;
+                              }
+                            );
+                        }
+                      });
                     }
                     FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
                     scrollToBottom();
@@ -667,6 +705,10 @@ oppia.directive('conversationSkin', [
             },
             TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + TIME_FADEIN_MSEC +
             TIME_PADDING_MSEC);
+
+            $rootScope.$broadcast(EVENT_NEW_CARD_OPENED, {
+              stateName: newStateName
+            });
           };
 
           $scope.showUpcomingCard = function() {
@@ -713,6 +755,9 @@ oppia.directive('conversationSkin', [
           });
 
           $window.addEventListener('beforeunload', function(e) {
+            if ($scope.redirectToRefresherExplorationConfirmed) {
+              return;
+            }
             if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&
                 !ExplorationPlayerStateService.isStateTerminal(
                   PlayerTranscriptService.getLastCard().stateName)) {
@@ -800,7 +845,7 @@ oppia.directive('conversationSkin', [
               $scope.explorationId);
           };
 
-          // Interaction answer validity is used to enable/disable 
+          // Interaction answer validity is used to enable/disable
           // the progress-nav's Submit button. This logic is here because
           // Interactions and the progress-nav are both descendants
           // of ConversationSkinDirective.

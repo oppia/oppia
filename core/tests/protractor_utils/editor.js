@@ -495,7 +495,8 @@ var _setOutcomeFeedback = function(feedbackEditorElem, richTextInstructions) {
   richTextInstructions(feedbackEditor);
 };
 
-var _setOutcomeDest = function(destEditorElem, destName, createDest) {
+var _setOutcomeDest = function(
+    destEditorElem, destName, createDest, refresherExplorationId) {
   expect(destName === null && createDest).toBe(false);
   var destinationElement =
     destEditorElem.element(by.css('.protractor-test-dest-bubble'));
@@ -514,6 +515,10 @@ var _setOutcomeDest = function(destEditorElem, destName, createDest) {
     destinationElement.element(
       by.css('.protractor-test-add-state-input')
     ).sendKeys(destName);
+  } else if (refresherExplorationId) {
+    destinationElement.element(
+      by.css('.protractor-test-add-refresher-exploration-id')
+    ).sendKeys(refresherExplorationId);
   }
 };
 
@@ -525,6 +530,8 @@ var _setOutcomeDest = function(destEditorElem, destName, createDest) {
 // - destStateName: the name of the destination state of the rule, or null if
 //     the rule loops to the current state.
 // - createState: true if the rule creates a new state, else false.
+// - refresherExplorationId: the id of refresher exploration for the current
+//     state (if applicable), by default, should be null.
 // - ruleName: the name of the rule, e.g. IsGreaterThan.
 //
 // Note that feedbackInstructions may be null (which means 'specify no
@@ -547,6 +554,7 @@ var addResponse = function(interactionId, feedbackInstructions, destStateName,
   for (var i = 5; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
+
   _selectRule(ruleElement, interactionId, ruleName);
   _setRuleParameters.apply(null, args);
 
@@ -563,11 +571,11 @@ var addResponse = function(interactionId, feedbackInstructions, destStateName,
     // Set feedback contents.
     _setOutcomeFeedback(ruleElement, feedbackInstructions);
   }
-
   // If the destination is being changed, open the corresponding editor.
   if (destStateName) {
     // Set destination contents.
-    _setOutcomeDest(ruleElement, destStateName, createState);
+    _setOutcomeDest(
+      ruleElement, destStateName, createState, null);
   }
 
   // Close new response modal.
@@ -588,7 +596,7 @@ var setDefaultOutcome = function(feedbackInstructions,
 
   // If the destination is being changed, open the corresponding editor.
   if (destStateName) {
-    editor.setDestination(destStateName, createState);
+    editor.setDestination(destStateName, createState, null);
   }
 
   // Wait for feedback and/or destination editors to finish saving.
@@ -631,14 +639,16 @@ var ResponseEditor = function(responseNum) {
     //    the same state.
     //  - createState: whether the destination state is new and must be created
     //    at this point.
-    setDestination: function(destinationName, createState) {
+    setDestination: function(
+        destinationName, createState, refresherExplorationId) {
       // Begin editing destination.
       element(by.css('.protractor-test-open-outcome-dest-editor')).click();
 
       // Set destination contents.
       var destElement = element(by.css(
         '.protractor-test-edit-outcome-dest'));
-      _setOutcomeDest(destElement, destinationName, createState);
+      _setOutcomeDest(
+        destElement, destinationName, createState, refresherExplorationId);
 
       // Save destination.
       element(by.css('.protractor-test-save-outcome-dest')).click();
