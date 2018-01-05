@@ -26,6 +26,9 @@ oppia.factory('UrlService', ['$window', function($window) {
     getCurrentHref: function() {
       return this.getCurrentLocation().href;
     },
+    getCurrentQueryString: function() {
+      return this.getCurrentLocation().search;
+    },
     /* As params[key] is overwritten, if query string has multiple fieldValues
        for same fieldName, use getQueryFieldValuesAsList(fieldName) to get it
        in array form. */
