@@ -28,13 +28,13 @@ oppia.directive('hintAndSolutionButtons', [
         'ExplorationPlayerService', 'PlayerTranscriptService',
         'HintAndSolutionModalService', 'DeviceInfoService',
         'PlayerPositionService', 'EVENT_ACTIVE_CARD_CHANGED',
-        'EVENT_NEW_CARD_OPENED',
+        'EVENT_NEW_CARD_OPENED', 'HintsTooltipService',
         function(
             $scope, $rootScope, HintsAndSolutionManagerService,
             ExplorationPlayerService, PlayerTranscriptService,
             HintAndSolutionModalService, DeviceInfoService,
             PlayerPositionService, EVENT_ACTIVE_CARD_CHANGED,
-            EVENT_NEW_CARD_OPENED) {
+            EVENT_NEW_CARD_OPENED, HintsTooltipService) {
           // The state name of the latest card that's open. This is the state
           // name that the current hints and solution correspond to.
           var latestStateName = null;
@@ -43,6 +43,7 @@ oppia.directive('hintAndSolutionButtons', [
           $scope.activeHintIndex = null;
           $scope.solutionModalIsActive = false;
           $scope.currentlyOnLatestCard = true;
+          HintsTooltipService.reset();
 
           $scope.isHintConsumed = HintsAndSolutionManagerService.isHintConsumed;
           $scope.isSolutionConsumed = (
@@ -63,7 +64,16 @@ oppia.directive('hintAndSolutionButtons', [
             return HintsAndSolutionManagerService.isSolutionViewable();
           };
 
+          $rootScope.$on('hintReleased', function() {
+            if (HintsTooltipService.isTooltipViewable()) {
+              HintsTooltipService.startTimerForTooltip();
+            }
+          });
+
           $scope.displayHintModal = function(index) {
+            if (HintsTooltipService.isTooltipOpen()) {
+              HintsTooltipService.closeTooltipModal();
+            }
             $scope.activeHintIndex = index;
             var promise = (
               HintAndSolutionModalService.displayHintModal(index));
@@ -97,6 +107,7 @@ oppia.directive('hintAndSolutionButtons', [
           };
 
           $scope.$on(EVENT_NEW_CARD_OPENED, function(evt, data) {
+            HintsTooltipService.resetTimers();
             latestStateName = data.stateName;
             HintsAndSolutionManagerService.reset(
               ExplorationPlayerService.getHints(data.stateName),
