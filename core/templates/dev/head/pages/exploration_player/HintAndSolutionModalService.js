@@ -43,7 +43,8 @@ oppia.factory('HintAndSolutionModalService', [
               $rootScope.$broadcast(EVENT_AUTOPLAY_AUDIO);
               $scope.closeModal = function() {
                 AudioPlayerService.stop();
-                AudioTranslationManagerService.clearSecondaryAudioTranslations();
+                AudioTranslationManagerService
+                  .clearSecondaryAudioTranslations();
                 $uibModalInstance.dismiss('cancel');
               };
             }
@@ -69,7 +70,8 @@ oppia.factory('HintAndSolutionModalService', [
               $scope.solutionHtml = solution.getOppiaResponseHtml(interaction);
               $scope.closeModal = function() {
                 AudioPlayerService.stop();
-                AudioTranslationManagerService.clearSecondaryAudioTranslations();
+                AudioTranslationManagerService
+                  .clearSecondaryAudioTranslations();
                 $uibModalInstance.dismiss('cancel');
               };
             }
