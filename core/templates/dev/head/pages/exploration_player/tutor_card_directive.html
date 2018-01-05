@@ -82,18 +82,6 @@
           <div class="protractor-test-conversation-input"
                angular-html-bind="activeCard.interactionHtml">
           </div>
-          <div ng-if="hintsExist && !windowDimensionsService.isWindowNarrow()" style="text-align: right">
-            <hint-button ng-show="!areAllHintsExhausted() || (areAllHintsExhausted() && !solutionExists)"
-                         on-click-hint-button="consumeHint()"
-                         current-hint-is-available="isHintAvailable()"
-                         all-hints-are-exhausted="areAllHintsExhausted()"
-                         is-supplemental-card="false">
-            </hint-button>
-            <solution-button ng-if="areAllHintsExhausted()"
-                             on-click-solution-button="viewSolution()"
-                             solution-is-available="isCurrentSolutionAvailable()">
-            </solution-button>
-          </div>
         </div>
       </div>
     </div>
@@ -143,28 +131,6 @@
     background: inherit;
     border: none;
     white-space: normal;
-  }
-
-  .conversation-skin-tutor-card .hint-button {
-    background-color: #0D48A1;
-    border: none;
-    color: #ffffff;
-  }
-
-  .conversation-skin-tutor-card .solution-button {
-    background-color: #d9534f;
-    border-color: #d43f3a;
-    color: #fff;
-  }
-
-  .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:focus,
-  .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:hover {
-    background-color: #115FD4;
-  }
-
-  .conversation-skin-tutor-card button.md-button.md-default-theme.solution-button:focus,
-  .conversation-skin-tutor-card button.md-button.md-default-theme.solution-button:hover {
-    background-color: #da190b;
   }
 
   .conversation-skin-tutor-card.animate-card-width {
@@ -277,32 +243,9 @@
       white-space: normal;
     }
 
-    .conversation-skin-tutor-card .hint-button {
-      background-color: #0D48A1;
-      color: #ffffff;
-      padding: 6px 12px;
-    }
-
-    .conversation-skin-tutor-card .solution-button {
-      background-color: #d9534f;
-      border-color: #d43f3a;
-      color: #fff;
-      padding: 6px 12px;
-    }
-
-    .has-shadow {
-      box-shadow: 0 10px 10px rgba(0,0,0,0.24), 0 10px 10px rgba(0,0,0,0.24);
-    }
-
     .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:focus,
-    .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:hover,
-    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:focus,
-    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:hover {
+    .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:hover {
       background-color: #115FD4;
-    }
-    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:focus,
-    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:hover {
-      background-color: #da190b;
     }
   }
 </style>
