@@ -29,12 +29,12 @@ var customizeInteraction = function(elem, buttonText) {
 
 var expectInteractionDetailsToMatch = function(elem, buttonText) {
   expect(
-    elem.element(by.css('.protractor-test-continue-button')).getText()
+    element(by.css('.protractor-test-continue-button')).getText()
   ).toBe(buttonText.toUpperCase());
 };
 
 var submitAnswer = function(elem) {
-  elem.element(by.css('.protractor-test-continue-button')).click();
+  element(by.css('.protractor-test-continue-button')).click();
 };
 
 var testSuite = [];

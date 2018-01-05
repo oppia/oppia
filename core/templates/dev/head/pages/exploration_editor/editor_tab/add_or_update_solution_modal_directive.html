@@ -16,7 +16,8 @@
            angular-html-bind="correctAnswerEditorHtml">
       </div>
       <br>
-      <md-button class="oppia-learner-confirm-button" ng-click="onSubmitFromSubmitButton()"
+      <md-button class="oppia-learner-confirm-button protractor-test-submit-answer-button"
+                 ng-click="onSubmitFromSubmitButton()"
                  ng-if="data.correctAnswer === null && shouldAdditionalSubmitButtonBeShown()"
                  ng-disabled="!answerIsValid">
         Submit
