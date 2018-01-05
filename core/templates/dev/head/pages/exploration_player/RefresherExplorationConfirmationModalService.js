@@ -40,14 +40,14 @@ oppia.factory('RefresherExplorationConfirmationModalService', [
                   'parent');
                 var urlTemplate = '/explore/<refresher_exploration_id>';
                 var interpolationValues = {};
-                interpolationValues[
-                  'refresher_exploration_id'] = refresherExplorationId;
+                interpolationValues.refresher_exploration_id =
+                  refresherExplorationId;
                 url = UrlInterpolationService.interpolateUrl(
                   urlTemplate,interpolationValues);
                 if (collectionId) {
                   url = UrlService.addField(url, 'collection_id', collectionId);
                 }
-                for (var i=0; i < parentIdList.length; i++) {
+                for (var i = 0; i < parentIdList.length; i++) {
                   url = UrlService.addField(url, 'parent', parentIdList[i]);
                 }
                 url = UrlService.addField(
