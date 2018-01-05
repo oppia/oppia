@@ -50,7 +50,7 @@ oppia.directive('audioBar', [
             value: AudioTranslationManagerService.getCurrentAudioLanguageCode()
           };
 
-          $scope.showAudioBar = function(){
+          $scope.showAudioBar = function() {
             return (
               !BrowserCheckerService.isSafari() &&
               $scope.languagesInExploration.length > 0);
