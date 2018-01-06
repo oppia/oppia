@@ -19,11 +19,11 @@
 import logging
 import os
 
-import cloudstorage
-
 from core.platform import models
 import feconf
 import utils
+
+import cloudstorage
 
 app_identity_services = models.Registry.import_app_identity_services()
 (file_models,) = models.Registry.import_models([

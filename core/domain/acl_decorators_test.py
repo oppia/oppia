@@ -20,6 +20,7 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
+
 import webapp2
 import webtest
 
