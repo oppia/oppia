@@ -106,15 +106,24 @@ oppia.directive('feedbackPopup', [
             return triggerElt;
           };
 
-          $scope.saveFeedback = function() {
-            if ($scope.feedbackText) {
+          $scope.getAbbreviatedFeedbackText = function () {
+            if ($scope.feedbackText.length > 60 ) {
               var feedbackSubject = $scope.feedbackText.substr(0, 60);
+              
               if (feedbackSubject.includes(' ')) {
                 feedbackSubject = feedbackSubject.split(' ', 8).slice(0, -1)
                                   .join(' ');
               }
+              feedbackSubject.concat('...');
+              return feedbackSubject;
+            }
+            return $scope.feedbackText;
+          }
+
+          $scope.saveFeedback = function() {
+            if ($scope.feedbackText) {
               $http.post(feedbackUrl, {
-                subject: feedbackSubject,
+                subject: $scope.getAbbreviatedFeedbackText(),
                 feedback: $scope.feedbackText,
                 include_author: (
                   !$scope.isSubmitterAnonymized && $scope.isLoggedIn),
