@@ -28,7 +28,8 @@ oppia.directive('responseHeader', [
         isActive: '&isActive',
         getOnDeleteFn: '&onDeleteFn',
         getCorrect: '&labelledAsCorrect',
-        getNumRules: '&numRules'
+        getNumRules: '&numRules',
+        isResponse: '&isResponse'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/' +
