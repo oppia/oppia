@@ -67,7 +67,7 @@ oppia.factory('HintsAndSolutionManagerService', [
       var funcToEnqueue = null;
       if (!areAllHintsExhausted()) {
         funcToEnqueue = releaseHint;
-      } else if (!solutionReleased) {
+      } else if (!!solutionForLatestCard && !solutionReleased) {
         funcToEnqueue = releaseSolution;
       }
       if (funcToEnqueue) {

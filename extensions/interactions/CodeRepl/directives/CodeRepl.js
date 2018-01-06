@@ -38,16 +38,10 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         'code_repl_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'WindowDimensionsService',
-        'UrlService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'EVENT_PROGRESS_NAV_SUBMITTED',
         function(
             $scope, $attrs, WindowDimensionsService,
-            UrlService, EVENT_PROGRESS_NAV_SUBMITTED) {
-          $scope.isSubmitHidden = function() {
-            return (
-              !UrlService.isIframed() &&
-              WindowDimensionsService.isWindowNarrow());
-          };
-
+            EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
 
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
@@ -158,7 +152,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
             $scope.runAndSubmitCode($scope.code);
-          })
+          });
 
           $scope.runCode = function(codeInput, onFinishRunCallback) {
             $scope.code = codeInput;

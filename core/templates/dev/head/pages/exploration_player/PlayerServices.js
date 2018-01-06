@@ -34,6 +34,7 @@ oppia.factory('ExplorationPlayerService', [
   'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationLanguageService',
   'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
+  'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
   'PlayerCorrectnessFeedbackEnabledService',
   'GuestCollectionProgressService',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
@@ -47,6 +48,7 @@ oppia.factory('ExplorationPlayerService', [
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationLanguageService,
       LanguageUtilService, NumberAttemptsService, AudioPreloaderService,
+      WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
       PlayerCorrectnessFeedbackEnabledService,
       GuestCollectionProgressService,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
@@ -477,6 +479,11 @@ oppia.factory('ExplorationPlayerService', [
         if (!_editorPreviewMode) {
           StatsReportingService.recordSolutionHit(stateName);
         }
+      },
+      // Returns whether the screen is wide enough to fit two
+      // cards (e.g., the tutor and supplemental cards) side-by-side.
+      canWindowShowTwoCards: function() {
+        return WindowDimensionsService.getWidth() > TWO_CARD_THRESHOLD_PX;
       }
     };
   }

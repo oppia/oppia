@@ -40,7 +40,6 @@ oppia.directive('tutorCard', [
     return {
       restrict: 'E',
       scope: {
-        onClickContinueButton: '&',
         onSubmitAnswer: '&',
         onDismiss: '&',
         startCardChangeAnimation: '=',
@@ -121,8 +120,6 @@ oppia.directive('tutorCard', [
 
           $scope.isIframed = UrlService.isIframed();
 
-          $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
-
           $scope.OPPIA_AVATAR_IMAGE_URL = (
             UrlInterpolationService.getStaticImageUrl(
               '/avatar/oppia_avatar_100px.svg'));
@@ -147,8 +144,8 @@ oppia.directive('tutorCard', [
             return WindowDimensionsService.isWindowNarrow();
           };
 
-          $scope.isViewportNarrow = function() {
-            return WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
+          $scope.canWindowShowTwoCards = function() {
+            return ExplorationPlayerService.canWindowShowTwoCards();
           };
 
           $scope.submitAnswer = function(answer, interactionRulesService) {
@@ -206,4 +203,5 @@ oppia.directive('tutorCard', [
         }
       ]
     };
-  }]);
+  }
+]);

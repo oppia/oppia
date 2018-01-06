@@ -69,8 +69,8 @@ oppia.directive('supplementalCard', [
             $scope.helpCardHasContinueButton = false;
           };
 
-          $scope.isViewportNarrow = function() {
-            return WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
+          $scope.canWindowShowTwoCards = function() {
+            return ExplorationPlayerService.canWindowShowTwoCards();
           };
 
           $scope.isWindowTall = function() {
@@ -115,6 +115,8 @@ oppia.directive('supplementalCard', [
           };
 
           updateActiveCard();
-        }]
+        }
+      ]
     };
-  }]);
+  }
+]);
