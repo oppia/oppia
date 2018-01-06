@@ -1,7 +1,4 @@
-<audio-bar audio-translations="contentAudioTranslations"
-           content-html="activeCard.contentHtml"
-           ng-if="!isIframed">
-</audio-bar>
+<audio-bar ng-if="!isIframed"></audio-bar>
 <div class="conversation-skin-tutor-card"
      ng-class="{'animate-card-width': startCardChangeAnimation}">
   <div class="conversation-skin-tutor-card-content conversation-skin-animate-tutor-card-content"
@@ -220,6 +217,16 @@
   .conversation-skin-inline-interaction .conversation-skin-user-avatar {
     left: -20px;
     top: 14px;
+  }
+
+  /* When the size of the browser is reduced, and the answer submitted is
+     correct, the continue button (in the tutor card) hides under the
+     Correctness footer and the page cannot be scrolled down further.
+     So this padding allows to scroll down the tutor card. */
+  @media(max-width: 770px) {
+    .conversation-skin-tutor-card {
+      padding-bottom: 30px;
+    }
   }
 
   @media screen and (max-width: 959px) {
