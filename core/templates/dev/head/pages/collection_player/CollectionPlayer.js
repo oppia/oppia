@@ -35,11 +35,13 @@ oppia.controller('CollectionPlayer', [
   'ReadOnlyCollectionBackendApiService', 'CollectionObjectFactory',
   'CollectionPlaythroughObjectFactory', 'AlertsService',
   'UrlInterpolationService', 'GuestCollectionProgressService',
+  'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
       $scope, $anchorScroll, $location, $http,
       ReadOnlyCollectionBackendApiService, CollectionObjectFactory,
       CollectionPlaythroughObjectFactory, AlertsService,
-      UrlInterpolationService, GuestCollectionProgressService) {
+      UrlInterpolationService, GuestCollectionProgressService,
+      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     $scope.collection = null;
     $scope.collectionPlaythrough = null;
     $scope.collectionId = GLOBALS.collectionId;
@@ -60,6 +62,8 @@ oppia.controller('CollectionPlayer', [
     $scope.ICON_X_RIGHT_PX = 395;
     $scope.svgHeight = $scope.MIN_HEIGHT_FOR_PATH_SVG_PX;
     $scope.nextExplorationId = null;
+    $scope.whitelistedCollectionIdsForGuestProgress = (
+      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
     $anchorScroll.yOffset = -80;
 
     $scope.setIconHighlight = function(index) {
@@ -254,8 +258,12 @@ oppia.controller('CollectionPlayer', [
 
         // Load the user's current progress in the collection. If the user is a
         // guest, then either the defaults from the server will be used or the
-        // user's local progress, if any has been made.
-        if (!$scope.isLoggedIn &&
+        // user's local progress, if any has been made and the collection is
+        // whitelisted.
+        var collectionAllowsGuestProgress = (
+          $scope.whitelistedCollectionIdsForGuestProgress.indexOf(
+            $scope.collectionId) !== -1);
+        if (!$scope.isLoggedIn && collectionAllowsGuestProgress &&
             GuestCollectionProgressService.hasCompletedSomeExploration(
               $scope.collectionId)) {
           var completedExplorationIds = (

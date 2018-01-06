@@ -35,6 +35,7 @@ oppia.factory('ExplorationPlayerService', [
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
   'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
   'GuestCollectionProgressService',
+  'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       AlertsService, AnswerClassificationService, ExplorationContextService,
@@ -45,7 +46,8 @@ oppia.factory('ExplorationPlayerService', [
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService,
       LanguageUtilService, NumberAttemptsService, AudioPreloaderService,
-      GuestCollectionProgressService) {
+      GuestCollectionProgressService,
+      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
       ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -160,9 +162,13 @@ oppia.factory('ExplorationPlayerService', [
         StatsReportingService.recordExplorationCompleted(
           newStateName, LearnerParamsService.getAllParams());
 
-        // If the user is a guest and has completed this exploration within the
-        // context of a collection, record their temporary progress.
-        if (GLOBALS.collectionId && !_isLoggedIn) {
+        // If the user is a guest, has completed this exploration within the
+        // context of a collection, and the collection is whitelisted, record
+        // their temporary progress.
+        var collectionAllowsGuestProgress = (
+          WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.indexOf(
+            GLOBALS.collectionId) !== -1);
+        if (collectionAllowsGuestProgress && !_isLoggedIn) {
           GuestCollectionProgressService.recordExplorationCompletedInCollection(
             GLOBALS.collectionId, _explorationId);
         }
