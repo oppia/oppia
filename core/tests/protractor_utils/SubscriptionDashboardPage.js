@@ -41,7 +41,7 @@ var SubscriptionDashboardPage = function() {
     ).toEqual(value);
   };
 
-  this.navigateToSubscriptionButton = function(name){
+  this.navigateToSubscriptionButton = function(name) {
     subscriptionButton.click();
   };
 };
