@@ -300,7 +300,7 @@ oppia.directive('conversationSkin', [
           $scope.hasFullyLoaded = false;
           $scope.recommendedExplorationSummaries = null;
           $scope.answerIsCorrect = false;
-          $scope.toPreviousState = false;
+          $scope.pendingCardWasSeenBefore = false;
           $scope.isCorrectnessFeedbackEnabled = function() {
             return PlayerCorrectnessFeedbackEnabledService.isEnabled();
           };
@@ -312,7 +312,7 @@ oppia.directive('conversationSkin', [
 
           $scope.isLearnAgainButton = function() {
             return (
-              $scope.toPreviousState && !$scope.answerIsCorrect &&
+              $scope.pendingCardWasSeenBefore && !$scope.answerIsCorrect &&
               $scope.isCorrectnessFeedbackEnabled());
           };
 
@@ -672,7 +672,7 @@ oppia.directive('conversationSkin', [
                       var stateHistory =
                         PlayerTranscriptService.getStateHistory();
                       if (stateHistory.indexOf(newStateName) !== -1) {
-                        $scope.toPreviousState = true;
+                        $scope.pendingCardWasSeenBefore = true;
                       }
                       PlayerTranscriptService.addNewResponse(feedbackHtml);
                       if (!ExplorationPlayerStateService.isInteractionInline(
