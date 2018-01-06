@@ -17,14 +17,14 @@
  */
 
 oppia.factory('HintsTooltipService', [
-  '$uibModal', '$uibModalStack', '$timeout', 'UrlInterpolationService',
-  function($uibModal, $uibModalStack, $timeout, UrlInterpolationService) {
+  '$timeout',
+  function($timeout) {
     // 10 second wait before closing the modal.
     var CLOSE_TOOLTIP_MSEC = 10000;
-    var WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC = 5000;
+    var WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC = 120000;
     var timeout = null;
     var tooltipIsOpen = false;
-    var tooltipCanBeViewed = true;
+    var tooltipIsEnabled = true;
     var enqueueTimeout = function (func, timeToWaitMsec) {
       resetTimeouts();
       timeout = $timeout(func, timeToWaitMsec);
@@ -34,56 +34,36 @@ oppia.factory('HintsTooltipService', [
         $timeout.cancel(timeout);
       }
     };
-
-    var showTooltipModal = function () {
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration_player/hints_tooltip_directive.html'),
-        backdrop: 'static',
-        resolve: {},
-        controller: [
-          '$scope', '$uibModalInstance',
-          function ($scope, $uibModalInstance) {
-            tooltipIsOpen = true;
-            $scope.closeModal = function () {
-              if (timeout) {
-                $timeout.cancel(timeout);
-              }
-              $uibModalInstance.close('done');
-              tooltipIsOpen = false;
-            };
-            tooltipCanBeViewed = false;
-          }]
-      });
+    var showTooltip = function () {
+      tooltipIsOpen = true;
+      tooltipIsEnabled = false;
       enqueueTimeout(closeTooltip, CLOSE_TOOLTIP_MSEC);
     };
 
     var closeTooltip = function() {
-      $uibModalStack.dismissAll();
       tooltipIsOpen = false;
-      tooltipCanBeViewed = false;
+      tooltipIsEnabled = false;
     };
-
     return {
       startTimerForTooltip: function() {
-        enqueueTimeout(showTooltipModal, WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+        enqueueTimeout(showTooltip, WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
       },
       isTooltipOpen: function() {
         return tooltipIsOpen;
       },
-      closeTooltipModal: function() {
+      closeTooltipPopover: function() {
         resetTimeouts();
         closeTooltip();
       },
-      isTooltipViewable: function() {
-        return tooltipCanBeViewed;
+      isTooltipEnabled: function() {
+        return tooltipIsEnabled;
       },
       resetTimers: function() {
         resetTimeouts();
       },
       reset: function() {
         timeout = null;
-        tooltipCanBeViewed = true;
+        tooltipIsEnabled = true;
       }
     }
   }]);

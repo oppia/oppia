@@ -66,14 +66,14 @@ oppia.directive('hintAndSolutionButtons', [
           };
 
           $rootScope.$on('hintReleased', function() {
-            if (HintsTooltipService.isTooltipViewable()) {
+            if (HintsTooltipService.isTooltipEnabled()) {
               HintsTooltipService.startTimerForTooltip();
             }
           });
 
           $scope.displayHintModal = function(index) {
             if (HintsTooltipService.isTooltipOpen()) {
-              HintsTooltipService.closeTooltipModal();
+              HintsTooltipService.closeTooltipPopover();
             }
             $scope.activeHintIndex = index;
             var promise = (
@@ -117,6 +117,10 @@ oppia.directive('hintAndSolutionButtons', [
             resetLocalHintsArray();
           });
 
+          $scope.isTooltipVisible = function() {
+            return HintsTooltipService.isTooltipOpen();
+          };
+
           $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function(evt) {
             var activeCardIndex = PlayerPositionService.getActiveCardIndex();
             $scope.currentlyOnLatestCard = PlayerTranscriptService.isLastCard(
@@ -125,7 +129,6 @@ oppia.directive('hintAndSolutionButtons', [
               resetLocalHintsArray();
             }
           });
-
           resetLocalHintsArray();
         }
       ]
