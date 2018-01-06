@@ -34,6 +34,7 @@ oppia.factory('ExplorationPlayerService', [
   'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
   'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
+  'PlayerCorrectnessFeedbackEnabledService',
   'GuestCollectionProgressService',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
@@ -46,6 +47,7 @@ oppia.factory('ExplorationPlayerService', [
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService,
       LanguageUtilService, NumberAttemptsService, AudioPreloaderService,
+      PlayerCorrectnessFeedbackEnabledService,
       GuestCollectionProgressService,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ExplorationContextService.getExplorationId();
@@ -229,6 +231,8 @@ oppia.factory('ExplorationPlayerService', [
                 data.auto_tts_enabled);
               AudioPreloaderService.init(exploration);
               AudioPreloaderService.kickOffAudioPreloader(initStateName);
+              PlayerCorrectnessFeedbackEnabledService.init(
+                data.correctness_feedback_enabled);
               _loadInitialState(successCallback);
               NumberAttemptsService.reset();
             });
@@ -262,6 +266,8 @@ oppia.factory('ExplorationPlayerService', [
             AudioPreloaderService.init(exploration);
             AudioPreloaderService.kickOffAudioPreloader(
               exploration.getInitialState().name);
+            PlayerCorrectnessFeedbackEnabledService.init(
+              data.correctness_feedback_enabled);
             _loadInitialState(successCallback);
             $rootScope.$broadcast('playerServiceInitialized');
           });
@@ -345,6 +351,7 @@ oppia.factory('ExplorationPlayerService', [
           AnswerClassificationService.getMatchingClassificationResult(
             _explorationId, oldStateName, oldState, answer,
             interactionRulesService));
+        var answerIsCorrect = classificationResult.answerIsCorrect;
 
         if (!_editorPreviewMode) {
           var feedbackIsUseful = (
@@ -437,6 +444,8 @@ oppia.factory('ExplorationPlayerService', [
         successCallback(
           newStateName, refreshInteraction, feedbackHtml, questionHtml,
           newParams, refresherExplorationId);
+
+        return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {
         return answerIsBeingProcessed;
