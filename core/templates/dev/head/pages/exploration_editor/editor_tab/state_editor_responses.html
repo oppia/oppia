@@ -30,7 +30,8 @@
                                on-delete-fn="deleteAnswerGroup"
                                outcome="answerGroup.outcome"
                                labelled-as-correct="answerGroup.labelledAsCorrect"
-                               num-rules="answerGroup.rules.length">
+                               num-rules="answerGroup.rules.length"
+                               is-response="true">
               </response-header>
             </a>
 
@@ -70,7 +71,8 @@
                                summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:false"
                                short-summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:true"
                                labelled-as-correct="false"
-                               outcome="defaultOutcome">
+                               outcome="defaultOutcome"
+                               is-response="true">
               </response-header>
             </a>
 
