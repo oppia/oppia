@@ -36,7 +36,7 @@ describe('Audio preloader service', function() {
     });
   });
 
-  var aps, atms, eof, ecs;
+  var aps, atls, eof, ecs;
   var $httpBackend = null;
   var $rootScope = null;
   var explorationDict;
@@ -44,7 +44,7 @@ describe('Audio preloader service', function() {
   beforeEach(inject(function($injector) {
     $httpBackend = $injector.get('$httpBackend');
     aps = $injector.get('AudioPreloaderService');
-    atms = $injector.get('AudioTranslationManagerService');
+    atls = $injector.get('AudioTranslationLanguageService');
     eof = $injector.get('ExplorationObjectFactory');
     ecs = $injector.get('ExplorationContextService');
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
@@ -251,7 +251,7 @@ describe('Audio preloader service', function() {
       $httpBackend.expect('GET', requestUrl4).respond(201, 'audio data 4');
       var exploration = eof.createFromBackendDict(explorationDict);
       aps.init(exploration);
-      atms.init(['en'], 'en', 'en');
+      atls.init(['en'], 'en', 'en');
       aps.kickOffAudioPreloader(exploration.getInitialState().name);
 
       expect(aps.getFilenamesOfAudioCurrentlyDownloading().length).toBe(3);
@@ -276,7 +276,7 @@ describe('Audio preloader service', function() {
   it('should properly restart pre-loading from a new state', function() {
     var exploration = eof.createFromBackendDict(explorationDict);
     aps.init(exploration);
-    atms.init(['en'], 'en', 'en');
+    atls.init(['en'], 'en', 'en');
     aps.kickOffAudioPreloader(exploration.getInitialState().name);
     expect(aps.getFilenamesOfAudioCurrentlyDownloading().length).toBe(3);
     aps.restartAudioPreloader('State 3');

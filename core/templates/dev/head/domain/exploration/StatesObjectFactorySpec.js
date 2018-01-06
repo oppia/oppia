@@ -81,7 +81,8 @@ describe('States object factory', function() {
               feedback: [],
               param_changes: []
             },
-            hints: []
+            hints: [],
+            solution: null
           },
           param_changes: []
         }
@@ -105,18 +106,80 @@ describe('States object factory', function() {
             }
           },
           interaction: {
-            answer_groups: [],
+            answer_groups: [{
+              labelled_as_correct: false,
+              outcome: {
+                dest: 'second state',
+                feedback: {
+                  html: '<p>Good.</p>',
+                  audio_translations: {
+                    zh: {
+                      filename: 'myfile4.mp3',
+                      file_size_bytes: 1.1,
+                      needs_update: false
+                    }
+                  }
+                },
+                param_changes: []
+              },
+              rule_specs: [{
+                inputs: {
+                  x: 20
+                },
+                rule_type: 'Equals'
+              }]
+            }],
             confirmed_unclassified_answers: [],
             customization_args: {},
             default_outcome: {
               dest: 'new state',
-              feedback: [],
+              feedback: {
+                html: '<p>Feedback</p>',
+                audio_translations: {
+                  he: {
+                    filename: 'myfile10.mp3',
+                    file_size_bytes: 0.5,
+                    needs_update: false
+                  }
+                }
+              },
               param_changes: []
             },
-            hints: [],
+            hints: [{
+              hint_content: {
+                html: '<p>Here is a hint.</p>',
+                audio_translations: {
+                  es: {
+                    filename: 'myfile5.mp3',
+                    file_size_bytes: 0.7,
+                    needs_update: false
+                  },
+                  zh: {
+                    filename: 'myfile6.mp3',
+                    file_size_bytes: 0.9,
+                    needs_update: false
+                  },
+                  'hi-en': {
+                    filename: 'myfile8.mp3',
+                    file_size_bytes: 1.2,
+                    needs_update: false
+                  }
+                }
+              }
+            }, {
+              hint_content: {
+                html: '<p>Here is another hint.</p>',
+                audio_translations: {
+                  cs: {
+                    filename: 'myfile7.mp3',
+                    file_size_bytes: 0.2,
+                    needs_update: false
+                  }
+                }
+              }
+            }],
             id: 'TextInput'
           },
-          hints: [],
           param_changes: []
         },
         'second state': {
@@ -140,9 +203,22 @@ describe('States object factory', function() {
               param_changes: []
             },
             hints: [],
+            solution: {
+              answer_is_exclusive: false,
+              correct_answer: 'answer',
+              explanation: {
+                html: '<p>This is an explanation.</p>',
+                audio_translations: {
+                  de: {
+                    filename: 'myfile9.mp3',
+                    file_size_bytes: 0.5,
+                    needs_update: false
+                  }
+                }
+              }
+            },
             id: 'TextInput'
           },
-          hints: [],
           param_changes: []
         }
       }
@@ -184,23 +260,27 @@ describe('States object factory', function() {
     it('should correctly get all audio language codes in states', function() {
       var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
       expect(statesWithAudio.getAllAudioLanguageCodes())
-        .toEqual(['en', 'hi-en']);
+        .toEqual(['en', 'hi-en', 'zh', 'he', 'es', 'cs', 'de']);
     });
 
     it('should correctly get all audio translations in states', function() {
       var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
       expect(statesWithAudio.getAllAudioTranslations('hi-en'))
         .toEqual({
-          'first state': atof.createFromBackendDict({
+          'first state': [atof.createFromBackendDict({
             filename: 'myfile3.mp3',
             file_size_bytes: 0.8,
             needs_update: false
-          }),
-          'second state': atof.createFromBackendDict({
+          }), atof.createFromBackendDict({
+            filename: 'myfile8.mp3',
+            file_size_bytes: 1.2,
+            needs_update: false
+          })],
+          'second state': [atof.createFromBackendDict({
             filename: 'myfile2.mp3',
             file_size_bytes: 0.8,
             needs_update: false
-          })
+          })]
         });
     });
   });

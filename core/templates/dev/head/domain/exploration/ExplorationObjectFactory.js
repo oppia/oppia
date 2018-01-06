@@ -148,18 +148,6 @@ oppia.factory('ExplorationObjectFactory', [
       return this.states.getAllAudioTranslations(languageCode);
     };
 
-    Exploration.prototype.getAllAudioTranslationsFileSizeMB =
-      function(languageCode) {
-        var totalFileSizeMB = 0;
-        var allAudioTranslations =
-          this.states.getAllAudioTranslations(languageCode);
-        for (var audioTranslationStateName in allAudioTranslations) {
-          totalFileSizeMB +=
-            allAudioTranslations[audioTranslationStateName].getFileSizeMB();
-        }
-        return totalFileSizeMB;
-      };
-
     Exploration.prototype.getLanguageCode = function() {
       return this.languageCode;
     };

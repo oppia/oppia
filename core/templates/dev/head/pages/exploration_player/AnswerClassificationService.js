@@ -61,6 +61,7 @@ oppia.factory('AnswerClassificationService', [
               interactionRulesService[rule.type](
                 answer, rule.inputs)) {
             return AnswerClassificationResultObjectFactory.createNew(
+              answerGroups[i].labelledAsCorrect,
               answerGroups[i].outcome, i, j, EXPLICIT_CLASSIFICATION);
           }
         }
@@ -70,6 +71,7 @@ oppia.factory('AnswerClassificationService', [
       // returned. Throws an error if the default outcome is not defined.
       if (defaultOutcome) {
         return AnswerClassificationResultObjectFactory.createNew(
+          false,
           defaultOutcome, answerGroups.length, 0, DEFAULT_OUTCOME_CLASSIFICATION
         );
       } else {
@@ -149,6 +151,7 @@ oppia.factory('AnswerClassificationService', [
                 classifier.classifierData, answer);
               answerClassificationResult = (
                 AnswerClassificationResultObjectFactory.createNew(
+                  answerGroups[predictedAnswerGroupIndex].labelledAsCorrect,
                   answerGroups[predictedAnswerGroupIndex].outcome,
                   predictedAnswerGroupIndex,
                   findClassifierRuleIndex(

@@ -21,6 +21,7 @@ var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
+var collectionEditor = require('../protractor_utils/collectionEditor.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var CreatorDashboardPage =
@@ -118,9 +119,9 @@ describe('Full exploration editor', function() {
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateExplorationButton();
       editor.exitTutorialIfNecessary();
-      editor.setTitle('Parent Exploration');
+      editor.setTitle('Parent Exploration not in collection');
       editor.setCategory('Algebra');
-      editor.setObjective('This is the parent exploration');
+      editor.setObjective('This is a parent exploration');
       editor.setContent(forms.toRichText('Parent Exploration Content'));
       editor.setInteraction(
         'MultipleChoiceInput',
@@ -139,14 +140,62 @@ describe('Full exploration editor', function() {
       workflow.publishExploration();
       browser.waitForAngular();
 
+      browser.get(general.SERVER_URL_PREFIX);
+      dropdown = element(by.css('.protractor-test-profile-dropdown'));
+      browser.actions().mouseMove(dropdown).perform();
+      dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+      browser.waitForAngular();
+      creatorDashboardPage.clickCreateActivityButton();
+      creatorDashboardPage.clickCreateExplorationButton();
+      editor.exitTutorialIfNecessary();
+      editor.setTitle('Parent Exploration in collection');
+      editor.setCategory('Algebra');
+      editor.setObjective('This is a parent exploration');
+      editor.setContent(forms.toRichText('Parent Exploration Content'));
+      editor.setInteraction(
+        'MultipleChoiceInput',
+        [forms.toRichText('Correct'), forms.toRichText('Incorrect')]);
+      editor.addResponse('MultipleChoiceInput', null, 'card 2', true,
+        'Equals', 'Correct');
+
+      editor.ResponseEditor(
+        'default').setFeedback(forms.toRichText('try again'));
+      editor.ResponseEditor(
+        'default').setDestination(null, false, refresherExplorationId);
+
+      editor.moveToState('card 2');
+      editor.setInteraction('EndExploration');
+      editor.saveChanges();
+      workflow.publishExploration();
+      browser.waitForAngular();
+
+      browser.get(general.SERVER_URL_PREFIX);
+      dropdown = element(by.css('.protractor-test-profile-dropdown'));
+      browser.actions().mouseMove(dropdown).perform();
+      dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+      browser.waitForAngular();
+      creatorDashboardPage.clickCreateActivityButton();
+      creatorDashboardPage.clickCreateCollectionButton();
+      browser.waitForAngular();
+      collectionEditor.searchForAndAddExistingExploration(
+        'Parent Exploration in collection');
+      collectionEditor.saveDraft();
+      collectionEditor.closeSaveModal();
+      collectionEditor.publishCollection();
+      collectionEditor.setTitle('Test Collection');
+      collectionEditor.setObjective('This is a test collection.');
+      collectionEditor.setCategory('Algebra');
+      collectionEditor.saveChanges();
+      browser.waitForAngular();
+
       browser.get('/search/find?q=');
-      libraryPage.playExploration('Parent Exploration');
+      libraryPage.playExploration('Parent Exploration not in collection');
       explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
       general.waitForSystem();
       explorationPlayerPage.clickConfirmRedirectionButton();
       browser.waitForAngular();
       general.getExplorationIdFromPlayer().then(function(currentId) {
-        expect(currentId).toMatch(refresherExplorationId);
+        expect(currentId).toEqual(refresherExplorationId);
       });
       general.waitForSystem();
       explorationPlayerPage.clickOnSummaryTileAtEnd();
@@ -159,6 +208,23 @@ describe('Full exploration editor', function() {
         forms.toRichText('Parent Exploration Content'));
       explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Correct');
       browser.waitForAngular();
+
+      browser.get('/search/find?q=');
+      element.all(by.css(
+        '.protractor-test-collection-summary-tile-title')).first().click();
+      element.all(by.css(
+        '.protractor-test-collection-exploration')).first().click();
+      explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
+      general.waitForSystem();
+      explorationPlayerPage.clickConfirmRedirectionButton();
+      browser.waitForAngular();
+      // Check the current url to see if collection_id is present in it.
+      browser.getCurrentUrl().then(function(url) {
+        var pathname = url.split('/');
+        expect(
+          pathname[4].split('?')[1].split('=')[0]).toEqual('collection_id');
+      });
+      general.waitForSystem();
       users.logout();
     });
   });

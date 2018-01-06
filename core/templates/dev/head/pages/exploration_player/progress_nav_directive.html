@@ -15,31 +15,20 @@
     </md-button>
   </div>
   <div ng-if="!hasNext" style="margin: 0 12px 12px 0">
-    <div ng-if="!shouldContinueButtonBeShown() && !helpCardHasContinueButton">
-      <!-- TODO(allan): Look at using ng-switch once we upgrade
-        to >=angular-1.5.10, which supports "ng-switch-when-separator".
-        However, the current approach is cleaner in angular-1.5.8.
-      -->
-      <md-button ng-if="interactionId === 'Continue'"
-                 class="oppia-learner-confirm-button" ng-click="onSubmit()">
+    <div ng-if="isSubmitButtonShown() && !shouldContinueButtonBeShown() && !helpCardHasContinueButton">
+      <!-- Special case for the 'Continue' interaction. -->
+      <md-button ng-if="interactionId === 'Continue'" ng-click="onSubmit()"
+                 class="oppia-learner-confirm-button protractor-test-continue-button">
         <[interactionCustomizationArgs.buttonText.value]>
         <i class="fa fa-arrow-right" style="font-size: 19px; padding-top: 1.5px;"></i>
       </md-button>
-      <md-button ng-if="interactionId === 'ItemSelectionInput' &&
-                        interactionCustomizationArgs.maxAllowableSelectionCount.value > 1"
-                 class="oppia-learner-confirm-button" ng-click="onSubmit()"
-                 ng-disabled="submitIsDisabled"
+      <md-button ng-if="shouldGenericSubmitButtonBeShown()"
+                 class="oppia-learner-confirm-button protractor-test-submit-answer-button" ng-click="onSubmit()"
+                 ng-disabled="isSubmitButtonDisabled()"
                  translate="I18N_INTERACTIONS_SUBMIT">
-        Submit
-      </md-button>
-      <md-button ng-if="shouldGenericSubmitButtonBeShown"
-                 class="oppia-learner-confirm-button" ng-click="onSubmit()"
-                 ng-disabled="submitIsDisabled"
-                 translate="I18N_INTERACTIONS_SUBMIT">
-        Submit
       </md-button>
     </div>
-    <continue-button ng-if="!isIframed && shouldContinueButtonBeShown()"
+    <continue-button ng-if="shouldContinueButtonBeShown()"
                      focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
                      is-learn-again-button="isLearnAgainButton()"
                      ng-click="onClickContinueButton()">
