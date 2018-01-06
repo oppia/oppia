@@ -111,7 +111,7 @@ oppia.factory('AudioPlayerService', [
         return _currentTrack.progress;
       },
       isPlaying: function() {
-        return (_currentTrack && !_currentTrack.paused);
+        return Boolean(_currentTrack && !_currentTrack.paused);
       },
       isTrackLoaded: function() {
         return Boolean(_currentTrack);
