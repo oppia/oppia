@@ -23,7 +23,12 @@ oppia.factory('HintsTooltipService', [
     var CLOSE_TOOLTIP_MSEC = 10000;
     var WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC = 120000;
     var timeout = null;
+    // tooltipIsOpen is a flag which says that the tooltip is currently
+    // visible to the learner.
     var tooltipIsOpen = false;
+    // tooltipIsEnabled is a flag to say that the tooltip has been viewed once.
+    // When true, tooltip has not been viewed yet; False, tooltip has been
+    // viewed and is no longer viewable in the exploration.
     var tooltipIsEnabled = true;
     var enqueueTimeout = function (func, timeToWaitMsec) {
       resetTimeouts();
