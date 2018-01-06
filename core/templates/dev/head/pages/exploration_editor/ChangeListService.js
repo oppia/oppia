@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview A standalone service for the exploration editor and collection
+ * editor pages. It maintains a provisional list of changes to be committed to
+ * the server.
+ */
 
-// A service that maintains a provisional list of changes to be committed to
-// the server.
 oppia.factory('ChangeListService', [
   '$rootScope', '$log', 'AlertsService', 'ExplorationDataService',
   'autosaveInfoModalsService',
