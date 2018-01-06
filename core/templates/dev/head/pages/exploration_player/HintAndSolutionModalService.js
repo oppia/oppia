@@ -19,9 +19,13 @@
 oppia.factory('HintAndSolutionModalService', [
   '$uibModal', 'UrlInterpolationService', 'HintsAndSolutionManagerService',
   'ExplorationPlayerService', 'PlayerPositionService',
+  'AudioTranslationManagerService', 'AudioPlayerService',
+  'EVENT_AUTOPLAY_AUDIO',
   function(
       $uibModal, UrlInterpolationService, HintsAndSolutionManagerService,
-      ExplorationPlayerService, PlayerPositionService) {
+      ExplorationPlayerService, PlayerPositionService,
+      AudioTranslationManagerService, AudioPlayerService,
+      EVENT_AUTOPLAY_AUDIO) {
     return {
       displayHintModal: function(index) {
         return $uibModal.open({
@@ -29,11 +33,18 @@ oppia.factory('HintAndSolutionModalService', [
             '/pages/exploration_player/hint_and_solution_modal_directive.html'),
           backdrop: 'static',
           controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
+            '$scope', '$rootScope', '$uibModalInstance',
+            function($scope, $rootScope, $uibModalInstance) {
               $scope.isHint = true;
               $scope.hint = HintsAndSolutionManagerService.displayHint(index);
+              AudioTranslationManagerService.setSecondaryAudioTranslations(
+                $scope.hint.getBindableAudioTranslations(),
+                $scope.hint.getHtml());
+              $rootScope.$broadcast(EVENT_AUTOPLAY_AUDIO);
               $scope.closeModal = function() {
+                AudioPlayerService.stop();
+                AudioTranslationManagerService
+                  .clearSecondaryAudioTranslations();
                 $uibModalInstance.dismiss('cancel');
               };
             }
@@ -46,14 +57,21 @@ oppia.factory('HintAndSolutionModalService', [
             '/pages/exploration_player/hint_and_solution_modal_directive.html'),
           backdrop: 'static',
           controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
+            '$scope', '$rootScope', '$uibModalInstance',
+            function($scope, $rootScope, $uibModalInstance) {
               $scope.isHint = false;
               var solution = HintsAndSolutionManagerService.displaySolution();
+              AudioTranslationManagerService.setSecondaryAudioTranslations(
+                solution.explanation.getBindableAudioTranslations(),
+                solution.explanation.getHtml());
+              $rootScope.$broadcast(EVENT_AUTOPLAY_AUDIO);
               var interaction = ExplorationPlayerService.getInteraction(
                 PlayerPositionService.getCurrentStateName());
               $scope.solutionHtml = solution.getOppiaResponseHtml(interaction);
               $scope.closeModal = function() {
+                AudioPlayerService.stop();
+                AudioTranslationManagerService
+                  .clearSecondaryAudioTranslations();
                 $uibModalInstance.dismiss('cancel');
               };
             }
