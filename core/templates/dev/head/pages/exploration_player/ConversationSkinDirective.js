@@ -301,7 +301,6 @@ oppia.directive('conversationSkin', [
           $scope.recommendedExplorationSummaries = null;
           $scope.answerIsCorrect = false;
           $scope.toPreviousState = false;
-          $scope.feedbackHtmlAvailable = false;
           $scope.isCorrectnessFeedbackEnabled = function() {
             return PlayerCorrectnessFeedbackEnabledService.isEnabled();
           };
@@ -572,7 +571,7 @@ oppia.directive('conversationSkin', [
               answer, interactionRulesService, function(
                   newStateName, refreshInteraction, feedbackHtml,
                   feedbackAudioTranslations, contentHtml, newParams,
-                  refresherExplorationId, answerGroupIndex) {
+                  refresherExplorationId) {
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.
                 var millisecsLeftToWait = (
@@ -670,7 +669,6 @@ oppia.directive('conversationSkin', [
                         $scope.upcomingStateName));
 
                     if (feedbackHtml) {
-                      $scope.feedbackHtmlAvailable = true;
                       var stateHistory =
                         PlayerTranscriptService.getStateHistory();
                       if (stateHistory.indexOf(newStateName) !== -1) {

@@ -374,7 +374,6 @@ oppia.factory('ExplorationPlayerService', [
         // since classificationResult.outcome points
         // at oldState.interaction.default_outcome
         var outcome = angular.copy(classificationResult.outcome);
-        var answerGroupIndex = classificationResult.answerGroupIndex;
         var newStateName = outcome.dest;
         var refresherExplorationId = outcome.refresherExplorationId;
         var newState = exploration.getState(newStateName);
@@ -448,7 +447,7 @@ oppia.factory('ExplorationPlayerService', [
         successCallback(
           newStateName, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, questionHtml, newParams,
-          refresherExplorationId, answerGroupIndex);
+          refresherExplorationId);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {

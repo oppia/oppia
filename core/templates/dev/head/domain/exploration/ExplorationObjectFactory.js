@@ -26,15 +26,13 @@ oppia.factory('ExplorationObjectFactory', [
       StatesObjectFactory, ParamChangesObjectFactory, ParamSpecsObjectFactory,
       UrlInterpolationService) {
     var Exploration = function(
-        initStateName, paramChanges, paramSpecs, states, title, languageCode,
-        correctnessFeedbackEnabled) {
+        initStateName, paramChanges, paramSpecs, states, title, languageCode) {
       this.initStateName = initStateName;
       this.paramChanges = paramChanges;
       this.paramSpecs = paramSpecs;
       this.states = states;
       this.title = title;
       this.languageCode = languageCode;
-      this.correctnessFeedbackEnabled = correctnessFeedbackEnabled;
     };
 
     // Instance methods
