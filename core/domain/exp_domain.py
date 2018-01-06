@@ -3058,7 +3058,7 @@ class Exploration(object):
                 customization_args = state_dict[
                     'interaction']['customization_args']
                 customization_args.update({
-                    'allowImproperFractions': {
+                    'allowImproperFraction': {
                         'value': True
                     },
                     'allowNonzeroIntegerPart': {

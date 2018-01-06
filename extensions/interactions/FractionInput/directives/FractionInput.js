@@ -35,8 +35,13 @@ oppia.directive('oppiaInteractiveFractionInput', [
             WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
-          var requireSimplestForm =
-            $attrs.requireSimplestFormWithValue === 'true';
+          var requireSimplestForm = (
+            $attrs.requireSimplestFormWithValue === 'true');
+          var allowImproperFraction = (
+            $attrs.allowImproperFractionWithValue === 'true');
+          var allowNonzeroIntegerPart = (
+            $attrs.allowNonzeroIntegerPartWithValue === 'true');
+
           var errorMessage = '';
           // Label for errors caused whilst parsing a fraction.
           var FORM_ERROR_TYPE = 'FRACTION_FORMAT_ERROR';
@@ -94,6 +99,21 @@ oppia.directive('oppiaInteractiveFractionInput', [
                 errorMessage = (
                   'Please enter an answer in simplest form ' +
                   '(e.g., 1/3 instead of 2/6).');
+                $scope.FractionInputForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, false);
+              } else if (
+                  !allowImproperFraction && fraction.isImproperFraction()) {
+                errorMessage = (
+                  'Please enter an answer with a "proper" fractional part ' +
+                  '(e.g., 1 2/3 instead of 5/3).');
+                $scope.FractionInputForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, false);
+              } else if (
+                  !allowNonzeroIntegerPart &&
+                  fraction.hasNonzeroIntegerPart()) {
+                errorMessage = (
+                  'Please enter your answer as a fraction (e.g., 5/3 instead ' +
+                  'of 1 2/3).');
                 $scope.FractionInputForm.answer.$setValidity(
                   FORM_ERROR_TYPE, false);
               } else {
