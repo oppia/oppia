@@ -45,7 +45,7 @@ oppia.factory('ExplorationPlayerService', [
       ExpressionInterpolationService, StateClassifierMappingService,
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
-      EditableExplorationBackendApiService, AudioTranslationManagerService,
+      EditableExplorationBackendApiService, AudioTranslationLanguageService,
       LanguageUtilService, NumberAttemptsService, AudioPreloaderService,
       PlayerCorrectnessFeedbackEnabledService,
       GuestCollectionProgressService,
