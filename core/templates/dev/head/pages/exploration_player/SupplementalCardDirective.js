@@ -30,14 +30,12 @@ oppia.directive('supplementalCard', [
         '$scope', '$timeout', '$window', 'ExplorationPlayerService',
         'PlayerPositionService', 'PlayerTranscriptService',
         'WindowDimensionsService', 'CONTENT_FOCUS_LABEL_PREFIX',
-        'TWO_CARD_THRESHOLD_PX', 'EVENT_ACTIVE_CARD_CHANGED',
-        'CONTINUE_BUTTON_FOCUS_LABEL',
+        'EVENT_ACTIVE_CARD_CHANGED', 'CONTINUE_BUTTON_FOCUS_LABEL',
         function(
             $scope, $timeout, $window, ExplorationPlayerService,
             PlayerPositionService, PlayerTranscriptService,
             WindowDimensionsService, CONTENT_FOCUS_LABEL_PREFIX,
-            TWO_CARD_THRESHOLD_PX, EVENT_ACTIVE_CARD_CHANGED,
-            CONTINUE_BUTTON_FOCUS_LABEL) {
+            EVENT_ACTIVE_CARD_CHANGED, CONTINUE_BUTTON_FOCUS_LABEL) {
           var updateActiveCard = function() {
             var index = PlayerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -65,8 +63,8 @@ oppia.directive('supplementalCard', [
             $scope.helpCardHasContinueButton = false;
           };
 
-          $scope.isViewportNarrow = function() {
-            return WindowDimensionsService.getWidth() < TWO_CARD_THRESHOLD_PX;
+          $scope.canWindowShowTwoCards = function() {
+            return ExplorationPlayerService.canWindowShowTwoCards();
           };
 
           $scope.isWindowTall = function() {
@@ -101,6 +99,8 @@ oppia.directive('supplementalCard', [
           });
 
           updateActiveCard();
-        }]
+        }
+      ]
     };
-  }]);
+  }
+]);

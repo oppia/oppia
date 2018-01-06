@@ -32,6 +32,7 @@ class ImageClickInput(base.BaseInteraction):
     # a solution. Once this issue is fixed, ImageClickInput interaction can be
     # supported by the solution feature.
     can_have_solution = False
+    show_generic_submit_button = False
 
     _customization_arg_specs = [{
         'name': 'imageAndRegions',
