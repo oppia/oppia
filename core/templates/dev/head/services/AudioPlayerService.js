@@ -18,10 +18,10 @@
 
 oppia.factory('AudioPlayerService', [
   '$q', '$timeout', 'ngAudio', 'AssetsBackendApiService',
-  'ExplorationContextService',
+  'ExplorationContextService', 'AudioTranslationManagerService',
   function(
       $q, $timeout, ngAudio, AssetsBackendApiService,
-      ExplorationContextService) {
+      ExplorationContextService, AudioTranslationManagerService) {
     var _currentTrackFilename = null;
     var _currentTrack = null;
 
@@ -45,6 +45,8 @@ oppia.factory('AudioPlayerService', [
               _currentTrack.audio.onended = function() {
                 _currentTrack = null;
                 _currentTrackFilename = null;
+                AudioTranslationManagerService
+                  .clearSecondaryAudioTranslations();
               }
             }, 100);
 
