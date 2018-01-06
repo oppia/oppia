@@ -29,7 +29,8 @@
                                is-active="$index === activeAnswerGroupIndex"
                                on-delete-fn="deleteAnswerGroup"
                                outcome="answerGroup.outcome"
-                               num-rules="answerGroup.rules.length">
+                               num-rules="answerGroup.rules.length"
+                               is-response="true">
               </response-header>
             </a>
 
@@ -67,7 +68,8 @@
                                is-active="$index === activeAnswerGroupIndex"
                                summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:false"
                                short-summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:true"
-                               outcome="defaultOutcome">
+                               outcome="defaultOutcome"
+                               is-response="true">
               </response-header>
             </a>
 
