@@ -51,6 +51,7 @@
                     !isCurrentSupplementalCardNonempty() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback && activeCard.destStateName &&
                     !isOnTerminalCard()">
           <continue-button focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
+                           is-learn-again-button="isLearnAgainButton()"
                            ng-click="showPendingCard(upcomingStateName, upcomingParams, upcomingContentHtml)">
           </continue-button>
         </div>

@@ -23,6 +23,7 @@ oppia.directive('progressNav', [
       scope: {
         onSubmit: '&',
         onClickContinueButton: '&',
+        isLearnAgainButton: '&',
         submitIsDisabled: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

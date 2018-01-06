@@ -26,13 +26,15 @@ oppia.factory('ExplorationObjectFactory', [
       StatesObjectFactory, ParamChangesObjectFactory, ParamSpecsObjectFactory,
       UrlInterpolationService) {
     var Exploration = function(
-        initStateName, paramChanges, paramSpecs, states, title, languageCode) {
+        initStateName, paramChanges, paramSpecs, states, title, languageCode,
+        correctnessFeedbackEnabled) {
       this.initStateName = initStateName;
       this.paramChanges = paramChanges;
       this.paramSpecs = paramSpecs;
       this.states = states;
       this.title = title;
       this.languageCode = languageCode;
+      this.correctnessFeedbackEnabled = correctnessFeedbackEnabled;
     };
 
     // Instance methods
@@ -59,6 +61,18 @@ oppia.factory('ExplorationObjectFactory', [
 
     Exploration.prototype.getInteractionId = function(stateName) {
       return this.states.getState(stateName).interaction.id;
+    };
+
+    Exploration.prototype.isAnswerCorrect = function(
+        answerGroupIndex, stateName) {
+      var currentInteraction = this.states.getState(stateName).interaction;
+      /* Check if current answer is a default outcome which is always classified
+         as wrong. */
+      if (answerGroupIndex === currentInteraction.answerGroups.length) {
+        return false;
+      }
+      return currentInteraction.answerGroups[
+        answerGroupIndex].labelledAsCorrect;
     };
 
     Exploration.prototype.getInteractionCustomizationArgs =
@@ -140,7 +154,7 @@ oppia.factory('ExplorationObjectFactory', [
         var allAudioTranslations =
           this.states.getAllAudioTranslations(languageCode);
         for (var audioTranslationStateName in allAudioTranslations) {
-          totalFileSizeMB += 
+          totalFileSizeMB +=
             allAudioTranslations[audioTranslationStateName].getFileSizeMB();
         }
         return totalFileSizeMB;
@@ -166,7 +180,8 @@ oppia.factory('ExplorationObjectFactory', [
         StatesObjectFactory.createFromBackendDict(
           explorationBackendDict.states),
         explorationBackendDict.title,
-        explorationBackendDict.language_code);
+        explorationBackendDict.language_code,
+        explorationBackendDict.correctness_feedback_enabled);
     };
 
     return Exploration;

@@ -70,6 +70,7 @@
       <div class="conversation-skin-inline-interaction">
         <div ng-if="!isWindowNarrow() && activeCard.destStateName && activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1].oppiaResponse">
           <continue-button ng-if="!isIframed"
+                           is-learn-again-button="isLearnAgainButton()"
                            focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
                            ng-click="onClickContinueButton()">
           </continue-button>

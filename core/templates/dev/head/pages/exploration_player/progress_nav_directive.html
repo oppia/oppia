@@ -41,6 +41,7 @@
     </div>
     <continue-button ng-if="!isIframed && shouldContinueButtonBeShown()"
                      focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
+                     is-learn-again-button="isLearnAgainButton()"
                      ng-click="onClickContinueButton()">
     </continue-button>
   </div>
