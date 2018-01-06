@@ -448,7 +448,6 @@ oppia.factory('ExplorationPlayerService', [
           feedbackAudioTranslations, questionHtml, newParams,
           refresherExplorationId);
         return answerIsCorrect;
-
       },
       isAnswerBeingProcessed: function() {
         return answerIsBeingProcessed;
