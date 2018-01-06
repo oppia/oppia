@@ -34,6 +34,9 @@ oppia.factory('ExplorationPlayerService', [
   'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
   'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
+  'PlayerCorrectnessFeedbackEnabledService',
+  'GuestCollectionProgressService',
+  'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       AlertsService, AnswerClassificationService, ExplorationContextService,
@@ -43,7 +46,10 @@ oppia.factory('ExplorationPlayerService', [
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationManagerService,
-      LanguageUtilService, NumberAttemptsService, AudioPreloaderService) {
+      LanguageUtilService, NumberAttemptsService, AudioPreloaderService,
+      PlayerCorrectnessFeedbackEnabledService,
+      GuestCollectionProgressService,
+      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
       ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -158,6 +164,17 @@ oppia.factory('ExplorationPlayerService', [
         StatsReportingService.recordExplorationCompleted(
           newStateName, LearnerParamsService.getAllParams());
 
+        // If the user is a guest, has completed this exploration within the
+        // context of a collection, and the collection is whitelisted, record
+        // their temporary progress.
+        var collectionAllowsGuestProgress = (
+          WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.indexOf(
+            GLOBALS.collectionId) !== -1);
+        if (collectionAllowsGuestProgress && !_isLoggedIn) {
+          GuestCollectionProgressService.recordExplorationCompletedInCollection(
+            GLOBALS.collectionId, _explorationId);
+        }
+
         // For single state explorations, when the exploration reaches the
         // terminal state and explorationActuallyStarted is false, record
         // exploration actual start event.
@@ -214,6 +231,8 @@ oppia.factory('ExplorationPlayerService', [
                 data.auto_tts_enabled);
               AudioPreloaderService.init(exploration);
               AudioPreloaderService.kickOffAudioPreloader(initStateName);
+              PlayerCorrectnessFeedbackEnabledService.init(
+                data.correctness_feedback_enabled);
               _loadInitialState(successCallback);
               NumberAttemptsService.reset();
             });
@@ -247,6 +266,8 @@ oppia.factory('ExplorationPlayerService', [
             AudioPreloaderService.init(exploration);
             AudioPreloaderService.kickOffAudioPreloader(
               exploration.getInitialState().name);
+            PlayerCorrectnessFeedbackEnabledService.init(
+              data.correctness_feedback_enabled);
             _loadInitialState(successCallback);
             $rootScope.$broadcast('playerServiceInitialized');
           });
@@ -306,6 +327,9 @@ oppia.factory('ExplorationPlayerService', [
         }
         return randomSuffix;
       },
+      getHints: function(stateName) {
+        return exploration.getInteraction(stateName).hints;
+      },
       getSolution: function(stateName) {
         return exploration.getInteraction(stateName).solution;
       },
@@ -327,6 +351,7 @@ oppia.factory('ExplorationPlayerService', [
           AnswerClassificationService.getMatchingClassificationResult(
             _explorationId, oldStateName, oldState, answer,
             interactionRulesService));
+        var answerIsCorrect = classificationResult.answerIsCorrect;
 
         if (!_editorPreviewMode) {
           var feedbackIsUseful = (
@@ -349,6 +374,7 @@ oppia.factory('ExplorationPlayerService', [
         var outcome = angular.copy(classificationResult.outcome);
 
         var newStateName = outcome.dest;
+        var refresherExplorationId = outcome.refresherExplorationId;
         var newState = exploration.getState(newStateName);
 
         // Compute the data for the next state.
@@ -417,7 +443,9 @@ oppia.factory('ExplorationPlayerService', [
         $rootScope.$broadcast('playerStateChange', newStateName);
         successCallback(
           newStateName, refreshInteraction, feedbackHtml, questionHtml,
-          newParams);
+          newParams, refresherExplorationId);
+
+        return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {
         return answerIsBeingProcessed;

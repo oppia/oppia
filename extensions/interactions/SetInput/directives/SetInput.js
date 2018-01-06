@@ -66,6 +66,15 @@ oppia.directive('oppiaInteractiveSetInput', [
             return false;
           };
 
+          var hasEmptyString = function() {
+            for (var i = 0; i < $scope.answer.length; i++) {
+              if ($scope.answer[i] === '') {
+                return true;
+              }
+            }
+            return false;
+          };
+
           $scope.submitAnswer = function(answer) {
             if (hasDuplicates(answer)) {
               $scope.errorMessage = (
@@ -85,8 +94,20 @@ oppia.directive('oppiaInteractiveSetInput', [
               WindowDimensionsService.isWindowNarrow());
           };
 
+          $scope.isAnswerValid = function() {
+            return (!hasEmptyString() && $scope.answer.length > 0);
+          };
+
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
             $scope.submitAnswer($scope.answer);
+          });
+
+          $scope.$watch(function() {
+            return $scope.answer;
+          }, function() {
+            $scope.setAnswerValidity({
+              answerValidity: $scope.isAnswerValid()
+            });
           });
         }
       ]

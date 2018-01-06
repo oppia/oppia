@@ -330,7 +330,7 @@ describe('Exploration history', function() {
     // Check deleting a state
     editor.deleteState('second');
     editor.moveToState('first');
-    editor.ResponseEditor(0).setDestination('final card', false);
+    editor.ResponseEditor(0).setDestination('final card', false, null);
     editor.saveChanges();
 
     editor.expectGraphComparisonOf(2, 3).toBe([{
@@ -360,7 +360,7 @@ describe('Exploration history', function() {
 
     // Check re-inserting a deleted state
     editor.moveToState('third');
-    editor.ResponseEditor(0).setDestination('second', true);
+    editor.ResponseEditor(0).setDestination('second', true, null);
     editor.moveToState('second');
     editor.setContent(forms.toRichText('this is card 2'));
     editor.setInteraction('Continue');
