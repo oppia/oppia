@@ -560,9 +560,10 @@ oppia.directive('conversationSkin', [
                   var pairs = (
                     PlayerTranscriptService.getLastCard().inputResponsePairs);
                   var lastAnswerFeedbackPair = pairs[pairs.length - 1];
-                  AudioTranslationManagerService.setPrimaryAudioTranslations(
-                    feedbackAudioTranslations,
-                    feedbackHtml);
+                  AudioTranslationManagerService
+                    .setSecondaryAudioTranslations(
+                      feedbackAudioTranslations,
+                      feedbackHtml);
                   $scope.$broadcast(EVENT_AUTOPLAY_AUDIO);
 
                   if (_oldStateName === newStateName) {

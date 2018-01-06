@@ -88,12 +88,11 @@ oppia.directive('tutorCard', [
             $scope.interactionInstructions = (
               ExplorationPlayerStateService.getInteractionInstructions(
                 $scope.activeCard.stateName));
-
-
             $scope.contentAudioTranslations = (
               ExplorationPlayerService.getStateContentAudioTranslations(
                 $scope.activeCard.stateName));
-            AudioTranslationManagerService.setPrimaryAudioTranslations(
+            AudioTranslationManagerService.clearSecondaryAudioTranslations();
+            AudioTranslationManagerService.setContentAudioTranslations(
               angular.copy($scope.contentAudioTranslations),
               $scope.activeCard.contentHtml);
             AudioPlayerService.stop();
