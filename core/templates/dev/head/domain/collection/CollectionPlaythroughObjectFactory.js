@@ -26,11 +26,10 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
 
   // Stores information about a current playthrough of a collection for a
   // user.
-  var CollectionPlaythrough = function(collectionPlaythroughBackendObject) {
-    this._nextExplorationIds = (
-      collectionPlaythroughBackendObject.next_exploration_ids);
-    this._completedExplorationIds = (
-      collectionPlaythroughBackendObject.completed_exploration_ids);
+  var CollectionPlaythrough = function(
+      nextExplorationIds, completedExplorationIds) {
+    this._nextExplorationIds = nextExplorationIds;
+    this._completedExplorationIds = completedExplorationIds;
   };
 
   // Returns a list of upcoming exploration IDs. Changes to this list are not
@@ -66,9 +65,17 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
   // Static class methods. Note that "this" is not available in static
   // contexts. This function takes a JSON object which represents a backend
   // collection playthrough python dict.
-  CollectionPlaythrough.create = function(
+  CollectionPlaythrough.createFromBackendObject = function(
       collectionPlaythroughBackendObject) {
-    return new CollectionPlaythrough(collectionPlaythroughBackendObject);
+    return new CollectionPlaythrough(
+      collectionPlaythroughBackendObject.next_exploration_ids,
+      collectionPlaythroughBackendObject.completed_exploration_ids);
+  };
+
+  CollectionPlaythrough.create = function(
+      nextExplorationIds, completedExplorationIds) {
+    return new CollectionPlaythrough(
+      angular.copy(nextExplorationIds), angular.copy(completedExplorationIds));
   };
 
   return CollectionPlaythrough;

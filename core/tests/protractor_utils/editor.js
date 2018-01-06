@@ -651,6 +651,7 @@ var ResponseEditor = function(responseNum) {
         destElement, destinationName, createState, refresherExplorationId);
 
       // Save destination.
+      general.waitForSystem();
       element(by.css('.protractor-test-save-outcome-dest')).click();
     },
     // The current state name must be at the front of the list.

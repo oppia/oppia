@@ -246,7 +246,8 @@ describe('State editor', function() {
   });
 
   it('should add a solution', function() {
-    users.login('stateEditorUser1@example.com');
+    users.createUser('stateEditorUser3@example.com', 'stateEditorUser3');
+    users.login('stateEditorUser3@example.com');
     workflow.createExploration();
     editor.setContent(forms.toRichText('some content'));
 

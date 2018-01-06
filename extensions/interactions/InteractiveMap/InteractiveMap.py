@@ -33,6 +33,7 @@ class InteractiveMap(base.BaseInteraction):
     # conveyed meaningfully to the learner. Once this issue is fixed,
     # InteractiveMap interaction can be supported by the solution feature.
     can_have_solution = False
+    show_generic_submit_button = False
 
     _customization_arg_specs = [{
         'name': 'latitude',
