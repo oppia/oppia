@@ -27,16 +27,8 @@ oppia.factory('ExplorationPlayerStateService', [function() {
       return exploration;
     },
 
-    isCorrectnessFeedbackEnabled: function() {
-      return exploration.correctnessFeedbackEnabled;
-    },
-
     isInteractionInline: function(stateName) {
       return exploration.isInteractionInline(stateName);
-    },
-
-    isAnswerCorrect: function(answerGroupIndex, stateName) {
-      return exploration.isAnswerCorrect(answerGroupIndex, stateName);
     },
 
     getInteractionInstructions: function(stateName) {

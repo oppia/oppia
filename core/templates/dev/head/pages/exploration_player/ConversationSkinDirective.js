@@ -300,6 +300,8 @@ oppia.directive('conversationSkin', [
           $scope.hasFullyLoaded = false;
           $scope.recommendedExplorationSummaries = null;
           $scope.answerIsCorrect = false;
+          $scope.toPreviousState = false;
+          $scope.feedbackHtmlAvailable = false;
           $scope.isCorrectnessFeedbackEnabled = function() {
             return PlayerCorrectnessFeedbackEnabledService.isEnabled();
           };
@@ -307,6 +309,12 @@ oppia.directive('conversationSkin', [
           $scope.isCorrectnessFooterEnabled = function() {
             return (
               $scope.answerIsCorrect && $scope.isCorrectnessFeedbackEnabled());
+          };
+
+          $scope.isLearnAgainButton = function() {
+            return (
+              $scope.toPreviousState && !$scope.answerIsCorrect &&
+              $scope.isCorrectnessFeedbackEnabled());
           };
 
           $scope.OPPIA_AVATAR_IMAGE_URL = (
@@ -662,16 +670,11 @@ oppia.directive('conversationSkin', [
                         $scope.upcomingStateName));
 
                     if (feedbackHtml) {
-                      $scope.isLearnAgainButton = false;
+                      $scope.feedbackHtmlAvailable = true;
                       var stateHistory =
                         PlayerTranscriptService.getStateHistory();
-                      if (stateHistory.indexOf(newStateName) !== -1 &&
-                          ExplorationPlayerStateService.
-                            isCorrectnessFeedbackEnabled() &&
-                          !ExplorationPlayerStateService.isAnswerCorrect(
-                            answerGroupIndex, _oldStateName
-                          )) {
-                        $scope.isLearnAgainButton = true;
+                      if (stateHistory.indexOf(newStateName) !== -1) {
+                        $scope.toPreviousState = true;
                       }
                       PlayerTranscriptService.addNewResponse(feedbackHtml);
                       if (!ExplorationPlayerStateService.isInteractionInline(

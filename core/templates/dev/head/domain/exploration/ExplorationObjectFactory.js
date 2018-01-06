@@ -63,18 +63,6 @@ oppia.factory('ExplorationObjectFactory', [
       return this.states.getState(stateName).interaction.id;
     };
 
-    Exploration.prototype.isAnswerCorrect = function(
-        answerGroupIndex, stateName) {
-      var currentInteraction = this.states.getState(stateName).interaction;
-      /* Check if current answer is a default outcome which is always classified
-         as wrong. */
-      if (answerGroupIndex === currentInteraction.answerGroups.length) {
-        return false;
-      }
-      return currentInteraction.answerGroups[
-        answerGroupIndex].labelledAsCorrect;
-    };
-
     Exploration.prototype.getInteractionCustomizationArgs =
       function(stateName) {
         return this.states.getState(stateName).interaction.customizationArgs;
@@ -168,8 +156,7 @@ oppia.factory('ExplorationObjectFactory', [
         StatesObjectFactory.createFromBackendDict(
           explorationBackendDict.states),
         explorationBackendDict.title,
-        explorationBackendDict.language_code,
-        explorationBackendDict.correctness_feedback_enabled);
+        explorationBackendDict.language_code);
     };
 
     return Exploration;
