@@ -2,7 +2,7 @@
   <div ng-if="audioBarIsExpanded" class="audio-controls">
     <div style="width: 560px;">
       <i class="fa audio-controls-button-icon"
-         ng-click="onPlayButtonClicked(false)"
+         ng-click="onPlayButtonClicked()"
          ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play': !isAudioPlaying(), 'fa-pause': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
          uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
          tooltip-append-to-body="true" tooltip-placement="right"></i>
