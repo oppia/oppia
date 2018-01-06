@@ -23,6 +23,7 @@ import struct
 
 from core.domain import dependency_registry
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.tests import test_utils
@@ -44,7 +45,7 @@ _INTERACTION_CONFIG_SCHEMA = [
     ('name', basestring), ('display_mode', basestring),
     ('description', basestring), ('_customization_arg_specs', list),
     ('is_terminal', bool), ('needs_summary', bool),
-    ('show_nav_submit_button', bool)]
+    ('show_generic_submit_button', bool)]
 
 
 class InteractionAnswerUnitTests(test_utils.GenericTestBase):
@@ -152,7 +153,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             'is_linear', 'rule_descriptions', 'instructions',
             'narrow_instructions', 'needs_summary',
             'default_outcome_heading', 'can_have_solution',
-            'show_nav_submit_button'])
+            'show_generic_submit_button'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(interaction_dict['customization_arg_specs'], [{
             'name': 'placeholder',
@@ -502,3 +503,27 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         actual_linear_interaction_ids = self._get_linear_interaction_ids()
         self.assertEqual(
             actual_linear_interaction_ids, feconf.LINEAR_INTERACTION_IDS)
+
+
+class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
+    """Test that the interaction demo exploration covers all interactions."""
+
+    _DEMO_EXPLORATION_ID = '16'
+
+    def test_interactions_demo_exploration(self):
+        exp_services.load_demo(self._DEMO_EXPLORATION_ID)
+        exploration = exp_services.get_exploration_by_id(
+            self._DEMO_EXPLORATION_ID)
+
+        all_interaction_ids = set(
+            interaction_registry.Registry.get_all_interaction_ids())
+        observed_interaction_ids = set()
+
+        for state in exploration.states.values():
+            observed_interaction_ids.add(state.interaction.id)
+
+        missing_interaction_ids = (
+            all_interaction_ids - observed_interaction_ids)
+        self.assertEqual(len(missing_interaction_ids), 0, (
+            'Missing interaction IDs in demo exploration: %s' %
+            missing_interaction_ids))

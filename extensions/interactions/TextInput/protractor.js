@@ -44,7 +44,7 @@ var submitAnswer = function(elem, answer) {
   textAreaElem.isPresent().then(function(present) {
     if (present) {
       textAreaElem.sendKeys(answer);
-      textInputElem.element(by.tagName('button')).click();
+      element(by.css('.protractor-test-submit-answer-button')).click();
     } else {
       // This must be chained in here due to the textInputElem possibly being
       // invisible after the longer text area submits, causing the instantiation

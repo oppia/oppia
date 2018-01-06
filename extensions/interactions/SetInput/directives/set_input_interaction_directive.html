@@ -8,9 +8,3 @@
 </div>
 
 <div ng-if="errorMessage" class="oppia-form-error" aria-live="assertive" translate="<[errorMessage]>"></div>
-
-<br>
-
-<div ng-if="!isSubmitHidden()">
-  <button type="button" class="btn btn-default" ng-click="submitAnswer(answer)" translate="I18N_INTERACTIONS_SUBMIT" ng-disabled="!isAnswerValid()"></button>
-</div>
