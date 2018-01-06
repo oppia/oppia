@@ -40,7 +40,7 @@
                                 profile-picture="profilePicture"
                                 oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
                                 input-response-pair-id="getInputResponsePairId($index)"
-                                last="false">
+                                is-last-pair="false">
           </input-response-pair>
         </div>
       </div>
@@ -52,7 +52,7 @@
                             profile-picture="profilePicture"
                             oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
                             input-response-pair-id="getInputResponsePairId(activeCard.inputResponsePairs.length - 1)"
-                            last="true">
+                            is-last-pair="true">
       </input-response-pair>
     </div>
 
@@ -156,10 +156,9 @@
     width: 100%;
   }
 
+  /* This should match the value defined in AUDIO_HIGHLIGHT_CSS_CLASS. */
   .conversation-skin-audio-highlight {
-    border-style: solid;
-    border-width: 3px;
-    border-color: #f3d140
+    border: 3px solid #f3d140;
   }
 
   .conversation-skin-tutor-card,
