@@ -16,14 +16,14 @@
  * @fileoverview End-to-end tests for entire subscriptions functionality.
  */
 
-var CreatorDashboardPage =require(
-  '../protractor_utils/CreatorDashboardPage.js');
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
-var SubscriptionDashboardPage =require(
-  '../protractor_utils/SubscriptionDashboardPage.js');
+var SubscriptionDashboardPage =
+  require('../protractor_utils/SubscriptionDashboardPage.js');
 
 describe('Subscriptions functionality', function() {
   var creatorDashboardPage = null;

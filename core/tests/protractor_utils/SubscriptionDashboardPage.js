@@ -20,7 +20,7 @@
 var SubscriptionDashboardPage = function() {
   var subscriptionButton = element(
     by.css('.protractor-test-subscription-button'));
-  var subscriptionName =  element.all(
+  var subscriptionName = element.all(
     by.css('.protractor-test-subscription-name'));
 
   this.expectSubscriptionFirstNameToMatch = function(name) {
