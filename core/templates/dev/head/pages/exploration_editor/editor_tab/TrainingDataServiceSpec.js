@@ -84,10 +84,10 @@ describe('TrainingDataService', function() {
                 html: 'Feedback',
                 audio_translations: {}
               },
+              labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
-            },
-            labelled_as_correct: false
+            }
           }],
           default_outcome: {
             dest: 'State',
@@ -95,6 +95,7 @@ describe('TrainingDataService', function() {
               html: 'Default',
               audio_translations: {}
             },
+            labelled_as_correct: false,
             param_changes: [],
             refresher_exploration_id: null
           },

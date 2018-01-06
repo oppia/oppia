@@ -591,6 +591,7 @@ interaction:
     feedback:
       audio_translations: {}
       html: ''
+    labelled_as_correct: false
     param_changes: []
     refresher_exploration_id: null
   hints: []
@@ -615,6 +616,7 @@ interaction:
     feedback:
       audio_translations: {}
       html: ''
+    labelled_as_correct: false
     param_changes: []
     refresher_exploration_id: null
   hints: []
@@ -639,6 +641,7 @@ interaction:
     feedback:
       audio_translations: {}
       html: ''
+    labelled_as_correct: false
     param_changes: []
     refresher_exploration_id: null
   hints: []
@@ -665,6 +668,7 @@ interaction:
     feedback:
       audio_translations: {}
       html: ''
+    labelled_as_correct: false
     param_changes: []
     refresher_exploration_id: null
   hints: []
