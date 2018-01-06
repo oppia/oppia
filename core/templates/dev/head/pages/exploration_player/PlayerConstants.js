@@ -32,6 +32,9 @@ oppia.constant('EVENT_NEW_CARD_OPENED', 'newCardOpened');
    Also called when card is selected by clicking on progress dots */
 oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
 
+// Called when a hint is released.
+oppia.constant('EVENT_HINT_RELEASED');
+
 // The enforced waiting period before the first hint request.
 oppia.constant('WAIT_FOR_FIRST_HINT_MSEC', 60000);
 // The enforced waiting period before each of the subsequent hint requests.
