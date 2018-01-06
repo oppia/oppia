@@ -646,16 +646,20 @@ def _check_import_order(all_files):
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
     failed = False
     for filename in all_files:
-        if isort.SortImports(filename, check=True).incorrectly_sorted:
+        # This line prints the error message along with file path 
+        # and returns True if it finds an error else returns False
+        if isort.SortImports(filename, check=False).incorrectly_sorted:
             failed = True
     print ''
     print '----------------------------------------'
     print ''
     if failed:
-        summary_message = '%s   Import order failed' % _MESSAGE_TYPE_FAILED
+        summary_message = (
+            '%s   Import order checks failed' % _MESSAGE_TYPE_FAILED)
         summary_messages.append(summary_message)
     else:
-        summary_message = '%s   Import order passed' % _MESSAGE_TYPE_SUCCESS
+        summary_message = (
+            '%s   Import order checks passed' % _MESSAGE_TYPE_SUCCESS)
         summary_messages.append(summary_message)
 
     return summary_messages
