@@ -13,9 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview A standalone service for the exploration editor and collection
- * editor pages. It maintains a provisional list of changes to be committed to
- * the server.
+ * @fileoverview A service that maintains a provisional list of changes to be
+ * committed to the server.
  */
 
 oppia.factory('ChangeListService', [
