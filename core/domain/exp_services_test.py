@@ -660,6 +660,7 @@ states:
           audio_translations: {}
           html: ''
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -683,6 +684,7 @@ states:
           audio_translations: {}
           html: ''
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -728,6 +730,7 @@ states:
           audio_translations: {}
           html: ''
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -751,6 +754,7 @@ states:
           audio_translations: {}
           html: ''
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -881,6 +885,7 @@ interaction:
       audio_translations: {}
       html: ''
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -907,6 +912,7 @@ interaction:
       audio_translations: {}
       html: ''
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -934,6 +940,7 @@ interaction:
       audio_translations: {}
       html: ''
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -1044,7 +1051,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     'audio_translations': {},
                     'html': 'Try again'
                 },
-                'param_changes': []
+                'param_changes': [],
+                'refresher_exploration_id': None,
             },
             'labelled_as_correct': False,
         }]
@@ -1055,7 +1063,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'audio_translations': {},
                 'html': '<b>Incorrect</b>'
             },
-            'param_changes': []
+            'param_changes': [],
+            'refresher_exploration_id': None,
         }
 
     def test_add_state_cmd(self):
@@ -2308,6 +2317,7 @@ states:
           audio_translations: {}
           html: ''
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null

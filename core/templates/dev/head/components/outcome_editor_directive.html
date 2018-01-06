@@ -66,6 +66,14 @@
   </div>
 </div>
 
+<div ng-if="!outcome.feedback.getHtml().isEmpty() && displayFeedback">
+  <audio-translations-editor component-name="<[COMPONENT_NAME_FEEDBACK]>"
+                             subtitled-html="outcome.feedback"
+                             on-start-edit="onAudioTranslationsStartEditAction"
+                             on-change="onAudioTranslationsEdited">
+  </audio-translations-editor>
+</div>
+
 <br ng-if="displayFeedback">
 
 <div ng-if="!destinationEditorIsOpen"
@@ -89,7 +97,10 @@
           <[outcome.dest]>
         </span>
         <span ng-if="isSelfLoop(outcome)" style="position: relative;">
-          (try again)
+          <span ng-if="!outcome.refresherExplorationId">(try again)</span>
+          <span ng-if="outcome.refresherExplorationId">
+            (try again, with refresher exploration "<[outcome.refresherExplorationId]>")
+          </span>
         </span>
       </div>
     </div>

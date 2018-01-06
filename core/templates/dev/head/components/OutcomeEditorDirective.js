@@ -29,19 +29,20 @@ oppia.directive('outcomeEditor', [
         suppressWarnings: '&suppressWarnings'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/' +
-        'outcome_editor_directive.html'),
+        '/components/outcome_editor_directive.html'),
       controller: [
         '$scope', 'EditorStateService',
-        'stateInteractionIdService',
+        'stateInteractionIdService', 'COMPONENT_NAME_FEEDBACK',
         function($scope, EditorStateService,
-          stateInteractionIdService) {
+          stateInteractionIdService, COMPONENT_NAME_FEEDBACK) {
           $scope.editOutcomeForm = {};
           $scope.feedbackEditorIsOpen = false;
           $scope.destinationEditorIsOpen = false;
           // TODO(sll): Investigate whether this line can be removed, due to
           // $scope.savedOutcome now being set in onExternalSave().
           $scope.savedOutcome = angular.copy($scope.outcome);
+
+          $scope.COMPONENT_NAME_FEEDBACK = COMPONENT_NAME_FEEDBACK;
 
           var onExternalSave = function() {
             // The reason for this guard is because, when the editor page for an
@@ -132,6 +133,12 @@ oppia.directive('outcomeEditor', [
             $scope.$broadcast('saveOutcomeDestDetails');
             $scope.destinationEditorIsOpen = false;
             $scope.savedOutcome.dest = angular.copy($scope.outcome.dest);
+            if (!$scope.isSelfLoop($scope.outcome)) {
+              $scope.outcome.refresherExplorationId = null;
+            }
+            $scope.savedOutcome.refresherExplorationId = (
+              $scope.outcome.refresherExplorationId);
+
             $scope.getOnSaveDestFn()($scope.savedOutcome);
           };
 
@@ -143,7 +150,22 @@ oppia.directive('outcomeEditor', [
 
           $scope.cancelThisDestinationEdit = function() {
             $scope.outcome.dest = angular.copy($scope.savedOutcome.dest);
+            $scope.outcome.refresherExplorationId = (
+              $scope.savedOutcome.refresherExplorationId);
             $scope.destinationEditorIsOpen = false;
+          };
+
+
+          $scope.onAudioTranslationsStartEditAction = function() {
+            // Close the content editor and save all existing changes to the
+            // HTML.
+            if ($scope.feedbackEditorIsOpen) {
+              $scope.saveThisFeedback();
+            }
+          };
+
+          $scope.onAudioTranslationsEdited = function() {
+            $scope.saveThisFeedback();
           };
         }
       ]

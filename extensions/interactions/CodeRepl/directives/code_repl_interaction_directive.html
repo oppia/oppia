@@ -8,7 +8,15 @@
       </div>
       <md-button type="button" class="md-raised" ng-disabled="!interactionIsActive" ng-click="runCode(code)" ng-disabled="!hasLoaded">Test Run</md-button>
       <!-- This ng-click is needed for specifying solutions in the solution editor -->
-      <md-button type="submit" class="md-raised" ng-disabled="!interactionIsActive" ng-click="runAndSubmitCode(code)" ng-disabled="!hasLoaded">Submit</md-button>
+      <md-button ng-if="!isSubmitHidden()"
+                 type="submit"
+                 class="md-raised"
+                 ng-disabled="!interactionIsActive"
+                 ng-click="runAndSubmitCode(code)"
+                 ng-disabled="!hasLoaded"
+                 translate="I18N_INTERACTIONS_SUBMIT">
+        Submit
+      </md-button>
       <span class="code-repl-language">
         <em>Language: <[language]></em>
       </span>
