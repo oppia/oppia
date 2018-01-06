@@ -18,10 +18,10 @@
  */
 
 var SubscriptionDashboardPage = function() {
-  var subscriptionButton = 
-  element(by.css('.protractor-test-subscription-button'));
-  var subscriptionName = 
-  element.all(by.css('.protractor-test-subscription-name'));
+  var subscriptionButton = element(
+    by.css('.protractor-test-subscription-button'));
+  var subscriptionName =  element.all(
+    by.css('.protractor-test-subscription-name'));
 
   this.expectSubscriptionFirstNameToMatch = function(name) {
     expect(
@@ -41,8 +41,7 @@ var SubscriptionDashboardPage = function() {
     ).toEqual(value);
   };
 
-  this.navigateToSubscriptionButton = function(name)
-  {
+  this.navigateToSubscriptionButton = function(name){
     subscriptionButton.click();
   };
 };

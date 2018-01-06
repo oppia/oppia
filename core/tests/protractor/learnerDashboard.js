@@ -43,8 +43,8 @@ describe('Learner dashboard functionality', function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-    subscriptionDashboardPage = new 
-    SubscriptionDashboardPage.SubscriptionDashboardPage();
+    subscriptionDashboardPage = (
+      new SubscriptionDashboardPage.SubscriptionDashboardPage());
   });
 
   beforeAll(function() {
