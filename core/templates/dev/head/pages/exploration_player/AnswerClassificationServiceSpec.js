@@ -140,6 +140,7 @@ describe('Answer classification service with string classifier disabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 10, rules)
       ).toEqual(acrof.createNew(
+        state.interaction.answerGroups[0].labelledAsCorrect,
         oof.createNew('outcome 1', '', []), 0, 0, EXPLICIT_CLASSIFICATION
       ));
 
@@ -147,6 +148,7 @@ describe('Answer classification service with string classifier disabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 5, rules)
       ).toEqual(acrof.createNew(
+        state.interaction.answerGroups[1].labelledAsCorrect,
         oof.createNew('outcome 2', '', []), 1, 0, EXPLICIT_CLASSIFICATION
       ));
 
@@ -154,6 +156,7 @@ describe('Answer classification service with string classifier disabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 6, rules)
       ).toEqual(acrof.createNew(
+        state.interaction.answerGroups[1].labelledAsCorrect,
         oof.createNew('outcome 2', '', []), 1, 1, EXPLICIT_CLASSIFICATION
       ));
     });
@@ -163,6 +166,7 @@ describe('Answer classification service with string classifier disabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 7, rules)
       ).toEqual(acrof.createNew(
+        false,
         oof.createNew('default', '', []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
       ));
     });
@@ -364,6 +368,7 @@ describe('Answer classification service with string classifier enabled',
           explorationId, stateName, state, 0, rules)
       ).toEqual(
         acrof.createNew(
+          state.interaction.answerGroups[1].labelledAsCorrect,
           state.interaction.answerGroups[1].outcome, 1, 2,
           STATISTICAL_CLASSIFICATION)
       );
@@ -375,6 +380,7 @@ describe('Answer classification service with string classifier enabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state2, 0, rules)
       ).toEqual(acrof.createNew(
+        false,
         oof.createNew('default', '', []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
       ));
     });
