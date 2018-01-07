@@ -555,6 +555,14 @@ class CsrfTokenManager(object):
 
     @classmethod
     def create_csrf_token(cls, user_id):
+        """Creates a CSRF token for the given user_id.
+
+        Args:
+            user_id: str. The user_id for whom the token is generated.
+
+        Returns:
+            str. The generated CSRF token.
+        """
         return cls._create_token(user_id, cls._get_current_time())
 
     @classmethod
