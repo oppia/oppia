@@ -24,8 +24,6 @@ import os
 import re
 import unittest
 
-import webtest
-
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -43,6 +41,7 @@ import utils
 from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
 from google.appengine.api import mail
+import webtest
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()

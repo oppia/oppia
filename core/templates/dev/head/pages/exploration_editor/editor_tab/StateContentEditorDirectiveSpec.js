@@ -43,7 +43,7 @@ describe('State content editor directive', function() {
     shof = $injector.get('SubtitledHtmlObjectFactory');
     cls = $injector.get('changeListService');
     scs = $injector.get('stateContentService');
-    es = $injector.get('editabilityService');
+    es = $injector.get('EditabilityService');
     ess = $injector.get('explorationStatesService');
 
     scs.init('Third State', _getContent('This is some content.'));

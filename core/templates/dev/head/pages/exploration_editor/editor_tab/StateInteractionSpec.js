@@ -141,7 +141,7 @@ describe('State Interaction controller', function() {
         EditorStateService: ecs,
         changeListService: cls,
         explorationStatesService: ess,
-        editabilityService: {
+        EditabilityService: {
           isEditable: function() {
             return true;
           }
@@ -154,7 +154,7 @@ describe('State Interaction controller', function() {
         EditorStateService: ecs,
         changeListService: cls,
         explorationStatesService: ess,
-        editabilityService: {
+        EditabilityService: {
           isEditable: function() {
             return true;
           }

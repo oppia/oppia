@@ -14,12 +14,12 @@
 
 """Controllers for incoming email handlers."""
 
-from google.appengine.api import mail
-
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import feedback_services
 from core.platform import models
+
+from google.appengine.api import mail
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 

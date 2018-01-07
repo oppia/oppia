@@ -33,7 +33,6 @@ import feconf
 import main
 import utils
 
-
 import webapp2
 import webtest
 

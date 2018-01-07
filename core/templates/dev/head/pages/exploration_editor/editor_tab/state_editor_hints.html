@@ -22,7 +22,7 @@
               <span class="oppia-hint-sort-handle"
                     ng-if="stateHintsService.displayed.length > 1"
                     ng-mousedown="changeActiveHintIndex(null)">
-                <img ng-if="editabilityService.isEditable()" ng-src="<[dragDotsImgUrl]>" width="10">
+                <img ng-if="EditabilityService.isEditable()" ng-src="<[dragDotsImgUrl]>" width="10">
               </span>
               <a ng-click="changeActiveHintIndex($index)"
                  class="oppia-rule-tab protractor-test-hint-tab"
@@ -50,7 +50,7 @@
     </md-card>
 
     <md-card style="margin: 0; padding: 0;">
-      <div ng-if="editabilityService.isEditableOutsideTutorialMode()">
+      <div ng-if="EditabilityService.isEditableOutsideTutorialMode()">
         <button type="button"
                 class="btn btn-primary btn-lg oppia-add-hint-button protractor-test-oppia-add-hint-button"
                 ng-click="openAddHintModal()"

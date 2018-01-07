@@ -7,6 +7,7 @@
       <img class="conversation-skin-oppia-avatar"
            ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
       <div class="conversation-skin-tutor-card-top-content"
+           ng-class="getContentAudioHighlightClass()"
            focus-on="<[getContentFocusLabel($index)]>">
         <div class="protractor-test-conversation-content"
              angular-html-bind="activeCard.contentHtml">
@@ -38,7 +39,8 @@
           <input-response-pair data="responsePair"
                                 profile-picture="profilePicture"
                                 oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
-                                input-response-pair-id="getInputResponsePairId($index)">
+                                input-response-pair-id="getInputResponsePairId($index)"
+                                is-last-pair="false">
           </input-response-pair>
         </div>
       </div>
@@ -49,7 +51,8 @@
       <input-response-pair data="activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1]"
                             profile-picture="profilePicture"
                             oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
-                            input-response-pair-id="getInputResponsePairId(activeCard.inputResponsePairs.length - 1)">
+                            input-response-pair-id="getInputResponsePairId(activeCard.inputResponsePairs.length - 1)"
+                            is-last-pair="true">
       </input-response-pair>
     </div>
 
@@ -143,6 +146,11 @@
 
   .conversation-skin-tutor-card-top-content {
     width: 100%;
+  }
+
+  /* This should match the value defined in AUDIO_HIGHLIGHT_CSS_CLASS. */
+  .conversation-skin-audio-highlight {
+    border: 3px solid #f3d140;
   }
 
   .conversation-skin-tutor-card,
