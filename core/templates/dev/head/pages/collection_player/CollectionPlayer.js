@@ -32,17 +32,20 @@ oppia.animation('.oppia-collection-animate-slide', function() {
 
 oppia.controller('CollectionPlayer', [
   '$scope', '$anchorScroll', '$location', '$http',
-  'ReadOnlyCollectionBackendApiService',
-  'CollectionObjectFactory', 'CollectionPlaythroughObjectFactory',
-  'AlertsService', 'UrlInterpolationService',
-  function($scope, $anchorScroll, $location, $http,
-           ReadOnlyCollectionBackendApiService,
-           CollectionObjectFactory, CollectionPlaythroughObjectFactory,
-           AlertsService, UrlInterpolationService) {
+  'ReadOnlyCollectionBackendApiService', 'CollectionObjectFactory',
+  'CollectionPlaythroughObjectFactory', 'AlertsService',
+  'UrlInterpolationService', 'GuestCollectionProgressService',
+  'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
+  function(
+      $scope, $anchorScroll, $location, $http,
+      ReadOnlyCollectionBackendApiService, CollectionObjectFactory,
+      CollectionPlaythroughObjectFactory, AlertsService,
+      UrlInterpolationService, GuestCollectionProgressService,
+      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     $scope.collection = null;
     $scope.collectionPlaythrough = null;
     $scope.collectionId = GLOBALS.collectionId;
-    $scope.showingAllExplorations = !GLOBALS.isLoggedIn;
+    $scope.isLoggedIn = GLOBALS.isLoggedIn;
     $scope.explorationCardIsShown = false;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     // The pathIconParameters is an array containing the co-ordinates,
@@ -59,6 +62,8 @@ oppia.controller('CollectionPlayer', [
     $scope.ICON_X_RIGHT_PX = 395;
     $scope.svgHeight = $scope.MIN_HEIGHT_FOR_PATH_SVG_PX;
     $scope.nextExplorationId = null;
+    $scope.whitelistedCollectionIdsForGuestProgress = (
+      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
     $anchorScroll.yOffset = -80;
 
     $scope.setIconHighlight = function(index) {
@@ -121,10 +126,6 @@ oppia.controller('CollectionPlayer', [
         }
       }
       return nonRecommendedCollectionNodes;
-    };
-
-    $scope.toggleShowAllExplorations = function() {
-      $scope.showingAllExplorations = !$scope.showingAllExplorations;
     };
 
     $scope.updateExplorationPreview = function(explorationId) {
@@ -254,13 +255,36 @@ oppia.controller('CollectionPlayer', [
       function(collectionBackendObject) {
         $scope.collection = CollectionObjectFactory.create(
           collectionBackendObject);
-        $scope.collectionPlaythrough = (
-          CollectionPlaythroughObjectFactory.create(
-            collectionBackendObject.playthrough_dict));
+
+        // Load the user's current progress in the collection. If the user is a
+        // guest, then either the defaults from the server will be used or the
+        // user's local progress, if any has been made and the collection is
+        // whitelisted.
+        var collectionAllowsGuestProgress = (
+          $scope.whitelistedCollectionIdsForGuestProgress.indexOf(
+            $scope.collectionId) !== -1);
+        if (!$scope.isLoggedIn && collectionAllowsGuestProgress &&
+            GuestCollectionProgressService.hasCompletedSomeExploration(
+              $scope.collectionId)) {
+          var completedExplorationIds = (
+            GuestCollectionProgressService.getCompletedExplorationIds(
+              $scope.collection));
+          var nextExplorationIds = (
+            GuestCollectionProgressService.getNextExplorationIds(
+              $scope.collection, completedExplorationIds));
+          $scope.collectionPlaythrough = (
+            CollectionPlaythroughObjectFactory.create(
+              nextExplorationIds, completedExplorationIds));
+        } else {
+          $scope.collectionPlaythrough = (
+            CollectionPlaythroughObjectFactory.createFromBackendObject(
+              collectionBackendObject.playthrough_dict));
+        }
+
         var nextExplorationIds = (
           $scope.collectionPlaythrough.getNextExplorationIds());
         if (nextExplorationIds.length > 0) {
-          $scope.nextExplorationId = (nextExplorationIds[0]);
+          $scope.nextExplorationId = nextExplorationIds[0];
         } else {
           $scope.nextExplorationId = null;
         }

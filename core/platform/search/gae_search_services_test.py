@@ -19,10 +19,10 @@
 import datetime
 import time
 
-from google.appengine.api import search
-
 from core.platform.search import gae_search_services
 from core.tests import test_utils
+
+from google.appengine.api import search
 
 
 class SearchAddToIndexTests(test_utils.GenericTestBase):

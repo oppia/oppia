@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import StringIO
 import copy
 import datetime
 import os
-import StringIO
 import zipfile
 
 from core.domain import exp_domain
@@ -659,7 +659,9 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -682,7 +684,9 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -727,7 +731,9 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -750,7 +756,9 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -880,7 +888,9 @@ interaction:
     feedback:
       audio_translations: {}
       html: ''
+    labelled_as_correct: false
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -906,7 +916,9 @@ interaction:
     feedback:
       audio_translations: {}
       html: ''
+    labelled_as_correct: false
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -933,7 +945,9 @@ interaction:
     feedback:
       audio_translations: {}
       html: ''
+    labelled_as_correct: false
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -1044,9 +1058,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     'audio_translations': {},
                     'html': 'Try again'
                 },
-                'param_changes': []
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
             },
-            'labelled_as_correct': False,
         }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
@@ -1055,7 +1070,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'audio_translations': {},
                 'html': '<b>Incorrect</b>'
             },
-            'param_changes': []
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
         }
 
     def test_add_state_cmd(self):
@@ -2307,7 +2324,9 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null

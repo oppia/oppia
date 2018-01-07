@@ -17,7 +17,6 @@
 """Domain objects for configuration properties."""
 
 from core.platform import models
-
 import feconf
 import schema_utils
 

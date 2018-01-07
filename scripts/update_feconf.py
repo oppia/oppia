@@ -23,8 +23,7 @@ Usage: Run this script from your oppia root folder:
 
 import os
 
-import common # pylint: disable=relative-import
-
+import common  # pylint: disable=relative-import
 
 FECONF_CONFIG_PATH = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'feconf_updates.config')

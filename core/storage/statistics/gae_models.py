@@ -711,18 +711,18 @@ class ExplorationStatsModel(base_models.BaseModel):
     # Version of exploration.
     exp_version = ndb.IntegerProperty(indexed=True)
     # Number of learners starting the exploration (v1 - data collected before
-    # Nov 2017).
+    # Dec 2017).
     num_starts_v1 = ndb.IntegerProperty(indexed=True)
     num_starts_v2 = ndb.IntegerProperty(indexed=True)
     # Number of students who actually attempted the exploration. Only learners
     # who spent a minimum time on the exploration are considered to have
-    # actually started the exploration (v1 - data collected before Nov 2017).
-    num_actual_starts_v1 = ndb.IntegerProperty(indexed=False)
-    num_actual_starts_v2 = ndb.IntegerProperty(indexed=False)
+    # actually started the exploration (v1 - data collected before Dec 2017).
+    num_actual_starts_v1 = ndb.IntegerProperty(indexed=True)
+    num_actual_starts_v2 = ndb.IntegerProperty(indexed=True)
     # Number of students who completed the exploration (v1 - data collected
-    # before Nov 2017).
-    num_completions_v1 = ndb.IntegerProperty(indexed=False)
-    num_completions_v2 = ndb.IntegerProperty(indexed=False)
+    # before Dec 2017).
+    num_completions_v1 = ndb.IntegerProperty(indexed=True)
+    num_completions_v2 = ndb.IntegerProperty(indexed=True)
     # Keyed by state name that describes the analytics for that state.
     # {state_name: {
     #   'total_answers_count_v1': ...,

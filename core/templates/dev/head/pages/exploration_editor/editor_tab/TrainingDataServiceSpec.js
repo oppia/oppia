@@ -79,22 +79,25 @@ describe('TrainingDataService', function() {
               }
             }],
             outcome: {
+              dest: 'State',
               feedback: {
                 html: 'Feedback',
                 audio_translations: {}
               },
-              dest: 'State',
-              param_changes: []
-            },
-            labelled_as_correct: false
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            }
           }],
           default_outcome: {
+            dest: 'State',
             feedback: {
               html: 'Default',
               audio_translations: {}
             },
-            dest: 'State',
-            param_changes: []
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null
           },
           hints: [],
           confirmed_unclassified_answers: []

@@ -17,19 +17,21 @@
  */
 
 oppia.controller('StateSolution', [
-  '$scope', '$rootScope', '$uibModal', 'EditorStateService', 'AlertsService',
-  'INTERACTION_SPECS', 'stateSolutionService', 'explorationStatesService',
-  'SolutionVerificationService', 'ExplorationHtmlFormatterService',
-  'stateInteractionIdService', 'stateHintsService', 'UrlInterpolationService',
-  'SolutionObjectFactory', 'ExplorationContextService',
-  'ExplorationWarningsService', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
+  'AlertsService', 'INTERACTION_SPECS', 'stateSolutionService',
+  'explorationStatesService', 'SolutionVerificationService',
+  'ExplorationHtmlFormatterService', 'stateInteractionIdService',
+  'stateHintsService', 'UrlInterpolationService', 'SolutionObjectFactory',
+  'ExplorationContextService', 'ExplorationWarningsService',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function(
-    $scope, $rootScope, $uibModal, EditorStateService, AlertsService,
-    INTERACTION_SPECS, stateSolutionService, explorationStatesService,
-    SolutionVerificationService, ExplorationHtmlFormatterService,
-    stateInteractionIdService, stateHintsService, UrlInterpolationService,
-    SolutionObjectFactory, ExplorationContextService,
-    ExplorationWarningsService, INFO_MESSAGE_SOLUTION_IS_INVALID) {
+    $scope, $rootScope, $uibModal, $filter, EditorStateService,
+    AlertsService, INTERACTION_SPECS, stateSolutionService,
+    explorationStatesService, SolutionVerificationService,
+    ExplorationHtmlFormatterService, stateInteractionIdService,
+    stateHintsService, UrlInterpolationService, SolutionObjectFactory,
+    ExplorationContextService, ExplorationWarningsService,
+    INFO_MESSAGE_SOLUTION_IS_INVALID) {
     $scope.correctAnswer = null;
     $scope.correctAnswerEditorHtml = '';
     $scope.inlineSolutionEditorIsActive = false;
@@ -62,7 +64,10 @@ oppia.controller('StateSolution', [
 
     $scope.getSolutionSummary = function() {
       var solution = stateSolutionService.savedMemento;
-      return solution.getSummary(stateInteractionIdService.savedMemento);
+      var solutionAsPlainText =
+        solution.getSummary(stateInteractionIdService.savedMemento);
+      solutionAsPlainText = $filter('convertToPlainText')(solutionAsPlainText);
+      return solutionAsPlainText;
     };
 
     // This returns false if the current interaction ID is null.
@@ -84,7 +89,10 @@ oppia.controller('StateSolution', [
         backdrop: 'static',
         controller: [
           '$scope', '$uibModalInstance', 'stateSolutionService',
-          function($scope, $uibModalInstance, stateSolutionService) {
+          'EVENT_PROGRESS_NAV_SUBMITTED', 'INTERACTION_SPECS',
+          function(
+              $scope, $uibModalInstance, stateSolutionService,
+              EVENT_PROGRESS_NAV_SUBMITTED, INTERACTION_SPECS) {
             $scope.stateSolutionService = stateSolutionService;
             $scope.correctAnswerEditorHtml = (
               ExplorationHtmlFormatterService.getInteractionHtml(
@@ -97,6 +105,8 @@ oppia.controller('StateSolution', [
               type: 'html',
               ui_config: {}
             };
+
+            $scope.answerIsValid = false;
 
             var EMPTY_SOLUTION_DATA = {
               answerIsExclusive: false,
@@ -112,8 +122,22 @@ oppia.controller('StateSolution', [
                 stateSolutionService.savedMemento.explanation.getHtml())
             } : angular.copy(EMPTY_SOLUTION_DATA);
 
+            $scope.onSubmitFromSubmitButton = function() {
+              $scope.$broadcast(EVENT_PROGRESS_NAV_SUBMITTED);
+            };
+
             $scope.submitAnswer = function(answer) {
               $scope.data.correctAnswer = answer;
+            };
+
+            $scope.setInteractionAnswerValidity = function(answerValidity) {
+              $scope.answerIsValid = answerValidity;
+            };
+
+            $scope.shouldAdditionalSubmitButtonBeShown = function() {
+              var interactionSpecs = INTERACTION_SPECS[
+                stateInteractionIdService.savedMemento];
+              return interactionSpecs.show_generic_submit_button;
             };
 
             $scope.saveSolution = function() {
@@ -156,7 +180,7 @@ oppia.controller('StateSolution', [
       });
     };
 
-    $scope.deleteSolution = function(evt) {
+    $scope.deleteSolution = function(index, evt) {
       evt.stopPropagation();
 
       AlertsService.clearWarnings();

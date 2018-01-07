@@ -21,7 +21,6 @@ from core.domain import feedback_services
 from core.platform import models
 import feconf
 
-
 transaction_services = models.Registry.import_transaction_services()
 
 

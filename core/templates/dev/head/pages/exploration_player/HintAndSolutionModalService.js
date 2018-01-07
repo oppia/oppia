@@ -17,44 +17,37 @@
  */
 
 oppia.factory('HintAndSolutionModalService', [
-  '$uibModal', 'UrlInterpolationService', 'HintManagerService',
-  'SolutionManagerService', 'ExplorationPlayerService',
-  'PlayerPositionService',
-  function($uibModal, UrlInterpolationService, HintManagerService,
-           SolutionManagerService, ExplorationPlayerService,
-           PlayerPositionService) {
+  '$uibModal', 'UrlInterpolationService', 'HintsAndSolutionManagerService',
+  'ExplorationPlayerService', 'PlayerPositionService',
+  'AudioTranslationManagerService', 'AudioPlayerService',
+  'EVENT_AUTOPLAY_AUDIO', 'COMPONENT_NAME_HINT',
+  'COMPONENT_NAME_SOLUTION',
+  function(
+      $uibModal, UrlInterpolationService, HintsAndSolutionManagerService,
+      ExplorationPlayerService, PlayerPositionService,
+      AudioTranslationManagerService, AudioPlayerService,
+      EVENT_AUTOPLAY_AUDIO, COMPONENT_NAME_HINT,
+      COMPONENT_NAME_SOLUTION) {
     return {
-      displayHintModal: function() {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_player/hint_and_solution_modal_directive.html'),
-          backdrop: 'static',
-          controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
-              $scope.isHint = true;
-              $scope.hint = HintManagerService.consumeHint();
-              $scope.closeModal = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
-            }
-          ]
-        });
-      },
-      displayHintModalForIndex: function(index) {
+      displayHintModal: function(index) {
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_player/hint_and_solution_modal_directive.html'),
           backdrop: 'static',
           controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
+            '$scope', '$rootScope', '$uibModalInstance',
+            function($scope, $rootScope, $uibModalInstance) {
               $scope.isHint = true;
-              $scope.hint = (
-                index === HintManagerService.getCurrentHintIndex() ?
-                  HintManagerService.consumeHint() :
-                  HintManagerService.getHintAtIndex(index));
+              $scope.hint = HintsAndSolutionManagerService.displayHint(index);
+              AudioTranslationManagerService.setSecondaryAudioTranslations(
+                $scope.hint.getBindableAudioTranslations(),
+                $scope.hint.getHtml(),
+                COMPONENT_NAME_HINT);
+              $rootScope.$broadcast(EVENT_AUTOPLAY_AUDIO);
               $scope.closeModal = function() {
+                AudioPlayerService.stop();
+                AudioTranslationManagerService
+                  .clearSecondaryAudioTranslations();
                 $uibModalInstance.dismiss('cancel');
               };
             }
@@ -67,14 +60,42 @@ oppia.factory('HintAndSolutionModalService', [
             '/pages/exploration_player/hint_and_solution_modal_directive.html'),
           backdrop: 'static',
           controller: [
-            '$scope', '$uibModalInstance',
-            function($scope, $uibModalInstance) {
+            '$scope', '$rootScope', '$uibModalInstance',
+            function($scope, $rootScope, $uibModalInstance) {
               $scope.isHint = false;
-              var solution = SolutionManagerService.viewSolution();
+              var solution = HintsAndSolutionManagerService.displaySolution();
+              AudioTranslationManagerService.setSecondaryAudioTranslations(
+                solution.explanation.getBindableAudioTranslations(),
+                solution.explanation.getHtml(),
+                COMPONENT_NAME_SOLUTION);
+              $rootScope.$broadcast(EVENT_AUTOPLAY_AUDIO);
               var interaction = ExplorationPlayerService.getInteraction(
                 PlayerPositionService.getCurrentStateName());
-              $scope.solution = solution.getOppiaResponseHtml(interaction);
+              $scope.solutionHtml = solution.getOppiaResponseHtml(interaction);
               $scope.closeModal = function() {
+                AudioPlayerService.stop();
+                AudioTranslationManagerService
+                  .clearSecondaryAudioTranslations();
+                $uibModalInstance.dismiss('cancel');
+              };
+            }
+          ]
+        });
+      },
+      displaySolutionInterstitialModal: function() {
+        return $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_player/' +
+            'solution_interstitial_modal_directive.html'),
+          backdrop: 'static',
+          controller: [
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
+              $scope.continueToSolution = function() {
+                $uibModalInstance.close();
+              };
+
+              $scope.cancel = function() {
                 $uibModalInstance.dismiss('cancel');
               };
             }

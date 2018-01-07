@@ -30,6 +30,7 @@ class LogicProof(base.BaseInteraction):
     narrow_instructions = 'Construct a proof'
     needs_summary = True
     can_have_solution = True
+    show_generic_submit_button = True
 
     _customization_arg_specs = [{
         'name': 'question',

@@ -15,7 +15,7 @@
 /**
  * @fileoverview Directive for the Continue button in exploration player and
  * editor.
- */ 
+ */
 
 oppia.directive('continueButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -23,6 +23,7 @@ oppia.directive('continueButton', [
       restrict: 'E',
       scope: {
         onClickContinueButton: '&',
+        isLearnAgainButton: '&',
         focusLabel: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

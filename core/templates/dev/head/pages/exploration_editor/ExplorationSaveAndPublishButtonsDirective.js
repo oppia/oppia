@@ -23,11 +23,11 @@ oppia.directive('explorationSaveAndPublishButtons', [
         '/pages/exploration_editor/' +
         'exploration_save_and_publish_buttons_directive.html'),
       controller: [
-        '$scope', 'changeListService', 'editabilityService',
+        '$scope', 'changeListService', 'EditabilityService',
         'ExplorationRightsService', 'ExplorationWarningsService',
         'ExplorationSaveService',
         function(
-            $scope, changeListService, editabilityService,
+            $scope, changeListService, EditabilityService,
             ExplorationRightsService, ExplorationWarningsService,
             ExplorationSaveService) {
           $scope.saveIsInProcess = false;
@@ -43,7 +43,7 @@ oppia.directive('explorationSaveAndPublishButtons', [
           };
 
           $scope.isEditableOutsideTutorialMode = function() {
-            return editabilityService.isEditableOutsideTutorialMode();
+            return EditabilityService.isEditableOutsideTutorialMode();
           };
 
           $scope.countWarnings = function() {

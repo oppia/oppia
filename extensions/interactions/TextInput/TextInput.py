@@ -30,6 +30,7 @@ class TextInput(base.BaseInteraction):
     narrow_instructions = None
     needs_summary = False
     can_have_solution = True
+    show_generic_submit_button = True
 
     # NB: There used to be an integer-typed parameter here called 'columns'
     # that was removed in revision 628942010573. Some text interactions in

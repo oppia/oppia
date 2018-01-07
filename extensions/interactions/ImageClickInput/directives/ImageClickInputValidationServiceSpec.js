@@ -37,7 +37,9 @@ describe('ImageClickInputValidationService', function() {
         html: '',
         audio_translations: {}
       },
-      param_changes: []
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null
     });
 
     badOutcome = oof.createFromBackendDict({
@@ -46,7 +48,9 @@ describe('ImageClickInputValidationService', function() {
         html: '',
         audio_translations: {}
       },
-      param_changes: []
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null
     });
 
     customizationArguments = {
@@ -68,8 +72,7 @@ describe('ImageClickInputValidationService', function() {
           x: 'SecondLabel'
         }
       }],
-      outcome: goodDefaultOutcome,
-      labelled_as_correct: false
+      outcome: goodDefaultOutcome
     }];
   }));
 

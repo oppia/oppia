@@ -18,7 +18,6 @@
 
 from core.domain import email_manager
 from core.platform import models
-
 import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
