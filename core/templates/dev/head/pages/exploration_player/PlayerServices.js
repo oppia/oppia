@@ -353,7 +353,7 @@ oppia.factory('ExplorationPlayerService', [
           AnswerClassificationService.getMatchingClassificationResult(
             _explorationId, oldStateName, oldState, answer,
             interactionRulesService));
-        var answerIsCorrect = classificationResult.answerIsCorrect;
+        var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
 
         if (!_editorPreviewMode) {
           var feedbackIsUseful = (

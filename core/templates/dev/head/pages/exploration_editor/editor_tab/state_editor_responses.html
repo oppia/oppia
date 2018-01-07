@@ -16,7 +16,7 @@
             <span class="oppia-rule-sort-handle" ng-if="answerGroups.length > 1" ng-mousedown="changeActiveAnswerGroupIndex(-1)">
               <img ng-if="EditabilityService.isEditable()" ng-src="<[dragDotsImgUrl]>" width="10">
             </span>
-            <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(answerGroup.outcome)" ng-click="changeActiveAnswerGroupIndex($index)"
+            <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopThatIsMarkedCorrect(answerGroup.outcome) || isSelfLoopWithNoFeedback(answerGroup.outcome)" ng-click="changeActiveAnswerGroupIndex($index)"
                  uib-tooltip="<[getOutcomeTooltip(answerGroup.outcome)]>" tooltip-placement="bottom">
               <div class="oppia-rule-header-warning-style" >
                 ⚠
@@ -29,7 +29,6 @@
                                is-active="$index === activeAnswerGroupIndex"
                                on-delete-fn="deleteAnswerGroup"
                                outcome="answerGroup.outcome"
-                               labelled-as-correct="answerGroup.labelledAsCorrect"
                                num-rules="answerGroup.rules.length"
                                is-response="true">
               </response-header>
@@ -42,11 +41,10 @@
                                        outcome="answerGroup.outcome"
                                        on-save-answer-group-feedback="saveActiveAnswerGroupFeedback"
                                        on-save-answer-group-dest="saveActiveAnswerGroupDest"
-                                       on-save-answer-group-rules="saveActiveAnswerGroupRules"
                                        on-save-answer-group-correctness-label="saveActiveAnswerGroupCorrectnessLabel"
+                                       on-save-answer-group-rules="saveActiveAnswerGroupRules"
                                        is-editable="EditabilityService.isEditable()"
                                        display-feedback="!isLinearWithNoFeedback(answerGroup.outcome)"
-                                       labelled-as-correct="answerGroup.labelledAsCorrect"
                                        class="protractor-test-response-body">
                   </answer-group-editor>
                 </div>
@@ -59,7 +57,7 @@
       <div>
         <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
           <li ng-class="{'active': activeAnswerGroupIndex === answerGroups.length}" class="oppia-rule-block">
-            <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopWithNoFeedback(defaultOutcome) && !suppressDefaultAnswerGroupWarnings()" ng-click="changeActiveAnswerGroupIndex(answerGroups.length)"
+            <div class="oppia-rule-header-warning-placement" ng-if="isSelfLoopThatIsMarkedCorrect(defaultOutcome) || (isSelfLoopWithNoFeedback(defaultOutcome) && !suppressDefaultAnswerGroupWarnings())" ng-click="changeActiveAnswerGroupIndex(answerGroups.length)"
                  uib-tooltip="<[getOutcomeTooltip(defaultOutcome)]>" tooltip-placement="bottom">
               <div class="oppia-rule-header-warning-style" >
                 ⚠
@@ -70,7 +68,6 @@
                                is-active="$index === activeAnswerGroupIndex"
                                summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:false"
                                short-summary="defaultOutcome|summarizeDefaultOutcome:getCurrentInteractionId():answerGroups.length:true"
-                               labelled-as-correct="false"
                                outcome="defaultOutcome"
                                is-response="true">
               </response-header>
@@ -83,6 +80,7 @@
                                        outcome="defaultOutcome"
                                        on-save-answer-group-feedback="saveDefaultOutcomeFeedback"
                                        on-save-answer-group-dest="saveDefaultOutcomeDest"
+                                       on-save-answer-group-correctness-label="saveDefaultOutcomeCorrectnessLabel"
                                        is-editable="EditabilityService.isEditable()"
                                        suppress-warnings="suppressDefaultAnswerGroupWarnings()"
                                        display-feedback="!isLinearWithNoFeedback(defaultOutcome)"

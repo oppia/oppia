@@ -66,7 +66,9 @@ describe('States object factory', function() {
               outcome: {
                 dest: 'outcome 1',
                 feedback: [''],
-                param_changes: []
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
               },
               rule_specs: [{
                 inputs: {
@@ -74,11 +76,11 @@ describe('States object factory', function() {
                 },
                 rule_type: 'Equals'
               }],
-              labelled_as_correct: false
             }],
             default_outcome: {
               dest: 'default',
               feedback: [],
+              labelled_as_correct: false,
               param_changes: []
             },
             hints: [],
@@ -107,7 +109,6 @@ describe('States object factory', function() {
           },
           interaction: {
             answer_groups: [{
-              labelled_as_correct: false,
               outcome: {
                 dest: 'second state',
                 feedback: {
@@ -120,7 +121,9 @@ describe('States object factory', function() {
                     }
                   }
                 },
-                param_changes: []
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
               },
               rule_specs: [{
                 inputs: {
@@ -143,6 +146,7 @@ describe('States object factory', function() {
                   }
                 }
               },
+              labelled_as_correct: false,
               param_changes: []
             },
             hints: [{
@@ -200,6 +204,7 @@ describe('States object factory', function() {
             default_outcome: {
               dest: 'new state',
               feedback: [],
+              labelled_as_correct: false,
               param_changes: []
             },
             hints: [],

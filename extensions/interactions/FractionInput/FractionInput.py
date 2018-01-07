@@ -37,4 +37,18 @@ class FractionInput(base.BaseInteraction):
             'type': 'bool',
         },
         'default_value': False
+    }, {
+        'name': 'allowImproperFraction',
+        'description': 'Allow improper fractions in the learner\'s answer',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': True
+    }, {
+        'name': 'allowNonzeroIntegerPart',
+        'description': 'Allow the answer to contain an integer part',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': True
     }]
