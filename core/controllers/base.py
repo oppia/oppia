@@ -132,6 +132,11 @@ class BaseHandler(webapp2.RequestHandler):
 
     @webapp2.cached_property
     def jinja2_env(self):
+        """Returns a Jinja2 environment cached for frontend templates.
+        
+        Returns:
+            Environment. A Jinja2 environment object used to load templates. 
+        """
         return jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
@@ -541,6 +546,11 @@ class CsrfTokenManager(object):
 
     @classmethod
     def _get_current_time(cls):
+         """Returns the current server time.
+
+        Returns:
+            float. Returns the time in seconds as floating point number.   
+        """
         return time.time()
 
     @classmethod
