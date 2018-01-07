@@ -302,6 +302,7 @@ oppia.directive('conversationSkin', [
           $scope.hasFullyLoaded = false;
           $scope.recommendedExplorationSummaries = null;
           $scope.answerIsCorrect = false;
+          $scope.pendingCardWasSeenBefore = false;
           $scope.isCorrectnessFeedbackEnabled = function() {
             return PlayerCorrectnessFeedbackEnabledService.isEnabled();
           };
@@ -309,6 +310,12 @@ oppia.directive('conversationSkin', [
           $scope.isCorrectnessFooterEnabled = function() {
             return (
               $scope.answerIsCorrect && $scope.isCorrectnessFeedbackEnabled());
+          };
+
+          $scope.isLearnAgainButton = function() {
+            return (
+              $scope.pendingCardWasSeenBefore && !$scope.answerIsCorrect &&
+              $scope.isCorrectnessFeedbackEnabled());
           };
 
           $scope.OPPIA_AVATAR_IMAGE_URL = (
@@ -663,8 +670,12 @@ oppia.directive('conversationSkin', [
                         $scope.upcomingStateName));
 
                     if (feedbackHtml) {
+                      var stateHistory =
+                        PlayerTranscriptService.getStateHistory();
+                      if (stateHistory.indexOf(newStateName) !== -1) {
+                        $scope.pendingCardWasSeenBefore = true;
+                      }
                       PlayerTranscriptService.addNewResponse(feedbackHtml);
-
                       if (!ExplorationPlayerStateService.isInteractionInline(
                             $scope.activeCard.stateName)) {
                         $scope.$broadcast('helpCardAvailable', {

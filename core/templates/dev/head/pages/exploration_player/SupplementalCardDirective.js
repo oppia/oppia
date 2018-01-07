@@ -22,6 +22,7 @@ oppia.directive('supplementalCard', [
       restrict: 'E',
       scope: {
         onClickContinueButton: '&',
+        isLearnAgainButton: '&',
         onSubmitAnswer: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

@@ -374,7 +374,6 @@ oppia.factory('ExplorationPlayerService', [
         // since classificationResult.outcome points
         // at oldState.interaction.default_outcome
         var outcome = angular.copy(classificationResult.outcome);
-
         var newStateName = outcome.dest;
         var refresherExplorationId = outcome.refresherExplorationId;
         var newState = exploration.getState(newStateName);
