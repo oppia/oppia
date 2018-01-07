@@ -43,6 +43,7 @@ oppia.factory('FractionInputValidationService', [
             customizationArgs.allowImproperFraction.value;
         var allowNonzeroIntegerPart =
           customizationArgs.allowNonzeroIntegerPart.value;
+
         warningsList = warningsList.concat(
           this.getCustomizationArgsWarnings(customizationArgs));
 
