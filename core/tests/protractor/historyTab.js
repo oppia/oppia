@@ -85,7 +85,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       7: {
-        text: '    outcome:',
+        text: '  - outcome:',
         highlighted: true
       },
       8: {
