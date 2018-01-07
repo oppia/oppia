@@ -289,35 +289,35 @@ describe('FractionInputValidationService', function() {
 
   it('should catch not allowImproperFraction and rule has improper fraction',
     function(){
-    customizationArgs.allowImproperFraction.value = false;
-    answerGroups[0].rules = [equalsThreeByTwoRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: (
-        'Rule ' + 1 + ' from answer group ' +
-        1 + ' will never be matched because it is an ' +
-        'improper fraction')
-    }]);
-  });
+      customizationArgs.allowImproperFraction.value = false;
+      answerGroups[0].rules = [equalsThreeByTwoRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule ' + 1 + ' from answer group ' +
+          1 + ' will never be matched because it is an ' +
+          'improper fraction')
+      }]);
+    });
 
   it('should catch not allowNonzeroIntegerPart and rule has integer part',
     function(){
-    customizationArgs.allowNonzeroIntegerPart.value = false;
-    answerGroups[0].rules = [equalsOneAndHalfRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: (
-        'Rule ' + 1 + ' from answer group ' +
-        1 + ' will never be matched because it has a ' +
-        'non zero integer part')
-    }]);
-  });
+      customizationArgs.allowNonzeroIntegerPart.value = false;
+      answerGroups[0].rules = [equalsOneAndHalfRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule ' + 1 + ' from answer group ' +
+          1 + ' will never be matched because it has a ' +
+          'non zero integer part')
+      }]);
+    });
 
   it('should catch if not allowNonzeroIntegerPart and ' +
     'rule is HasIntegerPartEqualTo', function(){
