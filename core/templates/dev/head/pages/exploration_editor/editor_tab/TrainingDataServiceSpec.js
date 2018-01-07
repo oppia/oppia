@@ -51,7 +51,7 @@ describe('TrainingDataService', function() {
     $httpBackend = $injector.get('$httpBackend');
     siis = $injector.get('stateInteractionIdService');
     ecs = $injector.get('EditorStateService');
-    cls = $injector.get('changeListService');
+    cls = $injector.get('ChangeListService');
     ess = $injector.get('explorationStatesService');
     rs = $injector.get('ResponsesService');
     tds = $injector.get('TrainingDataService');
