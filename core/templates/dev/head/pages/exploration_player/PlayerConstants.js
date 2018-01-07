@@ -32,7 +32,10 @@ oppia.constant('EVENT_NEW_CARD_OPENED', 'newCardOpened');
    Also called when card is selected by clicking on progress dots */
 oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
 
-/* Called when a new audio-equippable component is loaded and displayed 
+// Called when a hint is released.
+oppia.constant('EVENT_HINT_RELEASED');
+
+/* Called when a new audio-equippable component is loaded and displayed
    to the user, allowing for the automatic playing of audio if necessary. */
 oppia.constant('EVENT_AUTOPLAY_AUDIO', 'autoPlayAudio');
 

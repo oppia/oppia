@@ -17,13 +17,15 @@
  */
 
 oppia.factory('HintsAndSolutionManagerService', [
-  '$timeout', 'PlayerTranscriptService', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
-  'HINT_REQUEST_STRING_I18N_IDS', 'WAIT_FOR_FIRST_HINT_MSEC',
-  'WAIT_FOR_SUBSEQUENT_HINTS_MSEC',
+  '$timeout', '$rootScope', 'PlayerTranscriptService',
+  'DELAY_FOR_HINT_FEEDBACK_MSEC', 'HINT_REQUEST_STRING_I18N_IDS',
+  'WAIT_FOR_FIRST_HINT_MSEC', 'WAIT_FOR_SUBSEQUENT_HINTS_MSEC',
+  'EVENT_HINT_RELEASED',
   function(
-      $timeout, PlayerTranscriptService, DELAY_FOR_HINT_FEEDBACK_MSEC,
-      HINT_REQUEST_STRING_I18N_IDS, WAIT_FOR_FIRST_HINT_MSEC,
-      WAIT_FOR_SUBSEQUENT_HINTS_MSEC) {
+      $timeout, $rootScope, PlayerTranscriptService,
+      DELAY_FOR_HINT_FEEDBACK_MSEC, HINT_REQUEST_STRING_I18N_IDS,
+      WAIT_FOR_FIRST_HINT_MSEC, WAIT_FOR_SUBSEQUENT_HINTS_MSEC,
+      EVENT_HINT_RELEASED) {
     var timeout = null;
     var ACCELERATED_HINT_WAIT_TIME_MSEC = 10000;
 
@@ -45,6 +47,7 @@ oppia.factory('HintsAndSolutionManagerService', [
 
     var releaseHint = function() {
       numHintsReleased++;
+      $rootScope.$broadcast('EVENT_HINT_RELEASED');
     };
     var releaseSolution = function() {
       solutionReleased = true;
