@@ -546,6 +546,11 @@ class CsrfTokenManager(object):
 
     @classmethod
     def _get_current_time(cls):
+         """Returns the current server time.
+
+        Returns:
+            float. Returns the time in seconds as floating point number.   
+        """
         return time.time()
 
     @classmethod
