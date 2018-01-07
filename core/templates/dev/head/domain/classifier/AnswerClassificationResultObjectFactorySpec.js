@@ -30,9 +30,9 @@ describe('Answer Classification Object Factory', function() {
   it('should create a new result', function() {
     var answerClassificationResult = (
       AnswerClassificationResultObjectFactory.createNew(
-        "defaultOutcome", 1, 0, EXPLICIT_CLASSIFICATION));
+        'defaultOutcome', 1, 0, EXPLICIT_CLASSIFICATION));
 
-    expect(answerClassificationResult.outcome).toEqual("defaultOutcome");
+    expect(answerClassificationResult.outcome).toEqual('defaultOutcome');
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(
