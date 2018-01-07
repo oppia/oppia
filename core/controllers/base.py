@@ -14,8 +14,8 @@
 
 """Base constants and handlers."""
 
-import base64
 import Cookie
+import base64
 import datetime
 import hmac
 import json
@@ -26,10 +26,6 @@ import time
 import traceback
 import urlparse
 
-import jinja2
-import webapp2
-from google.appengine.api import users
-
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
@@ -39,6 +35,10 @@ from core.platform import models
 import feconf
 import jinja_utils
 import utils
+
+from google.appengine.api import users
+import jinja2
+import webapp2
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()

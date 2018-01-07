@@ -28,7 +28,7 @@ class FractionInput(base.BaseInteraction):
     narrow_instructions = None
     needs_summary = False
     can_have_solution = True
-    show_nav_submit_button = True
+    show_generic_submit_button = True
 
     _customization_arg_specs = [{
         'name': 'requireSimplestForm',
@@ -37,4 +37,18 @@ class FractionInput(base.BaseInteraction):
             'type': 'bool',
         },
         'default_value': False
+    }, {
+        'name': 'allowImproperFraction',
+        'description': 'Allow improper fractions in the learner\'s answer',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': True
+    }, {
+        'name': 'allowNonzeroIntegerPart',
+        'description': 'Allow the answer to contain an integer part',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': True
     }]

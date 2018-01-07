@@ -150,11 +150,11 @@ oppia.controller('FeedbackTab', [
         controller: [
           '$scope', '$uibModalInstance', 'suggestionIsOpen', 
           'suggestionIsValid', 'unsavedChangesExist', 'suggestionStatus',
-          'description', 'currentContent', 'newContent', 'editabilityService',
+          'description', 'currentContent', 'newContent', 'EditabilityService',
           function(
             $scope, $uibModalInstance, suggestionIsOpen, 
             suggestionIsValid, unsavedChangesExist, suggestionStatus, 
-            description, currentContent, newContent, editabilityService) {
+            description, currentContent, newContent, EditabilityService) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
               'accepted.';
             var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
@@ -165,7 +165,7 @@ oppia.controller('FeedbackTab', [
               'this exploration. Please save/discard your unsaved changes if ' +
               'you wish to accept.';
             $scope.isOpen = suggestionIsOpen;
-            $scope.canEdit = editabilityService.isEditable();
+            $scope.canEdit = EditabilityService.isEditable();
             $scope.canReject = $scope.canEdit && $scope.isOpen;
             $scope.canAccept = $scope.canEdit && $scope.isOpen &&
               suggestionIsValid && !unsavedChangesExist;

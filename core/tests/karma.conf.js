@@ -17,8 +17,8 @@ module.exports = function(config) {
       'assets/rich_text_components_definitions.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
-      'third_party/static/jquery-3.0.0/jquery.min.js',
-      'third_party/static/jqueryui-1.10.3/jquery-ui.min.js',
+      'third_party/static/jquery-3.2.1/jquery.min.js',
+      'third_party/static/jqueryui-1.12.1/jquery-ui.min.js',
       'third_party/static/angularjs-1.5.8/angular.js',
       'third_party/static/angularjs-1.5.8/angular-mocks.js',
       'third_party/static/headroom-js-0.9.4/headroom.min.js',

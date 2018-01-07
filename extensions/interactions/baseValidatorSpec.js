@@ -51,6 +51,7 @@ describe('Interaction validator', function() {
         html: '',
         audio_translations: {}
       },
+      labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null
     });
@@ -60,6 +61,7 @@ describe('Interaction validator', function() {
         html: 'Feedback',
         audio_translations: {}
       },
+      labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null
     });
@@ -69,6 +71,7 @@ describe('Interaction validator', function() {
         html: '',
         audio_translations: {}
       },
+      labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null
     });

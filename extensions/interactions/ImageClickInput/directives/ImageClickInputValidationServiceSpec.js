@@ -37,6 +37,7 @@ describe('ImageClickInputValidationService', function() {
         html: '',
         audio_translations: {}
       },
+      labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null
     });
@@ -47,6 +48,7 @@ describe('ImageClickInputValidationService', function() {
         html: '',
         audio_translations: {}
       },
+      labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null
     });
@@ -70,8 +72,7 @@ describe('ImageClickInputValidationService', function() {
           x: 'SecondLabel'
         }
       }],
-      outcome: goodDefaultOutcome,
-      labelled_as_correct: false
+      outcome: goodDefaultOutcome
     }];
   }));
 

@@ -22,14 +22,19 @@ var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var SubscriptionDashboardPage =
+  require('../protractor_utils/SubscriptionDashboardPage.js');
 
 describe('Subscriptions functionality', function() {
   var creatorDashboardPage = null;
   var preferencesPage = null;
+  var subscriptionDashboardPage = null;
 
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     preferencesPage = new PreferencesPage.PreferencesPage();
+    subscriptionDashboardPage = (
+      new SubscriptionDashboardPage.SubscriptionDashboardPage());
   });
 
   it('handle subscriptions to creators correctly', function() {
@@ -51,10 +56,10 @@ describe('Subscriptions functionality', function() {
     users.login('learner1@subscriptions.com');
     browser.get('/profile/creator1subscriptions');
     browser.waitForAngular();
-    element(by.css('.protractor-test-subscription-button')).click();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
     browser.get('/profile/creator2subscriptions');
     browser.waitForAngular();
-    element(by.css('.protractor-test-subscription-button')).click();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
     preferencesPage.get();
     preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
     preferencesPage.expectDisplayedLastSubscriptionToBe('creator...');
@@ -66,13 +71,13 @@ describe('Subscriptions functionality', function() {
     users.login('learner2@subscriptions.com');
     browser.get('/profile/creator1subscriptions');
     browser.waitForAngular();
-    element(by.css('.protractor-test-subscription-button')).click();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
     browser.get('/profile/creator2subscriptions');
     browser.waitForAngular();
     // Subscribe and then unsubscribe from the same user.
-    element(by.css('.protractor-test-subscription-button')).click();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
     browser.waitForAngular();
-    element(by.css('.protractor-test-subscription-button')).click();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
     preferencesPage.get();
     preferencesPage.expectSubscriptionCountToEqual(1);
     preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
@@ -82,23 +87,16 @@ describe('Subscriptions functionality', function() {
     creatorDashboardPage.get();
     browser.waitForAngular();
     creatorDashboardPage.navigateToSubscriptionDashboard();
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).first().getText()).toMatch(
-      'learner...');
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).last().getText()).toMatch(
-      'learner...');
+    subscriptionDashboardPage.expectSubscriptionFirstNameToMatch('learner...');
+    subscriptionDashboardPage.expectSubscriptionLastNameToMatch('learner...');
     users.logout();
 
     users.login('creator2@subscriptions.com');
     creatorDashboardPage.get();
     browser.waitForAngular();
     creatorDashboardPage.navigateToSubscriptionDashboard();
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).count()).toEqual(1);
-    expect(element.all(by.css(
-      '.protractor-test-subscription-name')).last().getText()).toMatch(
-      'learner...');
+    subscriptionDashboardPage.expectSubscriptionCountToEqual(1); 
+    subscriptionDashboardPage.expectSubscriptionLastNameToMatch('learner...');
     users.logout();
   });
 

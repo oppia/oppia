@@ -3,7 +3,7 @@
     <h3>Basic Settings</h3>
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
-        <div ng-if="editabilityService.isEditable()">
+        <div ng-if="EditabilityService.isEditable()">
           <div role="form" class="form-horizontal">
             <exploration-title-editor label-text="Title"
                                       focus-label="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>"
@@ -85,7 +85,7 @@
           </div>
         </div>
 
-        <div ng-if="!editabilityService.isEditable()">
+        <div ng-if="!EditabilityService.isEditable()">
           <div class="row">
             <div class="col-lg-2 col-md-2 col-sm-2">
               <label for="explorationTitle">
@@ -147,7 +147,7 @@
     </div>
   </md-card>
 
-  <md-card class="oppia-editor-card" ng-if="editabilityService.isEditable()">
+  <md-card class="oppia-editor-card" ng-if="EditabilityService.isEditable()">
     <h3>Advanced Features</h3>
     <div class="row">
       <div class="row">
@@ -393,7 +393,7 @@
     </div>
   </md-card>
 
-  <md-card class="oppia-editor-card" ng-if="editabilityService.isEditable()">
+  <md-card class="oppia-editor-card" ng-if="EditabilityService.isEditable()">
     <div class="row">
       <div class="col-lg-6 col-md-6 col-sm-6">
         <h3>Controls</h3>

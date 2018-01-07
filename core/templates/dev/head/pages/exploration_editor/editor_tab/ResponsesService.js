@@ -112,7 +112,7 @@ oppia.factory('ResponsesService', [
           updates.refresherExplorationId);
       }
       if (updates.hasOwnProperty('labelledAsCorrect')) {
-        answerGroup.labelledAsCorrect = updates.labelledAsCorrect;
+        answerGroup.outcome.labelledAsCorrect = updates.labelledAsCorrect;
       }
       _saveAnswerGroups(_answerGroups);
     };
@@ -249,6 +249,9 @@ oppia.factory('ResponsesService', [
         }
         if (updates.hasOwnProperty('refresherExplorationId')) {
           outcome.refresherExplorationId = updates.refresherExplorationId;
+        }
+        if (updates.hasOwnProperty('labelledAsCorrect')) {
+          outcome.labelledAsCorrect = updates.labelledAsCorrect;
         }
         _saveDefaultOutcome(outcome);
       },

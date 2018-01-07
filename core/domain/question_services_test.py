@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain import exp_domain
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import exp_domain
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import user_services

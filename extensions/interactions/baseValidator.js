@@ -53,6 +53,15 @@ oppia.factory('baseInteractionValidationService', [
                 String(i + 1) + '.')
             });
           }
+          if (answerGroups[i].outcome.dest === stateName &&
+              answerGroups[i].outcome.labelledAsCorrect) {
+            partialWarningsList.push({
+              type: WARNING_TYPES.ERROR,
+              message: (
+                'In answer group ' + String(i + 1) + ', self-loops should ' +
+                'not be labelled as correct.')
+            });
+          }
         }
         return partialWarningsList;
       },
@@ -64,6 +73,15 @@ oppia.factory('baseInteractionValidationService', [
             message: (
               'Please add feedback for the user in the [All other answers] ' +
               'rule.')
+          });
+        }
+        if (defaultOutcome && defaultOutcome.dest === stateName &&
+            defaultOutcome.labelledAsCorrect) {
+          partialWarningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: (
+              'In the [All other answers] group, self-loops should not be ' +
+              'labelled as correct.')
           });
         }
         return partialWarningsList;

@@ -17,15 +17,18 @@
  */
 
 oppia.factory('HintsAndSolutionManagerService', [
-  '$timeout', 'PlayerTranscriptService', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
-  'HINT_REQUEST_STRING_I18N_IDS', 'WAIT_FOR_FIRST_HINT_MSEC',
-  'WAIT_FOR_SUBSEQUENT_HINTS_MSEC',
+  '$timeout', '$rootScope', 'PlayerTranscriptService',
+  'DELAY_FOR_HINT_FEEDBACK_MSEC', 'HINT_REQUEST_STRING_I18N_IDS',
+  'WAIT_FOR_FIRST_HINT_MSEC', 'WAIT_FOR_SUBSEQUENT_HINTS_MSEC',
   function(
-      $timeout, PlayerTranscriptService, DELAY_FOR_HINT_FEEDBACK_MSEC,
-      HINT_REQUEST_STRING_I18N_IDS, WAIT_FOR_FIRST_HINT_MSEC,
-      WAIT_FOR_SUBSEQUENT_HINTS_MSEC) {
+      $timeout, $rootScope, PlayerTranscriptService,
+      DELAY_FOR_HINT_FEEDBACK_MSEC, HINT_REQUEST_STRING_I18N_IDS,
+      WAIT_FOR_FIRST_HINT_MSEC, WAIT_FOR_SUBSEQUENT_HINTS_MSEC) {
     var timeout = null;
     var ACCELERATED_HINT_WAIT_TIME_MSEC = 10000;
+    var WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC = 120000;
+    // Max wait of 10 seconds before closing the tooltip.
+    var CLOSE_TOOLTIP_MSEC = 10000;
 
     var numHintsReleased = 0;
     var numHintsConsumed = 0;
@@ -35,6 +38,14 @@ oppia.factory('HintsAndSolutionManagerService', [
     var solutionForLatestCard = null;
     var wrongAnswersSinceLastHintConsumed = 0;
 
+    // tooltipIsOpen is a flag which says that the tooltip is currently
+    // visible to the learner.
+    var tooltipIsOpen = false;
+    // This is set to true as soon as a hint/solution is clicked or when the
+    // tooltip has been triggered.
+    var hintsDiscovered = false;
+    var tooltipTimeout = null;
+
     // This replaces any timeouts that are already queued.
     var enqueueTimeout = function(func, timeToWaitMsec) {
       if (timeout) {
@@ -43,8 +54,20 @@ oppia.factory('HintsAndSolutionManagerService', [
       timeout = $timeout(func, timeToWaitMsec);
     };
 
+    var closeTooltip = function() {
+      tooltipIsOpen = false;
+    };
+    var showTooltip = function () {
+      tooltipIsOpen = true;
+      hintsDiscovered = true;
+      enqueueTimeout(closeTooltip, CLOSE_TOOLTIP_MSEC);
+    };
+
     var releaseHint = function() {
       numHintsReleased++;
+      if (!hintsDiscovered) {
+        enqueueTimeout(showTooltip, WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+      }
     };
     var releaseSolution = function() {
       solutionReleased = true;
@@ -61,13 +84,16 @@ oppia.factory('HintsAndSolutionManagerService', [
     };
 
     var consumeHint = function() {
+      hintsDiscovered = true;
+      closeTooltip();
+
       numHintsConsumed++;
       wrongAnswersSinceLastHintConsumed = 0;
 
       var funcToEnqueue = null;
       if (!areAllHintsExhausted()) {
         funcToEnqueue = releaseHint;
-      } else if (!solutionReleased) {
+      } else if (!!solutionForLatestCard && !solutionReleased) {
         funcToEnqueue = releaseSolution;
       }
       if (funcToEnqueue) {
@@ -107,6 +133,7 @@ oppia.factory('HintsAndSolutionManagerService', [
         return null;
       },
       displaySolution: function() {
+        hintsDiscovered = true;
         solutionConsumed = true;
         return solutionForLatestCard;
       },
@@ -118,6 +145,9 @@ oppia.factory('HintsAndSolutionManagerService', [
       },
       isHintConsumed: function(index) {
         return index < numHintsConsumed;
+      },
+      isHintTooltipOpen: function() {
+        return tooltipIsOpen;
       },
       isSolutionViewable: function() {
         return solutionReleased;

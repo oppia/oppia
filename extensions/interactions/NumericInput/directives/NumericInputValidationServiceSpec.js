@@ -39,6 +39,7 @@ describe('NumericInputValidationService', function() {
         audio_translations: {},
         html: ''
       },
+      labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null
     });

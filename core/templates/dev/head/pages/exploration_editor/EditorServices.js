@@ -16,34 +16,6 @@
  * @fileoverview Standalone services for the exploration editor page.
  */
 
-// TODO(sll): Should this depend on a versioning service that keeps track of
-// the current active version? Previous versions should not be editable.
-oppia.factory('editabilityService', [function() {
-  var isEditable = false;
-  var inTutorialMode = false;
-
-  return {
-    isEditable: function() {
-      return isEditable && !inTutorialMode;
-    },
-    isEditableOutsideTutorialMode: function() {
-      return isEditable;
-    },
-    markEditable: function() {
-      isEditable = true;
-    },
-    markNotEditable: function() {
-      isEditable = false;
-    },
-    onEndTutorial: function() {
-      inTutorialMode = false;
-    },
-    onStartTutorial: function() {
-      inTutorialMode = true;
-    }
-  };
-}]);
-
 oppia.factory('explorationPropertyService', [
   '$rootScope', '$log', 'ChangeListService', 'AlertsService',
   function($rootScope, $log, ChangeListService, AlertsService) {

@@ -40,7 +40,7 @@ oppia.controller('ExplorationEditor', [
   'explorationCategoryService', 'explorationObjectiveService',
   'explorationLanguageCodeService', 'ExplorationRightsService',
   'explorationInitStateNameService', 'explorationTagsService',
-  'editabilityService', 'explorationStatesService', 'RouterService',
+  'EditabilityService', 'explorationStatesService', 'RouterService',
   'graphDataService', 'StateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'ExplorationWarningsService', '$templateCache', 'ExplorationContextService',
@@ -55,7 +55,7 @@ oppia.controller('ExplorationEditor', [
       explorationCategoryService, explorationObjectiveService,
       explorationLanguageCodeService, ExplorationRightsService,
       explorationInitStateNameService, explorationTagsService,
-      editabilityService, explorationStatesService, RouterService,
+      EditabilityService, explorationStatesService, RouterService,
       graphDataService, StateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       ExplorationWarningsService, $templateCache, ExplorationContextService,
@@ -64,7 +64,7 @@ oppia.controller('ExplorationEditor', [
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, explorationAutomaticTextToSpeechService,
       UrlInterpolationService, explorationCorrectnessFeedbackService) {
-    $scope.editabilityService = editabilityService;
+    $scope.EditabilityService = EditabilityService;
     $scope.EditorStateService = EditorStateService;
 
     /**********************************************************
@@ -148,7 +148,7 @@ oppia.controller('ExplorationEditor', [
           data.email_preferences.mute_suggestion_notifications);
 
         if (GLOBALS.can_edit) {
-          editabilityService.markEditable();
+          EditabilityService.markEditable();
         }
 
         graphDataService.recompute();
@@ -345,7 +345,7 @@ oppia.controller('ExplorationEditor', [
     $templateCache.put('ng-joyride-title-tplv1.html', ngJoyrideTemplate);
 
     var leaveTutorial = function() {
-      editabilityService.onEndTutorial();
+      EditabilityService.onEndTutorial();
       $scope.$apply();
       StateEditorTutorialFirstTimeService.markTutorialFinished();
       $scope.tutorialInProgress = false;
@@ -368,7 +368,7 @@ oppia.controller('ExplorationEditor', [
       // otherwise elements within ng-if's are not guaranteed to be present on
       // the page.
       $timeout(function() {
-        editabilityService.onStartTutorial();
+        EditabilityService.onStartTutorial();
         $scope.tutorialInProgress = true;
       });
     };

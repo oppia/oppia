@@ -35,6 +35,7 @@ describe('EndExplorationValidationService', function() {
         html: '',
         audio_translations: {}
       },
+      labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null
     };
@@ -53,10 +54,10 @@ describe('EndExplorationValidationService', function() {
           html: '',
           audio_translations: {}
         },
+        labelled_as_correct: false,
         param_changes: [],
         refresher_exploration_id: null
-      },
-      labelled_as_correct: false
+      }
     }];
   }));
 
