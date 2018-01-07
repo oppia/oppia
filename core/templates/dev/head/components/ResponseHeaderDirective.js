@@ -27,19 +27,22 @@ oppia.directive('responseHeader', [
         getShortSummary: '&shortSummary',
         isActive: '&isActive',
         getOnDeleteFn: '&onDeleteFn',
-        getCorrect: '&labelledAsCorrect',
-        getNumRules: '&numRules'
+        getNumRules: '&numRules',
+        isResponse: '&isResponse'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/' +
-        'response_header_directive.html'),
+        '/components/response_header_directive.html'),
       controller: [
-        '$scope', 'editabilityService', 'EditorStateService', 'RouterService',
+        '$scope', 'EditabilityService', 'EditorStateService', 'RouterService',
         'PLACEHOLDER_OUTCOME_DEST', 'explorationCorrectnessFeedbackService',
         function(
-            $scope, editabilityService, EditorStateService, RouterService,
+            $scope, EditabilityService, EditorStateService, RouterService,
             PLACEHOLDER_OUTCOME_DEST, explorationCorrectnessFeedbackService) {
-          $scope.editabilityService = editabilityService;
+          $scope.EditabilityService = EditabilityService;
+
+          $scope.isCorrect = function() {
+            return $scope.getOutcome() && $scope.getOutcome().labelledAsCorrect;
+          };
 
           $scope.isOutcomeLooping = function() {
             var outcome = $scope.getOutcome();

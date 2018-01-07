@@ -25,8 +25,8 @@ from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import creator_dashboard
 from core.controllers import custom_landing_pages
-from core.controllers import email_dashboard
 from core.controllers import editor
+from core.controllers import email_dashboard
 from core.controllers import feedback
 from core.controllers import learner_dashboard
 from core.controllers import learner_playlist
@@ -43,12 +43,14 @@ from core.domain import acl_decorators
 from core.domain import user_services
 from core.platform import models
 import feconf
-# pylint: enable=relative-import
 
 from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras.routes import RedirectRoute
+
+# pylint: enable=relative-import
+
 
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()

@@ -25,24 +25,31 @@ oppia.directive('outcomeEditor', [
         displayFeedback: '=',
         getOnSaveDestFn: '&onSaveDest',
         getOnSaveFeedbackFn: '&onSaveFeedback',
+        getOnSaveCorrectnessLabelFn: '&onSaveCorrectnessLabel',
         outcome: '=outcome',
         suppressWarnings: '&suppressWarnings'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/outcome_editor_directive.html'),
       controller: [
-        '$scope', 'EditorStateService',
-        'stateInteractionIdService', 'COMPONENT_NAME_FEEDBACK',
-        function($scope, EditorStateService,
-          stateInteractionIdService, COMPONENT_NAME_FEEDBACK) {
+        '$scope', 'EditorStateService', 'stateInteractionIdService',
+        'COMPONENT_NAME_FEEDBACK', 'explorationCorrectnessFeedbackService',
+        function(
+            $scope, EditorStateService, stateInteractionIdService,
+            COMPONENT_NAME_FEEDBACK, explorationCorrectnessFeedbackService) {
           $scope.editOutcomeForm = {};
           $scope.feedbackEditorIsOpen = false;
           $scope.destinationEditorIsOpen = false;
+          $scope.correctnessLabelEditorIsOpen = false;
           // TODO(sll): Investigate whether this line can be removed, due to
           // $scope.savedOutcome now being set in onExternalSave().
           $scope.savedOutcome = angular.copy($scope.outcome);
 
           $scope.COMPONENT_NAME_FEEDBACK = COMPONENT_NAME_FEEDBACK;
+
+          $scope.isCorrectnessFeedbackEnabled = function() {
+            return explorationCorrectnessFeedbackService.isEnabled();
+          };
 
           var onExternalSave = function() {
             // The reason for this guard is because, when the editor page for an
@@ -140,6 +147,13 @@ oppia.directive('outcomeEditor', [
               $scope.outcome.refresherExplorationId);
 
             $scope.getOnSaveDestFn()($scope.savedOutcome);
+          };
+
+          $scope.onChangeCorrectnessLabel = function() {
+            $scope.savedOutcome.labelledAsCorrect = (
+              $scope.outcome.labelledAsCorrect);
+
+            $scope.getOnSaveCorrectnessLabelFn()($scope.savedOutcome);
           };
 
           $scope.cancelThisFeedbackEdit = function() {

@@ -105,7 +105,7 @@
         <div>
           <label for="tmpMessageText">
             Add new message
-            <span ng-if="editabilityService.isEditable() && !activeThread.suggestion">(and/or change status)</span>
+            <span ng-if="EditabilityService.isEditable() && !activeThread.suggestion">(and/or change status)</span>
           </label>
           <textarea class="form-control protractor-test-feedback-response-textarea" ng-model="tmpMessage.text"
                     id="tmpMessageText" rows="6"
@@ -114,7 +114,7 @@
         </div>
 
         <div>
-          <span ng-show="editabilityService.isEditable() && !activeThread.suggestion">
+          <span ng-show="EditabilityService.isEditable() && !activeThread.suggestion">
             Change status (optional):
             <select ng-model="tmpMessage.status"
                     ng-options="choice.id as choice.text for choice in STATUS_CHOICES"

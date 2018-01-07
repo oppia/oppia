@@ -262,6 +262,7 @@ oppia.directive('conversationSkin', [
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'INTERACTION_SPECS',
         'EVENT_NEW_CARD_OPENED', 'HintsAndSolutionManagerService',
         'AudioTranslationManagerService', 'EVENT_AUTOPLAY_AUDIO',
+        'COMPONENT_NAME_FEEDBACK',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
             MessengerService, ExplorationPlayerService, UrlService,
@@ -278,7 +279,8 @@ oppia.directive('conversationSkin', [
             RefresherExplorationConfirmationModalService,
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, INTERACTION_SPECS,
             EVENT_NEW_CARD_OPENED, HintsAndSolutionManagerService,
-            AudioTranslationManagerService, EVENT_AUTOPLAY_AUDIO) {
+            AudioTranslationManagerService, EVENT_AUTOPLAY_AUDIO,
+            COMPONENT_NAME_FEEDBACK) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
@@ -300,6 +302,7 @@ oppia.directive('conversationSkin', [
           $scope.hasFullyLoaded = false;
           $scope.recommendedExplorationSummaries = null;
           $scope.answerIsCorrect = false;
+          $scope.pendingCardWasSeenBefore = false;
           $scope.isCorrectnessFeedbackEnabled = function() {
             return PlayerCorrectnessFeedbackEnabledService.isEnabled();
           };
@@ -307,6 +310,12 @@ oppia.directive('conversationSkin', [
           $scope.isCorrectnessFooterEnabled = function() {
             return (
               $scope.answerIsCorrect && $scope.isCorrectnessFeedbackEnabled());
+          };
+
+          $scope.isLearnAgainButton = function() {
+            return (
+              $scope.pendingCardWasSeenBefore && !$scope.answerIsCorrect &&
+              $scope.isCorrectnessFeedbackEnabled());
           };
 
           $scope.OPPIA_AVATAR_IMAGE_URL = (
@@ -579,10 +588,9 @@ oppia.directive('conversationSkin', [
                   var pairs = (
                     PlayerTranscriptService.getLastCard().inputResponsePairs);
                   var lastAnswerFeedbackPair = pairs[pairs.length - 1];
-                  AudioTranslationManagerService
-                    .setSecondaryAudioTranslations(
-                      feedbackAudioTranslations,
-                      feedbackHtml);
+                  AudioTranslationManagerService.setSecondaryAudioTranslations(
+                    feedbackAudioTranslations, feedbackHtml,
+                    COMPONENT_NAME_FEEDBACK);
                   $scope.$broadcast(EVENT_AUTOPLAY_AUDIO);
 
                   if (_oldStateName === newStateName) {
@@ -662,8 +670,12 @@ oppia.directive('conversationSkin', [
                         $scope.upcomingStateName));
 
                     if (feedbackHtml) {
+                      var stateHistory =
+                        PlayerTranscriptService.getStateHistory();
+                      if (stateHistory.indexOf(newStateName) !== -1) {
+                        $scope.pendingCardWasSeenBefore = true;
+                      }
                       PlayerTranscriptService.addNewResponse(feedbackHtml);
-
                       if (!ExplorationPlayerStateService.isInteractionInline(
                             $scope.activeCard.stateName)) {
                         $scope.$broadcast('helpCardAvailable', {

@@ -3,8 +3,16 @@
            ng-click="onClickContinueButton()"
            style="margin-top: 12px;"
            aria-label="Continue">
-  <span translate="I18N_PLAYER_CONTINUE_BUTTON"></span>
-  <i class="fa fa-arrow-right"
-     style="font-size: 19px; padding-top: 1.5px;">
-  </i>
+  <div ng-if="!isLearnAgainButton()">
+    <span translate="I18N_PLAYER_CONTINUE_BUTTON"></span>
+    <i class="fa fa-arrow-right"
+       style="font-size: 19px; padding-top: 1.5px;">
+   </i>
+  </div>
+  <div ng-if="isLearnAgainButton()">
+    <span translate="I18N_PLAYER_LEARN_AGAIN_BUTTON"></span>
+    <i class="fa fa-repeat"
+       style="font-size: 19px; padding-top: 1.5px;">
+   </i>
+  </div>
 </md-button>

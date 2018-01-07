@@ -31,7 +31,7 @@ import subprocess
 import sys
 import urllib
 
-import common # pylint: disable=relative-import
+import common  # pylint: disable=relative-import
 
 
 def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):

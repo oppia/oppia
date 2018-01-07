@@ -40,9 +40,6 @@
   answer-group-editor .oppia-delete-rule-button:hover {
     opacity: 1;
   }
-  answer-group-editor .oppia-correctness-label-editor {
-    margin-top: 25px;
-  }
 </style>
 
 <div style="height: 100%;">
@@ -92,12 +89,8 @@
                   display-feedback="displayFeedback"
                   on-save-dest="getOnSaveAnswerGroupDestFn()"
                   on-save-feedback="getOnSaveAnswerGroupFeedbackFn()"
+                  on-save-correctness-label="getOnSaveAnswerGroupCorrectnessLabelFn()"
                   outcome="outcome"
                   suppress-warnings="suppressWarnings()">
   </outcome-editor>
-
-  <div class="oppia-correctness-label-editor" ng-if="answerGroupIsDefault && isCorrectnessFeedbackEnabled()">
-    <correctness-label-editor is-editable="isEditable" on-save-correctness-label="getOnSaveAnswerGroupCorrectnessLabelFn()" labelled-as-correct="labelledAsCorrect">
-    </correctness-label-editor>
-  </div>
 </div>

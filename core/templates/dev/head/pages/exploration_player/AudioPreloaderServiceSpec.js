@@ -164,11 +164,13 @@ describe('Audio preloader service', function() {
           interaction: {
             id: 'TextInput',
             default_outcome: {
+              dest: 'Introduction',
               feedback: [
                 '<p>Try again.</p>'
               ],
-              dest: 'Introduction',
-              param_changes: []
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -187,13 +189,14 @@ describe('Audio preloader service', function() {
                 },
                 rule_type: 'Contains'
               }],
-              labelled_as_correct:false,
               outcome: {
+                dest: 'State 1',
                 feedback: [
                   "<p>Let's go to State 1</p>"
                 ],
-                dest: 'State 1',
-                param_changes: []
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
               }
             }, {
               rule_specs: [{
@@ -202,13 +205,14 @@ describe('Audio preloader service', function() {
                 },
                 rule_type: 'Contains'
               }],
-              labelled_as_correct: false,
               outcome: {
+                dest: 'State 2',
                 feedback: [
                   "<p>Let's go to State 2</p>"
                 ],
-                dest: 'State 2',
-                param_changes: []
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
               }
             }],
             hints: []

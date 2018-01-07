@@ -35,13 +35,13 @@ oppia.directive('audioTranslationsEditor', [
         '/components/forms/audio_translations_editor_directive.html'),
       controller: [
         '$scope', '$uibModal', '$sce', 'stateContentService',
-        'editabilityService', 'LanguageUtilService', 'AlertsService',
+        'EditabilityService', 'LanguageUtilService', 'AlertsService',
         'ExplorationContextService', 'AssetsBackendApiService',
         function(
-            $scope, $uibModal, $sce, stateContentService, editabilityService,
+            $scope, $uibModal, $sce, stateContentService, EditabilityService,
             LanguageUtilService, AlertsService, ExplorationContextService,
             AssetsBackendApiService) {
-          $scope.isEditable = editabilityService.isEditable;
+          $scope.isEditable = EditabilityService.isEditable;
 
           // The following if-condition is present because, sometimes,
           // Travis-CI throws an error of the form "Cannot read property

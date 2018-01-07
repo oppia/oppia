@@ -23,6 +23,7 @@ oppia.directive('progressNav', [
       scope: {
         onSubmit: '&',
         onClickContinueButton: '&',
+        isLearnAgainButton: '&',
         isSubmitButtonShown: '&submitButtonIsShown',
         isSubmitButtonDisabled: '&submitButtonIsDisabled'
       },

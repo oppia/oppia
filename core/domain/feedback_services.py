@@ -18,12 +18,12 @@
 
 import datetime
 
+from core.domain import email_manager
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
-from core.domain import email_manager
 from core.platform import models
 import feconf
 import utils

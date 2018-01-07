@@ -21,9 +21,11 @@ oppia.factory('OutcomeObjectFactory', [
   'SubtitledHtmlObjectFactory',
   function(SubtitledHtmlObjectFactory) {
     var Outcome = function(
-        dest, feedback, paramChanges, refresherExplorationId) {
+        dest, feedback, labelledAsCorrect, paramChanges,
+        refresherExplorationId) {
       this.dest = dest;
       this.feedback = feedback;
+      this.labelledAsCorrect = labelledAsCorrect;
       this.paramChanges = paramChanges;
       this.refresherExplorationId = refresherExplorationId;
     };
@@ -32,6 +34,7 @@ oppia.factory('OutcomeObjectFactory', [
       return {
         dest: this.dest,
         feedback: this.feedback.toBackendDict(),
+        labelled_as_correct: this.labelledAsCorrect,
         param_changes: this.paramChanges,
         refresher_exploration_id: this.refresherExplorationId
       };
@@ -56,6 +59,7 @@ oppia.factory('OutcomeObjectFactory', [
       return new Outcome(
         dest,
         SubtitledHtmlObjectFactory.createDefault(feedbackText),
+        false,
         paramChanges,
         null);
     };
@@ -64,6 +68,7 @@ oppia.factory('OutcomeObjectFactory', [
       return new Outcome(
         outcomeDict.dest,
         SubtitledHtmlObjectFactory.createFromBackendDict(outcomeDict.feedback),
+        outcomeDict.labelled_as_correct,
         outcomeDict.param_changes,
         outcomeDict.refresher_exploration_id);
     };

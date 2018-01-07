@@ -14,18 +14,18 @@
 
 """Installation script for Oppia third-party libraries."""
 
+import StringIO
 import contextlib
 import json
 import os
 import shutil
-import StringIO
 import sys
 import tarfile
 import urllib
 import urllib2
 import zipfile
 
-import common # pylint: disable=relative-import
+import common  # pylint: disable=relative-import
 
 #These two lines prevent a "IOError: [Errno socket error]
 #[Errno -2] Name or service not known" error

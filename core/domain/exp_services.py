@@ -21,6 +21,7 @@ stored in the database. In particular, the various query methods should
 delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
+import StringIO
 import collections
 import copy
 import datetime
@@ -28,7 +29,6 @@ import logging
 import math
 import os
 import pprint
-import StringIO
 import traceback
 import zipfile
 
