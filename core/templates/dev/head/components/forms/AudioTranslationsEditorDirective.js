@@ -34,11 +34,11 @@ oppia.directive('audioTranslationsEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/audio_translations_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', '$sce', 'stateContentService',
+        '$scope', '$uibModal', '$sce', 'StateContentService',
         'EditabilityService', 'LanguageUtilService', 'AlertsService',
         'ExplorationContextService', 'AssetsBackendApiService',
         function(
-            $scope, $uibModal, $sce, stateContentService, EditabilityService,
+            $scope, $uibModal, $sce, StateContentService, EditabilityService,
             LanguageUtilService, AlertsService, ExplorationContextService,
             AssetsBackendApiService) {
           $scope.isEditable = EditabilityService.isEditable;

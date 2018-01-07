@@ -32,10 +32,10 @@ oppia.directive('outcomeEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/outcome_editor_directive.html'),
       controller: [
-        '$scope', 'EditorStateService', 'stateInteractionIdService',
+        '$scope', 'EditorStateService', 'StateInteractionIdService',
         'COMPONENT_NAME_FEEDBACK', 'explorationCorrectnessFeedbackService',
         function(
-            $scope, EditorStateService, stateInteractionIdService,
+            $scope, EditorStateService, StateInteractionIdService,
             COMPONENT_NAME_FEEDBACK, explorationCorrectnessFeedbackService) {
           $scope.editOutcomeForm = {};
           $scope.feedbackEditorIsOpen = false;
@@ -95,7 +95,7 @@ oppia.directive('outcomeEditor', [
           };
 
           $scope.getCurrentInteractionId = function() {
-            return stateInteractionIdService.savedMemento;
+            return StateInteractionIdService.savedMemento;
           };
 
           $scope.isSelfLoopWithNoFeedback = function(outcome) {

@@ -17,24 +17,24 @@
  */
 
 oppia.directive('solutionExplanationEditor', [
-  'UrlInterpolationService', 'stateSolutionService',
-  function(UrlInterpolationService, stateSolutionService) {
+  'UrlInterpolationService', 'StateSolutionService',
+  function(UrlInterpolationService, StateSolutionService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/solution_explanation_editor_directive.html'),
       controller: [
-        '$scope', 'EditabilityService', 'stateSolutionService',
+        '$scope', 'EditabilityService', 'StateSolutionService',
         'COMPONENT_NAME_SOLUTION',
-        function($scope, EditabilityService, stateSolutionService,
+        function($scope, EditabilityService, StateSolutionService,
             COMPONENT_NAME_SOLUTION) {
           $scope.isEditable = EditabilityService.isEditable();
 
           $scope.editSolutionForm = {};
           $scope.explanationEditorIsOpen = false;
 
-          $scope.stateSolutionService = stateSolutionService;
+          $scope.StateSolutionService = StateSolutionService;
           $scope.COMPONENT_NAME_SOLUTION = COMPONENT_NAME_SOLUTION;
 
           $scope.EXPLANATION_FORM_SCHEMA = {
@@ -49,7 +49,7 @@ oppia.directive('solutionExplanationEditor', [
           };
 
           $scope.saveThisExplanation = function() {
-            stateSolutionService.saveDisplayedValue();
+            StateSolutionService.saveDisplayedValue();
             $scope.explanationEditorIsOpen = false;
           };
 
@@ -66,7 +66,7 @@ oppia.directive('solutionExplanationEditor', [
           };
 
           $scope.onAudioTranslationsEdited = function() {
-            stateSolutionService.saveDisplayedValue();
+            StateSolutionService.saveDisplayedValue();
           };
 
           $scope.$on('externalSave', function() {

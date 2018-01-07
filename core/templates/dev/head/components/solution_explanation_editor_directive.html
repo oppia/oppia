@@ -12,7 +12,7 @@
           </i>
         </div>
         <strong>Explanation:</strong>
-        <span class="oppia-rte-editor" angular-html-bind="stateSolutionService.savedMemento.explanation.getHtml()"></span>
+        <span class="oppia-rte-editor" angular-html-bind="StateSolutionService.savedMemento.explanation.getHtml()"></span>
       </div>
     </div>
   </div>
@@ -22,7 +22,7 @@
       <strong>Explanation:</strong>
       <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
       <schema-based-editor schema="EXPLANATION_FORM_SCHEMA"
-                           local-value="stateSolutionService.displayed.explanation._html">
+                           local-value="StateSolutionService.displayed.explanation._html">
       </schema-based-editor>
     </div>
 
@@ -35,7 +35,7 @@
         </button>
         <button type="button"
                 class="btn btn-success"
-                ng-disabled="!stateSolutionService.displayed.explanation.getHtml()"
+                ng-disabled="!StateSolutionService.displayed.explanation.getHtml()"
                 ng-click="saveThisExplanation()">
           Save
         </button>
@@ -45,9 +45,9 @@
     </div>
   </div>
 
-  <div ng-if="stateSolutionService.savedMemento.explanation && !stateSolutionService.savedMemento.explanation.isEmpty()">
+  <div ng-if="StateSolutionService.savedMemento.explanation && !StateSolutionService.savedMemento.explanation.isEmpty()">
     <audio-translations-editor component-name="<[COMPONENT_NAME_SOLUTION]>"
-                               subtitled-html="stateSolutionService.displayed.explanation"
+                               subtitled-html="StateSolutionService.displayed.explanation"
                                on-start-edit="onAudioTranslationsStartEditAction"
                                on-change="onAudioTranslationsEdited">
     </audio-translations-editor>

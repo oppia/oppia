@@ -34,24 +34,24 @@ oppia.directive('stateContentEditor', [
         '/pages/exploration_editor/editor_tab/' +
         'state_content_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'stateContentService', 'EditabilityService',
+        '$scope', '$uibModal', 'StateContentService', 'EditabilityService',
         'EditorFirstTimeEventsService', 'explorationInitStateNameService',
         'EditorStateService', 'COMPONENT_NAME_CONTENT',
         function(
-            $scope, $uibModal, stateContentService, EditabilityService,
+            $scope, $uibModal, StateContentService, EditabilityService,
             EditorFirstTimeEventsService, explorationInitStateNameService,
             EditorStateService, COMPONENT_NAME_CONTENT) {
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
 
-          $scope.stateContentService = stateContentService;
+          $scope.StateContentService = StateContentService;
           $scope.contentEditorIsOpen = false;
           $scope.isEditable = EditabilityService.isEditable;
           $scope.COMPONENT_NAME_CONTENT = COMPONENT_NAME_CONTENT;
 
           var saveContent = function() {
-            stateContentService.saveDisplayedValue();
+            StateContentService.saveDisplayedValue();
             $scope.contentEditorIsOpen = false;
           };
 
@@ -75,9 +75,9 @@ oppia.directive('stateContentEditor', [
                 }
               ]
             }).result.then(function() {
-              var currentStateContent = stateContentService.displayed;
+              var currentStateContent = StateContentService.displayed;
               currentStateContent.markAllAudioAsNeedingUpdate();
-              stateContentService.saveDisplayedValue();
+              StateContentService.saveDisplayedValue();
             });
           };
 
@@ -104,7 +104,7 @@ oppia.directive('stateContentEditor', [
             EditorFirstTimeEventsService.registerFirstSaveContentEvent();
             saveContent();
 
-            var savedContent = stateContentService.savedMemento;
+            var savedContent = StateContentService.savedMemento;
             if (savedContent.hasUnflaggedAudioTranslations()) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
@@ -112,7 +112,7 @@ oppia.directive('stateContentEditor', [
           };
 
           $scope.cancelEdit = function() {
-            stateContentService.restoreFromMemento();
+            StateContentService.restoreFromMemento();
             $scope.contentEditorIsOpen = false;
           };
 
@@ -125,7 +125,7 @@ oppia.directive('stateContentEditor', [
           };
 
           $scope.onAudioTranslationsEdited = function() {
-            stateContentService.saveDisplayedValue();
+            StateContentService.saveDisplayedValue();
           };
         }
       ]
