@@ -45,6 +45,12 @@ describe('FractionInputValidationService', function() {
     customizationArgs = {
       requireSimplestForm: {
         value: true
+      },
+      allowImproperFraction: {
+        value: true
+      },
+      allowNonzeroIntegerPart: {
+        value: true
       }
     };
 
@@ -67,10 +73,31 @@ describe('FractionInputValidationService', function() {
       }
     });
 
+    equalsThreeByTwoRule = rof.createFromBackendDict({
+      rule_type: 'IsExactlyEqualTo',
+      inputs: {
+        f: createFractionDict(false, 0, 3, 2)
+      }
+    });
+
+    equalsOneAndHalfRule = rof.createFromBackendDict({
+      rule_type: 'IsExactlyEqualTo',
+      inputs: {
+        f: createFractionDict(false, 1, 1, 2)
+      }
+    });
+
     greaterThanMinusOneRule = rof.createFromBackendDict({
       rule_type: 'IsGreaterThan',
       inputs: {
         f: createFractionDict(true, 0, 1, 1)
+      }
+    });
+
+    integerPartEqualsOne = rof.createFromBackendDict({
+      rule_type: 'HasIntegerPartEqualTo',
+      inputs: {
+        x: 1
       }
     });
 
@@ -258,5 +285,53 @@ describe('FractionInputValidationService', function() {
         1 + ' is invalid: denominator should be ' +
         'greater than zero.')
     }]);
+  });
+
+  it('should catch not allowImproperFraction and rule has improper fraction',
+    function(){
+      customizationArgs.allowImproperFraction.value = false;
+      answerGroups[0].rules = [equalsThreeByTwoRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule ' + 1 + ' from answer group ' +
+          1 + ' will never be matched because it is an ' +
+          'improper fraction')
+      }]);
+  });
+
+  it('should catch not allowNonzeroIntegerPart and rule has integer part',
+    function(){
+      customizationArgs.allowNonzeroIntegerPart.value = false;
+      answerGroups[0].rules = [equalsOneAndHalfRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule ' + 1 + ' from answer group ' +
+          1 + ' will never be matched because it has a ' +
+          'non zero integer part')
+      }]);
+  });
+
+  it('should catch if not allowNonzeroIntegerPart and ' +
+    'rule is HasIntegerPartEqualTo', function(){
+      customizationArgs.allowNonzeroIntegerPart.value = false;
+      answerGroups[0].rules = [integerPartEqualsOne];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule ' + 1 + ' from answer group ' +
+          1 + ' will never be matched because integer part ' +
+          'has to be zero')
+      }]);
   });
 });
