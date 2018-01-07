@@ -517,7 +517,7 @@ class CsrfTokenManager(object):
         """Creates a new CSRF token.
 
         Args:
-            user_id: str. The user_id for whom the token is generated.
+            user_id: str. The user_id for which the token is generated.
             issued_on: float. The timestamp at which the token was issued.
 
         Returns:
