@@ -69,8 +69,6 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 // displayed.
 oppia.constant('FATAL_ERROR_CODES', [400, 401, 404, 500]);
 
-oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
-
 // Do not modify these, for backwards-compatibility reasons.
 oppia.constant('COMPONENT_NAME_CONTENT', 'content');
 oppia.constant('COMPONENT_NAME_HINT', 'hint');

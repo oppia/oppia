@@ -16,6 +16,8 @@
  * @fileoverview Rich Text Editor (RTE) Helper Service
  */
 
+oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
+
 oppia.factory('RteHelperService', [
   '$filter', '$log', '$interpolate', 'ExplorationContextService',
   'RTE_COMPONENT_SPECS', 'HtmlEscaperService', 'UrlInterpolationService',
