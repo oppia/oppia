@@ -17,24 +17,24 @@
  */
 
 oppia.factory('ExplorationSaveService', [
-  '$modal', '$timeout', '$rootScope', '$log', '$q',
+  '$uibModal', '$timeout', '$rootScope', '$log', '$q',
   'AlertsService', 'ExplorationDataService', 'explorationStatesService',
   'explorationTagsService', 'explorationTitleService',
   'explorationObjectiveService', 'explorationCategoryService',
-  'explorationLanguageCodeService', 'explorationRightsService',
+  'explorationLanguageCodeService', 'ExplorationRightsService',
   'ExplorationWarningsService', 'ExplorationDiffService',
   'explorationInitStateNameService', 'RouterService',
-  'FocusManagerService', 'changeListService', 'siteAnalyticsService',
+  'FocusManagerService', 'ChangeListService', 'siteAnalyticsService',
   'StatesObjectFactory', 'UrlInterpolationService',
   function(
-      $modal, $timeout, $rootScope, $log, $q,
+      $uibModal, $timeout, $rootScope, $log, $q,
       AlertsService, ExplorationDataService, explorationStatesService,
       explorationTagsService, explorationTitleService,
       explorationObjectiveService, explorationCategoryService,
-      explorationLanguageCodeService, explorationRightsService,
+      explorationLanguageCodeService, ExplorationRightsService,
       ExplorationWarningsService, ExplorationDiffService,
       explorationInitStateNameService, RouterService,
-      FocusManagerService, changeListService, siteAnalyticsService,
+      FocusManagerService, ChangeListService, siteAnalyticsService,
       StatesObjectFactory, UrlInterpolationService) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
@@ -74,20 +74,20 @@ oppia.factory('ExplorationSaveService', [
     };
 
     var showCongratulatorySharingModal = function() {
-      return $modal.open({
+      return $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/' +
           'post_publish_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'ExplorationContextService',
-          function($scope, $modalInstance, ExplorationContextService) {
+          '$scope', '$uibModalInstance', 'ExplorationContextService',
+          function($scope, $uibModalInstance, ExplorationContextService) {
             $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
               GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
             $scope.close = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
             $scope.explorationId = (
               ExplorationContextService.getExplorationId());
@@ -101,17 +101,17 @@ oppia.factory('ExplorationSaveService', [
       // This is resolved when modal is closed.
       var whenModalClosed = $q.defer();
 
-      var publishModalInstance = $modal.open({
+      var publishModalInstance = $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/' +
           'exploration_publish_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.publish = $modalInstance.close;
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+            $scope.publish = $uibModalInstance.close;
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               AlertsService.clearWarnings();
               whenModalClosed.resolve();
             };
@@ -124,7 +124,7 @@ oppia.factory('ExplorationSaveService', [
           onStartSaveCallback();
         }
 
-        explorationRightsService.publish().then(
+        ExplorationRightsService.publish().then(
           function() {
             if (onSaveDoneCallback) {
               onSaveDoneCallback();
@@ -145,9 +145,9 @@ oppia.factory('ExplorationSaveService', [
       // (regardless of success or failure of the operation).
       var whenSavingDone = $q.defer();
 
-      var changeList = changeListService.getChangeList();
+      var changeList = ChangeListService.getChangeList();
 
-      if (explorationRightsService.isPrivate()) {
+      if (ExplorationRightsService.isPrivate()) {
         siteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
           ExplorationDataService.explorationId);
       } else {
@@ -171,7 +171,7 @@ oppia.factory('ExplorationSaveService', [
             return;
           }
           $log.info('Changes to this exploration were saved successfully.');
-          changeListService.discardAllChanges();
+          ChangeListService.discardAllChanges();
           $rootScope.$broadcast('initExplorationPage');
           $rootScope.$broadcast('refreshVersionHistory', {
             forceRefresh: true
@@ -190,30 +190,30 @@ oppia.factory('ExplorationSaveService', [
     return {
       isExplorationSaveable: function() {
         return (
-          changeListService.isExplorationLockedForEditing() &&
+          ChangeListService.isExplorationLockedForEditing() &&
           !saveIsInProgress && (
-            (explorationRightsService.isPrivate() &&
+            (ExplorationRightsService.isPrivate() &&
               !ExplorationWarningsService.hasCriticalWarnings()) ||
-            (!explorationRightsService.isPrivate() &&
+            (!ExplorationRightsService.isPrivate() &&
               ExplorationWarningsService.countWarnings() === 0)
           )
         );
       },
 
       discardChanges: function() {
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/' +
             'confirm_discard_changes_modal_directive.html'),
           backdrop: 'static',
           keyboard: false,
           controller: [
-            '$scope', '$modalInstance', function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
               };
               $scope.confirmDiscard = function() {
-                $modalInstance.close();
+                $uibModalInstance.close();
               };
             }
           ]
@@ -221,23 +221,24 @@ oppia.factory('ExplorationSaveService', [
           AlertsService.clearWarnings();
           $rootScope.$broadcast('externalSave');
 
-          $modal.open({
+          $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration_editor/' +
               'editor_reloading_modal_directive.html'),
             backdrop: 'static',
             keyboard: false,
             controller: [
-              '$scope', '$modalInstance', function($scope, $modalInstance) {
+              '$scope', '$uibModalInstance', 
+              function($scope, $uibModalInstance) {
                 $timeout(function() {
-                  $modalInstance.dismiss('cancel');
+                  $uibModalInstance.dismiss('cancel');
                 }, 2500);
               }
             ],
             windowClass: 'oppia-loading-modal'
           });
 
-          changeListService.discardAllChanges();
+          ChangeListService.discardAllChanges();
           AlertsService.addSuccessMessage('Changes discarded.');
           $rootScope.$broadcast('initExplorationPage');
 
@@ -261,17 +262,17 @@ oppia.factory('ExplorationSaveService', [
         // If the metadata has not yet been specified, open the pre-publication
         // 'add exploration metadata' modal.
         if (isAdditionalMetadataNeeded()) {
-          var modalInstance = $modal.open({
+          var modalInstance = $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration_editor/' +
               'exploration_metadata_modal_directive.html'),
             backdrop: 'static',
             controller: [
-              '$scope', '$modalInstance', 'explorationObjectiveService',
+              '$scope', '$uibModalInstance', 'explorationObjectiveService',
               'explorationTitleService', 'explorationCategoryService',
               'explorationStatesService', 'ALL_CATEGORIES',
               'explorationLanguageCodeService', 'explorationTagsService',
-              function($scope, $modalInstance, explorationObjectiveService,
+              function($scope, $uibModalInstance, explorationObjectiveService,
               explorationTitleService, explorationCategoryService,
               explorationStatesService, ALL_CATEGORIES,
               explorationLanguageCodeService, explorationTagsService) {
@@ -376,7 +377,7 @@ oppia.factory('ExplorationSaveService', [
                   // will be called when the draft changes entered here
                   // are properly saved to the backend.
                   $timeout(function() {
-                    $modalInstance.close(metadataList);
+                    $uibModalInstance.close(metadataList);
                   }, 500);
                 };
 
@@ -388,7 +389,7 @@ oppia.factory('ExplorationSaveService', [
                   explorationLanguageCodeService.restoreFromMemento();
                   explorationTagsService.restoreFromMemento();
 
-                  $modalInstance.dismiss('cancel');
+                  $uibModalInstance.dismiss('cancel');
                   AlertsService.clearWarnings();
                 };
               }
@@ -447,7 +448,7 @@ oppia.factory('ExplorationSaveService', [
 
         RouterService.savePendingChanges();
 
-        if (!explorationRightsService.isPrivate() &&
+        if (!ExplorationRightsService.isPrivate() &&
             ExplorationWarningsService.countWarnings() > 0) {
           // If the exploration is not private, warnings should be fixed before
           // it can be saved.
@@ -462,7 +463,7 @@ oppia.factory('ExplorationSaveService', [
             .getStateObjects();
           var diffGraphData = ExplorationDiffService.getDiffGraphData(
             oldStates, newStates, [{
-              changeList: changeListService.getChangeList(),
+              changeList: ChangeListService.getChangeList(),
               directionForwards: true
             }]);
           diffData = {
@@ -486,14 +487,14 @@ oppia.factory('ExplorationSaveService', [
             return;
           }
 
-          var modalInstance = $modal.open({
+          var modalInstance = $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration_editor/' +
               'exploration_save_modal_directive.html'),
             backdrop: true,
             resolve: {
               isExplorationPrivate: function() {
-                return explorationRightsService.isPrivate();
+                return ExplorationRightsService.isPrivate();
               },
               diffData: function() {
                 return diffData;
@@ -501,9 +502,9 @@ oppia.factory('ExplorationSaveService', [
             },
             windowClass: 'oppia-save-exploration-modal',
             controller: [
-              '$scope', '$modalInstance', 'isExplorationPrivate',
+              '$scope', '$uibModalInstance', 'isExplorationPrivate',
               function(
-                $scope, $modalInstance, isExplorationPrivate) {
+                $scope, $uibModalInstance, isExplorationPrivate) {
                 $scope.showDiff = false;
                 $scope.onClickToggleDiffButton = function() {
                   $scope.showDiff = !$scope.showDiff;
@@ -523,10 +524,10 @@ oppia.factory('ExplorationSaveService', [
                 $scope.laterVersionHeader = 'New changes';
 
                 $scope.save = function(commitMessage) {
-                  $modalInstance.close(commitMessage);
+                  $uibModalInstance.close(commitMessage);
                 };
                 $scope.cancel = function() {
-                  $modalInstance.dismiss('cancel');
+                  $uibModalInstance.dismiss('cancel');
                   AlertsService.clearWarnings();
                 };
               }

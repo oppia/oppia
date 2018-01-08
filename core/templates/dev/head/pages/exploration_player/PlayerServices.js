@@ -32,8 +32,12 @@ oppia.factory('ExplorationPlayerService', [
   'ExpressionInterpolationService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
-  'EditableExplorationBackendApiService', 'AudioTranslationManagerService',
-  'LanguageUtilService', 'NumberAttemptsService',
+  'EditableExplorationBackendApiService', 'AudioTranslationLanguageService',
+  'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
+  'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
+  'PlayerCorrectnessFeedbackEnabledService',
+  'GuestCollectionProgressService',
+  'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       AlertsService, AnswerClassificationService, ExplorationContextService,
@@ -42,8 +46,12 @@ oppia.factory('ExplorationPlayerService', [
       ExpressionInterpolationService, StateClassifierMappingService,
       StatsReportingService, UrlInterpolationService,
       ReadOnlyExplorationBackendApiService,
-      EditableExplorationBackendApiService, AudioTranslationManagerService,
-      LanguageUtilService, NumberAttemptsService) {
+      EditableExplorationBackendApiService, AudioTranslationLanguageService,
+      LanguageUtilService, NumberAttemptsService, AudioPreloaderService,
+      WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
+      PlayerCorrectnessFeedbackEnabledService,
+      GuestCollectionProgressService,
+      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
       ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -68,8 +76,7 @@ oppia.factory('ExplorationPlayerService', [
     };
 
     // Evaluate feedback.
-    var makeFeedback = function(feedbacks, envs) {
-      var feedbackHtml = feedbacks.length > 0 ? feedbacks[0] : '';
+    var makeFeedback = function(feedbackHtml, envs) {
       return ExpressionInterpolationService.processHtml(feedbackHtml, envs);
     };
 
@@ -158,6 +165,26 @@ oppia.factory('ExplorationPlayerService', [
       if (!_editorPreviewMode && exploration.isStateTerminal(newStateName)) {
         StatsReportingService.recordExplorationCompleted(
           newStateName, LearnerParamsService.getAllParams());
+
+        // If the user is a guest, has completed this exploration within the
+        // context of a collection, and the collection is whitelisted, record
+        // their temporary progress.
+        var collectionAllowsGuestProgress = (
+          WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.indexOf(
+            GLOBALS.collectionId) !== -1);
+        if (collectionAllowsGuestProgress && !_isLoggedIn) {
+          GuestCollectionProgressService.recordExplorationCompletedInCollection(
+            GLOBALS.collectionId, _explorationId);
+        }
+
+        // For single state explorations, when the exploration reaches the
+        // terminal state and explorationActuallyStarted is false, record
+        // exploration actual start event.
+        if (!explorationActuallyStarted) {
+          StatsReportingService.recordExplorationActuallyStarted(
+            newStateName);
+          explorationActuallyStarted = true;
+        }
       }
     });
 
@@ -199,11 +226,15 @@ oppia.factory('ExplorationPlayerService', [
                 data);
               exploration.setInitialStateName(initStateName);
               initParams(manualParamChanges);
-              AudioTranslationManagerService.init(
+              AudioTranslationLanguageService.init(
                 exploration.getAllAudioLanguageCodes(),
                 null,
                 exploration.getLanguageCode(),
                 data.auto_tts_enabled);
+              AudioPreloaderService.init(exploration);
+              AudioPreloaderService.kickOffAudioPreloader(initStateName);
+              PlayerCorrectnessFeedbackEnabledService.init(
+                data.correctness_feedback_enabled);
               _loadInitialState(successCallback);
               NumberAttemptsService.reset();
             });
@@ -229,12 +260,16 @@ oppia.factory('ExplorationPlayerService', [
             StatsReportingService.initSession(
               _explorationId, exploration.title,
               version, data.session_id, GLOBALS.collectionId);
-            AudioTranslationManagerService.init(
+            AudioTranslationLanguageService.init(
               exploration.getAllAudioLanguageCodes(),
               data.preferred_audio_language_code,
               exploration.getLanguageCode(),
               data.auto_tts_enabled);
-
+            AudioPreloaderService.init(exploration);
+            AudioPreloaderService.kickOffAudioPreloader(
+              exploration.getInitialState().name);
+            PlayerCorrectnessFeedbackEnabledService.init(
+              data.correctness_feedback_enabled);
             _loadInitialState(successCallback);
             $rootScope.$broadcast('playerServiceInitialized');
           });
@@ -261,13 +296,10 @@ oppia.factory('ExplorationPlayerService', [
       getStateContentAudioTranslation: function(stateName, languageCode) {
         return exploration.getAudioTranslation(stateName, languageCode);
       },
-      getAllAudioTranslations: function() {
-        return exploration.getAllAudioTranslations();
-      },
       isContentAudioTranslationAvailable: function(stateName) {
         return Object.keys(
           exploration.getAudioTranslations(stateName)).length > 0 ||
-          AudioTranslationManagerService.isAutogeneratedAudioAllowed();
+          AudioTranslationLanguageService.isAutogeneratedAudioAllowed();
       },
       getInteractionHtml: function(stateName, labelForFocusTarget) {
         var interactionId = exploration.getInteractionId(stateName);
@@ -278,6 +310,7 @@ oppia.factory('ExplorationPlayerService', [
         return ExplorationHtmlFormatterService.getInteractionHtml(
           interactionId,
           exploration.getInteractionCustomizationArgs(stateName),
+          true,
           labelForFocusTarget);
       },
       getInteraction: function(stateName) {
@@ -295,6 +328,9 @@ oppia.factory('ExplorationPlayerService', [
           randomSuffix += ' ';
         }
         return randomSuffix;
+      },
+      getHints: function(stateName) {
+        return exploration.getInteraction(stateName).hints;
       },
       getSolution: function(stateName) {
         return exploration.getInteraction(stateName).solution;
@@ -315,31 +351,40 @@ oppia.factory('ExplorationPlayerService', [
         var oldState = exploration.getState(oldStateName);
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
-            _explorationId, oldStateName, oldState, answer, false,
+            _explorationId, oldStateName, oldState, answer,
             interactionRulesService));
+        var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
 
         if (!_editorPreviewMode) {
+          var feedbackIsUseful = (
+            AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+              _explorationId, oldStateName, oldState, answer,
+              interactionRulesService));
           StatsReportingService.recordAnswerSubmitted(
             oldStateName,
             LearnerParamsService.getAllParams(),
             answer,
             classificationResult.answerGroupIndex,
             classificationResult.ruleIndex,
-            classificationResult.classificationCategorization);
+            classificationResult.classificationCategorization,
+            feedbackIsUseful);
         }
 
         // Use angular.copy() to clone the object
         // since classificationResult.outcome points
         // at oldState.interaction.default_outcome
         var outcome = angular.copy(classificationResult.outcome);
-
         var newStateName = outcome.dest;
+        var refresherExplorationId = outcome.refresherExplorationId;
         var newState = exploration.getState(newStateName);
 
         // Compute the data for the next state.
         var oldParams = LearnerParamsService.getAllParams();
         oldParams.answer = answer;
-        var feedbackHtml = makeFeedback(outcome.feedback, [oldParams]);
+        var feedbackHtml =
+          makeFeedback(outcome.feedback.getHtml(), [oldParams]);
+        var feedbackAudioTranslations =
+          outcome.feedback.getBindableAudioTranslations();
         if (feedbackHtml === null) {
           answerIsBeingProcessed = false;
           AlertsService.addWarning('Expression parsing error.');
@@ -400,8 +445,10 @@ oppia.factory('ExplorationPlayerService', [
         $rootScope.$broadcast('updateActiveStateIfInEditor', newStateName);
         $rootScope.$broadcast('playerStateChange', newStateName);
         successCallback(
-          newStateName, refreshInteraction, feedbackHtml, questionHtml,
-          newParams);
+          newStateName, refreshInteraction, feedbackHtml,
+          feedbackAudioTranslations, questionHtml, newParams,
+          refresherExplorationId);
+        return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {
         return answerIsBeingProcessed;
@@ -414,27 +461,28 @@ oppia.factory('ExplorationPlayerService', [
           UrlInterpolationService.getStaticImageUrl(
             '/avatar/user_blue_72px.png'));
 
-        var deferred = $q.defer();
         if (_isLoggedIn && !_editorPreviewMode) {
-          $http.get(
+          return $http.get(
             '/preferenceshandler/profile_picture'
           ).then(function(response) {
             var profilePictureDataUrl = response.data.profile_picture_data_url;
-            if (profilePictureDataUrl) {
-              deferred.resolve(profilePictureDataUrl);
-            } else {
-              deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
-            }
+            return (
+              profilePictureDataUrl ? profilePictureDataUrl :
+              DEFAULT_PROFILE_IMAGE_PATH);
           });
         } else {
-          deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
+          return $q.resolve(DEFAULT_PROFILE_IMAGE_PATH);
         }
-        return deferred.promise;
       },
       recordSolutionHit: function(stateName) {
         if (!_editorPreviewMode) {
           StatsReportingService.recordSolutionHit(stateName);
         }
+      },
+      // Returns whether the screen is wide enough to fit two
+      // cards (e.g., the tutor and supplemental cards) side-by-side.
+      canWindowShowTwoCards: function() {
+        return WindowDimensionsService.getWidth() > TWO_CARD_THRESHOLD_PX;
       }
     };
   }

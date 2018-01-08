@@ -17,16 +17,16 @@
  */
 
 oppia.controller('Profile', [
-  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
+  '$scope', '$http', '$rootScope', 'DateTimeFormatService',
   'UrlInterpolationService',
-  function($scope, $http, $rootScope, oppiaDatetimeFormatter,
+  function($scope, $http, $rootScope, DateTimeFormatService,
     UrlInterpolationService) {
     var profileDataUrl = '/profilehandler/data/' + GLOBALS.PROFILE_USERNAME;
     var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService.getStaticImageUrl(
       '/general/no_profile_picture.png');
 
     $scope.getLocaleDateString = function(millisSinceEpoch) {
-      return oppiaDatetimeFormatter.getLocaleDateString(millisSinceEpoch);
+      return DateTimeFormatService.getLocaleDateString(millisSinceEpoch);
     };
 
     $rootScope.loadingMessage = 'Loading';

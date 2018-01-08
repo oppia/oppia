@@ -139,18 +139,6 @@ oppia.filter('wrapTextWithEllipsis', [
   }
 ]);
 
-// Filter that returns true iff an outcome has a self-loop and no feedback.
-oppia.filter('isOutcomeConfusing', [function() {
-  return function(outcome, currentStateName) {
-    return (
-      outcome.dest === currentStateName &&
-      !outcome.feedback.some(function(feedbackItem) {
-        return feedbackItem.trim().length > 0;
-      })
-    );
-  };
-}]);
-
 // Filter that changes {{...}} tags into the corresponding parameter input
 // values. Note that this returns an HTML string to accommodate the case of
 // multiple-choice input and image-click input.
@@ -317,7 +305,8 @@ oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
 oppia.filter('convertToPlainText', [function() {
   return function(input) {
     var strippedText = input.replace(/(<([^>]+)>)/ig, '');
-    strippedText = strippedText.replace('&nbsp;', ' ');
+    strippedText = strippedText.replace(/&nbsp;/ig, ' ');
+    strippedText = strippedText.replace(/&quot;/ig, '');
 
     var trimmedText = strippedText.trim();
     if (trimmedText.length === 0) {

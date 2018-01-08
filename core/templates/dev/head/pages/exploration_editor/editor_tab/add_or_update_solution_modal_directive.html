@@ -16,11 +16,18 @@
            angular-html-bind="correctAnswerEditorHtml">
       </div>
       <br>
+      <md-button class="oppia-learner-confirm-button protractor-test-submit-answer-button"
+                 ng-click="onSubmitFromSubmitButton()"
+                 ng-if="data.correctAnswer === null && shouldAdditionalSubmitButtonBeShown()"
+                 ng-disabled="!answerIsValid">
+        Submit
+      </md-button>
+      <br>
       <div ng-show="data.correctAnswer !== null">
         <strong>Explanation:</strong>
         <schema-based-editor class="protractor-test-explanation-textarea"
                              schema="EXPLANATION_FORM_SCHEMA"
-                             local-value="data.explanation">
+                             local-value="data.explanationHtml">
         </schema-based-editor>
       </div>
     </div>
@@ -31,8 +38,7 @@
   <button class="btn btn-default" ng-click="cancel()">Cancel</button>
   <button class="btn btn-success protractor-test-submit-solution-button"
           ng-click="saveSolution()"
-          ng-disabled="data.correctAnswer === null ||
-                       !data.explanation">
+          ng-disabled="data.correctAnswer === null || !data.explanationHtml || !answerIsValid">
     Check and Save Solution
   </button>
 </div>

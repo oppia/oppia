@@ -372,8 +372,13 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
             versions = range(1, exploration.version)
 
             # Get all exploration versions for current exploration id.
-            explorations = exp_services.get_multiple_explorations_by_version(
-                exploration.id, versions)
+            try:
+                explorations = (
+                    exp_services.get_multiple_explorations_by_version(
+                        exploration.id, versions))
+            except Exception as e:
+                yield ('ERROR with exp_id %s' % item.id, str(e))
+                return
 
         # Append latest exploration to the list of explorations.
         explorations.append(exploration)
@@ -389,6 +394,7 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
         for exploration, snapshot in zip(explorations, snapshots_by_version):
             if snapshot is None:
                 yield (
+                    'ERROR with exp_id %s' % item.id,
                     'Error: No exploration snapshot metadata model instance '
                     'found for exploration %s, version %d' % (
                         exploration.id, exploration.version))
@@ -405,6 +411,33 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
                 exp_services.create_and_save_state_id_mapping_model(
                     exploration, change_list)
         yield (exploration.id, exploration.version)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class HintsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that tabulates the number of hints used by each state of an
+    exploration.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+        for state_name, state in exploration.states.iteritems():
+            hints_length = len(state.interaction.hints)
+            if hints_length > 0:
+                exp_and_state_key = '%s %s' % (
+                    item.id, state_name.encode('utf-8'))
+                yield (str(hints_length), exp_and_state_key)
 
     @staticmethod
     def reduce(key, values):

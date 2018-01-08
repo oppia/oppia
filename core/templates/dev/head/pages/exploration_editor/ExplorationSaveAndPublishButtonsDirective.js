@@ -23,27 +23,27 @@ oppia.directive('explorationSaveAndPublishButtons', [
         '/pages/exploration_editor/' +
         'exploration_save_and_publish_buttons_directive.html'),
       controller: [
-        '$scope', 'changeListService', 'editabilityService',
-        'explorationRightsService', 'ExplorationWarningsService',
+        '$scope', 'ChangeListService', 'EditabilityService',
+        'ExplorationRightsService', 'ExplorationWarningsService',
         'ExplorationSaveService',
         function(
-            $scope, changeListService, editabilityService,
-            explorationRightsService, ExplorationWarningsService,
+            $scope, ChangeListService, EditabilityService,
+            ExplorationRightsService, ExplorationWarningsService,
             ExplorationSaveService) {
           $scope.saveIsInProcess = false;
           $scope.publishIsInProcess = false;
           $scope.loadingDotsAreShown = false;
 
           $scope.isPrivate = function() {
-            return explorationRightsService.isPrivate();
+            return ExplorationRightsService.isPrivate();
           };
 
           $scope.isExplorationLockedForEditing = function() {
-            return changeListService.isExplorationLockedForEditing();
+            return ChangeListService.isExplorationLockedForEditing();
           };
 
           $scope.isEditableOutsideTutorialMode = function() {
-            return editabilityService.isEditableOutsideTutorialMode();
+            return EditabilityService.isEditableOutsideTutorialMode();
           };
 
           $scope.countWarnings = function() {
@@ -55,7 +55,7 @@ oppia.directive('explorationSaveAndPublishButtons', [
           };
 
           $scope.getChangeListLength = function() {
-            return changeListService.getChangeList().length;
+            return ChangeListService.getChangeList().length;
           };
 
           $scope.isExplorationSaveable = function() {
@@ -65,7 +65,7 @@ oppia.directive('explorationSaveAndPublishButtons', [
           $scope.getPublishExplorationButtonTooltip = function() {
             if (ExplorationWarningsService.countWarnings() > 0) {
               return 'Please resolve the warnings before publishing.';
-            } else if (changeListService.isExplorationLockedForEditing()) {
+            } else if (ChangeListService.isExplorationLockedForEditing()) {
               return 'Please save your changes before publishing.';
             } else {
               return 'Publish to Oppia Library';
@@ -75,7 +75,7 @@ oppia.directive('explorationSaveAndPublishButtons', [
           $scope.getSaveButtonTooltip = function() {
             if (ExplorationWarningsService.hasCriticalWarnings() > 0) {
               return 'Please resolve the warnings.';
-            } else if (explorationRightsService.isPrivate()) {
+            } else if (ExplorationRightsService.isPrivate()) {
               return 'Save Draft';
             } else {
               return 'Publish Changes';

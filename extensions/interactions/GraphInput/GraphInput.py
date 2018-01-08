@@ -30,6 +30,7 @@ class GraphInput(base.BaseInteraction):
     narrow_instructions = 'View graph'
     needs_summary = True
     can_have_solution = True
+    show_generic_submit_button = True
 
     _customization_arg_specs = [{
         'name': 'graph',

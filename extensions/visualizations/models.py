@@ -33,9 +33,10 @@ class BaseVisualization(object):
     def id(self):
         return self.__class__.__name__
 
-    def __init__(self, calculation_id, options_dict):
+    def __init__(self, calculation_id, options_dict, show_addressed_info):
         self.options = options_dict
         self.calculation_id = calculation_id
+        self.show_addressed_info = show_addressed_info
 
     def validate(self):
         """Validates a visualization object.
@@ -59,6 +60,12 @@ class BaseVisualization(object):
         for spec in self._OPTIONS_SPECS:
             schema_utils.normalize_against_schema(
                 self.options[spec['name']], spec['schema'])
+
+        # Check that show_addressed_info is valid.
+        if not isinstance(self.show_addressed_info, bool):
+            raise utils.ValidationError(
+                'For visualization %s, expected a bool value for '
+                'show_addressed_info; received %s' % self.show_addressed_info)
 
 
 class BarChart(BaseVisualization):
@@ -90,7 +97,7 @@ class FrequencyTable(BaseVisualization):
             'items': {
                 'type': 'unicode',
             },
-            'len': 3,
+            'len': 2,
         },
     }, {
         'name': 'title',
@@ -115,7 +122,7 @@ class EnumeratedFrequencyTable(BaseVisualization):
             'items': {
                 'type': 'unicode',
             },
-            'len': 3,
+            'len': 2,
         },
     }, {
         'name': 'title',

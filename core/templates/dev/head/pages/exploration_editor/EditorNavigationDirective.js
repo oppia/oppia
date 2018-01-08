@@ -24,30 +24,34 @@ oppia.directive('editorNavigation', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_navigation_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$timeout', '$modal',
-        'RouterService', 'explorationRightsService',
+        '$scope', '$rootScope', '$timeout', '$uibModal',
+        'RouterService', 'ExplorationRightsService',
         'ExplorationWarningsService',
         'StateEditorTutorialFirstTimeService',
         'ThreadDataService', 'siteAnalyticsService',
         'ExplorationContextService', 'WindowDimensionsService',
         function(
-            $scope, $rootScope, $timeout, $modal,
-            RouterService, explorationRightsService,
+            $scope, $rootScope, $timeout, $uibModal,
+            RouterService, ExplorationRightsService,
             ExplorationWarningsService,
             StateEditorTutorialFirstTimeService,
             ThreadDataService, siteAnalyticsService,
             ExplorationContextService, WindowDimensionsService) {
-          $scope.postTutorialHelpPopoverIsShown = false;
+          $scope.popoverControlObject = {
+            postTutorialHelpPopoverIsShown: false
+          };
           $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
 
           $scope.$on('openPostTutorialHelpPopover', function() {
             if ($scope.isLargeScreen) {
-              $scope.postTutorialHelpPopoverIsShown = true;
+              $scope.popoverControlObject.postTutorialHelpPopoverIsShown = true;
               $timeout(function() {
-                $scope.postTutorialHelpPopoverIsShown = false;
+                $scope.popoverControlObject
+                  .postTutorialHelpPopoverIsShown = false;
               }, 5000);
             } else {
-              $scope.postTutorialHelpPopoverIsShown = false;
+              $scope.popoverControlObject
+              .postTutorialHelpPopoverIsShown = false;
             }
           });
 
@@ -56,16 +60,16 @@ oppia.directive('editorNavigation', [
           $scope.showUserHelpModal = function() {
             var explorationId = ExplorationContextService.getExplorationId();
             siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
-            var modalInstance = $modal.open({
+            var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration_editor/' +
                 'help_modal_directive.html'),
               backdrop: true,
               controller: [
-                '$scope', '$modalInstance',
+                '$scope', '$uibModalInstance',
                 'siteAnalyticsService', 'ExplorationContextService',
                 function(
-                  $scope, $modalInstance,
+                  $scope, $uibModalInstance,
                   siteAnalyticsService, ExplorationContextService) {
                   var explorationId = (
                     ExplorationContextService.getExplorationId());
@@ -74,13 +78,13 @@ oppia.directive('editorNavigation', [
                     siteAnalyticsService
                       .registerOpenTutorialFromHelpCenterEvent(
                         explorationId);
-                    $modalInstance.close();
+                    $uibModalInstance.close();
                   };
 
                   $scope.goToHelpCenter = function() {
                     siteAnalyticsService.registerVisitHelpCenterEvent(
                       explorationId);
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ],
@@ -99,7 +103,7 @@ oppia.directive('editorNavigation', [
           $scope.hasCriticalWarnings = (
             ExplorationWarningsService.hasCriticalWarnings);
 
-          $scope.explorationRightsService = explorationRightsService;
+          $scope.ExplorationRightsService = ExplorationRightsService;
           $scope.getTabStatuses = RouterService.getTabStatuses;
           $scope.selectMainTab = RouterService.navigateToMainTab;
           $scope.selectPreviewTab = RouterService.navigateToPreviewTab;

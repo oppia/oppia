@@ -16,10 +16,10 @@
 
 """System for computing recommendations for explorations and users."""
 
+import StringIO
 import csv
 import datetime
 import json
-import StringIO
 
 from core.domain import rights_manager
 from core.platform import models

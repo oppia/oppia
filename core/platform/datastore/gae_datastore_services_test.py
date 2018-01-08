@@ -16,10 +16,11 @@
 
 """Tests for the appengine datastore API wrapper."""
 
-from core.domain import exp_services
 from core.domain import collection_services
+from core.domain import exp_services
 from core.platform.datastore import gae_datastore_services
 from core.tests import test_utils
+
 
 class FetchMultipleEntitiesTests(test_utils.GenericTestBase):
     """Test fetching multiple entities from the datastore."""

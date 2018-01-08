@@ -18,6 +18,7 @@
 
 from core.domain import email_manager
 
+
 def inform_subscribers(creator_id, exploration_id, exploration_title):
     email_manager.send_emails_to_subscribers(
         creator_id, exploration_id, exploration_title)

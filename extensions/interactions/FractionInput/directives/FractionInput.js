@@ -18,22 +18,30 @@ oppia.directive('oppiaInteractiveFractionInput', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        // This should be called whenever the answer changes.
+        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/FractionInput/directives/' +
         'fraction_input_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'FocusManagerService',
-        'fractionInputRulesService',
+        '$scope', '$attrs', 'FocusManagerService', 'fractionInputRulesService',
         'FractionObjectFactory', 'FRACTION_PARSING_ERRORS',
-        function($scope, $attrs, FocusManagerService,
-          fractionInputRulesService,
-          FractionObjectFactory, FRACTION_PARSING_ERRORS) {
+        'WindowDimensionsService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        function(
+            $scope, $attrs, FocusManagerService, fractionInputRulesService,
+            FractionObjectFactory, FRACTION_PARSING_ERRORS,
+            WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
-          var requireSimplestForm =
-            $attrs.requireSimplestFormWithValue === 'true';
+          var requireSimplestForm = (
+            $attrs.requireSimplestFormWithValue === 'true');
+          var allowImproperFraction = (
+            $attrs.allowImproperFractionWithValue === 'true');
+          var allowNonzeroIntegerPart = (
+            $attrs.allowNonzeroIntegerPartWithValue === 'true');
+
           var errorMessage = '';
           // Label for errors caused whilst parsing a fraction.
           var FORM_ERROR_TYPE = 'FRACTION_FORMAT_ERROR';
@@ -93,6 +101,21 @@ oppia.directive('oppiaInteractiveFractionInput', [
                   '(e.g., 1/3 instead of 2/6).');
                 $scope.FractionInputForm.answer.$setValidity(
                   FORM_ERROR_TYPE, false);
+              } else if (
+                  !allowImproperFraction && fraction.isImproperFraction()) {
+                errorMessage = (
+                  'Please enter an answer with a "proper" fractional part ' +
+                  '(e.g., 1 2/3 instead of 5/3).');
+                $scope.FractionInputForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, false);
+              } else if (
+                  !allowNonzeroIntegerPart &&
+                  fraction.hasNonzeroIntegerPart()) {
+                errorMessage = (
+                  'Please enter your answer as a fraction (e.g., 5/3 instead ' +
+                  'of 1 2/3).');
+                $scope.FractionInputForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, false);
               } else {
                 $scope.onSubmit({
                   answer: fraction,
@@ -105,6 +128,22 @@ oppia.directive('oppiaInteractiveFractionInput', [
                 FORM_ERROR_TYPE, false);
             }
           };
+
+          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
+            $scope.submitAnswer($scope.answer);
+          });
+
+          $scope.isAnswerValid = function() {
+            return (!$scope.FractionInputForm.$invalid && $scope.answer !== '');
+          };
+
+          $scope.$watch(function() {
+            return $scope.answer;
+          }, function() {
+            $scope.setAnswerValidity({
+              answerValidity: $scope.isAnswerValid()
+            });
+          });
         }
       ]
     };
@@ -178,7 +217,8 @@ oppia.factory('fractionInputRulesService', [
         return toFloat(answer) > toFloat(inputs.f);
       },
       HasIntegerPartEqualTo: function(answer, inputs) {
-        return answer.wholeNumber === inputs.x;
+        var answerFraction = FractionObjectFactory.fromDict(answer);
+        return answerFraction.getIntegerPart() === inputs.x;
       },
       HasNumeratorEqualTo: function(answer, inputs) {
         return answer.numerator === inputs.x;

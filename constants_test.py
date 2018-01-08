@@ -16,8 +16,9 @@
 
 import os
 
-import constants #pylint: disable=relative-import
-from core.tests import test_utils #pylint: disable=relative-import
+import constants  # pylint: disable=relative-import
+from core.tests import test_utils  # pylint: disable=relative-import
+
 
 class ConstantsTests(test_utils.GenericTestBase):
 

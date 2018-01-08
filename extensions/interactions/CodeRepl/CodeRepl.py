@@ -30,6 +30,7 @@ class CodeRepl(base.BaseInteraction):
     narrow_instructions = 'Go to code editor'
     needs_summary = True
     can_have_solution = True
+    show_generic_submit_button = True
 
     # Language options 'lua', 'scheme', 'coffeescript', 'javascript', and
     # 'ruby' have been removed for possible later re-release.
@@ -78,8 +79,9 @@ class CodeRepl(base.BaseInteraction):
     _answer_visualization_specs = [{
         'id': 'FrequencyTable',
         'options': {
-            'column_headers': ['Answer', 'Count', 'Addressed?'],
-            'title': 'Top 10 answers'
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top 10 answers',
         },
         'calculation_id': 'Top10AnswerFrequencies',
+        'show_addressed_info': True,
     }]

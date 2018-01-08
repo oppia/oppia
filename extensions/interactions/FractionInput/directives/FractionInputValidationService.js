@@ -39,6 +39,10 @@ oppia.factory('FractionInputValidationService', [
         var warningsList = [];
         var shouldBeInSimplestForm =
           customizationArgs.requireSimplestForm.value;
+        var allowImproperFraction =
+            customizationArgs.allowImproperFraction.value;
+        var allowNonzeroIntegerPart =
+          customizationArgs.allowNonzeroIntegerPart.value;
 
         warningsList = warningsList.concat(
           this.getCustomizationArgsWarnings(customizationArgs));
@@ -102,6 +106,32 @@ oppia.factory('FractionInputValidationService', [
                     });
                   }
                 }
+                if (!allowImproperFraction) {
+                  var fraction = FractionObjectFactory.fromDict(rule.inputs.f);
+                  if (fraction.isImproperFraction()) {
+                    warningsList.push({
+                      type: WARNING_TYPES.ERROR,
+                      message: (
+                        'Rule ' + (j + 1) + ' from answer group ' +
+                        (i + 1) +
+                        ' will never be matched because it is an ' +
+                        'improper fraction')
+                    });
+                  }
+                }
+                if (!allowNonzeroIntegerPart) {
+                  var fraction = FractionObjectFactory.fromDict(rule.inputs.f);
+                  if (fraction.hasNonzeroIntegerPart()) {
+                    warningsList.push({
+                      type: WARNING_TYPES.ERROR,
+                      message: (
+                        'Rule ' + (j + 1) + ' from answer group ' +
+                        (i + 1) +
+                        ' will never be matched because it has a ' +
+                        'non zero integer part')
+                    });
+                  }
+                }
                 var f = toFloat(rule.inputs.f);
                 setLowerAndUpperBounds(range, f, f, true, true);
                 break;
@@ -124,6 +154,16 @@ oppia.factory('FractionInputValidationService', [
                 }
                 break;
               case 'HasIntegerPartEqualTo':
+                if (!allowNonzeroIntegerPart && rule.inputs.x !== 0) {
+                  warningsList.push({
+                    type: WARNING_TYPES.ERROR,
+                    message: (
+                      'Rule ' + (j + 1) + ' from answer group ' +
+                      (i + 1) +
+                      ' will never be matched because integer part ' +
+                      'has to be zero')
+                  });
+                }
                 if (!Number.isInteger(rule.inputs.x)) {
                   warningsList.push(getNonIntegerInputWarning(i, j));
                 }

@@ -37,15 +37,5 @@
         </button>
       </div>
     </div>
-
-    <!-- The following div will only show if maxAllowableSelectionCount is at
-      least 2. If maxAllowableSelectionCount is 1, the choices will be buttons
-      rather than checkboxes. -->
-    <div ng-if="displayCheckboxes">
-      <md-button class="oppia-learner-confirm-button"
-                 ng-click="submitAnswer(userSelections)" aria-label="Submit"
-                 ng-disabled="notEnoughSelections" translate="I18N_INTERACTIONS_ITEM_SELECTION_SUBMIT">
-      </md-button>
-    </div>
   </form>
 </div>

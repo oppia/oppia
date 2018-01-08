@@ -45,6 +45,7 @@ oppia.directive('explorationSummaryTile', [
         // desktop version of the summary tile is always displayed.
         mobileCutoffPx: '@mobileCutoffPx',
         isPlaylistTile: '&isPlaylistTile',
+        getParentExplorationIds: '&parentExplorationIds',
         showLearnerDashboardIconsIfPossible: (
           '&showLearnerDashboardIconsIfPossible')
       },
@@ -79,12 +80,12 @@ oppia.directive('explorationSummaryTile', [
       },
       controller: [
         '$scope', '$http',
-        'oppiaDatetimeFormatter', 'RatingComputationService',
-        'WindowDimensionsService',
+        'DateTimeFormatService', 'RatingComputationService',
+        'WindowDimensionsService', 'UrlService',
         function(
           $scope, $http,
-          oppiaDatetimeFormatter, RatingComputationService,
-          WindowDimensionsService) {
+          DateTimeFormatService, RatingComputationService,
+          WindowDimensionsService, UrlService) {
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.ACTIVITY_TYPE_EXPLORATION = (
             constants.ACTIVITY_TYPE_EXPLORATION);
@@ -120,7 +121,7 @@ oppia.directive('explorationSummaryTile', [
             if (!$scope.getLastUpdatedMsec()) {
               return null;
             }
-            return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               $scope.getLastUpdatedMsec());
           };
 
@@ -130,7 +131,16 @@ oppia.directive('explorationSummaryTile', [
             } else {
               var result = '/explore/' + $scope.getExplorationId();
               if ($scope.getCollectionId()) {
-                result += ('?collection_id=' + $scope.getCollectionId());
+                result = UrlService.addField(
+                  result, 'collection_id', $scope.getCollectionId());
+              }
+              if ($scope.getParentExplorationIds()) {
+                var parentExplorationIds = $scope.getParentExplorationIds();
+                for (var i = 0; i < parentExplorationIds.length - 1; i++ ) {
+                  result = UrlService.addField(
+                    result, 'parent', parentExplorationIds[i]);
+                }
+                return result;
               }
             }
             return result;

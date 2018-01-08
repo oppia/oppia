@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import StringIO
 import copy
 import datetime
 import os
-import StringIO
 import zipfile
 
 from core.domain import exp_domain
@@ -633,6 +633,7 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
 auto_tts_enabled: true
 blurb: ''
 category: A category
+correctness_feedback_enabled: false
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -655,8 +656,12 @@ states:
           value: 1
       default_outcome:
         dest: %s
-        feedback: []
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -676,8 +681,12 @@ states:
           value: 1
       default_outcome:
         dest: New state
-        feedback: []
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -696,6 +705,7 @@ title: A title
 auto_tts_enabled: true
 blurb: ''
 category: A category
+correctness_feedback_enabled: false
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -718,8 +728,12 @@ states:
           value: 1
       default_outcome:
         dest: %s
-        feedback: []
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -739,8 +753,12 @@ states:
           value: 1
       default_outcome:
         dest: Renamed state
-        feedback: []
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -867,8 +885,12 @@ interaction:
       value: 1
   default_outcome:
     dest: %s
-    feedback: []
+    feedback:
+      audio_translations: {}
+      html: ''
+    labelled_as_correct: false
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -891,8 +913,12 @@ interaction:
       value: 1
   default_outcome:
     dest: New state
-    feedback: []
+    feedback:
+      audio_translations: {}
+      html: ''
+    labelled_as_correct: false
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -916,8 +942,12 @@ interaction:
       value: 1
   default_outcome:
     dest: Renamed state
-    feedback: []
+    feedback:
+      audio_translations: {}
+      html: ''
+    labelled_as_correct: false
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -1024,16 +1054,25 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             }],
             'outcome': {
                 'dest': self.init_state_name,
-                'feedback': ['Try again'],
-                'param_changes': []
+                'feedback': {
+                    'audio_translations': {},
+                    'html': 'Try again'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
             },
-            'correct': False,
         }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
             'dest': self.init_state_name,
-            'feedback': ['Incorrect', '<b>Wrong answer</b>'],
-            'param_changes': []
+            'feedback': {
+                'audio_translations': {},
+                'html': '<b>Incorrect</b>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
         }
 
     def test_add_state_cmd(self):
@@ -1236,7 +1275,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         outcome = init_interaction.answer_groups[0].outcome
         self.assertEqual(rule_specs[0].rule_type, 'Equals')
         self.assertEqual(rule_specs[0].inputs, {'x': 0})
-        self.assertEqual(outcome.feedback, ['Try again'])
+        self.assertEqual(outcome.feedback.html, 'Try again')
         self.assertEqual(outcome.dest, self.init_state_name)
         self.assertEqual(init_interaction.default_outcome.dest, 'State 2')
 
@@ -2245,6 +2284,7 @@ class ExplorationConversionPipelineTests(ExplorationServicesUnitTests):
 auto_tts_enabled: true
 blurb: ''
 category: category
+correctness_feedback_enabled: false
 init_state_name: %s
 language_code: en
 objective: Old objective
@@ -2281,8 +2321,12 @@ states:
           value: Continue
       default_outcome:
         dest: END
-        feedback: []
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null

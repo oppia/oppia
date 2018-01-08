@@ -25,14 +25,19 @@ oppia.directive('oppiaInteractiveSetInput', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        // This should be called whenever the answer changes.
+        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/SetInput/directives/' +
         'set_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$translate', 'setInputRulesService',
-        function($scope, $attrs, $translate, setInputRulesService) {
+        'WindowDimensionsService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        function(
+            $scope, $attrs, $translate, setInputRulesService,
+            WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.schema = {
             type: 'list',
             items: {
@@ -71,6 +76,22 @@ oppia.directive('oppiaInteractiveSetInput', [
               });
             }
           };
+
+          $scope.isAnswerValid = function() {
+            return ($scope.answer.length > 0);
+          };
+
+          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
+            $scope.submitAnswer($scope.answer);
+          });
+
+          $scope.$watch(function() {
+            return $scope.answer;
+          }, function() {
+            $scope.setAnswerValidity({
+              answerValidity: $scope.isAnswerValid()
+            });
+          });
         }
       ]
     };

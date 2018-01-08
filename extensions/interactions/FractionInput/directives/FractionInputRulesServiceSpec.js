@@ -127,6 +127,9 @@ describe('Fraction Input rules service', function() {
     expect(firs.HasIntegerPartEqualTo(
       createPositiveFractionDict(2, 0, 2), INTEGER_RULE_INPUT)).toBe(
       false);
+    expect(firs.HasIntegerPartEqualTo(
+      createNegativeFractionDict(20, 0, 2), INTEGER_RULE_INPUT)).toBe(
+      false);
   });
 
   it('should have a correct \'has numerator equal to\' rule', function() {

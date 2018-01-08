@@ -29,7 +29,6 @@ from constants import constants
 import feconf
 import utils
 
-
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 COLLECTION_PROPERTY_TITLE = 'title'
@@ -59,6 +58,14 @@ CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
 CMD_ADD_COLLECTION_SKILL = 'add_collection_skill'
 # This takes an additional 'skill_id' parameter.
 CMD_DELETE_COLLECTION_SKILL = 'delete_collection_skill'
+# This takes additional 'question_id' and 'skill_id' parameters.
+CMD_ADD_QUESTION_ID_TO_SKILL = 'add_question_id_to_skill'
+# This takes additional 'question_id' and 'skill_id' parameters.
+CMD_REMOVE_QUESTION_ID_FROM_SKILL = 'remove_question_id_from_skill'
+
+# Prefix for skill IDs. This should not be changed -- doing so will result in
+# backwards-compatibility issues.
+_SKILL_ID_PREFIX = 'skill'
 
 
 class CollectionChange(object):
@@ -129,6 +136,12 @@ class CollectionChange(object):
             self.to_version = change_dict['to_version']
         elif self.cmd == CMD_ADD_COLLECTION_SKILL:
             self.name = change_dict['name']
+        elif self.cmd == CMD_ADD_QUESTION_ID_TO_SKILL:
+            self.skill_id = change_dict['skill_id']
+            self.question_id = change_dict['question_id']
+        elif self.cmd == CMD_REMOVE_QUESTION_ID_FROM_SKILL:
+            self.skill_id = change_dict['skill_id']
+            self.question_id = change_dict['question_id']
         elif self.cmd == CMD_DELETE_COLLECTION_SKILL:
             self.skill_id = change_dict['skill_id']
         else:
@@ -388,7 +401,7 @@ class CollectionSkill(object):
             raise utils.ValidationError(
                 'Expected index to be nonnegative, received %s' % index)
 
-        return 'skill%s' % index
+        return '%s%s' % (_SKILL_ID_PREFIX, index)
 
     @staticmethod
     def validate_skill_id(skill_id):
@@ -401,12 +414,12 @@ class CollectionSkill(object):
                 'Expected skill ID to have length at least 6, received %s' %
                 skill_id)
 
-        if skill_id[0:5] != 'skill':
+        if skill_id[:5] != _SKILL_ID_PREFIX:
             raise utils.ValidationError(
-                'Expected skill ID to begin with \'skill\', received %s' %
-                skill_id)
+                'Expected skill ID to begin with \'%s\', received %s' %
+                (_SKILL_ID_PREFIX, skill_id))
 
-        if not skill_id[5:].isdigit():
+        if not skill_id[len(_SKILL_ID_PREFIX):].isdigit():
             raise utils.ValidationError(
                 'Expected skill ID to end with a number, received %s' %
                 skill_id)
@@ -443,7 +456,7 @@ class Collection(object):
 
     def __init__(self, collection_id, title, category, objective,
                  language_code, tags, schema_version, nodes, skills,
-                 next_skill_id, version, created_on=None, last_updated=None):
+                 next_skill_index, version, created_on=None, last_updated=None):
         """Constructs a new collection given all the information necessary to
         represent a collection.
 
@@ -470,6 +483,9 @@ class Collection(object):
             schema_version: int. The schema version for the collection.
             nodes: list(CollectionNode). The list of nodes present in the
                 collection.
+            skills: dict. A dict mapping skill IDs to skill objects.
+            next_skill_index: int. The index to use for the next new skill
+                added to the collection.
             version: int. The version of the collection.
             created_on: datetime.datetime. Date and time when the collection is
                 created.
@@ -485,7 +501,7 @@ class Collection(object):
         self.schema_version = schema_version
         self.nodes = nodes
         self.skills = skills
-        self.next_skill_id = next_skill_id
+        self.next_skill_index = next_skill_index
         self.version = version
         self.created_on = created_on
         self.last_updated = last_updated
@@ -507,7 +523,7 @@ class Collection(object):
             'nodes': [
                 node.to_dict() for node in self.nodes
             ],
-            'next_skill_id': self.next_skill_id,
+            'next_skill_index': self.next_skill_index,
             'skills': {
                 skill_id: skill.to_dict()
                 for skill_id, skill in self.skills.iteritems()
@@ -569,7 +585,7 @@ class Collection(object):
                 for skill_id, skill_dict in
                 collection_dict['skills'].iteritems()
             },
-            collection_dict['next_skill_id'], collection_version,
+            collection_dict['next_skill_index'], collection_version,
             collection_created_on, collection_last_updated)
 
         return collection
@@ -644,6 +660,18 @@ class Collection(object):
         return collection_dict
 
     @classmethod
+    def _convert_v4_dict_to_v5_dict(cls, collection_dict):
+        """Converts a v4 collection dict into a v5 collection dict.
+
+        This changes the field name of next_skill_id to next_skill_index.
+        """
+        cls._convert_collection_contents_v4_dict_to_v5_dict(
+            collection_dict)
+
+        collection_dict['schema_version'] = 5
+        return collection_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the collection in the latest schema
         format.
@@ -709,11 +737,11 @@ class Collection(object):
         changes the language code.
 
         Args:
-            collection_contents: Collection. The Collection domain object to
-                convert.
+            collection_contents: dict. A dict representing the collection
+                contents object to convert.
 
         Returns:
-            Collection. The new Collection domain object.
+            dict. The updated collection_contents dict.
         """
         return collection_contents
 
@@ -724,11 +752,11 @@ class Collection(object):
         handled while loading the collection.
 
         Args:
-            collection_contents: Collection. The Collection domain object to
-                convert.
+            collection_contents: dict. A dict representing the collection
+                contents object to convert.
 
         Returns:
-            Collection. The new Collection domain object.
+            dict. The updated collection_contents dict.
         """
         return collection_contents
 
@@ -740,7 +768,14 @@ class Collection(object):
         Adds a skills dict and skill id counter. Migrates prerequisite_skills
         and acquired_skills to prerequistite_skill_ids and acquired_skill_ids.
         Then, gets skills in prerequisite_skill_ids and acquired_skill_ids in
-        nodes, and assigns them integer IDs.
+        nodes, and assigns them IDs.
+
+        Args:
+            collection_contents: dict. A dict representing the collection
+                contents object to convert.
+
+        Returns:
+            dict. The updated collection_contents dict.
         """
 
         skill_names = set()
@@ -771,6 +806,27 @@ class Collection(object):
         }
 
         collection_contents['next_skill_id'] = len(skill_names)
+
+        return collection_contents
+
+    @classmethod
+    def _convert_collection_contents_v4_dict_to_v5_dict(
+            cls, collection_contents):
+        """Converts from version 4 to 5.
+
+        Converts next_skill_id to next_skill_index, since next_skill_id isn't
+        actually a skill ID.
+
+        Args:
+            collection_contents: dict. A dict representing the collection
+                contents object to convert.
+
+        Returns:
+            dict. The updated collection_contents dict.
+        """
+        collection_contents['next_skill_index'] = collection_contents[
+            'next_skill_id']
+        del collection_contents['next_skill_id']
 
         return collection_contents
 
@@ -852,12 +908,8 @@ class Collection(object):
             list(str). A list of exploration IDs for which the prerequisite
             skills are satisfied.
         """
-        acquired_skill_ids = set()
-        for completed_exp_id in completed_exploration_ids:
-            collection_node = self.get_node(completed_exp_id)
-            if collection_node:
-                acquired_skill_ids.update(collection_node.acquired_skill_ids)
-
+        acquired_skill_ids = self.get_acquired_skill_ids_from_exploration_ids(
+            completed_exploration_ids)
         next_exp_ids = []
         for node in self.nodes:
             if node.exploration_id in completed_exploration_ids:
@@ -1064,16 +1116,42 @@ class Collection(object):
         del self.nodes[node_index]
 
     def add_skill(self, skill_name):
-        """Adds the new skill domain object with the specified name."""
+        """Adds the new skill domain object with the specified name.
 
-        for _, skill in self.skills.iteritems():
-            if skill.name == skill_name:
-                raise ValueError(
-                    'Skill with name "%s" already exists.' % skill_name)
+        Args:
+            skill_name: str. The name of the skill.
 
-        skill_id = CollectionSkill.get_skill_id_from_index(self.next_skill_id)
+        Returns
+            str. The id of the new skill.
+        """
+        if any([
+                skill_name == skill.name
+                for skill in self.skills.itervalues()]):
+            raise ValueError(
+                'Skill with name "%s" already exists.' % skill_name)
+
+        skill_id = CollectionSkill.get_skill_id_from_index(
+            self.next_skill_index)
         self.skills[skill_id] = CollectionSkill(skill_id, skill_name, [])
-        self.next_skill_id += 1
+        self.next_skill_index += 1
+        return skill_id
+
+    def get_skill_id_from_skill_name(self, skill_name):
+        """Gets the skill id from the skill name.
+
+        Args:
+            skill_name: str. The name of the skill.
+
+        Returns:
+            str or None. The id of the skill or None if the skill is not
+                present.
+        """
+        skill_id = None
+        for skill in self.skills.itervalues():
+            if skill_name == skill.name:
+                skill_id = skill.id
+                break
+        return skill_id
 
     def update_skill(self, skill_id, new_skill_name):
         """Renames skill with specified id to the new skill name."""
@@ -1081,10 +1159,11 @@ class Collection(object):
             raise ValueError(
                 'Skill with ID "%s" does not exist.' % skill_id)
 
-        for skill in self.skills.values():
-            if skill.name == new_skill_name:
-                raise ValueError('Skill with name "%s" already exists.'
-                                 % new_skill_name)
+        if any([
+                new_skill_name == skill.name
+                for skill in self.skills.itervalues()]):
+            raise ValueError('Skill with name "%s" already exists.'
+                             % new_skill_name)
 
         self.skills[skill_id].name = new_skill_name
 
@@ -1101,6 +1180,56 @@ class Collection(object):
                 node.acquired_skill_ids.remove(skill_id)
 
         del self.skills[skill_id]
+
+    def add_question_id_to_skill(self, skill_id, question_id):
+        """Adds the question id to the question list of the appropriate skill.
+
+        Args:
+            skill_id: str. The id of the skill.
+            question_id: str. The id of the question.
+
+        Raises:
+            Exception: question_id is already present in skill.
+        """
+        question_ids = self.skills[skill_id].question_ids
+        if question_id not in question_ids:
+            self.skills[skill_id].question_ids.append(
+                question_id)
+        else:
+            raise Exception(
+                'Question ID %s is already present in skill %s' % (
+                    self.question_id, skill_id))
+
+    def remove_question_id_from_skill(self, skill_id, question_id):
+        """Removes question id from the question list of the appropriate skill.
+
+        Args:
+            skill_id: str. The id of the skill.
+            question_id: str. The id of the question.
+
+        Raises:
+            Exception: question_id is not present in the skill.
+        """
+        if question_id not in self.skills[skill_id].question_ids:
+            raise Exception(
+                'Question ID %s is not present in skill %s' % (
+                    question_id, self.skills[skill_id].name))
+        else:
+            self.skills[skill_id].question_ids.remove(question_id)
+
+    def get_acquired_skill_ids_from_exploration_ids(self, exploration_ids):
+        """Returns a list of skill ids acquired by completing the given
+        explorations in the collection.
+
+        Returns:
+            set(str). A set of skill ids.
+        """
+        acquired_skill_ids = set()
+        for exp_id in exploration_ids:
+            collection_node = self.get_node(exp_id)
+            if collection_node:
+                acquired_skill_ids.update(collection_node.acquired_skill_ids)
+        return acquired_skill_ids
 
     def validate(self, strict=True):
         """Validates all properties of this collection and its constituents.
@@ -1144,6 +1273,13 @@ class Collection(object):
                     for lc in constants.ALL_LANGUAGE_CODES]):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
+
+        # TODO(sll): Remove this check once App Engine supports 3-letter
+        # language codes in search.
+        if len(self.language_code) != 2:
+            raise utils.ValidationError(
+                'Invalid language_code, it should have exactly 2 letters: %s' %
+                self.language_code)
 
         if not isinstance(self.tags, list):
             raise utils.ValidationError(
@@ -1206,24 +1342,24 @@ class Collection(object):
             raise utils.ValidationError(
                 'Expected skills to be a dict, received %s' % self.skills)
 
-        if not isinstance(self.next_skill_id, int):
+        if not isinstance(self.next_skill_index, int):
             raise utils.ValidationError(
-                'Expected next_skill_id to be an int, received %s' %
-                self.next_skill_id)
+                'Expected next_skill_index to be an int, received %s' %
+                self.next_skill_index)
 
-        if self.next_skill_id < 0:
+        if self.next_skill_index < 0:
             raise utils.ValidationError(
-                'Expected next_skill_id to be nonnegative, received %s' %
-                self.next_skill_id)
+                'Expected next_skill_index to be nonnegative, received %s' %
+                self.next_skill_index)
 
         # Validate all skills.
         for skill_id, skill in self.skills.iteritems():
             CollectionSkill.validate_skill_id(skill_id)
 
-            if int(skill_id[5:]) >= self.next_skill_id:
+            if int(skill_id[len(_SKILL_ID_PREFIX):]) >= self.next_skill_index:
                 raise utils.ValidationError(
                     'Expected skill ID number to be less than %s, received %s' %
-                    (self.next_skill_id, skill_id))
+                    (self.next_skill_index, skill_id))
 
             skill.validate()
 

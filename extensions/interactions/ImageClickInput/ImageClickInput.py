@@ -32,6 +32,7 @@ class ImageClickInput(base.BaseInteraction):
     # a solution. Once this issue is fixed, ImageClickInput interaction can be
     # supported by the solution feature.
     can_have_solution = False
+    show_generic_submit_button = False
 
     _customization_arg_specs = [{
         'name': 'imageAndRegions',
@@ -61,4 +62,8 @@ class ImageClickInput(base.BaseInteraction):
             'y_axis_label': 'Count',
         },
         'calculation_id': 'AnswerFrequencies',
+        # Bar charts don't have any useful way to display which answers are
+        # addressed yet. By setting this option to False, we consequentially
+        # avoid doing extra computation.
+        'show_addressed_info': False,
     }]

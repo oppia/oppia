@@ -3,7 +3,7 @@
     <h3>Basic Settings</h3>
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
-        <div ng-if="editabilityService.isEditable()">
+        <div ng-if="EditabilityService.isEditable()">
           <div role="form" class="form-horizontal">
             <exploration-title-editor label-text="Title"
                                       focus-label="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>"
@@ -85,7 +85,7 @@
           </div>
         </div>
 
-        <div ng-if="!editabilityService.isEditable()">
+        <div ng-if="!EditabilityService.isEditable()">
           <div class="row">
             <div class="col-lg-2 col-md-2 col-sm-2">
               <label for="explorationTitle">
@@ -147,7 +147,7 @@
     </div>
   </md-card>
 
-  <md-card class="oppia-editor-card" ng-if="editabilityService.isEditable()">
+  <md-card class="oppia-editor-card" ng-if="EditabilityService.isEditable()">
     <h3>Advanced Features</h3>
     <div class="row">
       <div class="row">
@@ -192,119 +192,139 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div role="form" class="form-horizontal">
+            <label for="enableCorrectnessFeedback" class="col-lg-2 col-md-2 col-sm-2">
+              Correctness Feedback
+            </label>
+            <span class="col-lg-2 col-md-2 col-sm-2">
+              <button type="button" class="btn btn-default" ng-click="toggleCorrectnessFeedback()" style="margin-top: 16px">
+                <span ng-if="!isCorrectnessFeedbackEnabled()">
+                  Enable
+                </span>
+                <span ng-if="isCorrectnessFeedbackEnabled()">
+                  Disable
+                </span>
+              </button>
+            </span>
+            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              This allows the user to categorise answer groups as correct or incorrect.
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   </md-card>
 
   <md-card class="oppia-editor-card">
-    <div ng-if="explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()">
+    <div ng-if="ExplorationRightsService.ownerNames.length > 0 && !ExplorationRightsService.isCloned()">
       <div class="row">
         <div class="col-lg-5 col-md-5 col-sm-5">
           <h3>Roles</h3>
-          <div ng-show="explorationRightsService.ownerNames.length > 0">
+          <div ng-show="ExplorationRightsService.ownerNames.length > 0">
             <strong>Managers</strong>
             <ul>
-              <li ng-repeat="ownerName in explorationRightsService.ownerNames track by $index">
+              <li ng-repeat="ownerName in ExplorationRightsService.ownerNames track by $index">
                 <[ownerName]>
               </li>
             </ul>
           </div>
 
-          <div ng-show="explorationRightsService.editorNames.length > 0">
+          <div ng-show="ExplorationRightsService.editorNames.length > 0">
             <strong>Collaborators</strong>
             <ul>
-              <li ng-repeat="editorName in explorationRightsService.editorNames track by $index">
+              <li ng-repeat="editorName in ExplorationRightsService.editorNames track by $index">
                 <[editorName]>
               </li>
             </ul>
           </div>
 
-          <div ng-show="explorationRightsService.viewerNames.length > 0">
+          <div ng-show="ExplorationRightsService.viewerNames.length > 0">
             <strong>Playtesters</strong>
             <ul>
-              <li ng-repeat="viewerName in explorationRightsService.viewerNames track by $index">
+              <li ng-repeat="viewerName in ExplorationRightsService.viewerNames track by $index">
                 <[viewerName]>
               </li>
             </ul>
           </div>
 
 
-          {% if can_modify_roles %}
-            <div ng-hide="isRolesFormOpen">
-              <button type="button" class="btn btn-default protractor-test-edit-roles" ng-click="openEditRolesForm()">
-                Edit Roles
-              </button>
-            </div>
+          <div ng-if="canModifyRoles" ng-hide="isRolesFormOpen">
+            <button type="button" class="btn btn-default protractor-test-edit-roles" ng-click="openEditRolesForm()">
+              Edit Roles
+            </button>
+          </div>
 
-            <div ng-show="isRolesFormOpen">
-              <strong>Add or Change Role</strong>
-              <div class="form-group">
-                <form ng-submit="editRole(newMemberUsername, newMemberRole.value)">
-                  <label for="newMemberUsername">Username of invited user</label>
-                  <div>
-                    <input type="text" id="newMemberUsername" class="form-control protractor-test-role-username" ng-model="newMemberUsername" placeholder="{{username}}">
-                  </div>
-                  <br>
-                  <label for="newMemberRole">Role of invited user</label>
-                  <div>
-                    <select ng-model="newMemberRole" class="form-control protractor-test-role-select" ng-options="r.name for r in ROLES" style="width: 250px;">
-                    </select>
-                    <span class="help-block">
-                      Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).
-                    </span>
-                  </div>
+          <div ng-if="canModifyRoles" ng-show="isRolesFormOpen">
+            <strong>Add or Change Role</strong>
+            <div class="form-group">
+              <form ng-submit="editRole(newMemberUsername, newMemberRole.value)">
+                <label for="newMemberUsername">Username of invited user</label>
+                <div>
+                  <input type="text" id="newMemberUsername" class="form-control protractor-test-role-username" ng-model="newMemberUsername" placeholder="{{username}}">
+                </div>
+                <br>
+                <label for="newMemberRole">Role of invited user</label>
+                <div>
+                  <select ng-model="newMemberRole" class="form-control protractor-test-role-select" ng-options="r.name for r in ROLES" style="width: 250px;">
+                  </select>
+                  <span class="help-block">
+                    Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).
+                  </span>
+                </div>
 
-                  <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
-                  <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
-                    ng-show="isRolesFormOpen">
-                    Cancel
-                  </button>
-                </form>
-              </div>
+                <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
+                <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
+                  ng-show="isRolesFormOpen">
+                  Cancel
+                </button>
+              </form>
             </div>
-          {% endif %}
+          </div>
         </div>
 
         <div class="col-lg-7 col-md-7 col-sm-7">
           <h3>Permissions</h3>
-          <p ng-if="explorationRightsService.isPrivate() &&explorationRightsService.viewableIfPrivate()">
+          <p ng-if="ExplorationRightsService.isPrivate() && ExplorationRightsService.viewableIfPrivate()">
             This exploration is <strong>private</strong>. Anyone with the link can access it.
           </p>
-          <p ng-if="explorationRightsService.isPrivate() &&!explorationRightsService.viewableIfPrivate()">
+          <p ng-if="ExplorationRightsService.isPrivate() && !ExplorationRightsService.viewableIfPrivate()">
             This exploration is <strong>private</strong>. Only invited users, moderators and site admins can
             access it.
           </p>
-          <p ng-if="!explorationRightsService.isPrivate()">
+          <p ng-if="!ExplorationRightsService.isPrivate()">
             This exploration is <strong>public</strong>: anyone can access it.
           </p>
 
-          <p ng-if="!explorationRightsService.isPrivate() || explorationRightsService.viewableIfPrivate()">
+          <p ng-if="!ExplorationRightsService.isPrivate() || ExplorationRightsService.viewableIfPrivate()">
             <em>Link to share:</em>
             <input class="form-control" type="text" value="<[getExplorePageUrl(explorationId)]>" readonly="readonly" onClick="this.select();">
           </p>
 
           <br>
 
-          <p ng-if="explorationRightsService.isPrivate()">
+          <p ng-if="ExplorationRightsService.isPrivate()">
             It is <strong>not shown</strong> in the Oppia library.
           </p>
-          <p ng-if="!explorationRightsService.isPrivate()">
+          <p ng-if="!ExplorationRightsService.isPrivate()">
             It is <strong>available</strong> in the Oppia library.
           </p>
         </div>
       </div>
     </div>
 
-    <div ng-if="explorationRightsService.ownerNames.length === 0 && !explorationRightsService.isCloned()">
+    <div ng-if="ExplorationRightsService.ownerNames.length === 0 && !ExplorationRightsService.isCloned()">
       <h3>Permissions</h3>
       <div>
         This exploration is <strong>public</strong> and <strong>community-editable</strong>.
-        <p ng-if="!explorationRightsService.isPrivate()">
+        <p ng-if="!ExplorationRightsService.isPrivate()">
           It is <strong>available</strong> in the Oppia library.
         </p>
       </div>
     </div>
 
-    <div ng-if="explorationRightsService.isCloned()">
+    <div ng-if="ExplorationRightsService.isCloned()">
       <h3>Status</h3>
       <div>
         This exploration was <strong>cloned</strong> from another exploration.
@@ -373,48 +393,42 @@
     </div>
   </md-card>
 
-  <md-card class="oppia-editor-card" ng-if="editabilityService.isEditable()">
+  <md-card class="oppia-editor-card" ng-if="EditabilityService.isEditable()">
     <div class="row">
       <div class="col-lg-6 col-md-6 col-sm-6">
         <h3>Controls</h3>
 
-        {% if can_release_ownership %}
-          <p class="oppia-exploration-ctrl" ng-hide="explorationRightsService.isCommunityOwned()">
-            <button type="button" class="btn btn-default" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
-              Transfer ownership to the community
-            </button>
-            <span ng-if="isExplorationLockedForEditing()">
-              <br>
-              Please save your changes first.
-            </span>
-          </p>
-        {% endif %}
+        <p ng-if="canReleaseOwnership" class="oppia-exploration-ctrl" ng-hide="ExplorationRightsService.isCommunityOwned()">
+          <button type="button" class="btn btn-default" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
+            Transfer ownership to the community
+          </button>
+          <span ng-if="isExplorationLockedForEditing()">
+            <br>
+            Please save your changes first.
+          </span>
+        </p>
 
-        {% if can_delete %}
-          <p class="oppia-exploration-ctrl">
-            <button type="button" ng-if="explorationRightsService.isPrivate()"
-                    class="btn btn-danger" ng-click="deleteExploration()"
-                    title="Delete this exploration">
-              Delete Exploration
-            </button>
-          </p>
-        {% endif %}
+        <p ng-if="canDelete" class="oppia-exploration-ctrl">
+          <button type="button" ng-if="ExplorationRightsService.isPrivate()"
+                  class="btn btn-danger" ng-click="deleteExploration()"
+                  title="Delete this exploration">
+            Delete Exploration
+          </button>
+        </p>
       </div>
 
       <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
         <h3>Admin Controls</h3>
 
-        {% if can_unpublish %}
-          <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="explorationRightsService.isPublic()">
-            <button type="button" class="btn btn-default" ng-click="unpublishExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
-              Unpublish
-              <span ng-if="currentUserIsAdmin">(as admin)</span>
-              <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
-            </button>
-          </p>
-        {% endif %}
+        <p ng-if="canUnpublish" class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="ExplorationRightsService.isPublic()">
+          <button type="button" class="btn btn-default" ng-click="unpublishExplorationAsModerator()" ng-disabled="isExplorationLockedForEditing()">
+            Unpublish
+            <span ng-if="currentUserIsAdmin">(as admin)</span>
+            <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
+          </button>
+        </p>
 
-        <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
+        <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="ExplorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
           <button type="button" class="btn btn-danger protractor-test-delete-exploration-button"
                   ng-click="deleteExploration()">
             Delete Exploration
@@ -444,7 +458,7 @@
 
     <h3>
       Initial parameter changes
-      <i class="material-icons md-18" tooltip="These changes are applied before the learner begins the exploration."
+      <i class="material-icons md-18" uib-tooltip="These changes are applied before the learner begins the exploration."
          tooltip-placement="right" style="padding-left: 4px; vertical-align: text-top;">&#xE88E;</i>
     </h3>
 

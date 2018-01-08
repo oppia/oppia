@@ -17,15 +17,15 @@
  */
 
 oppia.controller('ExplorationGraph', [
-  '$scope', '$modal', 'EditorStateService', 'AlertsService',
-  'explorationStatesService', 'editabilityService', 'RouterService',
+  '$scope', '$uibModal', 'EditorStateService', 'AlertsService',
+  'explorationStatesService', 'EditabilityService', 'RouterService',
   'graphDataService', 'UrlInterpolationService',
   function(
-    $scope, $modal, EditorStateService, AlertsService,
-    explorationStatesService, editabilityService, RouterService,
+    $scope, $uibModal, EditorStateService, AlertsService,
+    explorationStatesService, EditabilityService, RouterService,
     graphDataService, UrlInterpolationService) {
     $scope.getGraphData = graphDataService.getGraphData;
-    $scope.isEditable = editabilityService.isEditable;
+    $scope.isEditable = EditabilityService.isEditable;
 
     // We hide the graph at the outset in order not to confuse new exploration
     // creators.
@@ -49,7 +49,7 @@ oppia.controller('ExplorationGraph', [
     $scope.openStateGraphModal = function() {
       AlertsService.clearWarnings();
 
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/editor_tab/' +
           'exploration_graph_modal_directive.html'),
@@ -61,30 +61,30 @@ oppia.controller('ExplorationGraph', [
         },
         windowClass: 'oppia-large-modal-window',
         controller: [
-          '$scope', '$modalInstance', 'EditorStateService',
+          '$scope', '$uibModalInstance', 'EditorStateService',
           'graphDataService', 'isEditable',
-          function($scope, $modalInstance, EditorStateService,
+          function($scope, $uibModalInstance, EditorStateService,
                    graphDataService, isEditable) {
             $scope.currentStateName = EditorStateService.getActiveStateName();
             $scope.graphData = graphDataService.getGraphData();
             $scope.isEditable = isEditable;
 
             $scope.deleteState = function(stateName) {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 action: 'delete',
                 stateName: stateName
               });
             };
 
             $scope.selectState = function(stateName) {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 action: 'navigate',
                 stateName: stateName
               });
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               AlertsService.clearWarnings();
             };
           }

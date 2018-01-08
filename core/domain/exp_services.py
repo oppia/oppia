@@ -21,6 +21,7 @@ stored in the database. In particular, the various query methods should
 delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
+import StringIO
 import collections
 import copy
 import datetime
@@ -28,7 +29,7 @@ import logging
 import math
 import os
 import pprint
-import StringIO
+import traceback
 import zipfile
 
 from constants import constants
@@ -169,6 +170,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         versioned_exploration_states['states'],
         exploration_model.param_specs, exploration_model.param_changes,
         exploration_model.version, exploration_model.auto_tts_enabled,
+        exploration_model.correctness_feedback_enabled,
         created_on=exploration_model.created_on,
         last_updated=exploration_model.last_updated)
 
@@ -774,6 +776,9 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
                     exploration.update_auto_tts_enabled(change.new_value)
+                elif change.property_name == 'correctness_feedback_enabled':
+                    exploration.update_correctness_feedback_enabled(
+                        change.new_value)
             elif (
                     change.cmd ==
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
@@ -791,6 +796,7 @@ def apply_change_list(exploration_id, change_list):
                 e.__class__.__name__, e, exploration_id,
                 pprint.pprint(change_list))
         )
+        logging.error(traceback.format_exc())
         raise
 
 
@@ -852,6 +858,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
     exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
+    exploration_model.correctness_feedback_enabled = (
+        exploration.correctness_feedback_enabled)
 
     exploration_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
@@ -924,7 +932,8 @@ def _create_exploration(
             for (state_name, state) in exploration.states.iteritems()},
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
-        auto_tts_enabled=exploration.auto_tts_enabled
+        auto_tts_enabled=exploration.auto_tts_enabled,
+        correctness_feedback_enabled=exploration.correctness_feedback_enabled
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1

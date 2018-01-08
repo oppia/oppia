@@ -23,9 +23,16 @@ var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 
 describe('State editor', function() {
+  var explorationPlayerPage = null;
+
+  beforeEach(function() {
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
+
   it('should walk through the tutorial when user repeatedly clicks Next',
     function() {
       var NUM_TUTORIAL_STAGES = 7;
@@ -59,11 +66,11 @@ describe('State editor', function() {
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.expectContentToMatch(forms.toRichText('plain text'));
-    player.expectExplorationToNotBeOver();
-    player.expectInteractionToMatch('Continue', 'click here');
-    player.submitAnswer('Continue', null);
-    player.expectExplorationToBeOver();
+    explorationPlayerPage.expectContentToMatch(forms.toRichText('plain text'));
+    explorationPlayerPage.expectExplorationToNotBeOver();
+    explorationPlayerPage.expectInteractionToMatch('Continue', 'click here');
+    explorationPlayerPage.submitAnswer('Continue', null);
+    explorationPlayerPage.expectExplorationToBeOver();
 
     users.logout();
   });
@@ -92,13 +99,12 @@ describe('State editor', function() {
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.expectExplorationToNotBeOver();
-    player.expectInteractionToMatch(
+    explorationPlayerPage.expectExplorationToNotBeOver();
+    explorationPlayerPage.expectInteractionToMatch(
       'MultipleChoiceInput',
       [forms.toRichText('option A'), forms.toRichText('option B')]);
-    player.submitAnswer('MultipleChoiceInput', 'option B');
-    player.expectExplorationToBeOver();
-
+    explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'option B');
+    explorationPlayerPage.expectExplorationToBeOver();
     users.logout();
   });
 
@@ -120,17 +126,20 @@ describe('State editor', function() {
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.submitAnswer('NumericInput', 5);
-    player.expectLatestFeedbackToMatch(forms.toRichText('out of bounds'));
-    player.expectExplorationToNotBeOver();
+    explorationPlayerPage.submitAnswer('NumericInput', 5);
+    explorationPlayerPage.expectLatestFeedbackToMatch(
+      forms.toRichText('out of bounds')
+    );
+    explorationPlayerPage.expectExplorationToNotBeOver();
     // It's important to test the value 0 in order to ensure that it would
     // still get submitted even though it is a falsy value in JavaScript.
-    player.submitAnswer('NumericInput', 0);
-    player.expectLatestFeedbackToMatch(function(richTextChecker) {
-      richTextChecker.readBoldText('correct');
-    });
-    player.clickThroughToNextCard();
-    player.expectExplorationToBeOver();
+    explorationPlayerPage.submitAnswer('NumericInput', 0);
+    explorationPlayerPage.expectLatestFeedbackToMatch(
+      function(richTextChecker) {
+        richTextChecker.readBoldText('correct');
+      });
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToBeOver();
 
     users.logout();
   });
@@ -150,7 +159,7 @@ describe('State editor', function() {
       by.css('.protractor-test-save-interaction'));
     expect(saveInteractionBtn.isPresent()).toBe(false);
 
-    element(by.css('.protractor-test-close-add-response-modal')).click();
+    editor.closeAddResponseModal();
 
     // The Continue input has customization options. Therefore the
     // customization modal does appear and so does the save interaction button.
@@ -214,7 +223,8 @@ describe('State editor', function() {
   });
 
   it('should add/modify/delete a hint', function() {
-    users.login('stateEditorUser1@example.com');
+    users.createUser('stateEditorUser2@example.com', 'stateEditorUser2');
+    users.login('stateEditorUser2@example.com');
     workflow.createExploration();
     editor.setContent(forms.toRichText('some content'));
 
@@ -230,12 +240,14 @@ describe('State editor', function() {
     editor.addHint('hint one');
     editor.HintEditor(0).setHint('modified hint one');
     editor.HintEditor(0).deleteHint();
+    general.waitForSystem();
     editor.saveChanges();
     users.logout();
   });
 
   it('should add a solution', function() {
-    users.login('stateEditorUser1@example.com');
+    users.createUser('stateEditorUser3@example.com', 'stateEditorUser3');
+    users.login('stateEditorUser3@example.com');
     workflow.createExploration();
     editor.setContent(forms.toRichText('some content'));
 

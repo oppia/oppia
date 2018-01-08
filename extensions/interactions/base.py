@@ -111,6 +111,11 @@ class BaseInteraction(object):
     default_outcome_heading = None
     # Whether the solution feature supports this interaction.
     can_have_solution = None
+    # Whether to show a Submit button in the progress navigation area. This is
+    # a generic submit button so do not use this if special interaction-specific
+    # behavior is required. The interaction JS must also handle the
+    # EVENT_PROGRESS_NAV_SUBMITTED event broadcast by this Submit button.
+    show_generic_submit_button = False
 
     # Temporary cache for the rule definitions.
     _cached_rules_dict = None
@@ -136,7 +141,10 @@ class BaseInteraction(object):
             factory_cls = (
                 visualization_registry.Registry.get_visualization_class(
                     spec['id']))
-            result.append(factory_cls(spec['calculation_id'], spec['options']))
+            result.append(
+                factory_cls(
+                    spec['calculation_id'], spec['options'],
+                    spec['show_addressed_info']))
         return result
 
     @property
@@ -226,6 +234,7 @@ class BaseInteraction(object):
             'default_outcome_heading': self.default_outcome_heading,
             'rule_descriptions': self._rule_description_strings,
             'can_have_solution': self.can_have_solution,
+            'show_generic_submit_button': self.show_generic_submit_button,
         }
 
     def get_rule_description(self, rule_name):

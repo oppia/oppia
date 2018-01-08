@@ -125,7 +125,7 @@
                       <strong class="protractor-test-subscription-name"
                               popover-append-to-body
                               popover-trigger="<[showUsernamePopover(subscription.creator_username)]>"
-                              ng-attr-popover="<[subscription.creator_username]>">
+                              ng-attr-uib-popover="<[subscription.creator_username]>">
                         <[subscription.creator_username| truncate:10]>
                       </strong>
                     </div>
@@ -231,25 +231,25 @@
             <div class="col-lg-10 col-md-10 col-sm-10">
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
+                  <input type="checkbox" class="protractor-test-email-updates-checkbox" ng-model="canReceiveEmailUpdates" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
                   <span translate="I18N_PREFERENCES_EMAIL_RECEIVE_NEWS"></span>
                 </label>
               </div>
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="canReceiveEditorRoleEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
+                  <input type="checkbox" class="protractor-test-editor-role-email-checkbox" ng-model="canReceiveEditorRoleEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
                   <span translate="I18N_PREFERENCES_EMAIL_RECEIVE_EDIT_RIGHTS_NEWS"></span>
                 </label>
               </div>
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="canReceiveSubscriptionEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
+                  <input type="checkbox" class="protractor-test-subscription-email-checkbox" ng-model="canReceiveSubscriptionEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
                   <span translate="I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS"></span>
                 </label>
               </div>
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="canReceiveFeedbackMessageEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
+                  <input type="checkbox" class="protractor-test-feedback-message-email-checkbox" ng-model="canReceiveFeedbackMessageEmail" ng-change="saveEmailPreferences(canReceiveEmailUpdates, canReceiveEditorRoleEmail, canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail)">
                   <span translate="I18N_PREFERENCES_EMAIL_RECEIVE_FEEDBACK_NEWS"></span>
                 </label>
               </div>

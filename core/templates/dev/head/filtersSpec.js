@@ -27,7 +27,6 @@ describe('Testing filters', function() {
     'replaceInputsWithEllipses',
     'truncateAtFirstEllipsis',
     'wrapTextWithEllipsis',
-    'isOutcomeConfusing',
     'parameterizeRuleDescription',
     'normalizeWhitespace',
     'convertToPlainText',

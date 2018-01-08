@@ -20,7 +20,6 @@ from core.domain import exp_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.tests import test_utils
-
 import feconf
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'

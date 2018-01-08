@@ -18,7 +18,12 @@
 
 import ast
 import collections
+import copy
 import datetime
+
+import feconf
+import utils
+
 
 from core import jobs
 from core.domain import exp_domain
@@ -28,12 +33,224 @@ from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.platform import models
 
-import feconf
-import utils
-
-(stats_models, exp_models) = models.Registry.import_models([
-    models.NAMES.statistics, models.NAMES.exploration
+(exp_models, stats_models,) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.statistics
 ])
+
+
+class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for recomputing creator statistics from the events
+    in the datastore. Should only be run in events of data corruption.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StateCompleteEventLogEntryModel,
+                stats_models.AnswerSubmittedEventLogEntryModel,
+                stats_models.StateHitEventLogEntryModel,
+                stats_models.SolutionHitEventLogEntryModel,
+                stats_models.ExplorationActualStartEventLogEntryModel,
+                stats_models.CompleteExplorationEventLogEntryModel
+               ]
+
+    @staticmethod
+    def map(item):
+        if item.event_schema_version != 2:
+            return
+        if isinstance(item, stats_models.StateCompleteEventLogEntryModel):
+            yield (item.exp_id,
+                   {
+                       'event_type': feconf.EVENT_TYPE_STATE_COMPLETED,
+                       'version': item.exp_version,
+                       'state_name': item.state_name
+                   })
+        elif isinstance(
+                item, stats_models.AnswerSubmittedEventLogEntryModel):
+            yield (item.exp_id,
+                   {
+                       'event_type': feconf.EVENT_TYPE_ANSWER_SUBMITTED,
+                       'version': item.exp_version,
+                       'state_name': item.state_name,
+                       'is_feedback_useful': item.is_feedback_useful
+                   })
+        elif isinstance(item, stats_models.StateHitEventLogEntryModel):
+            yield (item.exploration_id,
+                   {
+                       'event_type': feconf.EVENT_TYPE_STATE_HIT,
+                       'version': item.exploration_version,
+                       'state_name': item.state_name,
+                       'session_id': item.session_id
+                   })
+        elif isinstance(item, stats_models.SolutionHitEventLogEntryModel):
+            yield (item.exp_id,
+                   {
+                       'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
+                       'version': item.exp_version,
+                       'state_name': item.state_name,
+                       'session_id': item.session_id
+                   })
+        elif isinstance(
+                item, stats_models.ExplorationActualStartEventLogEntryModel):
+            yield (item.exp_id,
+                   {
+                       'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
+                       'version': item.exp_version,
+                       'state_name': item.state_name
+                   })
+        elif isinstance(
+                item, stats_models.CompleteExplorationEventLogEntryModel):
+            yield (item.exploration_id,
+                   {
+                       'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+                       'version': item.exploration_version,
+                       'state_name': item.state_name
+                   })
+
+    @staticmethod
+    def reduce(exp_id, values):
+        values = map(ast.literal_eval, values)
+        sorted_events_dicts = sorted(values, key=lambda x: x['version'])
+
+        # Find the latest version number
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        latest_exp_version = exploration.version
+        versions = range(1, latest_exp_version + 1)
+
+        # Get a copy of the corrupted statistics models to copy uncorrupted
+        # v1 fields
+        old_stats = stats_services.get_multiple_exploration_stats_by_version(
+            exp_id, versions)
+        # Get list of snapshot models for each version of the exploration
+        snapshots_by_version = (
+            exp_models.ExplorationModel.get_snapshots_metadata(
+                exp_id, versions))
+
+        exp_stats_dicts = []
+        event_dict_idx = 0
+        event_dict = sorted_events_dicts[event_dict_idx]
+        for version in versions:
+            datastore_stats_for_version = old_stats[version-1]
+            if version == 1:
+                # Reset the possibly corrupted stats
+                datastore_stats_for_version.num_starts_v2 = 0
+                datastore_stats_for_version.num_completions_v2 = 0
+                datastore_stats_for_version.num_actual_starts_v2 = 0
+                for state_stats in (datastore_stats_for_version.
+                                    state_stats_mapping.values()):
+                    state_stats.total_answers_count_v2 = 0
+                    state_stats.useful_feedback_count_v2 = 0
+                    state_stats.total_hit_count_v2 = 0
+                    state_stats.first_hit_count_v2 = 0
+                    state_stats.num_times_solution_viewed_v2 = 0
+                    state_stats.num_completions_v2 = 0
+                exp_stats_dict = datastore_stats_for_version.to_dict()
+            else:
+                change_list = snapshots_by_version[version - 1]['commit_cmds']
+                # Copy recomputed v2 events from previous version
+                prev_stats_dict = copy.deepcopy(exp_stats_dicts[-1])
+                prev_stats_dict = (
+                    RecomputeStatisticsOneOffJob._apply_state_name_changes(
+                        prev_stats_dict, change_list))
+                # Copy uncorrupt v1 stats
+                prev_stats_dict['num_starts_v1'] = (
+                    datastore_stats_for_version.num_starts_v1)
+                prev_stats_dict['num_completions_v1'] = (
+                    datastore_stats_for_version.num_completions_v1)
+                prev_stats_dict['num_actual_starts_v1'] = (
+                    datastore_stats_for_version.num_actual_starts_v1)
+                state_stats_mapping = prev_stats_dict['state_stats_mapping']
+                for state in state_stats_mapping:
+                    state_stats_mapping[state]['total_answers_count_v1'] = (
+                        datastore_stats_for_version.state_stats_mapping[state]
+                        .total_answers_count_v1)
+                    state_stats_mapping[state]['useful_feedback_count_v1'] = (
+                        datastore_stats_for_version.state_stats_mapping[state]
+                        .useful_feedback_count_v1)
+                    state_stats_mapping[state]['total_hit_count_v1'] = (
+                        datastore_stats_for_version.state_stats_mapping[state]
+                        .total_hit_count_v1)
+                    state_stats_mapping[state]['first_hit_count_v1'] = (
+                        datastore_stats_for_version.state_stats_mapping[state]
+                        .first_hit_count_v1)
+                    state_stats_mapping[state]['num_completions_v1'] = (
+                        datastore_stats_for_version.state_stats_mapping[state]
+                        .num_completions_v1)
+                exp_stats_dict = copy.deepcopy(prev_stats_dict)
+
+            # Compute the statistics for events corresponding to this version
+            state_hit_session_ids, solution_hit_session_ids = set(), set()
+            while event_dict['version'] == version:
+                state_stats = (exp_stats_dict['state_stats_mapping'][
+                    event_dict['state_name']])
+                if event_dict['event_type'] == (
+                        feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION):
+                    exp_stats_dict['num_actual_starts_v2'] += 1
+                elif event_dict['event_type'] == (
+                        feconf.EVENT_TYPE_COMPLETE_EXPLORATION):
+                    exp_stats_dict['num_completions_v2'] += 1
+                elif event_dict['event_type'] == (
+                        feconf.EVENT_TYPE_ANSWER_SUBMITTED):
+                    state_stats['total_answers_count_v2'] += 1
+                    if event_dict['is_feedback_useful']:
+                        state_stats['useful_feedback_count_v2'] += 1
+                elif event_dict['event_type'] == feconf.EVENT_TYPE_STATE_HIT:
+                    state_stats['total_hit_count_v2'] += 1
+                    state_hit_key = (
+                        event_dict['session_id'] + event_dict['state_name'])
+                    if state_hit_key not in state_hit_session_ids:
+                        state_stats['first_hit_count_v2'] += 1
+                        state_hit_session_ids.add(state_hit_key)
+                elif event_dict['event_type'] == feconf.EVENT_TYPE_SOLUTION_HIT:
+                    solution_hit_key = (
+                        event_dict['session_id'] + event_dict['state_name'])
+                    if solution_hit_key not in solution_hit_session_ids:
+                        state_stats['num_times_solution_viewed_v2'] += 1
+                        solution_hit_session_ids.add(solution_hit_key)
+                elif event_dict['event_type'] == (
+                        feconf.EVENT_TYPE_STATE_COMPLETED):
+                    state_stats['num_completions_v2'] += 1
+                event_dict_idx += 1
+                if event_dict_idx < len(sorted_events_dicts):
+                    event_dict = sorted_events_dicts[event_dict_idx]
+                else:
+                    break
+
+            exp_stats_dicts.append(copy.deepcopy(exp_stats_dict))
+        stats_models.ExplorationStatsModel.save_multi(exp_stats_dicts)
+
+    @classmethod
+    def _apply_state_name_changes(cls, prev_stats_dict, change_list):
+        """Update the state_stats_mapping to correspond with the changes
+        in change_list.
+
+        Args:
+            prev_stats_dict: dict. A dict representation of an
+                ExplorationStatsModel.
+            change_list: list(dict). A list of all of the commit cmds from
+                the old_stats_model up to the next version.
+
+        Returns:
+            dict. A dict representation of an ExplorationStatsModel
+                with updated state_stats_mapping and version.
+        """
+        # Handling state additions, deletions and renames.
+        for change_dict in change_list:
+            if change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
+
+                prev_stats_dict['state_stats_mapping'][change_dict[
+                    'state_name']] = (stats_domain.StateStats
+                                      .create_default())
+            elif change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
+                prev_stats_dict['state_stats_mapping'].pop(change_dict[
+                    'state_name'])
+            elif change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
+                prev_stats_dict['state_stats_mapping'][
+                    change_dict['new_state_name']] = (
+                        prev_stats_dict['state_stats_mapping'].pop(
+                            change_dict['old_state_name']))
+        prev_stats_dict['exp_version'] += 1
+
+        return prev_stats_dict
 
 
 class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
@@ -138,6 +355,26 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 if answer['classification_categorization'] != (
                         exp_domain.DEFAULT_OUTCOME_CLASSIFICATION):
                     useful_feedback_count += 1
+                else:
+                    try:
+                        exploration = exp_services.get_exploration_by_id(
+                            item.exploration_id,
+                            version=item.exploration_version)
+                    except Exception:
+                        # Exploration does not exist.
+                        return
+
+                    state = exploration.states[unicode_state_name]
+                    if state.interaction.default_outcome is None:
+                        yield (
+                            'ERROR: Default outcome does not exist for state '
+                            '%s of exploration %s.' % (
+                                unicode_state_name, item.exploration_id))
+                        continue
+
+                    dest_state = state.interaction.default_outcome.dest
+                    if dest_state != unicode_state_name:
+                        useful_feedback_count += 1
             value = {
                 'event_type': GenerateV1StatisticsJob.EVENT_TYPE_STATE_ANSWERS,
                 'version': item.exploration_version,
@@ -174,6 +411,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
         snapshots_by_version = (
             exp_models.ExplorationModel.get_snapshots_metadata(
                 exp_id, version_numbers))
+        snapshot_timestamps_msec = [
+            snapshot['created_on_ms']
+            for snapshot in snapshots_by_version]
         exploration_stats_by_version = (
             stats_services.get_multiple_exploration_stats_by_version(
                 exp_id, version_numbers))
@@ -227,10 +467,29 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
             elif value['event_type'] == feconf.EVENT_TYPE_STATE_HIT:
                 state_name = value['state_name']
                 session_id = value['session_id']
+                event_timestamp_msec = value['created_on']
+
+                # Some state hit events have version as None. In these cases,
+                # we identify the version by comparing the event timestamp with
+                # the snapshot timestamps.
+                if version is None:
+                    # If the event timestamp is greater than the max snapshot
+                    # timestamp, then it is the latest version.
+                    if event_timestamp_msec > max(snapshot_timestamps_msec):
+                        version = len(snapshot_timestamps_msec)
+                    else:
+                        for index, snapshot_timestamp_msec in enumerate(
+                                snapshot_timestamps_msec):
+                            if event_timestamp_msec < snapshot_timestamp_msec:
+                                version = index
+                                break
+
+                versioned_exploration = explorations_by_version[version - 1]
 
                 # Some state names in events have spaces replaced with plus
                 # signs. We explicitly log these for future reference.
-                if '+' in state_name:
+                if '+' in state_name and (
+                        state_name not in versioned_exploration.states):
                     state_name = state_name.replace('+', ' ')
                     value['state_name'] = state_name
                     yield (
@@ -238,14 +497,24 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                         '%s) contains + instead of spaces.' % (
                             state_name, value['event_id'],
                             datetime.datetime.fromtimestamp(
-                                value['created_on']/1000)))
+                                event_timestamp_msec/1000)))
+
+                # Check that the event state name is in the list of states of
+                # the exploration domain object. If it is not, skip the event.
+                if state_name not in versioned_exploration.states:
+                    yield (
+                        'LOG: StateHitEvent with ID %s does not correspond to '
+                        'state name %s of version %s of the exploration with '
+                        'ID %s.' % (
+                            value['event_id'], state_name, version, exp_id))
+                    continue
 
                 state_hit_counts_by_version[version][state_name][
                     'total_hit_count'] += 1
                 state_session_ids_by_version[version][state_name].add(
                     session_id)
 
-                if value['created_on'] > session_id_latest_event_mapping[
+                if event_timestamp_msec > session_id_latest_event_mapping[
                         version][session_id]['created_on']:
                     session_id_latest_event_mapping[version][
                         session_id] = value
@@ -304,18 +573,51 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
 
                 # Handling state additions, renames and deletions.
                 for change_dict in change_list:
-                    if change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
-                        state_stats_mapping[change_dict[
-                            'state_name']] = (
-                                stats_domain.StateStats.create_default())
+                    # During v1 -> v2 migration of states, all pseudo END states
+                    # were replaced by an explicit END state through this
+                    # migration. We account for that change in the
+                    # state_stats_mapping too.
+                    if change_dict['cmd'] == (
+                            'migrate_states_schema_to_latest_version'):
+                        pseudo_end_state_name = 'END'
+                        if int(change_dict['from_version']) < 2 <= int(
+                                change_dict['to_version']):
+                            # The explicit end state is created only if there is
+                            # some state that used to refer to an implicit 'END'
+                            # state. This is confirmed by checking that there is
+                            # a state called 'END' in the immediate version of
+                            # the exploration after migration.
+                            if pseudo_end_state_name in (
+                                    versioned_exploration.states) and (
+                                        pseudo_end_state_name not in (
+                                            state_stats_mapping)):
+                                state_stats_mapping[pseudo_end_state_name] = (
+                                    stats_domain.StateStats.create_default())
+                    elif change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
+                        state_stats_mapping[change_dict['state_name']] = (
+                            stats_domain.StateStats.create_default())
                     elif change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
-                        state_stats_mapping.pop(
-                            change_dict['state_name'])
+                        if change_dict['state_name'] not in state_stats_mapping:
+                            yield (
+                                'ERROR during state deletion: State name %s not'
+                                ' in state stats mapping of exploration with ID'
+                                ' %s and version %s' % (
+                                    change_dict['state_name'], exp_id, version))
+                            return
+                        state_stats_mapping.pop(change_dict['state_name'])
                     elif change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
-                        state_stats_mapping[change_dict[
-                            'new_state_name']] = (
-                                state_stats_mapping.pop(
-                                    change_dict['old_state_name']))
+                        if change_dict['old_state_name'] not in (
+                                state_stats_mapping):
+                            yield (
+                                'ERROR during state rename: State name %s not '
+                                'in state stats mapping of exploration with ID '
+                                '%s and version %s' % (
+                                    change_dict['old_state_name'], exp_id,
+                                    version))
+                            return
+                        state_stats_mapping[change_dict['new_state_name']] = (
+                            state_stats_mapping.pop(
+                                change_dict['old_state_name']))
                     elif change_dict['cmd'] == 'AUTO_revert_version_number':
                         revert_to_version = change_dict['version_number']
 
@@ -397,7 +699,9 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 dest_states = [
                     answer_group.outcome.dest
                     for answer_group in init_state.interaction.answer_groups]
-                dest_states.append(init_state.interaction.default_outcome.dest)
+                if init_state.interaction.default_outcome is not None:
+                    dest_states.append(
+                        init_state.interaction.default_outcome.dest)
                 for dest_state in dest_states:
                     if dest_state != versioned_exploration.init_state_name:
                         # Some older explorations had the pseudo-END state as a
@@ -429,8 +733,57 @@ class GenerateV1StatisticsJob(jobs.BaseMapReduceOneOffJobManager):
                 exploration_stats = stats_domain.ExplorationStats(
                     exp_id, version, num_starts, 0, num_actual_starts, 0,
                     num_completions, 0, state_stats_mapping)
+
+            # Check if the number of actual starts is greater than the number of
+            # starts and update num_starts to be the maximum of the
+            # first hit count of all states of the exploration.
+            if exploration_stats.num_actual_starts_v1 > (
+                    exploration_stats.num_starts_v1):
+                exploration_stats.num_starts_v1 = max([
+                    exploration_stats.state_stats_mapping[
+                        state_name].first_hit_count_v1
+                    for state_name in exploration_stats.state_stats_mapping])
+
             exploration_stats_by_version_updated.append(
                 exploration_stats.to_dict())
+
+        refresh = False
+        # Check if number of actual starts is still greater than the number of
+        # starts for any version of the exploration.
+        for exploration_stats_dict in exploration_stats_by_version_updated:
+            if exploration_stats_dict['num_actual_starts_v1'] > (
+                    exploration_stats_dict['num_starts_v1']):
+                yield (
+                    'LOG: Refreshing statistics due to actual starts being '
+                    'greater than starts for exploration with ID %s ' % (
+                        exp_id))
+                refresh = True
+                break
+
+        # Check if number of actual starts is lesser than the number of
+        # completions for any version of the exploration.
+        for exploration_stats_dict in exploration_stats_by_version_updated:
+            if exploration_stats_dict['num_actual_starts_v1'] < (
+                    exploration_stats_dict['num_completions_v1']):
+                yield (
+                    'LOG: Refreshing statistics due to actual starts being '
+                    'lesser than completions for exploration with ID %s ' % (
+                        exp_id))
+                refresh = True
+                break
+
+        # Refresh statistics for all versions of the exploration.
+        if refresh:
+            for index, exploration_stats_dict in enumerate(
+                    exploration_stats_by_version_updated):
+                default_state_stats_mapping = {}
+                for state_name in exploration_stats_dict['state_stats_mapping']:
+                    default_state_stats_mapping[state_name] = (
+                        stats_domain.StateStats.create_default())
+                exploration_stats_by_version_updated[index] = (
+                    stats_domain.ExplorationStats.create_default(
+                        exp_id, index + 1,
+                        default_state_stats_mapping).to_dict())
 
         # Save all the ExplorationStats models to storage.
         stats_models.ExplorationStatsModel.save_multi(
@@ -778,3 +1131,128 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                     'all: %s sum:%s' % (
                         key, state_name, all_state_hit[state_name],
                         sum_state_hit[state_name]),)
+
+
+class GenerateAllStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Generates default state stats models for all explorations. This should be
+    run before GenerateV1StatisticsJob. If there are existing stats models,
+    their values are refreshed.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exp_model):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            exp_model: ExplorationModel.
+        """
+        if exp_model.deleted:
+            return
+
+        try:
+            exploration = exp_services.get_exploration_from_model(exp_model)
+        except Exception as e:
+            # Exploration does not exist.
+            return
+
+        latest_exp_version = exploration.version
+        exp_id = exploration.id
+
+        version_numbers = range(1, latest_exp_version + 1)
+        try:
+            explorations_by_version = (
+                exp_services.get_multiple_explorations_by_version(
+                    exp_id, version_numbers))
+        except Exception as e:
+            yield (exp_id, str(e))
+            return
+
+        yield (exp_id, 'Stats initial generation started')
+
+        # Retrieve list of snapshot models representing each version of the
+        # exploration.
+        snapshots_by_version = (
+            exp_models.ExplorationModel.get_snapshots_metadata(
+                exp_id, version_numbers))
+
+        # This dict will store the cumulative values of state stats from version
+        # 1 till the latest version of an exploration.
+        state_stats_mapping = {}
+        # This list will contain all the ExplorationStats domain objects for
+        # each version.
+        exploration_stats_by_version_updated = []
+        for version in version_numbers:
+            versioned_exploration = explorations_by_version[version - 1]
+
+            revert_to_version = None
+            if version == 1:
+                # Create default state stats mapping for the first version.
+                for state_name in versioned_exploration.states:
+                    state_stats_mapping[state_name] = (
+                        stats_domain.StateStats.create_default())
+            else:
+                change_list = snapshots_by_version[version - 1]['commit_cmds']
+
+                # Handling state additions, renames and deletions.
+                for change_dict in change_list:
+                    # During v1 -> v2 migration of states, all pseudo END states
+                    # were replaced by an explicit END state through this
+                    # migration. We account for that change in the
+                    # state_stats_mapping too.
+                    if change_dict['cmd'] == (
+                            'migrate_states_schema_to_latest_version'):
+                        pseudo_end_state_name = 'END'
+                        if int(change_dict['from_version']) < 2 <= int(
+                                change_dict['to_version']):
+                            # The explicit end state is created only if there is
+                            # some state that used to refer to an implicit 'END'
+                            # state. This is confirmed by checking that there is
+                            # a state called 'END' in the immediate version of
+                            # the exploration after migration.
+                            if pseudo_end_state_name in (
+                                    versioned_exploration.states) and (
+                                        pseudo_end_state_name not in (
+                                            state_stats_mapping)):
+                                state_stats_mapping[pseudo_end_state_name] = (
+                                    stats_domain.StateStats.create_default())
+                    elif change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
+                        state_stats_mapping[change_dict['state_name']] = (
+                            stats_domain.StateStats.create_default())
+                    elif change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
+                        state_stats_mapping.pop(change_dict['state_name'])
+                    elif change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
+                        state_stats_mapping[change_dict['new_state_name']] = (
+                            state_stats_mapping.pop(
+                                change_dict['old_state_name']))
+                    elif change_dict['cmd'] == 'AUTO_revert_version_number':
+                        revert_to_version = change_dict['version_number']
+
+            # Handling exploration reverts.
+            if revert_to_version:
+                old_exploration_stats = exploration_stats_by_version_updated[
+                    revert_to_version - 1]
+                state_stats_mapping = {
+                    state_name: stats_domain.StateStats.from_dict(
+                        old_exploration_stats['state_stats_mapping'][
+                            state_name])
+                    for state_name in old_exploration_stats[
+                        'state_stats_mapping']
+                }
+
+            # Create a fresh ExplorationStatsModel instance.
+            exploration_stats = stats_domain.ExplorationStats(
+                exp_id, version, 0, 0, 0, 0, 0, 0, state_stats_mapping)
+            exploration_stats_by_version_updated.append(
+                exploration_stats.to_dict())
+
+        # Save all the ExplorationStats models to storage.
+        stats_models.ExplorationStatsModel.save_multi(
+            exploration_stats_by_version_updated)
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        yield (key, stringified_values)

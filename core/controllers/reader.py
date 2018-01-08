@@ -18,8 +18,6 @@ import json
 import logging
 import random
 
-import jinja2
-
 from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
@@ -41,6 +39,8 @@ from core.domain import summary_services
 from core.domain import user_services
 import feconf
 import utils
+
+import jinja2
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
@@ -284,7 +284,9 @@ class ExplorationHandler(base.BaseHandler):
             'version': exploration.version,
             'preferred_audio_language_code': preferred_audio_language_code,
             'state_classifier_mapping': state_classifier_mapping,
-            'auto_tts_enabled': exploration.auto_tts_enabled
+            'auto_tts_enabled': exploration.auto_tts_enabled,
+            'correctness_feedback_enabled': (
+                exploration.correctness_feedback_enabled),
         })
         self.render_json(self.values)
 

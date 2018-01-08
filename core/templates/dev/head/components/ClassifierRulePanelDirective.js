@@ -28,10 +28,10 @@ oppia.directive('classifierRulePanel', [
         '/components/' +
         'classifier_panel_directive.html'),
       controller: [
-        '$scope', '$modal', 'ExplorationHtmlFormatterService',
+        '$scope', '$uibModal', 'ExplorationHtmlFormatterService',
         'stateInteractionIdService', 'stateCustomizationArgsService',
         'TrainingModalService',
-        function($scope, $modal, ExplorationHtmlFormatterService,
+        function($scope, $uibModal, ExplorationHtmlFormatterService,
             stateInteractionIdService, stateCustomizationArgsService,
             TrainingModalService) {
           $scope.trainingDataHtmlList = [];

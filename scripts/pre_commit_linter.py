@@ -102,12 +102,49 @@ BAD_PATTERNS_JS_REGEXP = [
         'regexp': r"\b(ddescribe|fdescribe)\(",
         'message': "In tests, please use 'describe' instead of 'ddescribe'"
                    "or 'fdescribe'",
-        'excluded_files': ()
+        'excluded_files': (),
+        'excluded_dirs': ()
     },
     {
         'regexp': r"\b(iit|fit)\(",
         'message': "In tests, please use 'it' instead of 'iit' or 'fit'",
-        'excluded_files': ()
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': r"templateUrl: \'",
+        'message': "The directives must be directly referenced.",
+        'excluded_files': (
+            'core/templates/dev/head/pages/exploration_player/'
+            'FeedbackPopupDirective.js'
+        ),
+        'excluded_dirs': (
+            'extensions/answer_summarizers/',
+            'extensions/classifiers/',
+            'extensions/dependencies/',
+            'extensions/objects/',
+            'extensions/value_generators/',
+            'extensions/visualizations/')
+    }
+]
+
+BAD_PATTERNS_HTML_REGEXP = [
+    {
+        'regexp': r"text\/ng-template",
+        'message': "The directives must be directly referenced.",
+        'excluded_files': (
+            'core/templates/dev/head/pages/exploration_player/'
+            'feedback_popup_container_directive.html',
+            'core/templates/dev/head/pages/exploration_player/'
+            'input_response_pair_directive.html'
+        ),
+        'excluded_dirs': (
+            'extensions/answer_summarizers/',
+            'extensions/classifiers/',
+            'extensions/dependencies/',
+            'extensions/objects/',
+            'extensions/value_generators/',
+            'extensions/visualizations/')
     }
 ]
 
@@ -123,6 +160,7 @@ EXCLUDED_PATHS = (
     'scripts/pre_commit_linter.py', 'integrations/*',
     'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg',
     '*.min.js', 'assets/scripts/*', 'core/tests/data/*', '*.mp3')
+
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -165,6 +203,7 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
+import isort             # pylint: disable=wrong-import-position
 from pylint import lint  # pylint: disable=wrong-import-position
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
@@ -343,6 +382,7 @@ def _lint_py_files(config_pylint, files_to_lint, result):
 
     print 'Python linting finished.'
 
+
 def _get_all_files():
     """This function is used to check if this script is ran from
     root directory and to return a list of all the files for linting and
@@ -433,7 +473,6 @@ def _pre_commit_linter(all_files):
         # linting function to return.
         process.join(timeout=600)
 
-
     js_messages = []
     while not js_stdout.empty():
         js_messages.append(js_stdout.get())
@@ -442,10 +481,8 @@ def _pre_commit_linter(all_files):
     print '\n'.join(js_messages)
     print '----------------------------------------'
     summary_messages = []
-    # Require block = False to prevent unnecessary waiting for the process
-    # output.
-    summary_messages.append(js_result.get(block=False))
-    summary_messages.append(py_result.get(block=False))
+    summary_messages.append(js_result.get())
+    summary_messages.append(py_result.get())
     print '\n'.join(summary_messages)
     print ''
     return summary_messages
@@ -505,6 +542,33 @@ def _check_newline_character(all_files):
     return summary_messages
 
 
+def _check_bad_pattern_in_file(filename, content, pattern):
+    """Detects whether the given pattern is present in the file.
+
+    Args:
+        filename: str. Name of the file.
+        content: str. Contents of the file.
+        pattern: dict ( regexp(regex pattern) : pattern to match,
+            message(str) : message to show if pattern matches,
+            excluded_files(tuple(str)) : files to be excluded from matching,
+            excluded_dirs(tuple(str)) : directories to be excluded from
+                matching). 
+            Object containing details for the pattern to be checked.
+
+    Returns:
+        bool. True if there is bad pattern else false.
+    """
+    regexp = pattern['regexp']
+    if not (any(filename.startswith(excluded_dir)
+                for excluded_dir in pattern['excluded_dirs'])
+            or filename in pattern['excluded_files']):
+        if re.search(regexp, content):
+            print '%s --> %s' % (
+                filename, pattern['message'])
+            return True
+    return False
+
+
 def _check_bad_patterns(all_files):
     """This function is used for detecting bad patterns.
     """
@@ -529,16 +593,19 @@ def _check_bad_patterns(all_files):
                     print '%s --> %s' % (
                         filename, BAD_PATTERNS[pattern]['message'])
                     total_error_count += 1
+
             if filename.endswith('.js'):
                 for regexp in BAD_PATTERNS_JS_REGEXP:
-                    regexp_pattern = regexp['regexp']
-                    if filename not in regexp['excluded_files']:
-                        if re.search(regexp_pattern, content):
-                            failed = True
-                            print '%s --> %s' % (
-                                filename,
-                                regexp['message'])
-                            total_error_count += 1
+                    if _check_bad_pattern_in_file(filename, content, regexp):
+                        failed = True
+                        total_error_count += 1
+
+            if filename.endswith('.html'):
+                for regexp in BAD_PATTERNS_HTML_REGEXP:
+                    if _check_bad_pattern_in_file(filename, content, regexp):
+                        failed = True
+                        total_error_count += 1
+
             if filename == 'app.yaml':
                 for pattern in BAD_PATTERNS_APP_YAML:
                     if pattern in content:
@@ -567,12 +634,45 @@ def _check_bad_patterns(all_files):
     return summary_messages
 
 
+def _check_import_order(all_files):
+    """This function is used to check that each file
+    has imports placed in alphabetical order.
+    """
+    print 'Starting import-order checks'
+    print '----------------------------------------'
+    summary_messages = []
+    all_files = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+    failed = False
+    for filename in all_files:
+        # This line prints the error message along with file path 
+        # and returns True if it finds an error else returns False
+        if isort.SortImports(filename, check=False).incorrectly_sorted:
+            failed = True
+    print ''
+    print '----------------------------------------'
+    print ''
+    if failed:
+        summary_message = (
+            '%s   Import order checks failed' % _MESSAGE_TYPE_FAILED)
+        summary_messages.append(summary_message)
+    else:
+        summary_message = (
+            '%s   Import order checks passed' % _MESSAGE_TYPE_SUCCESS)
+        summary_messages.append(summary_message)
+
+    return summary_messages
+
 def main():
     all_files = _get_all_files()
+    import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
-    all_messages = linter_messages + newline_messages + pattern_messages
+    all_messages = (
+        import_order_messages + linter_messages + newline_messages
+        + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
