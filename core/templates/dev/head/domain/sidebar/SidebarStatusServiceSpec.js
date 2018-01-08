@@ -1,9 +1,8 @@
 describe('SidebarStatusService', function() {
   var SidebarStatusService;
-  var sidebarIsShown;
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector, $rootScope, $controller) {
+  beforeEach(inject(function($injector) {
     SidebarStatusService = $injector.get('SidebarStatusService');
   }));
 
