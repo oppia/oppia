@@ -13,11 +13,19 @@
     margin: 0 auto;
     max-width: 560px;
     min-width: 360px;
-    padding-top: 9px;
+    padding-top: 5px;
     position: relative;
     text-align: center;
   }
-  
+
+  correctness-footer .tick-symbol {
+    font-size: 50px;
+  }
+
+  correctness-footer .inner-content {
+    padding-left:8px;
+  }
+
   /* Some mobile devices have CSS width below 360px, use a responsive min-width
      when under 360px to prevent pushing things offscreen. */
   @media(max-width: 360px) {
@@ -28,6 +36,6 @@
 </style>
 
 <div class="inner-container">
-  <img ng-src="<[correctnessfooterUrl]>" alt="Correct">
-  <span style="padding-left:10px;">CORRECT!</span>
+  <i class="material-icons tick-symbol">&#xE86C;</i>
+  <span class="inner-content">CORRECT!</span>
 </div>

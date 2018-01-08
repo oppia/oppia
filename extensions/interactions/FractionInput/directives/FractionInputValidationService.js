@@ -43,6 +43,7 @@ oppia.factory('FractionInputValidationService', [
             customizationArgs.allowImproperFraction.value;
         var allowNonzeroIntegerPart =
           customizationArgs.allowNonzeroIntegerPart.value;
+
         warningsList = warningsList.concat(
           this.getCustomizationArgsWarnings(customizationArgs));
 
@@ -153,7 +154,7 @@ oppia.factory('FractionInputValidationService', [
                 }
                 break;
               case 'HasIntegerPartEqualTo':
-                if (!allowNonzeroIntegerPart) {
+                if (!allowNonzeroIntegerPart && rule.inputs.x !== 0) {
                   warningsList.push({
                     type: WARNING_TYPES.ERROR,
                     message: (

@@ -106,6 +106,10 @@ oppia.directive('hintAndSolutionButtons', [
             resetLocalHintsArray();
           });
 
+          $scope.isTooltipVisible = function() {
+            return HintsAndSolutionManagerService.isHintTooltipOpen();
+          };
+
           $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function(evt) {
             var activeCardIndex = PlayerPositionService.getActiveCardIndex();
             $scope.currentlyOnLatestCard = PlayerTranscriptService.isLastCard(
@@ -114,7 +118,6 @@ oppia.directive('hintAndSolutionButtons', [
               resetLocalHintsArray();
             }
           });
-
           resetLocalHintsArray();
         }
       ]
