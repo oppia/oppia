@@ -45,7 +45,7 @@ oppia.controller('ExplorationEditor', [
   'explorationParamSpecsService', 'explorationParamChangesService',
   'ExplorationWarningsService', '$templateCache', 'ExplorationContextService',
   'ExplorationAdvancedFeaturesService', '$uibModal', 'ChangeListService',
-  'autosaveInfoModalsService', 'siteAnalyticsService',
+  'AutosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'ParamSpecsObjectFactory', 'explorationAutomaticTextToSpeechService',
   'UrlInterpolationService', 'explorationCorrectnessFeedbackService',
@@ -60,7 +60,7 @@ oppia.controller('ExplorationEditor', [
       explorationParamSpecsService, explorationParamChangesService,
       ExplorationWarningsService, $templateCache, ExplorationContextService,
       ExplorationAdvancedFeaturesService, $uibModal, ChangeListService,
-      autosaveInfoModalsService, siteAnalyticsService,
+      AutosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, explorationAutomaticTextToSpeechService,
       UrlInterpolationService, explorationCorrectnessFeedbackService) {
@@ -103,8 +103,8 @@ oppia.controller('ExplorationEditor', [
     // page load.
     $scope.initExplorationPage = function(successCallback) {
       ExplorationDataService.getData(function(explorationId, lostChanges) {
-        if (!autosaveInfoModalsService.isModalOpen()) {
-          autosaveInfoModalsService.showLostChangesModal(
+        if (!AutosaveInfoModalsService.isModalOpen()) {
+          AutosaveInfoModalsService.showLostChangesModal(
             lostChanges, explorationId);
         }
       }).then(function(data) {
@@ -178,7 +178,7 @@ oppia.controller('ExplorationEditor', [
             data.draft_changes.length > 0) {
           // Show modal displaying lost changes if the version of draft
           // changes is invalid, and draft_changes is not `null`.
-          autosaveInfoModalsService.showVersionMismatchModal(
+          AutosaveInfoModalsService.showVersionMismatchModal(
             ChangeListService.getChangeList());
           return;
         }
