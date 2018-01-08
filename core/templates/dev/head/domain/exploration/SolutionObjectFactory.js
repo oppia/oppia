@@ -89,7 +89,8 @@ oppia.factory('SolutionObjectFactory', [
     Solution.prototype.getOppiaResponseHtml = function(interaction) {
       return (
         '<label>' + (this.answerIsExclusive ? 'The only' : 'One') +
-        ' answer is: &nbsp;</label>' + ExplorationHtmlFormatterService.getShortAnswerHtml(
+        ' answer is: &nbsp;</label>' +
+        ExplorationHtmlFormatterService.getShortAnswerHtml(
           this.correctAnswer, interaction.id, interaction.customizationArgs) +
         '<br><br><label>Explanation: </label>' + this.explanation.getHtml());
     };
