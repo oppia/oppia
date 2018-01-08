@@ -86,14 +86,17 @@ oppia.factory('SolutionObjectFactory', [
       this.explanation = explanation;
     };
 
-    Solution.prototype.getOppiaResponseHtml = function(interaction) {
-      return (
-        '<label>' + (this.answerIsExclusive ? 'The only' : 'One') +
-        ' answer is: &nbsp;</label>' +
-        ExplorationHtmlFormatterService.getShortAnswerHtml(
-          this.correctAnswer, interaction.id, interaction.customizationArgs) +
-        '<br><br><label>Explanation: </label>' + this.explanation.getHtml());
+    Solution.prototype.getOppiaShortAnswerResponseHtml = function(interaction) {
+      return {
+        prefix: (this.answerIsExclusive ? 'The only' : 'One'),
+        answer: ExplorationHtmlFormatterService.getShortAnswerHtml(
+          this.correctAnswer, interaction.id, interaction.customizationArgs)};
     };
+
+    Solution.prototype.getOppiaSolutionExplanationResponseHtml =
+      function() {
+        return this.explanation.getHtml();
+      };
 
     return Solution;
   }]);
