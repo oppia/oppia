@@ -101,6 +101,13 @@ describe('FractionInputValidationService', function() {
       }
     });
 
+    integerPartEqualsZero = rof.createFromBackendDict({
+      rule_type: 'HasIntegerPartEqualTo',
+      inputs: {
+        x: 0
+      }
+    });
+
     lessThanTwoRule = rof.createFromBackendDict({
       rule_type: 'IsLessThan',
       inputs: {
@@ -288,7 +295,7 @@ describe('FractionInputValidationService', function() {
   });
 
   it('should catch not allowImproperFraction and rule has improper fraction',
-    function(){
+    function() {
       customizationArgs.allowImproperFraction.value = false;
       answerGroups[0].rules = [equalsThreeByTwoRule];
       var warnings = validatorService.getAllWarnings(
@@ -304,7 +311,7 @@ describe('FractionInputValidationService', function() {
     });
 
   it('should catch not allowNonzeroIntegerPart and rule has integer part',
-    function(){
+    function() {
       customizationArgs.allowNonzeroIntegerPart.value = false;
       answerGroups[0].rules = [equalsOneAndHalfRule];
       var warnings = validatorService.getAllWarnings(
@@ -320,7 +327,7 @@ describe('FractionInputValidationService', function() {
     });
 
   it('should catch if not allowNonzeroIntegerPart and ' +
-    'rule is HasIntegerPartEqualTo', function(){
+    'rule is HasIntegerPartEqualTo a non zero value', function() {
     customizationArgs.allowNonzeroIntegerPart.value = false;
     answerGroups[0].rules = [integerPartEqualsOne];
     var warnings = validatorService.getAllWarnings(
@@ -333,5 +340,15 @@ describe('FractionInputValidationService', function() {
         1 + ' will never be matched because integer part ' +
         'has to be zero')
     }]);
+  });
+
+  it('should allow if not allowNonzeroIntegerPart and ' +
+    'rule is HasIntegerPartEqualTo a zero value', function() {
+    customizationArgs.allowNonzeroIntegerPart.value = false;
+    answerGroups[0].rules = [integerPartEqualsZero];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
   });
 });

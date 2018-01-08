@@ -154,7 +154,7 @@ oppia.factory('FractionInputValidationService', [
                 }
                 break;
               case 'HasIntegerPartEqualTo':
-                if (!allowNonzeroIntegerPart) {
+                if (!allowNonzeroIntegerPart && rule.inputs.x !== 0) {
                   warningsList.push({
                     type: WARNING_TYPES.ERROR,
                     message: (
