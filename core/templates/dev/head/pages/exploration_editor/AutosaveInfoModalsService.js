@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Service for displaying different types of modals depending
- *  on the type of response received as a result of the autosaving request.
+ * on the type of response received as a result of the autosaving request.
  */
 
 oppia.factory('AutosaveInfoModalsService', [
