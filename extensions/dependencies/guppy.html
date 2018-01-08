@@ -18,6 +18,8 @@
   .guppy_active .main_cursor {
     animation: guppy-blink-animation 1s steps(2, start) infinite;
     -webkit-animation: guppy-blink-animation 1s steps(2, start) infinite;
+    <!-- Overrides the inline styling and sets the cursor color to black. -->
+    color: black !important;
   }
 
   @keyframes guppy-blink-animation {
