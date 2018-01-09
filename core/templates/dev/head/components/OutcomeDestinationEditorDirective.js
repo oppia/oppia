@@ -55,7 +55,7 @@ oppia.directive('outcomeDestinationEditor', [
           // development.
           $scope.canEditRefresherExplorationId = (
             GLOBALS.isAdmin || GLOBALS.isModerator);
-          $scope.explorationIdPattern = /^[a-zA-Z0-9.-_]+$/;
+          $scope.explorationIdPattern = /^[a-zA-Z0-9_-]+$/;
 
           $scope.isSelfLoop = function() {
             return $scope.outcome.dest === currentStateName;
