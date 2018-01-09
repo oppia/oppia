@@ -231,7 +231,7 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = '"' + inputs[varName] + '"';
         } else if (varType === 'Graph') {
           replacementText = '[reference graph]';
-        } else if (varType === 'Fraction'){
+        } else if (varType === 'Fraction') {
           replacementText = FractionObjectFactory
             .fromDict(inputs[varName]).toString();
         } else {
