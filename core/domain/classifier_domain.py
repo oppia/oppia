@@ -125,46 +125,124 @@ class ClassifierTrainingJob(object):
 
     @property
     def job_id(self):
+        """Returns the job_id of the classifier training job.
+
+        Returns:
+            str. The unique id of the classifier training job.
+
+        """
         return self._job_id
 
     @property
     def algorithm_id(self):
+        """Returns the algorithm_id of the algorithm used for generating
+            the classifier.
+
+        Returns:
+            str. The id of the algorithm used for generating the classifier.
+        """
         return self._algorithm_id
 
     @property
     def interaction_id(self):
+        """Returns the interaction_id to which the algorithm belongs.
+
+        Returns:
+            str. The id of the interaction to which the algorithm belongs.
+        """
         return self._interaction_id
 
     @property
     def exp_id(self):
+        """Returns the exploration id for which the classifier will be
+            generated.
+
+        Returns:
+            str. The id of the exploration that contains the state
+                for which classifier will be generated.
+        """
         return self._exp_id
 
     @property
     def exp_version(self):
+        """Returns the exploration version.
+
+        Returns:
+            str. The version of the exploration when the training job was
+                generated.
+        """
         return self._exp_version
 
     @property
     def next_scheduled_check_time(self):
+        """Returns the next scheduled time to check the job.
+
+        Returns:
+            datetime.datetime. The next scheduled time to check the job.
+        """
         return self._next_scheduled_check_time
 
     @property
     def state_name(self):
+        """Returns the state_name for which the classifier will be generated.
+
+        Returns:
+            str. The name of the state for which the classifier will be
+                generated.
+        """
         return self._state_name
 
     @property
     def status(self):
+        """Returns the status of the training job request.
+
+        Returns:
+            str. The status of the training job request. This can be either
+                NEW (default), PENDING (when a job has been picked up) or
+                COMPLETE.
+        """
         return self._status
 
     @property
     def training_data(self):
+        """Returns the training data used for training the classifier.
+
+        Returns:
+            list. The training data that is used for training the
+                classifier. This is populated lazily when the job request is
+                picked up by the VM. The list contains dicts where each dict
+                represents a single training data group, for example:
+                training_data = [
+                    {
+                        'answer_group_index': 1,
+                        'answers': ['a1', 'a2']
+                    },
+                    {
+                        'answer_group_index': 2,
+                        'answers': ['a2', 'a3']
+                    }
+                ]
+        """
         return self._training_data
 
     @property
     def classifier_data(self):
+        """Returns the classifier data.
+
+        Returns:
+            dict. The actual classifier model used for
+                classification purpose.
+        """
         return self._classifier_data
 
     @property
     def data_schema_version(self):
+        """Returns the schema version of the data used by the classifier.
+
+        Returns:
+            int. Schema version of the data used by the
+                classifier. This depends on the algorithm ID.
+        """
         return self._data_schema_version
 
     def update_status(self, status):
@@ -348,18 +426,40 @@ class TrainingJobExplorationMapping(object):
 
     @property
     def exp_id(self):
+        """Returns the exploration id.
+
+        Returns:
+            str. The id of the exploration.
+        """
         return self._exp_id
 
     @property
     def exp_version(self):
+        """Returns the exploration version.
+
+        Returns:
+            int. The exploration version at the time the
+                corresponding classifier's training job was created.
+        """
         return self._exp_version
 
     @property
     def state_name(self):
+        """Returns the state_name to which the classifier belongs.
+
+        Returns:
+            str. The name of the state to which the classifier belongs.
+        """
         return self._state_name
 
     @property
     def job_id(self):
+        """Returns the job_id of the training job.
+
+        Returns:
+            str. The unique ID of the training job in the
+                job-exploration mapping.
+        """
         return self._job_id
 
     def to_dict(self):
