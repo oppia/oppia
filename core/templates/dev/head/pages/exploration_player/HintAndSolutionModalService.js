@@ -71,7 +71,10 @@ oppia.factory('HintAndSolutionModalService', [
               $rootScope.$broadcast(EVENT_AUTOPLAY_AUDIO);
               var interaction = ExplorationPlayerService.getInteraction(
                 PlayerPositionService.getCurrentStateName());
-              $scope.solutionHtml = solution.getOppiaResponseHtml(interaction);
+              $scope.shortAnswerHtml = solution.getOppiaShortAnswerResponseHtml(
+                interaction);
+              $scope.solutionExplanationHtml =
+                solution.getOppiaSolutionExplanationResponseHtml();
               $scope.closeModal = function() {
                 AudioPlayerService.stop();
                 AudioTranslationManagerService
