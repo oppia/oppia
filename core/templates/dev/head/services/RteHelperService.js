@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service used by exploration creators to create or edit
- * the content of their explorations.
+ * @fileoverview A helper service for the Rich text editor(RTE).
  */
 
 oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
