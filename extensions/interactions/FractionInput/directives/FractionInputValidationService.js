@@ -67,6 +67,11 @@ oppia.factory('FractionInputValidationService', [
           range.ubi = ubi;
         };
         var isEnclosedBy = function(ra, rb) {
+          if((ra.lb === null && ra.ub === null) ||
+            (rb.lb === null && rb.ub === null)) {
+            return false;
+          }
+
           // Checks if range ra is enclosed by range rb.
           var lowerBoundConditionIsSatisfied =
             (rb.lb < ra.lb) || (rb.lb == ra.lb && (!ra.lbi || rb.lbi));
@@ -187,15 +192,20 @@ oppia.factory('FractionInputValidationService', [
             }
             for (var k = 0; k < ranges.length; k++) {
               if (isEnclosedBy(range, ranges[k])) {
-                warningsList.push({
-                  type: WARNING_TYPES.ERROR,
-                  message: (
-                    'Rule ' + (j + 1) + ' from answer group ' +
-                    (i + 1) + ' will never be matched because it ' +
-                    'is made redundant by rule ' + ranges[k].ruleIndex +
-                    ' from answer group ' + ranges[k].answerGroupIndex +
-                    '.')
-                });
+                var rule2 = answerGroups[ranges[k].answerGroupIndex - 1]
+                  .rules[ranges[k].ruleIndex - 1];
+                if(rule.type !== 'IsExactlyEqualTo' ||
+                  rule2.type !== 'IsExactlyEqualTo'){
+                  warningsList.push({
+                    type: WARNING_TYPES.ERROR,
+                    message: (
+                      'Rule ' + (j + 1) + ' from answer group ' +
+                      (i + 1) + ' will never be matched because it ' +
+                      'is made redundant by rule ' + ranges[k].ruleIndex +
+                      ' from answer group ' + ranges[k].answerGroupIndex +
+                      '.')
+                  });
+                }
               }
             }
             ranges.push(range);
