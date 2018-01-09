@@ -233,6 +233,12 @@ oppia.filter('parameterizeRuleDescription', [
         } else {
           replacementText = inputs[varName];
         }
+        if(typeof replacementText === 'string') {
+          if (replacementText.includes('oppia-noninteractive')) {
+            replacementText = '\'[' +
+              replacementText.split('-')[2].split(' ')[0] + ']\'';
+          }
+        }
 
         description = description.replace(PATTERN, ' ');
         finalDescription = finalDescription.replace(PATTERN, replacementText);
