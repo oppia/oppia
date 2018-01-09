@@ -20,5 +20,6 @@ from core.domain import email_manager
 
 
 def inform_subscribers(creator_id, exploration_id, exploration_title):
+    """Inform subscribers when an exploration is published by the creator."""
     email_manager.send_emails_to_subscribers(
         creator_id, exploration_id, exploration_title)
