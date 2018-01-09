@@ -19,7 +19,7 @@
 
 oppia.factory('ResponsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
-  'AnswerGroupsCacheService', 'EditorStateService', 'changeListService',
+  'AnswerGroupsCacheService', 'EditorStateService', 'ChangeListService',
   'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
   'stateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ExplorationContextService', 'ExplorationWarningsService',
@@ -27,7 +27,7 @@ oppia.factory('ResponsesService', [
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
-      AnswerGroupsCacheService, EditorStateService, changeListService,
+      AnswerGroupsCacheService, EditorStateService, ChangeListService,
       explorationStatesService, graphDataService, OutcomeObjectFactory,
       stateSolutionService, SolutionVerificationService, AlertsService,
       ExplorationContextService, ExplorationWarningsService,
@@ -98,17 +98,21 @@ oppia.factory('ResponsesService', [
 
     var _updateAnswerGroup = function(index, updates) {
       var answerGroup = _answerGroups[index];
-      if (updates.rules) {
+      if (updates.hasOwnProperty('rules')) {
         answerGroup.rules = updates.rules;
       }
-      if (updates.feedback) {
+      if (updates.hasOwnProperty('feedback')) {
         answerGroup.outcome.feedback = updates.feedback;
       }
-      if (updates.dest) {
+      if (updates.hasOwnProperty('dest')) {
         answerGroup.outcome.dest = updates.dest;
       }
+      if (updates.hasOwnProperty('refresherExplorationId')) {
+        answerGroup.outcome.refresherExplorationId = (
+          updates.refresherExplorationId);
+      }
       if (updates.hasOwnProperty('labelledAsCorrect')) {
-        answerGroup.labelledAsCorrect = updates.labelledAsCorrect;
+        answerGroup.outcome.labelledAsCorrect = updates.labelledAsCorrect;
       }
       _saveAnswerGroups(_answerGroups);
     };
@@ -237,11 +241,17 @@ oppia.factory('ResponsesService', [
       },
       updateDefaultOutcome: function(updates) {
         var outcome = _defaultOutcome;
-        if (updates.feedback) {
+        if (updates.hasOwnProperty('feedback')) {
           outcome.feedback = updates.feedback;
         }
-        if (updates.dest) {
+        if (updates.hasOwnProperty('dest')) {
           outcome.dest = updates.dest;
+        }
+        if (updates.hasOwnProperty('refresherExplorationId')) {
+          outcome.refresherExplorationId = updates.refresherExplorationId;
+        }
+        if (updates.hasOwnProperty('labelledAsCorrect')) {
+          outcome.labelledAsCorrect = updates.labelledAsCorrect;
         }
         _saveDefaultOutcome(outcome);
       },

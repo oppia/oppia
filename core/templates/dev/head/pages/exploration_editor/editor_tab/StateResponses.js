@@ -126,6 +126,14 @@ oppia.controller('StateResponses', [
       return outcome.isConfusing(EditorStateService.getActiveStateName());
     };
 
+    $scope.isSelfLoopThatIsMarkedCorrect = function(outcome) {
+      if (!outcome) {
+        return false;
+      }
+      var currentStateName = EditorStateService.getActiveStateName();
+      return ((outcome.dest === currentStateName) && outcome.labelledAsCorrect);
+    };
+
     $scope.changeActiveAnswerGroupIndex = function(newIndex) {
       $rootScope.$broadcast('externalSave');
       ResponsesService.changeActiveAnswerGroupIndex(newIndex);
@@ -164,6 +172,10 @@ oppia.controller('StateResponses', [
     };
 
     $scope.getOutcomeTooltip = function(outcome) {
+      if ($scope.isSelfLoopThatIsMarkedCorrect(outcome)) {
+        return 'Self-loops should not be labelled as correct.';
+      }
+
       // Outcome tooltip depends on whether feedback is displayed
       if ($scope.isLinearWithNoFeedback(outcome)) {
         return 'Please direct the learner to a different card.';
@@ -470,20 +482,20 @@ oppia.controller('StateResponses', [
 
     $scope.saveActiveAnswerGroupDest = function(updatedOutcome) {
       ResponsesService.updateActiveAnswerGroup({
-        dest: updatedOutcome.dest
+        dest: updatedOutcome.dest,
+        refresherExplorationId: updatedOutcome.refresherExplorationId
+      });
+    };
+
+    $scope.saveActiveAnswerGroupCorrectnessLabel = function(updatedOutcome) {
+      ResponsesService.updateActiveAnswerGroup({
+        labelledAsCorrect: updatedOutcome.labelledAsCorrect
       });
     };
 
     $scope.saveActiveAnswerGroupRules = function(updatedRules) {
       ResponsesService.updateActiveAnswerGroup({
         rules: updatedRules
-      });
-    };
-
-    $scope.saveActiveAnswerGroupCorrectnessLabel = function(
-      updatedCorrectnessLabel) {
-      ResponsesService.updateActiveAnswerGroup({
-        labelledAsCorrect: updatedCorrectnessLabel
       });
     };
 
@@ -495,7 +507,14 @@ oppia.controller('StateResponses', [
 
     $scope.saveDefaultOutcomeDest = function(updatedOutcome) {
       ResponsesService.updateDefaultOutcome({
-        dest: updatedOutcome.dest
+        dest: updatedOutcome.dest,
+        refresherExplorationId: updatedOutcome.refresherExplorationId
+      });
+    };
+
+    $scope.saveDefaultOutcomeCorrectnessLabel = function(updatedOutcome) {
+      ResponsesService.updateDefaultOutcome({
+        labelledAsCorrect: updatedOutcome.labelledAsCorrect
       });
     };
 

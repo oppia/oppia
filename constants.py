@@ -21,6 +21,7 @@
 import json
 import os
 
+
 def parse_json_from_js(js_file):
     """Extracts JSON object from JS file."""
     text = js_file.read()

@@ -18,14 +18,14 @@
 
 oppia.controller('ExplorationGraph', [
   '$scope', '$uibModal', 'EditorStateService', 'AlertsService',
-  'explorationStatesService', 'editabilityService', 'RouterService',
+  'explorationStatesService', 'EditabilityService', 'RouterService',
   'graphDataService', 'UrlInterpolationService',
   function(
     $scope, $uibModal, EditorStateService, AlertsService,
-    explorationStatesService, editabilityService, RouterService,
+    explorationStatesService, EditabilityService, RouterService,
     graphDataService, UrlInterpolationService) {
     $scope.getGraphData = graphDataService.getGraphData;
-    $scope.isEditable = editabilityService.isEditable;
+    $scope.isEditable = EditabilityService.isEditable;
 
     // We hide the graph at the outset in order not to confuse new exploration
     // creators.

@@ -460,5 +460,7 @@ var constants = {
   "ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS": {
     "CARD": "card",
     "LIST": "list"
-  }
+  },
+
+  "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": []
 };

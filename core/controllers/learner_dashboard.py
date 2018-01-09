@@ -31,6 +31,7 @@ class LearnerDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_learner_dashboard
     def get(self):
+        """Handles GET requests."""
         self.values.update({
             'nav_mode': feconf.NAV_MODE_LEARNER_DASHBOARD
         })
@@ -119,12 +120,16 @@ class LearnerDashboardHandler(base.BaseHandler):
 
 
 class LearnerDashboardIdsHandler(base.BaseHandler):
+    """Gets the progress of the learner.
+
+    Gets the ids of all explorations and collections completed by the user,
+    the activities currently being pursued, and the activities present in
+    the playlist.
+    """
 
     @acl_decorators.can_access_learner_dashboard
     def get(self):
-        # Get the progress of the learner - the ids of the explorations and
-        # collections completed by the user, the activities currently being
-        # completed and the ones present in the playlist of the user.
+        """Handles GET requests."""
         learner_dashboard_activities = (
             learner_progress_services.get_learner_dashboard_activities( # pylint: disable=line-too-long
                 self.user_id))

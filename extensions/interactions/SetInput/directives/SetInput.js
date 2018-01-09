@@ -34,12 +34,10 @@ oppia.directive('oppiaInteractiveSetInput', [
         'set_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$translate', 'setInputRulesService',
-        'WindowDimensionsService', 'UrlService',
-        'EVENT_PROGRESS_NAV_SUBMITTED',
+        'WindowDimensionsService', 'EVENT_PROGRESS_NAV_SUBMITTED',
         function(
             $scope, $attrs, $translate, setInputRulesService,
-            WindowDimensionsService, UrlService,
-            EVENT_PROGRESS_NAV_SUBMITTED) {
+            WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.schema = {
             type: 'list',
             items: {
@@ -79,14 +77,20 @@ oppia.directive('oppiaInteractiveSetInput', [
             }
           };
 
-          $scope.isSubmitHidden = function() {
-            return (
-              !UrlService.isIframed() &&
-              WindowDimensionsService.isWindowNarrow());
+          $scope.isAnswerValid = function() {
+            return ($scope.answer.length > 0);
           };
 
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
             $scope.submitAnswer($scope.answer);
+          });
+
+          $scope.$watch(function() {
+            return $scope.answer;
+          }, function() {
+            $scope.setAnswerValidity({
+              answerValidity: $scope.isAnswerValid()
+            });
           });
         }
       ]

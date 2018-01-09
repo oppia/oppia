@@ -15,7 +15,6 @@
 """Services for classifier data models."""
 
 import datetime
-
 import logging
 
 from core.domain import classifier_domain
@@ -23,7 +22,6 @@ from core.domain import classifier_registry
 from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.platform import models
-
 import feconf
 
 (classifier_models, exp_models) = models.Registry.import_models(

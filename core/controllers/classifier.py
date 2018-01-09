@@ -22,7 +22,6 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import classifier_services
 from core.domain import config_domain
-
 import feconf
 
 

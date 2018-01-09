@@ -16,9 +16,9 @@
 
 """Domain objects relating to questions."""
 
+from constants import constants
 from core.domain import exp_domain
 from core.platform import models
-from constants import constants
 import feconf
 import utils
 

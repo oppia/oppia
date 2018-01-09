@@ -159,7 +159,7 @@ describe('State editor', function() {
       by.css('.protractor-test-save-interaction'));
     expect(saveInteractionBtn.isPresent()).toBe(false);
 
-    element(by.css('.protractor-test-close-add-response-modal')).click();
+    editor.closeAddResponseModal();
 
     // The Continue input has customization options. Therefore the
     // customization modal does appear and so does the save interaction button.
@@ -246,7 +246,8 @@ describe('State editor', function() {
   });
 
   it('should add a solution', function() {
-    users.login('stateEditorUser1@example.com');
+    users.createUser('stateEditorUser3@example.com', 'stateEditorUser3');
+    users.login('stateEditorUser3@example.com');
     workflow.createExploration();
     editor.setContent(forms.toRichText('some content'));
 

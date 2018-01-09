@@ -40,11 +40,11 @@ oppia.controller('ExplorationEditor', [
   'explorationCategoryService', 'explorationObjectiveService',
   'explorationLanguageCodeService', 'ExplorationRightsService',
   'explorationInitStateNameService', 'explorationTagsService',
-  'editabilityService', 'explorationStatesService', 'RouterService',
+  'EditabilityService', 'explorationStatesService', 'RouterService',
   'graphDataService', 'StateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'ExplorationWarningsService', '$templateCache', 'ExplorationContextService',
-  'ExplorationAdvancedFeaturesService', '$uibModal', 'changeListService',
+  'ExplorationAdvancedFeaturesService', '$uibModal', 'ChangeListService',
   'autosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'ParamSpecsObjectFactory', 'explorationAutomaticTextToSpeechService',
@@ -55,16 +55,16 @@ oppia.controller('ExplorationEditor', [
       explorationCategoryService, explorationObjectiveService,
       explorationLanguageCodeService, ExplorationRightsService,
       explorationInitStateNameService, explorationTagsService,
-      editabilityService, explorationStatesService, RouterService,
+      EditabilityService, explorationStatesService, RouterService,
       graphDataService, StateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       ExplorationWarningsService, $templateCache, ExplorationContextService,
-      ExplorationAdvancedFeaturesService, $uibModal, changeListService,
+      ExplorationAdvancedFeaturesService, $uibModal, ChangeListService,
       autosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, explorationAutomaticTextToSpeechService,
       UrlInterpolationService, explorationCorrectnessFeedbackService) {
-    $scope.editabilityService = editabilityService;
+    $scope.EditabilityService = EditabilityService;
     $scope.EditorStateService = EditorStateService;
 
     /**********************************************************
@@ -148,7 +148,7 @@ oppia.controller('ExplorationEditor', [
           data.email_preferences.mute_suggestion_notifications);
 
         if (GLOBALS.can_edit) {
-          editabilityService.markEditable();
+          EditabilityService.markEditable();
         }
 
         graphDataService.recompute();
@@ -170,7 +170,7 @@ oppia.controller('ExplorationEditor', [
 
         // Initialize changeList by draft changes if they exist.
         if (data.draft_changes !== null) {
-          changeListService.loadAutosavedChangeList(data.draft_changes);
+          ChangeListService.loadAutosavedChangeList(data.draft_changes);
         }
 
         if (data.is_version_of_draft_valid === false &&
@@ -179,7 +179,7 @@ oppia.controller('ExplorationEditor', [
           // Show modal displaying lost changes if the version of draft
           // changes is invalid, and draft_changes is not `null`.
           autosaveInfoModalsService.showVersionMismatchModal(
-            changeListService.getChangeList());
+            ChangeListService.getChangeList());
           return;
         }
 
@@ -345,7 +345,7 @@ oppia.controller('ExplorationEditor', [
     $templateCache.put('ng-joyride-title-tplv1.html', ngJoyrideTemplate);
 
     var leaveTutorial = function() {
-      editabilityService.onEndTutorial();
+      EditabilityService.onEndTutorial();
       $scope.$apply();
       StateEditorTutorialFirstTimeService.markTutorialFinished();
       $scope.tutorialInProgress = false;
@@ -368,7 +368,7 @@ oppia.controller('ExplorationEditor', [
       // otherwise elements within ng-if's are not guaranteed to be present on
       // the page.
       $timeout(function() {
-        editabilityService.onStartTutorial();
+        EditabilityService.onStartTutorial();
         $scope.tutorialInProgress = true;
       });
     };

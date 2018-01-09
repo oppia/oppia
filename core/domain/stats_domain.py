@@ -18,12 +18,12 @@
 
 import numbers
 import sys
-import utils
 
 from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.platform import models
 import feconf
+import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 

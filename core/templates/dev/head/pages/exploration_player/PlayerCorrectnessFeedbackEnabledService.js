@@ -13,19 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the solution button in the exploration player.
+ * @fileoverview Service which sets and determines whether the correctness
+ * feedback is enabled or not.
  */
 
-oppia.directive('solutionButton', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {
-        onClickSolutionButton: '&',
-        solutionIsAvailable: '&'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_player/' +
-        'solution_button_directive.html')
-    };
-  }]);
+oppia.factory('PlayerCorrectnessFeedbackEnabledService', [function() {
+  var _correctnessFeedbackIsEnabled = false;
+
+  var _init = function(correctnessFeedbackIsEnabled) {
+    _correctnessFeedbackIsEnabled = correctnessFeedbackIsEnabled;
+  };
+
+  return {
+    init: function(correctnessFeedbackIsEnabled) {
+      _init(correctnessFeedbackIsEnabled);
+    },
+    isEnabled: function() {
+      return _correctnessFeedbackIsEnabled;
+    }
+  };
+}]);

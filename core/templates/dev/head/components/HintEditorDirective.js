@@ -28,11 +28,11 @@ oppia.directive('hintEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/hint_editor_directive.html'),
       controller: [
-        '$scope', 'editabilityService', 'stateHintsService',
+        '$scope', 'EditabilityService', 'stateHintsService',
         'COMPONENT_NAME_HINT',
-        function($scope, editabilityService, stateHintsService,
+        function($scope, EditabilityService, stateHintsService,
             COMPONENT_NAME_HINT) {
-          $scope.isEditable = editabilityService.isEditable();
+          $scope.isEditable = EditabilityService.isEditable();
           $scope.stateHintsService = stateHintsService;
           $scope.editHintForm = {};
           $scope.hintEditorIsOpen = false;

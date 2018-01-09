@@ -60,9 +60,9 @@ oppia.factory('ExplorationHtmlFormatterService', [
         // setInteractionAnswerValidity function.
         // Note that ItemSelectionInput is a special
         // case which has a special interaction-specific Submit
-        // button, not covered by show_nav_submit_button.
+        // button, not covered by show_generic_submit_button.
         var navSubmitButtonExists = (
-          INTERACTION_SPECS[interactionId].show_nav_submit_button ||
+          INTERACTION_SPECS[interactionId].show_generic_submit_button ||
           interactionId === 'ItemSelectionInput');
         if (navSubmitButtonExists) {
           element.attr(

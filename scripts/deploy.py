@@ -56,9 +56,11 @@ import random
 import shutil
 import string
 import subprocess
+
+import common  # pylint: disable=relative-import
+
 # pylint: enable=wrong-import-order
 
-import common # pylint: disable=relative-import
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(

@@ -17,6 +17,7 @@
 """Controllers for custom landing pages."""
 
 import random
+
 from core.controllers import base
 from core.domain import acl_decorators
 
