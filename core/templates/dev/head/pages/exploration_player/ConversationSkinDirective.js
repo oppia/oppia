@@ -312,6 +312,10 @@ oppia.directive('conversationSkin', [
               $scope.answerIsCorrect && $scope.isCorrectnessFeedbackEnabled());
           };
 
+          $scope.disableCorrectnessFooter = function() {
+            $scope.answerIsCorrect = false;
+          };
+
           $scope.isLearnAgainButton = function() {
             return (
               $scope.pendingCardWasSeenBefore && !$scope.answerIsCorrect &&
