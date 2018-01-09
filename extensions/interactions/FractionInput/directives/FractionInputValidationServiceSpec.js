@@ -150,6 +150,20 @@ describe('FractionInputValidationService', function() {
       }
     });
 
+    numeratorEqualsFiveRule = rof.createFromBackendDict({
+      rule_type: 'HasNumeratorEqualTo',
+      inputs: {
+        x: 5
+      }
+    });
+
+    denominatorEqualsFiveRule = rof.createFromBackendDict({
+      rule_type: 'HasDenominatorEqualTo',
+      inputs: {
+        x: 5
+      }
+    });
+
     answerGroups = [agof.createNew(
       [equalsOneRule, lessThanTwoRule],
       goodDefaultOutcome,
@@ -358,6 +372,18 @@ describe('FractionInputValidationService', function() {
     answerGroups[1] = angular.copy(answerGroups[0]);
     answerGroups[0].rules = [equalsOneRule];
     answerGroups[1].rules = [exactlyEqualToOneAndNotInSimplestFormRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
+  it('should allow if numerator and denominator should equal the same value ' +
+    'and are set in different rules', function() {
+    customizationArgs.requireSimplestForm = false;
+    answerGroups[1] = angular.copy(answerGroups[0]);
+    answerGroups[0].rules = [numeratorEqualsFiveRule];
+    answerGroups[1].rules = [denominatorEqualsFiveRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);

@@ -67,6 +67,11 @@ oppia.factory('FractionInputValidationService', [
           range.ubi = ubi;
         };
         var isEnclosedBy = function(ra, rb) {
+          if((ra.lb === null && ra.ub === null) ||
+            (rb.lb === null && rb.ub === null)) {
+            return false;
+          }
+
           // Checks if range ra is enclosed by range rb.
           var lowerBoundConditionIsSatisfied =
             (rb.lb < ra.lb) || (rb.lb == ra.lb && (!ra.lbi || rb.lbi));
