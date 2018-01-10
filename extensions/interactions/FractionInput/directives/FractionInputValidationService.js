@@ -194,8 +194,8 @@ oppia.factory('FractionInputValidationService', [
               if (isEnclosedBy(range, ranges[k])) {
                 var rule2 = answerGroups[ranges[k].answerGroupIndex - 1]
                   .rules[ranges[k].ruleIndex - 1];
-                if(rule.type !== 'IsExactlyEqualTo' ||
-                  rule2.type !== 'IsExactlyEqualTo'){
+                if (rule.type !== 'IsExactlyEqualTo' ||
+                  rule2.type !== 'IsExactlyEqualTo') {
                   warningsList.push({
                     type: WARNING_TYPES.ERROR,
                     message: (
