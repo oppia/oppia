@@ -68,8 +68,8 @@ oppia.factory('SolutionObjectFactory', [
       } else if (interactionId === 'LogicProof') {
         correctAnswer = this.correctAnswer.correct;
       } else if (interactionId === 'FractionInput') {
-        correctAnswer = FractionObjectFactory
-            .fromDict(this.correctAnswer).toString();
+        correctAnswer = FractionObjectFactory.fromDict(
+          this.correctAnswer).toString();
       } else {
         correctAnswer = (
           HtmlEscaperService.objToEscapedJson(this.correctAnswer));
