@@ -762,12 +762,12 @@ oppia.directive('conversationSkin', [
 
           $scope.showUpcomingCard = function() {
             /* This is for the following situation:
-               if A->B->C is the arrangement of cards and C redirected to A, then
-               after this, B and C are visited cards and hence
+               if A->B->C is the arrangement of cards and C redirected to A,
+               then after this, B and C are visited cards and hence
                pendingCardWasSeenBefore would be true during both these
                transitions and as answerIsCorrect is set to false below,
-               Continue would briefly change to Learn Again during these
-               transitions which is not required.
+               Continue would briefly change to Learn Again (after it is
+               clicked) during these transitions which is not required.
                Also, if the 'if' check is not there, Learn Again button would
                briefly switched to Continue before going to next card. */
             if ($scope.answerIsCorrect) {
