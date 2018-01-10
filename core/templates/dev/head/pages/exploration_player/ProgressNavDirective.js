@@ -25,8 +25,7 @@ oppia.directive('progressNav', [
         onClickContinueButton: '&',
         isLearnAgainButton: '&',
         isSubmitButtonShown: '&submitButtonIsShown',
-        isSubmitButtonDisabled: '&submitButtonIsDisabled',
-        disableCorrectnessFooter: '&disableCorrectnessFooter'
+        isSubmitButtonDisabled: '&submitButtonIsDisabled'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/progress_nav_directive.html'),
@@ -78,7 +77,6 @@ oppia.directive('progressNav', [
 
           $scope.changeCard = function(index) {
             if (index >= 0 && index < transcriptLength) {
-              $scope.disableCorrectnessFooter();
               PlayerPositionService.setActiveCardIndex(index);
               $rootScope.$broadcast('updateActiveStateIfInEditor',
                 PlayerPositionService.getCurrentStateName());

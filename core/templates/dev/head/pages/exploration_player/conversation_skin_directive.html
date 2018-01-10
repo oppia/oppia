@@ -50,8 +50,7 @@
                     is-learn-again-button="isLearnAgainButton()"
                     submit-button-is-disabled="!interactionAnswerIsValid"
                     submit-button-is-shown="!answerIsBeingProcessed"
-                    on-click-continue-button="showUpcomingCard()"
-                    disable-correctness-footer="disableCorrectnessFooter()">
+                    on-click-continue-button="showUpcomingCard()">
       </progress-nav>
     </div>
 
@@ -70,7 +69,7 @@
       </div>
     </div>
   </div>
-  <div class="conversation-skin-correctness-footer-container" ng-if="isCorrectnessFooterEnabled()">
+  <div class="conversation-skin-correctness-footer-container" ng-if="isCorrectnessFooterEnabled() && isOnLastCard()">
     <correctness-footer></correctness-footer>
   </div>
 </div>
