@@ -17,14 +17,14 @@
  */
 
 oppia.controller('SidebarStateName', [
-  '$scope', '$filter', '$rootScope', 'editabilityService',
+  '$scope', '$filter', '$rootScope', 'EditabilityService',
   'EditorStateService', 'FocusManagerService', 'explorationStatesService',
   'RouterService',
   function(
-      $scope, $filter, $rootScope, editabilityService,
+      $scope, $filter, $rootScope, EditabilityService,
       EditorStateService, FocusManagerService, explorationStatesService,
       RouterService) {
-    $scope.editabilityService = editabilityService;
+    $scope.EditabilityService = EditabilityService;
 
     var _stateNameMemento = null;
     $scope.stateNameEditorIsShown = false;

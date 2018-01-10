@@ -18,6 +18,7 @@
 deployment push to https://www.oppia.org/.
 """
 import sys
+
 import utils
 
 _BACKUP_NAME_PREFIX = 'opbkp'

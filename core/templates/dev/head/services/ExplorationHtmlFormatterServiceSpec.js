@@ -24,7 +24,7 @@ describe('Exploration Html Formatter Service', function() {
   beforeEach(module(function($provide) {
     $provide.constant('INTERACTION_SPECS', {
       sampleId: {
-        show_nav_submit_button: true
+        show_generic_submit_button: true
       },
     });
   }));

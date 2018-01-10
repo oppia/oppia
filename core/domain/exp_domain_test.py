@@ -62,6 +62,7 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -82,6 +83,7 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -118,6 +120,7 @@ states:
       default_outcome:
         dest: %s
         feedback: []
+        labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
       fallbacks: []
@@ -133,6 +136,7 @@ states:
       default_outcome:
         dest: New state
         feedback: []
+        labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
       fallbacks: []
@@ -219,6 +223,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'html': 'Feedback',
                         'audio_translations': {}
                     },
+                    'labelled_as_correct': False,
                     'param_changes': [],
                     'refresher_exploration_id': None,
                 },
@@ -233,7 +238,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     },
                     'rule_type': 'FuzzyMatches'
                 }],
-                'labelled_as_correct': False,
             })
         )
 
@@ -260,6 +264,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'html': 'Feedback',
                         'audio_translations': {}
                     },
+                    'labelled_as_correct': False,
                     'param_changes': [],
                     'refresher_exploration_id': None,
                 },
@@ -269,7 +274,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     },
                     'rule_type': 'Contains'
                 }],
-                'labelled_as_correct': False,
             })
         )
         exploration.validate()
@@ -334,6 +338,23 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.dest = destination
 
         outcome.feedback = exp_domain.SubtitledHtml('Feedback', {})
+        exploration.validate()
+
+        outcome.labelled_as_correct = 'hello'
+        self._assert_validation_error(
+            exploration, 'The "labelled_as_correct" field should be a boolean')
+
+        # Test that labelled_as_correct must be False for self-loops, and that
+        # this causes a strict validation failure but not a normal validation
+        # failure.
+        outcome.labelled_as_correct = True
+        with self.assertRaisesRegexp(
+            Exception, 'is labelled correct but is a self-loop.'
+            ):
+            exploration.validate(strict=True)
+        exploration.validate()
+
+        outcome.labelled_as_correct = False
         exploration.validate()
 
         outcome.param_changes = 'Changes'
@@ -994,6 +1015,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                         'html': '',
                         'audio_translations': {}
                     },
+                    'labelled_as_correct': False,
                     'param_changes': [],
                     'refresher_exploration_id': None,
                 },
@@ -2728,7 +2750,102 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V21
+    YAML_CONTENT_V22 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 22
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            audio_translations: {}
+            html: Correct!
+          labelled_as_correct: false
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 17
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V22
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -2856,6 +2973,12 @@ title: Title
             'eid', self.YAML_CONTENT_V21)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v22(self):
+        """Test direct loading from a v22 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V22)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
@@ -2884,6 +3007,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         'feedback': copy.deepcopy(
                             exp_domain.
                             SubtitledHtml.DEFAULT_SUBTITLED_HTML_DICT),
+                        'labelled_as_correct': False,
                         'param_changes': [],
                         'refresher_exploration_id': None,
                     },

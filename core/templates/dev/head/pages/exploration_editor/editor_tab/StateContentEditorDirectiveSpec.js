@@ -41,9 +41,9 @@ describe('State content editor directive', function() {
 
   beforeEach(inject(function($compile, $rootScope, $templateCache, $injector) {
     shof = $injector.get('SubtitledHtmlObjectFactory');
-    cls = $injector.get('changeListService');
+    cls = $injector.get('ChangeListService');
     scs = $injector.get('stateContentService');
-    es = $injector.get('editabilityService');
+    es = $injector.get('EditabilityService');
     ess = $injector.get('explorationStatesService');
 
     scs.init('Third State', _getContent('This is some content.'));
@@ -61,14 +61,17 @@ describe('State content editor directive', function() {
             outcome: {
               dest: 'unused',
               feedback: [],
-              param_changes: []
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
-            labelled_as_correct: false
           }],
           default_outcome: {
             dest: 'default',
             feedback: [],
-            param_changes: []
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null
           },
           hints: []
         },
@@ -86,14 +89,17 @@ describe('State content editor directive', function() {
             outcome: {
               dest: 'unused',
               feedback: [],
-              param_changes: []
-            },
-            labelled_as_correct: false
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            }
           }],
           default_outcome: {
             dest: 'default',
             feedback: [],
-            param_changes: []
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null
           },
           hints: []
         },
@@ -111,14 +117,17 @@ describe('State content editor directive', function() {
             outcome: {
               dest: 'unused',
               feedback: [],
-              param_changes: []
-            },
-            labelled_as_correct: false
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            }
           }],
           default_outcome: {
             dest: 'default',
             feedback: [],
-            param_changes: []
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null
           },
           hints: []
         },

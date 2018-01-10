@@ -23,14 +23,6 @@ oppia.directive('correctnessFooter', [
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/' +
-        'correctness_footer_directive.html'),
-      controller: [
-        '$scope',
-        function($scope) {
-          $scope.correctnessfooterUrl = 
-            UrlInterpolationService.getStaticImageUrl(
-              '/general/footer_tick.png');
-        }
-      ]
+        'correctness_footer_directive.html')
     };
   }]);

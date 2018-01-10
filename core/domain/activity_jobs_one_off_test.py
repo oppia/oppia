@@ -15,8 +15,8 @@
 # limitations under the License.
 
 from core.domain import activity_jobs_one_off
-from core.domain import collection_services
 from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager

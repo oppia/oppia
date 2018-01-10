@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import StringIO
 import copy
 import datetime
 import os
-import StringIO
 import zipfile
 
 from core.domain import exp_domain
@@ -659,6 +659,7 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -683,6 +684,7 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -729,6 +731,7 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -753,6 +756,7 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -884,6 +888,7 @@ interaction:
     feedback:
       audio_translations: {}
       html: ''
+    labelled_as_correct: false
     param_changes: []
     refresher_exploration_id: null
   hints: []
@@ -911,6 +916,7 @@ interaction:
     feedback:
       audio_translations: {}
       html: ''
+    labelled_as_correct: false
     param_changes: []
     refresher_exploration_id: null
   hints: []
@@ -939,6 +945,7 @@ interaction:
     feedback:
       audio_translations: {}
       html: ''
+    labelled_as_correct: false
     param_changes: []
     refresher_exploration_id: null
   hints: []
@@ -1051,10 +1058,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     'audio_translations': {},
                     'html': 'Try again'
                 },
+                'labelled_as_correct': False,
                 'param_changes': [],
                 'refresher_exploration_id': None,
             },
-            'labelled_as_correct': False,
         }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
@@ -1063,6 +1070,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'audio_translations': {},
                 'html': '<b>Incorrect</b>'
             },
+            'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
         }
@@ -2316,6 +2324,7 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
       hints: []

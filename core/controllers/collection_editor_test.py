@@ -14,8 +14,8 @@
 
 """Tests for the collection editor page."""
 
-from core.domain import collection_services
 from core.domain import collection_domain
+from core.domain import collection_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils

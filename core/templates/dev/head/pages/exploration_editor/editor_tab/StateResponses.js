@@ -126,6 +126,14 @@ oppia.controller('StateResponses', [
       return outcome.isConfusing(EditorStateService.getActiveStateName());
     };
 
+    $scope.isSelfLoopThatIsMarkedCorrect = function(outcome) {
+      if (!outcome) {
+        return false;
+      }
+      var currentStateName = EditorStateService.getActiveStateName();
+      return ((outcome.dest === currentStateName) && outcome.labelledAsCorrect);
+    };
+
     $scope.changeActiveAnswerGroupIndex = function(newIndex) {
       $rootScope.$broadcast('externalSave');
       ResponsesService.changeActiveAnswerGroupIndex(newIndex);
@@ -164,6 +172,10 @@ oppia.controller('StateResponses', [
     };
 
     $scope.getOutcomeTooltip = function(outcome) {
+      if ($scope.isSelfLoopThatIsMarkedCorrect(outcome)) {
+        return 'Self-loops should not be labelled as correct.';
+      }
+
       // Outcome tooltip depends on whether feedback is displayed
       if ($scope.isLinearWithNoFeedback(outcome)) {
         return 'Please direct the learner to a different card.';
@@ -475,16 +487,15 @@ oppia.controller('StateResponses', [
       });
     };
 
-    $scope.saveActiveAnswerGroupRules = function(updatedRules) {
+    $scope.saveActiveAnswerGroupCorrectnessLabel = function(updatedOutcome) {
       ResponsesService.updateActiveAnswerGroup({
-        rules: updatedRules
+        labelledAsCorrect: updatedOutcome.labelledAsCorrect
       });
     };
 
-    $scope.saveActiveAnswerGroupCorrectnessLabel = function(
-      updatedCorrectnessLabel) {
+    $scope.saveActiveAnswerGroupRules = function(updatedRules) {
       ResponsesService.updateActiveAnswerGroup({
-        labelledAsCorrect: updatedCorrectnessLabel
+        rules: updatedRules
       });
     };
 
@@ -498,6 +509,12 @@ oppia.controller('StateResponses', [
       ResponsesService.updateDefaultOutcome({
         dest: updatedOutcome.dest,
         refresherExplorationId: updatedOutcome.refresherExplorationId
+      });
+    };
+
+    $scope.saveDefaultOutcomeCorrectnessLabel = function(updatedOutcome) {
+      ResponsesService.updateDefaultOutcome({
+        labelledAsCorrect: updatedOutcome.labelledAsCorrect
       });
     };
 
