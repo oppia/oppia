@@ -410,4 +410,83 @@ describe('Testing filters', function() {
     expect(filter('  only First lettEr is  Affected ')).toEqual(
       'Only First lettEr is  Affected');
   }));
+
+  it('should correctly display RTE components', inject(function($filter) {
+    var ruleMath = {
+      type: "Equals",
+      inputs: {
+        x: 2
+      }
+    };
+    var interactionIdMath = 'TextInput';
+    var choicesMath = [
+      {
+        label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+        'x^3 - a x^2 - b x - c&amp;quot;"></oppia-noninteractive-math>',
+        val: 0
+      },
+      {
+        label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+        'x^3 + (a+b+c)x^2 + (ab+bc+ca)x + abc&amp;quot;">' +
+        '</oppia-noninteractive-math>',
+        val: 1
+      },
+      {
+        label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+        'x^3 - (a+b+c)x^2 + (ab+bc+ca)x - abc&amp;quot;">' +
+        '</oppia-noninteractive-math>',
+        val: 2
+      },
+      {
+        label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+        'x^3 + (a+b+c)x^2 - (ab+bc+ca)x + abc&amp;quot;">' +
+        '</oppia-noninteractive-math>',
+        val: 3
+      },
+    ];
+    var ruleLink = {
+      type: "Equals",
+      inputs: {
+        x: 0
+      }
+    };
+    var interactionIdLink = 'TextInput';
+    var choicesLink = [
+      {
+        label: '<p><oppia-noninteractive-link text-with-value="&amp;quot;' +
+        '&amp;quot;" url-with-value="&amp;quot;https://www.example.com/' +
+        '1&amp;quot;"></oppia-noninteractive-link><br></p>',
+        val: 0
+      },
+      {
+        label: '<p><oppia-noninteractive-link text-with-value="&amp;quot;' +
+        '&amp;quot;" url-with-value="&amp;quot;https://www.example.com/' +
+        '2&amp;quot;"></oppia-noninteractive-link><br></p>',
+        val: 1
+      },
+      {
+        label: '<p><oppia-noninteractive-link text-with-value="&amp;quot;' +
+        '&amp;quot;" url-with-value="&amp;quot;https://www.example.com/' +
+        '3&amp;quot;"></oppia-noninteractive-link><br></p>',
+        val: 2
+      },
+      {
+        label: '<p><oppia-noninteractive-link text-with-value="&amp;quot;' +
+        '&amp;quot;" url-with-value="&amp;quot;https://www.example.com/' +
+        '4&amp;quot;"></oppia-noninteractive-link><br></p>',
+        val: 3
+      },
+    ];
+    var ruleLink = {
+      type: "Equals",
+      inputs: {
+        x: 0
+      }
+    };
+    var filter = $filter('parameterizeRuleDescription');
+    expect(filter(ruleMath, interactionIdMath, choicesMath)).toEqual('is ' +
+      'equal to \'[math]\'');
+    expect(filter(ruleLink, interactionIdLink, choicesLink)).toEqual('is ' +
+      'equal to \'[link]\'');
+  }));
 });
