@@ -86,6 +86,9 @@ oppia.factory('HintsAndSolutionManagerService', [
     var consumeHint = function() {
       hintsDiscovered = true;
       closeTooltip();
+      if (tooltipTimeout) {
+        $timeout.cancel(tooltipTimeout);
+      }
 
       numHintsConsumed++;
       wrongAnswersSinceLastHintConsumed = 0;
@@ -113,6 +116,9 @@ oppia.factory('HintsAndSolutionManagerService', [
         if (timeout) {
           $timeout.cancel(timeout);
         }
+        if (tooltipTimeout) {
+          $timeout.cancel(tooltipTimeout);
+        }
 
         if (hintsForLatestCard.length > 0) {
           enqueueTimeout(releaseHint, WAIT_FOR_FIRST_HINT_MSEC);
@@ -135,6 +141,9 @@ oppia.factory('HintsAndSolutionManagerService', [
       displaySolution: function() {
         hintsDiscovered = true;
         solutionConsumed = true;
+        if (tooltipTimeout) {
+          $timeout.cancel(tooltipTimeout);
+        }
         return solutionForLatestCard;
       },
       getNumHints: function() {
