@@ -42,7 +42,7 @@ class ClassifierTrainingJob(object):
             belongs.
         exp_id: str. The id of the exploration that contains the state
             for which the classifier will be generated.
-        exp_version: str. The version of the exploration when
+        exp_version: int. The version of the exploration when
             the training job was generated.
         next_scheduled_check_time: datetime.datetime. The next scheduled time to
             check the job.
@@ -84,7 +84,7 @@ class ClassifierTrainingJob(object):
             belongs.
         exp_id: str. The id of the exploration id that contains the state
             for which classifier will be generated.
-        exp_version: str. The version of the exploration when
+        exp_version: int. The version of the exploration when
             the training job was generated.
         next_scheduled_check_time: datetime.datetime. The next scheduled time to
             check the job.
@@ -92,9 +92,9 @@ class ClassifierTrainingJob(object):
             generated.
         status: str. The status of the training job request. This can be either
             NEW (default), PENDING (when a job has been picked up) or COMPLETE.
-        training_data: list. The training data that is used for training the
-            classifier. This is populated lazily when the job request is picked
-            up by the VM. The list contains dicts where each dict
+        training_data: list(dict). The training data that is used for training
+            the classifier. This is populated lazily when the job request is
+            picked up by the VM. The list contains dicts where each dict
             represents a single training data group, for example:
             training_data = [
                 {
@@ -135,7 +135,7 @@ class ClassifierTrainingJob(object):
     @property
     def algorithm_id(self):
         """Returns the algorithm_id of the algorithm used for generating
-            the classifier.
+        the classifier.
 
         Returns:
             str. The id of the algorithm used for generating the classifier.
@@ -154,11 +154,11 @@ class ClassifierTrainingJob(object):
     @property
     def exp_id(self):
         """Returns the exploration id for which the classifier will be
-            generated.
+        generated.
 
         Returns:
             str. The id of the exploration that contains the state
-                for which classifier will be generated.
+            for which classifier will be generated.
         """
         return self._exp_id
 
@@ -167,8 +167,8 @@ class ClassifierTrainingJob(object):
         """Returns the exploration version.
 
         Returns:
-            str. The version of the exploration when the training job was
-                generated.
+            int. The version of the exploration when the training job was
+            generated.
         """
         return self._exp_version
 
@@ -187,7 +187,7 @@ class ClassifierTrainingJob(object):
 
         Returns:
             str. The name of the state for which the classifier will be
-                generated.
+            generated.
         """
         return self._state_name
 
@@ -197,8 +197,8 @@ class ClassifierTrainingJob(object):
 
         Returns:
             str. The status of the training job request. This can be either
-                NEW (default), PENDING (when a job has been picked up) or
-                COMPLETE.
+            NEW (default), PENDING (when a job has been picked up) or
+            COMPLETE.
         """
         return self._status
 
@@ -207,20 +207,20 @@ class ClassifierTrainingJob(object):
         """Returns the training data used for training the classifier.
 
         Returns:
-            list. The training data that is used for training the
-                classifier. This is populated lazily when the job request is
-                picked up by the VM. The list contains dicts where each dict
-                represents a single training data group, for example:
-                training_data = [
-                    {
-                        'answer_group_index': 1,
-                        'answers': ['a1', 'a2']
-                    },
-                    {
-                        'answer_group_index': 2,
-                        'answers': ['a2', 'a3']
-                    }
-                ]
+            list(dict). The training data that is used for training the
+            classifier. This is populated lazily when the job request is
+            picked up by the VM. The list contains dicts where each dict
+            represents a single training data group, for example:
+            training_data = [
+                {
+                    'answer_group_index': 1,
+                    'answers': ['a1', 'a2']
+                },
+                {
+                    'answer_group_index': 2,
+                    'answers': ['a2', 'a3']
+                }
+            ]
         """
         return self._training_data
 
@@ -230,7 +230,7 @@ class ClassifierTrainingJob(object):
 
         Returns:
             dict. The actual classifier model used for
-                classification purpose.
+            classification purpose.
         """
         return self._classifier_data
 
@@ -240,7 +240,7 @@ class ClassifierTrainingJob(object):
 
         Returns:
             int. Schema version of the data used by the
-                classifier. This depends on the algorithm ID.
+            classifier. This depends on the algorithm ID.
         """
         return self._data_schema_version
 
@@ -438,7 +438,7 @@ class TrainingJobExplorationMapping(object):
 
         Returns:
             int. The exploration version at the time the
-                corresponding classifier's training job was created.
+            corresponding classifier's training job was created.
         """
         return self._exp_version
 
@@ -457,7 +457,7 @@ class TrainingJobExplorationMapping(object):
 
         Returns:
             str. The unique ID of the training job in the
-                job-exploration mapping.
+            job-exploration mapping.
         """
         return self._job_id
 
