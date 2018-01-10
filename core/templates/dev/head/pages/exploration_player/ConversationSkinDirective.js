@@ -307,6 +307,11 @@ oppia.directive('conversationSkin', [
             return PlayerCorrectnessFeedbackEnabledService.isEnabled();
           };
 
+          $scope.isOnLastCard = function () {
+            return PlayerTranscriptService.isLastCard(
+              PlayerPositionService.getActiveCardIndex());
+          };
+
           $scope.isCorrectnessFooterEnabled = function() {
             return (
               $scope.answerIsCorrect && $scope.isCorrectnessFeedbackEnabled());
