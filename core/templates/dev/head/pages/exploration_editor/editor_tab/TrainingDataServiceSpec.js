@@ -51,7 +51,7 @@ describe('TrainingDataService', function() {
     $httpBackend = $injector.get('$httpBackend');
     siis = $injector.get('stateInteractionIdService');
     ecs = $injector.get('EditorStateService');
-    cls = $injector.get('changeListService');
+    cls = $injector.get('ChangeListService');
     ess = $injector.get('explorationStatesService');
     rs = $injector.get('ResponsesService');
     tds = $injector.get('TrainingDataService');
@@ -79,22 +79,25 @@ describe('TrainingDataService', function() {
               }
             }],
             outcome: {
+              dest: 'State',
               feedback: {
                 html: 'Feedback',
                 audio_translations: {}
               },
-              dest: 'State',
-              param_changes: []
-            },
-            labelled_as_correct: false
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            }
           }],
           default_outcome: {
+            dest: 'State',
             feedback: {
               html: 'Default',
               audio_translations: {}
             },
-            dest: 'State',
-            param_changes: []
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null
           },
           hints: [],
           confirmed_unclassified_answers: []

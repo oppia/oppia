@@ -22,6 +22,7 @@ from core.tests import test_utils
 import feconf
 import utils
 
+
 # Dictionary-like data structures within sample YAML must be formatted
 # alphabetically to match string equivalence with the YAML generation
 # methods tested below.

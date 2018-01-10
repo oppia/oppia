@@ -19,11 +19,11 @@
 oppia.factory('AudioPreloaderService', [
   '$uibModal', 'ExplorationContextService', 'AssetsBackendApiService',
   'ExplorationPlayerStateService', 'UrlInterpolationService',
-  'AudioTranslationManagerService', 'LanguageUtilService',
+  'AudioTranslationLanguageService', 'LanguageUtilService',
   'ComputeGraphService',
   function($uibModal, ExplorationContextService, AssetsBackendApiService,
       ExplorationPlayerStateService, UrlInterpolationService,
-      AudioTranslationManagerService, LanguageUtilService,
+      AudioTranslationLanguageService, LanguageUtilService,
       ComputeGraphService) {
     var MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
@@ -38,7 +38,7 @@ oppia.factory('AudioPreloaderService', [
     };
 
     var _getAudioFilenamesInBfsOrder = function(sourceStateName) {
-      var languageCode = AudioTranslationManagerService
+      var languageCode = AudioTranslationLanguageService
         .getCurrentAudioLanguageCode();
       var stateNamesInBfsOrder =
         ComputeGraphService.computeBfsTraversalOfStates(
@@ -49,9 +49,10 @@ oppia.factory('AudioPreloaderService', [
       allAudioTranslations = _exploration.getAllAudioTranslations(
         languageCode);
       stateNamesInBfsOrder.forEach(function(stateName) {
-        if (allAudioTranslations.hasOwnProperty(stateName)) {
-          audioFilenames.push(allAudioTranslations[stateName].filename);
-        }
+        var allAudioTranslationsForState = allAudioTranslations[stateName];
+        allAudioTranslationsForState.forEach(function(audioTranslation) {
+          audioFilenames.push(audioTranslation.filename);
+        });
       });
       return audioFilenames;
     };

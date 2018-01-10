@@ -30,6 +30,7 @@ class CodeRepl(base.BaseInteraction):
     narrow_instructions = 'Go to code editor'
     needs_summary = True
     can_have_solution = True
+    show_generic_submit_button = True
 
     # Language options 'lua', 'scheme', 'coffeescript', 'javascript', and
     # 'ruby' have been removed for possible later re-release.
