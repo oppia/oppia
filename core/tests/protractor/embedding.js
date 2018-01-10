@@ -28,7 +28,7 @@ var workflow = require('../protractor_utils/workflow.js');
 describe('Embedding', function() {
   var adminPage = null;
   var explorationPlayerPage = null;
-  var exp_id = null;
+  var explorationId = null;
   var createCountingExploration = function (){
     // Intro
     editor.setStateName('Intro');
@@ -39,11 +39,13 @@ describe('Embedding', function() {
       )
     );
     editor.setInteraction('NumericInput');
-    editor.addResponse('NumericInput', null, 'correct but why', true, 'Equals', 6);
+    editor.addResponse(
+      'NumericInput', null, 'correct but why', true, 'Equals', 6);
     editor.addResponse('NumericInput', forms.toRichText('Surely there\'s ' +
       'at least one? For example, you might have the red ball on the left, ' +
-      'the blue ball in the middle, and the yellow ball on the right. Now try ' +
-      'and find a few more. How many different ways can you find, in total?')
+      'the blue ball in the middle, and the yellow ball on the right. ' +
+      'Now try and find a few more. ' +
+      'How many different ways can you find, in total?')
       , null, false, 'IsLessThanOrEqualTo', 0);
     editor.setDefaultOutcome(null, 'Not 6', true);
 
@@ -67,20 +69,21 @@ describe('Embedding', function() {
       , 'END', false, 'Contains', 'factorial');
     editor.setDefaultOutcome(forms.toRichText('OK! There are indeed 6 ways ' +
       'to arrange the balls: there are 3 ways to choose the leftmost one, ' +
-      'and for each of these, there are 2 ways to choose the second one; the ' +
-      'last choice is then forced. This gives 3 x 2 = 6 scenarios. If you do ' +
-      'a quick search for the words \'permutation\' or \'factorial\' on the ' +
-      'Internet, you\'ll also be able to find more information about this ' +
-      'topic. See if you can figure out what the answer for 4 balls is!')
+      'and for each of these, there are 2 ways to choose the second one; ' +
+      'the last choice is then forced. This gives 3 x 2 = 6 scenarios. ' +
+      'If you do a quick search for the words \'permutation\' ' +
+      'or \'factorial\' on the Internet, you\'ll also be able to find more' +
+      ' information about this topic. See if you can figure out what the ' +
+      'answer for 4 balls is!')
       , null, false);
 
     // Not 6
     editor.moveToState('Not 6');
-    editor.setContent(forms.toRichText('OK, I\'d be interested in seeing what ' +
-      'you came up with; could you list the different ways? Write them as ' +
-      'three-character words, like this: RBY, This means: put the red ball ' +
-      'on the left, the blue ball in the middle, and the yellow ball on the ' +
-      'right. Can you list all the ways you found?'));
+    editor.setContent(forms.toRichText('OK, I\'d be interested in seeing ' +
+      'what you came up with; could you list the different ways? Write ' +
+      'them as three-character words, like this: RBY, This means: put the ' +
+      'red ball on the left, the blue ball in the middle, and the yellow ' +
+      'ball on the right. Can you list all the ways you found?'));
     editor.setInteraction('Continue', 'try again');
     editor.setDefaultOutcome(null, 'Intro', false);
 
@@ -92,7 +95,8 @@ describe('Embedding', function() {
     // save changes
     title = 'Protractor Test';
     category = 'Mathematics';
-    objective = 'learn how to count permutations accurately and systematically';
+    objective = 'learn how to count permutations' + 
+      ' accurately and systematically';
     editor.setTitle(title);
     editor.setCategory(category);
     editor.setObjective(objective);
@@ -149,12 +153,12 @@ describe('Embedding', function() {
     // Create exploration.
     // version 1 is creation of the exploration.
     workflow.createExploration();
-    general.getExplorationIdFromEditor().then(function(explorationId){
-      exp_id = explorationId;
+    general.getExplorationIdFromEditor().then(function(expId){
+      explorationId = expId;
       // creates version 2 of the exploration.
       createCountingExploration();
 
-      general.openEditor(exp_id);
+      general.openEditor(explorationId);
       editor.setContent(forms.toRichText('Version 3'));
       editor.saveChanges('demonstration edit');
 
@@ -257,14 +261,14 @@ describe('Embedding', function() {
     users.login('embedder2@example.com', true);
 
     // Change language to Thai, which is not a supported site language.
-    general.openEditor(exp_id);
+    general.openEditor(explorationId);
     editor.setLanguage('ภาษาไทย');
     editor.saveChanges('Changing the language to a not supported one.');
     // We expect the default language, English
     checkPlaceholder('Type a number');
 
     // Change language to Spanish, which is a supported site language.
-    general.openEditor(exp_id);
+    general.openEditor(explorationId);
     editor.setLanguage('español');
     editor.saveChanges('Changing the language to a supported one.');
     checkPlaceholder('Ingresa un número');
