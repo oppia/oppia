@@ -57,16 +57,17 @@ oppia.factory('HintsAndSolutionManagerService', [
     var closeTooltip = function() {
       tooltipIsOpen = false;
     };
-    var showTooltip = function () {
+    var showTooltip = function() {
       tooltipIsOpen = true;
       hintsDiscovered = true;
-      enqueueTimeout(closeTooltip, CLOSE_TOOLTIP_MSEC);
+      $timeout(closeTooltip, CLOSE_TOOLTIP_MSEC);
     };
 
     var releaseHint = function() {
       numHintsReleased++;
-      if (!hintsDiscovered) {
-        enqueueTimeout(showTooltip, WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+      if (!hintsDiscovered && !tooltipTimeout) {
+        tooltipTimeout = $timeout(
+          showTooltip, WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
       }
     };
     var releaseSolution = function() {
