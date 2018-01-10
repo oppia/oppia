@@ -129,7 +129,6 @@ class ClassifierTrainingJob(object):
 
         Returns:
             str. The unique id of the classifier training job.
-
         """
         return self._job_id
 
