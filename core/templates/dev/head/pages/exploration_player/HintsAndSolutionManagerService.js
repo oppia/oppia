@@ -57,16 +57,17 @@ oppia.factory('HintsAndSolutionManagerService', [
     var closeTooltip = function() {
       tooltipIsOpen = false;
     };
-    var showTooltip = function () {
+    var showTooltip = function() {
       tooltipIsOpen = true;
       hintsDiscovered = true;
-      enqueueTimeout(closeTooltip, CLOSE_TOOLTIP_MSEC);
+      $timeout(closeTooltip, CLOSE_TOOLTIP_MSEC);
     };
 
     var releaseHint = function() {
       numHintsReleased++;
-      if (!hintsDiscovered) {
-        enqueueTimeout(showTooltip, WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+      if (!hintsDiscovered && !tooltipTimeout) {
+        tooltipTimeout = $timeout(
+          showTooltip, WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
       }
     };
     var releaseSolution = function() {
@@ -86,6 +87,9 @@ oppia.factory('HintsAndSolutionManagerService', [
     var consumeHint = function() {
       hintsDiscovered = true;
       closeTooltip();
+      if (tooltipTimeout) {
+        $timeout.cancel(tooltipTimeout);
+      }
 
       numHintsConsumed++;
       wrongAnswersSinceLastHintConsumed = 0;
@@ -113,6 +117,9 @@ oppia.factory('HintsAndSolutionManagerService', [
         if (timeout) {
           $timeout.cancel(timeout);
         }
+        if (tooltipTimeout) {
+          $timeout.cancel(tooltipTimeout);
+        }
 
         if (hintsForLatestCard.length > 0) {
           enqueueTimeout(releaseHint, WAIT_FOR_FIRST_HINT_MSEC);
@@ -135,6 +142,9 @@ oppia.factory('HintsAndSolutionManagerService', [
       displaySolution: function() {
         hintsDiscovered = true;
         solutionConsumed = true;
+        if (tooltipTimeout) {
+          $timeout.cancel(tooltipTimeout);
+        }
         return solutionForLatestCard;
       },
       getNumHints: function() {
