@@ -186,10 +186,10 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
 }]);
 
 oppia.directive('textAngularRte', [
-  '$filter', '$timeout', 'HtmlEscaperService', 'rteHelperService',
+  '$filter', '$timeout', 'HtmlEscaperService', 'RteHelperService',
   'textAngularManager',
   function(
-    $filter, $timeout, HtmlEscaperService, rteHelperService,
+    $filter, $timeout, HtmlEscaperService, RteHelperService,
     textAngularManager) {
     return {
       restrict: 'E',
@@ -219,7 +219,7 @@ oppia.directive('textAngularRte', [
           $scope.placeholderText = $scope.uiConfig().placeholder;
         }
 
-        rteHelperService.getRichTextComponents().forEach(
+        RteHelperService.getRichTextComponents().forEach(
           function(componentDefn) {
             if (!($scope.uiConfig() &&
                 $scope.uiConfig().hide_complex_extensions &&
@@ -234,7 +234,7 @@ oppia.directive('textAngularRte', [
         $scope.toolbarOptionsJson = JSON.stringify(toolbarOptions);
 
         var _convertHtmlToRte = function(html) {
-          return rteHelperService.convertHtmlToRte(html);
+          return RteHelperService.convertHtmlToRte(html);
         };
 
         $scope.stripFormatting = function(html) {
@@ -270,7 +270,7 @@ oppia.directive('textAngularRte', [
           var displayedContent = $scope.isCustomizationModalOpen ?
             newVal :
             $filter('sanitizeHtmlForRte')(newVal);
-          $scope.htmlContent = rteHelperService.convertRteToHtml(
+          $scope.htmlContent = RteHelperService.convertRteToHtml(
             displayedContent);
         });
 
