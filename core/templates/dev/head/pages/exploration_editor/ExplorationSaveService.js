@@ -26,6 +26,7 @@ oppia.factory('ExplorationSaveService', [
   'explorationInitStateNameService', 'RouterService',
   'FocusManagerService', 'ChangeListService', 'siteAnalyticsService',
   'StatesObjectFactory', 'UrlInterpolationService',
+  'AutosaveInfoModalsService',
   function(
       $uibModal, $timeout, $rootScope, $log, $q,
       AlertsService, ExplorationDataService, explorationStatesService,
@@ -35,7 +36,8 @@ oppia.factory('ExplorationSaveService', [
       ExplorationWarningsService, ExplorationDiffService,
       explorationInitStateNameService, RouterService,
       FocusManagerService, ChangeListService, siteAnalyticsService,
-      StatesObjectFactory, UrlInterpolationService) {
+      StatesObjectFactory, UrlInterpolationService,
+      AutosaveInfoModalsService) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
     var saveIsInProgress = false;
@@ -167,7 +169,7 @@ oppia.factory('ExplorationSaveService', [
           if (isDraftVersionValid === false &&
               draftChanges !== null &&
               draftChanges.length > 0) {
-            autosaveInfoModalsService.showVersionMismatchModal(changeList);
+            AutosaveInfoModalsService.showVersionMismatchModal(changeList);
             return;
           }
           $log.info('Changes to this exploration were saved successfully.');
