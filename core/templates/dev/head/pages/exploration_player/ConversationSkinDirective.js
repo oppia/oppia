@@ -760,7 +760,11 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.showUpcomingCard = function() {
-            if (!$scope.isLearnAgainButton()) {
+            /* This is because when answerIsCorrect becomes false below, if
+               pendingCardWasSeenBefore is true (going forward to the card from
+               which redirection just happened), Learn Again would be briefly
+               visible. */
+            if ($scope.answerIsCorrect) {
               $scope.pendingCardWasSeenBefore = false;
             }
             $scope.answerIsCorrect = false;
