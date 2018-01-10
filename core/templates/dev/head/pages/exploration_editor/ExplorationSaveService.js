@@ -24,8 +24,9 @@ oppia.factory('ExplorationSaveService', [
   'explorationLanguageCodeService', 'ExplorationRightsService',
   'ExplorationWarningsService', 'ExplorationDiffService',
   'explorationInitStateNameService', 'RouterService',
-  'FocusManagerService', 'changeListService', 'siteAnalyticsService',
+  'FocusManagerService', 'ChangeListService', 'siteAnalyticsService',
   'StatesObjectFactory', 'UrlInterpolationService',
+  'AutosaveInfoModalsService',
   function(
       $uibModal, $timeout, $rootScope, $log, $q,
       AlertsService, ExplorationDataService, explorationStatesService,
@@ -34,8 +35,9 @@ oppia.factory('ExplorationSaveService', [
       explorationLanguageCodeService, ExplorationRightsService,
       ExplorationWarningsService, ExplorationDiffService,
       explorationInitStateNameService, RouterService,
-      FocusManagerService, changeListService, siteAnalyticsService,
-      StatesObjectFactory, UrlInterpolationService) {
+      FocusManagerService, ChangeListService, siteAnalyticsService,
+      StatesObjectFactory, UrlInterpolationService,
+      AutosaveInfoModalsService) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
     var saveIsInProgress = false;
@@ -145,7 +147,7 @@ oppia.factory('ExplorationSaveService', [
       // (regardless of success or failure of the operation).
       var whenSavingDone = $q.defer();
 
-      var changeList = changeListService.getChangeList();
+      var changeList = ChangeListService.getChangeList();
 
       if (ExplorationRightsService.isPrivate()) {
         siteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
@@ -167,11 +169,11 @@ oppia.factory('ExplorationSaveService', [
           if (isDraftVersionValid === false &&
               draftChanges !== null &&
               draftChanges.length > 0) {
-            autosaveInfoModalsService.showVersionMismatchModal(changeList);
+            AutosaveInfoModalsService.showVersionMismatchModal(changeList);
             return;
           }
           $log.info('Changes to this exploration were saved successfully.');
-          changeListService.discardAllChanges();
+          ChangeListService.discardAllChanges();
           $rootScope.$broadcast('initExplorationPage');
           $rootScope.$broadcast('refreshVersionHistory', {
             forceRefresh: true
@@ -190,7 +192,7 @@ oppia.factory('ExplorationSaveService', [
     return {
       isExplorationSaveable: function() {
         return (
-          changeListService.isExplorationLockedForEditing() &&
+          ChangeListService.isExplorationLockedForEditing() &&
           !saveIsInProgress && (
             (ExplorationRightsService.isPrivate() &&
               !ExplorationWarningsService.hasCriticalWarnings()) ||
@@ -238,7 +240,7 @@ oppia.factory('ExplorationSaveService', [
             windowClass: 'oppia-loading-modal'
           });
 
-          changeListService.discardAllChanges();
+          ChangeListService.discardAllChanges();
           AlertsService.addSuccessMessage('Changes discarded.');
           $rootScope.$broadcast('initExplorationPage');
 
@@ -463,7 +465,7 @@ oppia.factory('ExplorationSaveService', [
             .getStateObjects();
           var diffGraphData = ExplorationDiffService.getDiffGraphData(
             oldStates, newStates, [{
-              changeList: changeListService.getChangeList(),
+              changeList: ChangeListService.getChangeList(),
               directionForwards: true
             }]);
           diffData = {

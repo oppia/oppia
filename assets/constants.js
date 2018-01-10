@@ -453,7 +453,8 @@ var constants = {
     "id": "en-auto",
     "text": "English (auto)",
     "exploration_language": "en",
-    "speech_synthesis_code": "en-GB"
+    "speech_synthesis_code": "en-GB",
+    "speech_synthesis_code_mobile": "en_US"
   }],
 
   "//" : "Types of view in creator dashboard page.",

@@ -41,16 +41,10 @@ oppia.directive('oppiaInteractiveGraphInput', [
         'graph_input_interaction_directive.html'),
       controller: [
         '$scope', '$element', '$attrs', 'WindowDimensionsService',
-        'EVENT_PROGRESS_NAV_SUBMITTED',
+        'ExplorationPlayerService', 'EVENT_PROGRESS_NAV_SUBMITTED',
         function(
             $scope, $element, $attrs, WindowDimensionsService,
-            EVENT_PROGRESS_NAV_SUBMITTED) {
-          $scope.isSubmitHidden = function() {
-            return (
-              !UrlService.isIframed() &&
-              WindowDimensionsService.isWindowNarrow());
-          };
-
+            ExplorationPlayerService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.errorMessage = '';
           $scope.graph = {
             vertices: [],
@@ -119,8 +113,18 @@ oppia.directive('oppiaInteractiveGraphInput', [
           var checkValidGraph = function(graph) {
             return Boolean(graph);
           };
+
+          $scope.$watch(function() {
+            return $scope.graph;
+          }, function() {
+            $scope.setAnswerValidity({
+              answerValidity: checkValidGraph($scope.graph)
+            });
+          });
+
           init();
-        }]
+        }
+      ]
     };
   }
 ]);
@@ -329,7 +333,6 @@ oppia.directive('graphViz', [
                 y: $scope.state.mouseY,
                 label: ''
               });
-              setMode(_MODES.MOVE);
             }
             if ($scope.state.hoveredVertex === null) {
               $scope.state.selectedVertex = null;
@@ -428,6 +431,7 @@ oppia.directive('graphViz', [
             }
           };
           $scope.onMousedownVertex = function(index) {
+            console.log('MOUSEDOWN');
             if ($scope.state.currentMode === _MODES.ADD_EDGE) {
               if ($scope.canAddEdge) {
                 beginAddEdge(index);

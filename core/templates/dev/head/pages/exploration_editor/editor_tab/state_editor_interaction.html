@@ -13,11 +13,11 @@
         <img ng-src="<[userBlueImgUrl]>" alt="" class="oppia-editor-card-avatar">
         <div class="oppia-editor-card-section-container">
           <div class="oppia-editor-card-section" style="height: 100%;">
-            <button type="button" class="protractor-test-delete-interaction oppia-delete-interaction-button oppia-transition-200" ng-click="deleteInteraction()" ng-if="editabilityService.isEditable()">
+            <button type="button" class="protractor-test-delete-interaction oppia-delete-interaction-button oppia-transition-200" ng-click="deleteInteraction()" ng-if="EditabilityService.isEditable()">
               <i class="material-icons md-18">&#xE5CD;</i>
             </button>
 
-            <div ng-if="hasLoaded" class="protractor-test-interaction" ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
+            <div ng-if="hasLoaded" class="protractor-test-interaction" ng-class="{'oppia-editable-section': EditabilityService.isEditable()}">
               <div class="oppia-interaction-preview oppia-transition-200" style="position: absolute; width: 100%; height: 100%;" ng-click="openInteractionCustomizerModal()">
               </div>
               <div angular-html-bind="interactionPreviewHtml" style="padding: 5px; pointer-events: none;">

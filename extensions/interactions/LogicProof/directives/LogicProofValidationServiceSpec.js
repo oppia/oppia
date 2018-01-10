@@ -38,6 +38,7 @@ describe('LogicProofValidationService', function() {
         html: '',
         audio_translations: {}
       },
+      labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null
     });
@@ -48,6 +49,7 @@ describe('LogicProofValidationService', function() {
         html: '',
         audio_translations: {}
       },
+      labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null
     });

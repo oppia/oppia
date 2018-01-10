@@ -25,24 +25,43 @@ oppia.directive('outcomeEditor', [
         displayFeedback: '=',
         getOnSaveDestFn: '&onSaveDest',
         getOnSaveFeedbackFn: '&onSaveFeedback',
+        getOnSaveCorrectnessLabelFn: '&onSaveCorrectnessLabel',
         outcome: '=outcome',
         suppressWarnings: '&suppressWarnings'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/outcome_editor_directive.html'),
       controller: [
-        '$scope', 'EditorStateService',
-        'stateInteractionIdService', 'COMPONENT_NAME_FEEDBACK',
-        function($scope, EditorStateService,
-          stateInteractionIdService, COMPONENT_NAME_FEEDBACK) {
+        '$scope', 'EditorStateService', 'stateInteractionIdService',
+        'COMPONENT_NAME_FEEDBACK', 'explorationCorrectnessFeedbackService',
+        'INTERACTION_SPECS',
+        function(
+            $scope, EditorStateService, stateInteractionIdService,
+            COMPONENT_NAME_FEEDBACK, explorationCorrectnessFeedbackService,
+            INTERACTION_SPECS) {
           $scope.editOutcomeForm = {};
           $scope.feedbackEditorIsOpen = false;
           $scope.destinationEditorIsOpen = false;
+          $scope.correctnessLabelEditorIsOpen = false;
           // TODO(sll): Investigate whether this line can be removed, due to
           // $scope.savedOutcome now being set in onExternalSave().
           $scope.savedOutcome = angular.copy($scope.outcome);
 
           $scope.COMPONENT_NAME_FEEDBACK = COMPONENT_NAME_FEEDBACK;
+
+          $scope.getCurrentInteractionId = function() {
+            return stateInteractionIdService.savedMemento;
+          };
+
+          // This returns false if the current interaction ID is null.
+          $scope.isCurrentInteractionLinear = function() {
+            var interactionId = $scope.getCurrentInteractionId();
+            return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+          };
+
+          $scope.isCorrectnessFeedbackEnabled = function() {
+            return explorationCorrectnessFeedbackService.isEnabled();
+          };
 
           var onExternalSave = function() {
             // The reason for this guard is because, when the editor page for an
@@ -140,6 +159,13 @@ oppia.directive('outcomeEditor', [
               $scope.outcome.refresherExplorationId);
 
             $scope.getOnSaveDestFn()($scope.savedOutcome);
+          };
+
+          $scope.onChangeCorrectnessLabel = function() {
+            $scope.savedOutcome.labelledAsCorrect = (
+              $scope.outcome.labelledAsCorrect);
+
+            $scope.getOnSaveCorrectnessLabelFn()($scope.savedOutcome);
           };
 
           $scope.cancelThisFeedbackEdit = function() {

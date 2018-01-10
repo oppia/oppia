@@ -81,6 +81,14 @@ oppia.factory('FractionObjectFactory', [
         this.isNegative, this.wholeNumber, numerator, denominator);
     };
 
+    Fraction.prototype.hasNonzeroIntegerPart = function() {
+      return this.wholeNumber !== 0;
+    };
+
+    Fraction.prototype.isImproperFraction = function() {
+      return this.denominator <= this.numerator;
+    };
+
     Fraction.fromRawInputString = function(rawInput) {
       var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
       if (INVALID_CHARS_REGEX.test(rawInput)) {

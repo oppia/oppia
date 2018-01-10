@@ -25,8 +25,7 @@ oppia.directive('outcomeDestinationEditor', [
         outcome: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/' +
-        'outcome_destination_editor_directive.html'),
+        '/components/outcome_destination_editor_directive.html'),
       controller: [
         '$scope', 'EditorStateService', 'explorationStatesService',
         'StateGraphLayoutService', 'PLACEHOLDER_OUTCOME_DEST',
@@ -56,7 +55,7 @@ oppia.directive('outcomeDestinationEditor', [
           // development.
           $scope.canEditRefresherExplorationId = (
             GLOBALS.isAdmin || GLOBALS.isModerator);
-          $scope.explorationIdPattern = /^[a-zA-Z0-9.-]+$/;
+          $scope.explorationIdPattern = /^[a-zA-Z0-9_-]+$/;
 
           $scope.isSelfLoop = function() {
             return $scope.outcome.dest === currentStateName;
