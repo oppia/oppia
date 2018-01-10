@@ -84,7 +84,7 @@
       "angular": {
         "version": "1.5.8",
         "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8",
+        "url": "https://cdn.bootcss.com/angular.js/1.5.8",        
         "targetDirPrefix": "angularjs-",
         "files": [
           "angular.js", "angular.min.js", "angular.min.js.map", "angular-animate.js",
@@ -286,7 +286,7 @@
       "jquery": {
         "version": "3.2.1",
         "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1",
+        "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1",        
         "rootDirPrefix": "jquery-",
         "targetDirPrefix": "jquery-",
         "files": ["jquery.js", "jquery.min.js", "jquery.min.js.map"],

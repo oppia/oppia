@@ -1010,44 +1010,7 @@ oppia.factory('stateSolutionService', [
   }
 ]);
 
-// Service for computing graph data.
-oppia.factory('graphDataService', [
-  'explorationStatesService', 'explorationInitStateNameService',
-  'ComputeGraphService',
-  function(
-      explorationStatesService, explorationInitStateNameService,
-      ComputeGraphService) {
-    var _graphData = null;
 
-    // Returns an object which can be treated as the input to a visualization
-    // for a directed graph. The returned object has the following keys:
-    //   - nodes: an object whose keys are node ids (equal to node names) and
-    //       whose values are node names
-    //   - links: a list of objects. Each object represents a directed link
-    //       between two nodes, and has keys 'source' and 'target', the values
-    //       of which are the names of the corresponding nodes.
-    //   - initStateName: the name of the initial state.
-    //   - finalStateName: the name of the final state.
-    var _recomputeGraphData = function() {
-      if (!explorationInitStateNameService.savedMemento) {
-        return;
-      }
-
-      var states = explorationStatesService.getStates();
-      var initStateId = explorationInitStateNameService.savedMemento;
-      _graphData = ComputeGraphService.compute(initStateId, states);
-    };
-
-    return {
-      recompute: function() {
-        _recomputeGraphData();
-      },
-      getGraphData: function() {
-        return angular.copy(_graphData);
-      }
-    };
-  }
-]);
 
 oppia.constant('WARNING_TYPES', {
   // These must be fixed before the exploration can be saved.
