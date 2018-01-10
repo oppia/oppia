@@ -413,7 +413,7 @@ describe('Testing filters', function() {
 
   it('should correctly display RTE components', inject(function($filter) {
     var ruleMath = {
-      type: "Equals",
+      type: 'Equals',
       inputs: {
         x: 2
       }
@@ -444,8 +444,9 @@ describe('Testing filters', function() {
         val: 3
       },
     ];
+    
     var ruleLink = {
-      type: "Equals",
+      type: 'Equals',
       inputs: {
         x: 0
       }
@@ -477,12 +478,7 @@ describe('Testing filters', function() {
         val: 3
       },
     ];
-    var ruleLink = {
-      type: "Equals",
-      inputs: {
-        x: 0
-      }
-    };
+
     var filter = $filter('parameterizeRuleDescription');
     expect(filter(ruleMath, interactionIdMath, choicesMath)).toEqual('is ' +
       'equal to \'[math]\'');
