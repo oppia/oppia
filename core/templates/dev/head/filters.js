@@ -197,7 +197,13 @@ oppia.filter('parameterizeRuleDescription', [
             // The following case is for MultipleChoiceInput
             for (var i = 0; i < choices.length; i++) {
               if (choices[i].val === inputs[varName]) {
-                replacementText = '\'' + choices[i].label + '\'';
+                if (choices[i].label.includes('oppia-noninteractive')) {
+                  replacementText = '\'[' +
+                    choices[i].label.split('-')[2].split(' ')[0] + ']\'';
+                }
+                else {
+                  replacementText = '\'' + choices[i].label + '\'';
+                }
               }
             }
           }
@@ -232,12 +238,6 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = '[reference graph]';
         } else {
           replacementText = inputs[varName];
-        }
-        if(typeof replacementText === 'string') {
-          if (replacementText.includes('oppia-noninteractive')) {
-            replacementText = '\'[' +
-              replacementText.split('-')[2].split(' ')[0] + ']\'';
-          }
         }
 
         description = description.replace(PATTERN, ' ');
