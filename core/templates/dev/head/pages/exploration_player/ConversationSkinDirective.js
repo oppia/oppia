@@ -558,6 +558,7 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.submitAnswer = function(answer, interactionRulesService) {
+            $scope.pendingCardWasSeenBefore = false;
             // Safety check to prevent double submissions from occurring.
             if ($scope.answerIsBeingProcessed ||
               !$scope.isCurrentCardAtEndOfTranscript() ||
