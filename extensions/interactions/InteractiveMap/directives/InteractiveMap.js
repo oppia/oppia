@@ -44,7 +44,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.mapMarkers = [];
 
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
           });
 

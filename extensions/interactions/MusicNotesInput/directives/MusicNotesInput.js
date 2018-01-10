@@ -114,7 +114,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           HtmlEscaperService.escapedJsonToObj(attrs.initialSequenceWithValue) :
           scope.getLastAnswer();
 
-        scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+        scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
           scope.interactionIsActive = false;
           scope.initialSequence = scope.getLastAnswer();
           scope.reinitStaff();
