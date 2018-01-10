@@ -27,23 +27,43 @@ oppia.directive('responseHeader', [
         getShortSummary: '&shortSummary',
         isActive: '&isActive',
         getOnDeleteFn: '&onDeleteFn',
-        getNumRules: '&numRules'
+        getNumRules: '&numRules',
+        isResponse: '&isResponse'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/' +
-        'response_header_directive.html'),
+        '/components/response_header_directive.html'),
       controller: [
-        '$scope', 'editabilityService', 'EditorStateService', 'RouterService',
-        'PLACEHOLDER_OUTCOME_DEST',
+        '$scope', 'EditabilityService', 'EditorStateService', 'RouterService',
+        'PLACEHOLDER_OUTCOME_DEST', 'explorationCorrectnessFeedbackService',
+        'stateInteractionIdService', 'INTERACTION_SPECS',
         function(
-            $scope, editabilityService, EditorStateService, RouterService,
-            PLACEHOLDER_OUTCOME_DEST) {
-          $scope.editabilityService = editabilityService;
+            $scope, EditabilityService, EditorStateService, RouterService,
+            PLACEHOLDER_OUTCOME_DEST, explorationCorrectnessFeedbackService,
+            stateInteractionIdService, INTERACTION_SPECS) {
+          $scope.EditabilityService = EditabilityService;
+
+          $scope.getCurrentInteractionId = function() {
+            return stateInteractionIdService.savedMemento;
+          };
+
+          // This returns false if the current interaction ID is null.
+          $scope.isCurrentInteractionLinear = function() {
+            var interactionId = $scope.getCurrentInteractionId();
+            return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+          };
+
+          $scope.isCorrect = function() {
+            return $scope.getOutcome() && $scope.getOutcome().labelledAsCorrect;
+          };
 
           $scope.isOutcomeLooping = function() {
             var outcome = $scope.getOutcome();
             var activeStateName = EditorStateService.getActiveStateName();
             return outcome && (outcome.dest === activeStateName);
+          };
+
+          $scope.isCorrectnessFeedbackEnabled = function() {
+            return explorationCorrectnessFeedbackService.isEnabled();
           };
 
           $scope.isCreatingNewState = function() {

@@ -1,4 +1,4 @@
-<div class="audio-header">
+<div class="audio-header" ng-if="isAudioBarAvailable()">
   <div ng-if="audioBarIsExpanded" class="audio-controls">
     <div style="width: 560px;">
       <i class="fa audio-controls-button-icon"
@@ -13,7 +13,7 @@
         <!--Filler space for message-->
         <span class="audio-controls-message">&zwnj;</span>
       </div>
-      <select class="audio-language-select" 
+      <select class="audio-language-select"
               ng-model="selectedLanguage.value"
               ng-options="o.value as o.displayed for o in languagesInExploration"
               ng-change="onNewLanguageSelected()"></select>
@@ -44,7 +44,7 @@
     width: 30px;
   }
 
-  .audio-toggle-button {  
+  .audio-toggle-button {
     background-color: #0D48A1;
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
@@ -91,7 +91,7 @@
   .audio-controls-message {
     font-size: 10px;
     font-style: italic;
-    color: white;    
+    color: white;
   }
 
   .audio-header {
@@ -105,7 +105,10 @@
   }
 
   .audio-language-select {
-    border-radius: 50px;
+    border-radius: 9px;
+    font-size: 15px;
+    margin-left: 5px;
+    padding-left: 3px;
     width: 36%;
   }
 

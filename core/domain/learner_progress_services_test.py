@@ -17,11 +17,12 @@
 """Tests for learner progress services."""
 
 import datetime
+
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_services
-from core.domain import learner_progress_services
 from core.domain import learner_playlist_services
+from core.domain import learner_progress_services
 from core.platform import models
 from core.tests import test_utils
 

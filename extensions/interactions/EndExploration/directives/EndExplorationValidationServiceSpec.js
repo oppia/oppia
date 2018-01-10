@@ -34,7 +34,10 @@ describe('EndExplorationValidationService', function() {
       feedback: {
         html: '',
         audio_translations: {}
-      }
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null
     };
 
     customizationArguments = {
@@ -50,9 +53,11 @@ describe('EndExplorationValidationService', function() {
         feedback: {
           html: '',
           audio_translations: {}
-        }
-      },
-      labelled_as_correct: false
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null
+      }
     }];
   }));
 

@@ -143,7 +143,8 @@ oppia.filter('wrapTextWithEllipsis', [
 // values. Note that this returns an HTML string to accommodate the case of
 // multiple-choice input and image-click input.
 oppia.filter('parameterizeRuleDescription', [
-  'INTERACTION_SPECS', function(INTERACTION_SPECS) {
+  'INTERACTION_SPECS', 'FractionObjectFactory',
+  function(INTERACTION_SPECS, FractionObjectFactory) {
     return function(rule, interactionId, choices) {
       if (!rule) {
         return '';
@@ -230,6 +231,9 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = '"' + inputs[varName] + '"';
         } else if (varType === 'Graph') {
           replacementText = '[reference graph]';
+        } else if (varType === 'Fraction') {
+          replacementText = FractionObjectFactory
+            .fromDict(inputs[varName]).toString();
         } else {
           replacementText = inputs[varName];
         }
@@ -305,7 +309,8 @@ oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
 oppia.filter('convertToPlainText', [function() {
   return function(input) {
     var strippedText = input.replace(/(<([^>]+)>)/ig, '');
-    strippedText = strippedText.replace('&nbsp;', ' ');
+    strippedText = strippedText.replace(/&nbsp;/ig, ' ');
+    strippedText = strippedText.replace(/&quot;/ig, '');
 
     var trimmedText = strippedText.trim();
     if (trimmedText.length === 0) {

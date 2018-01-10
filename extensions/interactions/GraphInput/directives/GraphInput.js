@@ -24,22 +24,27 @@ oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
 
 oppia.directive('oppiaInteractiveGraphInput', [
   'HtmlEscaperService', 'graphInputRulesService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE',
+  'UrlService', 'EVENT_NEW_CARD_AVAILABLE',
   function(
       HtmlEscaperService, graphInputRulesService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE ) {
+      UrlService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
         onSubmit: '&',
-        getLastAnswer: '&lastAnswer'
+        getLastAnswer: '&lastAnswer',
+        // This should be called whenever the answer changes.
+        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
         'graph_input_interaction_directive.html'),
       controller: [
-        '$scope', '$element', '$attrs',
-        function($scope, $element, $attrs) {
+        '$scope', '$element', '$attrs', 'WindowDimensionsService',
+        'ExplorationPlayerService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        function(
+            $scope, $element, $attrs, WindowDimensionsService,
+            ExplorationPlayerService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.errorMessage = '';
           $scope.graph = {
             vertices: [],
@@ -55,10 +60,11 @@ oppia.directive('oppiaInteractiveGraphInput', [
               rulesService: graphInputRulesService
             });
           };
+          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitGraph);
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             $scope.interactionIsActive = false;
-            
+
             $scope.canAddVertex = false;
             $scope.canDeleteVertex = false;
             $scope.canEditVertexLabel = false;
@@ -107,8 +113,18 @@ oppia.directive('oppiaInteractiveGraphInput', [
           var checkValidGraph = function(graph) {
             return Boolean(graph);
           };
+
+          $scope.$watch(function() {
+            return $scope.graph;
+          }, function() {
+            $scope.setAnswerValidity({
+              answerValidity: checkValidGraph($scope.graph)
+            });
+          });
+
           init();
-        }]
+        }
+      ]
     };
   }
 ]);
@@ -317,7 +333,6 @@ oppia.directive('graphViz', [
                 y: $scope.state.mouseY,
                 label: ''
               });
-              setMode(_MODES.MOVE);
             }
             if ($scope.state.hoveredVertex === null) {
               $scope.state.selectedVertex = null;
@@ -416,6 +431,7 @@ oppia.directive('graphViz', [
             }
           };
           $scope.onMousedownVertex = function(index) {
+            console.log('MOUSEDOWN');
             if ($scope.state.currentMode === _MODES.ADD_EDGE) {
               if ($scope.canAddEdge) {
                 beginAddEdge(index);

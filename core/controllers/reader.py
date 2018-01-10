@@ -18,8 +18,6 @@ import json
 import logging
 import random
 
-import jinja2
-
 from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
@@ -41,6 +39,8 @@ from core.domain import summary_services
 from core.domain import user_services
 import feconf
 import utils
+
+import jinja2
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 

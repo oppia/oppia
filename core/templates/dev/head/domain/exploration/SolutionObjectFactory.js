@@ -46,7 +46,9 @@ oppia.factory('SolutionObjectFactory', [
 
     Solution.createNew = function(
         answerIsExclusive, correctAnswer, explanationHtml) {
-      return new Solution(answerIsExclusive, correctAnswer, 
+      return new Solution(
+        answerIsExclusive,
+        correctAnswer,
         SubtitledHtmlObjectFactory.createDefault(explanationHtml));
     };
 
@@ -84,13 +86,17 @@ oppia.factory('SolutionObjectFactory', [
       this.explanation = explanation;
     };
 
-    Solution.prototype.getOppiaResponseHtml = function(interaction) {
-      return (
-        (this.answerIsExclusive ? 'The only' : 'One') + ' answer is:<br>' +
-        ExplorationHtmlFormatterService.getShortAnswerHtml(
-          this.correctAnswer, interaction.id, interaction.customizationArgs) +
-        '. ' + this.explanation.getHtml());
+    Solution.prototype.getOppiaShortAnswerResponseHtml = function(interaction) {
+      return {
+        prefix: (this.answerIsExclusive ? 'The only' : 'One'),
+        answer: ExplorationHtmlFormatterService.getShortAnswerHtml(
+          this.correctAnswer, interaction.id, interaction.customizationArgs)};
     };
+
+    Solution.prototype.getOppiaSolutionExplanationResponseHtml =
+      function() {
+        return this.explanation.getHtml();
+      };
 
     return Solution;
   }]);

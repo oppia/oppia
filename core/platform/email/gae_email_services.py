@@ -20,6 +20,7 @@ import feconf
 
 from google.appengine.api import mail
 
+
 def get_incoming_email_address(reply_to_id):
     return 'reply+%s@%s' % (reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
 

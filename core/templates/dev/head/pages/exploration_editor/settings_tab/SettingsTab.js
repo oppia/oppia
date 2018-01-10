@@ -23,12 +23,13 @@ oppia.controller('SettingsTab', [
   'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationTagsService', 'ExplorationRightsService',
   'explorationInitStateNameService', 'explorationParamSpecsService',
-  'changeListService', 'AlertsService', 'explorationStatesService',
+  'ChangeListService', 'AlertsService', 'explorationStatesService',
   'explorationParamChangesService', 'ExplorationWarningsService',
   'ExplorationAdvancedFeaturesService', 'ALL_CATEGORIES',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
   'EditableExplorationBackendApiService', 'UrlInterpolationService',
   'explorationAutomaticTextToSpeechService',
+  'explorationCorrectnessFeedbackService',
   function(
       $scope, $http, $window, $uibModal,
       $rootScope, ExplorationDataService,
@@ -36,12 +37,13 @@ oppia.controller('SettingsTab', [
       explorationObjectiveService, explorationLanguageCodeService,
       explorationTagsService, ExplorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService,
-      changeListService, AlertsService, explorationStatesService,
+      ChangeListService, AlertsService, explorationStatesService,
       explorationParamChangesService, ExplorationWarningsService,
       ExplorationAdvancedFeaturesService, ALL_CATEGORIES,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
       EditableExplorationBackendApiService, UrlInterpolationService,
-      explorationAutomaticTextToSpeechService) {
+      explorationAutomaticTextToSpeechService,
+      explorationCorrectnessFeedbackService) {
     $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
@@ -180,6 +182,11 @@ oppia.controller('SettingsTab', [
       explorationAutomaticTextToSpeechService.isAutomaticTextToSpeechEnabled);
     $scope.toggleAutomaticTextToSpeech = (
       explorationAutomaticTextToSpeechService.toggleAutomaticTextToSpeech);
+
+    $scope.isCorrectnessFeedbackEnabled = (
+      explorationCorrectnessFeedbackService.isEnabled);
+    $scope.toggleCorrectnessFeedback = (
+      explorationCorrectnessFeedbackService.toggleCorrectnessFeedback);
 
     /********************************************
     * Methods for rights management.
@@ -375,7 +382,7 @@ oppia.controller('SettingsTab', [
     };
 
     $scope.isExplorationLockedForEditing = function() {
-      return changeListService.isExplorationLockedForEditing();
+      return ChangeListService.isExplorationLockedForEditing();
     };
 
     $scope.closeRolesForm = function() {

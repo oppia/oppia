@@ -20,14 +20,21 @@ oppia.directive('oppiaInteractiveLogicProof', [
       restrict: 'E',
       scope: {
         onSubmit: '&',
-        getLastAnswer: '&lastAnswer'
+        getLastAnswer: '&lastAnswer',
+        // This should be called whenever the answer changes.
+        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/LogicProof/directives/' +
         'logic_proof_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$uibModal', 'logicProofRulesService',
-        function($scope, $attrs, $uibModal, logicProofRulesService) {
+        'WindowDimensionsService', 'UrlService',
+        'ExplorationPlayerService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        function(
+            $scope, $attrs, $uibModal, logicProofRulesService,
+            WindowDimensionsService, UrlService,
+            ExplorationPlayerService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.localQuestionData = HtmlEscaperService.escapedJsonToObj(
             $attrs.questionWithValue);
 
@@ -35,7 +42,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // permited line templates) that is stored in defaultData.js within
           // the dependencies.
           $scope.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
-          
+
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
             $scope.interactionIsActive = false;
@@ -252,6 +259,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
               rulesService: logicProofRulesService
             });
           };
+
+          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitProof);
 
           $scope.showHelp = function() {
             $uibModal.open({

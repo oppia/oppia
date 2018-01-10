@@ -20,7 +20,7 @@ oppia.controller('StateInteraction', [
   '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
   'AlertsService', 'EditorStateService', 'HtmlEscaperService',
   'INTERACTION_SPECS', 'stateInteractionIdService',
-  'stateCustomizationArgsService', 'editabilityService',
+  'stateCustomizationArgsService', 'EditabilityService',
   'explorationStatesService', 'graphDataService',
   'InteractionDetailsCacheService',
   'ExplorationHtmlFormatterService', 'UrlInterpolationService',
@@ -28,7 +28,7 @@ oppia.controller('StateInteraction', [
   function($scope, $http, $rootScope, $uibModal, $injector, $filter,
       AlertsService, EditorStateService, HtmlEscaperService,
       INTERACTION_SPECS, stateInteractionIdService,
-      stateCustomizationArgsService, editabilityService,
+      stateCustomizationArgsService, EditabilityService,
       explorationStatesService, graphDataService,
       InteractionDetailsCacheService,
       ExplorationHtmlFormatterService, UrlInterpolationService,
@@ -67,7 +67,8 @@ oppia.controller('StateInteraction', [
         return '';
       }
       return ExplorationHtmlFormatterService.getInteractionHtml(
-        stateInteractionIdService.savedMemento, interactionCustomizationArgs);
+        stateInteractionIdService.savedMemento, interactionCustomizationArgs,
+        false);
     };
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
@@ -148,7 +149,7 @@ oppia.controller('StateInteraction', [
     };
 
     $scope.openInteractionCustomizerModal = function() {
-      if (editabilityService.isEditable()) {
+      if (EditabilityService.isEditable()) {
         AlertsService.clearWarnings();
 
         $uibModal.open({

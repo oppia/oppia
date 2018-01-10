@@ -3,7 +3,7 @@
     <h3>Basic Settings</h3>
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
-        <div ng-if="editabilityService.isEditable()">
+        <div ng-if="EditabilityService.isEditable()">
           <div role="form" class="form-horizontal">
             <exploration-title-editor label-text="Title"
                                       focus-label="<[::EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>"
@@ -85,7 +85,7 @@
           </div>
         </div>
 
-        <div ng-if="!editabilityService.isEditable()">
+        <div ng-if="!EditabilityService.isEditable()">
           <div class="row">
             <div class="col-lg-2 col-md-2 col-sm-2">
               <label for="explorationTitle">
@@ -147,7 +147,7 @@
     </div>
   </md-card>
 
-  <md-card class="oppia-editor-card" ng-if="editabilityService.isEditable()">
+  <md-card class="oppia-editor-card" ng-if="EditabilityService.isEditable()">
     <h3>Advanced Features</h3>
     <div class="row">
       <div class="row">
@@ -188,6 +188,28 @@
             </span>
             <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
               Automatic text-to-speech generates audio from your content for learners to listen to. This feature is enabled by default. It is recommended that you disable this feature if creating an exploration whose content consists of multiple languages.
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div role="form" class="form-horizontal">
+            <label for="enableCorrectnessFeedback" class="col-lg-2 col-md-2 col-sm-2">
+              Correctness Feedback
+            </label>
+            <span class="col-lg-2 col-md-2 col-sm-2">
+              <button type="button" class="btn btn-default" ng-click="toggleCorrectnessFeedback()" style="margin-top: 16px">
+                <span ng-if="!isCorrectnessFeedbackEnabled()">
+                  Enable
+                </span>
+                <span ng-if="isCorrectnessFeedbackEnabled()">
+                  Disable
+                </span>
+              </button>
+            </span>
+            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              This allows the user to categorise answer groups as correct or incorrect.
             </span>
           </div>
         </div>
@@ -371,7 +393,7 @@
     </div>
   </md-card>
 
-  <md-card class="oppia-editor-card" ng-if="editabilityService.isEditable()">
+  <md-card class="oppia-editor-card" ng-if="EditabilityService.isEditable()">
     <div class="row">
       <div class="col-lg-6 col-md-6 col-sm-6">
         <h3>Controls</h3>

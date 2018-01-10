@@ -27,7 +27,8 @@
   </div>
 
   <div ng-if="stateContentService.savedMemento && !stateContentService.savedMemento.isEmpty()">
-    <audio-translations-editor subtitled-html="stateContentService.displayed"
+    <audio-translations-editor component-name="<[COMPONENT_NAME_CONTENT]>"
+                               subtitled-html="stateContentService.displayed"
                                on-start-edit="onAudioTranslationsStartEditAction"
                                on-change="onAudioTranslationsEdited">
     </audio-translations-editor>

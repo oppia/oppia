@@ -26,7 +26,6 @@ from core.domain import search_services
 from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.domain import user_services
-
 import feconf
 import utils
 

@@ -115,7 +115,7 @@ oppia.controller('StatisticsTab', [
           var numCompletions = data.num_completions;
           $scope.stateStats = data.state_stats_mapping;
 
-          if (numStarts > 0) {
+          if (numActualStarts > 0) {
             $scope.explorationHasBeenVisited = true;
           }
 

@@ -31,6 +31,10 @@ class Continue(base.BaseInteraction):
     default_outcome_heading = 'When the button is clicked'
     # Linear interactions are not supposed to have a solution.
     can_have_solution = False
+    # The Continue button is added to the progress nav, but is handled
+    # separately from the generic Submit button because the text on it can
+    # change depending on the customization args.
+    show_generic_submit_button = False
 
     _customization_arg_specs = [{
         'name': 'buttonText',
