@@ -19,10 +19,10 @@
 
 oppia.factory('ChangeListService', [
   '$rootScope', '$log', 'AlertsService', 'ExplorationDataService',
-  'autosaveInfoModalsService',
+  'AutosaveInfoModalsService',
   function(
       $rootScope, $log, AlertsService, ExplorationDataService,
-      autosaveInfoModalsService) {
+      AutosaveInfoModalsService) {
     // TODO(sll): Implement undo, redo functionality. Show a message on each
     // step saying what the step is doing.
     // TODO(sll): Allow the user to view the list of changes made so far, as
@@ -81,8 +81,8 @@ oppia.factory('ChangeListService', [
         explorationChangeList,
         function(response) {
           if (!response.data.is_version_of_draft_valid) {
-            if (!autosaveInfoModalsService.isModalOpen()) {
-              autosaveInfoModalsService.showVersionMismatchModal(
+            if (!AutosaveInfoModalsService.isModalOpen()) {
+              AutosaveInfoModalsService.showVersionMismatchModal(
                 explorationChangeList);
             }
           }
@@ -92,8 +92,8 @@ oppia.factory('ChangeListService', [
           $log.error(
             'nonStrictValidationFailure: ' +
             JSON.stringify(explorationChangeList));
-          if (!autosaveInfoModalsService.isModalOpen()) {
-            autosaveInfoModalsService.showNonStrictValidationFailModal();
+          if (!AutosaveInfoModalsService.isModalOpen()) {
+            AutosaveInfoModalsService.showNonStrictValidationFailModal();
           }
         }
       );
