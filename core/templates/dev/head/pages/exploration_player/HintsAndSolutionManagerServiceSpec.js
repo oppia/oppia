@@ -65,8 +65,7 @@ describe('HintsAndSolutionManager service', function() {
     expect(hasms.isSolutionViewable()).toBe(false);
 
     // No additional hints become viewable because the first hint has not been
-    // consumed yet. So, no timeout is running.
-    expect($timeout.flush).toThrow();
+    // consumed yet.
 
     expect(hasms.isHintViewable(0)).toBe(true);
     expect(hasms.isHintViewable(1)).toBe(false);

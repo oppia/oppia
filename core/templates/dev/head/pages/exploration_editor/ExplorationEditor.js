@@ -44,8 +44,8 @@ oppia.controller('ExplorationEditor', [
   'graphDataService', 'StateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'ExplorationWarningsService', '$templateCache', 'ExplorationContextService',
-  'ExplorationAdvancedFeaturesService', '$uibModal', 'changeListService',
-  'autosaveInfoModalsService', 'siteAnalyticsService',
+  'ExplorationAdvancedFeaturesService', '$uibModal', 'ChangeListService',
+  'AutosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'ParamSpecsObjectFactory', 'explorationAutomaticTextToSpeechService',
   'UrlInterpolationService', 'explorationCorrectnessFeedbackService',
@@ -59,8 +59,8 @@ oppia.controller('ExplorationEditor', [
       graphDataService, StateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       ExplorationWarningsService, $templateCache, ExplorationContextService,
-      ExplorationAdvancedFeaturesService, $uibModal, changeListService,
-      autosaveInfoModalsService, siteAnalyticsService,
+      ExplorationAdvancedFeaturesService, $uibModal, ChangeListService,
+      AutosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, explorationAutomaticTextToSpeechService,
       UrlInterpolationService, explorationCorrectnessFeedbackService) {
@@ -103,8 +103,8 @@ oppia.controller('ExplorationEditor', [
     // page load.
     $scope.initExplorationPage = function(successCallback) {
       ExplorationDataService.getData(function(explorationId, lostChanges) {
-        if (!autosaveInfoModalsService.isModalOpen()) {
-          autosaveInfoModalsService.showLostChangesModal(
+        if (!AutosaveInfoModalsService.isModalOpen()) {
+          AutosaveInfoModalsService.showLostChangesModal(
             lostChanges, explorationId);
         }
       }).then(function(data) {
@@ -170,7 +170,7 @@ oppia.controller('ExplorationEditor', [
 
         // Initialize changeList by draft changes if they exist.
         if (data.draft_changes !== null) {
-          changeListService.loadAutosavedChangeList(data.draft_changes);
+          ChangeListService.loadAutosavedChangeList(data.draft_changes);
         }
 
         if (data.is_version_of_draft_valid === false &&
@@ -178,8 +178,8 @@ oppia.controller('ExplorationEditor', [
             data.draft_changes.length > 0) {
           // Show modal displaying lost changes if the version of draft
           // changes is invalid, and draft_changes is not `null`.
-          autosaveInfoModalsService.showVersionMismatchModal(
-            changeListService.getChangeList());
+          AutosaveInfoModalsService.showVersionMismatchModal(
+            ChangeListService.getChangeList());
           return;
         }
 

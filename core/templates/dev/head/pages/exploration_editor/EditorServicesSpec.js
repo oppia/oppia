@@ -51,7 +51,7 @@ describe('Change list service', function() {
     });
 
     beforeEach(inject(function($injector) {
-      cls = $injector.get('changeListService');
+      cls = $injector.get('ChangeListService');
       $httpBackend = $injector.get('$httpBackend');
     }));
 

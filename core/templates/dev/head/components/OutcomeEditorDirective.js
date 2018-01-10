@@ -34,9 +34,11 @@ oppia.directive('outcomeEditor', [
       controller: [
         '$scope', 'EditorStateService', 'stateInteractionIdService',
         'COMPONENT_NAME_FEEDBACK', 'explorationCorrectnessFeedbackService',
+        'INTERACTION_SPECS',
         function(
             $scope, EditorStateService, stateInteractionIdService,
-            COMPONENT_NAME_FEEDBACK, explorationCorrectnessFeedbackService) {
+            COMPONENT_NAME_FEEDBACK, explorationCorrectnessFeedbackService,
+            INTERACTION_SPECS) {
           $scope.editOutcomeForm = {};
           $scope.feedbackEditorIsOpen = false;
           $scope.destinationEditorIsOpen = false;
@@ -46,6 +48,16 @@ oppia.directive('outcomeEditor', [
           $scope.savedOutcome = angular.copy($scope.outcome);
 
           $scope.COMPONENT_NAME_FEEDBACK = COMPONENT_NAME_FEEDBACK;
+
+          $scope.getCurrentInteractionId = function() {
+            return stateInteractionIdService.savedMemento;
+          };
+
+          // This returns false if the current interaction ID is null.
+          $scope.isCurrentInteractionLinear = function() {
+            var interactionId = $scope.getCurrentInteractionId();
+            return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+          };
 
           $scope.isCorrectnessFeedbackEnabled = function() {
             return explorationCorrectnessFeedbackService.isEnabled();

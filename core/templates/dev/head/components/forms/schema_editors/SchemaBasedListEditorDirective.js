@@ -17,10 +17,10 @@
  */
 
 oppia.directive('schemaBasedListEditor', [
-  'schemaDefaultValueService', 'recursionHelper', 'FocusManagerService',
+  'SchemaDefaultValueService', 'recursionHelper', 'FocusManagerService',
   'schemaUndefinedLastElementService', 'IdGenerationService',
   'UrlInterpolationService', function(
-    schemaDefaultValueService, recursionHelper, FocusManagerService,
+    SchemaDefaultValueService, recursionHelper, FocusManagerService,
     schemaUndefinedLastElementService, IdGenerationService,
     UrlInterpolationService) {
     return {
@@ -98,7 +98,7 @@ oppia.directive('schemaBasedListEditor', [
 
         while ($scope.localValue.length < $scope.minListLength) {
           $scope.localValue.push(
-            schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
+            SchemaDefaultValueService.getDefaultValue($scope.itemSchema()));
         }
 
         $scope.hasDuplicates = function() {
@@ -121,7 +121,7 @@ oppia.directive('schemaBasedListEditor', [
             }
 
             $scope.localValue.push(
-              schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
+              SchemaDefaultValueService.getDefaultValue($scope.itemSchema()));
             FocusManagerService.setFocus(
               $scope.getFocusLabel($scope.localValue.length - 1));
           };

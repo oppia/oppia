@@ -3755,10 +3755,10 @@ md-card.preview-conversation-skin-supplemental-card {
     z-index: 10;
   }
   .oppia-splash-button-heading {
-    left: -webkit-calc(-70px + 15%);
-    left: -moz-calc(-70px + 15%);
-    left: -o-calc(-70px + 15%);
-    left: calc(-70px + 15%);
+    left: -webkit-calc(-70px - -15%);
+    left: -moz-calc(-70px - -15%);
+    left: -o-calc(-70px - -15%);
+    left: calc(-70px - -15%);
     position: relative;
   }
 
@@ -3769,10 +3769,10 @@ md-card.preview-conversation-skin-supplemental-card {
 
 @media (min-width: 575px) {
   .oppia-splash-button {
-    left: -webkit-calc(130px + 15%);
-    left: -moz-calc(130px + 15%);
-    left: -o-calc(130px + 15%);
-    left: calc(130px + 15%);
+    left: -webkit-calc(130px - -15%);
+    left: -moz-calc(130px - -15%);
+    left: -o-calc(130px - -15%);
+    left: calc(130px - -15%);
   }
 }
 

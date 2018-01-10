@@ -66,6 +66,7 @@ oppia.factory('SpeechSynthesisChunkerService', [
         PUNCTUATION_MARKS_TO_END_CHUNKS + ']{1}|^[\\s\\S]{1,' +
         CHUNK_LENGTH + '}$|^[\\s\\S]{1,' + CHUNK_LENGTH + '} ');
       var chunkArray = text.match(delimitChunkRegex);
+
       if (chunkArray == null ||
           chunkArray[0] === undefined ||
           chunkArray[0].length <= 2) {
@@ -197,8 +198,8 @@ oppia.factory('SpeechSynthesisChunkerService', [
         _speechUtteranceChunker(utterance, 0, callback);
       },
       cancel: function() {
-        _speechSynthesis.cancel();
         _speechUtteranceChunker.cancel = true;
+        _speechSynthesis.cancel();
       },
       convertToSpeakableText: function(html) {
         return _convertToSpeakableText(html);
