@@ -755,6 +755,9 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.showUpcomingCard = function() {
+            if (!$scope.isLearnAgainButton()) {
+              $scope.pendingCardWasSeenBefore = false;
+            }
             $scope.answerIsCorrect = false;
             $scope.showPendingCard(
               $scope.upcomingStateName, $scope.upcomingParams,
