@@ -318,6 +318,11 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.isLearnAgainButton = function() {
+            var interaction = ExplorationPlayerService.getInteraction(
+              $scope.activeCard.stateName);
+            if (INTERACTION_SPECS[interaction.id].is_linear) {
+              return false;
+            }
             return (
               $scope.pendingCardWasSeenBefore && !$scope.answerIsCorrect &&
               $scope.isCorrectnessFeedbackEnabled());
