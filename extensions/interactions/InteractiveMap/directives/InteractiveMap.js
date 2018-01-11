@@ -46,6 +46,12 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
 
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
+            $scope.overlayStyle = {
+              'background-color' : 'black'
+            };
+            $scope.mapStyle = {
+              'opacity' : '0.8'
+            };
           });
 
           $scope.$on('showInteraction', function() {
@@ -78,6 +84,30 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             zoom: zoomLevel,
             mapTypeId: google.maps.MapTypeId.ROADMAP,
             draggable: $scope.interactionIsActive
+          };
+
+          $scope.setOverlay = function() {
+            if ($scope.interactionIsActive) {
+              return;
+            }
+            $scope.overlayStyle = {
+              'background-color' : 'black'
+            };
+            $scope.mapStyle = {
+              'opacity' : '0.8'
+            };
+          };
+
+          $scope.resetOverlay = function() {
+            if ($scope.interactionIsActive) {
+              return;
+            }
+            $scope.overlayStyle = {
+              'background-color' : 'white'
+            };
+            $scope.mapStyle = {
+              'opacity' : '1'
+            };
           };
 
           $scope.registerClick = function($event, $params) {
