@@ -17,7 +17,6 @@
  * footer.
  */
 
-
 oppia.controller('LearnerViewInfo', [
   '$scope', '$uibModal', '$http', '$log', 'ExplorationContextService',
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'UrlInterpolationService',
