@@ -163,6 +163,7 @@ class CollectionRightsHandler(CollectionEditorHandler):
 
 
 class CollectionPublishHandler(base.BaseHandler):
+    """Handles the publication of the given collection."""
 
     @acl_decorators.can_publish_collection
     def put(self, collection_id):
@@ -199,6 +200,7 @@ class CollectionPublishHandler(base.BaseHandler):
 
 
 class CollectionUnpublishHandler(base.BaseHandler):
+    """Handles the unpublication of the given collection."""
 
     @acl_decorators.can_unpublish_collection
     def put(self, collection_id):

@@ -21,10 +21,6 @@ import collections
 import copy
 import datetime
 
-import feconf
-import utils
-
-
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -32,6 +28,8 @@ from core.domain import stats_domain
 from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.platform import models
+import feconf
+import utils
 
 (exp_models, stats_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics

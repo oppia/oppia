@@ -3,8 +3,15 @@
 <div class="modal-body">
   <span ng-if="isHint" class="oppia-learner-hint-and-solution-modal-body"
         angular-html-bind="hint.getHtml()"></span>
-  <span ng-if="!isHint" class="oppia-learner-hint-and-solution-modal-body"
-        angular-html-bind="solutionHtml"></span>
+  <div ng-if="!isHint">
+    <label><[shortAnswerHtml.prefix]> solution is: &nbsp; </label>
+    <span class="oppia-learner-hint-and-solution-modal-body"
+          angular-html-bind="shortAnswerHtml.answer"></span>
+    <br><br>
+    <label>Explanation: </label>
+    <span class="oppia-learner-hint-and-solution-modal-body"
+          angular-html-bind="solutionExplanationHtml"></span>
+  </div>
 </div>
 
 <button class="oppia-learner-got-it-button md-button md-default-theme pull-right"

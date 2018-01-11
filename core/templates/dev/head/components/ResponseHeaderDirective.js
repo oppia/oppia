@@ -35,10 +35,22 @@ oppia.directive('responseHeader', [
       controller: [
         '$scope', 'EditabilityService', 'EditorStateService', 'RouterService',
         'PLACEHOLDER_OUTCOME_DEST', 'explorationCorrectnessFeedbackService',
+        'stateInteractionIdService', 'INTERACTION_SPECS',
         function(
             $scope, EditabilityService, EditorStateService, RouterService,
-            PLACEHOLDER_OUTCOME_DEST, explorationCorrectnessFeedbackService) {
+            PLACEHOLDER_OUTCOME_DEST, explorationCorrectnessFeedbackService,
+            stateInteractionIdService, INTERACTION_SPECS) {
           $scope.EditabilityService = EditabilityService;
+
+          $scope.getCurrentInteractionId = function() {
+            return stateInteractionIdService.savedMemento;
+          };
+
+          // This returns false if the current interaction ID is null.
+          $scope.isCurrentInteractionLinear = function() {
+            var interactionId = $scope.getCurrentInteractionId();
+            return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+          };
 
           $scope.isCorrect = function() {
             return $scope.getOutcome() && $scope.getOutcome().labelledAsCorrect;
