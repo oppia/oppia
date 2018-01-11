@@ -86,7 +86,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             draggable: $scope.interactionIsActive
           };
 
-          $scope.setOverlay = function() {
+          $scope.showOverlay = function() {
             if ($scope.interactionIsActive) {
               return;
             }
@@ -98,7 +98,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             };
           };
 
-          $scope.resetOverlay = function() {
+          $scope.hideOverlay = function() {
             if ($scope.interactionIsActive) {
               return;
             }

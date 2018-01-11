@@ -37,8 +37,8 @@
 <div class="interactive-map-container">
   <div ng-style="overlayStyle">
     <div id="map_canvas" ng-style="mapStyle" ui-map="map" ui-options="mapOptions"
-        ui-event="{'map-click': 'registerClick($event, $params)', 'map-mouseover': 'setOverlay()',
-                   'map-mouseout': 'resetOverlay()'}">
+        ui-event="{'map-click': 'registerClick($event, $params)', 'map-mouseover': 'showOverlay()',
+                   'map-mouseout': 'hideOverlay()'}">
     </div>
   </div>
 </div>
