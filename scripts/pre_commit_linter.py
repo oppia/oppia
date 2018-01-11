@@ -552,7 +552,7 @@ def _check_bad_pattern_in_file(filename, content, pattern):
             message(str) : message to show if pattern matches,
             excluded_files(tuple(str)) : files to be excluded from matching,
             excluded_dirs(tuple(str)) : directories to be excluded from
-                matching). 
+                matching).
             Object containing details for the pattern to be checked.
 
     Returns:
@@ -646,9 +646,11 @@ def _check_import_order(all_files):
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
     failed = False
     for filename in all_files:
-        # This line prints the error message along with file path 
+        # This line prints the error message along with file path
         # and returns True if it finds an error else returns False
-        if isort.SortImports(filename, check=False).incorrectly_sorted:
+        # If check is set to True, isort simply checks the file and
+        # if check is set to False, it autocorrects import-order errors.
+        if isort.SortImports(filename, check=True).incorrectly_sorted:
             failed = True
     print ''
     print '----------------------------------------'
