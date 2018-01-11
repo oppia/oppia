@@ -62,7 +62,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
           };
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitGraph);
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
 
             $scope.canAddVertex = false;
@@ -294,7 +294,7 @@ oppia.directive('graphViz', [
           $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
           $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
 
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.state.currentMode = null;
           });
 
