@@ -8,21 +8,27 @@
 
 <script src="/assets/scripts/oppia-player-0.0.1.js"></script>
 <script src="/assets/scripts/embedding_tests.js"></script>
+<script src="../../third_party/static/jquery-3.2.1/jquery.min.js"></script>
+
+<form action="#" onsubmit="update()">
+  <input id="embedding-exploration-id" type="text" placeholder="explorationId">
+  <input id="embedding-submit-btn" type="submit" value="Submit">
+</form>
 
 <div>
   <h3>Iframe embedding</h3>
-  <iframe src="/embed/exploration/12" width="700" height="600">
+  <iframe src="/embed/exploration/idToBeReplaced" width="700" height="600">
   </iframe>
 </div>
 
 <div class="protractor-test-standard">
   <h3>Standard embedding of the latest version</h3>
-  <oppia oppia-id="12"></oppia>
+  <oppia oppia-id="idToBeReplaced"></oppia>
 </div>
 
 <div class="protractor-test-old-version">
   <h3>Standard embedding of version 2 of the exploration with deferred loading</h3>
-  <oppia oppia-id="12" autoload="false" exploration-version="2"></oppia>
+  <oppia oppia-id="idToBeReplaced" autoload="false" exploration-version="2"></oppia>
 </div>
 
 <div class="protractor-test-missing-id">
@@ -41,32 +47,18 @@
 </div>
 
 <script type="text/javascript">
-  // Get exploration id of newly created exploration in embedding.js and
-  // replace old exploration id (12) with new one.
-  (function (){
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {        
-        var res = xhttp.responseText.slice(5);
-        res = JSON.parse(res);
-        var activity_list = res['activity_list'];
-        if(activity_list.length === 0){
-          console.error('No explorations found');
-        }else if(activity_list.length > 1){
-          console.error('More than 1 explorations found');
-        }
-        // Get exploration id.
-        explorationId = activity_list[0]['id'];
-        document.getElementsByTagName('iframe')[0].src = '/embed/exploration/' + explorationId;
-        var elems = document.getElementsByTagName('oppia');
-        for(var i = 0; i < elems.length; i++){
-          if(elems[i].hasAttribute('oppia-id') && elems[i].getAttribute('oppia-id') === '12'){
-            elems[i].setAttribute('oppia-id', explorationId);
-          }
-        }  
-      }
-    };
-    xhttp.open("GET", "/searchhandler/data?q=Protractor Test", false);
-    xhttp.send(null);
-  })();
+  var currentExplorationId = 'idToBeReplaced';
+  var update = function(){
+    var newExplorationId = $('#embedding-exploration-id').val();
+    $('div > iframe').each(function(index){
+      var src = $(this).attr('src');
+      src = src.replace(currentExplorationId, newExplorationId);
+      $(this).attr('src', src);
+    });
+
+    // For first time loading of deferred loading version.
+    $('oppia[oppia-id="idToBeReplaced"]').each(function(index){
+      $(this).attr('oppia-id', newExplorationId);
+    });
+  }  
 </script>

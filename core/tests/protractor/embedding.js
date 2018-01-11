@@ -33,19 +33,14 @@ describe('Embedding', function() {
     // Intro
     editor.setStateName('Intro');
     editor.setContent(forms.toRichText(
-      'Suppose you were given three balls: one red, one blue, and one ' +
-      'yellow. How many ways are there to arrange them in a straight ' +
-      'line?'
+      'Given three balls of different colors. How many ways are there ' +
+      'to arrange them in a straight line?'
       )
     );
     editor.setInteraction('NumericInput');
     editor.addResponse(
       'NumericInput', null, 'correct but why', true, 'Equals', 6);
-    editor.addResponse('NumericInput', forms.toRichText('Surely there\'s ' +
-      'at least one? For example, you might have the red ball on the left, ' +
-      'the blue ball in the middle, and the yellow ball on the right. ' +
-      'Now try and find a few more. ' +
-      'How many different ways can you find, in total?')
+    editor.addResponse('NumericInput', forms.toRichText('Describe solution!!')
       , null, false, 'IsLessThanOrEqualTo', 0);
     editor.setDefaultOutcome(null, 'Not 6', true);
 
@@ -54,36 +49,18 @@ describe('Embedding', function() {
     editor.setContent(forms.toRichText('Right! Why do you think it is 6?'));
     editor.setInteraction('TextInput', 'Type your answer here.', 5);
     editor.addResponse('TextInput', forms.toRichText(
-      'Yes, the question is asking for the number of permutations of 3 ' +
-      'different balls, and that is 3! = 3 x 2 x 1. You can think about' +
-      ' this by noticing that there are 3 ways to pick the first ball --' +
-      ' then, once you\'ve done that, there are 2 ways to pick the second,' +
-      ' and the last choice is forced. That\'s 3 x 2 = 6 ways.')
+      'Yes, 3! = 3 x 2 x 1. That\'s 3 x 2 = 6 ways.')
       , 'END', true, 'Contains', 'permutation');
     editor.addResponse('TextInput', forms.toRichText(
-      'Yes, the question is asking for the number of permutations of 3 ' +
-      'different balls, and that is 3 factorial, or 3 x 2 x 1. You can ' +
-      'think about this by noticing that there are 3 ways to pick the first' +
-      ' ball -- then, once you\'ve done that, there are 2 ways to pick ' +
-      'the second, and the last choice is forced. That\'s 3 x 2 = 6 ways.')
+      'Yes, 3 factorial, or 3 x 2 x 1. That\'s 3 x 2 = 6 ways.')
       , 'END', false, 'Contains', 'factorial');
-    editor.setDefaultOutcome(forms.toRichText('OK! There are indeed 6 ways ' +
-      'to arrange the balls: there are 3 ways to choose the leftmost one, ' +
-      'and for each of these, there are 2 ways to choose the second one; ' +
-      'the last choice is then forced. This gives 3 x 2 = 6 scenarios. ' +
-      'If you do a quick search for the words \'permutation\' ' +
-      'or \'factorial\' on the Internet, you\'ll also be able to find more' +
-      ' information about this topic. See if you can figure out what the ' +
+    editor.setDefaultOutcome(forms.toRichText('Figure out what the ' +
       'answer for 4 balls is!')
       , null, false);
 
     // Not 6
     editor.moveToState('Not 6');
-    editor.setContent(forms.toRichText('OK, I\'d be interested in seeing ' +
-      'what you came up with; could you list the different ways? Write ' +
-      'them as three-character words, like this: RBY, This means: put the ' +
-      'red ball on the left, the blue ball in the middle, and the yellow ' +
-      'ball on the right. Can you list all the ways you found?'));
+    editor.setContent(forms.toRichText('List the different ways?'));
     editor.setInteraction('Continue', 'try again');
     editor.setDefaultOutcome(null, 'Intro', false);
 
@@ -126,10 +103,8 @@ describe('Embedding', function() {
 
       explorationPlayerPage.expectContentToMatch(
         forms.toRichText((version === 2) ?
-          'Suppose you were given three balls: one red, one blue, and one ' +
-          'yellow. How many ways are there to arrange them in a straight ' +
-          'line?' :
-          'Version 3'));
+          'Given three balls of different colors. How many ways are there ' +
+          'to arrange them in a straight line?' : 'Version 3'));
       explorationPlayerPage.submitAnswer('NumericInput', 6);
       explorationPlayerPage.expectContentToMatch(
         forms.toRichText('Right! Why do you think it is 6?'));
@@ -170,11 +145,22 @@ describe('Embedding', function() {
           general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
           TEST_PAGES[i].filename);
 
+        driver.findElement(by.xpath(
+          "//input[@id='embedding-exploration-id']")).sendKeys(explorationId);
+
+        /*
+          "https://stackoverflow.com/questions/34562061/
+          webdriver-click-vs-javascript-click"
+          This doesn't works: 
+          var elem = driver.findElement(
+            by.xpath("//input[@id='embedding-submit-btn'")).click();
+        */
+        driver.executeScript('window.update()');
+
         // Test of standard loading (new and old versions)
         browser.switchTo().frame(
           driver.findElement(
             by.xpath("//div[@class='protractor-test-standard']/iframe")));
-
         playCountingExploration(3);
         browser.switchTo().defaultContent();
 
@@ -236,7 +222,7 @@ describe('Embedding', function() {
       });
 
       users.logout();
-      general.checkForConsoleErrors([]);
+      general.checkForConsoleErrors(['.*idToBeReplaced.*']);
     });
   });
 
@@ -248,6 +234,11 @@ describe('Embedding', function() {
       driver.get(
         general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
         'embedding_tests_dev_i18n_0.0.1.html');
+
+      driver.findElement(by.xpath(
+        "//input[@id='embedding-exploration-id']")).sendKeys(explorationId);
+      driver.executeScript('window.update()');
+
       browser.switchTo().frame(driver.findElement(by.xpath(
           "//div[@class='protractor-test-embedded-exploration']/iframe")));
       general.waitForSystem();
@@ -274,6 +265,6 @@ describe('Embedding', function() {
     checkPlaceholder('Ingresa un número');
 
     users.logout();
-    general.checkForConsoleErrors([]);
+    general.checkForConsoleErrors(['.*idToBeReplaced.*']);
   });
 });

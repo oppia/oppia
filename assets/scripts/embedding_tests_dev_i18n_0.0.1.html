@@ -3,34 +3,28 @@
 
 <script src="/assets/scripts/oppia-player-0.0.1.js"></script>
 <script src="/assets/scripts/embedding_tests.js"></script>
+<script src="../../third_party/static/jquery-3.2.1/jquery.min.js"></script>
+
+<form action="#" onsubmit="update()">
+  <input id="embedding-exploration-id" type="text" placeholder="explorationId">
+  <input id="embedding-submit-btn" type="submit" value="Submit">
+</form>
 
 <div class="protractor-test-embedded-exploration">
   <h3>Standard embedding of the latest version</h3>
-  <oppia oppia-id="12"></oppia>
+  <oppia oppia-id="idToBeReplaced"></oppia>
 </div>
 
 <script type="text/javascript">
-  // Get exploration id of newly created exploration in embedding.js and
-  // replace old exploration id (12) with new one.
-  (function (){
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {        
-        var res = xhttp.responseText.slice(5);
-        res = JSON.parse(res);
-        var activity_list = res['activity_list'];
-        if(activity_list.length === 0){
-          console.error('No explorations found');
-        }else if(activity_list.length > 1){
-          console.error('More than 1 explorations found');
-        }
-        // Get exploration id.
-        explorationId = activity_list[0]['id'];
-        var elems = document.getElementsByTagName('oppia');
-        elems[0].setAttribute('oppia-id', explorationId);  
-      }
-    };
-    xhttp.open("GET", "/searchhandler/data?q=Protractor Test", false);
-    xhttp.send(null);
-  })();
+  var currentExplorationId = 'idToBeReplaced';
+  var update = function(){
+    var newExplorationId = $('#embedding-exploration-id').val();
+    $('div > iframe').each(function(index){
+      var src = $(this).attr('src');
+      src = src.replace(currentExplorationId, newExplorationId);
+      $(this).attr('src', src);
+      currentExplorationId = newExplorationId;
+    });
+  }  
 </script>
+
