@@ -177,6 +177,7 @@
 	"I18N_LIBRARY_VIEWS_TOOLTIP": "Görüntülenme",
 	"I18N_LIBRARY_VIEW_ALL": "Hepsini görüntüle",
 	"I18N_ONE_SUBSCRIBER_TEXT": "1 abonen var.",
+	"I18N_PLAYER_AUDIO_EXPAND_TEXT": "Ses",
 	"I18N_PLAYER_AUDIO_LANGUAGE": "Dil",
 	"I18N_PLAYER_AUDIO_LOADING_AUDIO": "Ses yükleniyor...",
 	"I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT": "Ses metinle tam örtüşmeyebilir",
