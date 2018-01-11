@@ -84,7 +84,7 @@
       "angular": {
         "version": "1.5.8",
         "downloadFormat": "files",
-        "url": "https://cdn.bootcss.com/angular.js/1.5.8",        
+        "url": "https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8",        
         "targetDirPrefix": "angularjs-",
         "files": [
           "angular.js", "angular.min.js", "angular.min.js.map", "angular-animate.js",
