@@ -17,6 +17,7 @@
  * footer.
  */
 
+
 oppia.controller('LearnerViewInfo', [
   '$scope', '$uibModal', '$http', '$log', 'ExplorationContextService',
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'UrlInterpolationService',
@@ -35,7 +36,11 @@ oppia.controller('LearnerViewInfo', [
           }
         }).then(function(response) {
           expInfo = response.data.summaries[0];
-          openInformationCardModal();
+          if(expInfo){
+            openInformationCardModal();
+          }else{
+            $log.info('This Exploration is not yet published yet.');
+          }
         }, function() {
           $log.error(
             'Information card failed to load for exploration ' + explorationId);
