@@ -47,10 +47,10 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
             $scope.overlayStyle = {
-              'background-color' : 'black'
+              'background-color': 'black'
             };
             $scope.mapStyle = {
-              opacity : '0.8'
+              opacity: '0.8'
             };
           });
 
@@ -91,10 +91,10 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
               return;
             }
             $scope.overlayStyle = {
-              'background-color' : 'black'
+              'background-color': 'black'
             };
             $scope.mapStyle = {
-              opacity : '0.8'
+              opacity: '0.8'
             };
           };
 
@@ -103,10 +103,10 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
               return;
             }
             $scope.overlayStyle = {
-              'background-color' : 'white'
+              'background-color': 'white'
             };
             $scope.mapStyle = {
-              opacity : '1'
+              opacity: '1'
             };
           };
 
