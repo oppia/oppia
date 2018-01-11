@@ -35,9 +35,9 @@ oppia.controller('LearnerViewInfo', [
           }
         }).then(function(response) {
           expInfo = response.data.summaries[0];
-          if(expInfo){
+          if (expInfo) {
             openInformationCardModal();
-          }else{
+          } else {
             $log.info('This Exploration is not yet published yet.');
           }
         }, function() {
