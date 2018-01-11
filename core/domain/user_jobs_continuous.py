@@ -308,7 +308,6 @@ class RecentUpdatesMRJobManager(
             logging.error(
                 'Invalid reducer key for RecentUpdatesMRJob: %s' % key)
 
-
         user_id = key[:key.find('@')]
         job_queued_msec = float(key[key.find('@') + 1:])
 
