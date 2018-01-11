@@ -44,14 +44,28 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.mapMarkers = [];
 
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            $scope.interactionIsActive = false;
+          $scope.setOverlay = function() {
             $scope.overlayStyle = {
               'background-color': 'black'
             };
             $scope.mapStyle = {
               opacity: '0.8'
             };
+          };
+
+          $scope.hideOverlay = function() {
+            $scope.overlayStyle = {
+              'background-color': 'white'
+            };
+            $scope.mapStyle = {
+              opacity: '1'
+            };
+          };
+
+
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+            $scope.interactionIsActive = false;
+            $scope.setOverlay();
           });
 
           $scope.$on('showInteraction', function() {
@@ -86,28 +100,18 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             draggable: $scope.interactionIsActive
           };
 
-          $scope.showOverlay = function() {
+          $scope.onMouseOver = function() {
             if ($scope.interactionIsActive) {
               return;
             }
-            $scope.overlayStyle = {
-              'background-color': 'black'
-            };
-            $scope.mapStyle = {
-              opacity: '0.8'
-            };
+            $scope.setOverlay();
           };
 
-          $scope.hideOverlay = function() {
+          $scope.onMouseOut = function() {
             if ($scope.interactionIsActive) {
               return;
             }
-            $scope.overlayStyle = {
-              'background-color': 'white'
-            };
-            $scope.mapStyle = {
-              opacity: '1'
-            };
+            $scope.hideOverlay();
           };
 
           $scope.registerClick = function($event, $params) {
