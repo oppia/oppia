@@ -54,4 +54,4 @@ oppia.factory('GraphDataService', [
         }
       };
     }
-  ]);
+]);
