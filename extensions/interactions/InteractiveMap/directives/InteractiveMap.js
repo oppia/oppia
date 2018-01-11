@@ -50,7 +50,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
               'background-color' : 'black'
             };
             $scope.mapStyle = {
-              'opacity' : '0.8'
+              opacity : '0.8'
             };
           });
 
@@ -94,7 +94,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
               'background-color' : 'black'
             };
             $scope.mapStyle = {
-              'opacity' : '0.8'
+              opacity : '0.8'
             };
           };
 
@@ -106,7 +106,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
               'background-color' : 'white'
             };
             $scope.mapStyle = {
-              'opacity' : '1'
+              opacity : '1'
             };
           };
 
