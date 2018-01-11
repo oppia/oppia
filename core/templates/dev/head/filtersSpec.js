@@ -444,7 +444,7 @@ describe('Testing filters', function() {
         val: 3
       },
     ];
-    
+
     var ruleLink = {
       type: 'Equals',
       inputs: {
@@ -480,9 +480,9 @@ describe('Testing filters', function() {
     ];
 
     var filter = $filter('parameterizeRuleDescription');
-    expect(filter(ruleMath, interactionIdMath, choicesMath)).toEqual('is ' +
-      'equal to \'[math]\'');
-    expect(filter(ruleLink, interactionIdLink, choicesLink)).toEqual('is ' +
-      'equal to \'[link]\'');
+    expect($filter('convertToPlainText')(filter(ruleMath, interactionIdMath,
+      choicesMath))).toEqual('is ' + 'equal to \'[math]\'');
+    expect($filter('convertToPlainText')(filter(ruleLink, interactionIdLink,
+      choicesLink))).toEqual('is ' + 'equal to \'[link]\'');
   }));
 });

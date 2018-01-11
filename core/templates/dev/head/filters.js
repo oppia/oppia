@@ -196,14 +196,28 @@ oppia.filter('parameterizeRuleDescription', [
           } else {
             // The following case is for MultipleChoiceInput
             for (var i = 0; i < choices.length; i++) {
+              var stringChange = true;
+              var choicesLabelString = choices[i].label;
+              while(stringChange) {
+                var nonInteractiveInputs = ['collapsible', 'image', 'link',
+                                            'math', 'tabs', 'video'];
+                for (var j = 0; j < nonInteractiveInputs.length; j++) {
+                  if (choicesLabelString.includes('<oppia-noninteractive-' +
+                    nonInteractiveInputs[j])) {
+                    var testString = '<oppia-noninteractive-' +
+                    nonInteractiveInputs[j];
+                    var regex = new RegExp('(' + testString + '([^>]+)>)');
+                    choicesLabelString = choicesLabelString.replace(regex, '[' +
+                    nonInteractiveInputs[j] + ']');
+                    stringChange = true;
+                    break;
+                  } else {
+                    stringChange = false;
+                  }
+                }
+              }
               if (choices[i].val === inputs[varName]) {
-                if (choices[i].label.includes('oppia-noninteractive')) {
-                  replacementText = '\'[' +
-                    choices[i].label.split('-')[2].split(' ')[0] + ']\'';
-                }
-                else {
-                  replacementText = '\'' + choices[i].label + '\'';
-                }
+                replacementText = '\'' + choicesLabelString + '\'';
               }
             }
           }
