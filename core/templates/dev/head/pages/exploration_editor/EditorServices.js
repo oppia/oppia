@@ -16,224 +16,9 @@
  * @fileoverview Standalone services for the exploration editor page.
  */
 
-// A service that maintains a provisional list of changes to be committed to
-// the server.
-oppia.factory('changeListService', [
-  '$rootScope', '$log', 'AlertsService', 'ExplorationDataService',
-  'autosaveInfoModalsService',
-  function(
-      $rootScope, $log, AlertsService, ExplorationDataService,
-      autosaveInfoModalsService) {
-    // TODO(sll): Implement undo, redo functionality. Show a message on each
-    // step saying what the step is doing.
-    // TODO(sll): Allow the user to view the list of changes made so far, as
-    // well as the list of changes in the undo stack.
-
-    // Temporary buffer for changes made to the exploration.
-    var explorationChangeList = [];
-    // Stack for storing undone changes. The last element is the most recently
-    // undone change.
-    var undoneChangeStack = [];
-
-    // All these constants should correspond to those in exp_domain.py.
-    // TODO(sll): Enforce this in code.
-    var CMD_ADD_STATE = 'add_state';
-    var CMD_RENAME_STATE = 'rename_state';
-    var CMD_DELETE_STATE = 'delete_state';
-    var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
-    var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
-
-    var ALLOWED_EXPLORATION_BACKEND_NAMES = {
-      category: true,
-      init_state_name: true,
-      language_code: true,
-      objective: true,
-      param_changes: true,
-      param_specs: true,
-      tags: true,
-      title: true,
-      auto_tts_enabled: true,
-      correctness_feedback_enabled: true
-    };
-
-    var ALLOWED_STATE_BACKEND_NAMES = {
-      answer_groups: true,
-      confirmed_unclassified_answers: true,
-      content: true,
-      default_outcome: true,
-      hints: true,
-      param_changes: true,
-      param_specs: true,
-      solution: true,
-      state_name: true,
-      widget_customization_args: true,
-      widget_id: true
-    };
-
-    var autosaveChangeListOnChange = function(explorationChangeList) {
-      // Asynchronously send an autosave request, and check for errors in the
-      // response:
-      // If error is present -> Check for the type of error occurred
-      // (Display the corresponding modals in both cases, if not already
-      // opened):
-      // - Version Mismatch.
-      // - Non-strict Validation Fail.
-      ExplorationDataService.autosaveChangeList(
-        explorationChangeList,
-        function(response) {
-          if (!response.data.is_version_of_draft_valid) {
-            if (!autosaveInfoModalsService.isModalOpen()) {
-              autosaveInfoModalsService.showVersionMismatchModal(
-                explorationChangeList);
-            }
-          }
-        },
-        function() {
-          AlertsService.clearWarnings();
-          $log.error(
-            'nonStrictValidationFailure: ' +
-            JSON.stringify(explorationChangeList));
-          if (!autosaveInfoModalsService.isModalOpen()) {
-            autosaveInfoModalsService.showNonStrictValidationFailModal();
-          }
-        }
-      );
-    };
-
-    var addChange = function(changeDict) {
-      if ($rootScope.loadingMessage) {
-        return;
-      }
-      explorationChangeList.push(changeDict);
-      undoneChangeStack = [];
-      autosaveChangeListOnChange(explorationChangeList);
-    };
-
-    return {
-      /**
-       * Saves a change dict that represents adding a new state. It is the
-       * responsbility of the caller to check that the new state name is valid.
-       *
-       * @param {string} stateName - The name of the newly-added state
-       */
-      addState: function(stateName) {
-        addChange({
-          cmd: CMD_ADD_STATE,
-          state_name: stateName
-        });
-      },
-      /**
-       * Saves a change dict that represents deleting a new state. It is the
-       * responsbility of the caller to check that the deleted state name
-       * corresponds to an existing state.
-       *
-       * @param {string} stateName - The name of the deleted state.
-       */
-      deleteState: function(stateName) {
-        addChange({
-          cmd: CMD_DELETE_STATE,
-          state_name: stateName
-        });
-      },
-      discardAllChanges: function() {
-        explorationChangeList = [];
-        undoneChangeStack = [];
-        ExplorationDataService.discardDraft();
-      },
-      /**
-       * Saves a change dict that represents a change to an exploration
-       * property (such as its title, category, ...). It is the responsibility
-       * of the caller to check that the old and new values are not equal.
-       *
-       * @param {string} backendName - The backend name of the property
-       *   (e.g. title, category)
-       * @param {string} newValue - The new value of the property
-       * @param {string} oldValue - The previous value of the property
-       */
-      editExplorationProperty: function(backendName, newValue, oldValue) {
-        if (!ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
-          AlertsService.addWarning(
-            'Invalid exploration property: ' + backendName);
-          return;
-        }
-        addChange({
-          cmd: CMD_EDIT_EXPLORATION_PROPERTY,
-          new_value: angular.copy(newValue),
-          old_value: angular.copy(oldValue),
-          property_name: backendName
-        });
-      },
-      /**
-       * Saves a change dict that represents a change to a state property. It
-       * is the responsibility of the caller to check that the old and new
-       * values are not equal.
-       *
-       * @param {string} stateName - The name of the state that is being edited
-       * @param {string} backendName - The backend name of the edited property
-       * @param {string} newValue - The new value of the property
-       * @param {string} oldValue - The previous value of the property
-       */
-      editStateProperty: function(stateName, backendName, newValue, oldValue) {
-        if (!ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
-          AlertsService.addWarning('Invalid state property: ' + backendName);
-          return;
-        }
-        addChange({
-          cmd: CMD_EDIT_STATE_PROPERTY,
-          new_value: angular.copy(newValue),
-          old_value: angular.copy(oldValue),
-          property_name: backendName,
-          state_name: stateName
-        });
-      },
-      getChangeList: function() {
-        return angular.copy(explorationChangeList);
-      },
-      isExplorationLockedForEditing: function() {
-        return explorationChangeList.length > 0;
-      },
-      /**
-       * Initializes the current changeList with the one received from backend.
-       * This behavior exists only in case of an autosave.
-       *
-       * @param {object} changeList - Autosaved changeList data
-       */
-      loadAutosavedChangeList: function(changeList) {
-        explorationChangeList = changeList;
-      },
-      /**
-       * Saves a change dict that represents the renaming of a state. This
-       * is also intended to change the initial state name if necessary
-       * (that is, the latter change is implied and does not have to be
-       * recorded separately in another change dict). It is the responsibility
-       * of the caller to check that the two names are not equal.
-       *
-       * @param {string} newStateName - The new name of the state
-       * @param {string} oldStateName - The previous name of the state
-       */
-      renameState: function(newStateName, oldStateName) {
-        addChange({
-          cmd: CMD_RENAME_STATE,
-          new_state_name: newStateName,
-          old_state_name: oldStateName
-        });
-      },
-      undoLastChange: function() {
-        if (explorationChangeList.length === 0) {
-          AlertsService.addWarning('There are no changes to undo.');
-          return;
-        }
-        var lastChange = explorationChangeList.pop();
-        undoneChangeStack.push(lastChange);
-        autosaveChangeListOnChange(explorationChangeList);
-      }
-    };
-  }
-]);
-
 oppia.factory('explorationPropertyService', [
-  '$rootScope', '$log', 'changeListService', 'AlertsService',
-  function($rootScope, $log, changeListService, AlertsService) {
+  '$rootScope', '$log', 'ChangeListService', 'AlertsService',
+  function($rootScope, $log, ChangeListService, AlertsService) {
     // Public base API for data services corresponding to exploration properties
     // (title, category, etc.)
 
@@ -315,7 +100,7 @@ oppia.factory('explorationPropertyService', [
             BACKEND_CONVERSIONS[this.propertyName](this.savedMemento);
         }
 
-        changeListService.editExplorationProperty(
+        ChangeListService.editExplorationProperty(
           this.propertyName, newBackendValue, oldBackendValue);
         this.savedMemento = angular.copy(this.displayed);
 
@@ -522,14 +307,14 @@ oppia.factory('explorationCorrectnessFeedbackService', [
 // mementos.
 oppia.factory('explorationStatesService', [
   '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
-  'explorationInitStateNameService', 'AlertsService', 'changeListService',
+  'explorationInitStateNameService', 'AlertsService', 'ChangeListService',
   'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'AngularNameService',
   'AnswerClassificationService', 'ExplorationContextService',
   'UrlInterpolationService',
   function(
       $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
-      explorationInitStateNameService, AlertsService, changeListService,
+      explorationInitStateNameService, AlertsService, ChangeListService,
       EditorStateService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, AngularNameService,
       AnswerClassificationService, ExplorationContextService,
@@ -619,7 +404,7 @@ oppia.factory('explorationStatesService', [
       }
 
       if (!angular.equals(oldValue, newValue)) {
-        changeListService.editStateProperty(
+        ChangeListService.editStateProperty(
           stateName, backendName, newBackendValue, oldBackendValue);
 
         var newStateData = _states.getState(stateName);
@@ -780,7 +565,7 @@ oppia.factory('explorationStatesService', [
 
         _states.addState(newStateName);
 
-        changeListService.addState(newStateName);
+        ChangeListService.addState(newStateName);
         $rootScope.$broadcast('refreshGraph');
         if (successCallback) {
           successCallback(newStateName);
@@ -829,7 +614,7 @@ oppia.factory('explorationStatesService', [
         }).result.then(function(deleteStateName) {
           _states.deleteState(deleteStateName);
 
-          changeListService.deleteState(deleteStateName);
+          ChangeListService.deleteState(deleteStateName);
 
           if (EditorStateService.getActiveStateName() === deleteStateName) {
             EditorStateService.setActiveStateName(
@@ -861,7 +646,7 @@ oppia.factory('explorationStatesService', [
         // init_state_name' command in the change list, otherwise the backend
         // will raise an error because the new initial state name does not
         // exist.
-        changeListService.renameState(newStateName, oldStateName);
+        ChangeListService.renameState(newStateName, oldStateName);
         // Amend initStateName appropriately, if necessary. Note that this
         // must come after the state renaming, otherwise saving will lead to
         // a complaint that the new name is not a valid state name.
@@ -876,8 +661,8 @@ oppia.factory('explorationStatesService', [
 ]);
 
 oppia.factory('statePropertyService', [
-  '$log', 'changeListService', 'AlertsService', 'explorationStatesService',
-  function($log, changeListService, AlertsService, explorationStatesService) {
+  '$log', 'ChangeListService', 'AlertsService', 'explorationStatesService',
+  function($log, ChangeListService, AlertsService, explorationStatesService) {
     // Public base API for data services corresponding to state properties
     // (interaction id, content, etc.)
     // WARNING: This should be initialized only in the context of the state
@@ -1028,115 +813,3 @@ oppia.constant('STATE_ERROR_MESSAGES', {
   INCORRECT_SOLUTION: (
     'The current solution does not lead to another card.')
 });
-
-// Service for displaying different types of modals depending on the type of
-// response received as a result of the autosaving request.
-oppia.factory('autosaveInfoModalsService', [
-  '$log', '$uibModal', '$timeout', '$window',
-  'ExplorationDataService', 'LocalStorageService', 
-  'ChangesInHumanReadableFormService', 'UrlInterpolationService',
-  function(
-      $log, $uibModal, $timeout, $window,
-      ExplorationDataService, LocalStorageService, 
-      ChangesInHumanReadableFormService, UrlInterpolationService) {
-    var _isModalOpen = false;
-    var _refreshPage = function(delay) {
-      $timeout(function() {
-        $window.location.reload();
-      }, delay);
-    };
-
-    return {
-      showNonStrictValidationFailModal: function() {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/' +
-            'save_validation_fail_modal_directive.html'),
-          // Prevent modal from closing when the user clicks outside it.
-          backdrop: 'static',
-          controller: [
-            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-              $scope.closeAndRefresh = function() {
-                $uibModalInstance.dismiss('cancel');
-                _refreshPage(20);
-              };
-            }
-          ]
-        }).result.then(function() {
-          _isModalOpen = false;
-        }, function() {
-          _isModalOpen = false;
-        });
-
-        _isModalOpen = true;
-      },
-      isModalOpen: function() {
-        return _isModalOpen;
-      },
-      showVersionMismatchModal: function(lostChanges) {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/' +
-            'save_version_mismatch_modal_directive.html'),
-          // Prevent modal from closing when the user clicks outside it.
-          backdrop: 'static',
-          controller: ['$scope', function($scope) {
-            // When the user clicks on discard changes button, signal backend
-            // to discard the draft and reload the page thereafter.
-            $scope.discardChanges = function() {
-              ExplorationDataService.discardDraft(function() {
-                _refreshPage(20);
-              });
-            };
-
-            $scope.hasLostChanges = (lostChanges && lostChanges.length > 0);
-            if ($scope.hasLostChanges) {
-              // TODO(sll): This should also include changes to exploration
-              // properties (such as the exploration title, category, etc.).
-              $scope.lostChangesHtml = (
-                ChangesInHumanReadableFormService.makeHumanReadable(
-                  lostChanges).html());
-              $log.error('Lost changes: ' + JSON.stringify(lostChanges));
-            }
-          }],
-          windowClass: 'oppia-autosave-version-mismatch-modal'
-        }).result.then(function() {
-          _isModalOpen = false;
-        }, function() {
-          _isModalOpen = false;
-        });
-
-        _isModalOpen = true;
-      },
-      showLostChangesModal: function(lostChanges, explorationId) {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/lost_changes_modal_directive.html'),
-          // Prevent modal from closing when the user clicks outside it.
-          backdrop: 'static',
-          controller: ['$scope', '$uibModalInstance', function(
-            $scope, $uibModalInstance) {
-            // When the user clicks on discard changes button, signal backend
-            // to discard the draft and reload the page thereafter.
-            $scope.close = function() {
-              LocalStorageService.removeExplorationDraft(explorationId);
-              $uibModalInstance.dismiss('cancel');
-            };
-
-            $scope.lostChangesHtml = (
-              ChangesInHumanReadableFormService.makeHumanReadable(
-                lostChanges).html());
-            $log.error('Lost changes: ' + JSON.stringify(lostChanges));
-          }],
-          windowClass: 'oppia-lost-changes-modal'
-        }).result.then(function() {
-          _isModalOpen = false;
-        }, function() {
-          _isModalOpen = false;
-        });
-
-        _isModalOpen = true;
-      }
-    };
-  }
-]);

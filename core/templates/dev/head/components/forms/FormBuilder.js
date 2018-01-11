@@ -113,35 +113,6 @@ oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
   };
 }]);
 
-oppia.factory('schemaDefaultValueService', [function() {
-  return {
-    // TODO(sll): Rewrite this to take validators into account, so that
-    // we always start with a valid value.
-    getDefaultValue: function(schema) {
-      if (schema.choices) {
-        return schema.choices[0];
-      } else if (schema.type === 'bool') {
-        return false;
-      } else if (schema.type === 'unicode' || schema.type === 'html') {
-        return '';
-      } else if (schema.type === 'list') {
-        return [this.getDefaultValue(schema.items)];
-      } else if (schema.type === 'dict') {
-        var result = {};
-        for (var i = 0; i < schema.properties.length; i++) {
-          result[schema.properties[i].name] = this.getDefaultValue(
-            schema.properties[i].schema);
-        }
-        return result;
-      } else if (schema.type === 'int' || schema.type === 'float') {
-        return 0;
-      } else {
-        console.error('Invalid schema type: ' + schema.type);
-      }
-    }
-  };
-}]);
-
 oppia.factory('schemaUndefinedLastElementService', [function() {
   return {
     // Returns true if the input value, taken as the last element in a list,
@@ -186,10 +157,10 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
 }]);
 
 oppia.directive('textAngularRte', [
-  '$filter', '$timeout', 'HtmlEscaperService', 'rteHelperService',
+  '$filter', '$timeout', 'HtmlEscaperService', 'RteHelperService',
   'textAngularManager',
   function(
-    $filter, $timeout, HtmlEscaperService, rteHelperService,
+    $filter, $timeout, HtmlEscaperService, RteHelperService,
     textAngularManager) {
     return {
       restrict: 'E',
@@ -219,7 +190,7 @@ oppia.directive('textAngularRte', [
           $scope.placeholderText = $scope.uiConfig().placeholder;
         }
 
-        rteHelperService.getRichTextComponents().forEach(
+        RteHelperService.getRichTextComponents().forEach(
           function(componentDefn) {
             if (!($scope.uiConfig() &&
                 $scope.uiConfig().hide_complex_extensions &&
@@ -234,7 +205,7 @@ oppia.directive('textAngularRte', [
         $scope.toolbarOptionsJson = JSON.stringify(toolbarOptions);
 
         var _convertHtmlToRte = function(html) {
-          return rteHelperService.convertHtmlToRte(html);
+          return RteHelperService.convertHtmlToRte(html);
         };
 
         $scope.stripFormatting = function(html) {
@@ -270,7 +241,7 @@ oppia.directive('textAngularRte', [
           var displayedContent = $scope.isCustomizationModalOpen ?
             newVal :
             $filter('sanitizeHtmlForRte')(newVal);
-          $scope.htmlContent = rteHelperService.convertRteToHtml(
+          $scope.htmlContent = RteHelperService.convertRteToHtml(
             displayedContent);
         });
 

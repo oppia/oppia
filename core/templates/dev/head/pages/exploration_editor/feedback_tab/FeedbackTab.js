@@ -20,13 +20,13 @@ oppia.controller('FeedbackTab', [
   '$scope', '$http', '$uibModal', '$timeout', '$rootScope', 'AlertsService',
   'DateTimeFormatService', 'ThreadStatusDisplayService',
   'ThreadDataService', 'explorationStatesService', 'ExplorationDataService',
-  'changeListService', 'StateObjectFactory', 'UrlInterpolationService',
+  'ChangeListService', 'StateObjectFactory', 'UrlInterpolationService',
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
     $scope, $http, $uibModal, $timeout, $rootScope, AlertsService,
     DateTimeFormatService, ThreadStatusDisplayService,
     ThreadDataService, explorationStatesService, ExplorationDataService,
-    changeListService, StateObjectFactory, UrlInterpolationService,
+    ChangeListService, StateObjectFactory, UrlInterpolationService,
     ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
     $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
     $scope.threadData = ThreadDataService.data;
@@ -106,7 +106,7 @@ oppia.controller('FeedbackTab', [
     };
 
     var _hasUnsavedChanges = function() {
-      return (changeListService.getChangeList().length > 0);
+      return (ChangeListService.getChangeList().length > 0);
     };
 
     $scope.getSuggestionButtonType = function() {
