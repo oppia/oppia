@@ -58,7 +58,7 @@ oppia.directive('tutorCard', [
         'AudioTranslationManagerService', 'TWO_CARD_THRESHOLD_PX',
         'CONTENT_FOCUS_LABEL_PREFIX', 'CONTINUE_BUTTON_FOCUS_LABEL',
         'EVENT_ACTIVE_CARD_CHANGED', 'EVENT_NEW_CARD_AVAILABLE',
-        'COMPONENT_NAME_CONTENT', 'AUDIO_HIGHLIGHT_CSS_CLASS',
+        'COMPONENT_NAME_CONTENT', 'AUDIO_HIGHLIGHT_CSS_CLASS', '$location',
         function(
           $scope, $timeout, $rootScope, $anchorScroll,
           ExplorationPlayerService, PlayerPositionService, UrlService,
@@ -68,7 +68,7 @@ oppia.directive('tutorCard', [
           AudioTranslationManagerService, TWO_CARD_THRESHOLD_PX,
           CONTENT_FOCUS_LABEL_PREFIX, CONTINUE_BUTTON_FOCUS_LABEL,
           EVENT_ACTIVE_CARD_CHANGED, EVENT_NEW_CARD_AVAILABLE,
-          COMPONENT_NAME_CONTENT, AUDIO_HIGHLIGHT_CSS_CLASS) {
+          COMPONENT_NAME_CONTENT, AUDIO_HIGHLIGHT_CSS_CLASS, $location) {
           var updateActiveCard = function() {
             var index = PlayerPositionService.getActiveCardIndex();
             if (index === null) {
@@ -191,12 +191,14 @@ oppia.directive('tutorCard', [
             $scope.waitingForOppiaFeedback = false;
 
             // Auto scroll to the new feedback on mobile device.
+            //console.log();
             if (DeviceInfoService.isMobileDevice()) {
               var index = PlayerPositionService.getActiveCardIndex();
               var activeCard = PlayerTranscriptService.getCard(index);
               var latestFeedbackIndex = (
                 activeCard.inputResponsePairs.length - 1);
-              $anchorScroll($scope.getInputResponsePairId(latestFeedbackIndex));
+              $location.hash(
+                $scope.getInputResponsePairId(latestFeedbackIndex));
             }
           });
 
