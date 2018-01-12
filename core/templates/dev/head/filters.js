@@ -18,7 +18,7 @@
 
 oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT', 30);
 oppia.constant('NON_INTERACTIVE_INPUTS', ['collapsible', 'image', 'link',
-                                        'math', 'tabs', 'video']);
+                                          'math', 'tabs', 'video']);
 
 oppia.filter('spacesToUnderscores', [function() {
   return function(input) {
