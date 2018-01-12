@@ -191,7 +191,6 @@ oppia.directive('tutorCard', [
             $scope.waitingForOppiaFeedback = false;
 
             // Auto scroll to the new feedback on mobile device.
-            //console.log();
             if (DeviceInfoService.isMobileDevice()) {
               var index = PlayerPositionService.getActiveCardIndex();
               var activeCard = PlayerTranscriptService.getCard(index);
