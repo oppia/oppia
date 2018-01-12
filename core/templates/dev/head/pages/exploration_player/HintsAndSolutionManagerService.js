@@ -26,9 +26,7 @@ oppia.factory('HintsAndSolutionManagerService', [
       WAIT_FOR_FIRST_HINT_MSEC, WAIT_FOR_SUBSEQUENT_HINTS_MSEC) {
     var timeout = null;
     var ACCELERATED_HINT_WAIT_TIME_MSEC = 10000;
-    var WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC = 120000;
-    // Max wait of 10 seconds before closing the tooltip.
-    var CLOSE_TOOLTIP_MSEC = 10000;
+    var WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC = 60000;
 
     var numHintsReleased = 0;
     var numHintsConsumed = 0;
@@ -54,13 +52,9 @@ oppia.factory('HintsAndSolutionManagerService', [
       timeout = $timeout(func, timeToWaitMsec);
     };
 
-    var closeTooltip = function() {
-      tooltipIsOpen = false;
-    };
     var showTooltip = function() {
       tooltipIsOpen = true;
       hintsDiscovered = true;
-      $timeout(closeTooltip, CLOSE_TOOLTIP_MSEC);
     };
 
     var releaseHint = function() {
@@ -86,7 +80,7 @@ oppia.factory('HintsAndSolutionManagerService', [
 
     var consumeHint = function() {
       hintsDiscovered = true;
-      closeTooltip();
+      tooltipIsOpen = false;
       if (tooltipTimeout) {
         $timeout.cancel(tooltipTimeout);
       }
