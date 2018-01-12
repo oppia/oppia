@@ -25,6 +25,7 @@ from core.tests import test_utils
 
 gae_search_services = models.Registry.import_search_services()
 
+
 class SearchServicesUnitTests(test_utils.GenericTestBase):
     """Test the search services module."""
     EXP_ID = 'An_exploration_id'

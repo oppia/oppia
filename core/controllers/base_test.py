@@ -481,6 +481,7 @@ class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
 
     class FakeHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
         def get(self):
             raise self.InternalErrorException('fake exception')
 

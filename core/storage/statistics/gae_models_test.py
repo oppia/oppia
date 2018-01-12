@@ -23,6 +23,7 @@ import feconf
 
 (stat_models,) = models.Registry.import_models([models.NAMES.statistics])
 
+
 class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the AnswerSubmittedEventLogEntryModel class."""
 
@@ -41,6 +42,7 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
         self.assertEqual(event_model.is_feedback_useful, True)
 
+
 class ExplorationActualStartEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
     """Test the ExplorationActualStartEventLogEntryModel class."""
@@ -58,6 +60,7 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
 
+
 class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the SolutionHitEventLogEntryModel class."""
 
@@ -74,6 +77,7 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
+
 
 class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StateHitEventLogEntryModel class."""
@@ -93,6 +97,7 @@ class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
 
+
 class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StateCompleteEventLogEntryModel class."""
 
@@ -109,6 +114,7 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
+
 
 class CompleteExplorationEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
@@ -131,6 +137,7 @@ class CompleteExplorationEventLogEntryModelUnitTests(
         self.assertEqual(event_model.params, {})
         self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
 
+
 class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StartExplorationEventLogEntryModel class."""
 
@@ -149,6 +156,7 @@ class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.params, {})
         self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
+
 
 class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
     """Test the ExplorationStatsModel class."""

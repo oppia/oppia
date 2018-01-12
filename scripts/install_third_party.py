@@ -75,6 +75,7 @@ DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
     }
 }
 
+
 def download_files(source_url_root, target_dir, source_filenames):
     """Downloads a group of files and saves them to a given directory.
 
@@ -336,6 +337,7 @@ def _install_third_party_libs():
         if os.path.isdir(full_dir):
             print 'Removing unnecessary MathJax directory \'%s\'' % subdir
             shutil.rmtree(full_dir)
+
 
 if __name__ == '__main__':
     _install_third_party_libs()

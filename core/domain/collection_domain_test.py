@@ -634,6 +634,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             collection.get_acquired_skill_ids_from_exploration_ids(
                 ['exp_id_0']))
 
+
 class ExplorationGraphUnitTests(test_utils.GenericTestBase):
     """Test the skill graph structure within a collection."""
 

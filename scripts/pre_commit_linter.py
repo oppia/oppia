@@ -53,6 +53,7 @@ import argparse
 import fnmatch
 import multiprocessing
 import os
+import pycodestyle
 import re
 import subprocess
 import sys
@@ -666,15 +667,53 @@ def _check_import_order(all_files):
 
     return summary_messages
 
+
+def _check_def_spacing(all_files):
+    """This function is used to check the number of blank lines
+    left above each class, function and method defintion.
+    """
+    print 'Starting def-spacing checks'
+    print '----------------------------------------'
+    print ''
+    pycodestyle_config_path = os.path.join(os.getcwd(), 'tox.ini')
+    summary_messages = []
+    # Selecting only Python files to check for errors
+    all_files = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.py')]
+    failed = False
+    style_guide = pycodestyle.StyleGuide(config_file=pycodestyle_config_path)
+    report = style_guide.check_files(all_files)
+    report.print_statistics()
+    print '----------------------------------------'
+    print ''
+    if report.get_count() != 0:
+        failed = True
+    if failed:
+        summary_message = (
+            '%s   Def spacing checks failed' % _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = (
+            '%s   Def spacing checks passed' % _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+    print ''
+    return summary_messages
+
+
 def main():
     all_files = _get_all_files()
+    def_spacing_messages = _check_def_spacing(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
-        import_order_messages + linter_messages + newline_messages
-        + pattern_messages)
+        def_spacing_messages + import_order_messages +
+        linter_messages + newline_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
