@@ -422,67 +422,61 @@ describe('Testing filters', function() {
     var choicesMath = [
       {
         label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
-        'x^3 - a x^2 - b x - c&amp;quot;"></oppia-noninteractive-math>',
+          'x^3 - a x^2 - b x - c&amp;quot;"></oppia-noninteractive-math>',
         val: 0
-      },
-      {
+      }, {
         label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
-        'x^3 + (a+b+c)x^2 + (ab+bc+ca)x + abc&amp;quot;">' +
-        '</oppia-noninteractive-math>',
+          'x^3 + (a+b+c)x^2 + (ab+bc+ca)x + abc&amp;quot;">' +
+          '</oppia-noninteractive-math>',
         val: 1
-      },
-      {
+      }, {
         label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
-        'x^3 - (a+b+c)x^2 + (ab+bc+ca)x - abc&amp;quot;">' +
-        '</oppia-noninteractive-math>',
+          'x^3 - (a+b+c)x^2 + (ab+bc+ca)x - abc&amp;quot;">' +
+          '</oppia-noninteractive-math>',
         val: 2
-      },
-      {
+      }, {
         label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
-        'x^3 + (a+b+c)x^2 - (ab+bc+ca)x + abc&amp;quot;">' +
-        '</oppia-noninteractive-math>',
+          'x^3 + (a+b+c)x^2 - (ab+bc+ca)x + abc&amp;quot;">' +
+          '</oppia-noninteractive-math>',
         val: 3
       },
     ];
 
-    var ruleLink = {
+    var ruleMixed = {
       type: 'Equals',
       inputs: {
         x: 0
       }
     };
-    var interactionIdLink = 'TextInput';
-    var choicesLink = [
+    var interactionIdMixed = 'TextInput';
+    var choicesMixed = [
       {
-        label: '<p><oppia-noninteractive-link text-with-value="&amp;quot;' +
-        '&amp;quot;" url-with-value="&amp;quot;https://www.example.com/' +
-        '1&amp;quot;"></oppia-noninteractive-link><br></p>',
+        label: '<p><oppia-noninteractive-image alt-with-value="&amp;' +
+          'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+          'filepath-with-value="&amp;quot;img_20180112_170413_5jxq15ngmd' +
+          '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
+          'input.</p><p><oppia-noninteractive-image alt-with-value="&amp;' +
+          'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+          'filepath-with-value="&amp;quot;img_20180112_170436_k7sz3xtvyy.' +
+          'png&amp;quot;"></oppia-noninteractive-image></p><p><oppia-' +
+          'noninteractive-link text-with-value="&amp;quot;&amp;quot;"' +
+          'url-with-value="&amp;quot;https://www.example.com&amp;quot;">' +
+          '</oppia-noninteractive-link><br><br></p>',
         val: 0
-      },
-      {
-        label: '<p><oppia-noninteractive-link text-with-value="&amp;quot;' +
-        '&amp;quot;" url-with-value="&amp;quot;https://www.example.com/' +
-        '2&amp;quot;"></oppia-noninteractive-link><br></p>',
+      }, {
+        label: '<p><oppia-noninteractive-image alt-with-value="&amp;quot;' +
+          'g&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-' +
+          'with-value="&amp;quot;img_20180112_170500_926cssn398.png&amp;quot;' +
+          '"></oppia-noninteractive-image><br></p>',
         val: 1
-      },
-      {
-        label: '<p><oppia-noninteractive-link text-with-value="&amp;quot;' +
-        '&amp;quot;" url-with-value="&amp;quot;https://www.example.com/' +
-        '3&amp;quot;"></oppia-noninteractive-link><br></p>',
-        val: 2
-      },
-      {
-        label: '<p><oppia-noninteractive-link text-with-value="&amp;quot;' +
-        '&amp;quot;" url-with-value="&amp;quot;https://www.example.com/' +
-        '4&amp;quot;"></oppia-noninteractive-link><br></p>',
-        val: 3
-      },
+      }
     ];
 
     var filter = $filter('parameterizeRuleDescription');
     expect($filter('convertToPlainText')(filter(ruleMath, interactionIdMath,
       choicesMath))).toEqual('is ' + 'equal to \'[math]\'');
-    expect($filter('convertToPlainText')(filter(ruleLink, interactionIdLink,
-      choicesLink))).toEqual('is ' + 'equal to \'[link]\'');
+    expect($filter('convertToPlainText')(filter(ruleMixed, interactionIdMixed,
+      choicesMixed))).toEqual('is ' + 'equal to \'[image]This is a text ' +
+      'input.[image][link]\'');
   }));
 });

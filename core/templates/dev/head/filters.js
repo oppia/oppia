@@ -17,6 +17,8 @@
  */
 
 oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT', 30);
+oppia.constant('NON_INTERACTIVE_INPUTS', ['collapsible', 'image', 'link',
+                                        'math', 'tabs', 'video']);
 
 oppia.filter('spacesToUnderscores', [function() {
   return function(input) {
@@ -143,7 +145,8 @@ oppia.filter('wrapTextWithEllipsis', [
 // values. Note that this returns an HTML string to accommodate the case of
 // multiple-choice input and image-click input.
 oppia.filter('parameterizeRuleDescription', [
-  'INTERACTION_SPECS', function(INTERACTION_SPECS) {
+  'INTERACTION_SPECS', 'NON_INTERACTIVE_INPUTS', function(INTERACTION_SPECS,
+    NON_INTERACTIVE_INPUTS) {
     return function(rule, interactionId, choices) {
       if (!rule) {
         return '';
@@ -198,17 +201,15 @@ oppia.filter('parameterizeRuleDescription', [
             for (var i = 0; i < choices.length; i++) {
               var stringChange = true;
               var choicesLabelString = choices[i].label;
-              while(stringChange) {
-                var nonInteractiveInputs = ['collapsible', 'image', 'link',
-                                            'math', 'tabs', 'video'];
-                for (var j = 0; j < nonInteractiveInputs.length; j++) {
-                  if (choicesLabelString.includes('<oppia-noninteractive-' +
-                    nonInteractiveInputs[j])) {
-                    var testString = '<oppia-noninteractive-' +
-                    nonInteractiveInputs[j];
+              while (stringChange) {
+                for (var j = 0; j < NON_INTERACTIVE_INPUTS.length; j++) {
+                  var testString = '<oppia-noninteractive-' +
+                  NON_INTERACTIVE_INPUTS[j];
+                  if (choicesLabelString.indexOf('<oppia-noninteractive-' +
+                    NON_INTERACTIVE_INPUTS[j]) !== -1) {
                     var regex = new RegExp('(' + testString + '([^>]+)>)');
-                    choicesLabelString = choicesLabelString.replace(regex, '[' +
-                    nonInteractiveInputs[j] + ']');
+                    choicesLabelString = choicesLabelString.replace(
+                      regex, '[' + NON_INTERACTIVE_INPUTS[j] + ']');
                     stringChange = true;
                     break;
                   } else {
