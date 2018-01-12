@@ -19,9 +19,9 @@
 
 oppia.factory('SolutionObjectFactory', [
   '$filter', 'HtmlEscaperService', 'ExplorationHtmlFormatterService',
-  'SubtitledHtmlObjectFactory',
+  'SubtitledHtmlObjectFactory', 'FractionObjectFactory',
   function($filter, HtmlEscaperService, ExplorationHtmlFormatterService,
-    SubtitledHtmlObjectFactory) {
+    SubtitledHtmlObjectFactory, FractionObjectFactory) {
     var Solution = function(answerIsExclusive, correctAnswer, explanation) {
       this.answerIsExclusive = answerIsExclusive;
       this.correctAnswer = correctAnswer;
@@ -67,6 +67,9 @@ oppia.factory('SolutionObjectFactory', [
         correctAnswer = '[Music Notes]';
       } else if (interactionId === 'LogicProof') {
         correctAnswer = this.correctAnswer.correct;
+      } else if (interactionId === 'FractionInput') {
+        correctAnswer = FractionObjectFactory.fromDict(
+          this.correctAnswer).toString();
       } else {
         correctAnswer = (
           HtmlEscaperService.objToEscapedJson(this.correctAnswer));

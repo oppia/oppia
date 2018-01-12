@@ -113,20 +113,6 @@ oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
   };
 }]);
 
-oppia.factory('schemaUndefinedLastElementService', [function() {
-  return {
-    // Returns true if the input value, taken as the last element in a list,
-    // should be considered as 'undefined' and therefore deleted.
-    getUndefinedValue: function(schema) {
-      if (schema.type === 'unicode' || schema.type === 'html') {
-        return '';
-      } else {
-        return undefined;
-      }
-    }
-  };
-}]);
-
 oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
   var _EXTENSION_SELECTOR = '[class^=oppia-noninteractive-]';
 

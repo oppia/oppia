@@ -21,12 +21,15 @@
  */
 oppia.directive('oppiaInteractiveInteractiveMap', [
   'HtmlEscaperService', 'interactiveMapRulesService', 'UrlInterpolationService',
+  'EVENT_NEW_CARD_AVAILABLE',
   function(
-      HtmlEscaperService, interactiveMapRulesService, UrlInterpolationService) {
+      HtmlEscaperService, interactiveMapRulesService, UrlInterpolationService,
+      EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/InteractiveMap/directives/' +
@@ -38,12 +41,36 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             HtmlEscaperService.escapedJsonToObj($attrs.longitudeWithValue)];
           $scope.zoom = (
             HtmlEscaperService.escapedJsonToObj($attrs.zoomWithValue));
+          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+          $scope.mapMarkers = [];
+
+          $scope.setOverlay = function() {
+            $scope.overlayStyle = {
+              'background-color': 'black'
+            };
+            $scope.mapStyle = {
+              opacity: '0.8'
+            };
+          };
+
+          $scope.hideOverlay = function() {
+            $scope.overlayStyle = {
+              'background-color': 'white'
+            };
+            $scope.mapStyle = {
+              opacity: '1'
+            };
+          };
+
+
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+            $scope.interactionIsActive = false;
+            $scope.setOverlay();
+          });
 
           $scope.$on('showInteraction', function() {
             refreshMap();
           });
-
-          $scope.mapMarkers = [];
 
           // This is required in order to avoid the following bug:
           //   http://stackoverflow.com/questions/18769287
@@ -54,6 +81,13 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
                 lat: coords[0],
                 lng: coords[1]
               });
+              if (!$scope.interactionIsActive) {
+                $scope.mapMarkers.push(new google.maps.Marker({
+                  map: $scope.map,
+                  position: new google.maps.LatLng(
+                    $scope.getLastAnswer()[0], $scope.getLastAnswer()[1])
+                }));
+              }
             }, 100);
           };
 
@@ -62,10 +96,28 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
           $scope.mapOptions = {
             center: new google.maps.LatLng(coords[0], coords[1]),
             zoom: zoomLevel,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            draggable: $scope.interactionIsActive
+          };
+
+          $scope.onMouseOver = function() {
+            if ($scope.interactionIsActive) {
+              return;
+            }
+            $scope.setOverlay();
+          };
+
+          $scope.onMouseOut = function() {
+            if ($scope.interactionIsActive) {
+              return;
+            }
+            $scope.hideOverlay();
           };
 
           $scope.registerClick = function($event, $params) {
+            if (!$scope.interactionIsActive) {
+              return;
+            }
             var ll = $params[0].latLng;
             $scope.mapMarkers.push(new google.maps.Marker({
               map: $scope.map,
