@@ -50,7 +50,7 @@ oppia.directive('tutorCard', [
         '/pages/exploration_player/' +
         'tutor_card_directive.html'),
       controller: [
-        '$scope', '$timeout', '$rootScope', '$anchorScroll',
+        '$scope', '$timeout', '$rootScope',
         'ExplorationPlayerService', 'PlayerPositionService', 'UrlService',
         'PlayerTranscriptService', 'ExplorationPlayerStateService',
         'WindowDimensionsService', 'DeviceInfoService', 'AudioPlayerService',
@@ -60,7 +60,7 @@ oppia.directive('tutorCard', [
         'EVENT_ACTIVE_CARD_CHANGED', 'EVENT_NEW_CARD_AVAILABLE',
         'COMPONENT_NAME_CONTENT', 'AUDIO_HIGHLIGHT_CSS_CLASS', '$location',
         function(
-          $scope, $timeout, $rootScope, $anchorScroll,
+          $scope, $timeout, $rootScope,
           ExplorationPlayerService, PlayerPositionService, UrlService,
           PlayerTranscriptService, ExplorationPlayerStateService,
           WindowDimensionsService, DeviceInfoService, AudioPlayerService,
