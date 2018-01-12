@@ -53,7 +53,6 @@ import argparse
 import fnmatch
 import multiprocessing
 import os
-import pycodestyle
 import re
 import subprocess
 import sys
@@ -205,6 +204,7 @@ for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
 import isort             # pylint: disable=wrong-import-position
+import pycodestyle       # pylint: disable=wrong-import-position
 from pylint import lint  # pylint: disable=wrong-import-position
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
