@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for ChangeObjectFactory.
+ * @fileoverview Tests for SidebarStatusService.
  */
 
 describe('SidebarStatusService', function() {
@@ -27,26 +27,25 @@ describe('SidebarStatusService', function() {
   it('should open and then toggle the sidebar if it is not open', function() {
     SidebarStatusService.openSidebar();
     expect(SidebarStatusService.isSidebarShown()).toBe(true);
-    SidebarStatusService.toggleSidebar();
-    expect(SidebarStatusService.isSidebarShown()).toBe(false);
   });
   
-  it('should close and then toggle the sidebar when it is open', function() {
+  it('should close the sidebar when it is open', function() {
     SidebarStatusService.openSidebar();
     SidebarStatusService.closeSidebar();
     expect(SidebarStatusService.isSidebarShown()).toBe(false);
-    SidebarStatusService.toggleSidebar();
-    expect(SidebarStatusService.isSidebarShown()).toBe(true);
   });
   
-  it('should close sidebar if pendingSidebarClick is false', function(){
-    SidebarStatusService.onDocumentClick();
+  it('should toggle the sidebar to open and then close', function(){
+    SidebarStatusService.toggleSidebar();
+    expect(SidebarStatusService.isSidebarShown()).toBe(true);
+    SidebarStatusService.toggleSidebar();
     expect(SidebarStatusService.isSidebarShown()).toBe(false);
   });
   
-  it('should toggle endingSidebarClick', function(){
+  it('should falsify pendingSidebarClick on document click', function(){
     SidebarStatusService.openSidebar();
     SidebarStatusService.onDocumentClick();
-    expect(SidebarStatusService.isSidebarShown()).toBe(true);
+    SidebarStatusService.onDocumentClick();
+    expect(SidebarStatusService.isSidebarShown()).toBe(false);
   });
 });
