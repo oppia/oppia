@@ -670,28 +670,25 @@ def _check_import_order(all_files):
 
 
 def _check_def_spacing(all_files):
-    """This function is used to check the number of blank lines
-    left above each class, function and method defintion.
+    """This function checks the number of blank lines
+    above each class, function and method defintion.
     """
     print 'Starting def-spacing checks'
     print '----------------------------------------'
     print ''
     pycodestyle_config_path = os.path.join(os.getcwd(), 'tox.ini')
     summary_messages = []
-    # Selecting only Python files to check for errors
-    all_files = [
+    # Select only Python files to check for errors
+    files_to_check = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.py')]
-    failed = False
     style_guide = pycodestyle.StyleGuide(config_file=pycodestyle_config_path)
-    report = style_guide.check_files(all_files)
+    report = style_guide.check_files(files_to_check)
     report.print_statistics()
     print '----------------------------------------'
     print ''
     if report.get_count() != 0:
-        failed = True
-    if failed:
         summary_message = (
             '%s   Def spacing checks failed' % _MESSAGE_TYPE_FAILED)
         print summary_message
