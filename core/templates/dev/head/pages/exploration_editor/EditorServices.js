@@ -795,8 +795,6 @@ oppia.factory('stateSolutionService', [
   }
 ]);
 
-
-
 oppia.constant('WARNING_TYPES', {
   // These must be fixed before the exploration can be saved.
   CRITICAL: 'critical',
