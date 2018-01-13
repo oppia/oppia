@@ -28,6 +28,40 @@
     padding-left:8px;
   }
 
+  @-webkit-keyframes anim_slides {
+    0% {
+      opacity:0;
+    }
+
+    25% {
+      opacity:0;
+    }
+
+    50% {
+      opacity:0.8;
+    }
+
+    75% {
+      opacity:1;
+    }
+
+    100% {
+      opacity:1;
+    }
+  }
+
+  .inner-container {
+    opacity:0;
+    -webkit-animation-name: anim_slides;
+    -webkit-animation-duration: 3.5s;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-direction: normal;
+    -webkit-animation-delay: 0;
+    -webkit-animation-play-state: running;
+    -webkit-animation-fill-mode: forwards;
+  }
+
   /* Some mobile devices have CSS width below 360px, use a responsive min-width
      when under 360px to prevent pushing things offscreen. */
   @media(max-width: 360px) {
