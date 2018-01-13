@@ -50,7 +50,7 @@ oppia.directive('tutorCard', [
         '/pages/exploration_player/' +
         'tutor_card_directive.html'),
       controller: [
-        '$scope', '$timeout', '$rootScope',
+        '$scope', '$timeout', '$rootScope', '$location',
         'ExplorationPlayerService', 'PlayerPositionService', 'UrlService',
         'PlayerTranscriptService', 'ExplorationPlayerStateService',
         'WindowDimensionsService', 'DeviceInfoService', 'AudioPlayerService',
@@ -58,9 +58,9 @@ oppia.directive('tutorCard', [
         'AudioTranslationManagerService', 'TWO_CARD_THRESHOLD_PX',
         'CONTENT_FOCUS_LABEL_PREFIX', 'CONTINUE_BUTTON_FOCUS_LABEL',
         'EVENT_ACTIVE_CARD_CHANGED', 'EVENT_NEW_CARD_AVAILABLE',
-        'COMPONENT_NAME_CONTENT', 'AUDIO_HIGHLIGHT_CSS_CLASS', '$location',
+        'COMPONENT_NAME_CONTENT', 'AUDIO_HIGHLIGHT_CSS_CLASS',
         function(
-          $scope, $timeout, $rootScope,
+          $scope, $timeout, $rootScope, $location,
           ExplorationPlayerService, PlayerPositionService, UrlService,
           PlayerTranscriptService, ExplorationPlayerStateService,
           WindowDimensionsService, DeviceInfoService, AudioPlayerService,
@@ -68,7 +68,7 @@ oppia.directive('tutorCard', [
           AudioTranslationManagerService, TWO_CARD_THRESHOLD_PX,
           CONTENT_FOCUS_LABEL_PREFIX, CONTINUE_BUTTON_FOCUS_LABEL,
           EVENT_ACTIVE_CARD_CHANGED, EVENT_NEW_CARD_AVAILABLE,
-          COMPONENT_NAME_CONTENT, AUDIO_HIGHLIGHT_CSS_CLASS, $location) {
+          COMPONENT_NAME_CONTENT, AUDIO_HIGHLIGHT_CSS_CLASS) {
           var updateActiveCard = function() {
             var index = PlayerPositionService.getActiveCardIndex();
             if (index === null) {
