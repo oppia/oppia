@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ describe('SidebarStatusService', function() {
     expect(SidebarStatusService.isSidebarShown()).toBe(false);
   });
   
-  it('should toggle endingSidebarClick', function(){
+  it('should toggle pendingSidebarClick', function(){
     SidebarStatusService.openSidebar();
     SidebarStatusService.onDocumentClick();
     expect(SidebarStatusService.isSidebarShown()).toBe(true);
