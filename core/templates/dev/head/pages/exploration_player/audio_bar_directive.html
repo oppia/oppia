@@ -16,6 +16,7 @@
       <select class="audio-language-select"
               ng-model="selectedLanguage.value"
               ng-options="o.value as o.displayed for o in languagesInExploration"
+              ng-style="hasPressedPlayButtonAtLeastOnce ? {'width': '36%'} : {'width': '50%'}"
               ng-change="onNewLanguageSelected()"></select>
     </div>
   </div>
