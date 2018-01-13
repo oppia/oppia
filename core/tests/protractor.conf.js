@@ -74,7 +74,7 @@ exports.config = {
     ],
 
     extensions: [
-      //'protractor/richTextComponents.js',
+      'protractor/richTextComponents.js',
       'protractor/interactions.js'
     ],
 

@@ -31,7 +31,7 @@ var expectInteractionDetailsToMatch = function(elem) {
 };
 
 var submitAnswer = function(elem, answer) {
-  elem.element(by.className('oppia-learner-confirm-button')).click();
+  element(by.css('.oppia-learner-confirm-button')).click();
 };
 
 var answerObjectType = 'CheckedProof';

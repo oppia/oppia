@@ -43,12 +43,11 @@
  */
 
 var INTERACTIONS = {
-  /*Continue: require('./Continue/protractor.js'),
+  Continue: require('./Continue/protractor.js'),
   FractionInput: require('./FractionInput/protractor.js'),
   MultipleChoiceInput: require('./MultipleChoiceInput/protractor.js'),
   NumericInput: require('./NumericInput/protractor.js'),
-  TextInput: require('./TextInput/protractor.js'),*/
-  LogicProof: require('./LogicProof/protractor.js')
+  TextInput: require('./TextInput/protractor.js')
 };
 
 var getInteraction = function(interactionName) {
