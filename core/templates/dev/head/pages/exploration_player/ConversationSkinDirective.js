@@ -257,7 +257,7 @@ oppia.directive('conversationSkin', [
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'EVENT_NEW_CARD_AVAILABLE', 'EVENT_PROGRESS_NAV_SUBMITTED',
         'FatigueDetectionService', 'NumberAttemptsService',
-        'PlayerCorrectnessFeedbackEnabledService', '$location',
+        'PlayerCorrectnessFeedbackEnabledService',
         'RefresherExplorationConfirmationModalService',
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'INTERACTION_SPECS',
         'EVENT_NEW_CARD_OPENED', 'HintsAndSolutionManagerService',
