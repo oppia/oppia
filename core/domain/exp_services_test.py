@@ -44,6 +44,7 @@ transaction_services = models.Registry.import_transaction_services()
 # TODO(msl): test ExpSummaryModel changes if explorations are updated,
 # reverted, deleted, created, rights changed
 
+
 def _count_at_least_editable_exploration_summaries(user_id):
     return len(exp_services._get_exploration_summaries_from_models(  # pylint: disable=protected-access
         exp_models.ExpSummaryModel.get_at_least_editable(
@@ -2120,6 +2121,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         exp_services.revert_exploration(albert_id, self.EXP_ID_1, 4, 3)
         self._check_contributors_summary(self.EXP_ID_1,
                                          {albert_id: 1, bob_id: 2})
+
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""

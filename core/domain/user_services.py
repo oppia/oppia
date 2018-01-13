@@ -46,6 +46,7 @@ SYSTEM_USERS = {
     feconf.MIGRATION_BOT_USER_ID: feconf.MIGRATION_BOT_USERNAME
 }
 
+
 class UserSettings(object):
     """Value object representing a user's settings.
 
@@ -905,6 +906,7 @@ def update_preferred_site_language_code(user_id, preferred_site_language_code):
         preferred_site_language_code)
     _save_user_settings(user_settings)
 
+
 def update_preferred_audio_language_code(
         user_id, preferred_audio_language_code):
     """Updates preferred_audio_language_code of user with given user_id.
@@ -918,6 +920,7 @@ def update_preferred_audio_language_code(
     user_settings.preferred_audio_language_code = (
         preferred_audio_language_code)
     _save_user_settings(user_settings)
+
 
 def update_user_role(user_id, role):
     """Updates the role of the user with given user_id.
@@ -1107,6 +1110,7 @@ def get_users_email_preferences(user_ids):
                 email_preferences_model.subscription_notifications))
 
     return result
+
 
 def set_email_preferences_for_exploration(
         user_id, exploration_id, mute_feedback_notifications=None,

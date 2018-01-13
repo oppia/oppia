@@ -66,6 +66,7 @@ _PARSER.add_argument(
     help='optional; if specified, display the output of the tests being run',
     action='store_true')
 
+
 def log(message, show_time=False):
     """Logs a message to the terminal.
 

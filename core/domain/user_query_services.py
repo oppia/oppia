@@ -22,6 +22,7 @@ import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
+
 def save_new_query_model(
         submitter_id, inactive_in_last_n_days=None,
         has_not_logged_in_for_n_days=None, created_at_least_n_exps=None,

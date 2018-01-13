@@ -284,6 +284,7 @@ class BulkEmailModel(base_models.BaseModel):
 
 REPLY_TO_ID_LENGTH = 84
 
+
 class FeedbackEmailReplyToIdModel(base_models.BaseModel):
     """This model stores unique_id for each <user, exploration, thread>
     combination.

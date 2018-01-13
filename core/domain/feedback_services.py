@@ -304,6 +304,7 @@ def get_next_page_of_all_feedback_messages(
     result_messages = [_get_message_from_model(m) for m in results]
     return (result_messages, new_urlsafe_start_cursor, more)
 
+
 def get_thread_analytics_multi(exploration_ids):
     """Fetches all FeedbackAnalytics, for all the given exploration ids.
 
