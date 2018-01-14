@@ -40,6 +40,7 @@ def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
             'The format of "new_version" should be: x.x.x')
     return arg
 
+
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--new_version', help='new version to be released', type=new_version_type)

@@ -22,7 +22,6 @@ from core.tests import test_utils
 import feconf
 import utils
 
-
 # Dictionary-like data structures within sample YAML must be formatted
 # alphabetically to match string equivalence with the YAML generation
 # methods tested below.
@@ -634,6 +633,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'skill0a',
             collection.get_acquired_skill_ids_from_exploration_ids(
                 ['exp_id_0']))
+
 
 class ExplorationGraphUnitTests(test_utils.GenericTestBase):
     """Test the skill graph structure within a collection."""

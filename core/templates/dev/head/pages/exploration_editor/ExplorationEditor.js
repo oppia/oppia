@@ -41,7 +41,7 @@ oppia.controller('ExplorationEditor', [
   'explorationLanguageCodeService', 'ExplorationRightsService',
   'explorationInitStateNameService', 'explorationTagsService',
   'EditabilityService', 'explorationStatesService', 'RouterService',
-  'graphDataService', 'StateEditorTutorialFirstTimeService',
+  'GraphDataService', 'StateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationParamChangesService',
   'ExplorationWarningsService', '$templateCache', 'ExplorationContextService',
   'ExplorationAdvancedFeaturesService', '$uibModal', 'ChangeListService',
@@ -56,7 +56,7 @@ oppia.controller('ExplorationEditor', [
       explorationLanguageCodeService, ExplorationRightsService,
       explorationInitStateNameService, explorationTagsService,
       EditabilityService, explorationStatesService, RouterService,
-      graphDataService, StateEditorTutorialFirstTimeService,
+      GraphDataService, StateEditorTutorialFirstTimeService,
       explorationParamSpecsService, explorationParamChangesService,
       ExplorationWarningsService, $templateCache, ExplorationContextService,
       ExplorationAdvancedFeaturesService, $uibModal, ChangeListService,
@@ -91,7 +91,7 @@ oppia.controller('ExplorationEditor', [
     };
 
     $scope.$on('refreshGraph', function() {
-      graphDataService.recompute();
+      GraphDataService.recompute();
       ExplorationWarningsService.updateWarnings();
     });
 
@@ -151,7 +151,7 @@ oppia.controller('ExplorationEditor', [
           EditabilityService.markEditable();
         }
 
-        graphDataService.recompute();
+        GraphDataService.recompute();
 
         if (!EditorStateService.getActiveStateName() ||
             !explorationStatesService.getState(

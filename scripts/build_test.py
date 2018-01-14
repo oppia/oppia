@@ -18,7 +18,6 @@
 import build
 from core.tests import test_utils
 
-
 # pylint: enable=relative-import
 
 

@@ -31,6 +31,7 @@ SEARCH_INDEX_COLLECTIONS = 'collections'
 # negative ranks are disallowed in the Search API.
 _DEFAULT_RANK = 20
 
+
 def index_exploration_summaries(exp_summaries):
     """Adds the explorations to the search index.
 
@@ -227,6 +228,7 @@ def clear_exploration_search_index():
     """
     search_services.clear_index(SEARCH_INDEX_EXPLORATIONS)
 
+
 def search_collections(query, limit, sort=None, cursor=None):
     """Searches through the available collections.
 
@@ -287,6 +289,7 @@ def clear_collection_search_index():
     many entries in the index.
     """
     search_services.clear_index(SEARCH_INDEX_COLLECTIONS)
+
 
 def update_collection_status_in_search(collection_id):
     """Updates the status field of a collection in the search index.

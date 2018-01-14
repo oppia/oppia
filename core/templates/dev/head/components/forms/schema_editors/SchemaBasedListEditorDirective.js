@@ -18,10 +18,10 @@
 
 oppia.directive('schemaBasedListEditor', [
   'SchemaDefaultValueService', 'recursionHelper', 'FocusManagerService',
-  'schemaUndefinedLastElementService', 'IdGenerationService',
+  'SchemaUndefinedLastElementService', 'IdGenerationService',
   'UrlInterpolationService', function(
     SchemaDefaultValueService, recursionHelper, FocusManagerService,
-    schemaUndefinedLastElementService, IdGenerationService,
+    SchemaUndefinedLastElementService, IdGenerationService,
     UrlInterpolationService) {
     return {
       scope: {
@@ -129,7 +129,7 @@ oppia.directive('schemaBasedListEditor', [
           var _deleteLastElementIfUndefined = function() {
             var lastValueIndex = $scope.localValue.length - 1;
             var valueToConsiderUndefined = (
-              schemaUndefinedLastElementService.getUndefinedValue(
+              SchemaUndefinedLastElementService.getUndefinedValue(
                 $scope.itemSchema()));
             if ($scope.localValue[lastValueIndex] ===
                 valueToConsiderUndefined) {

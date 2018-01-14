@@ -47,7 +47,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
           var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
           var pce = new PencilCodeEmbed(iframeDiv);
           pce.beginLoad($scope.initialCode);
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
             pce.hideMiddleButton();
             pce.hideToggleButton();

@@ -171,6 +171,7 @@ class NonnegativeInt(BaseObject):
         }]
     }
 
+
 class PositiveInt(BaseObject):
     """Nonnegative integer class."""
 
@@ -793,6 +794,7 @@ class MathExpression(BaseObject):
             'schema': UnicodeString.SCHEMA,
         }]
     }
+
 
 class Fraction(BaseObject):
     """Fraction class."""
