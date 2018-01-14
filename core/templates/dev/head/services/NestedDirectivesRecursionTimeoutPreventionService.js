@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ oppia.factory('NestedDirectivesRecursionTimeoutPreventionService', [
           };
         }
 
-      // Break the recursion loop by removing the contents,
+        // Break the recursion loop by removing the contents,
         var contents = element.contents().remove();
         var compiledContents;
         return {
