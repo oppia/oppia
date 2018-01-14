@@ -36,7 +36,7 @@ oppia.factory('NestedDirectivesRecursionTimeoutPreventionService', [
           };
         }
 
-      // Break the recursion loop by removing the contents,
+        // Break the recursion loop by removing the contents,
         var contents = element.contents().remove();
         var compiledContents;
         return {
