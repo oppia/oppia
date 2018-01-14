@@ -28,38 +28,25 @@
     padding-left: 8px;
   }
 
-  @-webkit-keyframes correct_feedback_fade_animation {
-    0% {
-      opacity: 0;
-    }
-
-    25% {
-      opacity: 0;
-    }
-
-    50% {
-      opacity: 0.8;
-    }
-
-    75% {
-      opacity: 1;
-    }
-
-    100% {
-      opacity: 1;
-    }
-  }
-
   .inner-container {
     opacity: 0;
-    -webkit-animation-name: correct_feedback_fade_animation;
-    -webkit-animation-duration: 3.5s;
+    -webkit-animation-name: fadein;
+    -webkit-animation-duration: 1.5s;
     -webkit-animation-timing-function: linear;
     -webkit-animation-iteration-count: 1;
     -webkit-animation-direction: normal;
-    -webkit-animation-delay: 0;
+    -webkit-animation-delay: 0.8s;
     -webkit-animation-play-state: running;
     -webkit-animation-fill-mode: forwards;
+
+    -ms-animation-name: fadein;
+    -ms-animation-duration: 1.5s;
+    -ms-animation-timing-function: linear;
+    -ms-animation-iteration-count: 1;
+    -ms-animation-direction: normal;
+    -ms-animation-delay: 0.8s;
+    -ms-animation-play-state: running;
+    -ms-animation-fill-mode: forwards;
   }
 
   /* Some mobile devices have CSS width below 360px, use a responsive min-width
