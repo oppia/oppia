@@ -24,7 +24,7 @@ describe('SidebarStatusService', function() {
     SidebarStatusService = $injector.get('SidebarStatusService');
   }));
   
-  it('should open and then toggle the sidebar if it is not open', function() {
+  it('should open the sidebar if it is not open', function() {
     SidebarStatusService.openSidebar();
     expect(SidebarStatusService.isSidebarShown()).toBe(true);
   });
