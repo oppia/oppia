@@ -28,6 +28,7 @@ from core.tests import test_utils
 
 gae_search_services = models.Registry.import_search_services()
 
+
 class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
 
     def setUp(self):

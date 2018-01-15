@@ -17,12 +17,12 @@
  */
 
 oppia.factory('ExplorationWarningsService', [
-  '$injector', 'graphDataService', 'explorationStatesService',
+  '$injector', 'GraphDataService', 'explorationStatesService',
   'ExpressionInterpolationService', 'explorationParamChangesService',
   'ParameterMetadataService', 'INTERACTION_SPECS',
   'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
-      $injector, graphDataService, explorationStatesService,
+      $injector, GraphDataService, explorationStatesService,
       ExpressionInterpolationService, explorationParamChangesService,
       ParameterMetadataService, INTERACTION_SPECS,
       WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
@@ -179,8 +179,8 @@ oppia.factory('ExplorationWarningsService', [
       stateWarnings = {};
       hasCriticalStateWarning = false;
 
-      graphDataService.recompute();
-      var _graphData = graphDataService.getGraphData();
+      GraphDataService.recompute();
+      var _graphData = GraphDataService.getGraphData();
 
       var _states = explorationStatesService.getStates();
       _states.getStateNames().forEach(function(stateName) {

@@ -220,6 +220,10 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/CodeNormalizerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/ComputeGraphService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/EditabilityService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/LocalStorageService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaDefaultValueService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaUndefinedLastElementService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorNavbarBreadcrumbDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorNavigationDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorServices.js"></script>
@@ -230,6 +234,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/AutosaveInfoModalsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorStateService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorFirstTimeEventsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/GraphDataService.js"></script>  
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/AngularNameService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/UserEmailPreferencesService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationDiffService.js"></script>
@@ -355,9 +360,6 @@
 
   <script src="{{ASSET_DIR_PREFIX}}/extensions/interactions/baseValidator.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/services/LocalStorageService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaDefaultValueService.js"></script>
-  
   {% include 'components/rich_text_components.html' %}
   {{ interaction_templates }}
   {{ visualizations_html }}

@@ -44,7 +44,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
           $scope.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
 
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
           });
 

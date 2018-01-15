@@ -1427,6 +1427,7 @@ class Collection(object):
                         'Skill with ID %s is not a prerequisite or acquired '
                         'skill of any node.' % skill_id)
 
+
 class CollectionSummary(object):
     """Domain object for an Oppia collection summary."""
 

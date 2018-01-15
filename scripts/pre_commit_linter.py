@@ -192,6 +192,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'numpy-1.6.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.3.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join('third_party', 'bleach-1.2.2'),
@@ -204,6 +205,7 @@ for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
 import isort             # pylint: disable=wrong-import-position
+import pycodestyle       # pylint: disable=wrong-import-position
 from pylint import lint  # pylint: disable=wrong-import-position
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
@@ -552,7 +554,7 @@ def _check_bad_pattern_in_file(filename, content, pattern):
             message(str) : message to show if pattern matches,
             excluded_files(tuple(str)) : files to be excluded from matching,
             excluded_dirs(tuple(str)) : directories to be excluded from
-                matching). 
+                matching).
             Object containing details for the pattern to be checked.
 
     Returns:
@@ -646,9 +648,11 @@ def _check_import_order(all_files):
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
     failed = False
     for filename in all_files:
-        # This line prints the error message along with file path 
+        # This line prints the error message along with file path
         # and returns True if it finds an error else returns False
-        if isort.SortImports(filename, check=False).incorrectly_sorted:
+        # If check is set to True, isort simply checks the file and
+        # if check is set to False, it autocorrects import-order errors.
+        if isort.SortImports(filename, check=True).incorrectly_sorted:
             failed = True
     print ''
     print '----------------------------------------'
@@ -664,15 +668,50 @@ def _check_import_order(all_files):
 
     return summary_messages
 
+
+def _check_def_spacing(all_files):
+    """This function checks the number of blank lines
+    above each class, function and method defintion.
+    """
+    print 'Starting def-spacing checks'
+    print '----------------------------------------'
+    print ''
+    pycodestyle_config_path = os.path.join(os.getcwd(), 'tox.ini')
+    summary_messages = []
+    # Select only Python files to check for errors
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.py')]
+    style_guide = pycodestyle.StyleGuide(config_file=pycodestyle_config_path)
+    report = style_guide.check_files(files_to_check)
+    report.print_statistics()
+    print '----------------------------------------'
+    print ''
+    if report.get_count() != 0:
+        summary_message = (
+            '%s   Def spacing checks failed' % _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = (
+            '%s   Def spacing checks passed' % _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+    print ''
+    return summary_messages
+
+
 def main():
     all_files = _get_all_files()
+    def_spacing_messages = _check_def_spacing(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
-        import_order_messages + linter_messages + newline_messages
-        + pattern_messages)
+        def_spacing_messages + import_order_messages +
+        linter_messages + newline_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)

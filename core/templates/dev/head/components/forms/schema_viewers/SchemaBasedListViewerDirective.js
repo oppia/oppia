@@ -17,8 +17,11 @@
  */
 
 oppia.directive('schemaBasedListViewer', [
-  'recursionHelper', 'UrlInterpolationService',
-  function(recursionHelper, UrlInterpolationService) {
+  'NestedDirectivesRecursionTimeoutPreventionService',
+  'UrlInterpolationService',
+  function(
+    NestedDirectivesRecursionTimeoutPreventionService,
+    UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
@@ -29,7 +32,7 @@ oppia.directive('schemaBasedListViewer', [
         '/components/forms/schema_viewers/' +
         'schema_based_list_viewer_directive.html'),
       restrict: 'E',
-      compile: recursionHelper.compile
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile
     };
   }
 ]);

@@ -17,12 +17,15 @@
  */
 
 oppia.directive('schemaBasedListEditor', [
-  'SchemaDefaultValueService', 'recursionHelper', 'FocusManagerService',
-  'schemaUndefinedLastElementService', 'IdGenerationService',
-  'UrlInterpolationService', function(
-    SchemaDefaultValueService, recursionHelper, FocusManagerService,
-    schemaUndefinedLastElementService, IdGenerationService,
-    UrlInterpolationService) {
+  'SchemaDefaultValueService', 
+  'NestedDirectivesRecursionTimeoutPreventionService',
+  'FocusManagerService', 'SchemaUndefinedLastElementService',
+  'IdGenerationService', 'UrlInterpolationService', 
+  function(
+    SchemaDefaultValueService, 
+    NestedDirectivesRecursionTimeoutPreventionService,
+    FocusManagerService, SchemaUndefinedLastElementService,
+    IdGenerationService, UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
@@ -41,7 +44,7 @@ oppia.directive('schemaBasedListEditor', [
         '/components/forms/schema_editors/' +
         'schema_based_list_editor_directive.html'),
       restrict: 'E',
-      compile: recursionHelper.compile,
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {
         var baseFocusLabel = (
           $scope.labelForFocusTarget() ||
@@ -129,7 +132,7 @@ oppia.directive('schemaBasedListEditor', [
           var _deleteLastElementIfUndefined = function() {
             var lastValueIndex = $scope.localValue.length - 1;
             var valueToConsiderUndefined = (
-              schemaUndefinedLastElementService.getUndefinedValue(
+              SchemaUndefinedLastElementService.getUndefinedValue(
                 $scope.itemSchema()));
             if ($scope.localValue[lastValueIndex] ===
                 valueToConsiderUndefined) {

@@ -431,6 +431,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             "denominator": denominator
         }
 
+
 class SchemaValidityTests(test_utils.GenericTestBase):
 
     def test_schemas_used_to_define_objects_are_valid(self):

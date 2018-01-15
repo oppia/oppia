@@ -44,7 +44,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
 
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
           });
           $scope.language = HtmlEscaperService.escapedJsonToObj(
