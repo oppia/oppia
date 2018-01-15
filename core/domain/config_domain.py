@@ -102,7 +102,7 @@ class ConfigProperty(object):
     """
 
     def refresh_default_value(self, default_value):
-        """Refreshes the default_value of the configuration property."""
+        """Refreshes the configuration property to the default value."""
 
         pass
 
@@ -182,7 +182,8 @@ class ConfigProperty(object):
             model_instance.id: model_instance.value})
 
     def normalize(self, value):
-        """Validate the given object using the schema, normalizing if necessary.
+        """Validates the given object using the schema and normalizes if
+        necessary.
 
         Args:
             value: The value of the configuration property.
