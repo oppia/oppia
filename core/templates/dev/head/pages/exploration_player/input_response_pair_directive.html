@@ -1,13 +1,13 @@
 <div class="conversation-skin-learner-answer-container">
   <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture()]>" alt="">
   <div ng-if="!data.isHint">
-    <div id="<[getInputResponsePairId()]>" ng-if="getShortAnswerHtml()"
+    <div ng-if="getShortAnswerHtml()"
          popover-placement="bottom" uib-popover-template="'popover/answer'"
          popover-trigger="click" style="cursor: pointer;">
       <div class="conversation-skin-learner-answer-content" angular-html-bind="getShortAnswerHtml()">
       </div>
     </div>
-    <div  id="<[getInputResponsePairId()]>" ng-if="!getShortAnswerHtml()">
+    <div ng-if="!getShortAnswerHtml()">
       <div class="conversation-skin-learner-answer-content" angular-html-bind="getAnswerHtml()">
       </div>
     </div>
