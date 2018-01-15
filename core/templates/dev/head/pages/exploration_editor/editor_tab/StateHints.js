@@ -68,6 +68,11 @@ oppia.controller('StateHints', [
       var hintAsPlainText = (
         hint.hintContent.getHtml() ?
           $filter('convertToPlainText')(hint.hintContent.getHtml()) : '');
+      if (hintAsPlainText === '') {
+        hintAsPlainText = hint.hintContent.getHtml().split(
+          '-')[2].split(' ')[0];
+        hintAsPlainText = $filter('capitalize')(hintAsPlainText);
+      }
       return hintAsPlainText;
     };
 
