@@ -122,9 +122,13 @@ oppia.directive('audioBar', [
             var audioHeader = angular.element($('.audio-header:first'));
             if (scrollTop > lastScrollTop) {
               audioHeader.addClass('nav-up');
+              if (!$scope.audioBarIsExpanded) {
+                audioHeader.addClass('nav-hidden');
+              }
             } else if (scrollTop === 0 ||
                        scrollTop + $(window).height() < $(document).height()) {
               audioHeader.removeClass('nav-up');
+              audioHeader.removeClass('nav-hidden');
             }
             lastScrollTop = scrollTop;
           };
