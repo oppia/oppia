@@ -24,12 +24,12 @@ describe('SidebarStatusService', function() {
     SidebarStatusService = $injector.get('SidebarStatusService');
   }));
   
-  it('should open the sidebar if it is not open', function() {
+  it('should open the sidebar if its not open', function() {
     SidebarStatusService.openSidebar();
     expect(SidebarStatusService.isSidebarShown()).toBe(true);
   });
   
-  it('should close the sidebar when it is open', function() {
+  it('should close the sidebar when its open', function() {
     SidebarStatusService.openSidebar();
     SidebarStatusService.closeSidebar();
     expect(SidebarStatusService.isSidebarShown()).toBe(false);
