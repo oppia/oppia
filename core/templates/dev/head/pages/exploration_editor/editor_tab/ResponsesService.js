@@ -20,7 +20,7 @@
 oppia.factory('ResponsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
   'AnswerGroupsCacheService', 'EditorStateService', 'ChangeListService',
-  'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
+  'explorationStatesService', 'GraphDataService', 'OutcomeObjectFactory',
   'stateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ExplorationContextService', 'ExplorationWarningsService',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
@@ -28,7 +28,7 @@ oppia.factory('ResponsesService', [
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       AnswerGroupsCacheService, EditorStateService, ChangeListService,
-      explorationStatesService, graphDataService, OutcomeObjectFactory,
+      explorationStatesService, GraphDataService, OutcomeObjectFactory,
       stateSolutionService, SolutionVerificationService, AlertsService,
       ExplorationContextService, ExplorationWarningsService,
       INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
@@ -91,7 +91,7 @@ oppia.factory('ResponsesService', [
           }
         }
 
-        graphDataService.recompute();
+        GraphDataService.recompute();
         _answerGroupsMemento = angular.copy(newAnswerGroups);
       }
     };
@@ -126,7 +126,7 @@ oppia.factory('ResponsesService', [
           EditorStateService.getActiveStateName(),
           angular.copy(newDefaultOutcome));
 
-        graphDataService.recompute();
+        GraphDataService.recompute();
         _defaultOutcomeMemento = angular.copy(newDefaultOutcome);
       }
     };

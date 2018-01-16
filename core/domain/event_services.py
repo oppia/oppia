@@ -30,6 +30,7 @@ import feconf
     models.NAMES.statistics, models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 
+
 class BaseEventHandler(object):
     """Base class for event dispatchers."""
 

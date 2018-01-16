@@ -66,6 +66,7 @@ FILEPATHS_PROVIDED_TO_FRONTEND = (
 
 HASH_BLOCK_SIZE = 2**20
 
+
 def _minify(source_path, target_path):
     """Runs the given file through a minifier and outputs it to target_path.
 
@@ -77,6 +78,7 @@ def _minify(source_path, target_path):
     cmd = 'java -jar %s %s -o %s' % (
         YUICOMPRESSOR_DIR, source_path, target_path)
     subprocess.check_call(cmd, shell=True)
+
 
 def _insert_hash(filepath, file_hash):
     """Inserts hash into filepath before the file extension.
@@ -90,6 +92,7 @@ def _insert_hash(filepath, file_hash):
     """
     filepath, file_extension = os.path.splitext(filepath)
     return '%s.%s%s' % (filepath, file_hash, file_extension)
+
 
 def ensure_directory_exists(filepath):
     """Ensures if directory tree exists, if not creates the directories.

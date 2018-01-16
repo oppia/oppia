@@ -151,5 +151,6 @@ def main():
     benchmarker.generate_training_benchmarks()
     benchmarker.generate_prediction_benchmarks()
 
+
 if __name__ == '__main__':
     main()
