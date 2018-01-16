@@ -652,7 +652,7 @@ oppia.directive('conversationSkin', [
                               }
                             );
                           ExplorationPlayerService.recordLeftForRefresherExp(
-                            newStateName, refresherExpId);
+                            newStateName, refresherExplorationId);
                         }
                       });
                     }
