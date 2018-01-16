@@ -2182,9 +2182,13 @@ pre.oppia-pre-wrapped-text {
 */
 .oppia-rte-editor > p,
 .form-control.oppia-rte-content > div > p {
-  line-height: 28px;
+  line-height: 1.5;
   margin-bottom: 18px;
   margin-top: 18px;
+}
+
+.multiple-choice-content-container > span > p {
+  line-height: 1.5;
 }
 
 .oppia-rte-editor > p:first-child,
