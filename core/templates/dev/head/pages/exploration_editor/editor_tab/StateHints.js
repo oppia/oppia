@@ -45,7 +45,7 @@ oppia.controller('StateHints', [
       for (var i = 0; i < stateHintsService.displayed.length; i++) {
         if (
           stateHintsService.displayed[i].hintContent.getHtml().indexOf(
-            'latex') != -1) {
+            'latex') !== -1) {
           $scope.isHintLatex.push(true);
         } else {
           $scope.isHintLatex.push(false);
@@ -155,7 +155,7 @@ oppia.controller('StateHints', [
         ]
       }).result.then(function(result) {
         stateHintsService.displayed.push(result.hint);
-        if (result.hint.hintContent.getHtml().indexOf('latex') != -1) {
+        if (result.hint.hintContent.getHtml().indexOf('latex') !== -1) {
           $scope.isHintLatex.push(true);
         } else {
           $scope.isHintLatex.push(false);
