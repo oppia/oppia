@@ -24,6 +24,7 @@ import utils
 (classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])
 
+
 class ClassifierTrainingJob(object):
     """Domain object for a classifier training job.
 

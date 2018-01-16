@@ -1646,6 +1646,7 @@ def get_scaled_average_rating(ratings):
     wilson_score_lower_bound = (a - b)/(1 + z**2/n)
     return 1 + 4 * wilson_score_lower_bound
 
+
 def get_exploration_search_rank(exp_id):
     """Returns the search rank.
 

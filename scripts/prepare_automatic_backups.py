@@ -97,5 +97,6 @@ def update_yaml_files():
 def _prepare_for_prod():
     update_yaml_files()
 
+
 if __name__ == '__main__':
     _prepare_for_prod()

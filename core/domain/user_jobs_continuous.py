@@ -35,6 +35,7 @@ from google.appengine.ext import ndb
         models.NAMES.feedback, models.NAMES.user]))
 transaction_services = models.Registry.import_transaction_services()
 
+
 # TODO(bhenning): Implement a working real-time layer for the recent dashboard
 # updates aggregator job.
 class RecentUpdatesRealtimeModel(

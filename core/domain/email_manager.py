@@ -37,6 +37,7 @@ transaction_services = models.Registry.import_transaction_services()
 def log_new_error(*args, **kwargs):
     logging.error(*args, **kwargs)
 
+
 NOTIFICATION_EMAIL_LIST_SCHEMA = {
     'type': 'list',
     'items': {
@@ -672,6 +673,7 @@ def can_users_receive_thread_email(
                 and not user_exploration_prefs.mute_feedback_notifications)
 
     return result
+
 
 def send_suggestion_email(
         exploration_title, exploration_id, author_id, recipient_list):
