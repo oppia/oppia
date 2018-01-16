@@ -50,7 +50,7 @@ oppia.directive('tutorCard', [
         '/pages/exploration_player/' +
         'tutor_card_directive.html'),
       controller: [
-        '$scope', '$timeout', '$rootScope',
+        '$scope', '$timeout', '$rootScope', '$anchorScroll',
         'ExplorationPlayerService', 'PlayerPositionService', 'UrlService',
         'PlayerTranscriptService', 'ExplorationPlayerStateService',
         'WindowDimensionsService', 'DeviceInfoService', 'AudioPlayerService',
@@ -60,7 +60,7 @@ oppia.directive('tutorCard', [
         'EVENT_ACTIVE_CARD_CHANGED', 'EVENT_NEW_CARD_AVAILABLE',
         'COMPONENT_NAME_CONTENT', 'AUDIO_HIGHLIGHT_CSS_CLASS',
         function(
-          $scope, $timeout, $rootScope,
+          $scope, $timeout, $rootScope, $anchorScroll,
           ExplorationPlayerService, PlayerPositionService, UrlService,
           PlayerTranscriptService, ExplorationPlayerStateService,
           WindowDimensionsService, DeviceInfoService, AudioPlayerService,
@@ -189,6 +189,22 @@ oppia.directive('tutorCard', [
 
           $scope.$on('oppiaFeedbackAvailable', function() {
             $scope.waitingForOppiaFeedback = false;
+
+            // Auto scroll to the new feedback on mobile device.
+            if (DeviceInfoService.isMobileDevice()) {
+              var index = PlayerPositionService.getActiveCardIndex();
+              var activeCard = PlayerTranscriptService.getCard(index);
+              var latestFeedbackIndex = (
+                activeCard.inputResponsePairs.length - 1);
+              /* Reference: https://stackoverflow.com/questions/40134381
+                 $anchorScroll() without changing actual hash value of url works
+                 only when written inside a timeout of 0 ms. */
+              $anchorScroll.yOffset = 80;
+              $timeout((function() {
+                $anchorScroll(
+                  $scope.getInputResponsePairId(latestFeedbackIndex));
+              }), 0);
+            }
           });
 
           updateActiveCard();
