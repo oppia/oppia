@@ -16,7 +16,7 @@
       <select class="audio-language-select"
               ng-model="selectedLanguage.value"
               ng-options="o.value as o.displayed for o in languagesInExploration"
-              ng-style="hasPressedPlayButtonAtLeastOnce ? {'width': '36%'} : {'width': '60%'}"
+              ng-style="hasPressedPlayButtonAtLeastOnce ? {'width': '30%'} : {'width': '60%'}"
               ng-change="onNewLanguageSelected()"></select>
     </div>
   </div>
@@ -110,7 +110,6 @@
     font-size: 15px;
     margin-left: 5px;
     padding-left: 3px;
-    width: 36%;
   }
 
   .progress-bar-section {
