@@ -31,26 +31,15 @@ oppia.controller('StateHints', [
     $scope.EditorStateService = EditorStateService;
     $scope.stateHintsService = stateHintsService;
     $scope.activeHintIndex = null;
-    $scope.isHintLatex = [];
     $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/drag_dots.png');
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
-      $scope.isHintLatex = [];
       stateHintsService.init(
         EditorStateService.getActiveStateName(),
           stateData.interaction.hints);
-      for (var i = 0; i < stateHintsService.displayed.length; i++) {
-        if (
-          stateHintsService.displayed[i].hintContent.getHtml().indexOf(
-            'latex') !== -1) {
-          $scope.isHintLatex.push(true);
-        } else {
-          $scope.isHintLatex.push(false);
-        }
-      }
       $scope.activeHintIndex = null;
     });
 
@@ -77,9 +66,6 @@ oppia.controller('StateHints', [
     };
 
     $scope.getLatexSummary = function(index, hint) {
-      if (!$scope.isHintLatex[index]) {
-        return null;
-      }
       return hint.hintContent.getHtml();
     };
 
@@ -95,7 +81,6 @@ oppia.controller('StateHints', [
         } else {
           AlertsService.addInfoMessage('Deleting empty hint.');
           stateHintsService.displayed.splice(currentActiveIndex, 1);
-          $scope.isHintLatex.splice(currentActiveIndex,1);
           stateHintsService.saveDisplayedValue();
         }
       }
@@ -155,11 +140,6 @@ oppia.controller('StateHints', [
         ]
       }).result.then(function(result) {
         stateHintsService.displayed.push(result.hint);
-        if (result.hint.hintContent.getHtml().indexOf('latex') !== -1) {
-          $scope.isHintLatex.push(true);
-        } else {
-          $scope.isHintLatex.push(false);
-        }
         stateHintsService.saveDisplayedValue();
       });
     };
@@ -243,7 +223,6 @@ oppia.controller('StateHints', [
           openDeleteLastHintModal();
         } else {
           stateHintsService.displayed.splice(index, 1);
-          $scope.isHintLatex.splice(index,1);
           stateHintsService.saveDisplayedValue();
         }
       });
