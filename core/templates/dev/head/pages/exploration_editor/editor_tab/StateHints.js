@@ -65,10 +65,6 @@ oppia.controller('StateHints', [
       return hintAsPlainText;
     };
 
-    $scope.getLatexSummary = function(index, hint) {
-      return hint.hintContent.getHtml();
-    };
-
     $scope.changeActiveHintIndex = function(newIndex) {
       var currentActiveIndex = $scope.activeHintIndex;
       if (currentActiveIndex !== null && (
