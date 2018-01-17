@@ -50,7 +50,7 @@ oppia.directive('tutorCard', [
         '/pages/exploration_player/' +
         'tutor_card_directive.html'),
       controller: [
-        '$scope', '$timeout', '$rootScope', '$anchorScroll',
+        '$scope', '$timeout', '$rootScope', '$anchorScroll', '$location',
         'ExplorationPlayerService', 'PlayerPositionService', 'UrlService',
         'PlayerTranscriptService', 'ExplorationPlayerStateService',
         'WindowDimensionsService', 'DeviceInfoService', 'AudioPlayerService',
@@ -60,7 +60,7 @@ oppia.directive('tutorCard', [
         'EVENT_ACTIVE_CARD_CHANGED', 'EVENT_NEW_CARD_AVAILABLE',
         'COMPONENT_NAME_CONTENT', 'AUDIO_HIGHLIGHT_CSS_CLASS',
         function(
-          $scope, $timeout, $rootScope, $anchorScroll,
+          $scope, $timeout, $rootScope, $anchorScroll, $location,
           ExplorationPlayerService, PlayerPositionService, UrlService,
           PlayerTranscriptService, ExplorationPlayerStateService,
           WindowDimensionsService, DeviceInfoService, AudioPlayerService,
@@ -200,10 +200,9 @@ oppia.directive('tutorCard', [
                  $anchorScroll() without changing actual hash value of url works
                  only when written inside a timeout of 0 ms. */
               $anchorScroll.yOffset = 80;
-              $timeout((function() {
-                $anchorScroll(
-                  $scope.getInputResponsePairId(latestFeedbackIndex));
-              }), 0);
+              $location.hash(
+                $scope.getInputResponsePairId(latestFeedbackIndex));
+              $anchorScroll();
             }
           });
 
