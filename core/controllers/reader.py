@@ -732,7 +732,7 @@ class RecommendationsHandler(base.BaseHandler):
                 auto_recommended_exp_ids = (
                     collection.get_next_exploration_ids_in_sequence(
                         exploration_id))
-            if not auto_recommended_exp_ids and include_system_recommendations:
+            elif include_system_recommendations:
                 system_chosen_exp_ids = (
                     recommendations_services.get_exploration_recommendations(
                         exploration_id))

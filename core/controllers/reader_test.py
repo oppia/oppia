@@ -784,6 +784,20 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         # follow a linear path through the collection.
         self.assertEqual(recommendation_ids, [self.EXP_ID_21])
 
+    def test_logged_out_sysexps_no_authexps_last_exp_in_col_has_no_exps(self):
+        """Check there are not recommended explorations when a user is logged
+        out and completes the last exploration of the collection. This is true
+        even if there are system recommendations for the last exploration.
+        """
+        self._set_recommendations(
+            self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_8])
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_0, collection_id=self.COL_ID,
+            include_system_recommendations=True)
+        # The collection is completed, so no other explorations should be
+        # recommended.
+        self.assertEqual(recommendation_ids, [])
+
     def test_logged_out_no_sysexps_but_authexps_first_exp_in_col_has_exps(self):
         """Check there is are recommended explorations when a user is logged out
         and completes the first exploration of a collection where that
