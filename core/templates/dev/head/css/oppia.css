@@ -2187,7 +2187,7 @@ pre.oppia-pre-wrapped-text {
   margin-top: 18px;
 }
 
-.multiple-choice-content-container > span > p {
+.oppia-rte-content > div > p {
   line-height: 1.5;
 }
 
