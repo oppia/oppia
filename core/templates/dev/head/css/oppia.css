@@ -2181,14 +2181,10 @@ pre.oppia-pre-wrapped-text {
     the same line-height, margin-top and margin-bottom attributes)
 */
 .oppia-rte-editor > p,
-.form-control.oppia-rte-content > div > p {
+.oppia-rte-content > div > p {
   line-height: 1.5;
   margin-bottom: 18px;
   margin-top: 18px;
-}
-
-.oppia-rte-content > div > p {
-  line-height: 1.5;
 }
 
 .oppia-rte-editor > p:first-child,
