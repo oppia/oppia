@@ -645,7 +645,8 @@ def _check_import_order(all_files):
     summary_messages = []
     all_files = [
         filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.py')]
     failed = False
     for filename in all_files:
         # This line prints the error message along with file path
