@@ -18,10 +18,10 @@
 
 oppia.factory('ParameterMetadataService', [
   'explorationStatesService', 'ExpressionInterpolationService',
-  'explorationParamChangesService', 'graphDataService',
+  'explorationParamChangesService', 'GraphDataService',
   function(
       explorationStatesService, ExpressionInterpolationService,
-      explorationParamChangesService, graphDataService) {
+      explorationParamChangesService, GraphDataService) {
     var PARAM_ACTION_GET = 'get';
     var PARAM_ACTION_SET = 'set';
 
@@ -148,7 +148,7 @@ oppia.factory('ParameterMetadataService', [
       //     (e.g. one parameter may be set based on the value assigned to
       //     another parameter).
       getUnsetParametersInfo: function(initNodeIds) {
-        var graphData = graphDataService.getGraphData();
+        var graphData = GraphDataService.getGraphData();
 
         var states = explorationStatesService.getStates();
 

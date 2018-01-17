@@ -25,6 +25,7 @@ import utils
     models.NAMES.user
 ])
 
+
 def subscribe_to_thread(user_id, feedback_thread_id):
     """Subscribes a user to a feedback thread.
 

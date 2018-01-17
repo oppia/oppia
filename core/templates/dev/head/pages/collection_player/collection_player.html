@@ -317,7 +317,7 @@
             <div ng-class="{'oppia-activity-summary-tile-mobile-background-mask': explorationCardIsShown}" ng-click="closeOnClickingOutside()">
               <exploration-summary-tile ng-if="explorationCardIsShown"
                                         ng-click="onClickStopPropagation($event)"
-                                        collection-id="getCollectionId()"
+                                        collection-id="collectionId"
                                         exploration-id="currentExplorationId"
                                         exploration-title="summaryToPreview.title"
                                         last-updated-msec="summaryToPreview.last_updated_msec"
@@ -347,7 +347,7 @@
           </div>
         </md-card>
         <exploration-summary-tile ng-if="explorationCardIsShown"
-                                  collection-id="getCollectionId()"
+                                  collection-id="collectionId"
                                   exploration-id="currentExplorationId"
                                   exploration-title="summaryToPreview.title"
                                   last-updated-msec="summaryToPreview.last_updated_msec"

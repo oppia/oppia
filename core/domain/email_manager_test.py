@@ -1705,6 +1705,7 @@ class BulkEmailsTests(test_utils.GenericTestBase):
     RECIPIENT_A_USERNAME = 'usera'
     RECIPIENT_B_EMAIL = 'b@example.com'
     RECIPIENT_B_USERNAME = 'userb'
+
     def setUp(self):
         super(BulkEmailsTests, self).setUp()
         # SENDER is authorised sender.
