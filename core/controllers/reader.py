@@ -720,26 +720,19 @@ class RecommendationsHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         auto_recommended_exp_ids = []
+
         if self.user_id and collection_id:
-            next_exp_ids_in_collection = (
+            auto_recommended_exp_ids = (
                 collection_services.get_next_exploration_ids_to_complete_by_user(  # pylint: disable=line-too-long
                     self.user_id, collection_id))
-            auto_recommended_exp_ids = list(
-                set(next_exp_ids_in_collection) -
-                set(author_recommended_exp_ids))
         else:
-            next_exp_ids_in_collection = []
             if collection_id:
                 collection = collection_services.get_collection_by_id(
                     collection_id)
-                next_exp_ids_in_collection = (
+                auto_recommended_exp_ids = (
                     collection.get_next_exploration_ids_in_sequence(
                         exploration_id))
-            if next_exp_ids_in_collection:
-                auto_recommended_exp_ids = list(
-                    set(next_exp_ids_in_collection) -
-                    set(author_recommended_exp_ids))
-            elif include_system_recommendations:
+            if not auto_recommended_exp_ids and include_system_recommendations:
                 system_chosen_exp_ids = (
                     recommendations_services.get_exploration_recommendations(
                         exploration_id))
@@ -750,10 +743,12 @@ class RecommendationsHandler(base.BaseHandler):
                     filtered_exp_ids,
                     min(MAX_SYSTEM_RECOMMENDATIONS, len(filtered_exp_ids)))
 
+        recommended_exp_ids = set(
+            author_recommended_exp_ids + auto_recommended_exp_ids)
         self.values.update({
             'summaries': (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    author_recommended_exp_ids + auto_recommended_exp_ids)),
+                    recommended_exp_ids)),
         })
         self.render_json(self.values)
 
