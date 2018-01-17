@@ -643,7 +643,7 @@ def _check_import_order(all_files):
     print 'Starting import-order checks'
     print '----------------------------------------'
     summary_messages = []
-    all_files = [
+    files_to_check = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.py')]
