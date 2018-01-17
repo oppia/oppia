@@ -408,7 +408,7 @@ oppia.filter('stripFormatting', [function() {
 /* The following filter replaces each RTE element occurrence in the input html
    by its corresponding name in square brackets and returns a string
    which contains the name in the same location as in the input html.
-   eq: <p>Sample1 <oppia-noninteractive-math></oppia-noninteractive-math>
+   eg: <p>Sample1 <oppia-noninteractive-math></oppia-noninteractive-math>
         Sample2 </p>
    will give as output: Sample1 [Math] Sample2 */
 oppia.filter('formatRtePreview', ['$filter', function($filter) {
