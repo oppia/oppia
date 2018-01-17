@@ -705,6 +705,10 @@ oppia.directive('conversationSkin', [
                       scrollToBottom();
                     } else {
                       PlayerTranscriptService.addNewResponse(feedbackHtml);
+                      // If there is no feedback, it immediately moves on
+                      // to next card. Therefore $scope.answerIsCorrect needs
+                      // to be set to false before it proceeds to next card.
+                      $scope.answerIsCorrect = false;
                       $scope.showPendingCard(
                         newStateName,
                         newParams,
