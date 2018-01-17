@@ -404,3 +404,34 @@ oppia.filter('stripFormatting', [function() {
     return strippedText;
   };
 }]);
+
+/* The following filter replaces each RTE element occurrence in the input html
+   by its corresponding name in square brackets and returns a string
+   which contains the name in the same location as in the input html.
+   eq: <p>Sample1 <oppia-noninteractive-math></oppia-noninteractive-math>
+        Sample2 </p>
+   will give as output: Sample1 [Math] Sample2 */
+oppia.filter('formatRtePreview', ['$filter', function($filter) {
+  return function(html) {
+    html = html.replace(/&nbsp;/ig, ' ');
+    html = html.replace(/&quot;/ig, '');
+    //Replace all html tags other than <oppia-noninteractive-**> ones to ''
+    html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
+    html = html.split(/[<>]+/);
+    var formattedOutput = '';
+    for (var i = 0; i < html.length; i++) {
+      if (html[i].indexOf('oppia-noninteractive') !== -1) {
+        formattedOutput += '[' + $filter(
+          'capitalize')(html[i].split('-')[2].split(' ')[0]) + ']';
+      } else {
+        formattedOutput += html[i];
+      }
+      formattedOutput += ' ';
+    }
+    if (html[0] === '') {
+      formattedOutput = formattedOutput.substr(1);
+    }
+    formattedOutput = formattedOutput.slice(0, -1);
+    return formattedOutput;
+  }
+}]);
