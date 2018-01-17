@@ -641,11 +641,12 @@ def _check_import_order(all_files):
     print 'Starting import-order checks'
     print '----------------------------------------'
     summary_messages = []
-    all_files = [
+    files_to_check = [
         filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.py')]
     failed = False
-    for filename in all_files:
+    for filename in files_to_check:
         # This line prints the error message along with file path
         # and returns True if it finds an error else returns False
         # If check is set to True, isort simply checks the file and
