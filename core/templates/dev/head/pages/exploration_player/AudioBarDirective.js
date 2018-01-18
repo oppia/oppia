@@ -121,10 +121,14 @@ oppia.directive('audioBar', [
             var scrollTop = $(this).scrollTop();
             var audioHeader = angular.element($('.audio-header:first'));
             if (scrollTop > lastScrollTop) {
-              audioHeader.addClass('nav-up');
+              audioHeader.addClass('audio-bar-nav-up');
+              if (!$scope.audioBarIsExpanded) {
+                audioHeader.addClass('audio-bar-nav-hidden');
+              }
             } else if (scrollTop === 0 ||
                        scrollTop + $(window).height() < $(document).height()) {
-              audioHeader.removeClass('nav-up');
+              audioHeader.removeClass('audio-bar-nav-up');
+              audioHeader.removeClass('audio-bar-nav-hidden');
             }
             lastScrollTop = scrollTop;
           };

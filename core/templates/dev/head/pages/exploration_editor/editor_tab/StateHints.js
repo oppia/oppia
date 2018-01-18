@@ -54,9 +54,8 @@ oppia.controller('StateHints', [
     };
 
     $scope.getHintSummary = function(hint) {
-      var hintAsPlainText = (
-        hint.hintContent.getHtml() ?
-          $filter('convertToPlainText')(hint.hintContent.getHtml()) : '');
+      var hintAsPlainText = $filter(
+        'formatRtePreview')(hint.hintContent.getHtml());
       return hintAsPlainText;
     };
 
