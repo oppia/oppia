@@ -31,10 +31,11 @@ oppia.factory('RefresherExplorationConfirmationModalService', [
             'refresher_exploration_confirmation_modal_directive.html'),
           backdrop: 'static',
           controller: [
-            '$scope', '$uibModalInstance', '$window',
-            function($scope, $uibModalInstance, $window) {
+            '$scope', '$uibModalInstance', '$window', '$timeout',
+            function($scope, $uibModalInstance, $window, $timeout) {
               $scope.confirmRedirect = function() {
                 redirectConfirmationCallback();
+
                 var collectionId = UrlService.getUrlParams().collection_id;
                 var parentIdList = UrlService.getQueryFieldValuesAsList(
                   'parent');
@@ -51,8 +52,19 @@ oppia.factory('RefresherExplorationConfirmationModalService', [
                 }
                 url = UrlService.addField(
                   url, 'parent', ExplorationPlayerService.getExplorationId());
-                $window.open(url, '_self');
-                $uibModalInstance.dismiss('cancel');
+
+                // Wait a little before redirecting the page to ensure other
+                // tasks started here (e.g. event recording) have sufficient
+                // time to complete.
+                // TODO(bhenning): Find a reliable way to send events that does
+                // not get interrupted with browser redirection.
+                $timeout(function() {
+                  $window.open(url, '_self');
+                }, 150);
+
+                // Close the dialog to ensure the confirmation cannot be called
+                // multiple times.
+                $uibModalInstance.close();
               };
               $scope.cancelRedirect = function() {
                 $uibModalInstance.dismiss('cancel');
