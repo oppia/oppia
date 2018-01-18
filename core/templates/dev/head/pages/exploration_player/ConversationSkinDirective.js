@@ -654,10 +654,10 @@ oppia.directive('conversationSkin', [
                               function() {
                                 $scope.redirectToRefresherExplorationConfirmed =
                                   true;
+                                ExplorationPlayerService.recordLeaveForRefresherExp(
+                                  newStateName, refresherExplorationId);
                               }
                             );
-                          ExplorationPlayerService.recordLeaveForRefresherExp(
-                            newStateName, refresherExplorationId);
                         }
                       });
                     }
