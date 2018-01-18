@@ -417,7 +417,7 @@ oppia.filter('formatRtePreview', ['$filter', function($filter) {
     html = html.replace(/&quot;/ig, '');
     //Replace all html tags other than <oppia-noninteractive-**> ones to ''
     html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
-    formattedOutput = html.replace(/(<([^>]+)>)/g, function(rteTag) {
+    var formattedOutput = html.replace(/(<([^>]+)>)/g, function(rteTag) {
       var replaceString = $filter(
         'capitalize')(rteTag.split('-')[2].split(' ')[0]);
       if (replaceString[replaceString.length - 1] === '>') {
@@ -425,12 +425,6 @@ oppia.filter('formatRtePreview', ['$filter', function($filter) {
       }
       return ' [' + replaceString + '] ';
     });
-    if (formattedOutput[0] === ' ') {
-      formattedOutput = formattedOutput.substr(1);
-    }
-    if (formattedOutput[formattedOutput.length - 1] === ' ') {
-      formattedOutput = formattedOutput.slice(0, -1);
-    }
-    return formattedOutput;
+    return formattedOutput.trim();
   }
 }]);
