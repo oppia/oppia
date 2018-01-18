@@ -479,9 +479,9 @@ oppia.factory('ExplorationPlayerService', [
           StatsReportingService.recordSolutionHit(stateName);
         }
       },
-      recordLeftForRefresherExp: function(stateName, refresherExpId) {
+      recordLeaveForRefresherExp: function(stateName, refresherExpId) {
         if (!_editorPreviewMode) {
-          StatsReportingService.recordLeftForRefresherExp(
+          StatsReportingService.recordLeaveForRefresherExp(
             stateName, refresherExpId);
         }
       },

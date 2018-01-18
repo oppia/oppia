@@ -135,6 +135,9 @@ class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
+        self.assertEqual(
+            event_model.event_schema_version,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
 
 
 class CompleteExplorationEventLogEntryModelUnitTests(

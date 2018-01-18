@@ -228,7 +228,7 @@ class StateCompleteEventHandler(BaseEventHandler):
 
 
 class LeaveForRefresherExpEventHandler(BaseEventHandler):
-    """Event handler for recording leave for refresher exploration events."""
+    """Event handler for recording "leave for refresher exploration" events."""
 
     EVENT_TYPE = feconf.EVENT_TYPE_LEAVE_FOR_REFRESHER_EXP
 
