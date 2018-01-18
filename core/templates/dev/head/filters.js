@@ -143,7 +143,8 @@ oppia.filter('wrapTextWithEllipsis', [
 // values. Note that this returns an HTML string to accommodate the case of
 // multiple-choice input and image-click input.
 oppia.filter('parameterizeRuleDescription', [
-  'INTERACTION_SPECS', function(INTERACTION_SPECS) {
+  'INTERACTION_SPECS', 'FractionObjectFactory',
+  function(INTERACTION_SPECS, FractionObjectFactory) {
     return function(rule, interactionId, choices) {
       if (!rule) {
         return '';
@@ -230,6 +231,9 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = '"' + inputs[varName] + '"';
         } else if (varType === 'Graph') {
           replacementText = '[reference graph]';
+        } else if (varType === 'Fraction') {
+          replacementText = FractionObjectFactory
+            .fromDict(inputs[varName]).toString();
         } else {
           replacementText = inputs[varName];
         }
@@ -399,4 +403,28 @@ oppia.filter('stripFormatting', [function() {
       tagRegex, '') : '';
     return strippedText;
   };
+}]);
+
+/* The following filter replaces each RTE element occurrence in the input html
+   by its corresponding name in square brackets and returns a string
+   which contains the name in the same location as in the input html.
+   eg: <p>Sample1 <oppia-noninteractive-math></oppia-noninteractive-math>
+        Sample2 </p>
+   will give as output: Sample1 [Math] Sample2 */
+oppia.filter('formatRtePreview', ['$filter', function($filter) {
+  return function(html) {
+    html = html.replace(/&nbsp;/ig, ' ');
+    html = html.replace(/&quot;/ig, '');
+    //Replace all html tags other than <oppia-noninteractive-**> ones to ''
+    html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
+    var formattedOutput = html.replace(/(<([^>]+)>)/g, function(rteTag) {
+      var replaceString = $filter(
+        'capitalize')(rteTag.split('-')[2].split(' ')[0]);
+      if (replaceString[replaceString.length - 1] === '>') {
+        replaceString = replaceString.slice(0, -1);
+      }
+      return ' [' + replaceString + '] ';
+    });
+    return formattedOutput.trim();
+  }
 }]);

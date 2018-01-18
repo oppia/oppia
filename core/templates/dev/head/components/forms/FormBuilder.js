@@ -113,49 +113,6 @@ oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
   };
 }]);
 
-oppia.factory('schemaDefaultValueService', [function() {
-  return {
-    // TODO(sll): Rewrite this to take validators into account, so that
-    // we always start with a valid value.
-    getDefaultValue: function(schema) {
-      if (schema.choices) {
-        return schema.choices[0];
-      } else if (schema.type === 'bool') {
-        return false;
-      } else if (schema.type === 'unicode' || schema.type === 'html') {
-        return '';
-      } else if (schema.type === 'list') {
-        return [this.getDefaultValue(schema.items)];
-      } else if (schema.type === 'dict') {
-        var result = {};
-        for (var i = 0; i < schema.properties.length; i++) {
-          result[schema.properties[i].name] = this.getDefaultValue(
-            schema.properties[i].schema);
-        }
-        return result;
-      } else if (schema.type === 'int' || schema.type === 'float') {
-        return 0;
-      } else {
-        console.error('Invalid schema type: ' + schema.type);
-      }
-    }
-  };
-}]);
-
-oppia.factory('schemaUndefinedLastElementService', [function() {
-  return {
-    // Returns true if the input value, taken as the last element in a list,
-    // should be considered as 'undefined' and therefore deleted.
-    getUndefinedValue: function(schema) {
-      if (schema.type === 'unicode' || schema.type === 'html') {
-        return '';
-      } else {
-        return undefined;
-      }
-    }
-  };
-}]);
-
 oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
   var _EXTENSION_SELECTOR = '[class^=oppia-noninteractive-]';
 
@@ -186,10 +143,10 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
 }]);
 
 oppia.directive('textAngularRte', [
-  '$filter', '$timeout', 'HtmlEscaperService', 'rteHelperService',
+  '$filter', '$timeout', 'HtmlEscaperService', 'RteHelperService',
   'textAngularManager',
   function(
-    $filter, $timeout, HtmlEscaperService, rteHelperService,
+    $filter, $timeout, HtmlEscaperService, RteHelperService,
     textAngularManager) {
     return {
       restrict: 'E',
@@ -219,7 +176,7 @@ oppia.directive('textAngularRte', [
           $scope.placeholderText = $scope.uiConfig().placeholder;
         }
 
-        rteHelperService.getRichTextComponents().forEach(
+        RteHelperService.getRichTextComponents().forEach(
           function(componentDefn) {
             if (!($scope.uiConfig() &&
                 $scope.uiConfig().hide_complex_extensions &&
@@ -234,7 +191,7 @@ oppia.directive('textAngularRte', [
         $scope.toolbarOptionsJson = JSON.stringify(toolbarOptions);
 
         var _convertHtmlToRte = function(html) {
-          return rteHelperService.convertHtmlToRte(html);
+          return RteHelperService.convertHtmlToRte(html);
         };
 
         $scope.stripFormatting = function(html) {
@@ -270,7 +227,7 @@ oppia.directive('textAngularRte', [
           var displayedContent = $scope.isCustomizationModalOpen ?
             newVal :
             $filter('sanitizeHtmlForRte')(newVal);
-          $scope.htmlContent = rteHelperService.convertRteToHtml(
+          $scope.htmlContent = RteHelperService.convertRteToHtml(
             displayedContent);
         });
 
@@ -405,51 +362,6 @@ oppia.directive('requireIsFloat', ['$filter', function($filter) {
 
       ctrl.$parsers.unshift(floatValidator);
       ctrl.$formatters.unshift(floatValidator);
-    }
-  };
-}]);
-
-// Prevents timeouts due to recursion in nested directives. See:
-//
-//   http://stackoverflow.com/q/14430655
-oppia.factory('recursionHelper', ['$compile', function($compile) {
-  return {
-    /**
-     * Manually compiles the element, fixing the recursion loop.
-     * @param {DOM element} element
-     * @param {function|object} link - A post-link function, or an object with
-     *   function(s) registered via pre and post properties.
-     * @return {object} An object containing the linking functions.
-     */
-    compile: function(element, link) {
-      // Normalize the link parameter
-      if (angular.isFunction(link)) {
-        link = {
-          post: link
-        };
-      }
-
-      // Break the recursion loop by removing the contents,
-      var contents = element.contents().remove();
-      var compiledContents;
-      return {
-        pre: (link && link.pre) ? link.pre : null,
-        post: function(scope, element) {
-          // Compile the contents.
-          if (!compiledContents) {
-            compiledContents = $compile(contents);
-          }
-          // Re-add the compiled contents to the element.
-          compiledContents(scope, function(clone) {
-            element.append(clone);
-          });
-
-          // Call the post-linking function, if any.
-          if (link && link.post) {
-            link.post.apply(null, arguments);
-          }
-        }
-      };
     }
   };
 }]);

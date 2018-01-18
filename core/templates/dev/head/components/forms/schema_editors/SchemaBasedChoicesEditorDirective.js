@@ -17,8 +17,11 @@
  */
 
 oppia.directive('schemaBasedChoicesEditor', [
-  'recursionHelper', 'UrlInterpolationService',
-  function(recursionHelper, UrlInterpolationService) {
+  'NestedDirectivesRecursionTimeoutPreventionService',
+  'UrlInterpolationService',
+  function(
+    NestedDirectivesRecursionTimeoutPreventionService,
+    UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
@@ -33,7 +36,7 @@ oppia.directive('schemaBasedChoicesEditor', [
         '/components/forms/schema_editors/' +
         'schema_based_choices_editor_directive.html'),
       restrict: 'E',
-      compile: recursionHelper.compile,
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {
         $scope.getReadonlySchema = function() {
           var readonlySchema = angular.copy($scope.schema());

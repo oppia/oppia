@@ -72,7 +72,7 @@ oppia.directive('collectionNodeCreator', [
           };
 
           var isValidSearchQuery = function(searchQuery) {
-            if (/^[a-zA-Z0-9- ]*$/.test(searchQuery)) {
+            if (/^[a-zA-Z0-9-_ ]*$/.test(searchQuery)) {
               return true;
             }
             return;

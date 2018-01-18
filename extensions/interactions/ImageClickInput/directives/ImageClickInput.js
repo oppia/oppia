@@ -96,7 +96,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               return 'inline';
             }
           };
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
           });
           $scope.onMousemoveImage = function(event) {
