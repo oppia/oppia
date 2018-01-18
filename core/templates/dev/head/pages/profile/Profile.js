@@ -123,7 +123,7 @@ oppia.controller('Profile', [
 
       $scope.goToPreviousPage = function() {
         if ($scope.currentPageNumber === 0) {
-          console.log('Error: cannot decrement page');
+          // Change this condition?
         } else {
           $scope.currentPageNumber--;
         }

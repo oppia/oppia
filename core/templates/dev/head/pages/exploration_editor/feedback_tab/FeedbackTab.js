@@ -148,12 +148,12 @@ oppia.controller('FeedbackTab', [
           }
         },
         controller: [
-          '$scope', '$uibModalInstance', 'suggestionIsOpen', 
+          '$scope', '$uibModalInstance', 'suggestionIsOpen',
           'suggestionIsValid', 'unsavedChangesExist', 'suggestionStatus',
           'description', 'currentContent', 'newContent', 'EditabilityService',
           function(
-            $scope, $uibModalInstance, suggestionIsOpen, 
-            suggestionIsValid, unsavedChangesExist, suggestionStatus, 
+            $scope, $uibModalInstance, suggestionIsOpen,
+            suggestionIsValid, unsavedChangesExist, suggestionStatus,
             description, currentContent, newContent, EditabilityService) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
               'accepted.';
@@ -239,7 +239,7 @@ oppia.controller('FeedbackTab', [
               $rootScope.$broadcast('refreshStateEditor');
             }
           }, function() {
-            console.log('Error resolving suggestion');
+            // Remove this function?
           });
       });
     };

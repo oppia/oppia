@@ -88,7 +88,6 @@ if (argv.enable_sendmail) {
 var requireFilesExist = function(filePaths) {
   filePaths.forEach(function(filePath) {
     if (!fs.lstatSync(filePath).isFile()) {
-      console.log(filePath + ' is not a valid filepath, check spelling');
       process.exit();
     }
   });
@@ -97,8 +96,6 @@ var requireFilesExist = function(filePaths) {
 // Check if there are enough commands/actions/tasks to run gulp.
 var checkCommands = function(yargs, argv, numRequired) {
   if (argv._.length < numRequired) {
-    // Display help(usage) message.
-    console.log(yargs.help());
     // Stop gulp and exit.
     process.exit();
   }

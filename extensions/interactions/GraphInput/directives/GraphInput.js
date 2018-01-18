@@ -431,7 +431,6 @@ oppia.directive('graphViz', [
             }
           };
           $scope.onMousedownVertex = function(index) {
-            console.log('MOUSEDOWN');
             if ($scope.state.currentMode === _MODES.ADD_EDGE) {
               if ($scope.canAddEdge) {
                 beginAddEdge(index);
