@@ -656,6 +656,8 @@ oppia.directive('conversationSkin', [
                                   true;
                               }
                             );
+                          ExplorationPlayerService.recordLeftForRefresherExp(
+                            newStateName, refresherExplorationId);
                         }
                       });
                     }

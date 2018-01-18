@@ -227,6 +227,20 @@ class StateCompleteEventHandler(BaseEventHandler):
             time_spent_in_state_secs)
 
 
+class LeaveForRefresherExpEventHandler(BaseEventHandler):
+    """Event handler for recording leave for refresher exploration events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_LEAVE_FOR_REFRESHER_EXP
+
+    @classmethod
+    def _handle_event(
+            cls, exp_id, refresher_exp_id, exp_version, state_name, session_id,
+            time_spent_in_state_secs):
+        stats_models.LeaveForRefresherExplorationEventLogEntryModel.create(
+            exp_id, refresher_exp_id, exp_version, state_name, session_id,
+            time_spent_in_state_secs)
+
+
 class FeedbackThreadCreatedEventHandler(BaseEventHandler):
     """Event handler for recording new feedback thread creation events."""
 

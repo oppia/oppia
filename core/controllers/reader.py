@@ -437,6 +437,22 @@ class StateCompleteEventHandler(base.BaseHandler):
         self.render_json({})
 
 
+class LeaveForRefresherExpEventHandler(base.BaseHandler):
+    """Tracks a learner leaving an exploration for a refresher exploration."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        event_services.LeaveForRefresherExpEventHandler.record(
+            exploration_id, self.payload.get('refresher_exp_id'),
+            self.payload.get('exp_version'), self.payload.get('state_name'),
+            self.payload.get('session_id'),
+            self.payload.get('time_spent_in_state_secs'))
+        self.render_json({})
+
+
 class ClassifyHandler(base.BaseHandler):
     """Stateless handler that performs a classify() operation server-side and
     returns the corresponding classification result, which is a dict containing
