@@ -438,6 +438,6 @@ describe('Testing filters', function() {
         '-collapsible>Text input 2<oppia-noninteractive-image>' +
         '</oppia-noninteractive-image> Text Input 3 ')
       ).toEqual('[Math] Text input [Collapsible] Text input 2 [Image]  ' +
-      'Text Input 3 ');
+      'Text Input 3');
     }));
 });
