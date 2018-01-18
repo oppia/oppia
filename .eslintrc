@@ -19,7 +19,13 @@
       "off"
     ],
     "no-console": [
-      "off"
+      "error",
+      {
+        "allow":[
+          "error",
+          "warn"
+        ]
+      }
     ],
     "no-constant-condition": [
       "off"

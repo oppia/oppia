@@ -42,8 +42,7 @@ oppia.directive('promoBar', [
           // dismissed. Cookies allow for a longer-lived memory of whether the
           // promo is dismissed.
           $scope.promoIsVisible = !isPromoDismissed();
-          console.log('Promo is visible: ', $scope.promoIsVisible);
-
+          
           $scope.dismissPromo = function() {
             $scope.promoIsVisible = false;
             setPromoDismissed(true);
