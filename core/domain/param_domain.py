@@ -144,10 +144,10 @@ class ParamChange(object):
         return self._customization_args
 
     def to_dict(self):
-        """Returns a dict representing this Param domain object.
+        """Returns a dict representing this ParamChange domain object.
 
         Returns:
-            dict. A dict representation of the Param instance.
+            dict. A dict representation of the ParamChange instance.
         """
         return {
             'name': self.name,
