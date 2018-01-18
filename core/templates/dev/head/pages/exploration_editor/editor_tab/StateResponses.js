@@ -543,8 +543,9 @@ oppia.filter('summarizeAnswerGroup', [
 
       if (answerGroup.rules) {
         var firstRule = $filter('convertToPlainText')(
+          $filter('formatRtePreview')(
           $filter('parameterizeRuleDescription')(
-            answerGroup.rules[0], interactionId, answerChoices));
+            answerGroup.rules[0], interactionId, answerChoices)));
         summary = 'Answer ' + firstRule;
 
         if (hasFeedback && shortenRule) {
