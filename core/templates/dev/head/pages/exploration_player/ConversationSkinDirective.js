@@ -641,6 +641,13 @@ oppia.directive('conversationSkin', [
                     $scope.redirectToRefresherExplorationConfirmed = false;
 
                     if (refresherExplorationId) {
+                      // TODO(bhenning): Add tests to verify the event is
+                      // properly recorded.
+                      var confirmRedirection = function() {
+                        $scope.redirectToRefresherExplorationConfirmed = true;
+                        ExplorationPlayerService.recordLeaveForRefresherExp(
+                          newStateName, refresherExplorationId);
+                      };
                       $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
                         params: {
                           stringified_exp_ids: JSON.stringify(
@@ -650,12 +657,7 @@ oppia.directive('conversationSkin', [
                         if (response.data.summaries.length > 0) {
                           RefresherExplorationConfirmationModalService.
                             displayRedirectConfirmationModal(
-                              refresherExplorationId,
-                              function() {
-                                $scope.redirectToRefresherExplorationConfirmed =
-                                  true;
-                              }
-                            );
+                              refresherExplorationId, confirmRedirection);
                         }
                       });
                     }

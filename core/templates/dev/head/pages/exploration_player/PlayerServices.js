@@ -479,6 +479,12 @@ oppia.factory('ExplorationPlayerService', [
           StatsReportingService.recordSolutionHit(stateName);
         }
       },
+      recordLeaveForRefresherExp: function(stateName, refresherExpId) {
+        if (!_editorPreviewMode) {
+          StatsReportingService.recordLeaveForRefresherExp(
+            stateName, refresherExpId);
+        }
+      },
       // Returns whether the screen is wide enough to fit two
       // cards (e.g., the tutor and supplemental cards) side-by-side.
       canWindowShowTwoCards: function() {

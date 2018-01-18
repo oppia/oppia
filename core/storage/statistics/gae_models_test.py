@@ -110,6 +110,31 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
 
+
+class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
+        test_utils.GenericTestBase):
+    """Test the LeaveForRefresherExplorationEventLogEntryModel class."""
+
+    def test_create_and_get_event_models(self):
+        event_id = (
+            stat_models.LeaveForRefresherExplorationEventLogEntryModel.create(
+                'exp_id1', 'exp_id2', 1, 'state_name1', 'session_id1', 0.0))
+
+        event_model = (
+            stat_models.LeaveForRefresherExplorationEventLogEntryModel.get(
+                event_id))
+
+        self.assertEqual(event_model.exp_id, 'exp_id1')
+        self.assertEqual(event_model.refresher_exp_id, 'exp_id2')
+        self.assertEqual(event_model.exp_version, 1)
+        self.assertEqual(event_model.state_name, 'state_name1')
+        self.assertEqual(event_model.session_id, 'session_id1')
+        self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
+        self.assertEqual(
+            event_model.event_schema_version,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+
+
 class CompleteExplorationEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
     """Test the CompleteExplorationEventLogEntryModel class."""
