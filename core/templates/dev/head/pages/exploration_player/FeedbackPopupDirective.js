@@ -83,6 +83,7 @@ oppia.directive('feedbackPopup', [
               }
             }
             if (!popoverChildElt) {
+              $log.error('Could not close popover element.');
               return undefined;
             }
 
@@ -98,6 +99,7 @@ oppia.directive('feedbackPopup', [
             }
 
             if (!triggerElt) {
+              $log.error('Could not find popover trigger.');
               return undefined;
             }
 

@@ -123,7 +123,7 @@ oppia.controller('Profile', [
 
       $scope.goToPreviousPage = function() {
         if ($scope.currentPageNumber === 0) {
-          // Change this condition?
+          $log.error('Error: cannot decrement page');
         } else {
           $scope.currentPageNumber--;
         }
@@ -131,7 +131,7 @@ oppia.controller('Profile', [
       $scope.goToNextPage = function() {
         if ($scope.currentPageNumber * $scope.PAGE_SIZE >= (
             data.edited_exp_summary_dicts.length)) {
-          // Change this condition?
+          $log.error('Error: Cannot increment page');
         } else {
           $scope.currentPageNumber++;
         }

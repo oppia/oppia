@@ -239,7 +239,7 @@ oppia.controller('FeedbackTab', [
               $rootScope.$broadcast('refreshStateEditor');
             }
           }, function() {
-            // Remove this function?
+            $log.error('Error resolving suggestion');
           });
       });
     };
