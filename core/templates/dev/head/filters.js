@@ -399,7 +399,7 @@ oppia.filter('stripFormatting', [function() {
     // or is the bold or italics tags.
     var tagRegex = new RegExp(
       '(?!<img.*class=".*(' + whitelistedImgClasses.join('|') +
-      ').*".*>)(?!<b>|<\/b>|<i>|<\/i>)<[^>]+>', 'gm');
+      ').*".*>)(?!<b>|<\/b>|<i>|<\/i>|<p>|<\/p>|<br)<[^>]+>', 'gm');
     var strippedText = html ? String(html).replace(styleRegex, '') : '';
     strippedText = strippedText ? String(strippedText).replace(
       tagRegex, '') : '';
