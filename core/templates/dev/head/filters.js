@@ -143,8 +143,8 @@ oppia.filter('wrapTextWithEllipsis', [
 // values. Note that this returns an HTML string to accommodate the case of
 // multiple-choice input and image-click input.
 oppia.filter('parameterizeRuleDescription', [
-  'INTERACTION_SPECS', 'FractionObjectFactory',
-  function(INTERACTION_SPECS, FractionObjectFactory) {
+  '$filter', 'INTERACTION_SPECS', 'FractionObjectFactory',
+  function( $filter, INTERACTION_SPECS, FractionObjectFactory) {
     return function(rule, interactionId, choices) {
       if (!rule) {
         return '';
@@ -188,7 +188,7 @@ oppia.filter('parameterizeRuleDescription', [
             replacementText = '[';
             var key = inputs[varName];
             for (var i = 0; i < key.length; i++) {
-              replacementText += key[i];
+              replacementText += $filter('formatRtePreview')(key[i]);
               if (i < key.length - 1) {
                 replacementText += ',';
               }
@@ -198,7 +198,9 @@ oppia.filter('parameterizeRuleDescription', [
             // The following case is for MultipleChoiceInput
             for (var i = 0; i < choices.length; i++) {
               if (choices[i].val === inputs[varName]) {
-                replacementText = '\'' + choices[i].label + '\'';
+                var filteredLabelText =
+                  $filter('formatRtePreview')(choices[i].label);
+                replacementText = '\'' + filteredLabelText + '\'';
               }
             }
           }
