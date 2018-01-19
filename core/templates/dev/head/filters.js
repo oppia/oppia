@@ -185,18 +185,19 @@ oppia.filter('parameterizeRuleDescription', [
         // ItemSelectionInput.
         if (choices) {
           if (varType === 'SetOfHtmlString') {
-            replacementText = '';
-            for (var i = 0; i < choices.length; i++) {
-              if (choices[i].label.indexOf('oppia-noninteractive') !== -1) {
-                replacementText +=
-                  $filter('formatRtePreview')(choices[i].label);
+            replacementText = '[';
+            var key = inputs[varName];
+            for (var i = 0; i < key.length; i++) {
+              if (key[i].indexOf('oppia-noninteractive') !== -1) {
+                replacementText += $filter('formatRtePreview')(key[i]);
               } else {
-                replacementText += choices[i].label;
+                replacementText += key[i];
               }
-              if (i < choices.length - 1) {
+              if (i < key.length - 1) {
                 replacementText += ',';
               }
             }
+            replacementText += ']';
           } else {
             // The following case is for MultipleChoiceInput
             for (var i = 0; i < choices.length; i++) {
@@ -204,7 +205,7 @@ oppia.filter('parameterizeRuleDescription', [
                 if (choices[i].label.indexOf('oppia-noninteractive') !== -1) {
                   choices[i].label =
                     $filter('formatRtePreview')(choices[i].label);
-                } 
+                }
                 replacementText = '\'' + choices[i].label + '\'';
               }
             }
