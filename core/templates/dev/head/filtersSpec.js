@@ -440,4 +440,79 @@ describe('Testing filters', function() {
       ).toEqual('[Math] Text input [Collapsible] Text input 2 [Image]  ' +
       'Text Input 3');
     }));
+
+  it('should correctly display RTE components in Answer Group Header',
+    inject(function($filter) {
+      var ruleMath = {
+        type: 'Equals',
+        inputs: {
+          x: 2
+        }
+      };
+      var interactionIdMath = 'TextInput';
+      var choicesMath = [
+        {
+          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+            'x^3 - a x^2 - b x - c&amp;quot;"></oppia-noninteractive-math>',
+          val: 0
+        }, {
+          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+            'x^3 + (a+b+c)x^2 + (ab+bc+ca)x + abc&amp;quot;">' +
+            '</oppia-noninteractive-math>',
+          val: 1
+        }, {
+          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+            'x^3 - (a+b+c)x^2 + (ab+bc+ca)x - abc&amp;quot;">' +
+            '</oppia-noninteractive-math>',
+          val: 2
+        }, {
+          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+            'x^3 + (a+b+c)x^2 - (ab+bc+ca)x + abc&amp;quot;">' +
+            '</oppia-noninteractive-math>',
+          val: 3
+        },
+      ];
+
+      var ruleMixed = {
+        type: 'Equals',
+        inputs: {
+          x: 0
+        }
+      };
+      var interactionIdMixed = 'TextInput';
+      var choicesMixed = [
+        {
+          label: '<p><oppia-noninteractive-image alt-with-value="&amp;' +
+            'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+            'filepath-with-value="&amp;quot;img_20180112_170413_5jxq15ngmd' +
+            '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
+            'input.</p><p><oppia-noninteractive-image alt-with-value="&amp;' +
+            'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+            'filepath-with-value="&amp;quot;img_20180112_170436_k7sz3xtvyy.' +
+            'png&amp;quot;"></oppia-noninteractive-image></p><p><oppia-' +
+            'noninteractive-link text-with-value="&amp;quot;&amp;quot;"' +
+            'url-with-value="&amp;quot;https://www.example.com&amp;quot;">' +
+            '</oppia-noninteractive-link><br><br></p>',
+          val: 0
+        }, {
+          label: '<p><oppia-noninteractive-image alt-with-value="&amp;quot;' +
+            'g&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-' +
+            'with-value="&amp;quot;img_20180112_170500_926cssn398.png&amp;' +
+            'quot;"></oppia-noninteractive-image><br></p>',
+          val: 1
+        }
+      ];
+
+      expect($filter('convertToPlainText')($filter('formatRtePreview')(
+        $filter('parameterizeRuleDescription')(ruleMath, interactionIdMath,
+          choicesMath)))
+      ).toEqual('is ' + 'equal to \'[Math]\'');
+
+      expect($filter('convertToPlainText')($filter('formatRtePreview')(
+        $filter('parameterizeRuleDescription')(ruleMixed, interactionIdMixed,
+        choicesMixed)))
+      ).toEqual('is ' + 'equal to \'[Image] This is a text ' +
+        'input. [Image]  [Link]\'');
+    }
+  ));
 });
