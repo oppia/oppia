@@ -506,13 +506,13 @@ describe('Testing filters', function() {
       expect($filter('convertToPlainText')($filter('formatRtePreview')(
         $filter('parameterizeRuleDescription')(ruleMath, interactionIdMath,
           choicesMath)))
-      ).toEqual('is ' + 'equal to \' [Math] \'');
+      ).toEqual('is ' + 'equal to \'[Math]\'');
 
       expect($filter('convertToPlainText')($filter('formatRtePreview')(
         $filter('parameterizeRuleDescription')(ruleMixed, interactionIdMixed,
         choicesMixed)))
-      ).toEqual('is ' + 'equal to \' [Image] This is a text ' +
-        'input. [Image]  [Link] \'');
+      ).toEqual('is ' + 'equal to \'[Image] This is a text ' +
+        'input. [Image]  [Link]\'');
     }
   ));
 });
