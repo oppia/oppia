@@ -376,8 +376,14 @@ class CollectionSkill(object):
         self.question_ids = question_ids
 
     def to_dict(self):
-        # Note to developers: ensure this matches the frontend in
-        # CollectionSkillObjectFactory
+        """Returns the dict of CollectionSkill object.
+
+        Note to developers: Ensure this matches the frontend in
+        CollectionSkillObjectFactory.
+
+        Returns:
+            dict. The dict of CollectionSkill object.
+        """
         return {
             'name': self.name,
             'question_ids': self.question_ids
@@ -385,6 +391,15 @@ class CollectionSkill(object):
 
     @classmethod
     def from_dict(cls, skill_id, skill_dict):
+        """Returns the CollectionSkill object.
+
+        Args:
+            skill_id: str. The skill ID.
+            skill_dict: dict. The skill dict.
+
+        Returns:
+            Object. The CollectionSkill object.
+        """
         return cls(
             skill_id,
             skill_dict['name'],
@@ -393,6 +408,17 @@ class CollectionSkill(object):
 
     @staticmethod
     def get_skill_id_from_index(index):
+        """Returns the skill ID from the given index.
+
+        Args:
+            index: str. The index of the collection skill.
+
+        Raises:
+            ValidationError: If the expected index is non-integer or negative.
+
+        Returns:
+            str. The skill ID along with the corresponding index.
+        """
         if not isinstance(index, int):
             raise utils.ValidationError(
                 'Expected index to be an integer, received %s' % index)
@@ -405,6 +431,15 @@ class CollectionSkill(object):
 
     @staticmethod
     def validate_skill_id(skill_id):
+        """Validates the given skill ID.
+
+        Args:
+            skill_id: str. The skill ID.
+
+        Raises:
+            ValidationError: If the skill ID is not a string of length at least
+                6 and does not begin and end with a number.
+        """
         if not isinstance(skill_id, basestring):
             raise utils.ValidationError(
                 'Expected skill ID to be a string, received %s' % skill_id)
