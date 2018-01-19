@@ -155,7 +155,8 @@ describe('Embedding', function() {
           var elem = driver.findElement(
             by.xpath("//input[@id='embedding-submit-btn'")).click();
         */
-        driver.executeScript('window.update()');
+        driver.findElement(
+          by.xpath("//input[@id='embedding-submit-btn']")).click();
 
         // Test of standard loading (new and old versions)
         browser.switchTo().frame(
@@ -222,7 +223,7 @@ describe('Embedding', function() {
       });
 
       users.logout();
-      general.checkForConsoleErrors(['.*idToBeReplaced.*']);
+      general.checkForConsoleErrors([]);
     });
   });
 
@@ -237,7 +238,8 @@ describe('Embedding', function() {
 
       driver.findElement(by.xpath(
         "//input[@id='embedding-exploration-id']")).sendKeys(explorationId);
-      driver.executeScript('window.update()');
+      driver.findElement(
+        by.xpath("//input[@id='embedding-submit-btn']")).click();
 
       browser.switchTo().frame(driver.findElement(by.xpath(
           "//div[@class='protractor-test-embedded-exploration']/iframe")));
