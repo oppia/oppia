@@ -396,10 +396,10 @@ oppia.filter('stripFormatting', [function() {
     var styleRegex = new RegExp(' style=\"[^\"]+\"', 'gm');
     // Strip out anything between and including <>,
     // unless it is an img whose class includes one of the whitelisted classes
-    // or is the bold or italics tags.
+    // or is the bold or italics or paragraph or breakline tags.
     var tagRegex = new RegExp(
       '(?!<img.*class=".*(' + whitelistedImgClasses.join('|') +
-      ').*".*>)(?!<b>|<\/b>|<i>|<\/i>)<[^>]+>', 'gm');
+      ').*".*>)(?!<b>|<\/b>|<i>|<\/i>|<p>|<\/p>|<br>)<[^>]+>', 'gm');
     var strippedText = html ? String(html).replace(styleRegex, '') : '';
     strippedText = strippedText ? String(strippedText).replace(
       tagRegex, '') : '';
