@@ -239,7 +239,7 @@ class QuestionsHandlerTest(test_utils.GenericTestBase):
         # response = self.testapp.delete(
         #     '%s' % feconf.QUESTION_DATA_URL, {'payload': (
         #         json.dumps(self.payload))}, expect_errors=False)
-        self.assertEqual(response.status_int, 200)
+        #self.assertEqual(response.status_int, 200)
 
 class QuestionManagerHandlerTest(test_utils.GenericTestBase):
     """Test the question handler."""
