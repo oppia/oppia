@@ -100,11 +100,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         question_id = question_services.add_question(self.owner_id, question)
         with self.assertRaisesRegexp(Exception, (
-            'The question with ID %s is not present in collection with ID random' %
+            'The question with ID %s is not present in collection with ID random' % # pylint: disable=line-too-long
             (question_id))):
-            question_services.delete_question(self.owner_id, 'random',(
+            question_services.delete_question(self.owner_id, 'random', (
                 question_id))
-        question_services.delete_question(self.owner_id, 'col1',(
+        question_services.delete_question(self.owner_id, 'col1', (
             question_id))
 
         with self.assertRaisesRegexp(Exception, (
@@ -131,13 +131,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                        'old_value': 'A Question'}
         change_list = [question_domain.QuestionChange(change_dict)]
         with self.assertRaisesRegexp(Exception, (
-            'The question with ID %s is not present in collection with ID random' %
+            'The question with ID %s is not present in collection with ID random' % # pylint: disable=line-too-long
             (question_id))):
             question_services.update_question(
                 self.owner_id, 'random', question_id, change_list, 'updated')
 
         question_services.update_question(
-            self.owner_id, collection_id, question_id, change_list,(
+            self.owner_id, collection_id, question_id, change_list, (
                 'updated title'))
 
         model = question_models.QuestionModel.get(question_id)

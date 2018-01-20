@@ -263,7 +263,7 @@ class QuestionSummary(object):
             Dict. A dict of Question Summary object.
         """
         return {
-        'question_id': self.question_id,
-        'question_title': self.question_title,
-        'skills': self.skills
+            'question_id': self.question_id,
+            'question_title': self.question_title,
+            'skills': self.skills
         }

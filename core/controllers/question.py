@@ -55,7 +55,7 @@ class QuestionsHandler(base.BaseHandler):
         question = question_domain.Question.from_dict(
             self.payload.get('question'))
         question_id = question_services.add_question(
-                self.user_id, question)
+            self.user_id, question)
         return self.render_json({
             'question_id': question_id
         })
@@ -78,7 +78,8 @@ class QuestionsHandler(base.BaseHandler):
             change) for change in (
                 json.loads(self.payload.get('change_list')))]
         question_services.update_question(
-            self.user_id, collection_id, question_id, change_list, commit_message)
+            self.user_id, collection_id, question_id, change_list, (
+                commit_message))
         return self.render_json({
             'question_id': question_id
         })
@@ -107,8 +108,8 @@ class QuestionManagerHandler(base.BaseHandler):
             raise self.PageNotFoundException
         question_summaries = (
             [question_summary.to_dict() for question_summary in (
-            question_services.get_question_summaries_for_collection(
-                collection_id))])
+                question_services.get_question_summaries_for_collection(
+                    collection_id))])
         return self.render_json({
             'question_summaries': question_summaries
             })

@@ -169,9 +169,9 @@ class QuestionSummaryDomainTest(test_utils.GenericTestBase):
 
     def test_to_dict(self):
         expected_object = {
-        'question_id': 'col1.abc',
-        'question_title': 'hello',
-        'skills': ['skill1', 'skill2']
+            'question_id': 'col1.abc',
+            'question_title': 'hello',
+            'skills': ['skill1', 'skill2']
         }
         observed_object = question_domain.QuestionSummary(
             'col1.abc', 'hello', ['skill1', 'skill2'])

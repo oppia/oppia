@@ -70,7 +70,7 @@ def add_question(committer_id, question):
 
 
 def delete_question(
-    committer_id, collection_id, question_id, force_deletion=False):
+        committer_id, collection_id, question_id, force_deletion=False):
     """Deletes the question with the given question_id.
 
     Args:
@@ -89,7 +89,7 @@ def delete_question(
     question = get_question_by_id(question_id)
     if collection_id != question.collection_id:
         raise Exception(
-            'The question with ID %s is not present in collection with ID %s' % (
+            'The question with ID %s is not present in collection with ID %s' % ( # pylint: disable=line-too-long
                 question_id, collection_id))
     question_model = question_models.QuestionModel.get(question_id)
     question_model.delete(
@@ -229,7 +229,7 @@ def _save_question(committer_id, question, change_list, commit_message):
 
 
 def update_question(
-    committer_id, collection_id, question_id, change_list, commit_message):
+        committer_id, collection_id, question_id, change_list, commit_message):
     """Updates a question. Commits changes.
 
     Args:
@@ -249,7 +249,7 @@ def update_question(
     question = get_question_by_id(question_id)
     if collection_id != question.collection_id:
         raise Exception(
-            'The question with ID %s is not present in collection with ID %s' % (
+            'The question with ID %s is not present in collection with ID %s' % ( # pylint: disable=line-too-long
                 question_id, collection_id))
     updated_question = apply_change_list(question_id, change_list)
     _save_question(
@@ -327,11 +327,10 @@ def get_questions_batch(
 
 
 def get_question_summaries_for_collection(collection_id):
-    """Gets a list of question summaries for a collection based on the skill_ids and sorts by given arg.
+    """Gets a list of question summaries for a collection.
 
     Args:
         collection_id: str. ID of the collection.
-        skill_ids: list(str). A list of skill IDs.
 
     Returns:
         list(QuestionSummary). A list of Question Summary objects.
