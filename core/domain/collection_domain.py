@@ -398,7 +398,7 @@ class CollectionSkill(object):
             skill_dict: dict. The skill dict.
 
         Returns:
-            Object. The CollectionSkill object.
+            CollectionSkill. The CollectionSkill object.
         """
         return cls(
             skill_id,
@@ -411,10 +411,10 @@ class CollectionSkill(object):
         """Returns the skill ID from the given index.
 
         Args:
-            index: str. The index of the collection skill.
+            index: int. The index of the collection skill.
 
         Raises:
-            ValidationError: If the expected index is non-integer or negative.
+            ValidationError: The expected index is non-integer or negative.
 
         Returns:
             str. The skill ID along with the corresponding index.
@@ -437,7 +437,7 @@ class CollectionSkill(object):
             skill_id: str. The skill ID.
 
         Raises:
-            ValidationError: If the skill ID is not a string of length at least
+            ValidationError: The skill ID is not a string of length at least
                 6 and does not begin and end with a number.
         """
         if not isinstance(skill_id, basestring):
