@@ -31,21 +31,20 @@ describe('Answer Classification Object Factory', function() {
     var answerClassificationResult = (
       AnswerClassificationResultObjectFactory.createNew(
         {
-            dest: 'default',
-            feedback: {
-              html: '',
-              audio_translations: {}
-            }, param_changes: []
+          dest: 'default',
+          feedback: {
+            html: '',
+            audio_translations: {}
+          }, param_changes: []
         }, 1, 0, EXPLICIT_CLASSIFICATION));
 
     expect(answerClassificationResult.outcome).toEqual({
-            dest: 'default',
-            feedback: {
-              html: '',
-              audio_translations: {}
-            },
-            param_changes: []
-          });
+      dest: 'default',
+      feedback: {
+        html: '',
+        audio_translations: {}
+        },param_changes: []
+      });
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(
