@@ -208,8 +208,8 @@ oppia.factory('StatsReportingService', [
               newStateName)) {
             createDefaultStateStatsMapping(newStateName);
           }
-          aggregatedStats.state_stats_mapping[newStateName].total_hit_count +=
-            1;
+          aggregatedStats.state_stats_mapping[newStateName].total_hit_count += (
+            1);
           if (isFirstHit) {
             aggregatedStats.state_stats_mapping[
               newStateName].first_hit_count += 1;
