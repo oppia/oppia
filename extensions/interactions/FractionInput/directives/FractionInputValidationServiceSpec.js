@@ -204,7 +204,8 @@ describe('FractionInputValidationService', function() {
     expect(warnings).toEqual([]);
   });
 
-  it('should catch identical rules as redundant', function() {
+  it('should catch equivalent followed by equals same number' +
+    'as redundant', function() {
     answerGroups[0].rules = [equivalentToOneRule, equalsOneRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,

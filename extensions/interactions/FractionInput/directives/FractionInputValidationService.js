@@ -81,14 +81,14 @@ oppia.factory('FractionInputValidationService', [
             upperBoundConditionIsSatisfied;
         };
 
-        var shouldCheckRangeCriteria = function(rule1, rule2) {
+        var shouldCheckRangeCriteria = function(earlierRule, laterRule) {
           if (
-            (rule1.type === 'IsExactlyEqualTo' &&
-            rule2.type === 'IsExactlyEqualTo') ||
-            (rule1.type === 'IsExactlyEqualTo' &&
-            rule2.type === 'IsEquivalentTo') ||
-            (rule1.type === 'IsExactlyEqualTo' &&
-            rule2.type === 'IsEquivalentToAndInSimplestForm')) {
+            (earlierRule.type === 'IsExactlyEqualTo' &&
+            laterRule.type === 'IsExactlyEqualTo') ||
+            (earlierRule.type === 'IsExactlyEqualTo' &&
+            laterRule.type === 'IsEquivalentTo') ||
+            (earlierRule.type === 'IsExactlyEqualTo' &&
+            laterRule.type === 'IsEquivalentToAndInSimplestForm')) {
             return false;
           }
           return true;
@@ -205,9 +205,9 @@ oppia.factory('FractionInputValidationService', [
             }
             for (var k = 0; k < ranges.length; k++) {
               if (isEnclosedBy(range, ranges[k])) {
-                var rule2 = answerGroups[ranges[k].answerGroupIndex - 1]
+                var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1]
                   .rules[ranges[k].ruleIndex - 1];
-                if (shouldCheckRangeCriteria(rule2, rule)) {
+                if (shouldCheckRangeCriteria(earlierRule, rule)) {
                   warningsList.push({
                     type: WARNING_TYPES.ERROR,
                     message: (
