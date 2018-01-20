@@ -43,8 +43,8 @@ describe('Answer Classification Object Factory', function() {
       feedback: {
         html: '',
         audio_translations: {}
-        },param_changes: []
-      });
+      },param_changes: []
+    });
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(
