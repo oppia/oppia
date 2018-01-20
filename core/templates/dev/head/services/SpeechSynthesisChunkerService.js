@@ -98,6 +98,7 @@ oppia.factory('SpeechSynthesisChunkerService', [
       // IMPORTANT!! Do not remove: Logging the object out fixes some onend
       // firing issues. Placing the speak invocation inside a callback
       // fixes ordering and onend issues.
+      // eslint-disable-next-line no-console
       console.log(newUtterance);
       $timeout(function () {
         speechSynthesis.speak(newUtterance);
