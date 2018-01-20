@@ -39,7 +39,7 @@ oppia.factory('StateImprovementSuggestionService', [
             var noAnswerSubmittedCount = stateStats.no_submitted_answer_count;
           }
 
-          if (totalEntryCount == 0) {
+          if (totalEntryCount === 0) {
             return;
           }
 

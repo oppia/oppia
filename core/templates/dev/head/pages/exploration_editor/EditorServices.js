@@ -550,7 +550,7 @@ oppia.factory('explorationStatesService', [
         saveStateProperty(stateName, 'solution', newSolution);
       },
       isInitialized: function() {
-        return _states != null;
+        return _states !== null;
       },
       addState: function(newStateName, successCallback) {
         newStateName = $filter('normalizeWhitespace')(newStateName);

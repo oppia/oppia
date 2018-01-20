@@ -6,6 +6,10 @@
     "html"
   ],
   "rules": {
+    "eqeqeq": [
+      "error",
+      "always"
+    ],
     "no-empty": [
       "error",
       {

@@ -67,7 +67,7 @@ oppia.factory('UrlService', ['$window', function($window) {
     addField: function(url, fieldName, fieldValue) {
       var encodedFieldValue = encodeURIComponent(fieldValue);
       var encodedFieldName = encodeURIComponent(fieldName);
-      return url + (url.indexOf('?') != -1 ? '&' : '?') + encodedFieldName +
+      return url + (url.indexOf('?') !== -1 ? '&' : '?') + encodedFieldName +
         '=' + encodedFieldValue;
     },
     getHash: function() {

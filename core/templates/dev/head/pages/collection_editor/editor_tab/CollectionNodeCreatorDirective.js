@@ -116,7 +116,7 @@ oppia.directive('collectionNodeCreator', [
 
           var convertTypeaheadToExplorationId = function(typeaheadOption) {
             var matchResults = typeaheadOption.match(/\(#(.*?)\)$/);
-            if (matchResults == null) {
+            if (matchResults === null) {
               return typeaheadOption;
             }
             return matchResults[1];

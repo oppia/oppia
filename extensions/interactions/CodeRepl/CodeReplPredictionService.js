@@ -231,7 +231,7 @@ oppia.factory('CodeReplPredictionService', [
         var nearestNeighborsIndexes = (
           predictionService.findNearestNeighborsIndexes(knnData, program));
         var nearesNeighborsClasses = [];
-        
+
         // Find classes of nearest neighbor programs.
         nearestNeighborsIndexes.forEach(function(neighbor) {
           var index = neighbor[0];
@@ -265,7 +265,7 @@ oppia.factory('CodeReplPredictionService', [
 
         if (predictedClassOccurrence >= occurrence) {
           if (classCountArray.length > 1) {
-            if (predictedClassOccurrence != classCountArray[1][1]) {
+            if (predictedClassOccurrence !== classCountArray[1][1]) {
               // Check whether second most likely prediction does not have same
               // occurrence count. If it does, then we assume that KNN has
               // failed.
