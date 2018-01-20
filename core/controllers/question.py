@@ -19,6 +19,7 @@ import json
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import question_services
+from core.domain import question_domain
 import feconf
 
 
@@ -41,3 +42,73 @@ class QuestionsBatchHandler(base.BaseHandler):
         return self.render_json({
             'questions_dict': questions_dict
         })
+
+
+class QuestionsHandler(base.BaseHandler):
+    """This handler completes requests for questions."""
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+    @acl_decorators.open_access
+    def post(self):
+        """Handles POST requests."""
+        if not self.payload.get('question'):
+            raise self.PageNotFoundException
+        question = question_domain.Question.from_dict(
+            self.payload.get('question'))
+        question_id = question_services.add_question(
+                self.user_id, question)
+        return self.render_json({
+            'question_id': question_id
+        })
+
+    @acl_decorators.open_access
+    def put(self):
+        """Handles PUT requests."""
+        question_id = self.payload.get('question_id')
+        collection_id = self.payload.get('collection_id')
+        commit_message = self.payload.get('commit_message')
+        if not question_id:
+            raise self.PageNotFoundException
+        if not collection_id:
+            raise self.PageNotFoundException
+        if not commit_message:
+            raise self.PageNotFoundException
+        if not self.payload.get('change_list'):
+            raise self.PageNotFoundException
+        change_list = [question_domain.QuestionChange(
+            change) for change in (
+                json.loads(self.payload.get('change_list')))]
+        question_services.update_question(
+            self.user_id, collection_id, question_id, change_list, commit_message)
+        return self.render_json({
+            'question_id': question_id
+        })
+
+    @acl_decorators.open_access
+    def delete(self):
+        """Handles Delete requests."""
+        collection_id = self.payload.get('collection_id')
+        question_id = self.payload.get('question_id')
+        if not collection_id:
+            raise self.PageNotFoundException
+        if not question_id:
+            raise self.PageNotFoundException
+        question_services.delete_question(
+            self.user_id, collection_id, question_id)
+
+
+class QuestionManagerHandler(base.BaseHandler):
+    """This handler completes requests for question summaries."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        collection_id = self.request.get('collection_id')
+        if not collection_id:
+            raise self.PageNotFoundException
+        question_summaries = (
+            [question_summary.to_dict() for question_summary in (
+            question_services.get_question_summaries_for_collection(
+                collection_id))])
+        return self.render_json({
+            'question_summaries': question_summaries
+            })

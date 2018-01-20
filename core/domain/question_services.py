@@ -69,18 +69,28 @@ def add_question(committer_id, question):
     return question_id
 
 
-def delete_question(committer_id, question_id, force_deletion=False):
+def delete_question(
+    committer_id, collection_id, question_id, force_deletion=False):
     """Deletes the question with the given question_id.
 
     Args:
         committer_id: str. ID of the committer.
+        collection_id: str. ID of the collection.
         question_id: str. ID of the question.
         force_deletion: bool. If true, the question and its history are fully
             deleted and are unrecoverable. Otherwise, the question and all
             its history are marked as deleted, but the corresponding models are
             still retained in the datastore. This last option is the preferred
             one.
+
+    Raises:
+        Exception. The question with ID is not present in collection with ID.
     """
+    question = get_question_by_id(question_id)
+    if collection_id != question.collection_id:
+        raise Exception(
+            'The question with ID %s is not present in collection with ID %s' % (
+                question_id, collection_id))
     question_model = question_models.QuestionModel.get(question_id)
     question_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_QUESTION_DELETED,
@@ -203,7 +213,7 @@ def _save_question(committer_id, question, change_list, commit_message):
     if not change_list:
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
-            'save question %s: %s' % (question.id, change_list))
+            'save question %s: %s' % (question.question_id, change_list))
 
     question.validate()
 
@@ -218,22 +228,32 @@ def _save_question(committer_id, question, change_list, commit_message):
     question_model.commit(committer_id, commit_message, change_list_dict)
 
 
-def update_question(committer_id, question_id, change_list, commit_message):
+def update_question(
+    committer_id, collection_id, question_id, change_list, commit_message):
     """Updates a question. Commits changes.
 
     Args:
-        committer_id: str. The id of the user who is performing the update
+        committer_id: str. The ID of the user who is performing the update
             action.
+        collection_id: str. The ID of the collection.
         question_id: str. The question ID.
         change_list: list(QuestionChange). A list of QuestionChange objects.
             These changes are applied in sequence to produce the resulting
             question.
         commit_message: str or None. A description of changes made to the
             question.
-    """
-    question = apply_change_list(question_id, change_list)
-    _save_question(committer_id, question, change_list, commit_message)
 
+    Raises:
+        Exception. The question with ID is not present in collection with ID.
+    """
+    question = get_question_by_id(question_id)
+    if collection_id != question.collection_id:
+        raise Exception(
+            'The question with ID %s is not present in collection with ID %s' % (
+                question_id, collection_id))
+    updated_question = apply_change_list(question_id, change_list)
+    _save_question(
+        committer_id, updated_question, change_list, commit_message)
 
 def add_question_id_to_skill(question_id, collection_id, skill_id, user_id):
     """Adds the question id to the question list of the appropriate skill.
@@ -278,10 +298,10 @@ def get_questions_batch(
     has already acquired.
 
     Args:
-        collection_id: str. Id of the collection.
+        collection_id: str. ID of the collection.
         skill_ids: list(str). A list of skill IDs for the questions to
             be retrieved.
-        user_id: str. Id of the user.
+        user_id: str. ID of the user.
         batch_size: int. The intended number of questions to be returned.
 
     Returns:
@@ -304,3 +324,31 @@ def get_questions_batch(
 
     questions_batch = get_questions_by_ids(random_question_ids)
     return questions_batch
+
+
+def get_question_summaries_for_collection(collection_id):
+    """Gets a list of question summaries for a collection based on the skill_ids and sorts by given arg.
+
+    Args:
+        collection_id: str. ID of the collection.
+        skill_ids: list(str). A list of skill IDs.
+
+    Returns:
+        list(QuestionSummary). A list of Question Summary objects.
+    """
+    collection = collection_services.get_collection_by_id(collection_id)
+    skill_ids_of_question = {}
+    for skill in collection.skills.values():
+        for question_id in skill.question_ids:
+            if question_id not in skill_ids_of_question:
+                skill_ids_of_question[question_id] = []
+            skill_ids_of_question[question_id].append(skill.name)
+    questions = get_questions_by_ids(skill_ids_of_question.keys())
+
+    question_summaries = []
+    for question in questions:
+        question_summaries.append(
+            question_domain.QuestionSummary(
+                question.question_id, question.title, (
+                    skill_ids_of_question[question.question_id])))
+    return question_summaries

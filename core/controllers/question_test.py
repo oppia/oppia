@@ -110,3 +110,205 @@ class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
             '%s/batch' % feconf.QUESTION_DATA_URL, self.payload,
             expect_errors=True)
         self.assertEqual(response.status_int, 404)
+
+
+class QuestionsHandlerTest(test_utils.GenericTestBase):
+    """Test the question handler."""
+
+    def setUp(self):
+        super(QuestionsHandlerTest, self).setUp()
+
+        self.collection_id = 'coll_0'
+        self.exp_id = 'exp_1'
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+
+        # Create a new collection and exploration.
+        self.save_new_valid_collection(
+            self.collection_id, self.new_user_id, exploration_id=self.exp_id)
+
+        # Add a skill.
+        collection_services.update_collection(
+            self.new_user_id, self.collection_id, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'test'
+            }], 'Add a new skill')
+        collection = collection_services.get_collection_by_id(
+            self.collection_id)
+        self.skill_id = collection.get_skill_id_from_skill_name('test')
+        collection_node = collection.get_node(self.exp_id)
+        collection_node.update_acquired_skill_ids([self.skill_id])
+
+        # Update the acquired skill IDs for the exploration.
+        collection_services.update_collection(
+            self.new_user_id, self.collection_id, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'property_name': (
+                    collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS), # pylint: disable=line-too-long
+                'exploration_id': self.exp_id,
+                'new_value': [self.skill_id]
+            }], 'Update skill')
+
+        self.payload = {}
+
+    def test_post(self):
+        """Test to verify Post method."""
+        question = question_domain.Question(
+        'dummy', 'A Question',
+        exp_domain.State.create_default_state('ABC').to_dict(), 1,
+        self.collection_id, 'en')
+        self.payload['question'] = question.to_dict()
+        self.login(self.NEW_USER_EMAIL)
+        response_json = self.post_json(
+            '%s' % feconf.QUESTION_DATA_URL, self.payload,
+            expect_errors=False)
+        self.assertIn('question_id', response_json.keys())
+
+        del self.payload['question']
+        response = self.testapp.post(
+            '%s' % feconf.QUESTION_DATA_URL, {'payload': (
+                json.dumps(self.payload))}, expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+    def test_put(self):
+        question = question_domain.Question(
+            'dummy', 'A Question',
+            exp_domain.State.create_default_state('ABC').to_dict(), 1,
+            self.collection_id, 'en')
+
+        question_id = question_services.add_question(
+            self.new_user_id, question)
+        question_services.add_question_id_to_skill(
+            question_id, self.collection_id,
+            self.skill_id, self.new_user_id)
+
+        collection_services.record_played_exploration_in_collection_context(
+            self.new_user_id, self.collection_id, self.exp_id)
+        change_list = [{'cmd': 'update_question_property',
+                       'property_name': 'title',
+                       'new_value': 'ABC',
+                       'old_value': 'A Question'}]
+        self.payload['change_list'] = json.dumps(change_list)
+        self.payload['commit_message'] = 'update title'
+        self.payload['collection_id'] = self.collection_id
+        self.payload['question_id'] = question_id
+        self.login(self.NEW_USER_EMAIL)
+        response_json = self.put_json(
+            '%s' % feconf.QUESTION_DATA_URL, self.payload,
+            expect_errors=False)
+        self.assertIn('question_id', response_json.keys())
+
+        del self.payload['change_list']
+        response = self.testapp.put(
+            '%s' % feconf.QUESTION_DATA_URL, {'payload': (
+                json.dumps(self.payload))}, expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+        del self.payload['commit_message']
+        response = self.testapp.put(
+            '%s' % feconf.QUESTION_DATA_URL, {'payload': (
+                json.dumps(self.payload))}, expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+        del self.payload['collection_id']
+        response = self.testapp.put(
+            '%s' % feconf.QUESTION_DATA_URL, {'payload': (
+                json.dumps(self.payload))}, expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+        del self.payload['question_id']
+        response = self.testapp.put(
+            '%s' % feconf.QUESTION_DATA_URL, {'payload': (
+                json.dumps(self.payload))}, expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+    def test_delete(self):
+        question = question_domain.Question(
+            'dummy', 'A Question',
+            exp_domain.State.create_default_state('ABC').to_dict(), 1,
+            self.collection_id, 'en')
+
+        question_id = question_services.add_question(self.new_user_id,
+            question)
+        question_services.add_question_id_to_skill(question_id,
+            self.collection_id, self.skill_id, self.new_user_id)
+        self.payload['collection_id'] = self.collection_id
+        self.payload['question_id'] = question_id
+        self.login(self.NEW_USER_EMAIL)
+        # response = self.testapp.delete(
+        #     '%s' % feconf.QUESTION_DATA_URL, {'payload': (
+        #         json.dumps(self.payload))}, expect_errors=False)
+        self.assertEqual(response.status_int, 200)
+
+class QuestionManagerHandlerTest(test_utils.GenericTestBase):
+    """Test the question handler."""
+
+    def setUp(self):
+        super(QuestionManagerHandlerTest, self).setUp()
+
+        self.collection_id = 'coll_0'
+        self.exp_id = 'exp_1'
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        # Create a new collection and exploration.
+        self.save_new_valid_collection(
+            self.collection_id, self.owner_id, exploration_id=self.exp_id)
+
+        # Add a skill.
+        collection_services.update_collection(
+            self.owner_id, self.collection_id, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'test'
+            }], 'Add a new skill')
+        collection = collection_services.get_collection_by_id(
+            self.collection_id)
+        self.skill_id = collection.get_skill_id_from_skill_name('test')
+        collection_node = collection.get_node(self.exp_id)
+        collection_node.update_acquired_skill_ids([self.skill_id])
+
+        # Update the acquired skill IDs for the exploration.
+        collection_services.update_collection(
+            self.owner_id, self.collection_id, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'property_name': (
+                    collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS), # pylint: disable=line-too-long
+                'exploration_id': self.exp_id,
+                'new_value': [self.skill_id]
+            }], 'Update skill')
+
+        question = question_domain.Question(
+            'dummy', 'A Question',
+            exp_domain.State.create_default_state('ABC').to_dict(), 1,
+            self.collection_id, 'en')
+
+        question_id = question_services.add_question(self.owner_id, question)
+        self.question = question_services.get_question_by_id(question_id)
+        question_services.add_question_id_to_skill(
+            self.question.question_id, self.question.collection_id,
+            self.skill_id, self.owner_id)
+
+        self.payload = {}
+
+    def test_get(self):
+        """Test to verify get method."""
+        self.payload['collection_id'] = self.collection_id
+        response_json = self.get_json(
+            '%s' % feconf.QUESTION_MANAGE_URL, self.payload,
+            expect_errors=False)
+        expected_question_summary = question_domain.QuestionSummary(
+            self.question.question_id, self.question.title, ['test'])
+        self.assertIn(
+            expected_question_summary.to_dict(),
+            response_json['question_summaries'])
+
+        response = self.testapp.get(
+            '%s/batch' % feconf.QUESTION_MANAGE_URL,
+            expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+        del self.payload['collection_id']
+        response = self.testapp.get(
+            '%s/batch' % feconf.QUESTION_MANAGE_URL, self.payload,
+            expect_errors=True)
+        self.assertEqual(response.status_int, 404)

@@ -87,7 +87,6 @@ class QuestionChange(object):
             'old_value': self.old_value
         }
 
-
 class Question(object):
     """Domain object for a question.
 
@@ -235,3 +234,36 @@ class Question(object):
             question_data: dict. A dict representing the question data.
         """
         self.question_data = question_data
+
+
+class QuestionSummary(object):
+    """Domain object for Question Summary.
+
+    Attributes:
+        question_id: str. The ID of the question.
+        question_title: str. The title of the question.
+        skill_ids: list(str). The list of skill IDs associted with question.
+    """
+    def __init__(self, question_id, question_title, skills):
+        """Constructs a Question Summary domain object.
+
+        Args:
+            question_id: str. The ID of the question.
+            question_title: str. The title of the question.
+            skills: list(str). The list of skill names associted with question.
+        """
+        self.question_id = question_id
+        self.question_title = question_title
+        self.skills = skills
+
+    def to_dict(self):
+        """Returns a dictionary of Question Summary domain object.
+
+        Returns:
+            Dict. A dict of Question Summary object.
+        """
+        return {
+        'question_id': self.question_id,
+        'question_title': self.question_title,
+        'skills': self.skills
+        }
