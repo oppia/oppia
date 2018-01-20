@@ -23,8 +23,8 @@ describe('Answer Classification Object Factory', function() {
   beforeEach(inject(function($injector) {
     AnswerClassificationResultObjectFactory = $injector.get(
       'AnswerClassificationResultObjectFactory');
-    EXPLICIT_CLASSIFICATION = $injector.get(
-      'EXPLICIT_CLASSIFICATION');
+    DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
+      'DEFAULT_OUTCOME_CLASSIFICATION');
   }));
 
   it('should create a new result', function() {
@@ -36,7 +36,7 @@ describe('Answer Classification Object Factory', function() {
             html: '',
             audio_translations: {}
           }, param_changes: []
-        }, 1, 0, EXPLICIT_CLASSIFICATION));
+        }, 1, 0, DEFAULT_OUTCOME_CLASSIFICATION));
 
     expect(answerClassificationResult.outcome).toEqual({
       dest: 'default',
@@ -48,6 +48,6 @@ describe('Answer Classification Object Factory', function() {
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(
-      EXPLICIT_CLASSIFICATION);
+      DEFAULT_OUTCOME_CLASSIFICATION);
   });
 });
