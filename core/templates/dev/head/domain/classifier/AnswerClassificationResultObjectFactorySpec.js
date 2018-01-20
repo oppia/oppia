@@ -36,7 +36,7 @@ describe('Answer Classification Object Factory', function() {
               html: '',
               audio_translations: {}
             }, param_changes: []
-        }, []}, 1, 0, EXPLICIT_CLASSIFICATION));
+        }, 1, 0, EXPLICIT_CLASSIFICATION));
 
     expect(answerClassificationResult.outcome).toEqual({
             dest: 'default',
