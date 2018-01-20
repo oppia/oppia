@@ -143,8 +143,8 @@ oppia.filter('wrapTextWithEllipsis', [
 // values. Note that this returns an HTML string to accommodate the case of
 // multiple-choice input and image-click input.
 oppia.filter('parameterizeRuleDescription', [
-  'INTERACTION_SPECS', 'FractionObjectFactory',
-  function(INTERACTION_SPECS, FractionObjectFactory) {
+  '$filter', 'INTERACTION_SPECS', 'FractionObjectFactory',
+  function( $filter, INTERACTION_SPECS, FractionObjectFactory) {
     return function(rule, interactionId, choices) {
       if (!rule) {
         return '';
@@ -188,7 +188,7 @@ oppia.filter('parameterizeRuleDescription', [
             replacementText = '[';
             var key = inputs[varName];
             for (var i = 0; i < key.length; i++) {
-              replacementText += key[i];
+              replacementText += $filter('formatRtePreview')(key[i]);
               if (i < key.length - 1) {
                 replacementText += ',';
               }
@@ -198,7 +198,9 @@ oppia.filter('parameterizeRuleDescription', [
             // The following case is for MultipleChoiceInput
             for (var i = 0; i < choices.length; i++) {
               if (choices[i].val === inputs[varName]) {
-                replacementText = '\'' + choices[i].label + '\'';
+                var filteredLabelText =
+                  $filter('formatRtePreview')(choices[i].label);
+                replacementText = '\'' + filteredLabelText + '\'';
               }
             }
           }
@@ -417,7 +419,7 @@ oppia.filter('formatRtePreview', ['$filter', function($filter) {
     html = html.replace(/&quot;/ig, '');
     //Replace all html tags other than <oppia-noninteractive-**> ones to ''
     html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
-    formattedOutput = html.replace(/(<([^>]+)>)/g, function(rteTag) {
+    var formattedOutput = html.replace(/(<([^>]+)>)/g, function(rteTag) {
       var replaceString = $filter(
         'capitalize')(rteTag.split('-')[2].split(' ')[0]);
       if (replaceString[replaceString.length - 1] === '>') {
@@ -425,12 +427,6 @@ oppia.filter('formatRtePreview', ['$filter', function($filter) {
       }
       return ' [' + replaceString + '] ';
     });
-    if (formattedOutput[0] === ' ') {
-      formattedOutput = formattedOutput.substr(1);
-    }
-    if (formattedOutput[formattedOutput.length - 1] === ' ') {
-      formattedOutput = formattedOutput.slice(0, -1);
-    }
-    return formattedOutput;
+    return formattedOutput.trim();
   }
 }]);
