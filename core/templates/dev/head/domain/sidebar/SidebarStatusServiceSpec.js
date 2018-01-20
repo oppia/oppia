@@ -20,7 +20,9 @@ describe('SidebarStatusService', function() {
   var SidebarStatusService;
 
   beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
+  beforeEach(inject(function($injector, _$window_) {
+    $window = _$window_;
+    $window.innerWidth = 600;
     SidebarStatusService = $injector.get('SidebarStatusService');
   }));
   
@@ -46,6 +48,7 @@ describe('SidebarStatusService', function() {
   it('should falsify pendingSidebarClick on document click', function(){
     SidebarStatusService.openSidebar();
     SidebarStatusService.onDocumentClick();
+    expect(SidebarStatusService.isSidebarShown()).toBe(true);
     SidebarStatusService.onDocumentClick();
     expect(SidebarStatusService.isSidebarShown()).toBe(false);
   });

@@ -102,7 +102,7 @@ module.exports = function(config) {
     customLaunchers: {
       Chrome_Travis: {
         base: 'Chrome',
-        flags: ['--window-size=650,650']
+        flags: ['--no-sandbox']
       }
     },
     plugins: [
