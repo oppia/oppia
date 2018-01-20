@@ -137,12 +137,6 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
                   return $(elem).text();
                 }).join('\n');
 
-              console.log('Code (normalized): ');
-              console.log(normalizedCode);
-              console.log('Output: ');
-              console.log(output);
-              console.log('------');
-
               hasSubmittedAnswer = true;
               $scope.onSubmit({
                 answer: {
@@ -162,12 +156,6 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
             }
 
             var normalizedCode = getNormalizedCode();
-
-            console.log('Code: ');
-            console.log(normalizedCode);
-            console.log('Error: ');
-            console.log(error.message);
-            console.log('------');
 
             errorIsHappening = true;
             hasSubmittedAnswer = true;
