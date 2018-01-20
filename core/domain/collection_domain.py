@@ -417,7 +417,7 @@ class CollectionSkill(object):
             ValidationError: The expected index is non-integer or negative.
 
         Returns:
-            str. The skill ID along with the corresponding index.
+            str. The skill ID corresponding to the given index.
         """
         if not isinstance(index, int):
             raise utils.ValidationError(
@@ -437,8 +437,7 @@ class CollectionSkill(object):
             skill_id: str. The skill ID.
 
         Raises:
-            ValidationError: The skill ID is not a string of length at least
-                6 and does not begin and end with a number.
+            ValidationError: The skill ID does not have the form skill{{digit}}.
         """
         if not isinstance(skill_id, basestring):
             raise utils.ValidationError(
