@@ -93,7 +93,7 @@ oppia.factory('SpeechSynthesisChunkerService', [
         }
         offset += chunk.length;
         _speechUtteranceChunker(utterance, offset, callback);
-      }
+      };
 
       // IMPORTANT!! Do not remove: Logging the object out fixes some onend
       // firing issues. Placing the speak invocation inside a callback
@@ -208,6 +208,6 @@ oppia.factory('SpeechSynthesisChunkerService', [
       formatLatexToSpeakableText: function(latex) {
         return _formatLatexToSpeakableText(latex);
       }
-    }
+    };
   }
 ]);

@@ -593,5 +593,5 @@ oppia.controller('LearnerDashboard', [
         element.hide().slideDown(done);
       }
     }
-  }
+  };
 });

@@ -269,7 +269,7 @@ oppia.filter('isInteger', [function() {
   return function(input) {
     return Number.isInteger(Number(input));
   };
-}])
+}]);
 
 oppia.filter('isFloat', [function() {
   return function(input) {

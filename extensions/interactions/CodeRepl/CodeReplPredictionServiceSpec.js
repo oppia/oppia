@@ -29,7 +29,7 @@ describe('CodeRepl prediction service', function() {
     it('should calculate correct jaccard index', function() {
       var multisetA = [1, 2];
       var multisetB = [3, 4];
-      var expectedValue = 0.0
+      var expectedValue = 0.0;
       var value = service.calcJaccardIndex(multisetA, multisetB);
       expect(value).toEqual(expectedValue);
 
@@ -60,7 +60,7 @@ describe('CodeRepl prediction service', function() {
       var programTokens = tokenizer.generateTokens(program.split('\n'));
       var tokenToId = {
         '=': 0, 15: 1, 'if': 2, '>': 3, 5: 4, print: 5, ':': 6
-      }
+      };
 
       var expectedTokens = [
         'V', '=', '15', 'if', 'V', '>', '5', ':', 'print', 'UNK',
@@ -117,6 +117,6 @@ describe('CodeRepl prediction service', function() {
             testData[i].answer_group_index.toString());
         }
       }
-    })
+    });
   });
 });

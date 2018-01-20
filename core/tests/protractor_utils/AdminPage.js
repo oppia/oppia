@@ -99,7 +99,7 @@ var AdminPage = function(){
     browser.waitForAngular();
     // Change values for "update role" form, and submit it.
     updateFormName.sendKeys(name);
-    roleOption(newRole).click()
+    roleOption(newRole).click();
     updateFormSubmit.click();
     general.waitForSystem();
     return true;
