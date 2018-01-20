@@ -443,11 +443,6 @@ class CollectionSkill(object):
             raise utils.ValidationError(
                 'Expected skill ID to be a string, received %s' % skill_id)
 
-        if len(skill_id) < 6:
-            raise utils.ValidationError(
-                'Expected skill ID to have length at least 6, received %s' %
-                skill_id)
-
         if skill_id[:5] != _SKILL_ID_PREFIX:
             raise utils.ValidationError(
                 'Expected skill ID to begin with \'%s\', received %s' %
