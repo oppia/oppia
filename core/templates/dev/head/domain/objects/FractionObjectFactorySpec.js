@@ -74,38 +74,53 @@ describe('FractionObjectFactory', function() {
 
     it('should throw errors for invalid fractions', function() {
       // Invalid characters.
-      expect(function() {Fraction.fromRawInputString('3 \ b');}).toThrow(
-        new Error(errors.INVALID_CHARS));
-      expect(function() {Fraction.fromRawInputString('a 3/5');}).toThrow(
-        new Error(errors.INVALID_CHARS));
-      expect(function() {Fraction.fromRawInputString('5 b/c');}).toThrow(
-        new Error(errors.INVALID_CHARS));
-      expect(function() {Fraction.fromRawInputString('a b/c');}).toThrow(
-        new Error(errors.INVALID_CHARS));
+      expect(function() {
+        Fraction.fromRawInputString('3 \ b');
+      }).toThrow(new Error(errors.INVALID_CHARS));
+      expect(function() {
+        Fraction.fromRawInputString('a 3/5');
+      }).toThrow(new Error(errors.INVALID_CHARS));
+      expect(function() {
+        Fraction.fromRawInputString('5 b/c');
+      }).toThrow(new Error(errors.INVALID_CHARS));
+      expect(function() {
+        Fraction.fromRawInputString('a b/c');
+      }).toThrow(new Error(errors.INVALID_CHARS));
       // Invalid format.
-      expect(function() {Fraction.fromRawInputString('1 / -3');}).toThrow(
-        new Error(errors.INVALID_FORMAT));
-      expect(function() {Fraction.fromRawInputString('-1 -3/2');}).toThrow(
-        new Error(errors.INVALID_FORMAT));
-      expect(function() {Fraction.fromRawInputString('3 -');}).toThrow(
-        new Error(errors.INVALID_FORMAT));
-      expect(function() {Fraction.fromRawInputString('1  1');}).toThrow(
-        new Error(errors.INVALID_FORMAT));
-      expect(function() {Fraction.fromRawInputString('1/3 1/2');}).toThrow(
-        new Error(errors.INVALID_FORMAT));
-      expect(function() {Fraction.fromRawInputString('1 2 3 / 4');}).toThrow(
-        new Error(errors.INVALID_FORMAT));
-      expect(function() {Fraction.fromRawInputString('1 / 2 3');}).toThrow(
-        new Error(errors.INVALID_FORMAT));
-      expect(function() {Fraction.fromRawInputString('- / 3');}).toThrow(
-        new Error(errors.INVALID_FORMAT));
-      expect(function() {Fraction.fromRawInputString('/ 3');}).toThrow(
-        new Error(errors.INVALID_FORMAT));
+      expect(function() {
+        Fraction.fromRawInputString('1 / -3');
+      }).toThrow(new Error(errors.INVALID_FORMAT));
+      expect(function() {
+        Fraction.fromRawInputString('-1 -3/2');
+      }).toThrow(new Error(errors.INVALID_FORMAT));
+      expect(function() {
+        Fraction.fromRawInputString('3 -');
+      }).toThrow(new Error(errors.INVALID_FORMAT));
+      expect(function() {
+        Fraction.fromRawInputString('1  1');
+      }).toThrow(new Error(errors.INVALID_FORMAT));
+      expect(function() {
+        Fraction.fromRawInputString('1/3 1/2');
+      }).toThrow(new Error(errors.INVALID_FORMAT));
+      expect(function() {
+        Fraction.fromRawInputString('1 2 3 / 4');
+      }).toThrow(new Error(errors.INVALID_FORMAT));
+      expect(function() {
+        Fraction.fromRawInputString('1 / 2 3');
+      }).toThrow(new Error(errors.INVALID_FORMAT));
+      expect(function() {
+        Fraction.fromRawInputString('- / 3');
+      }).toThrow(new Error(errors.INVALID_FORMAT));
+      expect(function() {
+        Fraction.fromRawInputString('/ 3');
+      }).toThrow(new Error(errors.INVALID_FORMAT));
       // Division by zero.
-      expect(function() {Fraction.fromRawInputString(' 1/0');}).toThrow(
-        new Error(errors.DIVISION_BY_ZERO));
-      expect(function() {Fraction.fromRawInputString('1 2 /0');}).toThrow(
-        new Error(errors.DIVISION_BY_ZERO));
+      expect(function() {
+        Fraction.fromRawInputString(' 1/0');
+      }).toThrow(new Error(errors.DIVISION_BY_ZERO));
+      expect(function() {
+        Fraction.fromRawInputString('1 2 /0');
+      }).toThrow(new Error(errors.DIVISION_BY_ZERO));
     });
 
     it('should convert to the correct float value', function() {
