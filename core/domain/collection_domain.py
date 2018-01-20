@@ -391,7 +391,7 @@ class CollectionSkill(object):
 
     @classmethod
     def from_dict(cls, skill_id, skill_dict):
-        """Returns the CollectionSkill object corresponding to the given 
+        """Returns the CollectionSkill object corresponding to the given
         skill_id and skill_dict.
 
         Args:
