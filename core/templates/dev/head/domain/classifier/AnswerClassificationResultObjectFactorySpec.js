@@ -30,7 +30,7 @@ describe('Answer Classification Object Factory', function() {
   it('should create a new result', function() {
     var answerClassificationResult = (
       AnswerClassificationResultObjectFactory.createNew(
-        ('outcome', '', []), 1, 0, EXPLICIT_CLASSIFICATION));
+        {'outcome 1', {'', {}}, []}, 1, 0, EXPLICIT_CLASSIFICATION));
 
     expect(answerClassificationResult.outcome).toEqual(('outcome', '', []));
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
