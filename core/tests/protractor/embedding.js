@@ -34,8 +34,7 @@ describe('Embedding', function() {
     editor.setStateName('Intro');
     editor.setContent(forms.toRichText(
       'Given three balls of different colors. How many ways are there ' +
-      'to arrange them in a straight line?'
-      )
+      'to arrange them in a straight line?')
     );
     editor.setInteraction('NumericInput');
     editor.addResponse(
@@ -81,7 +80,7 @@ describe('Embedding', function() {
 
     // publish changes
     workflow.publishExploration();
-  }
+  };
 
   beforeEach(function() {
     adminPage = new AdminPage.AdminPage();
@@ -130,7 +129,7 @@ describe('Embedding', function() {
     workflow.createExploration();
     general.getExplorationIdFromEditor().then(function(expId){
       explorationId = expId;
-      // creates version 2 of the exploration.
+      // Create version 2 of the exploration.
       createCountingExploration();
 
       general.openEditor(explorationId);
@@ -138,44 +137,34 @@ describe('Embedding', function() {
       editor.saveChanges('demonstration edit');
 
       for (var i = 0; i < TEST_PAGES.length; i++) {
-        // This is necessary as the pages are non-angular; we need xpaths below
-        // for the same reason.
+        // This is necessary as the pages are non-angular;
         var driver = browser.driver;
         driver.get(
           general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
           TEST_PAGES[i].filename);
 
-        driver.findElement(by.xpath(
-          "//input[@id='embedding-exploration-id']")).sendKeys(explorationId);
-
-        /*
-          "https://stackoverflow.com/questions/34562061/
-          webdriver-click-vs-javascript-click"
-          This doesn't works: 
-          var elem = driver.findElement(
-            by.xpath("//input[@id='embedding-submit-btn'")).click();
-        */
         driver.findElement(
-          by.xpath("//input[@id='embedding-submit-btn']")).click();
+          by.css('#embedding-exploration-id')).sendKeys(explorationId);
+        driver.findElement(
+          by.css('#embedding-submit-btn')).click();
 
         // Test of standard loading (new and old versions)
         browser.switchTo().frame(
           driver.findElement(
-            by.xpath("//div[@class='protractor-test-standard']/iframe")));
+            by.css('.protractor-test-standard iframe')));
         playCountingExploration(3);
         browser.switchTo().defaultContent();
 
         if (TEST_PAGES[i].isVersion1) {
           // Test of deferred loading (old version)
           driver.findElement(
-            by.xpath(
-              "//div[@class='protractor-test-old-version']/oppia/div/button")
+            by.css('.protractor-test-old-version oppia div button')
           ).click();
         }
 
         browser.switchTo().frame(
           driver.findElement(
-            by.xpath("//div[@class='protractor-test-old-version']/iframe")));
+            by.css('.protractor-test-old-version iframe')));
         playCountingExploration(2);
         browser.switchTo().defaultContent();
       }
@@ -236,13 +225,13 @@ describe('Embedding', function() {
         general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
         'embedding_tests_dev_i18n_0.0.1.html');
 
-      driver.findElement(by.xpath(
-        "//input[@id='embedding-exploration-id']")).sendKeys(explorationId);
       driver.findElement(
-        by.xpath("//input[@id='embedding-submit-btn']")).click();
+        by.css('#embedding-exploration-id')).sendKeys(explorationId);
+      driver.findElement(
+        by.css('#embedding-submit-btn')).click();
 
-      browser.switchTo().frame(driver.findElement(by.xpath(
-          "//div[@class='protractor-test-embedded-exploration']/iframe")));
+      browser.switchTo().frame(driver.findElement(
+        by.css('.protractor-test-embedded-exploration iframe')));
       general.waitForSystem();
       browser.waitForAngular();
       expect(driver.findElement(by.css('.protractor-test-float-form-input'))
@@ -267,6 +256,14 @@ describe('Embedding', function() {
     checkPlaceholder('Ingresa un número');
 
     users.logout();
-    general.checkForConsoleErrors(['.*idToBeReplaced.*']);
+
+    // This error is to be ignored as 'idToBeReplaced' is not a valid
+    // exploration id. It appers just after the page loads.
+    var errorsToIgnore = new RegExp('http:\/\/localhost:9001\/assets\/' +
+      'scripts\/embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
+      '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
+      'locale=en#version=0.0.1&secret=.*\' in a frame because it set ' +
+      '\'X-Frame-Options\' to \'deny\'.', 'g');
+    general.checkForConsoleErrors([errorsToIgnore]);
   });
 });

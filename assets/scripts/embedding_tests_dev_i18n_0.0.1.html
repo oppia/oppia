@@ -1,28 +1,38 @@
 <h2>v0.0.1 (unminified)</h2>
 <p>For instructions: see the README file in /assets/scripts.</p>
 
+<style type="text/css">
+  .embedding-content{
+    display: none;
+  }
+</style>
+
 <script src="/assets/scripts/oppia-player-0.0.1.js"></script>
 <script src="/assets/scripts/embedding_tests.js"></script>
 <script src="../../third_party/static/jquery-3.2.1/jquery.min.js"></script>
 
 <input id="embedding-exploration-id" type="text" placeholder="explorationId">
-<input id="embedding-submit-btn" type="submit" value="Submit" onclick="update()">
+<input id="embedding-submit-btn" type="submit" value="Update Exploration ID" onclick="onChangeExpId()">
 
-<div class="protractor-test-embedded-exploration">
+<div class="protractor-test-embedded-exploration embedding-content">
   <h3>Standard embedding of the latest version</h3>
   <oppia oppia-id="idToBeReplaced"></oppia>
 </div>
 
 <script type="text/javascript">
-  var currentExplorationId = 'idToBeReplaced';
-  var update = function(){
+  // To keep track of next exploration id to be replaced.
+  var placeHolderExplorationId = 'idToBeReplaced';
+  var onChangeExpId = function() {
     var newExplorationId = $('#embedding-exploration-id').val();
-    $('div > iframe').each(function(index){
+    $('div > iframe').each(function(index) {
       var src = $(this).attr('src');
-      src = src.replace(currentExplorationId, newExplorationId);
+      src = src.replace(placeHolderExplorationId, newExplorationId);
       $(this).attr('src', src);
-      currentExplorationId = newExplorationId;
     });
-  }  
+    placeHolderExplorationId = newExplorationId;
+
+    // Show the contents
+    $('.embedding-content').show();
+  };
 </script>
 

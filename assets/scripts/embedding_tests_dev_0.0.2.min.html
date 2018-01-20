@@ -6,52 +6,63 @@
   the Oppia iframe to the containing page.
 </p>
 
+<style type="text/css">
+  .embedding-content{
+    display: none;
+  }
+</style>
+
 <script src="/assets/scripts/oppia-player-0.0.2.min.js"></script>
 <script src="/assets/scripts/embedding_tests.js"></script>
 <script src="../../third_party/static/jquery-3.2.1/jquery.min.js"></script>
 
 <input id="embedding-exploration-id" type="text" placeholder="explorationId">
-<input id="embedding-submit-btn" type="submit" value="Submit" onclick="update()">
+<input id="embedding-submit-btn" type="submit" value="Update Exploration ID" onclick="onChangeExpId()">
 
-<div>
+<div class=" embedding-content">
   <h3>Iframe embedding</h3>
   <iframe src="/embed/exploration/idToBeReplaced" width="700" height="600">
   </iframe>
 </div>
 
-<div class="protractor-test-standard">
+<div class="protractor-test-standard embedding-content">
   <h3>Standard embedding of the latest version</h3>
   <oppia oppia-id="idToBeReplaced"></oppia>
 </div>
 
-<div class="protractor-test-old-version">
+<div class="protractor-test-old-version embedding-content">
   <h3>Standard embedding of version 2 of the exploration</h3>
   <oppia oppia-id="idToBeReplaced" exploration-version="2"></oppia>
 </div>
 
-<div class="protractor-test-missing-id">
+<div class="protractor-test-missing-id embedding-content">
   <h3>ERROR: No oppia id specified</h3>
   <oppia></oppia>
 </div>
 
-<div class="protractor-test-invalid-id">
+<div class="protractor-test-invalid-id embedding-content">
   <h3>ERROR: 404 error</h3>
   <oppia oppia-id="fake_id"></oppia>
 </div>
 
 <script type="text/javascript">
-  var currentExplorationId = 'idToBeReplaced';
-  var update = function(){
+  // To keep track of next exploration id to be replaced.
+  var placeHolderExplorationId = 'idToBeReplaced';
+  var onChangeExpId = function() {
     var newExplorationId = $('#embedding-exploration-id').val();
-    $('div > iframe').each(function(index){
+    $('div > iframe').each(function(index) {
       var src = $(this).attr('src');
-      src = src.replace(currentExplorationId, newExplorationId);
+      src = src.replace(placeHolderExplorationId, newExplorationId);
       $(this).attr('src', src);
     });
+    placeHolderExplorationId = newExplorationId;
 
     // For first time loading of deferred loading version.
-    $('oppia[oppia-id="idToBeReplaced"]').each(function(index){
+    $('oppia[oppia-id="idToBeReplaced"]').each(function(index) {
       $(this).attr('oppia-id', newExplorationId);
     });
-  }  
+
+    // Show the contents
+    $('.embedding-content').show();
+  };
 </script>
