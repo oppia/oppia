@@ -143,20 +143,6 @@ describe('FractionInputValidationService', function() {
       }
     });
 
-    exactlyEqualToTwoByFour = rof.createFromBackendDict({
-      rule_type: 'IsExactlyEqualTo',
-      inputs: {
-        f: createFractionDict(false, 0, 2, 4)
-      }
-    });
-
-    equivalentToHalf = rof.createFromBackendDict({
-      rule_type: 'IsEquivalentTo',
-      inputs: {
-        f: createFractionDict(false, 0, 1, 2)
-      }
-    });
-
     zeroDenominatorRule = rof.createFromBackendDict({
       rule_type: 'HasDenominatorEqualTo',
       inputs: {
@@ -219,7 +205,7 @@ describe('FractionInputValidationService', function() {
   });
 
   it('should catch identical rules as redundant', function() {
-    answerGroups[0].rules = [equivalentToOneAndSimplestFormRule, equalsOneRule];
+    answerGroups[0].rules = [equivalentToOneRule, equalsOneRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
