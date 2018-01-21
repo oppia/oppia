@@ -116,8 +116,8 @@ describe('HintsAndSolutionManager service', function() {
       expect(hasms.isHintViewable(1)).toBe(false);
       expect(hasms.isSolutionViewable()).toBe(false);
 
-      // The first hint is consumed, but a delay is needed for the second hint to
-      // be viewable.
+      // The first hint is consumed, but a delay is needed for the second hint
+      // to be viewable.
       expect(hasms.displayHint(0).getHtml()).toBe('one');
       expect(hasms.isHintViewable(0)).toBe(true);
       expect(hasms.isHintViewable(1)).toBe(false);
