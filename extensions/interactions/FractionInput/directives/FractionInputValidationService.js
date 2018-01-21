@@ -81,6 +81,19 @@ oppia.factory('FractionInputValidationService', [
             upperBoundConditionIsSatisfied;
         };
 
+        var shouldCheckRangeCriteria = function(earlierRule, laterRule) {
+          if (
+            (earlierRule.type === 'IsExactlyEqualTo' &&
+            laterRule.type === 'IsExactlyEqualTo') ||
+            (earlierRule.type === 'IsExactlyEqualTo' &&
+            laterRule.type === 'IsEquivalentTo') ||
+            (earlierRule.type === 'IsExactlyEqualTo' &&
+            laterRule.type === 'IsEquivalentToAndInSimplestForm')) {
+            return false;
+          }
+          return true;
+        };
+
         var ranges = [];
         for (var i = 0; i < answerGroups.length; i++) {
           var rules = answerGroups[i].rules;
@@ -192,10 +205,9 @@ oppia.factory('FractionInputValidationService', [
             }
             for (var k = 0; k < ranges.length; k++) {
               if (isEnclosedBy(range, ranges[k])) {
-                var rule2 = answerGroups[ranges[k].answerGroupIndex - 1]
+                var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1]
                   .rules[ranges[k].ruleIndex - 1];
-                if (rule.type !== 'IsExactlyEqualTo' ||
-                  rule2.type !== 'IsExactlyEqualTo') {
+                if (shouldCheckRangeCriteria(earlierRule, rule)) {
                   warningsList.push({
                     type: WARNING_TYPES.ERROR,
                     message: (

@@ -190,8 +190,23 @@ describe('FractionInputValidationService', function() {
     }]);
   });
 
-  it('should catch identical rules as redundant', function() {
+  it('should not catch equals followed by equivalent as redundant', function() {
     answerGroups[0].rules = [equalsOneRule, equivalentToOneRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+
+    answerGroups[0].rules = [equalsOneRule, equivalentToOneAndSimplestFormRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
+  it('should catch equivalent followed by equals same value' +
+    'as redundant', function() {
+    answerGroups[0].rules = [equivalentToOneRule, equalsOneRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -200,7 +215,8 @@ describe('FractionInputValidationService', function() {
       message: 'Rule 2 from answer group 1 will never be matched ' +
         'because it is made redundant by rule 1 from answer group 1.'
     }]);
-    answerGroups[0].rules = [equalsOneRule, equivalentToOneAndSimplestFormRule];
+
+    answerGroups[0].rules = [equivalentToOneAndSimplestFormRule, equalsOneRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
