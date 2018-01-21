@@ -121,7 +121,7 @@ oppia.factory('ExplorationPropertyService', [
 
   // A data service that stores the current exploration title so that it can be
   // displayed and edited in multiple places in the UI.
-  oppia.factory('ExplorationTitleService',[
+oppia.factory('ExplorationTitleService',[
     'ExplorationPropertyService', '$filter', 'ValidatorsService',
     'ExplorationRightsService',
     function(
@@ -135,13 +135,12 @@ oppia.factory('ExplorationPropertyService', [
           value, true, ExplorationRightsService.isPrivate());
       };
       return child;
-    }
-  ]);
+    }]);
   
   // A data service that stores the current 
   //exploration category so that it can be
   // displayed and edited in multiple places in the UI.
-  oppia.factory('ExplorationCategoryService', [
+oppia.factory('ExplorationCategoryService', [
     'ExplorationPropertyService', '$filter', 'ValidatorsService',
     'ExplorationRightsService',
     function(
@@ -155,12 +154,11 @@ oppia.factory('ExplorationPropertyService', [
           value, true, ExplorationRightsService.isPrivate());
       };
       return child;
-    }
-  ]);
+    }]);
   
   // A data service that stores the current exploration objective so that it can
   // be displayed and edited in multiple places in the UI.
-  oppia.factory('ExplorationObjectiveService', [
+oppia.factory('ExplorationObjectiveService', [
     'ExplorationPropertyService', '$filter', 'ValidatorsService',
     'ExplorationRightsService',
     function(
@@ -175,11 +173,10 @@ oppia.factory('ExplorationPropertyService', [
           ValidatorsService.isNonempty(value, false));
       };
       return child;
-    }
-  ]);
+    }]);
   
   // A data service that stores the exploration language code.
-  oppia.factory('ExplorationLanguageCodeService', [
+oppia.factory('ExplorationLanguageCodeService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {
       var child = Object.create(ExplorationPropertyService);
       child.propertyName = 'language_code';
@@ -205,23 +202,21 @@ oppia.factory('ExplorationPropertyService', [
         });
       };
       return child;
-    }
-  ]);
+    }]);
   
   // A data service that stores the name of the exploration's initial state.
   // NOTE: This service does not perform validation. Users of this service
   // should ensure that new initial state names passed to the service are
   // valid.
-  oppia.factory('ExplorationInitStateNameService', [
+oppia.factory('ExplorationInitStateNameService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {
       var child = Object.create(ExplorationPropertyService);
       child.propertyName = 'init_state_name';
       return child;
-    }
-  ]);
+    }]);
   
   // A data service that stores tags for the exploration.
-  oppia.factory('ExplorationTagsService', [
+oppia.factory('ExplorationTagsService', [
     'ExplorationPropertyService',
     function(ExplorationPropertyService) {
       var child = Object.create(ExplorationPropertyService);
@@ -245,26 +240,23 @@ oppia.factory('ExplorationPropertyService', [
         return true;
       };
       return child;
-    }
-  ]);
+    }]);
   
-  oppia.factory('ExplorationParamSpecsService', [
+oppia.factory('ExplorationParamSpecsService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {
       var child = Object.create(ExplorationPropertyService);
       child.propertyName = 'param_specs';
       return child;
-    }
-  ]);
+    }]);
   
-  oppia.factory('ExplorationParamChangesService', [
+oppia.factory('ExplorationParamChangesService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {
       var child = Object.create(ExplorationPropertyService);
       child.propertyName = 'param_changes';
       return child;
-    }
-  ]);
+    }]);
   
-  oppia.factory('ExplorationAutomaticTextToSpeechService', [
+oppia.factory('ExplorationAutomaticTextToSpeechService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {
       var child = Object.create(ExplorationPropertyService);
       child.propertyName = 'auto_tts_enabled';
@@ -283,10 +275,9 @@ oppia.factory('ExplorationPropertyService', [
       };
   
       return child;
-    }
-  ]);
+    }]);
   
-  oppia.factory('ExplorationCorrectnessFeedbackService', [
+oppia.factory('ExplorationCorrectnessFeedbackService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {
       var child = Object.create(ExplorationPropertyService);
       child.propertyName = 'correctness_feedback_enabled';
@@ -305,13 +296,12 @@ oppia.factory('ExplorationPropertyService', [
       };
   
       return child;
-    }
-  ]);
+    }]);
   
   // Data service for keeping track of the exploration's states. Note that this
   // is unlike the other exploration property services, in that it keeps no
   // mementos.
-  oppia.factory('ExplorationStatesService', [
+oppia.factory('ExplorationStatesService', [
     '$log', '$uibModal', '$filter', '$location', 
     '$rootScope', '$injector', '$q',
     'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
@@ -671,6 +661,5 @@ oppia.factory('ExplorationPropertyService', [
           $rootScope.$broadcast('refreshGraph');
         }
       };
-    }
-  ]);
+    }]);
   
