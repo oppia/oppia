@@ -16,7 +16,8 @@
  */
 
 oppia.factory('ExtensionTagAssemblerService', [
-  '$filter', 'HtmlEscaperService', function($filter, HtmlEscaperService) {
+  '$filter', 'HtmlEscaperService',
+  function($filter, HtmlEscaperService) {
     return {
       formatCustomizationArgAttrs: function(element, customizationArgSpecs) {
         for (var caSpecName in customizationArgSpecs) {
