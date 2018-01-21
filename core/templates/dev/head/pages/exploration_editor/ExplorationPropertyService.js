@@ -19,7 +19,8 @@
 oppia.factory('ExplorationPropertyService', [
     '$rootScope', '$log', 'ChangeListService', 'AlertsService',
     function($rootScope, $log, ChangeListService, AlertsService) {
-      // Public base API for data services corresponding to exploration properties
+      // Public base API for data
+      // services corresponding to exploration properties
       // (title, category, etc.)
   
       var BACKEND_CONVERSIONS = {
@@ -39,9 +40,11 @@ oppia.factory('ExplorationPropertyService', [
             throw 'Exploration property name cannot be null.';
           }
   
-          $log.info('Initializing exploration ' + this.propertyName + ':', value);
+          $log.info('Initializing exploration ' 
+          + this.propertyName + ':', value);
   
-          // The current value of the property (which may not have been saved to
+          // The current value of the property 
+          //(which may not have been saved to
           // the frontend yet). In general, this will be bound directly to the UI.
           this.displayed = angular.copy(value);
           // The previous (saved-in-the-frontend) value of the property. Here,
@@ -69,7 +72,8 @@ oppia.factory('ExplorationPropertyService', [
         _isValid: function(value) {
           return true;
         },
-        // Normalizes the displayed value. Then, if the memento and the displayed
+        // Normalizes the displayed value.
+        // Then, if the memento and the displayed
         // value are the same, does nothing. Otherwise, creates a new entry in the
         // change list, and updates the memento to the displayed value.
         saveDisplayedValue: function() {
@@ -111,8 +115,7 @@ oppia.factory('ExplorationPropertyService', [
           this.displayed = angular.copy(this.savedMemento);
         }
       };
-    }
-  ]);
+    }]);
   
   // A data service that stores the current exploration title so that it can be
   // displayed and edited in multiple places in the UI.
