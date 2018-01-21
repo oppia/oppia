@@ -41,7 +41,7 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
       this.secondLastMessageRead = true;
     }
     this.lastMessageRead = true;
-  }
+  };
 
   FeedbackThreadSummary.prototype.appendNewMessage = function(
     lastMessageText, authorLastMessage) {
@@ -62,7 +62,7 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
       lastMessageText, totalMessageCount, lastMessageRead,
       secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
       explorationTitle, explorationId, threadId);
-  }
+  };
 
   FeedbackThreadSummary.createFromBackendDict = function(
     feedbackThreadSummaryBackendDict) {

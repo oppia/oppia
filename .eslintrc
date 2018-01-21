@@ -57,6 +57,10 @@
         "keywords": true
       }
     ],
+    "semi": [
+      "error",
+      "always"
+    ],
     "space-unary-ops": [
       "error",
       {

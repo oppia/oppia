@@ -31,7 +31,7 @@ oppia.factory('explorationPropertyService', [
       param_specs: function(paramSpecs) {
         return paramSpecs.toBackendDict();
       },
-    }
+    };
 
     return {
       init: function(value) {
@@ -330,7 +330,7 @@ oppia.factory('explorationStatesService', [
         });
       },
       content: function(content) {
-        return content.toBackendDict()
+        return content.toBackendDict();
       },
       default_outcome: function(defaultOutcome) {
         if (defaultOutcome) {
@@ -538,7 +538,7 @@ oppia.factory('explorationStatesService', [
         saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
       },
       getHintsMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'hints')
+        return getStatePropertyMemento(stateName, 'hints');
       },
       saveHints: function(stateName, newHints) {
         saveStateProperty(stateName, 'hints', newHints);

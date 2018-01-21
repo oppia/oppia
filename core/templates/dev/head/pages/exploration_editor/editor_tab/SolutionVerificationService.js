@@ -32,5 +32,5 @@ oppia.factory('SolutionVerificationService', [
           ));
         return state.name !== result.outcome.dest;
       }
-    }
+    };
   }]);

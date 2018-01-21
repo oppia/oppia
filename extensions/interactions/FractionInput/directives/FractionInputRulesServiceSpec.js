@@ -31,7 +31,7 @@ describe('Fraction Input rules service', function() {
       wholeNumber: wholeNumber,
       numerator: numerator,
       denominator: denominator
-    }
+    };
   };
 
   var createPositiveFractionDict = function(
@@ -41,7 +41,7 @@ describe('Fraction Input rules service', function() {
       wholeNumber: wholeNumber,
       numerator: numerator,
       denominator: denominator
-    }
+    };
   };
 
   var RULE_INPUT = {

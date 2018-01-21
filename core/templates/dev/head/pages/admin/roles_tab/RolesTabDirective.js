@@ -96,7 +96,7 @@ oppia.directive('adminRolesTab', [
               'Server error: ' + errorResponse.data.error);
           });
           AdminTaskManagerService.finishTask();
-        }
+        };
 
         $scope.submitUpdateRoleForm = function(values) {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -119,7 +119,7 @@ oppia.directive('adminRolesTab', [
               'Server error: ' + errorResponse.data.error);
           });
           AdminTaskManagerService.finishTask();
-        }
+        };
       }]
     };
   }
