@@ -83,9 +83,9 @@ oppia.directive('explorationSummaryTile', [
         'DateTimeFormatService', 'RatingComputationService',
         'WindowDimensionsService', 'UrlService',
         function(
-          $scope, $http,
-          DateTimeFormatService, RatingComputationService,
-          WindowDimensionsService, UrlService) {
+            $scope, $http,
+            DateTimeFormatService, RatingComputationService,
+            WindowDimensionsService, UrlService) {
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.ACTIVITY_TYPE_EXPLORATION = (
             constants.ACTIVITY_TYPE_EXPLORATION);

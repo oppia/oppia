@@ -120,8 +120,8 @@ oppia.factory('explorationTitleService', [
   'explorationPropertyService', '$filter', 'ValidatorsService',
   'ExplorationRightsService',
   function(
-    explorationPropertyService, $filter, ValidatorsService,
-    ExplorationRightsService) {
+      explorationPropertyService, $filter, ValidatorsService,
+      ExplorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'title';
     child._normalize = $filter('normalizeWhitespace');
@@ -139,8 +139,8 @@ oppia.factory('explorationCategoryService', [
   'explorationPropertyService', '$filter', 'ValidatorsService',
   'ExplorationRightsService',
   function(
-    explorationPropertyService, $filter, ValidatorsService,
-    ExplorationRightsService) {
+      explorationPropertyService, $filter, ValidatorsService,
+      ExplorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'category';
     child._normalize = $filter('normalizeWhitespace');
@@ -158,8 +158,8 @@ oppia.factory('explorationObjectiveService', [
   'explorationPropertyService', '$filter', 'ValidatorsService',
   'ExplorationRightsService',
   function(
-    explorationPropertyService, $filter, ValidatorsService,
-    ExplorationRightsService) {
+      explorationPropertyService, $filter, ValidatorsService,
+      ExplorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'objective';
     child._normalize = $filter('normalizeWhitespace');

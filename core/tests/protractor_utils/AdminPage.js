@@ -77,7 +77,7 @@ var AdminPage = function(){
   };
 
   this.editConfigProperty = function(
-    propertyName, objectType, editingInstructions) {
+      propertyName, objectType, editingInstructions) {
     general.waitForSystem();
     this.get();
     configTab.click();

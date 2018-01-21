@@ -20,7 +20,7 @@ oppia.factory('FractionInputValidationService', [
   'WARNING_TYPES', 'baseInteractionValidationService',
   'FractionObjectFactory',
   function(
-    WARNING_TYPES, baseInteractionValidationService, FractionObjectFactory) {
+      WARNING_TYPES, baseInteractionValidationService, FractionObjectFactory) {
     var getNonIntegerInputWarning = function(i, j) {
       return {
         type: WARNING_TYPES.ERROR,
@@ -35,7 +35,7 @@ oppia.factory('FractionInputValidationService', [
         return [];
       },
       getAllWarnings: function(
-        stateName, customizationArgs, answerGroups, defaultOutcome) {
+          stateName, customizationArgs, answerGroups, defaultOutcome) {
         var warningsList = [];
         var shouldBeInSimplestForm =
           customizationArgs.requireSimplestForm.value;

@@ -33,7 +33,7 @@ describe('FractionInputValidationService', function() {
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
     createFractionDict = function(
-      isNegative, wholeNumber, numerator, denominator) {
+        isNegative, wholeNumber, numerator, denominator) {
       return {
         isNegative: isNegative,
         wholeNumber: wholeNumber,
