@@ -23,7 +23,7 @@ oppia.factory('ExplorationPropertyService', [
       // Public base API for data
       // services corresponding to exploration properties
       // (title, category, etc.)
-  
+
       var BACKEND_CONVERSIONS = {
         param_changes: function(paramChanges) {
           return paramChanges.map(function(paramChange) {
@@ -34,17 +34,17 @@ oppia.factory('ExplorationPropertyService', [
           return paramSpecs.toBackendDict();
         },
       }
-  
+
       return {
         init: function(value) {
           if (this.propertyName === null) {
             throw 'Exploration property name cannot be null.';
           }
-  
-          $log.info('Initializing exploration ' + 
+
+          $log.info('Initializing exploration ' +
           this.propertyName + ':', value);
-  
-          // The current value of the property 
+
+          // The current value of the property
           //(which may not have been saved to the frontend yet).
           // In general, this will be bound directly to the UI.
           this.displayed = angular.copy(value);
@@ -52,7 +52,7 @@ oppia.factory('ExplorationPropertyService', [
           // 'saved' means that this is the latest value of the property as
           // determined by the frontend change list.
           this.savedMemento = angular.copy(value);
-  
+
           $rootScope.$broadcast('explorationPropertyChanged');
         },
         // Returns whether the current value has changed from the memento.
@@ -82,34 +82,34 @@ oppia.factory('ExplorationPropertyService', [
           if (this.propertyName === null) {
             throw 'Exploration property name cannot be null.';
           }
-  
+
           this.displayed = this._normalize(this.displayed);
-  
+
           if (!this._isValid(this.displayed) || !this.hasChanged()) {
             this.restoreFromMemento();
             return;
           }
-  
+
           if (angular.equals(this.displayed, this.savedMemento)) {
             return;
           }
-  
+
           AlertsService.clearWarnings();
-  
+
           var newBackendValue = angular.copy(this.displayed);
           var oldBackendValue = angular.copy(this.savedMemento);
-  
+
           if (BACKEND_CONVERSIONS.hasOwnProperty(this.propertyName)) {
             newBackendValue =
               BACKEND_CONVERSIONS[this.propertyName](this.displayed);
             oldBackendValue =
               BACKEND_CONVERSIONS[this.propertyName](this.savedMemento);
           }
-  
+
           ChangeListService.editExplorationProperty(
             this.propertyName, newBackendValue, oldBackendValue);
           this.savedMemento = angular.copy(this.displayed);
-  
+
           $rootScope.$broadcast('explorationPropertyChanged');
         },
         // Reverts the displayed value to the saved memento.
@@ -136,8 +136,8 @@ oppia.factory('ExplorationTitleService',[
       };
       return child;
     }]);
-  
-  // A data service that stores the current 
+
+  // A data service that stores the current
   //exploration category so that it can be
   // displayed and edited in multiple places in the UI.
 oppia.factory('ExplorationCategoryService', [
@@ -155,7 +155,7 @@ oppia.factory('ExplorationCategoryService', [
       };
       return child;
     }]);
-  
+
   // A data service that stores the current exploration objective so that it can
   // be displayed and edited in multiple places in the UI.
 oppia.factory('ExplorationObjectiveService', [
@@ -174,7 +174,7 @@ oppia.factory('ExplorationObjectiveService', [
       };
       return child;
     }]);
-  
+
   // A data service that stores the exploration language code.
 oppia.factory('ExplorationLanguageCodeService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {
@@ -203,7 +203,7 @@ oppia.factory('ExplorationLanguageCodeService', [
       };
       return child;
     }]);
-  
+
   // A data service that stores the name of the exploration's initial state.
   // NOTE: This service does not perform validation. Users of this service
   // should ensure that new initial state names passed to the service are
@@ -214,7 +214,7 @@ oppia.factory('ExplorationInitStateNameService', [
       child.propertyName = 'init_state_name';
       return child;
     }]);
-  
+
   // A data service that stores tags for the exploration.
 oppia.factory('ExplorationTagsService', [
     'ExplorationPropertyService',
@@ -236,73 +236,73 @@ oppia.factory('ExplorationTagsService', [
             return false;
           }
         }
-  
+
         return true;
       };
       return child;
     }]);
-  
+
 oppia.factory('ExplorationParamSpecsService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {
       var child = Object.create(ExplorationPropertyService);
       child.propertyName = 'param_specs';
       return child;
     }]);
-  
+
 oppia.factory('ExplorationParamChangesService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {
       var child = Object.create(ExplorationPropertyService);
       child.propertyName = 'param_changes';
       return child;
     }]);
-  
+
 oppia.factory('ExplorationAutomaticTextToSpeechService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {
       var child = Object.create(ExplorationPropertyService);
       child.propertyName = 'auto_tts_enabled';
-  
+
       child._isValid = function(value) {
         return (typeof value === 'boolean');
       };
-  
+
       child.isAutomaticTextToSpeechEnabled = function() {
         return child.savedMemento;
       };
-  
+
       child.toggleAutomaticTextToSpeech = function() {
         child.displayed = !child.displayed;
         child.saveDisplayedValue();
       };
-  
+
       return child;
     }]);
-  
+
 oppia.factory('ExplorationCorrectnessFeedbackService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {
       var child = Object.create(ExplorationPropertyService);
       child.propertyName = 'correctness_feedback_enabled';
-  
+
       child._isValid = function(value) {
         return (typeof value === 'boolean');
       };
-  
+
       child.isEnabled = function() {
         return child.savedMemento;
       };
-  
+
       child.toggleCorrectnessFeedback = function() {
         child.displayed = !child.displayed;
         child.saveDisplayedValue();
       };
-  
+
       return child;
     }]);
-  
+
   // Data service for keeping track of the exploration's states. Note that this
   // is unlike the other exploration property services, in that it keeps no
   // mementos.
 oppia.factory('ExplorationStatesService', [
-    '$log', '$uibModal', '$filter', '$location', 
+    '$log', '$uibModal', '$filter', '$location',
     '$rootScope', '$injector', '$q',
     'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
     'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
@@ -319,7 +319,7 @@ oppia.factory('ExplorationStatesService', [
       var _states = null;
       // Properties that have a different backend representation from the
       // frontend and must be converted.
-  
+
       var BACKEND_CONVERSIONS = {
         answer_groups: function(answerGroups) {
           return answerGroups.map(function(answerGroup) {
@@ -357,7 +357,7 @@ oppia.factory('ExplorationStatesService', [
           }
         }
       };
-  
+
       // Maps backend names to the corresponding frontend dict accessor lists.
       var PROPERTY_REF_DATA = {
         answer_groups: ['interaction', 'answerGroups'],
@@ -372,51 +372,51 @@ oppia.factory('ExplorationStatesService', [
         widget_id: ['interaction', 'id'],
         widget_customization_args: ['interaction', 'customizationArgs']
       };
-  
+
       var _setState = function(stateName, stateData, refreshGraph) {
         _states.setState(stateName, angular.copy(stateData));
         if (refreshGraph) {
           $rootScope.$broadcast('refreshGraph');
         }
       };
-  
+
       var getStatePropertyMemento = function(stateName, backendName) {
         var accessorList = PROPERTY_REF_DATA[backendName];
         var propertyRef = _states.getState(stateName);
         accessorList.forEach(function(key) {
           propertyRef = propertyRef[key];
         });
-  
+
         return angular.copy(propertyRef);
       };
-  
+
       var saveStateProperty = function(stateName, backendName, newValue) {
         var oldValue = getStatePropertyMemento(stateName, backendName);
         var newBackendValue = angular.copy(newValue);
         var oldBackendValue = angular.copy(oldValue);
-  
+
         if (BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
           newBackendValue = convertToBackendRepresentation(
             newValue, backendName);
           oldBackendValue = convertToBackendRepresentation(
             oldValue, backendName);
         }
-  
+
         if (!angular.equals(oldValue, newValue)) {
           ChangeListService.editStateProperty(
             stateName, backendName, newBackendValue, oldBackendValue);
-  
+
           var newStateData = _states.getState(stateName);
           var accessorList = PROPERTY_REF_DATA[backendName];
-  
+
           var propertyRef = newStateData;
           for (var i = 0; i < accessorList.length - 1; i++) {
             propertyRef = propertyRef[accessorList[i]];
           }
-  
+
           propertyRef[accessorList[accessorList.length - 1]] = angular.copy(
             newValue);
-  
+
           // We do not refresh the state editor
           // immediately after the interaction
           // id alone is saved, because the customization args dict will be
@@ -427,13 +427,13 @@ oppia.factory('ExplorationStatesService', [
           _setState(stateName, newStateData, refreshGraph);
         }
       };
-  
-      var convertToBackendRepresentation = 
+
+      var convertToBackendRepresentation =
       function(frontendValue, backendName) {
         var conversionFunction = BACKEND_CONVERSIONS[backendName];
         return conversionFunction(frontendValue);
       };
-  
+
       // TODO(sll): Add unit tests for all get/save methods.
       return {
         init: function(statesBackendDict) {
@@ -566,9 +566,9 @@ oppia.factory('ExplorationStatesService', [
             return;
           }
           AlertsService.clearWarnings();
-  
+
           _states.addState(newStateName);
-  
+
           ChangeListService.addState(newStateName);
           $rootScope.$broadcast('refreshGraph');
           if (successCallback) {
@@ -577,7 +577,7 @@ oppia.factory('ExplorationStatesService', [
         },
         deleteState: function(deleteStateName) {
           AlertsService.clearWarnings();
-  
+
           var initStateName = ExplorationInitStateNameService.displayed;
           if (deleteStateName === initStateName) {
             return;
@@ -587,7 +587,7 @@ oppia.factory('ExplorationStatesService', [
               'No state with name ' + deleteStateName + ' exists.');
             return;
           }
-  
+
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration_editor/editor_tab/' +
@@ -604,11 +604,11 @@ oppia.factory('ExplorationStatesService', [
                 $scope.deleteStateWarningText = (
                   'Are you sure you want to delete the card "' +
                   deleteStateName + '"?');
-  
+
                 $scope.reallyDelete = function() {
                   $uibModalInstance.close(deleteStateName);
                 };
-  
+
                 $scope.cancel = function() {
                   $uibModalInstance.dismiss('cancel');
                   AlertsService.clearWarnings();
@@ -617,14 +617,14 @@ oppia.factory('ExplorationStatesService', [
             ]
           }).result.then(function(deleteStateName) {
             _states.deleteState(deleteStateName);
-  
+
             ChangeListService.deleteState(deleteStateName);
-  
+
             if (EditorStateService.getActiveStateName() === deleteStateName) {
               EditorStateService.setActiveStateName(
                 ExplorationInitStateNameService.savedMemento);
             }
-  
+
             $location.path('/gui/' + EditorStateService.getActiveStateName());
             $rootScope.$broadcast('refreshGraph');
             // This ensures that if the deletion changes rules in the current
@@ -642,9 +642,9 @@ oppia.factory('ExplorationStatesService', [
             return;
           }
           AlertsService.clearWarnings();
-  
+
           _states.renameState(oldStateName, newStateName);
-  
+
           EditorStateService.setActiveStateName(newStateName);
           // The 'rename state' command must come before the 'change
           // init_state_name' command in the change list, otherwise the backend
@@ -662,4 +662,3 @@ oppia.factory('ExplorationStatesService', [
         }
       };
     }]);
-    
