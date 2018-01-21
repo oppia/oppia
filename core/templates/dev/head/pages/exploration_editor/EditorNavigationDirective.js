@@ -69,8 +69,8 @@ oppia.directive('editorNavigation', [
                 '$scope', '$uibModalInstance',
                 'siteAnalyticsService', 'ExplorationContextService',
                 function(
-                  $scope, $uibModalInstance,
-                  siteAnalyticsService, ExplorationContextService) {
+                    $scope, $uibModalInstance,
+                    siteAnalyticsService, ExplorationContextService) {
                   var explorationId = (
                     ExplorationContextService.getExplorationId());
 

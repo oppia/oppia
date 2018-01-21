@@ -57,5 +57,5 @@ oppia.factory('FatigueDetectionService', [
       reset: function() {
         submissionTimesMsec = [];
       }
-    }
+    };
   }]);

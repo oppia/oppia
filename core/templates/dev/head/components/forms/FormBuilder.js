@@ -146,8 +146,8 @@ oppia.directive('textAngularRte', [
   '$filter', '$timeout', 'HtmlEscaperService', 'RteHelperService',
   'textAngularManager',
   function(
-    $filter, $timeout, HtmlEscaperService, RteHelperService,
-    textAngularManager) {
+      $filter, $timeout, HtmlEscaperService, RteHelperService,
+      textAngularManager) {
     return {
       restrict: 'E',
       scope: {
@@ -269,7 +269,7 @@ oppia.filter('isInteger', [function() {
   return function(input) {
     return Number.isInteger(Number(input));
   };
-}])
+}]);
 
 oppia.filter('isFloat', [function() {
   return function(input) {

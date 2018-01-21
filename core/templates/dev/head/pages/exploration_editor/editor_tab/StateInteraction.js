@@ -227,7 +227,7 @@ oppia.controller('StateInteraction', [
                   validationService.getCustomizationArgsWarnings(
                     stateCustomizationArgsService.displayed);
                 return warningsList;
-              }
+              };
 
               $scope.onChangeInteractionId = function(newInteractionId) {
                 EditorFirstTimeEventsService

@@ -38,6 +38,6 @@ oppia.directive('explorationTitleEditor', [
           $scope.explorationTitleService = ExplorationTitleService;
         }
       ]
-    }
+    };
   }
-])
+]);

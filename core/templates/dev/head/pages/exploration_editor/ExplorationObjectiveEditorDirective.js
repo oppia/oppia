@@ -37,6 +37,6 @@ oppia.directive('explorationObjectiveEditor', [
           $scope.explorationObjectiveService = ExplorationObjectiveService;
         }
       ]
-    }
+    };
   }
-])
+]);

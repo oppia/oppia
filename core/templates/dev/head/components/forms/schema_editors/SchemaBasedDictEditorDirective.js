@@ -20,8 +20,8 @@ oppia.directive('schemaBasedDictEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',
   function(
-    NestedDirectivesRecursionTimeoutPreventionService,
-    UrlInterpolationService) {
+      NestedDirectivesRecursionTimeoutPreventionService,
+      UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',

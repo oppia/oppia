@@ -383,7 +383,7 @@ oppia.controller('ExplorationEditor', [
           '$scope', '$uibModalInstance', 'siteAnalyticsService',
           'ExplorationContextService',
           function($scope, $uibModalInstance, siteAnalyticsService,
-          ExplorationContextService) {
+              ExplorationContextService) {
             var explorationId = ExplorationContextService.getExplorationId();
 
             siteAnalyticsService.registerTutorialModalOpenEvent(explorationId);

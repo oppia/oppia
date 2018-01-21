@@ -270,6 +270,7 @@ oppia.factory('ExplorationSaveService', [
               'exploration_metadata_modal_directive.html'),
             backdrop: 'static',
             controller: [
+<<<<<<< HEAD
               '$scope', '$uibModalInstance', 'ExplorationObjectiveService',
               'ExplorationTitleService', 'ExplorationCategoryService',
               'ExplorationStatesService', 'ALL_CATEGORIES',
@@ -279,6 +280,17 @@ oppia.factory('ExplorationSaveService', [
               ExplorationStatesService, ALL_CATEGORIES,
               ExplorationLanguageCodeService, ExplorationTagsService) {
                 $scope.explorationTitleService = ExplorationTitleService;
+=======
+              '$scope', '$uibModalInstance', 'explorationObjectiveService',
+              'explorationTitleService', 'explorationCategoryService',
+              'explorationStatesService', 'ALL_CATEGORIES',
+              'explorationLanguageCodeService', 'explorationTagsService',
+              function($scope, $uibModalInstance, explorationObjectiveService,
+                  explorationTitleService, explorationCategoryService,
+                  explorationStatesService, ALL_CATEGORIES,
+                  explorationLanguageCodeService, explorationTagsService) {
+                $scope.explorationTitleService = explorationTitleService;
+>>>>>>> develop
                 $scope.explorationObjectiveService =
                   ExplorationObjectiveService;
                 $scope.explorationCategoryService =
@@ -506,7 +518,7 @@ oppia.factory('ExplorationSaveService', [
             controller: [
               '$scope', '$uibModalInstance', 'isExplorationPrivate',
               function(
-                $scope, $uibModalInstance, isExplorationPrivate) {
+                  $scope, $uibModalInstance, isExplorationPrivate) {
                 $scope.showDiff = false;
                 $scope.onClickToggleDiffButton = function() {
                   $scope.showDiff = !$scope.showDiff;
