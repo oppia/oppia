@@ -29,8 +29,8 @@ describe('Embedding', function() {
   var adminPage = null;
   var explorationPlayerPage = null;
   var explorationId = null;
-  var createCountingExploration = function (){
-    // Intro
+  var createCountingExploration = function () {
+    // Intro.
     editor.setStateName('Intro');
     editor.setContent(forms.toRichText(
       'Given three balls of different colors. How many ways are there ' +
@@ -43,7 +43,7 @@ describe('Embedding', function() {
       , null, false, 'IsLessThanOrEqualTo', 0);
     editor.setDefaultOutcome(null, 'Not 6', true);
 
-    // correct but why
+    // correct but why.
     editor.moveToState('correct but why');
     editor.setContent(forms.toRichText('Right! Why do you think it is 6?'));
     editor.setInteraction('TextInput', 'Type your answer here.', 5);
@@ -57,18 +57,18 @@ describe('Embedding', function() {
       'answer for 4 balls is!')
       , null, false);
 
-    // Not 6
+    // Not 6.
     editor.moveToState('Not 6');
     editor.setContent(forms.toRichText('List the different ways?'));
     editor.setInteraction('Continue', 'try again');
     editor.setDefaultOutcome(null, 'Intro', false);
 
-    // END
+    // END.
     editor.moveToState('END');
     editor.setContent(forms.toRichText('Congratulations, you have finished!'));
     editor.setInteraction('EndExploration');
 
-    // save changes
+    // Save changes.
     title = 'Protractor Test';
     category = 'Mathematics';
     objective = 'learn how to count permutations' + 
@@ -78,7 +78,7 @@ describe('Embedding', function() {
     editor.setObjective(objective);
     editor.saveChanges('Done!');
 
-    // publish changes
+    // Publish changes.
     workflow.publishExploration();
   };
 
@@ -125,11 +125,11 @@ describe('Embedding', function() {
     users.login('user1@embedding.com', true);
 
     // Create exploration.
-    // version 1 is creation of the exploration.
+    // Version 1 is creation of the exploration.
     workflow.createExploration();
-    general.getExplorationIdFromEditor().then(function(expId){
+    general.getExplorationIdFromEditor().then(function(expId) {
       explorationId = expId;
-      // Create version 2 of the exploration.
+      // Create Version 2 of the exploration.
       createCountingExploration();
 
       general.openEditor(explorationId);
@@ -137,34 +137,37 @@ describe('Embedding', function() {
       editor.saveChanges('demonstration edit');
 
       for (var i = 0; i < TEST_PAGES.length; i++) {
-        // This is necessary as the pages are non-angular;
+        // This is necessary as the pages are non-angular.
         var driver = browser.driver;
         driver.get(
           general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
           TEST_PAGES[i].filename);
 
-        driver.findElement(
-          by.css('#embedding-exploration-id')).sendKeys(explorationId);
-        driver.findElement(
-          by.css('#embedding-submit-btn')).click();
+        driver.findElement(by.css(
+          '.protractor-test-exploration-id-input-field')
+        ).sendKeys(explorationId);
 
-        // Test of standard loading (new and old versions)
+        driver.findElement(by.css(
+          '.protractor-test-exploration-id-submit-button')
+        ).click();
+
+        // Test of standard loading (new and old versions).
         browser.switchTo().frame(
           driver.findElement(
-            by.css('.protractor-test-standard iframe')));
+            by.css('.protractor-test-standard > iframe')));
         playCountingExploration(3);
         browser.switchTo().defaultContent();
 
         if (TEST_PAGES[i].isVersion1) {
-          // Test of deferred loading (old version)
+          // Test of deferred loading (old version).
           driver.findElement(
-            by.css('.protractor-test-old-version oppia div button')
+            by.css('.protractor-test-old-version > oppia > div > button')
           ).click();
         }
 
         browser.switchTo().frame(
           driver.findElement(
-            by.css('.protractor-test-old-version iframe')));
+            by.css('.protractor-test-old-version > iframe')));
         playCountingExploration(2);
         browser.switchTo().defaultContent();
       }
@@ -225,13 +228,16 @@ describe('Embedding', function() {
         general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
         'embedding_tests_dev_i18n_0.0.1.html');
 
-      driver.findElement(
-        by.css('#embedding-exploration-id')).sendKeys(explorationId);
-      driver.findElement(
-        by.css('#embedding-submit-btn')).click();
+      driver.findElement(by.css(
+        '.protractor-test-exploration-id-input-field')
+      ).sendKeys(explorationId);
+      
+      driver.findElement(by.css(
+        '.protractor-test-exploration-id-submit-button')
+      ).click();
 
       browser.switchTo().frame(driver.findElement(
-        by.css('.protractor-test-embedded-exploration iframe')));
+        by.css('.protractor-test-embedded-exploration > iframe')));
       general.waitForSystem();
       browser.waitForAngular();
       expect(driver.findElement(by.css('.protractor-test-float-form-input'))
@@ -246,7 +252,7 @@ describe('Embedding', function() {
     general.openEditor(explorationId);
     editor.setLanguage('ภาษาไทย');
     editor.saveChanges('Changing the language to a not supported one.');
-    // We expect the default language, English
+    // We expect the default language, English.
     checkPlaceholder('Type a number');
 
     // Change language to Spanish, which is a supported site language.
@@ -259,11 +265,11 @@ describe('Embedding', function() {
 
     // This error is to be ignored as 'idToBeReplaced' is not a valid
     // exploration id. It appers just after the page loads.
-    var errorsToIgnore = new RegExp('http:\/\/localhost:9001\/assets\/' +
+    var errorToIgnore = new RegExp('http:\/\/localhost:9001\/assets\/' +
       'scripts\/embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
       '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
       'locale=en#version=0.0.1&secret=.*\' in a frame because it set ' +
       '\'X-Frame-Options\' to \'deny\'.', 'g');
-    general.checkForConsoleErrors([errorsToIgnore]);
+    general.checkForConsoleErrors([errorToIgnore]);
   });
 });
