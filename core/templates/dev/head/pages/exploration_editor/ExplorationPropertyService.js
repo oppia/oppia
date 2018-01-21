@@ -312,7 +312,8 @@ oppia.factory('ExplorationPropertyService', [
   // is unlike the other exploration property services, in that it keeps no
   // mementos.
   oppia.factory('ExplorationStatesService', [
-    '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
+    '$log', '$uibModal', '$filter', '$location', 
+    '$rootScope', '$injector', '$q',
     'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
     'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
     'SolutionValidityService', 'AngularNameService',
@@ -426,7 +427,8 @@ oppia.factory('ExplorationPropertyService', [
           propertyRef[accessorList[accessorList.length - 1]] = angular.copy(
             newValue);
   
-          // We do not refresh the state editor immediately after the interaction
+          // We do not refresh the state editor
+          // immediately after the interaction
           // id alone is saved, because the customization args dict will be
           // temporarily invalid. A change in interaction id will always entail
           // a change in the customization args dict anyway, so the graph will
@@ -436,7 +438,8 @@ oppia.factory('ExplorationPropertyService', [
         }
       };
   
-      var convertToBackendRepresentation = function(frontendValue, backendName) {
+      var convertToBackendRepresentation = 
+      function(frontendValue, backendName) {
         var conversionFunction = BACKEND_CONVERSIONS[backendName];
         return conversionFunction(frontendValue);
       };
@@ -484,7 +487,8 @@ oppia.factory('ExplorationPropertyService', [
         isNewStateNameValid: function(newStateName, showWarnings) {
           if (_states.hasState(newStateName)) {
             if (showWarnings) {
-              AlertsService.addWarning('A state with this name already exists.');
+              AlertsService.addWarning(
+                'A state with this name already exists.');
             }
             return false;
           }
@@ -519,7 +523,8 @@ oppia.factory('ExplorationPropertyService', [
           saveStateProperty(stateName, 'widget_id', newInteractionId);
         },
         getInteractionCustomizationArgsMemento: function(stateName) {
-          return getStatePropertyMemento(stateName, 'widget_customization_args');
+          return getStatePropertyMemento(
+            stateName, 'widget_customization_args');
         },
         saveInteractionCustomizationArgs: function(
             stateName, newCustomizationArgs) {
