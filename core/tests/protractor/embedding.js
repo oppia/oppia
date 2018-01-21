@@ -22,7 +22,7 @@ var users = require('../protractor_utils/users.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var editor = require('../protractor_utils/editor.js');
 var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js')
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('Embedding', function() {
