@@ -17,13 +17,13 @@
  */
 
 oppia.factory('ExplorationWarningsService', [
-  '$injector', 'GraphDataService', 'explorationStatesService',
-  'ExpressionInterpolationService', 'explorationParamChangesService',
+  '$injector', 'GraphDataService', 'ExplorationStatesService',
+  'ExpressionInterpolationService', 'ExplorationParamChangesService',
   'ParameterMetadataService', 'INTERACTION_SPECS',
   'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
   function(
-      $injector, GraphDataService, explorationStatesService,
-      ExpressionInterpolationService, explorationParamChangesService,
+      $injector, GraphDataService, ExplorationStatesService,
+      ExpressionInterpolationService, ExplorationParamChangesService,
       ParameterMetadataService, INTERACTION_SPECS,
       WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
     var _warningsList = [];
@@ -33,7 +33,7 @@ oppia.factory('ExplorationWarningsService', [
     var _getStatesWithoutInteractionIds = function() {
       var statesWithoutInteractionIds = [];
 
-      var states = explorationStatesService.getStates();
+      var states = ExplorationStatesService.getStates();
 
       states.getStateNames().forEach(function(stateName) {
         if (!states.getState(stateName).interaction.id) {
@@ -47,10 +47,10 @@ oppia.factory('ExplorationWarningsService', [
     var _getStatesWithIncorrectSolution = function() {
       var statesWithIncorrectSolution = [];
 
-      var states = explorationStatesService.getStates();
+      var states = ExplorationStatesService.getStates();
       states.getStateNames().forEach(function(stateName) {
         if (states.getState(stateName).interaction.solution &&
-            !explorationStatesService.isSolutionValid(stateName)) {
+            !ExplorationStatesService.isSolutionValid(stateName)) {
           statesWithIncorrectSolution.push(stateName);
         }
       });
@@ -158,7 +158,7 @@ oppia.factory('ExplorationWarningsService', [
     var _getStatesAndAnswerGroupsWithEmptyClassifiers = function() {
       var results = [];
 
-      var states = explorationStatesService.getStates();
+      var states = ExplorationStatesService.getStates();
 
       states.getStateNames().forEach(function(stateName) {
         var groupIndexes = _getAnswerGroupIndexesWithEmptyClassifiers(
@@ -182,7 +182,7 @@ oppia.factory('ExplorationWarningsService', [
       GraphDataService.recompute();
       var _graphData = GraphDataService.getGraphData();
 
-      var _states = explorationStatesService.getStates();
+      var _states = ExplorationStatesService.getStates();
       _states.getStateNames().forEach(function(stateName) {
         var interaction = _states.getState(stateName).interaction;
         if (interaction.id) {
