@@ -117,7 +117,8 @@ oppia.factory('ExplorationPropertyService', [
         }
       };
     }]);
-  
+
+
   // A data service that stores the current exploration title so that it can be
   // displayed and edited in multiple places in the UI.
   oppia.factory('ExplorationTitleService',[
@@ -137,7 +138,8 @@ oppia.factory('ExplorationPropertyService', [
     }
   ]);
   
-  // A data service that stores the current exploration category so that it can be
+  // A data service that stores the current 
+  //exploration category so that it can be
   // displayed and edited in multiple places in the UI.
   oppia.factory('ExplorationCategoryService', [
     'ExplorationPropertyService', '$filter', 'ValidatorsService',
