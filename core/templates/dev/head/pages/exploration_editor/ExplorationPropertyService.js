@@ -16,6 +16,7 @@
  * @fileoverview Standalone services for the exploration editor page.
  */
 
+
 oppia.factory('ExplorationPropertyService', [
     '$rootScope', '$log', 'ChangeListService', 'AlertsService',
     function($rootScope, $log, ChangeListService, AlertsService) {
@@ -117,7 +118,6 @@ oppia.factory('ExplorationPropertyService', [
         }
       };
     }]);
-
 
   // A data service that stores the current exploration title so that it can be
   // displayed and edited in multiple places in the UI.
