@@ -218,8 +218,7 @@ class AdminHandler(base.BaseHandler):
 
     def _generate_dummy_explorations(
             self, num_dummy_exps_to_generate, num_dummy_exps_to_publish):
-        """
-        Generates and publishes the given number of dummy explorations.
+        """Generates and publishes the given number of dummy explorations.
 
         Args:
             num_dummy_exps_to_generate: int. Count of dummy explorations to

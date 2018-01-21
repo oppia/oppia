@@ -199,7 +199,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             })}
 
         self._assert_validation_error(
-            'Expected skill ID to have length at least 6, received a')
+            'Expected skill ID to begin with \'skill\', received a')
 
         self.collection.skills = {
             'abcdef': collection_domain.CollectionSkill.from_dict(

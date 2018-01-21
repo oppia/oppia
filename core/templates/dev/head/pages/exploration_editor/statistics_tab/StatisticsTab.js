@@ -218,12 +218,12 @@ oppia.controller('StatisticsTab', [
               var title1 = 'Answer feedback statistics';
               $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1 = angular.copy(
                 COMPLETION_RATE_PIE_CHART_OPTIONS);
-              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1.title = title1
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1.title = title1;
 
               var title2 = 'Solution usage statistics';
               $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2 = angular.copy(
                 COMPLETION_RATE_PIE_CHART_OPTIONS);
-              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2.title = title2
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2.title = title2;
 
               $scope.stateName = stateName;
               $scope.stateStats = stateStats;

@@ -131,7 +131,7 @@ describe('Answer classification service with string classifier disabled',
 
     it('should fail if no frontend rules are provided', function() {
       expect(function() {
-        acs.getMatchingClassificationResult(explorationId, stateName, state, 0)
+        acs.getMatchingClassificationResult(explorationId, stateName, state, 0);
       }).toThrow();
     });
 
@@ -212,7 +212,7 @@ describe('Answer classification service with string classifier disabled',
 
       expect(function() {
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 0)
+          explorationId, stateName, state, 0);
       }).toThrow();
     });
   });

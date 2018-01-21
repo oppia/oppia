@@ -34,9 +34,9 @@ oppia.directive('learnerDashboardIcons', [
         'LearnerDashboardActivityIdsObjectFactory',
         'LearnerPlaylistService',
         function(
-          $scope, LearnerDashboardIdsBackendApiService,
-          LearnerDashboardActivityIdsObjectFactory,
-          LearnerPlaylistService) {
+            $scope, LearnerDashboardIdsBackendApiService,
+            LearnerDashboardActivityIdsObjectFactory,
+            LearnerPlaylistService) {
           $scope.activityIsCurrentlyHoveredOver = true;
           $scope.playlistTooltipIsEnabled = false;
 
@@ -147,7 +147,7 @@ oppia.directive('learnerDashboardIcons', [
           };
 
           $scope.removeFromLearnerPlaylist = function(
-            activityId, activityTitle, activityType) {
+              activityId, activityTitle, activityType) {
             var isSuccessfullyRemoved = (
               LearnerPlaylistService.removeFromLearnerPlaylist(
                 activityId, activityTitle, activityType,

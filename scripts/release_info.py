@@ -14,8 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Script that simplifies releases by collecting various information.
+"""Script that simplifies releases by collecting various information.
 Should be run from the oppia root dir.
 """
 import collections

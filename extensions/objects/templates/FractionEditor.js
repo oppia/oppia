@@ -50,7 +50,7 @@ oppia.directive('fractionEditor', [
 
         $scope.getWarningText = function() {
           return errorMessage;
-        }
+        };
       }]
     };
   }]);

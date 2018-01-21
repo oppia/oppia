@@ -31,7 +31,7 @@
              classifierData = backendStateClassifierMapping[
                stateName].classifier_data;
              dataSchemaVersion = backendStateClassifierMapping[
-               stateName].data_schema_version
+               stateName].data_schema_version;
              stateClassifierMapping[stateName] = ClassifierObjectFactory.create(
                algorithmId, classifierData, dataSchemaVersion);
            }
