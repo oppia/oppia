@@ -270,7 +270,7 @@ class TestBase(unittest.TestCase):
             self.assertEqual(json_response.status_int, 200)
 
         self.assertEqual(
-            json_response.content_type, 'application/javascript')
+            json_response.content_type, 'application/json')
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])

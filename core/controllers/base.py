@@ -265,7 +265,7 @@ class BaseHandler(webapp2.RequestHandler):
         Args:
             values: dict. The key-value pairs to encode in the JSON response.
         """
-        self.response.content_type = 'application/javascript; charset=utf-8'
+        self.response.content_type = 'application/json; charset=utf-8'
         self.response.headers['Content-Disposition'] = (
             'attachment; filename="oppia-attachment.txt"')
         self.response.headers['Strict-Transport-Security'] = (
