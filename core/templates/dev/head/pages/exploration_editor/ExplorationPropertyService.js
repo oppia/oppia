@@ -40,12 +40,12 @@ oppia.factory('ExplorationPropertyService', [
             throw 'Exploration property name cannot be null.';
           }
   
-          $log.info('Initializing exploration ' 
-          + this.propertyName + ':', value);
+          $log.info('Initializing exploration ' + 
+          this.propertyName + ':', value);
   
           // The current value of the property 
-          //(which may not have been saved to
-          // the frontend yet). In general, this will be bound directly to the UI.
+          //(which may not have been saved to the frontend yet).
+          // In general, this will be bound directly to the UI.
           this.displayed = angular.copy(value);
           // The previous (saved-in-the-frontend) value of the property. Here,
           // 'saved' means that this is the latest value of the property as
@@ -74,7 +74,8 @@ oppia.factory('ExplorationPropertyService', [
         },
         // Normalizes the displayed value.
         // Then, if the memento and the displayed
-        // value are the same, does nothing. Otherwise, creates a new entry in the
+        // value are the same, does nothing.
+        // Otherwise, creates a new entry in the
         // change list, and updates the memento to the displayed value.
         saveDisplayedValue: function() {
           if (this.propertyName === null) {
@@ -119,7 +120,7 @@ oppia.factory('ExplorationPropertyService', [
   
   // A data service that stores the current exploration title so that it can be
   // displayed and edited in multiple places in the UI.
-  oppia.factory('ExplorationTitleService', [
+  oppia.factory('ExplorationTitleService',[
     'ExplorationPropertyService', '$filter', 'ValidatorsService',
     'ExplorationRightsService',
     function(
@@ -402,8 +403,10 @@ oppia.factory('ExplorationPropertyService', [
         var oldBackendValue = angular.copy(oldValue);
   
         if (BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
-          newBackendValue = convertToBackendRepresentation(newValue, backendName);
-          oldBackendValue = convertToBackendRepresentation(oldValue, backendName);
+          newBackendValue = convertToBackendRepresentation(
+            newValue, backendName);
+          oldBackendValue = convertToBackendRepresentation(
+            oldValue, backendName);
         }
   
         if (!angular.equals(oldValue, newValue)) {
@@ -439,7 +442,8 @@ oppia.factory('ExplorationPropertyService', [
       // TODO(sll): Add unit tests for all get/save methods.
       return {
         init: function(statesBackendDict) {
-          _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
+          _states = StatesObjectFactory.createFromBackendDict(
+            statesBackendDict);
           // Initialize the solutionValidityService.
           SolutionValidityService.init(_states.getStateNames());
           _states.getStateNames().forEach(function(stateName) {
