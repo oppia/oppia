@@ -56,8 +56,8 @@ oppia.factory('AudioTranslationLanguageService', [
     };
 
     var _init = function(
-      allAudioLanguageCodesInExploration, preferredAudioLanguageCode,
-      explorationLanguageCode, automaticTextToSpeechEnabled) {
+        allAudioLanguageCodesInExploration, preferredAudioLanguageCode,
+        explorationLanguageCode, automaticTextToSpeechEnabled) {
       _allAudioLanguageCodesInExploration = allAudioLanguageCodesInExploration;
       _explorationLanguageCode = explorationLanguageCode;
       _automaticTextToSpeechEnabled = automaticTextToSpeechEnabled;

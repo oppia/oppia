@@ -24,9 +24,9 @@ oppia.controller('LearnerLocalNav', [
   'FocusManagerService', 'UrlInterpolationService',
   'FLAG_EXPLORATION_URL_TEMPLATE',
   function(
-    $scope, $uibModal, $http, ExplorationPlayerService, AlertsService,
-    FocusManagerService, UrlInterpolationService,
-    FLAG_EXPLORATION_URL_TEMPLATE) {
+      $scope, $uibModal, $http, ExplorationPlayerService, AlertsService,
+      FocusManagerService, UrlInterpolationService,
+      FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = ExplorationPlayerService.getExplorationId();
     $scope.canEdit = GLOBALS.canEdit;
     $scope.username = GLOBALS.username;

@@ -19,9 +19,9 @@
 
 oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
   var FeedbackThreadSummary = function(
-    status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,
-    lastMessageRead, secondLastMessageRead, authorLastMessage,
-    authorSecondLastMessage, explorationTitle, explorationId, threadId) {
+      status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,
+      lastMessageRead, secondLastMessageRead, authorLastMessage,
+      authorSecondLastMessage, explorationTitle, explorationId, threadId) {
     this.status = status;
     this.originalAuthorId = originalAuthorId;
     this.lastUpdated = lastUpdated;
@@ -44,7 +44,7 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
   };
 
   FeedbackThreadSummary.prototype.appendNewMessage = function(
-    lastMessageText, authorLastMessage) {
+      lastMessageText, authorLastMessage) {
     this.lastMessageText = lastMessageText;
     this.lastUpdated = new Date();
     this.authorSecondLastMessage = this.authorLastMessage;
@@ -55,9 +55,9 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
   };
 
   FeedbackThreadSummary.create = function(
-    status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,
-    lastMessageRead, secondLastMessageRead, authorLastMessage,
-    authorSecondLastMessage, explorationTitle, explorationId, threadId) {
+      status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,
+      lastMessageRead, secondLastMessageRead, authorLastMessage,
+      authorSecondLastMessage, explorationTitle, explorationId, threadId) {
     return new FeedbackThreadSummary(status, originalAuthorId, lastUpdated,
       lastMessageText, totalMessageCount, lastMessageRead,
       secondLastMessageRead, authorLastMessage, authorSecondLastMessage,
@@ -65,7 +65,7 @@ oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
   };
 
   FeedbackThreadSummary.createFromBackendDict = function(
-    feedbackThreadSummaryBackendDict) {
+      feedbackThreadSummaryBackendDict) {
     return new FeedbackThreadSummary(
       feedbackThreadSummaryBackendDict.status,
       feedbackThreadSummaryBackendDict.original_author_id,

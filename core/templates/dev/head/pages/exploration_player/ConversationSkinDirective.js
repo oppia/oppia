@@ -519,7 +519,7 @@ oppia.directive('conversationSkin', [
 
             PlayerPositionService.init(_navigateToActiveCard);
             ExplorationPlayerService.init(function(
-              exploration, initHtml, newParams) {
+                exploration, initHtml, newParams) {
               ExplorationPlayerStateService.setExploration(exploration);
               $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
               _nextFocusLabel = FocusManagerService.generateFocusLabel();

@@ -25,8 +25,8 @@ oppia.factory('CodeReplPredictionService', [
   'WinnowingPreprocessingService', 'SVMPredictionService',
   'PythonProgramTokenizer', 'PythonProgramTokenType',
   'CountVectorizerService', function(
-    WinnowingPreprocessingService, SVMPredictionService,
-    PythonProgramTokenizer, PythonProgramTokenType, CountVectorizerService) {
+      WinnowingPreprocessingService, SVMPredictionService,
+      PythonProgramTokenizer, PythonProgramTokenType, CountVectorizerService) {
     // The string with which all the variable and method names need to be
     // replaced.
     var TOKEN_NAME_VAR = 'V';

@@ -25,7 +25,7 @@ describe('Fraction Input rules service', function() {
   }));
 
   var createNegativeFractionDict = function(
-    wholeNumber, numerator, denominator) {
+      wholeNumber, numerator, denominator) {
     return {
       isNegative: true,
       wholeNumber: wholeNumber,
@@ -35,7 +35,7 @@ describe('Fraction Input rules service', function() {
   };
 
   var createPositiveFractionDict = function(
-    wholeNumber, numerator, denominator) {
+      wholeNumber, numerator, denominator) {
     return {
       isNegative: false,
       wholeNumber: wholeNumber,

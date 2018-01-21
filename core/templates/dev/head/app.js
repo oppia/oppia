@@ -83,10 +83,10 @@ oppia.config(['$provide', function($provide) {
     'ExplorationContextService', 'PAGE_CONTEXT',
     'UrlInterpolationService',
     function(
-      taOptions, $document, $uibModal, $timeout, FocusManagerService,
-      taRegisterTool, RteHelperService, AlertsService,
-      ExplorationContextService, PAGE_CONTEXT,
-      UrlInterpolationService) {
+        taOptions, $document, $uibModal, $timeout, FocusManagerService,
+        taRegisterTool, RteHelperService, AlertsService,
+        ExplorationContextService, PAGE_CONTEXT,
+        UrlInterpolationService) {
       taOptions.disableSanitizer = true;
       taOptions.forceTextAngularSanitize = false;
       taOptions.classes.textEditor = 'form-control oppia-rte-content';
@@ -100,8 +100,8 @@ oppia.config(['$provide', function($provide) {
       // after exiting the modal, and moves the cursor back to where it was
       // before the modal was opened.
       var _openCustomizationModal = function(
-        customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
-        onDismissCallback, refocusFn) {
+          customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
+          onDismissCallback, refocusFn) {
         $document[0].execCommand('enableObjectResizing', false, false);
         var modalDialog = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

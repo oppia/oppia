@@ -153,7 +153,7 @@ oppia.directive('oppiaInteractiveFractionInput', [
 oppia.directive('oppiaResponseFractionInput', [
   'FractionObjectFactory', 'HtmlEscaperService', 'UrlInterpolationService',
   function(
-    FractionObjectFactory, HtmlEscaperService, UrlInterpolationService) {
+      FractionObjectFactory, HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -171,7 +171,7 @@ oppia.directive('oppiaResponseFractionInput', [
 oppia.directive('oppiaShortResponseFractionInput', [
   'FractionObjectFactory', 'HtmlEscaperService', 'UrlInterpolationService',
   function(
-    FractionObjectFactory, HtmlEscaperService, UrlInterpolationService) {
+      FractionObjectFactory, HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

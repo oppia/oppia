@@ -35,9 +35,9 @@ oppia.directive('progressNav', [
         'ExplorationPlayerStateService', 'WindowDimensionsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'INTERACTION_SPECS',
         function($scope, $rootScope, PlayerPositionService, UrlService,
-          PlayerTranscriptService, ExplorationPlayerService,
-          ExplorationPlayerStateService, WindowDimensionsService,
-          CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS) {
+            PlayerTranscriptService, ExplorationPlayerService,
+            ExplorationPlayerStateService, WindowDimensionsService,
+            CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           $scope.isIframed = UrlService.isIframed();
 

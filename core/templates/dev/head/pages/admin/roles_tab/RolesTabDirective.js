@@ -20,8 +20,8 @@ oppia.directive('adminRolesTab', [
   '$http', 'ADMIN_ROLE_HANDLER_URL', 'AdminTaskManagerService',
   'UrlInterpolationService',
   function(
-    $http, ADMIN_ROLE_HANDLER_URL, AdminTaskManagerService,
-    UrlInterpolationService) {
+      $http, ADMIN_ROLE_HANDLER_URL, AdminTaskManagerService,
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
