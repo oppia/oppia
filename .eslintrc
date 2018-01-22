@@ -3,9 +3,17 @@
     "eslint:recommended",
   ],
   "plugins": [
+    "angular",
     "html"
   ],
   "rules": {
+    "angular/directive-restrict": [
+      2,
+      {
+        "restrict": "E",
+        "explicit": "always"
+      }
+    ],
     "no-empty": [
       "error",
       {
