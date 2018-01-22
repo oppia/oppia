@@ -28,7 +28,7 @@ var workflow = require('../protractor_utils/workflow.js');
 describe('Embedding', function() {
   var adminPage = null;
   var explorationPlayerPage = null;
-  var explorationId = null;
+
   var createCountingExploration = function () {
     // Intro.
     editor.setStateName('Intro');
@@ -128,7 +128,7 @@ describe('Embedding', function() {
     // Version 1 is creation of the exploration.
     workflow.createExploration();
     general.getExplorationIdFromEditor().then(function(expId) {
-      explorationId = expId;
+      var explorationId = expId;
       // Create Version 2 of the exploration.
       createCountingExploration();
 
@@ -222,6 +222,7 @@ describe('Embedding', function() {
   it('should use the exploration language as site language.', function() {
     // Opens the test file and checks the placeholder in the exploration is
     // correct.
+    var explorationId = null;
     var checkPlaceholder = function(expectedPlaceholder) {
       var driver = browser.driver;
       driver.get(
@@ -245,31 +246,58 @@ describe('Embedding', function() {
       browser.switchTo().defaultContent();
     };
 
-    users.createModerator('embedder2@example.com', 'Embedder2');
+    users.createUser('embedder2@example.com', 'Embedder2');
     users.login('embedder2@example.com', true);
 
-    // Change language to Thai, which is not a supported site language.
-    general.openEditor(explorationId);
-    editor.setLanguage('ภาษาไทย');
-    editor.saveChanges('Changing the language to a not supported one.');
-    // We expect the default language, English.
-    checkPlaceholder('Type a number');
+    // Create an exploration.
+    workflow.createExploration();
+    general.getExplorationIdFromEditor().then(function(expId) {
+      explorationId = expId;
+      
+      editor.setContent(forms.toRichText('Language Test'));
+      editor.setInteraction('NumericInput');
+      editor.addResponse('NumericInput', forms.toRichText('Nice!!')
+        , 'END', true, 'IsLessThanOrEqualTo', 0);
+      editor.setDefaultOutcome(forms.toRichText('Ok!!'), null, false);
 
-    // Change language to Spanish, which is a supported site language.
-    general.openEditor(explorationId);
-    editor.setLanguage('español');
-    editor.saveChanges('Changing the language to a supported one.');
-    checkPlaceholder('Ingresa un número');
+      editor.moveToState('END');
+      editor.setContent(forms.toRichText('END'));
+      editor.setInteraction('EndExploration');
 
-    users.logout();
+      // Save changes.
+      title = 'Language Test';
+      category = 'Languages';
+      objective = 'This is a Language Test for valid and invalid.';
+      editor.setTitle(title);
+      editor.setCategory(category);
+      editor.setObjective(objective);
+      editor.saveChanges('Done!');
 
-    // This error is to be ignored as 'idToBeReplaced' is not a valid
-    // exploration id. It appers just after the page loads.
-    var errorToIgnore = new RegExp('http:\/\/localhost:9001\/assets\/' +
-      'scripts\/embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
-      '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
-      'locale=en#version=0.0.1&secret=.*\' in a frame because it set ' +
-      '\'X-Frame-Options\' to \'deny\'.', 'g');
-    general.checkForConsoleErrors([errorToIgnore]);
+      // Publish changes.
+      workflow.publishExploration();
+
+      // Change language to Thai, which is not a supported site language.
+      general.openEditor(explorationId);
+      editor.setLanguage('ภาษาไทย');
+      editor.saveChanges('Changing the language to a not supported one.');
+      // We expect the default language, English.
+      checkPlaceholder('Type a number');
+
+      // Change language to Spanish, which is a supported site language.
+      general.openEditor(explorationId);
+      editor.setLanguage('español');
+      editor.saveChanges('Changing the language to a supported one.');
+      checkPlaceholder('Ingresa un número');
+
+      users.logout();
+
+      // This error is to be ignored as 'idToBeReplaced' is not a valid
+      // exploration id. It appers just after the page loads.
+      var errorToIgnore = 'http:\/\/localhost:9001\/assets\/' +
+        'scripts\/embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
+        '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
+        'locale=en#version=0.0.1&secret=';
+      general.checkForConsoleErrors([errorToIgnore]);
+    });
   });
 });
