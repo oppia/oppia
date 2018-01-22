@@ -39,7 +39,7 @@ oppia.directive('oppiaInteractiveFractionInput', [
             $attrs.requireSimplestFormWithValue === 'true');
           var allowImproperFraction = (
             $attrs.allowImproperFractionWithValue === 'true');
-          var allowNonzeroIntegerPart = (
+          $scope.allowNonzeroIntegerPart = (
             $attrs.allowNonzeroIntegerPartWithValue === 'true');
 
           var errorMessage = '';
@@ -109,7 +109,7 @@ oppia.directive('oppiaInteractiveFractionInput', [
                 $scope.FractionInputForm.answer.$setValidity(
                   FORM_ERROR_TYPE, false);
               } else if (
-                  !allowNonzeroIntegerPart &&
+                  !$scope.allowNonzeroIntegerPart &&
                   fraction.hasNonzeroIntegerPart()) {
                 errorMessage = (
                   'Please enter your answer as a fraction (e.g., 5/3 instead ' +
@@ -153,7 +153,7 @@ oppia.directive('oppiaInteractiveFractionInput', [
 oppia.directive('oppiaResponseFractionInput', [
   'FractionObjectFactory', 'HtmlEscaperService', 'UrlInterpolationService',
   function(
-    FractionObjectFactory, HtmlEscaperService, UrlInterpolationService) {
+      FractionObjectFactory, HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -171,7 +171,7 @@ oppia.directive('oppiaResponseFractionInput', [
 oppia.directive('oppiaShortResponseFractionInput', [
   'FractionObjectFactory', 'HtmlEscaperService', 'UrlInterpolationService',
   function(
-    FractionObjectFactory, HtmlEscaperService, UrlInterpolationService) {
+      FractionObjectFactory, HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},

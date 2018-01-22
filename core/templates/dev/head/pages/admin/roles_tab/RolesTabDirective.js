@@ -20,8 +20,8 @@ oppia.directive('adminRolesTab', [
   '$http', 'ADMIN_ROLE_HANDLER_URL', 'AdminTaskManagerService',
   'UrlInterpolationService',
   function(
-    $http, ADMIN_ROLE_HANDLER_URL, AdminTaskManagerService,
-    UrlInterpolationService) {
+      $http, ADMIN_ROLE_HANDLER_URL, AdminTaskManagerService,
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -96,7 +96,7 @@ oppia.directive('adminRolesTab', [
               'Server error: ' + errorResponse.data.error);
           });
           AdminTaskManagerService.finishTask();
-        }
+        };
 
         $scope.submitUpdateRoleForm = function(values) {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -119,7 +119,7 @@ oppia.directive('adminRolesTab', [
               'Server error: ' + errorResponse.data.error);
           });
           AdminTaskManagerService.finishTask();
-        }
+        };
       }]
     };
   }

@@ -57,6 +57,10 @@
         "keywords": true
       }
     ],
+    "semi": [
+      "error",
+      "always"
+    ],
     "space-unary-ops": [
       "error",
       {
@@ -76,6 +80,10 @@
       2,
       {
         "ArrayExpression": "first",
+        "FunctionExpression": {
+          "body": 1,
+          "parameters": 2
+        },
         "MemberExpression": 1,
         "SwitchCase": 1
       }

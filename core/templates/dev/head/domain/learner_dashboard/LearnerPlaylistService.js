@@ -56,7 +56,7 @@
     };
 
     var _removeFromLearnerPlaylist = function(
-      activityId, activityTitle, activityType, learnerDashboardActivityIds) {
+        activityId, activityTitle, activityType, learnerDashboardActivityIds) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/learner_dashboard/' +

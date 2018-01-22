@@ -59,7 +59,7 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-cancel-redirection-button'));
 
   var explorationSummaryTile = element(
-    by.css('.protractor-test-exp-summary-tile-title'))
+    by.css('.protractor-test-exp-summary-tile-title'));
 
   var feedbackPopupLink =
     element(by.css('.protractor-test-exploration-feedback-popup-link'));

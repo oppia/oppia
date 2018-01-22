@@ -20,8 +20,8 @@ oppia.directive('schemaBasedCustomViewer', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',
   function(
-    NestedDirectivesRecursionTimeoutPreventionService,
-    UrlInterpolationService) {
+      NestedDirectivesRecursionTimeoutPreventionService,
+      UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',

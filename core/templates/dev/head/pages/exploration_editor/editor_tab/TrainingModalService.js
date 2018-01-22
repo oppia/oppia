@@ -68,7 +68,7 @@ oppia.factory('TrainingModalService', [
 
                 var rulesServiceName =
                   AngularNameService.getNameOfInteractionRulesService(
-                    interactionId)
+                    interactionId);
 
                 // Inject RulesService dynamically.
                 var rulesService = $injector.get(rulesServiceName);
