@@ -18,7 +18,7 @@
  
 describe('Answer Classification Object Factory', function() {
   var AnswerClassificationResultObjectFactory;
-  var SampleOutcome = {
+  var sampleOutcome = {
     dest: 'default',
     feedback: {
       html: '',
@@ -38,9 +38,9 @@ describe('Answer Classification Object Factory', function() {
   it('should create a new result', function() {
     var answerClassificationResult = (
       AnswerClassificationResultObjectFactory.createNew(
-      SampleOutcome, 1, 0, DEFAULT_OUTCOME_CLASSIFICATION));
+      sampleOutcome, 1, 0, DEFAULT_OUTCOME_CLASSIFICATION));
 
-    expect(answerClassificationResult.outcome).toEqual(SampleOutcome);
+    expect(answerClassificationResult.outcome).toEqual(sampleOutcome);
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(
