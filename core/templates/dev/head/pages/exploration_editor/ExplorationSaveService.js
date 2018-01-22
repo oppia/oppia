@@ -275,9 +275,9 @@ oppia.factory('ExplorationSaveService', [
               'explorationStatesService', 'ALL_CATEGORIES',
               'explorationLanguageCodeService', 'explorationTagsService',
               function($scope, $uibModalInstance, explorationObjectiveService,
-              explorationTitleService, explorationCategoryService,
-              explorationStatesService, ALL_CATEGORIES,
-              explorationLanguageCodeService, explorationTagsService) {
+                  explorationTitleService, explorationCategoryService,
+                  explorationStatesService, ALL_CATEGORIES,
+                  explorationLanguageCodeService, explorationTagsService) {
                 $scope.explorationTitleService = explorationTitleService;
                 $scope.explorationObjectiveService =
                   explorationObjectiveService;
@@ -506,7 +506,7 @@ oppia.factory('ExplorationSaveService', [
             controller: [
               '$scope', '$uibModalInstance', 'isExplorationPrivate',
               function(
-                $scope, $uibModalInstance, isExplorationPrivate) {
+                  $scope, $uibModalInstance, isExplorationPrivate) {
                 $scope.showDiff = false;
                 $scope.onClickToggleDiffButton = function() {
                   $scope.showDiff = !$scope.showDiff;

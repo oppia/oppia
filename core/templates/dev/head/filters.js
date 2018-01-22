@@ -428,5 +428,5 @@ oppia.filter('formatRtePreview', ['$filter', function($filter) {
       return ' [' + replaceString + '] ';
     });
     return formattedOutput.trim();
-  }
+  };
 }]);

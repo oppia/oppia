@@ -18,7 +18,7 @@
 
 describe('Audio preloader service', function() {
   beforeEach(function() {
-    module('oppia')
+    module('oppia');
     // Set a global value for INTERACTION_SPECS that will be used by all the
     // descendant dependencies.
     module(function($provide) {

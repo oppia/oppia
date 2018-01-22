@@ -209,7 +209,7 @@ oppia.factory('ExplorationWarningsService', [
 
       var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
       angular.forEach(statesWithoutInteractionIds, function(
-        stateWithoutInteractionIds) {
+          stateWithoutInteractionIds) {
         if (stateWarnings.hasOwnProperty(stateWithoutInteractionIds)) {
           stateWarnings[stateWithoutInteractionIds].push(
             STATE_ERROR_MESSAGES.ADD_INTERACTION);
@@ -234,7 +234,7 @@ oppia.factory('ExplorationWarningsService', [
 
         if (unreachableStateNames.length) {
           angular.forEach(unreachableStateNames, function(
-            unreachableStateName) {
+              unreachableStateName) {
             if (stateWarnings.hasOwnProperty(unreachableStateName)) {
               stateWarnings[unreachableStateName].push(
                 STATE_ERROR_MESSAGES.STATE_UNREACHABLE);

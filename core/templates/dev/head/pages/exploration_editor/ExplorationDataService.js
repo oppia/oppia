@@ -22,8 +22,8 @@ oppia.factory('ExplorationDataService', [
   'EditableExplorationBackendApiService', 'LocalStorageService',
   'ReadOnlyExplorationBackendApiService', 'UrlService',
   function($http, $log, $window, $q, AlertsService,
-    EditableExplorationBackendApiService, LocalStorageService,
-    ReadOnlyExplorationBackendApiService, UrlService) {
+      EditableExplorationBackendApiService, LocalStorageService,
+      ReadOnlyExplorationBackendApiService, UrlService) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var draftChangeListId = null;

@@ -20,7 +20,7 @@ oppia.factory('FractionInputValidationService', [
   'WARNING_TYPES', 'baseInteractionValidationService',
   'FractionObjectFactory',
   function(
-    WARNING_TYPES, baseInteractionValidationService, FractionObjectFactory) {
+      WARNING_TYPES, baseInteractionValidationService, FractionObjectFactory) {
     var getNonIntegerInputWarning = function(i, j) {
       return {
         type: WARNING_TYPES.ERROR,
@@ -35,7 +35,7 @@ oppia.factory('FractionInputValidationService', [
         return [];
       },
       getAllWarnings: function(
-        stateName, customizationArgs, answerGroups, defaultOutcome) {
+          stateName, customizationArgs, answerGroups, defaultOutcome) {
         var warningsList = [];
         var shouldBeInSimplestForm =
           customizationArgs.requireSimplestForm.value;
@@ -79,6 +79,19 @@ oppia.factory('FractionInputValidationService', [
             (rb.ub > ra.ub) || (rb.ub == ra.ub && (!ra.ubi || rb.ubi));
           return lowerBoundConditionIsSatisfied &&
             upperBoundConditionIsSatisfied;
+        };
+
+        var shouldCheckRangeCriteria = function(earlierRule, laterRule) {
+          if (
+            (earlierRule.type === 'IsExactlyEqualTo' &&
+            laterRule.type === 'IsExactlyEqualTo') ||
+            (earlierRule.type === 'IsExactlyEqualTo' &&
+            laterRule.type === 'IsEquivalentTo') ||
+            (earlierRule.type === 'IsExactlyEqualTo' &&
+            laterRule.type === 'IsEquivalentToAndInSimplestForm')) {
+            return false;
+          }
+          return true;
         };
 
         var ranges = [];
@@ -192,10 +205,9 @@ oppia.factory('FractionInputValidationService', [
             }
             for (var k = 0; k < ranges.length; k++) {
               if (isEnclosedBy(range, ranges[k])) {
-                var rule2 = answerGroups[ranges[k].answerGroupIndex - 1]
+                var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1]
                   .rules[ranges[k].ruleIndex - 1];
-                if (rule.type !== 'IsExactlyEqualTo' ||
-                  rule2.type !== 'IsExactlyEqualTo') {
+                if (shouldCheckRangeCriteria(earlierRule, rule)) {
                   warningsList.push({
                     type: WARNING_TYPES.ERROR,
                     message: (

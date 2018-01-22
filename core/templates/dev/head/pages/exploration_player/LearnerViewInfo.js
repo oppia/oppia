@@ -21,7 +21,7 @@ oppia.controller('LearnerViewInfo', [
   '$scope', '$uibModal', '$http', '$log', 'ExplorationContextService',
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'UrlInterpolationService',
   function($scope, $uibModal, $http, $log, ExplorationContextService,
-    EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, UrlInterpolationService) {
+      EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, UrlInterpolationService) {
     var explorationId = ExplorationContextService.getExplorationId();
     var expInfo = null;
 
@@ -58,7 +58,7 @@ oppia.controller('LearnerViewInfo', [
           '$scope', '$window', '$uibModalInstance', 'DateTimeFormatService',
           'RatingComputationService', 'expInfo', 'UrlInterpolationService',
           function($scope, $window, $uibModalInstance, DateTimeFormatService,
-                   RatingComputationService, expInfo, UrlInterpolationService) {
+              RatingComputationService, expInfo, UrlInterpolationService) {
             var getExplorationTagsSummary = function(arrayOfTags) {
               var tagsToShow = [];
               var tagsInTooltip = [];
