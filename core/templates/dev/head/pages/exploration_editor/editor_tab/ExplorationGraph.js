@@ -21,15 +21,9 @@ oppia.controller('ExplorationGraph', [
   'ExplorationStatesService', 'EditabilityService', 'RouterService',
   'GraphDataService', 'UrlInterpolationService',
   function(
-<<<<<<< HEAD
-    $scope, $uibModal, EditorStateService, AlertsService,
-    ExplorationStatesService, EditabilityService, RouterService,
-    GraphDataService, UrlInterpolationService) {
-=======
       $scope, $uibModal, EditorStateService, AlertsService,
-      explorationStatesService, EditabilityService, RouterService,
+      ExplorationStatesService, EditabilityService, RouterService,
       GraphDataService, UrlInterpolationService) {
->>>>>>> develop
     $scope.getGraphData = GraphDataService.getGraphData;
     $scope.isEditable = EditabilityService.isEditable;
 

@@ -25,23 +25,13 @@ oppia.controller('StateSolution', [
   'ExplorationContextService', 'ExplorationWarningsService',
   'INFO_MESSAGE_SOLUTION_IS_INVALID',
   function(
-<<<<<<< HEAD
-    $scope, $rootScope, $uibModal, $filter, EditorStateService,
-    AlertsService, INTERACTION_SPECS, stateSolutionService,
-    ExplorationStatesService, SolutionVerificationService,
-    ExplorationHtmlFormatterService, stateInteractionIdService,
-    stateHintsService, UrlInterpolationService, SolutionObjectFactory,
-    ExplorationContextService, ExplorationWarningsService,
-    INFO_MESSAGE_SOLUTION_IS_INVALID) {
-=======
       $scope, $rootScope, $uibModal, $filter, EditorStateService,
       AlertsService, INTERACTION_SPECS, stateSolutionService,
-      explorationStatesService, SolutionVerificationService,
+      ExplorationStatesService, SolutionVerificationService,
       ExplorationHtmlFormatterService, stateInteractionIdService,
       stateHintsService, UrlInterpolationService, SolutionObjectFactory,
       ExplorationContextService, ExplorationWarningsService,
       INFO_MESSAGE_SOLUTION_IS_INVALID) {
->>>>>>> develop
     $scope.correctAnswer = null;
     $scope.correctAnswerEditorHtml = '';
     $scope.inlineSolutionEditorIsActive = false;

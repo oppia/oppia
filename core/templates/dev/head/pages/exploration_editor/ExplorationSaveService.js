@@ -230,7 +230,7 @@ oppia.factory('ExplorationSaveService', [
             backdrop: 'static',
             keyboard: false,
             controller: [
-              '$scope', '$uibModalInstance', 
+              '$scope', '$uibModalInstance',
               function($scope, $uibModalInstance) {
                 $timeout(function() {
                   $uibModalInstance.dismiss('cancel');
@@ -270,27 +270,15 @@ oppia.factory('ExplorationSaveService', [
               'exploration_metadata_modal_directive.html'),
             backdrop: 'static',
             controller: [
-<<<<<<< HEAD
               '$scope', '$uibModalInstance', 'ExplorationObjectiveService',
               'ExplorationTitleService', 'ExplorationCategoryService',
               'ExplorationStatesService', 'ALL_CATEGORIES',
               'ExplorationLanguageCodeService', 'ExplorationTagsService',
               function($scope, $uibModalInstance, ExplorationObjectiveService,
-              ExplorationTitleService, ExplorationCategoryService,
-              ExplorationStatesService, ALL_CATEGORIES,
-              ExplorationLanguageCodeService, ExplorationTagsService) {
+                  ExplorationTitleService, ExplorationCategoryService,
+                  ExplorationStatesService, ALL_CATEGORIES,
+                  ExplorationLanguageCodeService, ExplorationTagsService) {
                 $scope.explorationTitleService = ExplorationTitleService;
-=======
-              '$scope', '$uibModalInstance', 'explorationObjectiveService',
-              'explorationTitleService', 'explorationCategoryService',
-              'explorationStatesService', 'ALL_CATEGORIES',
-              'explorationLanguageCodeService', 'explorationTagsService',
-              function($scope, $uibModalInstance, explorationObjectiveService,
-                  explorationTitleService, explorationCategoryService,
-                  explorationStatesService, ALL_CATEGORIES,
-                  explorationLanguageCodeService, explorationTagsService) {
-                $scope.explorationTitleService = explorationTitleService;
->>>>>>> develop
                 $scope.explorationObjectiveService =
                   ExplorationObjectiveService;
                 $scope.explorationCategoryService =
