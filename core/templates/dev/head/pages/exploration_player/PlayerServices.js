@@ -193,7 +193,7 @@ oppia.factory('ExplorationPlayerService', [
       // exploration data from what's currently specified in the editor, and
       // also initializes the parameters to empty strings.
       initSettingsFromEditor: function(activeStateNameFromPreviewTab,
-        manualParamChangesToInit) {
+          manualParamChangesToInit) {
         if (_editorPreviewMode) {
           manualParamChanges = manualParamChangesToInit;
           initStateName = activeStateNameFromPreviewTab;

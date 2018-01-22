@@ -101,7 +101,7 @@ oppia.factory('AutosaveInfoModalsService', [
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: ['$scope', '$uibModalInstance', function(
-            $scope, $uibModalInstance) {
+              $scope, $uibModalInstance) {
             // When the user clicks on discard changes button, signal backend
             // to discard the draft and reload the page thereafter.
             $scope.close = function() {

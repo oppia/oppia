@@ -20,8 +20,8 @@ oppia.directive('formOverlay', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',
   function(
-    NestedDirectivesRecursionTimeoutPreventionService,
-    UrlInterpolationService) {
+      NestedDirectivesRecursionTimeoutPreventionService,
+      UrlInterpolationService) {
     return {
       scope: {
         definition: '=',
