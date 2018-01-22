@@ -185,7 +185,7 @@ oppia.factory('SpeechSynthesisChunkerService', [
         // Handle basic trigonometric functions.
         .replace(/t\sa\sn/g, 'the tangent of')
         .replace(/s\si\sn/g, 'the sine of')
-        .replace(/c\so\ss/g, 'the cosine of').speak
+        .replace(/c\so\ss/g, 'the cosine of')
         // Handle square roots.
         .replace(/s\sq\sr\st\s\{\s*(.+)\s*\}/g, 'the square root of $1')
         // Remove brackets.
