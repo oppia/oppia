@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the AnswerClassificationResultObjectFactory.
  */
  
-describe('Answer Classification Object Factory', function() {
+describe('Answer classification result object factory', function() {
   var AnswerClassificationResultObjectFactory;
   var sampleOutcome = {
     dest: 'default',
