@@ -18,6 +18,14 @@
  
 describe('Answer Classification Object Factory', function() {
   var AnswerClassificationResultObjectFactory;
+  var SampleOutcome = {
+    dest: 'default',
+    feedback: {
+      html: '',
+      audio_translations: {}
+    }, param_changes: []
+  };
+  
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
@@ -30,21 +38,9 @@ describe('Answer Classification Object Factory', function() {
   it('should create a new result', function() {
     var answerClassificationResult = (
       AnswerClassificationResultObjectFactory.createNew(
-        {
-          dest: 'default',
-          feedback: {
-            html: '',
-            audio_translations: {}
-          }, param_changes: []
-        }, 1, 0, DEFAULT_OUTCOME_CLASSIFICATION));
+      SampleOutcome, 1, 0, DEFAULT_OUTCOME_CLASSIFICATION));
 
-    expect(answerClassificationResult.outcome).toEqual({
-      dest: 'default',
-      feedback: {
-        html: '',
-        audio_translations: {}
-      },param_changes: []
-    });
+    expect(answerClassificationResult.outcome).toEqual(SampleOutcome);
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(
