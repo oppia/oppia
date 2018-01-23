@@ -47,6 +47,7 @@ class QuestionsBatchHandler(base.BaseHandler):
 class QuestionsHandler(base.BaseHandler):
     """This handler completes requests for questions."""
     REQUIRE_PAYLOAD_CSRF_CHECK = False
+
     @acl_decorators.open_access
     def post(self):
         """Handles POST requests."""

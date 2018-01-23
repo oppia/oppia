@@ -88,6 +88,7 @@ class QuestionChange(object):
             'old_value': self.old_value
         }
 
+
 class Question(object):
     """Domain object for a question.
 
