@@ -30,6 +30,7 @@ transaction_services = models.Registry.import_transaction_services()
 # Counts contributions from all versions.
 VERSION_ALL = 'all'
 
+
 def get_exploration_stats(exp_id, exp_version):
     """Retrieves the ExplorationStats domain instance.
 
@@ -47,6 +48,7 @@ def get_exploration_stats(exp_id, exp_version):
             exp_id, exp_version, {})
 
     return exploration_stats
+
 
 def update_stats(exp_id, exp_version, aggregated_stats):
     """Updates ExplorationStatsModel according to the dict containing aggregated

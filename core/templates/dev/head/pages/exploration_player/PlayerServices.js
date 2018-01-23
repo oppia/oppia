@@ -193,7 +193,7 @@ oppia.factory('ExplorationPlayerService', [
       // exploration data from what's currently specified in the editor, and
       // also initializes the parameters to empty strings.
       initSettingsFromEditor: function(activeStateNameFromPreviewTab,
-        manualParamChangesToInit) {
+          manualParamChangesToInit) {
         if (_editorPreviewMode) {
           manualParamChanges = manualParamChangesToInit;
           initStateName = activeStateNameFromPreviewTab;
@@ -477,6 +477,12 @@ oppia.factory('ExplorationPlayerService', [
       recordSolutionHit: function(stateName) {
         if (!_editorPreviewMode) {
           StatsReportingService.recordSolutionHit(stateName);
+        }
+      },
+      recordLeaveForRefresherExp: function(stateName, refresherExpId) {
+        if (!_editorPreviewMode) {
+          StatsReportingService.recordLeaveForRefresherExp(
+            stateName, refresherExpId);
         }
       },
       // Returns whether the screen is wide enough to fit two

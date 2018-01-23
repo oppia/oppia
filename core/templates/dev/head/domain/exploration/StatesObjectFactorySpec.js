@@ -226,7 +226,7 @@ describe('States object factory', function() {
           },
           param_changes: []
         }
-      }
+      };
     }));
 
     it('should create a new state given a state name', function() {

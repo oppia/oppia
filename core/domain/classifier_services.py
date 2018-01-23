@@ -280,6 +280,7 @@ def get_classifier_training_job_from_model(classifier_training_job_model):
         classifier_training_job_model.classifier_data,
         classifier_training_job_model.data_schema_version)
 
+
 def get_classifier_training_job_by_id(job_id):
     """Gets a classifier training job by a job_id.
 

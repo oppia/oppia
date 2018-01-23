@@ -47,7 +47,7 @@ oppia.factory('AudioPlayerService', [
                 _currentTrackFilename = null;
                 AudioTranslationManagerService
                   .clearSecondaryAudioTranslations();
-              }
+              };
             }, 100);
 
             successCallback();

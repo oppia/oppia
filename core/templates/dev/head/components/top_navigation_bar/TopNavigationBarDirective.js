@@ -75,7 +75,7 @@ oppia.directive('topNavigationBar', [
           };
           $scope.onMouseoutDropdownMenuAbout = function(evt) {
             angular.element(evt.currentTarget)[0].blur();
-          }
+          };
           $scope.onMouseoverDropdownMenu = function(evt) {
             angular.element(evt.currentTarget).parent().addClass('open');
           };

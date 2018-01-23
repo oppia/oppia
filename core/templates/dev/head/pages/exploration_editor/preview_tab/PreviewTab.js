@@ -125,7 +125,7 @@ oppia.controller('PreviewTab', [
       initStateNameForPreview = explorationInitStateNameService.savedMemento;
       $timeout(function() {
         ExplorationPlayerService.init(function(exploration, initHtml,
-          newParams) {
+            newParams) {
           $scope.loadPreviewState(initStateNameForPreview, []);
         });
       }, 200);

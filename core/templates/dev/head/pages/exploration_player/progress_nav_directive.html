@@ -3,7 +3,7 @@
     even when the first button is not present. -->
   <div>
     <!-- ng-if on this second wrapping div because ng-if lags on buttons. -->
-    <div ng-if="hasPrevious">
+    <div ng-if="hasPrevious && !helpCardHasContinueButton">
       <md-button ng-click="changeCard(activeCardIndex-1)" class="md-raised" style="margin: 0 0 12px 12px;">
         <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
       </div>

@@ -19,12 +19,12 @@
 oppia.controller('ExplorationGraph', [
   '$scope', '$uibModal', 'EditorStateService', 'AlertsService',
   'explorationStatesService', 'EditabilityService', 'RouterService',
-  'graphDataService', 'UrlInterpolationService',
+  'GraphDataService', 'UrlInterpolationService',
   function(
-    $scope, $uibModal, EditorStateService, AlertsService,
-    explorationStatesService, EditabilityService, RouterService,
-    graphDataService, UrlInterpolationService) {
-    $scope.getGraphData = graphDataService.getGraphData;
+      $scope, $uibModal, EditorStateService, AlertsService,
+      explorationStatesService, EditabilityService, RouterService,
+      GraphDataService, UrlInterpolationService) {
+    $scope.getGraphData = GraphDataService.getGraphData;
     $scope.isEditable = EditabilityService.isEditable;
 
     // We hide the graph at the outset in order not to confuse new exploration
@@ -62,11 +62,11 @@ oppia.controller('ExplorationGraph', [
         windowClass: 'oppia-large-modal-window',
         controller: [
           '$scope', '$uibModalInstance', 'EditorStateService',
-          'graphDataService', 'isEditable',
+          'GraphDataService', 'isEditable',
           function($scope, $uibModalInstance, EditorStateService,
-                   graphDataService, isEditable) {
+              GraphDataService, isEditable) {
             $scope.currentStateName = EditorStateService.getActiveStateName();
-            $scope.graphData = graphDataService.getGraphData();
+            $scope.graphData = GraphDataService.getGraphData();
             $scope.isEditable = isEditable;
 
             $scope.deleteState = function(stateName) {

@@ -33,8 +33,8 @@ oppia.factory('EditableCollectionBackendApiService', [
   'EDITABLE_COLLECTION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
   'ReadOnlyCollectionBackendApiService',
   function($http, $q, COLLECTION_DATA_URL_TEMPLATE,
-    EDITABLE_COLLECTION_DATA_URL_TEMPLATE, UrlInterpolationService,
-    ReadOnlyCollectionBackendApiService) {
+      EDITABLE_COLLECTION_DATA_URL_TEMPLATE, UrlInterpolationService,
+      ReadOnlyCollectionBackendApiService) {
     var _fetchCollection = function(
         collectionId, successCallback, errorCallback) {
       var collectionDataUrl = UrlInterpolationService.interpolateUrl(

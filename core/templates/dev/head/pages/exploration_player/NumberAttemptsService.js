@@ -31,6 +31,6 @@ oppia.factory('NumberAttemptsService', [
       getNumberAttempts: function() {
         return numberAttempts;
       }
-    }
+    };
   }
 ]);

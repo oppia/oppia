@@ -27,6 +27,7 @@ import feconf
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
+
 class QuestionsBatchHandlerTest(test_utils.GenericTestBase):
     """Test the handler for rendering questions batch."""
 

@@ -69,7 +69,7 @@
       </div>
     </div>
   </div>
-  <div class="conversation-skin-correctness-footer-container" ng-if="isCorrectnessFooterEnabled()">
+  <div class="conversation-skin-correctness-footer-container" ng-if="isCorrectnessFooterEnabled() && isOnLastCard()">
     <correctness-footer></correctness-footer>
   </div>
 </div>
@@ -117,9 +117,6 @@
       <div ng-if="collectionSummary" class="conversation-skin-back-to-collection-container">
         <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
       </div>
-      <div ng-if="!collectionSummary" class="conversation-skin-back-to-collection-container">
-        <a ng-href="/library" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_LIBRARY"></a>
-      </div>
     </div>
 
     <div ng-if="collectionSummary && recommendedExplorationSummaries.length === 0">
@@ -139,6 +136,10 @@
         </collection-summary-tile>
       </div>
     </div>
+  </div>
+
+  <div ng-if="!collectionSummary" class="conversation-skin-back-to-collection-container">
+    <a ng-href="/library" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_LIBRARY"></a>
   </div>
 </div>
 
@@ -350,6 +351,7 @@ otherwise they will interfere with the iframed conversation skin directive.
 
   .conversation-skin-final-ratings {
     text-align: center;
+    margin-bottom: 60px;
   }
   .conversation-skin-final-ratings-header {
     color: #064b46;

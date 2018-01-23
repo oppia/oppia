@@ -34,7 +34,7 @@
      }));
 
      it('should return correct classifier details.', function() {
-       var stateName = 'stateName1'
+       var stateName = 'stateName1';
        var retrievedClassifier = mappingService.getClassifier(stateName);
 
        expect(retrievedClassifier.algorithmId).toEqual('LDAStringClassifier');

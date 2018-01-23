@@ -35,6 +35,7 @@ from google.appengine.ext import ndb
         models.NAMES.feedback, models.NAMES.user]))
 transaction_services = models.Registry.import_transaction_services()
 
+
 # TODO(bhenning): Implement a working real-time layer for the recent dashboard
 # updates aggregator job.
 class RecentUpdatesRealtimeModel(
@@ -432,7 +433,8 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
     # Public query method.
     @classmethod
     def get_dashboard_stats(cls, user_id):
-        """
+        """Returns the dashboard stats associated with the given user_id.
+
         Args:
             user_id: str. The ID of the user.
 

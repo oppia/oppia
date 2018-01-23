@@ -33,7 +33,7 @@ describe('FractionInputValidationService', function() {
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
     createFractionDict = function(
-      isNegative, wholeNumber, numerator, denominator) {
+        isNegative, wholeNumber, numerator, denominator) {
       return {
         isNegative: isNegative,
         wholeNumber: wholeNumber,
@@ -150,6 +150,20 @@ describe('FractionInputValidationService', function() {
       }
     });
 
+    numeratorEqualsFiveRule = rof.createFromBackendDict({
+      rule_type: 'HasNumeratorEqualTo',
+      inputs: {
+        x: 5
+      }
+    });
+
+    denominatorEqualsFiveRule = rof.createFromBackendDict({
+      rule_type: 'HasDenominatorEqualTo',
+      inputs: {
+        x: 5
+      }
+    });
+
     answerGroups = [agof.createNew(
       [equalsOneRule, lessThanTwoRule],
       goodDefaultOutcome,
@@ -176,8 +190,23 @@ describe('FractionInputValidationService', function() {
     }]);
   });
 
-  it('should catch identical rules as redundant', function() {
+  it('should not catch equals followed by equivalent as redundant', function() {
     answerGroups[0].rules = [equalsOneRule, equivalentToOneRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+
+    answerGroups[0].rules = [equalsOneRule, equivalentToOneAndSimplestFormRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
+  it('should catch equivalent followed by equals same value' +
+    'as redundant', function() {
+    answerGroups[0].rules = [equivalentToOneRule, equalsOneRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -186,7 +215,8 @@ describe('FractionInputValidationService', function() {
       message: 'Rule 2 from answer group 1 will never be matched ' +
         'because it is made redundant by rule 1 from answer group 1.'
     }]);
-    answerGroups[0].rules = [equalsOneRule, equivalentToOneAndSimplestFormRule];
+
+    answerGroups[0].rules = [equivalentToOneAndSimplestFormRule, equalsOneRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -346,6 +376,30 @@ describe('FractionInputValidationService', function() {
     'rule is HasIntegerPartEqualTo a zero value', function() {
     customizationArgs.allowNonzeroIntegerPart.value = false;
     answerGroups[0].rules = [integerPartEqualsZero];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
+  it('should allow equivalent fractions with if not requireSimplestForm ' +
+    'and rules are IsExactlyEqualTo', function() {
+    customizationArgs.requireSimplestForm = false;
+    answerGroups[1] = angular.copy(answerGroups[0]);
+    answerGroups[0].rules = [equalsOneRule];
+    answerGroups[1].rules = [exactlyEqualToOneAndNotInSimplestFormRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
+  it('should allow if numerator and denominator should equal the same value ' +
+    'and are set in different rules', function() {
+    customizationArgs.requireSimplestForm = false;
+    answerGroups[1] = angular.copy(answerGroups[0]);
+    answerGroups[0].rules = [numeratorEqualsFiveRule];
+    answerGroups[1].rules = [denominatorEqualsFiveRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);

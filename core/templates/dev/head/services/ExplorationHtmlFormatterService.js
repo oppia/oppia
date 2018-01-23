@@ -92,7 +92,7 @@ oppia.factory('ExplorationHtmlFormatterService', [
       },
 
       getShortAnswerHtml: function(
-        answer, interactionId, interactionCustomizationArgs) {
+          answer, interactionId, interactionCustomizationArgs) {
         // TODO(sll): Get rid of this special case for multiple choice.
         var interactionChoices = null;
         if (interactionCustomizationArgs.choices) {

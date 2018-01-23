@@ -376,8 +376,14 @@ class CollectionSkill(object):
         self.question_ids = question_ids
 
     def to_dict(self):
-        # Note to developers: ensure this matches the frontend in
-        # CollectionSkillObjectFactory
+        """Returns the dict of CollectionSkill object.
+
+        Note to developers: Ensure this matches the frontend in
+        CollectionSkillObjectFactory.
+
+        Returns:
+            dict. A dict version of the CollectionSkill object.
+        """
         return {
             'name': self.name,
             'question_ids': self.question_ids
@@ -385,6 +391,16 @@ class CollectionSkill(object):
 
     @classmethod
     def from_dict(cls, skill_id, skill_dict):
+        """Returns the CollectionSkill object corresponding to the given
+        skill_id and skill_dict.
+
+        Args:
+            skill_id: str. The skill ID.
+            skill_dict: dict. The skill dict.
+
+        Returns:
+            CollectionSkill. The CollectionSkill object.
+        """
         return cls(
             skill_id,
             skill_dict['name'],
@@ -393,6 +409,17 @@ class CollectionSkill(object):
 
     @staticmethod
     def get_skill_id_from_index(index):
+        """Returns the skill ID associated with the given index.
+
+        Args:
+            index: int. The index of the collection skill.
+
+        Raises:
+            ValidationError: The given index is non-integer or negative.
+
+        Returns:
+            str. The skill ID corresponding to the given index.
+        """
         if not isinstance(index, int):
             raise utils.ValidationError(
                 'Expected index to be an integer, received %s' % index)
@@ -405,14 +432,17 @@ class CollectionSkill(object):
 
     @staticmethod
     def validate_skill_id(skill_id):
+        """Validates the given skill ID.
+
+        Args:
+            skill_id: str. The skill ID to validate.
+
+        Raises:
+            ValidationError: The skill ID does not have the form skill{{digit}}.
+        """
         if not isinstance(skill_id, basestring):
             raise utils.ValidationError(
                 'Expected skill ID to be a string, received %s' % skill_id)
-
-        if len(skill_id) < 6:
-            raise utils.ValidationError(
-                'Expected skill ID to have length at least 6, received %s' %
-                skill_id)
 
         if skill_id[:5] != _SKILL_ID_PREFIX:
             raise utils.ValidationError(
@@ -1426,6 +1456,7 @@ class Collection(object):
                     raise utils.ValidationError(
                         'Skill with ID %s is not a prerequisite or acquired '
                         'skill of any node.' % skill_id)
+
 
 class CollectionSummary(object):
     """Domain object for an Oppia collection summary."""

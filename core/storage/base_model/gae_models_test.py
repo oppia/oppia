@@ -110,6 +110,7 @@ class TestVersionedModel(base_models.VersionedModel):
     SNAPSHOT_METADATA_CLASS = TestSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TestSnapshotContentModel
 
+
 class VersionedModelTests(test_utils.GenericTestBase):
     """Test methods for VersionedModel."""
 

@@ -45,8 +45,8 @@ oppia.directive('collectionSummaryTile', [
       controller: [
         '$scope', 'DateTimeFormatService',
         'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function(
-          $scope, DateTimeFormatService,
-          COLLECTION_VIEWER_URL, COLLECTION_EDITOR_URL) {
+            $scope, DateTimeFormatService,
+            COLLECTION_VIEWER_URL, COLLECTION_EDITOR_URL) {
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
           $scope.ACTIVITY_TYPE_COLLECTION = constants.ACTIVITY_TYPE_COLLECTION;

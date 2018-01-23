@@ -46,6 +46,7 @@ CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST = 'AnswerFrequencyList'
 CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS = (
     'CategorizedAnswerFrequencyLists')
 
+
 class ExplorationStats(object):
     """Domain object representing analytics data for an exploration."""
 

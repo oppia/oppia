@@ -37,7 +37,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
         '$scope', '$attrs', '$element', '$timeout', '$uibModal',
         'FocusManagerService', 'pencilCodeEditorRulesService',
         function($scope, $attrs, $element, $timeout, $uibModal,
-          FocusManagerService, pencilCodeEditorRulesService) {
+            FocusManagerService, pencilCodeEditorRulesService) {
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
 
           $scope.initialCode = $scope.interactionIsActive ?
@@ -47,7 +47,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
           var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
           var pce = new PencilCodeEmbed(iframeDiv);
           pce.beginLoad($scope.initialCode);
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
             pce.hideMiddleButton();
             pce.hideToggleButton();
@@ -137,12 +137,6 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
                   return $(elem).text();
                 }).join('\n');
 
-              console.log('Code (normalized): ');
-              console.log(normalizedCode);
-              console.log('Output: ');
-              console.log(output);
-              console.log('------');
-
               hasSubmittedAnswer = true;
               $scope.onSubmit({
                 answer: {
@@ -162,12 +156,6 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
             }
 
             var normalizedCode = getNormalizedCode();
-
-            console.log('Code: ');
-            console.log(normalizedCode);
-            console.log('Error: ');
-            console.log(error.message);
-            console.log('------');
 
             errorIsHappening = true;
             hasSubmittedAnswer = true;

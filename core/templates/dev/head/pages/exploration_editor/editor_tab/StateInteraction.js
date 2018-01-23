@@ -21,7 +21,7 @@ oppia.controller('StateInteraction', [
   'AlertsService', 'EditorStateService', 'HtmlEscaperService',
   'INTERACTION_SPECS', 'stateInteractionIdService',
   'stateCustomizationArgsService', 'EditabilityService',
-  'explorationStatesService', 'graphDataService',
+  'explorationStatesService', 'GraphDataService',
   'InteractionDetailsCacheService',
   'ExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
@@ -29,7 +29,7 @@ oppia.controller('StateInteraction', [
       AlertsService, EditorStateService, HtmlEscaperService,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, EditabilityService,
-      explorationStatesService, graphDataService,
+      explorationStatesService, GraphDataService,
       InteractionDetailsCacheService,
       ExplorationHtmlFormatterService, UrlInterpolationService,
       SubtitledHtmlObjectFactory, stateSolutionService, stateContentService) {
@@ -144,7 +144,7 @@ oppia.controller('StateInteraction', [
           'onInteractionIdChanged', stateInteractionIdService.savedMemento);
       }
 
-      graphDataService.recompute();
+      GraphDataService.recompute();
       _updateInteractionPreviewAndAnswerChoices();
     };
 
@@ -227,7 +227,7 @@ oppia.controller('StateInteraction', [
                   validationService.getCustomizationArgsWarnings(
                     stateCustomizationArgsService.displayed);
                 return warningsList;
-              }
+              };
 
               $scope.onChangeInteractionId = function(newInteractionId) {
                 EditorFirstTimeEventsService
@@ -354,7 +354,7 @@ oppia.controller('StateInteraction', [
         stateSolutionService.saveDisplayedValue();
         $rootScope.$broadcast(
           'onInteractionIdChanged', stateInteractionIdService.savedMemento);
-        graphDataService.recompute();
+        GraphDataService.recompute();
         _updateInteractionPreviewAndAnswerChoices();
       });
     };
