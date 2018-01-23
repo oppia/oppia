@@ -86,7 +86,7 @@ class QuestionsHandler(base.BaseHandler):
         })
 
     @acl_decorators.open_access
-    def delete(self, collection_id = None, question_id = None):
+    def delete(self, collection_id=None, question_id=None):
         """Handles Delete requests."""
         # print self.request.get('collection_id')
         # collection_id = self.payload.get('collection_id')
