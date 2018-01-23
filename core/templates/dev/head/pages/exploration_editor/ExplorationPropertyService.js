@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Standalone services for the exploration editor page.
+ * @fileoverview Services for exploration properties with
+ *               base class as ExplorationPropertyService
  */
 
 
