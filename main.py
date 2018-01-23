@@ -473,7 +473,7 @@ URLS = MAPREDUCE_HANDLERS + [
         question.QuestionsHandler),
     get_redirect_route(
         r'%s/<collection_id>/<question_id>' % feconf.QUESTION_DATA_URL,
-        question.QuestionsHandler),    
+        question.QuestionsHandler),
     get_redirect_route(
         r'%s' % feconf.QUESTION_MANAGE_URL,
         question.QuestionManagerHandler),
