@@ -256,8 +256,9 @@ describe('Embedding', function() {
       
       editor.setContent(forms.toRichText('Language Test'));
       editor.setInteraction('NumericInput');
-      editor.addResponse('NumericInput', forms.toRichText('Nice!!')
-        , 'END', true, 'IsLessThanOrEqualTo', 0);
+      editor.addResponse(
+        'NumericInput', forms.toRichText('Nice!!'),
+        'END', true, 'IsLessThanOrEqualTo', 0);
       editor.setDefaultOutcome(forms.toRichText('Ok!!'), null, false);
 
       editor.moveToState('END');
@@ -292,7 +293,7 @@ describe('Embedding', function() {
       users.logout();
 
       // This error is to be ignored as 'idToBeReplaced' is not a valid
-      // exploration id. It appers just after the page loads.
+      // exploration id. It appears just after the page loads.
       var errorToIgnore = 'http:\/\/localhost:9001\/assets\/' +
         'scripts\/embedding_tests_dev_i18n_0.0.1.html - Refused to display ' +
         '\'http:\/\/localhost:9001\/explore\/idToBeReplaced\\?iframed=true&' +
