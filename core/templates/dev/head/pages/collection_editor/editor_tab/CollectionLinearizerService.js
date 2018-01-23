@@ -112,7 +112,7 @@ oppia.factory('CollectionLinearizerService', [
       var rightNode = getNodeRightOf(linearNodeList, nodeIndex);
       if (!leftNode) {
         // Case 1 is a no-op: there's nothing to swap with.
-        return;
+        return false;
       }
 
       // Case 2 involves two shifts. Take for instance: a->b
