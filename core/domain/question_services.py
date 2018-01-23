@@ -255,6 +255,7 @@ def update_question(
     _save_question(
         committer_id, updated_question, change_list, commit_message)
 
+
 def add_question_id_to_skill(question_id, collection_id, skill_id, user_id):
     """Adds the question id to the question list of the appropriate skill.
 
