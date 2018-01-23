@@ -177,6 +177,39 @@ describe('Collection object factory', function() {
     expect(_sampleCollection.containsCollectionNode('exp_id1')).toBe(true);
   });
 
+  it('should be able to change the position of node in nodes list', function() {
+    expect(_sampleCollection.getCollectionNodeCount()).toEqual(0);
+
+    var collectionNodeBackendObject1 = {
+      exploration_id: 'exp_id0',
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      exploration: {}
+    };
+    var collectionNodeBackendObject2 = {
+      exploration_id: 'exp_id1',
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      exploration: {}
+    };
+    var collectionNode1 = CollectionNodeObjectFactory.create(
+      collectionNodeBackendObject1);
+    var collectionNode2 = CollectionNodeObjectFactory.create(
+      collectionNodeBackendObject2);
+
+    _sampleCollection.addCollectionNode(collectionNode1);
+    _sampleCollection.addCollectionNode(collectionNode2);
+    expect(_sampleCollection.getCollectionNodeCount()).toEqual(2);
+    expect(_sampleCollection.containsCollectionNode('exp_id0')).toBe(true);
+    expect(_sampleCollection.containsCollectionNode('exp_id1')).toBe(true);
+
+    _sampleCollection.moveCollectionNode('exp_id0', 1);
+    expect(_sampleCollection.getCollectionNodes()[0]).toEqual(
+      _sampleCollection.getCollectionNodeByExplorationId('exp_id1'));
+    expect(_sampleCollection.getCollectionNodes()[1]).toEqual(
+      _sampleCollection.getCollectionNodeByExplorationId('exp_id0'));
+  });
+
   it('should be able to retrieve a mutable collection node by exploration id',
     function() {
       expect(_getCollectionNode('exp_id0')).toBeUndefined();

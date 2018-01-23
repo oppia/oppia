@@ -46,6 +46,9 @@ COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS = 'acquired_skills'
 CMD_ADD_COLLECTION_NODE = 'add_collection_node'
 # This takes an additional 'exploration_id' parameter.
 CMD_DELETE_COLLECTION_NODE = 'delete_collection_node'
+# This takes additional 'exploration_id' and 'new_position' parameters and,
+# optionally, 'old_position'.
+CMD_MOVE_COLLECTION_NODE = 'move_collection_node'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property'
@@ -124,6 +127,10 @@ class CollectionChange(object):
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict.get('old_value')
+        elif self.cmd == CMD_MOVE_COLLECTION_NODE:
+            self.exploration_id = change_dict['exploration_id']
+            self.new_position = change_dict['new_position']
+            self.old_position = change_dict.get('old_position')
         elif self.cmd == CMD_EDIT_COLLECTION_PROPERTY:
             if (change_dict['property_name'] not in
                     self.COLLECTION_PROPERTIES):
@@ -1144,6 +1151,35 @@ class Collection(object):
                 'Exploration is not part of this collection: %s' %
                 exploration_id)
         del self.nodes[node_index]
+
+    def move_node(self, exploration_id, new_position):
+        """Changes the position of the node corresponding to the given
+        exploration in the nodes list of the collection.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+            new_postion: int. The new position of the node in the nodes list.
+
+        Raises:
+            ValueError: The exploration is not part of the collection.
+            ValueError: The exploration cannot be moved to the new_position or
+            it's already there'.
+        """
+        old_position = self._find_node(exploration_id)
+        if old_position is None:
+            raise ValueError(
+                'Exploration is not part of this collection: %s' %
+                exploration_id)
+        if new_position >= len(self.nodes) or new_position < 0:
+            raise ValueError(
+                'Cannot move the exploration(%s) to this position: %i' % (
+                    exploration_id, new_position))
+        if new_position == old_position:
+            raise ValueError(
+                'Exploration is already on postion: %i' % new_position)
+        node = self.get_node(exploration_id)
+        self.nodes.pop(old_position)
+        self.nodes.insert(new_position, node)
 
     def add_skill(self, skill_name):
         """Adds the new skill domain object with the specified name.

@@ -633,6 +633,8 @@ def apply_change_list(collection_id, change_list):
                 elif (change.property_name ==
                       collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS): # pylint: disable=line-too-long
                     collection_node.update_acquired_skill_ids(change.new_value)
+            elif change.cmd == collection_domain.CMD_MOVE_COLLECTION_NODE:
+                collection.move_node(change.exploration_id, change.new_position)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
                 if (change.property_name ==
                         collection_domain.COLLECTION_PROPERTY_TITLE):

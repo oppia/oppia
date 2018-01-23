@@ -26,6 +26,7 @@
 // 'acquired_skills' are deprecated. Do not use them.
 oppia.constant('CMD_ADD_COLLECTION_NODE', 'add_collection_node');
 oppia.constant('CMD_DELETE_COLLECTION_NODE', 'delete_collection_node');
+oppia.constant('CMD_MOVE_COLLECTION_NODE', 'move_collection_node');
 oppia.constant('CMD_EDIT_COLLECTION_PROPERTY', 'edit_collection_property');
 oppia.constant(
   'CMD_EDIT_COLLECTION_NODE_PROPERTY', 'edit_collection_node_property');
@@ -46,8 +47,8 @@ oppia.factory('CollectionUpdateService', [
   'ChangeObjectFactory', 'UndoRedoService',
   'CMD_ADD_COLLECTION_NODE', 'CMD_DELETE_COLLECTION_NODE',
   'CMD_EDIT_COLLECTION_PROPERTY', 'CMD_EDIT_COLLECTION_NODE_PROPERTY',
-  'COLLECTION_PROPERTY_TITLE', 'COLLECTION_PROPERTY_CATEGORY',
-  'COLLECTION_PROPERTY_OBJECTIVE',
+  'CMD_MOVE_COLLECTION_NODE', 'COLLECTION_PROPERTY_TITLE',
+  'COLLECTION_PROPERTY_CATEGORY', 'COLLECTION_PROPERTY_OBJECTIVE',
   'COLLECTION_PROPERTY_LANGUAGE_CODE', 'COLLECTION_PROPERTY_TAGS',
   'COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS',
   'COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS',
@@ -56,8 +57,8 @@ oppia.factory('CollectionUpdateService', [
       ChangeObjectFactory, UndoRedoService,
       CMD_ADD_COLLECTION_NODE, CMD_DELETE_COLLECTION_NODE,
       CMD_EDIT_COLLECTION_PROPERTY, CMD_EDIT_COLLECTION_NODE_PROPERTY,
-      COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
-      COLLECTION_PROPERTY_OBJECTIVE,
+      CMD_MOVE_COLLECTION_NODE, COLLECTION_PROPERTY_TITLE,
+      COLLECTION_PROPERTY_CATEGORY, COLLECTION_PROPERTY_OBJECTIVE,
       COLLECTION_PROPERTY_LANGUAGE_CODE, COLLECTION_PROPERTY_TAGS,
       COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
       COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
@@ -89,6 +90,18 @@ oppia.factory('CollectionUpdateService', [
 
     var _getNewPropertyValueFromChangeDict = function(changeDict) {
       return _getParameterFromChangeDict(changeDict, 'new_value');
+    };
+
+    // Applies a node position change, specifically. See _applyChange()
+    // for details on the other behavior of this function.
+    var _applyNodePositionChange = function(
+        collection, explorationId, newPosition, oldPosition, apply,
+        reverse) {
+      _applyChange(collection, CMD_MOVE_COLLECTION_NODE, {
+        exploration_id: explorationId,
+        new_position: angular.copy(newPosition),
+        old_position: angular.copy(oldPosition)
+      }, apply, reverse);
     };
 
     // Applies a property change to a collection node. See _applyChanges() for
@@ -212,6 +225,21 @@ oppia.factory('CollectionUpdateService', [
         });
       },
 
+      /**
+       * Changes the position of collection node to the newPosition in the nodes
+       * list and records the change in undo/redo service.
+       */
+      moveCollectionNode: function(collection, explorationId, newPosition,
+          oldPosition) {
+        _applyNodePositionChange(collection, explorationId, newPosition,
+          oldPosition, function(changeDict, collection) {
+            // Apply.
+            collection.moveCollectionNode(explorationId, newPosition);
+          }, function(changeDict, collection) {
+            // Undo.
+            collection.moveCollectionNode(explorationId, oldPosition);
+          });
+      },
       /**
        * Changes the title of a collection and records the change in the
        * undo/redo service.

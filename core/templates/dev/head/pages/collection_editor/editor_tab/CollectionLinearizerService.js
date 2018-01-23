@@ -262,7 +262,14 @@ oppia.factory('CollectionLinearizerService', [
        * exploration ID does not associate to any nodes in the collection.
        */
       shiftNodeLeft: function(collection, explorationId) {
-        return shiftNode(collection, explorationId, swapLeft);
+        if(shiftNode(collection, explorationId, swapLeft)) {
+          var nodes = collection.getCollectionNodes();
+          var nodeIndex = findNodeIndex(nodes, explorationId);
+          CollectionUpdateService.moveCollectionNode(
+              collection, explorationId, nodeIndex - 1, nodeIndex);
+          return true;
+        }
+        return false;
       },
 
       /**
@@ -273,7 +280,14 @@ oppia.factory('CollectionLinearizerService', [
        * exploration ID does not associate to any nodes in the collection.
        */
       shiftNodeRight: function(collection, explorationId) {
-        return shiftNode(collection, explorationId, swapRight);
+        if(shiftNode(collection, explorationId, swapRight)) {
+          var nodes = collection.getCollectionNodes();
+          var nodeIndex = findNodeIndex(nodes, explorationId);
+          CollectionUpdateService.moveCollectionNode(
+              collection, explorationId, nodeIndex + 1, nodeIndex);
+          return true;
+        }
+        return false;
       }
     };
   }
