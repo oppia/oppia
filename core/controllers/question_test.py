@@ -248,8 +248,8 @@ class QuestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 404)
 
         response = self.testapp.delete(
-            '%s/' % feconf.QUESTION_DATA_URL, expect_errors=True)
-        self.assertEqual(response.status_int, 405)
+            '%s' % feconf.QUESTION_DATA_URL, expect_errors=True)
+        self.assertEqual(response.status_int, 404)
 
 
 class QuestionManagerHandlerTest(test_utils.GenericTestBase):

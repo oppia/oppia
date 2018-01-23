@@ -86,15 +86,15 @@ class QuestionsHandler(base.BaseHandler):
         })
 
     @acl_decorators.open_access
-    def delete(self, collection_id, question_id):
+    def delete(self, collection_id = None, question_id = None):
         """Handles Delete requests."""
         # print self.request.get('collection_id')
         # collection_id = self.payload.get('collection_id')
         # question_id = self.payload.get('question_id')
         print collection_id, question_id
-        if not collection_id:
+        if collection_id is None:
             raise self.PageNotFoundException
-        if not question_id:
+        if question_id is None:
             raise self.PageNotFoundException
         question_services.delete_question(
             self.user_id, collection_id, question_id)
