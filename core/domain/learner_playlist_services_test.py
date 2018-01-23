@@ -16,10 +16,10 @@
 
 """Tests for learner playlist services."""
 
-from core.domain import learner_progress_services
 from core.domain import learner_playlist_services
-from core.tests import test_utils
+from core.domain import learner_progress_services
 from core.platform import models
+from core.tests import test_utils
 import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])

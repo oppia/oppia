@@ -17,7 +17,6 @@
 """Domain objects for configuration properties."""
 
 from core.platform import models
-
 import feconf
 import schema_utils
 
@@ -102,6 +101,8 @@ class ConfigProperty(object):
     """
 
     def refresh_default_value(self, default_value):
+        """Refreshes the configuration property to the default value."""
+
         pass
 
     def __init__(self, name, schema, description, default_value):
@@ -118,18 +119,26 @@ class ConfigProperty(object):
 
     @property
     def name(self):
+        """Returns the name of the configuration property."""
+
         return self._name
 
     @property
     def schema(self):
+        """Returns the schema of the configuration property."""
+
         return self._schema
 
     @property
     def description(self):
+        """Returns the description of the configuration property."""
+
         return self._description
 
     @property
     def default_value(self):
+        """Returns the default value of the configuration property."""
+
         return self._default_value
 
     @property
@@ -172,6 +181,15 @@ class ConfigProperty(object):
             model_instance.id: model_instance.value})
 
     def normalize(self, value):
+        """Validates the given object using the schema and normalizes if
+        necessary.
+
+        Args:
+            value: The value of the configuration property.
+
+        Returns:
+            instance. The normalized object.
+        """
         return schema_utils.normalize_against_schema(value, self._schema)
 
 
@@ -184,10 +202,25 @@ class Registry(object):
 
     @classmethod
     def init_config_property(cls, name, instance):
+        """Initializes _config_registry with keys as the property names and
+        values as instances of the specified property.
+
+        Args:
+            name: str. The name of the configuration property.
+        """
         cls._config_registry[name] = instance
 
     @classmethod
     def get_config_property(cls, name):
+        """Returns the instance of the specified name of the configuration
+        property.
+
+        Args:
+            name: str. The name of the configuration property.
+
+        Returns:
+            instance. The instance of the specified configuration property.
+        """
         return cls._config_registry.get(name)
 
     @classmethod

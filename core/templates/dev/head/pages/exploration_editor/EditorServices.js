@@ -16,251 +16,9 @@
  * @fileoverview Standalone services for the exploration editor page.
  */
 
-// TODO(sll): Should this depend on a versioning service that keeps track of
-// the current active version? Previous versions should not be editable.
-oppia.factory('editabilityService', [function() {
-  var isEditable = false;
-  var inTutorialMode = false;
-
-  return {
-    isEditable: function() {
-      return isEditable && !inTutorialMode;
-    },
-    isEditableOutsideTutorialMode: function() {
-      return isEditable;
-    },
-    markEditable: function() {
-      isEditable = true;
-    },
-    markNotEditable: function() {
-      isEditable = false;
-    },
-    onEndTutorial: function() {
-      inTutorialMode = false;
-    },
-    onStartTutorial: function() {
-      inTutorialMode = true;
-    }
-  };
-}]);
-
-// A service that maintains a provisional list of changes to be committed to
-// the server.
-oppia.factory('changeListService', [
-  '$rootScope', '$log', 'AlertsService', 'ExplorationDataService',
-  'autosaveInfoModalsService',
-  function(
-      $rootScope, $log, AlertsService, ExplorationDataService,
-      autosaveInfoModalsService) {
-    // TODO(sll): Implement undo, redo functionality. Show a message on each
-    // step saying what the step is doing.
-    // TODO(sll): Allow the user to view the list of changes made so far, as
-    // well as the list of changes in the undo stack.
-
-    // Temporary buffer for changes made to the exploration.
-    var explorationChangeList = [];
-    // Stack for storing undone changes. The last element is the most recently
-    // undone change.
-    var undoneChangeStack = [];
-
-    // All these constants should correspond to those in exp_domain.py.
-    // TODO(sll): Enforce this in code.
-    var CMD_ADD_STATE = 'add_state';
-    var CMD_RENAME_STATE = 'rename_state';
-    var CMD_DELETE_STATE = 'delete_state';
-    var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
-    var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
-
-    var ALLOWED_EXPLORATION_BACKEND_NAMES = {
-      category: true,
-      init_state_name: true,
-      language_code: true,
-      objective: true,
-      param_changes: true,
-      param_specs: true,
-      tags: true,
-      title: true,
-      auto_tts_enabled: true
-    };
-
-    var ALLOWED_STATE_BACKEND_NAMES = {
-      answer_groups: true,
-      confirmed_unclassified_answers: true,
-      content: true,
-      default_outcome: true,
-      hints: true,
-      param_changes: true,
-      param_specs: true,
-      solution: true,
-      state_name: true,
-      widget_customization_args: true,
-      widget_id: true
-    };
-
-    var autosaveChangeListOnChange = function(explorationChangeList) {
-      // Asynchronously send an autosave request, and check for errors in the
-      // response:
-      // If error is present -> Check for the type of error occurred
-      // (Display the corresponding modals in both cases, if not already
-      // opened):
-      // - Version Mismatch.
-      // - Non-strict Validation Fail.
-      ExplorationDataService.autosaveChangeList(
-        explorationChangeList,
-        function(response) {
-          if (!response.data.is_version_of_draft_valid) {
-            if (!autosaveInfoModalsService.isModalOpen()) {
-              autosaveInfoModalsService.showVersionMismatchModal(
-                explorationChangeList);
-            }
-          }
-        },
-        function() {
-          AlertsService.clearWarnings();
-          $log.error(
-            'nonStrictValidationFailure: ' +
-            JSON.stringify(explorationChangeList));
-          if (!autosaveInfoModalsService.isModalOpen()) {
-            autosaveInfoModalsService.showNonStrictValidationFailModal();
-          }
-        }
-      );
-    };
-
-    var addChange = function(changeDict) {
-      if ($rootScope.loadingMessage) {
-        return;
-      }
-      explorationChangeList.push(changeDict);
-      undoneChangeStack = [];
-      autosaveChangeListOnChange(explorationChangeList);
-    };
-
-    return {
-      /**
-       * Saves a change dict that represents adding a new state. It is the
-       * responsbility of the caller to check that the new state name is valid.
-       *
-       * @param {string} stateName - The name of the newly-added state
-       */
-      addState: function(stateName) {
-        addChange({
-          cmd: CMD_ADD_STATE,
-          state_name: stateName
-        });
-      },
-      /**
-       * Saves a change dict that represents deleting a new state. It is the
-       * responsbility of the caller to check that the deleted state name
-       * corresponds to an existing state.
-       *
-       * @param {string} stateName - The name of the deleted state.
-       */
-      deleteState: function(stateName) {
-        addChange({
-          cmd: CMD_DELETE_STATE,
-          state_name: stateName
-        });
-      },
-      discardAllChanges: function() {
-        explorationChangeList = [];
-        undoneChangeStack = [];
-        ExplorationDataService.discardDraft();
-      },
-      /**
-       * Saves a change dict that represents a change to an exploration
-       * property (such as its title, category, ...). It is the responsibility
-       * of the caller to check that the old and new values are not equal.
-       *
-       * @param {string} backendName - The backend name of the property
-       *   (e.g. title, category)
-       * @param {string} newValue - The new value of the property
-       * @param {string} oldValue - The previous value of the property
-       */
-      editExplorationProperty: function(backendName, newValue, oldValue) {
-        if (!ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
-          AlertsService.addWarning(
-            'Invalid exploration property: ' + backendName);
-          return;
-        }
-        addChange({
-          cmd: CMD_EDIT_EXPLORATION_PROPERTY,
-          new_value: angular.copy(newValue),
-          old_value: angular.copy(oldValue),
-          property_name: backendName
-        });
-      },
-      /**
-       * Saves a change dict that represents a change to a state property. It
-       * is the responsibility of the caller to check that the old and new
-       * values are not equal.
-       *
-       * @param {string} stateName - The name of the state that is being edited
-       * @param {string} backendName - The backend name of the edited property
-       * @param {string} newValue - The new value of the property
-       * @param {string} oldValue - The previous value of the property
-       */
-      editStateProperty: function(stateName, backendName, newValue, oldValue) {
-        if (!ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
-          AlertsService.addWarning('Invalid state property: ' + backendName);
-          return;
-        }
-        addChange({
-          cmd: CMD_EDIT_STATE_PROPERTY,
-          new_value: angular.copy(newValue),
-          old_value: angular.copy(oldValue),
-          property_name: backendName,
-          state_name: stateName
-        });
-      },
-      getChangeList: function() {
-        return angular.copy(explorationChangeList);
-      },
-      isExplorationLockedForEditing: function() {
-        return explorationChangeList.length > 0;
-      },
-      /**
-       * Initializes the current changeList with the one received from backend.
-       * This behavior exists only in case of an autosave.
-       *
-       * @param {object} changeList - Autosaved changeList data
-       */
-      loadAutosavedChangeList: function(changeList) {
-        explorationChangeList = changeList;
-      },
-      /**
-       * Saves a change dict that represents the renaming of a state. This
-       * is also intended to change the initial state name if necessary
-       * (that is, the latter change is implied and does not have to be
-       * recorded separately in another change dict). It is the responsibility
-       * of the caller to check that the two names are not equal.
-       *
-       * @param {string} newStateName - The new name of the state
-       * @param {string} oldStateName - The previous name of the state
-       */
-      renameState: function(newStateName, oldStateName) {
-        addChange({
-          cmd: CMD_RENAME_STATE,
-          new_state_name: newStateName,
-          old_state_name: oldStateName
-        });
-      },
-      undoLastChange: function() {
-        if (explorationChangeList.length === 0) {
-          AlertsService.addWarning('There are no changes to undo.');
-          return;
-        }
-        var lastChange = explorationChangeList.pop();
-        undoneChangeStack.push(lastChange);
-        autosaveChangeListOnChange(explorationChangeList);
-      }
-    };
-  }
-]);
-
 oppia.factory('explorationPropertyService', [
-  '$rootScope', '$log', 'changeListService', 'AlertsService',
-  function($rootScope, $log, changeListService, AlertsService) {
+  '$rootScope', '$log', 'ChangeListService', 'AlertsService',
+  function($rootScope, $log, ChangeListService, AlertsService) {
     // Public base API for data services corresponding to exploration properties
     // (title, category, etc.)
 
@@ -273,7 +31,7 @@ oppia.factory('explorationPropertyService', [
       param_specs: function(paramSpecs) {
         return paramSpecs.toBackendDict();
       },
-    }
+    };
 
     return {
       init: function(value) {
@@ -342,7 +100,7 @@ oppia.factory('explorationPropertyService', [
             BACKEND_CONVERSIONS[this.propertyName](this.savedMemento);
         }
 
-        changeListService.editExplorationProperty(
+        ChangeListService.editExplorationProperty(
           this.propertyName, newBackendValue, oldBackendValue);
         this.savedMemento = angular.copy(this.displayed);
 
@@ -362,8 +120,8 @@ oppia.factory('explorationTitleService', [
   'explorationPropertyService', '$filter', 'ValidatorsService',
   'ExplorationRightsService',
   function(
-    explorationPropertyService, $filter, ValidatorsService,
-    ExplorationRightsService) {
+      explorationPropertyService, $filter, ValidatorsService,
+      ExplorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'title';
     child._normalize = $filter('normalizeWhitespace');
@@ -381,8 +139,8 @@ oppia.factory('explorationCategoryService', [
   'explorationPropertyService', '$filter', 'ValidatorsService',
   'ExplorationRightsService',
   function(
-    explorationPropertyService, $filter, ValidatorsService,
-    ExplorationRightsService) {
+      explorationPropertyService, $filter, ValidatorsService,
+      ExplorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'category';
     child._normalize = $filter('normalizeWhitespace');
@@ -400,8 +158,8 @@ oppia.factory('explorationObjectiveService', [
   'explorationPropertyService', '$filter', 'ValidatorsService',
   'ExplorationRightsService',
   function(
-    explorationPropertyService, $filter, ValidatorsService,
-    ExplorationRightsService) {
+      explorationPropertyService, $filter, ValidatorsService,
+      ExplorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'objective';
     child._normalize = $filter('normalizeWhitespace');
@@ -420,7 +178,11 @@ oppia.factory('explorationLanguageCodeService', [
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'language_code';
     child.getAllLanguageCodes = function() {
-      return constants.ALL_LANGUAGE_CODES;
+      // TODO(sll): Update this once the App Engine search service supports
+      // 3-letter language codes.
+      return constants.ALL_LANGUAGE_CODES.filter(function(languageCodeDict) {
+        return languageCodeDict.code.length === 2;
+      });
     };
     child.getCurrentLanguageDescription = function() {
       for (var i = 0; i < constants.ALL_LANGUAGE_CODES.length; i++) {
@@ -431,7 +193,9 @@ oppia.factory('explorationLanguageCodeService', [
     };
     child._isValid = function(value) {
       return constants.ALL_LANGUAGE_CODES.some(function(elt) {
-        return elt.code === value;
+        // TODO(sll): Remove the second clause once the App Engine search
+        // service supports 3-letter language codes.
+        return elt.code === value && elt.code.length === 2;
       });
     };
     return child;
@@ -516,19 +280,41 @@ oppia.factory('explorationAutomaticTextToSpeechService', [
   }
 ]);
 
+oppia.factory('explorationCorrectnessFeedbackService', [
+  'explorationPropertyService', function(explorationPropertyService) {
+    var child = Object.create(explorationPropertyService);
+    child.propertyName = 'correctness_feedback_enabled';
+
+    child._isValid = function(value) {
+      return (typeof value === 'boolean');
+    };
+
+    child.isEnabled = function() {
+      return child.savedMemento;
+    };
+
+    child.toggleCorrectnessFeedback = function() {
+      child.displayed = !child.displayed;
+      child.saveDisplayedValue();
+    };
+
+    return child;
+  }
+]);
+
 // Data service for keeping track of the exploration's states. Note that this
 // is unlike the other exploration property services, in that it keeps no
 // mementos.
 oppia.factory('explorationStatesService', [
-  '$log', '$modal', '$filter', '$location', '$rootScope', '$injector', '$q',
-  'explorationInitStateNameService', 'AlertsService', 'changeListService',
+  '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
+  'explorationInitStateNameService', 'AlertsService', 'ChangeListService',
   'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'AngularNameService',
   'AnswerClassificationService', 'ExplorationContextService',
   'UrlInterpolationService',
   function(
-      $log, $modal, $filter, $location, $rootScope, $injector, $q,
-      explorationInitStateNameService, AlertsService, changeListService,
+      $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
+      explorationInitStateNameService, AlertsService, ChangeListService,
       EditorStateService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, AngularNameService,
       AnswerClassificationService, ExplorationContextService,
@@ -544,7 +330,7 @@ oppia.factory('explorationStatesService', [
         });
       },
       content: function(content) {
-        return content.toBackendDict()
+        return content.toBackendDict();
       },
       default_outcome: function(defaultOutcome) {
         if (defaultOutcome) {
@@ -618,7 +404,7 @@ oppia.factory('explorationStatesService', [
       }
 
       if (!angular.equals(oldValue, newValue)) {
-        changeListService.editStateProperty(
+        ChangeListService.editStateProperty(
           stateName, backendName, newBackendValue, oldBackendValue);
 
         var newStateData = _states.getState(stateName);
@@ -752,7 +538,7 @@ oppia.factory('explorationStatesService', [
         saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
       },
       getHintsMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'hints')
+        return getStatePropertyMemento(stateName, 'hints');
       },
       saveHints: function(stateName, newHints) {
         saveStateProperty(stateName, 'hints', newHints);
@@ -779,7 +565,7 @@ oppia.factory('explorationStatesService', [
 
         _states.addState(newStateName);
 
-        changeListService.addState(newStateName);
+        ChangeListService.addState(newStateName);
         $rootScope.$broadcast('refreshGraph');
         if (successCallback) {
           successCallback(newStateName);
@@ -798,7 +584,7 @@ oppia.factory('explorationStatesService', [
           return;
         }
 
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/editor_tab/' +
             'confirm_delete_state_modal_directive.html'),
@@ -809,18 +595,18 @@ oppia.factory('explorationStatesService', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', 'deleteStateName',
-            function($scope, $modalInstance, deleteStateName) {
+            '$scope', '$uibModalInstance', 'deleteStateName',
+            function($scope, $uibModalInstance, deleteStateName) {
               $scope.deleteStateWarningText = (
                 'Are you sure you want to delete the card "' +
                 deleteStateName + '"?');
 
               $scope.reallyDelete = function() {
-                $modalInstance.close(deleteStateName);
+                $uibModalInstance.close(deleteStateName);
               };
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
                 AlertsService.clearWarnings();
               };
             }
@@ -828,7 +614,7 @@ oppia.factory('explorationStatesService', [
         }).result.then(function(deleteStateName) {
           _states.deleteState(deleteStateName);
 
-          changeListService.deleteState(deleteStateName);
+          ChangeListService.deleteState(deleteStateName);
 
           if (EditorStateService.getActiveStateName() === deleteStateName) {
             EditorStateService.setActiveStateName(
@@ -860,7 +646,7 @@ oppia.factory('explorationStatesService', [
         // init_state_name' command in the change list, otherwise the backend
         // will raise an error because the new initial state name does not
         // exist.
-        changeListService.renameState(newStateName, oldStateName);
+        ChangeListService.renameState(newStateName, oldStateName);
         // Amend initStateName appropriately, if necessary. Note that this
         // must come after the state renaming, otherwise saving will lead to
         // a complaint that the new name is not a valid state name.
@@ -875,8 +661,8 @@ oppia.factory('explorationStatesService', [
 ]);
 
 oppia.factory('statePropertyService', [
-  '$log', 'changeListService', 'AlertsService', 'explorationStatesService',
-  function($log, changeListService, AlertsService, explorationStatesService) {
+  '$log', 'ChangeListService', 'AlertsService', 'explorationStatesService',
+  function($log, ChangeListService, AlertsService, explorationStatesService) {
     // Public base API for data services corresponding to state properties
     // (interaction id, content, etc.)
     // WARNING: This should be initialized only in the context of the state
@@ -1009,45 +795,6 @@ oppia.factory('stateSolutionService', [
   }
 ]);
 
-// Service for computing graph data.
-oppia.factory('graphDataService', [
-  'explorationStatesService', 'explorationInitStateNameService',
-  'ComputeGraphService',
-  function(
-      explorationStatesService, explorationInitStateNameService,
-      ComputeGraphService) {
-    var _graphData = null;
-
-    // Returns an object which can be treated as the input to a visualization
-    // for a directed graph. The returned object has the following keys:
-    //   - nodes: an object whose keys are node ids (equal to node names) and
-    //       whose values are node names
-    //   - links: a list of objects. Each object represents a directed link
-    //       between two nodes, and has keys 'source' and 'target', the values
-    //       of which are the names of the corresponding nodes.
-    //   - initStateName: the name of the initial state.
-    //   - finalStateName: the name of the final state.
-    var _recomputeGraphData = function() {
-      if (!explorationInitStateNameService.savedMemento) {
-        return;
-      }
-
-      var states = explorationStatesService.getStates();
-      var initStateId = explorationInitStateNameService.savedMemento;
-      _graphData = ComputeGraphService.compute(initStateId, states);
-    };
-
-    return {
-      recompute: function() {
-        _recomputeGraphData();
-      },
-      getGraphData: function() {
-        return angular.copy(_graphData);
-      }
-    };
-  }
-]);
-
 oppia.constant('WARNING_TYPES', {
   // These must be fixed before the exploration can be saved.
   CRITICAL: 'critical',
@@ -1064,375 +811,3 @@ oppia.constant('STATE_ERROR_MESSAGES', {
   INCORRECT_SOLUTION: (
     'The current solution does not lead to another card.')
 });
-
-oppia.factory('lostChangesService', ['UtilsService', function(UtilsService) {
-  var CMD_ADD_STATE = 'add_state';
-  var CMD_RENAME_STATE = 'rename_state';
-  var CMD_DELETE_STATE = 'delete_state';
-  var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
-
-  var makeRulesListHumanReadable = function(answerGroupValue) {
-    var rulesList = [];
-    answerGroupValue.rules.forEach(function(rule) {
-      var ruleElm = angular.element('<li></li>');
-      ruleElm.html('<p>Type: ' + rule.type + '</p>');
-      ruleElm.append(
-        '<p>Value: ' + (
-          Object.keys(rule.inputs).map(function(input) {
-            return rule.inputs[input];
-          })
-        ).toString() + '</p>');
-      rulesList.push(ruleElm);
-    });
-
-    return rulesList;
-  };
-
-  // An edit is represented either as an object or an array. If it's an object,
-  // then simply return that object. In case of an array, return the last item.
-  var getStatePropertyValue = function(statePropertyValue) {
-    return angular.isArray(statePropertyValue) ?
-      statePropertyValue[statePropertyValue.length - 1] : statePropertyValue;
-  };
-
-  // Detects whether an object of the type 'answer_group' or 'default_outcome'
-  // has been added, edited or deleted. Returns - 'addded', 'edited' or
-  // 'deleted' accordingly.
-  var getRelativeChangeToGroups = function(changeObject) {
-    var newValue = changeObject.new_value;
-    var oldValue = changeObject.old_value;
-    var result = '';
-
-    if (angular.isArray(newValue) && angular.isArray(oldValue)) {
-      result = (newValue.length > oldValue.length) ?
-        'added' : (newValue.length === oldValue.length) ?
-        'edited' : 'deleted';
-    } else {
-      if (!UtilsService.isEmpty(oldValue)) {
-        if (!UtilsService.isEmpty(newValue)) {
-          result = 'edited';
-        } else {
-          result = 'deleted';
-        }
-      } else if (!UtilsService.isEmpty(newValue)) {
-        result = 'added';
-      }
-    }
-    return result;
-  };
-
-  var makeHumanReadable = function(lostChanges) {
-    var outerHtml = angular.element('<ul></ul>');
-    var stateWiseEditsMapping = {};
-    // The variable stateWiseEditsMapping stores the edits grouped by state.
-    // For instance, you made the following edits:
-    // 1. Changed content to 'Welcome!' instead of '' in 'Introduction'.
-    // 2. Added an interaction in this state.
-    // 2. Added a new state 'End'.
-    // 3. Ended Exporation from state 'End'.
-    // stateWiseEditsMapping will look something like this:
-    // - 'Introduction': [
-    //   - 'Edited Content: Welcome!',:
-    //   - 'Added Interaction: Continue',
-    //   - 'Added interaction customizations']
-    // - 'End': ['Ended exploration']
-
-    lostChanges.forEach(function(lostChange) {
-      switch (lostChange.cmd) {
-        case CMD_ADD_STATE:
-          outerHtml.append(
-            angular.element('<li></li>').html(
-              'Added state: ' + lostChange.state_name));
-          break;
-        case CMD_RENAME_STATE:
-          outerHtml.append(
-            angular.element('<li></li>').html(
-              'Renamed state: ' + lostChange.old_state_name + ' to ' +
-                lostChange.new_state_name));
-          break;
-        case CMD_DELETE_STATE:
-          outerHtml.append(
-            angular.element('<li></li>').html(
-              'Deleted state: ' + lostChange.state_name));
-          break;
-        case CMD_EDIT_STATE_PROPERTY:
-          var newValue = getStatePropertyValue(lostChange.new_value);
-          var oldValue = getStatePropertyValue(lostChange.old_value);
-          var stateName = lostChange.state_name;
-          if (!stateWiseEditsMapping[stateName]) {
-            stateWiseEditsMapping[stateName] = [];
-          }
-
-          switch (lostChange.property_name) {
-            case 'content':
-              if (newValue !== null) {
-                // TODO(sll): Also add display of audio translations here.
-                stateWiseEditsMapping[stateName].push(
-                  angular.element('<div></div>').html(
-                    '<strong>Edited content: </strong><div class="content">' +
-                      newValue.html + '</div>')
-                    .addClass('state-edit-desc'));
-              }
-              break;
-
-            case 'widget_id':
-              var lostChangeValue = '';
-              if (oldValue === null) {
-                if (newValue !== 'EndExploration') {
-                  lostChangeValue = ('<strong>Added Interaction: </strong>' +
-                                     newValue);
-                } else {
-                  lostChangeValue = 'Ended Exploration';
-                }
-              } else {
-                lostChangeValue = ('<strong>Deleted Interaction: </strong>' +
-                                   oldValue);
-              }
-              stateWiseEditsMapping[stateName].push(
-                angular.element('<div></div>').html(lostChangeValue)
-                  .addClass('state-edit-desc'));
-              break;
-
-            case 'widget_customization_args':
-              var lostChangeValue = '';
-              if (UtilsService.isEmpty(oldValue)) {
-                lostChangeValue = 'Added Interaction Customizations';
-              } else if (UtilsService.isEmpty(newValue)) {
-                lostChangeValue = 'Removed Interaction Customizations';
-              } else {
-                lostChangeValue = 'Edited Interaction Customizations';
-              }
-              stateWiseEditsMapping[stateName].push(
-                angular.element('<div></div>').html(lostChangeValue)
-                  .addClass('state-edit-desc'));
-              break;
-
-            case 'answer_groups':
-              var answerGroupChanges = getRelativeChangeToGroups(lostChange);
-              var answerGroupHtml = '';
-              if (answerGroupChanges === 'added') {
-                answerGroupHtml += (
-                  '<p class="sub-edit"><i>Destination: </i>' +
-                    newValue.outcome.dest + '</p>');
-                answerGroupHtml += (
-                  '<div class="sub-edit"><i>Feedback: </i>' +
-                    '<div class="feedback">' +
-                    newValue.outcome.feedback + '</div></div>');
-                var rulesList = makeRulesListHumanReadable(newValue);
-                if (rulesList.length > 0) {
-                  answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';
-                  var rulesListHtml = (angular.element('<ol></ol>')
-                                       .addClass('rules-list'));
-                  for (var rule in rulesList) {
-                    rulesListHtml.html(rulesList[rule][0].outerHTML);
-                  }
-                  answerGroupHtml += rulesListHtml[0].outerHTML;
-                }
-                stateWiseEditsMapping[stateName].push(
-                  angular.element('<div><strong>Added answer group: ' +
-                                  '</strong></div>')
-                    .append(answerGroupHtml)
-                    .addClass('state-edit-desc answer-group'));
-              } else if (answerGroupChanges === 'edited') {
-                if (newValue.outcome.dest !== oldValue.outcome.dest) {
-                  answerGroupHtml += (
-                    '<p class="sub-edit"><i>Destination: </i>' +
-                      newValue.outcome.dest + '</p>');
-                }
-                if (!angular.equals(
-                    newValue.outcome.feedback, oldValue.outcome.feedback)) {
-                  answerGroupHtml += (
-                    '<div class="sub-edit"><i>Feedback: </i>' +
-                      '<div class="feedback">' + newValue.outcome.feedback +
-                      '</div></div>');
-                }
-                if (!angular.equals(newValue.rules, oldValue.rules)) {
-                  var rulesList = makeRulesListHumanReadable(newValue);
-                  if (rulesList.length > 0) {
-                    answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';
-                    var rulesListHtml = (angular.element('<ol></ol>')
-                                         .addClass('rules-list'));
-                    for (var rule in rulesList) {
-                      rulesListHtml.html(rulesList[rule][0].outerHTML);
-                    }
-                    answerGroupChanges = rulesListHtml[0].outerHTML;
-                  }
-                }
-                stateWiseEditsMapping[stateName].push(
-                  angular.element('<div><strong>Edited answer group: <strong>' +
-                                  '</div>')
-                    .append(answerGroupHtml)
-                    .addClass('state-edit-desc answer-group'));
-              } else if (answerGroupChanges === 'deleted') {
-                stateWiseEditsMapping[stateName].push(
-                  angular.element('<div>Deleted answer group</div>')
-                    .addClass('state-edit-desc'));
-              }
-              break;
-
-            case 'default_outcome':
-              var defaultOutcomeChanges = getRelativeChangeToGroups(lostChange);
-              var defaultOutcomeHtml = '';
-              if (defaultOutcomeChanges === 'added') {
-                defaultOutcomeHtml += (
-                  '<p class="sub-edit"><i>Destination: </i>' +
-                    newValue.dest + '</p>');
-                defaultOutcomeHtml += (
-                  '<div class="sub-edit"><i>Feedback: </i>' +
-                    '<div class="feedback">' + newValue.feedback +
-                    '</div></div>');
-                stateWiseEditsMapping[stateName].push(
-                  angular.element('<div>Added default outcome: </div>')
-                    .append(defaultOutcomeHtml)
-                    .addClass('state-edit-desc default-outcome'));
-              } else if (defaultOutcomeChanges === 'edited') {
-                if (newValue.dest !== oldValue.dest) {
-                  defaultOutcomeHtml += (
-                    '<p class="sub-edit"><i>Destination: </i>' + newValue.dest +
-                      '</p>');
-                }
-                if (!angular.equals(newValue.feedback, oldValue.feedback)) {
-                  defaultOutcomeHtml += (
-                    '<div class="sub-edit"><i>Feedback: </i>' +
-                      '<div class="feedback">' + newValue.feedback +
-                      '</div></div>');
-                }
-                stateWiseEditsMapping[stateName].push(
-                  angular.element('<div>Edited default outcome: </div>')
-                    .append(defaultOutcomeHtml)
-                    .addClass('state-edit-desc default-outcome'));
-              } else if (defaultOutcomeChanges === 'deleted') {
-                stateWiseEditsMapping[stateName].push(
-                  angular.element('<div>Deleted default outcome</div>')
-                    .addClass('state-edit-desc'));
-              }
-          }
-      }
-    });
-
-    for (var stateName in stateWiseEditsMapping) {
-      var stateChangesEl = angular.element(
-        '<li>Edits to state: ' + stateName + '</li>');
-      for (var stateEdit in stateWiseEditsMapping[stateName]) {
-        stateChangesEl.append(stateWiseEditsMapping[stateName][stateEdit]);
-      }
-      outerHtml.append(stateChangesEl);
-    }
-
-    return outerHtml;
-  };
-
-  return {
-    makeHumanReadable: makeHumanReadable
-  };
-}]);
-
-// Service for displaying different types of modals depending on the type of
-// response received as a result of the autosaving request.
-oppia.factory('autosaveInfoModalsService', [
-  '$log', '$modal', '$timeout', '$window',
-  'ExplorationDataService', 'LocalStorageService', 'lostChangesService',
-  'UrlInterpolationService',
-  function(
-      $log, $modal, $timeout, $window,
-      ExplorationDataService, LocalStorageService, lostChangesService,
-      UrlInterpolationService) {
-    var _isModalOpen = false;
-    var _refreshPage = function(delay) {
-      $timeout(function() {
-        $window.location.reload();
-      }, delay);
-    };
-
-    return {
-      showNonStrictValidationFailModal: function() {
-        $modal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/' +
-            'save_validation_fail_modal_directive.html'),
-          // Prevent modal from closing when the user clicks outside it.
-          backdrop: 'static',
-          controller: [
-            '$scope', '$modalInstance', function($scope, $modalInstance) {
-              $scope.closeAndRefresh = function() {
-                $modalInstance.dismiss('cancel');
-                _refreshPage(20);
-              };
-            }
-          ]
-        }).result.then(function() {
-          _isModalOpen = false;
-        }, function() {
-          _isModalOpen = false;
-        });
-
-        _isModalOpen = true;
-      },
-      isModalOpen: function() {
-        return _isModalOpen;
-      },
-      showVersionMismatchModal: function(lostChanges) {
-        $modal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/' +
-            'save_version_mismatch_modal_directive.html'),
-          // Prevent modal from closing when the user clicks outside it.
-          backdrop: 'static',
-          controller: ['$scope', function($scope) {
-            // When the user clicks on discard changes button, signal backend
-            // to discard the draft and reload the page thereafter.
-            $scope.discardChanges = function() {
-              ExplorationDataService.discardDraft(function() {
-                _refreshPage(20);
-              });
-            };
-
-            $scope.hasLostChanges = (lostChanges && lostChanges.length > 0);
-            if ($scope.hasLostChanges) {
-              // TODO(sll): This should also include changes to exploration
-              // properties (such as the exploration title, category, etc.).
-              $scope.lostChangesHtml = (
-                lostChangesService.makeHumanReadable(lostChanges).html());
-              $log.error('Lost changes: ' + JSON.stringify(lostChanges));
-            }
-          }],
-          windowClass: 'oppia-autosave-version-mismatch-modal'
-        }).result.then(function() {
-          _isModalOpen = false;
-        }, function() {
-          _isModalOpen = false;
-        });
-
-        _isModalOpen = true;
-      },
-      showLostChangesModal: function(lostChanges, explorationId) {
-        $modal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/lost_changes_modal_directive.html'),
-          // Prevent modal from closing when the user clicks outside it.
-          backdrop: 'static',
-          controller: ['$scope', '$modalInstance', function(
-            $scope, $modalInstance) {
-            // When the user clicks on discard changes button, signal backend
-            // to discard the draft and reload the page thereafter.
-            $scope.close = function() {
-              LocalStorageService.removeExplorationDraft(explorationId);
-              $modalInstance.dismiss('cancel');
-            };
-
-            $scope.lostChangesHtml = (
-              lostChangesService.makeHumanReadable(lostChanges).html());
-            $log.error('Lost changes: ' + JSON.stringify(lostChanges));
-          }],
-          windowClass: 'oppia-lost-changes-modal'
-        }).result.then(function() {
-          _isModalOpen = false;
-        }, function() {
-          _isModalOpen = false;
-        });
-
-        _isModalOpen = true;
-      }
-    };
-  }
-]);

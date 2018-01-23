@@ -29,6 +29,7 @@ import re
 import subprocess
 import threading
 import time
+
 # pylint: enable=wrong-import-order
 
 
@@ -64,6 +65,7 @@ _PARSER.add_argument(
     '--verbose',
     help='optional; if specified, display the output of the tests being run',
     action='store_true')
+
 
 def log(message, show_time=False):
     """Logs a message to the terminal.

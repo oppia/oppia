@@ -29,13 +29,13 @@ but it will have no effect.
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
-import os
-import sys
-import subprocess
-import collections
-import pprint
 import argparse
+import collections
+import os
+import pprint
 import shutil
+import subprocess
+import sys
 
 # pylint: enable=wrong-import-order
 

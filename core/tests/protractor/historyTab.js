@@ -85,82 +85,110 @@ describe('Exploration history', function() {
         highlighted: true
       },
       7: {
-        text: '  - correct: false',
+        text: '  - outcome:',
         highlighted: true
       },
       8: {
-        text: '    outcome:',
-        highlighted: true
-      },
-      9: {
         text: '      dest: second',
         highlighted: true
       },
+      9: {
+        text: '      feedback:',
+        highlighted: true
+      },
       10: {
-        text: '      feedback: []',
+        text: '        audio_translations: {}',
         highlighted: true
       },
       11: {
-        text: '      param_changes: []',
+        text: '        html: \'\'',
         highlighted: true
       },
       12: {
-        text: '    rule_specs:',
+        text: '      labelled_as_correct: false',
         highlighted: true
       },
       13: {
-        text: '    - inputs:',
+        text: '      param_changes: []',
         highlighted: true
       },
       14: {
-        text: '        x: 6',
+        text: '      refresher_exploration_id: null',
         highlighted: true
       },
       15: {
-        text: '      rule_type: Equals',
+        text: '    rule_specs:',
         highlighted: true
       },
       16: {
+        text: '    - inputs:',
+        highlighted: true
+      },
+      17: {
+        text: '        x: 6',
+        highlighted: true
+      },
+      18: {
+        text: '      rule_type: Equals',
+        highlighted: true
+      },
+      19: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: false
       },
-      17: {
+      20: {
         text: '  customization_args: {}',
         highlighted: false
       },
-      18: {
+      21: {
         text: '  default_outcome:',
         highlighted: false
       },
-      19: {
+      22: {
         text: '    dest: first',
         highlighted: true
       },
-      20: {
-        text: '    feedback: []',
-        highlighted: false
-      },
-      21: {
-        text: '    param_changes: []',
-        highlighted: false
-      },
-      22: {
-        text: '  hints: []',
-        highlighted: false
-      },
       23: {
-        text: '  id: NumericInput',
-        highlighted: true
+        text: '    feedback:',
+        highlighted: false
       },
       24: {
-        text: '  solution: null',
+        text: '      audio_translations: {}',
         highlighted: false
       },
       25: {
-        text: 'param_changes: []',
+        text: '      html: \'\'',
         highlighted: false
       },
       26: {
+        text: '    labelled_as_correct: false',
+        highlighted: false
+      },
+      27: {
+        text: '    param_changes: []',
+        highlighted: false
+      },
+      28: {
+        text: '    refresher_exploration_id: null',
+        highlighted: false
+      },
+      29: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      30: {
+        text: '  id: NumericInput',
+        highlighted: true
+      },
+      31: {
+        text: '  solution: null',
+        highlighted: false
+      },
+      32: {
+        text: 'param_changes: []',
+        highlighted: false
+      },
+      33: {
         text: ' ',
         highlighted: false
       }
@@ -210,30 +238,46 @@ describe('Exploration history', function() {
         highlighted: true
       },
       11: {
-        text: '    feedback: []',
+        text: '    feedback:',
         highlighted: false
       },
       12: {
-        text: '    param_changes: []',
+        text: '      audio_translations: {}',
         highlighted: false
       },
       13: {
-        text: '  hints: []',
+        text: '      html: \'\'',
         highlighted: false
       },
       14: {
-        text: '  id: null',
-        highlighted: true
+        text: '    labelled_as_correct: false',
+        highlighted: false
       },
       15: {
-        text: '  solution: null',
+        text: '    param_changes: []',
         highlighted: false
       },
       16: {
-        text: 'param_changes: []',
+        text: '    refresher_exploration_id: null',
         highlighted: false
       },
       17: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      18: {
+        text: '  id: null',
+        highlighted: true
+      },
+      19: {
+        text: '  solution: null',
+        highlighted: false
+      },
+      20: {
+        text: 'param_changes: []',
+        highlighted: false
+      },
+      21: {
         text: ' ',
         highlighted: false
       }
@@ -252,8 +296,12 @@ describe('Exploration history', function() {
       '      value: Continue\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
-      '    feedback: []\n' +
+      '    feedback:\n' +
+      '      audio_translations: {}\n' +
+      '      html: \'\'\n' +
+      '    labelled_as_correct: false\n' +
       '    param_changes: []\n' +
+      '    refresher_exploration_id: null\n' +
       '  hints: []\n' +
       '  id: Continue\n' +
       '  solution: null\n' +
@@ -291,7 +339,7 @@ describe('Exploration history', function() {
     // Check deleting a state
     editor.deleteState('second');
     editor.moveToState('first');
-    editor.ResponseEditor(0).setDestination('final card', false);
+    editor.ResponseEditor(0).setDestination('final card', false, null);
     editor.saveChanges();
 
     editor.expectGraphComparisonOf(2, 3).toBe([{
@@ -321,7 +369,7 @@ describe('Exploration history', function() {
 
     // Check re-inserting a deleted state
     editor.moveToState('third');
-    editor.ResponseEditor(0).setDestination('second', true);
+    editor.ResponseEditor(0).setDestination('second', true, null);
     editor.moveToState('second');
     editor.setContent(forms.toRichText('this is card 2'));
     editor.setInteraction('Continue');

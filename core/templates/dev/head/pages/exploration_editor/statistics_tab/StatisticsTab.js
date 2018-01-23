@@ -20,13 +20,13 @@
 oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
-  '$scope', '$http', '$modal', 'AlertsService', 'explorationStatesService',
+  '$scope', '$http', '$uibModal', 'AlertsService', 'explorationStatesService',
   'ExplorationDataService', 'ComputeGraphService', 'DateTimeFormatService',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
   'IMPROVE_TYPE_INCOMPLETE', 'ENABLE_NEW_STATS_FRAMEWORK',
   function(
-      $scope, $http, $modal, AlertsService, explorationStatesService,
+      $scope, $http, $uibModal, AlertsService, explorationStatesService,
       ExplorationDataService, ComputeGraphService, DateTimeFormatService,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
@@ -115,7 +115,7 @@ oppia.controller('StatisticsTab', [
           var numCompletions = data.num_completions;
           $scope.stateStats = data.state_stats_mapping;
 
-          if (numStarts > 0) {
+          if (numActualStarts > 0) {
             $scope.explorationHasBeenVisited = true;
           }
 
@@ -175,7 +175,7 @@ oppia.controller('StatisticsTab', [
         '/createhandler/state_rules_stats/' + $scope.explorationId + '/' +
         encodeURIComponent(stateName)
       ).then(function(response) {
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/statistics_tab/' +
             'state_stats_modal_directive.html'),
@@ -195,11 +195,11 @@ oppia.controller('StatisticsTab', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', '$filter', '$injector', 'stateName',
+            '$scope', '$uibModalInstance', '$filter', '$injector', 'stateName',
             'stateStats', 'improvementType', 'visualizationsInfo',
             'HtmlEscaperService', 'AngularNameService',
             'AnswerClassificationService', 'ENABLE_NEW_STATS_FRAMEWORK',
-            function($scope, $modalInstance, $filter, $injector, stateName,
+            function($scope, $uibModalInstance, $filter, $injector, stateName,
                 stateStats, improvementType, visualizationsInfo,
                 HtmlEscaperService, AngularNameService,
                 AnswerClassificationService, ENABLE_NEW_STATS_FRAMEWORK) {
@@ -218,12 +218,12 @@ oppia.controller('StatisticsTab', [
               var title1 = 'Answer feedback statistics';
               $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1 = angular.copy(
                 COMPLETION_RATE_PIE_CHART_OPTIONS);
-              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1.title = title1
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1.title = title1;
 
               var title2 = 'Solution usage statistics';
               $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2 = angular.copy(
                 COMPLETION_RATE_PIE_CHART_OPTIONS);
-              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2.title = title2
+              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2.title = title2;
 
               $scope.stateName = stateName;
               $scope.stateStats = stateStats;
@@ -303,7 +303,7 @@ oppia.controller('StatisticsTab', [
               $scope.visualizationsHtml = _getVisualizationsHtml();
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
                 AlertsService.clearWarnings();
               };
             }

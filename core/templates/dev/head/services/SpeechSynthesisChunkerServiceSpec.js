@@ -44,7 +44,7 @@ describe('Speech Synthesis Chunker Service', function() {
       var latex1 = '\\\\frac{2}{3}';
       var latex2 = '\\\\frac{abc}{xyz}';
       var latex3 = '\\\\frac{3n}{5}';
-      var latex4 = '\\\\frac{ijk}{5xy}'
+      var latex4 = '\\\\frac{ijk}{5xy}';
       var speakableLatex1 =
         SpeechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
       var speakableLatex2 =

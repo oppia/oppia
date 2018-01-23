@@ -19,7 +19,9 @@
 
 oppia.factory('SolutionObjectFactory', [
   '$filter', 'HtmlEscaperService', 'ExplorationHtmlFormatterService',
-  function($filter, HtmlEscaperService, ExplorationHtmlFormatterService) {
+  'SubtitledHtmlObjectFactory', 'FractionObjectFactory',
+  function($filter, HtmlEscaperService, ExplorationHtmlFormatterService,
+      SubtitledHtmlObjectFactory, FractionObjectFactory) {
     var Solution = function(answerIsExclusive, correctAnswer, explanation) {
       this.answerIsExclusive = answerIsExclusive;
       this.correctAnswer = correctAnswer;
@@ -30,7 +32,7 @@ oppia.factory('SolutionObjectFactory', [
       return {
         answer_is_exclusive: this.answerIsExclusive,
         correct_answer: this.correctAnswer,
-        explanation: this.explanation
+        explanation: this.explanation.toBackendDict()
       };
     };
 
@@ -38,12 +40,16 @@ oppia.factory('SolutionObjectFactory', [
       return new Solution(
         solutionBackendDict.answer_is_exclusive,
         solutionBackendDict.correct_answer,
-        solutionBackendDict.explanation);
+        SubtitledHtmlObjectFactory.createFromBackendDict(
+          solutionBackendDict.explanation));
     };
 
     Solution.createNew = function(
-        answerIsExclusive, correctAnswer, explanation) {
-      return new Solution(answerIsExclusive, correctAnswer, explanation);
+        answerIsExclusive, correctAnswer, explanationHtml) {
+      return new Solution(
+        answerIsExclusive,
+        correctAnswer,
+        SubtitledHtmlObjectFactory.createDefault(explanationHtml));
     };
 
     Solution.prototype.getSummary = function(interactionId) {
@@ -61,14 +67,18 @@ oppia.factory('SolutionObjectFactory', [
         correctAnswer = '[Music Notes]';
       } else if (interactionId === 'LogicProof') {
         correctAnswer = this.correctAnswer.correct;
+      } else if (interactionId === 'FractionInput') {
+        correctAnswer = FractionObjectFactory.fromDict(
+          this.correctAnswer).toString();
       } else {
         correctAnswer = (
           HtmlEscaperService.objToEscapedJson(this.correctAnswer));
       }
       var explanation = (
-        $filter('convertToPlainText')(this.explanation));
+        $filter('convertToPlainText')(this.explanation.getHtml()));
       return (
-        solutionType + ' solution is "' + correctAnswer + '". ' + explanation);
+        solutionType + ' solution is "' + correctAnswer +
+        '". ' + explanation + '.');
     };
 
     Solution.prototype.setCorrectAnswer = function(correctAnswer) {
@@ -79,13 +89,17 @@ oppia.factory('SolutionObjectFactory', [
       this.explanation = explanation;
     };
 
-    Solution.prototype.getOppiaResponseHtml = function(interaction) {
-      return (
-        (this.answerIsExclusive ? 'The only' : 'One') + ' answer is:<br>' +
-        ExplorationHtmlFormatterService.getShortAnswerHtml(
-          this.correctAnswer, interaction.id, interaction.customizationArgs) +
-        '. ' + this.explanation);
+    Solution.prototype.getOppiaShortAnswerResponseHtml = function(interaction) {
+      return {
+        prefix: (this.answerIsExclusive ? 'The only' : 'One'),
+        answer: ExplorationHtmlFormatterService.getShortAnswerHtml(
+          this.correctAnswer, interaction.id, interaction.customizationArgs)};
     };
+
+    Solution.prototype.getOppiaSolutionExplanationResponseHtml =
+      function() {
+        return this.explanation.getHtml();
+      };
 
     return Solution;
   }]);

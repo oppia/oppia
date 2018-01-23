@@ -20,17 +20,20 @@ describe('FractionInputValidationService', function() {
   var greaterThanMinusOneRule, equalsOneRule, equivalentToOneRule,
     lessThanTwoRule;
   var createFractionDict;
+  var oof, agof, rof;
   beforeEach(function() {
     module('oppia');
   });
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
     validatorService = $injector.get('FractionInputValidationService');
-
+    oof = $injector.get('OutcomeObjectFactory');
+    agof = $injector.get('AnswerGroupObjectFactory');
+    rof = $injector.get('RuleObjectFactory');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
     createFractionDict = function(
-      isNegative, wholeNumber, numerator, denominator) {
+        isNegative, wholeNumber, numerator, denominator) {
       return {
         isNegative: isNegative,
         wholeNumber: wholeNumber,
@@ -42,76 +45,130 @@ describe('FractionInputValidationService', function() {
     customizationArgs = {
       requireSimplestForm: {
         value: true
+      },
+      allowImproperFraction: {
+        value: true
+      },
+      allowNonzeroIntegerPart: {
+        value: true
       }
     };
 
     currentState = 'First State';
-    goodDefaultOutcome = {
+    goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
-      feedback: []
-    };
+      feedback: {
+        html: '',
+        audio_translations: {}
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null
+    });
 
-    equalsOneRule = {
-      type: 'IsExactlyEqualTo',
+    equalsOneRule = rof.createFromBackendDict({
+      rule_type: 'IsExactlyEqualTo',
       inputs: {
         f: createFractionDict(false, 0, 1, 1)
       }
-    };
+    });
 
-    greaterThanMinusOneRule = {
-      type: 'IsGreaterThan',
+    equalsThreeByTwoRule = rof.createFromBackendDict({
+      rule_type: 'IsExactlyEqualTo',
+      inputs: {
+        f: createFractionDict(false, 0, 3, 2)
+      }
+    });
+
+    equalsOneAndHalfRule = rof.createFromBackendDict({
+      rule_type: 'IsExactlyEqualTo',
+      inputs: {
+        f: createFractionDict(false, 1, 1, 2)
+      }
+    });
+
+    greaterThanMinusOneRule = rof.createFromBackendDict({
+      rule_type: 'IsGreaterThan',
       inputs: {
         f: createFractionDict(true, 0, 1, 1)
       }
-    };
+    });
 
-    lessThanTwoRule = {
-      type: 'IsLessThan',
+    integerPartEqualsOne = rof.createFromBackendDict({
+      rule_type: 'HasIntegerPartEqualTo',
       inputs: {
-        f: createFractionDict(false, 0, 2, 1)
+        x: 1
       }
-    };
+    });
 
-    equivalentToOneRule = {
-      type: 'IsEquivalentTo',
-      inputs: {
-        f: createFractionDict(false, 0, 10, 10)
-      }
-    };
-
-    equivalentToOneAndSimplestFormRule = {
-      type: 'IsEquivalentToAndInSimplestForm',
-      inputs: {
-        f: createFractionDict(false, 0, 10, 10)
-      }
-    };
-
-    exactlyEqualToOneAndNotInSimplestFormRule = {
-      type: 'IsExactlyEqualTo',
-      inputs: {
-        f: createFractionDict(false, 0, 10, 10)
-      }
-    };
-
-    nonIntegerRule = {
-      type: 'HasNumeratorEqualTo',
-      inputs: {
-        x: 0.5
-      }
-    };
-
-    zeroDenominatorRule = {
-      type: 'HasDenominatorEqualTo',
+    integerPartEqualsZero = rof.createFromBackendDict({
+      rule_type: 'HasIntegerPartEqualTo',
       inputs: {
         x: 0
       }
-    };
+    });
 
-    answerGroups = [{
-      rules: [equalsOneRule, lessThanTwoRule],
-      outcome: goodDefaultOutcome,
-      correct: false
-    }];
+    lessThanTwoRule = rof.createFromBackendDict({
+      rule_type: 'IsLessThan',
+      inputs: {
+        f: createFractionDict(false, 0, 2, 1)
+      }
+    });
+
+    equivalentToOneRule = rof.createFromBackendDict({
+      rule_type: 'IsEquivalentTo',
+      inputs: {
+        f: createFractionDict(false, 0, 10, 10)
+      }
+    });
+
+    equivalentToOneAndSimplestFormRule = rof.createFromBackendDict({
+      rule_type: 'IsEquivalentToAndInSimplestForm',
+      inputs: {
+        f: createFractionDict(false, 0, 10, 10)
+      }
+    });
+
+    exactlyEqualToOneAndNotInSimplestFormRule = rof.createFromBackendDict({
+      rule_type: 'IsExactlyEqualTo',
+      inputs: {
+        f: createFractionDict(false, 0, 10, 10)
+      }
+    });
+
+    nonIntegerRule = rof.createFromBackendDict({
+      rule_type: 'HasNumeratorEqualTo',
+      inputs: {
+        x: 0.5
+      }
+    });
+
+    zeroDenominatorRule = rof.createFromBackendDict({
+      rule_type: 'HasDenominatorEqualTo',
+      inputs: {
+        x: 0
+      }
+    });
+
+    numeratorEqualsFiveRule = rof.createFromBackendDict({
+      rule_type: 'HasNumeratorEqualTo',
+      inputs: {
+        x: 5
+      }
+    });
+
+    denominatorEqualsFiveRule = rof.createFromBackendDict({
+      rule_type: 'HasDenominatorEqualTo',
+      inputs: {
+        x: 5
+      }
+    });
+
+    answerGroups = [agof.createNew(
+      [equalsOneRule, lessThanTwoRule],
+      goodDefaultOutcome,
+      false
+    )];
   }));
 
   it('should be able to perform basic validation', function() {
@@ -133,8 +190,23 @@ describe('FractionInputValidationService', function() {
     }]);
   });
 
-  it('should catch identical rules as redundant', function() {
+  it('should not catch equals followed by equivalent as redundant', function() {
     answerGroups[0].rules = [equalsOneRule, equivalentToOneRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+
+    answerGroups[0].rules = [equalsOneRule, equivalentToOneAndSimplestFormRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
+  it('should catch equivalent followed by equals same value' +
+    'as redundant', function() {
+    answerGroups[0].rules = [equivalentToOneRule, equalsOneRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -143,7 +215,8 @@ describe('FractionInputValidationService', function() {
       message: 'Rule 2 from answer group 1 will never be matched ' +
         'because it is made redundant by rule 1 from answer group 1.'
     }]);
-    answerGroups[0].rules = [equalsOneRule, equivalentToOneAndSimplestFormRule];
+
+    answerGroups[0].rules = [equivalentToOneAndSimplestFormRule, equalsOneRule];
     var warnings = validatorService.getAllWarnings(
       currentState, customizationArgs, answerGroups,
       goodDefaultOutcome);
@@ -249,5 +322,87 @@ describe('FractionInputValidationService', function() {
         1 + ' is invalid: denominator should be ' +
         'greater than zero.')
     }]);
+  });
+
+  it('should catch not allowImproperFraction and rule has improper fraction',
+    function() {
+      customizationArgs.allowImproperFraction.value = false;
+      answerGroups[0].rules = [equalsThreeByTwoRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule ' + 1 + ' from answer group ' +
+          1 + ' will never be matched because it is an ' +
+          'improper fraction')
+      }]);
+    });
+
+  it('should catch not allowNonzeroIntegerPart and rule has integer part',
+    function() {
+      customizationArgs.allowNonzeroIntegerPart.value = false;
+      answerGroups[0].rules = [equalsOneAndHalfRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule ' + 1 + ' from answer group ' +
+          1 + ' will never be matched because it has a ' +
+          'non zero integer part')
+      }]);
+    });
+
+  it('should catch if not allowNonzeroIntegerPart and ' +
+    'rule is HasIntegerPartEqualTo a non zero value', function() {
+    customizationArgs.allowNonzeroIntegerPart.value = false;
+    answerGroups[0].rules = [integerPartEqualsOne];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: (
+        'Rule ' + 1 + ' from answer group ' +
+        1 + ' will never be matched because integer part ' +
+        'has to be zero')
+    }]);
+  });
+
+  it('should allow if not allowNonzeroIntegerPart and ' +
+    'rule is HasIntegerPartEqualTo a zero value', function() {
+    customizationArgs.allowNonzeroIntegerPart.value = false;
+    answerGroups[0].rules = [integerPartEqualsZero];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
+  it('should allow equivalent fractions with if not requireSimplestForm ' +
+    'and rules are IsExactlyEqualTo', function() {
+    customizationArgs.requireSimplestForm = false;
+    answerGroups[1] = angular.copy(answerGroups[0]);
+    answerGroups[0].rules = [equalsOneRule];
+    answerGroups[1].rules = [exactlyEqualToOneAndNotInSimplestFormRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
+  });
+
+  it('should allow if numerator and denominator should equal the same value ' +
+    'and are set in different rules', function() {
+    customizationArgs.requireSimplestForm = false;
+    answerGroups[1] = angular.copy(answerGroups[0]);
+    answerGroups[0].rules = [numeratorEqualsFiveRule];
+    answerGroups[1].rules = [denominatorEqualsFiveRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArgs, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([]);
   });
 });

@@ -116,7 +116,7 @@ describe('Sidebar state name controller', function() {
         $scope: scope,
         $filter: filter,
         $rootScope: rootScope,
-        editabilityService: {
+        EditabilityService: {
           isEditable: function() {
             return true;
           }

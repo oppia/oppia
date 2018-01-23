@@ -14,8 +14,8 @@
 
 """Base constants and handlers."""
 
-import base64
 import Cookie
+import base64
 import datetime
 import hmac
 import json
@@ -26,10 +26,6 @@ import time
 import traceback
 import urlparse
 
-import jinja2
-import webapp2
-from google.appengine.api import users
-
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
@@ -39,6 +35,10 @@ from core.platform import models
 import feconf
 import jinja_utils
 import utils
+
+from google.appengine.api import users
+import jinja2
+import webapp2
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
@@ -132,6 +132,11 @@ class BaseHandler(webapp2.RequestHandler):
 
     @webapp2.cached_property
     def jinja2_env(self):
+        """Returns a Jinja2 environment cached for frontend templates.
+
+        Returns:
+            Environment. A Jinja2 environment object used to load templates.
+        """
         return jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
@@ -265,7 +270,7 @@ class BaseHandler(webapp2.RequestHandler):
         Args:
             values: dict. The key-value pairs to encode in the JSON response.
         """
-        self.response.content_type = 'application/javascript; charset=utf-8'
+        self.response.content_type = 'application/json; charset=utf-8'
         self.response.headers['Content-Disposition'] = (
             'attachment; filename="oppia-attachment.txt"')
         self.response.headers['Strict-Transport-Security'] = (
@@ -274,6 +279,18 @@ class BaseHandler(webapp2.RequestHandler):
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
+
+    def _get_logout_url(self, redirect_url_on_logout):
+        """Prepares and returns logout url which will be handled
+        by LogoutPage handler.
+
+        Args:
+            redirect_url_on_logout: str. URL to redirect to on logout.
+
+        Returns:
+            str. Logout URL to be handled by LogoutPage handler.
+        """
+        return current_user_services.create_logout_url(redirect_url_on_logout)
 
     def render_template(
             self, filepath, iframe_restriction='DENY',
@@ -356,9 +373,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         if self.user_id:
             values['login_url'] = None
-            values['logout_url'] = (
-                current_user_services.create_logout_url(
-                    redirect_url_on_logout))
+            values['logout_url'] = self._get_logout_url(redirect_url_on_logout)
         else:
             target_url = (
                 '/' if self.request.uri.endswith(feconf.SPLASH_URL)
@@ -502,7 +517,7 @@ class CsrfTokenManager(object):
         """Creates a new CSRF token.
 
         Args:
-            user_id: str. The user_id for whom the token is generated.
+            user_id: str. The user_id for which the token is generated.
             issued_on: float. The timestamp at which the token was issued.
 
         Returns:
@@ -531,10 +546,23 @@ class CsrfTokenManager(object):
 
     @classmethod
     def _get_current_time(cls):
+        """Returns the current server time.
+
+        Returns:
+            float. The time in seconds as floating point number.
+        """
         return time.time()
 
     @classmethod
     def create_csrf_token(cls, user_id):
+        """Creates a CSRF token for the given user_id.
+
+        Args:
+            user_id: str. The user_id for whom the token is generated.
+
+        Returns:
+            str. The generated CSRF token.
+        """
         return cls._create_token(user_id, cls._get_current_time())
 
     @classmethod

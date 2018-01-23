@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import datetime
+
 from core.platform import models
 from core.tests import test_utils
 import feconf

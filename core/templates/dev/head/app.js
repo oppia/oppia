@@ -69,22 +69,24 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 // displayed.
 oppia.constant('FATAL_ERROR_CODES', [400, 401, 404, 500]);
 
-oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
-
-oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
+// Do not modify these, for backwards-compatibility reasons.
+oppia.constant('COMPONENT_NAME_CONTENT', 'content');
+oppia.constant('COMPONENT_NAME_HINT', 'hint');
+oppia.constant('COMPONENT_NAME_SOLUTION', 'solution');
+oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
 
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
-    '$delegate', '$document', '$modal', '$timeout', 'FocusManagerService',
-    'taRegisterTool', 'rteHelperService', 'AlertsService',
+    '$delegate', '$document', '$uibModal', '$timeout', 'FocusManagerService',
+    'taRegisterTool', 'RteHelperService', 'AlertsService',
     'ExplorationContextService', 'PAGE_CONTEXT',
     'UrlInterpolationService',
     function(
-      taOptions, $document, $modal, $timeout, FocusManagerService,
-      taRegisterTool, rteHelperService, AlertsService,
-      ExplorationContextService, PAGE_CONTEXT,
-      UrlInterpolationService) {
+        taOptions, $document, $uibModal, $timeout, FocusManagerService,
+        taRegisterTool, RteHelperService, AlertsService,
+        ExplorationContextService, PAGE_CONTEXT,
+        UrlInterpolationService) {
       taOptions.disableSanitizer = true;
       taOptions.forceTextAngularSanitize = false;
       taOptions.classes.textEditor = 'form-control oppia-rte-content';
@@ -98,17 +100,17 @@ oppia.config(['$provide', function($provide) {
       // after exiting the modal, and moves the cursor back to where it was
       // before the modal was opened.
       var _openCustomizationModal = function(
-        customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
-        onDismissCallback, refocusFn) {
+          customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
+          onDismissCallback, refocusFn) {
         $document[0].execCommand('enableObjectResizing', false, false);
-        var modalDialog = $modal.open({
+        var modalDialog = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/forms/customize_rte_component_modal_directive.html'),
           backdrop: 'static',
           resolve: {},
           controller: [
-            '$scope', '$modalInstance', '$timeout',
-            function($scope, $modalInstance, $timeout) {
+            '$scope', '$uibModalInstance', '$timeout',
+            function($scope, $uibModalInstance, $timeout) {
               $scope.customizationArgSpecs = customizationArgSpecs;
 
               // Without this code, the focus will remain in the background RTE
@@ -136,7 +138,7 @@ oppia.config(['$provide', function($provide) {
               }
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
               };
 
               $scope.save = function() {
@@ -149,7 +151,7 @@ oppia.config(['$provide', function($provide) {
                     $scope.tmpCustomizationArgs[i].value);
                 }
 
-                $modalInstance.close(customizationArgsDict);
+                $uibModalInstance.close(customizationArgsDict);
               };
             }
           ]
@@ -161,8 +163,8 @@ oppia.config(['$provide', function($provide) {
         modalDialog.result['finally'](refocusFn);
       };
 
-      rteHelperService.getRichTextComponents().forEach(function(componentDefn) {
-        var buttonDisplay = rteHelperService.createToolbarIcon(componentDefn);
+      RteHelperService.getRichTextComponents().forEach(function(componentDefn) {
+        var buttonDisplay = RteHelperService.createToolbarIcon(componentDefn);
         var canUseFs = ExplorationContextService.getPageContext() ===
           PAGE_CONTEXT.EDITOR;
 
@@ -205,10 +207,10 @@ oppia.config(['$provide', function($provide) {
               textAngular.$editor().$parent.isCustomizationModalOpen = true;
               _openCustomizationModal(
                 componentDefn.customizationArgSpecs,
-                rteHelperService.createCustomizationArgDictFromAttrs(
+                RteHelperService.createCustomizationArgDictFromAttrs(
                   $element[0].attributes),
                 function(customizationArgsDict) {
-                  var el = rteHelperService.createRteElement(
+                  var el = RteHelperService.createRteElement(
                     componentDefn, customizationArgsDict);
                   $element[0].parentNode.replaceChild(el, $element[0]);
                   textAngular.$editor().updateTaBindtaTextElement();
@@ -236,7 +238,7 @@ oppia.config(['$provide', function($provide) {
               componentDefn.customizationArgSpecs,
               {},
               function(customizationArgsDict) {
-                var el = rteHelperService.createRteElement(
+                var el = RteHelperService.createRteElement(
                   componentDefn, customizationArgsDict);
                 var insertionPoint = (
                   textAngular.$editor().displayElements.text[0].querySelector(
@@ -415,202 +417,7 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
   };
 }]);
 
-oppia.factory('rteHelperService', [
-  '$filter', '$log', '$interpolate', 'ExplorationContextService',
-  'RTE_COMPONENT_SPECS', 'HtmlEscaperService', 'UrlInterpolationService',
-  function(
-      $filter, $log, $interpolate, ExplorationContextService,
-      RTE_COMPONENT_SPECS, HtmlEscaperService, UrlInterpolationService) {
-    var _RICH_TEXT_COMPONENTS = [];
-
-    Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
-      _RICH_TEXT_COMPONENTS.push({
-        backendId: RTE_COMPONENT_SPECS[componentId].backend_id,
-        customizationArgSpecs: angular.copy(
-          RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
-        id: RTE_COMPONENT_SPECS[componentId].frontend_id,
-        iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
-        previewUrlTemplate:
-        RTE_COMPONENT_SPECS[componentId].preview_url_template,
-        isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
-        isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
-        requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
-        tooltip: RTE_COMPONENT_SPECS[componentId].tooltip
-      });
-    });
-
-    var _createCustomizationArgDictFromAttrs = function(attrs) {
-      var customizationArgsDict = {};
-      for (var i = 0; i < attrs.length; i++) {
-        var attr = attrs[i];
-        if (attr.name === 'class' || attr.name === 'src' ||
-          attr.name === '_moz_resizing') {
-          continue;
-        }
-        var separatorLocation = attr.name.indexOf('-with-value');
-        if (separatorLocation === -1) {
-          $log.error('RTE Error: invalid customization attribute ' + attr.name);
-          continue;
-        }
-        var argName = attr.name.substring(0, separatorLocation);
-        customizationArgsDict[argName] = HtmlEscaperService.escapedJsonToObj(
-          attr.value);
-      }
-      return customizationArgsDict;
-    };
-
-    return {
-      createCustomizationArgDictFromAttrs: function(attrs) {
-        return _createCustomizationArgDictFromAttrs(attrs);
-      },
-      createToolbarIcon: function(componentDefn) {
-        var el = $('<img/>');
-        el.attr(
-          'src', UrlInterpolationService.getExtensionResourceUrl(
-            componentDefn.iconDataUrl));
-        el.addClass('oppia-rte-toolbar-image');
-        return el.get(0);
-      },
-      // Returns a DOM node.
-      createRteElement: function(componentDefn, customizationArgsDict) {
-        var el = $('<img/>');
-        if (ExplorationContextService.isInExplorationContext()) {
-          // TODO(sll): This extra key was introduced in commit
-          // 19a934ce20d592a3fc46bd97a2f05f41d33e3d66 in order to retrieve an
-          // image for RTE previews. However, it has had the unfortunate side-
-          // effect of adding an extra tag to the exploration RTE tags stored
-          // in the datastore. We are now removing this key in
-          // convertRteToHtml(), but we need to find a less invasive way to
-          // handle previews.
-          customizationArgsDict = angular.extend(customizationArgsDict, {
-            explorationId: ExplorationContextService.getExplorationId()
-          });
-        }
-        var componentPreviewUrlTemplate = componentDefn.previewUrlTemplate;
-        if (componentDefn.previewUrlTemplate.indexOf(
-            '/rich_text_components') === 0) {
-          var interpolatedUrl = UrlInterpolationService.getExtensionResourceUrl(
-            componentPreviewUrlTemplate);
-        } else {
-          var interpolatedUrl = ($interpolate(
-            componentPreviewUrlTemplate, false, null, true)(
-              customizationArgsDict));
-        }
-
-        if (!interpolatedUrl) {
-          $log.error(
-            'Error interpolating url : ' + componentDefn.previewUrlTemplate);
-        } else {
-          el.attr('src', interpolatedUrl);
-        }
-        el.addClass('oppia-noninteractive-' + componentDefn.id);
-        if (componentDefn.isBlockElement) {
-          el.addClass('block-element');
-        }
-        for (var attrName in customizationArgsDict) {
-          el.attr(
-            $filter('camelCaseToHyphens')(attrName) + '-with-value',
-            HtmlEscaperService.objToEscapedJson(
-              customizationArgsDict[attrName]));
-        }
-
-        return el.get(0);
-      },
-      // Replace <oppia-noninteractive> tags with <img> tags.
-      convertHtmlToRte: function(html) {
-        // If an undefined or empty html value is passed in, then the same type
-        // of value should be returned. Without this check,
-        // convertHtmlToRte(undefined) would return 'undefined', which is not
-        // ideal.
-        if (!html) {
-          return html;
-        }
-
-        var elt = $('<div>' + html + '</div>');
-        var that = this;
-
-        _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-          elt.find('oppia-noninteractive-' + componentDefn.id).replaceWith(
-            function() {
-              return that.createRteElement(
-                componentDefn,
-                _createCustomizationArgDictFromAttrs(this.attributes));
-            }
-          );
-        });
-
-        return elt.html();
-      },
-      // Replace <img> tags with <oppia-noninteractive> tags.
-      convertRteToHtml: function(rte) {
-        // If an undefined or empty rte value is passed in, then the same type
-        // of value should be returned. Without this check,
-        // convertRteToHtml(undefined) would return 'undefined', which is not
-        // ideal.
-        if (!rte) {
-          return rte;
-        }
-
-        var elt = $('<div>' + rte + '</div>');
-
-        _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-          elt.find(
-            'img.oppia-noninteractive-' + componentDefn.id
-          ).replaceWith(function() {
-            // Look for a class name starting with oppia-noninteractive-*.
-            var tagNameMatch = /(^|\s)(oppia-noninteractive-[a-z0-9\-]+)/.exec(
-              this.className);
-            if (!tagNameMatch) {
-              $log.error('RTE Error: invalid class name ' + this.className);
-            }
-            var jQueryElt = $('<' + tagNameMatch[2] + '/>');
-            for (var i = 0; i < this.attributes.length; i++) {
-              var attr = this.attributes[i];
-              // The exploration-id-with-value attribute was added in
-              // createRteElement(), and should be stripped. See commit
-              // 19a934ce20d592a3fc46bd97a2f05f41d33e3d66.
-              if (attr.name !== 'class' && attr.name !== 'src' &&
-                attr.name !== 'exploration-id-with-value') {
-                jQueryElt.attr(attr.name, attr.value);
-              }
-            }
-            return jQueryElt.get(0);
-          });
-        });
-
-        return elt.html();
-      },
-      getRichTextComponents: function() {
-        return angular.copy(_RICH_TEXT_COMPONENTS);
-      }
-    };
-  }
-]);
-
 oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
-
-// Service for manipulating the page URL.
-oppia.factory('urlService', ['$window', function($window) {
-  return {
-    getUrlParams: function() {
-      var params = {};
-      var parts = $window.location.href.replace(
-        /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-          params[key] = value;
-        }
-      );
-      return params;
-    },
-    isIframed: function() {
-      var pathname = this.getPathname();
-      var urlParts = pathname.split('/');
-      return urlParts[1] === 'embed';
-    },
-    getPathname: function() {
-      return window.location.pathname;
-    }
-  };
-}]);
 
 // Service for sending events to Google Analytics.
 //

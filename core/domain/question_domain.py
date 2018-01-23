@@ -16,9 +16,9 @@
 
 """Domain objects relating to questions."""
 
+from constants import constants
 from core.domain import exp_domain
 from core.platform import models
-from constants import constants
 import feconf
 import utils
 
@@ -34,6 +34,9 @@ QUESTION_PROPERTY_QUESTION_DATA = 'question_data'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_UPDATE_QUESTION_PROPERTY = 'update_question_property'
+
+CMD_ADD_QUESTION_SKILL = 'add_question_skill'
+CMD_REMOVE_QUESTION_SKILL = 'remove_question_skill'
 
 
 class QuestionChange(object):
@@ -68,6 +71,10 @@ class QuestionChange(object):
                 self.old_value = change_dict.get('old_value')
             else:
                 raise Exception('Invalid change_dict: %s' % change_dict)
+        elif self.cmd == CMD_ADD_QUESTION_SKILL:
+            self.skill_name = change_dict['skill_name']
+        elif self.cmd == CMD_REMOVE_QUESTION_SKILL:
+            self.skill_id = change_dict['skill_id']
 
     def to_dict(self):
         """Returns a dict representing QuestionChange domain object.

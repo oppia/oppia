@@ -18,8 +18,6 @@ import json
 import logging
 import random
 
-import jinja2
-
 from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
@@ -41,6 +39,8 @@ from core.domain import summary_services
 from core.domain import user_services
 import feconf
 import utils
+
+import jinja2
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
@@ -284,7 +284,9 @@ class ExplorationHandler(base.BaseHandler):
             'version': exploration.version,
             'preferred_audio_language_code': preferred_audio_language_code,
             'state_classifier_mapping': state_classifier_mapping,
-            'auto_tts_enabled': exploration.auto_tts_enabled
+            'auto_tts_enabled': exploration.auto_tts_enabled,
+            'correctness_feedback_enabled': (
+                exploration.correctness_feedback_enabled),
         })
         self.render_json(self.values)
 
@@ -432,6 +434,22 @@ class StateCompleteEventHandler(base.BaseHandler):
                 exploration_id, self.payload.get('exp_version'),
                 self.payload.get('state_name'), self.payload.get('session_id'),
                 self.payload.get('time_spent_in_state_secs'))
+        self.render_json({})
+
+
+class LeaveForRefresherExpEventHandler(base.BaseHandler):
+    """Tracks a learner leaving an exploration for a refresher exploration."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        event_services.LeaveForRefresherExpEventHandler.record(
+            exploration_id, self.payload.get('refresher_exp_id'),
+            self.payload.get('exp_version'), self.payload.get('state_name'),
+            self.payload.get('session_id'),
+            self.payload.get('time_spent_in_state_secs'))
         self.render_json({})
 
 
@@ -699,6 +717,10 @@ class RecommendationsHandler(base.BaseHandler):
     if there are upcoming explorations for the learner to complete.
     """
 
+    # TODO(bhenning): Move the recommendation selection logic & related tests to
+    # the domain layer as service methods or to the frontend to reduce the
+    # amount of logic needed in this handler.
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_play_exploration
@@ -714,40 +736,34 @@ class RecommendationsHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         auto_recommended_exp_ids = []
-        if self.user_id and collection_id:
-            next_exp_ids_in_collection = (
-                collection_services.get_next_exploration_ids_to_complete_by_user(  # pylint: disable=line-too-long
-                    self.user_id, collection_id))
-            auto_recommended_exp_ids = list(
-                set(next_exp_ids_in_collection) -
-                set(author_recommended_exp_ids))
-        else:
-            next_exp_ids_in_collection = []
-            if collection_id:
+
+        if collection_id:
+            if self.user_id:
+                auto_recommended_exp_ids = (
+                    collection_services.get_next_exploration_ids_to_complete_by_user(  # pylint: disable=line-too-long
+                        self.user_id, collection_id))
+            else:
                 collection = collection_services.get_collection_by_id(
                     collection_id)
-                next_exp_ids_in_collection = (
+                auto_recommended_exp_ids = (
                     collection.get_next_exploration_ids_in_sequence(
                         exploration_id))
-            if next_exp_ids_in_collection:
-                auto_recommended_exp_ids = list(
-                    set(next_exp_ids_in_collection) -
-                    set(author_recommended_exp_ids))
-            elif include_system_recommendations:
-                system_chosen_exp_ids = (
-                    recommendations_services.get_exploration_recommendations(
-                        exploration_id))
-                filtered_exp_ids = list(
-                    set(system_chosen_exp_ids) -
-                    set(author_recommended_exp_ids))
-                auto_recommended_exp_ids = random.sample(
-                    filtered_exp_ids,
-                    min(MAX_SYSTEM_RECOMMENDATIONS, len(filtered_exp_ids)))
+        elif include_system_recommendations:
+            system_chosen_exp_ids = (
+                recommendations_services.get_exploration_recommendations(
+                    exploration_id))
+            filtered_exp_ids = list(
+                set(system_chosen_exp_ids) - set(author_recommended_exp_ids))
+            auto_recommended_exp_ids = random.sample(
+                filtered_exp_ids,
+                min(MAX_SYSTEM_RECOMMENDATIONS, len(filtered_exp_ids)))
 
+        recommended_exp_ids = set(
+            author_recommended_exp_ids + auto_recommended_exp_ids)
         self.values.update({
             'summaries': (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    author_recommended_exp_ids + auto_recommended_exp_ids)),
+                    recommended_exp_ids)),
         })
         self.render_json(self.values)
 

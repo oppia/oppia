@@ -16,7 +16,6 @@
 
 from core.platform import models
 from core.tests import test_utils
-
 import feconf
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
@@ -110,6 +109,7 @@ class TestVersionedModel(base_models.VersionedModel):
     """Model that inherits the VersionedModel for testing."""
     SNAPSHOT_METADATA_CLASS = TestSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TestSnapshotContentModel
+
 
 class VersionedModelTests(test_utils.GenericTestBase):
     """Test methods for VersionedModel."""

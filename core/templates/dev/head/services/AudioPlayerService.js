@@ -18,18 +18,15 @@
 
 oppia.factory('AudioPlayerService', [
   '$q', '$timeout', 'ngAudio', 'AssetsBackendApiService',
-  'ExplorationContextService',
+  'ExplorationContextService', 'AudioTranslationManagerService',
   function(
       $q, $timeout, ngAudio, AssetsBackendApiService,
-      ExplorationContextService) {
-    // The ID of the directive that contains the currently playing
-    // audio. This is a unique generated string in each directive.
-    var _currentAudioControlsDirectiveId = null;
+      ExplorationContextService, AudioTranslationManagerService) {
     var _currentTrackFilename = null;
     var _currentTrack = null;
 
     var _load = function(
-        filename, directiveId, successCallback, errorCallback) {
+        filename, successCallback, errorCallback) {
       if (filename !== _currentTrackFilename) {
         AssetsBackendApiService.loadAudio(
         ExplorationContextService.getExplorationId(), filename)
@@ -37,7 +34,6 @@ oppia.factory('AudioPlayerService', [
             var blobUrl = URL.createObjectURL(loadedAudiofile.data);
             _currentTrack = ngAudio.load(blobUrl);
             _currentTrackFilename = filename;
-            _currentAudioControlsDirectiveId = directiveId;
 
             // ngAudio doesn't seem to be provide any way of detecting
             // when native audio object has finished loading. It seems
@@ -49,8 +45,9 @@ oppia.factory('AudioPlayerService', [
               _currentTrack.audio.onended = function() {
                 _currentTrack = null;
                 _currentTrackFilename = null;
-                _currentAudioControlsDirectiveId = null;
-              }
+                AudioTranslationManagerService
+                  .clearSecondaryAudioTranslations();
+              };
             }, 100);
 
             successCallback();
@@ -75,7 +72,6 @@ oppia.factory('AudioPlayerService', [
     var _stop = function() {
       if (_currentTrack) {
         _currentTrack.stop();
-        _currentAudioControlsDirectiveId = null;
         _currentTrackFilename = null;
         _currentTrack = null;
       }
@@ -91,9 +87,9 @@ oppia.factory('AudioPlayerService', [
     };
 
     return {
-      load: function(filename, directiveId) {
+      load: function(filename) {
         return $q(function(resolve, reject) {
-          _load(filename, directiveId, resolve, reject);
+          _load(filename, resolve, reject);
         });
       },
       play: function() {
@@ -108,8 +104,14 @@ oppia.factory('AudioPlayerService', [
       rewind: function(seconds) {
         _rewind(seconds);
       },
+      getProgress: function() {
+        if (!_currentTrack) {
+          return 0;
+        }
+        return _currentTrack.progress;
+      },
       isPlaying: function() {
-        return (_currentTrack && !_currentTrack.paused);
+        return Boolean(_currentTrack && !_currentTrack.paused);
       },
       isTrackLoaded: function() {
         return Boolean(_currentTrack);
@@ -117,9 +119,6 @@ oppia.factory('AudioPlayerService', [
       clear: function() {
         _currentTrack = null;
         _currentTrackFilename = null;
-      },
-      getCurrentAudioControlsDirectiveId: function() {
-        return _currentAudioControlsDirectiveId;
       }
     };
   }

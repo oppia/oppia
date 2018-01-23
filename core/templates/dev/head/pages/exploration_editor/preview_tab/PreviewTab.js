@@ -18,7 +18,7 @@
  */
 
 oppia.controller('PreviewTab', [
-  '$scope', '$modal', '$q', '$timeout', 'LearnerParamsService',
+  '$scope', '$uibModal', '$q', '$timeout', 'LearnerParamsService',
   'ExplorationDataService', 'ExplorationAdvancedFeaturesService',
   'explorationCategoryService', 'EditorStateService',
   'explorationInitStateNameService', 'explorationParamChangesService',
@@ -27,7 +27,7 @@ oppia.controller('PreviewTab', [
   'ParameterMetadataService', 'ParamChangeObjectFactory',
   'UrlInterpolationService',
   function(
-      $scope, $modal, $q, $timeout, LearnerParamsService,
+      $scope, $uibModal, $q, $timeout, LearnerParamsService,
       ExplorationDataService, ExplorationAdvancedFeaturesService,
       explorationCategoryService, EditorStateService,
       explorationInitStateNameService, explorationParamChangesService,
@@ -89,19 +89,19 @@ oppia.controller('PreviewTab', [
     };
 
     $scope.showSetParamsModal = function(manualParamChanges, callback) {
-      var modalInstance = $modal.open({
+      var modalInstance = $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/preview_tab/' +
           'preview_set_parameters_modal_directive.html'),
         backdrop: 'static',
         windowClass: 'oppia-preview-set-params-modal',
         controller: [
-          '$scope', '$modalInstance', 'RouterService',
-          function($scope, $modalInstance, RouterService) {
+          '$scope', '$uibModalInstance', 'RouterService',
+          function($scope, $uibModalInstance, RouterService) {
             $scope.manualParamChanges = manualParamChanges;
-            $scope.previewParamModalOk = $modalInstance.close;
+            $scope.previewParamModalOk = $uibModalInstance.close;
             $scope.previewParamModalCancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               RouterService.navigateToMainTab();
             };
           }
@@ -125,7 +125,7 @@ oppia.controller('PreviewTab', [
       initStateNameForPreview = explorationInitStateNameService.savedMemento;
       $timeout(function() {
         ExplorationPlayerService.init(function(exploration, initHtml,
-          newParams) {
+            newParams) {
           $scope.loadPreviewState(initStateNameForPreview, []);
         });
       }, 200);

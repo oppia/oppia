@@ -17,17 +17,17 @@
  */
 
 oppia.controller('FeedbackTab', [
-  '$scope', '$http', '$modal', '$timeout', '$rootScope', 'AlertsService',
+  '$scope', '$http', '$uibModal', '$timeout', '$rootScope', 'AlertsService',
   'DateTimeFormatService', 'ThreadStatusDisplayService',
   'ThreadDataService', 'explorationStatesService', 'ExplorationDataService',
-  'changeListService', 'StateObjectFactory', 'UrlInterpolationService',
+  'ChangeListService', 'StateObjectFactory', 'UrlInterpolationService',
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
-    $scope, $http, $modal, $timeout, $rootScope, AlertsService,
-    DateTimeFormatService, ThreadStatusDisplayService,
-    ThreadDataService, explorationStatesService, ExplorationDataService,
-    changeListService, StateObjectFactory, UrlInterpolationService,
-    ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
+      $scope, $http, $uibModal, $timeout, $rootScope, AlertsService,
+      DateTimeFormatService, ThreadStatusDisplayService,
+      ThreadDataService, explorationStatesService, ExplorationDataService,
+      ChangeListService, StateObjectFactory, UrlInterpolationService,
+      ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
     $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
     $scope.threadData = ThreadDataService.data;
     $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
@@ -56,14 +56,14 @@ oppia.controller('FeedbackTab', [
     };
 
     $scope.showCreateThreadModal = function() {
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/feedback_tab/' +
           'editor_create_feedback_thread_modal_directive.html'),
         backdrop: true,
         resolve: {},
-        controller: ['$scope', '$modalInstance', function(
-          $scope, $modalInstance) {
+        controller: ['$scope', '$uibModalInstance', function(
+            $scope, $uibModalInstance) {
           $scope.newThreadSubject = '';
           $scope.newThreadText = '';
 
@@ -77,14 +77,14 @@ oppia.controller('FeedbackTab', [
               return;
             }
 
-            $modalInstance.close({
+            $uibModalInstance.close({
               newThreadSubject: newThreadSubject,
               newThreadText: newThreadText
             });
           };
 
           $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
           };
         }]
       }).result.then(function(result) {
@@ -106,7 +106,7 @@ oppia.controller('FeedbackTab', [
     };
 
     var _hasUnsavedChanges = function() {
-      return (changeListService.getChangeList().length > 0);
+      return (ChangeListService.getChangeList().length > 0);
     };
 
     $scope.getSuggestionButtonType = function() {
@@ -116,7 +116,7 @@ oppia.controller('FeedbackTab', [
 
     // TODO(Allan): Implement ability to edit suggestions before applying.
     $scope.showSuggestionModal = function() {
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/feedback_tab/' +
           'editor_view_suggestion_modal_directive.html'),
@@ -148,13 +148,13 @@ oppia.controller('FeedbackTab', [
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'suggestionIsOpen', 'suggestionIsValid',
-          'unsavedChangesExist', 'suggestionStatus', 'description',
-          'currentContent', 'newContent', 'editabilityService',
+          '$scope', '$uibModalInstance', 'suggestionIsOpen',
+          'suggestionIsValid', 'unsavedChangesExist', 'suggestionStatus',
+          'description', 'currentContent', 'newContent', 'EditabilityService',
           function(
-            $scope, $modalInstance, suggestionIsOpen, suggestionIsValid,
-            unsavedChangesExist, suggestionStatus, description,
-            currentContent, newContent, editabilityService) {
+              $scope, $uibModalInstance, suggestionIsOpen,
+              suggestionIsValid, unsavedChangesExist, suggestionStatus,
+              description, currentContent, newContent, EditabilityService) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
               'accepted.';
             var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
@@ -165,7 +165,7 @@ oppia.controller('FeedbackTab', [
               'this exploration. Please save/discard your unsaved changes if ' +
               'you wish to accept.';
             $scope.isOpen = suggestionIsOpen;
-            $scope.canEdit = editabilityService.isEditable();
+            $scope.canEdit = EditabilityService.isEditable();
             $scope.canReject = $scope.canEdit && $scope.isOpen;
             $scope.canAccept = $scope.canEdit && $scope.isOpen &&
               suggestionIsValid && !unsavedChangesExist;
@@ -188,7 +188,7 @@ oppia.controller('FeedbackTab', [
             $scope.commitMessage = description;
 
             $scope.acceptSuggestion = function() {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
                 commitMessage: $scope.commitMessage,
                 // TODO(sll): If audio files exist for the content being
@@ -202,13 +202,13 @@ oppia.controller('FeedbackTab', [
             };
 
             $scope.rejectSuggestion = function() {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 action: ACTION_REJECT_SUGGESTION
               });
             };
 
             $scope.cancelReview = function() {
-              $modalInstance.dismiss();
+              $uibModalInstance.dismiss();
             };
           }
         ]
@@ -239,7 +239,7 @@ oppia.controller('FeedbackTab', [
               $rootScope.$broadcast('refreshStateEditor');
             }
           }, function() {
-            console.log('Error resolving suggestion');
+            $log.error('Error resolving suggestion');
           });
       });
     };

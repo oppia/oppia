@@ -124,6 +124,14 @@ oppia.factory('PlayerTranscriptService', ['$log', function($log) {
       }
       return transcript[index];
     },
+    getLastAnswerOnActiveCard: function(index) {
+      if (this.isLastCard(index)) {
+        return null;
+      } else {
+        return transcript[index].
+          inputResponsePairs.slice(-1)[0].learnerInput;
+      }
+    },
     isLastCard: function(index) {
       return index === transcript.length - 1;
     },

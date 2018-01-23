@@ -23,10 +23,11 @@ Run this script from the Oppia root directory:
 
 import os
 import time
-import yaml
 
 from core.domain import classifier_registry
 import feconf
+
+import yaml
 
 
 def measure_runtime(func):
@@ -149,6 +150,7 @@ def main():
     benchmarker = LDAStringClassifierBenchmarker()
     benchmarker.generate_training_benchmarks()
     benchmarker.generate_prediction_benchmarks()
+
 
 if __name__ == '__main__':
     main()

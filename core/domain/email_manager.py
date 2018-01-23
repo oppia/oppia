@@ -37,6 +37,7 @@ transaction_services = models.Registry.import_transaction_services()
 def log_new_error(*args, **kwargs):
     logging.error(*args, **kwargs)
 
+
 NOTIFICATION_EMAIL_LIST_SCHEMA = {
     'type': 'list',
     'items': {
@@ -469,12 +470,12 @@ def send_role_notification_email(
         'Hi %s,<br>'
         '<br>'
         '<b>%s</b> has granted you %s to their exploration, '
-        '"<a href="http://www.oppia.org/create/%s">%s</a>", on Oppia.org.<br>'
+        '"<a href="https://www.oppia.org/create/%s">%s</a>", on Oppia.org.<br>'
         '<br>'
         'This allows you to:<br>'
         '<ul>%s</ul>'
         'You can find the exploration '
-        '<a href="http://www.oppia.org/create/%s">here</a>.<br>'
+        '<a href="https://www.oppia.org/create/%s">here</a>.<br>'
         '<br>'
         'Thanks, and happy collaborating!<br>'
         '<br>'
@@ -672,6 +673,7 @@ def can_users_receive_thread_email(
                 and not user_exploration_prefs.mute_feedback_notifications)
 
     return result
+
 
 def send_suggestion_email(
         exploration_title, exploration_id, author_id, recipient_list):

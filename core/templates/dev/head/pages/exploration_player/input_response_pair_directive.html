@@ -2,7 +2,7 @@
   <img class="conversation-skin-user-avatar img-circle" ng-src="<[profilePicture()]>" alt="">
   <div ng-if="!data.isHint">
     <div ng-if="getShortAnswerHtml()"
-         popover-placement="bottom" popover-template="'popover/answer'"
+         popover-placement="bottom" uib-popover-template="'popover/answer'"
          popover-trigger="click" style="cursor: pointer;">
       <div class="conversation-skin-learner-answer-content" angular-html-bind="getShortAnswerHtml()">
       </div>
@@ -29,9 +29,9 @@
     <span id="<[getInputResponsePairId()]>"></span>
     <div ng-if="data.oppiaResponse !== null"
          angular-html-bind="data.oppiaResponse"
-         class="conversation-skin-oppia-feedback-content protractor-test-conversation-feedback">
+         class="conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
+         ng-class="getFeedbackAudioHighlightClass()">
     </div>
-  
 </div>
 
 <style>
@@ -59,7 +59,7 @@
     content: ' ';
     height: 0;
     position: absolute;
-    top: 11%;  
+    top: 11%;
     width: 0;
   }
 

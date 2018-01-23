@@ -18,8 +18,8 @@ import json
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous_test
 from core.domain import feedback_services
-from core.domain import subscription_services
 from core.domain import rights_manager
+from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils

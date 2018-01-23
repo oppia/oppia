@@ -19,16 +19,16 @@
 
 oppia.factory('ResponsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
-  'AnswerGroupsCacheService', 'EditorStateService', 'changeListService',
-  'explorationStatesService', 'graphDataService', 'OutcomeObjectFactory',
+  'AnswerGroupsCacheService', 'EditorStateService', 'ChangeListService',
+  'explorationStatesService', 'GraphDataService', 'OutcomeObjectFactory',
   'stateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ExplorationContextService', 'ExplorationWarningsService',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
-      AnswerGroupsCacheService, EditorStateService, changeListService,
-      explorationStatesService, graphDataService, OutcomeObjectFactory,
+      AnswerGroupsCacheService, EditorStateService, ChangeListService,
+      explorationStatesService, GraphDataService, OutcomeObjectFactory,
       stateSolutionService, SolutionVerificationService, AlertsService,
       ExplorationContextService, ExplorationWarningsService,
       INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
@@ -91,23 +91,29 @@ oppia.factory('ResponsesService', [
           }
         }
 
-        graphDataService.recompute();
+        GraphDataService.recompute();
         _answerGroupsMemento = angular.copy(newAnswerGroups);
       }
     };
 
     var _updateAnswerGroup = function(index, updates) {
       var answerGroup = _answerGroups[index];
-      if (updates.rules) {
+      if (updates.hasOwnProperty('rules')) {
         answerGroup.rules = updates.rules;
       }
-      if (updates.feedback) {
+      if (updates.hasOwnProperty('feedback')) {
         answerGroup.outcome.feedback = updates.feedback;
       }
-      if (updates.dest) {
+      if (updates.hasOwnProperty('dest')) {
         answerGroup.outcome.dest = updates.dest;
       }
-      answerGroup.correct = false;
+      if (updates.hasOwnProperty('refresherExplorationId')) {
+        answerGroup.outcome.refresherExplorationId = (
+          updates.refresherExplorationId);
+      }
+      if (updates.hasOwnProperty('labelledAsCorrect')) {
+        answerGroup.outcome.labelledAsCorrect = updates.labelledAsCorrect;
+      }
       _saveAnswerGroups(_answerGroups);
     };
 
@@ -120,7 +126,7 @@ oppia.factory('ResponsesService', [
           EditorStateService.getActiveStateName(),
           angular.copy(newDefaultOutcome));
 
-        graphDataService.recompute();
+        GraphDataService.recompute();
         _defaultOutcomeMemento = angular.copy(newDefaultOutcome);
       }
     };
@@ -166,20 +172,22 @@ oppia.factory('ResponsesService', [
         if (AnswerGroupsCacheService.contains(newInteractionId)) {
           _answerGroups = AnswerGroupsCacheService.get(newInteractionId);
         } else {
-          // Preserve the default outcome unless the interaction is terminal.
-          // Recreate the default outcome if switching away from a terminal
-          // interaction.
           _answerGroups = [];
-          _confirmedUnclassifiedAnswers = [];
-          if (newInteractionId) {
-            if (INTERACTION_SPECS[newInteractionId].is_terminal) {
-              _defaultOutcome = null;
-            } else if (!_defaultOutcome) {
-              _defaultOutcome = OutcomeObjectFactory.createNew(
-                EditorStateService.getActiveStateName(), [], []);
-            }
+        }
+
+        // Preserve the default outcome unless the interaction is terminal.
+        // Recreate the default outcome if switching away from a terminal
+        // interaction.
+        if (newInteractionId) {
+          if (INTERACTION_SPECS[newInteractionId].is_terminal) {
+            _defaultOutcome = null;
+          } else if (!_defaultOutcome) {
+            _defaultOutcome = OutcomeObjectFactory.createNew(
+              EditorStateService.getActiveStateName(), '', []);
           }
         }
+
+        _confirmedUnclassifiedAnswers = [];
 
         _saveAnswerGroups(_answerGroups);
         _saveDefaultOutcome(_defaultOutcome);
@@ -233,11 +241,17 @@ oppia.factory('ResponsesService', [
       },
       updateDefaultOutcome: function(updates) {
         var outcome = _defaultOutcome;
-        if (updates.feedback) {
+        if (updates.hasOwnProperty('feedback')) {
           outcome.feedback = updates.feedback;
         }
-        if (updates.dest) {
+        if (updates.hasOwnProperty('dest')) {
           outcome.dest = updates.dest;
+        }
+        if (updates.hasOwnProperty('refresherExplorationId')) {
+          outcome.refresherExplorationId = updates.refresherExplorationId;
+        }
+        if (updates.hasOwnProperty('labelledAsCorrect')) {
+          outcome.labelledAsCorrect = updates.labelledAsCorrect;
         }
         _saveDefaultOutcome(outcome);
       },

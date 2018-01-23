@@ -39,7 +39,7 @@ describe('Exploration data service', function() {
       });
       module(function($provide) {
         $provide.value(
-          'urlService', mockUrlService);
+          'UrlService', mockUrlService);
       });
     });
 

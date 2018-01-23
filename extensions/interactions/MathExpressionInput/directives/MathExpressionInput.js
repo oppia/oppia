@@ -28,16 +28,21 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        // This should be called whenever the answer changes.
+        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MathExpressionInput/directives/' +
         'math_expression_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
-        'DebouncerService', 'DeviceInfoService',
-        function($scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS,
-          DebouncerService, DeviceInfoService) {
+        'DebouncerService', 'DeviceInfoService', 'WindowDimensionsService',
+        'EVENT_PROGRESS_NAV_SUBMITTED',
+        function(
+            $scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS,
+            DebouncerService, DeviceInfoService, WindowDimensionsService,
+            EVENT_PROGRESS_NAV_SUBMITTED) {
           var guppyDivElt = $element[0].querySelector('.guppy-div');
 
           /**
@@ -196,6 +201,8 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
               rulesService: mathExpressionInputRulesService
             });
           };
+
+          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitAnswer);
         }
       ]
     };

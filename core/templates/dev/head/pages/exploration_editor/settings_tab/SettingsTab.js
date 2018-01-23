@@ -17,31 +17,33 @@
  */
 
 oppia.controller('SettingsTab', [
-  '$scope', '$http', '$window', '$modal',
+  '$scope', '$http', '$window', '$uibModal',
   '$rootScope', 'ExplorationDataService',
   'explorationTitleService', 'explorationCategoryService',
   'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationTagsService', 'ExplorationRightsService',
   'explorationInitStateNameService', 'explorationParamSpecsService',
-  'changeListService', 'AlertsService', 'explorationStatesService',
+  'ChangeListService', 'AlertsService', 'explorationStatesService',
   'explorationParamChangesService', 'ExplorationWarningsService',
   'ExplorationAdvancedFeaturesService', 'ALL_CATEGORIES',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
   'EditableExplorationBackendApiService', 'UrlInterpolationService',
   'explorationAutomaticTextToSpeechService',
+  'explorationCorrectnessFeedbackService',
   function(
-      $scope, $http, $window, $modal,
+      $scope, $http, $window, $uibModal,
       $rootScope, ExplorationDataService,
       explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService,
       explorationTagsService, ExplorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService,
-      changeListService, AlertsService, explorationStatesService,
+      ChangeListService, AlertsService, explorationStatesService,
       explorationParamChangesService, ExplorationWarningsService,
       ExplorationAdvancedFeaturesService, ALL_CATEGORIES,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
       EditableExplorationBackendApiService, UrlInterpolationService,
-      explorationAutomaticTextToSpeechService) {
+      explorationAutomaticTextToSpeechService,
+      explorationCorrectnessFeedbackService) {
     $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
@@ -56,6 +58,10 @@ oppia.controller('SettingsTab', [
     $scope.isRolesFormOpen = false;
 
     $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
+    $scope.canDelete = GLOBALS.canDelete;
+    $scope.canModifyRoles = GLOBALS.canModifyRoles;
+    $scope.canReleaseOwnership = GLOBALS.canReleaseOwnership;
+    $scope.canUnpublish = GLOBALS.canUnpublish;
 
     var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
     var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -177,6 +183,11 @@ oppia.controller('SettingsTab', [
     $scope.toggleAutomaticTextToSpeech = (
       explorationAutomaticTextToSpeechService.toggleAutomaticTextToSpeech);
 
+    $scope.isCorrectnessFeedbackEnabled = (
+      explorationCorrectnessFeedbackService.isEnabled);
+    $scope.toggleCorrectnessFeedback = (
+      explorationCorrectnessFeedbackService.toggleCorrectnessFeedback);
+
     /********************************************
     * Methods for rights management.
     ********************************************/
@@ -226,13 +237,13 @@ oppia.controller('SettingsTab', [
     ********************************************/
     $scope.previewSummaryTile = function() {
       AlertsService.clearWarnings();
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/settings_tab/' +
           'preview_summary_tile_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.getExplorationTitle = function() {
               return explorationTitleService.displayed;
             };
@@ -260,7 +271,7 @@ oppia.controller('SettingsTab', [
             };
 
             $scope.close = function() {
-              $modalInstance.dismiss();
+              $uibModalInstance.dismiss();
               AlertsService.clearWarnings();
             };
           }
@@ -270,17 +281,17 @@ oppia.controller('SettingsTab', [
 
     $scope.showTransferExplorationOwnershipModal = function() {
       AlertsService.clearWarnings();
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/settings_tab/' +
           'transfer_exploration_ownership_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.transfer = $modalInstance.close;
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+            $scope.transfer = $uibModalInstance.close;
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               AlertsService.clearWarnings();
             };
           }
@@ -293,17 +304,17 @@ oppia.controller('SettingsTab', [
     $scope.deleteExploration = function() {
       AlertsService.clearWarnings();
 
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/settings_tab/' +
           'delete_exploration_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.reallyDelete = $modalInstance.close;
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+            $scope.reallyDelete = $uibModalInstance.close;
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               AlertsService.clearWarnings();
             };
           }
@@ -326,7 +337,7 @@ oppia.controller('SettingsTab', [
         // exposed to the mdoerator.
         var draftEmailBody = response.data.draft_email_body;
 
-        $modal.open({
+        $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/settings_tab/' +
             'moderator_unpublish_exploration_modal_directive.html'),
@@ -337,8 +348,8 @@ oppia.controller('SettingsTab', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', 'draftEmailBody',
-            function($scope, $modalInstance, draftEmailBody) {
+            '$scope', '$uibModalInstance', 'draftEmailBody',
+            function($scope, $uibModalInstance, draftEmailBody) {
               $scope.willEmailBeSent = Boolean(draftEmailBody);
               $scope.emailBody = draftEmailBody;
 
@@ -352,13 +363,13 @@ oppia.controller('SettingsTab', [
               }
 
               $scope.reallyTakeAction = function() {
-                $modalInstance.close({
+                $uibModalInstance.close({
                   emailBody: $scope.emailBody
                 });
               };
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss('cancel');
                 AlertsService.clearWarnings();
               };
             }
@@ -371,7 +382,7 @@ oppia.controller('SettingsTab', [
     };
 
     $scope.isExplorationLockedForEditing = function() {
-      return changeListService.isExplorationLockedForEditing();
+      return ChangeListService.isExplorationLockedForEditing();
     };
 
     $scope.closeRolesForm = function() {

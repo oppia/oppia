@@ -15,4 +15,9 @@
     </span>
     <p ng-show="newStateNameForm.newStateName.$error.pattern" class="help-block oppia-form-error" style="font-size: 0.85em;">Please pick a card name consisting of alphanumeric characters, spaces and/or hyphens.</p>
   </ng-form>
+
+  <div ng-if="isSelfLoop() && canEditRefresherExplorationId" style="margin-top: 12px;">
+    <b>Refresher exploration ID (optional):</b>
+    <input type="text" name="refresherExplorationId" ng-model="outcome.refresherExplorationId" class="form-control protractor-test-add-refresher-exploration-id" tabindex="0" aria-invalid="false" ng-pattern="explorationIdPattern">
+  </div>
 </div>

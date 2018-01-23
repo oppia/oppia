@@ -242,7 +242,7 @@
               <li flex="50">
                 <span class="protractor-test-exp-summary-tile-rating">
                   <span class="fa fa-star fa-lg oppia-dashboard-card-statistic-icon"
-                        tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>"
+                        uib-tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>"
                         tooltip-placement="top">
                   </span>
                   <span class="oppia-dashboard-card-statistic-value">
@@ -253,7 +253,7 @@
 
               <li flex="50" style="padding-left: 8px;" class="protractor-test-exploration-feedback-count">
                 <span class="fa fa-comments fa-lg oppia-dashboard-card-statistic-icon"
-                      tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
+                      uib-tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
                       tooltip-placement="top">
                 </span>
                 <a ng-if="exploration.num_open_threads != 0" ng-href="/create/<[exploration.id]>#/feedback"
@@ -268,7 +268,7 @@
 
               <li flex="50">
                 <span class="fa fa-eye fa-lg oppia-dashboard-card-statistic-icon"
-                      tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
+                      uib-tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
                       tooltip-placement="top">
                 </span>
                 <span class="oppia-dashboard-card-statistic-value">
@@ -278,7 +278,7 @@
 
               <li flex="50">
                 <span class="fa fa-clock-o fa-lg oppia-dashboard-card-statistic-icon"
-                      tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
+                      uib-tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
                       tooltip-placement="top">
                 </span>
                 <span class="oppia-dashboard-card-statistic-value">
@@ -341,7 +341,7 @@
               <strong class="protractor-test-subscription-name"
                       popover-append-to-body
                       popover-trigger="<[showUsernamePopover(subscriber.subscriber_username)]>"
-                      ng-attr-popover="<[subscriber.subscriber_username]>">
+                      ng-attr-uib-popover="<[subscriber.subscriber_username]>">
                 <[subscriber.subscriber_username| truncate:10]>
               </strong>
             </div>
@@ -384,6 +384,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/HintAndSolutionButtonsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
 

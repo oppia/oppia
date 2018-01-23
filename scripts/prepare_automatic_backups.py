@@ -15,9 +15,10 @@
 # limitations under the License.
 
 """Contains routines which will add a backup cron job to prepare Oppia for a
-deployment push to https://oppia.org/.
+deployment push to https://www.oppia.org/.
 """
 import sys
+
 import utils
 
 _BACKUP_NAME_PREFIX = 'opbkp'
@@ -95,6 +96,7 @@ def update_yaml_files():
 
 def _prepare_for_prod():
     update_yaml_files()
+
 
 if __name__ == '__main__':
     _prepare_for_prod()

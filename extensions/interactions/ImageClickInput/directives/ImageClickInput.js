@@ -23,12 +23,16 @@
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
-  function($sce, HtmlEscaperService, ExplorationContextService,
-           imageClickInputRulesService, UrlInterpolationService) {
+  'EVENT_NEW_CARD_AVAILABLE',
+  function(
+      $sce, HtmlEscaperService, ExplorationContextService,
+      imageClickInputRulesService, UrlInterpolationService,
+      EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ImageClickInput/directives/' +
@@ -47,8 +51,31 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               '/' + encodeURIComponent($scope.filepath)) : null);
           $scope.mouseX = 0;
           $scope.mouseY = 0;
+          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+
           $scope.currentlyHoveredRegions = [];
           $scope.allRegions = imageAndRegions.labeledRegions;
+          $scope.updateCurrentlyHoveredRegions = function() {
+            for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
+              var labeledRegion = imageAndRegions.labeledRegions[i];
+              var regionArea = labeledRegion.region.area;
+              if (regionArea[0][0] <= $scope.mouseX &&
+                  $scope.mouseX <= regionArea[1][0] &&
+                  regionArea[0][1] <= $scope.mouseY &&
+                  $scope.mouseY <= regionArea[1][1]) {
+                $scope.currentlyHoveredRegions.push(labeledRegion.label);
+              }
+            }
+          };
+          if (!$scope.interactionIsActive) {
+            /*The following lines highlight the learner's last answer for this
+              card. This need only be done at the beginning as if he submits
+              an answer, based on EVENT_NEW_CARD_AVAILABLE, the image is made
+              inactive, so his last selection would be higlighted.*/
+            $scope.mouseX = $scope.getLastAnswer().clickPosition[0];
+            $scope.mouseY = $scope.getLastAnswer().clickPosition[1];
+            $scope.updateCurrentlyHoveredRegions();
+          }
           $scope.getRegionDimensions = function(index) {
             var image = $($element).find('.oppia-image-click-img');
             var labeledRegion = imageAndRegions.labeledRegions[index];
@@ -69,21 +96,20 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               return 'inline';
             }
           };
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+            $scope.interactionIsActive = false;
+          });
           $scope.onMousemoveImage = function(event) {
-            var image = $($element).find('.oppia-image-click-img');
-            $scope.mouseX = (event.pageX - image.offset().left) / image.width();
-            $scope.mouseY = (event.pageY - image.offset().top) / image.height();
-            $scope.currentlyHoveredRegions = [];
-            for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
-              var labeledRegion = imageAndRegions.labeledRegions[i];
-              var regionArea = labeledRegion.region.area;
-              if (regionArea[0][0] <= $scope.mouseX &&
-                  $scope.mouseX <= regionArea[1][0] &&
-                  regionArea[0][1] <= $scope.mouseY &&
-                  $scope.mouseY <= regionArea[1][1]) {
-                $scope.currentlyHoveredRegions.push(labeledRegion.label);
-              }
+            if (!$scope.interactionIsActive) {
+              return;
             }
+            var image = $($element).find('.oppia-image-click-img');
+            $scope.mouseX =
+              (event.pageX - image.offset().left) / image.width();
+            $scope.mouseY =
+              (event.pageY - image.offset().top) / image.height();
+            $scope.currentlyHoveredRegions = [];
+            $scope.updateCurrentlyHoveredRegions();
           };
           $scope.onClickImage = function() {
             $scope.onSubmit({

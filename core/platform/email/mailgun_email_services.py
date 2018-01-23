@@ -16,10 +16,10 @@
 
 """Provides mailgun api to send email."""
 
-import requests
-
 from core.platform.email import gae_email_services
 import feconf
+
+import requests
 
 
 def send_mail(

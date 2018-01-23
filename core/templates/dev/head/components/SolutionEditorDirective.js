@@ -17,25 +17,26 @@
  */
 
 oppia.directive('solutionEditor', [
-  '$modal', 'UrlInterpolationService', 'stateSolutionService',
+  '$uibModal', 'UrlInterpolationService', 'stateSolutionService',
   'EditorStateService', 'explorationStatesService',
   'ExplorationWarningsService', 'AlertsService',
   'SolutionObjectFactory', 'SolutionVerificationService',
   'ExplorationContextService', 'ExplorationHtmlFormatterService',
   'stateInteractionIdService', 'stateCustomizationArgsService',
   'INFO_MESSAGE_SOLUTION_IS_INVALID',
-  function($modal, UrlInterpolationService, stateSolutionService,
-           EditorStateService, explorationStatesService,
-           ExplorationWarningsService, AlertsService,
-           SolutionObjectFactory, SolutionVerificationService,
-           ExplorationContextService, ExplorationHtmlFormatterService,
-           stateInteractionIdService, stateCustomizationArgsService,
-           INFO_MESSAGE_SOLUTION_IS_INVALID) {
+  function($uibModal, UrlInterpolationService, stateSolutionService,
+      EditorStateService, explorationStatesService,
+      ExplorationWarningsService, AlertsService,
+      SolutionObjectFactory, SolutionVerificationService,
+      ExplorationContextService, ExplorationHtmlFormatterService,
+      stateInteractionIdService, stateCustomizationArgsService,
+      INFO_MESSAGE_SOLUTION_IS_INVALID) {
     return {
       restrict: 'E',
       scope: {
         getInteractionId: '&interactionId',
-        correctAnswerEditorHtml: '='
+        correctAnswerEditorHtml: '=',
+        onOpenSolutionEditor: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/solution_editor_directive.html'),
@@ -55,88 +56,8 @@ oppia.directive('solutionEditor', [
               stateInteractionIdService.savedMemento,
               stateCustomizationArgsService.savedMemento);
           };
-
-          $scope.openSolutionEditor = function() {
-            $modal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'add_or_update_solution_modal_directive.html'),
-              backdrop: 'static',
-              controller: [
-                '$scope', '$modalInstance', 'stateInteractionIdService',
-                'stateSolutionService', 'EditorStateService',
-                'ExplorationHtmlFormatterService',
-                'explorationStatesService',
-                function($scope, $modalInstance, stateInteractionIdService,
-                         stateSolutionService, EditorStateService,
-                         ExplorationHtmlFormatterService,
-                         explorationStatesService) {
-                  $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
-                    'currentCorrectAnswerEditorHtmlForSolutionEditor');
-                  $scope.correctAnswer = null;
-                  $scope.correctAnswerEditorHtml = (
-                    ExplorationHtmlFormatterService.getInteractionHtml(
-                      stateInteractionIdService.savedMemento,
-                      /* eslint-disable max-len */
-                      explorationStatesService.getInteractionCustomizationArgsMemento(
-                        EditorStateService.getActiveStateName()),
-                      /* eslint-enable max-len */
-                      $scope.SOLUTION_EDITOR_FOCUS_LABEL));
-                  $scope.EXPLANATION_FORM_SCHEMA = {
-                    type: 'html',
-                    ui_config: {}
-                  };
-
-                  $scope.data = {
-                    answerIsExclusive: (
-                      stateSolutionService.savedMemento.answerIsExclusive),
-                    correctAnswer: null,
-                    explanation: stateSolutionService.savedMemento.explanation
-                  };
-
-                  $scope.submitAnswer = function(answer) {
-                    $scope.data.correctAnswer = answer;
-                  };
-
-                  $scope.saveSolution = function() {
-                    if (typeof $scope.data.answerIsExclusive === 'boolean' &&
-                        $scope.data.correctAnswer !== null &&
-                        $scope.data.explanation !== '') {
-                      $modalInstance.close({
-                        solution: SolutionObjectFactory.createNew(
-                          $scope.data.answerIsExclusive,
-                          $scope.data.correctAnswer,
-                          $scope.data.explanation)
-                      });
-                    }
-                  };
-
-                  $scope.cancel = function() {
-                    $modalInstance.dismiss('cancel');
-                    AlertsService.clearWarnings();
-                  };
-                }
-              ]
-            }).result.then(function(result) {
-              var correctAnswer = result.solution.correctAnswer;
-              var currentStateName = EditorStateService.getActiveStateName();
-              var state = explorationStatesService.getState(currentStateName);
-              var solutionIsValid = SolutionVerificationService.verifySolution(
-                ExplorationContextService.getExplorationId(), state,
-                correctAnswer);
-
-              explorationStatesService.updateSolutionValidity(
-                currentStateName, solutionIsValid);
-              ExplorationWarningsService.updateWarnings();
-              if (!solutionIsValid) {
-                AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
-              }
-
-              stateSolutionService.displayed = result.solution;
-              stateSolutionService.saveDisplayedValue();
-            });
-          };
         }
       ]
     };
-  }]);
+  }
+]);

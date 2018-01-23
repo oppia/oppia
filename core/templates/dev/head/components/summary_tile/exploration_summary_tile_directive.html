@@ -20,7 +20,7 @@
           <circular-image ng-if="avatarsList.length > 0"
                           src="avatarsList[0].image"
                           link="avatarsList[0].link"
-                          tooltip="<[avatarsList[0].tooltipText | truncate:16]>"
+                          uib-tooltip="<[avatarsList[0].tooltipText | truncate:16]>"
                           tooltip-placement="bottom">
           </circular-image>
         </div>
@@ -40,7 +40,7 @@
       <ul ng-if="!isCollectionPreviewTile" layout="row" class="metrics" layout-align="space-between center">
         <li>
           <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
-            <span class="fa fa-star fa-lg" tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
+            <span class="fa fa-star fa-lg" uib-tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
               <span class="oppia-icon-accessibility-label"><['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]></span>
             </span>
             <span ng-if="getAverageRating()">
@@ -51,7 +51,7 @@
           </span>
         </li>
         <li>
-          <span class="fa fa-eye fa-lg" tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
+          <span class="fa fa-eye fa-lg" uib-tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
             <span class="oppia-icon-accessibility-label"><['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]></span>
           </span>
           <span ng-if="getNumViews()">

@@ -55,21 +55,30 @@ describe('Answer classification service with string classifier disabled',
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
-              feedback: [''],
-              param_changes: []
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {
                 x: 10
               },
               rule_type: 'Equals'
-            }],
-            correct: false
+            }]
           }, {
             outcome: {
               dest: 'outcome 2',
-              feedback: [''],
-              param_changes: []
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {
@@ -91,13 +100,17 @@ describe('Answer classification service with string classifier disabled',
                 x: 7
               },
               rule_type: 'FuzzyMatches'
-            }],
-            correct: false
+            }]
           }],
           default_outcome: {
             dest: 'default',
-            feedback: [],
-            param_changes: []
+            feedback: {
+              html: '',
+              audio_translations: {}
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null
           },
           hints: []
         },
@@ -118,7 +131,7 @@ describe('Answer classification service with string classifier disabled',
 
     it('should fail if no frontend rules are provided', function() {
       expect(function() {
-        acs.getMatchingClassificationResult(explorationId, stateName, state, 0)
+        acs.getMatchingClassificationResult(explorationId, stateName, state, 0);
       }).toThrow();
     });
 
@@ -128,21 +141,21 @@ describe('Answer classification service with string classifier disabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 10, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('outcome 1', [''], []), 0, 0, EXPLICIT_CLASSIFICATION
+        oof.createNew('outcome 1', '', []), 0, 0, EXPLICIT_CLASSIFICATION
       ));
 
       expect(
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 5, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('outcome 2', [''], []), 1, 0, EXPLICIT_CLASSIFICATION
+        oof.createNew('outcome 2', '', []), 1, 0, EXPLICIT_CLASSIFICATION
       ));
 
       expect(
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 6, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('outcome 2', [''], []), 1, 1, EXPLICIT_CLASSIFICATION
+        oof.createNew('outcome 2', '', []), 1, 1, EXPLICIT_CLASSIFICATION
       ));
     });
 
@@ -151,7 +164,7 @@ describe('Answer classification service with string classifier disabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 7, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('default', [], []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
+        oof.createNew('default', '', []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
       ));
     });
 
@@ -167,21 +180,30 @@ describe('Answer classification service with string classifier disabled',
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
-              feedback: [''],
-              param_changes: []
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {
                 x: 10
               },
               rule_type: 'Equals'
-            }],
-            correct: false
+            }]
           }],
           default_outcome: {
             dest: 'default',
-            feedback: [],
-            param_changes: []
+            feedback: {
+              html: '',
+              audio_translations: {}
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null
           },
           hints: []
         },
@@ -190,7 +212,7 @@ describe('Answer classification service with string classifier disabled',
 
       expect(function() {
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 0)
+          explorationId, stateName, state, 0);
       }).toThrow();
     });
   });
@@ -249,21 +271,30 @@ describe('Answer classification service with string classifier enabled',
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
-              feedback: [''],
-              param_changes: []
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {
                 x: 10
               },
               rule_type: 'Equals'
-            }],
-            correct: false
+            }]
           }, {
             outcome: {
               dest: 'outcome 2',
-              feedback: [''],
-              param_changes: []
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {
@@ -280,13 +311,17 @@ describe('Answer classification service with string classifier enabled',
                 x: 7
               },
               rule_type: 'FuzzyMatches'
-            }],
-            correct: false
+            }]
           }],
           default_outcome: {
             dest: 'default',
-            feedback: [],
-            param_changes: []
+            feedback: {
+              html: '',
+              audio_translations: {}
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null
           },
           hints: []
         },
@@ -343,7 +378,7 @@ describe('Answer classification service with string classifier enabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state2, 0, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('default', [], []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
+        oof.createNew('default', '', []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
       ));
     });
   }
