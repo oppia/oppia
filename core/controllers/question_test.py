@@ -234,13 +234,23 @@ class QuestionsHandlerTest(test_utils.GenericTestBase):
         question_services.add_question_id_to_skill(
             question_id, self.collection_id, self.skill_id,
             self.new_user_id)
-        self.payload['collection_id'] = self.collection_id
-        self.payload['question_id'] = question_id
         self.login(self.NEW_USER_EMAIL)
-        # response = self.testapp.delete(
-        #     '%s' % feconf.QUESTION_DATA_URL, {'payload': (
-        #         json.dumps(self.payload))}, expect_errors=False)
-        #self.assertEqual(response.status_int, 200)
+        response = self.testapp.delete(
+            '%s/%s/%s' % (
+                feconf.QUESTION_DATA_URL, self.collection_id, question_id),
+            expect_errors=False)
+        self.assertEqual(response.status_int, 200)
+
+        response = self.testapp.delete(
+            '%s/%s' % (
+                feconf.QUESTION_DATA_URL, self.collection_id),
+            expect_errors=True)
+        self.assertEqual(response.status_int, 404)
+
+        response = self.testapp.delete(
+            '%s/' % feconf.QUESTION_DATA_URL, expect_errors=True)
+        self.assertEqual(response.status_int, 405)
+
 
 class QuestionManagerHandlerTest(test_utils.GenericTestBase):
     """Test the question handler."""
