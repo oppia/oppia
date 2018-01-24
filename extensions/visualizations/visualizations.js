@@ -61,11 +61,13 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
   };
 }]);
 
-oppia.directive('oppiaVisualizationFrequencyTable', [function() {
+oppia.directive('oppiaVisualizationFrequencyTable', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
   return {
     restrict: 'E',
     scope: {},
-    templateUrl: 'visualizations/FrequencyTable',
+    templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+      '/visualizations/frequency_table_directive.html'),
     controller: [
       '$scope', '$attrs', 'HtmlEscaperService',
       function($scope, $attrs, HtmlEscaperService) {
@@ -78,11 +80,13 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
   };
 }]);
 
-oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
+oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
   return {
     restrict: 'E',
     scope: {},
-    templateUrl: 'visualizations/EnumeratedFrequencyTable',
+    templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+      '/visualizations/enumerated_frequency_table_directive.html'),
     controller: [
       '$scope', '$attrs', 'HtmlEscaperService',
       function($scope, $attrs, HtmlEscaperService) {
