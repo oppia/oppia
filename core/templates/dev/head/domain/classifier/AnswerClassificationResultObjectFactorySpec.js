@@ -18,13 +18,7 @@
  
 describe('Answer classification result object factory', function() {
   var AnswerClassificationResultObjectFactory;
-  var sampleOutcome = {
-    dest: 'default',
-    feedback: {
-      html: '',
-      audio_translations: {}
-    }, param_changes: []
-  };
+  var DEFAULT_OUTCOME_CLASSIFICATION,oof;
   
   beforeEach(module('oppia'));
 
@@ -33,14 +27,17 @@ describe('Answer classification result object factory', function() {
       'AnswerClassificationResultObjectFactory');
     DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
       'DEFAULT_OUTCOME_CLASSIFICATION');
+    oof = $injector.get('OutcomeObjectFactory');
   }));
 
   it('should create a new result', function() {
     var answerClassificationResult = (
       AnswerClassificationResultObjectFactory.createNew(
-      sampleOutcome, 1, 0, DEFAULT_OUTCOME_CLASSIFICATION));
+      oof.createNew('outcome 1', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION));
 
-    expect(answerClassificationResult.outcome).toEqual(sampleOutcome);
+    expect(answerClassificationResult.outcome).toEqual(
+      oof.createNew('outcome 1', '', [])
+    );
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(
