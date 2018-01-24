@@ -33,7 +33,9 @@ describe('Answer classification result object factory', function() {
   it('should create a new result', function() {
     var answerClassificationResult = (
       AnswerClassificationResultObjectFactory.createNew(
-      oof.createNew('outcome 1', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION));
+      oof.createNew('outcome 1', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
+      )
+    );
 
     expect(answerClassificationResult.outcome).toEqual(
       oof.createNew('outcome 1', '', [])
