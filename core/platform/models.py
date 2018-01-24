@@ -36,7 +36,6 @@ class _Platform(object):
 
         Raises:
             NotImplementedError: method not overwritten in derived classes.
-
         """
         raise NotImplementedError
 
