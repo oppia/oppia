@@ -23,7 +23,7 @@ oppia.factory('baseInteractionValidationService', [
       // as 'chocies') used to verify the basic structure of the input
       // customization arguments object.
       requireCustomizationArguments: function(
-        customizationArguments, argNames) {
+          customizationArguments, argNames) {
         var missingArgs = [];
         for (var i = 0; i < argNames.length; i++) {
           if (!customizationArguments.hasOwnProperty(argNames[i])) {

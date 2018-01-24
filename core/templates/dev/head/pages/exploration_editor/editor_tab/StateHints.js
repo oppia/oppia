@@ -23,11 +23,11 @@ oppia.controller('StateHints', [
   'UrlInterpolationService', 'HintObjectFactory', 'ExplorationPlayerService',
   'stateSolutionService',
   function(
-    $scope, $rootScope, $uibModal, $filter, EditorStateService,
-    AlertsService, INTERACTION_SPECS, stateHintsService,
-    explorationStatesService, stateInteractionIdService,
-    UrlInterpolationService, HintObjectFactory, ExplorationPlayerService,
-    stateSolutionService) {
+      $scope, $rootScope, $uibModal, $filter, EditorStateService,
+      AlertsService, INTERACTION_SPECS, stateHintsService,
+      explorationStatesService, stateInteractionIdService,
+      UrlInterpolationService, HintObjectFactory, ExplorationPlayerService,
+      stateSolutionService) {
     $scope.EditorStateService = EditorStateService;
     $scope.stateHintsService = stateHintsService;
     $scope.activeHintIndex = null;
@@ -54,9 +54,8 @@ oppia.controller('StateHints', [
     };
 
     $scope.getHintSummary = function(hint) {
-      var hintAsPlainText = (
-        hint.hintContent.getHtml() ?
-          $filter('convertToPlainText')(hint.hintContent.getHtml()) : '');
+      var hintAsPlainText = $filter(
+        'formatRtePreview')(hint.hintContent.getHtml());
       return hintAsPlainText;
     };
 

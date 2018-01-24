@@ -31,7 +31,7 @@ oppia.factory('explorationPropertyService', [
       param_specs: function(paramSpecs) {
         return paramSpecs.toBackendDict();
       },
-    }
+    };
 
     return {
       init: function(value) {
@@ -120,8 +120,8 @@ oppia.factory('explorationTitleService', [
   'explorationPropertyService', '$filter', 'ValidatorsService',
   'ExplorationRightsService',
   function(
-    explorationPropertyService, $filter, ValidatorsService,
-    ExplorationRightsService) {
+      explorationPropertyService, $filter, ValidatorsService,
+      ExplorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'title';
     child._normalize = $filter('normalizeWhitespace');
@@ -139,8 +139,8 @@ oppia.factory('explorationCategoryService', [
   'explorationPropertyService', '$filter', 'ValidatorsService',
   'ExplorationRightsService',
   function(
-    explorationPropertyService, $filter, ValidatorsService,
-    ExplorationRightsService) {
+      explorationPropertyService, $filter, ValidatorsService,
+      ExplorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'category';
     child._normalize = $filter('normalizeWhitespace');
@@ -158,8 +158,8 @@ oppia.factory('explorationObjectiveService', [
   'explorationPropertyService', '$filter', 'ValidatorsService',
   'ExplorationRightsService',
   function(
-    explorationPropertyService, $filter, ValidatorsService,
-    ExplorationRightsService) {
+      explorationPropertyService, $filter, ValidatorsService,
+      ExplorationRightsService) {
     var child = Object.create(explorationPropertyService);
     child.propertyName = 'objective';
     child._normalize = $filter('normalizeWhitespace');
@@ -330,7 +330,7 @@ oppia.factory('explorationStatesService', [
         });
       },
       content: function(content) {
-        return content.toBackendDict()
+        return content.toBackendDict();
       },
       default_outcome: function(defaultOutcome) {
         if (defaultOutcome) {
@@ -538,7 +538,7 @@ oppia.factory('explorationStatesService', [
         saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
       },
       getHintsMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'hints')
+        return getStatePropertyMemento(stateName, 'hints');
       },
       saveHints: function(stateName, newHints) {
         saveStateProperty(stateName, 'hints', newHints);

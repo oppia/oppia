@@ -143,8 +143,8 @@ oppia.filter('wrapTextWithEllipsis', [
 // values. Note that this returns an HTML string to accommodate the case of
 // multiple-choice input and image-click input.
 oppia.filter('parameterizeRuleDescription', [
-  'INTERACTION_SPECS', 'FractionObjectFactory',
-  function(INTERACTION_SPECS, FractionObjectFactory) {
+  '$filter', 'INTERACTION_SPECS', 'FractionObjectFactory',
+  function( $filter, INTERACTION_SPECS, FractionObjectFactory) {
     return function(rule, interactionId, choices) {
       if (!rule) {
         return '';
@@ -188,7 +188,7 @@ oppia.filter('parameterizeRuleDescription', [
             replacementText = '[';
             var key = inputs[varName];
             for (var i = 0; i < key.length; i++) {
-              replacementText += key[i];
+              replacementText += $filter('formatRtePreview')(key[i]);
               if (i < key.length - 1) {
                 replacementText += ',';
               }
@@ -198,7 +198,9 @@ oppia.filter('parameterizeRuleDescription', [
             // The following case is for MultipleChoiceInput
             for (var i = 0; i < choices.length; i++) {
               if (choices[i].val === inputs[varName]) {
-                replacementText = '\'' + choices[i].label + '\'';
+                var filteredLabelText =
+                  $filter('formatRtePreview')(choices[i].label);
+                replacementText = '\'' + filteredLabelText + '\'';
               }
             }
           }
@@ -394,13 +396,37 @@ oppia.filter('stripFormatting', [function() {
     var styleRegex = new RegExp(' style=\"[^\"]+\"', 'gm');
     // Strip out anything between and including <>,
     // unless it is an img whose class includes one of the whitelisted classes
-    // or is the bold or italics tags.
+    // or is the bold or italics or paragraph or breakline tags.
     var tagRegex = new RegExp(
       '(?!<img.*class=".*(' + whitelistedImgClasses.join('|') +
-      ').*".*>)(?!<b>|<\/b>|<i>|<\/i>)<[^>]+>', 'gm');
+      ').*".*>)(?!<b>|<\/b>|<i>|<\/i>|<p>|<\/p>|<br>)<[^>]+>', 'gm');
     var strippedText = html ? String(html).replace(styleRegex, '') : '';
     strippedText = strippedText ? String(strippedText).replace(
       tagRegex, '') : '';
     return strippedText;
+  };
+}]);
+
+/* The following filter replaces each RTE element occurrence in the input html
+   by its corresponding name in square brackets and returns a string
+   which contains the name in the same location as in the input html.
+   eg: <p>Sample1 <oppia-noninteractive-math></oppia-noninteractive-math>
+        Sample2 </p>
+   will give as output: Sample1 [Math] Sample2 */
+oppia.filter('formatRtePreview', ['$filter', function($filter) {
+  return function(html) {
+    html = html.replace(/&nbsp;/ig, ' ');
+    html = html.replace(/&quot;/ig, '');
+    //Replace all html tags other than <oppia-noninteractive-**> ones to ''
+    html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
+    var formattedOutput = html.replace(/(<([^>]+)>)/g, function(rteTag) {
+      var replaceString = $filter(
+        'capitalize')(rteTag.split('-')[2].split(' ')[0]);
+      if (replaceString[replaceString.length - 1] === '>') {
+        replaceString = replaceString.slice(0, -1);
+      }
+      return ' [' + replaceString + '] ';
+    });
+    return formattedOutput.trim();
   };
 }]);

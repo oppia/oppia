@@ -193,7 +193,7 @@ describe('StateImprovementSuggestionService', function() {
         },
         param_changes: []
       }
-    }
+    };
 
     var _createState = function(destStateName) {
       // Only a partial state definition is needed for these tests.
