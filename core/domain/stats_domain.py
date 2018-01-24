@@ -84,18 +84,41 @@ class ExplorationStats(object):
 
     @property
     def num_starts(self):
+        """Gets the total of learners that have started exploration.
+
+        Returns:
+            int. Sum of learners that have started the exploration with
+                version 1 or version 2.
+        """
         return self.num_starts_v1 + self.num_starts_v2
 
     @property
     def num_actual_starts(self):
+        """Gets the total of learners that have started the exploration and
+           moved on past initial state of exploration.
+
+        Returns:
+            int. Sum of learners that have started and moved passed the
+                initial state of the exploration with version 1 or version 2.
+        """
         return self.num_actual_starts_v1 + self.num_actual_starts_v2
 
     @property
     def num_completions(self):
+        """Gets the total learners that have completed the exploration.
+
+        Returns:
+            int. Sum of learners that have completd the exploration with either
+                version 1 or version 2
+        """
         return self.num_completions_v1 + self.num_completions_v2
 
     def to_dict(self):
-        """Returns a dict representation of the domain object."""
+        """Returns a dict representation of the domain object.
+
+        Returns:
+            dict. All the class data of ExplorationStats.
+        """
         state_stats_mapping_dict = {}
         for state_name in self.state_stats_mapping:
             state_stats_mapping_dict[state_name] = self.state_stats_mapping[
@@ -117,6 +140,9 @@ class ExplorationStats(object):
     def to_frontend_dict(self):
         """Returns a dict representation of the domain object for use in the
         frontend.
+
+        Returns:
+            dict. The class data of ExplorationStats used by the frontend.
         """
         state_stats_mapping_dict = {}
         for state_name in self.state_stats_mapping:
@@ -162,7 +188,12 @@ class ExplorationStats(object):
         return sum_first_hits
 
     def validate(self):
-        """Validates the ExplorationStats domain object."""
+        """Validates the ExplorationStats domain object.
+
+        Rasies:
+            ValidationError: ExplorationStats property is not of the correct
+            type.
+        """
 
         exploration_stats_properties = [
             'num_starts_v1',
@@ -249,35 +280,75 @@ class StateStats(object):
 
     @property
     def total_answers_count(self):
+        """Gets to sum of total number of answers submitted.
+
+        Returns:
+            int. Sum of answers submitted in version 1 and version 2.
+        """
         return self.total_answers_count_v1 + self.total_answers_count_v2
 
     @property
     def useful_feedback_count(self):
+        """Gets to sum of answers that got useful feedback.
+
+        Returns:
+            int. Sum of answers that recivered useful feedback in version 1 and
+                version 2.
+        """
         return self.useful_feedback_count_v1 + self.useful_feedback_count_v2
 
     @property
     def total_hit_count(self):
+        """Gets to sum of times the state is entered.
+
+        Returns:
+            int. Sum of times state has been entered in version 1 and version 2.
+        """
         return self.total_hit_count_v1 + self.total_hit_count_v2
 
     @property
     def first_hit_count(self):
+        """Gets the number of times the state is entered for the first time.
+
+        Returns:
+            int. Sum of times state is entered for the first time in version 1
+                and version 2.
+        """
         return self.first_hit_count_v1 + self.first_hit_count_v2
 
     @property
     def num_completions(self):
+        """Gets the number of times the state is completed.
+
+        Returns:
+            int. Sum of time state is completed in version 1 and version 2.
+        """
         return self.num_completions_v1 + self.num_completions_v2
 
     @property
     def num_times_solution_viewed(self):
+        """Gets the number of times the solution is viewed.
+
+        Returns:
+            int. Number of times the solution has been viewed in version 2.
+        """
         return self.num_times_solution_viewed_v2
 
     @classmethod
     def create_default(cls):
-        """Creates a StateStats domain object and sets all properties to 0."""
+        """Creates a StateStats domain object and sets all properties to 0.
+
+        Returns:
+            StateStats. All initialization data set to 0.
+        """
         return cls(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     def to_dict(self):
-        """Returns a dict representation of the domain object."""
+        """Returns a dict representation of the domain object.
+
+        Returns:
+            dict. All the class data of StateStats object.
+        """
         state_stats_dict = {
             'total_answers_count_v1': self.total_answers_count_v1,
             'total_answers_count_v2': self.total_answers_count_v2,
@@ -297,6 +368,9 @@ class StateStats(object):
     def to_frontend_dict(self):
         """Returns a dict representation of the domain object for use in the
         frontend.
+
+        Returns:
+            dict. The class data of a StateStats object used by the frontend.
         """
         state_stats_dict = {
             'total_answers_count': self.total_answers_count,
@@ -310,7 +384,14 @@ class StateStats(object):
 
     @classmethod
     def from_dict(cls, state_stats_dict):
-        """Constructs a StateStats domain object from a dict."""
+        """Constructs a StateStats domain object from a dict.
+
+        Args:
+            state_stats_dict: dict. All stats about the state.
+
+        Returns:
+            StateStats. Initalizion of class with values from state_stats_dict.
+        """
         return cls(
             state_stats_dict['total_answers_count_v1'],
             state_stats_dict['total_answers_count_v2'],
@@ -326,7 +407,11 @@ class StateStats(object):
         )
 
     def validate(self):
-        """Validates the StateStats domain object."""
+        """Validates the StateStats domain object.
+
+        Raises:
+            ValidationError: A stat is of the wrong type.
+        """
 
         state_stats_properties = [
             'total_answers_count_v1',
@@ -387,12 +472,20 @@ class StateAnswers(object):
     def get_submitted_answer_dict_list(self):
         """Returns the submitted_answer_list stored within this object as a list
         of StateAnswer dicts.
+
+        Returns:
+            list. Answers submitted to state in for of dict.
         """
         return [state_answer.to_dict()
                 for state_answer in self.submitted_answer_list]
 
     def validate(self):
-        """Validates StateAnswers domain object entity."""
+        """Validates StateAnswers domain object entity.
+
+        Rasies:
+            ValidationError: Value of StateAnswers is of wrong type or doesn't
+                exist.
+        """
 
         if not isinstance(self.exploration_id, basestring):
             raise utils.ValidationError(
@@ -452,6 +545,21 @@ class SubmittedAnswer(object):
                  rule_spec_index, classification_categorization, params,
                  session_id, time_spent_in_sec, rule_spec_str=None,
                  answer_str=None):
+        """Construct a SubmittedAnswer domain object.
+
+        Args:
+            answer: Answer that is submitted.
+            interaction_id: The ID of the interaction which created the answers.
+            answer_group_index: int. Index corrosponding to which group to
+                the answer belongs to.
+            rule_spec_index: int.
+            classification_categorization:
+            params: dict. Parameters for submittd answer.
+            session_id: String. ID of of session that submitted answer.
+            time_spent_in_sec: number. Time taken to submit an answer.
+            rule-spec_str: None or String. Populated by answer migration.
+            answer_str: None or String. Popluated by answer migration.
+        """
         self.answer = answer
         self.interaction_id = interaction_id
         self.answer_group_index = answer_group_index
@@ -464,6 +572,12 @@ class SubmittedAnswer(object):
         self.answer_str = answer_str
 
     def to_dict(self):
+        """Create a dict representation of SubmittedAnswer object.
+
+        Returns:
+            submitted_answer_dict: dict. All the data of a SubmittedAnswer
+                object.
+        """
         submitted_answer_dict = {
             'answer': self.answer,
             'interaction_id': self.interaction_id,
@@ -482,6 +596,16 @@ class SubmittedAnswer(object):
 
     @classmethod
     def from_dict(cls, submitted_answer_dict):
+        """Return a SubmittedAnswer with the values from arguments.
+
+        Args:
+            submitted_answer_dict: dict. All the values of a SubmittedAnswer
+                object.
+
+        Returns:
+            SubmittedAnswer. Initialization of class with values from
+                submitted_answer_dict.
+        """
         return cls(
             submitted_answer_dict['answer'],
             submitted_answer_dict['interaction_id'],
@@ -495,7 +619,12 @@ class SubmittedAnswer(object):
             answer_str=submitted_answer_dict.get('answer_str'))
 
     def validate(self):
-        """Validates this submitted answer object."""
+        """Validates this submitted answer object.
+
+        Raises:
+            ValidationError: One of the values for the class data is of wrong
+                type or not within expenced range.
+        """
         # TODO(bhenning): Validate the normalized answer against future answer
         # objects after #956 is addressed.
         if self.time_spent_in_sec is None:
@@ -579,11 +708,21 @@ class AnswerOccurrence(object):
     of times.
     """
     def __init__(self, answer, frequency):
-        """Initialize domain object for answer occurrences."""
+        """Initialize domain object for answer occurrences.
+
+        Args:
+            answer: Specific answer submitted to a state.
+            frequency: int. Number of times this answer occures
+        """
         self.answer = answer
         self.frequency = frequency
 
     def to_raw_type(self):
+        """Gets the class data of AnswerOccurrence object.
+
+        Returns:
+            dict. Values of answer and frequency.
+        """
         return {
             'answer': self.answer,
             'frequency': self.frequency
@@ -591,6 +730,15 @@ class AnswerOccurrence(object):
 
     @classmethod
     def from_raw_type(cls, answer_occurrence_dict):
+        """Return a AnswerOccurrence object from args.
+
+        Args:
+            answer_occurrence_dict: dict. Data to intialize AnswerOccurrence.
+
+        Returns:
+            AnswerOccurence. Initialization of class with values from
+                answer_occurrence_dict.
+        """
         return cls(
             answer_occurrence_dict['answer'],
             answer_occurrence_dict['frequency'])
@@ -601,6 +749,11 @@ class AnswerCalculationOutput(object):
     calculation.
     """
     def __init__(self, calculation_output_type):
+        """Initalize AnswerCalculationOutput object.
+
+        Args:
+            calculation_output_type: Type of answer to be submitted.
+        """
         self.calculation_output_type = calculation_output_type
 
 
@@ -609,6 +762,10 @@ class AnswerFrequencyList(AnswerCalculationOutput):
     def __init__(self, answer_occurrences=None):
         """Initialize domain object for answer frequency list for a given list
         of AnswerOccurrence objects (default is empty list).
+
+        Args:
+            answer_occurrences: list. AnswerOccurrence objects containing
+                answers and frequency.
         """
         super(AnswerFrequencyList, self).__init__(
             CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
@@ -616,12 +773,27 @@ class AnswerFrequencyList(AnswerCalculationOutput):
             answer_occurrences if answer_occurrences else [])
 
     def to_raw_type(self):
+        """Get a list of answers and there frequency.
+
+        Returns:
+            list. dicts with answer and its frequency.
+        """
         return [
             answer_occurrence.to_raw_type()
             for answer_occurrence in self.answer_occurrences]
 
     @classmethod
     def from_raw_type(cls, answer_occurrence_list):
+        """Create a AnswerFrequencyList object from a list of AnswerOccurrence
+        objcets
+
+        Args:
+            answer_occurence_list: List of AnswerOccurence objects.
+
+        Returns:
+            AnswerFrequencyList. Intialization of AnswerFrequencyList with data
+                from answer_occurence_list.
+        """
         return cls([
             AnswerOccurrence.from_raw_type(answer_occurrence_dict)
             for answer_occurrence_dict in answer_occurrence_list])
@@ -633,6 +805,9 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
     def __init__(self, categorized_answer_freq_lists=None):
         """Initialize domain object for categorized answer frequency lists for
         a given dict (default is empty).
+
+        Args:
+            categorized_answer_freq_list: list. AnswerOccurence objects.
         """
         super(CategorizedAnswerFrequencyLists, self).__init__(
             CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS)
@@ -641,6 +816,11 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
             if categorized_answer_freq_lists else {})
 
     def to_raw_type(self):
+        """Get a dict of all the answers and their frequency.
+
+        Return:
+            dict. Answer and frequency dicts sorted by catergory.
+        """
         return {
             category: answer_frequency_list.to_raw_type()
             for category, answer_frequency_list in (
@@ -649,6 +829,15 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
 
     @classmethod
     def from_raw_type(cls, categorized_frequency_dict):
+        """Create a CategorizedAnswerFrequencyLists object from given args.
+
+        Args:
+            categorized_frequency_dict: Dict of AnswerOccurrence.
+
+        Returns:
+            CategorizedAnswerFrequencyLists. Initalization of class with values
+                from categorized_frequency_dict.
+        """
         return cls({
             category: AnswerFrequencyList.from_raw_type(answer_occurrence_list)
             for category, answer_occurrence_list in (
@@ -695,6 +884,10 @@ class StateAnswersCalcOutput(object):
     def validate(self):
         """Validates StateAnswersCalcOutputModel domain object entity before
         it is commited to storage.
+
+        Rasies:
+            ValidationError: One of the class values is of the wrong type or to
+                large.
         """
 
         # There is a danger of data overflow if answer_opts exceeds 1MB. This
