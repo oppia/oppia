@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Services for accessing exploration properties in editor
+ * @fileoverview Services for storing exploration properties for
+ * displaying and editing them in multiple places in the UI,
  * with base class as ExplorationPropertyService.
  */
 
