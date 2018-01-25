@@ -121,6 +121,8 @@
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_8_HEADING": "Comparte tu exploración",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_9_HEADING": "Mejora tu exploración",
 	"I18N_GET_STARTED_PAGE_TITLE": "Comenzar",
+	"I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER": "Escribe una fracción en el formato «x/x» o un número mixto como «x x/x».",
+	"I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER": "Escribe una fracción en el formato «x/x».",
 	"I18N_INTERACTIONS_GRAPH_ADD_EDGE": "Agregar arista",
 	"I18N_INTERACTIONS_GRAPH_ADD_NODE": "Agregar nodo",
 	"I18N_INTERACTIONS_GRAPH_DELETE": "Eliminar",
