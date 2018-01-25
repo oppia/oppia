@@ -199,7 +199,9 @@ oppia.factory('SpeechSynthesisChunkerService', [
       },
       cancel: function() {
         _speechUtteranceChunker.cancel = true;
-        _speechSynthesis.cancel();
+        if (_speechSynthesis) {
+          _speechSynthesis.cancel();
+        }
       },
       convertToSpeakableText: function(html) {
         return _convertToSpeakableText(html);
