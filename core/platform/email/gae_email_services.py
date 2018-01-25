@@ -22,6 +22,12 @@ from google.appengine.api import mail
 
 
 def get_incoming_email_address(reply_to_id):
+    """Returns string detailing the id of the reply-client
+
+    Args:
+      - reply_to_id: str. The unique reply-to id used in reply-to email
+          sent to recipient.
+    """
     return 'reply+%s@%s' % (reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
 
 
