@@ -18,7 +18,7 @@
  
 describe('Answer classification result object factory', function() {
   var AnswerClassificationResultObjectFactory;
-  var DEFAULT_OUTCOME_CLASSIFICATION
+  var DEFAULT_OUTCOME_CLASSIFICATION;
   var oof;
   
   beforeEach(module('oppia'));
