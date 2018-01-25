@@ -31,15 +31,15 @@ def send_mail(
     email_manager._send_email().
 
     Args:
-      - sender_email: str. the email address of the sender. This should be in
+        sender_email: str. the email address of the sender. This should be in
           the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
-      - recipient_email: str. the email address of the recipient.
-      - subject: str. The subject line of the email.
-      - plaintext_body: str. The plaintext body of the email.
-      - html_body: str. The HTML body of the email. Must fit in a datastore
+        recipient_email: str. the email address of the recipient.
+        subject: str. The subject line of the email.
+        plaintext_body: str. The plaintext body of the email.
+        html_body: str. The HTML body of the email. Must fit in a datastore
           entity.
-      - bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the email.
-      - reply_to_id: str or None. The unique reply-to id used in reply-to email
+        bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the email.
+        reply_to_id: str or None. The unique reply-to id used in reply-to email
           sent to recipient.
 
     Raises:
