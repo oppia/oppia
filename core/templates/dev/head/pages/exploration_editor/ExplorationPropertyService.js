@@ -13,10 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Services for exploration properties with
- *               base class as ExplorationPropertyService
+ * @fileoverview Services for accessing exploration properties in editor
+ * with base class as ExplorationPropertyService.
  */
-
 
 oppia.factory('ExplorationPropertyService', [
   '$rootScope', '$log', 'ChangeListService', 'AlertsService',
