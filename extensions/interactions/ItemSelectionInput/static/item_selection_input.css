@@ -10,9 +10,13 @@
 
 md-checkbox.item-selection-input-checkbox.md-default-theme .md-icon {
   border-color: #0d48a1;
+  top: 2px;
 }
 md-checkbox.item-selection-input-checkbox.md-default-theme.md-checked .md-icon {
   background-color: rgba(102, 187, 106, 0.87);
+}
+md-checkbox .md-label {
+  vertical-align: top;
 }
 
 .item-selection-input-form-container {
