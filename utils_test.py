@@ -172,6 +172,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(p, '/a/b/')
 
     def test_vfs_normpath(self):
+        """Test vfs_normpath method."""
         p = utils.vfs_normpath('/foo/../bar')
         self.assertEqual(p, '/bar')
         p = utils.vfs_normpath('foo//bar')
@@ -182,6 +183,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(p, '/foo/bar/baz')
 
     def test_capitalize_string(self):
+        """Test capitalize_string method."""
         test_data = [
             [None, None],
             ['', ''],
@@ -199,6 +201,7 @@ class UtilsTests(test_utils.GenericTestBase):
             self.assertEqual(utils.capitalize_string(datum[0]), datum[1])
 
     def test_get_thumbnail_icon_url_for_category(self):
+        """Test to fetch thumbnail url for category."""
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Architecture'),
             '/subjects/Architecture.svg')
@@ -210,7 +213,7 @@ class UtilsTests(test_utils.GenericTestBase):
             '/subjects/Lightbulb.svg')
 
     def test_get_asset_dir_prefix_returns_correct_slug(self):
-
+        """Test to check get_asset_dir_prefix gives correct slug ."""
         with self.swap(feconf, 'DEV_MODE', True):
             utils.ASSET_DIR_PREFIX = None
             asset_dir_prefix = utils.get_asset_dir_prefix()
@@ -227,6 +230,7 @@ class UtilsTests(test_utils.GenericTestBase):
             self.assertTrue(asset_dir_prefix.startswith('/build'))
 
     def test_are_datetimes_close(self):
+        """Test are_datetimes_close method."""
         initial_time = datetime.datetime(2016, 12, 1, 0, 0, 0)
         with self.swap(feconf, 'PROXIMAL_TIMEDELTA_SECS', 2):
             self.assertTrue(utils.are_datetimes_close(
@@ -237,12 +241,14 @@ class UtilsTests(test_utils.GenericTestBase):
                 initial_time))
 
     def test_convert_to_str(self):
+        """Test convert_to_str method."""
         string1 = 'Home'
         string2 = u'Лорем'
         self.assertEqual(utils.convert_to_str(string1), string1)
         self.assertEqual(utils.convert_to_str(string2), string2.encode('utf-8'))
 
     def test_get_hashable_value(self):
+        """Test get_hashable_value method."""
         json1 = ['foo', 'bar', {'baz': 3}]
         json2 = ['fee', {'fie': ['foe', 'fum']}]
         json1_deepcopy = copy.deepcopy(json1)
