@@ -27,15 +27,15 @@ NAMES = utils.create_enum(
 
 
 class _Platform(object):
-    """Acts as a base class for platform-specific imports related to GAE.
+    """A base class for platform-specific imports related to GAE.
     """
     @classmethod
     def import_models(cls):
-        """Acts as an abstract method that should be implemented on inherited
+        """An abstract method that should be implemented on inherited
         classes.
 
         Raises:
-            NotImplementedError: method not overwritten in derived classes.
+            NotImplementedError: The method not overwritten in derived classes.
         """
         raise NotImplementedError
 
