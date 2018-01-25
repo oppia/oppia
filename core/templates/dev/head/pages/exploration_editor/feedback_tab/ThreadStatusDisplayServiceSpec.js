@@ -14,42 +14,42 @@
 
 
 describe('Thread Status Display Service', function() {
-    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-    var ThreadStatusDisplayService;
-    beforeEach(inject(function(_ThreadStatusDisplayService_) {
-      ThreadStatusDisplayService = _ThreadStatusDisplayService_;
-    }));
+  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  var ThreadStatusDisplayService;
+  beforeEach(inject(function(_ThreadStatusDisplayService_) {
+    ThreadStatusDisplayService = _ThreadStatusDisplayService_;
+  }));
       
-    describe('Getting human readable status',function(){
-      it('should give human readable status for valid status choice',function(){
-        var mockStatusChoices = ThreadStatusDisplayService.STATUS_CHOICES;
+  describe('Getting human readable status',function(){
+    it('should give human readable status for valid status choice',function(){
+      var mockStatusChoices = ThreadStatusDisplayService.STATUS_CHOICES;
       
-        for (var i = 0; i < mockStatusChoices.length; i++) {
-          mockStatusID = mockStatusChoices[i].id;
-          expect(
-              ThreadStatusDisplayService.getHumanReadableStatus(
-                  mockStatusID)).toBe(mockStatusChoices[i].text);    
-        }
-      });
-      it('should give empty string for invalid status',function(){
-        var mockStatusID = 'INVALID_STATUS';
-        
+      for (var i = 0; i < mockStatusChoices.length; i++) {
+        mockStatusID = mockStatusChoices[i].id;
         expect(
-            ThreadStatusDisplayService.getHumanReadableStatus(
-                mockStatusID)).toBe('');
-      });
+          ThreadStatusDisplayService.getHumanReadableStatus(
+            mockStatusID)).toBe(mockStatusChoices[i].text);    
+      }
     });
-    describe('Getting label class',function(){
-      it('should give label class for status ',function(){
-        var mockStatusID = 'open';
-        expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-            'label label-info');
+    it('should give empty string for invalid status',function(){
+      var mockStatusID = 'INVALID_STATUS';
         
-        mockStatusID = 'notOpen';
-        expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-            'label label-default');
-      });
+      expect(
+        ThreadStatusDisplayService.getHumanReadableStatus(
+          mockStatusID)).toBe('');
     });
   });
+  describe('Getting label class',function(){
+    it('should give label class for status ',function(){
+      var mockStatusID = 'open';
+      expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
+        'label label-info');
+
+      mockStatusID = 'notOpen';
+      expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
+        'label label-default');
+    });
+  });
+});
 
   
