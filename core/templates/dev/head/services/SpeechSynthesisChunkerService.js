@@ -202,7 +202,9 @@ oppia.factory('SpeechSynthesisChunkerService', [
       },
       cancel: function() {
         cancelRequested = true;
-        _speechSynthesis.cancel();
+        if (_speechSynthesis) {
+          _speechSynthesis.cancel();
+        }
       },
       convertToSpeakableText: function(html) {
         return _convertToSpeakableText(html);
