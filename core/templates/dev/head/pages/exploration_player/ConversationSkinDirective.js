@@ -498,7 +498,7 @@ oppia.directive('conversationSkin', [
               var recommendedExplorationIds = [];
               if ($scope.parentExplorationIds.length > 0) {
                 var parentExplorationId = $scope.parentExplorationIds[
-                  $scope.parentExplorationIds.length - 1];
+                  $scope.parentExplorationIds.length - 1].split('#')[0];
                 recommendedExplorationIds.push(parentExplorationId);
               } else {
                 recommendedExplorationIds =
