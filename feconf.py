@@ -30,17 +30,17 @@ PLATFORM = 'gae'
 # This variable is for serving minified resources
 # when set to True. It reflects we are emulating running Oppia in a production
 # environment.
-FORCE_PROD_MODE = True
+FORCE_PROD_MODE = False
 
 # Whether we should serve the development or production experience.
 # DEV_MODE should only be changed to False in the production environment,
 # or if you want to use minified resources in the development environment.
 
 if PLATFORM == 'gae':
-    DEV_MODE = ((
-        not os.environ.get('SERVER_SOFTWARE')
-        or os.environ['SERVER_SOFTWARE'].startswith('Development'))
-        and not FORCE_PROD_MODE)
+    DEV_MODE = (
+        (not os.environ.get('SERVER_SOFTWARE') or
+         os.environ['SERVER_SOFTWARE'].startswith('Development')) and
+        not FORCE_PROD_MODE)
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
