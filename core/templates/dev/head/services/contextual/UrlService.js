@@ -23,9 +23,6 @@ oppia.factory('UrlService', ['$window', function($window) {
     getCurrentLocation: function() {
       return $window.location;
     },
-    getCurrentHref: function() {
-      return this.getCurrentLocation().href;
-    },
     getCurrentQueryString: function() {
       return this.getCurrentLocation().search;
     },
@@ -51,15 +48,15 @@ oppia.factory('UrlService', ['$window', function($window) {
     },
     getQueryFieldValuesAsList: function(fieldName) {
       var fieldValues = [];
-      if (this.getCurrentHref().indexOf('?') > -1) {
+      if (this.getCurrentQueryString().indexOf('?') > -1) {
         // Each queryItem return one field-value pair in the url.
-        var queryItems = this.getCurrentHref().slice(
-          this.getCurrentHref().indexOf('?') + 1).split('&');
+        var queryItems = this.getCurrentQueryString().slice(
+          this.getCurrentQueryString().indexOf('?') + 1).split('&');
         for (var i = 0; i < queryItems.length; i++) {
           var currentFieldName = decodeURIComponent(
             queryItems[i].split('=')[0]);
           var currentFieldValue = decodeURIComponent(
-            queryItems[i].split('=')[1]).split('#')[0];
+            queryItems[i].split('=')[1]);
           if (currentFieldName === fieldName) {
             fieldValues.push(currentFieldValue);
           }
