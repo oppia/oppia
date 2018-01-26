@@ -73,7 +73,7 @@ for arg in "$@"; do
   fi
   # Used to emulate running Oppia in a production environment.
   if [ "$arg" == "--prod_env" ]; then
-    FORCE_PROD_MODE=true
+    FORCE_PROD_MODE=True
     $PYTHON_CMD scripts/build.py
   fi
 done
