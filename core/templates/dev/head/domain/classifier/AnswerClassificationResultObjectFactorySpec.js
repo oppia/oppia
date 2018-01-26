@@ -17,24 +17,23 @@
  */
  
 describe('Answer classification result object factory', function() {
-  var AnswerClassificationResultObjectFactory;
+  var oof,acrof;
   var DEFAULT_OUTCOME_CLASSIFICATION;
-  var oof;
-  
+   
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    AnswerClassificationResultObjectFactory = $injector.get(
-      'AnswerClassificationResultObjectFactory');
+    acrof = $injector.get('AnswerClassificationResultObjectFactory');
+    oof = $injector.get('OutcomeObjectFactory');
     DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
       'DEFAULT_OUTCOME_CLASSIFICATION');
-    oof = $injector.get('OutcomeObjectFactory');
+    
   }));
 
   it('should create a new result', function() {
     var answerClassificationResult = (
-      AnswerClassificationResultObjectFactory.createNew(
-      oof.createNew('default', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
+      acrof.createNew(
+        oof.createNew('default', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
       )
     );
 
