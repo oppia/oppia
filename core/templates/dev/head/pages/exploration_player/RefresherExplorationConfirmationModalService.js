@@ -44,12 +44,10 @@ oppia.factory('RefresherExplorationConfirmationModalService', [
                   EXPLORATION_URL_TEMPLATE, {
                     exploration_id: refresherExplorationId
                   });
-                if (collectionId) {
-                  collectionId = collectionId.split('#')[0];
+                if (collectionId) { 
                   url = UrlService.addField(url, 'collection_id', collectionId);
                 }
                 for (var i = 0; i < parentIdList.length; i++) {
-                  parentIdList[i] = parentIdList[i].split('#')[0];
                   url = UrlService.addField(url, 'parent', parentIdList[i]);
                 }
                 url = UrlService.addField(

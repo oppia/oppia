@@ -33,7 +33,8 @@ oppia.factory('UrlService', ['$window', function($window) {
       var params = {};
       var parts = this.getCurrentHref().replace(
         /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-          params[decodeURIComponent(key)] = decodeURIComponent(value);
+          params[decodeURIComponent(key)] = decodeURIComponent(
+            value).split('#')[0];
         }
       );
       return params;
@@ -56,7 +57,7 @@ oppia.factory('UrlService', ['$window', function($window) {
           var currentFieldName = decodeURIComponent(
             queryItems[i].split('=')[0]);
           var currentFieldValue = decodeURIComponent(
-            queryItems[i].split('=')[1]);
+            queryItems[i].split('=')[1]).split('#')[0];
           if (currentFieldName === fieldName) {
             fieldValues.push(currentFieldValue);
           }
