@@ -122,6 +122,9 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           };
           $scope.onMousemoveImage = function(event) {
             if (!$scope.interactionIsActive) {
+              $scope.lastAnswer = {
+                clickPosition: [$scope.mouseX, $scope.mouseY]
+              };
               return;
             }
             var image = $($element).find('.oppia-image-click-img');
@@ -133,11 +136,6 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             $scope.updateCurrentlyHoveredRegions();
           };
           $scope.onClickImage = function() {
-            if (!$scope.lastAnswer) {
-              $scope.lastAnswer = {
-                clickPosition: [$scope.mouseX, $scope.mouseY]
-              };
-            }
             $scope.onSubmit({
               answer: {
                 clickPosition: [$scope.mouseX, $scope.mouseY],
