@@ -133,9 +133,11 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             $scope.updateCurrentlyHoveredRegions();
           };
           $scope.onClickImage = function() {
-            $scope.lastAnswer = {
-              clickPosition: [$scope.mouseX, $scope.mouseY]
-            };
+            if (!$scope.lastAnswer) {
+              $scope.lastAnswer = {
+                clickPosition: [$scope.mouseX, $scope.mouseY]
+              };
+            }
             $scope.onSubmit({
               answer: {
                 clickPosition: [$scope.mouseX, $scope.mouseY],
