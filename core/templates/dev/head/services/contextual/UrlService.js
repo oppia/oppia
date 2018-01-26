@@ -31,8 +31,14 @@ oppia.factory('UrlService', ['$window', function($window) {
        in array form. */
     getUrlParams: function() {
       var params = {};
+      /* This is to remove the hash value from URL as mentioned in
+         https://stackoverflow.com/a/5298684.
+      */
+      history.pushState(
+        "", document.title, $window.location.pathname + $window.location.search
+      );
       var parts = this.getCurrentHref().replace(
-        /[?&]+([^=&]+)=([^&#]*)/gi, function(m, key, value) {
+        /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
           params[decodeURIComponent(key)] = decodeURIComponent(value);
         }
       );
