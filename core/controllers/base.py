@@ -316,7 +316,6 @@ class BaseHandler(webapp2.RequestHandler):
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'DEV_MODE': feconf.DEV_MODE,
-            'MINIFICATION': feconf.IS_MINIFIED,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
             'ACTIVITY_STATUS_PRIVATE': (
                 rights_manager.ACTIVITY_STATUS_PRIVATE),
