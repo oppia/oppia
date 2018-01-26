@@ -59,7 +59,7 @@ oppia.factory('RefresherExplorationConfirmationModalService', [
                 // TODO(bhenning): Find a reliable way to send events that does
                 // not get interrupted with browser redirection.
                 $timeout(function() {
-                  //$window.open(url, '_self');
+                  $window.open(url, '_self');
                 }, 150);
 
                 // Close the dialog to ensure the confirmation cannot be called
