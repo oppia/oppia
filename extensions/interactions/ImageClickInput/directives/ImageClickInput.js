@@ -110,11 +110,11 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             };
             if ($scope.lastAnswer) {
               answer.left =
-                $scope.lastAnswer.clickPosition[0]*image.width() +
+                $scope.lastAnswer.clickPosition[0] * image.width() +
                 image.offset().left -
                 image.parent().offset().left - 5;
               answer.top =
-                $scope.lastAnswer.clickPosition[1]*image.height() +
+                $scope.lastAnswer.clickPosition[1] * image.height() +
                 image.offset().top -
                 image.parent().offset().top - 5;
             }
