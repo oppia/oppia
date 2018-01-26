@@ -27,7 +27,7 @@ describe('Answer classification result object factory', function() {
     oof = $injector.get('OutcomeObjectFactory');
     DEFAULT_OUTCOME_CLASSIFICATION = $injector.get(
       'DEFAULT_OUTCOME_CLASSIFICATION');
-    }));
+  }));
 
   it('should create a new result', function() {
     var answerClassificationResult = (
