@@ -52,6 +52,9 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           $scope.mouseX = 0;
           $scope.mouseY = 0;
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+          if (!$scope.interactionIsActive) {
+            $scope.lastAnswer = $scope.getLastAnswer();
+          }
 
           $scope.currentlyHoveredRegions = [];
           $scope.allRegions = imageAndRegions.labeledRegions;
@@ -99,6 +102,24 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
           });
+          $scope.getDotLocation = function() {
+            var image = $($element).find('.oppia-image-click-img');
+            var answer = {
+              left: null,
+              top: null
+            };
+            if ($scope.lastAnswer) {
+              answer.left =
+                $scope.lastAnswer.clickPosition[0]*image.width() +
+                image.offset().left -
+                image.parent().offset().left - 5;
+              answer.top =
+                $scope.lastAnswer.clickPosition[1]*image.height() +
+                image.offset().top -
+                image.parent().offset().top - 5;
+            }
+            return answer;
+          };
           $scope.onMousemoveImage = function(event) {
             if (!$scope.interactionIsActive) {
               return;
@@ -112,6 +133,9 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             $scope.updateCurrentlyHoveredRegions();
           };
           $scope.onClickImage = function() {
+            $scope.lastAnswer = {
+              clickPosition: [$scope.mouseX, $scope.mouseY]
+            };
             $scope.onSubmit({
               answer: {
                 clickPosition: [$scope.mouseX, $scope.mouseY],
