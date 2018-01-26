@@ -1,60 +1,236 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+{% macro warnings_and_loader() -%}
+  <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content" ng-cloak>
+    <div class="oppia-toast-container toast-top-center">
+      <div ng-repeat="warning in (AlertsService.warnings | limitTo:5) track by $index" class="toast toast-warning oppia-toast">
+        <button type="button" class="toast-close-button" ng-click="AlertsService.deleteWarning(warning)" role="button">&times;</button>
+        <div class="toast-message">
+          <[warning.content]>
+        </div>
+      </div>
+    </div>
 
-/**
- * @fileoverview Oppia's base controller.
- */
+    <div>
+      <div ng-repeat="message in AlertsService.messages track by $index">
+        <alert-message message-object="message" message-index="$index"></alert-message>
+      </div>
+    </div>
 
-oppia.controller('Base', [
-  '$scope', '$rootScope', '$document', 'AlertsService', 'BackgroundMaskService',
-  'SidebarStatusService',
-  function($scope, $rootScope, $document, AlertsService, BackgroundMaskService,
-      SidebarStatusService) {
-    $scope.AlertsService = AlertsService;
-    $scope.currentLang = 'en';
-    $scope.promoBarIsEnabled = GLOBALS.PROMO_BAR_IS_ENABLED;
-    $scope.promoBarMessage = GLOBALS.PROMO_BAR_MESSAGE;
+    <div ng-show="loadingMessage" class="oppia-loading-fullpage">
+      <div class="oppia-align-center">
+        <span translate="<[loadingMessage]>"></span>
+        <span class="oppia-loading-dot-one">.</span>
+        <span class="oppia-loading-dot-two">.</span>
+        <span class="oppia-loading-dot-three">.</span>
+      </div>
+    </div>
+    <div ng-show="!loadingMessage">
+      {% block content %}{% endblock %}
+      {% block footer %}{% endblock %}
+    </div>
+  </div>
+{%- endmacro %}
 
-    $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
-    // If this is nonempty, the whole page goes into 'Loading...' mode.
-    $rootScope.loadingMessage = '';
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    {% block prerender %}
+    {% endblock prerender %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-    $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
-    $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
+    <!-- Tiles for Internet Explorer. -->
+    <meta name="application-name" content="{{SITE_NAME}}">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-square70x70logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-tiny.png')}}">
+    <meta name="msapplication-square150x150logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-square.png')}}">
+    <meta name="msapplication-wide310x150logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-wide.png')}}">
+    <meta name="msapplication-square310x310logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-large.png')}}">
 
-    $scope.isBackgroundMaskActive = BackgroundMaskService.isMaskActive;
+    <!-- The itemprops are for G+ sharing. -->
+    <meta itemprop="name" content="{{meta_name}}">
+    <meta itemprop="description" content="{{meta_description}}">
+    <!-- The og tags are for Facebook sharing. -->
+    <meta property="og:title" content="{{meta_name}}">
+    <meta property="og:site_name" content="Oppia">
+    <meta property="og:url" content="{{FULL_URL}}">
+    <meta property="og:description" content="{{meta_description}}">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/288x288_logo_mint.png')}}">
 
-    // Listener function to catch the change in language preference.
-    $rootScope.$on('$translateChangeSuccess', function(evt, response) {
-      $scope.currentLang = response.language;
-    });
+    <link rel="apple-touch-icon" href="{{get_static_resource_url('/assets/images/logo/favicon.png')}}">
 
-    // TODO(sll): use 'touchstart' for mobile.
-    $document.on('click', function() {
-      SidebarStatusService.onDocumentClick();
-      $scope.$apply();
-    });
+    <!-- The title is bound to the rootScope. The content of the block
+    maintitle can be a string or a translation id. If it is a translation it
+    will be replaced by its translation when the page is loading. If it is a
+    string it would be displayed as is. This is the only way to translate
+    the page title because the head of the file is outside the scope of
+    any other controller. -->
+    <title itemprop="name" translate="{% block maintitle %}Oppia{% endblock maintitle %}"></title>
+    {% block base_url %}{% endblock base_url %}
 
-    $scope.skipToMainContent = function() {
-      var mainContentElement = document.getElementById('oppia-main-content');
+    {% block header_css %}
+      {% include 'pages/header_css_libs.html' %}
+    {% endblock header_css %}
 
-      if (!mainContentElement) {
-        throw Error('Variable mainContentElement is undefined.');
-      }
-      mainContentElement.tabIndex = -1;
-      mainContentElement.scrollIntoView();
-      mainContentElement.focus();
-    };
-  }
-]);
+    <script>
+      var GLOBALS = {
+        ACTIVITY_STATUS_PRIVATE: JSON.parse(
+          '{{ACTIVITY_STATUS_PRIVATE|js_string}}'),
+        ACTIVITY_STATUS_PUBLIC: JSON.parse(
+          '{{ACTIVITY_STATUS_PUBLIC|js_string}}'),
+        ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
+        can_create_collections: JSON.parse('{{can_create_collections|js_string}}'),
+        ADDITIONAL_ANGULAR_MODULES: JSON.parse('{{additional_angular_modules|js_string}}'),
+        csrf_token: JSON.parse('{{csrf_token|js_string}}'),
+        DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
+        status_code: JSON.parse('{{status_code}}'),
+        GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
+        INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
+        MINIFICATION: JSON.parse('{{MINIFICATION|js_string}}'),
+        NAV_MODE: JSON.parse('{{nav_mode|js_string}}'),
+        /* A list of functions to be called when an exploration is completed */
+        POST_COMPLETION_HOOKS: [],
+        preferredSiteLanguageCode: JSON.parse(
+          '{{preferred_site_language_code|js_string}}'),
+        SITE_NAME: JSON.parse('{{SITE_NAME|js_string}}'),
+        SITE_FEEDBACK_FORM_URL: JSON.parse('{{SITE_FEEDBACK_FORM_URL|js_string}}'),
+        SYSTEM_USERNAMES: JSON.parse('{{SYSTEM_USERNAMES|js_string}}'),
+        TEMPLATE_DIR_PREFIX: JSON.parse('{{TEMPLATE_DIR_PREFIX|js_string}}'),
+        isAdmin: JSON.parse('{{is_admin|js_string}}'),
+        isModerator: JSON.parse('{{is_moderator|js_string}}'),
+        isSuperAdmin: JSON.parse('{{is_super_admin|js_string}}'),
+        loginUrl: JSON.parse('{{login_url|js_string}}'),
+        logoutUrl: JSON.parse('{{logout_url|js_string}}'),
+        profilePictureDataUrl: JSON.parse('{{profile_picture_data_url|js_string}}'),
+        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}'),
+        username: JSON.parse('{{username|js_string}}'),
+        iframed: JSON.parse('{{iframed|js_string}}'),
+        allowYamlFileUpload: JSON.parse('{{allow_yaml_file_upload|js_string}}'),
+        PROMO_BAR_IS_ENABLED: JSON.parse('{{promo_bar_enabled|js_string}}'),
+        PROMO_BAR_MESSAGE: JSON.parse('{{promo_bar_message|js_string}}')
+      };
+    </script>
+    <script ng-if="!additionalAngularModules">
+      GLOBALS.ADDITIONAL_ANGULAR_MODULES = [];
+    </script>
+
+    {% block header_js %}
+      {% include 'pages/header_js_libs.html' %}
+    {% endblock header_js %}
+
+    {{BEFORE_END_HEAD_TAG_HOOK}}
+  </head>
+
+  <body>
+    <div ng-if="iframed">
+      {{ warnings_and_loader() }}
+    </div>
+    <div ng-if="!iframed">
+      <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
+      <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
+      </promo-bar>
+      <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
+      </div>
+
+      <div class="oppia-base-container"
+           ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
+           ng-swipe-left="closeSidebarOnSwipe()">
+        <div class="oppia-content-container">
+          <div id="wrapper">
+            <div class="oppia-main-body">
+              <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation" headroom tolerance="0" offset="0">
+                <div class="navbar-container">
+                  <top-navigation-bar></top-navigation-bar>
+                  <div class="collapse navbar-collapse oppia-navbar-collapse ng-cloak">
+                    {% block navbar_breadcrumb %}
+                    {% endblock navbar_breadcrumb %}
+
+                    {% block local_top_nav_options %}
+                    {% endblock local_top_nav_options %}
+                  </div>
+                </div>
+              </nav>
+
+              <div class="oppia-top-of-page-padding"></div>
+
+              {{ warnings_and_loader() }}
+            </div>
+
+            <noscript>
+              <div class="oppia-page-cards-container">
+                <div class="md-default-theme oppia-page-card oppia-long-text">
+                  <!-- Note to developers: We replicate the translated text inline because, without JavaScript enabled, the translation engine doesn't kick in.-->
+                  <h2>
+                    <span translate="I18N_SPLASH_JAVASCRIPT_ERROR_TITLE">We Need JavaScript in Your Browser</span>
+                    <i class="material-icons">&#xE811;</i>
+                  </h2>
+                  <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION"
+                     translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}">Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com"/>click here.</a></p>
+                  <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_THANKS">Thank you.</p>
+                </div>
+              </div>
+            </noscript>
+            <side-navigation-bar></side-navigation-bar>
+          </div>
+        </div>
+      </div>
+
+      <div ng-if="devMode" class="oppia-dev-mode">
+        Dev Mode
+      </div>
+
+      <div ng-if="siteFeedbackFromUrl">
+        <a ng-href="{{siteFeedbackFromUrl}}" target="_blank"
+           class="oppia-site-feedback oppia-transition-200">
+          <i class="material-icons md-18">&#xE87F;</i>
+            <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
+          </i>
+        </a>
+      </div>
+    </div>
+
+    {% include 'pages/footer_js_libs.html' %}
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/app.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/filters.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/i18n.js"></script>
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Base.js"></script>
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/AlertsService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ExplorationContextService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/UtilsService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/DebouncerService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/DateTimeFormatService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/IdGenerationService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ValidatorsService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/TranslationFileHashLoaderService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/RteHelperService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ConstructTranslationIdsService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/DeviceInfoService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/UrlService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/WindowDimensionsService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/stateful/BackgroundMaskService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/stateful/FocusManagerService.js"></script>
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/alerts/AlertMessageDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/create_button/CreateActivityButtonDirective.js"></script>
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/promo/PromoBarDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/side_navigation_bar/SideNavigationBarDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/social_buttons/SocialButtonsDirective.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/top_navigation_bar/TopNavigationBarDirective.js"></script>
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/CollectionCreationService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationCreationService.js"></script>
+
+    <script src="{{TEMPLATE_DIR_PREFIX}}/domain/sidebar/SidebarStatusService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
+
+    {% block footer_js %}
+    {% endblock footer_js %}
+  </body>
+</html>
