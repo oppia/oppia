@@ -30,15 +30,12 @@ describe('Answer classification result object factory', function() {
   }));
 
   it('should create a new result', function() {
-    var answerClassificationResult = (
-      acrof.createNew(
-        oof.createNew('default', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
-      )
+    var answerClassificationResult = acrof.createNew(
+      oof.createNew('default', '', []), 1, 0, DEFAULT_OUTCOME_CLASSIFICATION
     );
 
     expect(answerClassificationResult.outcome).toEqual(
-      oof.createNew('default', '', [])
-    );
+      oof.createNew('default', '', []));
     expect(answerClassificationResult.answerGroupIndex).toEqual(1);
     expect(answerClassificationResult.ruleIndex).toEqual(0);
     expect(answerClassificationResult.classificationCategorization).toEqual(
