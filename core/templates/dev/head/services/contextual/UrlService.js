@@ -32,9 +32,8 @@ oppia.factory('UrlService', ['$window', function($window) {
     getUrlParams: function() {
       var params = {};
       var parts = this.getCurrentHref().replace(
-        /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-          params[decodeURIComponent(key)] = decodeURIComponent(
-            value).split('#')[0];
+        /[?&]+([^=&]+)=([^&#]*)/gi, function(m, key, value) {
+          params[decodeURIComponent(key)] = decodeURIComponent(value);
         }
       );
       return params;
