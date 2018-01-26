@@ -52,8 +52,7 @@ describe('Url Service', function() {
         field1: '?value=1',
         field2: '?value&1'
       };
-      mockLocation.href = 'http://' + pathname +
-        '?field1=%3Fvalue%3D1&field2=%3Fvalue%261';
+      mockLocation.search = '?field1=%3Fvalue%3D1&field2=%3Fvalue%261';
       expect(UrlService.getUrlParams()).toEqual(expectedObject);
     });
 

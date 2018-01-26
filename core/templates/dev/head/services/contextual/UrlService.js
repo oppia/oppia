@@ -26,18 +26,15 @@ oppia.factory('UrlService', ['$window', function($window) {
     getCurrentHref: function() {
       return this.getCurrentLocation().href;
     },
+    getCurrentQueryString: function() {
+      return this.getCurrentLocation().search;
+    },
     /* As params[key] is overwritten, if query string has multiple fieldValues
        for same fieldName, use getQueryFieldValuesAsList(fieldName) to get it
        in array form. */
     getUrlParams: function() {
       var params = {};
-      /* This is to remove the hash value from URL as mentioned in
-         https://stackoverflow.com/a/5298684.
-      */
-      history.pushState(
-        '', document.title, $window.location.pathname + $window.location.search
-      );
-      var parts = this.getCurrentHref().replace(
+      var parts = this.getCurrentQueryString().replace(
         /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
           params[decodeURIComponent(key)] = decodeURIComponent(value);
         }
