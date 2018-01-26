@@ -104,21 +104,21 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           });
           $scope.getDotLocation = function() {
             var image = $($element).find('.oppia-image-click-img');
-            var answer = {
+            var dotLocation = {
               left: null,
               top: null
             };
             if ($scope.lastAnswer) {
-              answer.left =
+              dotLocation.left =
                 $scope.lastAnswer.clickPosition[0] * image.width() +
                 image.offset().left -
                 image.parent().offset().left - 5;
-              answer.top =
+              dotLocation.top =
                 $scope.lastAnswer.clickPosition[1] * image.height() +
                 image.offset().top -
                 image.parent().offset().top - 5;
             }
-            return answer;
+            return dotLocation;
           };
           $scope.onMousemoveImage = function(event) {
             if (!$scope.interactionIsActive) {
