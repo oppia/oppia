@@ -33,11 +33,11 @@ oppia.directive('outcomeEditor', [
         '/components/outcome_editor_directive.html'),
       controller: [
         '$scope', 'EditorStateService', 'stateInteractionIdService',
-        'COMPONENT_NAME_FEEDBACK', 'explorationCorrectnessFeedbackService',
+        'COMPONENT_NAME_FEEDBACK', 'ExplorationCorrectnessFeedbackService',
         'INTERACTION_SPECS',
         function(
             $scope, EditorStateService, stateInteractionIdService,
-            COMPONENT_NAME_FEEDBACK, explorationCorrectnessFeedbackService,
+            COMPONENT_NAME_FEEDBACK, ExplorationCorrectnessFeedbackService,
             INTERACTION_SPECS) {
           $scope.editOutcomeForm = {};
           $scope.feedbackEditorIsOpen = false;
@@ -60,7 +60,7 @@ oppia.directive('outcomeEditor', [
           };
 
           $scope.isCorrectnessFeedbackEnabled = function() {
-            return explorationCorrectnessFeedbackService.isEnabled();
+            return ExplorationCorrectnessFeedbackService.isEnabled();
           };
 
           var onExternalSave = function() {
