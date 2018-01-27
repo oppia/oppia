@@ -99,8 +99,17 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               return 'inline';
             }
           };
+          $scope.getDotDisplay = function() {
+            if (ExplorationContextService.getEditorTabContext() === 'editor') {
+              return 'none';
+            }
+            return 'inline';
+          };
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
+            $scope.lastAnswer = {
+              clickPosition: [$scope.mouseX, $scope.mouseY]
+            };
           });
           $scope.getDotLocation = function() {
             var image = $($element).find('.oppia-image-click-img');
@@ -122,9 +131,6 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           };
           $scope.onMousemoveImage = function(event) {
             if (!$scope.interactionIsActive) {
-              $scope.lastAnswer = {
-                clickPosition: [$scope.mouseX, $scope.mouseY]
-              };
               return;
             }
             var image = $($element).find('.oppia-image-click-img');
