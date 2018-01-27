@@ -347,7 +347,6 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
     calculation_ids = set([
         visualization.calculation_id for visualization in visualizations])
 
-    print(len(visualizations))
     calculation_ids_to_outputs = {}
     for calculation_id in calculation_ids:
         # This is None if the calculation job has not yet been run for this
