@@ -49,7 +49,7 @@ describe('Collections', function() {
     adminPage.updateRole(PLAYER_USERNAME, 'collection editor');
     users.logout();
 
-    users.login('creator@explorations.com');    
+    users.login('creator@explorations.com');
     // Create four test explorations.
     workflow.createAndPublishExploration(
       'First Exploration',
@@ -98,6 +98,7 @@ describe('Collections', function() {
         'Languages',
         'discover the Protractor Testing'
       );
+      users.logout();
 
       users.login('player@collections.com');
       browser.get(general.SERVER_URL_PREFIX);
