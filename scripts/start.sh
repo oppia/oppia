@@ -113,7 +113,7 @@ echo Starting GAE development server
 # settings in feconf.py. Be careful with this -- you do not want to spam people
 # accidentally!
 
-if [[ "$FORCE_PROD_MODE" == "true" ]]; then
+if [[ "$FORCE_PROD_MODE" == "True" ]]; then
   # This starts up a dev server which uses minified resources.
   $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --prod_env=True --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG
 else
