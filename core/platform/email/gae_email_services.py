@@ -25,11 +25,11 @@ def get_incoming_email_address(reply_to_id):
     """Returns string detailing the id of the reply-client.
 
     Args:
-      - reply_to_id: str or None. The unique reply-to id used in reply-to email
-          sent to recipient.
+        reply_to_id: str. The unique reply-to id used in reply-to email
+            sent to recipient.
 
     Returns:
-      A str detailing the id of the reply-client.
+        str. Details of the reply-client id.
     """
     return 'reply+%s@%s' % (reply_to_id, feconf.INCOMING_EMAILS_DOMAIN_NAME)
 

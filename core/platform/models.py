@@ -32,6 +32,9 @@ class _Platform(object):
     @classmethod
     def import_models(cls):
         """Function to be implemented in child classes.
+
+        Raises:
+            Exception: Abstract method overridden in child class.
         """
         raise NotImplementedError
 
