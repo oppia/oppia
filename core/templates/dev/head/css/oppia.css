@@ -939,7 +939,7 @@ p {
   margin: 0;
   text-align: left;
   word-spacing: 0;
-  word-break: break-all;
+  word-break: break-word;
 }
 
 .oppia-long-text p {
