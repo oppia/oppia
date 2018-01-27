@@ -4983,3 +4983,19 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
   width: 1px;
 }
+
+.modal-dialog md-checkbox .md-icon {
+  top: 2px;
+}
+
+.modal-dialog md-checkbox .md-label {
+  vertical-align: top;
+}
+
+.oppia-rule-body-container md-checkbox .md-icon {
+  top: 2px;
+}
+
+.oppia-rule-body-container md-checkbox .md-label {
+  vertical-align: top;
+}
