@@ -17,10 +17,10 @@
  */
 
 oppia.factory('GraphDataService', [
-  'explorationStatesService', 'explorationInitStateNameService',
+  'ExplorationStatesService', 'ExplorationInitStateNameService',
   'ComputeGraphService',
   function(
-      explorationStatesService, explorationInitStateNameService,
+      ExplorationStatesService, ExplorationInitStateNameService,
       ComputeGraphService) {
     var _graphData = null;
 
@@ -34,12 +34,12 @@ oppia.factory('GraphDataService', [
     //   - initStateName: the name of the initial state.
     //   - finalStateName: the name of the final state.
     var _recomputeGraphData = function() {
-      if (!explorationInitStateNameService.savedMemento) {
+      if (!ExplorationInitStateNameService.savedMemento) {
         return;
       }
 
-      var states = explorationStatesService.getStates();
-      var initStateId = explorationInitStateNameService.savedMemento;
+      var states = ExplorationStatesService.getStates();
+      var initStateId = ExplorationInitStateNameService.savedMemento;
       _graphData = ComputeGraphService.compute(initStateId, states);
     };
 
