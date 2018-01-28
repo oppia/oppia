@@ -62,18 +62,7 @@ oppia.directive('stateContentEditor', [
                 'mark_all_audio_as_needing_update_modal_directive.html'),
               backdrop: true,
               resolve: {},
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.flagAll = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              controller: 'MarkAllAudioAsNeedingUpdateCtrl'
             }).result.then(function() {
               var currentStateContent = stateContentService.displayed;
               currentStateContent.markAllAudioAsNeedingUpdate();
