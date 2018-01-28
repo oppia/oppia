@@ -37,11 +37,11 @@ oppia.directive('feedbackPopup', [
       controller: [
         '$scope', '$element', '$http', '$timeout', 'FocusManagerService',
         'AlertsService', 'BackgroundMaskService', 'PlayerPositionService',
-        'WindowDimensionsService',
+        'WindowDimensionsService', 'FilterService', 
         function(
             $scope, $element, $http, $timeout, FocusManagerService,
             AlertsService, BackgroundMaskService, PlayerPositionService,
-            WindowDimensionsService) {
+            WindowDimensionsService, FilterService) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
           $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
@@ -106,24 +106,10 @@ oppia.directive('feedbackPopup', [
             return triggerElt;
           };
 
-          $scope.getAbbreviatedFeedbackText = function () {
-            if ($scope.feedbackText.length > 60 ) {
-              var feedbackSubject = $scope.feedbackText.substr(0, 60);
-              
-              if (feedbackSubject.includes(' ')) {
-                feedbackSubject = feedbackSubject.split(' ', 8).slice(0, -1)
-                                  .join(' ');
-              }
-              feedbackSubject.concat('...');
-              return feedbackSubject;
-            }
-            return $scope.feedbackText;
-          }
-
           $scope.saveFeedback = function() {
             if ($scope.feedbackText) {
               $http.post(feedbackUrl, {
-                subject: $scope.getAbbreviatedFeedbackText(),
+                subject: FilterService.getAbbreviatedText($scope.feedbackText),
                 feedback: $scope.feedbackText,
                 include_author: (
                   !$scope.isSubmitterAnonymized && $scope.isLoggedIn),
