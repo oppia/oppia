@@ -373,11 +373,15 @@ oppia.controller('StateResponses', [
           '$scope', '$uibModalInstance', 'ResponsesService',
           'EditorStateService', 'EditorFirstTimeEventsService',
           'RuleObjectFactory', 'OutcomeObjectFactory',
+          'stateInteractionIdService', 
           function(
               $scope, $uibModalInstance, ResponsesService,
               EditorStateService, EditorFirstTimeEventsService,
-              RuleObjectFactory, OutcomeObjectFactory) {
+              RuleObjectFactory, OutcomeObjectFactory, 
+              stateInteractionIdService) {
             $scope.feedbackEditorIsOpen = false;
+            $scope.stateInteractionIdService = stateInteractionIdService;
+
             $scope.openFeedbackEditor = function() {
               $scope.feedbackEditorIsOpen = true;
             };

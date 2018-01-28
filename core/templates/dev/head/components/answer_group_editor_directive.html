@@ -44,7 +44,7 @@
 
 <div style="height: 100%;">
   <!-- For the default answer group, 'rules' is null. Otherwise, 'rules' is a list of rules. -->
-  <div ng-if="rules">
+  <div ng-if="rules" ng-class="stateInteractionIdService.displayed">
     <strong>
       If the learner's answer...
     </strong>
