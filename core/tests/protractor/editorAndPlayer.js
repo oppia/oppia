@@ -27,8 +27,6 @@ var ExplorationPlayerPage =
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var logicProofUtils = require(
-  '../../../extensions/interactions/LogicProof/protractor.js');
 
 describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
@@ -71,7 +69,7 @@ describe('Full exploration editor', function() {
       by.css('.protractor-test-back-button')).then(function(buttons){
         expect(buttons.length).toBe(1);
       });
-    logicProofUtils.submitAnswer();
+    explorationPlayerPage.submitAnswer('LogicProof');
     element.all(
       by.css('.protractor-test-back-button')).then(function(buttons){
         expect(buttons.length).toBe(0);
