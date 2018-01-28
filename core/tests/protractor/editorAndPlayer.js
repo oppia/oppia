@@ -27,6 +27,8 @@ var ExplorationPlayerPage =
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var logicProofUtils = require(
+  '../../../extensions/interactions/LogicProof/protractor.js');
 
 describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
@@ -37,6 +39,43 @@ describe('Full exploration editor', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+  });
+
+  it('should prevent going back when help card is shown', function(){
+    users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
+    users.login('user2@editorAndPlayer.com');
+    workflow.createExploration();
+
+    editor.setStateName('card 1');
+    editor.setContent(forms.toRichText('this is card 1'));
+    editor.setInteraction('Continue');
+    editor.ResponseEditor('default').setDestination('card 2', true, null);
+
+    editor.moveToState('card 2');
+    editor.setContent(forms.toRichText(
+      'this is card 2 with non-inline interaction'));
+    editor.setInteraction(
+      'LogicProof',
+      '', '', 'from p we have p');
+    editor.addResponse(
+      'LogicProof', forms.toRichText('Great'), 'final card', true, 'Correct');
+
+    // Setup a terminating state
+    editor.moveToState('final card');
+    editor.setInteraction('EndExploration');
+    editor.saveChanges();
+
+    general.moveToPlayer();
+    explorationPlayerPage.submitAnswer('Continue');
+    element.all(
+      by.css('.protractor-test-back-button')).then(function(buttons){
+      expect(buttons.length).toBe(1)
+    });
+    logicProofUtils.submitAnswer();
+    element.all(
+      by.css('.protractor-test-back-button')).then(function(buttons){
+      expect(buttons.length).toBe(0)
+    });
   });
 
   it('should redirect back to parent exploration correctly when parent id is ' +
