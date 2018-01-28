@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ var expectInteractionDetailsToMatch = function(elem) {
   ).toBe(true);
 };
 
-var submitAnswer = function() { 
+var submitAnswer = function() {
   // TODO: find a way to send keys to the codeRepl. Temporarily pass the
   // answer as defaultText in the customization args.
   element(by.css('.oppia-learner-confirm-button')).click();
@@ -44,7 +44,7 @@ var testSuite = [{
   ruleArguments: ['Correct'],
   expectedInteractionDetails: [],
   wrongAnswers: [],
-  correctAnswers: ['']
+  correctAnswers: []
 }];
 
 exports.customizeInteraction = customizeInteraction;
