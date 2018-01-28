@@ -23,11 +23,11 @@
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE',
+  'EVENT_NEW_CARD_AVAILABLE', 'EDITOR_TAB_CONTEXT',
   function(
       $sce, HtmlEscaperService, ExplorationContextService,
       imageClickInputRulesService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE) {
+      EVENT_NEW_CARD_AVAILABLE, EDITOR_TAB_CONTEXT) {
     return {
       restrict: 'E',
       scope: {
@@ -100,7 +100,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             }
           };
           $scope.getDotDisplay = function() {
-            if (ExplorationContextService.getEditorTabContext() === 'editor') {
+            if (ExplorationContextService.getEditorTabContext() ===
+                EDITOR_TAB_CONTEXT.EDITOR) {
               return 'none';
             }
             return 'inline';
