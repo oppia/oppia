@@ -381,7 +381,9 @@ oppia.controller('StateResponses', [
               stateInteractionIdService) {
             $scope.feedbackEditorIsOpen = false;
             $scope.stateInteractionIdService = stateInteractionIdService;
-
+            var name = $scope.stateInteractionIdService.displayed;
+            name = name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+            $scope.stateInteractionIdService.name = name;
             $scope.openFeedbackEditor = function() {
               $scope.feedbackEditorIsOpen = true;
             };

@@ -44,7 +44,7 @@
 
 <div style="height: 100%;">
   <!-- For the default answer group, 'rules' is null. Otherwise, 'rules' is a list of rules. -->
-  <div ng-if="rules" ng-class="stateInteractionIdService.displayed">
+  <div ng-if="rules">
     <strong>
       If the learner's answer...
     </strong>
@@ -69,7 +69,7 @@
 
         <div ng-if="activeRuleIndex === $index">
           <div class="oppia-editor-card-section">
-            <div class="oppia-rule-body-container">
+            <div class="oppia-rule-body-container" ng-class="stateInteractionIdService.name">
               <rule-editor rule="rule" is-editable="isEditable" is-editing-rule-inline="true" on-cancel-rule-edit="cancelActiveRuleEdit()" on-save-rule="saveRules()" class="protractor-test-answer-body">
               </rule-editor>
             </div>

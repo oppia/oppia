@@ -4984,10 +4984,10 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 1px;
 }
 
-.ItemSelectionInput md-checkbox .md-icon {
+.item-selection-input md-checkbox .md-icon {
   top: 2px;
 }
 
-.ItemSelectionInput md-checkbox .md-label {
+.item-selection-input md-checkbox .md-label {
   vertical-align: top;
 }

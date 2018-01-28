@@ -46,7 +46,9 @@ oppia.directive('answerGroupEditor', [
           $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           $scope.editAnswerGroupForm = {};
           $scope.stateInteractionIdService = stateInteractionIdService;
-
+          var name = $scope.stateInteractionIdService.displayed;
+          name = name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+          $scope.stateInteractionIdService.name = name;
           $scope.getAnswerChoices = function() {
             return ResponsesService.getAnswerChoices();
           };
