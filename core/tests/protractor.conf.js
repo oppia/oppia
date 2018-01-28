@@ -63,8 +63,8 @@ exports.config = {
 
     mainEditor: [
       'protractor/editorAndPlayer.js',
-      'protractor/stateEditor.js',
-      'protractor/explorationFeedback.js'
+      //'protractor/stateEditor.js',
+      //'protractor/explorationFeedback.js'
     ],
 
     editorFeatures: [
