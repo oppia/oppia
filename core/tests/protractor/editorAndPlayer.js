@@ -74,6 +74,7 @@ describe('Full exploration editor', function() {
       by.css('.protractor-test-back-button')).then(function(buttons){
         expect(buttons.length).toBe(0);
       });
+    users.logout();
   });
 
   it('should redirect back to parent exploration correctly when parent id is' +
@@ -126,7 +127,7 @@ describe('Full exploration editor', function() {
     users.logout();
   });
 
-  it('should give option for redirection when author has specified ' +
+  /*it('should give option for redirection when author has specified ' +
       'a refresher exploration Id', function() {
     users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
 
@@ -542,7 +543,7 @@ describe('Full exploration editor', function() {
       editor.setInteraction('EndExploration');
       users.logout();
     });
-  });
+  });*/
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
