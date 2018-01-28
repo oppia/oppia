@@ -127,7 +127,7 @@ describe('Full exploration editor', function() {
     users.logout();
   });
 
-  /*it('should give option for redirection when author has specified ' +
+  it('should give option for redirection when author has specified ' +
       'a refresher exploration Id', function() {
     users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
 
@@ -543,7 +543,7 @@ describe('Full exploration editor', function() {
       editor.setInteraction('EndExploration');
       users.logout();
     });
-  });*/
+  });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
