@@ -69,17 +69,17 @@ describe('Full exploration editor', function() {
     explorationPlayerPage.submitAnswer('Continue');
     element.all(
       by.css('.protractor-test-back-button')).then(function(buttons){
-      expect(buttons.length).toBe(1)
-    });
+        expect(buttons.length).toBe(1);
+      });
     logicProofUtils.submitAnswer();
     element.all(
       by.css('.protractor-test-back-button')).then(function(buttons){
-      expect(buttons.length).toBe(0)
-    });
+        expect(buttons.length).toBe(0);
+      });
   });
 
-  /*it('should redirect back to parent exploration correctly when parent id is ' +
-      'given as query parameter', function() {
+  it('should redirect back to parent exploration correctly when parent id is' +
+      ' given as query parameter', function() {
     users.createUser('user1@editorAndPlayer.com', 'user1EditorAndPlayer');
     users.login('user1@editorAndPlayer.com');
 
@@ -544,7 +544,7 @@ describe('Full exploration editor', function() {
       editor.setInteraction('EndExploration');
       users.logout();
     });
-  });*/
+  });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
