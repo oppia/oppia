@@ -35,13 +35,15 @@ oppia.directive('feedbackPopup', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/feedback_popup_directive.html'),
       controller: [
-        '$scope', '$element', '$http', '$timeout', 'FocusManagerService',
-        'AlertsService', 'BackgroundMaskService', 'PlayerPositionService',
-        'WindowDimensionsService', 'FilterService', 
+        '$scope', '$element', '$http', '$timeout', '$filter',
+        'FocusManagerService', 'AlertsService', 'BackgroundMaskService', 
+        'PlayerPositionService', 'WindowDimensionsService',
+        'SUMMARRY_TITLE_CHARACTER_COUNT',
         function(
-            $scope, $element, $http, $timeout, FocusManagerService,
-            AlertsService, BackgroundMaskService, PlayerPositionService,
-            WindowDimensionsService, FilterService) {
+            $scope, $element, $http, $timeout, $filter,
+            FocusManagerService, AlertsService, BackgroundMaskService,
+            PlayerPositionService, WindowDimensionsService,
+            SUMMARRY_TITLE_CHARACTER_COUNT) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
           $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
@@ -109,7 +111,8 @@ oppia.directive('feedbackPopup', [
           $scope.saveFeedback = function() {
             if ($scope.feedbackText) {
               $http.post(feedbackUrl, {
-                subject: FilterService.getAbbreviatedText($scope.feedbackText),
+                subject: $filter('getAbbreviatedText')(
+                  $scope.feedbackText, SUMMARRY_TITLE_CHARACTER_COUNT),
                 feedback: $scope.feedbackText,
                 include_author: (
                   !$scope.isSubmitterAnonymized && $scope.isLoggedIn),

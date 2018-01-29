@@ -35,7 +35,8 @@ describe('Testing filters', function() {
     'summarizeNonnegativeNumber',
     'truncateAndCapitalize',
     'capitalize',
-    'stripFormatting'
+    'stripFormatting',
+    'getAbbreviatedText'
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -409,5 +410,16 @@ describe('Testing filters', function() {
     expect(filter('  ab c ')).toEqual('Ab c');
     expect(filter('  only First lettEr is  Affected ')).toEqual(
       'Only First lettEr is  Affected');
+  }));
+
+  it('should not shorten the length of text', inject(function($filter) {
+    expect($filter('getAbbreviatedText')('It will remain unchanged.', 50))
+      .toBe('It will remain unchanged.');
+  }));
+
+  it('should shorten the length of text', inject(function($filter) {
+    expect($filter('getAbbreviatedText')(
+      'It has to convert to a substring as it exceeds the character limit.', 
+      50)).toBe('It has to convert to a substring as it exceeds...');
   }));
 });
