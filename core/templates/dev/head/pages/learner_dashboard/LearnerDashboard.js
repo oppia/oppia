@@ -293,7 +293,7 @@ oppia.controller('LearnerDashboard', [
       constants.ACTIVITY_TYPE_EXPLORATION);
 
     $scope.onClickThread = function(
-      threadStatus, explorationId, threadId, explorationTitle) {
+        threadStatus, explorationId, threadId, explorationTitle) {
       var threadDataUrl = UrlInterpolationService.interpolateUrl(
         '/learnerdashboardthreadhandler/<explorationId>/<threadId>', {
           explorationId: explorationId,
@@ -380,7 +380,7 @@ oppia.controller('LearnerDashboard', [
           '$scope', '$uibModalInstance', 'newContent', 'oldContent',
           'description',
           function($scope, $uibModalInstance, newContent, oldContent,
-            description) {
+              description) {
             $scope.newContent = newContent;
             $scope.oldContent = oldContent;
             $scope.description = description;
@@ -393,7 +393,7 @@ oppia.controller('LearnerDashboard', [
     };
 
     $scope.openRemoveActivityModal = function(
-      sectionNameI18nId, subsectionName, activity) {
+        sectionNameI18nId, subsectionName, activity) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/learner_dashboard/' +
@@ -412,7 +412,7 @@ oppia.controller('LearnerDashboard', [
         },
         controller: [
           '$scope', '$uibModalInstance', '$http', 'sectionNameI18nId',
-          'subsectionName', 
+          'subsectionName',
           function(
               $scope, $uibModalInstance, $http, sectionNameI18nId,
               subsectionName) {
@@ -561,11 +561,14 @@ oppia.controller('LearnerDashboard', [
           LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS);
         $scope.feedbackThreadActive = false;
 
+        $scope.noExplorationActivity = (
+            ($scope.completedExplorationsList.length === 0) &&
+            ($scope.incompleteExplorationsList.length === 0));
+        $scope.noCollectionActivity = (
+            ($scope.completedCollectionsList.length === 0) &&
+            ($scope.incompleteCollectionsList.length === 0));
         $scope.noActivity = (
-          ($scope.completedExplorationsList.length === 0) &&
-          ($scope.completedCollectionsList.length === 0) &&
-          ($scope.incompleteExplorationsList.length === 0) &&
-          ($scope.incompleteCollectionsList.length === 0) &&
+          ($scope.noExplorationActivity) && ($scope.noCollectionActivity) &&
           ($scope.explorationPlaylist.length === 0) &&
           ($scope.collectionPlaylist.length === 0));
         $rootScope.loadingMessage = '';
@@ -590,5 +593,5 @@ oppia.controller('LearnerDashboard', [
         element.hide().slideDown(done);
       }
     }
-  }
+  };
 });

@@ -39,7 +39,9 @@ describe('NumericInputValidationService', function() {
         audio_translations: {},
         html: ''
       },
-      param_changes: []
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null
     });
     equalsZeroRule = rof.createFromBackendDict({
       rule_type: 'Equals',

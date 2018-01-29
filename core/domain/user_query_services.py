@@ -18,10 +18,10 @@
 
 from core.domain import email_manager
 from core.platform import models
-
 import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+
 
 def save_new_query_model(
         submitter_id, inactive_in_last_n_days=None,

@@ -106,7 +106,7 @@
         ng-mouseenter="state.hoveredVertex = $index"
         ng-mouseleave="state.hoveredVertex = ($index === state.hoveredVertex) ? null : state.hoveredVertex"
         ng-mousedown="onMousedownVertex($index)"
-        ng-mouseup="onMouseupVertex($index)"
+        ng-touchstart="onMousedownVertex($index)"
         ng-attr-style="fill: <[getVertexColor($index)]>;"
         class="unselectable-text">
         <[vertex.label]>
@@ -115,7 +115,7 @@
         ng-mouseleave="state.hoveredVertex = ($index === state.hoveredVertex) ? null : state.hoveredVertex"
         ng-click="onClickVertex($index)"
         ng-mousedown="onMousedownVertex($index)"
-        ng-mouseup="onMouseupVertex($index)"
+        ng-touchstart="onMousedownVertex($index)"
         ng-attr-style="fill: <[getVertexColor($index)]>;"
         cx="0"
         cy="0"

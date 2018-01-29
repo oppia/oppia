@@ -700,6 +700,52 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
 
+class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student leaving for a refresher exploration."""
+    # ID of exploration currently being played.
+    exp_id = ndb.StringProperty(indexed=True)
+    # ID of the refresher exploration.
+    refresher_exp_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exp_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session.
+    session_id = ndb.StringProperty(indexed=True)
+    # Time since start of this state before this event occurred (in sec).
+    time_spent_in_state_secs = ndb.FloatProperty()
+    # The version of the event schema used to describe an event of this type.
+    event_schema_version = ndb.IntegerProperty(
+        indexed=True, default=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        """Generates a unique id for the event model of the form
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
+
+    @classmethod
+    def create(cls, exp_id, refresher_exp_id, exp_version, state_name,
+               session_id, time_spent_in_state_secs):
+        """Creates a new leave for refresher exploration event."""
+        entity_id = cls.get_new_event_entity_id(
+            exp_id, session_id)
+        leave_for_refresher_exp_entity = cls(
+            id=entity_id,
+            exp_id=exp_id,
+            refresher_exp_id=refresher_exp_id,
+            exp_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            time_spent_in_state_secs=time_spent_in_state_secs)
+        leave_for_refresher_exp_entity.put()
+        return entity_id
+
+
 class ExplorationStatsModel(base_models.BaseModel):
     """Model for storing analytics data for an exploration. This model contains
     statistics data aggregated from version 1 to the version given in the key.
@@ -711,18 +757,18 @@ class ExplorationStatsModel(base_models.BaseModel):
     # Version of exploration.
     exp_version = ndb.IntegerProperty(indexed=True)
     # Number of learners starting the exploration (v1 - data collected before
-    # Nov 2017).
+    # Dec 2017).
     num_starts_v1 = ndb.IntegerProperty(indexed=True)
     num_starts_v2 = ndb.IntegerProperty(indexed=True)
     # Number of students who actually attempted the exploration. Only learners
     # who spent a minimum time on the exploration are considered to have
-    # actually started the exploration (v1 - data collected before Nov 2017).
-    num_actual_starts_v1 = ndb.IntegerProperty(indexed=False)
-    num_actual_starts_v2 = ndb.IntegerProperty(indexed=False)
+    # actually started the exploration (v1 - data collected before Dec 2017).
+    num_actual_starts_v1 = ndb.IntegerProperty(indexed=True)
+    num_actual_starts_v2 = ndb.IntegerProperty(indexed=True)
     # Number of students who completed the exploration (v1 - data collected
-    # before Nov 2017).
-    num_completions_v1 = ndb.IntegerProperty(indexed=False)
-    num_completions_v2 = ndb.IntegerProperty(indexed=False)
+    # before Dec 2017).
+    num_completions_v1 = ndb.IntegerProperty(indexed=True)
+    num_completions_v2 = ndb.IntegerProperty(indexed=True)
     # Keyed by state name that describes the analytics for that state.
     # {state_name: {
     #   'total_answers_count_v1': ...,

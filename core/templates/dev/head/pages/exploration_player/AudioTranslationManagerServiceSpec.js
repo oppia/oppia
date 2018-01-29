@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,61 +18,81 @@
 
 describe('Audio translation manager service', function() {
   beforeEach(module('oppia'));
-  
+
   var atms;
+  var testAudioTranslations;
+  var testAudioTranslations2;
   beforeEach(inject(function($injector) {
     atms = $injector.get('AudioTranslationManagerService');
+    atof = $injector.get('AudioTranslationObjectFactory');
+
+    testAudioTranslations = {
+      en: atof.createFromBackendDict({
+        filename: 'audio-en.mp3',
+        file_size_bytes: 0.5,
+        needs_update: false
+      }),
+      es: atof.createFromBackendDict({
+        filename: 'audio-es.mp3',
+        file_size_bytes: 0.5,
+        needs_update: false
+      })
+    };
+
+    testAudioTranslations2 = {
+      zh: atof.createFromBackendDict({
+        filename: 'audio-zh.mp3',
+        file_size_bytes: 0.5,
+        needs_update: false
+      }),
+      'hi-en': atof.createFromBackendDict({
+        filename: 'audio-hi-en.mp3',
+        file_size_bytes: 0.5,
+        needs_update: false
+      })
+    };
   }));
 
-  it('should properly initialize the current audio language when ' +
-     'a preferred language is set', function() {
-    var allAudioLanguageCodesInExploration = ['hi-en', 'en'];
-    var preferredLanguageCode = 'hi-en';
-    var explorationLanguageCode = 'hi';
-    atms.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
-      explorationLanguageCode);
-    expect(atms.getCurrentAudioLanguageCode()).toEqual('hi-en');
-    atms.clearCurrentAudioLanguageCode();
-
-    allAudioLanguageCodesInExploration = ['hi-en', 'en'];
-    preferredLanguageCode = 'en';
-    explorationLanguageCode = 'hi';
-    atms.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
-      explorationLanguageCode);
-    expect(atms.getCurrentAudioLanguageCode()).toEqual('en');
-    atms.clearCurrentAudioLanguageCode();
-
-    allAudioLanguageCodesInExploration = ['hi-en'];
-    preferredLanguageCode = 'en';
-    explorationLanguageCode = 'hi';
-    atms.init(['hi-en'], preferredLanguageCode,
-      explorationLanguageCode);
-    expect(atms.getCurrentAudioLanguageCode()).toEqual('hi-en');
-  });
-
-  it('should initialize the current audio language when ' +
-     'no preferred language is set and the exploration contains ' +
-     'an audio language that is related to the exploration language',
+  it('should properly set primary and secondary audio translations',
     function() {
-      var allAudioLanguageCodesInExploration = ['hi-en', 'en'];
-      var preferredLanguageCode = null;
-      var explorationLanguageCode = 'hi';
-      atms.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
-        explorationLanguageCode);
-      expect(atms.getCurrentAudioLanguageCode()).toEqual('hi-en');
-    }
-  );
-
-  it('should initialize the current audio language to the most ' +
-     'relevant language when multiple audio languages are related ' +
-     'to the exploration language',
-    function() {
-      var allAudioLanguageCodesInExploration = ['hi-en', 'en'];
-      var preferredLanguageCode = null;
-      var explorationLanguageCode = 'en';
-      atms.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
-        explorationLanguageCode);
-      expect(atms.getCurrentAudioLanguageCode()).toEqual('en'); 
-    }
-  );
+      atms.setContentAudioTranslations(testAudioTranslations);
+      expect(atms.getCurrentAudioTranslations()).toEqual({
+        en: atof.createFromBackendDict({
+          filename: 'audio-en.mp3',
+          file_size_bytes: 0.5,
+          needs_update: false
+        }),
+        es: atof.createFromBackendDict({
+          filename: 'audio-es.mp3',
+          file_size_bytes: 0.5,
+          needs_update: false
+        })
+      });
+      atms.setSecondaryAudioTranslations(testAudioTranslations2);
+      expect(atms.getCurrentAudioTranslations()).toEqual({
+        zh: atof.createFromBackendDict({
+          filename: 'audio-zh.mp3',
+          file_size_bytes: 0.5,
+          needs_update: false
+        }),
+        'hi-en': atof.createFromBackendDict({
+          filename: 'audio-hi-en.mp3',
+          file_size_bytes: 0.5,
+          needs_update: false
+        })
+      });
+      atms.clearSecondaryAudioTranslations();
+      expect(atms.getCurrentAudioTranslations()).toEqual({
+        en: atof.createFromBackendDict({
+          filename: 'audio-en.mp3',
+          file_size_bytes: 0.5,
+          needs_update: false
+        }),
+        es: atof.createFromBackendDict({
+          filename: 'audio-es.mp3',
+          file_size_bytes: 0.5,
+          needs_update: false
+        })
+      });
+    });
 });

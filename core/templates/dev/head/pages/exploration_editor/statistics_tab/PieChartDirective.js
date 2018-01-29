@@ -32,9 +32,12 @@ oppia.directive('pieChart', [function() {
         return;
       }
       var options = $scope.options();
-      var chart = new google.visualization.PieChart($element[0]);
+      var chart = null;
 
       var redrawChart = function() {
+        if (!chart) {
+          chart = new google.visualization.PieChart($element[0]);
+        }
         chart.draw(google.visualization.arrayToDataTable($scope.data()), {
           title: options.title,
           pieHole: options.pieHole,

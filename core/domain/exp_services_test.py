@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import StringIO
 import copy
 import datetime
 import os
-import StringIO
 import zipfile
 
 from core.domain import exp_domain
@@ -43,6 +43,7 @@ transaction_services = models.Registry.import_transaction_services()
 
 # TODO(msl): test ExpSummaryModel changes if explorations are updated,
 # reverted, deleted, created, rights changed
+
 
 def _count_at_least_editable_exploration_summaries(user_id):
     return len(exp_services._get_exploration_summaries_from_models(  # pylint: disable=protected-access
@@ -659,7 +660,9 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -682,7 +685,9 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -727,7 +732,9 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -750,7 +757,9 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
@@ -880,7 +889,9 @@ interaction:
     feedback:
       audio_translations: {}
       html: ''
+    labelled_as_correct: false
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -906,7 +917,9 @@ interaction:
     feedback:
       audio_translations: {}
       html: ''
+    labelled_as_correct: false
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -933,7 +946,9 @@ interaction:
     feedback:
       audio_translations: {}
       html: ''
+    labelled_as_correct: false
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -1044,9 +1059,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     'audio_translations': {},
                     'html': 'Try again'
                 },
-                'param_changes': []
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
             },
-            'labelled_as_correct': False,
         }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
@@ -1055,7 +1071,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'audio_translations': {},
                 'html': '<b>Incorrect</b>'
             },
-            'param_changes': []
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
         }
 
     def test_add_state_cmd(self):
@@ -2104,6 +2122,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self._check_contributors_summary(self.EXP_ID_1,
                                          {albert_id: 1, bob_id: 2})
 
+
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
     ALBERT_EMAIL = 'albert@example.com'
@@ -2307,7 +2326,9 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null

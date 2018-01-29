@@ -24,6 +24,7 @@ import feconf
 (feedback_models, email_models) = models.Registry.import_models([
     models.NAMES.feedback, models.NAMES.email])
 
+
 class IncomingReplyEmailTests(test_utils.GenericTestBase):
 
     USER_A_EMAIL = 'a@example.com'

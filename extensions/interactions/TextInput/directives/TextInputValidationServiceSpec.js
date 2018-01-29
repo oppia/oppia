@@ -42,7 +42,9 @@ describe('TextInputValidationService', function() {
         html: '',
         audio_translations: {}
       },
-      param_changes: []
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null
     });
 
     customizationArguments = {

@@ -66,7 +66,9 @@ describe('Compare versions service', function() {
             default_outcome: {
               dest: 'default',
               feedback: [],
-              param_changes: []
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             hints: []
           },
@@ -78,10 +80,11 @@ describe('Compare versions service', function() {
               outcome: {
                 dest: ruleDestName,
                 feedback: [],
-                param_changes: []
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
               },
-              rule_specs: [],
-              labelled_as_correct: false
+              rule_specs: []
             };
           });
         statesData[stateName] = newStateData;

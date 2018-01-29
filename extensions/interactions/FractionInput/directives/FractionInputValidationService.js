@@ -20,7 +20,7 @@ oppia.factory('FractionInputValidationService', [
   'WARNING_TYPES', 'baseInteractionValidationService',
   'FractionObjectFactory',
   function(
-    WARNING_TYPES, baseInteractionValidationService, FractionObjectFactory) {
+      WARNING_TYPES, baseInteractionValidationService, FractionObjectFactory) {
     var getNonIntegerInputWarning = function(i, j) {
       return {
         type: WARNING_TYPES.ERROR,
@@ -35,10 +35,14 @@ oppia.factory('FractionInputValidationService', [
         return [];
       },
       getAllWarnings: function(
-        stateName, customizationArgs, answerGroups, defaultOutcome) {
+          stateName, customizationArgs, answerGroups, defaultOutcome) {
         var warningsList = [];
         var shouldBeInSimplestForm =
           customizationArgs.requireSimplestForm.value;
+        var allowImproperFraction =
+            customizationArgs.allowImproperFraction.value;
+        var allowNonzeroIntegerPart =
+          customizationArgs.allowNonzeroIntegerPart.value;
 
         warningsList = warningsList.concat(
           this.getCustomizationArgsWarnings(customizationArgs));
@@ -63,6 +67,11 @@ oppia.factory('FractionInputValidationService', [
           range.ubi = ubi;
         };
         var isEnclosedBy = function(ra, rb) {
+          if((ra.lb === null && ra.ub === null) ||
+            (rb.lb === null && rb.ub === null)) {
+            return false;
+          }
+
           // Checks if range ra is enclosed by range rb.
           var lowerBoundConditionIsSatisfied =
             (rb.lb < ra.lb) || (rb.lb == ra.lb && (!ra.lbi || rb.lbi));
@@ -70,6 +79,19 @@ oppia.factory('FractionInputValidationService', [
             (rb.ub > ra.ub) || (rb.ub == ra.ub && (!ra.ubi || rb.ubi));
           return lowerBoundConditionIsSatisfied &&
             upperBoundConditionIsSatisfied;
+        };
+
+        var shouldCheckRangeCriteria = function(earlierRule, laterRule) {
+          if (
+            (earlierRule.type === 'IsExactlyEqualTo' &&
+            laterRule.type === 'IsExactlyEqualTo') ||
+            (earlierRule.type === 'IsExactlyEqualTo' &&
+            laterRule.type === 'IsEquivalentTo') ||
+            (earlierRule.type === 'IsExactlyEqualTo' &&
+            laterRule.type === 'IsEquivalentToAndInSimplestForm')) {
+            return false;
+          }
+          return true;
         };
 
         var ranges = [];
@@ -102,6 +124,32 @@ oppia.factory('FractionInputValidationService', [
                     });
                   }
                 }
+                if (!allowImproperFraction) {
+                  var fraction = FractionObjectFactory.fromDict(rule.inputs.f);
+                  if (fraction.isImproperFraction()) {
+                    warningsList.push({
+                      type: WARNING_TYPES.ERROR,
+                      message: (
+                        'Rule ' + (j + 1) + ' from answer group ' +
+                        (i + 1) +
+                        ' will never be matched because it is an ' +
+                        'improper fraction')
+                    });
+                  }
+                }
+                if (!allowNonzeroIntegerPart) {
+                  var fraction = FractionObjectFactory.fromDict(rule.inputs.f);
+                  if (fraction.hasNonzeroIntegerPart()) {
+                    warningsList.push({
+                      type: WARNING_TYPES.ERROR,
+                      message: (
+                        'Rule ' + (j + 1) + ' from answer group ' +
+                        (i + 1) +
+                        ' will never be matched because it has a ' +
+                        'non zero integer part')
+                    });
+                  }
+                }
                 var f = toFloat(rule.inputs.f);
                 setLowerAndUpperBounds(range, f, f, true, true);
                 break;
@@ -124,6 +172,16 @@ oppia.factory('FractionInputValidationService', [
                 }
                 break;
               case 'HasIntegerPartEqualTo':
+                if (!allowNonzeroIntegerPart && rule.inputs.x !== 0) {
+                  warningsList.push({
+                    type: WARNING_TYPES.ERROR,
+                    message: (
+                      'Rule ' + (j + 1) + ' from answer group ' +
+                      (i + 1) +
+                      ' will never be matched because integer part ' +
+                      'has to be zero')
+                  });
+                }
                 if (!Number.isInteger(rule.inputs.x)) {
                   warningsList.push(getNonIntegerInputWarning(i, j));
                 }
@@ -147,15 +205,19 @@ oppia.factory('FractionInputValidationService', [
             }
             for (var k = 0; k < ranges.length; k++) {
               if (isEnclosedBy(range, ranges[k])) {
-                warningsList.push({
-                  type: WARNING_TYPES.ERROR,
-                  message: (
-                    'Rule ' + (j + 1) + ' from answer group ' +
-                    (i + 1) + ' will never be matched because it ' +
-                    'is made redundant by rule ' + ranges[k].ruleIndex +
-                    ' from answer group ' + ranges[k].answerGroupIndex +
-                    '.')
-                });
+                var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1]
+                  .rules[ranges[k].ruleIndex - 1];
+                if (shouldCheckRangeCriteria(earlierRule, rule)) {
+                  warningsList.push({
+                    type: WARNING_TYPES.ERROR,
+                    message: (
+                      'Rule ' + (j + 1) + ' from answer group ' +
+                      (i + 1) + ' will never be matched because it ' +
+                      'is made redundant by rule ' + ranges[k].ruleIndex +
+                      ' from answer group ' + ranges[k].answerGroupIndex +
+                      '.')
+                  });
+                }
               }
             }
             ranges.push(range);

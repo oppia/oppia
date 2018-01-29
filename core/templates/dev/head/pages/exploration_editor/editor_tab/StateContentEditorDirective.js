@@ -34,20 +34,21 @@ oppia.directive('stateContentEditor', [
         '/pages/exploration_editor/editor_tab/' +
         'state_content_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'stateContentService', 'editabilityService',
-        'EditorFirstTimeEventsService', 'explorationInitStateNameService',
-        'EditorStateService',
+        '$scope', '$uibModal', 'stateContentService', 'EditabilityService',
+        'EditorFirstTimeEventsService', 'ExplorationInitStateNameService',
+        'EditorStateService', 'COMPONENT_NAME_CONTENT',
         function(
-            $scope, $uibModal, stateContentService, editabilityService,
-            EditorFirstTimeEventsService, explorationInitStateNameService,
-            EditorStateService) {
+            $scope, $uibModal, stateContentService, EditabilityService,
+            EditorFirstTimeEventsService, ExplorationInitStateNameService,
+            EditorStateService, COMPONENT_NAME_CONTENT) {
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
 
           $scope.stateContentService = stateContentService;
           $scope.contentEditorIsOpen = false;
-          $scope.isEditable = editabilityService.isEditable;
+          $scope.isEditable = EditabilityService.isEditable;
+          $scope.COMPONENT_NAME_CONTENT = COMPONENT_NAME_CONTENT;
 
           var saveContent = function() {
             stateContentService.saveDisplayedValue();
@@ -89,7 +90,7 @@ oppia.directive('stateContentEditor', [
           $scope.isCurrentStateInitialState = function() {
             return (
               EditorStateService.getActiveStateName() ===
-              explorationInitStateNameService.savedMemento);
+              ExplorationInitStateNameService.savedMemento);
           };
 
           $scope.openStateContentEditor = function() {

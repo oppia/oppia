@@ -29,8 +29,7 @@
         UPDATABLE_ROLES: JSON.parse('{{updatable_roles|js_string}}'),
         VIEWABLE_ROLES: JSON.parse('{{viewable_roles|js_string}}'),
         ROLE_GRAPH_DATA: JSON.parse('{{role_graph_data|js_string}}'),
-        DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
-        MINIFICATION: JSON.parse('{{MINIFICATION|js_string}}')
+        DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}')
       }
     </script>
 
@@ -105,6 +104,10 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/IdGenerationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/DebouncerService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/RteHelperService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaDefaultValueService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaUndefinedLastElementService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/DeviceInfoService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/UrlService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/stateful/FocusManagerService.js"></script>

@@ -33,9 +33,11 @@ email_services = models.Registry.import_email_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
-# Stub for logging.error(), so that it can be swapped out in tests.
 def log_new_error(*args, **kwargs):
+    """Logs an error message. (This is a stub for logging.error(), so that the
+    latter can be swapped out in tests.)"""
     logging.error(*args, **kwargs)
+
 
 NOTIFICATION_EMAIL_LIST_SCHEMA = {
     'type': 'list',
@@ -469,12 +471,12 @@ def send_role_notification_email(
         'Hi %s,<br>'
         '<br>'
         '<b>%s</b> has granted you %s to their exploration, '
-        '"<a href="http://www.oppia.org/create/%s">%s</a>", on Oppia.org.<br>'
+        '"<a href="https://www.oppia.org/create/%s">%s</a>", on Oppia.org.<br>'
         '<br>'
         'This allows you to:<br>'
         '<ul>%s</ul>'
         'You can find the exploration '
-        '<a href="http://www.oppia.org/create/%s">here</a>.<br>'
+        '<a href="https://www.oppia.org/create/%s">here</a>.<br>'
         '<br>'
         'Thanks, and happy collaborating!<br>'
         '<br>'
@@ -672,6 +674,7 @@ def can_users_receive_thread_email(
                 and not user_exploration_prefs.mute_feedback_notifications)
 
     return result
+
 
 def send_suggestion_email(
         exploration_title, exploration_id, author_id, recipient_list):
@@ -896,6 +899,18 @@ def send_query_failure_email(recipient_id, query_id, query_params):
 
 def send_user_query_email(
         sender_id, recipient_ids, email_subject, email_body, email_intent):
+    """Sends an email to all the recipients of the query.
+
+    Args:
+        sender_id: str. The ID of the user sending the email.
+        recipient_ids: list(str). The user IDs of the email recipients.
+        email_subject: str. The subject of the email.
+        email_body: str. The body of the email.
+        email_intent: str. The intent string, i.e. the purpose of the email.
+
+    Returns:
+        bulk_email_model_id: str. The ID of the bulk email model.
+    """
     bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
     sender_name = user_services.get_username(sender_id)
     sender_email = user_services.get_email_from_user_id(sender_id)
@@ -906,6 +921,13 @@ def send_user_query_email(
 
 
 def send_test_email_for_bulk_emails(tester_id, email_subject, email_body):
+    """Sends a test email to the tester.
+
+    Args:
+        tester_id: str. The user ID of the tester.
+        email_subject: str. The subject of the email.
+        email_body: str. The body of the email.
+    """
     tester_name = user_services.get_username(tester_id)
     tester_email = user_services.get_email_from_user_id(tester_id)
     return _send_email(

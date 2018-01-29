@@ -19,15 +19,15 @@
 oppia.controller('StateHints', [
   '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
   'AlertsService', 'INTERACTION_SPECS', 'stateHintsService',
-  'explorationStatesService', 'stateInteractionIdService',
+  'ExplorationStatesService', 'stateInteractionIdService',
   'UrlInterpolationService', 'HintObjectFactory', 'ExplorationPlayerService',
   'stateSolutionService',
   function(
-    $scope, $rootScope, $uibModal, $filter, EditorStateService,
-    AlertsService, INTERACTION_SPECS, stateHintsService,
-    explorationStatesService, stateInteractionIdService,
-    UrlInterpolationService, HintObjectFactory, ExplorationPlayerService,
-    stateSolutionService) {
+      $scope, $rootScope, $uibModal, $filter, EditorStateService,
+      AlertsService, INTERACTION_SPECS, stateHintsService,
+      ExplorationStatesService, stateInteractionIdService,
+      UrlInterpolationService, HintObjectFactory, ExplorationPlayerService,
+      stateSolutionService) {
     $scope.EditorStateService = EditorStateService;
     $scope.stateHintsService = stateHintsService;
     $scope.activeHintIndex = null;
@@ -40,14 +40,22 @@ oppia.controller('StateHints', [
       stateHintsService.init(
         EditorStateService.getActiveStateName(),
           stateData.interaction.hints);
-
       $scope.activeHintIndex = null;
     });
 
+    $scope.getHintButtonText = function() {
+      var hintButtonText = '+ Add Hint';
+      if ($scope.stateHintsService.displayed) {
+        if ($scope.stateHintsService.displayed.length >= 5) {
+          hintButtonText = 'Limit Reached';
+        }
+      }
+      return hintButtonText;
+    };
+
     $scope.getHintSummary = function(hint) {
-      var hintAsPlainText = (
-        hint.hintContent.getHtml() ?
-          $filter('convertToPlainText')(hint.hintContent.getHtml()) : '');
+      var hintAsPlainText = $filter(
+        'formatRtePreview')(hint.hintContent.getHtml());
       return hintAsPlainText;
     };
 
@@ -81,6 +89,9 @@ oppia.controller('StateHints', [
     };
 
     $scope.openAddHintModal = function() {
+      if ($scope.stateHintsService.displayed.length === 5) {
+        return;
+      }
       AlertsService.clearWarnings();
       $rootScope.$broadcast('externalSave');
 

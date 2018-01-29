@@ -23,18 +23,17 @@ import re
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import exp_services
 from core.domain import event_services
+from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import subscription_services
-from core.domain import user_jobs_one_off
 from core.domain import user_jobs_continuous_test
+from core.domain import user_jobs_one_off
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-
 import feconf
 
 (user_models, feedback_models) = models.Registry.import_models(

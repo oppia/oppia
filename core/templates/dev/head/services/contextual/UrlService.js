@@ -19,11 +19,21 @@
 
 oppia.factory('UrlService', ['$window', function($window) {
   return {
+    // This function is for testing purposes (to mock $window.location)
+    getCurrentLocation: function() {
+      return $window.location;
+    },
+    getCurrentQueryString: function() {
+      return this.getCurrentLocation().search;
+    },
+    /* As params[key] is overwritten, if query string has multiple fieldValues
+       for same fieldName, use getQueryFieldValuesAsList(fieldName) to get it
+       in array form. */
     getUrlParams: function() {
       var params = {};
-      var parts = $window.location.href.replace(
+      var parts = this.getCurrentQueryString().replace(
         /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-          params[key] = value;
+          params[decodeURIComponent(key)] = decodeURIComponent(value);
         }
       );
       return params;
@@ -34,10 +44,34 @@ oppia.factory('UrlService', ['$window', function($window) {
       return urlParts[1] === 'embed';
     },
     getPathname: function() {
-      return $window.location.pathname;
+      return this.getCurrentLocation().pathname;
+    },
+    getQueryFieldValuesAsList: function(fieldName) {
+      var fieldValues = [];
+      if (this.getCurrentQueryString().indexOf('?') > -1) {
+        // Each queryItem return one field-value pair in the url.
+        var queryItems = this.getCurrentQueryString().slice(
+          this.getCurrentQueryString().indexOf('?') + 1).split('&');
+        for (var i = 0; i < queryItems.length; i++) {
+          var currentFieldName = decodeURIComponent(
+            queryItems[i].split('=')[0]);
+          var currentFieldValue = decodeURIComponent(
+            queryItems[i].split('=')[1]);
+          if (currentFieldName === fieldName) {
+            fieldValues.push(currentFieldValue);
+          }
+        }
+      }
+      return fieldValues;
+    },
+    addField: function(url, fieldName, fieldValue) {
+      var encodedFieldValue = encodeURIComponent(fieldValue);
+      var encodedFieldName = encodeURIComponent(fieldName);
+      return url + (url.indexOf('?') != -1 ? '&' : '?') + encodedFieldName +
+        '=' + encodedFieldValue;
     },
     getHash: function() {
-      return $window.location.hash;
+      return this.getCurrentLocation().hash;
     }
   };
 }]);

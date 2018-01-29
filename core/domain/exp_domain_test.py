@@ -62,7 +62,9 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: null
       solution: null
@@ -81,7 +83,9 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: null
       solution: null
@@ -116,7 +120,9 @@ states:
       default_outcome:
         dest: %s
         feedback: []
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       fallbacks: []
       id: null
     param_changes: []
@@ -130,7 +136,9 @@ states:
       default_outcome:
         dest: New state
         feedback: []
+        labelled_as_correct: false
         param_changes: []
+        refresher_exploration_id: null
       fallbacks: []
       id: null
     param_changes: []
@@ -215,7 +223,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'html': 'Feedback',
                         'audio_translations': {}
                     },
+                    'labelled_as_correct': False,
                     'param_changes': [],
+                    'refresher_exploration_id': None,
                 },
                 'rule_specs': [{
                     'inputs': {
@@ -228,7 +238,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     },
                     'rule_type': 'FuzzyMatches'
                 }],
-                'labelled_as_correct': False,
             })
         )
 
@@ -255,7 +264,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                         'html': 'Feedback',
                         'audio_translations': {}
                     },
+                    'labelled_as_correct': False,
                     'param_changes': [],
+                    'refresher_exploration_id': None,
                 },
                 'rule_specs': [{
                     'inputs': {
@@ -263,7 +274,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     },
                     'rule_type': 'Contains'
                 }],
-                'labelled_as_correct': False,
             })
         )
         exploration.validate()
@@ -330,12 +340,54 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.feedback = exp_domain.SubtitledHtml('Feedback', {})
         exploration.validate()
 
+        outcome.labelled_as_correct = 'hello'
+        self._assert_validation_error(
+            exploration, 'The "labelled_as_correct" field should be a boolean')
+
+        # Test that labelled_as_correct must be False for self-loops, and that
+        # this causes a strict validation failure but not a normal validation
+        # failure.
+        outcome.labelled_as_correct = True
+        with self.assertRaisesRegexp(
+            Exception, 'is labelled correct but is a self-loop.'
+            ):
+            exploration.validate(strict=True)
+        exploration.validate()
+
+        outcome.labelled_as_correct = False
+        exploration.validate()
+
         outcome.param_changes = 'Changes'
         self._assert_validation_error(
             exploration, 'Expected outcome param_changes to be a list')
 
         outcome.param_changes = []
         exploration.validate()
+
+        outcome.refresher_exploration_id = 12345
+        self._assert_validation_error(
+            exploration,
+            'Expected outcome refresher_exploration_id to be a string')
+
+        outcome.refresher_exploration_id = None
+        exploration.validate()
+
+        outcome.refresher_exploration_id = 'valid_string'
+        exploration.validate()
+
+        # Test that refresher_exploration_id must be None for non-self-loops.
+        new_state_name = 'New state'
+        exploration.add_states([new_state_name])
+
+        outcome.dest = new_state_name
+        outcome.refresher_exploration_id = 'another_string'
+        self._assert_validation_error(
+            exploration,
+            'has a refresher exploration ID, but is not a self-loop')
+
+        outcome.refresher_exploration_id = None
+        exploration.validate()
+        exploration.delete_state(new_state_name)
 
         # Validate InteractionInstance.
         interaction.id = 15
@@ -416,6 +468,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.language_code = 'fake_code'
         self._assert_validation_error(exploration, 'Invalid language_code')
         exploration.language_code = 'English'
+        self._assert_validation_error(exploration, 'Invalid language_code')
+        # TODO(sll): Remove the next two lines once the App Engine search
+        # service supports 3-letter language codes.
+        exploration.language_code = 'kab'
         self._assert_validation_error(exploration, 'Invalid language_code')
         exploration.language_code = 'en'
         exploration.validate()
@@ -903,7 +959,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             old_states, new_to_old_state_names)
         self.assertEqual(actual_dict, expected_dict)
 
-
     def test_is_demo_property(self):
         """Test the is_demo property."""
         demo = exp_domain.Exploration.create_default_exploration('0')
@@ -960,7 +1015,9 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                         'html': '',
                         'audio_translations': {}
                     },
+                    'labelled_as_correct': False,
                     'param_changes': [],
+                    'refresher_exploration_id': None,
                 },
                 'hints': [],
                 'id': None,
@@ -2600,7 +2657,195 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V20
+    YAML_CONTENT_V21 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 21
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - labelled_as_correct: false
+        outcome:
+          dest: END
+          feedback:
+            audio_translations: {}
+            html: Correct!
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          audio_translations: {}
+          html: ''
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          audio_translations: {}
+          html: ''
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 16
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V22 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 22
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            audio_translations: {}
+            html: Correct!
+          labelled_as_correct: false
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 17
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V22
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -2722,6 +2967,18 @@ title: Title
             'eid', self.YAML_CONTENT_V20)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v21(self):
+        """Test direct loading from a v21 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V21)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v22(self):
+        """Test direct loading from a v22 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V22)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
@@ -2750,7 +3007,9 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         'feedback': copy.deepcopy(
                             exp_domain.
                             SubtitledHtml.DEFAULT_SUBTITLED_HTML_DICT),
+                        'labelled_as_correct': False,
                         'param_changes': [],
+                        'refresher_exploration_id': None,
                     },
                     'hints': [],
                     'id': None,

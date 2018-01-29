@@ -20,16 +20,16 @@ oppia.controller('StateInteraction', [
   '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
   'AlertsService', 'EditorStateService', 'HtmlEscaperService',
   'INTERACTION_SPECS', 'stateInteractionIdService',
-  'stateCustomizationArgsService', 'editabilityService',
-  'explorationStatesService', 'graphDataService',
+  'stateCustomizationArgsService', 'EditabilityService',
+  'ExplorationStatesService', 'GraphDataService',
   'InteractionDetailsCacheService',
   'ExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
   function($scope, $http, $rootScope, $uibModal, $injector, $filter,
       AlertsService, EditorStateService, HtmlEscaperService,
       INTERACTION_SPECS, stateInteractionIdService,
-      stateCustomizationArgsService, editabilityService,
-      explorationStatesService, graphDataService,
+      stateCustomizationArgsService, EditabilityService,
+      ExplorationStatesService, GraphDataService,
       InteractionDetailsCacheService,
       ExplorationHtmlFormatterService, UrlInterpolationService,
       SubtitledHtmlObjectFactory, stateSolutionService, stateContentService) {
@@ -67,7 +67,8 @@ oppia.controller('StateInteraction', [
         return '';
       }
       return ExplorationHtmlFormatterService.getInteractionHtml(
-        stateInteractionIdService.savedMemento, interactionCustomizationArgs);
+        stateInteractionIdService.savedMemento, interactionCustomizationArgs,
+        false);
     };
 
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
@@ -143,12 +144,12 @@ oppia.controller('StateInteraction', [
           'onInteractionIdChanged', stateInteractionIdService.savedMemento);
       }
 
-      graphDataService.recompute();
+      GraphDataService.recompute();
       _updateInteractionPreviewAndAnswerChoices();
     };
 
     $scope.openInteractionCustomizerModal = function() {
-      if (editabilityService.isEditable()) {
+      if (EditabilityService.isEditable()) {
         AlertsService.clearWarnings();
 
         $uibModal.open({
@@ -226,7 +227,7 @@ oppia.controller('StateInteraction', [
                   validationService.getCustomizationArgsWarnings(
                     stateCustomizationArgsService.displayed);
                 return warningsList;
-              }
+              };
 
               $scope.onChangeInteractionId = function(newInteractionId) {
                 EditorFirstTimeEventsService
@@ -353,7 +354,7 @@ oppia.controller('StateInteraction', [
         stateSolutionService.saveDisplayedValue();
         $rootScope.$broadcast(
           'onInteractionIdChanged', stateInteractionIdService.savedMemento);
-        graphDataService.recompute();
+        GraphDataService.recompute();
         _updateInteractionPreviewAndAnswerChoices();
       });
     };
@@ -417,12 +418,12 @@ oppia.directive('testInteractionPanel', [
         '/pages/exploration_editor/editor_tab/' +
         'test_interaction_modal_directive.html'),
       controller: [
-        '$scope', 'EditorStateService', 'explorationStatesService',
+        '$scope', 'EditorStateService', 'ExplorationStatesService',
         'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-        function($scope, EditorStateService, explorationStatesService,
+        function($scope, EditorStateService, ExplorationStatesService,
             INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE) {
           var _stateName = EditorStateService.getActiveStateName();
-          var _state = explorationStatesService.getState(_stateName);
+          var _state = ExplorationStatesService.getState(_stateName);
           $scope.interactionIsInline = (
             INTERACTION_SPECS[_state.interaction.id].display_mode ===
             INTERACTION_DISPLAY_MODE_INLINE);

@@ -21,12 +21,14 @@
  */
 
 oppia.directive('oppiaInteractivePencilCodeEditor', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
+  function(
+      HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/PencilCodeEditor/directives/' +
@@ -35,12 +37,22 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
         '$scope', '$attrs', '$element', '$timeout', '$uibModal',
         'FocusManagerService', 'pencilCodeEditorRulesService',
         function($scope, $attrs, $element, $timeout, $uibModal,
-          FocusManagerService, pencilCodeEditorRulesService) {
-          $scope.initialCode = HtmlEscaperService.escapedJsonToObj(
-            $attrs.initialCodeWithValue);
+            FocusManagerService, pencilCodeEditorRulesService) {
+          $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+
+          $scope.initialCode = $scope.interactionIsActive ?
+            HtmlEscaperService.escapedJsonToObj($attrs.initialCodeWithValue) :
+            $scope.getLastAnswer().code;
+
           var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
           var pce = new PencilCodeEmbed(iframeDiv);
           pce.beginLoad($scope.initialCode);
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+            $scope.interactionIsActive = false;
+            pce.hideMiddleButton();
+            pce.hideToggleButton();
+            pce.setReadOnly();
+          });
           pce.on('load', function() {
             // Hides the error console at the bottom right, and prevents it
             // from showing up even if the code has an error. Also, hides the
@@ -62,9 +74,14 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
               type: 'text/javascript'
             }]);
 
-            pce.hideToggleButton();
-            pce.setEditable();
             pce.showEditor();
+            pce.hideToggleButton();
+            if ($scope.interactionIsActive) {
+              pce.setEditable();
+            } else {
+              pce.hideMiddleButton();
+              pce.setReadOnly();
+            }
 
             // Pencil Code automatically takes the focus on load, so we clear
             // it.
@@ -120,12 +137,6 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
                   return $(elem).text();
                 }).join('\n');
 
-              console.log('Code (normalized): ');
-              console.log(normalizedCode);
-              console.log('Output: ');
-              console.log(output);
-              console.log('------');
-
               hasSubmittedAnswer = true;
               $scope.onSubmit({
                 answer: {
@@ -145,12 +156,6 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
             }
 
             var normalizedCode = getNormalizedCode();
-
-            console.log('Code: ');
-            console.log(normalizedCode);
-            console.log('Error: ');
-            console.log(error.message);
-            console.log('------');
 
             errorIsHappening = true;
             hasSubmittedAnswer = true;

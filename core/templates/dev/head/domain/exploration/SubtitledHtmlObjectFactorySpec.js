@@ -125,7 +125,7 @@ describe('SubtitledHtml object factory', function() {
 
     it('should toggle needs-update attribute', inject(function() {
       expect(subtitledHtml.getAudioTranslation('en').needsUpdate).toBe(false);
-      subtitledHtml.toggleNeedsUpdateAttribute('en')
+      subtitledHtml.toggleNeedsUpdateAttribute('en');
       expect(subtitledHtml.getAudioTranslation('en').needsUpdate).toBe(true);
     }));
 

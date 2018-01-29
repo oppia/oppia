@@ -21,7 +21,6 @@ from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
 from core.domain import user_services
 from core.platform import models
-
 import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])

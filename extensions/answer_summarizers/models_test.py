@@ -287,6 +287,7 @@ class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
         ]
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
+
 class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
     CALCULATION_ID = 'TopAnswersByCategorization'
 
