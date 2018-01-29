@@ -35,7 +35,8 @@ class _Platform(object):
         classes.
 
         Raises:
-            NotImplementedError: The method not overwritten in derived classes.
+            NotImplementedError: The method is not overwritten in derived
+                classes.
         """
         raise NotImplementedError
 
