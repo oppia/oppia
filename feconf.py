@@ -27,22 +27,20 @@ DEBUG = False
 # code in core/platform.
 PLATFORM = 'gae'
 
-# This should be string comparison, since all environment variables
-# are converted to string
-IS_MINIFIED = os.environ.get('MINIFICATION') == 'True'
+# This variable is for serving minified resources
+# when set to True. It reflects we are emulating running Oppia in a production
+# environment.
+FORCE_PROD_MODE = False
 
 # Whether we should serve the development or production experience.
-# DEV_MODE should only be changed to False in the production environment.
-# To use minified resources in the development environment,
-# change the MINIFICATION env variable in app.yaml to True.
-# When DEV_MODE is True, this indicates that we are not running in
-# the production App Engine environment, which affects things like
-# login/logout URLs,as well as third-party libraries
-# that App Engine normally provides.
+# DEV_MODE should only be changed to False in the production environment,
+# or if you want to use minified resources in the development environment.
+
 if PLATFORM == 'gae':
     DEV_MODE = (
-        not os.environ.get('SERVER_SOFTWARE')
-        or os.environ['SERVER_SOFTWARE'].startswith('Development'))
+        (not os.environ.get('SERVER_SOFTWARE') or
+         os.environ['SERVER_SOFTWARE'].startswith('Development')) and
+        not FORCE_PROD_MODE)
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
@@ -52,7 +50,7 @@ SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 
 EXTENSIONS_DIR_PREFIX = (
-    'backend_prod_files' if (IS_MINIFIED or not DEV_MODE) else '')
+    'backend_prod_files' if not DEV_MODE else '')
 INTERACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
 RTE_EXTENSIONS_DIR = (
@@ -62,9 +60,8 @@ RTE_EXTENSIONS_DEFINITIONS_PATH = (
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
-# Choose production templates folder if minification flag is used or
-# if in production mode
-if IS_MINIFIED or not DEV_MODE:
+# Choose production templates folder when we are in production mode.
+if not DEV_MODE:
     FRONTEND_TEMPLATES_DIR = (
         os.path.join('backend_prod_files', 'templates', 'head'))
 else:
