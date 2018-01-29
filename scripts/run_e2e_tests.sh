@@ -102,21 +102,21 @@ fi
 trap cleanup EXIT
 
 
-# Argument passed to gulpfile.js to help build with minification.
-MINIFICATION=false
+# Argument passed to feconf.py to help choose production templates folder.
+FORCE_PROD_MODE=False
 for arg in "$@"; do
   # Used to emulate running Oppia in a production environment.
   if [ "$arg" == "--prod_env" ]; then
-    MINIFICATION=true
+    FORCE_PROD_MODE=True
     echo "  Generating files for production mode..."
     $PYTHON_CMD scripts/build.py
   fi
 done
 
-yaml_env_variable="MINIFICATION: $MINIFICATION"
-sed -i.bak -e s/"MINIFICATION: .*"/"$yaml_env_variable"/ app.yaml
-# Delete the modified yaml file(-i.bak)
-rm app.yaml.bak
+feconf_env_variable="FORCE_PROD_MODE = $FORCE_PROD_MODE"
+sed -i.bak -e s/"FORCE_PROD_MODE = .*"/"$feconf_env_variable"/ feconf.py
+# Delete the modified feconf.py file(-i.bak)
+rm feconf.py.bak
 
 # Start a selenium process. The program sends thousands of lines of useless
 # info logs to stderr so we discard them.

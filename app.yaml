@@ -132,11 +132,8 @@ libraries:
   version: '2.7.11'
 - name: webapp2
   version: '2.5.2'
-# This environmental variable is for serving minified resources
-# when set to true. It allows minified resources to be used when
-# running the server in the dev environment.
+
 env_variables:
-  MINIFICATION: false
   PYTHONHTTPSVERIFY: 1
 
 
