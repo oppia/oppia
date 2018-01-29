@@ -735,6 +735,13 @@ class RecommendationsHandler(base.BaseHandler):
         except Exception:
             raise self.PageNotFoundException
 
+        # Refresher exploration URLs may contain a collection ID, but they may
+        # not actually be in the collection. Hence the following check.
+        if collection_id:
+            collection = collection_services.get_collection_by_id(collection_id)
+            if exploration_id not in collection.exploration_ids:
+                collection_id = None
+
         auto_recommended_exp_ids = []
 
         if collection_id:
@@ -743,8 +750,6 @@ class RecommendationsHandler(base.BaseHandler):
                     collection_services.get_next_exploration_ids_to_complete_by_user(  # pylint: disable=line-too-long
                         self.user_id, collection_id))
             else:
-                collection = collection_services.get_collection_by_id(
-                    collection_id)
                 auto_recommended_exp_ids = (
                     collection.get_next_exploration_ids_in_sequence(
                         exploration_id))
