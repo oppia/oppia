@@ -4983,11 +4983,3 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
   width: 1px;
 }
-
-.item-selection-input md-checkbox .md-icon {
-  top: 2px;
-}
-
-.item-selection-input md-checkbox .md-label {
-  vertical-align: top;
-}
