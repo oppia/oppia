@@ -207,8 +207,12 @@ class ExplorationPage(base.BaseHandler):
             return
 
         # Note: this is an optional argument and will be None when the
-        # exploration is being played outside the context of a collection.
-        collection_id = self.request.get('collection_id')
+        # exploration is being played outside the context of a collection or if
+        # the 'parent' parameter is present.
+        if self.request.get('parent'):
+            collection_id = None
+        else:
+            collection_id = self.request.get('collection_id')
         can_edit = rights_manager.check_can_edit_activity(
             self.user, exploration_rights)
 
