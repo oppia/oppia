@@ -130,20 +130,29 @@ oppia.directive('explorationSummaryTile', [
               return '#';
             } else {
               var result = '/explore/' + $scope.getExplorationId();
-              if ($scope.getCollectionId()) {
-                result = UrlService.addField(
-                  result, 'collection_id', $scope.getCollectionId());
+              var urlParams = UrlService.getUrlParams();
+              var parentExplorationIds = $scope.getParentExplorationIds();
+
+              var collectionIdToAdd = $scope.getCollectionId();
+              // Replace the collection ID with the one in the URL if it exists
+              // in urlParams.
+              if (parentExplorationIds &&
+                  urlParams.hasOwnProperty('collection_id')) {
+                collectionIdToAdd = urlParams.collection_id;
               }
-              if ($scope.getParentExplorationIds()) {
-                var parentExplorationIds = $scope.getParentExplorationIds();
-                for (var i = 0; i < parentExplorationIds.length - 1; i++ ) {
+
+              if (collectionIdToAdd) {
+                result = UrlService.addField(
+                  result, 'collection_id', collectionIdToAdd);
+              }
+              if (parentExplorationIds) {
+                for (var i = 0; i < parentExplorationIds.length - 1; i++) {
                   result = UrlService.addField(
                     result, 'parent', parentExplorationIds[i]);
                 }
-                return result;
               }
+              return result;
             }
-            return result;
           };
 
           if (!$scope.mobileCutoffPx) {
