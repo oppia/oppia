@@ -20,13 +20,13 @@
 oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
-  '$scope', '$http', '$uibModal', 'AlertsService', 'explorationStatesService',
+  '$scope', '$http', '$uibModal', 'AlertsService', 'ExplorationStatesService',
   'ExplorationDataService', 'ComputeGraphService', 'DateTimeFormatService',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
   'IMPROVE_TYPE_INCOMPLETE', 'ENABLE_NEW_STATS_FRAMEWORK',
   function(
-      $scope, $http, $uibModal, AlertsService, explorationStatesService,
+      $scope, $http, $uibModal, AlertsService, ExplorationStatesService,
       ExplorationDataService, ComputeGraphService, DateTimeFormatService,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
@@ -147,10 +147,10 @@ oppia.controller('StatisticsTab', [
           };
           // TODO(bhenning): before, there was a special opacity computed for
           // the ending (numCompletions/numVisits), should we do this for all
-          // terminal nodes, instead? If so, explorationStatesService needs to
+          // terminal nodes, instead? If so, ExplorationStatesService needs to
           // be able to provide whether given states are terminal
 
-          explorationStatesService.getStateNames().forEach(function(stateName) {
+          ExplorationStatesService.getStateNames().forEach(function(stateName) {
             var visits = 0;
             if ($scope.stateStats.hasOwnProperty(stateName)) {
               visits = $scope.stateStats[stateName].first_entry_count;
@@ -259,7 +259,7 @@ oppia.controller('StatisticsTab', [
                     var isAddressedResults = null;
                     if (visualizationInfo.show_addressed_info) {
                       var explorationId = ExplorationDataService.explorationId;
-                      var state = explorationStatesService.getState(
+                      var state = ExplorationStatesService.getState(
                         $scope.stateName);
 
                       isAddressedResults = visualizationInfo.data.map(
