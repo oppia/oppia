@@ -95,8 +95,8 @@ oppia.directive('stateContentEditor', [
             var contentHasChanged =
               savedContent.getHtml() !=
               stateContentService.displayed.getHtml();
-            if (savedContent.hasUnflaggedAudioTranslations()
-              && contentHasChanged) {
+            if (savedContent.hasUnflaggedAudioTranslations() &&
+              contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
             saveContent();
