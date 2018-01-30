@@ -74,6 +74,9 @@ describe('Full exploration editor', function() {
       by.css('.protractor-test-back-button')).then(function(buttons){
         expect(buttons.length).toBe(0);
       });
+
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToBeOver();
     users.logout();
   });
 
