@@ -49,8 +49,11 @@ oppia.directive('solutionExplanationEditor', [
           };
 
           $scope.saveThisExplanation = function() {
+            var contentHasChanged =
+              stateSolutionService.displayed.explanation.getHtml() !=
+              stateSolutionService.savedMemento.explanation.getHtml();
             if (stateSolutionService.displayed.explanation
-              .hasUnflaggedAudioTranslations()) {
+              .hasUnflaggedAudioTranslations() && contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
             stateSolutionService.saveDisplayedValue();

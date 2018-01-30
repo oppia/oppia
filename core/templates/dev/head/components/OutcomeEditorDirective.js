@@ -159,10 +159,13 @@ oppia.directive('outcomeEditor', [
           $scope.saveThisFeedback = function(fromClickSaveFeedbackButton) {
             $scope.$broadcast('saveOutcomeFeedbackDetails');
             $scope.feedbackEditorIsOpen = false;
+            var contentHasChanged =
+              $scope.savedOutcome.feedback.getHtml() !=
+              $scope.outcome.feedback.getHtml();
             $scope.savedOutcome.feedback = angular.copy(
               $scope.outcome.feedback);
             if ($scope.savedOutcome.feedback.hasUnflaggedAudioTranslations() &&
-                fromClickSaveFeedbackButton) {
+                fromClickSaveFeedbackButton && contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
             $scope.getOnSaveFeedbackFn()($scope.savedOutcome);

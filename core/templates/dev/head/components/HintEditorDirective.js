@@ -55,8 +55,12 @@ oppia.directive('hintEditor', [
 
           $scope.saveThisHint = function() {
             $scope.hintEditorIsOpen = false;
+            var contentHasChanged = 
+              $scope.hintMemento.hintContent.getHtml() !=
+              $scope.hint.hintContent.getHtml();
             $scope.hintMemento = null;
-            if ($scope.hint.hintContent.hasUnflaggedAudioTranslations()) {
+            if ($scope.hint.hintContent.hasUnflaggedAudioTranslations() &&
+              contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
             $scope.getOnSaveFn()();
