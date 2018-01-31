@@ -240,6 +240,7 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = inputs[varName];
         }
 
+        replacementText = replacementText.replace('$', '$$$$');
         description = description.replace(PATTERN, ' ');
         finalDescription = finalDescription.replace(PATTERN, replacementText);
       }
