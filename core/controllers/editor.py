@@ -902,7 +902,9 @@ class AudioUploadHandler(EditorHandler):
             else:
                 audio = mutagen.File(tempbuffer)
         except mutagen.mp3.HeaderNotFoundError:
-            raise self.InvalidInputException('%s file cannot sync to MPEG Frame' %extension)
+            raise self.InvalidInputException(
+                '%s file cannot sync to MPEG Frame' %extension
+                )
 
         except mutagen.MutagenError:
             # The calls to mp3.MP3() versus mutagen.File() seem to behave
@@ -913,7 +915,7 @@ class AudioUploadHandler(EditorHandler):
             # raise a MutagenError.
             raise self.InvalidInputException('Audio not recognized '
                                              'as a %s filedfgfggfg' % extension)
-            
+
         tempbuffer.close()
 
         if audio is None:
