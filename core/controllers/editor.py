@@ -387,6 +387,13 @@ class ExplorationRightsHandler(EditorHandler):
                 exploration_id).to_dict()
         })
 
+    @acl_decorators.can_edit_exploration
+    def put(self,exploration_id):
+        """Sends email to all the owners when the exploration is modified"""
+        exploration = exp_services.get_exploration_by_id(exploration_id)
+        email_body = self.payload.get('email_body')
+        
+
 
 class ExplorationStatusHandler(EditorHandler):
     """Handles publishing of an exploration."""
