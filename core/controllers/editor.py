@@ -387,22 +387,6 @@ class ExplorationRightsHandler(EditorHandler):
                 exploration_id).to_dict()
         })
 
-    @acl_decorators.can_edit_exploration
-    def put(self,exploration_id):
-        """Sends email to all the owners when the exploration is modified"""
-
-        #check if the exploration is modified by some creator or assigned creator
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        email_body = self.payload.get('email_body')
-        edit_rights_creators = rights_manager.get_exploration_rights(exploration_id)
-
-        #sending emails to all the creators
-        for creator_id in edit_rights_creators.owner_ids:
-            email_manager.send_moderator_action_email(
-                self.user_id, creator_id,'Modified Exploration ',exploration.title,email_body
-                )
-
-
 class ExplorationStatusHandler(EditorHandler):
     """Handles publishing of an exploration."""
 
@@ -917,6 +901,9 @@ class AudioUploadHandler(EditorHandler):
                 audio = mp3.MP3(tempbuffer)
             else:
                 audio = mutagen.File(tempbuffer)
+        except mutagen.mp3.HeaderNotFoundError:
+            raise self.InvalidInputException('%s file cannot sync to MPEG Frame' %extension)
+
         except mutagen.MutagenError:
             # The calls to mp3.MP3() versus mutagen.File() seem to behave
             # differently upon not being able to interpret the audio.
@@ -925,7 +912,8 @@ class AudioUploadHandler(EditorHandler):
             # the case. Occasionally, mutagen.File() also seems to
             # raise a MutagenError.
             raise self.InvalidInputException('Audio not recognized '
-                                             'as a %s file' % extension)
+                                             'as a %s filedfgfggfg' % extension)
+            
         tempbuffer.close()
 
         if audio is None:
