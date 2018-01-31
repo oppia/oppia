@@ -387,6 +387,7 @@ class ExplorationRightsHandler(EditorHandler):
                 exploration_id).to_dict()
         })
 
+
 class ExplorationStatusHandler(EditorHandler):
     """Handles publishing of an exploration."""
 
@@ -903,9 +904,7 @@ class AudioUploadHandler(EditorHandler):
                 audio = mutagen.File(tempbuffer)
         except mutagen.mp3.HeaderNotFoundError:
             raise self.InvalidInputException(
-                '%s file cannot sync to MPEG Frame' %extension
-                )
-
+                '%s file cannot sync to MPEG Frame' %extension )
         except mutagen.MutagenError:
             # The calls to mp3.MP3() versus mutagen.File() seem to behave
             # differently upon not being able to interpret the audio.
@@ -914,8 +913,7 @@ class AudioUploadHandler(EditorHandler):
             # the case. Occasionally, mutagen.File() also seems to
             # raise a MutagenError.
             raise self.InvalidInputException('Audio not recognized '
-                                             'as a %s filedfgfggfg' % extension)
-
+                                             'as a %s file' % extension)
         tempbuffer.close()
 
         if audio is None:
