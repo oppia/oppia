@@ -390,9 +390,17 @@ class ExplorationRightsHandler(EditorHandler):
     @acl_decorators.can_edit_exploration
     def put(self,exploration_id):
         """Sends email to all the owners when the exploration is modified"""
+
+        #check if the exploration is modified by some creator or assigned creator
         exploration = exp_services.get_exploration_by_id(exploration_id)
         email_body = self.payload.get('email_body')
-        
+        edit_rights_creators = rights_manager.get_exploration_rights(exploration_id)
+
+        #sending emails to all the creators
+        for creator_id in edit_rights_creators.owner_ids:
+            email_manager.send_moderator_action_email(
+                self.user_id, creator_id,'Modified Exploration ',exploration.title,email_body
+                )
 
 
 class ExplorationStatusHandler(EditorHandler):
