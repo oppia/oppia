@@ -31,7 +31,7 @@ var expectInteractionDetailsToMatch = function(elem) {
 };
 
 var submitAnswer = function() {
-  // TODO: find a way to send keys to the code-mirror element.
+  // TODO(nithusha21): find a way to send keys to the code-mirror element.
   // Temporarily pass the answer as defaultText in the customization args.
   element(by.css('.oppia-learner-confirm-button')).click();
 };
