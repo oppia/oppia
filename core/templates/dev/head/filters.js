@@ -240,7 +240,7 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = inputs[varName];
         }
 
-        if(typeof(replacementText) === 'string') {
+        if(typeof (replacementText) === 'string') {
           // Replacing $ with $$. When this is used in the next replace
           // statement, it will be converted back to $.
           // Also to replace by $$, the appropriate string is $$$$
