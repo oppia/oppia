@@ -18,7 +18,7 @@
 
 oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT', 30);
 
-oppia.constant('SUMMARRY_TITLE_CHARACTER_COUNT', 50);
+oppia.constant('FEEDBACK_SUBJECT_MAX_CHAR_LIMIT', 50);
 
 oppia.filter('spacesToUnderscores', [function() {
   return function(input) {
@@ -414,9 +414,8 @@ oppia.filter('getAbbreviatedText', [function () {
     if (text.length > characterCount) {
       var subject = text.substr(0, characterCount);
         
-      if (subject.includes(' ')) {
-        subject = subject.split(' ').slice(0, -1)
-                          .join(' ');
+      if (subject.indexOf(' ') > -1) {
+        subject = subject.split(' ').slice(0, -1).join(' ');
       }
       return subject.concat('...');
     }

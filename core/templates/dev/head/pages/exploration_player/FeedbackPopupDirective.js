@@ -38,12 +38,12 @@ oppia.directive('feedbackPopup', [
         '$scope', '$element', '$http', '$timeout', '$filter',
         'FocusManagerService', 'AlertsService', 'BackgroundMaskService', 
         'PlayerPositionService', 'WindowDimensionsService',
-        'SUMMARRY_TITLE_CHARACTER_COUNT',
+        'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
         function(
             $scope, $element, $http, $timeout, $filter,
             FocusManagerService, AlertsService, BackgroundMaskService,
             PlayerPositionService, WindowDimensionsService,
-            SUMMARRY_TITLE_CHARACTER_COUNT) {
+            FEEDBACK_SUBJECT_MAX_CHAR_LIMIT) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
           $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
