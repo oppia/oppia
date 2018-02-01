@@ -545,6 +545,20 @@ describe('Testing filters', function() {
         }
       ];
 
+      var ruleMultipleChoice = {
+        type: 'Equals',
+        inputs: {
+          x: 0
+        }
+      };
+      var interactionIdMultipleChoice = 'TextInput';
+      var choicesMultipleChoice = [
+        {
+          label: '$10 should remain as $10',
+          val: 0
+        }
+      ];
+
       expect($filter('convertToPlainText')($filter('formatRtePreview')(
         $filter('parameterizeRuleDescription')(ruleMath, interactionIdMath,
           choicesMath)))
@@ -555,6 +569,10 @@ describe('Testing filters', function() {
         choicesMixed)))
       ).toEqual('is ' + 'equal to \'[Image] This is a text ' +
         'input. [Image]  [Link]\'');
+
+      expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
+        interactionIdMultipleChoice, choicesMultipleChoice)
+      ).toEqual('is equal to \'$10 should remain as x0\'');
     }
   ));
 });
