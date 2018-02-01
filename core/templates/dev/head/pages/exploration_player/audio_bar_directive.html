@@ -89,6 +89,32 @@
     width: 100%;
   }
 
+  .audio-controls.ng-enter,
+  .audio-controls.ng-leave {
+    -webkit-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -moz-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -ms-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -o-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    position: absolute;
+  }
+
+  .audio-controls.ng-enter {
+    top: -44px;
+  }
+
+  .audio-controls.ng-enter.audio-controls.ng-enter-active {
+    top: 0;
+  }
+
+  .audio-controls.ng-leave {
+    top: 0;
+  }
+
+  .audio-controls.ng-leave.audio-controls.ng-leave-active {
+    top: -44px;
+  }
+
   .audio-controls-message {
     font-size: 10px;
     font-style: italic;
