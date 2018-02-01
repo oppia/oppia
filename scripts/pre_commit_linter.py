@@ -141,10 +141,8 @@ BAD_PATTERNS_HTML_REGEXP = [
         'excluded_dirs': (
             'extensions/answer_summarizers/',
             'extensions/classifiers/',
-            'extensions/dependencies/',
             'extensions/objects/',
-            'extensions/value_generators/',
-            'extensions/visualizations/')
+            'extensions/value_generators/')
     }
 ]
 
