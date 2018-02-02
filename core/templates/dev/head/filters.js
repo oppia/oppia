@@ -241,11 +241,12 @@ oppia.filter('parameterizeRuleDescription', [
         }
 
         if (typeof (replacementText) === 'string') {
-          // Replacing $ with $$. When this is used in the next replace
+          // Replacing all occurances of $ with $$.
+          // When this is used in the next replace
           // statement, it will be converted back to $.
-          // Also to replace by $$, the appropriate string is $$$$
-          // as $$ -> $
-          replacementText = replacementText.replace('$', '$$$$');
+          // Also to replace by $$, the appropriate string is $$$
+          // as $$ becomes $
+          replacementText = replacementText.replace(/\$/g, '$$$');
         }
 
         description = description.replace(PATTERN, ' ');
