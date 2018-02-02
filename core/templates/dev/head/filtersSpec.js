@@ -554,7 +554,7 @@ describe('Testing filters', function() {
       var interactionIdMultipleChoice = 'TextInput';
       var choicesMultipleChoice = [
         {
-          label: '$10 should remain as $10',
+          label: '$10 should not become $$10',
           val: 0
         }
       ];
@@ -572,7 +572,7 @@ describe('Testing filters', function() {
 
       expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
         interactionIdMultipleChoice, choicesMultipleChoice)
-      ).toEqual('is equal to \'$10 should remain as x0\'');
+      ).toEqual('is equal to \'$10 should not become $$10\'');
     }
   ));
 });
