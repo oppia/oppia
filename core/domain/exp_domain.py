@@ -2864,7 +2864,7 @@ class Exploration(object):
                 for fallback in interaction['fallbacks']:
                     if fallback['outcome']['feedback']:
                         interaction['hints'].append({
-                            'hint_content': fallback['outcome']['feedback'][0]
+                            'hint_text': fallback['outcome']['feedback'][0]
                         })
             if 'solution' not in interaction:
                 interaction['solution'] = None
