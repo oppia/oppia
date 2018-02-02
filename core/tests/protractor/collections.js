@@ -134,9 +134,11 @@ describe('Collections', function() {
     var dropdown = element(by.css('.protractor-test-profile-dropdown'));
     browser.actions().mouseMove(dropdown).perform();
     dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+    general.waitForSystem();
     browser.waitForAngular();
     creatorDashboardPage.clickCreateActivityButton();
     creatorDashboardPage.clickCreateCollectionButton();
+    general.waitForSystem();
     browser.waitForAngular();
     // Add existing explorations.
     collectionEditor.addExistingExploration(firstExplorationId);
