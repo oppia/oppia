@@ -97,6 +97,7 @@ describe('Full exploration editor', function() {
     var dropdown = element(by.css('.protractor-test-profile-dropdown'));
     browser.actions().mouseMove(dropdown).perform();
     dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+    general.waitForSystem();
     browser.waitForAngular();
     creatorDashboardPage.clickCreateActivityButton();
     creatorDashboardPage.clickCreateExplorationButton();
@@ -115,6 +116,7 @@ describe('Full exploration editor', function() {
       dropdown = element(by.css('.protractor-test-profile-dropdown'));
       browser.actions().mouseMove(dropdown).perform();
       dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+      general.waitForSystem();
       browser.waitForAngular();
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateExplorationButton();
@@ -144,6 +146,7 @@ describe('Full exploration editor', function() {
       dropdown = element(by.css('.protractor-test-profile-dropdown'));
       browser.actions().mouseMove(dropdown).perform();
       dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+      general.waitForSystem();
       browser.waitForAngular();
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateExplorationButton();
@@ -173,9 +176,11 @@ describe('Full exploration editor', function() {
       dropdown = element(by.css('.protractor-test-profile-dropdown'));
       browser.actions().mouseMove(dropdown).perform();
       dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+      general.waitForSystem();
       browser.waitForAngular();
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateCollectionButton();
+      general.waitForSystem();
       browser.waitForAngular();
       collectionEditor.searchForAndAddExistingExploration(
         'Parent Exploration in collection');
@@ -193,6 +198,7 @@ describe('Full exploration editor', function() {
       explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
       general.waitForSystem();
       explorationPlayerPage.clickConfirmRedirectionButton();
+      general.waitForSystem();
       browser.waitForAngular();
       general.getExplorationIdFromPlayer().then(function(currentId) {
         expect(currentId).toEqual(refresherExplorationId);
@@ -216,6 +222,7 @@ describe('Full exploration editor', function() {
         explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
         general.waitForSystem();
         explorationPlayerPage.clickConfirmRedirectionButton();
+        general.waitForSystem();
         browser.waitForAngular();
         // Check the current url to see if collection_id is present in it.
         browser.getCurrentUrl().then(function(url) {
