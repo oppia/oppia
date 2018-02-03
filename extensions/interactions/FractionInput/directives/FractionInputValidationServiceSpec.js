@@ -436,59 +436,59 @@ describe('FractionInputValidationService', function() {
 
   it('should correctly check validity of HasFractionalPartExactlyEqualTo rule',
     function() {
-    customizationArgs.requireSimplestForm = false;
-    answerGroups[0].rules = [HasFractionalPartExactlyEqualToOneAndHalfRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: (
-        'Rule 1 from answer group 1 is invalid as ' +
-        'integer part should be zero')
-    }]);
+      customizationArgs.requireSimplestForm = false;
+      answerGroups[0].rules = [HasFractionalPartExactlyEqualToOneAndHalfRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule 1 from answer group 1 is invalid as ' +
+          'integer part should be zero')
+      }]);
 
-    customizationArgs.allowImproperFraction = false;
-    answerGroups[0].rules = [HasFractionalPartExactlyEqualToThreeHalfs];
-    var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: (
-        'Rule 1 from answer group 1 is invalid as ' +
-        'improper fractions are not allowed')
-    }]);
+      customizationArgs.allowImproperFraction = false;
+      answerGroups[0].rules = [HasFractionalPartExactlyEqualToThreeHalfs];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule 1 from answer group 1 is invalid as ' +
+          'improper fractions are not allowed')
+      }]);
 
-    answerGroups[0].rules = [HasFractionalPartExactlyEqualToNegativeValue];
-    var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: (
-        'Rule 1 from answer group 1 is invalid as ' +
-        'sign should be positive')
-    }]);
+      answerGroups[0].rules = [HasFractionalPartExactlyEqualToNegativeValue];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule 1 from answer group 1 is invalid as ' +
+          'sign should be positive')
+      }]);
 
-    customizationArgs.allowImproperFraction = true;
-    answerGroups[0].rules = [HasFractionalPartExactlyEqualToTwoFifthsRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([]);
+      customizationArgs.allowImproperFraction = true;
+      answerGroups[0].rules = [HasFractionalPartExactlyEqualToTwoFifthsRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([]);
 
-    answerGroups[1] = angular.copy(answerGroups[0]);
-    answerGroups[0].rules = [denominatorEqualsFiveRule];
-    answerGroups[1].rules = [HasFractionalPartExactlyEqualToTwoFifthsRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: (
-        'Rule 1 from answer group 2 will never be matched because it ' +
-        'is made redundant by rule 1 from answer group 1.')
-    }]);
+      answerGroups[1] = angular.copy(answerGroups[0]);
+      answerGroups[0].rules = [denominatorEqualsFiveRule];
+      answerGroups[1].rules = [HasFractionalPartExactlyEqualToTwoFifthsRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, customizationArgs, answerGroups,
+        goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Rule 1 from answer group 2 will never be matched because it ' +
+          'is made redundant by rule 1 from answer group 1.')
+      }]);
   });
 });
