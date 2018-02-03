@@ -298,11 +298,12 @@ def _lint_css_files(stylelint_path, files_to_lint, stdout, result):
 
     num_css_files = len(files_to_lint)
     if not files_to_lint:
+        result.put('')
         print 'There are no CSS files to lint.'
         return
 
     print 'Total css files: ', num_css_files
-    stylelint_cmd_args = [stylelint_path, '--fix']
+    stylelint_cmd_args = [stylelint_path]
     for _, filename in enumerate(files_to_lint):
         print 'Linting: ', filename
         proc_args = stylelint_cmd_args + [filename]
@@ -321,10 +322,10 @@ def _lint_css_files(stylelint_path, files_to_lint, stdout, result):
             stdout.put(linter_stdout)
 
     if num_files_with_errors:
-        result.put('%s    %s CSS files' % (
+        result.put('%s    %s CSS file' % (
             _MESSAGE_TYPE_FAILED, num_files_with_errors))
     else:
-        result.put('%s   %s CSS files linted (%.1f secs)' % (
+        result.put('%s   %s CSS file linted (%.1f secs)' % (
             _MESSAGE_TYPE_SUCCESS, num_css_files, time.time() - start_time))
 
     print 'CSS linting finished.'
@@ -504,7 +505,7 @@ def _pre_commit_linter(all_files):
     py_files_to_lint = [
         filename for filename in all_files if filename.endswith('.py')]
     css_files_to_lint = [
-        filename for filename in all_files if filename.endswith('.css')]
+        filename for filename in all_files if filename.endswith('oppia.css')]
 
     css_result = multiprocessing.Queue()
     css_stdout = multiprocessing.Queue()
@@ -512,7 +513,6 @@ def _pre_commit_linter(all_files):
         target=_lint_css_files, args=(stylelint_path, css_files_to_lint,
                                       css_stdout, css_result))
     css_linting_process.daemon = True
-    css_linting_process.start()
 
     js_result = multiprocessing.Queue()
     linting_processes = []
@@ -527,6 +527,7 @@ def _pre_commit_linter(all_files):
         args=(config_pylint, py_files_to_lint, py_result)))
     print 'Starting CSS, Javascript and Python Linting'
     print '----------------------------------------'
+    css_linting_process.start()
     for process in linting_processes:
         process.start()
 
