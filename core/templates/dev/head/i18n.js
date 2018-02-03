@@ -44,9 +44,6 @@ oppia.controller('I18nFooter', [
     var preferencesDataUrl = '/preferenceshandler/data';
     var siteLanguageUrl = '/save_site_language';
     $scope.supportedSiteLanguages = constants.SUPPORTED_SITE_LANGUAGES;
-    if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
-      $translate.use(GLOBALS.preferredSiteLanguageCode);
-    }
 
     // The $timeout seems to be necessary for the dropdown to show anything
     // at the outset, if the default language is not English.
@@ -72,6 +69,7 @@ oppia.controller('I18nFooter', [
         // to change; in such cases, the user's preferences are not picked up by
         // other pages. To avoid this, we manually set the cookie using the '/'
         // path each time a non-logged-in user changes their site language.
+        $cookies.remove('NG_TRANSLATE_LANG_KEY', {path: '/'});
         $cookies.put(
           'NG_TRANSLATE_LANG_KEY',
           '"' + $scope.currentLanguageCode + '"', {path: '/'});
