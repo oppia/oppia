@@ -3078,6 +3078,7 @@ title: Title
             'eid', self.YAML_CONTENT_V23)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
 
