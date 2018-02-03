@@ -490,5 +490,5 @@ describe('FractionInputValidationService', function() {
           'Rule 1 from answer group 2 will never be matched because it ' +
           'is made redundant by rule 1 from answer group 1.')
       }]);
-  });
+    });
 });
