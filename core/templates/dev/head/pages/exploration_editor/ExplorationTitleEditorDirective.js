@@ -33,9 +33,9 @@ oppia.directive('explorationTitleEditor', [
         '/pages/exploration_editor/' +
         'exploration_title_editor_directive.html'),
       controller: [
-        '$scope', 'explorationTitleService',
-        function($scope, explorationTitleService) {
-          $scope.explorationTitleService = explorationTitleService;
+        '$scope', 'ExplorationTitleService',
+        function($scope, ExplorationTitleService) {
+          $scope.explorationTitleService = ExplorationTitleService;
         }
       ]
     };

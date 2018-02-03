@@ -663,7 +663,7 @@ def get_asset_dir_prefix():
     It is used as a prefix in urls for images, css and script files.
     """
     asset_dir_prefix = ''
-    if feconf.IS_MINIFIED or not feconf.DEV_MODE:
+    if not feconf.DEV_MODE:
         asset_dir_prefix = '/build'
 
     return asset_dir_prefix
@@ -674,8 +674,8 @@ def get_template_dir_prefix():
     It is used as a prefix in urls for js script files under the templates
     directory.
     """
-    template_path = ('/templates/head' if feconf.IS_MINIFIED
-                     or not feconf.DEV_MODE else '/templates/dev/head')
+    template_path = (
+        '/templates/head' if not feconf.DEV_MODE else '/templates/dev/head')
     return '%s%s' % (get_asset_dir_prefix(), template_path)
 
 

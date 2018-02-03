@@ -23,11 +23,11 @@
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE',
+  'EVENT_NEW_CARD_AVAILABLE', 'EDITOR_TAB_CONTEXT',
   function(
       $sce, HtmlEscaperService, ExplorationContextService,
       imageClickInputRulesService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE) {
+      EVENT_NEW_CARD_AVAILABLE, EDITOR_TAB_CONTEXT) {
     return {
       restrict: 'E',
       scope: {
@@ -52,6 +52,9 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           $scope.mouseX = 0;
           $scope.mouseY = 0;
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
+          if (!$scope.interactionIsActive) {
+            $scope.lastAnswer = $scope.getLastAnswer();
+          }
 
           $scope.currentlyHoveredRegions = [];
           $scope.allRegions = imageAndRegions.labeledRegions;
@@ -96,9 +99,37 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               return 'inline';
             }
           };
+          $scope.getDotDisplay = function() {
+            if (ExplorationContextService.getEditorTabContext() ===
+                EDITOR_TAB_CONTEXT.EDITOR) {
+              return 'none';
+            }
+            return 'inline';
+          };
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
+            $scope.lastAnswer = {
+              clickPosition: [$scope.mouseX, $scope.mouseY]
+            };
           });
+          $scope.getDotLocation = function() {
+            var image = $($element).find('.oppia-image-click-img');
+            var dotLocation = {
+              left: null,
+              top: null
+            };
+            if ($scope.lastAnswer) {
+              dotLocation.left =
+                $scope.lastAnswer.clickPosition[0] * image.width() +
+                image.offset().left -
+                image.parent().offset().left - 5;
+              dotLocation.top =
+                $scope.lastAnswer.clickPosition[1] * image.height() +
+                image.offset().top -
+                image.parent().offset().top - 5;
+            }
+            return dotLocation;
+          };
           $scope.onMousemoveImage = function(event) {
             if (!$scope.interactionIsActive) {
               return;
