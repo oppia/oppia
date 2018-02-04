@@ -126,10 +126,12 @@
 	"I18N_LIBRARY_LOADING": "Įkeliama",
 	"I18N_LIBRARY_MAIN_HEADER": "Įsivaizduokite ką galima išmokti šiandien...",
 	"I18N_LIBRARY_N/A": "Nėra",
+	"I18N_PLAYER_AUDIO_EXPAND_TEXT": "Audio",
 	"I18N_PLAYER_SHARE_THIS_COLLECTION": "Dalintis šia kolekcija",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "Dar neprenumeruojate jokių kūrėjų.",
 	"I18N_PREFERENCES_SUBSCRIBED_CREATORS": "Kūrėjai, kuriuos prenumeruojate",
 	"I18N_SUBSCRIBE_BUTTON_TEXT": "Prenumeruoti",
+	"I18N_TOPNAV_GET_INVOLVED": "Įsitraukite",
 	"I18N_TOPNAV_OPPIA_FOUNDATION": "Oppia Fondas",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Nutraukti prenumeratą"
 }

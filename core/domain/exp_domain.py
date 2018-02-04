@@ -2863,8 +2863,9 @@ class Exploration(object):
                 interaction['hints'] = []
                 for fallback in interaction['fallbacks']:
                     if fallback['outcome']['feedback']:
-                        interaction['hints'].append(
-                            Hint(fallback['outcome']['feedback'][0]).to_dict())
+                        interaction['hints'].append({
+                            'hint_text': fallback['outcome']['feedback'][0]
+                        })
             if 'solution' not in interaction:
                 interaction['solution'] = None
         return states_dict

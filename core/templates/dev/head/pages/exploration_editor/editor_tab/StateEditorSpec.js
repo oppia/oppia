@@ -24,7 +24,7 @@ describe('State Editor controller', function() {
     beforeEach(inject(function($rootScope, $controller, $injector) {
       scope = $rootScope.$new();
       ecs = $injector.get('EditorStateService');
-      ess = $injector.get('explorationStatesService');
+      ess = $injector.get('ExplorationStatesService');
       scs = $injector.get('stateContentService');
 
       ess.init({
@@ -123,7 +123,7 @@ describe('State Editor controller', function() {
 
       $controller('StateEditor', {
         $scope: scope,
-        explorationStatesService: ess
+        ExplorationStatesService: ess
       });
     }));
 

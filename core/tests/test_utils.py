@@ -693,7 +693,7 @@ class TestBase(unittest.TestCase):
         examples: '' or 'build/'
         """
         filepath = ''
-        if feconf.IS_MINIFIED or not feconf.DEV_MODE:
+        if not feconf.DEV_MODE:
             filepath = os.path.join('build')
 
         return filepath
