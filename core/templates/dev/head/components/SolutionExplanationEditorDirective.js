@@ -49,9 +49,9 @@ oppia.directive('solutionExplanationEditor', [
           };
 
           $scope.saveThisExplanation = function() {
-            var contentHasChanged =
-              stateSolutionService.displayed.explanation.getHtml() !=
-              stateSolutionService.savedMemento.explanation.getHtml();
+            var contentHasChanged = (
+              stateSolutionService.displayed.explanation.getHtml() !==
+              stateSolutionService.savedMemento.explanation.getHtml());
             if (stateSolutionService.displayed.explanation
               .hasUnflaggedAudioTranslations() && contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
@@ -90,7 +90,7 @@ oppia.directive('solutionExplanationEditor', [
                 'mark_all_audio_as_needing_update_modal_directive.html'),
               backdrop: true,
               resolve: {},
-              controller: 'MarkAllAudioAsNeedingUpdateCtrl'
+              controller: 'MarkAllAudioAsNeedingUpdateController'
             }).result.then(function() {
               stateSolutionService.displayed.explanation
                 .markAllAudioAsNeedingUpdate();

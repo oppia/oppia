@@ -62,7 +62,7 @@ oppia.directive('stateContentEditor', [
                 'mark_all_audio_as_needing_update_modal_directive.html'),
               backdrop: true,
               resolve: {},
-              controller: 'MarkAllAudioAsNeedingUpdateCtrl'
+              controller: 'MarkAllAudioAsNeedingUpdateController'
             }).result.then(function() {
               var currentStateContent = stateContentService.displayed;
               currentStateContent.markAllAudioAsNeedingUpdate();
@@ -92,9 +92,9 @@ oppia.directive('stateContentEditor', [
           $scope.onSaveContentButtonClicked = function() {
             EditorFirstTimeEventsService.registerFirstSaveContentEvent();
             var savedContent = stateContentService.savedMemento;
-            var contentHasChanged =
-              savedContent.getHtml() !=
-              stateContentService.displayed.getHtml();
+            var contentHasChanged = (
+              savedContent.getHtml() !==
+              stateContentService.displayed.getHtml());
             if (savedContent.hasUnflaggedAudioTranslations() &&
               contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();

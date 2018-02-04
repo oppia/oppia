@@ -55,9 +55,9 @@ oppia.directive('hintEditor', [
 
           $scope.saveThisHint = function() {
             $scope.hintEditorIsOpen = false;
-            var contentHasChanged = 
-              $scope.hintMemento.hintContent.getHtml() !=
-              $scope.hint.hintContent.getHtml();
+            var contentHasChanged = (
+              $scope.hintMemento.hintContent.getHtml() !==
+              $scope.hint.hintContent.getHtml());
             $scope.hintMemento = null;
             if ($scope.hint.hintContent.hasUnflaggedAudioTranslations() &&
               contentHasChanged) {
@@ -98,7 +98,7 @@ oppia.directive('hintEditor', [
                 'mark_all_audio_as_needing_update_modal_directive.html'),
               backdrop: true,
               resolve: {},
-              controller: 'MarkAllAudioAsNeedingUpdateCtrl'
+              controller: 'MarkAllAudioAsNeedingUpdateController'
             }).result.then(function() {
               $scope.hint.hintContent.markAllAudioAsNeedingUpdate();
               stateHintsService.displayed[$scope.getIndexPlusOne() - 1]

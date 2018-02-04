@@ -16,7 +16,7 @@
  * @fileoverview Controller for the mark_all_audio_as_needing_update modal.
  */
 
-oppia.controller('MarkAllAudioAsNeedingUpdateCtrl', [
+oppia.controller('MarkAllAudioAsNeedingUpdateController', [
   '$scope', '$uibModalInstance',
   function($scope, $uibModalInstance) {
     $scope.flagAll = function() {
