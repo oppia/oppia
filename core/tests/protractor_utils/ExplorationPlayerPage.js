@@ -60,9 +60,6 @@ var ExplorationPlayerPage = function() {
   var returnToParentButton = element(
     by.css('.protractor-test-return-to-parent-button'));
 
-  var explorationSummaryTile = element(
-    by.css('.protractor-test-exp-summary-tile-title'));
-
   var feedbackPopupLink =
     element(by.css('.protractor-test-exploration-feedback-popup-link'));
   var suggestionPopupLink =
