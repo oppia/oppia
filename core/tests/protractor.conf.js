@@ -58,7 +58,7 @@ exports.config = {
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
     full: [
-      'protractor/editorAndPlayer.js'
+      'protractor/*.js'
     ],
 
     mainEditor: [

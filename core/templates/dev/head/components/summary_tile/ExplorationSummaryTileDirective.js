@@ -103,8 +103,8 @@ oppia.directive('explorationSummaryTile', [
 
           $scope.isRefresherExploration = false;
           if ($scope.getParentExplorationIds()) {
-          $scope.isRefresherExploration = (
-            $scope.getParentExplorationIds().length > 0) ? true : false;
+            $scope.isRefresherExploration = (
+              $scope.getParentExplorationIds().length > 0) ? true : false;
           }
 
           $scope.avatarsList = [];
