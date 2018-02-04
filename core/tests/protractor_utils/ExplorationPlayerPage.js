@@ -57,6 +57,8 @@ var ExplorationPlayerPage = function() {
       element(by.css('.protractor-test-confirm-redirection-button'));
   var cancelRedirectionButton = element(
     by.css('.protractor-test-cancel-redirection-button'));
+  var returnToParentButton = element(
+    by.css('.protractor-test-return-to-parent-button'));
 
   var explorationSummaryTile = element(
     by.css('.protractor-test-exp-summary-tile-title'));
@@ -101,6 +103,10 @@ var ExplorationPlayerPage = function() {
       explorationSummaryTile.click();
     });
     browser.waitForAngular();
+  };
+
+  this.clickOnReturnToParentButton = function() {
+    returnToParentButton.click();
   };
 
   // This verifies the question just asked, including formatting and

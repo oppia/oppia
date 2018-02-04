@@ -39,7 +39,7 @@ describe('Full exploration editor', function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
   });
 
-  it('should prevent going back when help card is shown', function() {
+  /*it('should prevent going back when help card is shown', function() {
     users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
     users.login('user2@editorAndPlayer.com');
     workflow.createExploration();
@@ -78,7 +78,7 @@ describe('Full exploration editor', function() {
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToBeOver();
     users.logout();
-  });
+  });*/
 
   it('should redirect back to parent exploration correctly when parent id is' +
       ' given as query parameter', function() {
@@ -111,13 +111,13 @@ describe('Full exploration editor', function() {
             parentId1 + '&parent=' + parentId2);
           browser.waitForAngular();
 
-          explorationPlayerPage.clickOnSummaryTileAtEnd();
+          explorationPlayerPage.clickOnReturnToParentButton();
 
           browser.getCurrentUrl().then(function(url) {
             var currentExplorationId = url.split('/')[4].split('?')[0];
             expect(currentExplorationId).toBe(parentId2);
 
-            explorationPlayerPage.clickOnSummaryTileAtEnd();
+            explorationPlayerPage.clickOnReturnToParentButton();
 
             browser.getCurrentUrl().then(function(url) {
               currentExplorationId = url.split('/')[4];
@@ -244,7 +244,7 @@ describe('Full exploration editor', function() {
       general.getExplorationIdFromPlayer().then(function(currentId) {
         expect(currentId).toEqual(refresherExplorationId);
         general.waitForSystem();
-        explorationPlayerPage.clickOnSummaryTileAtEnd();
+        explorationPlayerPage.clickOnReturnToParentButton();
         browser.waitForAngular();
         explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
         general.waitForSystem();
