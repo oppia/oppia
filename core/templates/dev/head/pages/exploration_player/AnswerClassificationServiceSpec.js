@@ -330,7 +330,7 @@ describe('Answer classification service with string classifier enabled',
 
       stateClassifierMapping = {
         stateName: {
-          algorithm_id: 'LDAStringClassifier',
+          algorithm_id: 'TestClassifier',
           classifier_data: {},
           data_schema_version: 1
         }
@@ -338,7 +338,7 @@ describe('Answer classification service with string classifier enabled',
       scms.init(stateClassifierMapping);
 
       registryService.setMapping({
-        LDAStringClassifier: {
+        TestClassifier: {
           v1: 'PredictionSampleService'
         }
       });

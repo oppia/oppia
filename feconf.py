@@ -30,7 +30,7 @@ PLATFORM = 'gae'
 # This variable is for serving minified resources
 # when set to True. It reflects we are emulating running Oppia in a production
 # environment.
-FORCE_PROD_MODE = True
+FORCE_PROD_MODE = False
 
 # Whether we should serve the development or production experience.
 # DEV_MODE should only be changed to False in the production environment,
@@ -78,7 +78,7 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 # A mapping of interaction ids to classifier properties.
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
-        'algorithm_id': 'LDAStringClassifier',
+        'algorithm_id': 'TextClassifier',
         'current_data_schema_version': 1
     },
     'CodeRepl': {
@@ -412,13 +412,6 @@ ALLOWED_RTE_EXTENSIONS = {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
     },
 }
-
-
-# This list contains the IDs of the classifiers used for obtaining instances
-# class of classifiers using classifier_registry.
-ANSWER_CLASSIFIER_CLASS_IDS = [
-    'LDAStringClassifier',
-]
 
 # These categories and interactions are displayed in the order in which they
 # appear in the interaction selector.

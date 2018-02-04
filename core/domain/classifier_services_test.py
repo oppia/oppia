@@ -19,7 +19,6 @@
 import datetime
 import os
 
-from core.domain import classifier_registry
 from core.domain import classifier_services
 from core.domain import exp_services
 from core.platform import models

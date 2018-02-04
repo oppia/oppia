@@ -121,54 +121,6 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
 
 
-class ClassifyHandlerTest(test_utils.GenericTestBase):
-    """Test the handler for classification."""
-
-    def setUp(self):
-        """Before the test, create an exploration_dict."""
-        super(ClassifyHandlerTest, self).setUp()
-        self.enable_ml_classifiers = self.swap(
-            feconf, 'ENABLE_ML_CLASSIFIERS', True)
-
-        # Reading YAML exploration into a dictionary.
-        yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                 '../tests/data/string_classifier_test.yaml')
-        with open(yaml_path, 'r') as yaml_file:
-            self.yaml_content = yaml_file.read()
-
-        self.login(self.VIEWER_EMAIL)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-
-        # Load demo exploration.
-        self.exp_id = '0'
-        self.title = 'Testing String Classifier'
-        self.category = 'Test'
-        exp_services.delete_demo(self.exp_id)
-        exp_services.load_demo(self.exp_id)
-
-        # Creating the exploration domain object.
-        self.exploration = exp_domain.Exploration.from_untitled_yaml(
-            self.exp_id,
-            self.title,
-            self.category,
-            self.yaml_content)
-
-    def test_classification_handler(self):
-        """Test the classification handler for a right answer."""
-
-        with self.enable_ml_classifiers:
-            # Testing the handler for a correct answer.
-            old_state_dict = self.exploration.states['Home'].to_dict()
-            answer = 'Permutations'
-            params = {}
-            res = self.post_json('/explorehandler/classify/%s' % self.exp_id,
-                                 {'params' : params,
-                                  'old_state' : old_state_dict,
-                                  'answer' : answer})
-            self.assertEqual(res['outcome']['feedback']['html'],
-                             '<p>Detected permutation.</p>')
-
-
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
     """Test the handler for giving feedback."""
 
@@ -197,55 +149,6 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         )
 
         self.logout()
-
-
-class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
-    """Test the handler for initialising exploration with
-    state_classifier_mapping.
-    """
-
-    def test_creation_of_state_classifier_mapping(self):
-        super(ExplorationStateClassifierMappingTests, self).setUp()
-        exploration_id = '15'
-
-        self.login(self.VIEWER_EMAIL)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-
-        exp_services.delete_demo(exploration_id)
-        # We enable ENABLE_ML_CLASSIFIERS so that the subsequent call to
-        # save_exploration handles job creation for trainable states.
-        # Since only one demo exploration has a trainable state, we modify our
-        # values for MIN_ASSIGNED_LABELS and MIN_TOTAL_TRAINING_EXAMPLES to let
-        # the classifier_demo_exploration.yaml be trainable. This is
-        # completely for testing purposes.
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 5):
-                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                    exp_services.load_demo(exploration_id)
-
-        # Retrieve job_id of created job (because of save_exp).
-        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
-        self.assertEqual(all_jobs.count(), 1)
-        for job in all_jobs:
-            job_id = job.id
-
-        classifier_services.store_classifier_data(job_id, {})
-
-        expected_state_classifier_mapping = {
-            'text': {
-                'algorithm_id': 'LDAStringClassifier',
-                'classifier_data': {},
-                'data_schema_version': 1
-            }
-        }
-        # Call the handler.
-        exploration_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exploration_id))
-        retrieved_state_classifier_mapping = exploration_dict[
-            'state_classifier_mapping']
-
-        self.assertEqual(expected_state_classifier_mapping,
-                         retrieved_state_classifier_mapping)
 
 
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):
