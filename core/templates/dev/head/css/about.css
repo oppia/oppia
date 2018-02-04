@@ -1,0 +1,369 @@
+/*
+  Copyright 2018 The Oppia Authors. All Rights Reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/*
+  Animation keyframes. These must be placed at the top of the file
+  in order to work in IE.
+*/
+@-webkit-keyframes dot {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@-moz-keyframes dot {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes dot {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Firefox < 16 */
+@-moz-keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Internet Explorer */
+@-ms-keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Opera < 12.1 */
+@-o-keyframes fadein {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@-webkit-viewport {
+  width: device-width;
+}
+
+@-moz-viewport {
+  width: device-width;
+}
+
+@-ms-viewport {
+  width: device-width;
+}
+
+@-o-viewport {
+  width: device-width;
+}
+
+@viewport {
+  width: device-width;
+}
+
+/* about page selectors. */
+.oppia-about-anchor {
+  display: block;
+  position: relative;
+  top: -70px;
+  visibility: hidden;
+}
+
+.oppia-about-right-menu {
+  left: 50%;
+  margin-left: 360px;
+  position: fixed;
+  top: 100px;
+  width: 300px;
+}
+
+.oppia-about-right-menu p {
+  line-height: 1;
+  margin: 0.5em 0;
+}
+.oppia-about-right-menu ul {
+  list-style-type: none;
+  padding-left: 20px;
+}
+
+.oppia-about-clearfix {
+  clear: both;
+  content: "";
+  display: table;
+}
+
+.oppia-about-extra-container {
+  position: relative;
+  top: 50px;
+  width: 100%;
+}
+
+@media(max-width: 700px) {
+  .oppia-about-extra-container {
+    margin-bottom: -10px;
+  }
+}
+@media(max-width: 440px) {
+  .oppia-about-extra-container {
+    margin-bottom: 30px;
+  }
+}
+
+.oppia-about-otter-container {
+  bottom: -2.3em;
+  display: inline-block;
+  position: absolute;
+}
+
+.oppia-about-otter-speech-card {
+  float: right;
+  width: 65%;
+}
+
+.oppia-about-otter-speech-bubble {
+  background: #fff;
+  border-left: none;
+  border-radius: 5px;
+  margin: 1em 0 3em;
+  padding: 20px 10px;
+  position: relative;
+  text-align: center;
+}
+
+.oppia-about-otter-speech-bubble:before {
+  background: #fff;
+  border-bottom-right-radius: 80px 50px;
+  bottom: -1.7em;
+  content: "";
+  display: block;
+  height: 30px;
+  left: 1em;
+  position: absolute;
+  width: 50px;
+  z-index: 10;
+}
+
+.oppia-about-otter-speech-bubble:after {
+  background: #eee;
+  border-bottom-right-radius: 40px 50px;
+  bottom: -1.7em;
+  content: "";
+  display: block;
+  height: 30px;
+  left: 1em;
+  position: absolute;
+  width: 20px;
+  z-index: 10;
+}
+
+.oppia-about-extra-container h3 {
+  color: #fff;
+  text-align: center;
+}
+
+.oppia-about-otter-speech-bubble h3 {
+  color: #000;
+}
+
+.oppia-about-static-content p {
+  margin: 1.5em 0;
+}
+
+.oppia-about-three-cols-feature,
+.oppia-about-three-cols-feature p {
+  text-align: center;
+}
+
+.oppia-about-three-cols-layout {
+  display: inline-block;
+  margin-right: 20px;
+  width: -webkit-calc((100% - 60px) / 3);
+  width: -moz-calc((100% - 60px) / 3);
+  width: -o-calc((100% - 60px) / 3);
+  width: calc((100% - 60px) / 3);
+}
+
+.oppia-about-three-cols-layout:last-of-type {
+  margin-right: 0;
+}
+
+.oppia-about-credits-letter-groups.three-col {
+  margin: 0 0 10% 0;
+  -moz-column-count: 3;
+  -moz-column-gap: 20px;
+  -webkit-column-count: 3;
+  -webkit-column-gap: 20px;
+  column-count: 3;
+  column-gap: 20px;
+}
+
+.oppia-about-extra-info {
+  background-color: #009788;
+  color: #fff;
+  height: 245px;
+  width: 100%;
+}
+
+.oppia-about-page-extra-info {
+  height: 245px;
+}
+
+.oppia-about-tab-content {
+  display: none;
+}
+
+.oppia-about-visible-content {
+  display: block;
+  position: relative;
+}
+
+.oppia-about-tabs {
+  border-bottom: 1px solid #eee;
+  display: -webkit-flex;
+  display: flex;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.oppia-about-tabs li {
+  display: -webkit-flex;
+  display: flex;
+  margin-bottom: 0;
+  width: -webkit-calc(100% / 3);
+  width: -moz-calc(100% / 3);
+  width: -o-calc(100% / 3);
+  width: calc(100% / 3);
+}
+
+.oppia-about-tabs-active .oppia-about-tabs-text,
+.oppia-about-tabs-text:focus {
+  color: #009688;
+  border-bottom: 2px solid #009688;
+}
+
+.oppia-about-tabs-text {
+  color: #009688;
+  border-bottom: none;
+  padding: 10px;
+  text-decoration: none;
+  width: 100%;
+}
+
+.oppia-about-tabs-text:hover,
+.oppia-about-tabs-text:focus
+{
+  color: #009688;
+  text-decoration: none;
+}
+
+.oppia-about-otter {
+  width: 200px;
+}
+
+.oppia-about-teach-tabs ul li {
+  width: -webkit-calc(100% / 2);
+  width: -moz-calc(100% / 2);
+  width: -o-calc(100% / 2);
+  width: calc(100% / 2);
+}
+
+.oppia-about-button {
+  background-color: rgb(0, 121, 109);
+  color: rgba(255,255,255,1.0);
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 18px;
+  margin: 0 15px 15px 15px;
+  max-width: 90%;
+  min-width: 200px;
+  padding: 15px;
+  text-transform: uppercase;
+  white-space: normal;
+  width: 366px;
+}
+
+.oppia-about-button:hover,
+.oppia-about-button:focus {
+  background-color: rgba(5,190,178,1);
+  color: rgba(255,255,255,1);
+}
+
+.oppia-about-buttons-container {
+  text-align: center;
+}
+
+.oppia-about-credits-letter-groups span {
+  font-size: 1.8em;
+}
+
+.oppia-about-credits-letter-groups ul li {
+  list-style-type: none;
+}
+
+.oppia-about-extra-content{
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/*
+  about media queries
+*/
+
+@media only screen and (min-width: 1400px) {
+  .oppia-about-extra-info {
+    height: 245px;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .oppia-about-otter-container {
+    left: -3em;
+    bottom: -1.8em;
+  }
+  .oppia-about-otter {
+    width: 200px;
+  }
+  .oppia-about-otter-speech-bubble {
+    padding: 10px;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .oppia-about-tabs li, .oppia-about-teach-tabs ul li {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+  }
+  .oppia-about-otter-speech-card {
+    width: 50%;
+  }
+  .oppia-about-buttons {
+    width: 100%;
+    margin: 20px 0 0 0;
+  }
+  .oppia-about-buttons:first-child {
+    margin: 0;
+  }
+  .oppia-about-three-cols-layout {
+    width: 100%;
+  }
+}

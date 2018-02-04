@@ -1,7 +1,11 @@
 {% extends 'pages/base.html' %}
 
 {% block maintitle %}I18N_ABOUT_PAGE_TITLE{% endblock maintitle %}
-
+{% block header_css %}
+  {{ super() }}
+  <link rel="stylesheet" type="text/css" media="screen"
+      href="{{TEMPLATE_DIR_PREFIX}}/css/about.css">
+{% endblock header_css %}
 {% block header_js %}
   {{ super() }}
 {% endblock %}
