@@ -123,7 +123,7 @@ class BaseJobManager(object):
             job_id = job_models.JobModel.get_new_id(cls.__name__)
             job_models.JobModel(id=job_id, job_type=cls.__name__).put()
             return job_id
-        """Uses _create_new_job to create a new task having a job id"""
+        
         return transaction_services.run_in_transaction(_create_new_job)
 
     @classmethod
@@ -138,7 +138,7 @@ class BaseJobManager(object):
             additional_job_params: dict(str : *) or None. Additional parameters
                 for the job.
         """
-        """Ensures that predictions are met."""
+        #Ensures that predictions are met.
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
             job_id, model.status_code, STATUS_CODE_QUEUED)
@@ -167,9 +167,8 @@ class BaseJobManager(object):
         cls._require_valid_transition(
             job_id, model.status_code, STATUS_CODE_STARTED)
         cls._require_correct_job_type(model.job_type)
-        """_pre_start_hook is a null block which takes in ID of the the job to 
-           start and does nothing"""
         cls._pre_start_hook(job_id)
+        
         model.metadata = metadata
         model.status_code = STATUS_CODE_STARTED
         model.time_started_msec = utils.get_current_time_in_millisecs()
@@ -195,7 +194,7 @@ class BaseJobManager(object):
         model.time_finished_msec = utils.get_current_time_in_millisecs()
         model.output = cls._compress_output_list(output_list)
         model.put()
-        """_post_completed_hook is a null block which takes in ID of the the job and does nothing"""
+        
         cls._post_completed_hook(job_id)
 
     @classmethod
@@ -245,7 +244,7 @@ class BaseJobManager(object):
                     ('%s <TRUNCATED>' % kept_str) if kept_str else '<TRUNCATED>'
                 ]
                 break
-        """Returns list of truncated outputs"""
+        
         return output_str_list
 
     @classmethod
@@ -282,7 +281,7 @@ class BaseJobManager(object):
         cls._require_valid_transition(
             job_id, model.status_code, STATUS_CODE_CANCELED)
         cls._require_correct_job_type(model.job_type)
-        """Gives message whether job is cancelled by system or the user"""
+       
         cancel_message = 'Canceled by %s' % (user_id or 'system')
 
         # Cancel the job.
@@ -516,9 +515,7 @@ class BaseJobManager(object):
 
 
 class BaseDeferredJobManager(BaseJobManager):
-    ss BaseDeferredJobManager(BaseJobManager):
-    """
-       BaseDeferredJobManager takes in the object of BaseJobManager which
+    """BaseDeferredJobManager takes in the object of BaseJobManager which
        ensures that there is one job of same type which is reading from or
        writing to a location. The BaseDeferredJobManager class is responsible
        for running the jobs created by BaseJobManager. This class has the main
@@ -533,7 +530,6 @@ class BaseDeferredJobManager(BaseJobManager):
            It raises error if the job failed. 
 
        (c)_real_enqueue() puts the job in queue if there is a job already running
-
     """
 
     @classmethod
@@ -598,8 +594,7 @@ class BaseDeferredJobManager(BaseJobManager):
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):
-    """
-       This class connects all the steps needed to perform a mapreduce job.
+    """This class connects all the steps needed to perform a mapreduce job.
        A mapreduce job splits the data in such a way that it is independent
        and tasks on it can be performed in a parallel fashion. The job is 
        processed and results are stored which are used for building the 
@@ -612,7 +607,6 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
        (b)finalized() method has a null block. It contains pass keyword which 
           indicated that nothings happens in this method.
-
     """
 
     def run(self, job_id, job_class_str, kwargs):
@@ -646,13 +640,11 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
 
 class StoreMapReduceResults(base_handler.PipelineBase):
-    """
-       This class has to store the results of mapreduce job and register
+    """This class has to store the results of mapreduce job and register
        whether it has been completed or failed. run() method iterates 
        to see if any job has finished and it appends that job to the 
        result list and registers the job as complete. If the job fails,
        failure is registered and job id is also mentioned in the logs.
-
     """
 
     def run(self, job_id, job_class_str, output):
@@ -685,12 +677,10 @@ class StoreMapReduceResults(base_handler.PipelineBase):
 
 class GoogleCloudStorageConsistentJsonOutputWriter(
         output_writers.GoogleCloudStorageConsistentOutputWriter):
-    """
-       This class uses Google Cloud Storage client library for storing
+    """This class uses Google Cloud Storage client library for storing
        data. This library controls the strongly consistent operations.
        The write method simply serializes data in JSON and then writes 
        it to the Google Cloud Storage.
-    
     """
     def write(self, data):
         """Writes that data serialized in JSON format.
@@ -893,11 +883,9 @@ class BaseMapReduceOneOffJobManager(BaseMapReduceJobManager):
 
 
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
-     """
-        This class creates InputReaders and splits data among them equally.
+     """This class creates InputReaders and splits data among them equally.
         It also validates the readers by checking whether all the params
         are present or not. 
-
      """
 
     _ENTITY_KINDS_PARAM = MAPPER_PARAM_KEY_ENTITY_KINDS
@@ -988,8 +976,7 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
 
 
 class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
-    """
-       This class checks whether the entity was created or not and also sees for
+    """This class checks whether the entity was created or not and also sees for
        how long the job has been queued.
     """
     @classmethod
