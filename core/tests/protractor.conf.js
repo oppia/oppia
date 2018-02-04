@@ -49,7 +49,8 @@ exports.config = {
 
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
-  allScriptsTimeout: 120000,
+  // (Note that the hint tooltip has a 60-second timeout.)
+  allScriptsTimeout: 180000,
 
   // ----- What tests to run -----
   //
@@ -62,14 +63,14 @@ exports.config = {
 
     mainEditor: [
       'protractor/editorAndPlayer.js',
-      'protractor/stateEditor.js'
+      'protractor/stateEditor.js',
+      'protractor/explorationFeedback.js'
     ],
 
     editorFeatures: [
-      'protractor/gadgetEditor.js',
-      'protractor/fallbacks.js',
       'protractor/historyTab.js',
-      'protractor/parameters.js'
+      'protractor/parameters.js',
+      'protractor/hintsAndSolutions.js'
     ],
 
     extensions: [
@@ -80,25 +81,32 @@ exports.config = {
     library: [
       'protractor/explorationRating.js',
       'protractor/privileges.js',
+      'protractor/libraryPagesTour.js',
       'protractor/publicationAndLibrary.js'
     ],
 
-    misc: [
-      'protractor/userManagement.js',
-      'protractor/embedding.js',
-      'protractor/preferences.js',
-      'protractor/cacheSlugs.js',
-      'protractor/staticPagesTour.js',
-      'protractor/loginFlow.js',
-      'protractor/libraryPagesTour.js',
-      'protractor/collections.js',
-      'protractor/explorationFeedback.js',
-      'protractor/subscriptions.js',
-      'protractor/suggestions.js'
+    learnerDashboard: [
+      'protractor/learnerDashboard.js',
     ],
 
-    i18n: [
+    users: [
+      'protractor/userManagement.js',
+      'protractor/loginFlow.js',
+      'protractor/subscriptions.js',
+      'protractor/preferences.js'
+    ],
+
+    misc: [
+      'protractor/suggestions.js',
+      'protractor/cacheSlugs.js',
+      'protractor/staticPagesTour.js',
+      'protractor/collections.js',
+      'protractor/accessibility.js',
       'protractor/i18n.js'
+    ],
+
+    embedding: [
+      'protractor/embedding.js'
     ]
   },
 

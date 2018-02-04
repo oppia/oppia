@@ -14,11 +14,12 @@
 
 """Controllers for incoming email handlers."""
 
-from google.appengine.api import mail
-
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import feedback_services
 from core.platform import models
+
+from google.appengine.api import mail
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 
@@ -26,6 +27,7 @@ from core.platform import models
 class IncomingReplyEmailHandler(base.BaseHandler):
     """Handler for receiving incoming reply emails."""
 
+    @acl_decorators.open_access
     def post(self, reply_to_id):
         incoming_mail = mail.InboundEmailMessage(self.request.body)
         model = email_models.FeedbackEmailReplyToIdModel.get_by_reply_to_id(

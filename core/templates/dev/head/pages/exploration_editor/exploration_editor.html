@@ -11,7 +11,6 @@
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
-    GLOBALS.ALLOWED_GADGETS = JSON.parse('{{ALLOWED_GADGETS|js_string}}');
     GLOBALS.ALLOWED_INTERACTION_CATEGORIES = JSON.parse(
       '{{ALLOWED_INTERACTION_CATEGORIES|js_string}}');
     GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
@@ -19,22 +18,27 @@
       '{{DEFAULT_OBJECT_VALUES|js_string}}');
     GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = JSON.parse(
       '{{DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR|js_string}}');
-    GLOBALS.GADGET_SPECS = JSON.parse('{{GADGET_SPECS|js_string}}');
     GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
     GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse(
       '{{INVALID_PARAMETER_NAMES|js_string}}');
     GLOBALS.NEW_STATE_TEMPLATE = JSON.parse(
       '{{NEW_STATE_TEMPLATE|js_string}}');
-    GLOBALS.PANEL_SPECS = JSON.parse('{{PANEL_SPECS|js_string}}');
     GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse(
       '{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
     GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
+    GLOBALS.canDelete = JSON.parse('{{can_delete|js_string}}');
+    GLOBALS.canModifyRoles = JSON.parse('{{can_modify_roles|js_string}}');
+    GLOBALS.canReleaseOwnership = JSON.parse(
+      '{{can_release_ownership|js_string}}');
+    GLOBALS.canUnpublish = JSON.parse('{{can_unpublish|js_string}}');
   </script>
 
-  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  <!-- Updated previous version to current version of google charts
+  https://developers.google.com/chart/interactive/docs/basic_load_libs#update-library-loader-code -->
+  <script type="text/javascript"  src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
-    if (window.google && window.google.load) {
-      google.load('visualization', '1', {packages: ['corechart']});
+    if (window.google && window.google.charts) {
+      google.charts.load('current', {packages: ['corechart']});
     } else {
       throw 'error: Could not load google visualization library. Are you offline?';
     }
@@ -46,7 +50,6 @@
     }
   </style>
 
-  {{dependencies_html}}
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
@@ -62,11 +65,11 @@
 {% block content %}
   <div ng-controller="ExplorationEditor" ng-cloak>
     <div class="container-fluid oppia-editor-page-container" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onFinishTutorial()" on-skip="onSkipTutorial()">
-      <div class="row" ng-if="explorationRightsService.isCloned()">
+      <div class="row" ng-if="ExplorationRightsService.isCloned()">
         <div class="col-lg-12 col-md-12 col-sm-12">
-          <div class="oppia-align-center alert alert-warning" style="padding: 2px; width: 90%;">
+          <div class="oppia-align-center uib-alert alert-warning" style="padding: 2px; width: 90%;">
             <strong>Note:</strong> This is a private, unpublishable copy of a
-            <a ng-href="<[getExplorationUrl(explorationRightsService.clonedFrom())]>" target="_blank">public exploration</a>.
+            <a ng-href="<[getExplorationUrl(ExplorationRightsService.clonedFrom())]>" target="_blank">public exploration</a>.
           </div>
         </div>
       </div>
@@ -78,7 +81,6 @@
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
       <div ng-if="getTabStatuses().active === 'preview'">
         {% include 'pages/exploration_editor/preview_tab/preview_tab.html' %}
-        {% include 'pages/exploration_editor/preview_tab/preview_set_parameters_modal_directive.html' %}
       </div>
 
       <div ng-show="getTabStatuses().active === 'stats'">
@@ -95,7 +97,6 @@
 
       <div ng-show="getTabStatuses().active === 'feedback'">
         {% include 'pages/exploration_editor/feedback_tab/feedback_tab.html' %}
-        {% include 'pages/exploration_editor/feedback_tab/thread_table_directive.html' %}
       </div>
     </div>
   </div>
@@ -122,54 +123,19 @@
     </defs>
   </svg>
 
-  {% include 'components/attribution_guide/attribution_guide_directive.html' %}
-  {% include 'components/embed_modal/embed_exploration_modal_directive.html' %}
-  {% include 'components/forms/html_select_directive.html' %}
-  {% include 'components/gadget/gadget_directive.html' %}
-  {% include 'components/gadget/gadget_panel_directive.html' %}
-  {% include 'components/profile_link/profile_link_text_directive.html' %}
-  {% include 'components/share/sharing_links_directive.html' %}
-
-  {% include 'components/answer_group_editor_directive.html' %}
-  {% include 'components/classifier_panel_directive.html' %}
-  {% include 'components/fallback_editor_directive.html' %}
-  {% include 'components/outcome_editor_directive.html' %}
-  {% include 'components/outcome_destination_editor_directive.html' %}
-  {% include 'components/outcome_feedback_editor_directive.html' %}
-  {% include 'components/response_header_directive.html' %}
-  {% include 'components/rule_editor_directive.html' %}
-  {% include 'components/version_diff_visualization_directive.html' %}
-
-  {% include 'pages/exploration_player/tutor_card_directive.html' %}
-  {% include 'pages/exploration_player/supplemental_card_directive.html' %}
-  {% include 'pages/exploration_editor/editor_navigation_directive.html' %}
-  {% include 'pages/exploration_editor/editor_navbar_breadcrumb_directive.html' %}
-  {% include 'pages/exploration_editor/editor_reloading_modal_directive.html' %}
-  {% include 'pages/exploration_editor/exploration_metadata_modal_directive.html' %}
-  {% include 'pages/exploration_editor/exploration_publish_modal_directive.html' %}
-  {% include 'pages/exploration_editor/exploration_save_and_publish_buttons_directive.html' %}
-  {% include 'pages/exploration_editor/exploration_save_modal_directive.html' %}
-  {% include 'pages/exploration_editor/help_modal_directive.html' %}
-  {% include 'pages/exploration_editor/param_changes_editor_directive.html' %}
-  {% include 'pages/exploration_editor/post_publish_modal_directive.html' %}
-  {% include 'pages/exploration_editor/save_validation_fail_modal.html' %}
-  {% include 'pages/exploration_editor/save_version_mismatch_modal.html' %}
-  {% include 'pages/exploration_editor/state_diff_modal_directive.html' %}
-  {% include 'pages/exploration_editor/welcome_modal_directive.html' %}
-
-  {% include 'pages/exploration_editor/editor_tab/state_graph_visualization_directive.html' %}
-
-  {% include 'pages/exploration_player/answer_feedback_pair_directive.html' %}
-  {% include 'pages/exploration_player/conversation_skin_directive.html' %}
-  {% include 'pages/exploration_player/progress_dots_directive.html' %}
 {% endblock content %}
 
 {% block footer_js %}
   {{ super() }}
   <script src="/third_party/static/d3js-3.4.11/d3.min.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/mathjaxConfig.js"></script>
+  <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   <script>
     {{ value_generators_js }}
   </script>
+
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
@@ -190,6 +156,8 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/Select2DropdownDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ImageUploaderDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/AudioTranslationsEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/AudioFileUploaderDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
 
@@ -197,6 +165,7 @@
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/CodeStringEditor.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/CoordTwoDimEditor.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/FilepathEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/FractionEditor.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/GraphEditor.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/GraphPropertyEditor.js"></script>
   <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/HtmlEditor.js"></script>
@@ -219,14 +188,13 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/attribution_guide/AttributionGuideDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/embed_modal/ExplorationEmbedButtonService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/HtmlSelectDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/gadget/GadgetDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/gadget/GadgetPanelDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/profile_link/ProfileLinkTextDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/HintAndSolutionButtonsDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/AnswerGroupEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/CodemirrorMergeviewDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/FallbackEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/HintEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/ClassifierRulePanelDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/OutcomeEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/OutcomeDestinationEditorDirective.js"></script>
@@ -234,39 +202,73 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/ResponseHeaderDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RuleEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RuleTypeSelectorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SolutionEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SolutionExplanationEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/StateGraphLayoutService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/VersionDiffVisualizationDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/services/autoplayedVideosService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/AutoplayedVideosService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CircularImageDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/services/explorationServices.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/services/messengerService.js"></script>
-
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/ExplorationHtmlFormatterService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/MessengerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/AudioPlayerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/AssetsBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/AutogeneratedAudioPlayerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/SpeechSynthesisChunkerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/CodeNormalizerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/ComputeGraphService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/EditabilityService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/LocalStorageService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaDefaultValueService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaUndefinedLastElementService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorNavbarBreadcrumbDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorNavigationDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationPropertyService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ChangeListService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationWarningsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationDataService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationRightsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/AutosaveInfoModalsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorStateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/EditorFirstTimeEventsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/GraphDataService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/AngularNameService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/UserEmailPreferencesService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationDiffService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditor.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationEditorAdvancedFeaturesService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationAdvancedFeaturesService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationSaveAndPublishButtonsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationSaveService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/GadgetValidationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationTitleEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationObjectiveEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/StateEditorTutorialFirstTimeService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ChangesInHumanReadableFormService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ParamChangesEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ParameterMetadataService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/RouterServices.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/RouterService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ValueGeneratorEditorDirective.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/AnswerGroupsCacheService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/ExplorationGraph.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/GadgetEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SidebarStateName.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateEditor.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateFallbacks.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/TrainingModalService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/TrainingDataService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateContentEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateHints.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateGraphVisualizationDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/InteractionDetailsCacheService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateInteraction.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateParameterChanges.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateResponses.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/ResponsesService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateSolution.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SolutionVerificationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SolutionValidityService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateStatistics.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/preview_tab/PreviewTab.js"></script>
@@ -274,56 +276,93 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/StateImprovementSuggestionService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/StatisticsTab.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/BarChartDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/PieChartDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/settings_tab/SettingsTab.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/history_tab/HistoryTab.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/history_tab/HistoryServices.js"></script>
-
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/history_tab/CompareVersionsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/history_tab/VersionTreeService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/FeedbackTab.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadDataService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/feedback_tab/ThreadTableDirective.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/classifier/AnswerClassificationResultObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/classifier/ClassifierObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/EditableExplorationBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ExplorationDraftObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ReadOnlyExplorationBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StateObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/StatesObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/InteractionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AnswerGroupObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/FallbackObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/HintObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/TriggerObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/OutcomeObjectFactory.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ContentObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/SolutionObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AudioTranslationObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/RuleObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangesObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamSpecObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamSpecsObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamTypeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/GuestCollectionProgressObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/GuestCollectionProgressService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/objects/FractionObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/summary/ExplorationSummaryBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/StopwatchObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/LanguageUtilService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/AudioLanguageObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/AutogeneratedAudioLanguageObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/AudioFileObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/FileDownloadRequestObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/BrowserCheckerService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/TutorCardDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/SupplementalCardDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationPlayerStateService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerConstants.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerClassificationService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerFeedbackPairDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StateClassifierMappingService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PredictionAlgorithmRegistryService.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/InputResponsePairDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/CorrectnessFooterDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerCorrectnessFeedbackEnabledService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ContinueButtonDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ConversationSkinDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationFooterDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationRecommendationsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/HintsAndSolutionManagerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/HintAndSolutionModalService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/RefresherExplorationConfirmationModalService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerParamsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewRatingService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerPositionService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerServices.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlayerTranscriptService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressDotsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ProgressNavDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StatsReportingService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/FatigueDetectionService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/NumberAttemptsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioTranslationLanguageService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioTranslationManagerService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioBarDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AudioPreloaderService.js"></script>
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionSyntaxTree.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/evaluator.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/parser.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/expressionInterpolationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionSyntaxTreeService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionEvaluatorService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionParserService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/expressions/ExpressionInterpolationService.js"></script>
 
   <script src="{{ASSET_DIR_PREFIX}}/extensions/interactions/baseValidator.js"></script>
 
+  {% include 'components/rich_text_components.html' %}
   {{ interaction_templates }}
   {{ visualizations_html }}
-  {{ gadget_templates }}
+  {{ dependencies_html }}
 {% endblock footer_js %}

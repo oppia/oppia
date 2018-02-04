@@ -18,6 +18,7 @@ import datetime
 import logging
 import os
 
+from constants import constants
 from core.domain import collection_services
 from core.domain import event_services
 from core.domain import exp_services
@@ -31,6 +32,7 @@ import utils
 
 from google.appengine.api import urlfetch
 
+
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
 
@@ -40,17 +42,46 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.set_username(user_id, username)
 
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.create_new_user(user_id, 'user@example.com')
 
         user_services.set_username(user_id, username)
         self.assertEquals(username, user_services.get_username(user_id))
+
+    def test_get_username_for_system_user(self):
+        self.assertEqual(
+            feconf.SYSTEM_COMMITTER_ID,
+            user_services.get_username(feconf.SYSTEM_COMMITTER_ID))
+        self.assertEqual(
+            feconf.MIGRATION_BOT_USERNAME,
+            user_services.get_username(feconf.MIGRATION_BOT_USER_ID))
+
+    def test_get_usernames(self):
+        user_ids = ['test1', feconf.SYSTEM_COMMITTER_ID, 'test2']
+        usernames = ['name1', feconf.SYSTEM_COMMITTER_ID, 'name2']
+        user_emails = [
+            'test1@email.com', feconf.SYSTEM_EMAIL_ADDRESS, 'test2@email.com']
+
+        for uid, email, name in zip(user_ids, user_emails, usernames):
+            if uid != feconf.SYSTEM_COMMITTER_ID:
+                user_services.create_new_user(uid, email)
+                user_services.set_username(uid, name)
+        # Handle usernames that exists.
+        self.assertEqual(usernames, user_services.get_usernames(user_ids))
+
+        # Return empty list when no user id passed.
+        self.assertEqual([], user_services.get_usernames([]))
+
+        # Return None for usernames that don't exists.
+        self.assertEqual(
+            [None, 'name1'],
+            user_services.get_usernames(['fakeUser', 'test1']))
 
     def test_get_username_for_nonexistent_user(self):
         with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.get_username('fakeUser')
 
     def test_get_username_none(self):
-        user_services.get_or_create_user('fakeUser', 'user@example.com')
+        user_services.create_new_user('fakeUser', 'user@example.com')
         self.assertEquals(None, user_services.get_username('fakeUser'))
 
     def test_is_username_taken_false(self):
@@ -59,20 +90,20 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_is_username_taken_true(self):
         user_id = 'someUser'
         username = 'newUsername'
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.create_new_user(user_id, 'user@example.com')
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken(username))
 
     def test_is_username_taken_different_case(self):
         user_id = 'someUser'
         username = 'camelCase'
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.create_new_user(user_id, 'user@example.com')
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken('CaMeLcAsE'))
 
     def test_set_invalid_usernames(self):
         user_id = 'someUser'
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.create_new_user(user_id, 'user@example.com')
         bad_usernames = [
             ' bob ', '@', '', 'a' * 100, 'ADMIN', 'admin', 'AdMiN2020']
         for username in bad_usernames:
@@ -83,7 +114,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         bad_email_addresses = ['@', '@@', 'abc', '', None, ['a', '@', 'b.com']]
         for email in bad_email_addresses:
             with self.assertRaises(utils.ValidationError):
-                user_services.get_or_create_user('user_id', email)
+                user_services.create_new_user('user_id', email)
 
     def test_email_truncation(self):
         email_addresses = [
@@ -94,7 +125,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             ('abcdefgh@efg.h', 'abcde..@efg.h'),
         ]
         for ind, (actual_email, expected_email) in enumerate(email_addresses):
-            user_settings = user_services.get_or_create_user(
+            user_settings = user_services.create_new_user(
                 str(ind), actual_email)
             self.assertEqual(user_settings.truncated_email, expected_email)
 
@@ -103,7 +134,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.create_new_user(user_id, user_email)
         user_services.set_username(user_id, username)
         self.assertEquals(user_services.get_username(user_id), username)
 
@@ -124,7 +155,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.create_new_user(user_id, user_email)
         user_services.set_username(user_id, username)
         self.assertEquals(user_services.get_username(user_id), username)
 
@@ -211,7 +242,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.create_new_user(user_id, user_email)
         user_services.set_username(user_id, username)
 
         # When UserEmailPreferencesModel is yet to be created,
@@ -259,7 +290,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.create_new_user(user_id, user_email)
         user_services.set_username(user_id, username)
 
         # When ExplorationUserDataModel is yet to be created, the value
@@ -315,6 +346,92 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_id, exploration_id)
         self.assertTrue(email_preferences.mute_feedback_notifications)
         self.assertTrue(email_preferences.mute_suggestion_notifications)
+
+    def test_get_usernames_by_role(self):
+        user_ids = ['test1', 'test2', 'test3', 'test4']
+        usernames = ['name1', 'name2', 'name3', 'name4']
+        user_emails = [
+            'test1@email.com', 'test2@email.com',
+            'test3@email.com', 'test4@email.com']
+
+        for uid, email, name in zip(user_ids, user_emails, usernames):
+            user_services.create_new_user(uid, email)
+            user_services.set_username(uid, name)
+
+        user_services.update_user_role(user_ids[0], feconf.ROLE_ID_MODERATOR)
+        user_services.update_user_role(user_ids[1], feconf.ROLE_ID_MODERATOR)
+        user_services.update_user_role(user_ids[2], feconf.ROLE_ID_BANNED_USER)
+        user_services.update_user_role(user_ids[3], feconf.ROLE_ID_BANNED_USER)
+
+        self.assertEqual(
+            set(user_services.get_usernames_by_role(feconf.ROLE_ID_MODERATOR)),
+            set(['name1', 'name2']))
+
+        self.assertEqual(
+            set(user_services.get_usernames_by_role(
+                feconf.ROLE_ID_BANNED_USER)),
+            set(['name3', 'name4']))
+
+    def test_get_user_ids_by_role(self):
+        user_ids = ['test1', 'test2', 'test3', 'test4']
+        usernames = ['name1', 'name2', 'name3', 'name4']
+        user_emails = [
+            'test1@email.com', 'test2@email.com',
+            'test3@email.com', 'test4@email.com']
+
+        for uid, email, name in zip(user_ids, user_emails, usernames):
+            user_services.create_new_user(uid, email)
+            user_services.set_username(uid, name)
+
+        user_services.update_user_role(user_ids[0], feconf.ROLE_ID_MODERATOR)
+        user_services.update_user_role(user_ids[1], feconf.ROLE_ID_MODERATOR)
+        user_services.update_user_role(user_ids[2], feconf.ROLE_ID_BANNED_USER)
+        user_services.update_user_role(user_ids[3], feconf.ROLE_ID_BANNED_USER)
+
+        self.assertEqual(
+            set(user_services.get_user_ids_by_role(feconf.ROLE_ID_MODERATOR)),
+            set(['test1', 'test2']))
+
+        self.assertEqual(
+            set(user_services.get_user_ids_by_role(
+                feconf.ROLE_ID_BANNED_USER)),
+            set(['test3', 'test4']))
+
+    def test_update_user_creator_dashboard_display(self):
+        user_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_services.create_new_user(user_id, user_email)
+        user_services.set_username(user_id, username)
+
+        user_setting = user_services.get_user_settings(user_id)
+        self.assertEqual(
+            user_setting.creator_dashboard_display_pref,
+            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'])
+
+        user_services.update_user_creator_dashboard_display(
+            user_id, constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
+        user_setting = user_services.get_user_settings(user_id)
+        self.assertEqual(
+            user_setting.creator_dashboard_display_pref,
+            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
+
+    def test_update_user_role(self):
+        user_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_services.create_new_user(user_id, user_email)
+        user_services.set_username(user_id, username)
+
+        self.assertEqual(user_services.get_user_role_from_id(user_id),
+                         feconf.ROLE_ID_EXPLORATION_EDITOR)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
+        self.assertEqual(user_services.get_user_role_from_id(user_id),
+                         feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def test_get_current_date_as_string(self):
         custom_datetimes = [
@@ -389,12 +506,15 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
     def test_contribution_msec_updates_on_published_explorations(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
         init_state_name = exploration.init_state_name
         exp_services.publish_exploration_and_update_user_profiles(
-            self.admin_id, self.EXP_ID)
+            self.admin, self.EXP_ID)
 
         # Test all owners and editors of exploration after publication have
         # updated first contribution times in msecs.
@@ -403,7 +523,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test editor of published exploration has updated contribution time.
         rights_manager.release_ownership_of_exploration(
-            self.admin_id, self.EXP_ID)
+            self.admin, self.EXP_ID)
 
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [{
@@ -441,7 +561,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test that another user who commits to unpublished exploration does not
         # have updated first contribution time.
         rights_manager.assign_role_for_exploration(
-            self.admin_id, self.EXP_ID, self.editor_id, 'editor')
+            self.admin, self.EXP_ID, self.editor_id, 'editor')
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [{
                 'cmd': 'rename_state',
@@ -454,7 +574,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test that after an exploration is published, all contributors have
         # updated first contribution time.
         exp_services.publish_exploration_and_update_user_profiles(
-            self.admin_id, self.EXP_ID)
+            self.admin, self.EXP_ID)
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
         self.assertIsNotNone(user_services.get_user_settings(
@@ -464,9 +584,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
         rights_manager.assign_role_for_exploration(
-            self.admin_id, self.EXP_ID, self.editor_id, 'editor')
+            self.admin, self.EXP_ID, self.editor_id, 'editor')
         exp_services.publish_exploration_and_update_user_profiles(
-            self.admin_id, self.EXP_ID)
+            self.admin, self.EXP_ID)
 
         # Test that contribution time is not given to an editor that has not
         # contributed.
@@ -480,8 +600,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.EXP_ID, self.owner_id, end_state_name='End')
 
         exp_services.publish_exploration_and_update_user_profiles(
-            self.owner_id, self.EXP_ID)
-        rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
+            self.owner, self.EXP_ID)
+        rights_manager.unpublish_exploration(self.admin, self.EXP_ID)
 
         # Test that contribution time is not eliminated if exploration is
         # unpublished.
@@ -496,9 +616,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             exploration_id=self.EXP_ID)
 
         collection_services.publish_collection_and_update_user_profiles(
-            self.admin_id, self.COL_ID)
+            self.admin, self.COL_ID)
         exp_services.publish_exploration_and_update_user_profiles(
-            self.admin_id, self.EXP_ID)
+            self.admin, self.EXP_ID)
 
         # Test all owners and editors of collection after publication have
         # updated first contribution times.
@@ -508,7 +628,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test editor of published collection has updated
         # first contribution time.
         rights_manager.release_ownership_of_collection(
-            self.admin_id, self.COL_ID)
+            self.admin, self.COL_ID)
 
         collection_services.update_collection(
             self.editor_id, self.COL_ID, [{
@@ -547,7 +667,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test that another user who commits to unpublished collection does not
         # have updated first contribution time.
         rights_manager.assign_role_for_collection(
-            self.admin_id, self.COL_ID, self.editor_id, 'editor')
+            self.admin, self.COL_ID, self.editor_id, 'editor')
         collection_services.update_collection(
             self.editor_id, self.COL_ID, [{
                 'cmd': 'edit_collection_property',
@@ -560,7 +680,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test that after an collection is published, all contributors have
         # updated first contribution times.
         collection_services.publish_collection_and_update_user_profiles(
-            self.admin_id, self.COL_ID)
+            self.admin, self.COL_ID)
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
         self.assertIsNotNone(user_services.get_user_settings(
@@ -574,9 +694,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             objective=self.COLLECTION_OBJECTIVE,
             exploration_id=self.EXP_ID)
         rights_manager.assign_role_for_collection(
-            self.admin_id, self.COL_ID, self.editor_id, 'editor')
+            self.admin, self.COL_ID, self.editor_id, 'editor')
         collection_services.publish_collection_and_update_user_profiles(
-            self.admin_id, self.COL_ID)
+            self.admin, self.COL_ID)
 
         # Test that contribution time is not given to an editor that has not
         # contributed.
@@ -592,8 +712,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             objective=self.COLLECTION_OBJECTIVE,
             exploration_id=self.EXP_ID)
         collection_services.publish_collection_and_update_user_profiles(
-            self.owner_id, self.COL_ID)
-        rights_manager.unpublish_collection(self.admin_id, self.COL_ID)
+            self.owner, self.COL_ID)
+        rights_manager.unpublish_collection(self.admin, self.COL_ID)
 
         # Test that first contribution msec is not eliminated if collection is
         # unpublished.
@@ -720,7 +840,7 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
         self.username = 'username'
         self.user_email = 'user@example.com'
 
-        user_services.get_or_create_user(self.user_id, self.user_email)
+        user_services.create_new_user(self.user_id, self.user_email)
         user_services.set_username(self.user_id, self.username)
 
     def test_invalid_subject_interests_are_not_accepted(self):

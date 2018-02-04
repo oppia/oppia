@@ -23,6 +23,7 @@ from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.platform import models
+
 (exp_models, recommendations_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
 
@@ -32,7 +33,7 @@ MAX_RECOMMENDATIONS = 10
 SIMILARITY_SCORE_THRESHOLD = 3.0
 
 
-class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceJobManager):
+class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job that computes a list of recommended explorations to play
     after completing an exploration.
     """

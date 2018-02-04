@@ -16,46 +16,69 @@
  * @fileoverview Directive for the header of the response tiles.
  */
 
-oppia.directive('responseHeader', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      getIndex: '&index',
-      getOutcome: '&outcome',
-      getSummary: '&summary',
-      getShortSummary: '&shortSummary',
-      isActive: '&isActive',
-      getOnDeleteFn: '&onDeleteFn',
-      getNumRules: '&numRules'
-    },
-    templateUrl: 'components/responseHeader',
-    controller: [
-      '$scope', 'editabilityService', 'editorContextService', 'routerService',
-      'PLACEHOLDER_OUTCOME_DEST',
-      function(
-          $scope, editabilityService, editorContextService, routerService,
-          PLACEHOLDER_OUTCOME_DEST) {
-        $scope.editabilityService = editabilityService;
+oppia.directive('responseHeader', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        getIndex: '&index',
+        getOutcome: '&outcome',
+        getSummary: '&summary',
+        getShortSummary: '&shortSummary',
+        isActive: '&isActive',
+        getOnDeleteFn: '&onDeleteFn',
+        getNumRules: '&numRules',
+        isResponse: '&isResponse'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/response_header_directive.html'),
+      controller: [
+        '$scope', 'EditabilityService', 'EditorStateService', 'RouterService',
+        'PLACEHOLDER_OUTCOME_DEST', 'ExplorationCorrectnessFeedbackService',
+        'stateInteractionIdService', 'INTERACTION_SPECS',
+        function(
+            $scope, EditabilityService, EditorStateService, RouterService,
+            PLACEHOLDER_OUTCOME_DEST, ExplorationCorrectnessFeedbackService,
+            stateInteractionIdService, INTERACTION_SPECS) {
+          $scope.EditabilityService = EditabilityService;
 
-        $scope.isOutcomeLooping = function() {
-          var outcome = $scope.getOutcome();
-          var activeStateName = editorContextService.getActiveStateName();
-          return outcome && (outcome.dest === activeStateName);
-        };
+          $scope.getCurrentInteractionId = function() {
+            return stateInteractionIdService.savedMemento;
+          };
 
-        $scope.isCreatingNewState = function() {
-          var outcome = $scope.getOutcome();
-          return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
-        };
+          // This returns false if the current interaction ID is null.
+          $scope.isCurrentInteractionLinear = function() {
+            var interactionId = $scope.getCurrentInteractionId();
+            return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+          };
 
-        $scope.navigateToState = function(stateName) {
-          routerService.navigateToMainTab(stateName);
-        };
+          $scope.isCorrect = function() {
+            return $scope.getOutcome() && $scope.getOutcome().labelledAsCorrect;
+          };
 
-        $scope.deleteResponse = function(evt) {
-          $scope.getOnDeleteFn()($scope.getIndex(), evt);
-        };
-      }
-    ]
-  };
-}]);
+          $scope.isOutcomeLooping = function() {
+            var outcome = $scope.getOutcome();
+            var activeStateName = EditorStateService.getActiveStateName();
+            return outcome && (outcome.dest === activeStateName);
+          };
+
+          $scope.isCorrectnessFeedbackEnabled = function() {
+            return ExplorationCorrectnessFeedbackService.isEnabled();
+          };
+
+          $scope.isCreatingNewState = function() {
+            var outcome = $scope.getOutcome();
+            return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
+          };
+
+          $scope.navigateToState = function(stateName) {
+            RouterService.navigateToMainTab(stateName);
+          };
+
+          $scope.deleteResponse = function(evt) {
+            $scope.getOnDeleteFn()($scope.getIndex(), evt);
+          };
+        }
+      ]
+    };
+  }]);

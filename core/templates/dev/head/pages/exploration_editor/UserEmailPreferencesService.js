@@ -17,10 +17,11 @@
  */
 
 oppia.factory('UserEmailPreferencesService', [
-  '$http', '$q', 'explorationData', 'alertsService',
+  '$http', '$q', 'ExplorationDataService', 'AlertsService',
   'UrlInterpolationService',
   function(
-      $http, $q, explorationData, alertsService, UrlInterpolationService) {
+      $http, $q, ExplorationDataService,
+      AlertsService, UrlInterpolationService) {
     var MESSAGE_TYPE_SUGGESTION = 'suggestion';
     var MESSAGE_TYPE_FEEDBACK = 'feedback';
     return {
@@ -48,23 +49,21 @@ oppia.factory('UserEmailPreferencesService', [
         });
       },
       saveChangeToBackend: function(requestParams) {
-        var whenPreferencesSaved = $q.defer();
         var that = this;
-
         var emailPreferencesUrl = UrlInterpolationService.interpolateUrl(
           '/createhandler/notificationpreferences/<exploration_id>', {
-            exploration_id: explorationData.explorationId
-          });
-        $http.put(emailPreferencesUrl, requestParams).then(
+            exploration_id: ExplorationDataService.explorationId
+          }
+        );
+        return $http.put(emailPreferencesUrl, requestParams).then(
           function(response) {
             var data = response.data;
-            alertsService.clearWarnings();
+            AlertsService.clearWarnings();
             that.init(
               data.email_preferences.mute_feedback_notifications,
               data.email_preferences.mute_suggestion_notifications);
-            whenPreferencesSaved.resolve();
-          });
-        return whenPreferencesSaved.promise;
+          }
+        );
       }
     };
   }

@@ -21,6 +21,7 @@ from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -55,53 +56,17 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
         'title': 'Title 5'
     }]
 
-    def test_all_exps_publicized(self):
-        """Test exploration summary batch job if all explorations are
-        publicized.
-        """
-        self._run_batch_job_once_and_verify_output(
-            self.EXP_SPECS,
-            default_status=rights_manager.ACTIVITY_STATUS_PUBLICIZED)
-
     def test_all_exps_public(self):
-        """Test summary batch job if all explorations are public
-        but not publicized."""
+        """Test summary batch job if all explorations are public."""
         self._run_batch_job_once_and_verify_output(
             self.EXP_SPECS,
             default_status=rights_manager.ACTIVITY_STATUS_PUBLIC)
-
-    def test_exps_some_publicized(self):
-        """Test summary batch job if some explorations are publicized."""
-
-        exp_specs = [{
-            'category': 'Category A',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-            'title': 'Title 1'
-        }, {
-            'category': 'Category B',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
-            'title': 'Title 2'
-        }, {
-            'category': 'Category C',
-            'status': rights_manager.ACTIVITY_STATUS_PRIVATE,
-            'title': 'Title 3'
-        }, {
-            'category': 'Category A',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
-            'title': 'Title 4'
-        }, {
-            'category': 'Category C',
-            'status': rights_manager.ACTIVITY_STATUS_PUBLICIZED,
-            'title': 'Title 5'
-        }]
-
-        self._run_batch_job_once_and_verify_output(exp_specs)
 
     def _run_batch_job_once_and_verify_output(
             self, exp_specs,
             default_title='A title',
             default_category='A category',
-            default_status=rights_manager.ACTIVITY_STATUS_PUBLICIZED):
+            default_status=rights_manager.ACTIVITY_STATUS_PUBLIC):
         """Run batch job for creating exploration summaries once and verify its
         output. exp_specs is a list of dicts with exploration specifications.
         Allowed keys are category, status, title. If a key is not specified,
@@ -122,6 +87,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.login(self.ADMIN_EMAIL)
             admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
             self.set_admins([self.ADMIN_USERNAME])
+            admin = user_services.UserActionsInfo(admin_id)
 
             # Create and delete an exploration (to make sure job handles
             # deleted explorations correctly).
@@ -149,14 +115,9 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     category=spec['category'])
                 exploration = exp_services.get_exploration_by_id(exp_id)
 
-                # Publish or publicize exploration.
+                # Publish exploration.
                 if spec['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
-                    rights_manager.publish_exploration(admin_id, exp_id)
-                elif (
-                        spec['status'] ==
-                        rights_manager.ACTIVITY_STATUS_PUBLICIZED):
-                    rights_manager.publish_exploration(admin_id, exp_id)
-                    rights_manager.publicize_exploration(admin_id, exp_id)
+                    rights_manager.publish_exploration(admin, exp_id)
 
                 # Do not include user_id here, so all explorations are not
                 # editable for now (will be updated depending on user_id
@@ -244,9 +205,6 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id'
 
-    def setUp(self):
-        super(OneOffExplorationFirstPublishedJobTest, self).setUp()
-
     def test_first_published_time_of_exploration_that_is_unpublished(self):
         """This tests that, if an exploration is published, unpublished, and
         then published again, the job uses the first publication time as the
@@ -258,10 +216,12 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        owner = user_services.UserActionsInfo(owner_id)
+        admin = user_services.UserActionsInfo(admin_id)
 
         self.save_new_valid_exploration(
             self.EXP_ID, owner_id, end_state_name='End')
-        rights_manager.publish_exploration(owner_id, self.EXP_ID)
+        rights_manager.publish_exploration(owner, self.EXP_ID)
         job_class = exp_jobs_one_off.ExplorationFirstPublishedOneOffJob
         job_id = job_class.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
@@ -276,8 +236,8 @@ class OneOffExplorationFirstPublishedJobTest(test_utils.GenericTestBase):
         self.assertLess(
             exp_first_published, last_updated_time_msec)
 
-        rights_manager.unpublish_exploration(admin_id, self.EXP_ID)
-        rights_manager.publish_exploration(owner_id, self.EXP_ID)
+        rights_manager.unpublish_exploration(admin, self.EXP_ID)
+        rights_manager.publish_exploration(owner, self.EXP_ID)
         job_id = job_class.create_new()
         exp_jobs_one_off.ExplorationFirstPublishedOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
@@ -300,9 +260,6 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
     USERNAME_B = 'usernameb'
     EMAIL_A = 'emaila@example.com'
     EMAIL_B = 'emailb@example.com'
-
-    def setUp(self):
-        super(ExpSummariesContributorsOneOffJobTest, self).setUp()
 
     def test_contributors_for_valid_contribution(self):
         """Test that if only one commit is made, that the contributor
@@ -365,11 +322,13 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         # Have one user make two commits.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, user_a_id, title='Original Title')
-        exploration_model = exp_models.ExplorationModel.get(
-            self.EXP_ID, strict=True, version=None)
-        exploration_model.title = 'New title'
-        exploration_model.commit(
-            user_a_id, 'Changed title.', [])
+        change_list = [{
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'property_name': 'title',
+            'new_value': 'New title'
+        }]
+        exp_services.update_exploration(
+            user_a_id, self.EXP_ID, change_list, 'Changed title.')
 
         # Have the second user revert version 2 to version 1
         exp_services.revert_exploration(user_b_id, self.EXP_ID, 2, 1)
@@ -592,56 +551,6 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
                 exploration_summary.contributors_summary)
 
 
-class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
-
-    EXP_ID = 'exp_id'
-
-    def setUp(self):
-        super(OneOffReindexExplorationsJobTest, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            '%s%s' % (self.EXP_ID, i),
-            title='title %d' % i,
-            category='category%d' % i
-        ) for i in xrange(5)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-            rights_manager.publish_exploration(self.owner_id, exp.id)
-
-        self.process_and_flush_pending_tasks()
-
-    def test_standard_operation(self):
-        job_id = (exp_jobs_one_off.IndexAllExplorationsJobManager.create_new())
-        exp_jobs_one_off.IndexAllExplorationsJobManager.enqueue(job_id)
-
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-
-        indexed_docs = []
-
-        def add_docs_mock(docs, index):
-            indexed_docs.extend(docs)
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-
-        add_docs_swap = self.swap(
-            search_services, 'add_documents_to_index', add_docs_mock)
-
-        with add_docs_swap:
-            self.process_and_flush_pending_tasks()
-
-        ids = [doc['id'] for doc in indexed_docs]
-        titles = [doc['title'] for doc in indexed_docs]
-        categories = [doc['category'] for doc in indexed_docs]
-
-        for index in xrange(5):
-            self.assertIn("%s%s" % (self.EXP_ID, index), ids)
-            self.assertIn('title %d' % index, titles)
-            self.assertIn('category%d' % index, categories)
-
-
 class ExplorationMigrationJobTest(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -743,3 +652,104 @@ class ExplorationMigrationJobTest(test_utils.GenericTestBase):
         # Ensure the exploration is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+
+class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
+    """Tests for the ExplorationStateIdMapping one off job."""
+
+    EXP_ID = 'eid'
+
+    def setUp(self):
+        """Initialize owner before each test case."""
+        super(ExplorationStateIdMappingJobTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_that_mapreduce_job_works_for_first_version_of_exploration(self):
+        """Tests that mapreduce job works correctly when the only first
+        exploration version exists."""
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', False):
+            exploration = self.save_new_valid_exploration(
+                self.EXP_ID, self.owner_id)
+
+        job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
+        exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
+
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
+            self.process_and_flush_pending_tasks()
+
+        expected_mapping = {
+            exploration.init_state_name: 0
+        }
+        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 1)
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 1)
+        self.assertEqual(mapping.largest_state_id_used, 0)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+    def test_that_mapreduce_job_works(self):
+        """Test that mapreduce job is working as expected."""
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', False):
+            exploration = self.save_new_valid_exploration(
+                self.EXP_ID, self.owner_id)
+
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'new state',
+                }], 'Add state name')
+
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'new state 2',
+                }, {
+                    'cmd': exp_domain.CMD_DELETE_STATE,
+                    'state_name': 'new state'
+                }], 'Modify states')
+
+            exp_services.revert_exploration(self.owner_id, self.EXP_ID, 3, 1)
+
+        job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
+        exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
+
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
+            self.process_and_flush_pending_tasks()
+
+        expected_mapping = {
+            exploration.init_state_name: 0
+        }
+        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 1)
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 1)
+        self.assertEqual(mapping.largest_state_id_used, 0)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+        expected_mapping = {
+            exploration.init_state_name: 0,
+            'new state': 1
+        }
+        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 2)
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 2)
+        self.assertEqual(mapping.largest_state_id_used, 1)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+        expected_mapping = {
+            exploration.init_state_name: 0,
+            'new state 2': 2
+        }
+        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 3)
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 3)
+        self.assertEqual(mapping.largest_state_id_used, 2)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+        expected_mapping = {
+            exploration.init_state_name: 0
+        }
+        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 4)
+        self.assertEqual(mapping.exploration_id, self.EXP_ID)
+        self.assertEqual(mapping.exploration_version, 4)
+        self.assertEqual(mapping.largest_state_id_used, 2)
+        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)

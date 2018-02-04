@@ -17,31 +17,62 @@
  * domain objects.
  */
 
-oppia.factory('OutcomeObjectFactory', [function() {
-  var Outcome = function(dest, feedback, paramChanges) {
-    this.dest = dest;
-    this.feedback = feedback;
-    this.paramChanges = paramChanges;
-  };
-
-  Outcome.prototype.toBackendDict = function() {
-    return {
-      dest: this.dest,
-      feedback: this.feedback,
-      param_changes: this.paramChanges
+oppia.factory('OutcomeObjectFactory', [
+  'SubtitledHtmlObjectFactory',
+  function(SubtitledHtmlObjectFactory) {
+    var Outcome = function(
+        dest, feedback, labelledAsCorrect, paramChanges,
+        refresherExplorationId) {
+      this.dest = dest;
+      this.feedback = feedback;
+      this.labelledAsCorrect = labelledAsCorrect;
+      this.paramChanges = paramChanges;
+      this.refresherExplorationId = refresherExplorationId;
     };
-  };
 
-  Outcome.createNew = function(dest, feedback, paramChanges) {
-    return new Outcome(dest, feedback, paramChanges);
-  };
+    Outcome.prototype.toBackendDict = function() {
+      return {
+        dest: this.dest,
+        feedback: this.feedback.toBackendDict(),
+        labelled_as_correct: this.labelledAsCorrect,
+        param_changes: this.paramChanges,
+        refresher_exploration_id: this.refresherExplorationId
+      };
+    };
+    /**
+     * Returns true iff an outcome has a self-loop, no feedback, and no
+     * refresher exploration.
+     */
+    Outcome.prototype.isConfusing = function(currentStateName) {
+      return (
+        this.dest === currentStateName &&
+        !this.hasNonemptyFeedback() &&
+        this.refresherExplorationId === null
+      );
+    };
 
-  Outcome.createFromBackendDict = function(outcomeDict) {
-    return new Outcome(
-      outcomeDict.dest,
-      outcomeDict.feedback,
-      outcomeDict.param_changes);
-  };
+    Outcome.prototype.hasNonemptyFeedback = function() {
+      return this.feedback.getHtml().trim() !== '';
+    };
 
-  return Outcome;
-}]);
+    Outcome.createNew = function(dest, feedbackText, paramChanges) {
+      return new Outcome(
+        dest,
+        SubtitledHtmlObjectFactory.createDefault(feedbackText),
+        false,
+        paramChanges,
+        null);
+    };
+
+    Outcome.createFromBackendDict = function(outcomeDict) {
+      return new Outcome(
+        outcomeDict.dest,
+        SubtitledHtmlObjectFactory.createFromBackendDict(outcomeDict.feedback),
+        outcomeDict.labelled_as_correct,
+        outcomeDict.param_changes,
+        outcomeDict.refresher_exploration_id);
+    };
+
+    return Outcome;
+  }
+]);

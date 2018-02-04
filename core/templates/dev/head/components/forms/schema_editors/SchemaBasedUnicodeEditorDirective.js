@@ -17,36 +17,24 @@
  */
 
 oppia.directive('schemaBasedUnicodeEditor', [
-  function() {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
         isDisabled: '&',
         validators: '&',
         uiConfig: '&',
-        allowExpressions: '&',
         labelForFocusTarget: '&',
         onInputBlur: '=',
         onInputFocus: '='
       },
-      templateUrl: 'schemaBasedEditor/unicode',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/schema_editors/' +
+        'schema_based_unicode_editor_directive.html'),
       restrict: 'E',
       controller: [
-        '$scope', '$filter', '$sce', 'parameterSpecsService',
-        function($scope, $filter, $sce, parameterSpecsService) {
-          $scope.allowedParameterNames =
-            parameterSpecsService.getAllParamsOfType('unicode');
-          $scope.doUnicodeParamsExist =
-            ($scope.allowedParameterNames.length > 0);
-
-          if ($scope.uiConfig() && $scope.uiConfig().rows &&
-              $scope.doUnicodeParamsExist) {
-            $scope.doUnicodeParamsExist = false;
-            console.log(
-              'Multi-row unicode fields with parameters are not currently ' +
-              'supported.');
-          }
-
+        '$scope', '$filter', '$sce', '$translate', 'DeviceInfoService',
+        function($scope, $filter, $sce, $translate, DeviceInfoService) {
           if ($scope.uiConfig() && $scope.uiConfig().coding_mode) {
             // Flag that is flipped each time the codemirror view is
             // shown. (The codemirror instance needs to be refreshed
@@ -104,6 +92,11 @@ oppia.directive('schemaBasedUnicodeEditor', [
             if (!$scope.uiConfig()) {
               return '';
             } else {
+              if (!$scope.uiConfig().placeholder &&
+                  DeviceInfoService.hasTouchEvents()) {
+                return $translate.instant(
+                  'I18N_PLAYER_DEFAULT_MOBILE_PLACEHOLDER');
+              }
               return $scope.uiConfig().placeholder;
             }
           };

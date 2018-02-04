@@ -16,6 +16,8 @@
 
 """Models for Oppia feedback threads and messages."""
 
+import datetime
+
 from core.platform import models
 import feconf
 import utils
@@ -70,6 +72,27 @@ class FeedbackThreadModel(base_models.BaseModel):
     summary = ndb.TextProperty(indexed=False)
     # Specifies whether this thread has a related learner suggestion.
     has_suggestion = ndb.BooleanProperty(indexed=True, default=False)
+    # The number of messages in the thread.
+    message_count = ndb.IntegerProperty(indexed=True)
+    # When this thread was last updated. This overrides the field in
+    # BaseModel. We are overriding it because we do not want the last_updated
+    # field to be updated everytime the feedback thread is changed. For example,
+    # on running the job for calculating the number of messages in a thread
+    # and updating the message_count field we do not wish the last_updated field
+    # to be updated.
+    last_updated = ndb.DateTimeProperty(indexed=True)
+
+    def put(self, update_last_updated_time=True):
+        """Writes the given thread instance to the datastore.
+
+        Args:
+            update_last_updated_time: bool. Whether to update the
+                last_updated_field of the thread.
+        """
+        if update_last_updated_time:
+            self.last_updated = datetime.datetime.utcnow()
+
+        return super(FeedbackThreadModel, self).put()
 
     @classmethod
     def generate_new_thread_id(cls, exploration_id):
@@ -108,6 +131,24 @@ class FeedbackThreadModel(base_models.BaseModel):
             str. Full thread ID.
         """
         return '.'.join([exploration_id, thread_id])
+
+    @classmethod
+    def get_exploration_and_thread_ids(cls, full_thread_ids):
+        """Gives back the exploration ids and thread ids corresponding to the
+        full thread ids.
+
+        Args:
+            full_thread_ids: str. The list of full thread ids.
+
+        Returns:
+            list(str). The list of exploration ids to which the threads belong.
+            list(str). The ids of the threads corresponding to the full thread
+                ids.
+        """
+        exploration_and_thread_ids = (
+            [thread_id.split('.') for thread_id in full_thread_ids])
+
+        return zip(*exploration_and_thread_ids)
 
     @property
     def thread_id(self):
@@ -317,8 +358,15 @@ class FeedbackMessageModel(base_models.BaseModel):
         """
         full_thread_id = FeedbackThreadModel.generate_full_thread_id(
             exploration_id, thread_id)
-        return cls.get_all().filter(
-            cls.thread_id == full_thread_id).order(-cls.last_updated).get()
+        thread = FeedbackThreadModel.get_by_exp_and_thread_id(
+            exploration_id, thread_id)
+        if thread.message_count:
+            most_recent_message = cls.get(
+                exploration_id, thread_id, thread.message_count - 1)
+            return most_recent_message
+        else:
+            return cls.get_all().filter(
+                cls.thread_id == full_thread_id).order(-cls.last_updated).get()
 
     @classmethod
     def get_message_count(cls, exploration_id, thread_id):
@@ -335,13 +383,94 @@ class FeedbackMessageModel(base_models.BaseModel):
         """
         full_thread_id = FeedbackThreadModel.generate_full_thread_id(
             exploration_id, thread_id)
-        return cls.get_all(include_deleted=True).filter(
-            cls.thread_id == full_thread_id).count()
+        thread = FeedbackThreadModel.get_by_exp_and_thread_id(
+            exploration_id, thread_id)
+        if thread.message_count:
+            return thread.message_count
+        else:
+            return cls.get_all(include_deleted=True).filter(
+                cls.thread_id == full_thread_id).count()
 
     @classmethod
     def get_all_messages(cls, page_size, urlsafe_start_cursor):
         return cls._fetch_page_sorted_by_last_updated(
             cls.query(), page_size, urlsafe_start_cursor)
+
+
+class FeedbackThreadUserModel(base_models.BaseModel):
+    """Model for storing the ids of the messages in the thread that are read by
+    the user.
+
+    Instances of this class have keys of the form [user_id].[thread_id]
+    """
+    message_ids_read_by_user = ndb.IntegerProperty(repeated=True, indexed=True)
+
+    @classmethod
+    def generate_full_id(cls, user_id, exploration_id, thread_id):
+        full_thread_id = (
+            FeedbackThreadModel.generate_full_thread_id(
+                exploration_id, thread_id))
+        return '%s.%s' % (user_id, full_thread_id)
+
+    @classmethod
+    def get(cls, user_id, exploration_id, thread_id):
+        """Gets the FeedbackThreadUserModel corresponding to the given user and
+        the thread given by the exploration id and thread id.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration to which the thread
+                belongs.
+            thread_id: str. The id of the thread.
+
+        Returns:
+            FeedbackThreadUserModel. The FeedbackThreadUserModel instance which
+                matches with the given user_id, exploration_id and thread id.
+        """
+        instance_id = cls.generate_full_id(user_id, exploration_id, thread_id)
+        return super(FeedbackThreadUserModel, cls).get(
+            instance_id, strict=False)
+
+    @classmethod
+    def create(cls, user_id, exploration_id, thread_id):
+        """Creates a new FeedbackThreadUserModel instance and returns it.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_id: str. The id of the exploration to which the thread
+                belongs.
+            thread_id: str. The id of the thread.
+
+        Returns:
+            FeedbackThreadUserModel. The newly created FeedbackThreadUserModel
+                instance.
+        """
+        instance_id = cls.generate_full_id(user_id, exploration_id, thread_id)
+        new_instance = cls(id=instance_id)
+        new_instance.put()
+        return new_instance
+
+    @classmethod
+    def get_multi(cls, user_id, exploration_ids, thread_ids):
+        """Gets the ExplorationUserDataModel corresponding to the given user and
+        the exploration and thread ids.
+
+        Args:
+            user_id: str. The id of the user.
+            exploration_ids: list(str). The ids of the explorations to which
+                the threads belong.
+            thread_ids: list(str). The ids of the threads.
+
+        Returns:
+            list(FeedbackThreadUserModel). The FeedbackThreadUserModels
+                corresponding to the given user and the exploration and thread
+                ids.
+        """
+        instance_ids = [
+            cls.generate_full_id(user_id, exploration_id, thread_id)
+            for exploration_id, thread_id in zip(exploration_ids, thread_ids)]
+
+        return super(FeedbackThreadUserModel, cls).get_multi(instance_ids)
 
 
 class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -390,41 +519,30 @@ class SuggestionModel(base_models.BaseModel):
     # Learner-provided description of suggestion.
     description = ndb.TextProperty(required=True, indexed=False)
     # The state's content after the suggested edits.
-    # Contains keys 'type' (always 'text') and 'value' (the actual content).
+    # For legacy reasons, contains keys 'type' (always 'text') and 'value' (the
+    # HTML string representing the actual content).
     state_content = ndb.JsonProperty(required=True, indexed=False)
 
     @classmethod
-    def create(cls, exploration_id, thread_id, author_id, exploration_version,
-               state_name, description, state_content):
-        """Creates a new SuggestionModel entry.
+    def _convert_suggestion_html_to_legacy_state_content(cls, suggestion_html):
+        """Converts a suggestion HTML string to a legacy state content object.
+
+        The state content object is a dict containing two keys, "type" and
+        "value". For historical reasons, the value of "type" is always "text"
+        while the value of "value" is the actual suggestion made by the learner
+        in the form of html content.
 
         Args:
-            exploration_id: str. ID of the corresponding exploration.
-            thread_id: str. ID of the corresponding thread.
-            author_id: str. ID of the user who submitted the suggestion.
-            state_name: str. ID of the state the suggestion is for.
-            description: str. Learner-provided description of suggestion.
-            state_content: dict. Contains two keys, "type" and "value". For
-                historical reasons, the value of "type" is always "text"
-                while the value of "value" is the actual suggestion made
-                by learner in the form of html content.
-            exploration_version: int. exploration version for which the
-                suggestion was made.
+            suggestion_html: str. The HTML representing the suggestion.
 
-        Raises:
-            Exception: There is already a feedback thread with the same
-                exploration_id and thread_id.
+        Returns:
+            dict. The legacy content object that corresponds to the given
+            suggestion HTML.
         """
-        instance_id = cls._get_instance_id(exploration_id, thread_id)
-        if cls.get_by_id(instance_id):
-            raise Exception('There is already a feedback thread with the given '
-                            'thread id: %s' % instance_id)
-        cls(id=instance_id, author_id=author_id,
-            exploration_id=exploration_id,
-            exploration_version=exploration_version,
-            state_name=state_name,
-            description=description,
-            state_content=state_content).put()
+        return {
+            'type': 'text',
+            'value': suggestion_html,
+        }
 
     @classmethod
     def _get_instance_id(cls, exploration_id, thread_id):
@@ -443,6 +561,46 @@ class SuggestionModel(base_models.BaseModel):
         return '.'.join([exploration_id, thread_id])
 
     @classmethod
+    def create(cls, exploration_id, thread_id, author_id, exploration_version,
+               state_name, description, suggestion_html):
+        """Creates a new SuggestionModel entry.
+
+        Args:
+            exploration_id: str. ID of the corresponding exploration.
+            thread_id: str. ID of the corresponding thread.
+            author_id: str. ID of the user who submitted the suggestion.
+            exploration_version: int. exploration version for which the
+                suggestion was made.
+            state_name: str. ID of the state the suggestion is for.
+            description: str. Learner-provided description of suggestion.
+            suggestion_html: str. The content of the suggestion.
+
+        Raises:
+            Exception: There is already a feedback thread with the same
+                exploration_id and thread_id.
+        """
+        instance_id = cls._get_instance_id(exploration_id, thread_id)
+        if cls.get_by_id(instance_id):
+            raise Exception('There is already a feedback thread with the given '
+                            'thread id: %s' % instance_id)
+        state_content = cls._convert_suggestion_html_to_legacy_state_content(
+            suggestion_html)
+        cls(id=instance_id, author_id=author_id,
+            exploration_id=exploration_id,
+            exploration_version=exploration_version,
+            state_name=state_name,
+            description=description,
+            state_content=state_content).put()
+
+    def get_suggestion_html(self):
+        """Retrieves the suggestion HTML of this instance as a string.
+
+        Returns:
+            str. The suggested content HTML string.
+        """
+        return self.state_content['value']
+
+    @classmethod
     def get_by_exploration_and_thread_id(cls, exploration_id, thread_id):
         """Gets a suggestion by the corresponding exploration and thread IDs.
 
@@ -456,7 +614,6 @@ class SuggestionModel(base_models.BaseModel):
                 exploration and thread IDs, or None if no such SuggestionModel
                 exists.
         """
-
         return cls.get_by_id(cls._get_instance_id(exploration_id, thread_id))
 
 

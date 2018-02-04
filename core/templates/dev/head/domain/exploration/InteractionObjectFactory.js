@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,18 +18,21 @@
  */
 
 oppia.factory('InteractionObjectFactory', [
-  'AnswerGroupObjectFactory', 'FallbackObjectFactory', 'OutcomeObjectFactory',
+  'AnswerGroupObjectFactory', 'HintObjectFactory', 'OutcomeObjectFactory',
+  'SolutionObjectFactory',
   function(
-    AnswerGroupObjectFactory, FallbackObjectFactory, OutcomeObjectFactory) {
+      AnswerGroupObjectFactory, HintObjectFactory, OutcomeObjectFactory,
+      SolutionObjectFactory) {
     var Interaction = function(
         answerGroups, confirmedUnclassifiedAnswers, customizationArgs,
-        defaultOutcome, fallbacks, id) {
+        defaultOutcome, hints, id, solution) {
       this.answerGroups = answerGroups;
       this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
       this.customizationArgs = customizationArgs;
       this.defaultOutcome = defaultOutcome;
-      this.fallbacks = fallbacks;
+      this.hints = hints;
       this.id = id;
+      this.solution = solution;
     };
 
     Interaction.prototype.toBackendDict = function() {
@@ -41,10 +44,11 @@ oppia.factory('InteractionObjectFactory', [
         customization_args: this.customizationArgs,
         default_outcome:
           this.defaultOutcome ? this.defaultOutcome.toBackendDict() : null,
-        fallbacks: this.fallbacks.map(function(fallback) {
-          return fallback.toBackendDict();
+        hints: this.hints.map(function(hint) {
+          return hint.toBackendDict();
         }),
-        id: this.id
+        id: this.id,
+        solution: this.solution ? this.solution.toBackendDict() : null
       };
     };
 
@@ -61,22 +65,28 @@ oppia.factory('InteractionObjectFactory', [
         interactionDict.confirmed_unclassified_answers,
         interactionDict.customization_args,
         defaultOutcome,
-        generateFallbacksFromBackend(interactionDict.fallbacks),
-        interactionDict.id);
+        generateHintsFromBackend(interactionDict.hints),
+        interactionDict.id,
+        interactionDict.solution ? (
+          generateSolutionFromBackend(interactionDict.solution)) : null);
     };
 
     var generateAnswerGroupsFromBackend = function(answerGroupBackendDicts) {
       return answerGroupBackendDicts.map(function(
-        answerGroupBackendDict) {
+          answerGroupBackendDict) {
         return AnswerGroupObjectFactory.createFromBackendDict(
           answerGroupBackendDict);
       });
     };
 
-    var generateFallbacksFromBackend = function(fallbackBackendDicts) {
-      return fallbackBackendDicts.map(function(fallbackBackendDict) {
-        return FallbackObjectFactory.createFromBackendDict(fallbackBackendDict);
+    var generateHintsFromBackend = function(hintBackendDicts) {
+      return hintBackendDicts.map(function(hintBackendDict) {
+        return HintObjectFactory.createFromBackendDict(hintBackendDict);
       });
+    };
+
+    var generateSolutionFromBackend = function(solutionBackendDict) {
+      return SolutionObjectFactory.createFromBackendDict(solutionBackendDict);
     };
 
     return Interaction;

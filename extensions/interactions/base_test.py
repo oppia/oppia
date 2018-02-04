@@ -23,6 +23,7 @@ import struct
 
 from core.domain import dependency_registry
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.tests import test_utils
@@ -34,7 +35,7 @@ import utils
 
 # File names ending in any of these suffixes will be ignored when checking the
 # validity of interaction definitions.
-IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store']
+IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store', '.swp']
 # Expected dimensions for an interaction thumbnail PNG image.
 INTERACTION_THUMBNAIL_WIDTH_PX = 178
 INTERACTION_THUMBNAIL_HEIGHT_PX = 146
@@ -43,7 +44,8 @@ TEXT_INPUT_ID = 'TextInput'
 _INTERACTION_CONFIG_SCHEMA = [
     ('name', basestring), ('display_mode', basestring),
     ('description', basestring), ('_customization_arg_specs', list),
-    ('is_terminal', bool), ('needs_summary', bool)]
+    ('is_terminal', bool), ('needs_summary', bool),
+    ('show_generic_submit_button', bool)]
 
 
 class InteractionAnswerUnitTests(test_utils.GenericTestBase):
@@ -107,7 +109,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
     def _validate_answer_visualization_specs(self, answer_visualization_specs):
         _ANSWER_VISUALIZATIONS_SPECS_SCHEMA = [
             ('id', basestring), ('options', dict),
-            ('calculation_id', basestring)]
+            ('calculation_id', basestring), ('show_addressed_info', bool)]
         _ANSWER_VISUALIZATION_KEYS = [
             item[0] for item in _ANSWER_VISUALIZATIONS_SPECS_SCHEMA]
 
@@ -147,10 +149,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         interaction_dict = interaction.to_dict()
         self.assertItemsEqual(interaction_dict.keys(), [
             'id', 'name', 'description', 'display_mode',
-            'customization_arg_specs', 'is_trainable',
-            'is_string_classifier_trainable', 'is_terminal', 'is_linear',
-            'rule_descriptions', 'instructions', 'narrow_instructions',
-            'needs_summary', 'default_outcome_heading'])
+            'customization_arg_specs', 'is_trainable', 'is_terminal',
+            'is_linear', 'rule_descriptions', 'instructions',
+            'narrow_instructions', 'needs_summary',
+            'default_outcome_heading', 'can_have_solution',
+            'show_generic_submit_button'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(interaction_dict['customization_arg_specs'], [{
             'name': 'placeholder',
@@ -212,57 +215,95 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 feconf.INTERACTIONS_DIR, interaction_id)
             self.assertTrue(os.path.isdir(interaction_dir))
 
-            # In this directory there should only be a config .py file, an
-            # html file, a JS file, a validator.js file,  a directory named
-            # 'static' that contains (at least) a .png thumbnail file,
-            # (optionally) a JS test spec file, (optionally) a JS test spec
-            # file for rules, and (optionally) a protractor.js file.
-            dir_contents = self._listdir_omit_ignored(interaction_dir)
+            # The interaction directory should contain the following files:
+            #  Required:
+            #    * A python file called {InteractionName}.py.
+            #    * An html file called {InteractionName}.html.
+            #    * A directory name 'directives' containing JS and HTML files
+            #      for directives
+            #    * A directory named 'static' containing at least a .png file.
+            #  Optional:
+            #    * A JS file called protractor.js.
+            interaction_dir_contents = (
+                self._listdir_omit_ignored(interaction_dir))
 
-            optional_dirs_and_files_count = 0
-
-            try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir, '%sSpec.js' % interaction_id)))
-                optional_dirs_and_files_count += 1
-            except Exception:
-                pass
-
-            try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir, 'validatorSpec.js')))
-                optional_dirs_and_files_count += 1
-            except Exception:
-                pass
-
-            try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir, '%sRulesServiceSpec.js' % interaction_id)))
-                optional_dirs_and_files_count += 1
-            except Exception:
-                pass
+            interaction_dir_optional_dirs_and_files_count = 0
 
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
                     interaction_dir, 'protractor.js')))
-                optional_dirs_and_files_count += 1
+                interaction_dir_optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    interaction_dir,
+                    '%sPredictionService.js' % interaction_id)))
+                interaction_dir_optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    interaction_dir,
+                    '%sPredictionServiceSpec.js' % interaction_id)))
+                interaction_dir_optional_dirs_and_files_count += 1
             except Exception:
                 pass
 
             self.assertEqual(
-                optional_dirs_and_files_count + 5, len(dir_contents),
-                dir_contents
+                interaction_dir_optional_dirs_and_files_count + 4,
+                len(interaction_dir_contents)
             )
 
             py_file = os.path.join(interaction_dir, '%s.py' % interaction_id)
             html_file = os.path.join(
                 interaction_dir, '%s.html' % interaction_id)
-            js_file = os.path.join(interaction_dir, '%s.js' % interaction_id)
-            validator_js_file = os.path.join(interaction_dir, 'validator.js')
 
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_file))
+
+            # Check that the directives subdirectory exists.
+            directives_dir = os.path.join(
+                interaction_dir, 'directives')
+            self.assertTrue(os.path.isdir(directives_dir))
+
+            # The directives directory should contain the following files:
+            #  Required:
+            #    * A JS file called {InteractionName}.js.
+            #    * A JS file called {InteractionName}ValidationService.js
+            #    * A HTML file called
+            #      {InteractionName}_interaction_directive.html
+            #    * A HTML file called
+            #      {InteractionName}_response_directive.html
+            #    * A HTML file called
+            #      {InteractionName}_short_response_directive.html
+            #  Optional:
+            #    * A JS file called {InteractionName}ValidationServiceSpecs.js
+            #    * A JS file called {InteractionName}RulesServiceSpecs.js
+
+            snakecase_interaction_id = (
+                utils.camelcase_to_snakecase(interaction_id))
+
+            js_file = os.path.join(directives_dir, '%s.js' % interaction_id)
+            validation_service_js_file = os.path.join(
+                directives_dir, '%sValidationService.js' % interaction_id)
+            interaction_directive_html = os.path.join(
+                directives_dir,
+                '%s_interaction_directive.html' % snakecase_interaction_id)
+            response_directive_html = os.path.join(
+                directives_dir,
+                '%s_response_directive.html' % snakecase_interaction_id)
+            short_response_directive_html = os.path.join(
+                directives_dir,
+                '%s_short_response_directive.html' % snakecase_interaction_id)
+
             self.assertTrue(os.path.isfile(js_file))
+            self.assertTrue(os.path.isfile(validation_service_js_file))
+            self.assertTrue(os.path.isfile(interaction_directive_html))
+            self.assertTrue(os.path.isfile(response_directive_html))
+            self.assertTrue(os.path.isfile(short_response_directive_html))
 
             # Check that the PNG thumbnail image has the correct dimensions.
             static_dir = os.path.join(interaction_dir, 'static')
@@ -279,36 +320,31 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             js_file_content = utils.get_file_contents(js_file)
             html_file_content = utils.get_file_contents(html_file)
-            validator_js_file_content = utils.get_file_contents(
-                validator_js_file)
+            validation_service_js_file_content = utils.get_file_contents(
+                validation_service_js_file)
 
             self.assertIn(
                 'oppiaInteractive%s' % interaction_id, js_file_content)
             self.assertIn('oppiaResponse%s' % interaction_id, js_file_content)
-            directive_prefix = '<script type="text/ng-template"'
-            self.assertIn(
-                '%s id="interaction/%s"' % (directive_prefix, interaction_id),
-                html_file_content)
-            self.assertIn(
-                '%s id="response/%s"' % (directive_prefix, interaction_id),
-                html_file_content)
             # Check that the html template includes js script for the
             # interaction.
             self.assertIn(
-                '<script src="{{cache_slug}}/extensions/interactions/%s/%s.js">'
+                '<script src="{{cache_slug}}/extensions/interactions/%s/'
+                'directives/%s.js">'
                 '</script>' % (interaction_id, interaction_id),
                 html_file_content)
             self.assertIn(
                 '<script src="{{cache_slug}}/extensions/interactions/%s/'
-                'validator.js"></script>' % interaction_id,
+                'directives/%sValidationService.js"></script>' % (
+                    interaction_id, interaction_id),
                 html_file_content)
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
             self.assertIn(
-                'oppiaInteractive%sValidator' % interaction_id,
-                validator_js_file_content)
-            self.assertNotIn('<script>', validator_js_file_content)
-            self.assertNotIn('</script>', validator_js_file_content)
+                '%sValidationService' % interaction_id,
+                validation_service_js_file_content)
+            self.assertNotIn('<script>', validation_service_js_file_content)
+            self.assertNotIn('</script>', validation_service_js_file_content)
 
             interaction = interaction_registry.Registry.get_interaction_by_id(
                 interaction_id)
@@ -383,6 +419,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             else:
                 self.assertIsNone(interaction.default_outcome_heading)
 
+            # Check that interactions that can have solution cannot be linear.
+            if interaction.can_have_solution:
+                self.assertFalse(interaction.is_linear)
+
             default_object_values = obj_services.get_default_object_values()
 
             # Check that the rules for this interaction have object editor
@@ -393,8 +433,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 for (_, param_obj_cls) in param_list:
                     # TODO(sll): Get rid of these special cases.
                     if param_obj_cls.__name__ in [
-                            'NonnegativeInt', 'ListOfGraph',
-                            'ListOfCoordTwoDim', 'SetOfNormalizedString']:
+                            'NonnegativeInt', 'ListOfCodeEvaluation',
+                            'ListOfCoordTwoDim', 'ListOfGraph',
+                            'SetOfNormalizedString']:
                         continue
 
                     # Check that the rule has an object editor template.
@@ -462,3 +503,27 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         actual_linear_interaction_ids = self._get_linear_interaction_ids()
         self.assertEqual(
             actual_linear_interaction_ids, feconf.LINEAR_INTERACTION_IDS)
+
+
+class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
+    """Test that the interaction demo exploration covers all interactions."""
+
+    _DEMO_EXPLORATION_ID = '16'
+
+    def test_interactions_demo_exploration(self):
+        exp_services.load_demo(self._DEMO_EXPLORATION_ID)
+        exploration = exp_services.get_exploration_by_id(
+            self._DEMO_EXPLORATION_ID)
+
+        all_interaction_ids = set(
+            interaction_registry.Registry.get_all_interaction_ids())
+        observed_interaction_ids = set()
+
+        for state in exploration.states.values():
+            observed_interaction_ids.add(state.interaction.id)
+
+        missing_interaction_ids = (
+            all_interaction_ids - observed_interaction_ids)
+        self.assertEqual(len(missing_interaction_ids), 0, (
+            'Missing interaction IDs in demo exploration: %s' %
+            missing_interaction_ids))

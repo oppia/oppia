@@ -16,9 +16,19 @@
  * @fileoverview Directive for the attribution guide.
  */
 
-oppia.directive('attributionGuide', [function() {
-  return {
-    restrict: 'E',
-    templateUrl: 'components/attributionGuide'
-  };
-}]);
+oppia.directive('attributionGuide', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/attribution_guide/' +
+        'attribution_guide_directive.html'),
+      controller: [
+        '$scope', 'BrowserCheckerService', function(
+            $scope, BrowserCheckerService) {
+          $scope.isMobileDevice = BrowserCheckerService.isMobileDevice();
+        }
+      ]
+    };
+  }]);

@@ -29,13 +29,12 @@ var customizeInteraction = function(elem, buttonText) {
 
 var expectInteractionDetailsToMatch = function(elem, buttonText) {
   expect(
-    elem.element(by.tagName('oppia-interactive-continue')).
-      element(by.tagName('button')).getText()
+    element(by.css('.protractor-test-continue-button')).getText()
   ).toBe(buttonText.toUpperCase());
 };
 
 var submitAnswer = function(elem) {
-  elem.element(by.tagName('oppia-interactive-continue')).click();
+  element(by.css('.protractor-test-continue-button')).click();
 };
 
 var testSuite = [];

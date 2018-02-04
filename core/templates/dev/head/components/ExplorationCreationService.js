@@ -18,11 +18,11 @@
  */
 
 oppia.factory('ExplorationCreationService', [
-  '$http', '$modal', '$timeout', '$rootScope', '$window',
-  'alertsService', 'siteAnalyticsService', 'UrlInterpolationService',
+  '$http', '$uibModal', '$timeout', '$rootScope', '$window',
+  'AlertsService', 'siteAnalyticsService', 'UrlInterpolationService',
   function(
-      $http, $modal, $timeout, $rootScope, $window,
-      alertsService, siteAnalyticsService, UrlInterpolationService) {
+      $http, $uibModal, $timeout, $rootScope, $window,
+      AlertsService, siteAnalyticsService, UrlInterpolationService) {
     var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
     var explorationCreationInProgress = false;
@@ -34,7 +34,7 @@ oppia.factory('ExplorationCreationService', [
         }
 
         explorationCreationInProgress = true;
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
         $rootScope.loadingMessage = 'Creating exploration';
 
         $http.post('/contributehandler/create_new', {
@@ -55,28 +55,30 @@ oppia.factory('ExplorationCreationService', [
         });
       },
       showUploadExplorationModal: function() {
-        alertsService.clearWarnings();
+        AlertsService.clearWarnings();
 
-        $modal.open({
+        $uibModal.open({
           backdrop: true,
-          templateUrl: 'modals/uploadActivity',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/creator_dashboard/' +
+            'upload_activity_modal_directive.html'),
           controller: [
-            '$scope', '$modalInstance', function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.save = function() {
                 var returnObj = {};
                 var file = document.getElementById('newFileInput').files[0];
                 if (!file || !file.size) {
-                  alertsService.addWarning('Empty file detected.');
+                  AlertsService.addWarning('Empty file detected.');
                   return;
                 }
                 returnObj.yamlFile = file;
 
-                $modalInstance.close(returnObj);
+                $uibModalInstance.close(returnObj);
               };
 
               $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
-                alertsService.clearWarnings();
+                $uibModalInstance.dismiss('cancel');
+                AlertsService.clearWarnings();
               };
             }
           ]
@@ -110,7 +112,7 @@ oppia.factory('ExplorationCreationService', [
           }).fail(function(data) {
             var transformedData = data.responseText.substring(5);
             var parsedResponse = JSON.parse(transformedData);
-            alertsService.addWarning(
+            AlertsService.addWarning(
               parsedResponse.error || 'Error communicating with server.');
             $rootScope.loadingMessage = '';
             $scope.$apply();

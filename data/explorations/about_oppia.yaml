@@ -6,25 +6,23 @@ language_code: en
 objective: Learn about the world's first community-built personal online tutor
 param_changes: []
 param_specs: {}
-schema_version: 10
-skin_customizations:
-  panels_contents:
-    bottom: []
+schema_version: 17
 states:
   About this website:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "<div>Oppia.org is a hosted version of the Oppia codebase:\_</div><div><oppia-noninteractive-link\
-        \ open_link_in_same_window-with-value=\"false\" url-with-value=\"&amp;quot;https://github.com/oppia/oppia/&amp;quot;\"\
-        ></oppia-noninteractive-link></div><div><br></div><div>This site is maintained\
-        \ by a group of volunteers in their spare time. If you want to help, let us\
-        \ know! You can email the site admins at admin@oppia.org.</div><div><br></div><div>Much\
+      audio_translations: {}
+      html: "<div>Oppia.org is a hosted version of the Oppia codebase:\_</div><div><oppia-noninteractive-link\
+        \ url-with-value=\"&amp;quot;https://github.com/oppia/oppia/&amp;quot;\"></oppia-noninteractive-link></div><div><br></div><div>This\
+        \ site is maintained by a group of volunteers in their spare time. If you\
+        \ want to help, let us know! You can email the site admins at admin@oppia.org.</div><div><br></div><div>Much\
         \ of the code powering this site is written by Google engineers. However,\
         \ oppia.org is not a Google product, and Google bears no responsibility for\
         \ the content of this website.</div>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Contact
           feedback: []
           param_changes: []
@@ -32,7 +30,8 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Credits
           feedback: []
           param_changes: []
@@ -40,7 +39,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Site License
           feedback: []
           param_changes: []
@@ -61,27 +61,27 @@ states:
         feedback:
         - '...'
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Contact:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <div>If you have a question relating to this site, you can get in touch
-        by posting to our forum:</div><div><oppia-noninteractive-link open_link_in_same_window-with-value="false"
-        url-with-value="&amp;quot;https://www.oppia.org/forum&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>You
+      audio_translations: {}
+      html: <div>If you have a question relating to this site, you can get in touch
+        by posting to our forum:</div><div><oppia-noninteractive-link url-with-value="&amp;quot;https://www.oppia.org/forum&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>You
         can also follow our blog to get the latest updates:</div><div><oppia-noninteractive-link
-        open_link_in_same_window-with-value="false" url-with-value="&amp;quot;http://oppiablog.blogspot.com/&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>If
+        url-with-value="&amp;quot;https://medium.com/oppia-org&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>If
         you find a bug or have a feature request, please create an issue on the Oppia
-        bug tracker:</div><div><oppia-noninteractive-link open_link_in_same_window-with-value="false"
-        url-with-value="&amp;quot;https://github.com/oppia/oppia/issues/new&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>You
+        bug tracker:</div><div><oppia-noninteractive-link url-with-value="&amp;quot;https://github.com/oppia/oppia/issues/new&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>You
         can also get in touch with the developers of the open-source Oppia codebase
-        via the developers' forum:</div><div><oppia-noninteractive-link open_link_in_same_window-with-value="false"
-        url-with-value="&amp;quot;https://groups.google.com/forum/#!forum/oppia-dev&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>If
+        via the developers' forum:</div><div><oppia-noninteractive-link url-with-value="&amp;quot;https://groups.google.com/forum/#!forum/oppia-dev&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>If
         you need to contact the admins privately, you can email them at admin@oppia.org.</div>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: So what can I tell you
           feedback: []
           param_changes: []
@@ -89,7 +89,8 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Credits
           feedback: []
           param_changes: []
@@ -97,7 +98,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Site License
           feedback: []
           param_changes: []
@@ -117,30 +119,29 @@ states:
         feedback:
         - '...'
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Contribute:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Great question! I'm completely built and owned by the community, so without
+      audio_translations: {}
+      html: Great question! I'm completely built and owned by the community, so without
         your contributions I wouldn't exist!<div><br></div><div>First, you can contribute
         by being an active member of the Oppia community. This includes posting on
         our forum, giving feedback to the site, and giving feedback to exploration
         authors. You can take a look at our Community Guidelines here:</div><div><oppia-noninteractive-link
-        open_link_in_same_window-with-value="false" text-with-value="&amp;quot;&amp;quot;"
-        url-with-value="&amp;quot;https://www.oppia.org/info#community&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>Second,
+        text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;https://www.oppia.org/info#community&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>Second,
         you can contribute by creating content. This includes creating and publishing
         explorations. Making explorations is fun and easy, you can try it for yourself
         by going back to my home page and clicking 'Create Exploration'. You can take
         a look at the Publishing Criteria here:</div><div><span></span><oppia-noninteractive-link
-        open_link_in_same_window-with-value="false" text-with-value="&amp;quot;&amp;quot;"
-        url-with-value="&amp;quot;https://www.oppia.org/info#publish-criteria&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>Finally,
+        text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;https://www.oppia.org/info#publish-criteria&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>Finally,
         you can contribute directly to the open source platform. We are always in
         need of designers, programmers, marketers, and everyone in-between. Visit
         the code site to find out more about how you can contribute:</div><div><oppia-noninteractive-link
-        open_link_in_same_window-with-value="false" text-with-value="&amp;quot;&amp;quot;"
-        url-with-value="&amp;quot;https://github.com/oppia/oppia&amp;quot;"></oppia-noninteractive-link><br></div>
+        text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;https://github.com/oppia/oppia&amp;quot;"></oppia-noninteractive-link><br></div>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -151,22 +152,24 @@ states:
         dest: So what can I tell you
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes: []
   Credits:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <div>The open-source codebase has been contributed to by many people.
+      audio_translations: {}
+      html: <div>The open-source codebase has been contributed to by many people.
         You can see a full list of contributors on our Credits page:</div><div><oppia-noninteractive-link
-        open_link_in_same_window-with-value="false" text-with-value="&amp;quot;&amp;quot;"
-        url-with-value="&amp;quot;https://www.oppia.org/info#credits&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>We
+        text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;https://www.oppia.org/info#credits&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>We
         have lots of plans for the future! If you'd like to help, you'd be very welcome,
         and we'd be delighted to help you get started. Feel free to reach out to us
         at the oppia-dev Google Group, or by contacting admin@oppia.org.</div>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Contact
           feedback: []
           param_changes: []
@@ -174,7 +177,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: So what can I tell you
           feedback: []
           param_changes: []
@@ -182,7 +186,8 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Site License
           feedback: []
           param_changes: []
@@ -202,13 +207,15 @@ states:
         feedback:
         - '...'
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   END:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Congratulations, you have finished!
+      audio_translations: {}
+      html: Congratulations, you have finished!
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -216,13 +223,15 @@ states:
         recommendedExplorationIds:
           value: []
       default_outcome: null
-      fallbacks: []
+      hints: []
       id: EndExploration
+      solution: null
     param_changes: []
   End Card:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "Fantastic. Feel free to try one of my featured explorations below. Then\
+      audio_translations: {}
+      html: "Fantastic. Feel free to try one of my featured explorations below. Then\
         \ I hope you'll feel inspired to create a few explorations yourself.\_<div><br></div><div>Have\
         \ fun!</div>"
     interaction:
@@ -235,13 +244,15 @@ states:
         dest: END
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes: []
   Example1:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <div>Great question! To demonstrate, can I ask your name?</div>
+      audio_translations: {}
+      html: <div>Great question! To demonstrate, can I ask your name?</div>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -254,20 +265,23 @@ states:
         dest: Example2
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   Example2:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "<div>Guess what {{answer}}, you\u2019ve been playing one of my explorations\
+      audio_translations: {}
+      html: "<div>Guess what {{answer}}, you\u2019ve been playing one of my explorations\
         \ all along!\_</div><div><br></div><div>Explorations are like interactive\
         \ lessons. There are many types of interactions you can have in an exploration;\
         \ for example, let's try using a map.</div><div><br></div><div>Can you find\
         \ Helsinki, Finland on the map?</div>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Example3
           feedback:
           - Great job, you found it!
@@ -282,23 +296,25 @@ states:
       confirmed_unclassified_answers: []
       customization_args:
         latitude:
-          value: 0
+          value: 0.0
         longitude:
-          value: 0
+          value: 0.0
         zoom:
-          value: 0
+          value: 0.0
       default_outcome:
         dest: Example3
         feedback:
         - Well, not quite, but close enough!
         param_changes: []
-      fallbacks: []
+      hints: []
       id: InteractiveMap
+      solution: null
     param_changes: []
   Example3:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "<div>You can easily share explorations with others using the share icon\
+      audio_translations: {}
+      html: "<div>You can easily share explorations with others using the share icon\
         \ at the top. You can click on the discussion icon to give feedback and report\
         \ issues with a conversation. Remember, this is a community project\u2014\
         \ your participation is welcome and needed!</div><div><br></div><div>Creating\
@@ -314,13 +330,15 @@ states:
         dest: So what can I tell you
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes: []
   First State:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "<div>Hi there, I\u2019m Oppia! I\u2019m an online personal tutor for\
+      audio_translations: {}
+      html: "<div>Hi there, I\u2019m Oppia! I\u2019m an online personal tutor for\
         \ everybody.</div><div><br></div><div>Most of the time, learning something\
         \ online feels like watching a lecture, or reading a textbook, or filling\
         \ out a worksheet-- ugh. My learning explorations are much more dynamic: I\
@@ -340,19 +358,21 @@ states:
         dest: So what can I tell you
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes: []
   Site License:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Yes, all the content on this website can be used freely under the Creative
+      audio_translations: {}
+      html: Yes, all the content on this website can be used freely under the Creative
         Commons 2.0 License. You can learn more about the License here:<div><oppia-noninteractive-link
-        open_link_in_same_window-with-value="false" text-with-value="&amp;quot;&amp;quot;"
-        url-with-value="&amp;quot;https://www.oppia.org/info#license&amp;quot;"></oppia-noninteractive-link><br></div>
+        text-with-value="&amp;quot;&amp;quot;" url-with-value="&amp;quot;https://www.oppia.org/info#license&amp;quot;"></oppia-noninteractive-link><br></div>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Credits
           feedback: []
           param_changes: []
@@ -360,7 +380,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Contact
           feedback: []
           param_changes: []
@@ -368,7 +389,8 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: So what can I tell you
           feedback: []
           param_changes: []
@@ -388,16 +410,19 @@ states:
         feedback:
         - '...'
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   So what can I tell you:
+    classifier_model_id: null
     content:
-    - type: text
-      value: So, what else can I tell you about myself?
+      audio_translations: {}
+      html: So, what else can I tell you about myself?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: About this website
           feedback: []
           param_changes: []
@@ -405,7 +430,8 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: End Card
           feedback: []
           param_changes: []
@@ -413,7 +439,8 @@ states:
         - inputs:
             x: 3
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Example1
           feedback: []
           param_changes: []
@@ -421,7 +448,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Contribute
           feedback: []
           param_changes: []
@@ -442,9 +470,10 @@ states:
         feedback:
         - '...'
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
-states_schema_version: 7
+states_schema_version: 13
 tags: []
 title: About Oppia

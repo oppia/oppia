@@ -30,8 +30,8 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: $env_script
   # Tell apt to default to "yes" when installing packages. Necessary for unattended installs.
   config.vm.provision "shell", inline: 'echo \'APT::Get::Assume-Yes "true";\' > /etc/apt/apt.conf.d/90yes'
-  config.vm.network "forwarded_port", guest: 8000, host: 8000
-  config.vm.network "forwarded_port", guest: 8181, host: 8181
+  config.vm.network "forwarded_port", guest: 8000, host: 8000, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 8181, host: 8181, host_ip: "127.0.0.1"
   config.vm.box = "ubuntu/trusty64"
   config.vm.synced_folder ".", "/home/vagrant/oppia"
   config.vm.provision "shell", inline: $script

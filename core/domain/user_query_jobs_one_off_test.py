@@ -24,7 +24,6 @@ from core.domain import user_query_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-
 import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
@@ -59,7 +58,7 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             job_id, additional_job_params=params)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
 

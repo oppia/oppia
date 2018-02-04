@@ -1,33 +1,16 @@
-<script type="text/ng-template" id="schemaBasedEditor/int">
-  <style>
-    schema-based-int-editor .oppia-blue-on-focus > input:focus {
-      border-bottom-color: rgb(63, 81, 181);
-      border-bottom-width: 2px;
-    }  
-  </style>
+<style>
+  schema-based-int-editor .oppia-blue-on-focus > input:focus {
+    border-bottom-color: rgb(63, 81, 181);
+    border-bottom-width: 2px;
+  }
+</style>
 
-  <div class="input-group">
-    <span ng-if="!expressionMode">
-      <md-input-group class="long oppia-blue-on-focus md-default-theme" style="margin: 0px;">
-        <input type="number" ng-model="$parent.localValue" ng-disabled="isDisabled()"
-               required apply-validation="validators()" focus-on="<[labelForFocusTarget()]>"
-               ng-blur="onInputBlur()" ng-focus="onInputFocus()">
-      </md-input-group>
-    </span>
-
-    <span ng-if="allowExpressions()">
-      <schema-based-expression-editor ng-if="expressionMode" is-disabled="isDisabled()"
-                                      local-value="$parent.$parent.localValue"
-                                      param-names="paramNames" output-type="int"
-                                      ng-keypress="onKeypress($event)"
-                                      label-for-focus-target="labelForFocusTarget()">
-      </schema-based-expression-editor>
-      <span class="input-group-btn">
-        <button type="button" class="btn btn-default" ng-click="toggleExpressionMode()" ng-disabled="isDisabled()">
-          <span ng-if="!expressionMode">E</span>
-          <span ng-if="expressionMode"><del>E</del></span>
-        </button>
-      </span>
-    </span>
-  </div>
-</script>
+<div class="input-group">
+  <span ng-if="!expressionMode">
+    <md-input-group class="long oppia-blue-on-focus md-default-theme" style="margin: 0px;">
+      <input type="number" ng-model="$parent.localValue" ng-disabled="isDisabled()"
+             required apply-validation="validators()" focus-on="<[labelForFocusTarget()]>"
+             ng-blur="onInputBlur()" ng-focus="onInputFocus()">
+    </md-input-group>
+  </span>
+</div>

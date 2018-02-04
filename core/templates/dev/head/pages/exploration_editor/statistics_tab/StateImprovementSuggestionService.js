@@ -17,8 +17,8 @@
  */
 
 oppia.factory('StateImprovementSuggestionService', [
-  'IMPROVE_TYPE_DEFAULT', 'IMPROVE_TYPE_INCOMPLETE',
-  function(IMPROVE_TYPE_DEFAULT, IMPROVE_TYPE_INCOMPLETE) {
+  'IMPROVE_TYPE_INCOMPLETE', 'ENABLE_NEW_STATS_FRAMEWORK',
+  function(IMPROVE_TYPE_INCOMPLETE, ENABLE_NEW_STATS_FRAMEWORK) {
     return {
       // Returns an array of suggested improvements to states. Each suggestion
       // is an object with the keys: rank, improveType, and stateName.
@@ -28,31 +28,25 @@ oppia.factory('StateImprovementSuggestionService', [
         };
 
         var rankedStates = [];
-        var stateNames = Object.keys(explorationStates);
-        for (var i = 0; i < stateNames.length; i++) {
-          var stateName = stateNames[i];
+        explorationStates.getStateNames().forEach(function(stateName) {
           var stateStats = allStateStats[stateName];
-
-          var totalEntryCount = stateStats.total_entry_count;
-          var noAnswerSubmittedCount = stateStats.no_submitted_answer_count;
-          var defaultAnswerCount = stateStats.num_default_answers;
+          if (ENABLE_NEW_STATS_FRAMEWORK) {
+            var totalEntryCount = stateStats.total_hit_count;
+            var noAnswerSubmittedCount = totalEntryCount - (
+              stateStats.num_completions);
+          } else {
+            var totalEntryCount = stateStats.total_entry_count;
+            var noAnswerSubmittedCount = stateStats.no_submitted_answer_count;
+          }
 
           if (totalEntryCount == 0) {
-            continue;
+            return;
           }
 
           var threshold = 0.2 * totalEntryCount;
           var eligibleFlags = [];
-          var state = explorationStates[stateName];
+          var state = explorationStates.getState(stateName);
           var stateInteraction = state.interaction;
-          if (defaultAnswerCount > threshold &&
-              stateInteraction.default_outcome &&
-              stateInteraction.default_outcome.dest == stateName) {
-            eligibleFlags.push({
-              rank: defaultAnswerCount,
-              improveType: IMPROVE_TYPE_DEFAULT,
-            });
-          }
           if (noAnswerSubmittedCount > threshold) {
             eligibleFlags.push({
               rank: noAnswerSubmittedCount,
@@ -67,7 +61,7 @@ oppia.factory('StateImprovementSuggestionService', [
               type: eligibleFlags[0].improveType,
             });
           }
-        }
+        });
 
         // The returned suggestions are sorted decreasingly by their ranks.
         rankedStates.sort(rankComparator);

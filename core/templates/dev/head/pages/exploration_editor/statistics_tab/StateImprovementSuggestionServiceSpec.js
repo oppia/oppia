@@ -23,10 +23,178 @@ describe('StateImprovementSuggestionService', function() {
   // should be added to make sure getStateImprovements() is thoroughly tested.
 
   describe('getStateImprovements', function() {
-    var IMPROVE_TYPE_DEFAULT = 'default';
     var IMPROVE_TYPE_INCOMPLETE = 'incomplete';
 
     var siss;
+    var ssof;
+
+    // A self-looping state.
+    var statesDict1 = {
+      state: {
+        content: {
+          html: 'content',
+          audio_translations: {}
+        },
+        interaction: {
+          id: 'RuleTest',
+          answer_groups: [{
+            outcome: {
+              dest: 'unused',
+              feedback: [''],
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            rule_specs: [{
+              inputs: {
+                x: 10
+              },
+              rule_type: 'Equals'
+            }],
+          }],
+          default_outcome: {
+            dest: 'state',
+            feedback: [],
+            param_changes: []
+          },
+          hints: []
+        },
+        param_changes: []
+      }
+    };
+
+    // A non-looping state.
+    var statesDict2 = {
+      initial: {
+        content: {
+          html: 'content',
+          audio_translations: {}
+        },
+        interaction: {
+          id: 'RuleTest',
+          answer_groups: [{
+            outcome: {
+              dest: 'unused',
+              feedback: [''],
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            rule_specs: [{
+              inputs: {
+                x: 10
+              },
+              rule_type: 'Equals'
+            }]
+          }],
+          default_outcome: {
+            dest: 'end',
+            feedback: [],
+            param_changes: []
+          },
+          hints: []
+        },
+        param_changes: []
+      },
+      end: {
+        content: {
+          html: 'content',
+          audio_translations: {}
+        },
+        interaction: {
+          id: 'RuleTest',
+          answer_groups: [{
+            outcome: {
+              dest: 'unused',
+              feedback: [''],
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            rule_specs: [{
+              inputs: {
+                x: 10
+              },
+              rule_type: 'Equals'
+            }]
+          }],
+          default_outcome: {
+            dest: null,
+            feedback: [],
+            param_changes: []
+          },
+          hints: []
+        },
+        param_changes: []
+      }
+    };
+
+    // 2 states that are both self-looping
+    var statesDict3 = {
+      'State 1': {
+        content: {
+          html: 'content',
+          audio_translations: {}
+        },
+        interaction: {
+          id: 'RuleTest',
+          answer_groups: [{
+            outcome: {
+              dest: 'next state',
+              feedback: [''],
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            rule_specs: [{
+              inputs: {
+                x: 10
+              },
+              rule_type: 'Equals'
+            }]
+          }],
+          default_outcome: {
+            dest: 'State 1',
+            feedback: [],
+            param_changes: []
+          },
+          hints: []
+        },
+        param_changes: []
+      },
+      'State 2': {
+        content: {
+          html: 'content',
+          audio_translations: {}
+        },
+        interaction: {
+          id: 'RuleTest',
+          answer_groups: [{
+            outcome: {
+              dest: 'next state',
+              feedback: [''],
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            rule_specs: [{
+              inputs: {
+                x: 10
+              },
+              rule_type: 'Equals'
+            }]
+          }],
+          default_outcome: {
+            dest: 'State 2',
+            feedback: [],
+            param_changes: []
+          },
+          hints: []
+        },
+        param_changes: []
+      }
+    };
+
     var _createState = function(destStateName) {
       // Only a partial state definition is needed for these tests.
       if (destStateName) {
@@ -48,8 +216,7 @@ describe('StateImprovementSuggestionService', function() {
     var _createDefaultStateStats = function() {
       return {
         total_entry_count: 0,
-        no_submitted_answer_count: 0,
-        num_default_answers: 0
+        no_submitted_answer_count: 0
       };
     };
 
@@ -62,69 +229,17 @@ describe('StateImprovementSuggestionService', function() {
     };
     var _answerDefaultOutcome = function(stateStats) {
       stateStats.total_entry_count++;
-      stateStats.num_default_answers++;
     };
 
     beforeEach(inject(function($injector) {
       siss = $injector.get('StateImprovementSuggestionService');
+      ssof = $injector.get('StatesObjectFactory');
     }));
-
-    it('should produce default improvement suggestions for a typical ' +
-        'state-user scenario with 5 exploration visits and 3 default answer ' +
-        'submissions', function() {
-      // Create a looping state, similar to create_default_exploration.
-      var states = {
-        state: _createState('state')
-      };
-
-      // These stats represent entering the state 5 times and submitting a
-      // default answer three times.
-      var stateStats = {
-        state: _createDefaultStateStats()
-      };
-      _enterStateWithoutAnswer(stateStats.state);
-      _enterStateWithoutAnswer(stateStats.state);
-      _answerDefaultOutcome(stateStats.state);
-      _answerDefaultOutcome(stateStats.state);
-      _answerDefaultOutcome(stateStats.state);
-
-      // Expect a single improvement recommendation for the state due to the
-      // high number of default hits.
-      var improvements = siss.getStateImprovements(states, stateStats);
-      expect(improvements).toEqual([{
-        rank: 3,
-        stateName: 'state',
-        type: IMPROVE_TYPE_DEFAULT
-      }]);
-    });
-
-    it('should produce suggestions for a single default rule hit', function() {
-      // Create a looping state, similar to create_default_exploration.
-      var states = {
-        state: _createState('state')
-      };
-
-      // Enter the state, then submit an answer to its default outcome.
-      var stateStats = {
-        state: _createDefaultStateStats()
-      };
-      _answerDefaultOutcome(stateStats.state);
-
-      var improvements = siss.getStateImprovements(states, stateStats);
-      expect(improvements).toEqual([{
-        rank: 1,
-        stateName: 'state',
-        type: IMPROVE_TYPE_DEFAULT
-      }]);
-    });
 
     it('should not suggest improvements for non-default answers', function() {
       // Create a non-looping state for testing, similar to
       // save_new_valid_exploration.
-      var states = {
-        initial: _createState('end'),
-        end: _createState(null)
-      };
+      var states = ssof.createFromBackendDict(statesDict2);
 
       // Submit an answer to an answer group rather than the default answer.
       // The end state does not have any relevant stats, either.
@@ -139,12 +254,10 @@ describe('StateImprovementSuggestionService', function() {
       expect(improvements).toEqual([]);
     });
 
-    it('should suggest default and incomplete improvements depending on both ' +
-        'unsubmitted and default answer counts', function() {
+    it('should suggest incomplete improvements depending on unsubmitted ' +
+       'answer counts', function() {
       // Create a looping state, similar to create_default_exploration.
-      var states = {
-        state: _createState('state')
-      };
+      var states = ssof.createFromBackendDict(statesDict1);
 
       // These stats represent failing to answer something twice and hitting the
       // default outcome once.
@@ -162,66 +275,6 @@ describe('StateImprovementSuggestionService', function() {
         rank: 2,
         stateName: 'state',
         type: IMPROVE_TYPE_INCOMPLETE
-      }]);
-
-      // Now hit the default outcome two more times.
-      _answerDefaultOutcome(stateStats.state);
-      _answerDefaultOutcome(stateStats.state);
-
-      // The improvement will now be default.
-      improvements = siss.getStateImprovements(states, stateStats);
-      expect(improvements).toEqual([{
-        rank: 3,
-        stateName: 'state',
-        type: IMPROVE_TYPE_DEFAULT
-      }]);
-    });
-
-    it('should rank across multiple states according to default hits and ' +
-        'properly sort the returned list of improvements by rank', function() {
-      // Create an 'exploration' with 2 states. Both are self-loops.
-      var states = {
-        'State 1': _createState('State 1'),
-        'State 2': _createState('State 2')
-      };
-
-      // These stats represent hitting the default outcomes of state 1 once and
-      // state 2 twice.
-      var stateStats = {
-        'State 1': _createDefaultStateStats(),
-        'State 2': _createDefaultStateStats()
-      };
-      _answerDefaultOutcome(stateStats['State 1']);
-      _answerDefaultOutcome(stateStats['State 2']);
-      _answerDefaultOutcome(stateStats['State 2']);
-
-      // The result should be default improvements.
-      var improvements = siss.getStateImprovements(states, stateStats);
-      expect(improvements).toEqual([{
-        rank: 2,
-        stateName: 'State 2',
-        type: IMPROVE_TYPE_DEFAULT
-      }, {
-        rank: 1,
-        stateName: 'State 1',
-        type: IMPROVE_TYPE_DEFAULT
-      }]);
-
-      // Hit the default rule of state 1 two more times.
-      _answerDefaultOutcome(stateStats['State 1']);
-      _answerDefaultOutcome(stateStats['State 1']);
-
-      // The second state will now have a lower rank and should appear second in
-      // the returned improvements list.
-      improvements = siss.getStateImprovements(states, stateStats);
-      expect(improvements).toEqual([{
-        rank: 3,
-        stateName: 'State 1',
-        type: IMPROVE_TYPE_DEFAULT
-      }, {
-        rank: 2,
-        stateName: 'State 2',
-        type: IMPROVE_TYPE_DEFAULT
       }]);
     });
   });

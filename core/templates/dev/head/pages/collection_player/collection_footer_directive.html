@@ -1,34 +1,32 @@
-<script type="text/ng-template" id="components/collectionFooter">
-  <div class="footer navbar-fixed-bottom oppia-collection-footer">
-    <div class="row">
-      <div class="col-sm-5">
+<div class="footer navbar-fixed-bottom oppia-collection-footer">
+  <div class="row">
+    <div class="col-sm-5">
+      <ul>
+        <li>
+          <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="collection-footer-img" alt="">
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm-7">
+      <div class="pull-right">
         <ul>
           <li>
-            <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="collection-footer-img" alt="">
+            <h4 translate="I18N_PLAYER_SHARE_THIS_COLLECTION" class="oppia-share-collection-footer"></h4>
+          </li>
+          <li>
+            <sharing-links ng-click="$event.stopPropagation()"
+                           twitter-text="getTwitterText()"
+                           collection-id="collectionId"
+                           layout-type="row"
+                           share-type="collection"
+                           class="oppia-collection-footer-sharing-links">
+            </sharing-links>
           </li>
         </ul>
       </div>
-      <div class="col-sm-7">
-        <div class="pull-right">
-          <ul>
-            <li>
-              <h4 translate="I18N_PLAYER_SHARE_THIS_COLLECTION" class="oppia-share-collection-footer"></h4>
-            </li>
-            <li>
-              <sharing-links ng-click="$event.stopPropagation()"
-                             twitter-text="getTwitterText()"
-                             collection-id="collectionId"
-                             layout-type="row"
-                             share-type="collection"
-                             class="oppia-collection-footer-sharing-links">
-              </sharing-links>
-            </li>
-          </ul>
-        </div>
-      </div>
     </div>
   </div>
-</script>
+</div>
 
 <style>
   .oppia-collection-footer {

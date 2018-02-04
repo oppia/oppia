@@ -23,19 +23,18 @@ param_specs:
     obj_type: UnicodeString
   sneezeitem:
     obj_type: UnicodeString
-schema_version: 10
-skin_customizations:
-  panels_contents:
-    bottom: []
+schema_version: 17
 states:
   Clearing:
+    classifier_model_id: null
     content:
-    - type: text
-      value: You are at a clearing. There are lots of pretty <b>flowers</b> here.<div>There
+      audio_translations: {}
+      html: You are at a clearing. There are lots of pretty <b>flowers</b> here.<div>There
         is a path leading back to the <b>southeast</b>.</div>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: picking
           feedback: []
           param_changes: []
@@ -43,7 +42,8 @@ states:
         - inputs:
             x: pick
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: picking
           feedback: []
           param_changes: []
@@ -51,7 +51,8 @@ states:
         - inputs:
             x: flower
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: Fork
           feedback:
           - You go southeast
@@ -60,7 +61,8 @@ states:
         - inputs:
             x: southeast
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: Fork
           feedback:
           - You go southeast
@@ -82,13 +84,15 @@ states:
         - Huh?
         - Did you mean "pick some flowers"?
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   END:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Congratulations, you have finished!
+      audio_translations: {}
+      html: Congratulations, you have finished!
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -96,17 +100,20 @@ states:
         recommendedExplorationIds:
           value: []
       default_outcome: null
-      fallbacks: []
+      hints: []
       id: EndExploration
+      solution: null
     param_changes: []
   Fork:
+    classifier_model_id: null
     content:
-    - type: text
-      value: You are standing at a fork in the road. The main road goes to the <b>northeast</b>,
+      audio_translations: {}
+      html: You are standing at a fork in the road. The main road goes to the <b>northeast</b>,
         while a smaller path winds to the <b>northwest</b>.
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Troll
           feedback:
           - You go northeast
@@ -115,7 +122,8 @@ states:
         - inputs:
             x: northeast
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: Clearing
           feedback:
           - You go northwest
@@ -124,7 +132,8 @@ states:
         - inputs:
             x: northwest
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: Troll
           feedback:
           - You go northeast
@@ -133,7 +142,8 @@ states:
         - inputs:
             x: ne
           rule_type: StartsWith
-      - outcome:
+      - correct: false
+        outcome:
           dest: Clearing
           feedback:
           - You go northwest
@@ -142,7 +152,8 @@ states:
         - inputs:
             x: nw
           rule_type: StartsWith
-      - outcome:
+      - correct: false
+        outcome:
           dest: Fork
           feedback:
           - You cannot go back
@@ -167,16 +178,19 @@ states:
         - Maybe you should pick a direction to go in. Northwest or Northeast?
         - I'm not sure how to {{answer}}
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   Rainbow:
+    classifier_model_id: null
     content:
-    - type: text
-      value: <span>"Guess how many coins I'm holding!"</span><br>
+      audio_translations: {}
+      html: <span>"Guess how many coins I'm holding!"</span><br>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: get coins
           feedback:
           - Correct!
@@ -185,7 +199,8 @@ states:
         - inputs:
             x: '{{numcoins}}'
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Rainbow
           feedback:
           - Actually, I can't hold any more than 10 coins. My hands are too small.
@@ -194,7 +209,8 @@ states:
         - inputs:
             x: 10.0
           rule_type: IsGreaterThan
-      - outcome:
+      - correct: false
+        outcome:
           dest: Rainbow
           feedback:
           - I do have some coins!
@@ -203,7 +219,8 @@ states:
         - inputs:
             x: 1.0
           rule_type: IsLessThan
-      - outcome:
+      - correct: false
+        outcome:
           dest: Rainbow
           feedback:
           - No, fewer than that!
@@ -212,7 +229,8 @@ states:
         - inputs:
             x: '{{numcoins}}'
           rule_type: IsGreaterThan
-      - outcome:
+      - correct: false
+        outcome:
           dest: Rainbow
           feedback:
           - More than that!
@@ -228,19 +246,22 @@ states:
         feedback:
         - This should never happen
         param_changes: []
-      fallbacks: []
+      hints: []
       id: NumericInput
+      solution: null
     param_changes: []
   Road:
+    classifier_model_id: null
     content:
-    - type: text
-      value: '<div><div>You get: a name tag. It says "Hello, I''m {{answer}}!"</div><div>You
+      audio_translations: {}
+      html: '<div><div>You get: a name tag. It says "Hello, I''m {{answer}}!"</div><div>You
         also get a pretty red <b>towel</b>.</div></div><div><br></div>You are standing
         in a small courtyard. To the north is a gate, with a sign:<div>"This way to
         adventure!"</div>'
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Fork
           feedback: []
           param_changes: []
@@ -257,8 +278,9 @@ states:
         dest: Fork
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -278,14 +300,16 @@ states:
       generator_id: Copier
       name: payitem
   Troll:
+    classifier_model_id: null
     content:
-    - type: text
-      value: You come to a bridge that is being guarded by a troll. The troll says:<div><br></div><div>"Hello,
+      audio_translations: {}
+      html: You come to a bridge that is being guarded by a troll. The troll says:<div><br></div><div>"Hello,
         {{Name}}. You have to pay a toll if you want to cross this bridge."</div><div><br></div><div>There
         is a path leading back to the <b>southwest</b>.</div>
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Fork
           feedback:
           - You go southwest
@@ -294,7 +318,8 @@ states:
         - inputs:
             x: southwest
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: Fork
           feedback:
           - You go southwest
@@ -303,7 +328,8 @@ states:
         - inputs:
             x: sw
           rule_type: StartsWith
-      - outcome:
+      - correct: false
+        outcome:
           dest: Troll
           feedback:
           - You use nothing. Nothing happens.
@@ -312,7 +338,8 @@ states:
         - inputs:
             x: use nothing
           rule_type: StartsWith
-      - outcome:
+      - correct: false
+        outcome:
           dest: Troll
           feedback:
           - You do nothing. nothing happens.
@@ -321,7 +348,8 @@ states:
         - inputs:
             x: nothing
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: Troll
           feedback:
           - You flail at the troll with your {{Weapon}}. He is not amused.
@@ -330,7 +358,8 @@ states:
         - inputs:
             x: '{{Weapon}}'
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: pre-rainbow
           feedback:
           - You flail your {{sneezeitem}} at the troll. Oh no, the troll is allergic!
@@ -340,7 +369,8 @@ states:
         - inputs:
             x: '{{sneezeitem}}'
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - "You give the coins to the troll. He counts them. \n\"Hmm, {{numcoins}}\
@@ -351,7 +381,8 @@ states:
         - inputs:
             x: '{{payitem}}'
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: Troll
           feedback:
           - You don't have that!
@@ -360,7 +391,8 @@ states:
         - inputs:
             x: use
           rule_type: StartsWith
-      - outcome:
+      - correct: false
+        outcome:
           dest: Troll
           feedback:
           - You flail at the troll with your bare hands. He is not amused.
@@ -369,7 +401,8 @@ states:
         - inputs:
             x: troll
           rule_type: Contains
-      - outcome:
+      - correct: false
+        outcome:
           dest: Troll
           feedback:
           - Pay toll with what?
@@ -392,13 +425,15 @@ states:
         - I don't understand
         - Have you tried using things? (type "use [item]")
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   Welcome:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "<div>Hello, brave adventurer, and welcome!</div><div><br></div><div>On\
+      audio_translations: {}
+      html: "<div>Hello, brave adventurer, and welcome!</div><div><br></div><div>On\
         \ this adventure, keep two things in mind:</div><div><br></div><div>1) Figuring\
         \ out what to do is half the game! That said, the possible options are usually\
         \ displayed in <b>bold</b> within the text of the state. Go back and look\
@@ -420,13 +455,15 @@ states:
         dest: Road
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   get coins:
+    classifier_model_id: null
     content:
-    - type: text
-      value: He gives you the <b>coins</b> and uses his magic to return you back to
+      audio_translations: {}
+      html: He gives you the <b>coins</b> and uses his magic to return you back to
         the troll.
     interaction:
       answer_groups: []
@@ -438,17 +475,19 @@ states:
         dest: Troll
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes:
     - customization_args:
         value: coins
       generator_id: Copier
       name: payitem
   picking:
+    classifier_model_id: null
     content:
-    - type: text
-      value: You pick a pretty bouquet of <b>flowers</b>.
+      audio_translations: {}
+      html: You pick a pretty bouquet of <b>flowers</b>.
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -459,17 +498,19 @@ states:
         dest: Clearing
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes:
     - customization_args:
         value: flowers
       generator_id: Copier
       name: sneezeitem
   pre-rainbow:
+    classifier_model_id: null
     content:
-    - type: text
-      value: You find yourself at the end of a rainbow. There's a leprechaun here.<div>He
+      audio_translations: {}
+      html: You find yourself at the end of a rainbow. There's a leprechaun here.<div>He
         says:<br><div>"Hello, {{Name}}! How are you?"</div></div>
     interaction:
       answer_groups: []
@@ -483,8 +524,9 @@ states:
         dest: Rainbow
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes:
     - customization_args:
         list_of_values:
@@ -500,6 +542,6 @@ states:
         - '10'
       generator_id: RandomSelector
       name: numcoins
-states_schema_version: 7
+states_schema_version: 13
 tags: []
 title: Parameterized Adventure

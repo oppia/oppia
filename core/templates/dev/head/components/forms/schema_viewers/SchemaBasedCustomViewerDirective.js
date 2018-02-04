@@ -17,16 +17,22 @@
  */
 
 oppia.directive('schemaBasedCustomViewer', [
-  'recursionHelper', function(recursionHelper) {
+  'NestedDirectivesRecursionTimeoutPreventionService',
+  'UrlInterpolationService',
+  function(
+      NestedDirectivesRecursionTimeoutPreventionService,
+      UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
         // The class of the object being edited.
         objType: '='
       },
-      templateUrl: 'schemaBasedViewer/custom',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/schema_viewers/' +
+        'schema_based_custom_viewer_directive.html'),
       restrict: 'E',
-      compile: recursionHelper.compile
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile
     };
   }
 ]);

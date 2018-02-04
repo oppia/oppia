@@ -1,5 +1,5 @@
-core/templates/dev/head/expressions/parser.js
-core/templates/prod/*
+core/templates/dev/head/expressions/ExpressionParserService.js
+backend_prod_files/*
 core/tests/protractor.conf.js
 extensions/interactions/LogicProof/static/js/generatedDefaultData.js
 extensions/interactions/LogicProof/static/js/generatedParser.js

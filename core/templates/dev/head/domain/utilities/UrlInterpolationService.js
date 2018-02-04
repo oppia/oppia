@@ -18,23 +18,51 @@
  */
 
 oppia.factory('UrlInterpolationService', [
-  'alertsService', 'utilsService', function(alertsService, utilsService) {
+  'AlertsService', 'UtilsService', function(AlertsService, UtilsService) {
     var validateResourcePath = function(resourcePath) {
       if (!resourcePath) {
-        alertsService.fatalWarning('Empty path passed in method.');
+        AlertsService.fatalWarning('Empty path passed in method.');
       }
 
       var RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH = /^\//;
       // Ensure that resourcePath starts with a forward slash.
       if (!resourcePath.match(RESOURCE_PATH_STARTS_WITH_FORWARD_SLASH)) {
-        alertsService.fatalWarning(
+        AlertsService.fatalWarning(
           'Path must start with \'\/\': \'' + resourcePath + '\'.');
       }
     };
 
-    var getCachePrefixedUrl = function(resourcePath) {
+    /**
+     * Given a resource path relative to subfolder in /,
+     * returns resource path with cache slug.
+     */
+    var getUrlWithSlug = function(resourcePath) {
+      if (!GLOBALS.DEV_MODE) {
+        if (hashes[resourcePath]) {
+          var index = resourcePath.lastIndexOf('.');
+          return (resourcePath.slice(0, index) + '.' + hashes[resourcePath] +
+                  resourcePath.slice(index));
+        }
+      }
+      return resourcePath;
+    };
+
+    /**
+     * Given a resource path relative to subfolder in /,
+     * returns complete resource path with cache slug and prefixed with url
+     * depending on dev/prod mode.
+     */
+    var getCompleteUrl = function(prefix, path) {
+      return GLOBALS.ASSET_DIR_PREFIX + prefix + getUrlWithSlug(path);
+    };
+
+    /**
+     * Given a resource path relative to extensions folder,
+     * returns the complete url path to that resource.
+     */
+    var getExtensionResourceUrl = function(resourcePath) {
       validateResourcePath(resourcePath);
-      return GLOBALS.ASSET_DIR_PREFIX + resourcePath;
+      return getCompleteUrl('/extensions', resourcePath);
     };
 
     return {
@@ -56,7 +84,7 @@ oppia.factory('UrlInterpolationService', [
        */
       interpolateUrl: function(urlTemplate, interpolationValues) {
         if (!urlTemplate) {
-          alertsService.fatalWarning(
+          AlertsService.fatalWarning(
             'Invalid or empty URL template passed in: \'' + urlTemplate + '\'');
           return null;
         }
@@ -65,7 +93,7 @@ oppia.factory('UrlInterpolationService', [
         if (!(interpolationValues instanceof Object) || (
             Object.prototype.toString.call(
               interpolationValues) === '[object Array]')) {
-          alertsService.fatalWarning(
+          AlertsService.fatalWarning(
             'Expected an object of interpolation values to be passed into ' +
             'interpolateUrl.');
           return null;
@@ -79,12 +107,12 @@ oppia.factory('UrlInterpolationService', [
         var INVALID_VARIABLE_REGEX = /(<{2,})(\w*)(>{2,})/;
 
         // Parameter values can only contain alphanumerical characters, spaces,
-        // hyphens or underscores.
-        var VALID_URL_PARAMETER_VALUE_REGEX = /^(\w| |_|-)+$/;
+        // hyphens, underscores, periods or the equal to symbol.
+        var VALID_URL_PARAMETER_VALUE_REGEX = /^(\w| |_|-|[.]|=)+$/;
 
         if (urlTemplate.match(INVALID_VARIABLE_REGEX) ||
             urlTemplate.match(EMPTY_VARIABLE_REGEX)) {
-          alertsService.fatalWarning(
+          AlertsService.fatalWarning(
             'Invalid URL template received: \'' + urlTemplate + '\'');
           return null;
         }
@@ -92,15 +120,15 @@ oppia.factory('UrlInterpolationService', [
         var escapedInterpolationValues = {};
         for (var varName in interpolationValues) {
           var value = interpolationValues[varName];
-          if (!utilsService.isString(value)) {
-            alertsService.fatalWarning(
+          if (!UtilsService.isString(value)) {
+            AlertsService.fatalWarning(
               'Parameters passed into interpolateUrl must be strings.');
             return null;
           }
 
           // Ensure the value is valid.
           if (!value.match(VALID_URL_PARAMETER_VALUE_REGEX)) {
-            alertsService.fatalWarning(
+            AlertsService.fatalWarning(
               'Parameter values passed into interpolateUrl must only contain ' +
               'alphanumerical characters, hyphens, underscores or spaces: \'' +
               value + '\'');
@@ -117,7 +145,7 @@ oppia.factory('UrlInterpolationService', [
         while (match) {
           var varName = match[1];
           if (!escapedInterpolationValues.hasOwnProperty(varName)) {
-            alertsService.fatalWarning('Expected variable \'' + varName +
+            AlertsService.fatalWarning('Expected variable \'' + varName +
               '\' when interpolating URL.');
             return null;
           }
@@ -130,57 +158,49 @@ oppia.factory('UrlInterpolationService', [
       },
 
       /**
-       * Given an resource path, returns the relative url path to that resource
-       * prefixing the appropriate cache_slug to it.
-       */
-      getStaticResourceUrl: function(resourcePath) {
-        return getCachePrefixedUrl(resourcePath);
-      },
-
-      /**
-       * Given an image path, returns the complete url path to that image
-       * prefixing the appropriate cache_slug to it.
+       * Given an image path relative to /assets/images folder,
+       * returns the complete url path to that image.
        */
       getStaticImageUrl: function(imagePath) {
         validateResourcePath(imagePath);
-        return getCachePrefixedUrl('/assets/images' + imagePath);
+        return getCompleteUrl('/assets', '/images' + imagePath);
       },
 
       /**
-       * Given a gadget type, returns the complete url path to that
-       * gadget type image, prefixing the appropriate cache_slug to it.
+       * Given a path relative to /assets folder, returns the complete url path
+       * to that asset.
        */
-      getGadgetImgUrl: function(gadgetType) {
-        if (!gadgetType) {
-          alertsService.fatalWarning(
-            'Empty gadgetType passed in getGadgetImgUrl.');
-        }
-        return getCachePrefixedUrl('/extensions/gadgets/' + gadgetType +
-          '/static/images/' + gadgetType + '.png');
+      getStaticAssetUrl: function(assetPath) {
+        validateResourcePath(assetPath);
+        return getCompleteUrl('/assets', assetPath);
       },
 
       /**
-       * Given an interaction id, returns the complete url path to the thumbnail
-       * image for the interaction, prefixing the appropriate cache_slug to it.
+       * Given an interaction id, returns the complete url path to
+       * the thumbnail image for the interaction.
        */
       getInteractionThumbnailImageUrl: function(interactionId) {
         if (!interactionId) {
-          alertsService.fatalWarning(
+          AlertsService.fatalWarning(
             'Empty interactionId passed in getInteractionThumbnailImageUrl.');
         }
-        return getCachePrefixedUrl('/extensions/interactions/' +
-          interactionId + '/static/' + interactionId + '.png');
+        return getExtensionResourceUrl('/interactions/' + interactionId +
+          '/static/' + interactionId + '.png');
       },
 
       /**
-       * Given an componenth path relative to /components folder,
-       * returns the complete url path to that component, prefixing the
-       * appropriate cache_slug to it.
+       * Given a directive path relative to head folder,
+       * returns the complete url path to that directive.
        */
-      getComponentUrl: function(componentPath) {
-        validateResourcePath(componentPath);
-        return GLOBALS.TEMPLATE_DIR_PREFIX + '/components' + componentPath;
-      }
+      getDirectiveTemplateUrl: function(path) {
+        validateResourcePath(path);
+        return GLOBALS.TEMPLATE_DIR_PREFIX + getUrlWithSlug(path);
+      },
+
+      getExtensionResourceUrl: getExtensionResourceUrl,
+
+      _getUrlWithSlug: getUrlWithSlug,
+      _getCompleteUrl: getCompleteUrl
     };
   }
 ]);

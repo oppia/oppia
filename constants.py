@@ -21,16 +21,20 @@
 import json
 import os
 
-def parse_json(js_file):
+
+def parse_json_from_js(js_file):
+    """Extracts JSON object from JS file."""
     text = js_file.read()
     first_bracket_index = text.find('= {')
     last_bracket_index = text.rfind('}')
     json_text = text[first_bracket_index + 2:last_bracket_index + 1]
     return json.loads(json_text)
 
+
 class Constants(dict):
     """Transforms dict to object, attributes can be accesed by dot notation"""
     __getattr__ = dict.__getitem__
 
+
 with open(os.path.join('assets', 'constants.js'), 'r') as f:
-    constants = Constants(parse_json(f))
+    constants = Constants(parse_json_from_js(f))

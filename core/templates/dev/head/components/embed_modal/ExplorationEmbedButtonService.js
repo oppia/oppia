@@ -17,26 +17,29 @@
  */
 
 oppia.factory('ExplorationEmbedButtonService', [
-  '$modal', 'siteAnalyticsService', function($modal, siteAnalyticsService) {
+  '$uibModal', 'siteAnalyticsService', 'UrlInterpolationService',
+  function($uibModal, siteAnalyticsService, UrlInterpolationService) {
     return {
       showModal: function(explorationId) {
-        $modal.open({
+        $uibModal.open({
           backdrop: true,
-          templateUrl: 'modals/embedExploration',
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/embed_modal/' +
+            'embed_exploration_modal_directive.html'),
           resolve: {
             explorationId: function() {
               return explorationId;
             }
           },
           controller: [
-            '$scope', '$modalInstance', '$window', 'explorationId',
-            function($scope, $modalInstance, $window, explorationId) {
+            '$scope', '$uibModalInstance', '$window', 'explorationId',
+            function($scope, $uibModalInstance, $window, explorationId) {
               $scope.explorationId = explorationId;
               $scope.serverName = (
                 $window.location.protocol + '//' + $window.location.host);
 
               $scope.close = function() {
-                $modalInstance.dismiss('close');
+                $uibModalInstance.dismiss('close');
               };
 
               $scope.selectText = function($event) {

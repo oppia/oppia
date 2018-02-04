@@ -20,38 +20,46 @@
 // follows:
 //
 // <some-html-element popover-placement="bottom"
-//                    popover-template="popover/feedback"
+//                    uib-popover-template="popover/feedback"
 //                    popover-trigger="click" state-name="<[STATE_NAME]>">
 // </some-html-element>
 //
 // The state-name argument is optional. If it is not provided, the feedback is
 // assumed to apply to the exploration as a whole.
 oppia.directive('feedbackPopup', [
-  'oppiaPlayerService', function(oppiaPlayerService) {
+  'ExplorationPlayerService', 'UrlInterpolationService',
+  function(ExplorationPlayerService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'components/feedback',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration_player/feedback_popup_directive.html'),
       controller: [
-        '$scope', '$element', '$http', '$timeout', 'focusService',
-        'alertsService', 'playerPositionService',
+        '$scope', '$element', '$http', '$timeout', 'FocusManagerService',
+        'AlertsService', 'BackgroundMaskService', 'PlayerPositionService',
+        'WindowDimensionsService',
         function(
-            $scope, $element, $http, $timeout, focusService,
-            alertsService, playerPositionService) {
+            $scope, $element, $http, $timeout, FocusManagerService,
+            AlertsService, BackgroundMaskService, PlayerPositionService,
+            WindowDimensionsService) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
-          $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
+          $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
           $scope.feedbackSubmitted = false;
           // We generate a random id since there may be multiple popover
           // elements on the same page.
           $scope.feedbackPopoverId = (
             'feedbackPopover' + Math.random().toString(36).slice(2));
 
-          focusService.setFocus($scope.feedbackPopoverId);
+          if (WindowDimensionsService.isWindowNarrow()) {
+            BackgroundMaskService.activateMask();
+          }
+
+          FocusManagerService.setFocus($scope.feedbackPopoverId);
 
           var feedbackUrl = (
             '/explorehandler/give_feedback/' +
-            oppiaPlayerService.getExplorationId());
+            ExplorationPlayerService.getExplorationId());
 
           var getTriggerElt = function() {
             // Find the popover trigger node (the one with a popover-template
@@ -68,13 +76,14 @@ oppia.directive('feedbackPopup', [
             var popoverChildElt = null;
             for (var i = 0; i < 10; i++) {
               elt = elt.parent();
-              if (!angular.isUndefined(elt.attr('popover-template-popup'))) {
+              if (!angular.isUndefined(
+                    elt.attr('uib-popover-template-popup'))) {
                 popoverChildElt = elt;
                 break;
               }
             }
             if (!popoverChildElt) {
-              console.log('Could not close popover element.');
+              $log.error('Could not close popover element.');
               return undefined;
             }
 
@@ -83,14 +92,14 @@ oppia.directive('feedbackPopup', [
             var childElts = popoverElt.children();
             for (var i = 0; i < childElts.length; i++) {
               var childElt = $(childElts[i]);
-              if (childElt.attr('popover-template')) {
+              if (childElt.attr('uib-popover-template')) {
                 triggerElt = childElt;
                 break;
               }
             }
 
             if (!triggerElt) {
-              console.log('Could not find popover trigger.');
+              $log.error('Could not find popover trigger.');
               return undefined;
             }
 
@@ -104,7 +113,7 @@ oppia.directive('feedbackPopup', [
                 feedback: $scope.feedbackText,
                 include_author: (
                   !$scope.isSubmitterAnonymized && $scope.isLoggedIn),
-                state_name: playerPositionService.getCurrentStateName()
+                state_name: PlayerPositionService.getCurrentStateName()
               });
             }
 
@@ -125,7 +134,12 @@ oppia.directive('feedbackPopup', [
             $timeout(function() {
               getTriggerElt().trigger('click');
             });
+            BackgroundMaskService.deactivateMask();
           };
+
+          $scope.$on('$destroy', function() {
+            BackgroundMaskService.deactivateMask();
+          });
         }
       ]
     };

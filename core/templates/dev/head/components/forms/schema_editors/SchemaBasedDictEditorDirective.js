@@ -17,7 +17,11 @@
  */
 
 oppia.directive('schemaBasedDictEditor', [
-  'recursionHelper', function(recursionHelper) {
+  'NestedDirectivesRecursionTimeoutPreventionService',
+  'UrlInterpolationService',
+  function(
+      NestedDirectivesRecursionTimeoutPreventionService,
+      UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
@@ -25,12 +29,13 @@ oppia.directive('schemaBasedDictEditor', [
         // Read-only property. An object whose keys and values are the dict
         // properties and the corresponding schemas.
         propertySchemas: '&',
-        allowExpressions: '&',
         labelForFocusTarget: '&'
       },
-      templateUrl: 'schemaBasedEditor/dict',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/schema_editors/' +
+        'schema_based_dict_editor_directive.html'),
       restrict: 'E',
-      compile: recursionHelper.compile,
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: [
         '$scope', 'IdGenerationService',
         function($scope, IdGenerationService) {

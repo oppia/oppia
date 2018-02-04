@@ -6,15 +6,13 @@ language_code: en
 objective: Learn how to model objects as graphs
 param_changes: []
 param_specs: {}
-schema_version: 10
-skin_customizations:
-  panels_contents:
-    bottom: []
+schema_version: 17
 states:
   Bosses correct:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "As you can see, graphs are very useful for modeling real world behavior.\
+      audio_translations: {}
+      html: "As you can see, graphs are very useful for modeling real world behavior.\
         \ They are widely used in many fields, such as computer science and statistics.\_\
         <div><br></div><div>Maybe from now on you'll start seeing graphs all over\
         \ the place!\_</div>"
@@ -28,20 +26,23 @@ states:
         dest: END
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes: []
   Bosses question:
+    classifier_model_id: null
     content:
-    - type: text
-      value: 'There are 6 employees in a company: Fred, George, Hannah, Irene, John
+      audio_translations: {}
+      html: 'There are 6 employees in a company: Fred, George, Hannah, Irene, John
         and Kevin.<div><ul><li>Fred and Hannah report to John.</li><li>Kevin reports
         to George.</li><li>John and George report to Irene.</li></ul><div>Try modeling
         this as a graph, with a directed edge from an employee to his or her immediate
         superior.</div></div>'
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Bosses correct
           feedback:
           - Well done!
@@ -112,35 +113,37 @@ states:
             isWeighted: false
             vertices:
             - label: Fred
-              x: 150
-              y: 50
+              x: 150.0
+              y: 50.0
             - label: George
-              x: 200
-              y: 50
+              x: 200.0
+              y: 50.0
             - label: Irene
-              x: 150
-              y: 100
+              x: 150.0
+              y: 100.0
             - label: Hannah
               x: 269.09375
-              y: 49
+              y: 49.0
             - label: John
               x: 201.09375
-              y: 101
+              y: 101.0
             - label: Kevin
               x: 265.09375
-              y: 100
+              y: 100.0
       default_outcome:
         dest: Bosses question
         feedback:
         - Not exactly... try again!
         param_changes: []
-      fallbacks: []
+      hints: []
       id: GraphInput
+      solution: null
     param_changes: []
   Cities correct:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Distances on a map are a very common thing to use graphs to model, as
+      audio_translations: {}
+      html: Distances on a map are a very common thing to use graphs to model, as
         computers can then process these graphs to do stuff like path-finding without
         worrying about extra details that a full map would have. Note that it doesn't
         matter how far apart the vertices are when you draw them, the important thing
@@ -159,13 +162,15 @@ states:
         dest: Bosses question
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes: []
   Cities question:
+    classifier_model_id: null
     content:
-    - type: text
-      value: 'Use the following information about distances between cities to model
+      audio_translations: {}
+      html: 'Use the following information about distances between cities to model
         them on a graph:<div><ul><li>Paris is 344km from London.</li><li>London is
         932km from Berlin.</li><li>Berlin is 878km from Paris.</li><li>Paris is 1054km
         from Madrid.</li><li>London is 1265km from Madrid.</li><li>Madrid is 1871km
@@ -173,7 +178,8 @@ states:
         just put the number)</div></div>'
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Cities correct
           feedback:
           - Excellent!
@@ -242,28 +248,30 @@ states:
             vertices:
             - label: London
               x: 305.09375
-              y: 32
+              y: 32.0
             - label: Paris
               x: 324.09375
-              y: 98
+              y: 98.0
             - label: Madrid
               x: 211.09375
-              y: 190
+              y: 190.0
             - label: Berlin
               x: 491.09375
-              y: 119
+              y: 119.0
       default_outcome:
         dest: Cities question
         feedback:
         - Not quite, try again!
         param_changes: []
-      fallbacks: []
+      hints: []
       id: GraphInput
+      solution: null
     param_changes: []
   END:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Congratulations, you have finished!
+      audio_translations: {}
+      html: Congratulations, you have finished!
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -271,18 +279,20 @@ states:
         recommendedExplorationIds:
           value: []
       default_outcome: null
-      fallbacks: []
+      hints: []
       id: EndExploration
+      solution: null
     param_changes: []
   Friends correct:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Friendships and social relations are just one example of things that
-        can be modeled by graphs.<div><br></div><div>Sometimes, though, we want a
-        bit more information in our graphs. For example, let's say that we want to
-        use a graph to model distances between cities. In this case, we can attach
-        numbers to each edge to represent this data. In mathematician-speak, such
-        a graph is a "weighted graph", since each edge has a "weight" number.</div><div><br></div><div>Let's
+      audio_translations: {}
+      html: Friendships and social relations are just one example of things that can
+        be modeled by graphs.<div><br></div><div>Sometimes, though, we want a bit
+        more information in our graphs. For example, let's say that we want to use
+        a graph to model distances between cities. In this case, we can attach numbers
+        to each edge to represent this data. In mathematician-speak, such a graph
+        is a "weighted graph", since each edge has a "weight" number.</div><div><br></div><div>Let's
         give this a try!</div>
     interaction:
       answer_groups: []
@@ -294,13 +304,15 @@ states:
         dest: Cities question
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes: []
   Friends question:
+    classifier_model_id: null
     content:
-    - type: text
-      value: '<div>There are a group of 5 people in a room: Alice, Bob, Charlie, David
+      audio_translations: {}
+      html: '<div>There are a group of 5 people in a room: Alice, Bob, Charlie, David
         and Emily. We have that:</div><div><ul><li>Alice is friends with everyone
         but David<br></li><li>Bob is friends with Alice only<br></li><li>Charlie is
         friends with Alice and David<br></li><li>David is friends with Charlie and
@@ -308,7 +320,8 @@ states:
         to model the friendships as a graph!</div>'
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Friends correct
           feedback:
           - Correct!
@@ -352,7 +365,8 @@ states:
                 x: 17.09375
                 y: 161
           rule_type: IsIsomorphicTo
-      - outcome:
+      - correct: false
+        outcome:
           dest: Friends question
           feedback:
           - Did you forget to add new edges?
@@ -406,34 +420,36 @@ states:
             vertices:
             - label: Bob
               x: 380.59375
-              y: 97
+              y: 97.0
             - label: Emily
               x: 259.59375
-              y: 98
+              y: 98.0
             - label: David
               x: 291.59375
-              y: 157
+              y: 157.0
             - label: Charlie
               x: 353.59375
-              y: 159
+              y: 159.0
             - label: Alice
               x: 320.59375
-              y: 57
+              y: 57.0
       default_outcome:
         dest: Friends question
         feedback:
         - Not quite... Let's try again!
         param_changes: []
-      fallbacks: []
+      hints: []
       id: GraphInput
+      solution: null
     param_changes: []
   Introduction:
+    classifier_model_id: null
     content:
-    - type: text
-      value: 'When mathematicians talk about graph theory, they usually aren''t referring
+      audio_translations: {}
+      html: 'When mathematicians talk about graph theory, they usually aren''t referring
         to curve sketching!<div><br></div><div>A graph is a mathematical object that
         consists of "vertices" and "edges". Does this sound complicated? Actually,
-        it isn''t: in simple terms, graphs just dots joined by lines! The dots are
+        it isn''t: in simple terms, graphs are just dots joined by lines! The dots are
         called "vertices" and the lines are called "edges". An example of a graph
         is shown below:</div><div><br></div><div><oppia-noninteractive-image filepath-with-value="&amp;quot;A
         simple graph.png&amp;quot;"></oppia-noninteractive-image><br></div><div><br></div><div>Despite
@@ -449,9 +465,10 @@ states:
         dest: Friends question
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes: []
-states_schema_version: 7
+states_schema_version: 13
 tags: []
 title: Graph Modeling

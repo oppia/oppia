@@ -19,19 +19,26 @@
 // only there so that the Karma tests run, since it looks like Karma doesn't
 // 'see' the GLOBALS variable that is defined in base.html. We should fix this
 // in order to make the testing and production environments match.
+<<<<<<< HEAD
+'use strict';
+=======
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
 var oppia = angular.module(
   'oppia', [
-    'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngTouch', 'ngResource',
+    'ngMaterial', 'ngAnimate', 'ngAudio', 'ngSanitize', 'ngTouch', 'ngResource',
     'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
     'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
-    'toastr'
+    'toastr', 'headroom'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
 for (var constantName in constants) {
   oppia.constant(constantName, constants[constantName]);
 }
+<<<<<<< HEAD
+=======
 
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
 oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
 
@@ -42,12 +49,22 @@ oppia.constant('RULE_TYPE_CLASSIFIER', 'FuzzyMatches');
 oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // Feature still in development.
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
-oppia.constant('ENABLE_STRING_CLASSIFIER', false);
-
+oppia.constant('ENABLE_ML_CLASSIFIERS', false);
+// NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
+oppia.constant('ENABLE_NEW_STATS_FRAMEWORK', false);
+// Feature still in development.
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'The current solution does not lead to another card.');
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',
+  'The solution is now valid!');
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
+  'The current solution is no longer valid.');
 oppia.constant('PARAMETER_TYPES', {
   REAL: 'Real',
   UNICODE_STRING: 'UnicodeString'
 });
+oppia.constant('ACTION_ACCEPT_SUGGESTION', 'accept');
+oppia.constant('ACTION_REJECT_SUGGESTION', 'reject');
 
 // The maximum number of nodes to show in a row of the state graph.
 oppia.constant('MAX_NODES_PER_ROW', 4);
@@ -59,7 +76,212 @@ oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
 // displayed.
 oppia.constant('FATAL_ERROR_CODES', [400, 401, 404, 500]);
 
-oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
+// Do not modify these, for backwards-compatibility reasons.
+oppia.constant('COMPONENT_NAME_CONTENT', 'content');
+oppia.constant('COMPONENT_NAME_HINT', 'hint');
+oppia.constant('COMPONENT_NAME_SOLUTION', 'solution');
+oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
+
+// Add RTE extensions to textAngular toolbar options.
+oppia.config(['$provide', function($provide) {
+  $provide.decorator('taOptions', [
+    '$delegate', '$document', '$uibModal', '$timeout', 'FocusManagerService',
+    'taRegisterTool', 'RteHelperService', 'AlertsService',
+    'ExplorationContextService', 'PAGE_CONTEXT',
+    'UrlInterpolationService',
+    function(
+        taOptions, $document, $uibModal, $timeout, FocusManagerService,
+        taRegisterTool, RteHelperService, AlertsService,
+        ExplorationContextService, PAGE_CONTEXT,
+        UrlInterpolationService) {
+      taOptions.disableSanitizer = true;
+      taOptions.forceTextAngularSanitize = false;
+      taOptions.classes.textEditor = 'form-control oppia-rte-content';
+      taOptions.setup.textEditorSetup = function($element) {
+        $timeout(function() {
+          $element.trigger('focus');
+        });
+      };
+
+      // The refocusFn arg is a function that restores focus to the text editor
+      // after exiting the modal, and moves the cursor back to where it was
+      // before the modal was opened.
+      var _openCustomizationModal = function(
+          customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
+          onDismissCallback, refocusFn) {
+        $document[0].execCommand('enableObjectResizing', false, false);
+        var modalDialog = $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/forms/customize_rte_component_modal_directive.html'),
+          backdrop: 'static',
+          resolve: {},
+          controller: [
+            '$scope', '$uibModalInstance', '$timeout',
+            function($scope, $uibModalInstance, $timeout) {
+              $scope.customizationArgSpecs = customizationArgSpecs;
+<<<<<<< HEAD
+             
+=======
+
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
+              // Without this code, the focus will remain in the background RTE
+              // even after the modal loads. This switches the focus to a
+              // temporary field in the modal which is then removed from the
+              // DOM.
+              // TODO(sll): Make this switch to the first input field in the
+              // modal instead.
+              $scope.modalIsLoading = true;
+              FocusManagerService.setFocus('tmpFocusPoint');
+              $timeout(function() {
+                $scope.modalIsLoading = false;
+              });
+
+              $scope.tmpCustomizationArgs = [];
+              for (var i = 0; i < customizationArgSpecs.length; i++) {
+                var caName = customizationArgSpecs[i].name;
+                $scope.tmpCustomizationArgs.push({
+                  name: caName,
+                  value: (
+                    attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+                      attrsCustomizationArgsDict[caName] :
+                      customizationArgSpecs[i].default_value)
+                });
+              }
+
+              $scope.cancel = function() {
+                $uibModalInstance.dismiss('cancel');
+              };
+
+              $scope.save = function() {
+                $scope.$broadcast('externalSave');
+
+                var customizationArgsDict = {};
+                for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
+                  var caName = $scope.tmpCustomizationArgs[i].name;
+                  customizationArgsDict[caName] = (
+                    $scope.tmpCustomizationArgs[i].value);
+                }
+
+                $uibModalInstance.close(customizationArgsDict);
+              };
+            }
+          ]
+        });
+
+        modalDialog.result.then(onSubmitCallback, onDismissCallback);
+        // 'finally' is a JS keyword. If it is just used in its ".finally" form,
+        // the minification process throws an error.
+        modalDialog.result['finally'](refocusFn);
+      };
+
+      RteHelperService.getRichTextComponents().forEach(function(componentDefn) {
+        var buttonDisplay = RteHelperService.createToolbarIcon(componentDefn);
+        var canUseFs = ExplorationContextService.getPageContext() ===
+          PAGE_CONTEXT.EDITOR;
+
+        taRegisterTool(componentDefn.id, {
+          display: buttonDisplay.outerHTML,
+          tooltiptext: componentDefn.tooltip,
+          disabled: function() {
+            // Disable components that affect fs for non-editors.
+            return !canUseFs && componentDefn.requiresFs;
+          },
+          onElementSelect: {
+            element: 'img',
+            filter: function(elt) {
+              return elt.hasClass('oppia-noninteractive-' + componentDefn.id);
+            },
+            action: function(event, $element) {
+              event.preventDefault();
+              var textAngular = this;
+
+              if (!canUseFs && componentDefn.requiresFs) {
+                var FS_UNAUTHORIZED_WARNING = 'Unfortunately, only ' +
+                  'exploration authors can make changes involving files.';
+                AlertsService.addWarning(FS_UNAUTHORIZED_WARNING);
+                // Without this, the view will not update to show the warning.
+                textAngular.$editor().$parent.$apply();
+                return;
+              }
+
+              // Move the cursor to be immediately after the clicked widget.
+              // This prevents users from overwriting the widget.
+              var elRange = rangy.createRange();
+              elRange.setStartAfter($element.get(0));
+              elRange.setEndAfter($element.get(0));
+              var elSelection = rangy.getSelection();
+              elSelection.removeAllRanges();
+              elSelection.addRange(elRange);
+              var savedSelection = rangy.saveSelection();
+
+              // Temporarily pauses sanitizer so rangy markers save position
+              textAngular.$editor().$parent.isCustomizationModalOpen = true;
+              _openCustomizationModal(
+                componentDefn.customizationArgSpecs,
+                RteHelperService.createCustomizationArgDictFromAttrs(
+                  $element[0].attributes),
+                function(customizationArgsDict) {
+                  var el = RteHelperService.createRteElement(
+                    componentDefn, customizationArgsDict);
+                  $element[0].parentNode.replaceChild(el, $element[0]);
+                  textAngular.$editor().updateTaBindtaTextElement();
+                },
+                function() {},
+                function() {
+                  // Re-enables the sanitizer now that the modal is closed.
+                  textAngular.$editor(
+                  ).$parent.isCustomizationModalOpen = false;
+                  textAngular.$editor().displayElements.text[0].focus();
+                  rangy.restoreSelection(savedSelection);
+                });
+              return false;
+            }
+          },
+          action: function() {
+            var textAngular = this;
+            var savedSelection = rangy.saveSelection();
+            textAngular.$editor().wrapSelection(
+              'insertHtml', '<span class="insertionPoint"></span>');
+
+            // Temporarily pauses sanitizer so rangy markers save position.
+            textAngular.$editor().$parent.isCustomizationModalOpen = true;
+            _openCustomizationModal(
+              componentDefn.customizationArgSpecs,
+              {},
+              function(customizationArgsDict) {
+                var el = RteHelperService.createRteElement(
+                  componentDefn, customizationArgsDict);
+                var insertionPoint = (
+                  textAngular.$editor().displayElements.text[0].querySelector(
+                    '.insertionPoint'));
+                var parent = insertionPoint.parentNode;
+                parent.replaceChild(el, insertionPoint);
+                textAngular.$editor().updateTaBindtaTextElement();
+              },
+              function() {
+                // Clean up the insertion point if no widget was inserted.
+                var insertionPoint = (
+                  textAngular.$editor().displayElements.text[0].querySelector(
+                    '.insertionPoint'));
+                if (insertionPoint !== null) {
+                  insertionPoint.remove();
+                }
+              },
+              function() {
+                // Re-enables the sanitizer now that the modal is closed.
+                textAngular.$editor().$parent.isCustomizationModalOpen = false;
+                textAngular.$editor().displayElements.text[0].focus();
+                rangy.restoreSelection(savedSelection);
+              }
+            );
+          }
+        });
+      });
+
+      return taOptions;
+    }
+  ]);
+}]);
 
 oppia.config([
   '$compileProvider', '$httpProvider', '$interpolateProvider',
@@ -93,7 +315,7 @@ oppia.config([
     // Add an interceptor to convert requests to strings and to log and show
     // warnings for error responses.
     $httpProvider.interceptors.push([
-      '$q', '$log', 'alertsService', function($q, $log, alertsService) {
+      '$q', '$log', 'AlertsService', function($q, $log, AlertsService) {
         return {
           request: function(config) {
             if (config.data) {
@@ -118,7 +340,7 @@ oppia.config([
               if (rejection.data && rejection.data.error) {
                 warningMessage = rejection.data.error;
               }
-              alertsService.addWarning(warningMessage);
+              AlertsService.addWarning(warningMessage);
             }
             return $q.reject(rejection);
           }
@@ -168,22 +390,6 @@ oppia.config(['toastrConfig', function(toastrConfig) {
   });
 }]);
 
-// Returns true if the user is on a mobile device.
-// See: http://stackoverflow.com/a/14301832/5020618
-oppia.factory('deviceInfoService', ['$window', function($window) {
-  return {
-    isMobileDevice: function() {
-      return typeof $window.orientation !== 'undefined';
-    },
-    isMobileUserAgent: function() {
-      return /Mobi/.test(navigator.userAgent);
-    },
-    hasTouchEvents: function() {
-      return 'ontouchstart' in $window;
-    }
-  };
-}]);
-
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
 oppia.factory('$exceptionHandler', ['$log', function($log) {
@@ -191,9 +397,9 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
     var messageAndSourceAndStackTrace = [
       '',
       'Cause: ' + cause,
-      'Source: ' + window.location.href,
       exception.message,
-      String(exception.stack)
+      String(exception.stack),
+      '    at URL: ' + window.location.href
     ].join('\n');
 
     // Catch all errors, to guard against infinite recursive loops.
@@ -222,250 +428,7 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
   };
 }]);
 
-// Service for HTML serialization and escaping.
-oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
-  var htmlEscaper = {
-    objToEscapedJson: function(obj) {
-      return this.unescapedStrToEscapedStr(JSON.stringify(obj));
-    },
-    escapedJsonToObj: function(json) {
-      if (!json) {
-        $log.error('Empty string was passed to JSON decoder.');
-        return '';
-      }
-      return JSON.parse(this.escapedStrToUnescapedStr(json));
-    },
-    unescapedStrToEscapedStr: function(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-    },
-    escapedStrToUnescapedStr: function(value) {
-      return String(value)
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, '\'')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&amp;/g, '&');
-    }
-  };
-  return htmlEscaper;
-}]);
-
-// Service for converting dates in milliseconds since the Epoch to
-// human-readable dates.
-oppia.factory('oppiaDatetimeFormatter', ['$filter', function($filter) {
-  return {
-    // Returns just the time if the local datetime representation has the
-    // same date as the current date. Otherwise, returns just the date if the
-    // local datetime representation has the same year as the current date.
-    // Otherwise, returns the full date (with the year abbreviated).
-    getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
-      var date = new Date(millisSinceEpoch);
-      if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
-        // The replace function removes 'seconds' from the time returned.
-        return date.toLocaleTimeString().replace(/:\d\d /, ' ');
-      } else if (date.getFullYear() === new Date().getFullYear()) {
-        return $filter('date')(date, 'MMM d');
-      } else {
-        return $filter('date')(date, 'shortDate');
-      }
-    },
-    // Returns just the date.
-    getLocaleDateString: function(millisSinceEpoch) {
-      var date = new Date(millisSinceEpoch);
-      return date.toLocaleDateString();
-    },
-    // Returns whether the date is at most one week before the current date.
-    isRecent: function(millisSinceEpoch) {
-      var ONE_WEEK_IN_MILLIS = 7 * 24 * 60 * 60 * 1000;
-      return new Date().getTime() - millisSinceEpoch < ONE_WEEK_IN_MILLIS;
-    }
-  };
-}]);
-
-// Service for validating things and (optionally) displaying warning messages
-// if the validation fails.
-oppia.factory('validatorsService', [
-  '$filter', 'alertsService', function($filter, alertsService) {
-    return {
-      /**
-       * Checks whether an entity name is valid, and displays a warning message
-       * if it isn't.
-       * @param {string} input - The input to be checked.
-       * @param {boolean} showWarnings - Whether to show warnings in the
-       *   butterbar.
-       * @return {boolean} True if the entity name is valid, false otherwise.
-       */
-      isValidEntityName: function(input, showWarnings, allowEmpty) {
-        input = $filter('normalizeWhitespace')(input);
-        if (!input && !allowEmpty) {
-          if (showWarnings) {
-            alertsService.addWarning('Please enter a non-empty name.');
-          }
-          return false;
-        }
-
-        for (var i = 0; i < GLOBALS.INVALID_NAME_CHARS.length; i++) {
-          if (input.indexOf(GLOBALS.INVALID_NAME_CHARS[i]) !== -1) {
-            if (showWarnings) {
-              alertsService.addWarning(
-               'Invalid input. Please use a non-empty description consisting ' +
-               'of alphanumeric characters, spaces and/or hyphens.'
-              );
-            }
-            return false;
-          }
-        }
-        return true;
-      },
-      isValidExplorationTitle: function(input, showWarnings) {
-        if (!this.isValidEntityName(input, showWarnings)) {
-          return false;
-        }
-
-        if (input.length > 40) {
-          if (showWarnings) {
-            alertsService.addWarning(
-              'Exploration titles should be at most 40 characters long.');
-          }
-          return false;
-        }
-
-        return true;
-      },
-      // NB: this does not check whether the card name already exists in the
-      // states dict.
-      isValidStateName: function(input, showWarnings) {
-        if (!this.isValidEntityName(input, showWarnings)) {
-          return false;
-        }
-
-        if (input.length > 50) {
-          if (showWarnings) {
-            alertsService.addWarning(
-              'Card names should be at most 50 characters long.');
-          }
-          return false;
-        }
-
-        return true;
-      },
-      isNonempty: function(input, showWarnings) {
-        if (!input) {
-          if (showWarnings) {
-            // TODO(sll): Allow this warning to be more specific in terms of
-            // what needs to be entered.
-            alertsService.addWarning('Please enter a non-empty value.');
-          }
-          return false;
-        }
-        return true;
-      }
-    };
-  }
-]);
-
-// Service for generating random IDs.
-oppia.factory('IdGenerationService', [function() {
-  return {
-    generateNewId: function() {
-      return Math.random().toString(36).slice(2);
-    }
-  };
-}]);
-
 oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
-
-// Service for setting focus. This broadcasts a 'focusOn' event which sets
-// focus to the element in the page with the corresponding focusOn attribute.
-// Note: This requires LABEL_FOR_CLEARING_FOCUS to exist somewhere in the HTML
-// page.
-oppia.factory('focusService', [
-  '$rootScope', '$timeout', 'deviceInfoService', 'LABEL_FOR_CLEARING_FOCUS',
-  'IdGenerationService',
-  function(
-      $rootScope, $timeout, deviceInfoService, LABEL_FOR_CLEARING_FOCUS,
-      IdGenerationService) {
-    var _nextLabelToFocusOn = null;
-    return {
-      clearFocus: function() {
-        this.setFocus(LABEL_FOR_CLEARING_FOCUS);
-      },
-      setFocus: function(name) {
-        if (_nextLabelToFocusOn) {
-          return;
-        }
-
-        _nextLabelToFocusOn = name;
-        $timeout(function() {
-          $rootScope.$broadcast('focusOn', _nextLabelToFocusOn);
-          _nextLabelToFocusOn = null;
-        });
-      },
-      setFocusIfOnDesktop: function(newFocusLabel) {
-        if (!deviceInfoService.isMobileDevice()) {
-          this.setFocus(newFocusLabel);
-        }
-      },
-      // Generates a random string (to be used as a focus label).
-      generateFocusLabel: function() {
-        return IdGenerationService.generateNewId();
-      }
-    };
-  }
-]);
-
-// Service for manipulating the page URL.
-oppia.factory('urlService', ['$window', function($window) {
-  return {
-    getUrlParams: function() {
-      var params = {};
-      var parts = $window.location.href.replace(
-        /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-          params[key] = value;
-        }
-      );
-      return params;
-    },
-    isIframed: function() {
-      var pathname = this.getPathname();
-      var urlParts = pathname.split('/');
-      return urlParts[1] === 'embed';
-    },
-    getPathname: function() {
-      return window.location.pathname;
-    }
-  };
-}]);
-
-// Service for computing the window dimensions.
-oppia.factory('windowDimensionsService', ['$window', function($window) {
-  var onResizeHooks = [];
-
-  $window.onresize = function() {
-    onResizeHooks.forEach(function(hookFn) {
-      hookFn();
-    });
-  };
-  return {
-    getWidth: function() {
-      return (
-        $window.innerWidth || document.documentElement.clientWidth ||
-        document.body.clientWidth);
-    },
-    registerOnResizeHook: function(hookFn) {
-      onResizeHooks.push(hookFn);
-    },
-    isWindowNarrow: function() {
-      var NORMAL_NAVBAR_CUTOFF_WIDTH_PX = 768;
-      return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
-    }
-  };
-}]);
 
 // Service for sending events to Google Analytics.
 //
@@ -473,8 +436,7 @@ oppia.factory('windowDimensionsService', ['$window', function($window) {
 // turned on. This flag must be turned on explicitly by the application
 // owner in feconf.py.
 oppia.factory('siteAnalyticsService', ['$window', function($window) {
-  var CAN_SEND_ANALYTICS_EVENTS = GLOBALS.CAN_SEND_ANALYTICS_EVENTS;
-
+  var CAN_SEND_ANALYTICS_EVENTS = constants.CAN_SEND_ANALYTICS_EVENTS;
   // For definitions of the various arguments, please see:
   // developers.google.com/analytics/devguides/collection/analyticsjs/events
   var _sendEventToGoogleAnalytics = function(
@@ -643,69 +605,16 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
   };
 }]);
 
-// Service for debouncing function calls.
-oppia.factory('oppiaDebouncer', [function() {
-  return {
-    // Returns a function that will not be triggered as long as it continues to
-    // be invoked. The function only gets executed after it stops being called
-    // for `wait` milliseconds.
-    debounce: function(func, millisecsToWait) {
-      var timeout;
-      var context = this;
-      var args = arguments;
-      var timestamp;
-      var result;
-
-      var later = function() {
-        var last = new Date().getTime() - timestamp;
-        if (last < millisecsToWait) {
-          timeout = setTimeout(later, millisecsToWait - last);
-        } else {
-          timeout = null;
-          result = func.apply(context, args);
-          if (!timeout) {
-            context = null;
-            args = null;
-          }
-        }
-      };
-
-      return function() {
-        context = this;
-        args = arguments;
-        timestamp = new Date().getTime();
-        if (!timeout) {
-          timeout = setTimeout(later, millisecsToWait);
-        }
-        return result;
-      };
-    }
-  };
-}]);
-
-// Shim service for functions on $window that allows these functions to be
-// mocked in unit tests.
-oppia.factory('currentLocationService', ['$window', function($window) {
-  return {
-    getHash: function() {
-      return $window.location.hash;
-    },
-    getPathname: function() {
-      return $window.location.pathname;
-    }
-  };
-}]);
-
-// Service for assembling extension tags (for gadgets and interactions).
+// Service for assembling extension tags (for interactions).
 oppia.factory('extensionTagAssemblerService', [
-  '$filter', 'oppiaHtmlEscaper', function($filter, oppiaHtmlEscaper) {
+  '$filter', 'HtmlEscaperService', function($filter, HtmlEscaperService) {
     return {
       formatCustomizationArgAttrs: function(element, customizationArgSpecs) {
         for (var caSpecName in customizationArgSpecs) {
           var caSpecValue = customizationArgSpecs[caSpecName].value;
           element.attr(
             $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
-            oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
+            HtmlEscaperService.objToEscapedJson(caSpecValue));
         }
         return element;
       }
@@ -740,93 +649,9 @@ if (typeof Object.create !== 'function') {
   })();
 }
 
-// Service for code normalization. Used by the code REPL and pencil code
-// interactions.
-oppia.factory('codeNormalizationService', [function() {
-  var removeLeadingWhitespace = function(str) {
-    return str.replace(/^\s+/g, '');
-  };
-  var removeTrailingWhitespace = function(str) {
-    return str.replace(/\s+$/g, '');
-  };
-  var removeIntermediateWhitespace = function(str) {
-    return str.replace(/\s+/g, ' ');
-  };
-  return {
-    getNormalizedCode: function(codeString) {
-      /*
-       * Normalizes a code string (which is assumed not to contain tab
-       * characters). In particular:
-       *
-       * - Strips out lines that start with '#' (comments), possibly preceded by
-       *     whitespace.
-       * - Trims trailing whitespace on each line, and normalizes multiple
-       *     whitespace characters within a single line into one space
-       *     character.
-       * - Removes blank newlines.
-       * - Make the indentation level four spaces.
-       */
-      // TODO(sll): Augment this function to strip out comments that occur at
-      // the end of a line. However, be careful with lines where '#' is
-      // contained in quotes or the character is escaped.
-      var FOUR_SPACES = '    ';
-      // Maps the number of spaces at the beginning of a line to an int
-      // specifying the desired indentation level.
-      var numSpacesToDesiredIndentLevel = {
-        0: 0
-      };
-
-      var codeLines = removeTrailingWhitespace(codeString).split('\n');
-      var normalizedCodeLines = [];
-      codeLines.forEach(function(line) {
-        if (removeLeadingWhitespace(line).indexOf('#') === 0) {
-          return;
-        }
-        line = removeTrailingWhitespace(line);
-        if (!line) {
-          return;
-        }
-
-        var numSpaces = line.length - removeLeadingWhitespace(line).length;
-
-        var existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
-        var maxNumSpaces = Math.max.apply(null, existingNumSpaces);
-        if (numSpaces > maxNumSpaces) {
-          // Add a new indentation level
-          numSpacesToDesiredIndentLevel[numSpaces] = existingNumSpaces.length;
-        }
-
-        // This is set when the indentation level of the current line does not
-        // start a new scope, and also does not match any previous indentation
-        // level. This case is actually invalid, but for now, we take the
-        // largest indentation level that is less than this one.
-        // TODO(sll): Bad indentation should result in an error nearer the
-        // source.
-        var isShortfallLine =
-          !numSpacesToDesiredIndentLevel.hasOwnProperty(numSpaces) &&
-          numSpaces < maxNumSpaces;
-
-        // Clear all existing indentation levels to the right of this one.
-        for (var indentLength in numSpacesToDesiredIndentLevel) {
-          if (Number(indentLength) > numSpaces) {
-            delete numSpacesToDesiredIndentLevel[indentLength];
-          }
-        }
-
-        if (isShortfallLine) {
-          existingNumSpaces = Object.keys(numSpacesToDesiredIndentLevel);
-          numSpaces = Math.max.apply(null, existingNumSpaces);
-        }
-
-        var normalizedLine = '';
-        for (var i = 0; i < numSpacesToDesiredIndentLevel[numSpaces]; i++) {
-          normalizedLine += FOUR_SPACES;
-        }
-        normalizedLine += removeIntermediateWhitespace(
-          removeLeadingWhitespace(line));
-        normalizedCodeLines.push(normalizedLine);
-      });
-      return normalizedCodeLines.join('\n');
-    }
-  };
-}]);
+// Add a Number.isInteger() polyfill for IE.
+Number.isInteger = Number.isInteger || function(value) {
+  return (
+    typeof value === 'number' && isFinite(value) &&
+    Math.floor(value) === value);
+};

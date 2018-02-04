@@ -16,10 +16,13 @@
  * @fileoverview Controller for the history tab of the collection editor.
  */
 
-oppia.directive('collectionHistoryTab', [function() {
-  return {
-    restrict: 'E',
-    templateUrl: 'inline/collection_history_tab_directive',
-    controller: [function() {}]
-  };
-}]);
+oppia.directive('collectionHistoryTab', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                   '/pages/collection_editor/history_tab/' +
+                   'collection_history_tab_directive.html'),
+      controller: [function() {}]
+    };
+  }]);

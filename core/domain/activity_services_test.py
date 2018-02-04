@@ -14,13 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from constants import constants
 from core.domain import activity_domain
 from core.domain import activity_services
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.tests import test_utils
-import feconf
 
 
 class ActivityServicesTests(test_utils.GenericTestBase):
@@ -32,11 +33,11 @@ class ActivityServicesTests(test_utils.GenericTestBase):
 
     def _create_exploration_reference(self, exploration_id):
         return activity_domain.ActivityReference(
-            feconf.ACTIVITY_TYPE_EXPLORATION, exploration_id)
+            constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
     def _create_collection_reference(self, collection_id):
         return activity_domain.ActivityReference(
-            feconf.ACTIVITY_TYPE_COLLECTION, collection_id)
+            constants.ACTIVITY_TYPE_COLLECTION, collection_id)
 
     def _compare_lists(self, reference_list_1, reference_list_2):
         hashes_1 = [reference.get_hash() for reference in reference_list_1]
@@ -52,6 +53,8 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.moderator = user_services.UserActionsInfo(self.moderator_id)
 
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
         self.save_new_valid_exploration(self.EXP_ID_1, self.owner_id)
@@ -59,8 +62,8 @@ class ActivityServicesTests(test_utils.GenericTestBase):
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
 
     def test_update_featured_refs_correctly_promotes_activities(self):
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
+        rights_manager.publish_collection(self.owner, self.COL_ID_2)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
@@ -73,7 +76,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
                 self._create_collection_reference(self.COL_ID_2)])
 
     def test_update_featured_refs_clears_existing_featured_activities(self):
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
         activity_services.update_featured_activity_references([
             self._create_exploration_reference(self.EXP_ID_0)])
         self._compare_lists(
@@ -85,8 +88,8 @@ class ActivityServicesTests(test_utils.GenericTestBase):
             activity_services.get_featured_activity_references(), [])
 
     def test_updating_with_duplicate_refs_raises_exception(self):
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
+        rights_manager.publish_collection(self.owner, self.COL_ID_2)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
@@ -96,9 +99,9 @@ class ActivityServicesTests(test_utils.GenericTestBase):
                 self._create_exploration_reference(self.EXP_ID_0)])
 
     def test_deleted_activity_is_removed_from_featured_list(self):
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_1)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
+        rights_manager.publish_collection(self.owner, self.COL_ID_2)
         activity_services.update_featured_activity_references([
             self._create_exploration_reference(self.EXP_ID_0),
             self._create_collection_reference(self.COL_ID_2)])
@@ -125,9 +128,9 @@ class ActivityServicesTests(test_utils.GenericTestBase):
             activity_services.get_featured_activity_references(), [])
 
     def test_unpublished_activity_is_removed_from_featured_list(self):
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_1)
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
+        rights_manager.publish_collection(self.owner, self.COL_ID_2)
         activity_services.update_featured_activity_references([
             self._create_exploration_reference(self.EXP_ID_0),
             self._create_collection_reference(self.COL_ID_2)])
@@ -139,45 +142,31 @@ class ActivityServicesTests(test_utils.GenericTestBase):
 
         # Unpublishing an unfeatured activity does not affect the featured
         # list.
-        rights_manager.unpublish_exploration(self.moderator_id, self.EXP_ID_1)
+        rights_manager.unpublish_exploration(self.moderator, self.EXP_ID_1)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
                 self._create_exploration_reference(self.EXP_ID_0),
                 self._create_collection_reference(self.COL_ID_2)])
 
         # Unpublishing a featured activity removes it from the featured list.
-        rights_manager.unpublish_collection(self.moderator_id, self.COL_ID_2)
+        rights_manager.unpublish_collection(self.moderator, self.COL_ID_2)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
                 self._create_exploration_reference(self.EXP_ID_0)])
 
-        rights_manager.unpublish_exploration(self.moderator_id, self.EXP_ID_0)
+        rights_manager.unpublish_exploration(self.moderator, self.EXP_ID_0)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-    def test_publish_or_publicize_activity_does_not_affect_featured_list(self):
+    def test_publish_activity_does_not_affect_featured_list(self):
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-        rights_manager.publish_exploration(self.owner_id, self.EXP_ID_0)
-        self._compare_lists(
-            activity_services.get_featured_activity_references(), [])
-        rights_manager.publicize_exploration(self.moderator_id, self.EXP_ID_0)
-        self._compare_lists(
-            activity_services.get_featured_activity_references(), [])
-        rights_manager.unpublicize_exploration(
-            self.moderator_id, self.EXP_ID_0)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
-        rights_manager.publish_collection(self.owner_id, self.COL_ID_2)
-        self._compare_lists(
-            activity_services.get_featured_activity_references(), [])
-        rights_manager.publicize_collection(self.moderator_id, self.COL_ID_2)
-        self._compare_lists(
-            activity_services.get_featured_activity_references(), [])
-        rights_manager.unpublicize_collection(
-            self.moderator_id, self.COL_ID_2)
+        rights_manager.publish_collection(self.owner, self.COL_ID_2)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 

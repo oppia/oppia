@@ -19,7 +19,7 @@
 
 {% block content %}
   <div class="oppia-static-header">
-    <h1>Help Students Around the World</h1>
+    <h1 translate="I18N_TEACH_PAGE_HEADING"></h1>
   </div>
   <background-banner></background-banner>
   <div ng-controller="Teach">
@@ -28,13 +28,12 @@
         <div class="about-nav md-tab oppia-about-teach-tabs">
           <ul class="oppia-about-tabs">
             <li class="oppia-about-tabs-active">
-              <a class="oppia-about-tabs-text" href="teach" name="teach">
-                Teach with Oppia
+              <a ng-click="onTabClick(TAB_ID_TEACH)" class="oppia-about-tabs-text" href="" id="teach" translate="I18N_TEACH_PAGE_TAB_TEACH_WITH_OPPIA">
+
               </a>
             </li>
             <li>
-              <a class="oppia-about-tabs-text" href="playbook" name="playbook">
-                Participation Playbook
+              <a ng-click="onTabClick(TAB_ID_PLAYBOOK)" class="oppia-about-tabs-text" href="" id="playbook" translate="I18N_TEACH_PAGE_TAB_PARTICIPATION_PLAYBOOK">
               </a>
             </li>
           </ul>
@@ -46,59 +45,18 @@
           <div class="oppia-static-card-content oppia-static-card-content-narrow">
             <h2>Teach with Oppia</h2>
             <p>
-              You might know a student who's struggling with a topic at school.
-              They really want to learn it, but they've gotten a bit stuck, and
-              it's hard for them to get the personalized support they need. And
-              it's not just this student: other students, all over the world, are
-              likely to have trouble with the same topics, again and again.
+              The Oppia team is currently working hard on a series of free online lessons on <strong>basic mathematics</strong>. These lessons are targeted at students who don't have good access to textbooks and teachers, but who do have (low-end) mobile devices. We hope students will be able to learn from these lessons at their own pace, supported by useful, targeted feedback.
             </p>
             <p>
-              To address this, we're excited to announce the
-              <em>Teach with Oppia</em> program, which enables anyone to
-              contribute to a collection of free, accessible lessons on topics
-              that learners find challenging. These lessons, called
-              <em>explorations</em>, use Oppia's unique technology to recreate 1-on-1
-              tutoring, combining engaging instruction, clear explanations, and
-              ample exercises that allow students to gain proficiency with the subject.
-              Students can then do these lessons at their own pace, supported by
-              useful, targeted feedback.
+              The story-based lessons we're creating relate mathematics to a student's real-life experience (similar to this <a href="https://www.oppia.org/explore/DIWZiVgs0km-?collection_id=4UgTQUc1tala">sample lesson</a> on Fractions). We want them to be demonstrably effective, to represent the best that can be done with online teaching, and to be available to anyone free-of-charge. We also plan to improve the lessons over time, so that they're as useful for as many students around the world as possible.
             </p>
             <p>
-              Ultimately, Oppia's goal is to cover as many subjects as possible.
-              However, our short-term goal is to create a set of effective,
-              enjoyable explorations for basic mathematics (up to pre-algebra)
-              that students can use on their own, and that provably help them learn.
+              The <a href="https://goo.gl/forms/tDUx4TS6B8Apkqhq2"><em>Teach with Oppia</em></a> program invites applications from volunteers who can demonstrate a passion and aptitude for helping students learn basic mathematics. Participants will receive personalized feedback on the lessons they create, as well as assistance with playtesting and promoting their lessons. They'll also be able to connect with other like-minded creators, as well as the Oppia development team, to ensure their creations are well-realized.
             </p>
             <p>
-              To achieve this, the <em>Teach with Oppia</em> program is currently accepting
-              applications from individuals who can demonstrate a passion and aptitude
-              for helping students learn basic mathematics. Participants will receive
-              personalized feedback on the lessons they create, as well as
-              assistance with playtesting and promoting their lessons. They'll
-              also be able to connect with other like-minded creators, as well as
-              the Oppia development team, to ensure that their creations are as
-              well-realized as possible.
+              Although the program runs year-round, we can only accommodate a limited number of participants. However, we are currently accepting submissions on a rolling basis -- so if you love coming up with engaging stories, explaining a topic clearly, or identifying roadblocks that students may run into and helping them overcome these, please don't hesitate to get in touch!
             </p>
-            <p>
-              Though the program runs year-round, we can only accommodate a
-              limited number of participants at any given time. We accept
-              submissions on a rolling basis, so please fill out
-              <a href="https://goo.gl/forms/ljmQ9R3AZRkT2kU23">this form</a>
-              if you'd like to take part.
-            </p>
-            <p>
-              Interested individuals who wish to contribute explorations <em>not</em>
-              focused on basic mathematics may also still apply. However,
-              because Oppia is entirely volunteer-driven, we simply do not have
-              the time to support every educator interested in the program.
-              Therefore, in order to receive the same level of support from the
-              Oppia team, these individuals will need to create, promote, and
-              refine at least one exploration on their own first. This
-              demonstrates that the individual could be a valuable long-term
-              contributor to the project and is committed to Oppia's mission of
-              helping anyone learn anything they want in an effective and
-              enjoyable way.
-            </p>
+
           </div>
           <a ng-click="onApplyToTeachWithOppia()" class="btn oppia-about-button oppia-teach-button"
              translate="I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA" target="_blank" tabindex="0"></a>
@@ -106,111 +64,52 @@
 
           <div class="playbook oppia-about-tab-content">
             <div class="oppia-static-card-content oppia-static-card-content-narrow">
-              <h2>Community Guidelines</h2>
+              <h2 translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_HEADING"></h2>
               <ol>
                 <li>
-                  <p>
-                    <strong>Everyone is welcome to play and give feedback on
-                    published explorations.</strong> With everyone's help, we can
-                    continuously improve the lessons on the site and make them
-                    as effective as possible.
+                  <p translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_1">
                   </p>
                 </li>
                 <li>
-                  <p>
-                    <strong>Use good judgement when publishing explorations.</strong>
-                    Explorations should have significant educational value and
-                    cannot contain advertising, spam, vandalism and/or abuse.
+                  <p translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_2">
                   </p>
                 </li>
                 <li>
-                  <p>
-                    <strong>Be a good citizen.</strong>
-                    Creating multiple accounts, abusing the feedback systems, using
-                    explorations to trick users, or other similar antisocial
-                    behavior will not be tolerated and may result in account
-                    suspension.
+                  <p translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_GUIDELINE_3">
                   </p>
                 </li>
               </ol>
-              <p>
-                If you need any clarification on these guidelines, please feel free
-                to ask on our <a href="/forum" class="inline-links">forum</a>.
+              <p translate="I18N_TEACH_PAGE_COMMUNITY_GUIDELINES_TEXT">
               </p>
 
-              <h2>Making Your Explorations Publishable</h2>
+              <h2 translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_HEADING"></h2>
 
-              <p>
-                When an exploration is published, it is credited to you, and
-                becomes available for anyone to learn from. In order to create a
-                good learning experience for students, here's a few tips we've
-                found useful:
+              <p translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_PARAGRAPH_1">
               </p>
 
               <ul style="margin-left: 25px;">
-                <li>
-                  <strong>Teach something meaningful</strong> - Present
-                  information that's new to the target audience &mdash; don't just
-                  test knowledge they're already assumed to have. Also, if you'd
-                  like to teach a topic covered by an existing exploration,
-                  consider submitting feedback for the current exploration to help
-                  improve it instead &mdash; it's easier!
+                <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_1">
                 </li>
-                <li>
-                  <strong>Teach more than a single factoid</strong> - When picking
-                  topics, try and pick either an involved, tricky concept that has
-                  nuances and depth, or a collection of related, interesting facts.
-                  It can also be nice to have a sense of progression and challenge,
-                  so that the learner gets the chance to apply a concept they've
-                  just learned to an unseen situation.
+                <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_2 ">
                 </li>
-                <li>
-                  <strong>Give informative feedback</strong> - Don't just tell
-                  learners if they're correct or incorrect. Explain the reasoning,
-                  or dig deeper to try and help them understand their mistake. Use
-                  fallbacks to provide hints for open-ended questions and give
-                  learners new, useful insights.
+                <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_3">
                 </li>
-                <li>
-                  <strong>Proofread</strong> - Ensure that your exploration is
-                  well-written and easy to read. It should be free of typos,
-                  factual errors and bugs, since these will cause it to lose
-                  credibility in the learner's eyes.
+                <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_4">
                 </li>
-                <li>
-                  <strong>Represent it accurately</strong> - The learning objective
-                  is shown to learners who are browsing explorations, and should
-                  reflect the content of your exploration. The exploration should
-                  deliver all the content promised in the learning objective and in
-                  the exploration itself.
+                <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_5">
                 </li>
-                <li>
-                  <strong>Stay interesting!</strong> - The best explorations tell
-                  a story, and have useful feedback. They give learners a chance
-                  to reason about concepts, try out new knowledge, and receive
-                  useful feedback on their work.
+                <li translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_INSTRUCTION_6">
                 </li>
               </ul>
 
-              <p>
-                For additional help on crafting useful feedback and good
-                explorations, check out our <a href="http://oppia.github.io/#/DesignTips" class="inline-links">Design Tips</a> page.
+              <p translate="I18N_TEACH_PAGE_PUBLICATION_INSTRUCTIONS_PARAGRAPH_2">
               </p>
 
-              <h2>Publication policy</h2>
+              <h2 translate="I18N_TEACH_PAGE_PUBLICATION_POLICY_HEADING"></h2>
 
-              <p>
-                Any owner of a private exploration can publish it at any time.
-                However, low-quality explorations may be unpublished by the
-                moderators, with feedback on how to improve them.
+              <p translate="I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_1">
               </p>
-
-              <p>
-                Explorations are meant to be continuously improved, and
-                explorations that haven't been edited for a long time may be
-                considered "orphaned". In this case, ownership may be handed to the
-                Oppia community at large (at moderator discretion), so that the
-                exploration can continue to be improved.
+              <p translate="I18N_TEACH_PAGE_PUBLICATION_POLICY_PARAGRAPH_2">
               </p>
             </div>
           </div>
@@ -222,7 +121,7 @@
           <div class="oppia-about-extra-info">
             <div class="oppia-static-content oppia-static-extra-content oppia-about-extra-content">
               <div class="oppia-static-card-content oppia-static-card-content-wide oppia-about-buttons-container">
-                <a href="/dashboard?mode=create" class="btn oppia-about-button"
+                <a href="/creator_dashboard?mode=create" class="btn oppia-about-button"
                    translate="I18N_ACTION_CREATE_EXPLORATION"></a>
                 <a href="/library" class="btn oppia-about-button"
                    translate="I18N_ACTION_BROWSE_EXPLORATIONS"></a>
@@ -235,40 +134,6 @@
   </div>
   <div class="oppia-footer-padding-below-banner">
   </div>
-  <script>
-    $(document).ready(function() {
-      var activeTabClass = 'oppia-about-tabs-active';
-      var hash = window.location.hash.slice(1);
-      var visibleContent = 'oppia-about-visible-content';
-
-      function activateTab(tabName) {
-        $("a[name='" + tabName + "']").parent().addClass(activeTabClass).siblings().removeClass(activeTabClass);
-        $('.' + tabName).addClass(visibleContent).siblings().removeClass(visibleContent);
-      }
-
-      if (hash === 'teach') {
-        activateTab('teach');
-      } else if (hash === 'playbook') {
-        activateTab("playbook");
-      }
-
-      window.onhashchange = function() {
-        var hashChange = window.location.hash.slice(1);
-        if (hashChange === 'teach') {
-          activateTab('teach');
-        } else if (hashChange === 'playbook') {
-          activateTab('playbook');
-        }
-      };
-
-      $('.oppia-about-tabs li').on('click', function(evt) {
-        evt.preventDefault();
-        $(this).addClass(activeTabClass).siblings().removeClass(activeTabClass);
-        var currentAttrVal = $(this).children('a').attr('href');
-        $('.' + currentAttrVal).addClass(visibleContent).siblings().removeClass(visibleContent);
-      });
-    });
-  </script>
 {% endblock %}
 
 {% block footer_js %}

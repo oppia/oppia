@@ -1,0 +1,26 @@
+<div class="pencil-code-editor-container">
+  <div style="height: 500px; position: relative;" class="pencil-code-editor-iframe">
+    <div></div>
+  </div>
+  <div style="margin-top: 4px;">
+    <md-button class="md-button-success" ng-click="reset(currentInitialValue)" ng-disabled="!interactionIsActive">
+      <span style="color: #333;">Reset Code</span>
+    </md-button>
+  </div>
+</div>
+<style>
+  .pencil-code-editor-container {
+    background: #fff;
+    max-width: 100%;
+    min-width: 560px;
+    padding: 8px;
+    width: 1000px;
+  }
+
+  @media screen and (max-width: 959px) {
+    .pencil-code-editor-container {
+      width: 100vw;
+      min-width: 360px;
+    }
+  }
+</style>

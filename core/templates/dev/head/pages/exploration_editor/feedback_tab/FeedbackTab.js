@@ -17,26 +17,27 @@
  */
 
 oppia.controller('FeedbackTab', [
-  '$scope', '$http', '$modal', '$timeout', '$rootScope', 'alertsService',
-  'oppiaDatetimeFormatter', 'threadStatusDisplayService',
-  'threadDataService', 'explorationStatesService', 'explorationData',
-  'changeListService', 'StateObjectFactory',
+  '$scope', '$http', '$uibModal', '$timeout', '$rootScope', 'AlertsService',
+  'DateTimeFormatService', 'ThreadStatusDisplayService',
+  'ThreadDataService', 'ExplorationStatesService', 'ExplorationDataService',
+  'ChangeListService', 'StateObjectFactory', 'UrlInterpolationService',
+  'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
-    $scope, $http, $modal, $timeout, $rootScope, alertsService,
-    oppiaDatetimeFormatter, threadStatusDisplayService,
-    threadDataService, explorationStatesService, explorationData,
-    changeListService, StateObjectFactory) {
-    var ACTION_ACCEPT_SUGGESTION = 'accept';
-    var ACTION_REJECT_SUGGESTION = 'reject';
-    $scope.STATUS_CHOICES = threadStatusDisplayService.STATUS_CHOICES;
-    $scope.threadData = threadDataService.data;
-    $scope.getLabelClass = threadStatusDisplayService.getLabelClass;
+      $scope, $http, $uibModal, $timeout, $rootScope, AlertsService,
+      DateTimeFormatService, ThreadStatusDisplayService,
+      ThreadDataService, ExplorationStatesService, ExplorationDataService,
+      ChangeListService, StateObjectFactory, UrlInterpolationService,
+      ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
+    $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
+    $scope.threadData = ThreadDataService.data;
+    $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
     $scope.getHumanReadableStatus = (
-      threadStatusDisplayService.getHumanReadableStatus);
+      ThreadStatusDisplayService.getHumanReadableStatus);
     $scope.getLocaleAbbreviatedDatetimeString = (
-      oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString);
+      DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
     $scope.activeThread = null;
+    $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
     $rootScope.loadingMessage = 'Loading';
     $scope.tmpMessage = {
       status: null,
@@ -55,40 +56,42 @@ oppia.controller('FeedbackTab', [
     };
 
     $scope.showCreateThreadModal = function() {
-      $modal.open({
-        templateUrl: 'modals/editorFeedbackCreateThread',
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/feedback_tab/' +
+          'editor_create_feedback_thread_modal_directive.html'),
         backdrop: true,
         resolve: {},
-        controller: ['$scope', '$modalInstance', function(
-          $scope, $modalInstance) {
+        controller: ['$scope', '$uibModalInstance', function(
+            $scope, $uibModalInstance) {
           $scope.newThreadSubject = '';
           $scope.newThreadText = '';
 
           $scope.create = function(newThreadSubject, newThreadText) {
             if (!newThreadSubject) {
-              alertsService.addWarning('Please specify a thread subject.');
+              AlertsService.addWarning('Please specify a thread subject.');
               return;
             }
             if (!newThreadText) {
-              alertsService.addWarning('Please specify a message.');
+              AlertsService.addWarning('Please specify a message.');
               return;
             }
 
-            $modalInstance.close({
+            $uibModalInstance.close({
               newThreadSubject: newThreadSubject,
               newThreadText: newThreadText
             });
           };
 
           $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
           };
         }]
       }).result.then(function(result) {
-        threadDataService.createNewThread(
+        ThreadDataService.createNewThread(
           result.newThreadSubject, result.newThreadText, function() {
             $scope.clearActiveThread();
-            alertsService.addSuccessMessage('Feedback thread created.');
+            AlertsService.addSuccessMessage('Feedback thread created.');
           });
       });
     };
@@ -98,12 +101,12 @@ oppia.controller('FeedbackTab', [
     };
 
     var _isSuggestionValid = function() {
-      return explorationStatesService.hasState(
+      return ExplorationStatesService.hasState(
         $scope.activeThread.suggestion.state_name);
     };
 
     var _hasUnsavedChanges = function() {
-      return (changeListService.getChangeList().length > 0);
+      return (ChangeListService.getChangeList().length > 0);
     };
 
     $scope.getSuggestionButtonType = function() {
@@ -113,8 +116,10 @@ oppia.controller('FeedbackTab', [
 
     // TODO(Allan): Implement ability to edit suggestions before applying.
     $scope.showSuggestionModal = function() {
-      $modal.open({
-        templateUrl: 'modals/editorViewSuggestion',
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/feedback_tab/' +
+          'editor_view_suggestion_modal_directive.html'),
         backdrop: true,
         size: 'lg',
         resolve: {
@@ -134,22 +139,22 @@ oppia.controller('FeedbackTab', [
             return $scope.activeThread.suggestion.description;
           },
           currentContent: function() {
-            var state = explorationStatesService.getState(
+            var state = ExplorationStatesService.getState(
               $scope.activeThread.suggestion.state_name);
-            return state !== undefined ? state.content[0].value : null;
+            return state !== undefined ? state.content.getHtml() : null;
           },
           newContent: function() {
-            return $scope.activeThread.suggestion.state_content.value;
+            return $scope.activeThread.suggestion.suggestion_html;
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'suggestionIsOpen', 'suggestionIsValid',
-          'unsavedChangesExist', 'suggestionStatus', 'description',
-          'currentContent', 'newContent', 'editabilityService',
+          '$scope', '$uibModalInstance', 'suggestionIsOpen',
+          'suggestionIsValid', 'unsavedChangesExist', 'suggestionStatus',
+          'description', 'currentContent', 'newContent', 'EditabilityService',
           function(
-            $scope, $modalInstance, suggestionIsOpen, suggestionIsValid,
-            unsavedChangesExist, suggestionStatus, description,
-            currentContent, newContent, editabilityService) {
+              $scope, $uibModalInstance, suggestionIsOpen,
+              suggestionIsValid, unsavedChangesExist, suggestionStatus,
+              description, currentContent, newContent, EditabilityService) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
               'accepted.';
             var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
@@ -160,7 +165,7 @@ oppia.controller('FeedbackTab', [
               'this exploration. Please save/discard your unsaved changes if ' +
               'you wish to accept.';
             $scope.isOpen = suggestionIsOpen;
-            $scope.canEdit = editabilityService.isEditable();
+            $scope.canEdit = EditabilityService.isEditable();
             $scope.canReject = $scope.canEdit && $scope.isOpen;
             $scope.canAccept = $scope.canEdit && $scope.isOpen &&
               suggestionIsValid && !unsavedChangesExist;
@@ -183,63 +188,74 @@ oppia.controller('FeedbackTab', [
             $scope.commitMessage = description;
 
             $scope.acceptSuggestion = function() {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
-                commitMessage: $scope.commitMessage
+                commitMessage: $scope.commitMessage,
+                // TODO(sll): If audio files exist for the content being
+                // replaced, implement functionality in the modal for the
+                // exploration creator to indicate whether this change
+                // requires the corresponding audio subtitles to be updated.
+                // For now, we default to assuming that the changes are
+                // sufficiently small as to warrant no updates.
+                audioUpdateRequired: false
               });
             };
 
             $scope.rejectSuggestion = function() {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 action: ACTION_REJECT_SUGGESTION
               });
             };
 
             $scope.cancelReview = function() {
-              $modalInstance.dismiss();
+              $uibModalInstance.dismiss();
             };
           }
         ]
       }).result.then(function(result) {
-        threadDataService.resolveSuggestion(
+        ThreadDataService.resolveSuggestion(
           $scope.activeThread.thread_id, result.action, result.commitMessage,
+          result.audioUpdateRequired,
           function() {
-            threadDataService.fetchThreads(function() {
+            ThreadDataService.fetchThreads(function() {
               $scope.setActiveThread($scope.activeThread.thread_id);
             });
             // Immediately update editor to reflect accepted suggestion.
             if (result.action === ACTION_ACCEPT_SUGGESTION) {
               var suggestion = $scope.activeThread.suggestion;
               var stateName = suggestion.state_name;
-              var stateDict = explorationData.data.states[stateName];
+              var stateDict = ExplorationDataService.data.states[stateName];
               var state = StateObjectFactory.createFromBackendDict(
                 stateName, stateDict);
-              state.content[0].value = suggestion.state_content.value;
-              explorationData.data.version += 1;
-              explorationStatesService.setState(stateName, state);
+              state.content.setHtml(suggestion.suggestion_html);
+              if (result.audioUpdateRequired) {
+                state.content.markAllAudioAsNeedingUpdate();
+              }
+              ExplorationDataService.data.version += 1;
+              ExplorationStatesService.setState(stateName, state);
               $rootScope.$broadcast('refreshVersionHistory', {
                 forceRefresh: true
               });
               $rootScope.$broadcast('refreshStateEditor');
             }
           }, function() {
-            console.log('Error resolving suggestion');
+            $log.error('Error resolving suggestion');
           });
       });
     };
 
     $scope.addNewMessage = function(threadId, tmpText, tmpStatus) {
       if (threadId === null) {
-        alertsService.addWarning('Cannot add message to thread with ID: null.');
+        AlertsService.addWarning('Cannot add message to thread with ID: null.');
         return;
       }
       if (!tmpStatus) {
-        alertsService.addWarning('Invalid message status: ' + tmpStatus);
+        AlertsService.addWarning('Invalid message status: ' + tmpStatus);
         return;
       }
 
       $scope.messageSendingInProgress = true;
-      threadDataService.addNewMessage(threadId, tmpText, tmpStatus, function() {
+      ThreadDataService.addNewMessage(threadId, tmpText, tmpStatus, function() {
         _resetTmpMessageFields();
         $scope.messageSendingInProgress = false;
       }, function() {
@@ -248,8 +264,8 @@ oppia.controller('FeedbackTab', [
     };
 
     $scope.setActiveThread = function(threadId) {
-      threadDataService.fetchMessages(threadId);
-      threadDataService.markThreadAsSeen(threadId);
+      ThreadDataService.fetchMessages(threadId);
+      ThreadDataService.markThreadAsSeen(threadId);
 
       var allThreads = [].concat(
         $scope.threadData.feedbackThreads, $scope.threadData.suggestionThreads);
@@ -265,8 +281,8 @@ oppia.controller('FeedbackTab', [
 
     // Initial load of the thread list on page load.
     $scope.clearActiveThread();
-    threadDataService.fetchFeedbackStats();
-    threadDataService.fetchThreads(function() {
+    ThreadDataService.fetchFeedbackStats();
+    ThreadDataService.fetchThreads(function() {
       $timeout(function() {
         $rootScope.loadingMessage = '';
       }, 500);

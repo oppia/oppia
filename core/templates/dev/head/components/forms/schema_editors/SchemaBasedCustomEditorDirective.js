@@ -17,16 +17,22 @@
  */
 
 oppia.directive('schemaBasedCustomEditor', [
-  'recursionHelper', function(recursionHelper) {
+  'NestedDirectivesRecursionTimeoutPreventionService',
+  'UrlInterpolationService',
+  function(
+      NestedDirectivesRecursionTimeoutPreventionService,
+      UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
         // The class of the object being edited.
         objType: '='
       },
-      templateUrl: 'schemaBasedEditor/custom',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/schema_editors/' +
+        'schema_based_custom_editor_directive.html'),
       restrict: 'E',
-      compile: recursionHelper.compile
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile
     };
   }
 ]);

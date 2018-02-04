@@ -22,6 +22,7 @@ import os
 import re
 import types
 
+from constants import constants
 from core.controllers import base
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -31,7 +32,6 @@ from core.tests import test_utils
 import feconf
 import main
 import utils
-
 
 import webapp2
 import webtest
@@ -92,6 +92,8 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
             # Some of these will 404 or 302. This is expected.
             response = self.testapp.get(url, expect_errors=True)
+            if response.status_int not in [200, 302, 401, 404]:
+                print url
             self.assertIn(response.status_int, [200, 302, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
@@ -124,11 +126,12 @@ class BaseHandlerTest(test_utils.GenericTestBase):
     def test_root_redirect_rules_for_logged_in_learners(self):
         self.login(self.TEST_LEARNER_EMAIL)
 
-        # Since no exploration has been created, going to '/' should redirect
-        # to the library page.
+        # Since by default the homepage for all logged in users is the
+        # learner dashboard, going to '/' should redirect to the learner
+        # dashboard page.
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
-        self.assertIn('library', response.headers['location'])
+        self.assertIn('learner_dashboard', response.headers['location'])
         self.logout()
 
     def test_root_redirect_rules_for_users_with_no_user_contribution_model(
@@ -141,46 +144,37 @@ class BaseHandlerTest(test_utils.GenericTestBase):
             user_id)
         user_contribution_model.delete()
 
-        # Since no exploration has been created, going to '/' should redirect
-        # to the library page.
+        # Since by default the homepage for all logged in users is the
+        # learner dashboard, going to '/' should redirect to the learner
+        # dashboard page.
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 302)
-        self.assertIn('library', response.headers['location'])
+        self.assertIn('learner_dashboard', response.headers['location'])
         self.logout()
 
     def test_root_redirect_rules_for_logged_in_creators(self):
         self.login(self.TEST_CREATOR_EMAIL)
         creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
-        exploration_id = '0_en_test_exploration'
-        self.save_new_valid_exploration(
-            exploration_id, creator_user_id, title='Test',
-            category='Test', language_code='en')
+        # Set the default dashboard as creator dashboard.
+        user_services.update_user_default_dashboard(
+            creator_user_id, constants.DASHBOARD_TYPE_CREATOR)
 
-        # Since at least one exploration has been created, going to '/' should
-        # redirect to the dashboard page.
+        # Since the default dashboard has been set as creator dashboard, going
+        # to '/' should redirect to the creator dashboard.
         response = self.testapp.get('/')
-        self.assertIn('dashboard', response.headers['location'])
-        exp_services.delete_exploration(creator_user_id, exploration_id)
-        self.logout()
-        self.login(self.TEST_CREATOR_EMAIL)
-        response = self.testapp.get('/')
-
-        # Even though the exploration is deleted, the user is still redirected
-        # to the dashboard. This is because deleted explorations are still
-        # associated with their creators.
-        self.assertEqual(response.status_int, 302)
-        self.assertIn('dashboard', response.headers['location'])
+        self.assertIn('creator_dashboard', response.headers['location'])
 
     def test_root_redirect_rules_for_logged_in_editors(self):
         self.login(self.TEST_CREATOR_EMAIL)
         creator_user_id = self.get_user_id_from_email(self.TEST_CREATOR_EMAIL)
+        creator = user_services.UserActionsInfo(creator_user_id)
         editor_user_id = self.get_user_id_from_email(self.TEST_EDITOR_EMAIL)
         exploration_id = '1_en_test_exploration'
         self.save_new_valid_exploration(
             exploration_id, creator_user_id, title='Test',
             category='Test', language_code='en')
         rights_manager.assign_role_for_exploration(
-            creator_user_id, exploration_id, editor_user_id,
+            creator, exploration_id, editor_user_id,
             rights_manager.ROLE_EDITOR)
         self.logout()
         self.login(self.TEST_EDITOR_EMAIL)
@@ -328,18 +322,50 @@ class I18nDictsTest(test_utils.GenericTestBase):
         )).keys())
 
     def _extract_keys_from_html_file(self, filename):
-        regex_pattern = r'(I18N_[A-Z/_\d]*)'
+        # The \b is added at the start to ensure that keys ending with
+        # '_I18N_IDS' do not get matched. Instances of such keys can be found
+        # in learner_dashboard.html.
+        regex_pattern = r'(\bI18N_[A-Z/_\d]*)'
         return re.findall(regex_pattern, utils.get_file_contents(
             filename))
 
+    def _get_tags(self, input_string, key, filename):
+        """Returns the parts in the input string that lie within <...>
+        characters.
+        """
+        result = []
+        bracket_level = 0
+        current_string = ''
+        for c in input_string:
+            if c == '<':
+                current_string += c
+                bracket_level += 1
+            elif c == '>':
+                self.assertGreater(
+                    bracket_level, 0,
+                    msg='Invalid HTML: %s at %s in %s' % (
+                        input_string, key, filename))
+                result.append(current_string + c)
+                current_string = ''
+                bracket_level -= 1
+            elif bracket_level > 0:
+                current_string += c
+
+        self.assertEqual(
+            bracket_level, 0,
+            msg='Invalid HTML: %s at %s in %s' % (input_string, key, filename))
+        return sorted(result)
+
     def test_i18n_keys(self):
-        """Tests that all JSON files in i18n.js have the same set of keys."""
+        """Tests that the keys in all JSON files are a subset of those in
+        en.json.
+        """
         master_key_list = self._extract_keys_from_json_file('en.json')
         self.assertGreater(len(master_key_list), 0)
 
         supported_language_filenames = [
             ('%s.json' % language_details['id'])
-            for language_details in feconf.SUPPORTED_SITE_LANGUAGES]
+            for language_details in constants.SUPPORTED_SITE_LANGUAGES]
 
         filenames = os.listdir(
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
@@ -364,7 +390,8 @@ class I18nDictsTest(test_utils.GenericTestBase):
 
     def test_alphabetic_i18n_keys(self):
         """Tests that the keys of all i18n json files are arranged in
-        alphabetical order."""
+        alphabetical order.
+        """
         filenames = os.listdir(
             os.path.join(os.getcwd(), self.get_static_asset_filepath(),
                          'assets', 'i18n'))
@@ -390,12 +417,13 @@ class I18nDictsTest(test_utils.GenericTestBase):
     def test_keys_in_source_code_match_en(self):
         """Tests that keys in HTML files are present in en.json."""
         en_key_list = self._extract_keys_from_json_file('en.json')
-        dirs_to_search = ['core', 'extensions']
+        dirs_to_search = [
+            os.path.join('core', 'templates', 'dev', 'head'),
+            'extensions']
         files_checked = 0
         missing_keys_count = 0
         for directory in dirs_to_search:
-            for root, _, files in os.walk(os.path.join(
-                    os.getcwd(), directory)):
+            for root, _, files in os.walk(os.path.join(os.getcwd(), directory)):
                 for filename in files:
                     if filename.endswith('.html'):
                         files_checked += 1
@@ -413,11 +441,47 @@ class I18nDictsTest(test_utils.GenericTestBase):
         self.assertEqual(missing_keys_count, 0)
         self.assertGreater(files_checked, 0)
 
+    def test_html_in_translations_is_preserved_correctly(self):
+        """Tests that HTML in translated strings matches the original
+        structure.
+        """
+        # For this test, show the entire diff if there is a mismatch.
+        self.maxDiff = None
+
+        master_translation_dict = json.loads(utils.get_file_contents(
+            os.path.join(os.getcwd(), 'assets', 'i18n', 'en.json')))
+        # Remove anything outside '<'...'>' tags. Note that this handles both
+        # HTML tags and Angular variable interpolations.
+        master_tags_dict = {
+            key: self._get_tags(value, key, 'en.json')
+            for key, value in master_translation_dict.iteritems()
+        }
+
+        mismatches = []
+
+        filenames = os.listdir(os.path.join(
+            os.getcwd(), self.get_static_asset_filepath(), 'assets', 'i18n'))
+        for filename in filenames:
+            if filename == 'qqq.json':
+                continue
+            translation_dict = json.loads(utils.get_file_contents(
+                os.path.join(os.getcwd(), 'assets', 'i18n', filename)))
+            for key, value in translation_dict.iteritems():
+                tags = self._get_tags(value, key, filename)
+                if tags != master_tags_dict[key]:
+                    mismatches.append('%s (%s): %s != %s' % (
+                        filename, key, tags, master_tags_dict[key]))
+
+        # Sorting the list before printing makes it easier to systematically
+        # fix any issues that arise.
+        self.assertEqual(sorted(mismatches), [])
+
 
 class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
 
     class FakeHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
         def get(self):
             raise self.InternalErrorException('fake exception')
 
@@ -433,4 +497,59 @@ class GetHandlerTypeIfExceptionRaisedTest(test_utils.GenericTestBase):
 
             response = self.get_json('/fake', expect_errors=True)
             self.assertTrue(isinstance(response, dict))
-            self.assertEqual(500, response['code'])
+            self.assertEqual(500, response['status_code'])
+
+
+class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
+    """Tests that all methods in handlers have authentication decorators
+    applied on them.
+    """
+
+    def test_every_method_has_decorator(self):
+        handlers_checked = []
+
+        for route in main.URLS:
+            # URLS = MAPREDUCE_HANDLERS + other handers. MAPREDUCE_HANDLERS
+            # are tuples. So, below check is to handle them.
+            if isinstance(route, tuple):
+                continue
+            else:
+                handler = route.handler
+
+            # Following handler are present in base.py where acl_decorators
+            # cannot be imported.
+            if (handler.__name__ == 'LogoutPage' or
+                    handler.__name__ == 'Error404Handler'):
+                continue
+
+            if handler.get != base.BaseHandler.get:
+                handler_is_decorated = hasattr(handler.get, '__wrapped__')
+                handlers_checked.append(
+                    (handler.__name__, 'GET', handler_is_decorated))
+
+            if handler.post != base.BaseHandler.post:
+                handler_is_decorated = hasattr(handler.post, '__wrapped__')
+                handlers_checked.append(
+                    (handler.__name__, 'POST', handler_is_decorated))
+
+            if handler.put != base.BaseHandler.put:
+                handler_is_decorated = hasattr(handler.put, '__wrapped__')
+                handlers_checked.append(
+                    (handler.__name__, 'PUT', handler_is_decorated))
+
+            if handler.delete != base.BaseHandler.delete:
+                handler_is_decorated = hasattr(handler.delete, '__wrapped__')
+                handlers_checked.append(
+                    (handler.__name__, 'DELETE', handler_is_decorated))
+
+        self.log_line('Verifying decorators for handlers .... ')
+        for (name, method, handler_is_decorated) in handlers_checked:
+            self.log_line('%s %s method: %s' % (
+                name, method, 'PASS' if handler_is_decorated else 'FAIL'))
+        self.log_line(
+            'Total number of handlers checked: %s' % len(handlers_checked))
+
+        self.assertGreater(len(handlers_checked), 0)
+
+        for (name, method, handler_is_decorated) in handlers_checked:
+            self.assertTrue(handler_is_decorated)

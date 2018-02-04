@@ -33,11 +33,11 @@
           </schema-based-viewer>
         </td>
         <td class="col-sm-3 col-md-3 col-lg-3">
-          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" is-disabled="true" allow-expressions="unicodeForm.allowExpressions">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" is-disabled="true">
           </form-overlay>
         </td>
         <td class="col-sm-3 col-md-3 col-lg-3">
-          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" allow-expressions="unicodeForm.allowExpressions">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value">
           </form-overlay>
         </td>
       </tr>
@@ -50,11 +50,11 @@
           </schema-based-viewer>
         </td>
         <td class="col-sm-3 col-md-3 col-lg-3">
-          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" is-disabled="true" allow-expressions="unicodeForm.allowExpressions">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" is-disabled="true">
           </form-overlay>
         </td>
         <td class="col-sm-3 col-md-3 col-lg-3">
-          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" allow-expressions="unicodeForm.allowExpressions">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value">
           </form-overlay>
         </td>
       </tr>
@@ -84,11 +84,11 @@
             </schema-based-viewer>
           </td>
           <td class="col-sm-3 col-md-3 col-lg-3">
-            <form-overlay definition="form.schema" saved-value="form.value" is-disabled="true" allow-expressions="form.allowExpressions">
+            <form-overlay definition="form.schema" saved-value="form.value" is-disabled="true">
             </form-overlay>
           </td>
           <td class="col-sm-3 col-md-3 col-lg-3">
-            <form-overlay definition="form.schema" saved-value="form.value" allow-expressions="form.allowExpressions">
+            <form-overlay definition="form.schema" saved-value="form.value">
             </form-overlay>
           </td>
         </tr>
@@ -96,17 +96,6 @@
     </div>
   </div>
 
-  <script type="text/ng-template" id="formOverlay/entryPoint">
-    <ng-form name="schemaForm">
-      <schema-based-editor local-value="localValue" schema="definition" is-disabled="isDisabled()" allow-expressions="allowExpressions()">
-      </schema-based-editor>
-    </ng-form>
-
-    <div ng-if="!isDisabled()">
-      <button ng-click="submitValue(localValue)" class="btn btn-success" ng-disabled="schemaForm.$invalid">Submit</button>
-      <button ng-click="cancelEdit()" class="btn btn-default">Cancel</button>
-    </div>
-  </script>
 {% endblock %}
 
 {% block footer_js %}
@@ -114,6 +103,27 @@
   <script src="/third_party/static/code-mirror-3.19.0/mode/python/python.js"></script>
   <script src="/third_party/static/ui-codemirror-0.1.2/src/ui-codemirror.js"></script>
   {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/filters.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/tests/FormBuilderTestPage.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedFloatEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedIntEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedCustomViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedDictViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedListViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
+
 {% endblock footer_js %}

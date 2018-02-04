@@ -1,0 +1,11 @@
+<div class="row numeric-input-container">
+  <!-- This ng-form is needed for submitting answer on hitting enter. -->
+  <form ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+      <ng-form name="numericInputForm">
+        <schema-based-editor schema="NUMERIC_INPUT_FORM_SCHEMA" local-value="answer" label-for-focus-target="labelForFocusTarget">
+        </schema-based-editor>
+      </ng-form>
+    </div>
+  </form>
+</div>

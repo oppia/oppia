@@ -55,7 +55,6 @@ class SentEmailModel(base_models.BaseModel):
         feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION,
         feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION,
         feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
-        feconf.EMAIL_INTENT_PUBLICIZE_EXPLORATION,
         feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION,
         feconf.EMAIL_INTENT_DELETE_EXPLORATION,
         feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
@@ -284,6 +283,7 @@ class BulkEmailModel(base_models.BaseModel):
 
 
 REPLY_TO_ID_LENGTH = 84
+
 
 class FeedbackEmailReplyToIdModel(base_models.BaseModel):
     """This model stores unique_id for each <user, exploration, thread>

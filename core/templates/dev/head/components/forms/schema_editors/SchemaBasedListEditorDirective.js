@@ -17,11 +17,15 @@
  */
 
 oppia.directive('schemaBasedListEditor', [
-  'schemaDefaultValueService', 'recursionHelper', 'focusService',
-  'schemaUndefinedLastElementService', 'IdGenerationService',
+  'SchemaDefaultValueService', 
+  'NestedDirectivesRecursionTimeoutPreventionService',
+  'FocusManagerService', 'SchemaUndefinedLastElementService',
+  'IdGenerationService', 'UrlInterpolationService', 
   function(
-    schemaDefaultValueService, recursionHelper, focusService,
-    schemaUndefinedLastElementService, IdGenerationService) {
+      SchemaDefaultValueService, 
+      NestedDirectivesRecursionTimeoutPreventionService,
+      FocusManagerService, SchemaUndefinedLastElementService,
+      IdGenerationService, UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
@@ -33,13 +37,14 @@ oppia.directive('schemaBasedListEditor', [
         len: '=',
         // UI configuration. May be undefined.
         uiConfig: '&',
-        allowExpressions: '&',
         validators: '&',
         labelForFocusTarget: '&'
       },
-      templateUrl: 'schemaBasedEditor/list',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/schema_editors/' +
+        'schema_based_list_editor_directive.html'),
       restrict: 'E',
-      compile: recursionHelper.compile,
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {
         var baseFocusLabel = (
           $scope.labelForFocusTarget() ||
@@ -96,7 +101,7 @@ oppia.directive('schemaBasedListEditor', [
 
         while ($scope.localValue.length < $scope.minListLength) {
           $scope.localValue.push(
-            schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
+            SchemaDefaultValueService.getDefaultValue($scope.itemSchema()));
         }
 
         $scope.hasDuplicates = function() {
@@ -119,15 +124,15 @@ oppia.directive('schemaBasedListEditor', [
             }
 
             $scope.localValue.push(
-              schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
-            focusService.setFocus(
+              SchemaDefaultValueService.getDefaultValue($scope.itemSchema()));
+            FocusManagerService.setFocus(
               $scope.getFocusLabel($scope.localValue.length - 1));
           };
 
           var _deleteLastElementIfUndefined = function() {
             var lastValueIndex = $scope.localValue.length - 1;
             var valueToConsiderUndefined = (
-              schemaUndefinedLastElementService.getUndefinedValue(
+              SchemaUndefinedLastElementService.getUndefinedValue(
                 $scope.itemSchema()));
             if ($scope.localValue[lastValueIndex] ===
                 valueToConsiderUndefined) {

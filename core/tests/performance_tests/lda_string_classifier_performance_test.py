@@ -23,10 +23,11 @@ Run this script from the Oppia root directory:
 
 import os
 import time
-import yaml
 
 from core.domain import classifier_registry
 import feconf
+
+import yaml
 
 
 def measure_runtime(func):
@@ -107,7 +108,8 @@ class LDAStringClassifierBenchmarker(object):
         """
         classifier = (
             classifier_registry.Registry.get_classifier_by_algorithm_id(
-                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']))
+                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                    'algorithm_id']))
         classifier.train(self.examples[:num])
         classifier_dict = classifier.to_dict()
         return classifier_dict
@@ -130,7 +132,8 @@ class LDAStringClassifierBenchmarker(object):
             raise Exception('No classifier found')
         classifier = (
             classifier_registry.Registry.get_classifier_by_algorithm_id(
-                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']))
+                feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                    'algorithm_id']))
         classifier.from_dict(self.classifier_model_dict)
         classifier.predict(self.docs_to_classify[:num])
 
@@ -147,6 +150,7 @@ def main():
     benchmarker = LDAStringClassifierBenchmarker()
     benchmarker.generate_training_benchmarks()
     benchmarker.generate_prediction_benchmarks()
+
 
 if __name__ == '__main__':
     main()

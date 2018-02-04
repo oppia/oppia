@@ -29,7 +29,7 @@ _VERSION_DELIMITER = '-'
 
 # Constants used for generating ids.
 MAX_RETRIES = 10
-RAND_RANGE = 127 * 127
+RAND_RANGE = (1 << 30) - 1
 ID_LENGTH = 12
 
 
@@ -88,10 +88,6 @@ class BaseModel(ndb.Model):
                 (cls.__name__, entity_id))
         return entity
 
-    def put(self):
-        """Stores this entity's data."""
-        super(BaseModel, self).put()
-
     @classmethod
     def get_multi(cls, entity_ids, include_deleted=False):
         """Gets list of entities by list of ids.
@@ -107,8 +103,18 @@ class BaseModel(ndb.Model):
             not found, or it has been deleted and include_deleted is False,
             then the corresponding entry is None.
         """
-        entity_keys = [ndb.Key(cls, entity_id) for entity_id in entity_ids]
+        entity_keys = []
+        none_argument_indices = []
+        for index, entity_id in enumerate(entity_ids):
+            if entity_id:
+                entity_keys.append(ndb.Key(cls, entity_id))
+            else:
+                none_argument_indices.append(index)
+
         entities = ndb.get_multi(entity_keys)
+        for index in none_argument_indices:
+            entities.insert(index, None)
+
         if not include_deleted:
             for i in xrange(len(entities)):
                 if entities[i] and entities[i].deleted:
@@ -271,15 +277,17 @@ class VersionedModel(BaseModel):
         self.populate(**snapshot_dict)
         return self
 
-    def _reconstitute_from_snapshot_model(self, snapshot_model):
-        """Make this instance into a reconstitution of the given snapshot.
+    def _reconstitute_from_snapshot_id(self, snapshot_id):
+        """Gets a reconstituted instance of this model class, based on the given
+        snapshot id.
 
         Args:
-            snapshot_model: VersionedModel.
+            snapshot_id: str.
 
         Returns:
             VersionedModel. Reconstituted instance.
         """
+        snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id)
         snapshot_dict = snapshot_model.content
         reconstituted_model = self._reconstitute(snapshot_dict)
         # TODO(sll): The 'created_on' and 'last_updated' values here will be
@@ -292,36 +300,6 @@ class VersionedModel(BaseModel):
         reconstituted_model.created_on = snapshot_model.created_on
         reconstituted_model.last_updated = snapshot_model.last_updated
         return reconstituted_model
-
-    def _reconstitute_from_snapshot_id(self, snapshot_id):
-        """Makes this instance into a reconstitution of the given snapshot."""
-        snapshot_model = self.SNAPSHOT_CONTENT_CLASS.get(snapshot_id)
-        return self._reconstitute_from_snapshot_model(snapshot_model)
-
-    @classmethod
-    def _reconstitute_multi_from_models(cls, snapshot_id_model_list):
-        """Iterates through each entry in the list and reconstitutes the model
-        with the corresponding snapshot ID. Each value in the list is a tuple
-        where the first entry is a snapshot ID and the second is a model object.
-        This function should be more efficient than using
-        _reconstitute_from_snapshot_id for N models. Returns a list of the
-        reconstituted models.
-        """
-
-        # TODO(bhenning): Remove this method and revert
-        # _reconstitute_from_snapshot_model once the answer migration is
-        # completed.
-        snapshot_ids = [
-            snapshot_id_model[0]
-            for snapshot_id_model in snapshot_id_model_list]
-        models_to_reconstitute = [
-            snapshot_id_model[1]
-            for snapshot_id_model in snapshot_id_model_list]
-        snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(snapshot_ids)
-        return [
-            model._reconstitute_from_snapshot_model(snapshot_model) # pylint: disable=protected-access
-            for model, snapshot_model in zip(
-                models_to_reconstitute, snapshot_models)]
 
     @classmethod
     def _get_snapshot_id(cls, instance_id, version_number):
@@ -550,6 +528,57 @@ class VersionedModel(BaseModel):
         return cls(id=entity_id)._reconstitute_from_snapshot_id(
             snapshot_id)
         # pylint: enable=protected-access
+
+    @classmethod
+    def get_multi_versions(cls, entity_id, version_numbers):
+        """Gets model instances for each version specified in version_numbers.
+
+        Args:
+            entity_id: str. ID of the entity.
+            version_numbers: list(int). List of version numbers.
+
+        Returns:
+            list(VersionedModel). Model instances representing the given
+                versions.
+
+        Raises:
+            ValueError. The given entity_id is invalid.
+            ValueError. Requested version number cannot be higher than the
+                current version number.
+            ValueError. At least one version number is invalid.
+        """
+        instances = []
+
+        entity = cls.get(entity_id, strict=False)
+        if not entity:
+            raise ValueError('The given entity_id %s is invalid.' % (entity_id))
+        current_version = entity.version
+        max_version = max(version_numbers)
+        if max_version > current_version:
+            raise ValueError(
+                'Requested version number %s cannot be higher than the current '
+                'version number %s.' % (max_version, current_version))
+
+        snapshot_ids = []
+        # pylint: disable=protected-access
+        for version in version_numbers:
+            snapshot_id = cls._get_snapshot_id(entity_id, version)
+            snapshot_ids.append(snapshot_id)
+
+        snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(snapshot_ids)
+        for snapshot_model in snapshot_models:
+            if snapshot_model is None:
+                raise ValueError(
+                    'At least one version number is invalid.')
+            snapshot_dict = snapshot_model.content
+            reconstituted_model = cls(id=entity_id)._reconstitute(
+                snapshot_dict)
+            reconstituted_model.created_on = snapshot_model.created_on
+            reconstituted_model.last_updated = snapshot_model.last_updated
+
+            instances.append(reconstituted_model)
+        # pylint: enable=protected-access
+        return instances
 
     @classmethod
     def get(cls, entity_id, strict=True, version=None):

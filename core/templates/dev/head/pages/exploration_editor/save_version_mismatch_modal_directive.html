@@ -1,0 +1,22 @@
+<div class="modal-header">
+  <h3>Error Saving Exploration</h3>
+</div>
+
+<div class="modal-body">
+  <p>
+    Sorry! Someone else has saved a new version of this exploration, so
+    your pending changes cannot be saved.
+  </p>
+
+  <p ng-show="hasLostChanges">
+    The lost changes are displayed below. You may want to copy and
+    paste these changes before discarding them.
+  </p>
+
+  <div class="oppia-lost-changes" ng-bind-html="lostChangesHtml">
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default" ng-click="discardChanges()">Discard Changes</button>
+</div>

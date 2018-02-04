@@ -28,6 +28,11 @@ class ImageClickInput(base.BaseInteraction):
     instructions = 'Click on the image'
     narrow_instructions = 'View image'
     needs_summary = False
+    # It is required to show which region is being clicked on while specifying
+    # a solution. Once this issue is fixed, ImageClickInput interaction can be
+    # supported by the solution feature.
+    can_have_solution = False
+    show_generic_submit_button = False
 
     _customization_arg_specs = [{
         'name': 'imageAndRegions',
@@ -50,21 +55,15 @@ class ImageClickInput(base.BaseInteraction):
     }]
 
     _answer_visualization_specs = [{
-        # Table with answer counts for top N answers.
-        'id': 'FrequencyTable',
+        # Bar chart with answer counts.
+        'id': 'BarChart',
         'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'Top 5 answers'
-        },
-        'calculation_id': 'Top5AnswerFrequencies',
-    }, {
-        # Table with answer counts.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'All answers'
+            'x_axis_label': 'Answer',
+            'y_axis_label': 'Count',
         },
         'calculation_id': 'AnswerFrequencies',
+        # Bar charts don't have any useful way to display which answers are
+        # addressed yet. By setting this option to False, we consequentially
+        # avoid doing extra computation.
+        'show_addressed_info': False,
     }]
-
-    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

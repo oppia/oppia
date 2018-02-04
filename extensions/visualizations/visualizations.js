@@ -16,22 +16,24 @@
  * @fileoverview Directives for all reusable data visualization components.
  */
 
-// Each visualization receives two variables: 'data' and 'options'. The exact
-// format for each of these is specific to the particular visualization.
+// Each visualization receives three variables: 'data', 'options', and
+// 'isAddressed'. The exact format for each of these is specific to the
+// particular visualization.
 
 oppia.directive('oppiaVisualizationBarChart', [function() {
   return {
     restrict: 'E',
     scope: {},
     controller: [
-      '$scope', '$attrs', '$element', 'oppiaHtmlEscaper',
-      function($scope, $attrs, $element, oppiaHtmlEscaper) {
-        $scope.data = oppiaHtmlEscaper.escapedJsonToObj($attrs.data);
-        $scope.options = oppiaHtmlEscaper.escapedJsonToObj($attrs.options);
+      '$scope', '$attrs', '$element', 'HtmlEscaperService',
+      function($scope, $attrs, $element, HtmlEscaperService) {
+        $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
+        $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
 
         var dataArray = [['Answers', '']];
         for (var i = 0; i < $scope.data.length; i++) {
-          dataArray.push([$scope.data[i].answer, $scope.data[i].frequency]);
+          dataArray.push([
+            String($scope.data[i].answer), $scope.data[i].frequency]);
         }
 
         var data = google.visualization.arrayToDataTable(dataArray);
@@ -46,6 +48,9 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
           },
           legend: {
             position: 'none'
+          },
+          vAxis: {
+            title: 'Answer choice'
           }
         };
 
@@ -62,10 +67,37 @@ oppia.directive('oppiaVisualizationFrequencyTable', [function() {
     scope: {},
     templateUrl: 'visualizations/FrequencyTable',
     controller: [
-      '$scope', '$attrs', 'oppiaHtmlEscaper',
-      function($scope, $attrs, oppiaHtmlEscaper) {
-        $scope.data = oppiaHtmlEscaper.escapedJsonToObj($attrs.data);
-        $scope.options = oppiaHtmlEscaper.escapedJsonToObj($attrs.options);
+      '$scope', '$attrs', 'HtmlEscaperService',
+      function($scope, $attrs, HtmlEscaperService) {
+        $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
+        $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
+        $scope.isAddressed = HtmlEscaperService.escapedJsonToObj(
+          $attrs.isAddressed);
+      }
+    ]
+  };
+}]);
+
+oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    templateUrl: 'visualizations/EnumeratedFrequencyTable',
+    controller: [
+      '$scope', '$attrs', 'HtmlEscaperService',
+      function($scope, $attrs, HtmlEscaperService) {
+        $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
+        $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
+        $scope.isAddressed = HtmlEscaperService.escapedJsonToObj(
+          $attrs.isAddressed);
+
+        $scope.answerVisible = $scope.data.map(function(_, i) {
+          // First element is shown while all others are hidden by default.
+          return i === 0;
+        });
+        $scope.toggleAnswerVisibility = function(i) {
+          $scope.answerVisible[i] = !$scope.answerVisible[i];
+        };
       }
     ]
   };

@@ -23,19 +23,30 @@
  * in an e2e test.
  */
 
-var dashboard = require('../protractor_utils/dashboard.js');
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
-var library = require('../protractor_utils/library.js');
-var player = require('../protractor_utils/player.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('ExplorationFeedback', function() {
   var EXPLORATION_TITLE = 'Sample Exploration';
   var EXPLORATION_OBJECTIVE = 'To explore something';
-  var EXPLORATION_CATEGORY = 'Random';
+  var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_LANGUAGE = 'English';
+  var creatorDashboardPage = null;
+  var libraryPage = null;
+  var explorationPlayerPage = null;
+
+  beforeEach(function() {
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
 
   beforeEach(function() {
     users.createUser('user1@ExplorationFeedback.com',
@@ -54,24 +65,26 @@ describe('ExplorationFeedback', function() {
                                          EXPLORATION_CATEGORY,
                                          EXPLORATION_OBJECTIVE,
                                          EXPLORATION_LANGUAGE);
-    browser.get(general.SERVER_URL_PREFIX);
-    var numberOfFeedbackMessages = dashboard.getNumberOfFeedbackMessages();
-    expect(numberOfFeedbackMessages).toEqual(0);
+    creatorDashboardPage.get();
+    expect(
+      creatorDashboardPage.getNumberOfFeedbackMessages()
+    ).toEqual(0);
     users.logout();
 
     // Learner plays the exploration and submits a feedback
     users.login('user2@ExplorationFeedback.com');
-    browser.get(general.LIBRARY_URL_SUFFIX);
-    library.playExploration(EXPLORATION_TITLE);
-    player.submitFeedback(feedback);
+    libraryPage.get();
+    libraryPage.playExploration(EXPLORATION_TITLE);
+    explorationPlayerPage.submitFeedback(feedback);
     users.logout();
 
     // Creator reads the feedback and responds
     users.login('user1@ExplorationFeedback.com');
-    browser.get(general.SERVER_URL_PREFIX);
-    numberOfFeedbackMessages = dashboard.getNumberOfFeedbackMessages();
-    expect(numberOfFeedbackMessages).toEqual(1);
-    dashboard.navigateToExplorationEditor();
+    creatorDashboardPage.get();
+    expect(
+      creatorDashboardPage.getNumberOfFeedbackMessages()
+    ).toEqual(1);
+    creatorDashboardPage.navigateToExplorationEditor();
 
     editor.readFeedbackMessages().then(function(messages) {
       expect(messages.length).toEqual(1);

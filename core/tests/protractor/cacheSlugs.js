@@ -39,7 +39,6 @@ var checkConsoleErrorsExist = function(expectedErrors) {
     // that have a unique value for their message attribute.
     var uniqueLogMessages = getUniqueLogMessages(browserLogs);
     expect(uniqueLogMessages.length).toBe(expectedErrors.length);
-
     for (var i = 0; i < expectedErrors.length; i++) {
       var errorPresent = false;
       for (var j = 0; j < uniqueLogMessages.length; j++) {

@@ -17,13 +17,16 @@
  * playing the exploration in each node.
  */
 
-oppia.directive('collectionNodeList', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      getCollectionId: '&collectionId',
-      getCollectionNodes: '&collectionNodes'
-    },
-    templateUrl: 'inline/collection_node_list_directive'
-  };
-}]);
+oppia.directive('collectionNodeList', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        getCollectionId: '&collectionId',
+        getCollectionNodes: '&collectionNodes'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/collection_player/' +
+        'collection_node_list_directive.html')
+    };
+  }]);

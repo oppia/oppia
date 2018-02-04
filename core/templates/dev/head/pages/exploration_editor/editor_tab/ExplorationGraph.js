@@ -17,40 +17,42 @@
  */
 
 oppia.controller('ExplorationGraph', [
-  '$scope', '$modal', 'editorContextService', 'alertsService',
-  'explorationStatesService', 'editabilityService', 'routerService',
-  'graphDataService',
+  '$scope', '$uibModal', 'EditorStateService', 'AlertsService',
+  'ExplorationStatesService', 'EditabilityService', 'RouterService',
+  'GraphDataService', 'UrlInterpolationService',
   function(
-      $scope, $modal, editorContextService, alertsService,
-      explorationStatesService, editabilityService, routerService,
-      graphDataService) {
-    $scope.getGraphData = graphDataService.getGraphData;
-    $scope.isEditable = editabilityService.isEditable;
+      $scope, $uibModal, EditorStateService, AlertsService,
+      ExplorationStatesService, EditabilityService, RouterService,
+      GraphDataService, UrlInterpolationService) {
+    $scope.getGraphData = GraphDataService.getGraphData;
+    $scope.isEditable = EditabilityService.isEditable;
 
     // We hide the graph at the outset in order not to confuse new exploration
     // creators.
     $scope.isGraphShown = function() {
-      var states = explorationStatesService.getStates();
-      return Boolean(states && Object.keys(states).length > 1);
+      return Boolean(ExplorationStatesService.isInitialized() &&
+        ExplorationStatesService.getStateNames().length > 1);
     };
 
     $scope.deleteState = function(deleteStateName) {
-      explorationStatesService.deleteState(deleteStateName);
+      ExplorationStatesService.deleteState(deleteStateName);
     };
 
     $scope.onClickStateInMinimap = function(stateName) {
-      routerService.navigateToMainTab(stateName);
+      RouterService.navigateToMainTab(stateName);
     };
 
     $scope.getActiveStateName = function() {
-      return editorContextService.getActiveStateName();
+      return EditorStateService.getActiveStateName();
     };
 
     $scope.openStateGraphModal = function() {
-      alertsService.clearWarnings();
+      AlertsService.clearWarnings();
 
-      $modal.open({
-        templateUrl: 'modals/stateGraph',
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/editor_tab/' +
+          'exploration_graph_modal_directive.html'),
         backdrop: true,
         resolve: {
           isEditable: function() {
@@ -59,37 +61,37 @@ oppia.controller('ExplorationGraph', [
         },
         windowClass: 'oppia-large-modal-window',
         controller: [
-          '$scope', '$modalInstance', 'editorContextService',
-          'graphDataService', 'isEditable',
-          function($scope, $modalInstance, editorContextService,
-                   graphDataService, isEditable) {
-            $scope.currentStateName = editorContextService.getActiveStateName();
-            $scope.graphData = graphDataService.getGraphData();
+          '$scope', '$uibModalInstance', 'EditorStateService',
+          'GraphDataService', 'isEditable',
+          function($scope, $uibModalInstance, EditorStateService,
+              GraphDataService, isEditable) {
+            $scope.currentStateName = EditorStateService.getActiveStateName();
+            $scope.graphData = GraphDataService.getGraphData();
             $scope.isEditable = isEditable;
 
             $scope.deleteState = function(stateName) {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 action: 'delete',
                 stateName: stateName
               });
             };
 
             $scope.selectState = function(stateName) {
-              $modalInstance.close({
+              $uibModalInstance.close({
                 action: 'navigate',
                 stateName: stateName
               });
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              $uibModalInstance.dismiss('cancel');
+              AlertsService.clearWarnings();
             };
           }
         ]
       }).result.then(function(closeDict) {
         if (closeDict.action === 'delete') {
-          explorationStatesService.deleteState(closeDict.stateName);
+          ExplorationStatesService.deleteState(closeDict.stateName);
         } else if (closeDict.action === 'navigate') {
           $scope.onClickStateInMinimap(closeDict.stateName);
         } else {

@@ -18,6 +18,254 @@ from core.domain import exp_domain
 from core.domain import stats_domain
 from core.tests import test_utils
 import feconf
+import utils
+
+
+class ExplorationStatsTests(test_utils.GenericTestBase):
+    """Tests the ExplorationStats domain object."""
+
+    def _get_exploration_stats_from_dict(self, exploration_stats_dict):
+        state_stats_mapping = {}
+        for state_name in exploration_stats_dict['state_stats_mapping']:
+            state_stats_mapping[state_name] = stats_domain.StateStats.from_dict(
+                exploration_stats_dict['state_stats_mapping'][state_name])
+        return stats_domain.ExplorationStats(
+            exploration_stats_dict['exp_id'],
+            exploration_stats_dict['exp_version'],
+            exploration_stats_dict['num_starts_v1'],
+            exploration_stats_dict['num_starts_v2'],
+            exploration_stats_dict['num_actual_starts_v1'],
+            exploration_stats_dict['num_actual_starts_v2'],
+            exploration_stats_dict['num_completions_v1'],
+            exploration_stats_dict['num_completions_v2'],
+            state_stats_mapping)
+
+    def test_to_dict(self):
+        state_stats_dict = {
+            'total_answers_count_v1': 0,
+            'total_answers_count_v2': 10,
+            'useful_feedback_count_v1': 0,
+            'useful_feedback_count_v2': 4,
+            'total_hit_count_v1': 0,
+            'total_hit_count_v2': 18,
+            'first_hit_count_v1': 0,
+            'first_hit_count_v2': 7,
+            'num_times_solution_viewed_v2': 2,
+            'num_completions_v1': 0,
+            'num_completions_v2': 2
+        }
+        expected_exploration_stats_dict = {
+            'exp_id': 'exp_id1',
+            'exp_version': 1,
+            'num_starts_v1': 0,
+            'num_starts_v2': 30,
+            'num_actual_starts_v1': 0,
+            'num_actual_starts_v2': 10,
+            'num_completions_v1': 0,
+            'num_completions_v2': 5,
+            'state_stats_mapping': {
+                'Home': state_stats_dict
+            }
+        }
+        observed_exploration_stats = self._get_exploration_stats_from_dict(
+            expected_exploration_stats_dict)
+        self.assertDictEqual(
+            expected_exploration_stats_dict,
+            observed_exploration_stats.to_dict())
+
+    def test_get_sum_of_first_hit_counts(self):
+        """Test the get_sum_of_first_hit_counts method."""
+        state_stats_dict = {
+            'total_answers_count_v1': 0,
+            'total_answers_count_v2': 10,
+            'useful_feedback_count_v1': 0,
+            'useful_feedback_count_v2': 4,
+            'total_hit_count_v1': 0,
+            'total_hit_count_v2': 18,
+            'first_hit_count_v1': 0,
+            'first_hit_count_v2': 7,
+            'num_times_solution_viewed_v2': 2,
+            'num_completions_v1': 0,
+            'num_completions_v2': 2
+        }
+        exploration_stats_dict = {
+            'exp_id': 'exp_id1',
+            'exp_version': 1,
+            'num_starts_v1': 0,
+            'num_starts_v2': 30,
+            'num_actual_starts_v1': 0,
+            'num_actual_starts_v2': 10,
+            'num_completions_v1': 0,
+            'num_completions_v2': 5,
+            'state_stats_mapping': {
+                'Home': state_stats_dict,
+                'Home2': state_stats_dict
+            }
+        }
+        exploration_stats = self._get_exploration_stats_from_dict(
+            exploration_stats_dict)
+
+        self.assertEqual(exploration_stats.get_sum_of_first_hit_counts(), 14)
+
+    def test_validate(self):
+        state_stats_dict = {
+            'total_answers_count_v1': 0,
+            'total_answers_count_v2': 10,
+            'useful_feedback_count_v1': 0,
+            'useful_feedback_count_v2': 4,
+            'total_hit_count_v1': 0,
+            'total_hit_count_v2': 18,
+            'first_hit_count_v1': 0,
+            'first_hit_count_v2': 7,
+            'num_times_solution_viewed_v2': 2,
+            'num_completions_v1': 0,
+            'num_completions_v2': 2
+        }
+        exploration_stats_dict = {
+            'exp_id': 'exp_id1',
+            'exp_version': 1,
+            'num_starts_v1': 0,
+            'num_starts_v2': 30,
+            'num_actual_starts_v1': 0,
+            'num_actual_starts_v2': 10,
+            'num_completions_v1': 0,
+            'num_completions_v2': 5,
+            'state_stats_mapping': {
+                'Home': state_stats_dict
+            }
+        }
+        exploration_stats = self._get_exploration_stats_from_dict(
+            exploration_stats_dict)
+        exploration_stats.validate()
+
+        # Make the exp_id integer.
+        exploration_stats.exp_id = 10
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected exp_id to be a string')):
+            exploration_stats.validate()
+
+        # Make the num_actual_starts string.
+        exploration_stats.exp_id = 'exp_id1'
+        exploration_stats.num_actual_starts_v2 = '0'
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected num_actual_starts_v2 to be an int')):
+            exploration_stats.validate()
+
+        # Make the state_stats_mapping list.
+        exploration_stats.num_actual_starts_v2 = 10
+        exploration_stats.state_stats_mapping = []
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected state_stats_mapping to be a dict')):
+            exploration_stats.validate()
+
+        # Make the num_completions negative.
+        exploration_stats.state_stats_mapping = {}
+        exploration_stats.num_completions_v2 = -5
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            '%s cannot have negative values' % ('num_completions_v2'))):
+            exploration_stats.validate()
+
+
+class StateStatsTests(test_utils.GenericTestBase):
+    """Tests the StateStats domain object."""
+
+    def test_from_dict(self):
+        state_stats_dict = {
+            'total_answers_count_v1': 0,
+            'total_answers_count_v2': 10,
+            'useful_feedback_count_v1': 0,
+            'useful_feedback_count_v2': 4,
+            'total_hit_count_v1': 0,
+            'total_hit_count_v2': 18,
+            'first_hit_count_v1': 0,
+            'first_hit_count_v2': 7,
+            'num_times_solution_viewed_v2': 2,
+            'num_completions_v1': 0,
+            'num_completions_v2': 2
+        }
+        state_stats = stats_domain.StateStats(0, 10, 0, 4, 0, 18, 0, 7, 2, 0, 2)
+        expected_state_stats = stats_domain.StateStats.from_dict(
+            state_stats_dict)
+        self.assertEqual(
+            state_stats.total_answers_count_v1,
+            expected_state_stats.total_answers_count_v1)
+        self.assertEqual(
+            state_stats.total_answers_count_v2,
+            expected_state_stats.total_answers_count_v2)
+        self.assertEqual(
+            state_stats.useful_feedback_count_v1,
+            expected_state_stats.useful_feedback_count_v1)
+        self.assertEqual(
+            state_stats.useful_feedback_count_v2,
+            expected_state_stats.useful_feedback_count_v2)
+        self.assertEqual(
+            state_stats.total_hit_count_v1,
+            expected_state_stats.total_hit_count_v1)
+        self.assertEqual(
+            state_stats.total_hit_count_v2,
+            expected_state_stats.total_hit_count_v2)
+        self.assertEqual(
+            state_stats.first_hit_count_v1,
+            expected_state_stats.first_hit_count_v1)
+        self.assertEqual(
+            state_stats.first_hit_count_v2,
+            expected_state_stats.first_hit_count_v2)
+        self.assertEqual(
+            state_stats.num_times_solution_viewed_v2,
+            expected_state_stats.num_times_solution_viewed_v2)
+        self.assertEqual(
+            state_stats.num_completions_v1,
+            expected_state_stats.num_completions_v1)
+        self.assertEqual(
+            state_stats.num_completions_v2,
+            expected_state_stats.num_completions_v2)
+
+    def test_create_default(self):
+        state_stats = stats_domain.StateStats.create_default()
+        self.assertEqual(state_stats.total_answers_count_v1, 0)
+        self.assertEqual(state_stats.total_answers_count_v2, 0)
+        self.assertEqual(state_stats.useful_feedback_count_v1, 0)
+        self.assertEqual(state_stats.useful_feedback_count_v2, 0)
+        self.assertEqual(state_stats.total_hit_count_v1, 0)
+        self.assertEqual(state_stats.total_hit_count_v2, 0)
+        self.assertEqual(state_stats.total_answers_count_v1, 0)
+        self.assertEqual(state_stats.total_answers_count_v2, 0)
+        self.assertEqual(state_stats.num_times_solution_viewed_v2, 0)
+        self.assertEqual(state_stats.num_completions_v1, 0)
+        self.assertEqual(state_stats.num_completions_v2, 0)
+
+    def test_to_dict(self):
+        state_stats_dict = {
+            'total_answers_count_v1': 0,
+            'total_answers_count_v2': 10,
+            'useful_feedback_count_v1': 0,
+            'useful_feedback_count_v2': 4,
+            'total_hit_count_v1': 0,
+            'total_hit_count_v2': 18,
+            'first_hit_count_v1': 0,
+            'first_hit_count_v2': 7,
+            'num_times_solution_viewed_v2': 2,
+            'num_completions_v1': 0,
+            'num_completions_v2': 2
+        }
+        state_stats = stats_domain.StateStats(0, 10, 0, 4, 0, 18, 0, 7, 2, 0, 2)
+        self.assertEqual(state_stats_dict, state_stats.to_dict())
+
+    def test_validation(self):
+        state_stats = stats_domain.StateStats(0, 10, 0, 4, 0, 18, 0, 7, 2, 0, 2)
+        state_stats.validate()
+
+        # Change total_answers_count to string.
+        state_stats.total_answers_count_v2 = '10'
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected total_answers_count_v2 to be an int')):
+            state_stats.validate()
+
+        # Make the total_answers_count negative.
+        state_stats.total_answers_count_v2 = -5
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            '%s cannot have negative values' % ('total_answers_count_v2'))):
+            state_stats.validate()
 
 
 class StateAnswersTests(test_utils.GenericTestBase):
@@ -447,13 +695,131 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
         self.submitted_answer.validate()
 
 
+class AnswerFrequencyListDomainTests(test_utils.GenericTestBase):
+    """Tests AnswerFrequencyList for basic domain object operations."""
+
+    ANSWER_A = stats_domain.AnswerOccurrence('answer a', 3)
+    ANSWER_B = stats_domain.AnswerOccurrence('answer b', 2)
+    ANSWER_C = stats_domain.AnswerOccurrence('answer c', 1)
+
+    def test_has_correct_type(self):
+        answer_frequency_list = stats_domain.AnswerFrequencyList([])
+        self.assertEqual(
+            answer_frequency_list.calculation_output_type,
+            stats_domain.CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
+
+    def test_defaults_to_empty_list(self):
+        answer_frequency_list = stats_domain.AnswerFrequencyList()
+        self.assertEqual(len(answer_frequency_list.answer_occurrences), 0)
+
+    def test_create_list_from_raw_object(self):
+        answer_frequency_list = (
+            stats_domain.AnswerFrequencyList.from_raw_type([{
+                'answer': 'answer a', 'frequency': 3
+            }, {
+                'answer': 'answer b', 'frequency': 2
+            }]))
+        answer_occurrences = answer_frequency_list.answer_occurrences
+        self.assertEqual(len(answer_occurrences), 2)
+        self.assertEqual(answer_occurrences[0].answer, 'answer a')
+        self.assertEqual(answer_occurrences[0].frequency, 3)
+        self.assertEqual(answer_occurrences[1].answer, 'answer b')
+        self.assertEqual(answer_occurrences[1].frequency, 2)
+
+    def test_convert_list_to_raw_object(self):
+        answer_frequency_list = stats_domain.AnswerFrequencyList(
+            [self.ANSWER_A, self.ANSWER_B])
+        self.assertEqual(answer_frequency_list.to_raw_type(), [{
+            'answer': 'answer a', 'frequency': 3
+        }, {
+            'answer': 'answer b', 'frequency': 2
+        }])
+
+
+class CategorizedAnswerFrequencyListsDomainTests(test_utils.GenericTestBase):
+    """Tests CategorizedAnswerFrequencyLists for basic domain object
+    operations.
+    """
+    ANSWER_A = stats_domain.AnswerOccurrence('answer a', 3)
+    ANSWER_B = stats_domain.AnswerOccurrence('answer b', 2)
+    ANSWER_C = stats_domain.AnswerOccurrence('answer c', 1)
+
+    def test_has_correct_type(self):
+        answer_frequency_lists = (
+            stats_domain.CategorizedAnswerFrequencyLists({}))
+        self.assertEqual(
+            answer_frequency_lists.calculation_output_type,
+            stats_domain.CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS)
+
+    def test_defaults_to_empty_dict(self):
+        answer_frequency_lists = stats_domain.CategorizedAnswerFrequencyLists()
+        self.assertEqual(
+            len(answer_frequency_lists.categorized_answer_freq_lists), 0)
+
+    def test_create_list_from_raw_object(self):
+        answer_frequency_lists = (
+            stats_domain.CategorizedAnswerFrequencyLists.from_raw_type({
+                'category a': [{'answer': 'answer a', 'frequency': 3}],
+                'category b': [{
+                    'answer': 'answer b',
+                    'frequency': 2
+                }, {
+                    'answer': 'answer c',
+                    'frequency': 1
+                }]
+            }))
+        self.assertEqual(
+            len(answer_frequency_lists.categorized_answer_freq_lists), 2)
+        self.assertIn(
+            'category a', answer_frequency_lists.categorized_answer_freq_lists)
+        self.assertIn(
+            'category b', answer_frequency_lists.categorized_answer_freq_lists)
+
+        category_a_answer_list = (
+            answer_frequency_lists.categorized_answer_freq_lists['category a'])
+        category_b_answer_list = (
+            answer_frequency_lists.categorized_answer_freq_lists['category b'])
+        category_a_answers = category_a_answer_list.answer_occurrences
+        category_b_answers = category_b_answer_list.answer_occurrences
+        self.assertEqual(len(category_a_answers), 1)
+        self.assertEqual(len(category_b_answers), 2)
+
+        self.assertEqual(category_a_answers[0].answer, 'answer a')
+        self.assertEqual(category_a_answers[0].frequency, 3)
+        self.assertEqual(category_b_answers[0].answer, 'answer b')
+        self.assertEqual(category_b_answers[0].frequency, 2)
+        self.assertEqual(category_b_answers[1].answer, 'answer c')
+        self.assertEqual(category_b_answers[1].frequency, 1)
+
+    def test_convert_list_to_raw_object(self):
+        answer_frequency_lists = stats_domain.CategorizedAnswerFrequencyLists({
+            'category a': stats_domain.AnswerFrequencyList([self.ANSWER_A]),
+            'category b': stats_domain.AnswerFrequencyList(
+                [self.ANSWER_B, self.ANSWER_C]),
+        })
+        self.assertEqual(answer_frequency_lists.to_raw_type(), {
+            'category a': [{'answer': 'answer a', 'frequency': 3}],
+            'category b': [{
+                'answer': 'answer b',
+                'frequency': 2
+            }, {
+                'answer': 'answer c',
+                'frequency': 1
+            }]
+        })
+
+
 class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     """Tests the StateAnswersCalcOutput domain object for validation."""
+
+    class UnknownCalculationOutputObject(object):
+        pass
 
     def setUp(self):
         super(StateAnswersCalcOutputValidationTests, self).setUp()
         self.state_answers_calc_output = stats_domain.StateAnswersCalcOutput(
-            'exp_id', 1, 'initial_state', 'AnswerFrequencies', {})
+            'exp_id', 1, 'initial_state', 'TextInput', 'AnswerFrequencies',
+            stats_domain.AnswerFrequencyList.from_raw_type([]))
 
         # The canonical object should have no validation problems
         self.state_answers_calc_output.validate()
@@ -476,9 +842,19 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
             self.state_answers_calc_output,
             'Expected calculation_id to be a string')
 
-    def test_calculation_output_must_be_less_than_one_million_bytes(self):
+    def test_calculation_output_must_be_known_type(self):
         self.state_answers_calc_output.calculation_output = (
-            ['This is not a long sentence.'] * 200000)
+            self.UnknownCalculationOutputObject())
+        self._assert_validation_error(
+            self.state_answers_calc_output,
+            'Expected calculation output to be one of')
+
+    def test_calculation_output_must_be_less_than_one_million_bytes(self):
+        occurred_answer = stats_domain.AnswerOccurrence(
+            'This is not a long sentence.', 1)
+        self.state_answers_calc_output.calculation_output = (
+            stats_domain.AnswerFrequencyList(
+                [occurred_answer] * 200000))
         self._assert_validation_error(
             self.state_answers_calc_output,
             'calculation_output is too big to be stored')

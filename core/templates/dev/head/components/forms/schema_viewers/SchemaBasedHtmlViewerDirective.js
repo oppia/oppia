@@ -16,12 +16,15 @@
  * @fileoverview Directive for a schema-based viewer for HTML.
  */
 
-oppia.directive('schemaBasedHtmlViewer', [function() {
-  return {
-    scope: {
-      localValue: '='
-    },
-    templateUrl: 'schemaBasedViewer/html',
-    restrict: 'E'
-  };
-}]);
+oppia.directive('schemaBasedHtmlViewer', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      scope: {
+        localValue: '='
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/schema_viewers/' +
+        'schema_based_html_viewer_directive.html'),
+      restrict: 'E'
+    };
+  }]);

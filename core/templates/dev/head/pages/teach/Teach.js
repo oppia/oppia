@@ -22,12 +22,50 @@ oppia.controller('Teach', [
   function(
       $scope, $timeout, $window, siteAnalyticsService,
       UrlInterpolationService) {
+    // Define constants
+    $scope.TAB_ID_TEACH = 'teach';
+    $scope.TAB_ID_PLAYBOOK = 'playbook';
+
+    var activeTabClass = 'oppia-about-tabs-active';
+    var hash = window.location.hash.slice(1);
+    var visibleContent = 'oppia-about-visible-content';
+
+    var activateTab = function(tabName) {
+      $("a[id='" + tabName + "']").parent().addClass(
+        activeTabClass
+      ).siblings().removeClass(activeTabClass);
+      $('.' + tabName).addClass(visibleContent).siblings().removeClass(
+        visibleContent
+      );
+    };
+
+    if (hash === $scope.TAB_ID_TEACH) {
+      activateTab($scope.TAB_ID_TEACH);
+    } else if (hash === $scope.TAB_ID_PLAYBOOK) {
+      activateTab($scope.TAB_ID_PLAYBOOK);
+    }
+
+    window.onhashchange = function() {
+      var hashChange = window.location.hash.slice(1);
+      if (hashChange === $scope.TAB_ID_TEACH) {
+        activateTab($scope.TAB_ID_TEACH);
+      } else if (hashChange === $scope.TAB_ID_PLAYBOOK) {
+        activateTab($scope.TAB_ID_PLAYBOOK);
+      }
+    };
+
+    $scope.onTabClick = function(tabName) {
+      // Update hash
+      window.location.hash = '#' + tabName;
+      activateTab(tabName);
+    };
+
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
     $scope.onApplyToTeachWithOppia = function() {
       siteAnalyticsService.registerApplyToTeachWithOppiaEvent();
       $timeout(function() {
-        $window.location = 'https://goo.gl/forms/ljmQ9R3AZRkT2kU23';
+        $window.location = 'https://goo.gl/forms/tDUx4TS6B8Apkqhq2';
       }, 150);
       return false;
     };

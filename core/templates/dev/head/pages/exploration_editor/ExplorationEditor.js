@@ -18,58 +18,68 @@
  */
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-oppia.constant('GADGET_SPECS', GLOBALS.GADGET_SPECS);
-oppia.constant('PANEL_SPECS', GLOBALS.PANEL_SPECS);
 oppia.constant(
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
   'explorationTitleInputFocusLabel');
+oppia.constant(
+  'EXPLORATION_DATA_URL_TEMPLATE',
+  '/explorehandler/init/<exploration_id>');
+oppia.constant(
+  'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
+  '/explorehandler/init/<exploration_id>?v=<version>');
+oppia.constant(
+  'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/data/<exploration_id>');
+oppia.constant(
+  'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
+  '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
-  'explorationData', 'editorContextService', 'explorationTitleService',
-  'explorationCategoryService', 'explorationGadgetsService',
-  'explorationObjectiveService', 'explorationLanguageCodeService',
-  'explorationRightsService', 'explorationInitStateNameService',
-  'explorationTagsService', 'editabilityService', 'explorationStatesService',
-  'routerService', 'graphDataService', 'stateEditorTutorialFirstTimeService',
-  'explorationParamSpecsService', 'explorationParamChangesService',
-  'explorationWarningsService', '$templateCache', 'explorationContextService',
-  'explorationAdvancedFeaturesService', '$modal', 'changeListService',
-  'autosaveInfoModalsService', 'siteAnalyticsService',
+  'ExplorationDataService', 'EditorStateService', 'ExplorationTitleService',
+  'ExplorationCategoryService', 'ExplorationObjectiveService',
+  'ExplorationLanguageCodeService', 'ExplorationRightsService',
+  'ExplorationInitStateNameService', 'ExplorationTagsService',
+  'EditabilityService', 'ExplorationStatesService', 'RouterService',
+  'GraphDataService', 'StateEditorTutorialFirstTimeService',
+  'ExplorationParamSpecsService', 'ExplorationParamChangesService',
+  'ExplorationWarningsService', '$templateCache', 'ExplorationContextService',
+  'ExplorationAdvancedFeaturesService', '$uibModal', 'ChangeListService',
+  'AutosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
+  'ParamSpecsObjectFactory', 'ExplorationAutomaticTextToSpeechService',
+  'UrlInterpolationService', 'ExplorationCorrectnessFeedbackService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
-      explorationData, editorContextService, explorationTitleService,
-      explorationCategoryService, explorationGadgetsService,
-      explorationObjectiveService, explorationLanguageCodeService,
-      explorationRightsService, explorationInitStateNameService,
-      explorationTagsService, editabilityService, explorationStatesService,
-      routerService, graphDataService, stateEditorTutorialFirstTimeService,
-      explorationParamSpecsService, explorationParamChangesService,
-      explorationWarningsService, $templateCache, explorationContextService,
-      explorationAdvancedFeaturesService, $modal, changeListService,
-      autosaveInfoModalsService, siteAnalyticsService,
-      UserEmailPreferencesService, ParamChangesObjectFactory) {
-    $scope.editabilityService = editabilityService;
-    $scope.editorContextService = editorContextService;
-
-    $scope.areGadgetsEnabled = (
-      explorationAdvancedFeaturesService.areGadgetsEnabled);
+      ExplorationDataService, EditorStateService, ExplorationTitleService,
+      ExplorationCategoryService, ExplorationObjectiveService,
+      ExplorationLanguageCodeService, ExplorationRightsService,
+      ExplorationInitStateNameService, ExplorationTagsService,
+      EditabilityService, ExplorationStatesService, RouterService,
+      GraphDataService, StateEditorTutorialFirstTimeService,
+      ExplorationParamSpecsService, ExplorationParamChangesService,
+      ExplorationWarningsService, $templateCache, ExplorationContextService,
+      ExplorationAdvancedFeaturesService, $uibModal, ChangeListService,
+      AutosaveInfoModalsService, siteAnalyticsService,
+      UserEmailPreferencesService, ParamChangesObjectFactory,
+      ParamSpecsObjectFactory, ExplorationAutomaticTextToSpeechService,
+      UrlInterpolationService, ExplorationCorrectnessFeedbackService) {
+    $scope.EditabilityService = EditabilityService;
+    $scope.EditorStateService = EditorStateService;
 
     /**********************************************************
      * Called on initial load of the exploration editor page.
      *********************************************************/
     $rootScope.loadingMessage = 'Loading';
 
-    $scope.explorationId = explorationContextService.getExplorationId();
+    $scope.explorationId = ExplorationContextService.getExplorationId();
     $scope.explorationUrl = '/create/' + $scope.explorationId;
-    $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
     $scope.explorationDownloadUrl = (
       '/createhandler/download/' + $scope.explorationId);
     $scope.revertExplorationUrl = (
       '/createhandler/revert/' + $scope.explorationId);
 
-    $scope.getTabStatuses = routerService.getTabStatuses;
+    $scope.getTabStatuses = RouterService.getTabStatuses;
 
     /********************************************
     * Methods affecting the graph visualization.
@@ -81,8 +91,8 @@ oppia.controller('ExplorationEditor', [
     };
 
     $scope.$on('refreshGraph', function() {
-      graphDataService.recompute();
-      explorationWarningsService.updateWarnings();
+      GraphDataService.recompute();
+      ExplorationWarningsService.updateWarnings();
     });
 
     $scope.getExplorationUrl = function(explorationId) {
@@ -92,27 +102,34 @@ oppia.controller('ExplorationEditor', [
     // Initializes the exploration page using data from the backend. Called on
     // page load.
     $scope.initExplorationPage = function(successCallback) {
-      explorationData.getData().then(function(data) {
-        explorationStatesService.init(data.states);
+      ExplorationDataService.getData(function(explorationId, lostChanges) {
+        if (!AutosaveInfoModalsService.isModalOpen()) {
+          AutosaveInfoModalsService.showLostChangesModal(
+            lostChanges, explorationId);
+        }
+      }).then(function(data) {
+        ExplorationStatesService.init(data.states);
 
-        explorationTitleService.init(data.title);
-        explorationCategoryService.init(data.category);
-        explorationGadgetsService.init(data.skin_customizations);
-        explorationObjectiveService.init(data.objective);
-        explorationLanguageCodeService.init(data.language_code);
-        explorationInitStateNameService.init(data.init_state_name);
-        explorationTagsService.init(data.tags);
-        explorationParamSpecsService.init(data.param_specs);
-        explorationParamChangesService.init(
+        ExplorationTitleService.init(data.title);
+        ExplorationCategoryService.init(data.category);
+        ExplorationObjectiveService.init(data.objective);
+        ExplorationLanguageCodeService.init(data.language_code);
+        ExplorationInitStateNameService.init(data.init_state_name);
+        ExplorationTagsService.init(data.tags);
+        ExplorationParamSpecsService.init(
+          ParamSpecsObjectFactory.createFromBackendDict(data.param_specs));
+        ExplorationParamChangesService.init(
           ParamChangesObjectFactory.createFromBackendList(data.param_changes));
+        ExplorationAutomaticTextToSpeechService.init(data.auto_tts_enabled);
+        ExplorationCorrectnessFeedbackService.init(
+          data.correctness_feedback_enabled);
 
-        $scope.explorationTitleService = explorationTitleService;
-        $scope.explorationCategoryService = explorationCategoryService;
-        $scope.explorationGadgetsService = explorationGadgetsService;
-        $scope.explorationObjectiveService = explorationObjectiveService;
-        $scope.explorationRightsService = explorationRightsService;
+        $scope.explorationTitleService = ExplorationTitleService;
+        $scope.explorationCategoryService = ExplorationCategoryService;
+        $scope.explorationObjectiveService = ExplorationObjectiveService;
+        $scope.ExplorationRightsService = ExplorationRightsService;
         $scope.explorationInitStateNameService = (
-          explorationInitStateNameService);
+          ExplorationInitStateNameService);
 
         $scope.currentUserIsAdmin = data.is_admin;
         $scope.currentUserIsModerator = data.is_moderator;
@@ -120,8 +137,8 @@ oppia.controller('ExplorationEditor', [
         $scope.currentUser = data.user;
         $scope.currentVersion = data.version;
 
-        explorationAdvancedFeaturesService.init(data);
-        explorationRightsService.init(
+        ExplorationAdvancedFeaturesService.init(data);
+        ExplorationRightsService.init(
           data.rights.owner_names, data.rights.editor_names,
           data.rights.viewer_names, data.rights.status,
           data.rights.cloned_from, data.rights.community_owned,
@@ -131,29 +148,29 @@ oppia.controller('ExplorationEditor', [
           data.email_preferences.mute_suggestion_notifications);
 
         if (GLOBALS.can_edit) {
-          editabilityService.markEditable();
+          EditabilityService.markEditable();
         }
 
-        graphDataService.recompute();
+        GraphDataService.recompute();
 
-        if (!editorContextService.getActiveStateName() ||
-            !explorationStatesService.getState(
-              editorContextService.getActiveStateName())) {
-          editorContextService.setActiveStateName(
-            explorationInitStateNameService.displayed);
+        if (!EditorStateService.getActiveStateName() ||
+            !ExplorationStatesService.getState(
+              EditorStateService.getActiveStateName())) {
+          EditorStateService.setActiveStateName(
+            ExplorationInitStateNameService.displayed);
         }
 
-        if (!routerService.isLocationSetToNonStateEditorTab() &&
+        if (!RouterService.isLocationSetToNonStateEditorTab() &&
             !data.states.hasOwnProperty(
-              routerService.getCurrentStateFromLocationPath('gui'))) {
-          routerService.navigateToMainTab();
+              RouterService.getCurrentStateFromLocationPath('gui'))) {
+          RouterService.navigateToMainTab();
         }
 
-        explorationWarningsService.updateWarnings();
+        ExplorationWarningsService.updateWarnings();
 
         // Initialize changeList by draft changes if they exist.
         if (data.draft_changes !== null) {
-          changeListService.loadAutosavedChangeList(data.draft_changes);
+          ChangeListService.loadAutosavedChangeList(data.draft_changes);
         }
 
         if (data.is_version_of_draft_valid === false &&
@@ -161,8 +178,8 @@ oppia.controller('ExplorationEditor', [
             data.draft_changes.length > 0) {
           // Show modal displaying lost changes if the version of draft
           // changes is invalid, and draft_changes is not `null`.
-          autosaveInfoModalsService.showVersionMismatchModal(
-            changeListService.getChangeList());
+          AutosaveInfoModalsService.showVersionMismatchModal(
+            ChangeListService.getChangeList());
           return;
         }
 
@@ -171,8 +188,8 @@ oppia.controller('ExplorationEditor', [
           forceRefresh: true
         });
 
-        if (explorationStatesService.getState(
-              editorContextService.getActiveStateName())) {
+        if (ExplorationStatesService.getState(
+              EditorStateService.getActiveStateName())) {
           $scope.$broadcast('refreshStateEditor');
         }
 
@@ -180,7 +197,7 @@ oppia.controller('ExplorationEditor', [
           successCallback();
         }
 
-        stateEditorTutorialFirstTimeService.init(
+        StateEditorTutorialFirstTimeService.init(
           data.show_state_editor_tutorial_on_load, $scope.explorationId);
       });
     };
@@ -215,7 +232,7 @@ oppia.controller('ExplorationEditor', [
       selector: _ID_TUTORIAL_STATE_CONTENT,
       heading: 'Content',
       text: (
-        '<p>An Oppia exploration is divided into several \'cards.\' ' +
+        '<p>An Oppia exploration is divided into several \'cards\'. ' +
         'The first part of a card is the <b>content</b>.</p>' +
         '<p>Use the content section to set the scene. ' +
         'Tell the learner a story, give them some information, ' +
@@ -238,7 +255,7 @@ oppia.controller('ExplorationEditor', [
       text: (
         '<p>After you\'ve written the content of your conversation, ' +
         'choose an <b>interaction type</b>. ' +
-        'An interaction is how you want your leaner to respond ' +
+        'An interaction is how you want your learner to respond ' +
         'to your question.</p> ' +
         '<p>Oppia has several built-in interactions, including:</p>' +
         '<ul>' +
@@ -328,9 +345,9 @@ oppia.controller('ExplorationEditor', [
     $templateCache.put('ng-joyride-title-tplv1.html', ngJoyrideTemplate);
 
     var leaveTutorial = function() {
-      editabilityService.onEndTutorial();
+      EditabilityService.onEndTutorial();
       $scope.$apply();
-      stateEditorTutorialFirstTimeService.markTutorialFinished();
+      StateEditorTutorialFirstTimeService.markTutorialFinished();
       $scope.tutorialInProgress = false;
     };
 
@@ -346,39 +363,41 @@ oppia.controller('ExplorationEditor', [
 
     $scope.tutorialInProgress = false;
     $scope.startTutorial = function() {
-      routerService.navigateToMainTab();
+      RouterService.navigateToMainTab();
       // The $timeout wrapper is needed for all components on the page to load,
       // otherwise elements within ng-if's are not guaranteed to be present on
       // the page.
       $timeout(function() {
-        editabilityService.onStartTutorial();
+        EditabilityService.onStartTutorial();
         $scope.tutorialInProgress = true;
       });
     };
 
     $scope.showWelcomeExplorationModal = function() {
-      var modalInstance = $modal.open({
-        templateUrl: 'modals/welcomeExploration',
+      var modalInstance = $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/' +
+          'welcome_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'UrlInterpolationService',
-          'siteAnalyticsService', 'explorationContextService',
-          function($scope, $modalInstance, UrlInterpolationService,
-              siteAnalyticsService, explorationContextService) {
-            var explorationId = explorationContextService.getExplorationId();
+          '$scope', '$uibModalInstance', 'siteAnalyticsService',
+          'ExplorationContextService',
+          function($scope, $uibModalInstance, siteAnalyticsService,
+              ExplorationContextService) {
+            var explorationId = ExplorationContextService.getExplorationId();
 
             siteAnalyticsService.registerTutorialModalOpenEvent(explorationId);
 
             $scope.beginTutorial = function() {
               siteAnalyticsService.registerAcceptTutorialModalEvent(
                 explorationId);
-              $modalInstance.close();
+              $uibModalInstance.close();
             };
 
             $scope.cancel = function() {
               siteAnalyticsService.registerDeclineTutorialModalEvent(
                 explorationId);
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
 
             $scope.editorWelcomeImgUrl = (
@@ -392,7 +411,7 @@ oppia.controller('ExplorationEditor', [
       modalInstance.result.then(function() {
         $scope.startTutorial();
       }, function() {
-        stateEditorTutorialFirstTimeService.markTutorialFinished();
+        StateEditorTutorialFirstTimeService.markTutorialFinished();
       });
     };
 

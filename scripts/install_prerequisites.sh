@@ -27,13 +27,13 @@
 
 if [ -e "/etc/is_vagrant_vm" ]
 then
-  source $(dirname $0)/vagrant_lockfile.sh || exit 1
+  source $(dirname $0)/vagrant_lock.sh || exit 1
 fi
 
 sudo apt-get update
 sudo apt-get install curl
 sudo apt-get install git
-sudo apt-get install openjdk-7-jre
+sudo apt-get install openjdk-8-jre
 sudo apt-get install python-setuptools
 sudo apt-get install python-dev
 sudo apt-get install python-pip

@@ -19,19 +19,17 @@
 
 oppia.factory('ExplorationObjectFactory', [
   'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE', 'StateObjectFactory',
-  'StatesObjectFactory', 'ParamChangesObjectFactory',
+  'StatesObjectFactory', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
   'UrlInterpolationService',
   function(
       INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE, StateObjectFactory,
-      StatesObjectFactory, ParamChangesObjectFactory,
+      StatesObjectFactory, ParamChangesObjectFactory, ParamSpecsObjectFactory,
       UrlInterpolationService) {
     var Exploration = function(
-        initStateName, paramChanges, paramSpecs, skinCustomizations,
-        states, title, languageCode) {
+        initStateName, paramChanges, paramSpecs, states, title, languageCode) {
       this.initStateName = initStateName;
       this.paramChanges = paramChanges;
       this.paramSpecs = paramSpecs;
-      this.skinCustomizations = skinCustomizations;
       this.states = states;
       this.title = title;
       this.languageCode = languageCode;
@@ -56,16 +54,16 @@ oppia.factory('ExplorationObjectFactory', [
     };
 
     Exploration.prototype.getInteraction = function(stateName) {
-      return this.states[stateName].interaction;
+      return this.states.getState(stateName).interaction;
     };
 
     Exploration.prototype.getInteractionId = function(stateName) {
-      return this.states[stateName].interaction.id;
+      return this.states.getState(stateName).interaction.id;
     };
 
     Exploration.prototype.getInteractionCustomizationArgs =
       function(stateName) {
-        return this.states[stateName].interaction.customizationArgs;
+        return this.states.getState(stateName).interaction.customizationArgs;
       };
 
     Exploration.prototype.getInteractionInstructions = function(stateName) {
@@ -102,12 +100,12 @@ oppia.factory('ExplorationObjectFactory', [
           INTERACTION_DISPLAY_MODE_INLINE);
     };
 
-    Exploration.prototype.getGadgetPanelsContents = function() {
-      return this.skinCustomizations.panels_contents;
+    Exploration.prototype.getStates = function() {
+      return angular.copy(this.states);
     };
 
     Exploration.prototype.getState = function(stateName) {
-      return this.states[stateName];
+      return this.states.getState(stateName);
     };
 
     Exploration.prototype.getInitialState = function() {
@@ -119,7 +117,29 @@ oppia.factory('ExplorationObjectFactory', [
     };
 
     Exploration.prototype.getUninterpolatedContentHtml = function(stateName) {
-      return this.getState(stateName).content[0].value;
+      return this.getState(stateName).content.getHtml();
+    };
+
+    Exploration.prototype.getAudioTranslations = function(stateName) {
+      return this.getState(stateName).content.getBindableAudioTranslations();
+    };
+
+    Exploration.prototype.getAudioTranslation = function(
+        stateName, languageCode) {
+      return this.getState(stateName).content.getAudioTranslation(
+        languageCode);
+    };
+
+    Exploration.prototype.getAllAudioTranslations = function(languageCode) {
+      return this.states.getAllAudioTranslations(languageCode);
+    };
+
+    Exploration.prototype.getLanguageCode = function() {
+      return this.languageCode;
+    };
+
+    Exploration.prototype.getAllAudioLanguageCodes = function() {
+      return this.states.getAllAudioLanguageCodes();
     };
 
     // Static class methods. Note that "this" is not available in
@@ -129,8 +149,8 @@ oppia.factory('ExplorationObjectFactory', [
         explorationBackendDict.init_state_name,
         ParamChangesObjectFactory.createFromBackendList(
           explorationBackendDict.param_changes),
-        explorationBackendDict.param_specs,
-        explorationBackendDict.skin_customizations,
+        ParamSpecsObjectFactory.createFromBackendDict(
+          explorationBackendDict.param_specs),
         StatesObjectFactory.createFromBackendDict(
           explorationBackendDict.states),
         explorationBackendDict.title,

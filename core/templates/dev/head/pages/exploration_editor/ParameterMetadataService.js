@@ -16,12 +16,12 @@
  * @fileoverview Service for computing parameter metadata.
  */
 
-oppia.factory('parameterMetadataService', [
-  'explorationStatesService', 'expressionInterpolationService',
-  'explorationParamChangesService', 'graphDataService',
+oppia.factory('ParameterMetadataService', [
+  'ExplorationStatesService', 'ExpressionInterpolationService',
+  'ExplorationParamChangesService', 'GraphDataService',
   function(
-      explorationStatesService, expressionInterpolationService,
-      explorationParamChangesService, graphDataService) {
+      ExplorationStatesService, ExpressionInterpolationService,
+      ExplorationParamChangesService, GraphDataService) {
     var PARAM_ACTION_GET = 'get';
     var PARAM_ACTION_SET = 'set';
 
@@ -44,7 +44,7 @@ oppia.factory('parameterMetadataService', [
             });
           } else {
             var paramsReferenced = (
-              expressionInterpolationService.getParamsFromString(
+              ExpressionInterpolationService.getParamsFromString(
                 pc.customizationArgs.value));
             for (var j = 0; j < paramsReferenced.length; j++) {
               result.push({
@@ -87,8 +87,8 @@ oppia.factory('parameterMetadataService', [
       var result = getMetadataFromParamChanges(state.paramChanges);
 
       // Next, the content is evaluated.
-      expressionInterpolationService.getParamsFromString(
-          state.content[0].value).forEach(
+      ExpressionInterpolationService.getParamsFromString(
+          state.content.getHtml()).forEach(
         function(paramName) {
           result.push({
             action: PARAM_ACTION_GET,
@@ -108,7 +108,7 @@ oppia.factory('parameterMetadataService', [
       // Finally, the rule feedback strings are evaluated.
       state.interaction.answerGroups.forEach(function(group) {
         for (var k = 0; k < group.outcome.feedback.length; k++) {
-          expressionInterpolationService.getParamsFromString(
+          ExpressionInterpolationService.getParamsFromString(
               group.outcome.feedback[k]).forEach(
             function(paramName) {
               result.push({
@@ -148,14 +148,14 @@ oppia.factory('parameterMetadataService', [
       //     (e.g. one parameter may be set based on the value assigned to
       //     another parameter).
       getUnsetParametersInfo: function(initNodeIds) {
-        var graphData = graphDataService.getGraphData();
+        var graphData = GraphDataService.getGraphData();
 
-        var states = explorationStatesService.getStates();
+        var states = ExplorationStatesService.getStates();
 
         // Determine all parameter names that are used within this exploration.
         var allParamNames = [];
         var expParamMetadata = getMetadataFromParamChanges(
-          explorationParamChangesService.savedMemento);
+          ExplorationParamChangesService.savedMemento);
         var stateParamMetadatas = {};
 
         expParamMetadata.forEach(function(expParamMetadataItem) {
@@ -163,16 +163,17 @@ oppia.factory('parameterMetadataService', [
             allParamNames.push(expParamMetadataItem.paramName);
           }
         });
-        for (var stateName in states) {
+
+        states.getStateNames().forEach(function(stateName) {
           stateParamMetadatas[stateName] = getStateParamMetadata(
-            states[stateName]);
+            states.getState(stateName));
           for (var i = 0; i < stateParamMetadatas[stateName].length; i++) {
             var pName = stateParamMetadatas[stateName][i].paramName;
             if (allParamNames.indexOf(pName) === -1) {
               allParamNames.push(pName);
             }
           }
-        }
+        });
 
         // For each parameter, do a BFS to see if it's possible to get from
         // the start node to a node requiring this parameter, without passing

@@ -21,12 +21,10 @@
   </style>
 
   <div class="container">
-    <div class="oppia-forum">
-      {% if on_localhost %}
-        <div class="oppia-warning">
-          <strong>Warning:</strong> This page may not display correctly on localhost. To view it, change 'localhost' to '127.0.0.1' in the URL bar.
-        </div>
-      {% endif %}
+    <div class="oppia-forum" ng-controller="Forum">
+      <div ng-if="DEV_MODE" class="oppia-warning">
+        <strong>Warning:</strong> This page may not display correctly on localhost. To view it, change 'localhost' to '127.0.0.1' in the URL bar.
+      </div>
 
       <iframe src="{{full_google_group_url}}" frameborder="0" height="1300" style="width: 100%;">
       </iframe>
@@ -37,3 +35,8 @@
 {% block footer%}
   {% include 'pages/footer.html' %}
 {% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/forum/Forum.js"></script>
+{% endblock footer_js %}

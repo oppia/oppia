@@ -1,5 +1,5 @@
 application: oppiaserver
-version: 2-5-0
+version: default
 runtime: python27
 api_version: 1
 threadsafe: false
@@ -48,20 +48,16 @@ handlers:
   application_readable: true
   http_headers:
     Cache-Control: 'public, max-age=60'
-- url: /css
-  # NB: not minified. TODO(sll): fix.
-  static_dir: core/templates/dev/head/css
-  secure: always
-# Serve js scripts under core/templates/dev/head. This regex allows
-# us to recursively serve js scripts. "\1" inserts text captured by
-# the capture group in the URL pattern.
-- url: /templates/dev/head/(.*\.(js))$
+# Serve js scripts and css files under core/templates/dev/head.
+# This regex allows us to recursively serve js scripts.
+# "\1" inserts text captured by the capture group in the URL pattern.
+- url: /templates/dev/head/(.*\.(js|css))$
   static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*\.(js))$
+  upload: core/templates/dev/head/(.*\.(js|css))$
   secure: always
-- url: /templates/dev/head/components/(.*\.(html))$
-  static_files: core/templates/dev/head/components/\1
-  upload: core/templates/dev/head/components/(.*\.(html))$
+- url: /templates/dev/head/(.*\.(html))$
+  static_files: core/templates/dev/head/\1
+  upload: core/templates/dev/head/(.*\.(html))$
   # TODO(vojtechjelinek): Remove application_readable after all
   # components are referenced directly by URL
   application_readable: true
@@ -79,21 +75,15 @@ handlers:
   # TODO(Sean Lip): Add cache when system to break cache during
   # new release is figured out.
     Cache-Control: 'no-cache'
-- url: /extensions/gadgets/(.*)/static/(.*)
-  static_files: extensions/gadgets/\1/static/\2
-  upload: extensions/gadgets/(.*)/static/(.*)
-  secure: always
-  http_headers:
-    Cache-Control: 'no-cache'
 - url: /extensions/interactions/(.*)/static/(.*)
   static_files: extensions/interactions/\1/static/\2
   upload: extensions/interactions/(.*)/static/(.*)
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
-- url: /extensions/rich_text_components/(.*)/static/(.*)
-  static_files: extensions/rich_text_components/\1/static/\2
-  upload: extensions/rich_text_components/(.*)/static/(.*)
+- url: /extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
+  static_files: extensions/\1/\2/directives/\3
+  upload: extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
@@ -101,9 +91,9 @@ handlers:
 # under extensions in dev mode. This regex allows us to recursively serve js
 # scripts under the three specified directories. "\1" and "\2" insert capture
 # groups from the url pattern.
-- url: /extensions/(gadgets|interactions|rich_text_components|objects)/(.*\.(js))$
+- url: /extensions/(interactions|rich_text_components|objects|classifiers)/(.*\.(js|png))$
   static_files: extensions/\1/\2
-  upload: extensions/(gadgets|interactions|rich_text_components|objects)/(.*\.(js))$
+  upload: extensions/(interactions|rich_text_components|objects|classifiers)/(.*\.(js|png))$
   secure: always
 - url: /mapreduce/pipeline/images
   static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
@@ -139,11 +129,39 @@ libraries:
   version: '1.6.1'
 # This is needed for sending requests to a mailgun HTTPS URL.
 - name: ssl
-  version: '2.7'
+  version: '2.7.11'
 - name: webapp2
   version: '2.5.2'
-# This environmental variable is for serving minified resources
-# when set to true. It allows minified resources to be used when
-# running the server in the dev environment.
+
 env_variables:
-  MINIFICATION: false
+  PYTHONHTTPSVERIFY: 1
+
+
+skip_files:
+# .pyc and .pyo files
+- ^(.*/)?.*\.py[co]$
+# Unix hidden files whose names begin with a dot
+- ^(.*/)?\..*$
+# Karma test files
+- ^(.*/)Spec.js$
+# Other folders to ignore
+- tests/
+- scripts/
+- integrations/
+- integrations_dev/
+# Some third_party static scripts are directly imported, namely: jquery,
+# jqueryui, angularjs, jqueryui-touch-punch, MathJax, code-mirror,
+# ui-codemirror, d3js, midi-js, ui-map, guppy, skulpt, math-expressions.
+# We exclude some of the scripts that are not directly imported in order to
+# reduce deployed file count.
+# TODO(sll): Find a more structured way of doing this.
+- third_party/static/angular-audio-1.7.4
+- third_party/static/angular-scroll-1.0.0
+- third_party/static/angular-toastr-1.7.0
+- third_party/static/font-awesome-4.4.0
+- third_party/static/messageformat-0.3.1
+- third_party/static/ng-img-crop-0.3.2
+- third_party/static/nginfinitescroll-1.0.0
+- third_party/static/perfectscrollbar-0.6.16
+- third_party/static/textAngular-1.4.5
+- third_party/static/widget

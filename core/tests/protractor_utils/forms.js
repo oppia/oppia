@@ -192,14 +192,14 @@ var AutocompleteDropdownEditor = function(elem) {
     setValue: function(text) {
       elem.element(by.css('.select2-container')).click();
       // NOTE: the input field is top-level in the DOM, and is outside the
-      // context of 'elem'. The 'select2-drop' id is assigned to the input
+      // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
-      element(by.id('select2-drop')).element(by.css('.select2-input')).
-        sendKeys(text + '\n');
+      element(by.css('.select2-dropdown')).element(
+        by.css('.select2-search input')).sendKeys(text + '\n');
     },
     expectOptionsToBe: function(expectedOptions) {
       elem.element(by.css('.select2-container')).click();
-      element(by.id('select2-drop')).all(by.tagName('li')).map(
+      element(by.css('.select2-dropdown')).all(by.tagName('li')).map(
         function(optionElem) {
           return optionElem.getText();
         }
@@ -207,8 +207,8 @@ var AutocompleteDropdownEditor = function(elem) {
         expect(actualOptions).toEqual(expectedOptions);
       });
       // Re-close the dropdown.
-      element(by.id('select2-drop')).element(by.css('.select2-input')).
-        sendKeys('\n');
+      element(by.css('.select2-dropdown')).element(
+        by.css('.select2-search input')).sendKeys('\n');
     }
   };
 };
@@ -217,9 +217,10 @@ var AutocompleteMultiDropdownEditor = function(elem) {
   return {
     setValues: function(texts) {
       // Clear all existing choices.
-      elem.element(by.css('.select2-choices'))
+      elem.element(by.css('.select2-selection__rendered'))
         .all(by.tagName('li')).map(function(choiceElem) {
-          return choiceElem.element(by.css('.select2-search-choice-close'));
+          return choiceElem.element(
+            by.css('.select2-selection__choice__remove'));
         }).then(function(deleteButtons) {
           // We iterate in descending order, because clicking on a delete button
           // removes the element from the DOM. We also omit the last element
@@ -232,11 +233,12 @@ var AutocompleteMultiDropdownEditor = function(elem) {
 
       for (var i = 0; i < texts.length; i++) {
         elem.element(by.css('.select2-container')).click();
-        elem.element(by.css('.select2-input')).sendKeys(texts[i] + '\n');
+        elem.element(by.css('.select2-search__field')).sendKeys(
+          texts[i] + '\n');
       }
     },
     expectCurrentSelectionToBe: function(expectedCurrentSelection) {
-      elem.element(by.css('.select2-choices'))
+      elem.element(by.css('.select2-selection__rendered'))
         .all(by.tagName('li')).map(function(choiceElem) {
           return choiceElem.getText();
         }).then(function(actualSelection) {
@@ -256,10 +258,10 @@ var MultiSelectEditor = function(elem) {
   var _toggleElementStatusesAndVerifyExpectedClass = function(
       texts, expectedClassBeforeToggle) {
     // Open the dropdown menu.
-    elem.element(by.css('.dropdown-toggle')).click();
+    elem.element(by.css('.protractor-test-search-bar-dropdown-toggle')).click();
 
-    elem.element(by.css('.dropdown-menu')).all(by.tagName('span')).filter(
-      function(choiceElem) {
+    elem.element(by.css('.protractor-test-search-bar-dropdown-menu'))
+      .all(by.tagName('span')).filter(function(choiceElem) {
         return choiceElem.getText().then(function(choiceText) {
           return texts.indexOf(choiceText) !== -1;
         });
@@ -276,13 +278,11 @@ var MultiSelectEditor = function(elem) {
         expect(filteredElements[i].getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
         filteredElements[i].click();
-        // Reopen the dropdown menu, since it closes after an item is
-        // toggled.
-        elem.element(by.css('.dropdown-toggle')).click();
       }
 
       // Close the dropdown menu at the end.
-      elem.element(by.css('.dropdown-toggle')).click();
+      elem.element(by.css(
+        '.protractor-test-search-bar-dropdown-toggle')).click();
     });
   };
 
@@ -297,17 +297,19 @@ var MultiSelectEditor = function(elem) {
     },
     expectCurrentSelectionToBe: function(expectedCurrentSelection) {
       // Open the dropdown menu.
-      elem.element(by.css('.dropdown-toggle')).click();
+      elem.element(by.css(
+        '.protractor-test-search-bar-dropdown-toggle')).click();
 
       // Find the selected elements.
-      elem.element(by.css('.dropdown-menu'))
+      elem.element(by.css('.protractor-test-search-bar-dropdown-menu'))
         .all(by.css('.protractor-test-selected')).map(function(selectedElem) {
           return selectedElem.getText();
         }).then(function(actualSelection) {
           expect(actualSelection).toEqual(expectedCurrentSelection);
 
           // Close the dropdown menu at the end.
-          elem.element(by.css('.dropdown-toggle')).click();
+          elem.element(by.css(
+            '.protractor-test-search-bar-dropdown-toggle')).click();
         }
       );
     }

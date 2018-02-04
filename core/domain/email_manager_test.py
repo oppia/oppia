@@ -28,6 +28,7 @@ import feconf
 
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 
+
 class EmailRightsTest(test_utils.GenericTestBase):
     """Test that only certain users can send certain types of emails."""
 
@@ -53,13 +54,11 @@ class EmailRightsTest(test_utils.GenericTestBase):
         expected_validation_results = {
             feconf.EMAIL_INTENT_SIGNUP: (True, False, False, False),
             feconf.EMAIL_INTENT_DAILY_BATCH: (True, False, False, False),
-            feconf.EMAIL_INTENT_MARKETING: (False, True, False, False),
-            feconf.EMAIL_INTENT_PUBLICIZE_EXPLORATION: (
-                False, True, True, False),
+            feconf.EMAIL_INTENT_MARKETING: (True, True, False, False),
             feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
-                False, True, True, False),
+                True, True, True, False),
             feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
-                False, True, True, False),
+                True, True, True, False),
         }
 
         # pylint: disable=protected-access
@@ -184,7 +183,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             '<br>'
             '<b>editor</b> has granted you manager rights to their '
             'exploration, '
-            '"<a href="http://www.oppia.org/create/A">Title</a>", '
+            '"<a href="https://www.oppia.org/create/A">Title</a>", '
             'on Oppia.org.<br>'
             '<br>'
             'This allows you to:<br>'
@@ -194,7 +193,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             '<li>View and playtest the exploration</li><br>'
             '</ul>'
             'You can find the exploration '
-            '<a href="http://www.oppia.org/create/A">here</a>.<br>'
+            '<a href="https://www.oppia.org/create/A">here</a>.<br>'
             '<br>'
             'Thanks, and happy collaborating!<br>'
             '<br>'
@@ -245,7 +244,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             '<br>'
             '<b>editor</b> has granted you editor rights to their '
             'exploration, '
-            '"<a href="http://www.oppia.org/create/A">Title</a>"'
+            '"<a href="https://www.oppia.org/create/A">Title</a>"'
             ', on Oppia.org.<br>'
             '<br>'
             'This allows you to:<br>'
@@ -254,7 +253,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             '<li>View and playtest the exploration</li><br>'
             '</ul>'
             'You can find the exploration '
-            '<a href="http://www.oppia.org/create/A">here</a>.<br>'
+            '<a href="https://www.oppia.org/create/A">here</a>.<br>'
             '<br>'
             'Thanks, and happy collaborating!<br>'
             '<br>'
@@ -304,7 +303,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             '<br>'
             '<b>editor</b> has granted you playtest access to their '
             'exploration, '
-            '"<a href="http://www.oppia.org/create/A">Title</a>"'
+            '"<a href="https://www.oppia.org/create/A">Title</a>"'
             ', on Oppia.org.<br>'
             '<br>'
             'This allows you to:<br>'
@@ -312,7 +311,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             '<li>View and playtest the exploration</li><br>'
             '</ul>'
             'You can find the exploration '
-            '<a href="http://www.oppia.org/create/A">here</a>.<br>'
+            '<a href="https://www.oppia.org/create/A">here</a>.<br>'
             '<br>'
             'Thanks, and happy collaborating!<br>'
             '<br>'
@@ -1107,7 +1106,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
             '<li>Message 1.3<br></li>'
             '</ul></li></ul>'
             'You can view and reply to your messages from your '
-            '<a href="https://www.oppia.org/dashboard">dashboard</a>.'
+            '<a href="https://www.oppia.org/creator_dashboard">dashboard</a>.'
             '<br>'
             '<br>Thanks, and happy teaching!<br>'
             '<br>'
@@ -1706,6 +1705,7 @@ class BulkEmailsTests(test_utils.GenericTestBase):
     RECIPIENT_A_USERNAME = 'usera'
     RECIPIENT_B_EMAIL = 'b@example.com'
     RECIPIENT_B_USERNAME = 'userb'
+
     def setUp(self):
         super(BulkEmailsTests, self).setUp()
         # SENDER is authorised sender.
@@ -1724,9 +1724,7 @@ class BulkEmailsTests(test_utils.GenericTestBase):
             self.RECIPIENT_B_EMAIL)
         self.recipient_ids = [self.recipient_a_id, self.recipient_b_id]
 
-        config_services.set_property(
-            self.sender_id, 'whitelisted_email_senders',
-            [self.SENDER_USERNAME])
+        self.set_admins([self.SENDER_USERNAME])
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
 
     def test_that_correct_email_is_sent(self):
@@ -1805,7 +1803,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         emails = ('user1@example.com', 'user2@example.com')
 
         for user_id, username, user_email in zip(user_ids, usernames, emails):
-            user_services.get_or_create_user(user_id, user_email)
+            user_services.create_new_user(user_id, user_email)
             user_services.set_username(user_id, username)
 
         # Both users can receive all emails in default setting.

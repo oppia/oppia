@@ -1,0 +1,10 @@
+<div ng-if="answer.length === 0">
+  <em translate="I18N_INTERACTIONS_SET_INPUT_EMPTY_SET"></em>
+</div>
+
+<div>
+  <schema-based-editor schema="schema" local-value="answer">
+  </schema-based-editor>
+</div>
+
+<div ng-if="errorMessage" class="oppia-form-error" aria-live="assertive" translate="<[errorMessage]>"></div>

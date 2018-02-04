@@ -46,65 +46,91 @@ describe('State Interaction controller', function() {
         autosaveChangeList: function() {}
       };
       module(function($provide) {
-        $provide.value('explorationData', mockExplorationData);
+        $provide.value('ExplorationDataService', mockExplorationData);
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
     beforeEach(inject(function($rootScope, $controller, $injector) {
       scope = $rootScope.$new();
-      ecs = $injector.get('editorContextService');
-      cls = $injector.get('changeListService');
-      ess = $injector.get('explorationStatesService');
+      ecs = $injector.get('EditorStateService');
+      cls = $injector.get('ChangeListService');
+      ess = $injector.get('ExplorationStatesService');
       siis = $injector.get('stateInteractionIdService');
       scas = $injector.get('stateCustomizationArgsService');
-      idc = $injector.get('interactionDetailsCache');
+      idc = $injector.get('InteractionDetailsCacheService');
       IS = $injector.get('INTERACTION_SPECS');
       $httpBackend = $injector.get('$httpBackend');
       scope.stateInteractionIdService = siis;
       scope.stateCustomizationArgsService = scas;
-      scope.interactionDetailsCache = idc;
+      scope.InteractionDetailsCacheService = idc;
 
       ess.init({
         'First State': {
-          content: [{
-            type: 'text',
-            value: 'First State Content'
-          }],
+          content: {
+            html: 'First State Content',
+            audio_translations: {}
+          },
           interaction: {
             id: 'TextInput',
             answer_groups: [{
               rule_specs: [],
-              outcome: {},
-              correct: false
+              outcome: {
+                dest: 'default',
+                feedback: {
+                  html: '',
+                  audio_translations: {}
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              },
             }],
             default_outcome: {
               dest: 'default',
-              feedback: [],
-              param_changes: []
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
-            fallbacks: []
+            hints: []
           },
           param_changes: []
         },
         'End State': {
-          content: [{
-            type: 'text',
-            value: ''
-          }],
+          content: {
+            html: '',
+            audio_translations: {}
+          },
           interaction: {
             id: 'TextInput',
             answer_groups: [{
               rule_specs: [],
-              outcome: {},
-              correct: false
+              outcome: {
+                dest: 'default',
+                feedback: {
+                  html: '',
+                  audio_translations: {}
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              }
             }],
             default_outcome: {
               dest: 'default',
-              feedback: [],
-              param_changes: []
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
-            fallbacks: []
+            hints: []
           },
           param_changes: []
         }
@@ -112,10 +138,10 @@ describe('State Interaction controller', function() {
 
       var stateEditorCtrl = $controller('StateEditor', {
         $scope: scope,
-        editorContextService: ecs,
-        changeListService: cls,
-        explorationStatesService: ess,
-        editabilityService: {
+        EditorStateService: ecs,
+        ChangeListService: cls,
+        ExplorationStatesService: ess,
+        EditabilityService: {
           isEditable: function() {
             return true;
           }
@@ -125,17 +151,17 @@ describe('State Interaction controller', function() {
 
       var interactionCtrl = $controller('StateInteraction', {
         $scope: scope,
-        editorContextService: ecs,
-        changeListService: cls,
-        explorationStatesService: ess,
-        editabilityService: {
+        EditorStateService: ecs,
+        ChangeListService: cls,
+        ExplorationStatesService: ess,
+        EditabilityService: {
           isEditable: function() {
             return true;
           }
         },
         stateInteractionIdService: siis,
         stateCustomizationArgsService: scas,
-        interactionDetailsCache: idc,
+        InteractionDetailsCacheService: idc,
         INTERACTION_SPECS: IS
       });
     }));
@@ -155,7 +181,7 @@ describe('State Interaction controller', function() {
         siis.displayed = 'TerminalInteraction';
         scope.onCustomizationModalSavePostHook();
 
-        expect(ess.getState('First State').content[0].value).toEqual(
+        expect(ess.getState('First State').content.getHtml()).toEqual(
           'First State Content');
         expect(ess.getState('First State').interaction.id).toEqual(
           'TerminalInteraction');
@@ -177,8 +203,8 @@ describe('State Interaction controller', function() {
         siis.displayed = 'TerminalInteraction';
         scope.onCustomizationModalSavePostHook();
 
-        expect(state.content[0].value).toEqual('');
-        expect(ess.getState('End State').content[0].value).toEqual(
+        expect(state.content.getHtml()).toEqual('');
+        expect(ess.getState('End State').content.getHtml()).toEqual(
           'Congratulations, you have finished!');
         expect(ess.getState('End State').interaction.id).toEqual(
           'TerminalInteraction');
@@ -200,8 +226,8 @@ describe('State Interaction controller', function() {
         siis.displayed = 'TextInput';
         scope.onCustomizationModalSavePostHook();
 
-        expect(state.content[0].value).toEqual('');
-        expect(ess.getState('End State').content[0].value).toEqual('');
+        expect(state.content.getHtml()).toEqual('');
+        expect(ess.getState('End State').content.getHtml()).toEqual('');
         expect(ess.getState('End State').interaction.id).toEqual('TextInput');
       }
     );

@@ -20,10 +20,42 @@
     },
     "ErrorContains": {
       "description": "has error message that contains {{x|UnicodeString}}"
+    },
+    "FuzzyMatches": {
+      "description": "is similar to {{training_data|ListOfCodeEvaluation}}"
     }
   },
   "Continue": {},
   "EndExploration": {},
+  "FractionInput": {
+    "IsExactlyEqualTo": {
+      "description": "exactly matches {{f|Fraction}}"
+    },
+    "IsEquivalentTo": {
+      "description": "is equivalent to {{f|Fraction}}"
+    },
+    "IsEquivalentToAndInSimplestForm": {
+      "description": "is equivalent to {{f|Fraction}} and in simplest form"
+    },
+    "IsLessThan": {
+      "description": "is less than {{f|Fraction}}"
+    },
+    "IsGreaterThan": {
+      "description": "is greater than {{f|Fraction}}"
+    },
+    "HasNumeratorEqualTo": {
+      "description": "has numerator equal to {{x|Int}}"
+    },
+    "HasDenominatorEqualTo": {
+      "description": "has denominator equal to {{x|NonnegativeInt}}"
+    },
+    "HasIntegerPartEqualTo": {
+      "description": "has integer part equal to {{x|Int}}"
+    },
+    "HasNoFractionalPart": {
+      "description": "has no fractional part"
+    }
+  },
   "GraphInput": {
     "IsIsomorphicTo": {
       "description": "is isomorphic to {{g|Graph}}, including matching labels"

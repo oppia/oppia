@@ -17,24 +17,27 @@
  * in collection player.
  */
 
-oppia.directive('collectionFooter', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      twitterText: '@'
-    },
-    templateUrl: 'components/collectionFooter',
-    controller: [
-      '$scope', 'UrlInterpolationService',
-      function($scope, UrlInterpolationService) {
-        $scope.collectionId = GLOBALS.collectionId;
+oppia.directive('collectionFooter', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        twitterText: '@'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/collection_player/' +
+        'collection_footer_directive.html'),
+      controller: [
+        '$scope',
+        function($scope) {
+          $scope.collectionId = GLOBALS.collectionId;
 
-        $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
-        $scope.getTwitterText = function() {
-          return $scope.twitterText;
-        };
-      }
-    ]
-  };
-}]);
+          $scope.getTwitterText = function() {
+            return $scope.twitterText;
+          };
+        }
+      ]
+    };
+  }]);

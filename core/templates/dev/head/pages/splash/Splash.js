@@ -17,17 +17,16 @@
  */
 
 oppia.controller('Splash', [
-  '$http', '$scope', '$timeout', '$window', 'siteAnalyticsService',
+  '$scope', '$timeout', '$window', 'siteAnalyticsService',
   'UrlInterpolationService',
-  function($http, $scope, $timeout, $window, siteAnalyticsService,
-    UrlInterpolationService) {
+  function($scope, $timeout, $window, siteAnalyticsService,
+      UrlInterpolationService) {
+    $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.getStaticSubjectImageUrl = function(subjectName) {
       return UrlInterpolationService.getStaticImageUrl('/subjects/' +
         subjectName + '.svg');
     };
-    $scope.aboutPageMascotImgUrl = UrlInterpolationService.getStaticImageUrl(
-      '/general/about_page_mascot.png');
 
     $scope.onRedirectToLogin = function(destinationUrl) {
       siteAnalyticsService.registerStartLoginEvent(
@@ -49,17 +48,9 @@ oppia.controller('Splash', [
     $scope.onClickCreateExplorationButton = function() {
       siteAnalyticsService.registerClickCreateExplorationButtonEvent();
       $timeout(function() {
-        $window.location = '/dashboard?mode=create';
+        $window.location = '/creator_dashboard?mode=create';
       }, 150);
       return false;
     };
-
-    $http.get('/librarygrouphandler', {
-      params: {
-        group_name: 'splash_page_featured'
-      }
-    }).success(function(data) {
-      $scope.activityList = data.activity_list;
-    });
   }
 ]);

@@ -26,5 +26,7 @@ class MathExpressionInput(base.BaseInteraction):
     is_trainable = False
     _dependency_ids = ['guppy', 'math_expressions']
     answer_type = 'MathExpression'
+    can_have_solution = True
+    show_generic_submit_button = True
 
     _customization_arg_specs = []

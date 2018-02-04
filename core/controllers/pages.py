@@ -14,11 +14,11 @@
 
 """Controllers for simple, mostly-static pages (like About, Forum, etc.)."""
 
-import random
 import urllib
 import urlparse
 
 from core.controllers import base
+from core.domain import acl_decorators
 import feconf
 
 
@@ -26,6 +26,7 @@ import feconf
 def require_maintenance_mode(handler):
     """Decorator that checks whether maintenance mode is enabled in feconf."""
     def test_maintenance_mode(self, **kwargs):
+        """Checks whether the site is in maintenance mode."""
         if not feconf.ENABLE_MAINTENANCE_MODE:
             raise self.UnauthorizedUserException(
                 'You cannot access this page unless the site is in '
@@ -37,6 +38,7 @@ def require_maintenance_mode(handler):
 class SplashPage(base.BaseHandler):
     """Landing page for Oppia."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         c_value = self.request.get('c')
@@ -46,11 +48,7 @@ class SplashPage(base.BaseHandler):
         })
 
         if not c_value:
-            random_number = random.randrange(0, 5)
-            if random_number == 0:
-                self.render_template('pages/splash/splash.html')
-            else:
-                self.redirect('/splash?c=nv%d' % random_number)
+            self.render_template('pages/splash/splash.html')
         else:
             try:
                 self.render_template('pages/splash/splash_%s.html' % c_value)
@@ -73,6 +71,7 @@ class SplashPage(base.BaseHandler):
 class AboutPage(base.BaseHandler):
     """Page with information about Oppia."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.values.update({
@@ -85,6 +84,7 @@ class AboutPage(base.BaseHandler):
 class GetStartedPage(base.BaseHandler):
     """Page with information about how to get started using Oppia."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.values.update({
@@ -97,6 +97,7 @@ class GetStartedPage(base.BaseHandler):
 class TeachPage(base.BaseHandler):
     """Page with information about how to teach on Oppia."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.values.update({
@@ -106,21 +107,10 @@ class TeachPage(base.BaseHandler):
         self.render_template('pages/teach/teach.html')
 
 
-class BlogPage(base.BaseHandler):
-    """Page embedding the Oppia blog."""
-
-    def get(self):
-        """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.BLOG_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_BLOG,
-        })
-        self.render_template('pages/blog/blog.html')
-
-
 class ContactPage(base.BaseHandler):
     """Page with information about how to contact Oppia."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.values.update({
@@ -133,6 +123,7 @@ class ContactPage(base.BaseHandler):
 class DonatePage(base.BaseHandler):
     """Page with information about how to donate to Oppia."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.values.update({
@@ -145,6 +136,7 @@ class DonatePage(base.BaseHandler):
 class ThanksPage(base.BaseHandler):
     """Page that thanks people who donate to Oppia."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.values.update({
@@ -157,6 +149,7 @@ class ThanksPage(base.BaseHandler):
 class ForumPage(base.BaseHandler):
     """Page with an embedded forum."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         # Note: if you are working in the development environment and
@@ -180,6 +173,7 @@ class ForumPage(base.BaseHandler):
 class TermsPage(base.BaseHandler):
     """Page with terms and conditions."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.values.update({
@@ -192,6 +186,7 @@ class TermsPage(base.BaseHandler):
 class PrivacyPage(base.BaseHandler):
     """Page with privacy policy."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.render_template('pages/privacy/privacy.html')
@@ -200,14 +195,25 @@ class PrivacyPage(base.BaseHandler):
 class AboutRedirectPage(base.BaseHandler):
     """A page that redirects to the main About page."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.redirect('/about')
 
 
+class FoundationRedirectPage(base.BaseHandler):
+    """A page that redirects to the separate Oppia Foundation site."""
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.FOUNDATION_SITE_URL)
+        return
+
+
 class TeachRedirectPage(base.BaseHandler):
     """A page that redirects to the main Teach page."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.redirect('/teach')
@@ -216,6 +222,7 @@ class TeachRedirectPage(base.BaseHandler):
 class ConsoleErrorPage(base.BaseHandler):
     """Page with missing resources to test cache slugs."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.render_template('pages/tests/console_errors.html')
@@ -224,6 +231,7 @@ class ConsoleErrorPage(base.BaseHandler):
 class MaintenancePage(base.BaseHandler):
     """Page describing that Oppia is down for maintenance mode."""
 
+    @acl_decorators.open_access
     def get(self, *args, **kwargs):
         """Handles GET requests."""
         self.render_template('pages/maintenance/maintenance.html')

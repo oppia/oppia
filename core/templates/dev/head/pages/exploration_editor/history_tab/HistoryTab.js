@@ -17,14 +17,16 @@
  */
 
 oppia.controller('HistoryTab', [
-  '$scope', '$http', '$rootScope', '$log', '$modal', 'explorationData',
-  'versionsTreeService', 'compareVersionsService', 'graphDataService',
-  'oppiaDatetimeFormatter',
+  '$scope', '$http', '$rootScope', '$log',
+  '$uibModal', 'ExplorationDataService',
+  'VersionTreeService', 'CompareVersionsService',
+  'DateTimeFormatService', 'UrlInterpolationService',
   function(
-      $scope, $http, $rootScope, $log, $modal, explorationData,
-      versionsTreeService, compareVersionsService, graphDataService,
-      oppiaDatetimeFormatter) {
-    $scope.explorationId = explorationData.explorationId;
+      $scope, $http, $rootScope, $log,
+      $uibModal, ExplorationDataService,
+      VersionTreeService, CompareVersionsService,
+      DateTimeFormatService, UrlInterpolationService) {
+    $scope.explorationId = ExplorationDataService.explorationId;
     $scope.explorationAllSnapshotsUrl =
         '/createhandler/snapshots/' + $scope.explorationId;
 
@@ -51,6 +53,10 @@ oppia.controller('HistoryTab', [
     var explorationSnapshots = null;
     var versionTreeParents = null;
     var nodesData = null;
+    var currentPage = 0;
+    $scope.displayedCurrentPageNumber = currentPage + 1;
+    $scope.versionNumbersToDisplay = [];
+    $scope.VERSIONS_PER_PAGE = 30;
 
     $scope.$on('refreshVersionHistory', function(evt, data) {
       // Uncheck all checkboxes when page is refreshed
@@ -100,17 +106,13 @@ oppia.controller('HistoryTab', [
     // Refreshes the displayed version history log.
     $scope.refreshVersionHistory = function() {
       $rootScope.loadingMessage = 'Loading';
-      explorationData.getData().then(function(data) {
+      ExplorationDataService.getData().then(function(data) {
         var currentVersion = data.version;
         /**
          * $scope.compareVersionMetadata is an object with keys
          * 'earlierVersion' and 'laterVersion' whose values are the metadata
          * of the compared versions, containing 'committerId', 'createdOn',
          * 'commitMessage', and 'versionNumber'.
-         *
-         * $scope.yamlStrs is an object with keys 'earlierVersion' and
-         * 'laterVersion', whose values are the YAML representations of the
-         * compared versions
          */
         $scope.compareVersions = {};
         $scope.compareVersionMetadata = {};
@@ -131,19 +133,19 @@ oppia.controller('HistoryTab', [
 
         $http.get($scope.explorationAllSnapshotsUrl).then(function(response) {
           explorationSnapshots = response.data.snapshots;
-          versionsTreeService.init(explorationSnapshots);
+          VersionTreeService.init(explorationSnapshots);
 
           // Re-populate versionCheckboxArray and explorationVersionMetadata
           // when history is refreshed.
           $scope.versionCheckboxArray = [];
           $scope.explorationVersionMetadata = {};
-          var lowestVersionIndex = Math.max(0, currentVersion - 30);
+          var lowestVersionIndex = 0;
           for (var i = currentVersion - 1; i >= lowestVersionIndex; i--) {
             var versionNumber = explorationSnapshots[i].version_number;
             $scope.explorationVersionMetadata[versionNumber] = {
               committerId: explorationSnapshots[i].committer_id,
               createdOnStr: (
-                oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+                DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
                   explorationSnapshots[i].created_on_ms)),
               commitMessage: explorationSnapshots[i].commit_message,
               versionNumber: explorationSnapshots[i].version_number
@@ -154,6 +156,7 @@ oppia.controller('HistoryTab', [
             });
           }
           $rootScope.loadingMessage = '';
+          $scope.computeVersionsToDisplay();
         });
       });
     };
@@ -183,7 +186,7 @@ oppia.controller('HistoryTab', [
       $scope.compareVersionMetadata.laterVersion =
         $scope.explorationVersionMetadata[laterComparedVersion];
 
-      compareVersionsService.getDiffGraphData(earlierComparedVersion,
+      CompareVersionsService.getDiffGraphData(earlierComparedVersion,
           laterComparedVersion).then(
         function(response) {
           $log.info('Retrieved version comparison data');
@@ -222,8 +225,10 @@ oppia.controller('HistoryTab', [
     };
 
     $scope.showRevertExplorationModal = function(version) {
-      $modal.open({
-        templateUrl: 'modals/revertExploration',
+      $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/history_tab/' +
+          'revert_exploration_modal_directive.html'),
         backdrop: true,
         resolve: {
           version: function() {
@@ -231,32 +236,45 @@ oppia.controller('HistoryTab', [
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'version', 'explorationData',
-          function($scope, $modalInstance, version, explorationData) {
+          '$scope', '$uibModalInstance', 'version', 'ExplorationDataService',
+          function($scope, $uibModalInstance, version, ExplorationDataService) {
             $scope.version = version;
 
             $scope.getExplorationUrl = function(version) {
               return (
-                '/explore/' + explorationData.explorationId + '?v=' + version);
+                '/explore/' + ExplorationDataService.explorationId +
+                '?v=' + version);
             };
 
             $scope.revert = function() {
-              $modalInstance.close(version);
+              $uibModalInstance.close(version);
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
           }
         ]
       }).result.then(function(version) {
         $http.post($scope.revertExplorationUrl, {
-          current_version: explorationData.data.version,
+          current_version: ExplorationDataService.data.version,
           revert_to_version: version
         }).then(function() {
           location.reload();
         });
       });
+    };
+
+    $scope.computeVersionsToDisplay = function() {
+      currentPage = $scope.displayedCurrentPageNumber - 1;
+      var begin = (currentPage * $scope.VERSIONS_PER_PAGE);
+      var end = Math.min(
+        begin + $scope.VERSIONS_PER_PAGE, $scope.versionCheckboxArray.length);
+      $scope.versionNumbersToDisplay = [];
+      for (var i = begin; i < end; i++) {
+        $scope.versionNumbersToDisplay.push(
+          $scope.versionCheckboxArray[i].vnum);
+      }
     };
   }
 ]);

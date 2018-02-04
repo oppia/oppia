@@ -30,6 +30,8 @@ class MusicNotesInput(base.BaseInteraction):
     instructions = 'Drag notes to the staff to form a sequence'
     narrow_instructions = 'Show music staff'
     needs_summary = True
+    can_have_solution = True
+    show_generic_submit_button = True
 
     _customization_arg_specs = [{
         'name': 'sequenceToGuess',
@@ -54,17 +56,8 @@ class MusicNotesInput(base.BaseInteraction):
         'id': 'FrequencyTable',
         'options': {
             'column_headers': ['Answer', 'Count'],
-            'title': 'Top 5 answers'
+            'title': 'Top 10 answers',
         },
-        'calculation_id': 'Top5AnswerFrequencies',
-    }, {
-        # Table with answer counts.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'All answers'
-        },
-        'calculation_id': 'AnswerFrequencies',
+        'calculation_id': 'Top10AnswerFrequencies',
+        'show_addressed_info': True,
     }]
-
-    _auxiliary_calculation_ids = ['TopAnswersByCategorization']

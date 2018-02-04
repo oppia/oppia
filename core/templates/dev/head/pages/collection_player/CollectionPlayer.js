@@ -32,17 +32,20 @@ oppia.animation('.oppia-collection-animate-slide', function() {
 
 oppia.controller('CollectionPlayer', [
   '$scope', '$anchorScroll', '$location', '$http',
-  'ReadOnlyCollectionBackendApiService',
-  'CollectionObjectFactory', 'CollectionPlaythroughObjectFactory',
-  'alertsService', 'UrlInterpolationService',
-  function($scope, $anchorScroll, $location, $http,
-           ReadOnlyCollectionBackendApiService,
-           CollectionObjectFactory, CollectionPlaythroughObjectFactory,
-           alertsService, UrlInterpolationService) {
+  'ReadOnlyCollectionBackendApiService', 'CollectionObjectFactory',
+  'CollectionPlaythroughObjectFactory', 'AlertsService',
+  'UrlInterpolationService', 'GuestCollectionProgressService',
+  'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
+  function(
+      $scope, $anchorScroll, $location, $http,
+      ReadOnlyCollectionBackendApiService, CollectionObjectFactory,
+      CollectionPlaythroughObjectFactory, AlertsService,
+      UrlInterpolationService, GuestCollectionProgressService,
+      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     $scope.collection = null;
     $scope.collectionPlaythrough = null;
     $scope.collectionId = GLOBALS.collectionId;
-    $scope.showingAllExplorations = !GLOBALS.isLoggedIn;
+    $scope.isLoggedIn = GLOBALS.isLoggedIn;
     $scope.explorationCardIsShown = false;
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     // The pathIconParameters is an array containing the co-ordinates,
@@ -59,6 +62,8 @@ oppia.controller('CollectionPlayer', [
     $scope.ICON_X_RIGHT_PX = 395;
     $scope.svgHeight = $scope.MIN_HEIGHT_FOR_PATH_SVG_PX;
     $scope.nextExplorationId = null;
+    $scope.whitelistedCollectionIdsForGuestProgress = (
+      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
     $anchorScroll.yOffset = -80;
 
     $scope.setIconHighlight = function(index) {
@@ -77,7 +82,7 @@ oppia.controller('CollectionPlayer', [
       var collectionNode = (
         $scope.collection.getCollectionNodeByExplorationId(explorationId));
       if (!collectionNode) {
-        alertsService.addWarning('There was an error loading the collection.');
+        AlertsService.addWarning('There was an error loading the collection.');
       }
       return collectionNode;
     };
@@ -123,10 +128,6 @@ oppia.controller('CollectionPlayer', [
       return nonRecommendedCollectionNodes;
     };
 
-    $scope.toggleShowAllExplorations = function() {
-      $scope.showingAllExplorations = !$scope.showingAllExplorations;
-    };
-
     $scope.updateExplorationPreview = function(explorationId) {
       $scope.explorationCardIsShown = true;
       $scope.currentExplorationId = explorationId;
@@ -160,7 +161,9 @@ oppia.controller('CollectionPlayer', [
           sParameterExtension += 250 + ' ' + y + ', ';
           y += 200;
         }
-        $scope.pathSvgParameters += ' S ' + sParameterExtension;
+        if (sParameterExtension !== '') {
+          $scope.pathSvgParameters += ' S ' + sParameterExtension;
+        }
       }
       if (collectionNodeCount % 2 === 0) {
         if (collectionNodeCount === 2) {
@@ -241,7 +244,7 @@ oppia.controller('CollectionPlayer', [
         $scope.collectionSummary = response.data.summaries[0];
       },
       function() {
-        alertsService.addWarning(
+        AlertsService.addWarning(
           'There was an error while fetching the collection summary.');
       }
     );
@@ -252,13 +255,36 @@ oppia.controller('CollectionPlayer', [
       function(collectionBackendObject) {
         $scope.collection = CollectionObjectFactory.create(
           collectionBackendObject);
-        $scope.collectionPlaythrough = (
-          CollectionPlaythroughObjectFactory.create(
-            collectionBackendObject.playthrough_dict));
+
+        // Load the user's current progress in the collection. If the user is a
+        // guest, then either the defaults from the server will be used or the
+        // user's local progress, if any has been made and the collection is
+        // whitelisted.
+        var collectionAllowsGuestProgress = (
+          $scope.whitelistedCollectionIdsForGuestProgress.indexOf(
+            $scope.collectionId) !== -1);
+        if (!$scope.isLoggedIn && collectionAllowsGuestProgress &&
+            GuestCollectionProgressService.hasCompletedSomeExploration(
+              $scope.collectionId)) {
+          var completedExplorationIds = (
+            GuestCollectionProgressService.getCompletedExplorationIds(
+              $scope.collection));
+          var nextExplorationIds = (
+            GuestCollectionProgressService.getNextExplorationIds(
+              $scope.collection, completedExplorationIds));
+          $scope.collectionPlaythrough = (
+            CollectionPlaythroughObjectFactory.create(
+              nextExplorationIds, completedExplorationIds));
+        } else {
+          $scope.collectionPlaythrough = (
+            CollectionPlaythroughObjectFactory.createFromBackendObject(
+              collectionBackendObject.playthrough_dict));
+        }
+
         var nextExplorationIds = (
           $scope.collectionPlaythrough.getNextExplorationIds());
         if (nextExplorationIds.length > 0) {
-          $scope.nextExplorationId = (nextExplorationIds[0]);
+          $scope.nextExplorationId = nextExplorationIds[0];
         } else {
           $scope.nextExplorationId = null;
         }
@@ -268,7 +294,7 @@ oppia.controller('CollectionPlayer', [
         // NOTE TO DEVELOPERS: Check the backend console for an indication as to
         // why this error occurred; sometimes the errors are noisy, so they are
         // not shown to the user.
-        alertsService.addWarning(
+        AlertsService.addWarning(
           'There was an error loading the collection.');
       }
     );
@@ -283,6 +309,15 @@ oppia.controller('CollectionPlayer', [
       $location.hash(id);
       $anchorScroll();
     };
+
+    $scope.closeOnClickingOutside = function() {
+      $scope.explorationCardIsShown = false;
+    };
+
+    $scope.onClickStopPropagation = function($evt) {
+      $evt.stopPropagation();
+    };
+
     // Touching anywhere outside the mobile preview should hide it.
     document.addEventListener('touchstart', function() {
       if ($scope.explorationCardIsShown === true) {

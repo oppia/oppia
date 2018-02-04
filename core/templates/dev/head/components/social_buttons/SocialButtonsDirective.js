@@ -16,14 +16,16 @@
  * @fileoverview Directive for the social buttons displayed in footer.
  */
 
-oppia.directive('socialButtons', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    templateUrl: 'components/socialButtons',
-    controller: ['$scope', 'UrlInterpolationService', function(
-        $scope, UrlInterpolationService) {
-      $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-    }]
-  };
-}]);
+oppia.directive('socialButtons', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/social_buttons/' +
+        'social_buttons_directive.html'),
+      controller: ['$scope', function($scope) {
+        $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+      }]
+    };
+  }]);

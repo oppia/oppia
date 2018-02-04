@@ -10,6 +10,11 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: ClassifierTrainingJobModel
+  properties:
+  - name: status
+  - name: next_scheduled_check_time
+
 - kind: DeleteExpCopiesRealtimeModel
   properties:
   - name: realtime_layer

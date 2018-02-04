@@ -16,27 +16,30 @@
  * @fileoverview Controller for the main tab of the collection editor.
  */
 
-oppia.directive('collectionMainTab', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    templateUrl: 'collectionEditor/editorTab',
-    controller: [
-      '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
-      function(
-          $scope, CollectionEditorStateService, CollectionLinearizerService) {
-        $scope.hasLoadedCollection = (
-          CollectionEditorStateService.hasLoadedCollection);
-        $scope.collection = CollectionEditorStateService.getCollection();
+oppia.directive('collectionMainTab', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/collection_editor/editor_tab/' +
+        'collection_editor_tab_directive.html'),
+      controller: [
+        '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
+        function(
+            $scope, CollectionEditorStateService, CollectionLinearizerService) {
+          $scope.hasLoadedCollection = (
+            CollectionEditorStateService.hasLoadedCollection);
+          $scope.collection = CollectionEditorStateService.getCollection();
 
-        // Returns a list of collection nodes which represents a valid linear
-        // path through the collection.
-        $scope.getLinearlySortedNodes = function() {
-          return (
-            CollectionLinearizerService.getCollectionNodesInPlayableOrder(
-              $scope.collection));
-        };
-      }
-    ]
-  };
-}]);
+          // Returns a list of collection nodes which represents a valid linear
+          // path through the collection.
+          $scope.getLinearlySortedNodes = function() {
+            return (
+              CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+                $scope.collection));
+          };
+        }
+      ]
+    };
+  }]);

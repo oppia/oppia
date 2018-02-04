@@ -16,26 +16,28 @@
  * @fileoverview Service for exploration saving & publication functionality.
  */
 
-oppia.factory('explorationSaveService', [
-  '$modal', '$timeout', '$rootScope', '$log', '$q',
-  'alertsService', 'explorationData', 'explorationStatesService',
-  'explorationTagsService', 'explorationTitleService',
-  'explorationObjectiveService', 'explorationCategoryService',
-  'explorationLanguageCodeService', 'explorationRightsService',
-  'explorationWarningsService', 'ExplorationDiffService',
-  'explorationInitStateNameService', 'routerService',
-  'focusService', 'changeListService', 'siteAnalyticsService',
-  'StateObjectFactory',
+oppia.factory('ExplorationSaveService', [
+  '$uibModal', '$timeout', '$rootScope', '$log', '$q',
+  'AlertsService', 'ExplorationDataService', 'ExplorationStatesService',
+  'ExplorationTagsService', 'ExplorationTitleService',
+  'ExplorationObjectiveService', 'ExplorationCategoryService',
+  'ExplorationLanguageCodeService', 'ExplorationRightsService',
+  'ExplorationWarningsService', 'ExplorationDiffService',
+  'ExplorationInitStateNameService', 'RouterService',
+  'FocusManagerService', 'ChangeListService', 'siteAnalyticsService',
+  'StatesObjectFactory', 'UrlInterpolationService',
+  'AutosaveInfoModalsService',
   function(
-      $modal, $timeout, $rootScope, $log, $q,
-      alertsService, explorationData, explorationStatesService,
-      explorationTagsService, explorationTitleService,
-      explorationObjectiveService, explorationCategoryService,
-      explorationLanguageCodeService, explorationRightsService,
-      explorationWarningsService, ExplorationDiffService,
-      explorationInitStateNameService, routerService,
-      focusService, changeListService, siteAnalyticsService,
-      StateObjectFactory) {
+      $uibModal, $timeout, $rootScope, $log, $q,
+      AlertsService, ExplorationDataService, ExplorationStatesService,
+      ExplorationTagsService, ExplorationTitleService,
+      ExplorationObjectiveService, ExplorationCategoryService,
+      ExplorationLanguageCodeService, ExplorationRightsService,
+      ExplorationWarningsService, ExplorationDiffService,
+      ExplorationInitStateNameService, RouterService,
+      FocusManagerService, ChangeListService, siteAnalyticsService,
+      StatesObjectFactory, UrlInterpolationService,
+      AutosaveInfoModalsService) {
     // Whether or not a save action is currently in progress
     // (request has been sent to backend but no reply received yet)
     var saveIsInProgress = false;
@@ -48,25 +50,25 @@ oppia.factory('explorationSaveService', [
 
     var isAdditionalMetadataNeeded = function() {
       return (
-        !explorationTitleService.savedMemento ||
-        !explorationObjectiveService.savedMemento ||
-        !explorationCategoryService.savedMemento ||
-        explorationLanguageCodeService.savedMemento ===
-          GLOBALS.DEFAULT_LANGUAGE_CODE ||
-        explorationTagsService.savedMemento.length === 0);
+        !ExplorationTitleService.savedMemento ||
+        !ExplorationObjectiveService.savedMemento ||
+        !ExplorationCategoryService.savedMemento ||
+        ExplorationLanguageCodeService.savedMemento ===
+          constants.DEFAULT_LANGUAGE_CODE ||
+        ExplorationTagsService.savedMemento.length === 0);
     };
 
     var areRequiredFieldsFilled = function() {
-      if (!explorationTitleService.displayed) {
-        alertsService.addWarning('Please specify a title');
+      if (!ExplorationTitleService.displayed) {
+        AlertsService.addWarning('Please specify a title');
         return false;
       }
-      if (!explorationObjectiveService.displayed) {
-        alertsService.addWarning('Please specify an objective');
+      if (!ExplorationObjectiveService.displayed) {
+        AlertsService.addWarning('Please specify an objective');
         return false;
       }
-      if (!explorationCategoryService.displayed) {
-        alertsService.addWarning('Please specify a category');
+      if (!ExplorationCategoryService.displayed) {
+        AlertsService.addWarning('Please specify a category');
         return false;
       }
 
@@ -74,23 +76,23 @@ oppia.factory('explorationSaveService', [
     };
 
     var showCongratulatorySharingModal = function() {
-      return $modal.open({
-        templateUrl: 'modals/shareExplorationAfterPublish',
+      return $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/' +
+          'post_publish_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', 'explorationContextService',
-          'UrlInterpolationService',
-          function($scope, $modalInstance, explorationContextService,
-            UrlInterpolationService) {
+          '$scope', '$uibModalInstance', 'ExplorationContextService',
+          function($scope, $uibModalInstance, ExplorationContextService) {
             $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
               GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
             $scope.close = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
             $scope.explorationId = (
-              explorationContextService.getExplorationId());
+              ExplorationContextService.getExplorationId());
           }
         ]
       });
@@ -101,16 +103,18 @@ oppia.factory('explorationSaveService', [
       // This is resolved when modal is closed.
       var whenModalClosed = $q.defer();
 
-      var publishModalInstance = $modal.open({
-        templateUrl: 'modals/publishExploration',
+      var publishModalInstance = $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration_editor/' +
+          'exploration_publish_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.publish = $modalInstance.close;
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+            $scope.publish = $uibModalInstance.close;
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
-              alertsService.clearWarnings();
+              $uibModalInstance.dismiss('cancel');
+              AlertsService.clearWarnings();
               whenModalClosed.resolve();
             };
           }
@@ -122,18 +126,17 @@ oppia.factory('explorationSaveService', [
           onStartSaveCallback();
         }
 
-        explorationRightsService.saveChangeToBackend({
-          is_public: true
-        }).then(function() {
-          if (onSaveDoneCallback) {
-            onSaveDoneCallback();
-          }
+        ExplorationRightsService.publish().then(
+          function() {
+            if (onSaveDoneCallback) {
+              onSaveDoneCallback();
+            }
 
-          showCongratulatorySharingModal();
-          siteAnalyticsService.registerPublishExplorationEvent(
-            explorationData.explorationId);
-          whenModalClosed.resolve();
-        });
+            showCongratulatorySharingModal();
+            siteAnalyticsService.registerPublishExplorationEvent(
+              ExplorationDataService.explorationId);
+            whenModalClosed.resolve();
+          });
       });
 
       return whenModalClosed.promise;
@@ -144,38 +147,38 @@ oppia.factory('explorationSaveService', [
       // (regardless of success or failure of the operation).
       var whenSavingDone = $q.defer();
 
-      var changeList = changeListService.getChangeList();
+      var changeList = ChangeListService.getChangeList();
 
-      if (explorationRightsService.isPrivate()) {
+      if (ExplorationRightsService.isPrivate()) {
         siteAnalyticsService.registerCommitChangesToPrivateExplorationEvent(
-          explorationData.explorationId);
+          ExplorationDataService.explorationId);
       } else {
         siteAnalyticsService.registerCommitChangesToPublicExplorationEvent(
-          explorationData.explorationId);
+          ExplorationDataService.explorationId);
       }
 
-      if (explorationWarningsService.countWarnings() === 0) {
+      if (ExplorationWarningsService.countWarnings() === 0) {
         siteAnalyticsService.registerSavePlayableExplorationEvent(
-          explorationData.explorationId);
+          ExplorationDataService.explorationId);
       }
       saveIsInProgress = true;
 
-      explorationData.save(
+      ExplorationDataService.save(
         changeList, commitMessage,
         function(isDraftVersionValid, draftChanges) {
           if (isDraftVersionValid === false &&
               draftChanges !== null &&
               draftChanges.length > 0) {
-            autosaveInfoModalsService.showVersionMismatchModal(changeList);
+            AutosaveInfoModalsService.showVersionMismatchModal(changeList);
             return;
           }
           $log.info('Changes to this exploration were saved successfully.');
-          changeListService.discardAllChanges();
+          ChangeListService.discardAllChanges();
           $rootScope.$broadcast('initExplorationPage');
           $rootScope.$broadcast('refreshVersionHistory', {
             forceRefresh: true
           });
-          alertsService.addSuccessMessage('Changes saved.');
+          AlertsService.addSuccessMessage('Changes saved.');
           saveIsInProgress = false;
           whenSavingDone.resolve();
         }, function() {
@@ -189,56 +192,61 @@ oppia.factory('explorationSaveService', [
     return {
       isExplorationSaveable: function() {
         return (
-          changeListService.isExplorationLockedForEditing() &&
+          ChangeListService.isExplorationLockedForEditing() &&
           !saveIsInProgress && (
-            (explorationRightsService.isPrivate() &&
-              !explorationWarningsService.hasCriticalWarnings()) ||
-            (!explorationRightsService.isPrivate() &&
-              explorationWarningsService.countWarnings() === 0)
+            (ExplorationRightsService.isPrivate() &&
+              !ExplorationWarningsService.hasCriticalWarnings()) ||
+            (!ExplorationRightsService.isPrivate() &&
+              ExplorationWarningsService.countWarnings() === 0)
           )
         );
       },
 
       discardChanges: function() {
-        $modal.open({
-          templateUrl: 'modals/confirmDiscardChanges',
+        $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/exploration_editor/' +
+            'confirm_discard_changes_modal_directive.html'),
           backdrop: 'static',
           keyboard: false,
           controller: [
-            '$scope', '$modalInstance', function($scope, $modalInstance) {
+            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.cancel = function() {
-                $modalInstance.dismiss();
+                $uibModalInstance.dismiss();
               };
               $scope.confirmDiscard = function() {
-                $modalInstance.close();
+                $uibModalInstance.close();
               };
             }
           ]
         }).result.then(function() {
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
           $rootScope.$broadcast('externalSave');
 
-          $modal.open({
-            templateUrl: 'modals/reloadingEditor',
+          $uibModal.open({
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration_editor/' +
+              'editor_reloading_modal_directive.html'),
             backdrop: 'static',
             keyboard: false,
             controller: [
-              '$scope', '$modalInstance', function($scope, $modalInstance) {
+              '$scope', '$uibModalInstance',
+              function($scope, $uibModalInstance) {
                 $timeout(function() {
-                  $modalInstance.dismiss('cancel');
+                  $uibModalInstance.dismiss('cancel');
                 }, 2500);
               }
             ],
             windowClass: 'oppia-loading-modal'
           });
 
-          changeListService.discardAllChanges();
-          alertsService.addSuccessMessage('Changes discarded.');
+          ChangeListService.discardAllChanges();
+          AlertsService.addSuccessMessage('Changes discarded.');
           $rootScope.$broadcast('initExplorationPage');
 
           // The reload is necessary because, otherwise, the
           // exploration-with-draft-changes will be reloaded
-          // (since it is already cached in explorationData).
+          // (since it is already cached in ExplorationDataService).
           location.reload();
         });
       },
@@ -250,47 +258,49 @@ oppia.factory('explorationSaveService', [
         var whenModalsClosed = $q.defer();
 
         siteAnalyticsService.registerOpenPublishExplorationModalEvent(
-          explorationData.explorationId);
-        alertsService.clearWarnings();
+          ExplorationDataService.explorationId);
+        AlertsService.clearWarnings();
 
         // If the metadata has not yet been specified, open the pre-publication
         // 'add exploration metadata' modal.
         if (isAdditionalMetadataNeeded()) {
-          var modalInstance = $modal.open({
-            templateUrl: 'modals/addExplorationMetadata',
+          var modalInstance = $uibModal.open({
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration_editor/' +
+              'exploration_metadata_modal_directive.html'),
             backdrop: 'static',
             controller: [
-              '$scope', '$modalInstance', 'explorationObjectiveService',
-              'explorationTitleService', 'explorationCategoryService',
-              'explorationStatesService', 'ALL_CATEGORIES',
-              'explorationLanguageCodeService', 'explorationTagsService',
-              function($scope, $modalInstance, explorationObjectiveService,
-              explorationTitleService, explorationCategoryService,
-              explorationStatesService, ALL_CATEGORIES,
-              explorationLanguageCodeService, explorationTagsService) {
-                $scope.explorationTitleService = explorationTitleService;
+              '$scope', '$uibModalInstance', 'ExplorationObjectiveService',
+              'ExplorationTitleService', 'ExplorationCategoryService',
+              'ExplorationStatesService', 'ALL_CATEGORIES',
+              'ExplorationLanguageCodeService', 'ExplorationTagsService',
+              function($scope, $uibModalInstance, ExplorationObjectiveService,
+                  ExplorationTitleService, ExplorationCategoryService,
+                  ExplorationStatesService, ALL_CATEGORIES,
+                  ExplorationLanguageCodeService, ExplorationTagsService) {
+                $scope.explorationTitleService = ExplorationTitleService;
                 $scope.explorationObjectiveService =
-                  explorationObjectiveService;
+                  ExplorationObjectiveService;
                 $scope.explorationCategoryService =
-                  explorationCategoryService;
+                  ExplorationCategoryService;
                 $scope.explorationLanguageCodeService = (
-                  explorationLanguageCodeService);
-                $scope.explorationTagsService = explorationTagsService;
+                  ExplorationLanguageCodeService);
+                $scope.explorationTagsService = ExplorationTagsService;
 
                 $scope.objectiveHasBeenPreviouslyEdited = (
-                  explorationObjectiveService.savedMemento.length > 0);
+                  ExplorationObjectiveService.savedMemento.length > 0);
 
                 $scope.requireTitleToBeSpecified = (
-                  !explorationTitleService.savedMemento);
+                  !ExplorationTitleService.savedMemento);
                 $scope.requireObjectiveToBeSpecified = (
-                  explorationObjectiveService.savedMemento.length < 15);
+                  ExplorationObjectiveService.savedMemento.length < 15);
                 $scope.requireCategoryToBeSpecified = (
-                  !explorationCategoryService.savedMemento);
+                  !ExplorationCategoryService.savedMemento);
                 $scope.askForLanguageCheck = (
-                  explorationLanguageCodeService.savedMemento ===
-                  GLOBALS.DEFAULT_LANGUAGE_CODE);
+                  ExplorationLanguageCodeService.savedMemento ===
+                  constants.DEFAULT_LANGUAGE_CODE);
                 $scope.askForTags = (
-                  explorationTagsService.savedMemento.length === 0);
+                  ExplorationTagsService.savedMemento.length === 0);
 
                 $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
@@ -303,34 +313,33 @@ oppia.factory('explorationSaveService', [
                   });
                 }
 
-                var _states = explorationStatesService.getStates();
-                if (_states) {
+                if (ExplorationStatesService.isInitialized()) {
                   var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2
                   .some(
                     function(categoryItem) {
                       return categoryItem.id ===
-                      explorationCategoryService.savedMemento;
+                      ExplorationCategoryService.savedMemento;
                     }
                   );
 
                   // If the current category is not in the dropdown, add it
                   // as the first option.
                   if (!categoryIsInSelect2 &&
-                      explorationCategoryService.savedMemento) {
+                      ExplorationCategoryService.savedMemento) {
                     $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
-                      id: explorationCategoryService.savedMemento,
-                      text: explorationCategoryService.savedMemento
+                      id: ExplorationCategoryService.savedMemento,
+                      text: ExplorationCategoryService.savedMemento
                     });
                   }
                 }
 
                 $scope.isSavingAllowed = function() {
                   return Boolean(
-                    explorationTitleService.displayed &&
-                    explorationObjectiveService.displayed &&
-                    explorationObjectiveService.displayed.length >= 15 &&
-                    explorationCategoryService.displayed &&
-                    explorationLanguageCodeService.displayed);
+                    ExplorationTitleService.displayed &&
+                    ExplorationObjectiveService.displayed &&
+                    ExplorationObjectiveService.displayed.length >= 15 &&
+                    ExplorationCategoryService.displayed &&
+                    ExplorationLanguageCodeService.displayed);
                 };
 
                 $scope.save = function() {
@@ -340,28 +349,28 @@ oppia.factory('explorationSaveService', [
 
                   // Record any fields that have changed.
                   var metadataList = [];
-                  if (explorationTitleService.hasChanged()) {
+                  if (ExplorationTitleService.hasChanged()) {
                     metadataList.push('title');
                   }
-                  if (explorationObjectiveService.hasChanged()) {
+                  if (ExplorationObjectiveService.hasChanged()) {
                     metadataList.push('objective');
                   }
-                  if (explorationCategoryService.hasChanged()) {
+                  if (ExplorationCategoryService.hasChanged()) {
                     metadataList.push('category');
                   }
-                  if (explorationLanguageCodeService.hasChanged()) {
+                  if (ExplorationLanguageCodeService.hasChanged()) {
                     metadataList.push('language');
                   }
-                  if (explorationTagsService.hasChanged()) {
+                  if (ExplorationTagsService.hasChanged()) {
                     metadataList.push('tags');
                   }
 
                   // Save all the displayed values.
-                  explorationTitleService.saveDisplayedValue();
-                  explorationObjectiveService.saveDisplayedValue();
-                  explorationCategoryService.saveDisplayedValue();
-                  explorationLanguageCodeService.saveDisplayedValue();
-                  explorationTagsService.saveDisplayedValue();
+                  ExplorationTitleService.saveDisplayedValue();
+                  ExplorationObjectiveService.saveDisplayedValue();
+                  ExplorationCategoryService.saveDisplayedValue();
+                  ExplorationLanguageCodeService.saveDisplayedValue();
+                  ExplorationTagsService.saveDisplayedValue();
 
                   // TODO(sll): Get rid of the $timeout here.
                   // It's currently used because there is a race condition: the
@@ -370,20 +379,20 @@ oppia.factory('explorationSaveService', [
                   // will be called when the draft changes entered here
                   // are properly saved to the backend.
                   $timeout(function() {
-                    $modalInstance.close(metadataList);
+                    $uibModalInstance.close(metadataList);
                   }, 500);
                 };
 
                 $scope.cancel = function() {
                   whenModalsClosed.resolve();
-                  explorationTitleService.restoreFromMemento();
-                  explorationObjectiveService.restoreFromMemento();
-                  explorationCategoryService.restoreFromMemento();
-                  explorationLanguageCodeService.restoreFromMemento();
-                  explorationTagsService.restoreFromMemento();
+                  ExplorationTitleService.restoreFromMemento();
+                  ExplorationObjectiveService.restoreFromMemento();
+                  ExplorationCategoryService.restoreFromMemento();
+                  ExplorationLanguageCodeService.restoreFromMemento();
+                  ExplorationTagsService.restoreFromMemento();
 
-                  $modalInstance.dismiss('cancel');
-                  alertsService.clearWarnings();
+                  $uibModalInstance.dismiss('cancel');
+                  AlertsService.clearWarnings();
                 };
               }
             ]
@@ -439,27 +448,24 @@ oppia.factory('explorationSaveService', [
         // controller 'saveIsInProgress' back to false.
         var whenModalClosed = $q.defer();
 
-        routerService.savePendingChanges();
+        RouterService.savePendingChanges();
 
-        if (!explorationRightsService.isPrivate() &&
-            explorationWarningsService.countWarnings() > 0) {
+        if (!ExplorationRightsService.isPrivate() &&
+            ExplorationWarningsService.countWarnings() > 0) {
           // If the exploration is not private, warnings should be fixed before
           // it can be saved.
-          alertsService.addWarning(explorationWarningsService.getWarnings()[0]);
+          AlertsService.addWarning(ExplorationWarningsService.getWarnings()[0]);
           return;
         }
 
-        explorationData.getLastSavedData().then(function(data) {
-          var oldStates = {};
-          for (var stateName in data.states) {
-            oldStates[stateName] =
-              (StateObjectFactory.createFromBackendDict(
-                stateName, data.states[stateName]));
-          }
-          var newStates = explorationStatesService.getStates();
+        ExplorationDataService.getLastSavedData().then(function(data) {
+          var oldStates = StatesObjectFactory.createFromBackendDict(
+            data.states).getStateObjects();
+          var newStates = ExplorationStatesService.getStates()
+            .getStateObjects();
           var diffGraphData = ExplorationDiffService.getDiffGraphData(
             oldStates, newStates, [{
-              changeList: changeListService.getChangeList(),
+              changeList: ChangeListService.getChangeList(),
               directionForwards: true
             }]);
           diffData = {
@@ -468,7 +474,7 @@ oppia.factory('explorationSaveService', [
             finalStateIds: diffGraphData.finalStateIds,
             v1InitStateId: diffGraphData.originalStateIds[data.init_state_name],
             v2InitStateId: diffGraphData.stateIds[
-              explorationInitStateNameService.displayed],
+              ExplorationInitStateNameService.displayed],
             v1States: oldStates,
             v2States: newStates
           };
@@ -476,19 +482,21 @@ oppia.factory('explorationSaveService', [
           // TODO(wxy): after diff supports exploration metadata, add a check to
           // exit if changes cancel each other out.
 
-          alertsService.clearWarnings();
+          AlertsService.clearWarnings();
 
           // If the modal is open, do not open another one.
           if (modalIsOpen) {
             return;
           }
 
-          var modalInstance = $modal.open({
-            templateUrl: 'modals/saveExploration',
+          var modalInstance = $uibModal.open({
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration_editor/' +
+              'exploration_save_modal_directive.html'),
             backdrop: true,
             resolve: {
               isExplorationPrivate: function() {
-                return explorationRightsService.isPrivate();
+                return ExplorationRightsService.isPrivate();
               },
               diffData: function() {
                 return diffData;
@@ -496,8 +504,9 @@ oppia.factory('explorationSaveService', [
             },
             windowClass: 'oppia-save-exploration-modal',
             controller: [
-              '$scope', '$modalInstance', 'isExplorationPrivate',
-              function($scope, $modalInstance, isExplorationPrivate) {
+              '$scope', '$uibModalInstance', 'isExplorationPrivate',
+              function(
+                  $scope, $uibModalInstance, isExplorationPrivate) {
                 $scope.showDiff = false;
                 $scope.onClickToggleDiffButton = function() {
                   $scope.showDiff = !$scope.showDiff;
@@ -517,11 +526,11 @@ oppia.factory('explorationSaveService', [
                 $scope.laterVersionHeader = 'New changes';
 
                 $scope.save = function(commitMessage) {
-                  $modalInstance.close(commitMessage);
+                  $uibModalInstance.close(commitMessage);
                 };
                 $scope.cancel = function() {
-                  $modalInstance.dismiss('cancel');
-                  alertsService.clearWarnings();
+                  $uibModalInstance.dismiss('cancel');
+                  AlertsService.clearWarnings();
                 };
               }
             ]
@@ -538,7 +547,7 @@ oppia.factory('explorationSaveService', [
             // The $timeout seems to be needed
             // in order to give the modal time to render.
             $timeout(function() {
-              focusService.setFocus('saveChangesModalOpened');
+              FocusManagerService.setFocus('saveChangesModalOpened');
             });
           });
 

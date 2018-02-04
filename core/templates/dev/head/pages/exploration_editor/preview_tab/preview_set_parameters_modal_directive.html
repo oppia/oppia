@@ -1,24 +1,22 @@
-<script type="text/ng-template" id="modals/previewParams">
-  <div class="modal-body oppia-preview-set-params-modal">
-    <p>Please enter values for the following parameters:</p>
-    <table class="oppia-preview-set-params-modal-table">
-      <tr ng-repeat="paramChange in manualParamChanges">
-        <td class="oppia-preview-set-params-modal-td">
-          <[paramChange.name]>
-        </td>
-        <td class="oppia-preview-set-params-modal-td">
-          <input type="text" ng-model="paramChange.customizationArgs.value">
-        </td>
-      </tr>
-    </table>
-    <button class="btn btn-success" ng-click="previewParamModalOk()">
-      OK
-    </button>
-    <button class="btn btn-danger" ng-click="previewParamModalCancel()">
-      Cancel
-    </button>
-  </div>
-</script>
+<div class="modal-body oppia-preview-set-params-modal">
+  <p>Please enter values for the following parameters:</p>
+  <table class="oppia-preview-set-params-modal-table">
+    <tr ng-repeat="paramChange in manualParamChanges">
+      <td class="oppia-preview-set-params-modal-td">
+        <[paramChange.name]>
+      </td>
+      <td class="oppia-preview-set-params-modal-td">
+        <input type="text" ng-model="paramChange.customizationArgs.value">
+      </td>
+    </tr>
+  </table>
+  <button class="btn btn-success" ng-click="previewParamModalOk()">
+    OK
+  </button>
+  <button class="btn btn-danger" ng-click="previewParamModalCancel()">
+    Cancel
+  </button>
+</div>
 
 <style>
   .oppia-preview-set-params-modal {

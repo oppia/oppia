@@ -19,30 +19,35 @@
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 
 describe('Preferences', function() {
+  var preferencesPage = null;
+  
+  beforeEach(function() {
+    preferencesPage = new PreferencesPage.PreferencesPage();
+  });
+
   it('should change editor role email checkbox value', function() {
     users.createUser('alice@preferences.com', 'alicePreferences');
     users.login('alice@preferences.com');
-    browser.get('/preferences');
-    var checkbox = element(by.model('canReceiveEditorRoleEmail'));
-    expect(checkbox.isSelected()).toBe(true);
-    checkbox.click();
-    expect(checkbox.isSelected()).toBe(false);
+    preferencesPage.get();
+    expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(true);
+    preferencesPage.toggleEditorRoleEmailsCheckbox();
+    expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(false);
     browser.refresh();
-    expect(checkbox.isSelected()).toBe(false);
+    expect(preferencesPage.isEditorRoleEmailsCheckboxSelected()).toBe(false);
   });
 
   it('should change feedback message email checkbox value', function() {
     users.createUser('bob@preferences.com', 'bobPreferences');
     users.login('bob@preferences.com');
-    browser.get('/preferences');
-    var checkbox = element(by.model('canReceiveFeedbackMessageEmail'));
-    expect(checkbox.isSelected()).toBe(true);
-    checkbox.click();
-    expect(checkbox.isSelected()).toBe(false);
+    preferencesPage.get();
+    expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(true);
+    preferencesPage.toggleFeedbackEmailsCheckbox();
+    expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
     browser.refresh();
-    expect(checkbox.isSelected()).toBe(false);
+    expect(preferencesPage.isFeedbackEmailsCheckboxSelected()).toBe(false);
   });
 
   afterEach(function() {

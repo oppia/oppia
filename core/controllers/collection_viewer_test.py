@@ -16,6 +16,7 @@
 
 from core.domain import collection_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
@@ -32,6 +33,7 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
@@ -81,7 +83,7 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_published_collections_are_visible_to_logged_out_users(self):
-        rights_manager.publish_collection(self.editor_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.editor, self.COLLECTION_ID)
 
         response = self.testapp.get(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
@@ -89,7 +91,7 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
 
     def test_published_collections_are_visible_to_logged_in_users(self):
-        rights_manager.publish_collection(self.editor_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.editor, self.COLLECTION_ID)
 
         self.login(self.NEW_USER_EMAIL)
         response = self.testapp.get(
@@ -127,60 +129,58 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         self.assertEqual(
             collection_dict['title'], 'Introduction to Collections in Oppia')
 
-        # Verify there are 5 explorations in this collection, the initial
+        # Verify there are 4 explorations in this collection, the initial
         # explorations to be completed, and that there are no explorations
         # currently completed within the context of this collection.
-        self.assertEqual(len(collection_dict['nodes']), 5)
+        self.assertEqual(len(collection_dict['nodes']), 4)
 
         playthrough_dict = collection_dict['playthrough_dict']
-        self.assertEqual(playthrough_dict['next_exploration_ids'], ['0'])
+        self.assertEqual(playthrough_dict['next_exploration_ids'], ['19'])
         self.assertEqual(playthrough_dict['completed_exploration_ids'], [])
 
-        # 'Complete' the first exploration. This should lead to 3 more being
+        # 'Complete' the first exploration. This should lead to 1 new one being
         # suggested to the learner.
         collection_services.record_played_exploration_in_collection_context(
+            self.viewer_id, '0', '19')
+        response_dict = self.get_json(
+            '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
+        collection_dict = response_dict['collection']
+
+        playthrough_dict = collection_dict['playthrough_dict']
+        self.assertEqual(
+            playthrough_dict['next_exploration_ids'], ['20'])
+        self.assertEqual(playthrough_dict['completed_exploration_ids'], ['19'])
+
+        # Completing the next exploration results in a third suggested exp.
+        collection_services.record_played_exploration_in_collection_context(
+            self.viewer_id, '0', '20')
+        response_dict = self.get_json(
+            '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
+        collection_dict = response_dict['collection']
+
+        playthrough_dict = collection_dict['playthrough_dict']
+        self.assertEqual(
+            playthrough_dict['next_exploration_ids'], ['21'])
+        self.assertEqual(
+            playthrough_dict['completed_exploration_ids'], ['19', '20'])
+
+        # Completing the next exploration results in a fourth and final
+        # suggested exp.
+        collection_services.record_played_exploration_in_collection_context(
+            self.viewer_id, '0', '21')
+        response_dict = self.get_json(
+            '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
+        collection_dict = response_dict['collection']
+
+        playthrough_dict = collection_dict['playthrough_dict']
+        self.assertEqual(
+            playthrough_dict['next_exploration_ids'], ['0'])
+        self.assertEqual(
+            playthrough_dict['completed_exploration_ids'], ['19', '20', '21'])
+
+        # Completing the final exploration should result in no new suggestions.
+        collection_services.record_played_exploration_in_collection_context(
             self.viewer_id, '0', '0')
-        response_dict = self.get_json(
-            '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
-        collection_dict = response_dict['collection']
-
-        playthrough_dict = collection_dict['playthrough_dict']
-        self.assertEqual(
-            playthrough_dict['next_exploration_ids'], ['13'])
-        self.assertEqual(playthrough_dict['completed_exploration_ids'], ['0'])
-
-        # Completing the 'Solar System' exploration results in no branching.
-        collection_services.record_played_exploration_in_collection_context(
-            self.viewer_id, '0', '13')
-        response_dict = self.get_json(
-            '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
-        collection_dict = response_dict['collection']
-
-        playthrough_dict = collection_dict['playthrough_dict']
-        self.assertEqual(
-            playthrough_dict['next_exploration_ids'], ['4'])
-        self.assertEqual(
-            playthrough_dict['completed_exploration_ids'], ['0', '13'])
-
-        # Completing the 'About Oppia' exploration results in another
-        # exploration being suggested.
-        collection_services.record_played_exploration_in_collection_context(
-            self.viewer_id, '0', '14')
-        response_dict = self.get_json(
-            '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
-        collection_dict = response_dict['collection']
-
-        playthrough_dict = collection_dict['playthrough_dict']
-        self.assertEqual(
-            playthrough_dict['next_exploration_ids'], ['4'])
-        self.assertEqual(
-            playthrough_dict['completed_exploration_ids'], ['0', '13', '14'])
-
-        # Completing all explorations should lead to no other suggestions.
-        collection_services.record_played_exploration_in_collection_context(
-            self.viewer_id, '0', '15')
-        collection_services.record_played_exploration_in_collection_context(
-            self.viewer_id, '0', '4')
         response_dict = self.get_json(
             '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
         collection_dict = response_dict['collection']
@@ -189,4 +189,4 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         self.assertEqual(playthrough_dict['next_exploration_ids'], [])
         self.assertEqual(
             playthrough_dict['completed_exploration_ids'],
-            ['0', '13', '14', '15', '4'])
+            ['19', '20', '21', '0'])
