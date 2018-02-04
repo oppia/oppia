@@ -79,13 +79,13 @@ oppia.directive('explorationSummaryTile', [
         );
       },
       controller: [
-        '$scope', '$http',
+        '$scope', '$http', '$window',
         'DateTimeFormatService', 'RatingComputationService',
         'WindowDimensionsService', 'UrlService',
         function(
-          $scope, $http,
-          DateTimeFormatService, RatingComputationService,
-          WindowDimensionsService, UrlService) {
+            $scope, $http, $window,
+            DateTimeFormatService, RatingComputationService,
+            WindowDimensionsService, UrlService) {
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.ACTIVITY_TYPE_EXPLORATION = (
             constants.ACTIVITY_TYPE_EXPLORATION);
@@ -101,12 +101,22 @@ oppia.directive('explorationSummaryTile', [
             }
           );
 
+          $scope.isRefresherExploration = false;
+          if ($scope.getParentExplorationIds()) {
+            $scope.isRefresherExploration = (
+              $scope.getParentExplorationIds().length > 0);
+          }
+
           $scope.avatarsList = [];
 
           $scope.MAX_AVATARS_TO_DISPLAY = 5;
 
           $scope.setHoverState = function(hoverState) {
             $scope.explorationIsCurrentlyHoveredOver = hoverState;
+          };
+
+          $scope.loadParentExploration = function() {
+            $window.location.href = $scope.getExplorationLink();
           };
 
           $scope.getAverageRating = function() {
