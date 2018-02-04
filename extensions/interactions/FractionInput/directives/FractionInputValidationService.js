@@ -95,7 +95,7 @@ oppia.factory('FractionInputValidationService', [
         };
 
         var ranges = [];
-        var denominators = [];
+        var matchedDenominators = [];
 
         for (var i = 0; i < answerGroups.length; i++) {
           var rules = answerGroups[i].rules;
@@ -110,7 +110,7 @@ oppia.factory('FractionInputValidationService', [
               ubi: false,
             };
 
-            var denominator = {
+            var matchedDenominator = {
               answerGroupIndex: i + 1,
               ruleIndex: j + 1,
               denominator: null,
@@ -208,7 +208,7 @@ oppia.factory('FractionInputValidationService', [
                       'should be greater than zero.')
                   });
                 }
-                denominator.denominator = rule.inputs.x;
+                matchedDenominator.denominator = rule.inputs.x;
                 break;
               case 'HasFractionalPartExactlyEqualTo':
                 if (rule.inputs.f.wholeNumber !== 0) {
@@ -263,26 +263,27 @@ oppia.factory('FractionInputValidationService', [
               }
             }
 
-            for (var k = 0; k < denominators.length; k++) {
-              if (denominators[k].denominator !== null &&
+            for (var k = 0; k < matchedDenominators.length; k++) {
+              if (matchedDenominators[k].denominator !== null &&
                 rule.type === 'HasFractionalPartExactlyEqualTo') {
-                if (denominators[k].denominator ===
+                if (matchedDenominators[k].denominator ===
                   rule.inputs.f.denominator) {
                   warningsList.push({
                     type: WARNING_TYPES.ERROR,
                     message: (
                       'Rule ' + (j + 1) + ' from answer group ' +
                       (i + 1) + ' will never be matched because it ' +
-                      'is made redundant by rule ' + denominators[k].ruleIndex +
-                      ' from answer group ' + denominators[k].answerGroupIndex +
-                      '.')
+                      'is made redundant by rule ' +
+                      matchedDenominators[k].ruleIndex +
+                      ' from answer group ' +
+                      matchedDenominators[k].answerGroupIndex + '.')
                   });
                 }
               }
             }
 
             ranges.push(range);
-            denominators.push(denominator);
+            matchedDenominators.push(matchedDenominator);
           }
         }
 
