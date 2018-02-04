@@ -31,7 +31,13 @@ describe('EndExplorationValidationService', function() {
 
     badOutcome = {
       dest: currentState,
-      feedback: []
+      feedback: {
+        html: '',
+        audio_translations: {}
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null
     };
 
     customizationArguments = {
@@ -40,16 +46,19 @@ describe('EndExplorationValidationService', function() {
       }
     };
 
-    goodAnswerGroups = [
-      {
-        rules: [],
-        outcome: {
-          dest: 'Second State',
-          feedback: []
+    goodAnswerGroups = [{
+      rules: [],
+      outcome: {
+        dest: 'Second State',
+        feedback: {
+          html: '',
+          audio_translations: {}
         },
-        correct: false
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null
       }
-    ];
+    }];
   }));
 
   it('should not have warnings for no answer groups or no default outcome',

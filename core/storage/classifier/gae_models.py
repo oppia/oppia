@@ -17,12 +17,10 @@
 import datetime
 
 from core.platform import models
-
 import feconf
 import utils
 
 from google.appengine.ext import ndb
-
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 

@@ -53,7 +53,10 @@
       "description": "has integer part equal to {{x|Int}}"
     },
     "HasNoFractionalPart": {
-      "description": "is an integer"
+      "description": "has no fractional part"
+    },
+    "HasFractionalPartExactlyEqualTo": {
+      "description": "has fractional part exactly equal to {{f|Fraction}}"
     }
   },
   "GraphInput": {

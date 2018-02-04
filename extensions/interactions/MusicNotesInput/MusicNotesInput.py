@@ -31,6 +31,7 @@ class MusicNotesInput(base.BaseInteraction):
     narrow_instructions = 'Show music staff'
     needs_summary = True
     can_have_solution = True
+    show_generic_submit_button = True
 
     _customization_arg_specs = [{
         'name': 'sequenceToGuess',
@@ -54,8 +55,9 @@ class MusicNotesInput(base.BaseInteraction):
         # Table with answer counts for top N answers.
         'id': 'FrequencyTable',
         'options': {
-            'column_headers': ['Answer', 'Count', 'Addressed?'],
-            'title': 'Top 10 answers'
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top 10 answers',
         },
         'calculation_id': 'Top10AnswerFrequencies',
+        'show_addressed_info': True,
     }]

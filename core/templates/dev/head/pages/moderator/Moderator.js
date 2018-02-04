@@ -17,10 +17,10 @@
 */
 
 oppia.controller('Moderator', [
-  '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter', 'AlertsService',
-  function($scope, $http, $rootScope, oppiaDatetimeFormatter, AlertsService) {
+  '$scope', '$http', '$rootScope', 'DateTimeFormatService', 'AlertsService',
+  function($scope, $http, $rootScope, DateTimeFormatService, AlertsService) {
     $scope.getDatetimeAsString = function(millisSinceEpoch) {
-      return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+      return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
         millisSinceEpoch);
     };
 

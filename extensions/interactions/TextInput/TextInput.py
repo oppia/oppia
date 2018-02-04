@@ -30,6 +30,7 @@ class TextInput(base.BaseInteraction):
     narrow_instructions = None
     needs_summary = False
     can_have_solution = True
+    show_generic_submit_button = True
 
     # NB: There used to be an integer-typed parameter here called 'columns'
     # that was removed in revision 628942010573. Some text interactions in
@@ -65,8 +66,9 @@ class TextInput(base.BaseInteraction):
         # Table with answer counts for top N answers.
         'id': 'FrequencyTable',
         'options': {
-            'column_headers': ['Answer', 'Count', 'Addressed?'],
-            'title': 'Top answers'
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top answers',
         },
         'calculation_id': 'Top10AnswerFrequencies',
+        'show_addressed_info': True,
     }]

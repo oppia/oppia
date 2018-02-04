@@ -25,7 +25,7 @@
       <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY" class="oppia-clickable-navbar-element">
         <a class="oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
       </li>
-      <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="dropdown oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
+      <li uib-dropdown ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
         <a class="oppia-navbar-tab"
            role="menuitem"
            aria-haspopup="true"
@@ -35,17 +35,16 @@
           <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_ABOUT"></span>
           <span class="caret"></span>
         </a>
-        <ul class="dropdown-menu oppia-navbar-dropdown"
+        <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown"
             ng-mouseover="onMouseoverDropdownMenu($event)"
             ng-mouseleave="onMouseoutDropdownMenu($event)"
             role="menu">
-          <li><a class="protractor-test-about-link oppia-navbar-tab-content" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
-          <li><a class="protractor-test-get-started-link oppia-navbar-tab-content" href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
-          <li><a class="protractor-test-teach-link oppia-navbar-tab-content" href="/teach" translate="I18N_TOPNAV_TEACH_WITH_OPPIA"></a></li>
-          <li><a href="https://medium.com/oppia-org" target="_blank" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_BLOG"></a></li>
-          <li><a href="/forum" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_FORUM"></a></li>
-          <li><a class="protractor-test-contact-link oppia-navbar-tab-content" href="/contact" translate="I18N_TOPNAV_CONTACT_US"></a></li>
-          <li><a href="/foundation" class="oppia-navbar-tab-content" translate="I18N_TOPNAV_OPPIA_FOUNDATION"></a></li>
+          <li><a class="oppia-navbar-tab-content protractor-test-about-link" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
+          <li><a class="oppia-navbar-tab-content protractor-test-get-started-link " href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
+          <li><a class="oppia-navbar-tab-content protractor-test-playbook-link " href="/teach#playbook" translate="I18N_TOPNAV_PARTICIPATION_PLAYBOOK"></a></li>
+          <li><a class="oppia-navbar-tab-content" href="https://medium.com/oppia-org" target="_blank"  translate="I18N_TOPNAV_BLOG">Blog</a></li>
+          <li><a class="oppia-navbar-tab-content" href="http://oppiafoundation.org"  target="_blank" translate="I18N_TOPNAV_OPPIA_FOUNDATION"></a></li>
+          <li><a class="oppia-navbar-tab-content" href="http://oppiafoundation.org/get-involved" target="_blank" translate="I18N_TOPNAV_GET_INVOLVED"></a></li>
         </ul>
       </li>
       <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_DONATE">
@@ -60,8 +59,8 @@
     </ul>
   </ul>
   <ul class="nav oppia-navbar-nav oppia-navbar-profile">
-    <li ng-if="username" class="dropdown protractor-test-profile-dropdown">
-      <a class="dropdown-toggle oppia-navbar-dropdown-toggle"
+    <li uib-dropdown ng-if="username" class="protractor-test-profile-dropdown">
+      <a uib-dropdown-toggle class="oppia-navbar-dropdown-toggle"
          ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
          ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)"
          role="menuitem"
@@ -98,7 +97,7 @@
         </div>
       </a>
 
-      <ul class="dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu"
+      <ul uib-dropdown-menu class="uib-dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu"
           ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
           ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)"
           ng-show="profileDropdownIsActive">
@@ -157,7 +156,7 @@
       </ul>
     </li>
 
-    <li ng-if="!username" class="dropdown oppia-navbar-clickable-dropdown">
+    <li uib-dropdown ng-if="!username" class="oppia-navbar-clickable-dropdown">
       <div class="oppia-navbar-button-container" style="margin-right: 10px;">
         <button class="btn oppia-navbar-button"
                 ng-click="onLoginButtonClicked()">
@@ -165,7 +164,7 @@
           <span class="caret"></span>
         </button>
       </div>
-      <ul class="dropdown-menu oppia-navbar-dropdown" role="menu"
+      <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown" role="menu"
           style="margin-right: 15px; padding: 0;"
           ng-mouseover="onMouseoverDropdownMenu($event)"
           ng-mouseleave="onMouseoutDropdownMenu($event)">
@@ -227,16 +226,16 @@
     position: absolute;
     right: 4px;
   }
-  top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.dropdown-menu {
+  top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.uib-dropdown-menu {
     display: block;
   }
-  top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.dropdown-menu {
+  top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.uib-dropdown-menu {
     display: inline-block;
   }
   top-navigation-bar .oppia-navbar-role-text {
     bottom: 0;
     color: white;
-    font-size: 1.12rem;
+    font-size: 11px;
     font-weight: bold;
     position: absolute;
     right: 3px;

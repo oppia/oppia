@@ -14,10 +14,10 @@
 
 """Tests for the exploration editor page."""
 
+import StringIO
 import datetime
 import logging
 import os
-import StringIO
 import zipfile
 
 from core import jobs_registry
@@ -27,8 +27,8 @@ from core.domain import config_services
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import stats_jobs_continuous_test
 from core.domain import rights_manager
+from core.domain import stats_jobs_continuous_test
 from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
@@ -412,6 +412,164 @@ class EditorTest(BaseEditorControllerTest):
             self.logout()
 
 
+class ExplorationEditorLogoutTest(BaseEditorControllerTest):
+    """Test handler for logout from exploration editor page."""
+
+    def test_logout_from_invalid_url(self):
+        """Logour from invalid url should redirect to library.
+        To be caught by regex.
+        """
+
+        published_exp_id = '_published_exp_id-1200'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            published_exp_id)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        rights_manager.publish_exploration(self.owner, published_exp_id)
+
+        invalid_current_page = '/doesnotexit/%s' % published_exp_id
+        invalid_logout_url = ('/exploration_editor_logout?return_url=%s' % (
+            invalid_current_page))
+
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(invalid_logout_url, expect_errors=False)
+        self.assertEqual(response.status_int, 302)
+        response.follow()
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('library', response.headers['location'])
+        self.logout()
+
+    def test_logout_from_invalid_extra_url(self):
+        """Logour from invalid url should redirect to library.
+        To be caught by regex.
+        """
+
+        published_exp_id = '123-published_exp_id'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            published_exp_id)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        rights_manager.publish_exploration(self.owner, published_exp_id)
+
+        invalid_current_page = '%s/%s/extra' % (
+            feconf.EDITOR_URL_PREFIX, published_exp_id)
+        invalid_logout_url = ('/exploration_editor_logout?return_url=%s' % (
+            invalid_current_page))
+
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(invalid_logout_url, expect_errors=False)
+        self.assertEqual(response.status_int, 302)
+        response.follow()
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('library', response.headers['location'])
+        self.logout()
+
+    def test_logout_from_invalid_regex_exp_id(self):
+        """Logour from invalid url should redirect to library.
+        To be caught by regex.
+        """
+
+        invalid_regex_exp_id = '1?23-inv@alid_ex#p_id'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            invalid_regex_exp_id)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        rights_manager.publish_exploration(self.owner, invalid_regex_exp_id)
+
+        invalid_current_page = '%s/%s' % (
+            feconf.EDITOR_URL_PREFIX, invalid_regex_exp_id)
+        invalid_logout_url = ('/exploration_editor_logout?return_url=%s' % (
+            invalid_current_page))
+
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(invalid_logout_url, expect_errors=False)
+        self.assertEqual(response.status_int, 302)
+        response.follow()
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('library', response.headers['location'])
+        self.logout()
+
+    def test_logout_from_empty_url(self):
+        """Logout from empty exploration id should redirect
+        to library page.
+        """
+        empty_redirect_logout_url = '/exploration_editor_logout?return_url='
+
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(empty_redirect_logout_url)
+        self.assertEqual(response.status_int, 302)
+
+        response.follow()
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('library', response.headers['location'])
+        self.logout()
+
+    def test_logout_from_invalid_exploration_id(self):
+        """Logout from invalid exploration id should redirect
+        to library page.
+        """
+
+        invalid_current_page = '%s/%s' % (
+            feconf.EDITOR_URL_PREFIX, 'invalid_eid')
+        invalid_logout_url = (
+            '/exploration_editor_logout?return_url=%s' % invalid_current_page)
+
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(invalid_logout_url, expect_errors=False)
+        self.assertEqual(response.status_int, 302)
+        response.follow()
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('library', response.headers['location'])
+        self.logout()
+
+    def test_logout_from_unpublished_exploration_editor(self):
+        """Logout from unpublished exploration should redirect
+        to library page.
+        """
+
+        unpublished_exp_id = '_unpublished_eid123'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            unpublished_exp_id)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        current_page_url = '%s/%s' % (
+            feconf.EDITOR_URL_PREFIX, unpublished_exp_id)
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(current_page_url, expect_errors=False)
+        self.assertEqual(response.status_int, 200)
+
+        response = self.testapp.get(
+            '/exploration_editor_logout?return_url=%s' % current_page_url)
+        self.assertEqual(response.status_int, 302)
+        response = response.follow()
+        self.assertEqual(response.status_int, 302)
+        self.assertIn('library', response.headers['location'])
+        self.logout()
+
+    def test_logout_from_published_exploration_editor(self):
+        """Logout from published exploration should redirect
+        to same page.
+        """
+
+        published_exp_id = 'published_eid-123'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            published_exp_id)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        current_page_url = '%s/%s' % (
+            feconf.EDITOR_URL_PREFIX, published_exp_id)
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(current_page_url, expect_errors=False)
+        self.assertEqual(response.status_int, 200)
+
+        rights_manager.publish_exploration(self.owner, published_exp_id)
+
+        response = self.testapp.get(
+            '/exploration_editor_logout?return_url=%s' % current_page_url)
+        self.assertEqual(response.status_int, 302)
+        response = response.follow()
+        self.assertEqual(response.status_int, 302)
+        self.assertIn(current_page_url, response.headers['location'])
+        self.logout()
+
+
 class DownloadIntegrationTest(BaseEditorControllerTest):
     """Test handler for exploration and state download."""
 
@@ -430,8 +588,12 @@ interaction:
       value: 1
   default_outcome:
     dest: State A
-    feedback: []
+    feedback:
+      audio_translations: {}
+      html: ''
+    labelled_as_correct: false
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -451,8 +613,12 @@ interaction:
       value: 1
   default_outcome:
     dest: State B
-    feedback: []
+    feedback:
+      audio_translations: {}
+      html: ''
+    labelled_as_correct: false
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -472,8 +638,12 @@ interaction:
       value: 1
   default_outcome:
     dest: %s
-    feedback: []
+    feedback:
+      audio_translations: {}
+      html: ''
+    labelled_as_correct: false
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -495,8 +665,12 @@ interaction:
       value: 1
   default_outcome:
     dest: State A
-    feedback: []
+    feedback:
+      audio_translations: {}
+      html: ''
+    labelled_as_correct: false
     param_changes: []
+    refresher_exploration_id: null
   hints: []
   id: TextInput
   solution: null
@@ -1177,21 +1351,10 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             self.assertEqual(response.status_int, 200)
             csrf_token = self.get_csrf_token_from_response(response)
 
-            # Submit an invalid action. This should cause an error.
-            response_dict = self.put_json(
-                '/createhandler/moderatorrights/%s' % self.EXP_ID, {
-                    'action': 'random_action',
-                    'email_body': None,
-                    'version': 1,
-                }, csrf_token, expect_errors=True, expected_status_int=400)
-            self.assertEqual(
-                response_dict['error'], 'Invalid moderator action.')
-
             # Try to unpublish the exploration without an email body. This
             # should cause an error.
             response_dict = self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID, {
-                    'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
                     'email_body': None,
                     'version': 1,
                 }, csrf_token, expect_errors=True, expected_status_int=400)
@@ -1201,7 +1364,6 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
 
             response_dict = self.put_json(
                 '/createhandler/moderatorrights/%s' % self.EXP_ID, {
-                    'action': feconf.MODERATOR_ACTION_UNPUBLISH_EXPLORATION,
                     'email_body': '',
                     'version': 1,
                 }, csrf_token, expect_errors=True, expected_status_int=400)

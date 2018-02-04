@@ -18,21 +18,21 @@
  */
 
 oppia.controller('PreviewTab', [
-  '$scope', '$modal', '$q', '$timeout', 'LearnerParamsService',
+  '$scope', '$uibModal', '$q', '$timeout', 'LearnerParamsService',
   'ExplorationDataService', 'ExplorationAdvancedFeaturesService',
-  'explorationCategoryService', 'EditorStateService',
-  'explorationInitStateNameService', 'explorationParamChangesService',
-  'explorationParamSpecsService', 'explorationStatesService',
-  'explorationTitleService', 'ExplorationPlayerService',
+  'ExplorationCategoryService', 'EditorStateService',
+  'ExplorationInitStateNameService', 'ExplorationParamChangesService',
+  'ExplorationParamSpecsService', 'ExplorationStatesService',
+  'ExplorationTitleService', 'ExplorationPlayerService',
   'ParameterMetadataService', 'ParamChangeObjectFactory',
   'UrlInterpolationService',
   function(
-      $scope, $modal, $q, $timeout, LearnerParamsService,
+      $scope, $uibModal, $q, $timeout, LearnerParamsService,
       ExplorationDataService, ExplorationAdvancedFeaturesService,
-      explorationCategoryService, EditorStateService,
-      explorationInitStateNameService, explorationParamChangesService,
-      explorationParamSpecsService, explorationStatesService,
-      explorationTitleService, ExplorationPlayerService,
+      ExplorationCategoryService, EditorStateService,
+      ExplorationInitStateNameService, ExplorationParamChangesService,
+      ExplorationParamSpecsService, ExplorationStatesService,
+      ExplorationTitleService, ExplorationPlayerService,
       ParameterMetadataService, ParamChangeObjectFactory,
       UrlInterpolationService) {
     $scope.isExplorationPopulated = false;
@@ -42,7 +42,7 @@ oppia.controller('PreviewTab', [
 
       // Show a warning message if preview doesn't start from the first state
       if (initStateNameForPreview !==
-          explorationInitStateNameService.savedMemento) {
+          ExplorationInitStateNameService.savedMemento) {
         $scope.previewWarning =
           'Preview started from \"' + initStateNameForPreview + '\"';
       } else {
@@ -89,19 +89,19 @@ oppia.controller('PreviewTab', [
     };
 
     $scope.showSetParamsModal = function(manualParamChanges, callback) {
-      var modalInstance = $modal.open({
+      var modalInstance = $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_editor/preview_tab/' +
           'preview_set_parameters_modal_directive.html'),
         backdrop: 'static',
         windowClass: 'oppia-preview-set-params-modal',
         controller: [
-          '$scope', '$modalInstance', 'RouterService',
-          function($scope, $modalInstance, RouterService) {
+          '$scope', '$uibModalInstance', 'RouterService',
+          function($scope, $uibModalInstance, RouterService) {
             $scope.manualParamChanges = manualParamChanges;
-            $scope.previewParamModalOk = $modalInstance.close;
+            $scope.previewParamModalOk = $uibModalInstance.close;
             $scope.previewParamModalCancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
               RouterService.navigateToMainTab();
             };
           }
@@ -122,10 +122,10 @@ oppia.controller('PreviewTab', [
     $scope.resetPreview = function() {
       $scope.previewWarning = '';
       $scope.isExplorationPopulated = false;
-      initStateNameForPreview = explorationInitStateNameService.savedMemento;
+      initStateNameForPreview = ExplorationInitStateNameService.savedMemento;
       $timeout(function() {
         ExplorationPlayerService.init(function(exploration, initHtml,
-          newParams) {
+            newParams) {
           $scope.loadPreviewState(initStateNameForPreview, []);
         });
       }, 200);

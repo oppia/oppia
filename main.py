@@ -25,8 +25,8 @@ from core.controllers import collection_editor
 from core.controllers import collection_viewer
 from core.controllers import creator_dashboard
 from core.controllers import custom_landing_pages
-from core.controllers import email_dashboard
 from core.controllers import editor
+from core.controllers import email_dashboard
 from core.controllers import feedback
 from core.controllers import learner_dashboard
 from core.controllers import learner_playlist
@@ -34,6 +34,7 @@ from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
 from core.controllers import profile
+from core.controllers import question
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
@@ -42,12 +43,14 @@ from core.domain import acl_decorators
 from core.domain import user_services
 from core.platform import models
 import feconf
-# pylint: enable=relative-import
 
 from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras.routes import RedirectRoute
+
+# pylint: enable=relative-import
+
 
 current_user_services = models.Registry.import_current_user_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -287,7 +290,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/moderatorhandler/featured', moderator.FeaturedActivitiesHandler),
     get_redirect_route(
-        r'/moderatorhandler/email_draft/<action>', moderator.EmailDraftHandler),
+        r'/moderatorhandler/email_draft', moderator.EmailDraftHandler),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
@@ -313,6 +316,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/explorehandler/state_complete_event/<exploration_id>',
         reader.StateCompleteEventHandler),
+    get_redirect_route(
+        r'/explorehandler/leave_for_refresher_exp_event/<exploration_id>',
+        reader.LeaveForRefresherExpEventHandler),
     get_redirect_route(
         r'/explorehandler/answer_submitted_event/<exploration_id>',
         reader.AnswerSubmittedEventHandler),
@@ -459,6 +465,10 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<collection_id>' % feconf.COLLECTION_UNPUBLISH_PREFIX,
         collection_editor.CollectionUnpublishHandler),
 
+    get_redirect_route(
+        r'%s/batch' % feconf.QUESTION_DATA_URL,
+        question.QuestionsBatchHandler),
+
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
         r'/emaildashboarddatahandler',
@@ -481,6 +491,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
+    get_redirect_route(
+        r'/exploration_editor_logout', editor.EditorLogoutHandler),
 
     get_redirect_route(
         r'/ml/trainedclassifierhandler', classifier.TrainedClassifierHandler),

@@ -29,6 +29,7 @@ describe('Interaction validator', function() {
 
   var currentState, otherState, goodOutcomeDest, goodOutcomeFeedback;
   var badOutcome, goodAnswerGroups, goodDefaultOutcome;
+  var agof, oof;
 
   beforeEach(function() {
     module('oppia');
@@ -40,21 +41,40 @@ describe('Interaction validator', function() {
     bivs = $injector.get('baseInteractionValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     agof = $injector.get('AnswerGroupObjectFactory');
+    oof = $injector.get('OutcomeObjectFactory');
 
     currentState = 'First State';
     otherState = 'Second State';
-    goodOutcomeDest = {
+    goodOutcomeDest = oof.createFromBackendDict({
       dest: otherState,
-      feedback: []
-    };
-    goodOutcomeFeedback = {
+      feedback: {
+        html: '',
+        audio_translations: {}
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null
+    });
+    goodOutcomeFeedback = oof.createFromBackendDict({
       dest: currentState,
-      feedback: ['Feedback']
-    };
-    badOutcome = {
+      feedback: {
+        html: 'Feedback',
+        audio_translations: {}
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null
+    });
+    badOutcome = oof.createFromBackendDict({
       dest: currentState,
-      feedback: []
-    };
+      feedback: {
+        html: '',
+        audio_translations: {}
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null
+    });
 
     goodAnswerGroups = [
       agof.createNew([], goodOutcomeDest, false),

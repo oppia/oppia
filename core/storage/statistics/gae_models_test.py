@@ -16,11 +16,13 @@
 
 """Tests for Oppia statistics models."""
 
+from core.domain import exp_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
 
 (stat_models,) = models.Registry.import_models([models.NAMES.statistics])
+
 
 class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the AnswerSubmittedEventLogEntryModel class."""
@@ -40,6 +42,7 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
         self.assertEqual(event_model.is_feedback_useful, True)
 
+
 class ExplorationActualStartEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
     """Test the ExplorationActualStartEventLogEntryModel class."""
@@ -57,6 +60,7 @@ class ExplorationActualStartEventLogEntryModelUnitTests(
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
 
+
 class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the SolutionHitEventLogEntryModel class."""
 
@@ -73,6 +77,7 @@ class SolutionHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
+
 
 class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StateHitEventLogEntryModel class."""
@@ -92,6 +97,7 @@ class StateHitEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
 
+
 class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StateCompleteEventLogEntryModel class."""
 
@@ -108,6 +114,31 @@ class StateCompleteEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.state_name, 'state_name1')
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
+
+
+class LeaveForRefresherExplorationEventLogEntryModelUnitTests(
+        test_utils.GenericTestBase):
+    """Test the LeaveForRefresherExplorationEventLogEntryModel class."""
+
+    def test_create_and_get_event_models(self):
+        event_id = (
+            stat_models.LeaveForRefresherExplorationEventLogEntryModel.create(
+                'exp_id1', 'exp_id2', 1, 'state_name1', 'session_id1', 0.0))
+
+        event_model = (
+            stat_models.LeaveForRefresherExplorationEventLogEntryModel.get(
+                event_id))
+
+        self.assertEqual(event_model.exp_id, 'exp_id1')
+        self.assertEqual(event_model.refresher_exp_id, 'exp_id2')
+        self.assertEqual(event_model.exp_version, 1)
+        self.assertEqual(event_model.state_name, 'state_name1')
+        self.assertEqual(event_model.session_id, 'session_id1')
+        self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
+        self.assertEqual(
+            event_model.event_schema_version,
+            feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+
 
 class CompleteExplorationEventLogEntryModelUnitTests(
         test_utils.GenericTestBase):
@@ -130,6 +161,7 @@ class CompleteExplorationEventLogEntryModelUnitTests(
         self.assertEqual(event_model.params, {})
         self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
 
+
 class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
     """Test the StartExplorationEventLogEntryModel class."""
 
@@ -148,6 +180,7 @@ class StartExplorationEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.params, {})
         self.assertEqual(event_model.play_type, feconf.PLAY_TYPE_NORMAL)
+
 
 class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
     """Test the ExplorationStatsModel class."""
@@ -170,3 +203,27 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.num_actual_starts_v2, 0)
         self.assertEqual(model.num_completions_v2, 0)
         self.assertEqual(model.state_stats_mapping, {})
+
+    def test_get_multi_stats_models(self):
+        stat_models.ExplorationStatsModel.create(
+            'exp_id1', 1, 0, 0, 0, 0, 0, 0, {})
+        stat_models.ExplorationStatsModel.create(
+            'exp_id1', 2, 0, 0, 0, 0, 0, 0, {})
+        stat_models.ExplorationStatsModel.create(
+            'exp_id2', 1, 0, 0, 0, 0, 0, 0, {})
+
+        exp_version_reference_dicts = [
+            exp_domain.ExpVersionReference('exp_id1', 1),
+            exp_domain.ExpVersionReference('exp_id1', 2),
+            exp_domain.ExpVersionReference('exp_id2', 1)]
+
+        stats_models = stat_models.ExplorationStatsModel.get_multi_stats_models(
+            exp_version_reference_dicts)
+
+        self.assertEqual(len(stats_models), 3)
+        self.assertEqual(stats_models[0].exp_id, 'exp_id1')
+        self.assertEqual(stats_models[0].exp_version, 1)
+        self.assertEqual(stats_models[1].exp_id, 'exp_id1')
+        self.assertEqual(stats_models[1].exp_version, 2)
+        self.assertEqual(stats_models[2].exp_id, 'exp_id2')
+        self.assertEqual(stats_models[2].exp_version, 1)

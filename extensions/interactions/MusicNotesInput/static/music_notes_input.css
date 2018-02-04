@@ -73,7 +73,7 @@
 }
 
 .oppia-music-input-staff {
-  background-image: url(../images/treble_clef.png);
+  background-image: url(/extensions/interactions/MusicNotesInput/static/images/treble_clef.png);
   background-repeat: no-repeat;
   background-position: 0.1% 62%;
   background-size: 8.5% 89%;
@@ -90,7 +90,7 @@
 
 .oppia-music-input-note-choices div.oppia-music-input-natural-note {
   float: left;
-  background-image: url(../images/whole_note.png);
+  background-image: url(/extensions/interactions/MusicNotesInput/static/images/whole_note.png);
   background-repeat: no-repeat;
   background-size: 71%;
   background-position: center;

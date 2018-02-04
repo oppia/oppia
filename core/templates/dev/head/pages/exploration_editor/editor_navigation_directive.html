@@ -24,8 +24,8 @@
   }
 </style>
 <ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak" style="margin-left: 20px;">
-  <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}">
-    <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
+  <li ng-class="{'active': getTabStatuses().active === 'main', 'uib-dropdown': countWarnings()}" ng-attr-uib-dropdown="<[countWarnings()]>">
+    <a href="#" uib-tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()"
        class="oppia-editor-navbar-tab-anchor protractor-test-main-tab">
       <i class="material-icons">&#xE254;</i>
     </a>
@@ -34,7 +34,7 @@
         <[countWarnings()]>
       </span>
     </div>
-    <ul class="dropdown-menu oppia-editor-warnings-box">
+    <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
       <span class="oppia-editor-warnings-header">Warnings</span>
       <li class="oppia-editor-warnings-text" ng-repeat="warning in getWarnings() track by $index">
         <hr class="oppia-editor-warnings-separator">
@@ -49,28 +49,28 @@
   </li>
 
   <li ng-if="userIsLoggedIn" id="tutorialPreviewTab" ng-class="{'active': getTabStatuses().active === 'preview'}">
-    <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
+    <a href="#" uib-tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
        class="oppia-editor-navbar-tab-anchor protractor-test-preview-tab">
       <i class="material-icons">&#xE037;</i>
     </a>
   </li>
 
   <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'settings'}">
-    <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
+    <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
        class="oppia-editor-navbar-tab-anchor protractor-test-settings-tab">
       <i class="material-icons">&#xE8B8;</i>
     </a>
   </li>
 
   <li ng-if="isLargeScreen && userIsLoggedIn" ng-class="{'active': getTabStatuses().active === 'stats'}">
-    <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
+    <a href="#" uib-tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
        class="oppia-editor-navbar-tab-anchor">
       <i class="material-icons">&#xE24B;</i>
     </a>
   </li>
 
   <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'history'}">
-    <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
+    <a href="#" uib-tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
        disabled="ExplorationRightsService.isCloned()"
        class="oppia-editor-navbar-tab-anchor protractor-test-history-tab">
       <i class="material-icons">&#xE192;</i>
@@ -78,7 +78,7 @@
   </li>
 
   <li ng-if="isLargeScreen" ng-class="{'active': getTabStatuses().active === 'feedback'}" ng-click="selectFeedbackTab()">
-    <a href="#" tooltip="Feedback" tooltip-placement="bottom"
+    <a href="#" uib-tooltip="Feedback" tooltip-placement="bottom"
        class="oppia-editor-navbar-tab-anchor protractor-test-feedback-tab">
       <i class="material-icons">&#xE87F;</i>
     </a>
@@ -90,10 +90,10 @@
   </li>
 
   <div ng-if="userIsLoggedIn" class="nav navbar-nav oppia-navbar-nav oppia-help-dropdown pull-right ng-cloak">
-    <li class="dropdown" popover-is-open="postTutorialHelpPopoverIsShown"
-        popover-placement="bottom" popover-trigger="none"
-        popover="To get help in the future, click here!">
-      <a href="#" tooltip="Help" tooltip-placement="bottom"
+    <li uib-dropdown class="uib-dropdown uib-popover" popover-is-open="popoverControlObject.postTutorialHelpPopoverIsShown"
+        popover-placement="bottom" popover-trigger="'none'"
+        uib-popover="To get help in the future, click here!">
+      <a href="#" uib-tooltip="Help" tooltip-placement="bottom"
          class="oppia-editor-navbar-tab-anchor" ng-click="showUserHelpModal()">
         <i class="material-icons">&#xE887;</i>
       </a>
@@ -101,18 +101,16 @@
   </div>
 </ul>
 <style type="text/css">
-  .oppia-help-dropdown .popover{
-    background-color: black;
+  .oppia-help-dropdown .uib-popover{
     color: white;
     font-size: 14px;
     max-width: 200px;
     text-align: center;
-    z-index: -1;
   }
-  .oppia-help-dropdown .popover.bottom > .arrow{
+  .oppia-help-dropdown .uib-popover.bottom > .arrow{
     border-bottom-color: #000;
   }
-  .oppia-help-dropdown .popover.bottom > .arrow:after {
+  .oppia-help-dropdown .uib-popover.bottom > .arrow:after {
     border-bottom-color: #000;
   }
 </style>

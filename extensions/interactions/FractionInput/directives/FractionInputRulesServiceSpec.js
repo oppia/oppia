@@ -25,23 +25,23 @@ describe('Fraction Input rules service', function() {
   }));
 
   var createNegativeFractionDict = function(
-    wholeNumber, numerator, denominator) {
+      wholeNumber, numerator, denominator) {
     return {
       isNegative: true,
       wholeNumber: wholeNumber,
       numerator: numerator,
       denominator: denominator
-    }
+    };
   };
 
   var createPositiveFractionDict = function(
-    wholeNumber, numerator, denominator) {
+      wholeNumber, numerator, denominator) {
     return {
       isNegative: false,
       wholeNumber: wholeNumber,
       numerator: numerator,
       denominator: denominator
-    }
+    };
   };
 
   var RULE_INPUT = {
@@ -55,6 +55,15 @@ describe('Fraction Input rules service', function() {
 
   var INTEGER_RULE_INPUT = {
     x: 20
+  };
+
+  var FRACTIONAL_RULE_INPUT = {
+    f: {
+      isNegative: false,
+      wholeNumber: 0,
+      numerator: 2,
+      denominator: 4
+    }
   };
 
   it('should have a correct \'equivalence\' rule', function() {
@@ -127,6 +136,9 @@ describe('Fraction Input rules service', function() {
     expect(firs.HasIntegerPartEqualTo(
       createPositiveFractionDict(2, 0, 2), INTEGER_RULE_INPUT)).toBe(
       false);
+    expect(firs.HasIntegerPartEqualTo(
+      createNegativeFractionDict(20, 0, 2), INTEGER_RULE_INPUT)).toBe(
+      false);
   });
 
   it('should have a correct \'has numerator equal to\' rule', function() {
@@ -160,5 +172,16 @@ describe('Fraction Input rules service', function() {
       createPositiveFractionDict(1, 0, 1))).toBe(true);
     expect(firs.HasNoFractionalPart(
       createPositiveFractionDict(1, 8, 4))).toBe(false);
+  });
+
+  it('should check if \'fractional part is exactly equal\' rule', function() {
+    expect(firs.HasFractionalPartExactlyEqualTo(
+      createPositiveFractionDict(1, 1, 2), FRACTIONAL_RULE_INPUT)).toBe(false);
+    expect(firs.HasFractionalPartExactlyEqualTo(
+      createPositiveFractionDict(1, 2, 4), FRACTIONAL_RULE_INPUT)).toBe(true);
+    expect(firs.HasFractionalPartExactlyEqualTo(
+      createPositiveFractionDict(1, 5, 6), FRACTIONAL_RULE_INPUT)).toBe(false);
+    expect(firs.HasFractionalPartExactlyEqualTo(
+      createPositiveFractionDict(6, 2, 4), FRACTIONAL_RULE_INPUT)).toBe(true);
   });
 });

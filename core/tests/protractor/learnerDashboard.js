@@ -23,20 +23,28 @@ var collectionEditor = require('../protractor_utils/collectionEditor.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 var LearnerDashboardPage =
   require('../protractor_utils/LearnerDashboardPage.js');
+var SubscriptionDashboardPage =
+  require('../protractor_utils/SubscriptionDashboardPage.js');
 
 describe('Learner dashboard functionality', function() {
   var creatorDashboardPage = null;
   var adminPage = null;
   var libraryPage = null;
   var learnerDashboardPage = null;
+  var explorationPlayerPage = null;
+  var subscriptionDashboardPage = null;
 
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    subscriptionDashboardPage = (
+      new SubscriptionDashboardPage.SubscriptionDashboardPage());
   });
 
   beforeAll(function() {
@@ -80,7 +88,7 @@ describe('Learner dashboard functionality', function() {
     // Play an exploration and leave it in between. It should be added to the
     // 'In Progress' section.
     general.openPlayer('3');
-    player.submitAnswer('Continue', null);
+    explorationPlayerPage.submitAnswer('Continue', null);
     browser.ignoreSynchronization = true;
     learnerDashboardPage.get();
     general.acceptAlert();
@@ -91,10 +99,10 @@ describe('Learner dashboard functionality', function() {
     // Play an exploration completely. It should be added to the 'Completed'
     // section.
     general.openPlayer('14');
-    player.submitAnswer('Continue', null);
-    player.submitAnswer(
+    explorationPlayerPage.submitAnswer('Continue', null);
+    explorationPlayerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
-    player.submitAnswer('Continue', null);
+    explorationPlayerPage.submitAnswer('Continue', null);
     learnerDashboardPage.get();
     browser.waitForAngular();
     learnerDashboardPage.navigateToCompletedSection();
@@ -127,10 +135,10 @@ describe('Learner dashboard functionality', function() {
       '.protractor-test-collection-summary-tile-title')).first().click();
     // Go to the first and only exploration.
     element.all(by.css(
-      '.protractor-test-collection-node')).first().click();
+      '.protractor-test-collection-exploration')).first().click();
     // Leave the exploration inbetween. The collection should be found in the
     // 'In Progress' section.
-    player.submitAnswer('Continue', null);
+    explorationPlayerPage.submitAnswer('Continue', null);
     browser.ignoreSynchronization = true;
     learnerDashboardPage.get();
     general.acceptAlert();
@@ -149,13 +157,13 @@ describe('Learner dashboard functionality', function() {
     general.waitForSystem();
     // Go to the first and only exploration.
     element.all(by.css(
-      '.protractor-test-collection-node')).first().click();
+      '.protractor-test-collection-exploration')).first().click();
     // Complete the exploration. The collection should be found in the
     // 'Completed' section as the collection is also completed.
-    player.submitAnswer('Continue', null);
-    player.submitAnswer(
+    explorationPlayerPage.submitAnswer('Continue', null);
+    explorationPlayerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
-    player.submitAnswer('Continue', null);
+    explorationPlayerPage.submitAnswer('Continue', null);
     learnerDashboardPage.get();
     browser.waitForAngular();
     general.waitForSystem();
@@ -200,10 +208,10 @@ describe('Learner dashboard functionality', function() {
     // Subscribe to both the creators.
     browser.get('/profile/creator1learnerDashboard');
     browser.waitForAngular();
-    element(by.css('.protractor-test-subscription-button')).click();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
     browser.get('/profile/creator2learnerDashboard');
     browser.waitForAngular();
-    element(by.css('.protractor-test-subscription-button')).click();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
 
     // Both creators should be present in the subscriptions section of the
     // dashboard.
@@ -222,11 +230,11 @@ describe('Learner dashboard functionality', function() {
 
     libraryPage.get();
     general.openPlayer('14');
-    player.submitAnswer('Continue', null);
-    player.submitAnswer(
+    explorationPlayerPage.submitAnswer('Continue', null);
+    explorationPlayerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
-    player.submitAnswer('Continue', null);
-    player.submitFeedback(feedback);
+    explorationPlayerPage.submitAnswer('Continue', null);
+    explorationPlayerPage.submitFeedback(feedback);
     learnerDashboardPage.get();
     browser.waitForAngular();
     learnerDashboardPage.navigateToFeedbackSection();

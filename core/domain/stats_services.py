@@ -30,6 +30,7 @@ transaction_services = models.Registry.import_transaction_services()
 # Counts contributions from all versions.
 VERSION_ALL = 'all'
 
+
 def get_exploration_stats(exp_id, exp_version):
     """Retrieves the ExplorationStats domain instance.
 
@@ -47,6 +48,7 @@ def get_exploration_stats(exp_id, exp_version):
             exp_id, exp_version, {})
 
     return exploration_stats
+
 
 def update_stats(exp_id, exp_version, aggregated_stats):
     """Updates ExplorationStatsModel according to the dict containing aggregated
@@ -295,6 +297,27 @@ def save_stats_model_transactional(exploration_stats):
         _save_stats_model, exploration_stats)
 
 
+def get_exploration_stats_multi(exp_version_references):
+    """Retrieves the exploration stats for the given explorations.
+
+    Args:
+        exp_version_references: list(ExpVersionReference). List of exploration
+            version reference domain objects.
+
+    Returns:
+        list(ExplorationStats). The list of exploration stats domain objects.
+    """
+    exploration_stats_models = (
+        stats_models.ExplorationStatsModel.get_multi_stats_models(
+            exp_version_references))
+
+    exploration_stats_list = [
+        get_exploration_stats_from_model(exploration_stats_model)
+        for exploration_stats_model in exploration_stats_models]
+
+    return exploration_stats_list
+
+
 def get_visualizations_info(exp_id, state_name, interaction_id):
     """Returns a list of visualization info. Each item in the list is a dict
     with keys 'data' and 'options'.
@@ -348,6 +371,7 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
         'id': visualization.id,
         'data': calculation_ids_to_outputs[visualization.calculation_id],
         'options': visualization.options,
+        'show_addressed_info': visualization.show_addressed_info,
     } for visualization in visualizations
             if visualization.calculation_id in calculation_ids_to_outputs]
 

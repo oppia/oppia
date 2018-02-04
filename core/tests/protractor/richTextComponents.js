@@ -21,9 +21,16 @@ var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 
 describe('rich-text components', function() {
+  var explorationPlayerPage = null;
+
+  beforeEach(function() {
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
+
   it('should display correctly', function() {
     users.createUser('user@richTextComponents.com', 'userRichTextComponents');
     users.login('user@richTextComponents.com');
@@ -52,7 +59,7 @@ describe('rich-text components', function() {
 
     editor.navigateToPreviewTab();
 
-    player.expectContentToMatch(function(richTextChecker) {
+    explorationPlayerPage.expectContentToMatch(function(richTextChecker) {
       richTextChecker.readBoldText('bold');
       richTextChecker.readPlainText(' ');
       richTextChecker.readRteComponent('Link', 'http://google.com/', true);
@@ -87,6 +94,8 @@ describe('rich-text components', function() {
       // TODO (@pranavsid98) This error is caused by the upgrade from Chrome 60
       // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
       'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
+      'Error parsing header X-XSS-Protection: 1; mode=block; ' +
+      'report=https:\/\/www.google.com\/appserve\/security-bugs\/log\/youtube:',
     ]);
   });
 });

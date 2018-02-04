@@ -31,7 +31,7 @@ import subprocess
 import sys
 import urllib
 
-import common # pylint: disable=relative-import
+import common  # pylint: disable=relative-import
 
 
 def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
@@ -39,6 +39,7 @@ def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
         raise argparse.ArgumentTypeError(
             'The format of "new_version" should be: x.x.x')
     return arg
+
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(

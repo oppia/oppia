@@ -17,6 +17,7 @@ describe('LogicProofValidationService', function() {
 
   var currentState;
   var badOutcome, goodAnswerGroups, goodDefaultOutcome;
+  var oof, agof;
 
   beforeEach(function() {
     module('oppia');
@@ -26,23 +27,34 @@ describe('LogicProofValidationService', function() {
     validatorService = $injector.get('LogicProofValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
+    oof = $injector.get('OutcomeObjectFactory');
+    agof = $injector.get('AnswerGroupObjectFactory');
+
     currentState = 'First State';
 
-    goodDefaultOutcome = {
+    goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
-      feedback: []
-    };
+      feedback: {
+        html: '',
+        audio_translations: {}
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null
+    });
 
-    badOutcome = {
+    badOutcome = oof.createFromBackendDict({
       dest: currentState,
-      feedback: []
-    };
+      feedback: {
+        html: '',
+        audio_translations: {}
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null
+    });
 
-    goodAnswerGroups = [{
-      rules: [],
-      outcome: goodDefaultOutcome,
-      correct: false
-    }];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false)];
   }));
 
   it('should be able to perform basic validation', function() {

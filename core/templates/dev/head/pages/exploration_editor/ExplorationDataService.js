@@ -20,14 +20,14 @@
 oppia.factory('ExplorationDataService', [
   '$http', '$log', '$window', '$q', 'AlertsService',
   'EditableExplorationBackendApiService', 'LocalStorageService',
-  'ReadOnlyExplorationBackendApiService', 'urlService',
+  'ReadOnlyExplorationBackendApiService', 'UrlService',
   function($http, $log, $window, $q, AlertsService,
-    EditableExplorationBackendApiService, LocalStorageService,
-    ReadOnlyExplorationBackendApiService, urlService) {
+      EditableExplorationBackendApiService, LocalStorageService,
+      ReadOnlyExplorationBackendApiService, UrlService) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var draftChangeListId = null;
-    var pathnameArray = urlService.getPathname().split('/');
+    var pathnameArray = UrlService.getPathname().split('/');
     for (var i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'create') {
         var explorationId = pathnameArray[i + 1];
@@ -89,10 +89,7 @@ oppia.factory('ExplorationDataService', [
       getData: function(errorCallback) {
         if (explorationData.data) {
           $log.info('Found exploration data in cache.');
-
-          var deferred = $q.defer();
-          deferred.resolve(explorationData.data);
-          return deferred.promise;
+          return $q.resolve(explorationData.data);
         } else {
           // Retrieve data from the server.
           // WARNING: Note that this is a version of the exploration with draft

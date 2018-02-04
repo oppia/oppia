@@ -52,7 +52,7 @@ describe('Solution Verification Service', function() {
   });
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
-    ess = $injector.get('explorationStatesService');
+    ess = $injector.get('ExplorationStatesService');
     siis = $injector.get('stateInteractionIdService');
     scas = $injector.get('stateCustomizationArgsService');
     idc = $injector.get('InteractionDetailsCacheService');
@@ -70,11 +70,15 @@ describe('Solution Verification Service', function() {
         interaction: {
           id: 'TextInput',
           answer_groups: [{
-            correct: false,
             outcome: {
               dest: 'End State',
-              feedback: [],
-              param_changes: []
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {x: 'abc'},
@@ -83,13 +87,18 @@ describe('Solution Verification Service', function() {
           }],
           default_outcome: {
             dest: 'First State',
-            feedback: [],
-            param_changes: []
+            feedback: {
+              html: '',
+              audio_translations: {}
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null
           },
           hints: [{
-            hint_text: 'one'
+            hint_content: 'one'
           }, {
-            hint_text: 'two'
+            hint_content: 'two'
           }]
         },
         param_changes: []
@@ -103,12 +112,23 @@ describe('Solution Verification Service', function() {
           id: 'TextInput',
           answer_groups: [{
             rule_specs: [],
-            outcome: {},
-            correct: false
+            outcome: {
+              dest: 'default',
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            }
           }],
           default_outcome: {
             dest: 'default',
-            feedback: [],
+            feedback: {
+              html: '',
+              audio_translations: {}
+            },
             param_changes: []
           },
           hints: []

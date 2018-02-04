@@ -1,0 +1,55 @@
+<div style="height: 100%;">
+  <div ng-if="!explanationEditorIsOpen"
+       style="height: 100%;"
+       ng-attr-title="<[isEditable ? 'Edit explanation' : '']>">
+    <div class="oppia-readonly-rule-tile"
+         ng-class="{'oppia-editable-section': isEditable}">
+      <div class="oppia-rule-preview oppia-transition-200">
+        <div class="oppia-click-to-start-editing"
+             ng-if="isEditable" ng-click="openExplanationEditor()">
+          <i class="material-icons oppia-editor-edit-icon pull-right"
+             title="Edit Explanation">&#xE254;
+          </i>
+        </div>
+        <strong>Explanation:</strong>
+        <span class="oppia-rte-editor" angular-html-bind="stateSolutionService.savedMemento.explanation.getHtml()"></span>
+      </div>
+    </div>
+  </div>
+
+  <div ng-if="isEditable && explanationEditorIsOpen">
+    <div class="oppia-rule-details-header">
+      <strong>Explanation:</strong>
+      <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
+      <schema-based-editor schema="EXPLANATION_FORM_SCHEMA"
+                           local-value="stateSolutionService.displayed.explanation._html">
+      </schema-based-editor>
+    </div>
+
+    <div class="oppia-rule-save-cancel-buttons">
+      <div class="pull-right">
+        <button type="button"
+                class="btn btn-default"
+                ng-click="cancelThisExplanationEdit()">
+          Cancel
+        </button>
+        <button type="button"
+                class="btn btn-success"
+                ng-disabled="!stateSolutionService.displayed.explanation.getHtml()"
+                ng-click="saveThisExplanation()">
+          Save
+        </button>
+      </div>
+
+      <div style="clear: both;"></div>
+    </div>
+  </div>
+
+  <div ng-if="stateSolutionService.savedMemento.explanation && !stateSolutionService.savedMemento.explanation.isEmpty()">
+    <audio-translations-editor component-name="<[COMPONENT_NAME_SOLUTION]>"
+                               subtitled-html="stateSolutionService.displayed.explanation"
+                               on-start-edit="onAudioTranslationsStartEditAction"
+                               on-change="onAudioTranslationsEdited">
+    </audio-translations-editor>
+  </div>
+</div>

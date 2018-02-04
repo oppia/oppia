@@ -16,7 +16,6 @@
 
 from core.platform import models
 from core.tests import test_utils
-
 import feconf
 
 (user_models, email_models) = models.Registry.import_models(

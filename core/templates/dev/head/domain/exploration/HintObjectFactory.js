@@ -17,24 +17,30 @@
  * domain objects.
  */
 
-oppia.factory('HintObjectFactory', function() {
-  var Hint = function(hintText) {
-    this.hintText = hintText;
-  };
-
-  Hint.prototype.toBackendDict = function() {
-    return {
-      hint_text: this.hintText
+oppia.factory('HintObjectFactory', [
+  'SubtitledHtmlObjectFactory',
+  function(SubtitledHtmlObjectFactory) {
+    var Hint = function(hintContent) {
+      this.hintContent = hintContent;
     };
-  };
 
-  Hint.createFromBackendDict = function(hintBackendDict) {
-    return new Hint(hintBackendDict.hint_text);
-  };
+    Hint.prototype.toBackendDict = function() {
+      return {
+        hint_content: this.hintContent.toBackendDict()
+      };
+    };
 
-  Hint.createNew = function(hintText) {
-    return new Hint(hintText);
-  };
+    Hint.createFromBackendDict = function(hintBackendDict) {
+      return new Hint(
+        SubtitledHtmlObjectFactory.createFromBackendDict(
+          hintBackendDict.hint_content));
+    };
 
-  return Hint;
-});
+    Hint.createNew = function(hintContent) {
+      return new Hint(
+        SubtitledHtmlObjectFactory.createDefault(hintContent));
+    };
+
+    return Hint;
+  }
+]);

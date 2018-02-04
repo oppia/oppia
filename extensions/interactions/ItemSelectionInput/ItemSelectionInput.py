@@ -29,6 +29,9 @@ class ItemSelectionInput(base.BaseInteraction):
     # Radio buttons get unselected when specifying a solution. This needs to be
     # fixed before solution feature can support this interaction.
     can_have_solution = False
+    # ItemSelectionInput's submit button is dynamic and is handled
+    # separately.
+    show_generic_submit_button = False
 
     _customization_arg_specs = [{
         'name': 'minAllowableSelectionCount',
@@ -75,12 +78,9 @@ class ItemSelectionInput(base.BaseInteraction):
         # Table with keyed answer counts for top N answers.
         'id': 'EnumeratedFrequencyTable',
         'options': {
-            'column_headers': [
-                'Answer (click to expand/collapse)',
-                'Count',
-                'Addressed?',
-            ],
+            'column_headers': ['Answer (click to expand/collapse)', 'Count'],
             'title': 'Top answers',
         },
         'calculation_id': 'Top10AnswerFrequencies',
+        'show_addressed_info': True,
     }]

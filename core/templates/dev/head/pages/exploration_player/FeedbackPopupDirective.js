@@ -20,7 +20,7 @@
 // follows:
 //
 // <some-html-element popover-placement="bottom"
-//                    popover-template="popover/feedback"
+//                    uib-popover-template="popover/feedback"
 //                    popover-trigger="click" state-name="<[STATE_NAME]>">
 // </some-html-element>
 //
@@ -76,13 +76,14 @@ oppia.directive('feedbackPopup', [
             var popoverChildElt = null;
             for (var i = 0; i < 10; i++) {
               elt = elt.parent();
-              if (!angular.isUndefined(elt.attr('popover-template-popup'))) {
+              if (!angular.isUndefined(
+                    elt.attr('uib-popover-template-popup'))) {
                 popoverChildElt = elt;
                 break;
               }
             }
             if (!popoverChildElt) {
-              console.log('Could not close popover element.');
+              $log.error('Could not close popover element.');
               return undefined;
             }
 
@@ -91,14 +92,14 @@ oppia.directive('feedbackPopup', [
             var childElts = popoverElt.children();
             for (var i = 0; i < childElts.length; i++) {
               var childElt = $(childElts[i]);
-              if (childElt.attr('popover-template')) {
+              if (childElt.attr('uib-popover-template')) {
                 triggerElt = childElt;
                 break;
               }
             }
 
             if (!triggerElt) {
-              console.log('Could not find popover trigger.');
+              $log.error('Could not find popover trigger.');
               return undefined;
             }
 

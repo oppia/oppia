@@ -34,20 +34,21 @@ oppia.directive('stateContentEditor', [
         '/pages/exploration_editor/editor_tab/' +
         'state_content_editor_directive.html'),
       controller: [
-        '$scope', '$modal', 'stateContentService', 'editabilityService',
-        'EditorFirstTimeEventsService', 'explorationInitStateNameService',
-        'EditorStateService',
+        '$scope', '$uibModal', 'stateContentService', 'EditabilityService',
+        'EditorFirstTimeEventsService', 'ExplorationInitStateNameService',
+        'EditorStateService', 'COMPONENT_NAME_CONTENT',
         function(
-            $scope, $modal, stateContentService, editabilityService,
-            EditorFirstTimeEventsService, explorationInitStateNameService,
-            EditorStateService) {
+            $scope, $uibModal, stateContentService, EditabilityService,
+            EditorFirstTimeEventsService, ExplorationInitStateNameService,
+            EditorStateService, COMPONENT_NAME_CONTENT) {
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
 
           $scope.stateContentService = stateContentService;
           $scope.contentEditorIsOpen = false;
-          $scope.isEditable = editabilityService.isEditable;
+          $scope.isEditable = EditabilityService.isEditable;
+          $scope.COMPONENT_NAME_CONTENT = COMPONENT_NAME_CONTENT;
 
           var saveContent = function() {
             stateContentService.saveDisplayedValue();
@@ -55,21 +56,21 @@ oppia.directive('stateContentEditor', [
           };
 
           var openMarkAllAudioAsNeedingUpdateModal = function() {
-            $modal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/forms/' +
                 'mark_all_audio_as_needing_update_modal_directive.html'),
               backdrop: true,
               resolve: {},
               controller: [
-                '$scope', '$modalInstance',
-                function($scope, $modalInstance) {
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
                   $scope.flagAll = function() {
-                    $modalInstance.close();
+                    $uibModalInstance.close();
                   };
 
                   $scope.cancel = function() {
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]
@@ -89,7 +90,7 @@ oppia.directive('stateContentEditor', [
           $scope.isCurrentStateInitialState = function() {
             return (
               EditorStateService.getActiveStateName() ===
-              explorationInitStateNameService.savedMemento);
+              ExplorationInitStateNameService.savedMemento);
           };
 
           $scope.openStateContentEditor = function() {

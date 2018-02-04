@@ -467,6 +467,22 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 5)
         self.assertEqual(exploration_stats.num_completions_v2, 2)
 
+    def test_get_exploration_stats_multi(self):
+        """Test the get_exploration_stats_multi method."""
+        stats_models.ExplorationStatsModel.create(
+            'exp_id2', 2, 10, 0, 0, 0, 0, 0, {})
+        exp_version_references = [
+            exp_domain.ExpVersionReference(self.exp_id, self.exp_version),
+            exp_domain.ExpVersionReference('exp_id2', 2)]
+
+        exp_stats_list = stats_services.get_exploration_stats_multi(
+            exp_version_references)
+        self.assertEqual(len(exp_stats_list), 2)
+        self.assertEqual(exp_stats_list[0].exp_id, self.exp_id)
+        self.assertEqual(exp_stats_list[0].exp_version, self.exp_version)
+        self.assertEqual(exp_stats_list[1].exp_id, 'exp_id2')
+        self.assertEqual(exp_stats_list[1].exp_version, 2)
+
 
 class ModifiedStatisticsAggregator(stats_jobs_continuous.StatisticsAggregator):
     """A modified StatisticsAggregator that does not start a new batch
@@ -1232,8 +1248,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             visualization = visualizations[0]
             self.assertEqual(
-                visualization['options']['column_headers'],
-                ['Answer', 'Count', 'Addressed?'])
+                visualization['options']['column_headers'], ['Answer', 'Count'])
             self.assertIn('Top', visualization['options']['title'])
 
     def test_has_vis_info_for_exp_with_answer_for_one_calculation(self):
@@ -1295,7 +1310,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self.assertEqual(top_answers_visualization['id'], 'FrequencyTable')
             self.assertEqual(
                 top_answers_visualization['options']['column_headers'],
-                ['Answer', 'Count', 'Addressed?'])
+                ['Answer', 'Count'])
             self.assertEqual(top_answers_visualization['data'], [{
                 'answer': ['A', 'B'],
                 'frequency': 3
@@ -1312,7 +1327,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
                 common_elements_visualization['id'], 'FrequencyTable')
             self.assertEqual(
                 common_elements_visualization['options']['column_headers'],
-                ['Element', 'Count', 'Addressed?'])
+                ['Element', 'Count'])
 
             common_visualization_data = (
                 common_elements_visualization['data'])

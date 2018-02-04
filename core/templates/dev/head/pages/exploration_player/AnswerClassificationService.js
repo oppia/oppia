@@ -20,10 +20,10 @@
 
 // NOTE TO DEVELOPERS: These constants must be the same (in name and value) as
 // the corresponding classification constants defined in core.domain.exp_domain.
-oppia.constant('EXPLICIT_CLASSIFICATION', 'explicit')
-oppia.constant('TRAINING_DATA_CLASSIFICATION', 'training_data_match')
-oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier')
-oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
+oppia.constant('EXPLICIT_CLASSIFICATION', 'explicit');
+oppia.constant('TRAINING_DATA_CLASSIFICATION', 'training_data_match');
+oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier');
+oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome');
 
 oppia.factory('AnswerClassificationService', [
   '$http', 'LearnerParamsService', 'AlertsService',
@@ -105,8 +105,6 @@ oppia.factory('AnswerClassificationService', [
        * @param {object} oldState - The state where the user submitted the
        *   answer.
        * @param {*} answer - The answer that the user has submitted.
-       * @param {boolean} isInEditorMode - Whether the function is being called
-       *   in editor mode.
        * @param {function} interactionRulesService - The service which contains
        *   the explicit rules of that interaction.
        *
@@ -114,8 +112,7 @@ oppia.factory('AnswerClassificationService', [
        *   AnswerClassificationResult domain object.
        */
       getMatchingClassificationResult: function(
-          explorationId, stateName, oldState, answer, isInEditorMode,
-          interactionRulesService) {
+          explorationId, stateName, oldState, answer, interactionRulesService) {
         var answerClassificationResult = null;
 
         var answerGroups = oldState.interaction.answerGroups;
@@ -162,6 +159,15 @@ oppia.factory('AnswerClassificationService', [
         }
 
         return answerClassificationResult;
+      },
+      isClassifiedExplicitlyOrGoesToNewState: function(
+          explorationId, stateName, state, answer, interactionRulesService) {
+        var result = this.getMatchingClassificationResult(
+          explorationId, stateName, state, answer, interactionRulesService);
+        return (
+          result.outcome.dest !== state.name ||
+          result.classificationCategorization !==
+            DEFAULT_OUTCOME_CLASSIFICATION);
       }
     };
   }

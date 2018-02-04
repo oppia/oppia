@@ -27,7 +27,6 @@ describe('Testing filters', function() {
     'replaceInputsWithEllipses',
     'truncateAtFirstEllipsis',
     'wrapTextWithEllipsis',
-    'isOutcomeConfusing',
     'parameterizeRuleDescription',
     'normalizeWhitespace',
     'convertToPlainText',
@@ -336,6 +335,41 @@ describe('Testing filters', function() {
       'white-space: normal; widows: 2; word-spacing: 0px; ' +
       '-webkit-text-stroke-width: 0px;">' +
       'MVP Ben Zobrist pictured</i>');
+      var PARAGRAPH_TEXT = ('<p style="box-sizing: border-box; margin: 18px ' +
+      '0px; line-height: 1.5; text-align: left; word-spacing: 0px; color: ' +
+      'rgb(85, 85, 85); font-family: Roboto, Arial, sans-serif; font-size: ' +
+      '16px; font-style: normal; font-variant-ligatures: normal; font-variant' +
+      '-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; ' +
+      'text-indent: 0px; text-transform: none; white-space: normal; widows: ' +
+      '2; -webkit-text-stroke-width: 0px; background-color: rgb(255, 255, ' +
+      '255); text-decoration-style: initial; text-decoration-color: initial;' +
+      '">Oppia makes it easy to create interactive lessons.</p>');
+      var BREAKLINE_TEXT = ('<p style="box-sizing: border-box; margin: 0px ' +
+      '0px 18px; line-height: 1.5; text-align: left; word-spacing: 0px; ' +
+      'color: rgb(85, 85, 85); font-family: Roboto, Arial, sans-serif; ' +
+      'font-size: 16px; font-style: normal; font-variant-ligatures: normal; ' +
+      'font-variant-caps: normal; font-weight: 400; letter-spacing: normal; ' +
+      'orphans: 2; text-indent: 0px; text-transform: none; white-space: ' +
+      'normal; widows: 2; -webkit-text-stroke-width: 0px; background-color: ' +
+      'rgb(255, 255, 255); text-decoration-style: initial; text-decoration-' +
+      'color: initial;">Oppia makes it easy to create interactive lessons ' +
+      '</p><p style="box-sizing: border-box; margin: 18px 0px; line-height: ' +
+      '1.5; text-align: left; word-spacing: 0px; color: rgb(85, 85, 85); font' +
+      '-family: Roboto, Arial, sans-serif; font-size: 16px; font-style: norma' +
+      'l; font-variant-ligatures: normal; font-variant-caps: normal; font-wei' +
+      'ght: 400; letter-spacing: normal; orphans: 2; text-indent: 0px; text-t' +
+      'ransform: none; white-space: normal; widows: 2; -webkit-text-stroke-wi' +
+      'dth: 0px; background-color: rgb(255, 255, 255); text-decoration-style' +
+      ': initial; text-decoration-color: initial;"><br style="box-sizing: bor' +
+      'der-box;"></p><p style="box-sizing: border-box; margin: 18px 0px 0px; ' +
+      'line-height: 1.5; text-align: left; word-spacing: 0px; color: rgb(85, ' +
+      '85, 85); font-family: Roboto, Arial, sans-serif; font-size: 16px; font' +
+      '-style: normal; font-variant-ligatures: normal; font-variant-caps: nor' +
+      'mal; font-weight: 400; letter-spacing: normal; orphans: 2; text-indent' +
+      ': 0px; text-transform: none; white-space: normal; widows: 2; -webkit-' +
+      'text-stroke-width: 0px; background-color: rgb(255, 255, 255); text-dec' +
+      'oration-style: initial; text-decoration-color: initial;">that educate ' +
+      'and engage.</p>');
       var whitelistedImgClasses = [
         'oppia-noninteractive-collapsible',
         'oppia-noninteractive-image',
@@ -390,6 +424,13 @@ describe('Testing filters', function() {
       expect(
         $filter('stripFormatting')(ITALIC_TEXT, whitelistedImgClasses)
       ).toEqual('<i>MVP Ben Zobrist pictured</i>');
+      expect(
+        $filter('stripFormatting')(PARAGRAPH_TEXT, whitelistedImgClasses)
+      ).toEqual('<p>Oppia makes it easy to create interactive lessons.</p>');
+      expect(
+        $filter('stripFormatting')(BREAKLINE_TEXT, whitelistedImgClasses)
+      ).toEqual('<p>Oppia makes it easy to create interactive lessons </p>' +
+      '<p><br></p><p>that educate and engage.</p>');
     }
   ));
 
@@ -411,4 +452,109 @@ describe('Testing filters', function() {
     expect(filter('  only First lettEr is  Affected ')).toEqual(
       'Only First lettEr is  Affected');
   }));
+
+  it('should get correct list of RTE components from HTML input',
+    inject(function($filter) {
+      var filter = $filter('formatRtePreview');
+      expect(
+        filter('<p>Text input</p>')
+      ).toEqual('Text input');
+      expect(
+        filter('<p><oppia-noninteractive-math attr1=value1></oppia-' +
+        'noninteractive-math>Text input</p>')
+      ).toEqual('[Math] Text input');
+      expect(
+        filter('<p><oppia-noninteractive-math></oppia-noninteractive-math>' +
+        'Text input<oppia-noninteractive-collapsible></oppia-noninteractive' +
+        '-collapsible>Text input 2</p>')
+      ).toEqual('[Math] Text input [Collapsible] Text input 2');
+      expect(
+        filter('<p><oppia-noninteractive-math></oppia-noninteractive-math>' +
+        'Text&nbsp;input<sample_tag><oppia-noninteractive-collapsible>' +
+        '</oppia-noninteractive-collapsible><a><sample_tag>Text input 2' +
+        '</sample_tag></a></p>')
+      ).toEqual('[Math] Text input [Collapsible] Text input 2');
+      expect(
+        filter('<oppia-noninteractive-math></oppia-noninteractive-math>' +
+        'Text input<oppia-noninteractive-collapsible></oppia-noninteractive' +
+        '-collapsible>Text input 2<oppia-noninteractive-image>' +
+        '</oppia-noninteractive-image> Text Input 3 ')
+      ).toEqual('[Math] Text input [Collapsible] Text input 2 [Image]  ' +
+      'Text Input 3');
+    }));
+
+  it('should correctly display RTE components in Answer Group Header',
+    inject(function($filter) {
+      var ruleMath = {
+        type: 'Equals',
+        inputs: {
+          x: 2
+        }
+      };
+      var interactionIdMath = 'TextInput';
+      var choicesMath = [
+        {
+          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+            'x^3 - a x^2 - b x - c&amp;quot;"></oppia-noninteractive-math>',
+          val: 0
+        }, {
+          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+            'x^3 + (a+b+c)x^2 + (ab+bc+ca)x + abc&amp;quot;">' +
+            '</oppia-noninteractive-math>',
+          val: 1
+        }, {
+          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+            'x^3 - (a+b+c)x^2 + (ab+bc+ca)x - abc&amp;quot;">' +
+            '</oppia-noninteractive-math>',
+          val: 2
+        }, {
+          label: '<oppia-noninteractive-math raw_latex-with-value="&amp;quot;' +
+            'x^3 + (a+b+c)x^2 - (ab+bc+ca)x + abc&amp;quot;">' +
+            '</oppia-noninteractive-math>',
+          val: 3
+        },
+      ];
+
+      var ruleMixed = {
+        type: 'Equals',
+        inputs: {
+          x: 0
+        }
+      };
+      var interactionIdMixed = 'TextInput';
+      var choicesMixed = [
+        {
+          label: '<p><oppia-noninteractive-image alt-with-value="&amp;' +
+            'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+            'filepath-with-value="&amp;quot;img_20180112_170413_5jxq15ngmd' +
+            '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
+            'input.</p><p><oppia-noninteractive-image alt-with-value="&amp;' +
+            'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
+            'filepath-with-value="&amp;quot;img_20180112_170436_k7sz3xtvyy.' +
+            'png&amp;quot;"></oppia-noninteractive-image></p><p><oppia-' +
+            'noninteractive-link text-with-value="&amp;quot;&amp;quot;"' +
+            'url-with-value="&amp;quot;https://www.example.com&amp;quot;">' +
+            '</oppia-noninteractive-link><br><br></p>',
+          val: 0
+        }, {
+          label: '<p><oppia-noninteractive-image alt-with-value="&amp;quot;' +
+            'g&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" filepath-' +
+            'with-value="&amp;quot;img_20180112_170500_926cssn398.png&amp;' +
+            'quot;"></oppia-noninteractive-image><br></p>',
+          val: 1
+        }
+      ];
+
+      expect($filter('convertToPlainText')($filter('formatRtePreview')(
+        $filter('parameterizeRuleDescription')(ruleMath, interactionIdMath,
+          choicesMath)))
+      ).toEqual('is ' + 'equal to \'[Math]\'');
+
+      expect($filter('convertToPlainText')($filter('formatRtePreview')(
+        $filter('parameterizeRuleDescription')(ruleMixed, interactionIdMixed,
+        choicesMixed)))
+      ).toEqual('is ' + 'equal to \'[Image] This is a text ' +
+        'input. [Image]  [Link]\'');
+    }
+  ));
 });

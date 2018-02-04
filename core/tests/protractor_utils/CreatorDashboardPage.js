@@ -25,6 +25,13 @@ var CreatorDashboardPage = function() {
     element(by.css('.protractor-test-exploration-dashboard-card'));
   var collectionCard = element(by.css('.protractor-test-collection-card'));
   var subscriptionTab = element(by.css('.protractor-test-subscription-tab'));
+  var createActivityButton =
+    element(by.css('.protractor-test-create-activity'));
+  var createCollectionButton =
+    element(by.css('.protractor-test-create-collection'));
+  var createExplorationButton =
+    element(by.css('.protractor-test-create-exploration'));
+
 
   this.get = function() {
     return browser.get(CREATOR_DASHBOARD_URL);
@@ -38,6 +45,18 @@ var CreatorDashboardPage = function() {
 
   this.navigateToExplorationEditor = function() {
     explorationDashboardCard.click();
+  };
+
+  this.clickCreateActivityButton = function() {
+    createActivityButton.click();
+  };
+
+  this.clickCreateCollectionButton = function() {
+    createCollectionButton.click();
+  };
+
+  this.clickCreateExplorationButton = function() {
+    createExplorationButton.click();
   };
 
   this.navigateToCollectionEditor = function() {

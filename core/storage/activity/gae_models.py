@@ -20,7 +20,6 @@ import core.storage.base_model.gae_models as base_models
 
 from google.appengine.ext import ndb
 
-
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
 ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'

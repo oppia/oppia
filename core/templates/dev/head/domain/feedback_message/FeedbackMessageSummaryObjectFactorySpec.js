@@ -56,6 +56,6 @@ describe('Feedback message object factory', function() {
     expect(feedbackMessageSummary.text).toEqual('Sample text');
     expect(feedbackMessageSummary.authorUsername).toEqual('User 1');
     expect(feedbackMessageSummary.authorPictureDataUrl).toEqual(
-      'sample_picture_url_1')
+      'sample_picture_url_1');
   });
 });

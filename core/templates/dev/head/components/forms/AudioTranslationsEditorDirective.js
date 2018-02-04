@@ -21,6 +21,7 @@ oppia.directive('audioTranslationsEditor', [
     return {
       restrict: 'E',
       scope: {
+        componentName: '@',
         subtitledHtml: '=',
         // A function that must be called at the outset of every attempt to
         // edit, even if the action is not subsequently taken through to
@@ -33,16 +34,26 @@ oppia.directive('audioTranslationsEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/audio_translations_editor_directive.html'),
       controller: [
-        '$scope', '$modal', '$sce', 'stateContentService', 'editabilityService',
-        'LanguageUtilService', 'AlertsService', 'ExplorationContextService',
-        'AssetsBackendApiService',
+        '$scope', '$uibModal', '$sce', 'stateContentService',
+        'EditabilityService', 'LanguageUtilService', 'AlertsService',
+        'ExplorationContextService', 'AssetsBackendApiService',
         function(
-            $scope, $modal, $sce, stateContentService, editabilityService,
+            $scope, $uibModal, $sce, stateContentService, EditabilityService,
             LanguageUtilService, AlertsService, ExplorationContextService,
             AssetsBackendApiService) {
-          $scope.isEditable = editabilityService.isEditable;
-          $scope.audioTranslations = (
-            $scope.subtitledHtml.getBindableAudioTranslations());
+          $scope.isEditable = EditabilityService.isEditable;
+
+          // The following if-condition is present because, sometimes,
+          // Travis-CI throws an error of the form "Cannot read property
+          // getBindableAudioTranslations of undefined". It looks like there is
+          // a race condition that is causing this directive to get
+          // initialized when it shouldn't. This is hard to reproduce
+          // deterministically, hence this guard.
+          if ($scope.subtitledHtml) {
+            $scope.audioTranslations = (
+              $scope.subtitledHtml.getBindableAudioTranslations());
+          }
+
           var explorationId = ExplorationContextService.getExplorationId();
 
           $scope.getAudioLanguageDescription = (
@@ -73,7 +84,7 @@ oppia.directive('audioTranslationsEditor', [
             }
 
             $scope.getOnStartEditFn()();
-            $modal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/forms/' +
                 'add_audio_translation_modal_directive.html'),
@@ -81,16 +92,21 @@ oppia.directive('audioTranslationsEditor', [
               resolve: {
                 allowedAudioLanguageCodes: function() {
                   return allowedAudioLanguageCodes;
+                },
+                componentName: function() {
+                  return $scope.componentName;
                 }
               },
               controller: [
-                '$scope', '$modalInstance', 'LanguageUtilService',
+                '$scope', '$uibModalInstance', 'LanguageUtilService',
                 'allowedAudioLanguageCodes', 'AlertsService',
                 'ExplorationContextService', 'IdGenerationService',
+                'componentName',
                 function(
-                    $scope, $modalInstance, LanguageUtilService,
+                    $scope, $uibModalInstance, LanguageUtilService,
                     allowedAudioLanguageCodes, AlertsService,
-                    ExplorationContextService, IdGenerationService) {
+                    ExplorationContextService, IdGenerationService,
+                    componentName) {
                   var ERROR_MESSAGE_BAD_FILE_UPLOAD = (
                     'There was an error uploading the audio file.');
                   var BUTTON_TEXT_SAVE = 'Save';
@@ -134,9 +150,9 @@ oppia.directive('audioTranslationsEditor', [
                   };
 
                   var generateNewFilename = function() {
-                    return (
-                      'content-' + $scope.languageCode + '-' +
-                      IdGenerationService.generateNewId() + '.mp3');
+                    return componentName + '-' +
+                      $scope.languageCode + '-' +
+                      IdGenerationService.generateNewId() + '.mp3';
                   };
 
                   $scope.save = function() {
@@ -149,7 +165,7 @@ oppia.directive('audioTranslationsEditor', [
                       AssetsBackendApiService.saveAudio(
                         explorationId, generatedFilename, uploadedFile
                       ).then(function() {
-                        $modalInstance.close({
+                        $uibModalInstance.close({
                           languageCode: $scope.languageCode,
                           filename: generatedFilename,
                           fileSizeBytes: uploadedFile.size
@@ -165,7 +181,7 @@ oppia.directive('audioTranslationsEditor', [
                   };
 
                   $scope.cancel = function() {
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                     AlertsService.clearWarnings();
                   };
                 }
@@ -180,7 +196,7 @@ oppia.directive('audioTranslationsEditor', [
           $scope.openDeleteAudioTranslationModal = function(languageCode) {
             $scope.getOnStartEditFn()();
 
-            $modal.open({
+            $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/forms/' +
                 'delete_audio_translation_modal_directive.html'),
@@ -191,21 +207,21 @@ oppia.directive('audioTranslationsEditor', [
                 }
               },
               controller: [
-                '$scope', '$modalInstance', 'LanguageUtilService',
+                '$scope', '$uibModalInstance', 'LanguageUtilService',
                 'languageCode',
                 function(
-                    $scope, $modalInstance, LanguageUtilService,
+                    $scope, $uibModalInstance, LanguageUtilService,
                     languageCode) {
                   $scope.languageDescription = (
                     LanguageUtilService.getAudioLanguageDescription(
                       languageCode));
 
                   $scope.reallyDelete = function() {
-                    $modalInstance.close();
+                    $uibModalInstance.close();
                   };
 
                   $scope.cancel = function() {
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                     AlertsService.clearWarnings();
                   };
                 }

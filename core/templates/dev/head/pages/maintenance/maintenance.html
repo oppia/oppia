@@ -10,6 +10,7 @@
       var GLOBALS = {
         ADDITIONAL_ANGULAR_MODULES: [],
         ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
+        DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}')
       };
     </script>
     {% include 'pages/header_js_libs.html' %}
@@ -57,10 +58,16 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/IdGenerationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/DebouncerService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/RteHelperService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/UrlService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/ObjectEditorDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/maintenance/Maintenance.js"></script>
+
+    <!-- These three files need to be loaded here only because they are dependencies for $provide, and Angular will not load without them. -->
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/DeviceInfoService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/stateful/FocusManagerService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/TranslationFileHashLoaderService.js"></script>
   </body>
 </html>
