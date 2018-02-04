@@ -53,7 +53,7 @@ class FractionInput(base.BaseInteraction):
         'default_value': True
     }, {
         'name': 'customPlaceholder',
-        'description': 'Custom placeholder text(optional)',
+        'description': 'Custom placeholder text (optional)',
         'schema': {
             'type': 'unicode'
         },
