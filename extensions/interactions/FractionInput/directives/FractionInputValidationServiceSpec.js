@@ -51,6 +51,9 @@ describe('FractionInputValidationService', function() {
       },
       allowNonzeroIntegerPart: {
         value: true
+      },
+      customPlaceholder: {
+        value: ''
       }
     };
 
