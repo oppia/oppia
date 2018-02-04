@@ -75,6 +75,11 @@
           <div class="protractor-test-conversation-input"
                angular-html-bind="activeCard.interactionHtml">
           </div>
+          <div class="conversation-skin-tutor-card-tooltip">
+              <button class="conversation-skin-tutor-card-tooltip-button">?
+                <span class="tooltip-text">Please don't enter any personal information here. Your answer will be saved and can be read by the creator.</span>
+              </button>
+          </div>
         </div>
       </div>
     </div>
@@ -225,6 +230,36 @@
   .conversation-skin-inline-interaction .conversation-skin-user-avatar {
     left: -20px;
     top: 14px;
+  }
+
+  .conversation-skin-tutor-card-tooltip {
+    padding-top: 8px;
+    display: inline-block;
+  }
+
+  .conversation-skin-tutor-card-tooltip-button {
+    position: relative;
+    border-radius: 50%;
+    background-color: #ff0000;
+    padding-top: 4px;
+    text-align: center;
+    font-size: 12px;
+    color: #ffffff;
+    font-weight: 900;
+  }
+
+  .tooltip-text {
+    visibility: hidden;
+    position: absolute;
+    color: #ffffff;
+    width: 400px;
+    background-color: #A9A9A9;
+    border-radius: 3%;
+    padding: 2px;
+  }
+
+  .conversation-skin-tutor-card-tooltip-button:hover .tooltip-text {
+    visibility: visible;
   }
 
   /* When the size of the browser is reduced, and the answer submitted is
