@@ -116,7 +116,7 @@ oppia.directive('explorationSummaryTile', [
           };
 
           $scope.loadParentExploration = function() {
-            $window.open($scope.getExplorationLink(), '_self');
+            $window.location.href = $scope.getExplorationLink();
           };
 
           $scope.getAverageRating = function() {
