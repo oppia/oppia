@@ -289,9 +289,6 @@ def _lint_css_files(stylelint_path, files_to_lint, stdout, result):
         files_to_lint: list(str). A list of filepaths to lint.
         stdout:  multiprocessing.Queue. A queue to store Stylelint outputs.
         result: multiprocessing.Queue. A queue to put results of test.
-
-    Returns:
-        None
     """
     start_time = time.time()
     num_files_with_errors = 0
@@ -341,9 +338,6 @@ def _lint_js_files(node_path, eslint_path, files_to_lint, stdout,
         files_to_lint: list(str). A list of filepaths to lint.
         stdout:  multiprocessing.Queue. A queue to store ESLint outputs.
         result: multiprocessing.Queue. A queue to put results of test.
-
-    Returns:
-        None
     """
     start_time = time.time()
     num_files_with_errors = 0
@@ -389,9 +383,6 @@ def _lint_py_files(config_pylint, files_to_lint, result):
         config_pylint: str. Path to the .pylintrc file.
         files_to_lint: list(str). A list of filepaths to lint.
         result: multiprocessing.Queue. A queue to put results of test.
-
-    Returns:
-        None
     """
     start_time = time.time()
     are_there_errors = False
@@ -515,21 +506,22 @@ def _pre_commit_linter(all_files):
     css_linting_process.daemon = True
 
     js_result = multiprocessing.Queue()
-    linting_processes = []
     js_stdout = multiprocessing.Queue()
-    linting_processes.append(multiprocessing.Process(
+    js_linting_process = multiprocessing.Process(
         target=_lint_js_files, args=(node_path, eslint_path, js_files_to_lint,
-                                     js_stdout, js_result)))
+                                     js_stdout, js_result))
+    js_linting_process.daemon = True
 
     py_result = multiprocessing.Queue()
-    linting_processes.append(multiprocessing.Process(
+    py_linting_process = multiprocessing.Process(
         target=_lint_py_files,
-        args=(config_pylint, py_files_to_lint, py_result)))
+        args=(config_pylint, py_files_to_lint, py_result))
+    py_linting_process.daemon = True
     print 'Starting CSS, Javascript and Python Linting'
     print '----------------------------------------'
     css_linting_process.start()
-    for process in linting_processes:
-        process.start()
+    js_linting_process.start()
+    py_linting_process.start()
 
     # Since only oppia.css is being linted presently, setting timeout parameter
     # to 600 causes the script to wait. Therefore timeout parameter has
@@ -537,10 +529,10 @@ def _pre_commit_linter(all_files):
     # TODO(apb7): Increase timeout parameter when linting multiple files.
     css_linting_process.join(timeout=50)
 
-    for process in linting_processes:
-        # Require timeout parameter to prevent against endless waiting for the
-        # linting function to return.
-        process.join(timeout=600)
+    # Require timeout parameter to prevent against endless waiting for the
+    # JS and Python linting functions to return.
+    js_linting_process.join(timeout=600)
+    py_linting_process.join(timeout=600)
 
     js_messages = []
     while not js_stdout.empty():
