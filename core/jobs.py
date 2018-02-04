@@ -123,6 +123,10 @@ class BaseJobManager(object):
             job_id = job_models.JobModel.get_new_id(cls.__name__)
             job_models.JobModel(id=job_id, job_type=cls.__name__).put()
             return job_id
+<<<<<<< HEAD
+=======
+
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
         return transaction_services.run_in_transaction(_create_new_job)
 
     @classmethod
@@ -137,7 +141,11 @@ class BaseJobManager(object):
             additional_job_params: dict(str : *) or None. Additional parameters
                 for the job.
         """
+<<<<<<< HEAD
         #Ensures that predictions are met.
+=======
+        # Ensure that preconditions are met.
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
             job_id, model.status_code, STATUS_CODE_QUEUED)
@@ -166,7 +174,13 @@ class BaseJobManager(object):
         cls._require_valid_transition(
             job_id, model.status_code, STATUS_CODE_STARTED)
         cls._require_correct_job_type(model.job_type)
+<<<<<<< HEAD
         cls._pre_start_hook(job_id)
+=======
+
+        cls._pre_start_hook(job_id)
+
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
         model.metadata = metadata
         model.status_code = STATUS_CODE_STARTED
         model.time_started_msec = utils.get_current_time_in_millisecs()
@@ -192,6 +206,10 @@ class BaseJobManager(object):
         model.time_finished_msec = utils.get_current_time_in_millisecs()
         model.output = cls._compress_output_list(output_list)
         model.put()
+<<<<<<< HEAD
+=======
+
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
         cls._post_completed_hook(job_id)
 
     @classmethod
@@ -241,6 +259,10 @@ class BaseJobManager(object):
                     ('%s <TRUNCATED>' % kept_str) if kept_str else '<TRUNCATED>'
                 ]
                 break
+<<<<<<< HEAD
+=======
+
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
         return output_str_list
 
     @classmethod
@@ -277,13 +299,26 @@ class BaseJobManager(object):
         cls._require_valid_transition(
             job_id, model.status_code, STATUS_CODE_CANCELED)
         cls._require_correct_job_type(model.job_type)
+<<<<<<< HEAD
         cancel_message = 'Canceled by %s' % (user_id or 'system')
         # Cancel the job.
         cls._pre_cancel_hook(job_id, cancel_message)
+=======
+
+        cancel_message = 'Canceled by %s' % (user_id or 'system')
+
+        # Cancel the job.
+        cls._pre_cancel_hook(job_id, cancel_message)
+
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
         model.status_code = STATUS_CODE_CANCELED
         model.time_finished_msec = utils.get_current_time_in_millisecs()
         model.error = cancel_message
         model.put()
+<<<<<<< HEAD
+=======
+
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
         cls._post_cancel_hook(job_id, cancel_message)
 
     @classmethod
@@ -507,6 +542,7 @@ class BaseJobManager(object):
 
 
 class BaseDeferredJobManager(BaseJobManager):
+<<<<<<< HEAD
     """BaseDeferredJobManager takes in the object of BaseJobManager which
     ensures that there is one job of same type which is reading from or
     writing to a location. The BaseDeferredJobManager class is responsible
@@ -525,6 +561,8 @@ class BaseDeferredJobManager(BaseJobManager):
     (c)_real_enqueue() puts the job in queue
      if there is a job already running
     """
+=======
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
 
     @classmethod
     def _run(cls, additional_job_params):
@@ -588,6 +626,7 @@ class BaseDeferredJobManager(BaseJobManager):
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):
+<<<<<<< HEAD
     """This class connects all the steps needed to perform a mapreduce job.
     A mapreduce job splits the data in such a way that it is independent
     and tasks on it can be performed in a parallel fashion. The job is
@@ -602,6 +641,8 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
     (b)finalized() method has a null block. It contains pass keyword which
     indicated that nothings happens in this method.
     """
+=======
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
 
     def run(self, job_id, job_class_str, kwargs):
         """Returns a coroutine which runs the job pipeline and stores results.
@@ -634,12 +675,15 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
 
 class StoreMapReduceResults(base_handler.PipelineBase):
+<<<<<<< HEAD
     """This class has to store the results of mapreduce job and register
     whether it has been completed or failed. run() method iterates
     to see if any job has finished and it appends that job to the
     result list and registers the job as complete. If the job fails,
     failure is registered and job id is also mentioned in the logs.
     """
+=======
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
 
     def run(self, job_id, job_class_str, output):
         """Extracts the results of a MR job and registers its completion.
@@ -671,11 +715,15 @@ class StoreMapReduceResults(base_handler.PipelineBase):
 
 class GoogleCloudStorageConsistentJsonOutputWriter(
         output_writers.GoogleCloudStorageConsistentOutputWriter):
+<<<<<<< HEAD
     """This class uses Google Cloud Storage client library for storing
     data. This library controls the strongly consistent operations.
     The write method simply serializes data in JSON and then writes
     it to the Google Cloud Storage.
     """
+=======
+
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
     def write(self, data):
         """Writes that data serialized in JSON format.
 
@@ -877,10 +925,13 @@ class BaseMapReduceOneOffJobManager(BaseMapReduceJobManager):
 
 
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
+<<<<<<< HEAD
     """This class creates InputReaders and splits data
     among them equally.It also validates the readers
     by checking whether all the params are present
     or not."""
+=======
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
     _ENTITY_KINDS_PARAM = MAPPER_PARAM_KEY_ENTITY_KINDS
     _READER_LIST_PARAM = 'readers'
 
@@ -969,9 +1020,13 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
 
 
 class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
+<<<<<<< HEAD
     """This class checks whether the entity was created or not and also sees for
        how long the job has been queued.
     """
+=======
+
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
     @classmethod
     def _get_continuous_computation_class(cls):
         """Returns the ContinuousComputationManager class associated with this
