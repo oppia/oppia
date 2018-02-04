@@ -1,0 +1,547 @@
+author_notes: ''
+blurb: ''
+category: Interactive Fiction
+init_state_name: Welcome
+language_code: en
+objective: N/A
+param_changes:
+- customization_args:
+    parse_with_jinja: true
+    value: '0'
+  generator_id: Copier
+  name: numcoins
+param_specs:
+  Name:
+    obj_type: UnicodeString
+  Test:
+    obj_type: UnicodeString
+  Weapon:
+    obj_type: UnicodeString
+  numcoins:
+    obj_type: UnicodeString
+  payitem:
+    obj_type: UnicodeString
+  sneezeitem:
+    obj_type: UnicodeString
+schema_version: 17
+states:
+  Clearing:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: You are at a clearing. There are lots of pretty <b>flowers</b> here.<div>There
+        is a path leading back to the <b>southeast</b>.</div>
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: picking
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: pick
+          rule_type: Contains
+      - correct: false
+        outcome:
+          dest: picking
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: flower
+          rule_type: Contains
+      - correct: false
+        outcome:
+          dest: Fork
+          feedback:
+          - You go southeast
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: southeast
+          rule_type: Contains
+      - correct: false
+        outcome:
+          dest: Fork
+          feedback:
+          - You go southeast
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: se
+          rule_type: StartsWith
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Clearing
+        feedback:
+        - Pardon?
+        - Huh?
+        - Did you mean "pick some flowers"?
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  Fork:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: You are standing at a fork in the road. The main road goes to the <b>northeast</b>,
+        while a smaller path winds to the <b>northwest</b>.
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Troll
+          feedback:
+          - You go northeast
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: northeast
+          rule_type: Contains
+      - correct: false
+        outcome:
+          dest: Clearing
+          feedback:
+          - You go northwest
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: northwest
+          rule_type: Contains
+      - correct: false
+        outcome:
+          dest: Troll
+          feedback:
+          - You go northeast
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: ne
+          rule_type: StartsWith
+      - correct: false
+        outcome:
+          dest: Clearing
+          feedback:
+          - You go northwest
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: nw
+          rule_type: StartsWith
+      - correct: false
+        outcome:
+          dest: Fork
+          feedback:
+          - You cannot go back
+          - The gate is closed
+          - There is no way back. You must carry on!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: back
+          rule_type: Contains
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Fork
+        feedback:
+        - Pardon?
+        - Nothing happens
+        - Maybe you should pick a direction to go in. Northwest or Northeast?
+        - I'm not sure how to {{answer}}
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  Rainbow:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: <span>"Guess how many coins I'm holding!"</span><br>
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: get coins
+          feedback:
+          - Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '{{numcoins}}'
+          rule_type: Equals
+      - correct: false
+        outcome:
+          dest: Rainbow
+          feedback:
+          - Actually, I can't hold any more than 10 coins. My hands are too small.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 10.0
+          rule_type: IsGreaterThan
+      - correct: false
+        outcome:
+          dest: Rainbow
+          feedback:
+          - I do have some coins!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 1.0
+          rule_type: IsLessThan
+      - correct: false
+        outcome:
+          dest: Rainbow
+          feedback:
+          - No, fewer than that!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '{{numcoins}}'
+          rule_type: IsGreaterThan
+      - correct: false
+        outcome:
+          dest: Rainbow
+          feedback:
+          - More than that!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '{{numcoins}}'
+          rule_type: IsLessThan
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Rainbow
+        feedback:
+        - This should never happen
+        param_changes: []
+      hints: []
+      id: NumericInput
+      solution: null
+    param_changes: []
+  Road:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: '<div><div>You get: a name tag. It says "Hello, I''m {{answer}}!"</div><div>You
+        also get a pretty red <b>towel</b>.</div></div><div><br></div>You are standing
+        in a small courtyard. To the north is a gate, with a sign:<div>"This way to
+        adventure!"</div>'
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Fork
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - Go north
+      default_outcome:
+        dest: Fork
+        feedback: []
+        param_changes: []
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{answer}}'
+      generator_id: Copier
+      name: Name
+    - customization_args:
+        value: towel
+      generator_id: Copier
+      name: Weapon
+    - customization_args:
+        value: nothing
+      generator_id: Copier
+      name: sneezeitem
+    - customization_args:
+        value: nothing
+      generator_id: Copier
+      name: payitem
+  Troll:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: You come to a bridge that is being guarded by a troll. The troll says:<div><br></div><div>"Hello,
+        {{Name}}. You have to pay a toll if you want to cross this bridge."</div><div><br></div><div>There
+        is a path leading back to the <b>southwest</b>.</div>
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Fork
+          feedback:
+          - You go southwest
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: southwest
+          rule_type: Contains
+      - correct: false
+        outcome:
+          dest: Fork
+          feedback:
+          - You go southwest
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: sw
+          rule_type: StartsWith
+      - correct: false
+        outcome:
+          dest: Troll
+          feedback:
+          - You use nothing. Nothing happens.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: use nothing
+          rule_type: StartsWith
+      - correct: false
+        outcome:
+          dest: Troll
+          feedback:
+          - You do nothing. nothing happens.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: nothing
+          rule_type: Contains
+      - correct: false
+        outcome:
+          dest: Troll
+          feedback:
+          - You flail at the troll with your {{Weapon}}. He is not amused.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '{{Weapon}}'
+          rule_type: Contains
+      - correct: false
+        outcome:
+          dest: pre-rainbow
+          feedback:
+          - You flail your {{sneezeitem}} at the troll. Oh no, the troll is allergic!
+            he sneezes really loudly and you are carried away by the gust...
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '{{sneezeitem}}'
+          rule_type: Contains
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - "You give the coins to the troll. He counts them. \n\"Hmm, {{numcoins}}\
+            \ is all you've got? Oh well, go ahead.\"\n\nYou walk across the bridge\
+            \ and toward victory!"
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '{{payitem}}'
+          rule_type: Contains
+      - correct: false
+        outcome:
+          dest: Troll
+          feedback:
+          - You don't have that!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: use
+          rule_type: StartsWith
+      - correct: false
+        outcome:
+          dest: Troll
+          feedback:
+          - You flail at the troll with your bare hands. He is not amused.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: troll
+          rule_type: Contains
+      - correct: false
+        outcome:
+          dest: Troll
+          feedback:
+          - Pay toll with what?
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: toll
+          rule_type: Contains
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Troll
+        feedback:
+        - Pardon?
+        - I don't know how to {{answer}}
+        - I don't understand
+        - Have you tried using things? (type "use [item]")
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  Welcome:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: "<div>Hello, brave adventurer, and welcome!</div><div><br></div><div>On\
+        \ this adventure, keep two things in mind:</div><div><br></div><div>1) Figuring\
+        \ out what to do is half the game! That said, the possible options are usually\
+        \ displayed in <b>bold</b> within the text of the state. Go back and look\
+        \ for the latest bolded words if you get stuck.</div><div><b><br></b></div><div>2)\
+        \ There is no global text-parsing engine, so each and every input field is\
+        \ very specific to its context - <u>there are no</u> \"inventory\" or \"look\"\
+        \ or \"drink\" or any other universal commands that would be available to\
+        \ you any time an input field is provided in a \"classic\" adventure game.</div><div><br></div><div>Now\
+        \ - what is your name?\_<br></div>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Road
+        feedback: []
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  get coins:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: He gives you the <b>coins</b> and uses his magic to return you back to
+        the troll.
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value: Continue
+      default_outcome:
+        dest: Troll
+        feedback: []
+        param_changes: []
+      hints: []
+      id: Continue
+      solution: null
+    param_changes:
+    - customization_args:
+        value: coins
+      generator_id: Copier
+      name: payitem
+  picking:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: You pick a pretty bouquet of <b>flowers</b>.
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value: Continue
+      default_outcome:
+        dest: Clearing
+        feedback: []
+        param_changes: []
+      hints: []
+      id: Continue
+      solution: null
+    param_changes:
+    - customization_args:
+        value: flowers
+      generator_id: Copier
+      name: sneezeitem
+  pre-rainbow:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: You find yourself at the end of a rainbow. There's a leprechaun here.<div>He
+        says:<br><div>"Hello, {{Name}}! How are you?"</div></div>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Rainbow
+        feedback: []
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes:
+    - customization_args:
+        list_of_values:
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        - '5'
+        - '6'
+        - '7'
+        - '8'
+        - '9'
+        - '10'
+      generator_id: RandomSelector
+      name: numcoins
+states_schema_version: 13
+tags: []
+title: Parameterized Adventure

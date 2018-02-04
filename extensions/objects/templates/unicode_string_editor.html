@@ -1,0 +1,33 @@
+<span ng-if="!largeInput">
+  <span ng-if="!active && !alwaysEditable">
+    <[localValue.label]>
+    (<a href="#" onclick="return false;" ng-click="openEditor()">Edit</a>)
+  </span>
+
+  <span ng-if="active || alwaysEditable">
+    <input ng-if="!largeInput" type="text" ng-model="localValue.label" class="form-control">
+    <button type="button" class="btn btn-default" ng-if="!alwaysEditable" ng-click="replaceValue(localValue.label)">
+      Close
+    </button>
+  </span>
+</span>
+
+<div ng-if="largeInput">
+  <div ng-if="!active && !alwaysEditable">
+    <textarea disabled="true">
+      <[localValue.label]>
+    </textarea>
+    (<a href="#" onclick="return false;" ng-click="openEditor()">Edit</a>)
+  </div>
+
+  <div ng-if="active || alwaysEditable">
+    <textarea ng-model="localValue.label"></textarea>
+    <button type="button" class="btn btn-default"  ng-if="!alwaysEditable" ng-click="replaceValue(localValue.label)">
+      Close
+    </button>
+  </div>
+</div>
+
+<div class="oppia-form-error">
+  <[getWarningText()]>
+</div>

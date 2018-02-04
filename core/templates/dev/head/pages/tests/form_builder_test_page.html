@@ -1,0 +1,129 @@
+{% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Tests for the Form Builder - Oppia
+{% endblock maintitle %}
+
+{% block header_js %}
+  <script>
+    GLOBALS.ADDITIONAL_ANGULAR_MODULES = ['ui.codemirror'];
+  </script>
+  {{ super() }}
+{% endblock header_js %}
+
+{% block content %}
+  <div class="container" ng-controller="FormBuilderTests">
+    <h3>Test page for object editors</h3>
+
+    <h4>Editors sharing a common value</h4>
+    <table class="table">
+      <tr>
+        <th>Form name</th>
+        <th>Read-only version</th>
+        <th>Preview version</th>
+        <th>Editable version</th>
+      </tr>
+      <tr>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <h5>Unicode form (copy 1)</h5>
+          <em>Saved value:</em> <[unicodeForm.value]>
+        </td>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <schema-based-viewer schema="unicodeForm.schema" local-value="unicodeForm.value">
+          </schema-based-viewer>
+        </td>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" is-disabled="true">
+          </form-overlay>
+        </td>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value">
+          </form-overlay>
+        </td>
+      </tr>
+      <tr>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <h5>Unicode form (copy 2)</h5>
+          <em>Saved value:</em> <[unicodeForm.value]>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <schema-based-viewer schema="unicodeForm.schema" local-value="unicodeForm.value">
+          </schema-based-viewer>
+        </td>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" is-disabled="true">
+          </form-overlay>
+        </td>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value">
+          </form-overlay>
+        </td>
+      </tr>
+    </table>
+
+    <div ng-repeat="formset in formsets">
+      <h4><[formset.name]></h4>
+      <table class="table">
+        <tr>
+          <th>Form name</th>
+          <th>Read-only version</th>
+          <th>Preview version</th>
+          <th>Editable version</th>
+        </tr>
+        <tr ng-repeat="form in formset.forms">
+          <td class="col-sm-3 col-md-3 col-lg-3">
+            <h5><[form.name]></h5>
+            <div>
+              <em>Saved value:</em>
+              <div style="max-width: 300px; word-wrap: break-word;">
+                <[form.value]>
+              </span>
+            </div>
+          </td>
+          <td class="col-sm-3 col-md-3 col-lg-3">
+            <schema-based-viewer schema="form.schema" local-value="form.value">
+            </schema-based-viewer>
+          </td>
+          <td class="col-sm-3 col-md-3 col-lg-3">
+            <form-overlay definition="form.schema" saved-value="form.value" is-disabled="true">
+            </form-overlay>
+          </td>
+          <td class="col-sm-3 col-md-3 col-lg-3">
+            <form-overlay definition="form.schema" saved-value="form.value">
+            </form-overlay>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block footer_js %}
+  <script src="/third_party/static/code-mirror-3.19.0/lib/codemirror.js"></script>
+  <script src="/third_party/static/code-mirror-3.19.0/mode/python/python.js"></script>
+  <script src="/third_party/static/ui-codemirror-0.1.2/src/ui-codemirror.js"></script>
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/filters.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/tests/FormBuilderTestPage.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedBoolEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedFloatEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedIntEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedCustomViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedDictViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedListViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
+
+{% endblock footer_js %}

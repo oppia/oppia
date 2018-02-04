@@ -1,0 +1,25 @@
+<div class="code-repl-container">
+  <div>
+    <!-- This ng-form is needed for submitting answer on hitting enter. -->
+    <form ng-submit="runAndSubmitCode(code)">
+      <div class="code-repl-input-box">
+        <div ui-codemirror="{onLoad: initCodeEditor, readOnly: !interactionIsActive}">
+        </div>
+      </div>
+      <md-button type="button" class="md-raised" ng-disabled="!interactionIsActive" ng-click="runCode(code)" ng-disabled="!hasLoaded">Test Run</md-button>
+      <span class="code-repl-language">
+        <em>Language: <[language]></em>
+      </span>
+    </form>
+  </div>
+
+  <hr>
+
+  <div ng-if="fullError">
+    <pre class="code-repl-terminal-error"><[fullError]></pre>
+  </div>
+  <div ng-if="!fullError">
+    <pre ng-if="output" class="code-repl-terminal"><[output]></pre>
+    <pre ng-if="!output" class="code-repl-terminal">[No terminal output]</pre>
+  </div>
+</div>

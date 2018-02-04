@@ -1,0 +1,405 @@
+author_notes: ''
+blurb: ''
+category: Languages
+init_state_name: Hola
+language_code: en
+objective: start speaking Spanish
+param_changes: []
+param_specs: {}
+schema_version: 17
+states:
+  Adios:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: "\xA1Ay! \xBF\xA150 pesos por una manzana!? \xA1Qu\xE9 caro!\n<br><br>\n\
+        \xA1Adi\xF3s!"
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Adios
+          feedback:
+          - Don't forget your accent marks next time!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: adios
+          rule_type: Contains
+      - correct: false
+        outcome:
+          dest: END
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: "adi\xF3s"
+          rule_type: Contains
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Adios
+        feedback:
+        - Say goodbye
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  Colores:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: "\xBFDe qu\xE9 colores son las manzanas?"
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Colores
+          feedback:
+          - Apples aren't black unless they are rotten...and they aren't blue
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '0'
+          rule_type: Equals
+      - correct: false
+        outcome:
+          dest: Colores
+          feedback:
+          - Orange and white...not quite
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '1'
+          rule_type: Equals
+      - correct: false
+        outcome:
+          dest: Adios
+          feedback:
+          - "\xA1S\xED! That's right -- apples are red and green."
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '2'
+          rule_type: Equals
+      - correct: false
+        outcome:
+          dest: Colores
+          feedback:
+          - Yellow and gray? Apples?
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '3'
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - negro y azul
+          - anaranjado y blanco
+          - rojo y verde
+          - amarillo y gris
+          - I don't know
+      default_outcome:
+        dest: Colores
+        feedback:
+        - 'Colores is easy to translate.
+
+          manzanas is apples.
+
+          So this is asking, what colors are apples?'
+        param_changes: []
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    param_changes: []
+  Como meaning:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: "Now, \"te llamas\" looks a lot like \"me llamo.\"\nAnd this sentence\
+        \ is a question.\n<br><br>What do you think \"\xBFC\xF3mo te llamas?\" means?"
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Me llamo
+          feedback:
+          - 'Yes!
+
+            So, let''s try this again...Introduce yourself.'
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: what is your name?
+          rule_type: Equals
+      - correct: false
+        outcome:
+          dest: Me llamo
+          feedback:
+          - 'Great!
+
+            So, let''s try this again...Introduce yourself.'
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: what do you call yourself?
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Me llamo
+        feedback:
+        - 'So this means "What is your name?"
+
+          So, let''s try this again...Introduce yourself.'
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  Hola:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: "Let's speak some Spanish! I'll say something in Spanish, and you can\
+        \ respond in Spanish. OK?<br><br>\n\xA1Hola!"
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Me llamo
+          feedback:
+          - 'Don''t forget: Spanish uses inverted exclamation points at the beginning
+            of sentences as well as the ending exclamation point.'
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: hola!
+          rule_type: Equals
+      - correct: false
+        outcome:
+          dest: Me llamo
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: hola
+          rule_type: Contains
+      - correct: false
+        outcome:
+          dest: Hola
+          feedback:
+          - Check your spelling!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: hola
+          rule_type: FuzzyEquals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Hola
+        feedback:
+        - Hola means Hello. Say Hello back (in Spanish).
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  Me llamo:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: "Me llamo Oppia.\n<br>\xBFC\xF3mo te llamas? (Write a complete sentence.)"
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Me llamo
+          feedback:
+          - You've got one too many verbs.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: me llamo es
+          rule_type: StartsWith
+      - correct: false
+        outcome:
+          dest: Supermercado
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: me llamo
+          rule_type: StartsWith
+      - correct: false
+        outcome:
+          dest: Supermercado
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: mi nombre es
+          rule_type: StartsWith
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Me llamo meaning
+        feedback: []
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  Me llamo meaning:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: (What do you think "Me llamo" means?)
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Como meaning
+          feedback:
+          - That's right!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: my name is
+          rule_type: Equals
+      - correct: false
+        outcome:
+          dest: Como meaning
+          feedback:
+          - Literally, yes, but it can also be translated as "My name is."
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: i am called
+          rule_type: Equals
+      - correct: false
+        outcome:
+          dest: Como meaning
+          feedback:
+          - Literally, yes, but it can also be translated as "My name is."
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: i call myself
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Como meaning
+        feedback:
+        - 'Me llamo means "My name is"
+
+          So "Me llamo Oppia" means "My name is Oppia".'
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  Supermercado:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: "\xA1Vamos al supermercado!\n<br><br>\n\xBFQu\xE9 podemos comprar all\xED\
+        ?"
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Supermercado
+          feedback:
+          - "\xA1\xBFVentanas en un supermercado?! \xA1Qu\xE9 extra\xF1o!\nYou can't\
+            \ buy windows in a supermarket. If you need more help, select \"I don't\
+            \ know\""
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '0'
+          rule_type: Equals
+      - correct: false
+        outcome:
+          dest: Supermercado
+          feedback:
+          - "\xA1\xBFCoches en un supermercado?! \xA1Qu\xE9 extra\xF1o!\n\nYou can't\
+            \ buy cars in a supermarket. If you need more help, select \"I don't know\""
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '1'
+          rule_type: Equals
+      - correct: false
+        outcome:
+          dest: Colores
+          feedback:
+          - Yes! You can buy apples in a supermarket.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '2'
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - Ventanas
+          - Coches
+          - Manzanas
+          - I don't know
+      default_outcome:
+        dest: Supermercado
+        feedback:
+        - 'Supermercado is supermarket.
+
+          What can you buy at a supermarket?'
+        param_changes: []
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    param_changes: []
+states_schema_version: 13
+tags: []
+title: "\xA1Hola!"

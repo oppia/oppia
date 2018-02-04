@@ -1,0 +1,503 @@
+start = expression
+
+/////////////////// LINE TEMPLATE READER VIEW ////////////////////
+
+expressionTemplate =
+     variableTemplate
+   / elementTemplate
+   / booleanTemplate
+
+
+booleanTemplate = expression:expression subs:substitution*
+    {
+      return {
+        expression: expression,
+        substitutions: subs,
+        type: 'boolean',
+      };
+    }
+
+// FUTURE: permit multiple simultaneous substitutions
+substitution = '[' from:variable '->' to:expression ']'
+    {
+      var output = {};
+      output[from.top_operator_name] = to;
+      return output;
+    }
+
+elementTemplate = '{{' element:element '|element}}'
+    {
+      return {
+        expression: element,
+        substitutions: [],
+        type: 'element',
+      };
+    }
+
+variableTemplate = '{{' variable:variable '|variable}}'
+    {
+      return {
+        expression: variable,
+        substitutions: [],
+        type: 'element',
+        kind: 'variable'
+      };
+    }
+
+// list may be empty
+listOfBooleanTemplates =
+    av:booleanTemplate? avList:commaThenBooleanTemplate*
+    {
+      var result = (av === '') ? [] : [av];
+      for (var i = 0; i < avList.length; i++) {
+        result.push(avList[i]);
+      }
+      return result;
+    }
+
+commaThenBooleanTemplate =
+    ',' av:booleanTemplate
+    { return av; }
+
+////////////////  LINE TEMPLATE ERROR MESSAGE ////////////////////
+
+// NOTE: the order here is essential to avoid e.g. {{x|variable}} being interpreted as "x or variable"
+expressionTemplate2 =
+     elementTemplate
+   / variableTemplate
+   / booleanTemplate2
+
+booleanTemplate2 = '{{' expression:expression subs:substitution* '}}'
+    {
+      return {
+        expression: expression,
+        substitutions: subs,
+        type: 'boolean',
+      };
+    }
+
+//////////////// CONTROL FUNCTIONS ////////////////////////////
+
+formulaLHS = name:name '(' arguments:listOfVariables ')'
+    {
+      return {
+        top_kind_name: 'binary_function',
+        top_operator_name: name,
+        arguments: arguments,
+        dummies:[]
+      }
+    }
+
+// list may be empty
+listOfVariables =
+    av:variable? avList:commaThenVariable*
+    {
+      var result = (av === '') ? [] : [av];
+      for (var i = 0; i < avList.length; i++) {
+        result.push(avList[i]);
+      }
+      return result;
+    }
+
+commaThenVariable =
+    ',' av:variable
+    { return av; }
+
+
+
+///////////////////////////////////////////////////////////////
+//                                                           //
+//                   THE EXPRESSION PARSER                   //
+//                                                           //
+///////////////////////////////////////////////////////////////
+
+
+expression =  a:iffFormula
+   {return a;}
+
+// list may be empty
+listOfExpressions =
+    av:expression? avList:commaThenExpression*
+    {
+      var result = (av === '') ? []: [av];
+      for (var i = 0; i < avList.length; i++) {
+        result.push(avList[i]);
+      }
+      return result;
+    }
+
+commaThenExpression =
+    ',' av:expression
+    { return av; }
+
+
+iffSymbol = '<=>'
+impliesSymbol = '=>'
+
+forAllSymbol = '∀'
+existsSymbol = '∃'
+
+andSymbol = '∧'
+orSymbol = '∨'
+notSymbol = '~'
+
+equalsSymbol = '='
+    {return 'equals'}
+lessThanOrEqualsSymbol = '<='
+    {return 'less_than_or_equals'}
+greaterThanOrEqualsSymbol = '>='
+    {return 'greater_than_or_equals'}
+lessThanSymbol = '<'
+    {return 'less_than'}
+greaterThanSymbol = '>'
+    {return 'greater_than'}
+notEqualsSymbol = '!='
+    {return 'not_equals'}
+membershipSymbol = '∈'
+    {return 'is_in';}
+
+
+addition = '+'
+subtraction = '-'
+multiplication = '*'
+division = '/'
+exponentiation = '^'
+
+
+iffFormula =
+    left:impliesFormula iffSymbol right:iffFormula
+    {
+      return {
+        top_kind_name: 'binary_connective',
+        top_operator_name: 'iff',
+        arguments: [left, right],
+        dummies: []
+      }
+    }
+  / impliesFormula
+
+impliesFormula =
+    left:quantifierFormula impliesSymbol right:impliesFormula
+    {
+      return {
+        top_kind_name: 'binary_connective',
+        top_operator_name: 'implies',
+        arguments: [left, right],
+        dummies: []
+      }
+    }
+  / quantifierFormula
+
+// This is messy but necessary to parse p&q|r, p&q&r, p&@x.q ect. correctly
+
+quantifierFormula =
+    forAllFormula
+  / orFormula
+
+forAllFormula =
+    forAllSymbol left:variable '.'? right:quantifierFormula
+    {
+      return {
+        top_kind_name: 'quantifier',
+        top_operator_name: 'for_all',
+        arguments: [right],
+        dummies: [left]
+      };
+    }
+  / existsFormula
+
+existsFormula =
+    existsSymbol left:variable '.'? right:quantifierFormula
+    {
+      return {
+        top_kind_name: 'quantifier',
+        top_operator_name: 'exists',
+        arguments: [right],
+        dummies: [left]
+      };
+    }
+  / boundedForAllFormula
+
+boundedForAllFormula =
+    forAllSymbol k:variable relation:boundableInfixRelationName n:element '.'? A:quantifierFormula
+    {
+      return {
+        top_kind_name: 'bounded_quantifier',
+        top_operator_name: 'bounded_for_all',
+        arguments: [{
+          top_kind_name: 'binary_relation',
+          top_operator_name: relation,
+          arguments: [k, n],
+          dummies: []
+        }, A],
+        dummies: [k]
+      };
+    }
+  / boundedExistsFormula
+
+boundedExistsFormula =
+    existsSymbol k:variable relation:boundableInfixRelationName n:element '.'? A:quantifierFormula
+    {
+      return {
+        top_kind_name: 'bounded_quantifier',
+        top_operator_name: 'bounded_exists',
+        arguments: [{
+          top_kind_name: 'binary_relation',
+          top_operator_name: relation,
+          arguments: [k, n],
+          dummies: []
+        }, A],
+        dummies: [k]
+      };
+    }
+
+
+orFormula =
+    left:andFormula orSymbol right:quantifierFormula
+    {
+      return {
+        top_kind_name: 'binary_connective',
+        top_operator_name: 'or',
+        arguments: [left, right],
+        dummies: []
+      };
+    }
+  / andFormula
+
+andFormula =
+    left:unaryFormula andSymbol right:andRHS
+    {
+      return {
+        top_kind_name: 'binary_connective',
+        top_operator_name: 'and',
+        arguments: [left, right],
+        dummies: []
+      }
+    }
+  / unaryFormula
+
+andRHS =
+    forAllFormula
+  / andFormula
+
+unaryFormula =
+    notFormula
+  / infixRelationFormula
+
+
+notFormula =
+    notSymbol right:notRHS
+    {
+      return {
+        top_kind_name: 'unary_connective',
+        top_operator_name: 'not',
+        arguments: [right],
+        dummies: []
+      }
+    }
+
+notRHS =
+    forAllFormula
+  / unaryFormula
+
+
+infixRelationFormula =
+    left:additionArgument name:infixRelationName right:infixRelationRHS
+    {
+       return {
+        top_kind_name: 'binary_relation',
+        top_operator_name: name,
+        arguments: [left, right],
+        dummies: []
+       }
+    }
+  / additionArgument
+
+infixRelationName =
+    equalsSymbol
+  / lessThanOrEqualsSymbol
+  / greaterThanOrEqualsSymbol
+  / lessThanSymbol
+  / greaterThanSymbol
+  / notEqualsSymbol
+  / membershipSymbol
+
+boundableInfixRelationName =
+    lessThanOrEqualsSymbol
+  / lessThanSymbol
+  / membershipSymbol
+
+infixRelationRHS =
+    forAllFormula
+  / notFormula
+  / infixRelationFormula
+
+element = additionArgument
+
+additionArgument =
+    left:subtractionArgument addition right:additionRHS
+    {
+      return {
+        top_kind_name: 'binary_function',
+        top_operator_name: 'addition',
+        arguments: [left, right],
+        dummies: []
+      }
+    }
+  / subtractionArgument
+
+additionRHS =
+    forAllFormula
+  / notFormula
+  / additionArgument
+
+subtractionArgument =
+    left:multiplicationArgument subtraction right:subtractionRHS
+    {
+      return {
+        top_kind_name: 'binary_function',
+        top_operator_name: 'subtraction',
+        arguments: [left, right],
+        dummies: []
+      }
+    }
+  / multiplicationArgument
+
+subtractionRHS =
+    forAllFormula
+  / notFormula
+  / subtractionArgument
+
+multiplicationArgument =
+    left:divisionArgument multiplication right:multiplicationRHS
+    {
+      return {
+        top_kind_name: 'binary_function',
+        top_operator_name: 'multiplication',
+        arguments: [left, right],
+        dummies: []
+      }
+    }
+  / divisionArgument
+
+multiplicationRHS =
+    forAllFormula
+  / notFormula
+  / multiplicationArgument
+
+divisionArgument =
+    left:exponentiationArgument division right:divisionRHS
+    {
+      return {
+        top_kind_name: 'binary_function',
+        top_operator_name: 'division',
+        arguments: [left, right],
+        dummies: []
+      }
+    }
+  / exponentiationArgument
+
+divisionRHS =
+    forAllFormula
+  / notFormula
+  / divisionArgument
+
+exponentiationArgument =
+    left:reducedArgument exponentiation right:exponentiationRHS
+    {
+      return {
+        top_kind_name: 'binary_function',
+        top_operator_name: 'exponentiation',
+        arguments: [left, right],
+        dummies: []
+      }
+    }
+  / reducedArgument
+
+exponentiationRHS =
+    forAllFormula
+  / notFormula
+  / exponentiationArgument
+
+
+
+reducedArgument =
+    bracketExpression
+  / prefixFunction
+  / constant
+  / variable
+
+bracketExpression =
+    '(' e: expression ')'
+    {return e;}
+
+prefixFunction =
+    name:name '(' arguments:listOfExpressions ')'
+    {
+      return {
+        top_kind_name: 'prefix_function',
+        top_operator_name: name,
+        arguments: arguments,
+        dummies: []
+      }
+    }
+  / rangedFunction
+
+  // NOTE: we use n:element instead of n:expression because otherwise the
+  // parser inexplicably fails (probably due to 'or' in some way).
+  rangedFunction =
+    name:name '{' k:variable relation:boundableInfixRelationName n:element '|' A:expression '}'
+    {
+      return {
+        top_kind_name: 'ranged_function',
+        top_operator_name: name,
+        arguments: [{
+          top_kind_name: 'binary_relation',
+          top_operator_name: relation,
+          arguments: [k, n],
+          dummies: []
+        }, A],
+        dummies: [k]
+      };
+    }
+
+constant =
+    digits:[0-9]+
+    {
+      return {
+        top_kind_name: 'constant',
+        top_operator_name: parseInt(digits.join(""), 10),
+        arguments: [],
+        dummies: [],
+        type: 'integer'
+      };
+    }
+  / string
+
+string = '\'' characters:[a-zA-Z0-9_]* '\''
+    {
+      return {
+        top_kind_name: 'constant',
+        top_operator_name: '\'' + characters.join('') + '\'',
+        arguments: [],
+        dummies: [],
+        type: 'string'
+      }
+    }
+
+variable =
+    name:name
+    {
+      return {
+        top_kind_name: 'variable',
+        top_operator_name: name,
+        arguments: [],
+        dummies: []
+      };
+    }
+
+name =
+    first:[A-Za-z] middle:[A-Za-z0-9_]*
+    {
+      return first + middle.join('');
+    }

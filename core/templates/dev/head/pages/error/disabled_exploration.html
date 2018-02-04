@@ -1,0 +1,24 @@
+{% extends 'pages/base.html' %}
+
+{% block navbar_breadcrumb %}
+{% endblock navbar_breadcrumb %}
+
+{% block maintitle %}
+  I18N_ERROR_DISABLED_EXPLORATION_PAGE_TITLE
+{% endblock maintitle %}
+
+{% block content %}
+  <div class="oppia-content">
+    <br>
+
+    <div class="oppia-wide-panel">
+      <div class="oppia-wide-panel-content protractor-test-error-container">
+        <h1 translate="I18N_ERROR_DISABLED_EXPLORATION"></h1>
+        <br>
+        <span translate="I18N_ERROR_DISABLED_EXPLORATION_MESSAGE"></span>
+        <span translate="I18N_ERROR_NEXT_STEPS" translate-values="{issueTrackerUrl: 'https://github.com/oppia/oppia/issues/new', homeUrl: '/'}"></span>
+      </div>
+    </div>
+
+  </div>
+{% endblock %}

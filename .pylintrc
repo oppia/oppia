@@ -1,0 +1,74 @@
+# To run this, install pylint and use the command:
+#
+#   pylint core --rcfile=.pylintrc -i y
+
+[GENERAL]
+init-hook='import sys; sys.path.append("../oppia_tools/google_appengine_1.9.50/google_appengine")'
+
+
+[BASIC]
+
+# Regular expression which should only match correct function names
+function-rgx=^[_a-z][a-z0-9_]*$
+
+# Regular expression which should only match correct method names
+method-rgx=^([_a-z][a-z0-9_]*|__[a-z0-9]+__)$
+
+# Regular expression which should only match correct constant names
+const-rgx=^(([A-Z_][A-Z0-9_]*)|(__.*__)|([a-z_]+_models)|([a-z_]+_services))$
+
+# Good variable names which should always be accepted, separated by a comma
+good-names=e,_,d,f,i,l,p,w,fn,fs,id,pc,sc,zf,setUp,tearDown,longMessage,maxDiff
+
+# Regex for dummy variables (to prevent 'unused argument' errors)
+dummy-variables-rgx=_|unused_*
+
+# Regular expression which should match good variable names
+variable-rgx=[a-z_]+
+
+[DESIGN]
+
+# Minimum number of public methods for a class (see R0903).
+min-public-methods=0
+
+# List of builtin function names that should not be used, separated by a comma
+bad-functions=apply,input
+
+[FORMAT]
+
+max-line-length=80
+
+indent-string='    '
+
+[SIMILARITIES]
+
+ignore-imports=yes
+
+[MESSAGES CONTROL]
+
+# TODO(sll): Consider re-enabling the following checks:
+#    abstract-method
+#    arguments-differ
+#    broad-except
+#    duplicate-code
+#    fixme
+#    missing-docstring
+#    no-member
+#    no-self-use
+#    redefined-variable-type
+#    too-many-arguments
+#    too-many-boolean-expressions
+#    too-many-branches
+#    too-many-instance-attributes
+#    too-many-lines
+#    too-many-locals
+#    too-many-public-methods
+#    too-many-statements
+# and fix those issues.
+
+disable=consider-using-ternary,locally-disabled,locally-enabled,logging-not-lazy,abstract-method,arguments-differ,broad-except,duplicate-code,fixme,len-as-condition,missing-docstring,no-else-return,no-member,no-self-use,not-context-manager,redefined-variable-type,too-many-arguments,too-many-boolean-expressions,too-many-branches,too-many-instance-attributes,too-many-lines,too-many-locals,too-many-public-methods,too-many-nested-blocks,too-many-statements
+
+[REPORTS]
+
+# Hide statistics, external dependencies and overall rating.
+reports=no

@@ -1,0 +1,442 @@
+author_notes: ''
+blurb: ''
+category: Test
+init_state_name: Continue
+language_code: en
+objective: check all the interactions work
+param_changes: []
+param_specs:
+  a:
+    obj_type: UnicodeString
+  b:
+    obj_type: UnicodeString
+  c:
+    obj_type: UnicodeString
+schema_version: 17
+states:
+  Code REPL:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Write a program the prints 12.<br>
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Music notes input
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: '12'
+          rule_type: OutputEquals
+      confirmed_unclassified_answers: []
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: '[Type your code here.]'
+        postCode:
+          value: ''
+        preCode:
+          value: ''
+      default_outcome:
+        dest: Code REPL
+        feedback:
+        - Wrong.
+        param_changes: []
+      hints: []
+      id: CodeRepl
+      solution: null
+    param_changes: []
+  Continue:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: "Click continue.<br><div><br></div><div><b>Parameters</b></div><div>{{a}}\
+        \ should be 1.</div><div><div>{{c}} should be 2.</div></div><div><span>{{b}}\
+        \ should be 0.5.</span><br></div><div>{{a*b}} should be 0.5.</div><div><span>{{-a*b}}\
+        \ should be -0.5.</span><br></div><div><span>{{a \_ * b \_}} should be 0.5.</span></div><div>{{abs(-a*b)}}\
+        \ should be 0.5.</div><div>{{if a + a == c then 'yes' else 'no'}} should be\
+        \ 'yes'</div><div><div><span>{{if a == c then 'yes' else 'no'}} should be\
+        \ 'no'</span><br></div><div><span>{{floor(a*b)}} should be 0.</span></div></div><div><div><span>{{log(2,\
+        \ 10)}} should be around 0.3.</span><br></div><div><div><span>{{pow(2, 10)}}\
+        \ should be 1024.</span></div><div><span>{{3 &lt; 4}} should be true.</span></div><div><span>{{3\
+        \ &gt; 4}} should be false.</span></div><div><span>{{4 &lt;= 4}} should be\
+        \ true.</span></div><div><span>{{4 &gt;= 3}} should be true.</span></div><div><span>&lt;\
+        \ should be an unescaped 'less-than' sign.</span></div><div><span>&gt; should\
+        \ be an unescaped 'greater-than' sign.</span></div></div></div>"
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value: Continue
+      default_outcome:
+        dest: Multiple choice input
+        feedback: []
+        param_changes: []
+      hints: []
+      id: Continue
+      solution: null
+    param_changes:
+    - customization_args:
+        parse_with_jinja: false
+        value: '1'
+      generator_id: Copier
+      name: a
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{a}}'
+      generator_id: Copier
+      name: b
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{a+b}}'
+      generator_id: Copier
+      name: c
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{b/c}}'
+      generator_id: Copier
+      name: b
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  Multiple choice input:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Choose option B.<br><div><br></div><div><b>Parameters</b></div><div><div>{{a}}
+        should be 1.</div><div><span>{{b}} should be 3.</span><br></div><div><div>{{c}}
+        should be 2.</div></div><div><span>{{a*b}} should be 3.</span></div></div>
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Text input
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 1
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - <oppia-noninteractive-image filepath-with-value="&amp;quot;A.png&amp;quot;"></oppia-noninteractive-image><br>
+          - Option B<br>
+          - <span></span><oppia-noninteractive-math raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;"></oppia-noninteractive-math><br>
+      default_outcome:
+        dest: Multiple choice input
+        feedback:
+        - Wrong.
+        param_changes: []
+      hints: []
+      id: MultipleChoiceInput
+      solution: null
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{a+c}}'
+      generator_id: Copier
+      name: b
+  Music notes input:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Enter two E4 notes (bottom line).<br>
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: World map
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x:
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E4
+            - noteDuration:
+                den: 1
+                num: 1
+              readableNoteName: E4
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        initialSequence:
+          value: []
+        sequenceToGuess:
+          value:
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: E4
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: E4
+      default_outcome:
+        dest: Music notes input
+        feedback:
+        - Wrong.
+        param_changes: []
+      hints: []
+      id: MusicNotesInput
+      solution: null
+    param_changes: []
+  Network Graph:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Do the following step by step:<br><br>1. Delete Node labelled B<span></span><div>2.
+        Add Node labelled Z</div><div>3. Add Edge of weight 150 connecting A to Z</div><div>4.
+        Delete Edge between A and F</div>
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Code REPL
+          feedback:
+          - Correct
+          param_changes: []
+        rule_specs:
+        - inputs:
+            g:
+              edges:
+              - dst: 1
+                src: 0
+                weight: 150
+              isDirected: false
+              isLabeled: true
+              isWeighted: true
+              vertices:
+              - label: A
+                x: 128.328125
+                y: 65.25
+              - label: Z
+                x: 189.0
+                y: 66.0
+              - label: F
+                x: 155.0
+                y: 125.0
+          rule_type: IsIsomorphicTo
+      confirmed_unclassified_answers: []
+      customization_args:
+        canAddEdge:
+          value: true
+        canAddVertex:
+          value: true
+        canDeleteEdge:
+          value: true
+        canDeleteVertex:
+          value: true
+        canEditEdgeWeight:
+          value: true
+        canEditVertexLabel:
+          value: true
+        canMoveVertex:
+          value: true
+        graph:
+          value:
+            edges:
+            - dst: 2
+              src: 0
+              weight: 1000
+            isDirected: false
+            isLabeled: true
+            isWeighted: true
+            vertices:
+            - label: A
+              x: 212.0
+              y: 45.0
+            - label: B
+              x: 379.0
+              y: 44.0
+            - label: F
+              x: 215.0
+              y: 155.5
+      default_outcome:
+        dest: Network Graph
+        feedback:
+        - Incorrect
+        param_changes: []
+      hints: []
+      id: GraphInput
+      solution: null
+    param_changes: []
+  Numeric input:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Enter a number larger than 6.<br>
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Set input
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: 6.0
+          rule_type: IsGreaterThan
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Numeric input
+        feedback:
+        - Wrong.
+        param_changes: []
+      hints: []
+      id: NumericInput
+      solution: null
+    param_changes: []
+  Set input:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Enter the set {abc, xyz}<br>
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Network Graph
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x:
+            - abc
+            - xyz
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Set input
+        feedback:
+        - Wrong.
+        param_changes: []
+      hints: []
+      id: SetInput
+      solution: null
+    param_changes: []
+  Text Area Input:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Please type hello.
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Numeric input
+          feedback:
+          - Correct
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: hello
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 10
+      default_outcome:
+        dest: Text Area Input
+        feedback:
+        - Wrong
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  Text input:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Enter the string rrrrr<br>
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: Text Area Input
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: rrrrr
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
+      default_outcome:
+        dest: Text input
+        feedback:
+        - Wrong.
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  World map:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Click on the USA.<br>
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            d: 3300.0
+            p:
+            - 40.0
+            - -105.0
+          rule_type: Within
+      confirmed_unclassified_answers: []
+      customization_args:
+        latitude:
+          value: 0.0
+        longitude:
+          value: 0.0
+        zoom:
+          value: 0.0
+      default_outcome:
+        dest: World map
+        feedback:
+        - Wrong.
+        param_changes: []
+      hints: []
+      id: InteractiveMap
+      solution: null
+    param_changes: []
+states_schema_version: 13
+tags: []
+title: Test of expressions and interactions

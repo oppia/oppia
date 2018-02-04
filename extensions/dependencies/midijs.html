@@ -1,0 +1,12 @@
+<script src="/third_party/static/midi-js-2ef687/build/MIDI.js"></script>
+<!-- This is needed for MIDI.js to work. -->
+<script src="/third_party/static/midi-js-2ef687/inc/base64binary.js"></script>
+<script>
+  $(document).ready(function() {
+    MIDI.loadPlugin({
+      soundfontUrl: '/third_party/static/midi-js-2ef687/soundfont/',
+      instrument: 'acoustic_grand_piano',
+      callback: function() {}
+    });
+  });
+</script>

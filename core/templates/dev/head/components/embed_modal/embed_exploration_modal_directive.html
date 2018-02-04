@@ -1,0 +1,35 @@
+<style>
+  .oppia-embed-exploration-modal .oppia-embed-modal-code {
+    background-color: #fcfcfc;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    display: inline-block;
+    padding: 10px;
+  }
+
+  .oppia-embed-exploration-modal .oppia-embed-modal-code:hover {
+    background-color: #f9f9f9;
+  }
+</style>
+
+<div class="oppia-embed-exploration-modal">
+  <div class="modal-header">
+    <h3>Embed this exploration</h3>
+  </div>
+
+  <div class="modal-body">
+    <p>
+      To embed this exploration in another webpage, copy the following HTML into the source code of the webpage:
+    </p>
+
+    <div class="oppia-embed-modal-code" ng-click="selectText($event)">&lt;iframe src="<[serverName]>/embed/exploration/<[explorationId]>" width="700" height="1000"&gt;</div>
+
+    <p>
+      For more details, as well as instructions on how to embed a particular version of an exploration, please see the <a href="https://oppia.github.io/#/EmbeddingAnExploration" target="_blank">documentation</a>.
+    </p>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="close()">Close</button>
+  </div>
+</div>

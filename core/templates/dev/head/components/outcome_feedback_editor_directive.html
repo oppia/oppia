@@ -1,0 +1,17 @@
+<style>
+  outcome-feedback-editor .oppia-rule-edit-feedback {
+    position: relative;
+  }
+</style>
+<div class="oppia-rule-edit-feedback protractor-test-feedback-bubble">
+  <div class="oppia-rule-details-header">
+    <strong>Oppia tells the learner...</strong>
+  </div>
+  <span ng-if="!outcome.hasNonemptyFeedback()">
+    <em>No feedback specified.</em>
+  </span>
+
+  <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
+  <schema-based-editor schema="OUTCOME_FEEDBACK_SCHEMA" local-value="outcome.feedback._html">
+  </schema-based-editor>
+</div>

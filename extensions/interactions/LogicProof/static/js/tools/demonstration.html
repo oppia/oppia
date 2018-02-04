@@ -1,0 +1,128 @@
+<html ng-app="logicDemo">
+  <head>
+    <script src="../../../../../../third_party/static/angularjs-1.5.8/angular.js"></script>
+    <script src="../generatedParser.js"></script>
+    <script src="../shared.js"></script>
+    <script src="../teacher.js"></script>
+    <script src="teacher2.js"></script>
+    <script src="../student.js"></script>
+    <script src="../data.js"></script>
+    <script src="demonstration.js"></script>
+    <script src="strings.js"></script>
+  </head>
+
+  <body ng-controller="TestCtrl">
+    <h4>Demonstration of the oppia logic interaction.</h4>
+
+    <p><center><u>Student's section </u></center></p>
+
+    <p>Assuming {{assumptionsDisplay}}, prove that {{targetDisplay}}</p>
+    <table>
+      <tr>
+        <td> <textarea ng-model="proofString" ng-trim="false" ng-change="editProof()" rows="10" cols="50"></textarea> </td>
+        <td valign="top">
+          <font color="red"><pre>{{proofError}}</pre></font>
+        </td>
+      </tr>
+    </table>
+    <p>
+      <button ng-click="submitProof()">Submit</button>
+      <font color="green" ng-show="checkSuccess">Correct!</font>
+    </p>
+
+
+
+    line <input type="text" ng-model="line"> mistake <input type="text" ng-model=mistakeName>
+    <button ng-click="doLocalCheck()">Check</button> {{localCheck}}
+
+    <hr>
+    <p></p>
+    <p><center><u>Teacher's section </u></center></p>
+
+    <b>Question </b><button ng-click="submitQuestion()">Submit</button>
+    <font color="green" ng-show="questionSuccess">Success</font>
+    <font color="red" ng-hide="questionSuccess">Failure</font>
+    <p>
+      Assumptions: <input type="text" ng-model="assumptionsString" size="30"> Target: <input type="text" ng-model="targetString" size="30">
+      <font color="red"> {{questionError}} </font>
+    </p>
+
+    <b>Line Templates </b><button ng-click="submitLineTemplates()">Submit</button>
+    <font color="green" ng-show="lineTemplateSuccess">Success</font>
+    <font color="red" ng-hide="lineTemplateSuccess">Failure</font>
+    <table>
+      <tr>
+        <td> Name </td>
+        <td> Reader view </td>
+        <td> Antecedents </td>
+        <td> Results </td>
+        <td> Variables </td>
+        <td> Error 1 </td>
+        <td> Error 2 </td>
+      </tr>
+      <tr ng-repeat="i in lineTemplateIndexer">
+        <td> <input type="text" ng-model="lineTemplateStrings[i].name" size="15"></td>
+        <td> <input type="text" ng-model="lineTemplateStrings[i].reader_view" size="40"></td>
+        <td> <input type="text" ng-model="lineTemplateStrings[i].antecedents" size="6"></td>
+        <td> <input type="text" ng-model="lineTemplateStrings[i].results" size="6"></td>
+        <td> <input type="text" ng-model="lineTemplateStrings[i].variables" size="6"></td>
+        <td> <input type="text" ng-model="lineTemplateStrings[i].error[0]" size="15"></td>
+        <td> <input type="text" ng-model="lineTemplateStrings[i].error[1]" size="15"></td>
+        <td> <font color="red"> {{LineTemplateErrors[i]}} </font> </td>
+      </tr>
+    </table>
+
+    <p></p>
+
+    <div ng-repeat="i in mistakeIndexer">
+      <b>Mistake Table: {{mistakeStrings[i].name}}</b> <button ng-click="submitMistakes(i)">Submit</button>
+      <font color="green" ng-show="mistakeSuccess[i]">Success</font>
+      <font color="red" ng-hide="mistakeSuccess[i]">Failure</font>
+      <table>
+        <tr>
+          <td> Name </td>
+          <td> Occurs </td>
+          <td> Message 1 </td>
+        <tr>
+        <tr ng-repeat="j in mistakeSectionIndexer[i]">
+          <td> <input type="text" ng-model="mistakeStrings[i].entries[j].name"></td>
+          <td> <input type="text" ng-model="mistakeStrings[i].entries[j].occurs" size="50"></td>
+          <td> <input type="text" ng-model="mistakeStrings[i].entries[j].message[0]" size="60"></td>
+          <td> <font color="red"> {{mistakeErrors[i][j]}} </font> </td>
+        </tr>
+      </table>
+      <p></p>
+    </div>
+
+    <p></p>
+    <b>Control Functions </b><button ng-click="submitControlFunctions()">Submit</button>
+    <font color="green" ng-show="controlFunctionSuccess">Success</font>
+    <font color="red" ng-hide="controlFunctionSuccess">Failure</font>
+    <table>
+      <tr><td>indentation(n)</td><td></td><td></td><td>Number of times line n is indented</td></tr>
+      <tr><td>template(n)</td><td></td><td></td><td>Name of the template of line n</td></tr>
+      <tr><td>antecedents(n)</td><td></td><td></td><td>Formulas line n assumes have been proved</td></tr>
+      <tr><td>results(n)</td><td></td><td></td><td>Formulas proved by line n</td></tr>
+      <tr><td>variables(n)</td><td></td><td></td><td>Free variables occuring in line n (as expressions)</td></tr>
+      <tr><td>text(n)</td><td></td><td></td><td>Raw text of line n</td></tr>
+      <tr><td>element(p, n)</td><td></td><td></td><td>The expression instantiating template variable p in line n</td></tr>
+      <tr><td>num_lines()</td><td></td><td></td><td>Number of lines in the proof</td></tr>
+      <tr><td>assumptions()</td><td></td><td></td><td>Formulas the student can assume in the problem</td></tr>
+      <tr><td>target()</td><td></td><td></td><td>Formula the student has to prove in this problem</td></tr>
+      <tr><td>question_variables()</td><td></td><td></td><td>Variables occurring in the question (as expressions)</td></tr>
+      <tr><td>entry(i, S)</td><td></td><td></td><td>The ith entry of set of expressions S</td></tr>
+      <tr><td>if(p,x,y)</td><td></td><td></td><td>If p is true this returns x, otherwise returns y</td></tr>
+      <tr><td>substitute(p,x,a)</td><td></td><td></td><td>Replaces all instances of variable x in formula p with element a</td></tr>
+      <tr ng-repeat="i in controlFunctionIndexer">
+        <td> <input type="text" ng-model="controlFunctionStrings[i].LHS"></td>
+        <td>=</td>
+        <td> <input type="text" ng-model="controlFunctionStrings[i].RHS" size="50"></td>
+        <td> <input type="text" ng-model="controlFunctionStrings[i].description" size="60"></td>
+        <td> <font color="red"> {{controlFunctionErrors[i]}} </font> </td>
+      </tr>
+    <table>
+
+    <p></p>
+    <button ng-click="requestJavascript()">Request Javascript</button>
+  </body>
+</html>

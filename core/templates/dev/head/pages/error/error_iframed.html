@@ -1,0 +1,61 @@
+{% extends "pages/base.html" %}
+
+{% block maintitle %}
+  Exploration Not Found - Oppia
+{% endblock maintitle %}
+
+{% block navbar_breadcrumb %}
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+{% endblock local_top_nav_options %}
+
+{% block content %}
+  <div role="main" style="margin: 0 auto; position: relative;">
+    <div class="oppia-page-container">
+      <md-card class="oppia-main-error-card">
+        <h3>Exploration Not Found</h3>
+        <p>
+          Uh-oh! The Oppia exploration you requested may have been removed or deleted.
+        </p>
+        <br>
+        <p>
+          To find similar explorations, visit the
+          <a href="https://www.oppia.org/library" target="_blank">Oppia.org library</a>.
+        </p>
+      </md-card>
+    </div>
+  </div>
+
+  <style>
+    html, body {
+      background: #afd2eb no-repeat center center fixed;
+      background-size: cover;
+      color: rgba(0,0,0,0.87);
+      font-family: 'Roboto', Arial, sans-serif;
+      font-size: 1.0em;
+    }
+
+    .oppia-page-container {
+      align-items: flex-start;
+      display: flex;
+      justify-content: center;
+      margin: 0 auto;
+      max-width: 1400px;
+      padding: 40px 14px;
+      width: 100%;
+    }
+
+    .oppia-main-error-card {
+      background: #fff;
+      border-radius: 2px;
+      flex-shrink: 10000;
+      max-width: 560px;
+      min-width: 360px;
+      padding: 20px 20px 30px;
+      text-align: left;
+      width: 100%;
+      z-index: 1;
+    }
+  </style>
+{% endblock %}

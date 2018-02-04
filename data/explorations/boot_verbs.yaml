@@ -1,0 +1,237 @@
+author_notes: ''
+blurb: ''
+category: Languages
+init_state_name: Sentence
+language_code: en
+objective: master the conjugation of Spanish boot verbs
+param_changes: []
+param_specs: {}
+schema_version: 17
+states:
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  Sentence:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: "<i>This is a brief exploration about conjugations in Spanish.</i><br><br>Consider\
+        \ the following sentence:<br><br>\_\_\_ <i>Yo __________ (jugar) al f\xFA\
+        tbol con amigos los domingos.<br><br></i>What verb conjugation goes in the\
+        \ blank?"
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - That is correct! Great job!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: juego
+          rule_type: Equals
+      - correct: false
+        outcome:
+          dest: boot verb
+          feedback:
+          - No, remember jugo means 'juice'. It sounds about right, but it isn't quite
+            because jugar is a boot verb.
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: jugo
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: subject
+        feedback: []
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  So...:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: OK, now you can join that stem together with the ending. What answer do
+        you get?
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: juego
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: So...
+        feedback:
+        - Try that again. Put jueg- together with -o and you get...?
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  boot verb:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: "Boot verbs can also be called stem-changing verbs.<br><br>\nWhat is it\
+        \ that makes it a boot verb? Well, if you use the normal way of writing out\
+        \ verb conjugations, it looks like this:<br><br>\nyo                     \
+        \     nosotros<br>\nt\xFA                          vosotros<br>\n\xE9l/ella/usted\
+        \               ustedes<br>\n\n<br>\nAnd in a boot verb the stem changes only\
+        \ in the yo, t\xFA, \xE9l/ella/usted and ustedes forms. If you draw a line\
+        \ around these, it looks like a boot.<br>\n<br>\nIn the case of jugar, since\
+        \ it is a verb ending in -gar, it uses the u &gt; ue stem, so what does the\
+        \ stem become?"
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: So...
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: jueg
+          rule_type: Equals
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+          - "That was quick! I was asking just for the stem, which is <b>jueg-</b>.\
+            \ But you already gave the entire conjugated verb\_<b>juego</b> (stem\
+            \ + ending). Great job!"
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: juego
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: So...
+        feedback:
+        - Not quite. Just change the <b>u</b> to a <b>ue</b> and you get <b>jueg-.</b>
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  subject:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: In order to figure out how to conjugate the verb properly, we should look
+        at the subject of the sentence. Can you identify what the subject is?
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: verb endings
+          feedback: []
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: yo
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: subject
+        feedback:
+        - Remember, the subject of the sentence is the noun in the sentence that is
+          doing the action. It is usually near the beginning of the sentence.
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  verb endings:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: So what is the correct verb ending for yo?
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: boot verb
+          feedback:
+          - But if you just drop the -ar and at -o, you get jugo which means juice,
+            so that's not quite right. That's because jugar is a boot verb!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: -o
+          rule_type: Equals
+      - correct: false
+        outcome:
+          dest: boot verb
+          feedback:
+          - But if you just drop the -ar and at -o, you get jugo which means juice,
+            so that's not quite right. That's because jugar is a boot verb!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: o
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: verb endings
+        feedback:
+        - "That doesn't look right. Here is the conjugation of hablo (to speak): yo\
+          \ hablo, t\xFA hablas, usted/\xE9l/ella habla, nosotros/as hablamos, vosotros/as\
+          \ habl\xE1is, ustedes/ellos/ellas hablan. From this list, what do you think\
+          \ the corresponding ending for 'yo' is?"
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 13
+tags: []
+title: Boot Verbs

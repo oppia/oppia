@@ -1,0 +1,40 @@
+category: Welcome
+next_skill_id: 5
+nodes:
+- acquired_skill_ids:
+  - skill0
+  exploration_id: '19'
+  prerequisite_skill_ids: []
+- acquired_skill_ids:
+  - skill1
+  exploration_id: '20'
+  prerequisite_skill_ids:
+  - skill0
+- acquired_skill_ids:
+  - skill2
+  exploration_id: '21'
+  prerequisite_skill_ids:
+  - skill1
+- acquired_skill_ids:
+  - skill3
+  exploration_id: '0'
+  prerequisite_skill_ids:
+  - skill2
+language_code: en
+objective: To introduce collections using demo explorations.
+schema_version: 4
+skills:
+  skill0:
+    name: First Example Exploration in Collection
+    question_ids: []
+  skill1:
+    name: Second Example Exploration in Collection
+    question_ids: []
+  skill2:
+    name: Third Example Exploration in Collection
+    question_ids: []
+  skill3:
+    name: Welcome to Oppia!
+    question_ids: []
+tags: []
+title: Introduction to Collections in Oppia
