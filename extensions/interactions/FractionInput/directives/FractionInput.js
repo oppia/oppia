@@ -229,6 +229,11 @@ oppia.factory('fractionInputRulesService', [
       HasNoFractionalPart: function(answer) {
         return answer.numerator === 0;
       },
+      HasFractionalPartExactlyEqualTo: function(answer, inputs) {
+        return (
+          answer.numerator === inputs.f.numerator &&
+          answer.denominator === inputs.f.denominator);
+      },
     };
   }
 ]);
