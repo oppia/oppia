@@ -77,7 +77,7 @@
           </div>
           <div class="conversation-skin-tutor-card-tooltip">
               <button class="conversation-skin-tutor-card-tooltip-button">?
-                <span class="tooltip-text">Please don't enter any personal information here. Your answer will be saved and can be read by the creator.</span>
+                <span class="conversation-skin-tutor-card-tooltip-text">Please don't enter any personal information here. Your answer will be saved and can be read by the creator.</span>
               </button>
           </div>
         </div>
@@ -233,29 +233,29 @@
   }
 
   .conversation-skin-tutor-card-tooltip {
-    padding-top: 8px;
     display: inline-block;
+    padding-top: 8px;
   }
 
   .conversation-skin-tutor-card-tooltip-button {
-    position: relative;
-    border-radius: 50%;
     background-color: #ff0000;
-    padding-top: 4px;
-    text-align: center;
-    font-size: 12px;
+    border-radius: 50%;
     color: #ffffff;
+    font-size: 12px;
     font-weight: 900;
+    padding-top: 4px;
+    position: relative;
+    text-align: center;
   }
 
-  .tooltip-text {
-    visibility: hidden;
-    position: absolute;
-    color: #ffffff;
-    width: 400px;
+  .conversation-skin-tutor-card-tooltip-text {
     background-color: #A9A9A9;
     border-radius: 3%;
+    color: #ffffff;
     padding: 2px;
+    position: absolute;
+    visibility: hidden;
+    width: 400px;
   }
 
   .conversation-skin-tutor-card-tooltip-button:hover .tooltip-text {
