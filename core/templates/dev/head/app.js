@@ -19,6 +19,10 @@
 // only there so that the Karma tests run, since it looks like Karma doesn't
 // 'see' the GLOBALS variable that is defined in base.html. We should fix this
 // in order to make the testing and production environments match.
+<<<<<<< HEAD
+'use strict';
+=======
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
 var oppia = angular.module(
   'oppia', [
     'ngMaterial', 'ngAnimate', 'ngAudio', 'ngSanitize', 'ngTouch', 'ngResource',
@@ -31,7 +35,10 @@ var oppia = angular.module(
 for (var constantName in constants) {
   oppia.constant(constantName, constants[constantName]);
 }
+<<<<<<< HEAD
+=======
 
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
 oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
 
@@ -112,7 +119,11 @@ oppia.config(['$provide', function($provide) {
             '$scope', '$uibModalInstance', '$timeout',
             function($scope, $uibModalInstance, $timeout) {
               $scope.customizationArgSpecs = customizationArgSpecs;
+<<<<<<< HEAD
+             
+=======
 
+>>>>>>> cdcbc557997ea785f6b95937409920c34e75f005
               // Without this code, the focus will remain in the background RTE
               // even after the modal loads. This switches the focus to a
               // temporary field in the modal which is then removed from the
