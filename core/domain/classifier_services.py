@@ -18,13 +18,12 @@ import datetime
 import logging
 
 from core.domain import classifier_domain
-from core.domain import exp_domain
-from core.domain import interaction_registry
 from core.platform import models
 import feconf
 
 (classifier_models, exp_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.exploration])
+
 
 def handle_trainable_states(exploration, state_names):
     """Creates ClassifierTrainingJobModel instances for all the state names

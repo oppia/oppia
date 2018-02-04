@@ -14,10 +14,7 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 
-import os
-
 from constants import constants
-from core.domain import classifier_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain

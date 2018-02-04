@@ -24,6 +24,7 @@ from core.tests import test_utils
 class ActivityListModelTest(test_utils.GenericTestBase):
     """Tests the ActivityListModel class."""
 
+
     def test_featured_activity_list_always_exists(self):
         featured_model_instance = (
             activity_models.ActivityReferencesModel.get_or_create('featured'))

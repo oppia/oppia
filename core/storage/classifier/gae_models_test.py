@@ -14,14 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
-
 from core.domain import classifier_domain
 from core.platform import models
 from core.tests import test_utils
 
 (classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])
+
 
 class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):
     """Tests for the TrainingJobExplorationMappingModel class."""
