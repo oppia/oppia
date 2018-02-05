@@ -69,10 +69,9 @@ oppia.controller('I18nFooter', [
         // to change; in such cases, the user's preferences are not picked up by
         // other pages. To avoid this, we manually set the cookie using the '/'
         // path each time a non-logged-in user changes their site language.
-        $cookies.remove('NG_TRANSLATE_LANG_KEY', {path: '/'});
         $cookies.put(
           'NG_TRANSLATE_LANG_KEY',
-          '"' + $scope.currentLanguageCode + '"', {path: '/'});
+          '"' + $scope.currentLanguageCode + '"');
       }
     };
   }

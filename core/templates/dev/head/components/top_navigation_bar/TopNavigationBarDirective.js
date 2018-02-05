@@ -27,15 +27,18 @@ oppia.directive('topNavigationBar', [
         '/components/top_navigation_bar/' +
         'top_navigation_bar_directive.html'),
       controller: [
-        '$scope', '$http', '$window', '$timeout', '$translate',
+        '$scope', '$http', '$window', '$timeout', '$translate', '$cookies',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS',
         'siteAnalyticsService', 'WindowDimensionsService', 'DebouncerService',
         function(
-            $scope, $http, $window, $timeout, $translate,
+            $scope, $http, $window, $timeout, $translate, $cookies,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS,
             siteAnalyticsService, WindowDimensionsService, DebouncerService) {
+          $cookies.remove('NG_TRANSLATE_LANG_KEY');
+          $cookies.put('test', 'value', {path: '/'});
+          console.log("tsss");
           if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
-            $cookies.remove('NG_TRANSLATE_LANG_KEY', {path: '/'});
+            //$cookies.remove('NG_TRANSLATE_LANG_KEY', {path: '/'});
             $translate.use(GLOBALS.preferredSiteLanguageCode);
           }
 
