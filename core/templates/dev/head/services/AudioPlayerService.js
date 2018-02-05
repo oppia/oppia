@@ -110,6 +110,11 @@ oppia.factory('AudioPlayerService', [
         }
         return _currentTrack.progress;
       },
+      setProgress: function(progress) {
+        if(_currentTrack) {
+          _currentTrack.progress = progress;
+        }
+      },
       isPlaying: function() {
         return Boolean(_currentTrack && !_currentTrack.paused);
       },
