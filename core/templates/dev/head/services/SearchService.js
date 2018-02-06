@@ -100,7 +100,7 @@ oppia.factory('SearchService', [
 
     return {
       getSearchUrlQueryString: function(searchQuery, selectedCategories,
-        selectedLanguageCodes) {
+          selectedLanguageCodes) {
         return encodeURIComponent(searchQuery) +
           _getSuffixForQuery(selectedCategories, selectedLanguageCodes);
       },

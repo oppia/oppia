@@ -29,6 +29,8 @@ oppia.controller('StateResponses', [
       ExplorationContextService, TrainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
       INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
+    $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
+      GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
     $scope.EditorStateService = EditorStateService;
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
@@ -260,7 +262,7 @@ oppia.controller('StateResponses', [
           'ExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'ExplorationContextService', 'EditorStateService',
-          'explorationStatesService', 'TrainingDataService',
+          'ExplorationStatesService', 'TrainingDataService',
           'AnswerClassificationService', 'FocusManagerService',
           'angularNameService', 'RULE_TYPE_CLASSIFIER',
           function(
@@ -268,12 +270,12 @@ oppia.controller('StateResponses', [
               ExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
               ExplorationContextService, EditorStateService,
-              explorationStatesService, TrainingDataService,
+              ExplorationStatesService, TrainingDataService,
               AnswerClassificationService, FocusManagerService,
               angularNameService, RULE_TYPE_CLASSIFIER) {
             var _explorationId = ExplorationContextService.getExplorationId();
             var _stateName = EditorStateService.getActiveStateName();
-            var _state = explorationStatesService.getState(_stateName);
+            var _state = ExplorationStatesService.getState(_stateName);
 
             $scope.stateContent = _state.content.getHtml();
             $scope.inputTemplate = (
@@ -294,7 +296,7 @@ oppia.controller('StateResponses', [
 
             var rulesServiceName =
               AngularNameService.getNameOfInteractionRulesService(
-                interactionId)
+                interactionId);
 
             // Inject RulesService dynamically.
             var rulesService = $injector.get(rulesServiceName);

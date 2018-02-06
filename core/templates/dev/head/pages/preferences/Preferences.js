@@ -95,7 +95,7 @@ oppia.controller('Preferences', [
     };
 
     $scope.savePreferredSiteLanguageCodes = function(
-      preferredSiteLanguageCode) {
+        preferredSiteLanguageCode) {
       $translate.use(preferredSiteLanguageCode);
       _forceSelect2Refresh();
       _saveDataItem(
@@ -103,7 +103,7 @@ oppia.controller('Preferences', [
     };
 
     $scope.savePreferredAudioLanguageCode = function(
-      preferredAudioLanguageCode) {
+        preferredAudioLanguageCode) {
       _saveDataItem(
         'preferred_audio_language_code', preferredAudioLanguageCode);
     };
@@ -120,8 +120,8 @@ oppia.controller('Preferences', [
     };
 
     $scope.saveEmailPreferences = function(
-      canReceiveEmailUpdates, canReceiveEditorRoleEmail,
-      canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail) {
+        canReceiveEmailUpdates, canReceiveEditorRoleEmail,
+        canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail) {
       var data = {
         can_receive_email_updates: canReceiveEmailUpdates,
         can_receive_editor_role_email: canReceiveEditorRoleEmail,

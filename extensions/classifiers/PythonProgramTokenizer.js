@@ -67,12 +67,12 @@ oppia.factory('PythonProgramTokenizer', [
     var intnumber = groupOfRegEx(hexnumber, binnumber, octnumber, decnumber);
     var exponent = '[eE][-+]?\\d+';
     var pointfloat = groupOfRegEx(
-      '\\d+\\.\\d*', '\\\\d+\\\\.\\\\d*') + regExMayBePresent(exponent)
+      '\\d+\\.\\d*', '\\\\d+\\\\.\\\\d*') + regExMayBePresent(exponent);
     var expfloat = '\\d+' + exponent;
     var floatnumber = groupOfRegEx(pointfloat, expfloat);
     var imagnumber = groupOfRegEx(
       '\\d+[jJ]', floatnumber + '[jJ]');
-    var num = groupOfRegEx(imagnumber, floatnumber, intnumber)
+    var num = groupOfRegEx(imagnumber, floatnumber, intnumber);
     // Tail end of ' string.
     var single = '[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'';
     // Tail end of " string.
@@ -95,20 +95,20 @@ oppia.factory('PythonProgramTokenizer', [
 
     var bracket = '[(){}]';
     var special = groupOfRegEx('\\r?\\n', '[:;.,\\`@]');
-    var funny = groupOfRegEx(operator, bracket, special)
+    var funny = groupOfRegEx(operator, bracket, special);
 
-    var plaintoken = groupOfRegEx(num, funny, str, name)
-    var token = ignore + plaintoken
+    var plaintoken = groupOfRegEx(num, funny, str, name);
+    var token = ignore + plaintoken;
 
     // First (or only) line of ' or " string.
     var contStr = groupOfRegEx(
       "[uUbB]?[rR]?'[^\\n'\\\\]*(?:\\\\.[^\\n'\\\\]*)*'" +
       groupOfRegEx("'", '\\\\\\r?\\n'),
       '[uUbB]?[rR]?"[^\\n"\\\\]*(?:\\\\.[^\\n"\\\\]*)*' +
-      groupOfRegEx('"', '\\\\\\r?\\n'))
-    var pseudoextras = groupOfRegEx('\\\\\\r?\\n|\\Z', comment, triple)
+      groupOfRegEx('"', '\\\\\\r?\\n'));
+    var pseudoextras = groupOfRegEx('\\\\\\r?\\n|\\Z', comment, triple);
     var pseudotoken = whitespace + groupOfRegEx(
-      pseudoextras, num, funny, contStr, name)
+      pseudoextras, num, funny, contStr, name);
 
     // Regular Expression object.
     var tokenprog = new RegExp(token);
@@ -210,7 +210,7 @@ oppia.factory('PythonProgramTokenizer', [
               break;
             }
 
-            column = 0
+            column = 0;
             // Measure leading whitespace.
             while (pos < max) {
               if (line[pos] === ' ') {
@@ -252,7 +252,7 @@ oppia.factory('PythonProgramTokenizer', [
 
             // Count indents or dedents.
             if (column > indents[-1]) {
-              indents.push(column)
+              indents.push(column);
               tokenizedProgram.push(
                 [PythonProgramTokenType.INDENT, line.slice(0, pos)]);
             }

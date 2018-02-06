@@ -270,7 +270,7 @@ class BaseHandler(webapp2.RequestHandler):
         Args:
             values: dict. The key-value pairs to encode in the JSON response.
         """
-        self.response.content_type = 'application/javascript; charset=utf-8'
+        self.response.content_type = 'application/json; charset=utf-8'
         self.response.headers['Content-Disposition'] = (
             'attachment; filename="oppia-attachment.txt"')
         self.response.headers['Strict-Transport-Security'] = (
@@ -316,7 +316,6 @@ class BaseHandler(webapp2.RequestHandler):
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'DEV_MODE': feconf.DEV_MODE,
-            'MINIFICATION': feconf.IS_MINIFIED,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
             'ACTIVITY_STATUS_PRIVATE': (
                 rights_manager.ACTIVITY_STATUS_PRIVATE),

@@ -43,14 +43,14 @@
      };
 
      ExplorationDraft.createFromLocalStorageDict = function(
-       explorationDraftDict) {
+         explorationDraftDict) {
        return new ExplorationDraft(
          explorationDraftDict.draftChanges,
          explorationDraftDict.draftChangeListId);
      };
 
      ExplorationDraft.toLocalStorageDict = function(
-       changeList, draftChangeListId) {
+         changeList, draftChangeListId) {
        return {
          draftChanges: changeList,
          draftChangeListId: draftChangeListId

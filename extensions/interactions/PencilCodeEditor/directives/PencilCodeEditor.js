@@ -37,7 +37,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
         '$scope', '$attrs', '$element', '$timeout', '$uibModal',
         'FocusManagerService', 'pencilCodeEditorRulesService',
         function($scope, $attrs, $element, $timeout, $uibModal,
-          FocusManagerService, pencilCodeEditorRulesService) {
+            FocusManagerService, pencilCodeEditorRulesService) {
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
 
           $scope.initialCode = $scope.interactionIsActive ?
