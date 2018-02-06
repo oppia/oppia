@@ -6,7 +6,7 @@
          ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play': !isAudioPlaying(), 'fa-pause': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
          uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
          tooltip-append-to-body="true" tooltip-placement="right"></i>
-      <div class="slider-section" ng-if="hasPressedPlayButtonAtLeastOnce">
+      <div class="audio-bar slider-section" ng-if="hasPressedPlayButtonAtLeastOnce">
         <md-slider ng-model="track.progress" ng-model-options="{ getterSetter: true }" aria-label="audio-slider">
         </md-slider>
         <span ng-if="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_LOADING_AUDIO"></span>
@@ -27,24 +27,24 @@
 
 <style>
 
-  md-slider {
+  .audio-bar md-slider {
     height: 5px;
   }
 
-  md-slider.md-default-theme .md-track-fill {
+  .audio-bar md-slider.md-default-theme .md-track-fill {
     background-color: #009688;
   }
 
-  md-slider.md-default-theme .md-thumb:after {
+  .audio-bar md-slider.md-default-theme .md-thumb:after {
     border-color: #009688;
     background-color: #009688;
   }
 
-  md-slider .md-track-container {
+  .audio-bar md-slider .md-track-container {
     top: 5px;
   }
 
-  md-slider .md-thumb-container {
+  .audio-bar md-slider .md-thumb-container {
     top: -17px;
   }
 
