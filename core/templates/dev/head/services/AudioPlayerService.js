@@ -111,7 +111,7 @@ oppia.factory('AudioPlayerService', [
         return _currentTrack.progress;
       },
       setProgress: function(progress) {
-        if(_currentTrack) {
+        if (_currentTrack) {
           _currentTrack.progress = progress;
         }
       },
