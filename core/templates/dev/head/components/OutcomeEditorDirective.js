@@ -32,13 +32,13 @@ oppia.directive('outcomeEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/outcome_editor_directive.html'),
       controller: [
-        '$scope', 'EditorStateService', 'stateInteractionIdService',
-        'COMPONENT_NAME_FEEDBACK', 'ExplorationCorrectnessFeedbackService',
-        'INTERACTION_SPECS',
+        '$scope', '$uibModal', 'EditorStateService',
+        'stateInteractionIdService', 'COMPONENT_NAME_FEEDBACK',
+        'ExplorationCorrectnessFeedbackService', 'INTERACTION_SPECS',
         function(
-            $scope, EditorStateService, stateInteractionIdService,
-            COMPONENT_NAME_FEEDBACK, ExplorationCorrectnessFeedbackService,
-            INTERACTION_SPECS) {
+            $scope, $uibModal, EditorStateService,
+            stateInteractionIdService, COMPONENT_NAME_FEEDBACK,
+            ExplorationCorrectnessFeedbackService, INTERACTION_SPECS) {
           $scope.editOutcomeForm = {};
           $scope.feedbackEditorIsOpen = false;
           $scope.destinationEditorIsOpen = false;
@@ -63,6 +63,22 @@ oppia.directive('outcomeEditor', [
             return ExplorationCorrectnessFeedbackService.isEnabled();
           };
 
+          var openMarkAllAudioAsNeedingUpdateModal = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/forms/' +
+                'mark_all_audio_as_needing_update_modal_directive.html'),
+              backdrop: true,
+              resolve: {},
+              controller: 'MarkAllAudioAsNeedingUpdateController'
+            }).result.then(function() {
+              $scope.outcome.feedback.markAllAudioAsNeedingUpdate();
+              $scope.savedOutcome.feedback = angular.copy(
+                $scope.outcome.feedback);
+              $scope.getOnSaveFeedbackFn()($scope.savedOutcome);
+            });
+          };
+
           var onExternalSave = function() {
             // The reason for this guard is because, when the editor page for an
             // exploration is first opened, the 'initializeAnswerGroups' event
@@ -76,7 +92,7 @@ oppia.directive('outcomeEditor', [
             if ($scope.feedbackEditorIsOpen) {
               if ($scope.editOutcomeForm.editFeedbackForm.$valid &&
                   !$scope.invalidStateAfterFeedbackSave()) {
-                $scope.saveThisFeedback();
+                $scope.saveThisFeedback(false);
               } else {
                 $scope.cancelThisFeedbackEdit();
               }
@@ -140,11 +156,18 @@ oppia.directive('outcomeEditor', [
             }
           };
 
-          $scope.saveThisFeedback = function() {
+          $scope.saveThisFeedback = function(fromClickSaveFeedbackButton) {
             $scope.$broadcast('saveOutcomeFeedbackDetails');
             $scope.feedbackEditorIsOpen = false;
+            var contentHasChanged = (
+              $scope.savedOutcome.feedback.getHtml() !==
+              $scope.outcome.feedback.getHtml());
             $scope.savedOutcome.feedback = angular.copy(
               $scope.outcome.feedback);
+            if ($scope.savedOutcome.feedback.hasUnflaggedAudioTranslations() &&
+                fromClickSaveFeedbackButton && contentHasChanged) {
+              openMarkAllAudioAsNeedingUpdateModal();
+            }
             $scope.getOnSaveFeedbackFn()($scope.savedOutcome);
           };
 
@@ -186,12 +209,12 @@ oppia.directive('outcomeEditor', [
             // Close the content editor and save all existing changes to the
             // HTML.
             if ($scope.feedbackEditorIsOpen) {
-              $scope.saveThisFeedback();
+              $scope.saveThisFeedback(false);
             }
           };
 
           $scope.onAudioTranslationsEdited = function() {
-            $scope.saveThisFeedback();
+            $scope.saveThisFeedback(false);
           };
         }
       ]
