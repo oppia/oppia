@@ -82,8 +82,10 @@ oppia.factory('ExplorationSaveService', [
           'post_publish_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$window', '$uibModalInstance', 'ExplorationContextService',
-          function($scope, $window, $uibModalInstance,
+          '$scope', '$window', '$uibModalInstance',
+          'ExplorationContextService',
+          function(
+              $scope, $window, $uibModalInstance,
               ExplorationContextService) {
             $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/congrats.svg');
@@ -94,10 +96,11 @@ oppia.factory('ExplorationSaveService', [
             };
             $scope.explorationId = (
               ExplorationContextService.getExplorationId());
-            $scope.explorationLink = $window.location.protocol + '//' +
-            $window.location.host + '/explore/' + $scope.explorationId;
-            $scope.selectText = function($event) {
-              var codeDiv = $event.currentTarget;
+            $scope.explorationLink = (
+              $window.location.protocol + '//' +
+              $window.location.host + '/explore/' + $scope.explorationId);
+            $scope.selectText = function(evt) {
+              var codeDiv = evt.currentTarget;
               var range = document.createRange();
               range.setStartBefore(codeDiv.firstChild);
               range.setEndAfter(codeDiv.lastChild);
