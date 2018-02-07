@@ -20,7 +20,6 @@
  */
 
 describe('Thread Status Display Service', function() {
-  
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   var ThreadStatusDisplayService;
   beforeEach(inject(function(_ThreadStatusDisplayService_) {
@@ -60,7 +59,6 @@ describe('Thread Status Display Service', function() {
       mockStatusID = 'ignored';
       expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
         'label label-default');
-
     });
   });
 });
