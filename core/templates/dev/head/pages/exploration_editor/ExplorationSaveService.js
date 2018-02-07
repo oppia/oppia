@@ -96,6 +96,15 @@ oppia.factory('ExplorationSaveService', [
             $scope.explorationLink = !GLOBALS.DEV_MODE ? 'https://www.oppia.org/explore/' +
             $scope.explorationId : 'localhost:8181/explore/' +
             $scope.explorationId;
+            $scope.selectText = function($event) {
+              var codeDiv = $event.currentTarget;
+              var range = document.createRange();
+              range.setStartBefore(codeDiv.firstChild);
+              range.setEndAfter(codeDiv.lastChild);
+              var selection = window.getSelection();
+              selection.removeAllRanges();
+              selection.addRange(range);
+            };
           }
         ]
       });
