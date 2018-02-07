@@ -62,4 +62,3 @@ describe('Thread Status Display Service', function() {
     });
   });
 });
-
