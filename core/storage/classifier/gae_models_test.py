@@ -24,6 +24,7 @@ import feconf
 (classifier_models,) = models.Registry.import_models(
     [models.NAMES.classifier])
 
+
 class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
     """Test the ClassifierTrainingJobModel class."""
 
