@@ -13,7 +13,14 @@
 // limitations under the License.
 
 
+/**
+ * @fileoverview Unit tests for ThreadStatusDisplayService, that provides
+ * information about how to display the status label for a thread in the 
+ * feedback tab of the exploration editor.
+ */
+
 describe('Thread Status Display Service', function() {
+  
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   var ThreadStatusDisplayService;
   beforeEach(inject(function(_ThreadStatusDisplayService_) {
@@ -39,17 +46,22 @@ describe('Thread Status Display Service', function() {
           mockStatusID)).toBe('');
     });
   });
+
   describe('Getting label class',function(){
     it('should give label class for status ',function(){
       var mockStatusID = 'open';
       expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
         'label label-info');
 
-      mockStatusID = 'notOpen';
+      mockStatusID = 'fixed';
       expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
         'label label-default');
+      
+      mockStatusID = 'ignored';
+      expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
+        'label label-default');
+
     });
   });
 });
 
-  
