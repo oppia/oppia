@@ -328,6 +328,7 @@
 	"I18N_PLAYER_RETURN_TO_COLLECTION": "Tillbaka till <[collectionTitle]>",
 	"I18N_PLAYER_RETURN_TO_EDITOR": "Tillbaka till redigeraren",
 	"I18N_PLAYER_RETURN_TO_LIBRARY": "Tillbaka till biblioteket",
+	"I18N_PLAYER_RETURN_TO_PARENT": "Gå tillbaka till huvudlektionen",
 	"I18N_PLAYER_SHARE_EXPLORATION": "Gillade du denna utforskning? Dela den med dina vänner!",
 	"I18N_PLAYER_SHARE_THIS_COLLECTION": "Dela denna samling",
 	"I18N_PLAYER_SHARE_THIS_EXPLORATION": "Dela denna utforskning",

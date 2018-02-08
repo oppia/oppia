@@ -295,6 +295,7 @@
 	"I18N_PLAYER_RETURN_TO_COLLECTION": "Volver a <[collectionTitle]>",
 	"I18N_PLAYER_RETURN_TO_EDITOR": "Volver al editor",
 	"I18N_PLAYER_RETURN_TO_LIBRARY": "Volver a la biblioteca",
+	"I18N_PLAYER_RETURN_TO_PARENT": "Volver a la lección principal",
 	"I18N_PLAYER_SHARE_EXPLORATION": "Disfrutado de esta exploración? Compártelo con tus amigos!",
 	"I18N_PLAYER_SHARE_THIS_COLLECTION": "Compartir esta colección",
 	"I18N_PLAYER_SHARE_THIS_EXPLORATION": "Compartir esta exploración",

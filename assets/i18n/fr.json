@@ -373,6 +373,7 @@
 	"I18N_PLAYER_RETURN_TO_COLLECTION": "Revenir à <[collectionTitle]>",
 	"I18N_PLAYER_RETURN_TO_EDITOR": "Revenir à l’éditeur",
 	"I18N_PLAYER_RETURN_TO_LIBRARY": "Retour à la bibliothèque",
+	"I18N_PLAYER_RETURN_TO_PARENT": "Retourner à la leçon principale",
 	"I18N_PLAYER_SHARE_EXPLORATION": "Cette exploration vous a plu ? Partagez-la avec vos amis !",
 	"I18N_PLAYER_SHARE_THIS_COLLECTION": "Partager cette collection",
 	"I18N_PLAYER_SHARE_THIS_EXPLORATION": "Partager cette exploration",
