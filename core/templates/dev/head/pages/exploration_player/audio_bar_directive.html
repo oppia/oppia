@@ -6,8 +6,9 @@
          ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play': !isAudioPlaying(), 'fa-pause': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
          uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
          tooltip-append-to-body="true" tooltip-placement="right"></i>
-      <div class="progress-bar-section" ng-if="hasPressedPlayButtonAtLeastOnce">
-        <md-progress-linear md-mode="<[getProgressBarMode()]>" value="<[AudioPlayerService.getProgress() * 100]>"></md-progress-linear>
+      <div class="audio-bar slider-section" ng-if="hasPressedPlayButtonAtLeastOnce">
+        <md-slider ng-model="track.progress" ng-model-options="{ getterSetter: true }" aria-label="audio-slider">
+        </md-slider>
         <span ng-if="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_LOADING_AUDIO"></span>
         <span ng-if="isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT"></span>
         <!--Filler space for message-->
@@ -26,8 +27,25 @@
 
 <style>
 
-  md-progress-linear.md-default-theme .md-bar {
+  .audio-bar md-slider {
+    height: 5px;
+  }
+
+  .audio-bar md-slider.md-default-theme .md-track-fill {
     background-color: #009688;
+  }
+
+  .audio-bar md-slider.md-default-theme .md-thumb:after {
+    border-color: #009688;
+    background-color: #009688;
+  }
+
+  .audio-bar md-slider .md-track-container {
+    top: 5px;
+  }
+
+  .audio-bar md-slider .md-thumb-container {
+    top: -17px;
   }
 
   .audio-header .fa-sort-up, .audio-header .fa-sort-down {
@@ -112,7 +130,7 @@
     padding-left: 3px;
   }
 
-  .progress-bar-section {
+  .slider-section {
     display: inline-block;
     margin: 0 auto;
     padding: 0 4px;
