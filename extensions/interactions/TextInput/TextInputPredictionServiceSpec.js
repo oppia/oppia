@@ -47,8 +47,7 @@ describe('Text Input Prediction Service', function() {
         for (var j = 0; j < trainingData[i].answers.length; j++) {
           predictedAnswerGroup = predictionService.predict(
             classifierData, trainingData[i].answers[j]);
-          if (predictedAnswerGroup === 
-            trainingData[i].answer_group_index.toString()) {
+          if (predictedAnswerGroup === trainingData[i].answer_group_index) {
             correctPredictions++;
           }
           totalAnswers++;
