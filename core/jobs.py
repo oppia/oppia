@@ -22,9 +22,9 @@ import copy
 import datetime
 import json
 import logging
+from core.platform import models
 import traceback
 
-from core.platform import models
 import utils
 
 from google.appengine.api import app_identity
