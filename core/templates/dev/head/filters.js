@@ -242,8 +242,8 @@ oppia.filter('parameterizeRuleDescription', [
 
         if (typeof (replacementText) === 'string') {
           // Replaces all occurances of $ with $$.
-          // This makes sure that the next regex matching will yield 
-          // the same $ sign pattern as the input 
+          // This makes sure that the next regex matching will yield
+          // the same $ sign pattern as the input
           replacementText = replacementText.split('$').join('$$');
         }
 
