@@ -182,6 +182,8 @@ oppia.directive('audioBar', [
 
           $scope.track = {             
             progress: function(progress) {
+              // update the track progress if argument progress is defined
+              // else return the current track progress
               if (angular.isDefined(progress)) {
                 AudioPlayerService.setProgress(progress / 100);
                 return progress;
