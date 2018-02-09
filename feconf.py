@@ -20,7 +20,6 @@ import copy
 import datetime
 import os
 
-
 # Whether to unconditionally log info messages.
 DEBUG = False
 
@@ -28,22 +27,20 @@ DEBUG = False
 # code in core/platform.
 PLATFORM = 'gae'
 
-# This should be string comparison, since all environment variables
-# are converted to string
-IS_MINIFIED = os.environ.get('MINIFICATION') == 'True'
+# This variable is for serving minified resources
+# when set to True. It reflects we are emulating running Oppia in a production
+# environment.
+FORCE_PROD_MODE = False
 
 # Whether we should serve the development or production experience.
-# DEV_MODE should only be changed to False in the production environment.
-# To use minified resources in the development environment,
-# change the MINIFICATION env variable in app.yaml to True.
-# When DEV_MODE is True, this indicates that we are not running in
-# the production App Engine environment, which affects things like
-# login/logout URLs,as well as third-party libraries
-# that App Engine normally provides.
+# DEV_MODE should only be changed to False in the production environment,
+# or if you want to use minified resources in the development environment.
+
 if PLATFORM == 'gae':
     DEV_MODE = (
-        not os.environ.get('SERVER_SOFTWARE')
-        or os.environ['SERVER_SOFTWARE'].startswith('Development'))
+        (not os.environ.get('SERVER_SOFTWARE') or
+         os.environ['SERVER_SOFTWARE'].startswith('Development')) and
+        not FORCE_PROD_MODE)
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
@@ -53,7 +50,7 @@ SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 
 EXTENSIONS_DIR_PREFIX = (
-    'backend_prod_files' if (IS_MINIFIED or not DEV_MODE) else '')
+    'backend_prod_files' if not DEV_MODE else '')
 INTERACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
 RTE_EXTENSIONS_DIR = (
@@ -63,9 +60,8 @@ RTE_EXTENSIONS_DEFINITIONS_PATH = (
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
-# Choose production templates folder if minification flag is used or
-# if in production mode
-if IS_MINIFIED or not DEV_MODE:
+# Choose production templates folder when we are in production mode.
+if not DEV_MODE:
     FRONTEND_TEMPLATES_DIR = (
         os.path.join('backend_prod_files', 'templates', 'head'))
 else:
@@ -156,7 +152,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 16
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 18
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -251,8 +247,11 @@ INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
 # circularities with exp_services.
 # TODO (Jacob) Refactor exp_services to remove this problem.
 _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
+
+
 def get_empty_ratings():
     return copy.deepcopy(_EMPTY_RATINGS)
+
 
 # Empty scaled average rating as a float.
 EMPTY_SCALED_AVERAGE_RATING = 0.0
@@ -620,6 +619,7 @@ EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
 EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
 EVENT_TYPE_RATE_EXPLORATION = 'rate_exploration'
 EVENT_TYPE_SOLUTION_HIT = 'solution_hit'
+EVENT_TYPE_LEAVE_FOR_REFRESHER_EXP = 'leave_for_refresher_exp'
 # The values for these event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'

@@ -19,7 +19,7 @@
 oppia.factory('SolutionVerificationService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',
   function(
-    $injector, AngularNameService, AnswerClassificationService) {
+      $injector, AngularNameService, AnswerClassificationService) {
     return {
       verifySolution: function(explorationId, state, correctAnswer) {
         var interactionId = state.interaction.id;
@@ -32,5 +32,5 @@ oppia.factory('SolutionVerificationService', [
           ));
         return state.name !== result.outcome.dest;
       }
-    }
+    };
   }]);

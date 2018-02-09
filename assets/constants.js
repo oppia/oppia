@@ -453,12 +453,15 @@ var constants = {
     "id": "en-auto",
     "text": "English (auto)",
     "exploration_language": "en",
-    "speech_synthesis_code": "en-GB"
+    "speech_synthesis_code": "en-GB",
+    "speech_synthesis_code_mobile": "en_US"
   }],
 
   "//" : "Types of view in creator dashboard page.",
   "ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS": {
     "CARD": "card",
     "LIST": "list"
-  }
+  },
+
+  "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": []
 };

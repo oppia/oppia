@@ -21,6 +21,7 @@ stored in the database. In particular, the various query methods should
 delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
+import StringIO
 import collections
 import copy
 import datetime
@@ -28,7 +29,6 @@ import logging
 import math
 import os
 import pprint
-import StringIO
 import traceback
 import zipfile
 
@@ -1674,6 +1674,7 @@ def get_scaled_average_rating(ratings):
     b = z * math.sqrt((x*(1-x))/n + (z**2)/(4*n**2))
     wilson_score_lower_bound = (a - b)/(1 + z**2/n)
     return 1 + 4 * wilson_score_lower_bound
+
 
 def get_exploration_search_rank(exp_id):
     """Returns the search rank.

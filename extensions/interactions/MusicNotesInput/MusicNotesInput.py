@@ -31,7 +31,7 @@ class MusicNotesInput(base.BaseInteraction):
     narrow_instructions = 'Show music staff'
     needs_summary = True
     can_have_solution = True
-    show_nav_submit_button = True
+    show_generic_submit_button = True
 
     _customization_arg_specs = [{
         'name': 'sequenceToGuess',

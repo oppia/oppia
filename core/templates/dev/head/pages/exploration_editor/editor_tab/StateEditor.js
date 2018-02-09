@@ -17,11 +17,11 @@
  */
 
 oppia.controller('StateEditor', [
-  '$scope', '$rootScope', 'EditorStateService', 'explorationStatesService',
+  '$scope', '$rootScope', 'EditorStateService', 'ExplorationStatesService',
   'INTERACTION_SPECS', 'ExplorationAdvancedFeaturesService',
   'UrlInterpolationService', 'stateContentService',
   function(
-      $scope, $rootScope, EditorStateService, explorationStatesService,
+      $scope, $rootScope, EditorStateService, ExplorationStatesService,
       INTERACTION_SPECS, ExplorationAdvancedFeaturesService,
       UrlInterpolationService, stateContentService) {
     $scope.areParametersEnabled = (
@@ -50,13 +50,13 @@ oppia.controller('StateEditor', [
 
     $scope.initStateEditor = function() {
       var stateName = EditorStateService.getActiveStateName();
-      var stateData = explorationStatesService.getState(stateName);
+      var stateData = ExplorationStatesService.getState(stateName);
       if (stateName && stateData) {
         stateContentService.init(
           EditorStateService.getActiveStateName(), stateData.content);
 
         $rootScope.$broadcast('stateEditorInitialized', stateData);
-        var interactionId = explorationStatesService.getInteractionIdMemento(
+        var interactionId = ExplorationStatesService.getInteractionIdMemento(
           stateName);
         $scope.interactionIdIsSet = Boolean(interactionId);
         $scope.currentInteractionCanHaveSolution = Boolean(
@@ -66,7 +66,7 @@ oppia.controller('StateEditor', [
           $scope.interactionIdIsSet &&
           INTERACTION_SPECS[interactionId].is_terminal);
 
-        var content = explorationStatesService.getStateContentMemento(
+        var content = ExplorationStatesService.getStateContentMemento(
           stateName);
         if (content.getHtml() || stateData.interaction.id) {
           $scope.interactionIsShown = true;
@@ -111,12 +111,12 @@ oppia.directive('trainingPanel', [
         'training_answer_modal_directive.html'),
       controller: [
         '$scope', 'ExplorationHtmlFormatterService',
-        'EditorStateService', 'explorationStatesService',
+        'EditorStateService', 'ExplorationStatesService',
         'trainingDataService', 'responsesService', 'stateInteractionIdService',
         'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
         'OutcomeObjectFactory',
         function($scope, ExplorationHtmlFormatterService,
-            EditorStateService, explorationStatesService,
+            EditorStateService, ExplorationStatesService,
             trainingDataService, responsesService, stateInteractionIdService,
             stateCustomizationArgsService, AnswerGroupObjectFactory,
             OutcomeObjectFactory) {
@@ -124,7 +124,7 @@ oppia.directive('trainingPanel', [
           $scope.addingNewResponse = false;
 
           var _stateName = EditorStateService.getActiveStateName();
-          var _state = explorationStatesService.getState(_stateName);
+          var _state = ExplorationStatesService.getState(_stateName);
           $scope.allOutcomes = trainingDataService.getAllPotentialOutcomes(
             _state);
 

@@ -15,7 +15,6 @@
 """Services for classifier data models."""
 
 import datetime
-
 import logging
 
 from core.domain import classifier_domain
@@ -23,7 +22,6 @@ from core.domain import classifier_registry
 from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.platform import models
-
 import feconf
 
 (classifier_models, exp_models) = models.Registry.import_models(
@@ -281,6 +279,7 @@ def get_classifier_training_job_from_model(classifier_training_job_model):
         classifier_training_job_model.training_data,
         classifier_training_job_model.classifier_data,
         classifier_training_job_model.data_schema_version)
+
 
 def get_classifier_training_job_by_id(job_id):
     """Gets a classifier training job by a job_id.

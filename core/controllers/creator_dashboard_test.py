@@ -20,9 +20,9 @@ from core.domain import exp_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rating_services
-from core.domain import subscription_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous_test
+from core.domain import subscription_services
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_continuous_test
 from core.domain import user_services

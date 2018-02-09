@@ -17,15 +17,18 @@
  */
 
 oppia.factory('HintsAndSolutionManagerService', [
-  '$timeout', 'PlayerTranscriptService', 'DELAY_FOR_HINT_FEEDBACK_MSEC',
-  'HINT_REQUEST_STRING_I18N_IDS', 'WAIT_FOR_FIRST_HINT_MSEC',
-  'WAIT_FOR_SUBSEQUENT_HINTS_MSEC',
+  '$timeout', '$rootScope', 'PlayerTranscriptService',
+  'DELAY_FOR_HINT_FEEDBACK_MSEC', 'HINT_REQUEST_STRING_I18N_IDS',
+  'WAIT_FOR_FIRST_HINT_MSEC', 'WAIT_FOR_SUBSEQUENT_HINTS_MSEC',
+  'EVENT_NEW_CARD_AVAILABLE',
   function(
-      $timeout, PlayerTranscriptService, DELAY_FOR_HINT_FEEDBACK_MSEC,
-      HINT_REQUEST_STRING_I18N_IDS, WAIT_FOR_FIRST_HINT_MSEC,
-      WAIT_FOR_SUBSEQUENT_HINTS_MSEC) {
+      $timeout, $rootScope, PlayerTranscriptService,
+      DELAY_FOR_HINT_FEEDBACK_MSEC, HINT_REQUEST_STRING_I18N_IDS,
+      WAIT_FOR_FIRST_HINT_MSEC, WAIT_FOR_SUBSEQUENT_HINTS_MSEC,
+      EVENT_NEW_CARD_AVAILABLE) {
     var timeout = null;
     var ACCELERATED_HINT_WAIT_TIME_MSEC = 10000;
+    var WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC = 60000;
 
     var numHintsReleased = 0;
     var numHintsConsumed = 0;
@@ -34,6 +37,23 @@ oppia.factory('HintsAndSolutionManagerService', [
     var hintsForLatestCard = [];
     var solutionForLatestCard = null;
     var wrongAnswersSinceLastHintConsumed = 0;
+    var correctAnswerSubmitted = false;
+
+    // tooltipIsOpen is a flag which says that the tooltip is currently
+    // visible to the learner.
+    var tooltipIsOpen = false;
+    // This is set to true as soon as a hint/solution is clicked or when the
+    // tooltip has been triggered.
+    var hintsDiscovered = false;
+    var tooltipTimeout = null;
+
+
+    $rootScope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+      correctAnswerSubmitted = true;
+      // This prevents tooltip to hide the Continue button of the help card in
+      // mobile view.
+      tooltipIsOpen = false;
+    });
 
     // This replaces any timeouts that are already queued.
     var enqueueTimeout = function(func, timeToWaitMsec) {
@@ -43,8 +63,19 @@ oppia.factory('HintsAndSolutionManagerService', [
       timeout = $timeout(func, timeToWaitMsec);
     };
 
+    var showTooltip = function() {
+      tooltipIsOpen = true;
+      hintsDiscovered = true;
+    };
+
     var releaseHint = function() {
-      numHintsReleased++;
+      if (!correctAnswerSubmitted) {
+        numHintsReleased++;
+        if (!hintsDiscovered && !tooltipTimeout) {
+          tooltipTimeout = $timeout(
+            showTooltip, WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+        }
+      }
     };
     var releaseSolution = function() {
       solutionReleased = true;
@@ -61,13 +92,19 @@ oppia.factory('HintsAndSolutionManagerService', [
     };
 
     var consumeHint = function() {
+      hintsDiscovered = true;
+      tooltipIsOpen = false;
+      if (tooltipTimeout) {
+        $timeout.cancel(tooltipTimeout);
+      }
+
       numHintsConsumed++;
       wrongAnswersSinceLastHintConsumed = 0;
 
       var funcToEnqueue = null;
       if (!areAllHintsExhausted()) {
         funcToEnqueue = releaseHint;
-      } else if (!solutionReleased) {
+      } else if (!!solutionForLatestCard && !solutionReleased) {
         funcToEnqueue = releaseSolution;
       }
       if (funcToEnqueue) {
@@ -84,8 +121,12 @@ oppia.factory('HintsAndSolutionManagerService', [
         hintsForLatestCard = newHints;
         solutionForLatestCard = newSolution;
         wrongAnswersSinceLastHintConsumed = 0;
+        correctAnswerSubmitted = false;
         if (timeout) {
           $timeout.cancel(timeout);
+        }
+        if (tooltipTimeout) {
+          $timeout.cancel(tooltipTimeout);
         }
 
         if (hintsForLatestCard.length > 0) {
@@ -107,7 +148,11 @@ oppia.factory('HintsAndSolutionManagerService', [
         return null;
       },
       displaySolution: function() {
+        hintsDiscovered = true;
         solutionConsumed = true;
+        if (tooltipTimeout) {
+          $timeout.cancel(tooltipTimeout);
+        }
         return solutionForLatestCard;
       },
       getNumHints: function() {
@@ -118,6 +163,9 @@ oppia.factory('HintsAndSolutionManagerService', [
       },
       isHintConsumed: function(index) {
         return index < numHintsConsumed;
+      },
+      isHintTooltipOpen: function() {
+        return tooltipIsOpen;
       },
       isSolutionViewable: function() {
         return solutionReleased;

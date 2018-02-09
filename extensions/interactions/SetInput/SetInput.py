@@ -29,7 +29,7 @@ class SetInput(base.BaseInteraction):
     narrow_instructions = None
     needs_summary = False
     can_have_solution = True
-    show_nav_submit_button = True
+    show_generic_submit_button = True
 
     # NB: There used to be a UnicodeString-typed parameter here called
     # 'element_type'. This has since been removed.

@@ -78,19 +78,19 @@ describe('Suggestions on Explorations', function() {
     editor.getSuggestionThreads().then(function(threads) {
       expect(threads.length).toEqual(1);
       expect(threads[0]).toMatch(suggestionDescription);
+      editor.acceptSuggestion(suggestionDescription);
+
+      editor.navigateToPreviewTab();
+      explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
+      users.logout();
+
+      // Student logs in and plays the exploration, finds the updated content
+      users.login('user3@ExplorationSuggestions.com');
+      libraryPage.get();
+      libraryPage.playExploration(EXPLORATION_TITLE);
+      explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
+      users.logout();
     });
-    editor.acceptSuggestion(suggestionDescription);
-
-    editor.navigateToPreviewTab();
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
-    users.logout();
-
-    // Student logs in and plays the exploration, finds the updated content
-    users.login('user3@ExplorationSuggestions.com');
-    libraryPage.get();
-    libraryPage.playExploration(EXPLORATION_TITLE);
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
-    users.logout();
   });
 
   afterEach(function() {

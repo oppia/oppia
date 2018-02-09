@@ -23,7 +23,6 @@ from core.domain import calculation_registry
 from core.domain import exp_services
 from core.domain import interaction_registry
 from core.platform import models
-
 import feconf
 import utils
 

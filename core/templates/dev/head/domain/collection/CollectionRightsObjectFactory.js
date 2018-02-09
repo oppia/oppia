@@ -101,7 +101,7 @@ oppia.factory('CollectionRightsObjectFactory', [
     // Note that the collection nodes within this collection will be completely
     // redefined as copies from the specified collection rights
     CollectionRights.prototype.copyFromCollectionRights = function(
-      otherCollectionRights) {
+        otherCollectionRights) {
       this._collectionId = otherCollectionRights.getCollectionId();
       this._canEdit = otherCollectionRights.canEdit();
       this._isPrivate = otherCollectionRights.isPrivate();

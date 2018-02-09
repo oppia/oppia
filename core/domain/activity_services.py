@@ -21,6 +21,7 @@ import logging
 from constants import constants
 from core.domain import activity_domain
 from core.platform import models
+
 (activity_models,) = models.Registry.import_models([models.NAMES.activity])
 
 

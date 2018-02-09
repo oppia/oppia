@@ -20,10 +20,10 @@
 
 // NOTE TO DEVELOPERS: These constants must be the same (in name and value) as
 // the corresponding classification constants defined in core.domain.exp_domain.
-oppia.constant('EXPLICIT_CLASSIFICATION', 'explicit')
-oppia.constant('TRAINING_DATA_CLASSIFICATION', 'training_data_match')
-oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier')
-oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome')
+oppia.constant('EXPLICIT_CLASSIFICATION', 'explicit');
+oppia.constant('TRAINING_DATA_CLASSIFICATION', 'training_data_match');
+oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier');
+oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome');
 
 oppia.factory('AnswerClassificationService', [
   '$http', 'LearnerParamsService', 'AlertsService',
@@ -61,7 +61,6 @@ oppia.factory('AnswerClassificationService', [
               interactionRulesService[rule.type](
                 answer, rule.inputs)) {
             return AnswerClassificationResultObjectFactory.createNew(
-              answerGroups[i].labelledAsCorrect,
               answerGroups[i].outcome, i, j, EXPLICIT_CLASSIFICATION);
           }
         }
@@ -71,7 +70,6 @@ oppia.factory('AnswerClassificationService', [
       // returned. Throws an error if the default outcome is not defined.
       if (defaultOutcome) {
         return AnswerClassificationResultObjectFactory.createNew(
-          false,
           defaultOutcome, answerGroups.length, 0, DEFAULT_OUTCOME_CLASSIFICATION
         );
       } else {
@@ -151,7 +149,6 @@ oppia.factory('AnswerClassificationService', [
                 classifier.classifierData, answer);
               answerClassificationResult = (
                 AnswerClassificationResultObjectFactory.createNew(
-                  answerGroups[predictedAnswerGroupIndex].labelledAsCorrect,
                   answerGroups[predictedAnswerGroupIndex].outcome,
                   predictedAnswerGroupIndex,
                   findClassifierRuleIndex(

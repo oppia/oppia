@@ -28,7 +28,6 @@ from core.tests import test_utils
 import feconf
 import utils
 
-
 CAN_EDIT_STR = 'can_edit'
 
 

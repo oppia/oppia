@@ -13,7 +13,7 @@
       <div class="col-sm-4 col-md-4 col-lg-4">
         <span>
           <em><[explorationVersionMetadata[versionNumber].createdOnStr]></em>
-          <span ng-if="versionNumber !== currentVersion && editabilityService.isEditable()">
+          <span ng-if="versionNumber !== currentVersion && EditabilityService.isEditable()">
             | <a href="#" class='protractor-test-revert-version' ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
           </span>
           <span>
@@ -32,7 +32,7 @@
       </div>
     </div>
 
-    <div style="margin-top: 30px" uib-pagination boundary-links="true" class="pagination-sm" max-size="5" items-per-page="VERSIONS_PER_PAGE" total-items="versionCheckboxArray.length" ng-model="displayedCurrentPageNumber" ng-change="computeVersionsToDisplay()"></div>
+    <div ng-show="versionCheckboxArray.length > VERSIONS_PER_PAGE" style="margin-top: 30px" uib-pagination boundary-links="true" class="pagination-sm" max-size="5" items-per-page="VERSIONS_PER_PAGE" total-items="versionCheckboxArray.length" ng-model="displayedCurrentPageNumber" ng-change="computeVersionsToDisplay()"></div>
   </md-card>
 
   <md-card class="oppia-editor-card" style="position: relative;"

@@ -80,13 +80,11 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
   'musicNotesInputRulesService', 'musicPhrasePlayerService',
   'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
   'EVENT_PROGRESS_NAV_SUBMITTED', 'WindowDimensionsService',
-  'UrlService',
   function(
       HtmlEscaperService, NOTE_NAMES_TO_MIDI_VALUES,
       musicNotesInputRulesService, musicPhrasePlayerService,
       UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE,
-      EVENT_PROGRESS_NAV_SUBMITTED, WindowDimensionsService,
-      UrlService) {
+      EVENT_PROGRESS_NAV_SUBMITTED, WindowDimensionsService) {
     return {
       restrict: 'E',
       scope: {
@@ -106,12 +104,6 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           return scope;
         };
 
-        scope.isSubmitHidden = function() {
-          return (
-            !UrlService.isIframed() &&
-            WindowDimensionsService.isWindowNarrow());
-        };
-
         scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
         scope.sequenceToGuess = HtmlEscaperService.escapedJsonToObj(
           attrs.sequenceToGuessWithValue);
@@ -122,7 +114,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           HtmlEscaperService.escapedJsonToObj(attrs.initialSequenceWithValue) :
           scope.getLastAnswer();
 
-        scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
+        scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
           scope.interactionIsActive = false;
           scope.initialSequence = scope.getLastAnswer();
           scope.reinitStaff();

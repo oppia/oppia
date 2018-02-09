@@ -18,10 +18,10 @@
 
 oppia.factory('AudioPlayerService', [
   '$q', '$timeout', 'ngAudio', 'AssetsBackendApiService',
-  'ExplorationContextService',
+  'ExplorationContextService', 'AudioTranslationManagerService',
   function(
       $q, $timeout, ngAudio, AssetsBackendApiService,
-      ExplorationContextService) {
+      ExplorationContextService, AudioTranslationManagerService) {
     var _currentTrackFilename = null;
     var _currentTrack = null;
 
@@ -45,7 +45,9 @@ oppia.factory('AudioPlayerService', [
               _currentTrack.audio.onended = function() {
                 _currentTrack = null;
                 _currentTrackFilename = null;
-              }
+                AudioTranslationManagerService
+                  .clearSecondaryAudioTranslations();
+              };
             }, 100);
 
             successCallback();
@@ -108,8 +110,13 @@ oppia.factory('AudioPlayerService', [
         }
         return _currentTrack.progress;
       },
+      setProgress: function(progress) {
+        if (_currentTrack) {
+          _currentTrack.progress = progress;
+        }
+      },
       isPlaying: function() {
-        return (_currentTrack && !_currentTrack.paused);
+        return Boolean(_currentTrack && !_currentTrack.paused);
       },
       isTrackLoaded: function() {
         return Boolean(_currentTrack);

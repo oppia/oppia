@@ -32,6 +32,10 @@ oppia.constant('EVENT_NEW_CARD_OPENED', 'newCardOpened');
    Also called when card is selected by clicking on progress dots */
 oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
 
+/* Called when a new audio-equippable component is loaded and displayed
+   to the user, allowing for the automatic playing of audio if necessary. */
+oppia.constant('EVENT_AUTOPLAY_AUDIO', 'autoPlayAudio');
+
 // The enforced waiting period before the first hint request.
 oppia.constant('WAIT_FOR_FIRST_HINT_MSEC', 60000);
 // The enforced waiting period before each of the subsequent hint requests.
@@ -62,4 +66,8 @@ oppia.constant(
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 
 
-oppia.constant('EVENT_PROGRESS_NAV_SUBMITTED', 'progress-nav-submit')
+oppia.constant('EVENT_PROGRESS_NAV_SUBMITTED', 'progress-nav-submit');
+
+/* This should match the CSS class defined in the tutor card directive. */
+oppia.constant(
+  'AUDIO_HIGHLIGHT_CSS_CLASS','conversation-skin-audio-highlight');

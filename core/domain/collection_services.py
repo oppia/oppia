@@ -597,6 +597,7 @@ def get_collection_ids_matching_query(query_string, cursor=None):
 
     return (returned_collection_ids, search_cursor)
 
+
 # Repository SAVE and DELETE methods.
 def apply_change_list(collection_id, change_list):
     """Applies a changelist to a pristine collection and returns the result.

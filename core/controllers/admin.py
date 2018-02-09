@@ -17,8 +17,6 @@
 import logging
 import random
 
-import jinja2
-
 from core import jobs
 from core import jobs_registry
 from core.controllers import base
@@ -37,6 +35,8 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
+
+import jinja2
 
 current_user_services = models.Registry.import_current_user_services()
 
@@ -218,8 +218,7 @@ class AdminHandler(base.BaseHandler):
 
     def _generate_dummy_explorations(
             self, num_dummy_exps_to_generate, num_dummy_exps_to_publish):
-        """
-        Generates and publishes the given number of dummy explorations.
+        """Generates and publishes the given number of dummy explorations.
 
         Args:
             num_dummy_exps_to_generate: int. Count of dummy explorations to

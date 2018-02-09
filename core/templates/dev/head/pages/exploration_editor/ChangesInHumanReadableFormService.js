@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to get changes in human readable form.  
+ * @fileoverview Service to get changes in human readable form.
  */
 
 oppia.factory('ChangesInHumanReadableFormService', [
@@ -283,7 +283,14 @@ oppia.factory('ChangesInHumanReadableFormService', [
     };
 
     return {
-      makeHumanReadable: makeHumanReadable
+      makeHumanReadable: function(lostChanges) {
+        try {
+          return makeHumanReadable(lostChanges);
+        } catch (e) {
+          return angular.element(
+            '<div>Error: Could not recover lost changes.</div>');
+        }
+      }
     };
   }]
 );
