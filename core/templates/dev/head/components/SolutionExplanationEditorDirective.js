@@ -25,9 +25,9 @@ oppia.directive('solutionExplanationEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/solution_explanation_editor_directive.html'),
       controller: [
-        '$scope', 'EditabilityService', 'stateSolutionService',
+        '$scope', '$uibModal', 'EditabilityService', 'stateSolutionService',
         'COMPONENT_NAME_SOLUTION',
-        function($scope, EditabilityService, stateSolutionService,
+        function($scope, $uibModal, EditabilityService, stateSolutionService,
             COMPONENT_NAME_SOLUTION) {
           $scope.isEditable = EditabilityService.isEditable();
 
@@ -49,6 +49,13 @@ oppia.directive('solutionExplanationEditor', [
           };
 
           $scope.saveThisExplanation = function() {
+            var contentHasChanged = (
+              stateSolutionService.displayed.explanation.getHtml() !==
+              stateSolutionService.savedMemento.explanation.getHtml());
+            if (stateSolutionService.displayed.explanation
+              .hasUnflaggedAudioTranslations() && contentHasChanged) {
+              openMarkAllAudioAsNeedingUpdateModal();
+            }
             stateSolutionService.saveDisplayedValue();
             $scope.explanationEditorIsOpen = false;
           };
@@ -72,9 +79,24 @@ oppia.directive('solutionExplanationEditor', [
           $scope.$on('externalSave', function() {
             if ($scope.explanationEditorIsOpen &&
               $scope.editSolutionForm.$valid) {
-              $scope.saveThisSolution();
+              $scope.saveThisExplanation();
             }
           });
+
+          var openMarkAllAudioAsNeedingUpdateModal = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/forms/' +
+                'mark_all_audio_as_needing_update_modal_directive.html'),
+              backdrop: true,
+              resolve: {},
+              controller: 'MarkAllAudioAsNeedingUpdateController'
+            }).result.then(function() {
+              stateSolutionService.displayed.explanation
+                .markAllAudioAsNeedingUpdate();
+              stateSolutionService.saveDisplayedValue();
+            });
+          };
         }
       ]
     };
