@@ -82,8 +82,11 @@ oppia.factory('ExplorationSaveService', [
           'post_publish_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$uibModalInstance', 'ExplorationContextService',
-          function($scope, $uibModalInstance, ExplorationContextService) {
+          '$scope', '$window', '$uibModalInstance',
+          'ExplorationContextService',
+          function(
+              $scope, $window, $uibModalInstance,
+              ExplorationContextService) {
             $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
@@ -93,6 +96,18 @@ oppia.factory('ExplorationSaveService', [
             };
             $scope.explorationId = (
               ExplorationContextService.getExplorationId());
+            $scope.explorationLink = (
+              $window.location.protocol + '//' +
+              $window.location.host + '/explore/' + $scope.explorationId);
+            $scope.selectText = function(evt) {
+              var codeDiv = evt.currentTarget;
+              var range = document.createRange();
+              range.setStartBefore(codeDiv.firstChild);
+              range.setEndAfter(codeDiv.lastChild);
+              var selection = window.getSelection();
+              selection.removeAllRanges();
+              selection.addRange(range);
+            };
           }
         ]
       });

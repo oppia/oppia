@@ -50,6 +50,9 @@ oppia.factory('HintsAndSolutionManagerService', [
 
     $rootScope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
       correctAnswerSubmitted = true;
+      // This prevents tooltip to hide the Continue button of the help card in
+      // mobile view.
+      tooltipIsOpen = false;
     });
 
     // This replaces any timeouts that are already queued.

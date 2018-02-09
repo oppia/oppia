@@ -51,6 +51,13 @@ class FractionInput(base.BaseInteraction):
             'type': 'bool',
         },
         'default_value': True
+    }, {
+        'name': 'customPlaceholder',
+        'description': 'Custom placeholder text (optional)',
+        'schema': {
+            'type': 'unicode'
+        },
+        'default_value': ''
     }]
 
     _answer_visualization_specs = [{

@@ -111,23 +111,23 @@ describe('Full exploration editor', function() {
             parentId1 + '&parent=' + parentId2);
           browser.waitForAngular();
 
-          explorationPlayerPage.clickOnSummaryTileAtEnd();
+          explorationPlayerPage.clickOnReturnToParentButton();
 
           browser.getCurrentUrl().then(function(url) {
             var currentExplorationId = url.split('/')[4].split('?')[0];
             expect(currentExplorationId).toBe(parentId2);
-          });
 
-          explorationPlayerPage.clickOnSummaryTileAtEnd();
+            explorationPlayerPage.clickOnReturnToParentButton();
 
-          browser.getCurrentUrl().then(function(url) {
-            currentExplorationId = url.split('/')[4];
-            expect(currentExplorationId).toBe(parentId1);
+            browser.getCurrentUrl().then(function(url) {
+              currentExplorationId = url.split('/')[4];
+              expect(currentExplorationId).toBe(parentId1);
+              users.logout();
+            });
           });
         });
       });
     });
-    users.logout();
   });
 
   it('should give option for redirection when author has specified ' +
@@ -138,6 +138,7 @@ describe('Full exploration editor', function() {
     var dropdown = element(by.css('.protractor-test-profile-dropdown'));
     browser.actions().mouseMove(dropdown).perform();
     dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+    general.waitForSystem();
     browser.waitForAngular();
     creatorDashboardPage.clickCreateActivityButton();
     creatorDashboardPage.clickCreateExplorationButton();
@@ -156,6 +157,7 @@ describe('Full exploration editor', function() {
       dropdown = element(by.css('.protractor-test-profile-dropdown'));
       browser.actions().mouseMove(dropdown).perform();
       dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+      general.waitForSystem();
       browser.waitForAngular();
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateExplorationButton();
@@ -185,6 +187,7 @@ describe('Full exploration editor', function() {
       dropdown = element(by.css('.protractor-test-profile-dropdown'));
       browser.actions().mouseMove(dropdown).perform();
       dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+      general.waitForSystem();
       browser.waitForAngular();
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateExplorationButton();
@@ -214,9 +217,11 @@ describe('Full exploration editor', function() {
       dropdown = element(by.css('.protractor-test-profile-dropdown'));
       browser.actions().mouseMove(dropdown).perform();
       dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+      general.waitForSystem();
       browser.waitForAngular();
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateCollectionButton();
+      general.waitForSystem();
       browser.waitForAngular();
       collectionEditor.searchForAndAddExistingExploration(
         'Parent Exploration in collection');
@@ -234,39 +239,41 @@ describe('Full exploration editor', function() {
       explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
       general.waitForSystem();
       explorationPlayerPage.clickConfirmRedirectionButton();
+      general.waitForSystem();
       browser.waitForAngular();
       general.getExplorationIdFromPlayer().then(function(currentId) {
         expect(currentId).toEqual(refresherExplorationId);
-      });
-      general.waitForSystem();
-      explorationPlayerPage.clickOnSummaryTileAtEnd();
-      browser.waitForAngular();
-      explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
-      general.waitForSystem();
-      explorationPlayerPage.clickCancelRedirectionButton();
-      browser.waitForAngular();
-      explorationPlayerPage.expectContentToMatch(
-        forms.toRichText('Parent Exploration Content'));
-      explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Correct');
-      browser.waitForAngular();
+        general.waitForSystem();
+        explorationPlayerPage.clickOnReturnToParentButton();
+        browser.waitForAngular();
+        explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
+        general.waitForSystem();
+        explorationPlayerPage.clickCancelRedirectionButton();
+        browser.waitForAngular();
+        explorationPlayerPage.expectContentToMatch(
+          forms.toRichText('Parent Exploration Content'));
+        explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Correct');
+        browser.waitForAngular();
 
-      browser.get('/search/find?q=');
-      element.all(by.css(
-        '.protractor-test-collection-summary-tile-title')).first().click();
-      element.all(by.css(
-        '.protractor-test-collection-exploration')).first().click();
-      explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
-      general.waitForSystem();
-      explorationPlayerPage.clickConfirmRedirectionButton();
-      browser.waitForAngular();
-      // Check the current url to see if collection_id is present in it.
-      browser.getCurrentUrl().then(function(url) {
-        var pathname = url.split('/');
-        expect(
-          pathname[4].split('?')[1].split('=')[0]).toEqual('collection_id');
+        browser.get('/search/find?q=');
+        element.all(by.css(
+          '.protractor-test-collection-summary-tile-title')).first().click();
+        element.all(by.css(
+          '.protractor-test-collection-exploration')).first().click();
+        explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
+        general.waitForSystem();
+        explorationPlayerPage.clickConfirmRedirectionButton();
+        general.waitForSystem();
+        browser.waitForAngular();
+        // Check the current url to see if collection_id is present in it.
+        browser.getCurrentUrl().then(function(url) {
+          var pathname = url.split('/');
+          expect(
+            pathname[4].split('?')[1].split('=')[0]).toEqual('collection_id');
+          general.waitForSystem();
+          users.logout();
+        });
       });
-      general.waitForSystem();
-      users.logout();
     });
   });
 
