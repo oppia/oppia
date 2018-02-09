@@ -241,12 +241,10 @@ oppia.filter('parameterizeRuleDescription', [
         }
 
         if (typeof (replacementText) === 'string') {
-          // Replacing all occurances of $ with $$.
-          // When this is used in the next replace
-          // statement, it will be converted back to $.
-          // Also to replace by $$, the appropriate string is $$$
-          // as $$ becomes $
-          replacementText = replacementText.replace(/\$/g, '$$$');
+          // Replaces all occurances of $ with $$.
+          // This makes sure that the next regex matching will yield 
+          // the same $ sign pattern as the input 
+          replacementText = replacementText.split('$').join('$$');
         }
 
         description = description.replace(PATTERN, ' ');
