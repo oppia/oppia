@@ -69,7 +69,7 @@
 
         <div ng-if="activeRuleIndex === $index">
           <div class="oppia-editor-card-section">
-            <div class="oppia-rule-body-container" ng-class="getInteraction()">
+            <div class="oppia-rule-body-container">
               <rule-editor rule="rule" is-editable="isEditable" is-editing-rule-inline="true" on-cancel-rule-edit="cancelActiveRuleEdit()" on-save-rule="saveRules()" class="protractor-test-answer-body">
               </rule-editor>
             </div>

@@ -1,3 +1,13 @@
+<style>
+md-checkbox .md-icon {
+  top: 2px;
+}
+
+md-checkbox .md-label {
+  vertical-align: top;
+}
+</style>
+
 <div class="container-fluid">
   <div ng-repeat="choice in choices track by $index">
     <md-checkbox ng-click="toggleSelection($index)"

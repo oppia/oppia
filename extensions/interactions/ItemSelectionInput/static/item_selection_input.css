@@ -89,11 +89,3 @@ md-checkbox.item-selection-input-checkbox .md-label {
   margin-right: 12px;
   width: 16px;
 }
-
-.item-selection-input md-checkbox .md-icon {
-  top: 2px;
-}
-
-.item-selection-input md-checkbox .md-label {
-  vertical-align: top;
-}
