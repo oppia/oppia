@@ -44,7 +44,7 @@ class _Platform(object):
 class _Gae(_Platform):
     """Provides platform-specific imports related to GAE (Google App Engine).
     """
-    
+
     @classmethod
     def import_models(cls, model_names):
         """Imports and returns the storage modules listed in model_names.
