@@ -462,8 +462,8 @@ oppia.directive('graphViz', [
 
           $scope.onTouchFinalVertex = function(index) {
             if ($scope.state.currentMode === _MODES.ADD_EDGE) {
-                tryAddEdge(
-                  $scope.state.addEdgeVertex, index);
+              tryAddEdge(
+                $scope.state.addEdgeVertex, index);
               endAddEdge();
             } else if ($scope.state.currentMode === _MODES.MOVE) {
               if ($scope.state.currentlyDraggedVertex !== null) {
