@@ -8,7 +8,7 @@
          tooltip-append-to-body="true" tooltip-placement="right"></i>
       <div class="slider-section" ng-if="hasPressedPlayButtonAtLeastOnce">
         <div ng-if="audioLoadingIndicatorIsShown">
-          <md-progress-linear md-mode="indeterminate"> </md-progress-linear>
+          <md-progress-linear md-mode="indeterminate"></md-progress-linear>
         </div>
         <div ng-if="!audioLoadingIndicatorIsShown">
           <md-slider ng-model="track.progress" ng-model-options="{ getterSetter: true }" aria-label="audio-slider">
