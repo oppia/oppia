@@ -246,15 +246,21 @@ oppia.filter('parameterizeRuleDescription', [
           }
           replacementText += ']';
         } else if (
-          varType === 'Real' || varType === 'NonnegativeInt') {
+          varType === 'Real' || varType === 'NonnegativeInt' ||
+          varType === 'Int') {
           replacementText = inputs[varName] + '';
-        } else {
+        } else if (
+          varType === 'CodeString' || varType === 'UnicodeString' ||
+          varType === 'LogicErrorCategory' || varType === 'NormalizedString' ||
+          varType === 'SetOfNormalizedString') {
           replacementText = inputs[varName];
+        } else {
+          throw 'Unknown variable type in rule description';
         }
 
         // Replaces all occurances of $ with $$.
         // This makes sure that the next regex matching will yield
-        // the same $ sign pattern as the input
+        // the same $ sign pattern as the input.
         replacementText = replacementText.split('$').join('$$');
 
         description = description.replace(PATTERN, ' ');
