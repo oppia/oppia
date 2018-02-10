@@ -3,7 +3,7 @@
     <div class="oppia-html-select-selection-element" angular-html-bind="options[getSelectionIndex()].val"></div>
     <span class="caret oppia-html-select-selection-caret"></span>
   </button>
-  <ul uib-dropdown-menu class="oppia-dropdown-menu" style="width: inherit;">
+  <ul uib-dropdown-menu style="width: inherit;">
     <li ng-repeat="choice in options">
       <a class="oppia-html-select-option protractor-test-html-select-option" angular-html-bind="choice.val" ng-click="select(choice.id)">
       </a>
@@ -47,7 +47,5 @@
     display: inline-block;
     margin-bottom: 0;
   }
-  .oppia-dropdown-menu {
-    position: relative;
-  }
+  
 </style>

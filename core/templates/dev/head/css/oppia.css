@@ -2507,7 +2507,8 @@ pre.oppia-pre-wrapped-text {
 .oppia-rule-block.active {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   margin: -2px;
-  z-index: 1;
+  position: relative;
+  z-index: 100;
 }
 
 .oppia-rule-sort-handle, .oppia-fallback-sort-handle, .oppia-hint-sort-handle, .oppia-learner-playlist-sort-handle {
