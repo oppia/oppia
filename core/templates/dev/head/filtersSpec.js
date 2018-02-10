@@ -545,6 +545,21 @@ describe('Testing filters', function() {
         }
       ];
 
+      expect($filter('convertToPlainText')($filter('formatRtePreview')(
+        $filter('parameterizeRuleDescription')(ruleMath, interactionIdMath,
+          choicesMath)))
+      ).toEqual('is ' + 'equal to \'[Math]\'');
+
+      expect($filter('convertToPlainText')($filter('formatRtePreview')(
+        $filter('parameterizeRuleDescription')(ruleMixed, interactionIdMixed,
+        choicesMixed)))
+      ).toEqual('is ' + 'equal to \'[Image] This is a text ' +
+        'input. [Image]  [Link]\'');
+    }
+  ));
+
+  it('should correctly parameterize rule description filter',
+    inject(function($filter) {
       var ruleMultipleChoice = {
         type: 'Equals',
         inputs: {
@@ -558,18 +573,6 @@ describe('Testing filters', function() {
           val: 0
         }
       ];
-
-      expect($filter('convertToPlainText')($filter('formatRtePreview')(
-        $filter('parameterizeRuleDescription')(ruleMath, interactionIdMath,
-          choicesMath)))
-      ).toEqual('is ' + 'equal to \'[Math]\'');
-
-      expect($filter('convertToPlainText')($filter('formatRtePreview')(
-        $filter('parameterizeRuleDescription')(ruleMixed, interactionIdMixed,
-        choicesMixed)))
-      ).toEqual('is ' + 'equal to \'[Image] This is a text ' +
-        'input. [Image]  [Link]\'');
-
       expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
         interactionIdMultipleChoice, choicesMultipleChoice)
       ).toEqual('is equal to \'$10 should not become $$10\'');
@@ -583,6 +586,5 @@ describe('Testing filters', function() {
       expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
         interactionIdMultipleChoice, choicesMultipleChoice)
       ).toEqual('is equal to \'$xyz should not become $$xyz\'');
-    }
-  ));
+    }));
 });

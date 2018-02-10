@@ -236,16 +236,26 @@ oppia.filter('parameterizeRuleDescription', [
         } else if (varType === 'Fraction') {
           replacementText = FractionObjectFactory
             .fromDict(inputs[varName]).toString();
+        } else if (varType === 'SetOfUnicodeString') {
+          replacementText = '[';
+          for (var i = 0; i < inputs[varName].length; i++) {
+            if (i !== 0) {
+              replacementText += ', ';
+            }
+            replacementText += inputs[varName][i];
+          }
+          replacementText += ']';
+        } else if (
+          varType === 'Real' || varType === 'NonnegativeInt') {
+          replacementText = inputs[varName] + '';
         } else {
           replacementText = inputs[varName];
         }
 
-        if (typeof (replacementText) === 'string') {
-          // Replaces all occurances of $ with $$.
-          // This makes sure that the next regex matching will yield
-          // the same $ sign pattern as the input
-          replacementText = replacementText.split('$').join('$$');
-        }
+        // Replaces all occurances of $ with $$.
+        // This makes sure that the next regex matching will yield
+        // the same $ sign pattern as the input
+        replacementText = replacementText.split('$').join('$$');
 
         description = description.replace(PATTERN, ' ');
         finalDescription = finalDescription.replace(PATTERN, replacementText);
