@@ -27,8 +27,8 @@ NAMES = utils.create_enum(
 
 
 class _Platform(object):
-    """A base class for platform-specific imports related to GAE.
-    """
+    """A base class for platform-specific imports related to GAE."""
+
     @classmethod
     def import_models(cls):
         """An abstract method that should be implemented on inherited
@@ -44,6 +44,7 @@ class _Platform(object):
 class _Gae(_Platform):
     """Provides platform-specific imports related to GAE (Google App Engine).
     """
+    
     @classmethod
     def import_models(cls, model_names):
         """Imports and returns the storage modules listed in model_names.
