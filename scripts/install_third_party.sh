@@ -128,12 +128,12 @@ fi
 
 # Install isort.
 echo Checking if isort is installed in third_party
-if [ ! -d "$TOOLS_DIR/isort-4.2.15" ]; then
+if [ ! -d "$TOOLS_DIR/isort-4.3.3" ]; then
   echo Installing isort
   # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o isort-4.2.15.tar.gz -L https://pypi.python.org/packages/4d/d5/7c8657126a43bcd3b0173e880407f48be4ac91b4957b51303eab744824cf/isort-4.2.15.tar.gz
-  tar xzf isort-4.2.15.tar.gz -C $TOOLS_DIR
-  rm isort-4.2.15.tar.gz
+  curl -o isort-4.3.3.tar.gz -L https://pypi.python.org/packages/a2/13/f9da1234eba3d254093e70de31be9bebade75806b07602c83654246a7286/isort-4.3.3.tar.gz
+  tar xzf isort-4.3.3.tar.gz -C $TOOLS_DIR
+  rm isort-4.3.3.tar.gz
 fi
 
 # Install pycodestyle.
