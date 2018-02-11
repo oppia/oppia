@@ -21,7 +21,7 @@
  * Oppia-ml uses scikit's SVC class during training classifier which uses
  * libsvm's implementation. If there are any changes in following part of
  * code in libsvm then corresponding changes must be propagated here.
- * 
+ *
  * libsvm's code for prediction:
  * https://github.com/arnaudsj/libsvm/blob/master/svm.cpp#L2481
  */
@@ -32,7 +32,7 @@ oppia.factory('SVMPredictionService', ['$log', function($log) {
       var kernel = kernelParams.kernel;
       var kvalues = [];
 
-      if (kernel == 'rbf') {
+      if (kernel === 'rbf') {
         var gamma = kernelParams.gamma;
         var vectorLength = input.length;
         for(var i = 0; i < supportVectors.length; i++) {
@@ -42,7 +42,7 @@ oppia.factory('SVMPredictionService', ['$log', function($log) {
           }
           kvalues.push(Math.exp(-gamma * sum));
         }
-      } else if (kernel == 'linear') {
+      } else if (kernel === 'linear') {
         var vectorLength = input.length;
         for (var i = 0; i < supportVectors.length; i++) {
           var sum = 0;
@@ -103,7 +103,7 @@ oppia.factory('SVMPredictionService', ['$log', function($log) {
           for(var k = 0; k < cj; k++) {
             sum += kvalues[sj + k] * coef2[sj + k];
           }
-          // TODO(prasanna08): Verify why libsvm uses subtraction 
+          // TODO(prasanna08): Verify why libsvm uses subtraction
           // instead of addition.
           sum += intercept[p];
           if (sum > 0) {
