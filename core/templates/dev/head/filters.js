@@ -342,6 +342,15 @@ oppia.filter('summarizeNonnegativeNumber', [function() {
   };
 }]);
 
+oppia.filter('removeExtraLines', [function() {
+  return function(string) {
+    if (!angular.isString(string)) {
+      return string;
+    }
+    return string.replace(/<p><br><\/p>/g, '');
+  };
+}]);
+
 // Note that this filter does not truncate at the middle of a word.
 oppia.filter('truncateAndCapitalize', [function() {
   return function(input, maxNumberOfCharacters) {

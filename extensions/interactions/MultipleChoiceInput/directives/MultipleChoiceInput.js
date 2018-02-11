@@ -33,10 +33,14 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MultipleChoiceInput/directives/' +
         'multiple_choice_input_interaction_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controller: ['$scope', '$attrs', '$filter', function($scope, $attrs, $filter) {
         $scope.choices = HtmlEscaperService.escapedJsonToObj(
           $attrs.choicesWithValue);
         $scope.answer = null;
+        for(var i = 0; i <= $scope.choices.length - 1; i++){
+          $scope.choices[i] = $filter('normalizeWhitespace')($scope.choices[i]);
+          $scope.choices[i] = $filter('removeExtraLines')($scope.choices[i]);
+        }
 
         $scope.submitAnswer = function(answer) {
           answer = parseInt(answer, 10);
