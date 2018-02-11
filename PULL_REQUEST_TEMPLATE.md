@@ -1,7 +1,16 @@
-[Explain what your PR does here]
+<!--
+  - Thanks for submitting code to Oppia! Please fill out the following as part of
+  - your pull request so we can review your code more easily.
+  -->
 
-**Checklist**
+## Explanation
+<!--
+  - Explain what your PR does and please include #bugnum in explanation.
+  -->
+
+## Checklist
 - [ ] The PR title starts with "Fix #bugnum: ", followed by a short, clear summary of the changes.
+- [ ] The PR explanation includes #bugnum.
 - [ ] The linter/Karma presubmit checks have passed.
   - These should run automatically, but if not, you can manually trigger them locally using `python scripts/pre_commit_linter.py` and `bash scripts/run_frontend_tests.sh`.
 - [ ] The PR is made from a branch that's **not** called "develop".
