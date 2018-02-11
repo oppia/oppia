@@ -711,8 +711,8 @@ def main():
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
-        def_spacing_messages + import_order_messages +
-        linter_messages + newline_messages + pattern_messages)
+        def_spacing_messages + linter_messages + newline_messages + 
+        pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
