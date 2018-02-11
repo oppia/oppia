@@ -255,7 +255,7 @@ oppia.filter('parameterizeRuleDescription', [
           varType === 'SetOfNormalizedString') {
           replacementText = inputs[varName];
         } else {
-          throw 'Unknown variable type in rule description';
+          throw Error('Unknown variable type in rule description');
         }
 
         // Replaces all occurances of $ with $$.
