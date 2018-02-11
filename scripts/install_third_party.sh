@@ -103,14 +103,14 @@ echo Checking if numpy is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
   echo Installing numpy
 
-  pip install numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
+  pip install -e numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
 fi
 
 echo Checking if pylint is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/pylint-1.7.1" ]; then
   echo Installing Pylint
 
-  pip install pylint==1.7.1 --target="$TOOLS_DIR/pylint-1.7.1"
+  pip install -e pylint==1.7.1 --target="$TOOLS_DIR/pylint-1.7.1"
   # Add __init__.py file so that pylint dependency backports are resolved
   # correctly.
   touch $TOOLS_DIR/pylint-1.7.1/backports/__init__.py
@@ -128,12 +128,12 @@ fi
 
 # Install isort.
 echo Checking if isort is installed in third_party
-if [ ! -d "$TOOLS_DIR/isort-4.2.15" ]; then
+if [ ! -d "$TOOLS_DIR/isort-4.3.3" ]; then
   echo Installing isort
   # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o isort-4.2.15.tar.gz -L https://pypi.python.org/packages/4d/d5/7c8657126a43bcd3b0173e880407f48be4ac91b4957b51303eab744824cf/isort-4.2.15.tar.gz
-  tar xzf isort-4.2.15.tar.gz -C $TOOLS_DIR
-  rm isort-4.2.15.tar.gz
+  curl -o isort-4.3.3.tar.gz -L https://pypi.python.org/packages/a2/13/f9da1234eba3d254093e70de31be9bebade75806b07602c83654246a7286/isort-4.3.3.tar.gz
+  tar xzf isort-4.3.3.tar.gz -C $TOOLS_DIR
+  rm isort-4.3.3.tar.gz
 fi
 
 # Install pycodestyle.
@@ -151,14 +151,14 @@ echo Checking if browsermob-proxy is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
   echo Installing browsermob-proxy
 
-  pip install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
+  pip install -e browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
 fi
 
 echo Checking if selenium is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   echo Installing selenium
 
-  pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
+  pip install -e selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
 fi
 
 # install pre-push script
