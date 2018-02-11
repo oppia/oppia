@@ -129,7 +129,7 @@ oppia.directive('audioTranslationsEditor', [
                   $scope.saveButtonText = BUTTON_TEXT_SAVE;
                   $scope.saveInProgress = false;
                   $scope.languageCode =
-                    allowedAudioLanguageCodes.indexOf(prevLanguageCode) != -1 ?
+                    allowedAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
                     prevLanguageCode : allowedAudioLanguageCodes[0];
                   var uploadedFile = null;
 
