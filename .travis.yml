@@ -66,7 +66,7 @@ before_install:
 #   https://github.com/travis-ci/travis-ci/issues/6928#issuecomment-264227708
 - source /opt/jdk_switcher/jdk_switcher.sh
 - jdk_switcher use oraclejdk8
-- pip install -e codecov
+- pip install codecov
 - pip install -e numpy==1.6.1
 - pip install -e pyyaml
 - export CHROME_BIN=/usr/bin/google-chrome-stable
