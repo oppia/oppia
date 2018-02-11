@@ -111,7 +111,8 @@ oppia.directive('audioTranslationsEditor', [
                     'There was an error uploading the audio file.');
                   var BUTTON_TEXT_SAVE = 'Save';
                   var BUTTON_TEXT_SAVING = 'Saving...';
-                  var prevLanguageCode = $window.localStorage.getItem('lang');
+                  var prevLanguageCode = $window.localStorage.getItem(
+                    'last_uploaded_audio_lang');
 
                   $scope.languageCodesAndDescriptions = (
                     allowedAudioLanguageCodes.map(function(languageCode) {
@@ -128,8 +129,8 @@ oppia.directive('audioTranslationsEditor', [
                   $scope.saveButtonText = BUTTON_TEXT_SAVE;
                   $scope.saveInProgress = false;
                   $scope.languageCode =
-                  allowedAudioLanguageCodes.indexOf(prevLanguageCode) != -1 ?
-                  prevLanguageCode : allowedAudioLanguageCodes[0];
+                    allowedAudioLanguageCodes.indexOf(prevLanguageCode) != -1 ?
+                    prevLanguageCode : allowedAudioLanguageCodes[0];
                   var uploadedFile = null;
 
                   $scope.isAudioTranslationValid = function() {
@@ -162,7 +163,8 @@ oppia.directive('audioTranslationsEditor', [
                       $scope.saveButtonText = BUTTON_TEXT_SAVING;
                       $scope.saveInProgress = true;
                       var generatedFilename = generateNewFilename();
-                      $window.localStorage.setItem('lang',$scope.languageCode);
+                      $window.localStorage.setItem(
+                        'last_uploaded_audio_lang', $scope.languageCode);
                       var explorationId = (
                         ExplorationContextService.getExplorationId());
                       AssetsBackendApiService.saveAudio(
