@@ -265,6 +265,17 @@ oppia.directive('graphViz', [
             ADD_VERTEX: 2,
             DELETE: 3
           };
+
+          var EDGE_HELP_TEXT = {
+            INITIAL: 'Touch the initial vertex of the edge',
+            FINAL: 'Touch the target vertex to create edge (' +
+              'click on same vertex to cancel edge creation)'
+          };
+
+          var MOVE_HELP_TEXT = {
+            INITIAL: 'Touch the vertex to move',
+            FINAL: 'Touch any point to move vertex to that point'
+          };
           // The current state of the UI and stuff like that
           $scope.state = {
             currentMode: _MODES.MOVE,
@@ -404,11 +415,21 @@ oppia.directive('graphViz', [
             $scope.graph[option] = !$scope.graph[option];
           };
 
+          $scope.helpText = null;
           var setMode = function(mode) {
             $scope.state.currentMode = mode;
+            if (mode === 1 && $scope.isMobile) {
+              $scope.helpText = EDGE_HELP_TEXT.INITIAL;
+            } else if (mode === 0 && $scope.isMobile) {
+              $scope.helpText = MOVE_HELP_TEXT.INITIAL;
+            } else {
+              $scope.helpText = null;
+            }
             $scope.state.addEdgeVertex = null;
             $scope.state.selectedVertex = null;
             $scope.state.selectedEdge = null;
+            $scope.state.currentlyDraggedVertex = null;
+            $scope.state.hoveredVertex = null;
           };
           $scope.onClickModeButton = function(mode, $event) {
             $event.preventDefault();
@@ -440,6 +461,8 @@ oppia.directive('graphViz', [
                 $scope.onTouchInitialVertex(index);
               } else {
                 if ($scope.state.addEdgeVertex === index) {
+                  $scope.state.hoveredVertex = null;
+                  $scope.helpText = EDGE_HELP_TEXT.INITIAL;
                   $scope.state.addEdgeVertex = null;
                   return;
                 }
@@ -452,10 +475,12 @@ oppia.directive('graphViz', [
             if ($scope.state.currentMode === _MODES.ADD_EDGE) {
               if ($scope.canAddEdge) {
                 beginAddEdge(index);
+                $scope.helpText = EDGE_HELP_TEXT.FINAL;
               }
             } else if ($scope.state.currentMode === _MODES.MOVE) {
               if ($scope.canMoveVertex) {
                 beginDragVertex(index);
+                $scope.helpText = MOVE_HELP_TEXT.FINAL;
               }
             }
           };
@@ -465,9 +490,13 @@ oppia.directive('graphViz', [
               tryAddEdge(
                 $scope.state.addEdgeVertex, index);
               endAddEdge();
+              $scope.state.hoveredVertex = null;
+              $scope.helpText = EDGE_HELP_TEXT.INITIAL;
             } else if ($scope.state.currentMode === _MODES.MOVE) {
               if ($scope.state.currentlyDraggedVertex !== null) {
                 endDragVertex();
+                $scope.state.hoveredVertex = null;
+                $scope.helpText = MOVE_HELP_TEXT.INITIAL;
               }
             }
           };
@@ -485,6 +514,15 @@ oppia.directive('graphViz', [
                 beginDragVertex(index);
               }
             }
+          };
+
+          $scope.onMouseleaveVertex = function(index) {
+            if ($scope.isMobile) {
+              return;
+            }
+            $scope.state.hoveredVertex = (
+              index === $scope.state.hoveredVertex) ?
+                null : $scope.state.hoveredVertex;
           };
 
           $scope.onClickVertexLabel = function(index) {

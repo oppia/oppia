@@ -18,13 +18,6 @@
     pointer-events: none;
   }
 </style>
-<div ng-show="isTouch && state.currentMode === 1 && isInteractionActive()">
-  Click on initial and final vertex to draw an edge between them. <br>
-  To cancel drawing an edge from a vertex, click on the same vertex again.
-</div>
-<div ng-show="isTouch && state.currentMode === 0 && isInteractionActive()">
-  Click on vertex and new position, to move the vertex to the new position.
-</div>
 <div class="oppia-graph-input-viz-container">
   <svg class="oppia-graph-viz-svg" width="100%" height="250" ng-mousemove="mousemoveGraphSVG($event)" ng-click="onClickGraphSVG($event)">
     <svg viewBox="0 0 90 250" width="100%" height="250" preserveAspectRatio="xMaxYMin meet">
@@ -67,7 +60,7 @@
       </text>
     </g>
 
-    <line ng-if="state.addEdgeVertex !== null"
+    <line ng-if="state.addEdgeVertex !== null && !isMobile"
       ng-attr-x1="<[graph.vertices[state.addEdgeVertex].x]>"
       ng-attr-y1="<[graph.vertices[state.addEdgeVertex].y]>"
       ng-attr-x2="<[state.mouseX]>"
@@ -118,7 +111,7 @@
         <[vertex.label]>
       </text>
       <circle ng-mouseenter="state.hoveredVertex = $index"
-        ng-mouseleave="state.hoveredVertex = ($index === state.hoveredVertex) ? null : state.hoveredVertex"
+        ng-mouseleave="onMouseleaveVertex($index)"
         ng-click="onClickVertex($index)"
         ng-mousedown="onMousedownVertex($index)"
         ng-attr-style="fill: <[getVertexColor($index)]>;"
@@ -129,6 +122,10 @@
     </g>
   </svg>
 </div>
+<div ng-show="isMobile">
+    <[helpText]>
+</div>
+<br>
 
 <div style="float: right; height: 35px;">
   <div ng-if="state.selectedVertex !== null && graph.isLabeled && canEditVertexLabel">
