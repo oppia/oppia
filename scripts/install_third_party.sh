@@ -103,14 +103,14 @@ echo Checking if numpy is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
   echo Installing numpy
 
-  pip install numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
+  pip install -e numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
 fi
 
 echo Checking if pylint is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/pylint-1.7.1" ]; then
   echo Installing Pylint
 
-  pip install pylint==1.7.1 --target="$TOOLS_DIR/pylint-1.7.1"
+  pip install -e pylint==1.7.1 --target="$TOOLS_DIR/pylint-1.7.1"
   # Add __init__.py file so that pylint dependency backports are resolved
   # correctly.
   touch $TOOLS_DIR/pylint-1.7.1/backports/__init__.py
@@ -151,14 +151,14 @@ echo Checking if browsermob-proxy is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
   echo Installing browsermob-proxy
 
-  pip install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
+  pip install -e browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
 fi
 
 echo Checking if selenium is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   echo Installing selenium
 
-  pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
+  pip install -e selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
 fi
 
 # install pre-push script
