@@ -652,7 +652,9 @@ def _check_import_order(all_files):
         # and returns True if it finds an error else returns False
         # If check is set to True, isort simply checks the file and
         # if check is set to False, it autocorrects import-order errors.
-        if isort.SortImports(filename, check=True).incorrectly_sorted:
+        if (
+            isort.SortImports(
+                filename, check=True, show_diff=True).incorrectly_sorted):
             failed = True
     print ''
     print '----------------------------------------'
