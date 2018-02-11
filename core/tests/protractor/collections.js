@@ -119,7 +119,7 @@ describe('Collections', function() {
       // Add existing explorations.
       collectionEditorPage.addExistingExploration(firstExplorationId);
       collectionEditorPage.saveDraft();
-      collectionEditorPage.CollectionEditorseSaveModal();
+      collectionEditorPage.closeSaveModal();
       collectionEditorPage.publishCollection();
       collectionEditorPage.setTitle('Test Collection 2');
       collectionEditorPage.setObjective('This is the second test collection.');
