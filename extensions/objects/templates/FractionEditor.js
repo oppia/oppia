@@ -29,7 +29,7 @@ oppia.directive('fractionEditor', [
       controller: ['$scope', function($scope) {
         var errorMessage = '';
         var fractionString = '0';
-        if ($scope.$parent.value != null) {
+        if ($scope.$parent.value !== null) {
           var defaultFraction =
             FractionObjectFactory.fromDict($scope.$parent.value);
           defaultFractionString = defaultFraction.toString();

@@ -2,7 +2,7 @@
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
   <ng-form name="FractionInputForm">
     <input type="text" name="answer" ng-model="answer" class="form-control"
-           ng-attr-placeholder="<[allowNonzeroIntegerPart ? ('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER' | translate) : ('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER' | translate)]>">
+           ng-attr-placeholder="<[customPlaceholder !== '' ? customPlaceholder : (allowNonzeroIntegerPart ? ('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER' | translate) : ('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER' | translate))]>">
   </ng-form>
 
   <div class="oppia-form-error oppia-fraction-input-error">

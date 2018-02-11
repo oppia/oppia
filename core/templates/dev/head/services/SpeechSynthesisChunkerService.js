@@ -69,7 +69,7 @@ oppia.factory('SpeechSynthesisChunkerService', [
         CHUNK_LENGTH + '}$|^[\\s\\S]{1,' + CHUNK_LENGTH + '} ');
       var chunkArray = text.match(delimitChunkRegex);
 
-      if (chunkArray == null ||
+      if (chunkArray === null ||
           chunkArray[0] === undefined ||
           chunkArray[0].length <= 2) {
         // Call once all text has been spoken.
