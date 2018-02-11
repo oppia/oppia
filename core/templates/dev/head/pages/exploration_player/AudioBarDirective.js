@@ -186,10 +186,8 @@ oppia.directive('audioBar', [
               // track progress if the progressPercentage argument is defined.
               if (angular.isDefined(progressPercentage)) {
                 AudioPlayerService.setProgress(progressPercentage / 100);
-                return progress;
-              } else {
-                return AudioPlayerService.getProgress() * 100;
               }
+              return AudioPlayerService.getProgress() * 100;
             }
           };
 
