@@ -35,7 +35,8 @@ describe('Testing filters', function() {
     'summarizeNonnegativeNumber',
     'truncateAndCapitalize',
     'capitalize',
-    'stripFormatting'
+    'stripFormatting',
+    'removeExtraLines'
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -482,6 +483,14 @@ describe('Testing filters', function() {
       ).toEqual('[Math] Text input [Collapsible] Text input 2 [Image]  ' +
       'Text Input 3');
     }));
+
+  it('should remove extra new lines', inject(function($filter) {
+    var filter = $filter('removeExtraLines');
+
+    expect(filter('<p><br></p>')).toEqual('');
+    expect(filter(null)).toEqual(null);
+    expect(filter(undefined)).toEqual(undefined);
+  }));
 
   it('should correctly display RTE components in Answer Group Header',
     inject(function($filter) {
