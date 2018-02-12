@@ -557,4 +557,34 @@ describe('Testing filters', function() {
         'input. [Image]  [Link]\'');
     }
   ));
+
+  it('should correctly parameterize rule description filter',
+    inject(function($filter) {
+      var ruleMultipleChoice = {
+        type: 'Equals',
+        inputs: {
+          x: 0
+        }
+      };
+      var interactionIdMultipleChoice = 'TextInput';
+      var choicesMultipleChoice = [
+        {
+          label: '$10 should not become $$10',
+          val: 0
+        }
+      ];
+      expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
+        interactionIdMultipleChoice, choicesMultipleChoice)
+      ).toEqual('is equal to \'$10 should not become $$10\'');
+
+      choicesMultipleChoice = [
+        {
+          label: '$xyz should not become $$xyz',
+          val: 0
+        }
+      ];
+      expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
+        interactionIdMultipleChoice, choicesMultipleChoice)
+      ).toEqual('is equal to \'$xyz should not become $$xyz\'');
+    }));
 });
