@@ -647,6 +647,7 @@ def _check_import_order(all_files):
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.py')]
     failed = False
+    settings_file = os.getcwd() + '/tox.ini'
     for filename in files_to_check:
         # This line prints the error message along with file path
         # and returns True if it finds an error else returns False
@@ -654,7 +655,8 @@ def _check_import_order(all_files):
         # if check is set to False, it autocorrects import-order errors.
         if (
             isort.SortImports(
-                filename, check=True, show_diff=True).incorrectly_sorted):
+                filename, check=True, show_diff=True,
+                settings_path=settings_file).incorrectly_sorted):
             failed = True
     print ''
     print '----------------------------------------'
@@ -713,7 +715,7 @@ def main():
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
-        def_spacing_messages + import_order_messages + 
+        def_spacing_messages + import_order_messages +
         linter_messages + newline_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
