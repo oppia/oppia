@@ -18,10 +18,10 @@
 
 oppia.directive('privateInfoTooltip', [
   'UrlInterpolationService', function(UrlInterpolationService) {
-  return {
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+    return {
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/private_info_tooltip/' +
         'private_info_tooltip_directive.html'),
-      restrict: 'E'
+    restrict: 'E'
   };
-}]);
+  }]);
