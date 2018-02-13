@@ -25,7 +25,7 @@ oppia.factory('ExplorationSummaryBackendApiService', [
       ValidatorsService, AlertsService) {
     var _fetchExpSummaries = function(
         explorationIds, includePrivateExplorations, successCallback,
-        errorCallback) {
+        errorCallback) {//console.log(ValidatorsService.isValidExplorationId);
       if (!explorationIds.every(ValidatorsService.isValidExplorationId)) {
         AlertsService.addWarning('Please enter a valid exploration ID.');
 
@@ -37,7 +37,7 @@ oppia.factory('ExplorationSummaryBackendApiService', [
       }
 
       var explorationSummaryDataUrl = EXPLORATION_SUMMARY_DATA_URL_TEMPLATE;
-
+     
       $http.get(explorationSummaryDataUrl, {
         params: {
           stringified_exp_ids: JSON.stringify(explorationIds),
@@ -51,6 +51,7 @@ oppia.factory('ExplorationSummaryBackendApiService', [
         }
       }, function(errorResponse) {
         if (errorCallback) {
+          
           errorCallback(errorResponse.data);
         }
       });
