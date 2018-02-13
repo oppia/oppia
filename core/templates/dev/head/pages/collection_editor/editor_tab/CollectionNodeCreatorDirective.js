@@ -72,7 +72,7 @@ oppia.directive('collectionNodeCreator', [
           };
 
           var isValidSearchQuery = function(searchQuery) {
-            // Excluding underscore(_) as because exp_id can have underscore.
+            // Allow underscores because they are allowed in exploration IDs.
             var INVALID_SEARCH_CHARS = GLOBALS.INVALID_NAME_CHARS.replace(
               '_', '');
             for (var i = 0; i < INVALID_SEARCH_CHARS.length; i++) {
