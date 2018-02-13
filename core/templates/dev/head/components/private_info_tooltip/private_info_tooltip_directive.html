@@ -1,0 +1,39 @@
+<div class="conversation-skin-tutor-card-tooltip">
+      <button class="conversation-skin-tutor-card-tooltip-button">?
+        <span class="conversation-skin-tutor-card-tooltip-text" translate="I18N_TUTOR_CARD_TOOLTIP"></span>
+      </button>
+</div>
+
+<style>
+  .conversation-skin-tutor-card-tooltip {
+    display: inline-block;
+    padding-top: 8px;
+  }
+
+  .conversation-skin-tutor-card-tooltip-button {
+    background-color: #ff0000;
+    border-radius: 50%;
+    color: #ffffff;
+    display: inline-block;
+    right: 0;
+    font-size: 12px;
+    font-weight: 900;
+    padding-top: 4px;
+    position: absolute;
+    text-align: center;
+  }
+
+  .conversation-skin-tutor-card-tooltip-text {
+    background-color: #A9A9A9;
+    border-radius: 3%;
+    color: #ffffff;
+    padding: 2px;
+    position: absolute;
+    visibility: hidden;
+    width: 400px;
+  }
+
+  .conversation-skin-tutor-card-tooltip-button:hover .conversation-skin-tutor-card-tooltip-text {
+    visibility: visible;
+  }
+</style>
