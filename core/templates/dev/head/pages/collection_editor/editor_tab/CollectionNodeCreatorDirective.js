@@ -72,10 +72,15 @@ oppia.directive('collectionNodeCreator', [
           };
 
           var isValidSearchQuery = function(searchQuery) {
-            if (/^[a-zA-Z0-9-_ ]*$/.test(searchQuery)) {
-              return true;
+            // Excluding underscore(_) as because exp_id can have underscore.
+            var INVALID_SEARCH_CHARS = GLOBALS.INVALID_NAME_CHARS.replace(
+              '_', '');
+            for (var i = 0; i < INVALID_SEARCH_CHARS.length; i++) {
+              if (searchQuery.indexOf(INVALID_SEARCH_CHARS[i]) !== -1) {
+                return false;
+              }
             }
-            return;
+            return true;
           };
 
           var addExplorationToCollection = function(newExplorationId) {
