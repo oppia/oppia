@@ -57,7 +57,7 @@ oppia.directive('collectionNodeCreator', [
                 explorationMetadataBackendDict.collection_node_metadata_list.
                   map(function(item) {
                     if (!$scope.collection.containsCollectionNode(item.id)) {
-                      options.push(item.title + ' (#' + item.id + ')');
+                      options.push(item.title + ' (' + item.id + ')');
                     }
                   });
                 return options;
