@@ -208,8 +208,11 @@
                 </span>
               </button>
             </span>
-            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
-              This allows the user to categorise answer groups as correct or incorrect.
+            <span ng-if="!isCorrectnessFeedbackEnabled()" class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              The feature is disabled. This allows the user to categorise answer groups as correct or incorrect.
+            </span>
+            <span ng-if="isCorrectnessFeedbackEnabled()" class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              The feature is enabled. This allows the user to categorise answer groups as correct or incorrect.
             </span>
           </div>
         </div>
