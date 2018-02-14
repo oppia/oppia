@@ -351,9 +351,9 @@ oppia.directive('graphViz', [
             initButtons();
             $scope.state.currentMode = $scope.buttons[0].mode;
             if ($scope.isMobile) {
-              if ($scope.state.currentMode  === _MODES.ADD_EDGE) {
+              if ($scope.state.currentMode === _MODES.ADD_EDGE) {
                 $scope.helpText = 'I18N_GRAPH_EDGE_INITIAL_HELPTEXT';
-              } else if ($scope.state.currentMode  === _MODES.MOVE) {
+              } else if ($scope.state.currentMode === _MODES.MOVE) {
                 $scope.helpText = 'I18N_GRAPH_MOVE_INITIAL_HELPTEXT';
               } else {
                 $scope.helpText = null;
@@ -419,9 +419,9 @@ oppia.directive('graphViz', [
           var setMode = function(mode) {
             $scope.state.currentMode = mode;
             if ($scope.isMobile) {
-              if ($scope.state.currentMode  === _MODES.ADD_EDGE) {
+              if ($scope.state.currentMode === _MODES.ADD_EDGE) {
                 $scope.helpText = 'I18N_GRAPH_EDGE_INITIAL_HELPTEXT';
-              } else if ($scope.state.currentMode  === _MODES.MOVE) {
+              } else if ($scope.state.currentMode === _MODES.MOVE) {
                 $scope.helpText = 'I18N_GRAPH_MOVE_INITIAL_HELPTEXT';
               } else {
                 $scope.helpText = null;
