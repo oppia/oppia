@@ -348,7 +348,7 @@ oppia.factory('ResponsesService', [
       },
       // This registers the change to the handlers in the list of changes, and
       // also updates the states object in ExplorationStatesService.
-      save: function(newAnswerGroups, defaultOutcome) {
+      save: function(newAnswerGroups, defaultOutcome) { 
         _saveAnswerGroups(newAnswerGroups);
         _saveDefaultOutcome(defaultOutcome);
       }
