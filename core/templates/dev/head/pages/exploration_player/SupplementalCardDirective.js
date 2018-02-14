@@ -85,7 +85,7 @@ oppia.directive('supplementalCard', [
           $scope.getHelpCardBottomPosition = function() {
             var helpCard = $('.conversation-skin-help-card');
             var container = $('.conversation-skin-supplemental-card-container');
-            return Math.max(container.height() - helpCard.height()/2, 0);
+            return Math.max(container.height() - helpCard.height() / 2, 0);
           };
 
           $scope.submitAnswer = function(answer, interactionRulesService) {
