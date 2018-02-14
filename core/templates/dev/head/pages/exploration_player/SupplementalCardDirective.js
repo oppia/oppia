@@ -67,7 +67,7 @@ oppia.directive('supplementalCard', [
 
           // We use the max because the height property of the help card is
           // unstable while animating, causing infinite digest errors.
-          var maxHelpCardHeightSeen = 0;
+          maxHelpCardHeightSeen = 0;
           $scope.clearHelpCard = function() {
             $scope.helpCardHtml = null;
             $scope.helpCardHasContinueButton = false;
@@ -80,6 +80,12 @@ oppia.directive('supplementalCard', [
               maxHelpCardHeightSeen = helpCard.height();
             }
             return maxHelpCardHeightSeen > $(window).height() - 100;
+          };
+
+          $scope.getHelpCardBottomPosition = function() {
+            var helpCard = $('.conversation-skin-help-card');
+            var container = $('.conversation-skin-supplemental-card-container');
+            return Math.max(container.height() - helpCard.height()/2, 0);
           };
 
           $scope.submitAnswer = function(answer, interactionRulesService) {
