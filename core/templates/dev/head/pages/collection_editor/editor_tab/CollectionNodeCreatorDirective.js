@@ -120,7 +120,7 @@ oppia.directive('collectionNodeCreator', [
           };
 
           var convertTypeaheadToExplorationId = function(typeaheadOption) {
-            var matchResults = typeaheadOption.match(/\(#(.*?)\)$/);
+            var matchResults = typeaheadOption.match(/\((.*?)\)$/);
             if (matchResults === null) {
               return typeaheadOption;
             }
