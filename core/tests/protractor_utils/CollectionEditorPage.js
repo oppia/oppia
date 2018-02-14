@@ -131,4 +131,3 @@ var CollectionEditorPage = function() {
 };
 exports.CollectionEditorPage = CollectionEditorPage;
 
-
