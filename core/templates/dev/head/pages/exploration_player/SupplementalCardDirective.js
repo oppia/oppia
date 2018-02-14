@@ -67,7 +67,7 @@ oppia.directive('supplementalCard', [
 
           // We use the max because the height property of the help card is
           // unstable while animating, causing infinite digest errors.
-          maxHelpCardHeightSeen = 0;
+          var maxHelpCardHeightSeen = 0;
           $scope.clearHelpCard = function() {
             $scope.helpCardHtml = null;
             $scope.helpCardHasContinueButton = false;
