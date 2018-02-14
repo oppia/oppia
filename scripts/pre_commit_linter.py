@@ -652,7 +652,8 @@ def _check_import_order(all_files):
         # and returns True if it finds an error else returns False
         # If check is set to True, isort simply checks the file and
         # if check is set to False, it autocorrects import-order errors.
-        if isort.SortImports(filename, check=True).incorrectly_sorted:
+        if (isort.SortImports(
+                filename, check=True, show_diff=True).incorrectly_sorted):
             failed = True
     print ''
     print '----------------------------------------'
@@ -705,14 +706,13 @@ def _check_def_spacing(all_files):
 def main():
     all_files = _get_all_files()
     def_spacing_messages = _check_def_spacing(all_files)
-    # TODO(apb7): Fix isort for core/jobs.py in Travis.
-    #import_order_messages = _check_import_order(all_files)
+    import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
-        def_spacing_messages + linter_messages + newline_messages + 
-        pattern_messages)
+        def_spacing_messages + import_order_messages +
+        newline_messages + linter_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
