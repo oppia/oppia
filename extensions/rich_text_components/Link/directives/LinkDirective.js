@@ -51,6 +51,9 @@ oppia.directive('oppiaNoninteractiveLink', [
             if ($scope.text) {
               $scope.showUrlInTooltip = true;
             }
+            else {
+              $scope.text = $scope.url;
+            }
           }
 
           // This following check disbales the link in Editor being caught
