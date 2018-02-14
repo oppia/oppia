@@ -129,5 +129,5 @@ var CollectionEditorPage = function() {
     saveChangesButton.click();
   };
 };
-exports.CollectionEditorPage = CollectionEditorPage;
 
+exports.CollectionEditorPage = CollectionEditorPage;
