@@ -10,6 +10,13 @@
       "error",
       "always"
     ],
+    "keyword-spacing": [
+      "error",
+      {
+        "before": true,
+        "after": true
+      }
+    ],
     "no-empty": [
       "error",
       {
