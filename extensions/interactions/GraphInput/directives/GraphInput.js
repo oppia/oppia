@@ -352,9 +352,11 @@ oppia.directive('graphViz', [
             $scope.state.currentMode = $scope.buttons[0].mode;
             if ($scope.isMobile) {
               if ($scope.state.currentMode === _MODES.ADD_EDGE) {
-                $scope.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+                $scope.helpText =
+                  'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
               } else if ($scope.state.currentMode === _MODES.MOVE) {
-                $scope.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
+                $scope.helpText =
+                  'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
               } else {
                 $scope.helpText = null;
               }
@@ -420,9 +422,11 @@ oppia.directive('graphViz', [
             $scope.state.currentMode = mode;
             if ($scope.isMobile) {
               if ($scope.state.currentMode === _MODES.ADD_EDGE) {
-                $scope.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+                $scope.helpText =
+                  'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
               } else if ($scope.state.currentMode === _MODES.MOVE) {
-                $scope.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
+                $scope.helpText =
+                  'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
               } else {
                 $scope.helpText = null;
               }
@@ -467,7 +471,8 @@ oppia.directive('graphViz', [
               } else {
                 if ($scope.state.addEdgeVertex === index) {
                   $scope.state.hoveredVertex = null;
-                  $scope.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+                  $scope.helpText =
+                    'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
                   $scope.state.addEdgeVertex = null;
                   return;
                 }
@@ -501,7 +506,8 @@ oppia.directive('graphViz', [
               if ($scope.state.currentlyDraggedVertex !== null) {
                 endDragVertex();
                 $scope.state.hoveredVertex = null;
-                $scope.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
+                $scope.helpText =
+                  'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
               }
             }
           };
