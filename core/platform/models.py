@@ -27,8 +27,15 @@ NAMES = utils.create_enum(
 
 
 class _Platform(object):
+    """Parent Class for other classes to inherit.
+    """
     @classmethod
     def import_models(cls):
+        """Function to be implemented in child classes.
+
+        Raises:
+            Exception: Abstract method overridden in child class.
+        """
         raise NotImplementedError
 
 
