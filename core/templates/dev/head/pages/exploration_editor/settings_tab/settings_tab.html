@@ -164,11 +164,15 @@
                 Enabled
               </span>
             </span>
-            <span ng-if="!areParametersEnabled()" class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
-              Usage of parameters is disabled. Values that change as the learner moves between cards (<a href="http://oppia.github.io/#/Parameters" target="_blank">more info</a>).
-            </span>
-            <span ng-if="areParametersEnabled()" class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
-              Usage of parameters is enabled. Values that change as the learner moves between cards (<a href="http://oppia.github.io/#/Parameters" target="_blank">more info</a>).
+            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              Parameters are
+              <span ng-if="!areParametersEnabled()">
+                disabled.
+              </span>
+              <span ng-if="areParametersEnabled()">
+                enabled.
+              </span>
+              Parameters are values that change as the learner moves between cards (<a href="http://oppia.github.io/#/Parameters" target="_blank">more info</a>).
             </span>
           </div>
         </div>
@@ -190,10 +194,10 @@
               </button>
             </span>
             <span ng-if="!isAutomaticTextToSpeechEnabled()" class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
-              Automatic text-to-speech feature is disabled. It generates audio from your content for learners to listen to.
+              Automatic text-to-speech is disabled. It generates audio from your content for learners to listen to.
             </span>
             <span ng-if="isAutomaticTextToSpeechEnabled()" class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
-              Automatic text-to-speech feature is enabled. It generates audio from your content for learners to listen to. It is recommended that you disable this feature if creating an exploration whose content consists of multiple languages.
+              Automatic text-to-speech is enabled. It generates audio from your content for learners to listen to. It is recommended that you disable this feature if creating an exploration whose content consists of multiple languages.
             </span>
           </div>
         </div>
@@ -214,11 +218,15 @@
                 </span>
               </button>
             </span>
-            <span ng-if="!isCorrectnessFeedbackEnabled()" class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
-              The feature is disabled. This allows the user to categorise answer groups as correct or incorrect.
-            </span>
-            <span ng-if="isCorrectnessFeedbackEnabled()" class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
-              The feature is enabled. This allows the user to categorise answer groups as correct or incorrect.
+            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              The feature is
+              <span ng-if="!isCorrectnessFeedbackEnabled()">
+                disabled.
+              </span>
+              <span ng-if="isCorrectnessFeedbackEnabled()">
+                enabled.
+              </span>
+              This allows the user to categorise answer groups as correct or incorrect.
             </span>
           </div>
         </div>
