@@ -26,7 +26,6 @@ from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
-from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import interaction_registry
@@ -455,36 +454,6 @@ class LeaveForRefresherExpEventHandler(base.BaseHandler):
             self.payload.get('session_id'),
             self.payload.get('time_spent_in_state_secs'))
         self.render_json({})
-
-
-class ClassifyHandler(base.BaseHandler):
-    """Stateless handler that performs a classify() operation server-side and
-    returns the corresponding classification result, which is a dict containing
-    three keys:
-        'outcome': A dict representing the outcome of the answer group matched.
-        'answer_group_index': The index of the matched answer group.
-        'rule_spec_index': The index of the matched rule spec in the matched
-            answer group.
-    """
-
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
-
-    @acl_decorators.can_play_exploration
-    def post(self, unused_exploration_id):
-        """Handle POST requests.
-
-        Note: unused_exploration_id is needed because
-            @acl_decorators.can_play_exploration needs 2 arguments.
-        """
-        # A domain object representing the old state.
-        old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
-        # The learner's raw answer.
-        answer = self.payload.get('answer')
-        # The learner's parameter values.
-        params = self.payload.get('params')
-        params['answer'] = answer
-        result = classifier_services.classify(old_state, answer)
-        self.render_json(result)
 
 
 class ReaderFeedbackHandler(base.BaseHandler):

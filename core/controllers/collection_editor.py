@@ -16,6 +16,8 @@
 
 """Controllers for the collections editor."""
 
+import base64
+
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import collection_services
@@ -234,7 +236,7 @@ class ExplorationMetadataSearchHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        query_string = self.request.get('q')
+        query_string = base64.b64decode(self.request.get('q'))
 
         search_cursor = self.request.get('cursor', None)
 

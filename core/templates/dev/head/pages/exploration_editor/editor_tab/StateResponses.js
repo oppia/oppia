@@ -378,6 +378,7 @@ oppia.controller('StateResponses', [
               EditorStateService, EditorFirstTimeEventsService,
               RuleObjectFactory, OutcomeObjectFactory) {
             $scope.feedbackEditorIsOpen = false;
+
             $scope.openFeedbackEditor = function() {
               $scope.feedbackEditorIsOpen = true;
             };

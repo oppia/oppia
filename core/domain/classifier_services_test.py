@@ -19,7 +19,6 @@
 import datetime
 import os
 
-from core.domain import classifier_registry
 from core.domain import classifier_services
 from core.domain import exp_services
 from core.platform import models
@@ -55,44 +54,6 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.exp_id = exploration_id
         self.exp_state = (
             exp_services.get_exploration_by_id(exploration_id).states['Home'])
-
-    def _is_string_classifier_called(self, answer):
-        sc = classifier_registry.Registry.get_classifier_by_algorithm_id(
-            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
-                'algorithm_id'])
-        string_classifier_predict = (
-            sc.__class__.predict)
-        predict_counter = test_utils.CallCounter(
-            string_classifier_predict)
-
-        with self.swap(sc.__class__, 'predict', predict_counter):
-            response = classifier_services.classify(self.exp_state, answer)
-
-        answer_group_index = response['answer_group_index']
-        rule_spec_index = response['rule_spec_index']
-        answer_groups = self.exp_state.interaction.answer_groups
-        if answer_group_index == len(answer_groups):
-            return 'default'
-
-        answer_group = answer_groups[answer_group_index]
-        return (answer_group.get_classifier_rule_index() == rule_spec_index and
-                predict_counter.times_called == 1)
-
-    def test_string_classifier_classification(self):
-        """All these responses trigger the string classifier."""
-
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'it\'s a permutation of 3 elements'))
-            self.assertTrue(
-                self._is_string_classifier_called(
-                    'There are 3 options for the first ball, and 2 for the '
-                    'remaining two. So 3*2=6.'))
-            self.assertTrue(
-                self._is_string_classifier_called('abc acb bac bca cbb cba'))
-            self.assertTrue(
-                self._is_string_classifier_called('dunno, just guessed'))
 
     def test_creation_of_jobs_and_mappings(self):
         """Test the handle_trainable_states method and
