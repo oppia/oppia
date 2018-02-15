@@ -29,7 +29,7 @@ oppia.factory('TextInputPredictionService', [
     return {
       predict: function(classifierData, textInput) {
         var cvVocabulary = classifierData.cv_vocabulary;
-        var prediction = '-1';
+        var prediction = -1;
         var svmData = classifierData.SVM;
 
         // Tokenize the text input.
