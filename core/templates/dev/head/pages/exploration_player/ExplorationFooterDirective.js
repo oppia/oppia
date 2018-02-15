@@ -44,6 +44,10 @@ oppia.directive('explorationFooter', [
             $scope.$apply();
           });
 
+          $scope.correctCount = function () {
+            return ExplorationPlayerService.getCorrectCount();
+          };
+
           $scope.contributorNames = [];
           ExplorationSummaryBackendApiService
             .loadPublicAndPrivateExplorationSummaries([$scope.explorationId])

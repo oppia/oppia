@@ -132,6 +132,28 @@
     padding: 12px;
   }
 
+  .oppia-exploration-footer .star-container {
+    margin: 0px 0px 4px 0px;
+    position: relative;
+  }
+
+  .oppia-exploration-footer .star {
+    position: absolute;
+    color: #F2C94C;
+    font-size: 42px;
+    right: 0px;
+    width: 45px;
+    padding: 0px 0px 2px 0px;
+  }
+
+  .oppia-exploration-footer .star-content {
+    position: absolute;
+    right: 19px;
+    top: 21px;
+    color: #094142;
+    font-size: 16px;
+  }
+
   @media (max-width: 475px) {
     .oppia-exploration-footer-sharing-links {
       display: none;
@@ -193,6 +215,10 @@
         </li>
       </ul>
       <hint-and-solution-buttons ng-if="windowIsNarrow"></hint-and-solution-buttons>
+      <div class="star-container" ng-if="windowIsNarrow">
+          <i class="material-icons star">star_rate</i>
+        <span class="star-content" ng-bind-html="correctCount()"></span>
+      </div>
     </div>
     <div class="col-sm-7">
       <div class="pull-right">
