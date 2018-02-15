@@ -35,7 +35,7 @@ oppia.factory('TextInputPredictionService', [
         // Tokenize the text input.
         var textInputTokens = TextInputTokenizer.generateTokens(textInput);
 
-        if (textInputTokens != null) {
+        if (textInputTokens !== null) {
           var textVector = CountVectorizerService.vectorize(
             textInputTokens, cvVocabulary);
           prediction = SVMPredictionService.predict(svmData, textVector);
