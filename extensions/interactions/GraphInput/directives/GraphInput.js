@@ -252,11 +252,11 @@ oppia.directive('graphViz', [
         '/interactions/GraphInput/directives/' +
         'graph_viz_directive.html'),
       controller: [
-        '$scope', '$element', '$attrs', '$document', 'FocusManagerService',
-        'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
+        '$scope', '$element', '$attrs', '$document', '$timeout',
+        'FocusManagerService', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
         'EVENT_NEW_CARD_AVAILABLE',
         function(
-            $scope, $element, $attrs, $document, FocusManagerService,
+            $scope, $element, $attrs, $document, $timeout, FocusManagerService,
             graphDetailService, GRAPH_INPUT_LEFT_MARGIN,
             EVENT_NEW_CARD_AVAILABLE) {
           var _MODES = {
@@ -300,6 +300,7 @@ oppia.directive('graphViz', [
 
           var vizContainer = $($element).find('.oppia-graph-viz-svg');
           $scope.vizWidth = vizContainer.width();
+          
           $scope.mousemoveGraphSVG = function(event) {
             if (!$scope.isInteractionActive()) {
               return;
@@ -653,8 +654,25 @@ oppia.directive('graphViz', [
           $scope.getEdgeCentre = function(index) {
             return graphDetailService.getEdgeCentre($scope.graph, index);
           };
+          
+          // Initial value of SVG view box.
+          $scope.svgViewBox = "";
+          
           if ($scope.isInteractionActive()) {
             $scope.init();
+            
+            // Set the SVG viewBox to appropriate size.
+            $timeout(function(){
+              var svgContainer = $($element).find('.oppia-graph-viz-svg')[0];
+              var boundingBox = svgContainer.getBBox();
+              console.log(svgContainer);
+              var viewBoxHeight = Math.max(
+                boundingBox.height, svgContainer.getAttribute('height'));
+              $scope.svgViewBox = (
+                boundingBox.x + ' ' + boundingBox.y + ' ' + boundingBox.width
+                + ' ' + viewBoxHeight);
+              console.log($scope.svgViewBox);
+            }, 1000);
           }
         }
       ]
