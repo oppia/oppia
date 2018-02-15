@@ -23,6 +23,9 @@
         "allowEmptyCatch": true
       }
     ],
+    "no-trailing-spaces":[
+      "error"
+    ],
     "no-redeclare": [
       "off"
     ],
