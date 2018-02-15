@@ -28,7 +28,7 @@ oppia.factory('CountVectorizerService', [function() {
     vectorize: function(tokens, vocabulary) {
       var vectorLength = Object.keys(vocabulary).length;
       var vector = [];
-      for(var i = 0; i < vectorLength; i++) {
+      for (var i = 0; i < vectorLength; i++) {
         vector.push(0);
       }
 
