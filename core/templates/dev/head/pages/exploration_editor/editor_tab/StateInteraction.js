@@ -159,15 +159,17 @@ oppia.controller('StateInteraction', [
           backdrop: true,
           resolve: {},
           controller: [
-            '$scope', '$uibModalInstance', '$injector', 'stateSolutionService',
-            'stateInteractionIdService', 'stateCustomizationArgsService',
-            'InteractionDetailsCacheService', 'INTERACTION_SPECS',
-            'UrlInterpolationService', 'EditorFirstTimeEventsService',
+            '$scope', '$uibModalInstance', '$filter', '$injector', 
+            'stateSolutionService', 'stateInteractionIdService', 
+            'stateCustomizationArgsService', 'InteractionDetailsCacheService', 
+            'INTERACTION_SPECS','UrlInterpolationService', 
+            'EditorFirstTimeEventsService',
             function(
-                $scope, $uibModalInstance, $injector, stateSolutionService,
-                stateInteractionIdService, stateCustomizationArgsService,
-                InteractionDetailsCacheService, INTERACTION_SPECS,
-                UrlInterpolationService, EditorFirstTimeEventsService) {
+                $scope, $uibModalInstance, $filter, $injector, 
+                stateSolutionService, stateInteractionIdService, 
+                stateCustomizationArgsService, InteractionDetailsCacheService, 
+                INTERACTION_SPECS, UrlInterpolationService, 
+                EditorFirstTimeEventsService) {
               EditorFirstTimeEventsService
                 .registerFirstClickAddInteractionEvent();
 
@@ -304,9 +306,21 @@ oppia.controller('StateInteraction', [
               };
 
               $scope.save = function() {
+                var textAreas = document.getElementsByTagName('textarea');
+                for (var i = 0; i < textAreas.length; i++) {
+                  var text = textAreas[i].value;
+                  text = $filter('normalizeWhitespace')(text);
+                  text = $filter('removeExtraLines')(text);
+                  text = text.toString();
+                  document.querySelectorAll('div > input')[i].value = text;
+                  document.getElementById(textAreas[i].id.replace(
+                                          'Html','Text')).innerHTML = text;
+                  document.getElementsByTagName(
+                           'textarea').value = text.toString;
+                }                
                 EditorFirstTimeEventsService
                   .registerFirstSaveInteractionEvent();
-                $uibModalInstance.close();
+                setTimeout($uibModalInstance.close(),100000);
               };
 
               $scope.okay = function() {
