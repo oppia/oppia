@@ -89,12 +89,12 @@ class JobModel(base_models.BaseModel):
 
     @property
     def is_cancelable(self):
-    	"""Checks if the job is cancelable.
-    	
-    	Returns:
-    		bool. True if the status_code is queued or started, otherwise 
-    		false.
-    	"""
+        """Checks if the job is cancelable.
+
+        Returns:
+            bool. True if the status_code is queued or started, otherwise 
+            false.
+        """
         # Whether the job is currently in 'queued' or 'started' status.
         return self.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
 
