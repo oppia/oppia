@@ -23,7 +23,7 @@
         "allowEmptyCatch": true
       }
     ],
-    "no-trailing-spaces":[
+    "no-trailing-spaces": [
       "error"
     ],
     "no-redeclare": [
