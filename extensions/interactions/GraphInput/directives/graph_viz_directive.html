@@ -133,7 +133,8 @@
     <md-button class="md-raised" ng-click="state.selectedVertex = null;" translate="I18N_INTERACTIONS_GRAPH_UPDATE_LABEL"></md-button>
   </div>
   <div ng-if="state.selectedEdge !== null && graph.isWeighted && canEditEdgeWeight">
-    <input type="number" ng-model="selectedEdgeWeight" ng-model-options="{getterSetter: true}" focus-on="edgeWeightEditBegun"></input>
-    <md-button class="md-raised" ng-click="state.selectedEdge = null;" translate="I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT"></md-button>
+    <input type="number" ng-model="selectedEdgeWeight" ng-model-options="{getterSetter: true}" focus-on="edgeWeightEditBegun" ng-style="shouldShowWrongWeightWarning ? {'border': '1px solid red'}: {}" ng-blur="shouldShowWrongWeightWarning = !isValidEdgeWeight()" ng-focus="shouldShowWrongWeightWarning = false"></input>
+    <md-button class="md-raised" ng-click="onUpdateEdgeWeight()" translate="I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT"></md-button>
+
   </div>
 </div>
