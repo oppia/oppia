@@ -17,8 +17,8 @@
  *
  * Note: This is a simple tokenizer for tokenizing text input. The parameter
  * n_grams is used for deciding if we need to add n_gram tokens other than
- * the unigram tokens. As of now, we are only interested in unigrams but if 
- * needed in the future, this tokenizer should be able to generate n-grams 
+ * the unigram tokens. As of now, we are only interested in unigrams but if
+ * needed in the future, this tokenizer should be able to generate n-grams
  * also.
  *
  * For reference: https://github.com/scikit-learn/scikit-learn/

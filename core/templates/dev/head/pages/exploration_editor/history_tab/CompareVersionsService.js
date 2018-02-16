@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to compare versions of explorations. 
+ * @fileoverview Service to compare versions of explorations.
  */
 
 oppia.factory('CompareVersionsService', [
