@@ -44,7 +44,7 @@ oppia.directive('explorationFooter', [
             $scope.$apply();
           });
 
-          $scope.correctCount = function () {
+          $scope.getNumberOfCorrectAnswers = function () {
             return ExplorationPlayerService.getCorrectCount();
           };
 

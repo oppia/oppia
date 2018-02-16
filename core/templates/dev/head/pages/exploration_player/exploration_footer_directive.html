@@ -133,25 +133,26 @@
   }
 
   .oppia-exploration-footer .star-container {
-    margin: 0px 0px 4px 0px;
+    margin: 0 0 4px 0;
     position: relative;
   }
 
   .oppia-exploration-footer .star {
-    position: absolute;
     color: #F2C94C;
-    font-size: 42px;
-    right: 0px;
+    font-size: 44px;
+    padding: 0 0 4px 0;
+    position: absolute;
+    right: 0;
+    top: -4px;
     width: 45px;
-    padding: 0px 0px 2px 0px;
   }
 
   .oppia-exploration-footer .star-content {
+    color: #094142;
+    font-size: 12px;
     position: absolute;
     right: 19px;
-    top: 21px;
-    color: #094142;
-    font-size: 16px;
+    top: 17px;
   }
 
   @media (max-width: 475px) {
@@ -216,8 +217,8 @@
       </ul>
       <hint-and-solution-buttons ng-if="windowIsNarrow"></hint-and-solution-buttons>
       <div class="star-container" ng-if="windowIsNarrow">
-          <i class="material-icons star">star_rate</i>
-        <span class="star-content" ng-bind-html="correctCount()"></span>
+        <i class="material-icons star">&#xE838;</i>
+        <span class="star-content">{{getNumberOfCorrectAnswers()}}</span>
       </div>
     </div>
     <div class="col-sm-7">
