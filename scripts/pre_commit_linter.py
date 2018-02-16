@@ -143,6 +143,12 @@ BAD_PATTERNS_HTML_REGEXP = [
             'extensions/classifiers/',
             'extensions/objects/',
             'extensions/value_generators/')
+    },
+    {
+        'regexp': r"([^ \t\r\n])[ \t]+$",
+        'message': "There should not be any trailing whitespaces.",
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
@@ -563,7 +569,7 @@ def _check_bad_pattern_in_file(filename, content, pattern):
     if not (any(filename.startswith(excluded_dir)
                 for excluded_dir in pattern['excluded_dirs'])
             or filename in pattern['excluded_files']):
-        if re.search(regexp, content):
+        if re.search(regexp, content, re.MULTILINE):
             print '%s --> %s' % (
                 filename, pattern['message'])
             return True
