@@ -21,7 +21,7 @@
  * Oppia-ml uses scikit's SVC class during training classifier which uses
  * libsvm's implementation. If there are any changes in following part of
  * code in libsvm then corresponding changes must be propagated here.
- * 
+ *
  * libsvm's code for prediction:
  * https://github.com/arnaudsj/libsvm/blob/master/svm.cpp#L2481
  */
@@ -32,17 +32,17 @@ oppia.factory('SVMPredictionService', ['$log', function($log) {
       var kernel = kernelParams.kernel;
       var kvalues = [];
 
-      if (kernel == 'rbf') {
+      if (kernel === 'rbf') {
         var gamma = kernelParams.gamma;
         var vectorLength = input.length;
-        for(var i = 0; i < supportVectors.length; i++) {
+        for (var i = 0; i < supportVectors.length; i++) {
           var sum = 0;
-          for(var j = 0; j < input.length; j++) {
+          for (var j = 0; j < input.length; j++) {
             sum += Math.pow((supportVectors[i][j] - input[j]), 2);
           }
           kvalues.push(Math.exp(-gamma * sum));
         }
-      } else if (kernel == 'linear') {
+      } else if (kernel === 'linear') {
         var vectorLength = input.length;
         for (var i = 0; i < supportVectors.length; i++) {
           var sum = 0;
@@ -65,7 +65,7 @@ oppia.factory('SVMPredictionService', ['$log', function($log) {
 
       var startIndices = [];
       startIndices[0] = 0;
-      for(var i = 1; i < nSupport.length; i++) {
+      for (var i = 1; i < nSupport.length; i++) {
         startIndices[i] = startIndices[i - 1] + nSupport[i - 1];
       }
 
@@ -80,13 +80,13 @@ oppia.factory('SVMPredictionService', ['$log', function($log) {
       var kvalues = this.kernel(kernelParams, supportVectors, input);
 
       var votes = [];
-      for(var i = 0; i < classes.length; i++) {
+      for (var i = 0; i < classes.length; i++) {
         votes.push(0);
       }
 
       var p = 0;
-      for(var i = 0; i < classes.length; i++) {
-        for(var j = i + 1; j < classes.length; j++) {
+      for (var i = 0; i < classes.length; i++) {
+        for (var j = i + 1; j < classes.length; j++) {
           var si = startIndices[i];
           var sj = startIndices[j];
           var ci = nSupport[i];
@@ -96,14 +96,14 @@ oppia.factory('SVMPredictionService', ['$log', function($log) {
           var coef2 = dualCoef[i];
 
           var sum = 0;
-          for(var k = 0; k < ci; k++) {
+          for (var k = 0; k < ci; k++) {
             sum += kvalues[si + k] * coef1[si + k];
           }
 
-          for(var k = 0; k < cj; k++) {
+          for (var k = 0; k < cj; k++) {
             sum += kvalues[sj + k] * coef2[sj + k];
           }
-          // TODO(prasanna08): Verify why libsvm uses subtraction 
+          // TODO(prasanna08): Verify why libsvm uses subtraction
           // instead of addition.
           sum += intercept[p];
           if (sum > 0) {
@@ -117,7 +117,7 @@ oppia.factory('SVMPredictionService', ['$log', function($log) {
 
       // Find out class which has got maximum votes.
       var maxVoteIdx = 0;
-      for(var i = 0; i < votes.length; i++) {
+      for (var i = 0; i < votes.length; i++) {
         if (votes[i] > votes[maxVoteIdx]) {
           maxVoteIdx = i;
         }

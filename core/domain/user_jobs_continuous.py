@@ -309,7 +309,6 @@ class RecentUpdatesMRJobManager(
             logging.error(
                 'Invalid reducer key for RecentUpdatesMRJob: %s' % key)
 
-
         user_id = key[:key.find('@')]
         job_queued_msec = float(key[key.find('@') + 1:])
 
@@ -434,7 +433,8 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
     # Public query method.
     @classmethod
     def get_dashboard_stats(cls, user_id):
-        """
+        """Returns the dashboard stats associated with the given user_id.
+
         Args:
             user_id: str. The ID of the user.
 

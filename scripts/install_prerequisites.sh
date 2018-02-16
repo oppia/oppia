@@ -33,7 +33,7 @@ fi
 sudo apt-get update
 sudo apt-get install curl
 sudo apt-get install git
-sudo apt-get install openjdk-7-jre
+sudo apt-get install openjdk-8-jre
 sudo apt-get install python-setuptools
 sudo apt-get install python-dev
 sudo apt-get install python-pip

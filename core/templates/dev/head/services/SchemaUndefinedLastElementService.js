@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Service to check if the last element of SchemaBasedList
- * is undefined. 
+ * is undefined.
  */
 
 oppia.factory('SchemaUndefinedLastElementService', [function() {

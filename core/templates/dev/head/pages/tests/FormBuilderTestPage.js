@@ -17,8 +17,11 @@
  */
 
 oppia.directive('formOverlay', [
-  'recursionHelper', 'UrlInterpolationService',
-  function(recursionHelper, UrlInterpolationService) {
+  'NestedDirectivesRecursionTimeoutPreventionService',
+  'UrlInterpolationService',
+  function(
+      NestedDirectivesRecursionTimeoutPreventionService,
+      UrlInterpolationService) {
     return {
       scope: {
         definition: '=',
@@ -28,7 +31,7 @@ oppia.directive('formOverlay', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/tests/form_entry_point_modal_directive.html'),
       restrict: 'E',
-      compile: recursionHelper.compile,
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {
         $scope.$watch('savedValue', function() {
           $scope.localValue = angular.copy($scope.savedValue);

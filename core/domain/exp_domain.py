@@ -2863,8 +2863,9 @@ class Exploration(object):
                 interaction['hints'] = []
                 for fallback in interaction['fallbacks']:
                     if fallback['outcome']['feedback']:
-                        interaction['hints'].append(
-                            Hint(fallback['outcome']['feedback'][0]).to_dict())
+                        interaction['hints'].append({
+                            'hint_text': fallback['outcome']['feedback'][0]
+                        })
             if 'solution' not in interaction:
                 interaction['solution'] = None
         return states_dict
@@ -3069,6 +3070,32 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v17_dict_to_v18_dict(cls, states_dict):
+        """Converts from version 17 to 18. Version 18 adds a new
+        customization arg to FractionInput interactions which allows
+        you to add custom placeholders.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'FractionInput':
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                customization_args.update({
+                    'customPlaceholder': {
+                        'value': ''
+                    }
+                })
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -3099,7 +3126,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 22
+    CURRENT_EXP_SCHEMA_VERSION = 23
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3530,6 +3557,21 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v22_dict_to_v23_dict(cls, exploration_dict):
+        """ Converts a v22 exploration dict into a v23 exploration dict.
+
+        Adds a new customization arg to FractionInput interactions
+        which allows you to add custom placeholders.
+        """
+        exploration_dict['schema_version'] = 23
+
+        exploration_dict['states'] = cls._convert_states_v17_dict_to_v18_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 18
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3670,6 +3712,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v21_dict_to_v22_dict(
                 exploration_dict)
             exploration_schema_version = 22
+
+        if exploration_schema_version == 22:
+            exploration_dict = cls._convert_v22_dict_to_v23_dict(
+                exploration_dict)
+            exploration_schema_version = 23
 
         return (exploration_dict, initial_schema_version)
 

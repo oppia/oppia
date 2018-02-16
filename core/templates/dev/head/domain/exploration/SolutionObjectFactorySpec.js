@@ -75,6 +75,6 @@ describe('Solution object factory', function() {
       });
       expect(solution.getSummary('FractionInput')).toEqual(
         'One solution is "1/6". This is the explanation to the answer.');
-    })
+    });
   });
 });

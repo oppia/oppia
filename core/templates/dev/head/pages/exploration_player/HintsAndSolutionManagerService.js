@@ -20,10 +20,12 @@ oppia.factory('HintsAndSolutionManagerService', [
   '$timeout', '$rootScope', 'PlayerTranscriptService',
   'DELAY_FOR_HINT_FEEDBACK_MSEC', 'HINT_REQUEST_STRING_I18N_IDS',
   'WAIT_FOR_FIRST_HINT_MSEC', 'WAIT_FOR_SUBSEQUENT_HINTS_MSEC',
+  'EVENT_NEW_CARD_AVAILABLE',
   function(
       $timeout, $rootScope, PlayerTranscriptService,
       DELAY_FOR_HINT_FEEDBACK_MSEC, HINT_REQUEST_STRING_I18N_IDS,
-      WAIT_FOR_FIRST_HINT_MSEC, WAIT_FOR_SUBSEQUENT_HINTS_MSEC) {
+      WAIT_FOR_FIRST_HINT_MSEC, WAIT_FOR_SUBSEQUENT_HINTS_MSEC,
+      EVENT_NEW_CARD_AVAILABLE) {
     var timeout = null;
     var ACCELERATED_HINT_WAIT_TIME_MSEC = 10000;
     var WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC = 60000;
@@ -35,6 +37,7 @@ oppia.factory('HintsAndSolutionManagerService', [
     var hintsForLatestCard = [];
     var solutionForLatestCard = null;
     var wrongAnswersSinceLastHintConsumed = 0;
+    var correctAnswerSubmitted = false;
 
     // tooltipIsOpen is a flag which says that the tooltip is currently
     // visible to the learner.
@@ -43,6 +46,14 @@ oppia.factory('HintsAndSolutionManagerService', [
     // tooltip has been triggered.
     var hintsDiscovered = false;
     var tooltipTimeout = null;
+
+
+    $rootScope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+      correctAnswerSubmitted = true;
+      // This prevents tooltip to hide the Continue button of the help card in
+      // mobile view.
+      tooltipIsOpen = false;
+    });
 
     // This replaces any timeouts that are already queued.
     var enqueueTimeout = function(func, timeToWaitMsec) {
@@ -58,10 +69,12 @@ oppia.factory('HintsAndSolutionManagerService', [
     };
 
     var releaseHint = function() {
-      numHintsReleased++;
-      if (!hintsDiscovered && !tooltipTimeout) {
-        tooltipTimeout = $timeout(
-          showTooltip, WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+      if (!correctAnswerSubmitted) {
+        numHintsReleased++;
+        if (!hintsDiscovered && !tooltipTimeout) {
+          tooltipTimeout = $timeout(
+            showTooltip, WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+        }
       }
     };
     var releaseSolution = function() {
@@ -108,6 +121,7 @@ oppia.factory('HintsAndSolutionManagerService', [
         hintsForLatestCard = newHints;
         solutionForLatestCard = newSolution;
         wrongAnswersSinceLastHintConsumed = 0;
+        correctAnswerSubmitted = false;
         if (timeout) {
           $timeout.cancel(timeout);
         }

@@ -96,17 +96,17 @@ oppia.directive('oppiaInteractiveGraphInput', [
             $scope.canAddVertex = $scope.interactionIsActive ?
               stringToBool($attrs.canAddVertexWithValue) : false;
             $scope.canDeleteVertex = $scope.interactionIsActive ?
-              stringToBool($attrs.canDeleteVertexWithValue) : false
+              stringToBool($attrs.canDeleteVertexWithValue) : false;
             $scope.canEditVertexLabel = $scope.interactionIsActive ?
-              stringToBool($attrs.canEditVertexLabelWithValue) : false
+              stringToBool($attrs.canEditVertexLabelWithValue) : false;
             $scope.canMoveVertex = $scope.interactionIsActive ?
-              stringToBool($attrs.canMoveVertexWithValue) : false
+              stringToBool($attrs.canMoveVertexWithValue) : false;
             $scope.canAddEdge = $scope.interactionIsActive ?
-              stringToBool($attrs.canAddEdgeWithValue) : false
+              stringToBool($attrs.canAddEdgeWithValue) : false;
             $scope.canDeleteEdge = $scope.interactionIsActive ?
-              stringToBool($attrs.canDeleteEdgeWithValue) : false
+              stringToBool($attrs.canDeleteEdgeWithValue) : false;
             $scope.canEditEdgeWeight = $scope.interactionIsActive ?
-              stringToBool($attrs.canEditEdgeWeightWithValue) : false
+              stringToBool($attrs.canEditEdgeWeightWithValue) : false;
           };
 
           // TODO(czxcjx): Write this function
@@ -254,11 +254,11 @@ oppia.directive('graphViz', [
       controller: [
         '$scope', '$element', '$attrs', '$document', 'FocusManagerService',
         'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
-        'EVENT_NEW_CARD_AVAILABLE',
+        'EVENT_NEW_CARD_AVAILABLE', 'DeviceInfoService',
         function(
             $scope, $element, $attrs, $document, FocusManagerService,
             graphDetailService, GRAPH_INPUT_LEFT_MARGIN,
-            EVENT_NEW_CARD_AVAILABLE) {
+            EVENT_NEW_CARD_AVAILABLE, DeviceInfoService) {
           var _MODES = {
             MOVE: 0,
             ADD_EDGE: 1,
@@ -297,6 +297,11 @@ oppia.directive('graphViz', [
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.state.currentMode = null;
           });
+
+          $scope.isMobile = false;
+          if (DeviceInfoService.isMobileDevice()) {
+            $scope.isMobile = true;
+          }
 
           var vizContainer = $($element).find('.oppia-graph-viz-svg');
           $scope.vizWidth = vizContainer.width();
@@ -345,6 +350,19 @@ oppia.directive('graphViz', [
           $scope.init = function() {
             initButtons();
             $scope.state.currentMode = $scope.buttons[0].mode;
+            if ($scope.isMobile) {
+              if ($scope.state.currentMode === _MODES.ADD_EDGE) {
+                $scope.helpText =
+                  'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+              } else if ($scope.state.currentMode === _MODES.MOVE) {
+                $scope.helpText =
+                  'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
+              } else {
+                $scope.helpText = null;
+              }
+            } else {
+              $scope.helpText = null;
+            }
           };
 
           var initButtons = function() {
@@ -399,11 +417,27 @@ oppia.directive('graphViz', [
             $scope.graph[option] = !$scope.graph[option];
           };
 
+          $scope.helpText = null;
           var setMode = function(mode) {
             $scope.state.currentMode = mode;
+            if ($scope.isMobile) {
+              if ($scope.state.currentMode === _MODES.ADD_EDGE) {
+                $scope.helpText =
+                  'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+              } else if ($scope.state.currentMode === _MODES.MOVE) {
+                $scope.helpText =
+                  'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
+              } else {
+                $scope.helpText = null;
+              }
+            } else {
+              $scope.helpText = null;
+            }
             $scope.state.addEdgeVertex = null;
             $scope.state.selectedVertex = null;
             $scope.state.selectedEdge = null;
+            $scope.state.currentlyDraggedVertex = null;
+            $scope.state.hoveredVertex = null;
           };
           $scope.onClickModeButton = function(mode, $event) {
             $event.preventDefault();
@@ -429,9 +463,59 @@ oppia.directive('graphViz', [
                 $scope.canEditVertexLabel) {
               beginEditVertexLabel(index);
             }
+            if ($scope.isMobile) {
+              $scope.state.hoveredVertex = index;
+              if ($scope.state.addEdgeVertex === null &&
+                  $scope.state.currentlyDraggedVertex === null) {
+                $scope.onTouchInitialVertex(index);
+              } else {
+                if ($scope.state.addEdgeVertex === index) {
+                  $scope.state.hoveredVertex = null;
+                  $scope.helpText =
+                    'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+                  $scope.state.addEdgeVertex = null;
+                  return;
+                }
+                $scope.onTouchFinalVertex(index);
+              }
+            }
           };
+
+          $scope.onTouchInitialVertex = function(index) {
+            if ($scope.state.currentMode === _MODES.ADD_EDGE) {
+              if ($scope.canAddEdge) {
+                beginAddEdge(index);
+                $scope.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_FINAL_HELPTEXT';
+              }
+            } else if ($scope.state.currentMode === _MODES.MOVE) {
+              if ($scope.canMoveVertex) {
+                beginDragVertex(index);
+                $scope.helpText = 'I18N_INTERACTIONS_GRAPH_MOVE_FINAL_HELPTEXT';
+              }
+            }
+          };
+
+          $scope.onTouchFinalVertex = function(index) {
+            if ($scope.state.currentMode === _MODES.ADD_EDGE) {
+              tryAddEdge(
+                $scope.state.addEdgeVertex, index);
+              endAddEdge();
+              $scope.state.hoveredVertex = null;
+              $scope.helpText = 'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT';
+            } else if ($scope.state.currentMode === _MODES.MOVE) {
+              if ($scope.state.currentlyDraggedVertex !== null) {
+                endDragVertex();
+                $scope.state.hoveredVertex = null;
+                $scope.helpText =
+                  'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT';
+              }
+            }
+          };
+
           $scope.onMousedownVertex = function(index) {
-            console.log('MOUSEDOWN');
+            if ($scope.isMobile) {
+              return;
+            }
             if ($scope.state.currentMode === _MODES.ADD_EDGE) {
               if ($scope.canAddEdge) {
                 beginAddEdge(index);
@@ -441,6 +525,15 @@ oppia.directive('graphViz', [
                 beginDragVertex(index);
               }
             }
+          };
+
+          $scope.onMouseleaveVertex = function(index) {
+            if ($scope.isMobile) {
+              return;
+            }
+            $scope.state.hoveredVertex = (
+              index === $scope.state.hoveredVertex) ?
+                null : $scope.state.hoveredVertex;
           };
 
           $scope.onClickVertexLabel = function(index) {
@@ -470,6 +563,9 @@ oppia.directive('graphViz', [
 
           // Document event
           $scope.onMouseupDocument = function() {
+            if ($scope.isMobile) {
+              return;
+            }
             if ($scope.state.currentMode === _MODES.ADD_EDGE) {
               if ($scope.state.hoveredVertex !== null) {
                 tryAddEdge(

@@ -23,15 +23,15 @@ oppia.factory('UrlService', ['$window', function($window) {
     getCurrentLocation: function() {
       return $window.location;
     },
-    getCurrentHref: function() {
-      return this.getCurrentLocation().href;
+    getCurrentQueryString: function() {
+      return this.getCurrentLocation().search;
     },
     /* As params[key] is overwritten, if query string has multiple fieldValues
        for same fieldName, use getQueryFieldValuesAsList(fieldName) to get it
        in array form. */
     getUrlParams: function() {
       var params = {};
-      var parts = this.getCurrentHref().replace(
+      var parts = this.getCurrentQueryString().replace(
         /[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
           params[decodeURIComponent(key)] = decodeURIComponent(value);
         }
@@ -48,10 +48,10 @@ oppia.factory('UrlService', ['$window', function($window) {
     },
     getQueryFieldValuesAsList: function(fieldName) {
       var fieldValues = [];
-      if (this.getCurrentHref().indexOf('?') > -1) {
+      if (this.getCurrentQueryString().indexOf('?') > -1) {
         // Each queryItem return one field-value pair in the url.
-        var queryItems = this.getCurrentHref().slice(
-          this.getCurrentHref().indexOf('?') + 1).split('&');
+        var queryItems = this.getCurrentQueryString().slice(
+          this.getCurrentQueryString().indexOf('?') + 1).split('&');
         for (var i = 0; i < queryItems.length; i++) {
           var currentFieldName = decodeURIComponent(
             queryItems[i].split('=')[0]);
@@ -67,7 +67,7 @@ oppia.factory('UrlService', ['$window', function($window) {
     addField: function(url, fieldName, fieldValue) {
       var encodedFieldValue = encodeURIComponent(fieldValue);
       var encodedFieldName = encodeURIComponent(fieldName);
-      return url + (url.indexOf('?') != -1 ? '&' : '?') + encodedFieldName +
+      return url + (url.indexOf('?') !== -1 ? '&' : '?') + encodedFieldName +
         '=' + encodedFieldValue;
     },
     getHash: function() {

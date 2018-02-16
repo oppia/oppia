@@ -24,8 +24,8 @@
 oppia.factory('TextInputPredictionService', [
   'SVMPredictionService', 'TextInputTokenizer',
   'CountVectorizerService', function(
-    SVMPredictionService, TextInputTokenizer,
-    CountVectorizerService) {
+      SVMPredictionService, TextInputTokenizer,
+      CountVectorizerService) {
     return {
       predict: function(classifierData, textInput) {
         var cvVocabulary = classifierData.cv_vocabulary;
@@ -35,7 +35,7 @@ oppia.factory('TextInputPredictionService', [
         // Tokenize the text input.
         var textInputTokens = TextInputTokenizer.generateTokens(textInput);
 
-        if (textInputTokens != null) {
+        if (textInputTokens !== null) {
           var textVector = CountVectorizerService.vectorize(
             textInputTokens, cvVocabulary);
           prediction = SVMPredictionService.predict(svmData, textVector);

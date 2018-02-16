@@ -51,4 +51,22 @@ class FractionInput(base.BaseInteraction):
             'type': 'bool',
         },
         'default_value': True
+    }, {
+        'name': 'customPlaceholder',
+        'description': 'Custom placeholder text (optional)',
+        'schema': {
+            'type': 'unicode'
+        },
+        'default_value': ''
+    }]
+
+    _answer_visualization_specs = [{
+        # Table with answer counts for top N answers.
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top answers',
+        },
+        'calculation_id': 'Top10AnswerFrequencies',
+        'show_addressed_info': True,
     }]

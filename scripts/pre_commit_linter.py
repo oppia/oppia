@@ -141,18 +141,17 @@ BAD_PATTERNS_HTML_REGEXP = [
         'excluded_dirs': (
             'extensions/answer_summarizers/',
             'extensions/classifiers/',
-            'extensions/dependencies/',
             'extensions/objects/',
-            'extensions/value_generators/',
-            'extensions/visualizations/')
+            'extensions/value_generators/')
     }
 ]
 
-BAD_PATTERNS_APP_YAML = {
-    'MINIFICATION: true': {
-        'message': 'Please set the MINIFICATION env variable in app.yaml'
+REQUIRED_STRINGS_FECONF = {
+    'FORCE_PROD_MODE = False': {
+        'message': 'Please set the FORCE_PROD_MODE variable in feconf.py'
                    'to False before committing.',
-        'excluded_files': ()}
+        'excluded_files': ()
+    }
 }
 
 EXCLUDED_PATHS = (
@@ -608,13 +607,13 @@ def _check_bad_patterns(all_files):
                         failed = True
                         total_error_count += 1
 
-            if filename == 'app.yaml':
-                for pattern in BAD_PATTERNS_APP_YAML:
-                    if pattern in content:
+            if filename == 'feconf.py':
+                for pattern in REQUIRED_STRINGS_FECONF:
+                    if pattern not in content:
                         failed = True
                         print '%s --> %s' % (
                             filename,
-                            BAD_PATTERNS_APP_YAML[pattern]['message'])
+                            REQUIRED_STRINGS_FECONF[pattern]['message'])
                         total_error_count += 1
     if failed:
         summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED
@@ -643,16 +642,18 @@ def _check_import_order(all_files):
     print 'Starting import-order checks'
     print '----------------------------------------'
     summary_messages = []
-    all_files = [
+    files_to_check = [
         filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.py')]
     failed = False
-    for filename in all_files:
+    for filename in files_to_check:
         # This line prints the error message along with file path
         # and returns True if it finds an error else returns False
         # If check is set to True, isort simply checks the file and
         # if check is set to False, it autocorrects import-order errors.
-        if isort.SortImports(filename, check=True).incorrectly_sorted:
+        if (isort.SortImports(
+                filename, check=True, show_diff=True).incorrectly_sorted):
             failed = True
     print ''
     print '----------------------------------------'
@@ -711,7 +712,7 @@ def main():
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
         def_spacing_messages + import_order_messages +
-        linter_messages + newline_messages + pattern_messages)
+        newline_messages + linter_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
