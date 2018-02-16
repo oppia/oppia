@@ -342,6 +342,7 @@ oppia.filter('summarizeNonnegativeNumber', [function() {
   };
 }]);
 
+// Note that this filter removes additional new lines or <p><br></p> tags.
 oppia.filter('removeExtraLines', [function() {
   return function(string) {
     if (!angular.isString(string)) {

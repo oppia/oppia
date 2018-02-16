@@ -311,7 +311,6 @@ oppia.controller('StateInteraction', [
                   var text = textAreas[i].value;
                   text = $filter('normalizeWhitespace')(text);
                   text = $filter('removeExtraLines')(text);
-                  text = text.toString();
                   document.querySelectorAll('div > input')[i].value = text;
                   document.getElementById(textAreas[i].id.replace(
                                           'Html','Text')).innerHTML = text;
@@ -320,7 +319,7 @@ oppia.controller('StateInteraction', [
                 }                
                 EditorFirstTimeEventsService
                   .registerFirstSaveInteractionEvent();
-                setTimeout($uibModalInstance.close(),100000);
+                $uibModalInstance.close();
               };
 
               $scope.okay = function() {
