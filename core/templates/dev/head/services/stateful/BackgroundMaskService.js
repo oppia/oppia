@@ -16,7 +16,7 @@
  * @fileoverview Service for enabling a background mask that leaves navigation
  * visible.
  */
- 
+
 oppia.factory('BackgroundMaskService', function() {
   var maskIsActive = false;
 

@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for the ClassifierObjectFactory.
  */
- 
+
 describe('Classifier Object Factory', function() {
   var ClassifierObjectFactory;
 
