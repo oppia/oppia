@@ -49,6 +49,7 @@ oppia.controller('ExplorationEditor', [
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'ParamSpecsObjectFactory', 'explorationAutomaticTextToSpeechService',
   'UrlInterpolationService', 'explorationCorrectnessFeedbackService',
+  'ThreadDataService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       ExplorationDataService, EditorStateService, explorationTitleService,
@@ -63,7 +64,8 @@ oppia.controller('ExplorationEditor', [
       AutosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, explorationAutomaticTextToSpeechService,
-      UrlInterpolationService, explorationCorrectnessFeedbackService) {
+      UrlInterpolationService, explorationCorrectnessFeedbackService,
+      ThreadDataService) {
     $scope.EditabilityService = EditabilityService;
     $scope.EditorStateService = EditorStateService;
 
@@ -163,7 +165,11 @@ oppia.controller('ExplorationEditor', [
         if (!RouterService.isLocationSetToNonStateEditorTab() &&
             !data.states.hasOwnProperty(
               RouterService.getCurrentStateFromLocationPath('gui'))) {
-          RouterService.navigateToMainTab();
+          if (ThreadDataService.getOpenThreadsCount() > 0) {
+            RouterService.navigateToFeedbackTab();
+          } else {
+            RouterService.navigateToMainTab();
+          }
         }
 
         ExplorationWarningsService.updateWarnings();
