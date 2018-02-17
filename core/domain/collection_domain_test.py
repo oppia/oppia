@@ -458,8 +458,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
     def test_add_delete_node(self):
         """Test that add_node and delete_node fail in the correct situations.
         """
-        collection = collection_domain.Collection.create_default_collection(
-            '0')
+        collection = collection_domain.Collection.create_default_collection('0')
         self.assertEqual(len(collection.nodes), 0)
 
         collection.add_node('test_exp')
@@ -485,6 +484,39 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
         collection.delete_node('test_exp')
         self.assertEqual(len(collection.nodes), 0)
+
+    def test_move_node(self):
+        """Test that move_node changes the position of node in the nodes list
+        and fails in the correct situation.
+        """
+        collection = collection_domain.Collection.create_default_collection('0')
+        self.assertEqual(len(collection.nodes), 0)
+
+        collection.add_node('exp_id_0')
+        collection.add_node('exp_id_1')
+        self.assertEqual(len(collection.nodes), 2)
+
+        with self.assertRaisesRegexp(
+            ValueError,
+            'Exploration is not part of this collection: incorrect_exp_id'
+            ):
+            collection.move_node('incorrect_exp_id', 0)
+
+        with self.assertRaisesRegexp(
+            ValueError,
+            r'Cannot move the exploration\(exp_id_0\) to this position: 2'
+            ):
+            collection.move_node('exp_id_0', 2)
+
+        with self.assertRaisesRegexp(
+            ValueError,
+            'Exploration is already on postion: 0'
+            ):
+            collection.move_node('exp_id_0', 0)
+
+        collection.move_node('exp_id_0', 1)
+        self.assertEqual(collection.nodes[0], collection.get_node('exp_id_1'))
+        self.assertEqual(collection.nodes[1], collection.get_node('exp_id_0'))
 
     def test_add_skill(self):
         """Test that add_skill correctly adds skills."""

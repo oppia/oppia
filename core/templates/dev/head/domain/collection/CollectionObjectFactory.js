@@ -211,6 +211,22 @@ oppia.factory('CollectionObjectFactory', [
       return angular.copy(Object.keys(this._explorationIdToNodeIndexMap));
     };
 
+    // Changes the position of node in the nodes list of collection.
+    Collection.prototype.moveCollectionNode = function(expId, newPosition) {
+      if (this._explorationIdToNodeIndexMap.hasOwnProperty(expId)) {
+        var oldPosition = this._explorationIdToNodeIndexMap[expId];
+        var node = angular.copy(this._nodes[oldPosition]);
+
+        if (this._nodes.length > newPosition && newPosition >= 0) {
+          var expInNewPosition = this._nodes[newPosition].getExplorationId();
+          this._explorationIdToNodeIndexMap[expInNewPosition] = oldPosition;
+          this._explorationIdToNodeIndexMap[expId] = newPosition;
+        }
+        this._nodes.splice(oldPosition, 1);
+        this._nodes.splice(newPosition, 0, node);
+      }
+    };
+
     // Gets a new ID for a skill. This should be of the same form as in the
     // backend, in collection_domain.CollectionSkill.get_skill_id_from_index.
     // This increments nextSkillIndex.
