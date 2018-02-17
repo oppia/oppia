@@ -92,8 +92,7 @@ class JobModel(base_models.BaseModel):
         """Checks if the job is cancelable.
 
         Returns:
-            bool. True if the status_code is queued or started, otherwise
-                false.
+            bool. Whether status_code is 'queued' or 'started'.
         """
         # Whether the job is currently in 'queued' or 'started' status.
         return self.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
