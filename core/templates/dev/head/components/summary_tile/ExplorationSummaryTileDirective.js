@@ -185,3 +185,22 @@ oppia.directive('explorationSummaryTile', [
       ]
     };
   }]);
+
+oppia.directive('touchStart', [function () {
+  return function (scope, element, attr) {
+    element.on('touchstart', function (event) {
+      scope.$apply(function () {
+        scope.$eval(attr.touchStart);
+      });
+    });
+  };
+}]);
+oppia.directive('touchEnd', [function () {
+  return function (scope, element, attr) {
+    element.on('touchend', function (event) {
+      scope.$apply(function () {
+        scope.$eval(attr.touchEnd);
+      });
+    });
+  };
+}]);
