@@ -713,10 +713,7 @@ oppia.directive('graphViz', [
           };
 
           $scope.isValidEdgeWeight = function() {
-            if (!angular.isNumber($scope.selectedEdgeWeightValue)) {
-              return false;
-            }
-            return true;
+            return angular.isNumber($scope.selectedEdgeWeightValue);
           };
 
           $scope.onUpdateEdgeWeight = function() {
