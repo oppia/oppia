@@ -236,7 +236,9 @@ oppia.filter('parameterizeRuleDescription', [
         } else if (varType === 'Fraction') {
           replacementText = FractionObjectFactory
             .fromDict(inputs[varName]).toString();
-        } else if (varType === 'SetOfUnicodeString') {
+        } else if (
+          varType === 'SetOfUnicodeString' ||
+          varType === 'SetOfNormalizedString') {
           replacementText = '[';
           for (var i = 0; i < inputs[varName].length; i++) {
             if (i !== 0) {
@@ -251,9 +253,17 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = inputs[varName] + '';
         } else if (
           varType === 'CodeString' || varType === 'UnicodeString' ||
-          varType === 'LogicErrorCategory' || varType === 'NormalizedString' ||
-          varType === 'SetOfNormalizedString') {
+          varType === 'LogicErrorCategory' || varType === 'NormalizedString') {
           replacementText = inputs[varName];
+        } else if (varType === 'ListOfCodeEvaluation') {
+          replacementText = '[';
+          for (var i = 0; i < inputs[varName].length; i++) {
+            if (i !== 0) {
+              replacementText += ', ';
+            }
+            replacementText += inputs[varName][i].code;
+          }
+          replacementText += ']';
         } else {
           throw Error('Unknown variable type in rule description');
         }
