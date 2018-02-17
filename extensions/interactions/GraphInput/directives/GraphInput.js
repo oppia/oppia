@@ -256,8 +256,8 @@ oppia.directive('graphViz', [
         'FocusManagerService', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
         'EVENT_NEW_CARD_AVAILABLE', 'DeviceInfoService',
         function(
-            $scope, $element, $attrs, $document, $timeout, FocusManagerService,
-            graphDetailService, GRAPH_INPUT_LEFT_MARGIN,
+            $scope, $element, $attrs, $document, $timeout,
+            FocusManagerService, graphDetailService, GRAPH_INPUT_LEFT_MARGIN,
             EVENT_NEW_CARD_AVAILABLE, DeviceInfoService) {
           var _MODES = {
             MOVE: 0,
@@ -759,7 +759,7 @@ oppia.directive('graphViz', [
             $scope.init();
             
             // Set the SVG viewBox to appropriate size.
-            $timeout(function(){
+            $timeout(function() {
               var svgContainer = $($element).find('.oppia-graph-viz-svg')[0];
               var boundingBox = svgContainer.getBBox();
               var viewBoxHeight = Math.max(
