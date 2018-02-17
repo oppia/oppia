@@ -264,8 +264,7 @@ oppia.filter('parameterizeRuleDescription', [
             replacementText += inputs[varName][i].code;
           }
           replacementText += ']';
-        }
-        else {
+        } else {
           throw Error('Unknown variable type in rule description');
         }
 
