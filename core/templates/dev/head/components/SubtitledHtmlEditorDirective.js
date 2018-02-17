@@ -72,5 +72,7 @@ oppia.directive('subtitledhintEditor', [
           $scope.onAudioTranslationsEdited = function() {
             $scope.getOnSaveFn()();
           };
-
-  }
+        }
+      ]
+    };
+  }]);
