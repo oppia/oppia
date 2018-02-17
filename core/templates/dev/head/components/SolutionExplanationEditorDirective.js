@@ -64,18 +64,6 @@ oppia.directive('solutionExplanationEditor', [
             $scope.explanationEditorIsOpen = false;
           };
 
-          $scope.onAudioTranslationsStartEditAction = function() {
-            // Close the content editor and save all existing changes to the
-            // HTML.
-            if ($scope.explanationEditorIsOpen) {
-              $scope.saveThisExplanation();
-            }
-          };
-
-          $scope.onAudioTranslationsEdited = function() {
-            stateSolutionService.saveDisplayedValue();
-          };
-
           $scope.$on('externalSave', function() {
             if ($scope.explanationEditorIsOpen &&
               $scope.editSolutionForm.$valid) {

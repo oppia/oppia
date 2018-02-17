@@ -107,18 +107,6 @@ oppia.directive('stateContentEditor', [
             stateContentService.restoreFromMemento();
             $scope.contentEditorIsOpen = false;
           };
-
-          $scope.onAudioTranslationsStartEditAction = function() {
-            // Close the content editor and save all existing changes to the
-            // HTML.
-            if ($scope.contentEditorIsOpen) {
-              saveContent();
-            }
-          };
-
-          $scope.onAudioTranslationsEdited = function() {
-            stateContentService.saveDisplayedValue();
-          };
         }
       ]
     };
