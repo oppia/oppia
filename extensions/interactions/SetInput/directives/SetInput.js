@@ -65,12 +65,9 @@ oppia.directive('oppiaInteractiveSetInput', [
           };
 
           var hasBlankOption = function(answer) {
-            for (var i = 0; i < answer.length; i++) {
-              if (answer[i] === '') {
-                return true;
-              }
-            }
-            return false;
+            return answer.some(function(element) {
+              return (element === '');
+            });
           };
 
           $scope.submitAnswer = function(answer) {
