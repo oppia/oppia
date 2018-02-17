@@ -348,7 +348,8 @@ oppia.controller('StateInteraction', [
         stateInteractionIdService.displayed = null;
         stateCustomizationArgsService.displayed = {};
         stateSolutionService.displayed = null;
-
+        InteractionDetailsCacheService.removeDetails(
+          stateInteractionIdService.savedMemento);
         stateInteractionIdService.saveDisplayedValue();
         stateCustomizationArgsService.saveDisplayedValue();
         stateSolutionService.saveDisplayedValue();

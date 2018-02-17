@@ -29,6 +29,9 @@ oppia.factory('InteractionDetailsCacheService', [function() {
     contains: function(interactionId) {
       return _cache.hasOwnProperty(interactionId);
     },
+    removeDetails: function (interactionId) {
+      delete _cache[interactionId];
+    },
     set: function(interactionId, interactionCustomizationArgs) {
       _cache[interactionId] = {
         customization: angular.copy(interactionCustomizationArgs)
