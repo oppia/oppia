@@ -128,7 +128,7 @@ BAD_PATTERNS_JS_REGEXP = [
     }
 ]
 
-BAD_PATTERNS_HTML_REGEXP = [
+BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': r"text\/ng-template",
         'message': "The directives must be directly referenced.",
@@ -145,7 +145,7 @@ BAD_PATTERNS_HTML_REGEXP = [
             'extensions/value_generators/')
     },
     {
-        'regexp': r"([^ \t\r\n])[ \t]+$",
+        'regexp': r"[ \t]+$",
         'message': "There should not be any trailing whitespaces.",
         'excluded_files': (),
         'excluded_dirs': ()
@@ -549,11 +549,12 @@ def _check_newline_character(all_files):
     return summary_messages
 
 
-def _check_bad_pattern_in_file(filename, pattern):
+def _check_bad_pattern_in_file(filename, content, pattern):
     """Detects whether the given pattern is present in the file.
 
     Args:
         filename: str. Name of the file.
+        content: str. Contents of the file.
         pattern: dict ( regexp(regex pattern) : pattern to match,
             message(str) : message to show if pattern matches,
             excluded_files(tuple(str)) : files to be excluded from matching,
@@ -569,14 +570,13 @@ def _check_bad_pattern_in_file(filename, pattern):
                 for excluded_dir in pattern['excluded_dirs'])
             or filename in pattern['excluded_files']):
         bad_pattern_count = 0
-        with open(filename, 'r') as file_to_check:
-            for line_num, line in enumerate(file_to_check, 1):
-                if re.search(regexp, line):
-                    print 'L: %s %s --> %s' % (
-                        line_num, filename, pattern['message'])
-                    bad_pattern_count += 1
-            if bad_pattern_count:
-                return True
+        for line_num, line in enumerate(content.split('\n'), 1):
+            if re.search(regexp, line):
+                print '%s --> Line %s: %s' % (
+                    filename, line_num, pattern['message'])
+                bad_pattern_count += 1
+        if bad_pattern_count:
+            return True
     return False
 
 
@@ -607,13 +607,13 @@ def _check_bad_patterns(all_files):
 
             if filename.endswith('.js'):
                 for regexp in BAD_PATTERNS_JS_REGEXP:
-                    if _check_bad_pattern_in_file(filename, regexp):
+                    if _check_bad_pattern_in_file(filename, content, regexp):
                         failed = True
                         total_error_count += 1
 
             if filename.endswith('.html'):
-                for regexp in BAD_PATTERNS_HTML_REGEXP:
-                    if _check_bad_pattern_in_file(filename, regexp):
+                for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
+                    if _check_bad_pattern_in_file(filename, content, regexp):
                         failed = True
                         total_error_count += 1
 
