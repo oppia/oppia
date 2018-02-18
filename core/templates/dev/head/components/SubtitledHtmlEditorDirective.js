@@ -20,10 +20,10 @@ oppia.directive('subtitledhintEditor', [
   'UrlInterpolationService', 'SubtitledHtmlObjectFactory',
   function(UrlInterpolationService, SubtitledHtmlObjectFactory){
     return {
-    restrict: 'E',
-    scope: {
-      subtitled: '=',
-      getOnSaveFn: '&onSaveFn'
+      restrict: 'E',
+      scope: {
+        subtitled: '=',
+        getOnSaveFn: '&onSaveFn'
     },
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
       '/components/subtitled_html_editor_directive.html'),
