@@ -20,7 +20,7 @@ oppia.directive('subtitledhintEditor', [
 
   'UrlInterpolationService', 'SubtitledHtmlObjectFactory',
   function(UrlInterpolationService, SubtitledHtmlObjectFactory){
-  	return {
+    return {
     restrict: 'E',
     scope: {
       subtitled: '=',
@@ -75,7 +75,7 @@ oppia.directive('subtitledhintEditor', [
           $scope.onAudioTranslationsEdited = function() {
             $scope.getOnSaveFn()();
           };
-        }
-      ]
+      }
+    ]
   };
   }]);
