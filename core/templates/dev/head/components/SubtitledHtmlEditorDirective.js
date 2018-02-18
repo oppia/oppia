@@ -17,7 +17,8 @@
  */          
 
 oppia.directive('subtitledhintEditor', [
-  'UrlInterpolationService', 'SubtitledHtmlObjectFactory',function(UrlInterpolationService, SubtitledHtmlObjectFactory){
+  'UrlInterpolationService', 'SubtitledHtmlObjectFactory',
+  function(UrlInterpolationService, SubtitledHtmlObjectFactory){
   	return {
       restrict: 'E',
       scope: {
