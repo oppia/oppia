@@ -24,10 +24,10 @@ oppia.directive('subtitledhintEditor', [
       scope: {
         subtitled: '=',
         getOnSaveFn: '&onSaveFn'
-    },
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/components/subtitled_html_editor_directive.html'),
-    controller: [
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/subtitled_html_editor_directive.html'),
+      controller: [
         '$scope', '$uibModal', 'EditabilityService',
         'COMPONENT_NAME_HTMLCONTENT',
         function($scope, $uibModal, EditabilityService,
