@@ -17,18 +17,20 @@
  */          
 
 oppia.directive('subtitledhintEditor', [
+
   'UrlInterpolationService', 'SubtitledHtmlObjectFactory',
   function(UrlInterpolationService, SubtitledHtmlObjectFactory){
   	return {
-      restrict: 'E',
-      scope: {
-      	subtitled: '=',
-      	getOnSaveFn: '&onSaveFn'
-      },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/subtitled_html_editor_directive.html'),
+    restrict: 'E',
+    scope: {
+      subtitled: '=',
+      getOnSaveFn: '&onSaveFn'
+    },
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/components/subtitled_html_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'EditabilityService','COMPONENT_NAME_HTMLCONTENT',
+        '$scope', '$uibModal', 'EditabilityService',
+        'COMPONENT_NAME_HTMLCONTENT',
         function($scope, $uibModal, EditabilityService,
             COMPONENT_NAME_HTMLCONTENT) {
           $scope.subtiledHtmlEditorIsOpen = false;
