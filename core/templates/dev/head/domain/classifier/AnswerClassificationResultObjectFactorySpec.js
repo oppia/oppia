@@ -17,7 +17,7 @@
  */
 
 describe('Answer classification result object factory', function() {
-  var oof,acrof;
+  var oof, acrof;
   var DEFAULT_OUTCOME_CLASSIFICATION;
 
   beforeEach(module('oppia'));

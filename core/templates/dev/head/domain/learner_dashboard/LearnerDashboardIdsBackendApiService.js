@@ -17,8 +17,8 @@
  * activities present in the learner dashboard.
  */
 
-oppia.factory('LearnerDashboardIdsBackendApiService',[
-  '$http',function($http) {
+oppia.factory('LearnerDashboardIdsBackendApiService', [
+  '$http', function($http) {
     var _fetchLearnerDashboardIds = function() {
       return $http.get('/learnerdashboardidshandler/data');
     };
