@@ -128,7 +128,7 @@ BAD_PATTERNS_JS_REGEXP = [
     }
 ]
 
-BAD_PATTERNS_HTML_REGEXP = [
+BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': r"text\/ng-template",
         'message': "The directives must be directly referenced.",
@@ -143,6 +143,12 @@ BAD_PATTERNS_HTML_REGEXP = [
             'extensions/classifiers/',
             'extensions/objects/',
             'extensions/value_generators/')
+    },
+    {
+        'regexp': r"[ \t]+$",
+        'message': "There should not be any trailing whitespaces.",
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
@@ -563,9 +569,13 @@ def _check_bad_pattern_in_file(filename, content, pattern):
     if not (any(filename.startswith(excluded_dir)
                 for excluded_dir in pattern['excluded_dirs'])
             or filename in pattern['excluded_files']):
-        if re.search(regexp, content):
-            print '%s --> %s' % (
-                filename, pattern['message'])
+        bad_pattern_count = 0
+        for line_num, line in enumerate(content.split('\n'), 1):
+            if re.search(regexp, line):
+                print '%s --> Line %s: %s' % (
+                    filename, line_num, pattern['message'])
+                bad_pattern_count += 1
+        if bad_pattern_count:
             return True
     return False
 
@@ -602,7 +612,7 @@ def _check_bad_patterns(all_files):
                         total_error_count += 1
 
             if filename.endswith('.html'):
-                for regexp in BAD_PATTERNS_HTML_REGEXP:
+                for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
                     if _check_bad_pattern_in_file(filename, content, regexp):
                         failed = True
                         total_error_count += 1
