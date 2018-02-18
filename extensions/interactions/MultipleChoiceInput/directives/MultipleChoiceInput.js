@@ -35,7 +35,7 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
         'multiple_choice_input_interaction_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.choices = HtmlEscaperService.escapedJsonToObj(
-        $attrs.choicesWithValue);
+          $attrs.choicesWithValue);
         $scope.answer = null;
 
         $scope.submitAnswer = function(answer) {

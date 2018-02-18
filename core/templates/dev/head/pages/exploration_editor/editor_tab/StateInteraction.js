@@ -159,14 +159,14 @@ oppia.controller('StateInteraction', [
           backdrop: true,
           resolve: {},
           controller: [
-            '$scope', '$uibModalInstance', '$injector', 'stateSolutionService', 
-            'stateInteractionIdService', 'stateCustomizationArgsService', 
+            '$scope', '$uibModalInstance', '$injector', 'stateSolutionService',
+            'stateInteractionIdService', 'stateCustomizationArgsService',
             'InteractionDetailsCacheService', 'INTERACTION_SPECS',
             'UrlInterpolationService', 'EditorFirstTimeEventsService',
             function(
-                $scope, $uibModalInstance, $injector, stateSolutionService, 
-                stateInteractionIdService, stateCustomizationArgsService, 
-                InteractionDetailsCacheService, INTERACTION_SPECS, 
+                $scope, $uibModalInstance, $injector, stateSolutionService,
+                stateInteractionIdService, stateCustomizationArgsService,
+                InteractionDetailsCacheService, INTERACTION_SPECS,
                 UrlInterpolationService, EditorFirstTimeEventsService) {
               EditorFirstTimeEventsService
                 .registerFirstClickAddInteractionEvent();
@@ -303,7 +303,7 @@ oppia.controller('StateInteraction', [
                 }
               };
 
-              $scope.save = function() {    
+              $scope.save = function() {
                 EditorFirstTimeEventsService
                   .registerFirstSaveInteractionEvent();
                 $uibModalInstance.close();
