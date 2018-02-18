@@ -74,6 +74,21 @@ describe('Player transcript service', function() {
     });
   });
 
+  it('should set lastAnswer correctly', function() {
+    pts.addNewCard('First state', {
+      a: 'b'
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    var lastAnswer = pts.getLastAnswerOnActiveCard(0);
+    expect(lastAnswer).toEqual(null);
+
+    pts.addNewInput('first answer', false);
+    pts.addNewCard('Second state', {
+      a: 'b'
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    lastAnswer = pts.getLastAnswerOnActiveCard(0);
+    expect(lastAnswer).toEqual('first answer');
+  });
+
   it('should record answer/feedback pairs in the correct order', function() {
     pts.addNewCard('First state', {
       a: 'b'

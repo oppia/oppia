@@ -33,6 +33,7 @@ class InteractiveMap(base.BaseInteraction):
     # conveyed meaningfully to the learner. Once this issue is fixed,
     # InteractiveMap interaction can be supported by the solution feature.
     can_have_solution = False
+    show_generic_submit_button = False
 
     _customization_arg_specs = [{
         'name': 'latitude',
@@ -75,8 +76,9 @@ class InteractiveMap(base.BaseInteraction):
         # Table with answer counts for top N answers.
         'id': 'FrequencyTable',
         'options': {
-            'column_headers': ['Answer', 'Count', 'Addressed?'],
-            'title': 'Top 10 answers'
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top 10 answers',
         },
         'calculation_id': 'Top10AnswerFrequencies',
+        'show_addressed_info': True,
     }]

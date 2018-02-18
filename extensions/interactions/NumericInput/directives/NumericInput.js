@@ -24,15 +24,19 @@ oppia.directive('oppiaInteractiveNumericInput', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&'
+        onSubmit: '&',
+        // This should be called whenever the answer changes.
+        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumericInput/directives/' +
         'numeric_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'FocusManagerService', 'numericInputRulesService',
+        'WindowDimensionsService', 'EVENT_PROGRESS_NAV_SUBMITTED',
         function(
-            $scope, $attrs, FocusManagerService, numericInputRulesService) {
+            $scope, $attrs, FocusManagerService, numericInputRulesService,
+            WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
@@ -49,6 +53,24 @@ oppia.directive('oppiaInteractiveNumericInput', [
               });
             }
           };
+
+          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
+            $scope.submitAnswer($scope.answer);
+          });
+
+          $scope.isAnswerValid = function() {
+            return (
+              $scope.answer !== undefined &&
+              $scope.answer !== null && $scope.answer !== '');
+          };
+
+          $scope.$watch(function() {
+            return $scope.answer;
+          }, function() {
+            $scope.setAnswerValidity({
+              answerValidity: $scope.isAnswerValid()
+            });
+          });
         }
       ]
     };

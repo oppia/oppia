@@ -28,8 +28,8 @@ current_user_services = models.Registry.import_current_user_services()
 def open_access(handler):
     """Decorator to give access to everyone."""
 
-    def test_can_access(self, **kwargs):
-        return handler(self, **kwargs)
+    def test_can_access(self, *args, **kwargs):
+        return handler(self, *args, **kwargs)
     test_can_access.__wrapped__ = True
 
     return test_can_access

@@ -23,15 +23,19 @@ oppia.directive('solutionExplanationEditor', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/explanation_editor_directive.html'),
+        '/components/solution_explanation_editor_directive.html'),
       controller: [
-        '$scope', 'editabilityService', 'stateSolutionService',
-        function($scope, editabilityService, stateSolutionService) {
-          $scope.isEditable = editabilityService.isEditable();
+        '$scope', '$uibModal', 'EditabilityService', 'stateSolutionService',
+        'COMPONENT_NAME_SOLUTION',
+        function($scope, $uibModal, EditabilityService, stateSolutionService,
+            COMPONENT_NAME_SOLUTION) {
+          $scope.isEditable = EditabilityService.isEditable();
 
           $scope.editSolutionForm = {};
-          $scope.stateSolutionService = stateSolutionService;
           $scope.explanationEditorIsOpen = false;
+
+          $scope.stateSolutionService = stateSolutionService;
+          $scope.COMPONENT_NAME_SOLUTION = COMPONENT_NAME_SOLUTION;
 
           $scope.EXPLANATION_FORM_SCHEMA = {
             type: 'html',
@@ -45,6 +49,13 @@ oppia.directive('solutionExplanationEditor', [
           };
 
           $scope.saveThisExplanation = function() {
+            var contentHasChanged = (
+              stateSolutionService.displayed.explanation.getHtml() !==
+              stateSolutionService.savedMemento.explanation.getHtml());
+            if (stateSolutionService.displayed.explanation
+              .hasUnflaggedAudioTranslations() && contentHasChanged) {
+              openMarkAllAudioAsNeedingUpdateModal();
+            }
             stateSolutionService.saveDisplayedValue();
             $scope.explanationEditorIsOpen = false;
           };
@@ -53,12 +64,39 @@ oppia.directive('solutionExplanationEditor', [
             $scope.explanationEditorIsOpen = false;
           };
 
+          $scope.onAudioTranslationsStartEditAction = function() {
+            // Close the content editor and save all existing changes to the
+            // HTML.
+            if ($scope.explanationEditorIsOpen) {
+              $scope.saveThisExplanation();
+            }
+          };
+
+          $scope.onAudioTranslationsEdited = function() {
+            stateSolutionService.saveDisplayedValue();
+          };
+
           $scope.$on('externalSave', function() {
             if ($scope.explanationEditorIsOpen &&
               $scope.editSolutionForm.$valid) {
-              $scope.saveThisSolution();
+              $scope.saveThisExplanation();
             }
           });
+
+          var openMarkAllAudioAsNeedingUpdateModal = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/forms/' +
+                'mark_all_audio_as_needing_update_modal_directive.html'),
+              backdrop: true,
+              resolve: {},
+              controller: 'MarkAllAudioAsNeedingUpdateController'
+            }).result.then(function() {
+              stateSolutionService.displayed.explanation
+                .markAllAudioAsNeedingUpdate();
+              stateSolutionService.saveDisplayedValue();
+            });
+          };
         }
       ]
     };

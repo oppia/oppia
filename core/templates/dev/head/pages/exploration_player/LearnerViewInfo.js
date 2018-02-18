@@ -18,10 +18,10 @@
  */
 
 oppia.controller('LearnerViewInfo', [
-  '$scope', '$modal', '$http', '$log', 'ExplorationContextService',
+  '$scope', '$uibModal', '$http', '$log', 'ExplorationContextService',
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'UrlInterpolationService',
-  function($scope, $modal, $http, $log, ExplorationContextService,
-    EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, UrlInterpolationService) {
+  function($scope, $uibModal, $http, $log, ExplorationContextService,
+      EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, UrlInterpolationService) {
     var explorationId = ExplorationContextService.getExplorationId();
     var expInfo = null;
 
@@ -44,7 +44,7 @@ oppia.controller('LearnerViewInfo', [
     };
 
     var openInformationCardModal = function() {
-      $modal.open({
+      $uibModal.open({
         animation: true,
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration_player/information_card_modal_directive.html'),
@@ -55,10 +55,10 @@ oppia.controller('LearnerViewInfo', [
           }
         },
         controller: [
-          '$scope', '$window', '$modalInstance', 'oppiaDatetimeFormatter',
+          '$scope', '$window', '$uibModalInstance', 'DateTimeFormatService',
           'RatingComputationService', 'expInfo', 'UrlInterpolationService',
-          function($scope, $window, $modalInstance, oppiaDatetimeFormatter,
-                   RatingComputationService, expInfo, UrlInterpolationService) {
+          function($scope, $window, $uibModalInstance, DateTimeFormatService,
+              RatingComputationService, expInfo, UrlInterpolationService) {
             var getExplorationTagsSummary = function(arrayOfTags) {
               var tagsToShow = [];
               var tagsInTooltip = [];
@@ -82,7 +82,7 @@ oppia.controller('LearnerViewInfo', [
             };
 
             var getLastUpdatedString = function(millisSinceEpoch) {
-              return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+              return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
                 millisSinceEpoch);
             };
 
@@ -116,7 +116,7 @@ oppia.controller('LearnerViewInfo', [
             $scope.objective = expInfo.objective;
 
             $scope.cancel = function() {
-              $modalInstance.dismiss();
+              $uibModalInstance.dismiss();
             };
           }
         ]

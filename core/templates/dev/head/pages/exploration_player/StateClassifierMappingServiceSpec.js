@@ -26,7 +26,7 @@
 
        mappingService.init({
          stateName1: {
-           algorithm_id: 'LDAStringClassifier',
+           algorithm_id: 'TestClassifier',
            classifier_data: {},
            data_schema_version: 1
          }
@@ -34,10 +34,10 @@
      }));
 
      it('should return correct classifier details.', function() {
-       var stateName = 'stateName1'
+       var stateName = 'stateName1';
        var retrievedClassifier = mappingService.getClassifier(stateName);
 
-       expect(retrievedClassifier.algorithmId).toEqual('LDAStringClassifier');
+       expect(retrievedClassifier.algorithmId).toEqual('TestClassifier');
        expect(retrievedClassifier.classifierData).toEqual({});
        expect(retrievedClassifier.dataSchemaVersion).toEqual(1);
      });

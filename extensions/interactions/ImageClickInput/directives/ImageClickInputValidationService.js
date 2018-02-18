@@ -41,7 +41,7 @@ oppia.factory('ImageClickInputValidationService', [
         var areAnyRegionStringsNonAlphaNumeric = false;
         var areAnyRegionStringsDuplicated = false;
         var seenRegionStrings = [];
-        if (imgAndRegionArgValue.labeledRegions.length == 0) {
+        if (imgAndRegionArgValue.labeledRegions.length === 0) {
           warningsList.push({
             type: WARNING_TYPES.ERROR,
             message: 'Please specify at least one region in the image.'
@@ -121,8 +121,7 @@ oppia.factory('ImageClickInputValidationService', [
           }
         }
 
-        if (!defaultOutcome ||
-            $filter('isOutcomeConfusing')(defaultOutcome, stateName)) {
+        if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
           warningsList.push({
             type: WARNING_TYPES.ERROR,
             message: (

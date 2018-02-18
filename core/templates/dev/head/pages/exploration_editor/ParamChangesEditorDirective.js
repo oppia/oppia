@@ -29,14 +29,14 @@ oppia.directive('paramChangesEditor', [
         '/pages/exploration_editor/' +
         'param_changes_editor_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'editabilityService',
-        'explorationParamSpecsService', 'AlertsService',
+        '$scope', '$rootScope', 'EditabilityService',
+        'ExplorationParamSpecsService', 'AlertsService',
         'ParamChangeObjectFactory',
         function(
-            $scope, $rootScope, editabilityService,
-            explorationParamSpecsService, AlertsService,
+            $scope, $rootScope, EditabilityService,
+            ExplorationParamSpecsService, AlertsService,
             ParamChangeObjectFactory) {
-          $scope.editabilityService = editabilityService;
+          $scope.EditabilityService = EditabilityService;
           $scope.isParamChangesEditorOpen = false;
           $scope.warningText = '';
           $scope.PREAMBLE_TEXT = {
@@ -53,7 +53,7 @@ oppia.directive('paramChangesEditor', [
           });
 
           var generateParamNameChoices = function() {
-            return explorationParamSpecsService.displayed.getParamNames().sort()
+            return ExplorationParamSpecsService.displayed.getParamNames().sort()
               .map(function(paramName) {
                 return {
                   id: paramName,
@@ -64,7 +64,7 @@ oppia.directive('paramChangesEditor', [
 
           // This is a local variable that is used by the select2 dropdowns for
           // choosing parameter names. It may not accurately reflect the content
-          // of explorationParamSpecsService, since it's possible that temporary
+          // of ExplorationParamSpecsService, since it's possible that temporary
           // parameter names may be added and then deleted within the course
           // of a single "parameter changes" edit.
           $scope.paramNameChoices = [];
@@ -77,7 +77,7 @@ oppia.directive('paramChangesEditor', [
               newParamName);
             // Add the new param name to $scope.paramNameChoices, if necessary,
             // so that it shows up in the dropdown.
-            if (explorationParamSpecsService.displayed.addParamIfNew(
+            if (ExplorationParamSpecsService.displayed.addParamIfNew(
               newParamChange.name)) {
               $scope.paramNameChoices = generateParamNameChoices();
             }
@@ -85,7 +85,7 @@ oppia.directive('paramChangesEditor', [
           };
 
           $scope.openParamChangesEditor = function() {
-            if (!editabilityService.isEditable()) {
+            if (!EditabilityService.isEditable()) {
               return;
             }
 
@@ -173,13 +173,13 @@ oppia.directive('paramChangesEditor', [
             $scope.isParamChangesEditorOpen = false;
 
             // Update paramSpecs manually with newly-added param names.
-            explorationParamSpecsService.restoreFromMemento();
+            ExplorationParamSpecsService.restoreFromMemento();
             $scope.paramChangesService.displayed.forEach(function(paramChange) {
-              explorationParamSpecsService.displayed.addParamIfNew(
+              ExplorationParamSpecsService.displayed.addParamIfNew(
                 paramChange.name);
             });
 
-            explorationParamSpecsService.saveDisplayedValue();
+            ExplorationParamSpecsService.saveDisplayedValue();
             $scope.paramChangesService.saveDisplayedValue();
             if ($scope.postSaveHook) {
               $scope.postSaveHook();
@@ -199,7 +199,7 @@ oppia.directive('paramChangesEditor', [
             // the select2 dropdowns. Otherwise, after the deletion, the
             // dropdowns may turn blank.
             $scope.paramChangesService.displayed.forEach(function(paramChange) {
-              explorationParamSpecsService.displayed.addParamIfNew(
+              ExplorationParamSpecsService.displayed.addParamIfNew(
                 paramChange.name);
             });
             $scope.paramNameChoices = generateParamNameChoices();
@@ -225,7 +225,7 @@ oppia.directive('paramChangesEditor', [
               // turn blank.
               $scope.paramChangesService.displayed.forEach(
                 function(paramChange) {
-                  explorationParamSpecsService.displayed.addParamIfNew(
+                  ExplorationParamSpecsService.displayed.addParamIfNew(
                     paramChange.name);
                 }
               );

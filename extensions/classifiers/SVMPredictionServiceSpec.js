@@ -43,15 +43,15 @@ describe('SVM prediction functions', function() {
 
     it('should predict correct label', function() {
       var svmData = {
-        classes: [0, 1], 
-        n_support: [2, 2], 
-        support_vectors: [[1.0, 1.0], [0.0, 0.0], [1.0, 0.0], [0.0, 1.0]], 
+        classes: [0, 1],
+        n_support: [2, 2],
+        support_vectors: [[1.0, 1.0], [0.0, 0.0], [1.0, 0.0], [0.0, 1.0]],
         dual_coef: [[1.0, 1.0, -1.0, -1.0]],
         intercept: [0.0],
-        probA: [], 
-        probB: [], 
+        probA: [],
+        probB: [],
         kernel_params: {
-          kernel: 'rbf', coef0: 0.0, degree: 3, gamma: 0.5}, 
+          kernel: 'rbf', coef0: 0.0, degree: 3, gamma: 0.5},
       };
 
       var input = [1, 1];

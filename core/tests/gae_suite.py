@@ -22,13 +22,10 @@ it from the command line by running
 from the oppia/ root folder.
 """
 
-# Pylint has issues with import order of argparse.
-#pylint: disable=wrong-import-order
 import argparse
 import os
 import sys
 import unittest
-#pylint: enable=wrong-import-order
 
 import feconf
 

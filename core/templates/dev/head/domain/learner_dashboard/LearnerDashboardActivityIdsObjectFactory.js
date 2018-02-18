@@ -19,9 +19,9 @@
 
 oppia.factory('LearnerDashboardActivityIdsObjectFactory', [function() {
   var LearnerDashboardActivityIds = function(
-    incompleteExplorationIds, incompleteCollectionIds,
-    completedExplorationIds, completedCollectionIds, explorationPlaylistIds,
-    collectionPlaylistIds) {
+      incompleteExplorationIds, incompleteCollectionIds,
+      completedExplorationIds, completedCollectionIds, explorationPlaylistIds,
+      collectionPlaylistIds) {
     this.incompleteExplorationIds = incompleteExplorationIds;
     this.incompleteCollectionIds = incompleteCollectionIds;
     this.completedExplorationIds = completedExplorationIds;
@@ -125,7 +125,7 @@ oppia.factory('LearnerDashboardActivityIdsObjectFactory', [function() {
     });
 
   LearnerDashboardActivityIds.createFromBackendDict = function(
-    learnerDashboardActivityIdsDict) {
+      learnerDashboardActivityIdsDict) {
     return new LearnerDashboardActivityIds(
       learnerDashboardActivityIdsDict.incomplete_exploration_ids,
       learnerDashboardActivityIdsDict.incomplete_collection_ids,

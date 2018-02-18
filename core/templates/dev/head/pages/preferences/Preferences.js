@@ -17,13 +17,13 @@
  */
 
 oppia.controller('Preferences', [
-  '$scope', '$http', '$rootScope', '$modal', '$timeout', '$translate',
+  '$scope', '$http', '$rootScope', '$uibModal', '$timeout', '$translate',
   'AlertsService', 'UrlInterpolationService', 'UtilsService',
   'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
   function(
-      $scope, $http, $rootScope, $modal, $timeout, $translate, AlertsService,
-      UrlInterpolationService, UtilsService, DASHBOARD_TYPE_CREATOR,
-      DASHBOARD_TYPE_LEARNER) {
+      $scope, $http, $rootScope, $uibModal, $timeout, $translate,
+      AlertsService, UrlInterpolationService, UtilsService,
+      DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
     $rootScope.loadingMessage = 'Loading';
     $scope.profilePictureDataUrl = '';
@@ -95,7 +95,7 @@ oppia.controller('Preferences', [
     };
 
     $scope.savePreferredSiteLanguageCodes = function(
-      preferredSiteLanguageCode) {
+        preferredSiteLanguageCode) {
       $translate.use(preferredSiteLanguageCode);
       _forceSelect2Refresh();
       _saveDataItem(
@@ -103,7 +103,7 @@ oppia.controller('Preferences', [
     };
 
     $scope.savePreferredAudioLanguageCode = function(
-      preferredAudioLanguageCode) {
+        preferredAudioLanguageCode) {
       _saveDataItem(
         'preferred_audio_language_code', preferredAudioLanguageCode);
     };
@@ -120,8 +120,8 @@ oppia.controller('Preferences', [
     };
 
     $scope.saveEmailPreferences = function(
-      canReceiveEmailUpdates, canReceiveEditorRoleEmail,
-      canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail) {
+        canReceiveEmailUpdates, canReceiveEditorRoleEmail,
+        canReceiveFeedbackMessageEmail, canReceiveSubscriptionEmail) {
       var data = {
         can_receive_email_updates: canReceiveEmailUpdates,
         can_receive_editor_role_email: canReceiveEditorRoleEmail,
@@ -140,12 +140,12 @@ oppia.controller('Preferences', [
     };
 
     $scope.showEditProfilePictureModal = function() {
-      $modal.open({
+      $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/preferences/edit_profile_picture_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$modalInstance', function($scope, $modalInstance) {
+          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.uploadedImage = null;
             $scope.croppedImageDataUrl = '';
             $scope.invalidImageWarningIsShown = false;
@@ -180,11 +180,11 @@ oppia.controller('Preferences', [
             };
 
             $scope.confirm = function() {
-              $modalInstance.close($scope.croppedImageDataUrl);
+              $uibModalInstance.close($scope.croppedImageDataUrl);
             };
 
             $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
+              $uibModalInstance.dismiss('cancel');
             };
           }
         ]

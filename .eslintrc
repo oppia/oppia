@@ -6,11 +6,25 @@
     "html"
   ],
   "rules": {
+    "eqeqeq": [
+      "error",
+      "always"
+    ],
+    "keyword-spacing": [
+      "error",
+      {
+        "before": true,
+        "after": true
+      }
+    ],
     "no-empty": [
       "error",
       {
         "allowEmptyCatch": true
       }
+    ],
+    "no-trailing-spaces": [
+      "error"
     ],
     "no-redeclare": [
       "off"
@@ -19,7 +33,13 @@
       "off"
     ],
     "no-console": [
-      "off"
+      "error",
+      {
+        "allow": [
+          "error",
+          "warn"
+        ]
+      }
     ],
     "no-constant-condition": [
       "off"
@@ -51,6 +71,10 @@
         "keywords": true
       }
     ],
+    "semi": [
+      "error",
+      "always"
+    ],
     "space-unary-ops": [
       "error",
       {
@@ -70,6 +94,10 @@
       2,
       {
         "ArrayExpression": "first",
+        "FunctionExpression": {
+          "body": 1,
+          "parameters": 2
+        },
         "MemberExpression": 1,
         "SwitchCase": 1
       }

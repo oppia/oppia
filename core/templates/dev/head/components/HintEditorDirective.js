@@ -22,17 +22,22 @@ oppia.directive('hintEditor', [
       restrict: 'E',
       scope: {
         hint: '=',
-        getIndex: '&index',
+        getIndexPlusOne: '&indexPlusOne',
         getOnSaveFn: '&onSave'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/hint_editor_directive.html'),
       controller: [
-        '$scope', 'editabilityService', function($scope, editabilityService) {
-          $scope.isEditable = editabilityService.isEditable();
-
+        '$scope', '$uibModal', 'EditabilityService', 'stateHintsService',
+        'COMPONENT_NAME_HINT',
+        function($scope, $uibModal, EditabilityService, stateHintsService,
+            COMPONENT_NAME_HINT) {
+          $scope.isEditable = EditabilityService.isEditable();
+          $scope.stateHintsService = stateHintsService;
           $scope.editHintForm = {};
           $scope.hintEditorIsOpen = false;
+
+          $scope.COMPONENT_NAME_HINT = COMPONENT_NAME_HINT;
 
           $scope.HINT_FORM_SCHEMA = {
             type: 'html',
@@ -50,7 +55,14 @@ oppia.directive('hintEditor', [
 
           $scope.saveThisHint = function() {
             $scope.hintEditorIsOpen = false;
+            var contentHasChanged = (
+              $scope.hintMemento.hintContent.getHtml() !==
+              $scope.hint.hintContent.getHtml());
             $scope.hintMemento = null;
+            if ($scope.hint.hintContent.hasUnflaggedAudioTranslations() &&
+              contentHasChanged) {
+              openMarkAllAudioAsNeedingUpdateModal();
+            }
             $scope.getOnSaveFn()();
           };
 
@@ -60,12 +72,40 @@ oppia.directive('hintEditor', [
             $scope.hintEditorIsOpen = false;
           };
 
+          $scope.onAudioTranslationsStartEditAction = function() {
+            // Close the content editor and save all existing changes to the
+            // HTML.
+            if ($scope.hintEditorIsOpen) {
+              $scope.saveThisHint();
+            }
+          };
+
+          $scope.onAudioTranslationsEdited = function() {
+            $scope.getOnSaveFn()();
+          };
+
           $scope.$on('externalSave', function() {
             if ($scope.hintEditorIsOpen &&
                 $scope.editHintForm.$valid) {
               $scope.saveThisHint();
             }
           });
+
+          var openMarkAllAudioAsNeedingUpdateModal = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/forms/' +
+                'mark_all_audio_as_needing_update_modal_directive.html'),
+              backdrop: true,
+              resolve: {},
+              controller: 'MarkAllAudioAsNeedingUpdateController'
+            }).result.then(function() {
+              $scope.hint.hintContent.markAllAudioAsNeedingUpdate();
+              stateHintsService.displayed[$scope.getIndexPlusOne() - 1]
+                .hintContent = angular.copy($scope.hint.hintContent);
+              $scope.getOnSaveFn()();
+            });
+          };
         }
       ]
     };

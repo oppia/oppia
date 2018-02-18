@@ -62,9 +62,10 @@ FILEPATHS_NOT_TO_RENAME = (
 # Hashes for files with these paths should be provided to the frontend in
 # JS hashes object.
 FILEPATHS_PROVIDED_TO_FRONTEND = (
-    'images/*', 'i18n/*', '*_directive.html', '*.png')
+    'images/*', 'i18n/*', '*_directive.html', '*.png', '*.json')
 
 HASH_BLOCK_SIZE = 2**20
+
 
 def _minify(source_path, target_path):
     """Runs the given file through a minifier and outputs it to target_path.
@@ -78,6 +79,7 @@ def _minify(source_path, target_path):
         YUICOMPRESSOR_DIR, source_path, target_path)
     subprocess.check_call(cmd, shell=True)
 
+
 def _insert_hash(filepath, file_hash):
     """Inserts hash into filepath before the file extension.
 
@@ -90,6 +92,7 @@ def _insert_hash(filepath, file_hash):
     """
     filepath, file_extension = os.path.splitext(filepath)
     return '%s.%s%s' % (filepath, file_hash, file_extension)
+
 
 def ensure_directory_exists(filepath):
     """Ensures if directory tree exists, if not creates the directories.

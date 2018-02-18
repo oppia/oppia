@@ -29,115 +29,6 @@ import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
-# Dictionary-like data structures within sample YAML must be formatted
-# alphabetically to match string equivalence with the YAML generation
-# methods tested below.
-#
-# If evaluating differences in YAML, conversion to dict form via
-# utils.dict_from_yaml can isolate differences quickly.
-
-SAMPLE_YAML_CONTENT = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-init_state_name: %s
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: %d
-states:
-  %s:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: %s
-        feedback: []
-        param_changes: []
-      hints: []
-      id: null
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: New state
-        feedback: []
-        param_changes: []
-      hints: []
-      id: null
-      solution: null
-    param_changes: []
-states_schema_version: %d
-tags: []
-title: Title
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME,
-    exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
-
-SAMPLE_UNTITLED_YAML_CONTENT = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: %s
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: %d
-states:
-  %s:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      customization_args: {}
-      default_outcome:
-        dest: %s
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      id: null
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      customization_args: {}
-      default_outcome:
-        dest: New state
-        feedback: []
-        param_changes: []
-      fallbacks: []
-      id: null
-    param_changes: []
-states_schema_version: %d
-tags: []
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME,
-    exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
-
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
@@ -206,8 +97,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exp_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': exploration.init_state_name,
-                    'feedback': ['Feedback'],
+                    'feedback': {
+                        'html': 'Feedback',
+                        'audio_translations': {}
+                    },
+                    'labelled_as_correct': False,
                     'param_changes': [],
+                    'refresher_exploration_id': None,
                 },
                 'rule_specs': [{
                     'inputs': {
@@ -220,7 +116,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     },
                     'rule_type': 'FuzzyMatches'
                 }],
-                'correct': False,
             })
         )
 
@@ -243,8 +138,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exp_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': exploration.init_state_name,
-                    'feedback': ['Feedback'],
+                    'feedback': {
+                        'html': 'Feedback',
+                        'audio_translations': {}
+                    },
+                    'labelled_as_correct': False,
                     'param_changes': [],
+                    'refresher_exploration_id': None,
                 },
                 'rule_specs': [{
                     'inputs': {
@@ -252,7 +152,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     },
                     'rule_type': 'Contains'
                 }],
-                'correct': False,
             })
         )
         exploration.validate()
@@ -315,15 +214,25 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Expected outcome dest to be a string')
 
         outcome.dest = destination
-        outcome.feedback = 'Feedback'
-        self._assert_validation_error(
-            exploration, 'Expected outcome feedback to be a list')
 
-        outcome.feedback = [15]
-        self._assert_validation_error(
-            exploration, 'Expected outcome feedback item to be a string')
+        outcome.feedback = exp_domain.SubtitledHtml('Feedback', {})
+        exploration.validate()
 
-        outcome.feedback = ['Feedback']
+        outcome.labelled_as_correct = 'hello'
+        self._assert_validation_error(
+            exploration, 'The "labelled_as_correct" field should be a boolean')
+
+        # Test that labelled_as_correct must be False for self-loops, and that
+        # this causes a strict validation failure but not a normal validation
+        # failure.
+        outcome.labelled_as_correct = True
+        with self.assertRaisesRegexp(
+            Exception, 'is labelled correct but is a self-loop.'
+            ):
+            exploration.validate(strict=True)
+        exploration.validate()
+
+        outcome.labelled_as_correct = False
         exploration.validate()
 
         outcome.param_changes = 'Changes'
@@ -332,6 +241,31 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         outcome.param_changes = []
         exploration.validate()
+
+        outcome.refresher_exploration_id = 12345
+        self._assert_validation_error(
+            exploration,
+            'Expected outcome refresher_exploration_id to be a string')
+
+        outcome.refresher_exploration_id = None
+        exploration.validate()
+
+        outcome.refresher_exploration_id = 'valid_string'
+        exploration.validate()
+
+        # Test that refresher_exploration_id must be None for non-self-loops.
+        new_state_name = 'New state'
+        exploration.add_states([new_state_name])
+
+        outcome.dest = new_state_name
+        outcome.refresher_exploration_id = 'another_string'
+        self._assert_validation_error(
+            exploration,
+            'has a refresher exploration ID, but is not a self-loop')
+
+        outcome.refresher_exploration_id = None
+        exploration.validate()
+        exploration.delete_state(new_state_name)
 
         # Validate InteractionInstance.
         interaction.id = 15
@@ -413,6 +347,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(exploration, 'Invalid language_code')
         exploration.language_code = 'English'
         self._assert_validation_error(exploration, 'Invalid language_code')
+        # TODO(sll): Remove the next two lines once the App Engine search
+        # service supports 3-letter language codes.
+        exploration.language_code = 'kab'
+        self._assert_validation_error(exploration, 'Invalid language_code')
         exploration.language_code = 'en'
         exploration.validate()
 
@@ -442,24 +380,30 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         init_state.update_interaction_hints([{
-            'hint_text': 'hint one',
+            'hint_content': {
+                'html': 'hint one',
+                'audio_translations': {}
+            },
         }])
 
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
-            'explanation': 'hello_world is a string',
+            'explanation': {
+                'html': 'hello_world is a string',
+                'audio_translations': {}
+            },
         }
         init_state.interaction.solution = (
             exp_domain.Solution.from_dict(init_state.interaction.id, solution))
         exploration.validate()
 
         # Add hint and delete hint
-        init_state.add_hint('new hint')
+        init_state.add_hint(exp_domain.SubtitledHtml('new hint', {}))
         self.assertEquals(
-            init_state.interaction.hints[1].hint_text,
+            init_state.interaction.hints[1].hint_content.html,
             'new hint')
-        init_state.add_hint('hint three')
+        init_state.add_hint(exp_domain.SubtitledHtml('hint three', {}))
         init_state.delete_hint(1)
         self.assertEquals(
             len(init_state.interaction.hints),
@@ -477,11 +421,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Solution should be set to None as default.
         self.assertEquals(init_state.interaction.solution, None)
 
-        init_state.add_hint('hint #1')
+        init_state.add_hint(exp_domain.SubtitledHtml('hint #1', {}))
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': [0, 0],
-            'explanation': 'hello_world is a string',
+            'explanation': {
+                'html': 'hello_world is a string',
+                'audio_translations': {}
+            }
         }
 
         # Object type of answer must match that of correct_answer
@@ -493,7 +440,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': 'hello_world!',
-            'explanation': 'hello_world is a string',
+            'explanation': {
+                'html': 'hello_world is a string',
+                'audio_translations': {}
+            }
         }
         init_state.interaction.solution = (
             exp_domain.Solution.from_dict(init_state.interaction.id, solution))
@@ -887,7 +837,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             old_states, new_to_old_state_names)
         self.assertEqual(actual_dict, expected_dict)
 
-
     def test_is_demo_property(self):
         """Test the is_demo property."""
         demo = exp_domain.Exploration.create_default_exploration('0')
@@ -940,8 +889,13 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': 'New state',
-                    'feedback': [],
+                    'feedback': {
+                        'html': '',
+                        'audio_translations': {}
+                    },
+                    'labelled_as_correct': False,
                     'param_changes': [],
+                    'refresher_exploration_id': None,
                 },
                 'hints': [],
                 'id': None,
@@ -967,12 +921,17 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         yaml_content = exploration.to_yaml()
-        self.assertEqual(yaml_content, SAMPLE_YAML_CONTENT)
+        self.assertEqual(yaml_content, self.SAMPLE_YAML_CONTENT)
 
         exploration2 = exp_domain.Exploration.from_yaml('exp2', yaml_content)
         self.assertEqual(len(exploration2.states), 2)
         yaml_content_2 = exploration2.to_yaml()
         self.assertEqual(yaml_content_2, yaml_content)
+
+        # Verify SAMPLE_UNTITLED_YAML_CONTENT can be converted to an exploration
+        # without error
+        exp_domain.Exploration.from_untitled_yaml(
+            'exp4', 'Title', 'Category', self.SAMPLE_UNTITLED_YAML_CONTENT)
 
         with self.assertRaises(Exception):
             exp_domain.Exploration.from_yaml('exp3', 'No_initial_state_name')
@@ -989,13 +948,13 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected a YAML version >= 10, received: 9'
             ):
             exp_domain.Exploration.from_yaml(
-                'exp4', SAMPLE_UNTITLED_YAML_CONTENT)
+                'exp4', self.SAMPLE_UNTITLED_YAML_CONTENT)
 
         with self.assertRaisesRegexp(
             Exception, 'Expected a YAML version <= 9'
             ):
             exp_domain.Exploration.from_untitled_yaml(
-                'exp4', 'Title', 'Category', SAMPLE_YAML_CONTENT)
+                'exp4', 'Title', 'Category', self.SAMPLE_YAML_CONTENT)
 
 
 class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
@@ -2402,7 +2361,467 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V18
+    YAML_CONTENT_V19 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 19
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - correct: false
+        outcome:
+          dest: END
+          feedback:
+            audio_translations: {}
+            html: Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          audio_translations: {}
+          html: ''
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          audio_translations: {}
+          html: ''
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 14
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V20 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 20
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - labelled_as_correct: false
+        outcome:
+          dest: END
+          feedback:
+            audio_translations: {}
+            html: Correct!
+          param_changes: []
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          audio_translations: {}
+          html: ''
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          audio_translations: {}
+          html: ''
+        param_changes: []
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 15
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V21 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 21
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - labelled_as_correct: false
+        outcome:
+          dest: END
+          feedback:
+            audio_translations: {}
+            html: Correct!
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          audio_translations: {}
+          html: ''
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          audio_translations: {}
+          html: ''
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 16
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V22 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 22
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            audio_translations: {}
+            html: Correct!
+          labelled_as_correct: false
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 17
+tags: []
+title: Title
+""")
+    YAML_CONTENT_V23 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 23
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            audio_translations: {}
+            html: Correct!
+          labelled_as_correct: false
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 18
+tags: []
+title: Title
+""")
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V23
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -2512,6 +2931,36 @@ title: Title
             'eid', self.YAML_CONTENT_V18)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v19(self):
+        """Test direct loading from a v19 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V19)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v20(self):
+        """Test direct loading from a v20 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V20)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v21(self):
+        """Test direct loading from a v21 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V21)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v22(self):
+        """Test direct loading from a v22 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V22)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v23(self):
+        """Test direct loading from a v23 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V23)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
@@ -2537,8 +2986,12 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'customization_args': {},
                     'default_outcome': {
                         'dest': dest_name,
-                        'feedback': [],
+                        'feedback': copy.deepcopy(
+                            exp_domain.
+                            SubtitledHtml.DEFAULT_SUBTITLED_HTML_DICT),
+                        'labelled_as_correct': False,
                         'param_changes': [],
+                        'refresher_exploration_id': None,
                     },
                     'hints': [],
                     'id': None,
@@ -2560,6 +3013,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'param_specs': {},
             'language_code': 'en',
+            'correctness_feedback_enabled': False,
         })
 
 

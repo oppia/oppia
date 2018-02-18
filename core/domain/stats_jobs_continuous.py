@@ -23,7 +23,6 @@ from core.domain import calculation_registry
 from core.domain import exp_services
 from core.domain import interaction_registry
 from core.platform import models
-
 import feconf
 import utils
 
@@ -606,12 +605,17 @@ class InteractionAnswerSummariesMRJobManager(
         latest_version = versions[0]
         latest_interaction_id = versioned_interaction_ids[latest_version][0]
 
+        # Ensure the exploration corresponding to these answers exists.
+        exp = exp_services.get_exploration_by_id(
+            exploration_id, strict=False)
+        if exp is None:
+            return
+
         if exploration_version == VERSION_ALL:
             # If aggregating across all versions, verify that the latest answer
             # version is equal to the latest version of the exploration,
             # otherwise ignore all answers since none of them can be applied to
             # the latest version.
-            exp = exp_services.get_exploration_by_id(exploration_id)
             if state_name in exp.states:
                 loaded_interaction_id = exp.states[state_name].interaction.id
                 # Only check if the version mismatches if the new version has a

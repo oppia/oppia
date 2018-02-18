@@ -49,7 +49,7 @@ describe('Sidebar state name controller', function() {
       rootScope = $rootScope;
       ecs = $injector.get('EditorStateService');
       fs = $injector.get('FocusManagerService');
-      ess = $injector.get('explorationStatesService');
+      ess = $injector.get('ExplorationStatesService');
       $httpBackend = $injector.get('$httpBackend');
 
       GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
@@ -116,14 +116,14 @@ describe('Sidebar state name controller', function() {
         $scope: scope,
         $filter: filter,
         $rootScope: rootScope,
-        editabilityService: {
+        EditabilityService: {
           isEditable: function() {
             return true;
           }
         },
         EditorStateService: ecs,
         FocusManagerService: fs,
-        explorationStatesService: ess,
+        ExplorationStatesService: ess,
         RouterService: {}
       });
     }));

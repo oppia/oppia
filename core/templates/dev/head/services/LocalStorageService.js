@@ -63,7 +63,7 @@
        * @param {Integer} draftChangeListId - The id of the draft to be saved.
        */
        saveExplorationDraft: function(
-         explorationId, changeList, draftChangeListId) {
+           explorationId, changeList, draftChangeListId) {
          var localSaveKey = _createExplorationDraftKey(explorationId);
          if (storage) {
            var draftDict = ExplorationDraftObjectFactory.toLocalStorageDict(

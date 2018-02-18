@@ -62,9 +62,21 @@ describe('HintsAndSolutions', function() {
     explorationPlayerPage.expectContentToMatch(
       forms.toRichText('What language is Oppia?'));
     explorationPlayerPage.submitAnswer('TextInput', 'Roman');
+    // We need to wait some time for the hint to activate.
+    general.waitForSystem();
+    general.waitForSystem();
+    general.waitForSystem();
+
     explorationPlayerPage.viewHint();
+    explorationPlayerPage.clickGotItButton();
     explorationPlayerPage.submitAnswer('TextInput', 'Greek');
+    // We need to wait some time for the solution to activate.
+    general.waitForSystem();
+    general.waitForSystem();
+    general.waitForSystem();
+
     explorationPlayerPage.viewSolution();
+    explorationPlayerPage.clickGotItButton();
     explorationPlayerPage.expectExplorationToNotBeOver();
     explorationPlayerPage.submitAnswer('TextInput', 'Finnish');
     explorationPlayerPage.clickThroughToNextCard();

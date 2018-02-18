@@ -11,11 +11,14 @@
   width: 100%;
 }
 
-.multiple-choice-radio-button-container,
-.multiple-choice-content-container {
+.multiple-choice-radio-button-container {
   display: table-cell;
 }
 
+.multiple-choice-content-container {
+  display: table-cell;
+  vertical-align: top;
+}
 
 .multiple-choice-option:hover {
   color: #115FD4;
@@ -41,7 +44,7 @@
   border-radius: 50%;
   display: inline-block;
   height: 16px;
-  margin-bottom: -2px;
+  margin-bottom: -7px;
   margin-right: 12px;
   width: 16px;
 }

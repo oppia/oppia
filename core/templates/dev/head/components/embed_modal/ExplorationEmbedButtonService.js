@@ -17,11 +17,11 @@
  */
 
 oppia.factory('ExplorationEmbedButtonService', [
-  '$modal', 'siteAnalyticsService', 'UrlInterpolationService',
-  function($modal, siteAnalyticsService, UrlInterpolationService) {
+  '$uibModal', 'siteAnalyticsService', 'UrlInterpolationService',
+  function($uibModal, siteAnalyticsService, UrlInterpolationService) {
     return {
       showModal: function(explorationId) {
-        $modal.open({
+        $uibModal.open({
           backdrop: true,
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/embed_modal/' +
@@ -32,18 +32,18 @@ oppia.factory('ExplorationEmbedButtonService', [
             }
           },
           controller: [
-            '$scope', '$modalInstance', '$window', 'explorationId',
-            function($scope, $modalInstance, $window, explorationId) {
+            '$scope', '$uibModalInstance', '$window', 'explorationId',
+            function($scope, $uibModalInstance, $window, explorationId) {
               $scope.explorationId = explorationId;
               $scope.serverName = (
                 $window.location.protocol + '//' + $window.location.host);
 
               $scope.close = function() {
-                $modalInstance.dismiss('close');
+                $uibModalInstance.dismiss('close');
               };
 
-              $scope.selectText = function($event) {
-                var codeDiv = $event.currentTarget;
+              $scope.selectText = function(evt) {
+                var codeDiv = evt.currentTarget;
                 var range = document.createRange();
                 range.setStartBefore(codeDiv.firstChild);
                 range.setEndAfter(codeDiv.lastChild);

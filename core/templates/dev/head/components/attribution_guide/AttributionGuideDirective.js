@@ -20,8 +20,15 @@ oppia.directive('attributionGuide', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/attribution_guide/' +
-        'attribution_guide_directive.html')
+        'attribution_guide_directive.html'),
+      controller: [
+        '$scope', 'BrowserCheckerService', function(
+            $scope, BrowserCheckerService) {
+          $scope.isMobileDevice = BrowserCheckerService.isMobileDevice();
+        }
+      ]
     };
   }]);

@@ -96,11 +96,55 @@ oppia.factory('StatesObjectFactory', [
     States.prototype.getAllAudioLanguageCodes = function() {
       var allAudioLanguageCodes = [];
       for (var stateName in this._states) {
-        var audioTranslationsForState =
-          this._states[stateName].content.getBindableAudioTranslations();
-        for (var languageCode in audioTranslationsForState) {
+        var state = this._states[stateName];
+
+        var audioTranslationsForStateContent =
+          state.content.getBindableAudioTranslations();
+        for (var languageCode in audioTranslationsForStateContent) {
           if (allAudioLanguageCodes.indexOf(languageCode) === -1) {
             allAudioLanguageCodes.push(languageCode);
+          }
+        }
+
+        state.interaction.answerGroups.forEach(function(answerGroup) {
+          var audioTranslationsForAnswerGroup =
+            answerGroup.outcome.feedback.getBindableAudioTranslations();
+          for (var languageCode in audioTranslationsForAnswerGroup) {
+            if (allAudioLanguageCodes.indexOf(languageCode) === -1) {
+              allAudioLanguageCodes.push(languageCode);
+            }
+          }
+        });
+
+        if (state.interaction.defaultOutcome !== null) {
+          var audioTranslationsForDefaultOutcome =
+            state.interaction.defaultOutcome.feedback
+              .getBindableAudioTranslations();
+          for (var languageCode in audioTranslationsForDefaultOutcome) {
+            if (allAudioLanguageCodes.indexOf(languageCode) === -1) {
+              allAudioLanguageCodes.push(languageCode);
+            }
+          }
+        }
+
+        state.interaction.hints.forEach(function(hint) {
+          var audioTranslationsForHint =
+            hint.hintContent.getBindableAudioTranslations();
+          for (var languageCode in audioTranslationsForHint) {
+            if (allAudioLanguageCodes.indexOf(languageCode) === -1) {
+              allAudioLanguageCodes.push(languageCode);
+            }
+          }
+        });
+
+        if (state.interaction.solution !== null) {
+          var audioTranslationsForSolution =
+            state.interaction.solution.explanation
+              .getBindableAudioTranslations();
+          for (var languageCode in audioTranslationsForSolution) {
+            if (allAudioLanguageCodes.indexOf(languageCode) === -1) {
+              allAudioLanguageCodes.push(languageCode);
+            }
           }
         }
       }
@@ -108,12 +152,54 @@ oppia.factory('StatesObjectFactory', [
     };
 
     States.prototype.getAllAudioTranslations = function(languageCode) {
-      var allAudioTranslations = [];
+      var allAudioTranslations = {};
       for (var stateName in this._states) {
-        var audioTranslationsForState =
-          this._states[stateName].content.getBindableAudioTranslations();
-        if (audioTranslationsForState.hasOwnProperty(languageCode)) {
-          allAudioTranslations.push(audioTranslationsForState[languageCode]);
+        var state = this._states[stateName];
+        allAudioTranslations[stateName] = [];
+
+        var audioTranslationsForStateContent =
+          state.content.getBindableAudioTranslations();
+        if (audioTranslationsForStateContent.hasOwnProperty(languageCode)) {
+          allAudioTranslations[stateName].push(
+            audioTranslationsForStateContent[languageCode]);
+        }
+
+        state.interaction.answerGroups.forEach(function(answerGroup) {
+          var audioTranslationsForAnswerGroup =
+            answerGroup.outcome.feedback.getBindableAudioTranslations();
+          if (audioTranslationsForAnswerGroup.hasOwnProperty(languageCode)) {
+            allAudioTranslations[stateName].push(
+              audioTranslationsForAnswerGroup[languageCode]);
+          }
+        });
+
+        if (state.interaction.defaultOutcome !== null) {
+          var audioTranslationsForDefaultOutcome =
+            state.interaction.defaultOutcome.feedback
+              .getBindableAudioTranslations();
+          if (audioTranslationsForDefaultOutcome.hasOwnProperty(languageCode)) {
+            allAudioTranslations[stateName].push(
+              audioTranslationsForDefaultOutcome[languageCode]);
+          }
+        }
+
+        state.interaction.hints.forEach(function(hint) {
+          var audioTranslationsForHint =
+            hint.hintContent.getBindableAudioTranslations();
+          if (audioTranslationsForHint.hasOwnProperty(languageCode)) {
+            allAudioTranslations[stateName].push(
+              audioTranslationsForHint[languageCode]);
+          }
+        });
+
+        if (state.interaction.solution !== null) {
+          var audioTranslationsForSolution =
+            state.interaction.solution.explanation
+              .getBindableAudioTranslations();
+          if (audioTranslationsForSolution.hasOwnProperty(languageCode)) {
+            allAudioTranslations[stateName].push(
+              audioTranslationsForSolution[languageCode]);
+          }
         }
       }
       return allAudioTranslations;

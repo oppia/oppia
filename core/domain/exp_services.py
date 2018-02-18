@@ -21,6 +21,7 @@ stored in the database. In particular, the various query methods should
 delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
+import StringIO
 import collections
 import copy
 import datetime
@@ -28,7 +29,7 @@ import logging
 import math
 import os
 import pprint
-import StringIO
+import traceback
 import zipfile
 
 from constants import constants
@@ -169,6 +170,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         versioned_exploration_states['states'],
         exploration_model.param_specs, exploration_model.param_changes,
         exploration_model.version, exploration_model.auto_tts_enabled,
+        exploration_model.correctness_feedback_enabled,
         created_on=exploration_model.created_on,
         last_updated=exploration_model.last_updated)
 
@@ -774,6 +776,9 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
                     exploration.update_auto_tts_enabled(change.new_value)
+                elif change.property_name == 'correctness_feedback_enabled':
+                    exploration.update_correctness_feedback_enabled(
+                        change.new_value)
             elif (
                     change.cmd ==
                     exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
@@ -791,6 +796,7 @@ def apply_change_list(exploration_id, change_list):
                 e.__class__.__name__, e, exploration_id,
                 pprint.pprint(change_list))
         )
+        logging.error(traceback.format_exc())
         raise
 
 
@@ -852,6 +858,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
     exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
+    exploration_model.correctness_feedback_enabled = (
+        exploration.correctness_feedback_enabled)
 
     exploration_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
@@ -924,7 +932,8 @@ def _create_exploration(
             for (state_name, state) in exploration.states.iteritems()},
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
-        auto_tts_enabled=exploration.auto_tts_enabled
+        auto_tts_enabled=exploration.auto_tts_enabled,
+        correctness_feedback_enabled=exploration.correctness_feedback_enabled
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1
@@ -1425,7 +1434,8 @@ def get_demo_exploration_components(demo_path):
 
 
 def save_new_exploration_from_yaml_and_assets(
-        committer_id, yaml_content, exploration_id, assets_list):
+        committer_id, yaml_content, exploration_id, assets_list,
+        strip_audio_translations=False):
     """Note that the default title and category will be used if the YAML
     schema version is less than
     exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
@@ -1438,6 +1448,8 @@ def save_new_exploration_from_yaml_and_assets(
         exploration_id: str. The id of the exploration.
         assets_list: list(list(str)). A list of lists of assets, which contains
             asset's filename and content.
+        strip_audio_translations: bool. Whether to strip away all audio
+            translations from the imported exploration.
 
     Raises:
         Exception: The yaml file is invalid due to a missing schema version.
@@ -1461,11 +1473,37 @@ def save_new_exploration_from_yaml_and_assets(
         exploration = exp_domain.Exploration.from_yaml(
             exploration_id, yaml_content)
 
-    commit_message = (
+    # Check whether audio translations should be stripped.
+    if strip_audio_translations:
+        for state in exploration.states.values():
+            # Strip away audio translations from the state content.
+            content = state.content
+            content.audio_translations = {}
+
+            if state.interaction is not None:
+                # Strip away audio translations from solutions.
+                solution = state.interaction.solution
+                if solution:
+                    solution.explanation.audio_translations = {}
+
+                # Strip away audio translations from hints.
+                for hint in state.interaction.hints:
+                    hint.hint_content.audio_translations = {}
+
+                # Strip away audio translations from answer groups (feedback).
+                for answer_group in state.interaction.answer_groups:
+                    answer_group.outcome.feedback.audio_translations = {}
+
+                # Strip away audio translations from the default outcome.
+                default_outcome = state.interaction.default_outcome
+                if default_outcome:
+                    default_outcome.feedback.audio_translations = {}
+
+    create_commit_message = (
         'New exploration created from YAML file with title \'%s\'.'
         % exploration.title)
 
-    _create_exploration(committer_id, exploration, commit_message, [{
+    _create_exploration(committer_id, exploration, create_commit_message, [{
         'cmd': CMD_CREATE_NEW,
         'title': exploration.title,
         'category': exploration.category,
@@ -1636,6 +1674,7 @@ def get_scaled_average_rating(ratings):
     b = z * math.sqrt((x*(1-x))/n + (z**2)/(4*n**2))
     wilson_score_lower_bound = (a - b)/(1 + z**2/n)
     return 1 + 4 * wilson_score_lower_bound
+
 
 def get_exploration_search_rank(exp_id):
     """Returns the search rank.

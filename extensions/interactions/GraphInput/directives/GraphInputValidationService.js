@@ -107,5 +107,5 @@ oppia.factory('GraphInputValidationService', [
         }
         return warningsList;
       }
-    }
+    };
   }]);

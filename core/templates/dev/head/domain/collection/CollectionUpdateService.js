@@ -52,16 +52,16 @@ oppia.factory('CollectionUpdateService', [
   'COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS',
   'COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS',
   'CMD_ADD_COLLECTION_SKILL', 'CMD_DELETE_COLLECTION_SKILL', function(
-    CollectionNodeObjectFactory, CollectionSkillObjectFactory,
-    ChangeObjectFactory, UndoRedoService,
-    CMD_ADD_COLLECTION_NODE, CMD_DELETE_COLLECTION_NODE,
-    CMD_EDIT_COLLECTION_PROPERTY, CMD_EDIT_COLLECTION_NODE_PROPERTY,
-    COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
-    COLLECTION_PROPERTY_OBJECTIVE,
-    COLLECTION_PROPERTY_LANGUAGE_CODE, COLLECTION_PROPERTY_TAGS,
-    COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
-    COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
-    CMD_ADD_COLLECTION_SKILL, CMD_DELETE_COLLECTION_SKILL) {
+      CollectionNodeObjectFactory, CollectionSkillObjectFactory,
+      ChangeObjectFactory, UndoRedoService,
+      CMD_ADD_COLLECTION_NODE, CMD_DELETE_COLLECTION_NODE,
+      CMD_EDIT_COLLECTION_PROPERTY, CMD_EDIT_COLLECTION_NODE_PROPERTY,
+      COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
+      COLLECTION_PROPERTY_OBJECTIVE,
+      COLLECTION_PROPERTY_LANGUAGE_CODE, COLLECTION_PROPERTY_TAGS,
+      COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
+      COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
+      CMD_ADD_COLLECTION_SKILL, CMD_DELETE_COLLECTION_SKILL) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
     // collection.
@@ -308,7 +308,7 @@ oppia.factory('CollectionUpdateService', [
        * undo/redo service.
        */
       addCollectionSkill: function(collection, skillName) {
-        var oldNextSkillId = collection.getNextSkillId();
+        var oldNextSkillIndex = collection.getNextSkillIndex();
         _applyChange(
           collection, CMD_ADD_COLLECTION_SKILL, {
             name: skillName
@@ -325,7 +325,7 @@ oppia.factory('CollectionUpdateService', [
             var skillName = _getSkillNameFromChangeDict(changeDict);
             var skillId = collection.getSkillIdFromName(skillName);
             collection.deleteCollectionSkill(skillId);
-            collection.setNextSkillId(oldNextSkillId);
+            collection.setNextSkillIndex(oldNextSkillIndex);
           });
       },
 

@@ -22,33 +22,43 @@ var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 
 var ExplorationPlayerPage = function() {
-  var conversationInput =
-    element(by.css('.protractor-test-conversation-input'));
-  var suggestionDescriptionInput =
-    element(by.css('.protractor-test-suggestion-description-input'));
-  var conversationContent =
-    element.all(by.css('.protractor-test-conversation-content'));
-  var conversationFeedback =
-    element.all(by.css('.protractor-test-conversation-feedback'));
-  var explorationHeader =
-    element(by.css('.protractor-test-exploration-header'));
-  var infoCardRating = element(by.css('.protractor-test-info-card-rating'));
-  var explorationSuggestionModal =
-      element(by.css('.protractor-test-exploration-suggestion-modal'));
-  var feedbackTextArea =
-      element(by.css('.protractor-test-exploration-feedback-textarea'));
+  var conversationInput = element(
+    by.css('.protractor-test-conversation-input'));
+  var suggestionDescriptionInput = element(
+    by.css('.protractor-test-suggestion-description-input'));
+  var conversationContent = element.all(
+    by.css('.protractor-test-conversation-content'));
+  var conversationFeedback = element.all(
+    by.css('.protractor-test-conversation-feedback'));
+  var explorationHeader = element(
+    by.css('.protractor-test-exploration-header'));
+  var infoCardRating = element(
+    by.css('.protractor-test-info-card-rating'));
+  var explorationSuggestionModal = element(
+    by.css('.protractor-test-exploration-suggestion-modal'));
+  var feedbackTextArea = element(
+    by.css('.protractor-test-exploration-feedback-textarea'));
   var ratingStar = element.all(by.css('.protractor-test-rating-star'));
 
-  var suggestionSubmitButton =
-      element(by.css('.protractor-test-suggestion-submit-btn'));
-  var feedbackSubmitButton =
-      element(by.css('.protractor-test-exploration-feedback-submit-btn'));
-  var explorationInfoIcon =
-      element(by.css('.protractor-test-exploration-info-icon'));
-  var nextCardButton =
-      element(by.css('.protractor-test-continue-to-next-card-button'));
+  var suggestionSubmitButton = element(
+    by.css('.protractor-test-suggestion-submit-btn'));
+  var feedbackSubmitButton = element(
+    by.css('.protractor-test-exploration-feedback-submit-btn'));
+  var explorationInfoIcon = element(
+    by.css('.protractor-test-exploration-info-icon'));
+  var nextCardButton = element(
+    by.css('.protractor-test-continue-to-next-card-button'));
   var viewHintButton = element(by.css('.protractor-test-view-hint'));
   var viewSolutionButton = element(by.css('.protractor-test-view-solution'));
+  var continueToSolutionButton = element(
+    by.css('.protractor-test-continue-to-solution-btn'));
+  var gotItButton = element(by.css('.oppia-learner-got-it-button'));
+  var confirmRedirectionButton =
+      element(by.css('.protractor-test-confirm-redirection-button'));
+  var cancelRedirectionButton = element(
+    by.css('.protractor-test-cancel-redirection-button'));
+  var returnToParentButton = element(
+    by.css('.protractor-test-return-to-parent-button'));
 
   var feedbackPopupLink =
     element(by.css('.protractor-test-exploration-feedback-popup-link'));
@@ -65,6 +75,25 @@ var ExplorationPlayerPage = function() {
 
   this.viewSolution = function() {
     viewSolutionButton.click();
+    general.waitForSystem();
+    continueToSolutionButton.click();
+    general.waitForSystem();
+  };
+
+  this.clickGotItButton = function() {
+    gotItButton.click();
+  };
+
+  this.clickConfirmRedirectionButton = function() {
+    confirmRedirectionButton.click();
+  };
+
+  this.clickCancelRedirectionButton = function() {
+    cancelRedirectionButton.click();
+  };
+
+  this.clickOnReturnToParentButton = function() {
+    returnToParentButton.click();
   };
 
   // This verifies the question just asked, including formatting and

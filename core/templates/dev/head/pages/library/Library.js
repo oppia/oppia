@@ -27,14 +27,14 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 });
 
 oppia.controller('Library', [
-  '$scope', '$http', '$modal', '$rootScope', '$window', '$timeout',
+  '$scope', '$http', '$uibModal', '$rootScope', '$window', '$timeout',
   'ConstructTranslationIdsService', 'UrlService', 'ALL_CATEGORIES',
   'SearchService', 'WindowDimensionsService', 'UrlInterpolationService',
   'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX', 'AlertsService',
   'LearnerDashboardIdsBackendApiService',
   'LearnerDashboardActivityIdsObjectFactory', 'LearnerPlaylistService',
   function(
-      $scope, $http, $modal, $rootScope, $window, $timeout,
+      $scope, $http, $uibModal, $rootScope, $window, $timeout,
       ConstructTranslationIdsService, UrlService, ALL_CATEGORIES,
       SearchService, WindowDimensionsService, UrlInterpolationService,
       LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX, AlertsService,
@@ -94,7 +94,7 @@ oppia.controller('Library', [
         // If not produce an error that would be caught by e2e tests.
         $timeout(function () {
           var actualWidth = $('exploration-summary-tile').width();
-          if (actualWidth && actualWidth != LIBRARY_TILE_WIDTH_PX) {
+          if (actualWidth && actualWidth !== LIBRARY_TILE_WIDTH_PX) {
             console.error(
               'The actual width of tile is different than the expected width.' +
               ' Actual size: ' + actualWidth + ', Expected size: ' +

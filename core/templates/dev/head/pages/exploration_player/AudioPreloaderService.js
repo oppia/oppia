@@ -17,120 +17,116 @@
  */
 
 oppia.factory('AudioPreloaderService', [
-  '$modal', 'ExplorationContextService', 'AssetsBackendApiService',
+  '$uibModal', 'ExplorationContextService', 'AssetsBackendApiService',
   'ExplorationPlayerStateService', 'UrlInterpolationService',
-  'AudioTranslationManagerService', 'LanguageUtilService',
-  function($modal, ExplorationContextService, AssetsBackendApiService,
+  'AudioTranslationLanguageService', 'LanguageUtilService',
+  'ComputeGraphService',
+  function($uibModal, ExplorationContextService, AssetsBackendApiService,
       ExplorationPlayerStateService, UrlInterpolationService,
-      AudioTranslationManagerService, LanguageUtilService) {
-    // List of languages that have been preloaded in the exploration.
-    var _preloadedLanguageCodes = [];
+      AudioTranslationLanguageService, LanguageUtilService,
+      ComputeGraphService) {
+    var MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
 
-    var _preloadAllAudioFiles = function(languageCode) {
-      var allAudioTranslations =
-        ExplorationPlayerStateService
-          .getExploration().getAllAudioTranslations(languageCode);
+    var _filenamesOfAudioCurrentlyDownloading = [];
+    var _filenamesOfAudioToBeDownloaded = [];
+    var _exploration = null;
+    var _audioLoadedCallback = null;
+    var _mostRecentlyRequestedAudioFilename = null;
 
-      allAudioTranslations.map(function(audioTranslation) {
-        AssetsBackendApiService.loadAudio(
-          ExplorationContextService.getExplorationId(),
-          audioTranslation.filename);
-      });
-
-      _preloadedLanguageCodes.push(languageCode);
+    var _init = function(exploration) {
+      _exploration = exploration;
     };
 
-    var _showBandwidthConfirmationModal = function(
-        audioTranslationsForContent, languageCode,
-        confirmationCallback) {
-      $modal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration_player/' +
-          'audio_preload_bandwidth_confirmation_modal_directive.html'),
-        resolve: {},
-        backdrop: true,
-        controller: [
-          '$scope', '$modalInstance',
-          'ExplorationPlayerStateService', 'AudioPreloaderService',
-          'LanguageUtilService',
-          function(
-              $scope, $modalInstance,
-              ExplorationPlayerStateService, AudioPreloaderService,
-              LanguageUtilService) {
-            $scope.fileSizeOfCurrentAudioTranslationMB =
-              audioTranslationsForContent[languageCode]
-                .getFileSizeMB().toPrecision(3);
-            $scope.totalFileSizeOfAllAudioTranslationsMB =
-              ExplorationPlayerStateService.getExploration()
-                .getAllAudioTranslationsFileSizeMB(languageCode)
-                .toPrecision(3);
-            $scope.currentLanguageDescription =
-              LanguageUtilService.getAudioLanguageDescription(languageCode);
-            $scope.shouldDownloadAllAudioInExploration = false;
+    var _getAudioFilenamesInBfsOrder = function(sourceStateName) {
+      var languageCode = AudioTranslationLanguageService
+        .getCurrentAudioLanguageCode();
+      var stateNamesInBfsOrder =
+        ComputeGraphService.computeBfsTraversalOfStates(
+          _exploration.getInitialState().name,
+          _exploration.getStates(),
+          sourceStateName);
+      var audioFilenames = [];
+      allAudioTranslations = _exploration.getAllAudioTranslations(
+        languageCode);
+      stateNamesInBfsOrder.forEach(function(stateName) {
+        var allAudioTranslationsForState = allAudioTranslations[stateName];
+        allAudioTranslationsForState.forEach(function(audioTranslation) {
+          audioFilenames.push(audioTranslation.filename);
+        });
+      });
+      return audioFilenames;
+    };
 
-            $scope.confirm = function() {
-              $modalInstance.close({
-                shouldDownloadAllAudioInExploration:
-                  $scope.shouldDownloadAllAudioInExploration,
-                shouldOpenSettingsModal: false
-              });
-            };
-
-            $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
-            };
-
-            $scope.chooseDifferentLanguage = function() {
-              $modalInstance.close({
-                shouldDownloadAllAudioInExploration: false,
-                shouldOpenSettingsModal: true
-              });
-            };
-          }]
-      }).result.then(function(result) {
-        if (result.shouldOpenSettingsModal) {
-          // If the user elected to choose a different language, open
-          // the settings modal (later can isolate to a language-only
-          // modal), and on the callback re-open the bandwidth confirmation
-          // modal if the file for the new language hasn't been loaded.
-          AudioTranslationManagerService
-            .showAudioTranslationSettingsModal(function(newLanguageCode) {
-              if (LanguageUtilService.isAutogeneratedAudioLanguage(
-                  newLanguageCode)) {
-                confirmationCallback(newLanguageCode);
-              } else {
-                var newAudioTranslation =
-                  audioTranslationsForContent[newLanguageCode];
-                if (newAudioTranslation && !AssetsBackendApiService.isCached(
-                  newAudioTranslation.filename)) {
-                  _showBandwidthConfirmationModal(
-                    audioTranslationsForContent, newLanguageCode,
-                    confirmationCallback)
-                }
-              }
-            });
-        } else {
-          confirmationCallback(languageCode);
-          if (result.shouldDownloadAllAudioInExploration) {
-            _preloadAllAudioFiles(languageCode);
+    var _loadAudio = function(audioFilename) {
+      AssetsBackendApiService.loadAudio(
+        ExplorationContextService.getExplorationId(), audioFilename
+      ).then(function(loadedAudio) {
+        for (var i = 0;
+             i < _filenamesOfAudioCurrentlyDownloading.length; i++) {
+          if (_filenamesOfAudioCurrentlyDownloading[i] ===
+              loadedAudio.filename) {
+            _filenamesOfAudioCurrentlyDownloading.splice(i, 1);
+            break;
           }
+        }
+        if (_filenamesOfAudioToBeDownloaded.length > 0) {
+          var nextAudioFilename = _filenamesOfAudioToBeDownloaded.shift();
+          _filenamesOfAudioCurrentlyDownloading.push(nextAudioFilename);
+          _loadAudio(nextAudioFilename);
+        }
+        if (_audioLoadedCallback) {
+          _audioLoadedCallback(loadedAudio.filename);
         }
       });
     };
 
+    var _kickOffAudioPreloader = function(sourceStateName) {
+      _filenamesOfAudioToBeDownloaded =
+        _getAudioFilenamesInBfsOrder(sourceStateName);
+      while (_filenamesOfAudioCurrentlyDownloading.length <
+          MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY &&
+          _filenamesOfAudioToBeDownloaded.length > 0) {
+        var audioFilename = _filenamesOfAudioToBeDownloaded.shift();
+        _filenamesOfAudioCurrentlyDownloading.push(audioFilename);
+        _loadAudio(audioFilename);
+      }
+    };
+
+    var _cancelPreloading = function() {
+      AssetsBackendApiService.abortAllCurrentDownloads();
+      _filenamesOfAudioCurrentlyDownloading = [];
+    };
+
     return {
-      init: function() {
-        _init();
+      init: function(exploration) {
+        _init(exploration);
       },
-      hasPreloadedLanguage: function(languageCode) {
-        return _preloadedLanguageCodes.indexOf(languageCode) !== -1;
+      kickOffAudioPreloader: function(sourceStateName) {
+        _kickOffAudioPreloader(sourceStateName);
       },
-      showBandwidthConfirmationModal: function(
-          audioTranslationsForContent, languageCode,
-          confirmationCallback) {
-        _showBandwidthConfirmationModal(
-          audioTranslationsForContent, languageCode,
-          confirmationCallback);
+      isLoadingAudioFile: function(filename) {
+        return _filenamesOfAudioCurrentlyDownloading.indexOf(filename) !== -1;
+      },
+      restartAudioPreloader: function(sourceStateName) {
+        _cancelPreloading();
+        _kickOffAudioPreloader(sourceStateName);
+      },
+      setAudioLoadedCallback: function(audioLoadedCallback) {
+        _audioLoadedCallback = audioLoadedCallback;
+      },
+      setMostRecentlyRequestedAudioFilename: function(
+          mostRecentlyRequestedAudioFilename) {
+        _mostRecentlyRequestedAudioFilename =
+          mostRecentlyRequestedAudioFilename;
+      },
+      clearMostRecentlyRequestedAudioFilename: function() {
+        _mostRecentlyRequestedAudioFilename = null;
+      },
+      getMostRecentlyRequestedAudioFilename: function() {
+        return _mostRecentlyRequestedAudioFilename;
+      },
+      getFilenamesOfAudioCurrentlyDownloading: function() {
+        return _filenamesOfAudioCurrentlyDownloading;
       }
     };
   }

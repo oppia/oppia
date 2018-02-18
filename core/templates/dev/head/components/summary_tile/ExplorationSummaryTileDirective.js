@@ -45,6 +45,7 @@ oppia.directive('explorationSummaryTile', [
         // desktop version of the summary tile is always displayed.
         mobileCutoffPx: '@mobileCutoffPx',
         isPlaylistTile: '&isPlaylistTile',
+        getParentExplorationIds: '&parentExplorationIds',
         showLearnerDashboardIconsIfPossible: (
           '&showLearnerDashboardIconsIfPossible')
       },
@@ -78,13 +79,13 @@ oppia.directive('explorationSummaryTile', [
         );
       },
       controller: [
-        '$scope', '$http',
-        'oppiaDatetimeFormatter', 'RatingComputationService',
-        'WindowDimensionsService',
+        '$scope', '$http', '$window',
+        'DateTimeFormatService', 'RatingComputationService',
+        'WindowDimensionsService', 'UrlService',
         function(
-          $scope, $http,
-          oppiaDatetimeFormatter, RatingComputationService,
-          WindowDimensionsService) {
+            $scope, $http, $window,
+            DateTimeFormatService, RatingComputationService,
+            WindowDimensionsService, UrlService) {
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.ACTIVITY_TYPE_EXPLORATION = (
             constants.ACTIVITY_TYPE_EXPLORATION);
@@ -100,12 +101,22 @@ oppia.directive('explorationSummaryTile', [
             }
           );
 
+          $scope.isRefresherExploration = false;
+          if ($scope.getParentExplorationIds()) {
+            $scope.isRefresherExploration = (
+              $scope.getParentExplorationIds().length > 0);
+          }
+
           $scope.avatarsList = [];
 
           $scope.MAX_AVATARS_TO_DISPLAY = 5;
 
           $scope.setHoverState = function(hoverState) {
             $scope.explorationIsCurrentlyHoveredOver = hoverState;
+          };
+
+          $scope.loadParentExploration = function() {
+            $window.location.href = $scope.getExplorationLink();
           };
 
           $scope.getAverageRating = function() {
@@ -120,7 +131,7 @@ oppia.directive('explorationSummaryTile', [
             if (!$scope.getLastUpdatedMsec()) {
               return null;
             }
-            return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               $scope.getLastUpdatedMsec());
           };
 
@@ -129,11 +140,29 @@ oppia.directive('explorationSummaryTile', [
               return '#';
             } else {
               var result = '/explore/' + $scope.getExplorationId();
-              if ($scope.getCollectionId()) {
-                result += ('?collection_id=' + $scope.getCollectionId());
+              var urlParams = UrlService.getUrlParams();
+              var parentExplorationIds = $scope.getParentExplorationIds();
+
+              var collectionIdToAdd = $scope.getCollectionId();
+              // Replace the collection ID with the one in the URL if it exists
+              // in urlParams.
+              if (parentExplorationIds &&
+                  urlParams.hasOwnProperty('collection_id')) {
+                collectionIdToAdd = urlParams.collection_id;
               }
+
+              if (collectionIdToAdd) {
+                result = UrlService.addField(
+                  result, 'collection_id', collectionIdToAdd);
+              }
+              if (parentExplorationIds) {
+                for (var i = 0; i < parentExplorationIds.length - 1; i++) {
+                  result = UrlService.addField(
+                    result, 'parent', parentExplorationIds[i]);
+                }
+              }
+              return result;
             }
-            return result;
           };
 
           if (!$scope.mobileCutoffPx) {

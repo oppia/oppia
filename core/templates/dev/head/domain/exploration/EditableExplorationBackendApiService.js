@@ -23,10 +23,10 @@ oppia.factory('EditableExplorationBackendApiService', [
   'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
   function($http, $q, EXPLORATION_DATA_URL_TEMPLATE,
-    EDITABLE_EXPLORATION_DATA_URL_TEMPLATE,
-    EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
-    UrlInterpolationService,
-    ReadOnlyExplorationBackendApiService) {
+      EDITABLE_EXPLORATION_DATA_URL_TEMPLATE,
+      EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
+      UrlInterpolationService,
+      ReadOnlyExplorationBackendApiService) {
     var _fetchExploration = function(
         explorationId, applyDraft, successCallback, errorCallback) {
       var editableExplorationDataUrl = _getExplorationUrl(
@@ -75,7 +75,7 @@ oppia.factory('EditableExplorationBackendApiService', [
     };
 
     var _deleteExploration = function(
-      explorationId, successCallback, errorCallback) {
+        explorationId, successCallback, errorCallback) {
       var editableExplorationDataUrl = _getExplorationUrl(explorationId, null);
 
       $http['delete'](editableExplorationDataUrl).then(function() {
@@ -147,7 +147,7 @@ oppia.factory('EditableExplorationBackendApiService', [
       /**
        * Deletes an exploration in the backend with the provided exploration
        * ID. If successful, the exploration will also be deleted from the
-       * ReadOnlyExplorationBackendApiService cache as well. 
+       * ReadOnlyExplorationBackendApiService cache as well.
        * Errors are passed to the error callback, if one is provided.
        */
       deleteExploration: function(explorationId) {

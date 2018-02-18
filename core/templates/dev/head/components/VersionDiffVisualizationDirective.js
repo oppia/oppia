@@ -51,7 +51,7 @@ oppia.directive('versionDiffVisualization', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/' +
         'version_diff_visualization_directive.html'),
-      controller: ['$scope', '$modal', function($scope, $modal) {
+      controller: ['$scope', '$uibModal', function($scope, $uibModal) {
         // Constants for color of nodes in diff graph
         var COLOR_ADDED = '#4EA24E';
         var COLOR_DELETED = '#DC143C';
@@ -125,7 +125,7 @@ oppia.directive('versionDiffVisualization', [
           } else if (nodeStateProperty === STATE_PROPERTY_CHANGED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
             $scope.diffGraphNodeColors[nodeId] = COLOR_CHANGED;
-            if (nodesData[nodeId].originalStateName !=
+            if (nodesData[nodeId].originalStateName !==
                 nodesData[nodeId].newestStateName) {
               $scope.diffGraphSecondaryLabels[nodeId] = '(was: ' +
                 nodesData[nodeId].originalStateName + ')';
@@ -137,7 +137,7 @@ oppia.directive('versionDiffVisualization', [
           } else if (nodeStateProperty === STATE_PROPERTY_UNCHANGED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
             $scope.diffGraphNodeColors[nodeId] = COLOR_UNCHANGED;
-            if (nodesData[nodeId].originalStateName !=
+            if (nodesData[nodeId].originalStateName !==
                 nodesData[nodeId].newestStateName) {
               $scope.diffGraphSecondaryLabels[nodeId] = '(was: ' +
                 nodesData[nodeId].originalStateName + ')';
@@ -189,7 +189,7 @@ oppia.directive('versionDiffVisualization', [
         // calculation of the state graph.
         $scope.onClickStateInDiffGraph = function(stateId) {
           var oldStateName = undefined;
-          if (nodesData[stateId].newestStateName !=
+          if (nodesData[stateId].newestStateName !==
               nodesData[stateId].originalStateName) {
             oldStateName = nodesData[stateId].originalStateName;
           }
@@ -208,7 +208,7 @@ oppia.directive('versionDiffVisualization', [
         //     deleted.
         $scope.showStateDiffModal = function(
             newStateName, oldStateName, stateProperty) {
-          $modal.open({
+          $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration_editor/' +
               'state_diff_modal_directive.html'),
@@ -248,11 +248,12 @@ oppia.directive('versionDiffVisualization', [
               }
             },
             controller: [
-              '$scope', '$http', '$modalInstance', '$timeout', 'newStateName',
-              'oldStateName', 'newState', 'oldState', 'headers',
-              'ExplorationContextService', 'UrlInterpolationService',
+              '$scope', '$http', '$uibModalInstance', '$timeout',
+              'newStateName', 'oldStateName', 'newState', 'oldState',
+              'headers', 'ExplorationContextService',
+              'UrlInterpolationService',
               function(
-                  $scope, $http, $modalInstance, $timeout, newStateName,
+                  $scope, $http, $uibModalInstance, $timeout, newStateName,
                   oldStateName, newState, oldState, headers,
                   ExplorationContextService, UrlInterpolationService) {
                 var STATE_YAML_URL = UrlInterpolationService.interpolateUrl(
@@ -304,7 +305,7 @@ oppia.directive('versionDiffVisualization', [
                 }
 
                 $scope.cancel = function() {
-                  $modalInstance.dismiss('cancel');
+                  $uibModalInstance.dismiss('cancel');
                 };
 
                 // Options for the codemirror mergeview.

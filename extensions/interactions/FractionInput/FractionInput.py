@@ -28,6 +28,7 @@ class FractionInput(base.BaseInteraction):
     narrow_instructions = None
     needs_summary = False
     can_have_solution = True
+    show_generic_submit_button = True
 
     _customization_arg_specs = [{
         'name': 'requireSimplestForm',
@@ -36,4 +37,36 @@ class FractionInput(base.BaseInteraction):
             'type': 'bool',
         },
         'default_value': False
+    }, {
+        'name': 'allowImproperFraction',
+        'description': 'Allow improper fractions in the learner\'s answer',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': True
+    }, {
+        'name': 'allowNonzeroIntegerPart',
+        'description': 'Allow the answer to contain an integer part',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': True
+    }, {
+        'name': 'customPlaceholder',
+        'description': 'Custom placeholder text (optional)',
+        'schema': {
+            'type': 'unicode'
+        },
+        'default_value': ''
+    }]
+
+    _answer_visualization_specs = [{
+        # Table with answer counts for top N answers.
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top answers',
+        },
+        'calculation_id': 'Top10AnswerFrequencies',
+        'show_addressed_info': True,
     }]

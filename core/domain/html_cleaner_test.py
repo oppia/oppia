@@ -129,7 +129,7 @@ class HtmlStripperUnitTests(test_utils.GenericTestBase):
 
 
 class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
-    '''Test the RTE component extractor.'''
+    """Test the RTE component extractor."""
 
     def test_get_rte_components(self):
         test_data = (

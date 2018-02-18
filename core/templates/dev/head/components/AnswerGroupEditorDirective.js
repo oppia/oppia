@@ -26,13 +26,14 @@ oppia.directive('answerGroupEditor', [
         getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
         getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
         getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
+        getOnSaveAnswerGroupCorrectnessLabelFn: (
+          '&onSaveAnswerGroupCorrectnessLabel'),
         outcome: '=',
         suppressWarnings: '&',
         rules: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/' +
-        'answer_group_editor_directive.html'),
+        '/components/answer_group_editor_directive.html'),
       controller: [
         '$scope', 'stateInteractionIdService', 'ResponsesService',
         'EditorStateService', 'AlertsService', 'INTERACTION_SPECS',

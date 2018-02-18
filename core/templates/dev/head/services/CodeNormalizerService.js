@@ -16,7 +16,7 @@
  * @fileoverview Service for code normalization. Used by the code REPL
  * and pencil code interactions.
  */
-  
+
 oppia.factory('CodeNormalizerService', [function() {
   var removeLeadingWhitespace = function(str) {
     return str.replace(/^\s+/g, '');

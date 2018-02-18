@@ -54,8 +54,8 @@ describe('State Interaction controller', function() {
     beforeEach(inject(function($rootScope, $controller, $injector) {
       scope = $rootScope.$new();
       ecs = $injector.get('EditorStateService');
-      cls = $injector.get('changeListService');
-      ess = $injector.get('explorationStatesService');
+      cls = $injector.get('ChangeListService');
+      ess = $injector.get('ExplorationStatesService');
       siis = $injector.get('stateInteractionIdService');
       scas = $injector.get('stateCustomizationArgsService');
       idc = $injector.get('InteractionDetailsCacheService');
@@ -75,13 +75,26 @@ describe('State Interaction controller', function() {
             id: 'TextInput',
             answer_groups: [{
               rule_specs: [],
-              outcome: {},
-              correct: false
+              outcome: {
+                dest: 'default',
+                feedback: {
+                  html: '',
+                  audio_translations: {}
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              },
             }],
             default_outcome: {
               dest: 'default',
-              feedback: [],
-              param_changes: []
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             hints: []
           },
@@ -96,13 +109,26 @@ describe('State Interaction controller', function() {
             id: 'TextInput',
             answer_groups: [{
               rule_specs: [],
-              outcome: {},
-              correct: false
+              outcome: {
+                dest: 'default',
+                feedback: {
+                  html: '',
+                  audio_translations: {}
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              }
             }],
             default_outcome: {
               dest: 'default',
-              feedback: [],
-              param_changes: []
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             hints: []
           },
@@ -113,9 +139,9 @@ describe('State Interaction controller', function() {
       var stateEditorCtrl = $controller('StateEditor', {
         $scope: scope,
         EditorStateService: ecs,
-        changeListService: cls,
-        explorationStatesService: ess,
-        editabilityService: {
+        ChangeListService: cls,
+        ExplorationStatesService: ess,
+        EditabilityService: {
           isEditable: function() {
             return true;
           }
@@ -126,9 +152,9 @@ describe('State Interaction controller', function() {
       var interactionCtrl = $controller('StateInteraction', {
         $scope: scope,
         EditorStateService: ecs,
-        changeListService: cls,
-        explorationStatesService: ess,
-        editabilityService: {
+        ChangeListService: cls,
+        ExplorationStatesService: ess,
+        EditabilityService: {
           isEditable: function() {
             return true;
           }
