@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Directive for the subtitled html editor.
- */          
+ */
 
 oppia.directive('subtitledhintEditor', [
   'UrlInterpolationService', 'SubtitledHtmlObjectFactory',
