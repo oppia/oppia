@@ -28,7 +28,7 @@ oppia.directive('subtitledhintEditor', [
     },
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
       '/components/subtitled_html_editor_directive.html'),
-      controller: [
+    controller: [
         '$scope', '$uibModal', 'EditabilityService',
         'COMPONENT_NAME_HTMLCONTENT',
         function($scope, $uibModal, EditabilityService,
@@ -77,5 +77,5 @@ oppia.directive('subtitledhintEditor', [
           };
         }
       ]
-    };
+  };
   }]);
