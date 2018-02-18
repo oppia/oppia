@@ -33,7 +33,7 @@ oppia.directive('imageWithRegionsEditor', [
       scope: true,
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: [
-        '$scope', '$element', '$uibModal', 
+        '$scope', '$element', '$uibModal',
         function($scope, $element, $uibModal) {
           $scope.alwaysEditable = true;
 

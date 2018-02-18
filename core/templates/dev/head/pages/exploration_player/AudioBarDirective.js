@@ -180,7 +180,7 @@ oppia.directive('audioBar', [
             }
           };
 
-          $scope.track = {             
+          $scope.track = {
             progress: function(progressPercentage) {
               // Returns the current track progress. In addition, sets the
               // track progress if the progressPercentage argument is defined.
