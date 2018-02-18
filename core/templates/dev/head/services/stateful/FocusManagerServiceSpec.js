@@ -71,7 +71,8 @@ describe('Focus Manager Service', function() {
     FocusManagerService.setFocusIfOnDesktop(focusLabel);
     if (!DeviceInfoService.isMobileDevice()) {
       $timeout(function () {
-        expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn', focusLabel);
+        expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn',
+          focusLabel);
       });
       $timeout.flush();
     }
