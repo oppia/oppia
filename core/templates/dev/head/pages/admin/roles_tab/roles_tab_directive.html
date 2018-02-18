@@ -67,7 +67,7 @@
 
       <md-card class="oppia-page-card oppia-long-text">
         <form class="form-horizontal" name="updateRoleForm" ng-submit="submitUpdateRoleForm(updateFormValues)">
-          <legend class="text-center">Update Role</legend>            
+          <legend class="text-center">Update Role</legend>
           <div class="form-group">
             <label class="col-md-4 col-lg-4 col-sm-4 control-label">Enter Username</label>
             <div class="col-md-8 col-lg-8 col-sm-8">
@@ -82,18 +82,18 @@
               </select>
             </div>
           </div>
-  
+
           <button type="submit" class="btn btn-success protractor-update-form-submit" ng-disabled="!updateFormValues.newRole || !updateFormValues.username" value="update role">Update Role</button>
         </form>
       </md-card>
     </div>
-    
+
     <div class="col-md-4">
       <md-card class="oppia-page-card oppia-long-text" style="">
         <legend class="text-center">Role Hierarchy</legend>
           <role-graph graph-data="graphData"
                       graph-data-loaded="graphDataLoaded">
-          </role-graph> 
+          </role-graph>
       </md-card>
     </div>
   </div>
