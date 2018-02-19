@@ -1303,6 +1303,7 @@ exports.navigateToSettingsTab = navigateToSettingsTab;
 
 exports.setStateName = setStateName;
 exports.expectCurrentStateToBe = expectCurrentStateToBe;
+exports.isOnFeedbackTab = isOnFeedbackTab;
 
 exports.setContent = setContent;
 exports.expectContentToMatch = expectContentToMatch;
