@@ -112,6 +112,11 @@ var expectCurrentStateToBe = function(name) {
   expect(_getStateName()).toMatch(name);
 };
 
+var isOnFeedbackTab = function() {
+  return expect(element(by.css(
+    '.protractor-test-oppia-feedback-tab-row')).isPresent()).toBe(true);
+};
+
 // CONTENT
 
 // 'richTextInstructions' is a function that is sent a RichTextEditor which it

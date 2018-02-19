@@ -85,9 +85,8 @@ describe('ExplorationFeedback', function() {
       creatorDashboardPage.getNumberOfFeedbackMessages()
     ).toEqual(1);
     creatorDashboardPage.navigateToExplorationEditor();
-    expect(element(by.css(
-      '.protractor-test-oppia-feedback-tab-row')).isPresent()).toBe(true);
 
+    editor.isOnFeedbackTab();
     editor.readFeedbackMessages().then(function(messages) {
       expect(messages.length).toEqual(1);
       expect(messages[0]).toEqual(feedback);
