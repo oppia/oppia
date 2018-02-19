@@ -112,7 +112,7 @@ var expectCurrentStateToBe = function(name) {
   expect(_getStateName()).toMatch(name);
 };
 
-var isOnFeedbackTab = function() {
+var expectCurrentTabToBeFeedbackTab = function() {
   return expect(element(by.css(
     '.protractor-test-oppia-feedback-tab-row')).isPresent()).toBe(true);
 };
@@ -1303,7 +1303,7 @@ exports.navigateToSettingsTab = navigateToSettingsTab;
 
 exports.setStateName = setStateName;
 exports.expectCurrentStateToBe = expectCurrentStateToBe;
-exports.isOnFeedbackTab = isOnFeedbackTab;
+exports.expectCurrentTabToBeFeedbackTab = expectCurrentTabToBeFeedbackTab;
 
 exports.setContent = setContent;
 exports.expectContentToMatch = expectContentToMatch;
