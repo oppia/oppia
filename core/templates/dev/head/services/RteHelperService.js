@@ -181,8 +181,9 @@ oppia.factory('RteHelperService', [
           });
         });
 
-        elt = $filter('removeExtraLines')(elt);
-        return elt.html();
+        text = elt.html();
+        text = $filter('removeExtraLines')(text);
+        return text;
       },
       getRichTextComponents: function() {
         return angular.copy(_RICH_TEXT_COMPONENTS);
