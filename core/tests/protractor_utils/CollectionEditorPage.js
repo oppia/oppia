@@ -20,40 +20,28 @@
 var CollectionEditorPage = function() {  
   var addExplorationButton = element(
     by.css('.protractor-test-add-exploration-button'));
-
   var addExplorationInput = element(       
     by.css('.protractor-test-add-exploration-input'));
-
   var closeSaveModal = element(
       by.css('.protractor-test-close-save-modal'));
-
   var collectionEditorObjectiveInput = element(
-        by.css('.protractor-collection-editor-objective-input'));
-  
+        by.css('.protractor-collection-editor-objective-input'));  
   var commitMessageInput = element(
-        by.css('.protractor-test-commit-message-input'));
-            
+        by.css('.protractor-test-commit-message-input'));            
   var editorCategoryDropdown = element.all(
     by.css('.protractor-test-collection-editor-category-dropdown'));
-
   var editorDeleteNode = element.all(
-    by.css('.protractor-test-editor-delete-node'));
-    
+    by.css('.protractor-test-editor-delete-node'));    
   var editorPublishButton = element(
     by.css('.protractor-test-editor-publish-button'));
-
   var editorShiftLeft = element.all(
     by.css('.protractor-test-editor-shift-left'));  
-
   var editorShiftRight = element.all(
-    by.css('.protractor-test-editor-shift-right'));  
-        
+    by.css('.protractor-test-editor-shift-right'));         
   var editorTitleInput = element(
     by.css('.protractor-collection-editor-title-input'));
-
   var saveChangesButton = element(
     by.css('.protractor-test-collection-save-changes-button'));
-
   var saveDraftButton = element(
     by.css('.protractor-test-save-draft-button'));   
                  
