@@ -113,7 +113,7 @@ var expectCurrentStateToBe = function(name) {
 };
 
 var expectCurrentTabToBeFeedbackTab = function() {
-  return expect(element(by.css(
+  expect(element(by.css(
     '.protractor-test-oppia-feedback-tab-row')).isPresent()).toBe(true);
 };
 
