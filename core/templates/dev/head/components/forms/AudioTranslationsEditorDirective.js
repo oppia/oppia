@@ -242,25 +242,24 @@ oppia.directive('audioTranslationsEditor', [
   }
 ]);
 
-oppia.directive('audioPlay', [function(){
-  return {
-    restrict:'E',
-    scope:{
-      src:'@',
-      isPlaying:'='
-    },
-    template:(
+oppia.directive('audioPlay', [
+  function(){
+    return {
+      restrict:'E',
+      scope:{
+        src:'@',
+      },
+      template:(
       '<audio controls preload="metadata" controlsList="nodownload" ' +
-      '       ng-src="<[src]>"></audio>'
-    ),
-    controller:['$scope', '$element',
-                function($scope, $element){
-                  var audio = $element.find('audio')[0];
-                  $scope.$on('$locationChangeStart', function(event) {
-                    audio.pause();
-                  });
-                }
-    ]
-  };
-}
+      '       ng-src="<[src]>"></audio>'),
+      controller:['$scope', '$element', function($scope, $element){
+        var audio = $element.find('audio')[0];
+
+        $scope.$on('$locationChangeStart', function(event) {
+          //The audio is paused when a change in route is detected
+          audio.pause();
+        });
+      }]
+    };
+  }
 ]);
