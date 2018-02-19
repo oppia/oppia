@@ -241,3 +241,26 @@ oppia.directive('audioTranslationsEditor', [
     };
   }
 ]);
+
+oppia.directive('audioPlay', [function(){
+  return {
+    restrict:'E',
+    scope:{
+      src:'@',
+      isPlaying:'='
+    },
+    template:(
+      '<audio controls preload="metadata" controlsList="nodownload" ' +
+      '       ng-src="<[src]>"></audio>'
+    ),
+    controller:['$scope', '$element',
+                function($scope, $element){
+                  var audio = $element.find('audio')[0];
+                  $scope.$on('$locationChangeStart', function(event) {
+                    audio.pause();
+                  });
+                }
+    ]
+  };
+}
+]);
