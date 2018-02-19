@@ -30,7 +30,7 @@ PLATFORM = 'gae'
 # This variable is for serving minified resources
 # when set to True. It reflects we are emulating running Oppia in a production
 # environment.
-FORCE_PROD_MODE = False
+FORCE_PROD_MODE = True
 
 # Whether we should serve the development or production experience.
 # DEV_MODE should only be changed to False in the production environment,

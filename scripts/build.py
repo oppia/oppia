@@ -26,10 +26,11 @@ import sys
 ASSETS_SRC_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
 
+THIRD_PARTY_STATIC_DIR = os.path.join('third_party', 'static')
 THIRD_PARTY_GENERATED_STAGING_DIR = os.path.join(
-    'backend_prod_files', 'third_party', 'generated', '')
+    'backend_prod_files', 'third_party', 'generated', 'js', 'third_party.min.js')
 THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
-    'build', 'third_party', 'generated', '')
+    'build', 'third_party', 'generated', 'js', 'third_party.min.js')
 
 EXTENSIONS_DEV_DIR = os.path.join('extensions', '')
 EXTENSIONS_STAGING_DIR = (
@@ -65,6 +66,7 @@ FILEPATHS_PROVIDED_TO_FRONTEND = (
     'images/*', 'i18n/*', '*_directive.html', '*.png', '*.json')
 
 HASH_BLOCK_SIZE = 2**20
+MANIFEST_FILE_PATH = os.path.join('manifest.json')
 
 
 def _minify(source_path, target_path):
@@ -79,6 +81,22 @@ def _minify(source_path, target_path):
         YUICOMPRESSOR_DIR, source_path, target_path)
     subprocess.check_call(cmd, shell=True)
 
+def minify_and_create_sourcemap(source_paths, target_path):
+    """Runs the given file through a minifier and outputs it to target_path.
+
+    Args:
+        source_path: str. Absolute path to file to be minified.
+        target_path: str. Absolute path to location where to copy
+            the minified file.
+    """
+    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+    node_path = os.path.join(
+        parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
+    uglify_path = os.path.join(
+        parent_dir, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
+    cmd = '%s %s %s --compress --mangle --source-map --output %s ' % (
+        node_path, uglify_path, " ".join(source_paths), target_path)
+    subprocess.check_call(cmd, shell=True)
 
 def _insert_hash(filepath, file_hash):
     """Inserts hash into filepath before the file extension.
@@ -155,6 +173,33 @@ def process_js(source_path, target_path):
     ensure_directory_exists(target_path)
     _minify(source_path, target_path)
 
+def get_dependency_filepaths():
+    filepaths = {
+        "css": [],
+        "js": [],
+        "fonts": []
+    }
+    with open(MANIFEST_FILE_PATH, 'r') as json_file:
+        manifest = json.loads(json_file.read())
+    frontend_dependencies = manifest["dependencies"]["frontend"]
+    for dependency in frontend_dependencies.values():
+        if "targetDir" in dependency:
+            dependency_dir = dependency["targetDir"]
+        else:
+            dependency_dir = (
+                dependency["targetDirPrefix"] + dependency["version"])
+        if "bundle" in dependency:
+            dependency_bundle = dependency["bundle"]
+            for css_file in dependency_bundle.get("css", []):
+                filepaths["css"].append(
+                    os.path.join(
+                        THIRD_PARTY_STATIC_DIR, dependency_dir, css_file))
+            for js_file in dependency_bundle.get("js", []):
+                filepaths["js"].append(
+                    os.path.join(
+                        THIRD_PARTY_STATIC_DIR, dependency_dir, js_file))
+            #TODO fonts
+    return filepaths
 
 def build_minified_third_party_libs(output_directory):
     """Generates third party files via Gulp.
@@ -397,7 +442,6 @@ def generate_build_directory():
     them into build directory.
     """
     hashes = dict()
-
     # Create hashes for assets, copy directories and files to build/assets
     hashes.update(get_file_hashes(ASSETS_SRC_DIR))
     copy_files_source_to_target(ASSETS_SRC_DIR, ASSETS_OUT_DIR, hashes)
