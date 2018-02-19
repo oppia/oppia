@@ -18,7 +18,7 @@
  */
 
 oppia.factory('NestedDirectivesRecursionTimeoutPreventionService', [
-  '$compile', 
+  '$compile',
   function($compile) {
     return {
       /**

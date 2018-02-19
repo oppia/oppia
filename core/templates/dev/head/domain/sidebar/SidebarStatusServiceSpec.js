@@ -25,25 +25,25 @@ describe('SidebarStatusService', function() {
     $window.innerWidth = 600;
     SidebarStatusService = $injector.get('SidebarStatusService');
   }));
-  
+
   it('should open the sidebar if its not open', function() {
     SidebarStatusService.openSidebar();
     expect(SidebarStatusService.isSidebarShown()).toBe(true);
   });
-  
+
   it('should close the sidebar when its open', function() {
     SidebarStatusService.openSidebar();
     SidebarStatusService.closeSidebar();
     expect(SidebarStatusService.isSidebarShown()).toBe(false);
   });
-  
+
   it('should toggle the sidebar to open and then close', function(){
     SidebarStatusService.toggleSidebar();
     expect(SidebarStatusService.isSidebarShown()).toBe(true);
     SidebarStatusService.toggleSidebar();
     expect(SidebarStatusService.isSidebarShown()).toBe(false);
   });
-  
+
 
   it('should falsify pendingSidebarClick on document click', function(){
     SidebarStatusService.openSidebar();

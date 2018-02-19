@@ -95,7 +95,7 @@ describe('Subscriptions functionality', function() {
     creatorDashboardPage.get();
     browser.waitForAngular();
     creatorDashboardPage.navigateToSubscriptionDashboard();
-    subscriptionDashboardPage.expectSubscriptionCountToEqual(1); 
+    subscriptionDashboardPage.expectSubscriptionCountToEqual(1);
     subscriptionDashboardPage.expectSubscriptionLastNameToMatch('learner...');
     users.logout();
   });

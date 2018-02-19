@@ -1434,7 +1434,8 @@ def get_demo_exploration_components(demo_path):
 
 
 def save_new_exploration_from_yaml_and_assets(
-        committer_id, yaml_content, exploration_id, assets_list):
+        committer_id, yaml_content, exploration_id, assets_list,
+        strip_audio_translations=False):
     """Note that the default title and category will be used if the YAML
     schema version is less than
     exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
@@ -1447,6 +1448,8 @@ def save_new_exploration_from_yaml_and_assets(
         exploration_id: str. The id of the exploration.
         assets_list: list(list(str)). A list of lists of assets, which contains
             asset's filename and content.
+        strip_audio_translations: bool. Whether to strip away all audio
+            translations from the imported exploration.
 
     Raises:
         Exception: The yaml file is invalid due to a missing schema version.
@@ -1470,11 +1473,37 @@ def save_new_exploration_from_yaml_and_assets(
         exploration = exp_domain.Exploration.from_yaml(
             exploration_id, yaml_content)
 
-    commit_message = (
+    # Check whether audio translations should be stripped.
+    if strip_audio_translations:
+        for state in exploration.states.values():
+            # Strip away audio translations from the state content.
+            content = state.content
+            content.audio_translations = {}
+
+            if state.interaction is not None:
+                # Strip away audio translations from solutions.
+                solution = state.interaction.solution
+                if solution:
+                    solution.explanation.audio_translations = {}
+
+                # Strip away audio translations from hints.
+                for hint in state.interaction.hints:
+                    hint.hint_content.audio_translations = {}
+
+                # Strip away audio translations from answer groups (feedback).
+                for answer_group in state.interaction.answer_groups:
+                    answer_group.outcome.feedback.audio_translations = {}
+
+                # Strip away audio translations from the default outcome.
+                default_outcome = state.interaction.default_outcome
+                if default_outcome:
+                    default_outcome.feedback.audio_translations = {}
+
+    create_commit_message = (
         'New exploration created from YAML file with title \'%s\'.'
         % exploration.title)
 
-    _create_exploration(committer_id, exploration, commit_message, [{
+    _create_exploration(committer_id, exploration, create_commit_message, [{
         'cmd': CMD_CREATE_NEW,
         'title': exploration.title,
         'category': exploration.category,

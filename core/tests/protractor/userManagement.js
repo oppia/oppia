@@ -23,7 +23,7 @@ var workflow = require('../protractor_utils/workflow.js');
 
 describe('Account creation', function() {
   var libraryPage = null;
-  
+
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
   });

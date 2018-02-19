@@ -84,7 +84,7 @@ oppia.factory('AudioPreloaderService', [
       _filenamesOfAudioToBeDownloaded =
         _getAudioFilenamesInBfsOrder(sourceStateName);
       while (_filenamesOfAudioCurrentlyDownloading.length <
-          MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY && 
+          MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY &&
           _filenamesOfAudioToBeDownloaded.length > 0) {
         var audioFilename = _filenamesOfAudioToBeDownloaded.shift();
         _filenamesOfAudioCurrentlyDownloading.push(audioFilename);
