@@ -16,7 +16,7 @@
  * @fileoverview Directive for the subtitled html editor.
  */
 
-oppia.directive('subtitledhintEditor', [
+oppia.directive('subtitledHtmlEditor', [
   'UrlInterpolationService', 'SubtitledHtmlObjectFactory',
   function(UrlInterpolationService, SubtitledHtmlObjectFactory){
     return {
@@ -30,8 +30,9 @@ oppia.directive('subtitledhintEditor', [
       controller: [
         '$scope', '$uibModal', 'EditabilityService',
         'COMPONENT_NAME_HTMLCONTENT',
-        function($scope, $uibModal, EditabilityService,
-            COMPONENT_NAME_HTMLCONTENT) {
+        function(
+        	$scope, $uibModal, EditabilityService,
+        	COMPONENT_NAME_HTMLCONTENT) {
           $scope.subtiledHtmlEditorIsOpen = false;
           $scope.subtitledMemento = null;
 
@@ -56,9 +57,10 @@ oppia.directive('subtitledhintEditor', [
             var contentHasChanged = (
               $scope.subtitledMemento.htmlContent.getHtml() !==
               $scope.subtitled.htmlContent.getHtml());
-            $scope.subtitledMemento = null;
-            if ($scope.subtitled.htmlContent.hasUnflaggedAudioTranslations() &&
-              contentHasChanged) {
+            $scope.subtitledMemento.htmlContent = angular.copy($scope.subtitled.htmlContent);
+            if (
+            	$scope.subtitled.htmlContent.hasUnflaggedAudioTranslations() &&
+            	contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
             $scope.getOnSaveFn()();
