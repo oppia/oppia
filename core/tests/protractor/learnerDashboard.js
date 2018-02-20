@@ -19,7 +19,7 @@
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
-var CollectionEditorPage = 
+var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');

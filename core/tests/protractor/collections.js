@@ -22,7 +22,7 @@ var workflow = require('../protractor_utils/workflow.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
-var CollectionEditorPage = 
+var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
 
 
