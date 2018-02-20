@@ -32,7 +32,7 @@ oppia.directive('subtitledHtmlEditor', [
         'COMPONENT_NAME_HTMLCONTENT',
         function(
             $scope, $uibModal, EditabilityService,
-        	COMPONENT_NAME_HTMLCONTENT) {
+            COMPONENT_NAME_HTMLCONTENT) {
           $scope.subtiledHtmlEditorIsOpen = false;
           $scope.subtitledMemento = null;
 
@@ -62,7 +62,7 @@ oppia.directive('subtitledHtmlEditor', [
             if (
               $scope.subtitled.htmlContent.hasUnflaggedAudioTranslations() && 
               contentHasChanged) {
-                openMarkAllAudioAsNeedingUpdateModal();
+              openMarkAllAudioAsNeedingUpdateModal();
             }
             $scope.getOnSaveFn()();
           };
