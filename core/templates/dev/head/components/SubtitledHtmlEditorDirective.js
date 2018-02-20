@@ -60,9 +60,9 @@ oppia.directive('subtitledHtmlEditor', [
             $scope.subtitledMemento.htmlContent = angular.copy(
             	$scope.subtitled.htmlContent);
             if (
-            	$scope.subtitled.htmlContent.hasUnflaggedAudioTranslations() &&
-            	contentHasChanged) {
-              openMarkAllAudioAsNeedingUpdateModal();
+              $scope.subtitled.htmlContent.hasUnflaggedAudioTranslations() && 
+              contentHasChanged) {
+            	openMarkAllAudioAsNeedingUpdateModal();
             }
             $scope.getOnSaveFn()();
           };
