@@ -236,9 +236,42 @@ oppia.filter('parameterizeRuleDescription', [
         } else if (varType === 'Fraction') {
           replacementText = FractionObjectFactory
             .fromDict(inputs[varName]).toString();
-        } else {
+        } else if (
+          varType === 'SetOfUnicodeString' ||
+          varType === 'SetOfNormalizedString') {
+          replacementText = '[';
+          for (var i = 0; i < inputs[varName].length; i++) {
+            if (i !== 0) {
+              replacementText += ', ';
+            }
+            replacementText += inputs[varName][i];
+          }
+          replacementText += ']';
+        } else if (
+          varType === 'Real' || varType === 'NonnegativeInt' ||
+          varType === 'Int') {
+          replacementText = inputs[varName] + '';
+        } else if (
+          varType === 'CodeString' || varType === 'UnicodeString' ||
+          varType === 'LogicErrorCategory' || varType === 'NormalizedString') {
           replacementText = inputs[varName];
+        } else if (varType === 'ListOfCodeEvaluation') {
+          replacementText = '[';
+          for (var i = 0; i < inputs[varName].length; i++) {
+            if (i !== 0) {
+              replacementText += ', ';
+            }
+            replacementText += inputs[varName][i].code;
+          }
+          replacementText += ']';
+        } else {
+          throw Error('Unknown variable type in rule description');
         }
+
+        // Replaces all occurances of $ with $$.
+        // This makes sure that the next regex matching will yield
+        // the same $ sign pattern as the input.
+        replacementText = replacementText.split('$').join('$$');
 
         description = description.replace(PATTERN, ' ');
         finalDescription = finalDescription.replace(PATTERN, replacementText);

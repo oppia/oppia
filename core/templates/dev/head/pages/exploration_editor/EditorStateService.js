@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview A service that maintains a record of which state 
+ * @fileoverview A service that maintains a record of which state
  * in the exploration is currently active.
  */
 

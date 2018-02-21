@@ -50,6 +50,8 @@ oppia.directive('oppiaNoninteractiveLink', [
             // have an empty 'text' value.
             if ($scope.text) {
               $scope.showUrlInTooltip = true;
+            } else {
+              $scope.text = $scope.url;
             }
           }
 

@@ -20,9 +20,10 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
-var collectionEditor = require('../protractor_utils/collectionEditor.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
+var CollectionEditorPage =
+  require('../protractor_utils/CollectionEditorPage.js');
 
 
 describe('Collections', function() {
@@ -37,6 +38,7 @@ describe('Collections', function() {
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     var EDITOR_USERNAME = 'aliceCollections';
     var PLAYER_USERNAME = 'playerCollections';
     var CREATOR_USERNAME = 'creatorExplorations';
@@ -115,14 +117,14 @@ describe('Collections', function() {
       });
       browser.waitForAngular();
       // Add existing explorations.
-      collectionEditor.addExistingExploration(firstExplorationId);
-      collectionEditor.saveDraft();
-      collectionEditor.closeSaveModal();
-      collectionEditor.publishCollection();
-      collectionEditor.setTitle('Test Collection 2');
-      collectionEditor.setObjective('This is the second test collection.');
-      collectionEditor.setCategory('Algebra');
-      collectionEditor.saveChanges();
+      collectionEditorPage.addExistingExploration(firstExplorationId);
+      collectionEditorPage.saveDraft();
+      collectionEditorPage.closeSaveModal();
+      collectionEditorPage.publishCollection();
+      collectionEditorPage.setTitle('Test Collection 2');
+      collectionEditorPage.setObjective('This is the second test collection.');
+      collectionEditorPage.setCategory('Algebra');
+      collectionEditorPage.saveChanges();
       browser.waitForAngular();
       users.logout();
     });
@@ -141,26 +143,26 @@ describe('Collections', function() {
     general.waitForSystem();
     browser.waitForAngular();
     // Add existing explorations.
-    collectionEditor.addExistingExploration(firstExplorationId);
-    collectionEditor.addExistingExploration(secondExplorationId);
-    collectionEditor.addExistingExploration(thirdExplorationId);
+    collectionEditorPage.addExistingExploration(firstExplorationId);
+    collectionEditorPage.addExistingExploration(secondExplorationId);
+    collectionEditorPage.addExistingExploration(thirdExplorationId);
     // Search and add existing explorations.
-    collectionEditor.searchForAndAddExistingExploration('Lazy');
-    collectionEditor.searchForAndAddExistingExploration('Linear');
-    collectionEditor.searchForAndAddExistingExploration('Testing');
+    collectionEditorPage.searchForAndAddExistingExploration('Lazy');
+    collectionEditorPage.searchForAndAddExistingExploration('Linear');
+    collectionEditorPage.searchForAndAddExistingExploration('Testing');
     // Shifting nodes in the node graph.
-    collectionEditor.shiftNodeLeft(1);
-    collectionEditor.shiftNodeRight(1);
+    collectionEditorPage.shiftNodeLeft(1);
+    collectionEditorPage.shiftNodeRight(1);
     // Delete node in the node graph.
-    collectionEditor.deleteNode(1);
+    collectionEditorPage.deleteNode(1);
     // Publish the collection.
-    collectionEditor.saveDraft();
-    collectionEditor.closeSaveModal();
-    collectionEditor.publishCollection();
-    collectionEditor.setTitle('Test Collection');
-    collectionEditor.setObjective('This is a test collection.');
-    collectionEditor.setCategory('Algebra');
-    collectionEditor.saveChanges();
+    collectionEditorPage.saveDraft();
+    collectionEditorPage.closeSaveModal();
+    collectionEditorPage.publishCollection();
+    collectionEditorPage.setTitle('Test Collection');
+    collectionEditorPage.setObjective('This is a test collection.');
+    collectionEditorPage.setCategory('Algebra');
+    collectionEditorPage.saveChanges();
     browser.waitForAngular();
     users.logout();
   });
@@ -182,10 +184,10 @@ describe('Collections', function() {
     // Checking in a collection with two nodes.
     browser.get('/collection_editor/create/' + collectionId);
     browser.waitForAngular();
-    collectionEditor.addExistingExploration(secondExplorationId);
-    collectionEditor.saveDraft();
-    collectionEditor.setCommitMessage('Add Exploration');
-    collectionEditor.closeSaveModal();
+    collectionEditorPage.addExistingExploration(secondExplorationId);
+    collectionEditorPage.saveDraft();
+    collectionEditorPage.setCommitMessage('Add Exploration');
+    collectionEditorPage.closeSaveModal();
     browser.waitForAngular();
     browser.get('/collection/' + collectionId);
     browser.waitForAngular();
@@ -194,10 +196,10 @@ describe('Collections', function() {
     // Checking in a collection with three nodes.
     browser.get('/collection_editor/create/' + collectionId);
     browser.waitForAngular();
-    collectionEditor.addExistingExploration(thirdExplorationId);
-    collectionEditor.saveDraft();
-    collectionEditor.setCommitMessage('Add Exploration');
-    collectionEditor.closeSaveModal();
+    collectionEditorPage.addExistingExploration(thirdExplorationId);
+    collectionEditorPage.saveDraft();
+    collectionEditorPage.setCommitMessage('Add Exploration');
+    collectionEditorPage.closeSaveModal();
     browser.waitForAngular();
     browser.get('/collection/' + collectionId);
     browser.waitForAngular();
@@ -206,10 +208,10 @@ describe('Collections', function() {
     // Checking in a collection with four nodes.
     browser.get('/collection_editor/create/' + collectionId);
     browser.waitForAngular();
-    collectionEditor.addExistingExploration(fourthExplorationId);
-    collectionEditor.saveDraft();
-    collectionEditor.setCommitMessage('Add Exploration');
-    collectionEditor.closeSaveModal();
+    collectionEditorPage.addExistingExploration(fourthExplorationId);
+    collectionEditorPage.saveDraft();
+    collectionEditorPage.setCommitMessage('Add Exploration');
+    collectionEditorPage.closeSaveModal();
     browser.waitForAngular();
     browser.get('/collection/' + collectionId);
     browser.waitForAngular();

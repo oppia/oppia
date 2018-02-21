@@ -39,14 +39,14 @@ describe('Prediction algorithm registry service', function() {
       predictionService = $injector.get('PredictionSampleService');
 
       registryService.setMapping({
-        LDAStringClassifier: {
+        TestClassifier: {
           v1: 'PredictionSampleService'
         }
       });
     }));
 
     it('should return correct prediction algorithm service.', function() {
-      var algorithmId = 'LDAStringClassifier';
+      var algorithmId = 'TestClassifier';
       var dataSchemaVersion = 1;
       var generatedPredictionService = registryService.getPredictionService(
         algorithmId, dataSchemaVersion);

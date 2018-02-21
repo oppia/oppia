@@ -117,7 +117,7 @@ describe('Exploration object factory', function() {
         .toEqual('content');
     });
 
-    it('should correctly get audio translations from an exploration', 
+    it('should correctly get audio translations from an exploration',
     function() {
       expect(exploration.getAllAudioTranslations('hi-en')).toEqual({
         'first state': [atof.createFromBackendDict({
