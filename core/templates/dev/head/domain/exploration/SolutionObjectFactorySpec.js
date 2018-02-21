@@ -66,6 +66,15 @@ describe('Solution object factory', function() {
       });
       expect(solution.getSummary('CodeRepl')).toEqual(
         'One solution is "a=10". This is the explanation to the answer.');
-    })
+
+      solution.setCorrectAnswer({
+        isNegative: false,
+        wholeNumber: 0,
+        numerator: 1,
+        denominator: 6
+      });
+      expect(solution.getSummary('FractionInput')).toEqual(
+        'One solution is "1/6". This is the explanation to the answer.');
+    });
   });
 });

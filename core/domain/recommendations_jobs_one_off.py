@@ -23,6 +23,7 @@ from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.platform import models
+
 (exp_models, recommendations_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
 

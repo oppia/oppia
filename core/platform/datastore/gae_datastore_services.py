@@ -18,6 +18,7 @@
 
 from google.appengine.ext import ndb
 
+
 def fetch_multiple_entities_by_ids_and_models(ids_and_models):
     """Fetches the entities from the datastore corresponding to the given ids
     and models.

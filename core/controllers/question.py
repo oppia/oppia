@@ -21,6 +21,7 @@ from core.domain import acl_decorators
 from core.domain import question_services
 import feconf
 
+
 class QuestionsBatchHandler(base.BaseHandler):
     """This handler completes requests for questions batch."""
 

@@ -719,6 +719,7 @@ class Outcome(object):
         return {
             'dest': self.dest,
             'feedback': self.feedback.to_dict(),
+            'labelled_as_correct': self.labelled_as_correct,
             'param_changes': [
                 param_change.to_dict() for param_change in self.param_changes],
             'refresher_exploration_id': self.refresher_exploration_id,
@@ -737,6 +738,7 @@ class Outcome(object):
         return cls(
             outcome_dict['dest'],
             SubtitledHtml.from_dict(outcome_dict['feedback']),
+            outcome_dict['labelled_as_correct'],
             [param_domain.ParamChange(
                 param_change['name'], param_change['generator_id'],
                 param_change['customization_args'])
@@ -744,13 +746,17 @@ class Outcome(object):
             outcome_dict['refresher_exploration_id'],
         )
 
-    def __init__(self, dest, feedback, param_changes, refresher_exploration_id):
+    def __init__(
+            self, dest, feedback, labelled_as_correct, param_changes,
+            refresher_exploration_id):
         """Initializes a Outcome domain object.
 
         Args:
             dest: str. The name of the destination state.
             feedback: SubtitledHtml. Feedback to give to the user if this rule
                 is triggered.
+            labelled_as_correct: bool. Whether this outcome has been labelled
+                by the creator as corresponding to a "correct" answer.
             param_changes: list(ParamChange). List of exploration-level
                 parameter changes to make if this rule is triggered.
             refresher_exploration_id: str or None. An optional exploration ID
@@ -763,6 +769,9 @@ class Outcome(object):
         self.dest = dest
         # Feedback to give the reader if this rule is triggered.
         self.feedback = feedback
+        # Whether this outcome has been labelled by the creator as
+        # corresponding to a "correct" answer.
+        self.labelled_as_correct = labelled_as_correct
         # Exploration-level parameter changes to make if this rule is
         # triggered.
         self.param_changes = param_changes or []
@@ -786,6 +795,11 @@ class Outcome(object):
                 % self.dest)
 
         self.feedback.validate()
+
+        if not isinstance(self.labelled_as_correct, bool):
+            raise utils.ValidationError(
+                'The "labelled_as_correct" field should be a boolean, received '
+                '%s' % self.labelled_as_correct)
 
         if not isinstance(self.param_changes, list):
             raise utils.ValidationError(
@@ -818,7 +832,6 @@ class AnswerGroup(object):
             'rule_specs': [rule_spec.to_dict()
                            for rule_spec in self.rule_specs],
             'outcome': self.outcome.to_dict(),
-            'labelled_as_correct': self.labelled_as_correct,
         }
 
     @classmethod
@@ -835,24 +848,20 @@ class AnswerGroup(object):
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
             [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
-            answer_group_dict['labelled_as_correct'],
         )
 
-    def __init__(self, outcome, rule_specs, labelled_as_correct):
+    def __init__(self, outcome, rule_specs):
         """Initializes a AnswerGroup domain object.
 
         Args:
             outcome: Outcome. The outcome corresponding to the answer group.
             rule_specs: list(RuleSpec). List of rule specifications.
-            labelled_as_correct: bool. Whether this answer group has been
-                labelled by the creator as a "correct" answer.
         """
         self.rule_specs = [RuleSpec(
             rule_spec.rule_type, rule_spec.inputs
         ) for rule_spec in rule_specs]
 
         self.outcome = outcome
-        self.labelled_as_correct = labelled_as_correct
 
     def validate(self, interaction, exp_param_specs_dict):
         """Verifies that all rule classes are valid, and that the AnswerGroup
@@ -876,10 +885,6 @@ class AnswerGroup(object):
         if len(self.rule_specs) < 1:
             raise utils.ValidationError(
                 'There must be at least one rule for each answer group.')
-        if not isinstance(self.labelled_as_correct, bool):
-            raise utils.ValidationError(
-                'The "labelled_as_correct" field should be a boolean, received '
-                '%s' % self.labelled_as_correct)
 
         seen_classifier_rule = False
         for rule_spec in self.rule_specs:
@@ -1228,7 +1233,7 @@ class InteractionInstance(object):
         """
         default_outcome = Outcome(
             default_dest_state_name,
-            SubtitledHtml.create_default_subtitled_html(), {}, None)
+            SubtitledHtml.create_default_subtitled_html(), False, {}, None)
         return cls(
             cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], {})
 
@@ -1243,6 +1248,7 @@ class State(object):
         'default_outcome': {
             'dest': feconf.DEFAULT_INIT_STATE_NAME,
             'feedback': SubtitledHtml.DEFAULT_SUBTITLED_HTML_DICT,
+            'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
         },
@@ -1418,8 +1424,7 @@ class State(object):
                     'received %s' % rule_specs_list)
 
             answer_group = AnswerGroup(
-                Outcome.from_dict(answer_group_dict['outcome']), [],
-                answer_group_dict['labelled_as_correct'])
+                Outcome.from_dict(answer_group_dict['outcome']), [])
             for rule_dict in rule_specs_list:
                 rule_spec = RuleSpec.from_dict(rule_dict)
 
@@ -2065,6 +2070,30 @@ class Exploration(object):
             if not self.language_code:
                 warnings_list.append(
                     'A language must be specified (in the \'Settings\' tab).')
+
+            # Check that self-loop outcomes are not labelled as correct.
+            all_state_names = self.states.keys()
+            for state_name, state in self.states.iteritems():
+                interaction = state.interaction
+                default_outcome = interaction.default_outcome
+
+                if default_outcome is not None:
+                    # Check that, if the outcome is a self-loop, then the
+                    # outcome is not labelled as correct.
+                    if (default_outcome.dest == state_name and
+                            default_outcome.labelled_as_correct):
+                        raise utils.ValidationError(
+                            'The default outcome for state %s is labelled '
+                            'correct but is a self-loop.' % state_name)
+
+                for group in interaction.answer_groups:
+                    # Check that, if the outcome is a self-loop, then the
+                    # outcome is not labelled as correct.
+                    if (group.outcome.dest == state_name and
+                            group.outcome.labelled_as_correct):
+                        raise utils.ValidationError(
+                            'The outcome for an answer group in state %s is '
+                            'labelled correct but is a self-loop.' % state_name)
 
             if len(warnings_list) > 0:
                 warning_str = ''
@@ -2834,8 +2863,9 @@ class Exploration(object):
                 interaction['hints'] = []
                 for fallback in interaction['fallbacks']:
                     if fallback['outcome']['feedback']:
-                        interaction['hints'].append(
-                            Hint(fallback['outcome']['feedback'][0]).to_dict())
+                        interaction['hints'].append({
+                            'hint_text': fallback['outcome']['feedback'][0]
+                        })
             if 'solution' not in interaction:
                 interaction['solution'] = None
         return states_dict
@@ -3000,6 +3030,72 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v16_dict_to_v17_dict(cls, states_dict):
+        """Converts from version 16 to 17. Version 17 moves the
+        labelled_as_correct field to the outcome dict (so that it also appears
+        for the default outcome) and adds two new customization args to
+        FractionInput interactions.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['outcome']['labelled_as_correct'] = (
+                    answer_group['labelled_as_correct'])
+                del answer_group['labelled_as_correct']
+
+            default_outcome = state_dict['interaction']['default_outcome']
+            if default_outcome is not None:
+                default_outcome['labelled_as_correct'] = False
+
+            if state_dict['interaction']['id'] == 'FractionInput':
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                customization_args.update({
+                    'allowImproperFraction': {
+                        'value': True
+                    },
+                    'allowNonzeroIntegerPart': {
+                        'value': True
+                    }
+                })
+
+        return states_dict
+
+    @classmethod
+    def _convert_states_v17_dict_to_v18_dict(cls, states_dict):
+        """Converts from version 17 to 18. Version 18 adds a new
+        customization arg to FractionInput interactions which allows
+        you to add custom placeholders.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'FractionInput':
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                customization_args.update({
+                    'customPlaceholder': {
+                        'value': ''
+                    }
+                })
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -3030,7 +3126,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 21
+    CURRENT_EXP_SCHEMA_VERSION = 23
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3445,6 +3541,37 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v21_dict_to_v22_dict(cls, exploration_dict):
+        """ Converts a v21 exploration dict into a v22 exploration dict.
+
+        Moves the labelled_as_correct field from the answer group level to the
+        outcome level, and adds two extra customization args to the
+        FractionInput interaction.
+        """
+        exploration_dict['schema_version'] = 22
+
+        exploration_dict['states'] = cls._convert_states_v16_dict_to_v17_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 17
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v22_dict_to_v23_dict(cls, exploration_dict):
+        """ Converts a v22 exploration dict into a v23 exploration dict.
+
+        Adds a new customization arg to FractionInput interactions
+        which allows you to add custom placeholders.
+        """
+        exploration_dict['schema_version'] = 23
+
+        exploration_dict['states'] = cls._convert_states_v17_dict_to_v18_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 18
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3580,6 +3707,16 @@ class Exploration(object):
             exploration_dict = cls._convert_v20_dict_to_v21_dict(
                 exploration_dict)
             exploration_schema_version = 21
+
+        if exploration_schema_version == 21:
+            exploration_dict = cls._convert_v21_dict_to_v22_dict(
+                exploration_dict)
+            exploration_schema_version = 22
+
+        if exploration_schema_version == 22:
+            exploration_dict = cls._convert_v22_dict_to_v23_dict(
+                exploration_dict)
+            exploration_schema_version = 23
 
         return (exploration_dict, initial_schema_version)
 

@@ -24,7 +24,7 @@ describe('State Editor controller', function() {
     beforeEach(inject(function($rootScope, $controller, $injector) {
       scope = $rootScope.$new();
       ecs = $injector.get('EditorStateService');
-      ess = $injector.get('explorationStatesService');
+      ess = $injector.get('ExplorationStatesService');
       scs = $injector.get('stateContentService');
 
       ess.init({
@@ -40,14 +40,17 @@ describe('State Editor controller', function() {
               outcome: {
                 dest: 'unused',
                 feedback: [],
-                param_changes: []
-              },
-              labelled_as_correct: false
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              }
             }],
             default_outcome: {
               dest: 'default',
               feedback: [],
-              param_changes: []
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             hints: []
           },
@@ -65,14 +68,17 @@ describe('State Editor controller', function() {
               outcome: {
                 dest: 'unused',
                 feedback: [],
-                param_changes: []
-              },
-              labelled_as_correct: false
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              }
             }],
             default_outcome: {
               dest: 'default',
               feedback: [],
-              param_changes: []
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             hints: []
           },
@@ -90,14 +96,17 @@ describe('State Editor controller', function() {
               outcome: {
                 dest: 'unused',
                 feedback: [],
-                param_changes: []
-              },
-              labelled_as_correct: false
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              }
             }],
             default_outcome: {
               dest: 'default',
               feedback: [],
-              param_changes: []
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             hints: []
           },
@@ -114,7 +123,7 @@ describe('State Editor controller', function() {
 
       $controller('StateEditor', {
         $scope: scope,
-        explorationStatesService: ess
+        ExplorationStatesService: ess
       });
     }));
 

@@ -6,13 +6,6 @@
         <schema-based-editor schema="NUMERIC_INPUT_FORM_SCHEMA" local-value="answer" label-for-focus-target="labelForFocusTarget">
         </schema-based-editor>
       </ng-form>
-
-      <!-- This ng-click is needed for specifying solutions in the solution editor -->
-      <md-button ng-if="!isSubmitHidden()" class="oppia-learner-confirm-button"
-                 ng-click="submitAnswer(answer)" style="margin-top: 15px;"
-                 translate="I18N_INTERACTIONS_SUBMIT">
-        Submit
-      </md-button>
     </div>
   </form>
 </div>

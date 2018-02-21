@@ -21,6 +21,7 @@ import datetime
 from core.tests import test_utils
 import feconf
 import utils
+
 # pylint: enable=relative-import
 
 
@@ -216,11 +217,6 @@ class UtilsTests(test_utils.GenericTestBase):
             self.assertEqual('', asset_dir_prefix)
 
         with self.swap(feconf, 'DEV_MODE', False):
-            utils.ASSET_DIR_PREFIX = None
-            asset_dir_prefix = utils.get_asset_dir_prefix()
-            self.assertTrue(asset_dir_prefix.startswith('/build'))
-
-        with self.swap(feconf, 'IS_MINIFIED', True):
             utils.ASSET_DIR_PREFIX = None
             asset_dir_prefix = utils.get_asset_dir_prefix()
             self.assertTrue(asset_dir_prefix.startswith('/build'))

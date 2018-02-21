@@ -16,8 +16,6 @@
 
 import logging
 
-from pipeline import pipeline
-
 from core import jobs
 from core.controllers import base
 from core.domain import acl_decorators
@@ -27,6 +25,8 @@ from core.domain import recommendations_jobs_one_off
 from core.domain import user_jobs_one_off
 from core.platform import models
 import utils
+
+from pipeline import pipeline
 
 (job_models,) = models.Registry.import_models([models.NAMES.job])
 
@@ -107,6 +107,7 @@ class CronActivitySearchRankHandler(base.BaseHandler):
 
 
 class CronMapreduceCleanupHandler(base.BaseHandler):
+    """Handler for cleaning up data items of completed map/reduce jobs."""
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):

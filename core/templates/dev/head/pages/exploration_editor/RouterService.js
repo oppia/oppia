@@ -18,12 +18,12 @@
 
 oppia.factory('RouterService', [
   '$rootScope', '$location', '$window', '$timeout', '$interval',
-  'explorationInitStateNameService', 'EditorStateService',
-  'explorationStatesService',
+  'ExplorationInitStateNameService', 'EditorStateService',
+  'ExplorationStatesService',
   function(
       $rootScope, $location, $window, $timeout, $interval,
-      explorationInitStateNameService, EditorStateService,
-      explorationStatesService) {
+      ExplorationInitStateNameService, EditorStateService,
+      ExplorationStatesService) {
     var MAIN_TAB = 'main';
     var PREVIEW_TAB = 'preview';
     var SETTINGS_TAB = 'settings';
@@ -78,9 +78,9 @@ oppia.factory('RouterService', [
         _tabs.active = MAIN_TAB;
         _doNavigationWithState(newPath, SLUG_GUI);
       } else {
-        if (explorationInitStateNameService.savedMemento) {
+        if (ExplorationInitStateNameService.savedMemento) {
           $location.path(
-            '/gui/' + explorationInitStateNameService.savedMemento);
+            '/gui/' + ExplorationInitStateNameService.savedMemento);
         }
       }
     });
@@ -89,9 +89,9 @@ oppia.factory('RouterService', [
       var pathBase = '/' + pathType + '/';
       var putativeStateName = path.substring(pathBase.length);
       var waitForStatesToLoad = $interval(function() {
-        if (explorationStatesService.isInitialized()) {
+        if (ExplorationStatesService.isInitialized()) {
           $interval.cancel(waitForStatesToLoad);
-          if (explorationStatesService.hasState(putativeStateName)) {
+          if (ExplorationStatesService.hasState(putativeStateName)) {
             EditorStateService.setActiveStateName(putativeStateName);
             if (pathType === SLUG_GUI) {
               $rootScope.$broadcast('refreshStateEditor');
@@ -102,7 +102,7 @@ oppia.factory('RouterService', [
             // this is taking lots of time and is probably not worth it.
           } else {
             $location.path(pathBase +
-                           explorationInitStateNameService.savedMemento);
+                           ExplorationInitStateNameService.savedMemento);
           }
         }
       }, 300);

@@ -19,8 +19,8 @@
 
 oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
   var FeedbackMessageSummary = function(
-    messageId, text, updatedStatus, suggestionHtml, currentContentHtml,
-    description, authorUsername, authorPictureDataUrl, createdOn) {
+      messageId, text, updatedStatus, suggestionHtml, currentContentHtml,
+      description, authorUsername, authorPictureDataUrl, createdOn) {
     this.messageId = messageId;
     this.text = text;
     this.updatedStatus = updatedStatus;
@@ -33,14 +33,14 @@ oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
   };
 
   FeedbackMessageSummary.createNewMessage = function(
-    newMessageId, newMessageText, authorUsername, authorPictureDataUrl) {
+      newMessageId, newMessageText, authorUsername, authorPictureDataUrl) {
     return new FeedbackMessageSummary(
       newMessageId, newMessageText, null, null, null, null, authorUsername,
       authorPictureDataUrl, new Date());
   };
 
   FeedbackMessageSummary.createFromBackendDict = function(
-    feedbackMessageSummaryBackendDict) {
+      feedbackMessageSummaryBackendDict) {
     return new FeedbackMessageSummary(
       feedbackMessageSummaryBackendDict.message_id,
       feedbackMessageSummaryBackendDict.text,

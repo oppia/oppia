@@ -22,7 +22,11 @@ describe('MusicNotesInput interaction', function() {
     var elt, scope, ctrlScope;
 
     beforeEach(module('directiveTemplates'));
-    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    beforeEach(module(
+      'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS, function($provide) {
+        $provide.value('ExplorationPlayerService', {});
+      }
+    ));
 
     beforeEach(inject(function($compile, _$templateCache_, $rootScope) {
       $templateCache = _$templateCache_;

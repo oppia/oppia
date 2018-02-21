@@ -1,12 +1,14 @@
 author_notes: ''
+auto_tts_enabled: true
 blurb: ''
 category: Test
+correctness_feedback_enabled: false
 init_state_name: "Text Input state name with unicode \u0105\u0142"
 language_code: en
 objective: Dummy exploration for testing all interactions
 param_changes: []
 param_specs: {}
-schema_version: 17
+schema_version: 21
 states:
   Code Editor:
     classifier_model_id: null
@@ -15,12 +17,14 @@ states:
       html: <p>Code Editor. Write a program which prints hello to me.</p>
     interaction:
       answer_groups:
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Pencil Code Editor
           feedback:
-          - <p>Hello! Let's move onto another interaction.</p>
+            audio_translations: {}
+            html: <p>Hello! Let's move onto another interaction.</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: Hello Oppia
@@ -38,9 +42,11 @@ states:
       default_outcome:
         dest: Code Editor
         feedback:
-        - <p>I'm looking for a particular 'Hello Oppia' message. Don't you want to
-          say hello?</p>
+          audio_translations: {}
+          html: <p>I'm looking for a particular 'Hello Oppia' message. Don't you want
+            to say hello?</p>
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: CodeRepl
       solution: null
@@ -59,8 +65,10 @@ states:
       default_outcome:
         dest: Graph Theory
         feedback:
-        - <p>Moving onward!</p>
+          audio_translations: {}
+          html: <p>Moving onward!</p>
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: Continue
       solution: null
@@ -81,6 +89,44 @@ states:
       id: EndExploration
       solution: null
     param_changes: []
+  Fraction Input:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: <p>Write 20/50 as a fraction in simplest terms.</p>
+    interaction:
+      answer_groups:
+      - labelled_as_correct: false
+        outcome:
+          dest: Set Input
+          feedback:
+            audio_translations: {}
+            html: <p>Yes, well done!</p>
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              denominator: 5
+              isNegative: false
+              numerator: 2
+              wholeNumber: 0
+          rule_type: IsExactlyEqualTo
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireSimplestForm:
+          value: true
+      default_outcome:
+        dest: Fraction Input
+        feedback:
+          audio_translations: {}
+          html: <p>No, that's not right. The answer is 2/5.</p>
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: FractionInput
+      solution: null
+    param_changes: []
   Graph Theory:
     classifier_model_id: null
     content:
@@ -88,12 +134,14 @@ states:
       html: <p>Graph Theory. Please create a pentagon.</p>
     interaction:
       answer_groups:
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Logic Proof
           feedback:
-          - <p>Penta-penta-pentagon!</p>
+            audio_translations: {}
+            html: <p>Penta-penta-pentagon!</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             g:
@@ -133,12 +181,14 @@ states:
                 x: 155.0
                 y: 112.5625
           rule_type: IsIsomorphicTo
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Graph Theory
           feedback:
-          - <p>That's a triangle. Your shape needs more sides.</p>
+            audio_translations: {}
+            html: <p>That's a triangle. Your shape needs more sides.</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             g:
@@ -166,12 +216,14 @@ states:
                 x: 132.0
                 y: 204.5625
           rule_type: IsIsomorphicTo
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Graph Theory
           feedback:
-          - <p>Your shape is missing one side!</p>
+            audio_translations: {}
+            html: <p>Your shape is missing one side!</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             g:
@@ -249,9 +301,14 @@ states:
       default_outcome:
         dest: Graph Theory
         feedback:
-        - <p>That's not quite a pentagon. Please try again!</p>
+          audio_translations: {}
+          html: <p>That's not quite a pentagon. Please try again!</p>
         param_changes: []
-      hints: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          audio_translations: {}
+          html: <p>dsf</p>
       id: GraphInput
       solution: null
     param_changes: []
@@ -262,54 +319,65 @@ states:
       html: <p>Image Region. Please click on the constructor in the Python code shown.</p>
     interaction:
       answer_groups:
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Image Region
           feedback:
-          - <p>That's the class definition. Try again.</p>
+            audio_translations: {}
+            html: <p>That's the class definition. Try again.</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: classdef
           rule_type: IsInRegion
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Image Region
           feedback:
-          - <p>That's the class's docstring. Try again.</p>
+            audio_translations: {}
+            html: <p>That's the class's docstring. Try again.</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: docstring
           rule_type: IsInRegion
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Image Region
           feedback:
-          - <p>That's a function, which is close to what you're looking for. Try again!</p>
+            audio_translations: {}
+            html: <p>That's a function, which is close to what you're looking for.
+              Try again!</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: instancefunc
           rule_type: IsInRegion
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Image Region
           feedback:
-          - <p>That's a classmethod. It does execute code, but it doesn't construct
-            anything. Try again!</p>
+            audio_translations: {}
+            html: <p>That's a classmethod. It does execute code, but it doesn't construct
+              anything. Try again!</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: classfunc
           rule_type: IsInRegion
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Continue
           feedback:
-          - <p>You found it! This is the code responsible for constructing a new class
-            object.</p>
+            audio_translations: {}
+            html: <p>You found it! This is the code responsible for constructing a
+              new class object.</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: ctor
@@ -365,49 +433,60 @@ states:
       default_outcome:
         dest: Image Region
         feedback:
-        - "<p>Constructors <i>initialize</i>\_an object, or <i>init</i>\_it.Constructors\
-          \ are also functions themselves.</p>"
+          audio_translations: {}
+          html: "<p>Constructors <i>initialize</i>\_an object, or <i>init</i>\_it.Constructors\
+            \ are also functions themselves.</p>"
         param_changes: []
-      hints: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          audio_translations: {}
+          html: <p>sdf</p>
       id: ImageClickInput
       solution: null
     param_changes: []
-  Item Selection:
+  Item Selection Multi:
     classifier_model_id: null
     content:
       audio_translations: {}
       html: <p>Item selection. Please select the good options.</p>
     interaction:
       answer_groups:
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Image Region
           feedback:
-          - <p>That's right!</p>
+            audio_translations: {}
+            html: <p>That's right!</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
             - <p>Good option A.</p>
             - <p>Good option C.</p>
           rule_type: Equals
-      - correct: false
+      - labelled_as_correct: false
         outcome:
-          dest: Item Selection
+          dest: Item Selection Multi
           feedback:
-          - <p>That's not a good option!</p>
+            audio_translations: {}
+            html: <p>That's not a good option!</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
             - <p>Bad option B.</p>
           rule_type: ContainsAtLeastOneOf
-      - correct: false
+      - labelled_as_correct: false
         outcome:
-          dest: Item Selection
+          dest: Item Selection Multi
           feedback:
-          - <p>That's not all of the good options!</p>
+            audio_translations: {}
+            html: <p>That's not all of the good options!</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: []
@@ -424,10 +503,83 @@ states:
         minAllowableSelectionCount:
           value: 2
       default_outcome:
-        dest: Item Selection
+        dest: Item Selection Multi
         feedback:
-        - <p>The two good options actually have the word 'good' in them.</p>
+          audio_translations: {}
+          html: <p>The two good options actually have the word 'good' in them.</p>
         param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          audio_translations: {}
+          html: <p>sdf</p>
+      id: ItemSelectionInput
+      solution: null
+    param_changes: []
+  Item Selection Single:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: <p>Item Selection with one choice. Select "Choice 2" below.<br></p>
+    interaction:
+      answer_groups:
+      - labelled_as_correct: false
+        outcome:
+          dest: Item Selection Single
+          feedback:
+            audio_translations: {}
+            html: <p>No, you want the one below this one.</p>
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - <p>Choice 1</p>
+          rule_type: Equals
+      - labelled_as_correct: false
+        outcome:
+          dest: Item Selection Multi
+          feedback:
+            audio_translations: {}
+            html: <p>Yes, good choice!</p>
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - <p>Choice 2</p>
+          rule_type: Equals
+      - labelled_as_correct: false
+        outcome:
+          dest: Item Selection Single
+          feedback:
+            audio_translations: {}
+            html: <p>No, you want the choice above this one.</p>
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - <p>Choice 3</p>
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - <p>Choice 1</p>
+          - <p>Choice 2</p>
+          - <p>Choice 3</p>
+        maxAllowableSelectionCount:
+          value: 1
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: Item Selection Single
+        feedback:
+          audio_translations: {}
+          html: ''
+        param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
       solution: null
@@ -439,12 +591,14 @@ states:
       html: <p>Logic Proof. From p we have what?</p>
     interaction:
       answer_groups:
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Number Input
           feedback:
-          - <p>You proved p!</p>
+            audio_translations: {}
+            html: <p>You proved p!</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs: {}
           rule_type: Correct
@@ -466,8 +620,10 @@ states:
       default_outcome:
         dest: Logic Proof
         feedback:
-        - <p>Given p, we have p. Try again.</p>
+          audio_translations: {}
+          html: <p>Given p, we have p. Try again.</p>
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: LogicProof
       solution: null
@@ -481,32 +637,38 @@ states:
         variable x.</p>
     interaction:
       answer_groups:
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Code Editor
           feedback:
-          - <p>That is the normal form of a line. Good job!</p>
+            audio_translations: {}
+            html: <p>That is the normal form of a line. Good job!</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: ax+by+c=0
           rule_type: IsMathematicallyEquivalentTo
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Code Editor
           feedback:
-          - <p>That's slope-intercept form. A popular form!</p>
+            audio_translations: {}
+            html: <p>That's slope-intercept form. A popular form!</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: y=mx+b
           rule_type: IsMathematicallyEquivalentTo
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Code Editor
           feedback:
-          - <p>That's point-slope form! Great!</p>
+            audio_translations: {}
+            html: <p>That's point-slope form! Great!</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: y-y0=m(x-x0)
@@ -516,21 +678,29 @@ states:
       default_outcome:
         dest: Math Expression Input
         feedback:
-        - <p>There are three specific equations I'm looking for. Be aware that these
-          can each be derived from each other.</p>
+          audio_translations: {}
+          html: <p>There are three specific equations I'm looking for. Be aware that
+            these can each be derived from each other.</p>
         param_changes: []
+        refresher_exploration_id: null
       hints:
-      - hint_text: <p>If you start with two points, p0=(x0, y0) and p1=(x1, y1), you
-          can find the slope between them as such:</p><p><br></p><p><oppia-noninteractive-math
-          raw_latex-with-value="&amp;quot;m=\\frac{y0-y1}{x0-x1}&amp;quot;"></oppia-noninteractive-math><br></p><p><br></p><p>This,
-          combined with one of the points, can create a linear relationship between
-          x and y.</p>
-      - hint_text: <p>It's possible to use the slope and first point of the line to
-          form a relationship:</p><p><br></p><p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;y-y0=m(x-x0)&amp;quot;"></oppia-noninteractive-math><br></p>
-      - hint_text: "<p>Which yields a final, common line equation:</p><p><br></p><p><oppia-noninteractive-math\
-          \ raw_latex-with-value=\"&amp;quot;y=mx+b&amp;quot;\"></oppia-noninteractive-math><br></p><p><br></p><p>Where\_\
-          <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;b=y0-m*x0&amp;quot;\"\
-          ></oppia-noninteractive-math></p>"
+      - hint_content:
+          audio_translations: {}
+          html: <p>If you start with two points, p0=(x0, y0) and p1=(x1, y1), you
+            can find the slope between them as such:</p><p><br></p><p><oppia-noninteractive-math
+            raw_latex-with-value="&amp;quot;m=\\frac{y0-y1}{x0-x1}&amp;quot;"></oppia-noninteractive-math><br></p><p><br></p><p>This,
+            combined with one of the points, can create a linear relationship between
+            x and y.</p>
+      - hint_content:
+          audio_translations: {}
+          html: <p>It's possible to use the slope and first point of the line to form
+            a relationship:</p><p><br></p><p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;y-y0=m(x-x0)&amp;quot;"></oppia-noninteractive-math><br></p>
+      - hint_content:
+          audio_translations: {}
+          html: "<p>Which yields a final, common line equation:</p><p><br></p><p><oppia-noninteractive-math\
+            \ raw_latex-with-value=\"&amp;quot;y=mx+b&amp;quot;\"></oppia-noninteractive-math><br></p><p><br></p><p>Where\_\
+            <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;b=y0-m*x0&amp;quot;\"\
+            ></oppia-noninteractive-math></p>"
       id: MathExpressionInput
       solution: null
     param_changes: []
@@ -541,32 +711,38 @@ states:
       html: <p>Multiple Choice. Select "Second choice" below.</p>
     interaction:
       answer_groups:
-      - correct: false
+      - labelled_as_correct: false
         outcome:
-          dest: Item Selection
+          dest: Item Selection Single
           feedback:
-          - <p>Nice choice!</p>
+            audio_translations: {}
+            html: <p>Nice choice!</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1
           rule_type: Equals
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Multiple Choice
           feedback:
-          - <p>Hmm, not quite. Perhaps the right option is below this one.</p>
+            audio_translations: {}
+            html: <p>Hmm, not quite. Perhaps the right option is below this one.</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
           rule_type: Equals
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Multiple Choice
           feedback:
-          - <p>Hmm, not quite. Perhaps the answer is above this one.</p>
+            audio_translations: {}
+            html: <p>Hmm, not quite. Perhaps the answer is above this one.</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 2
@@ -580,9 +756,15 @@ states:
           - <p>Third choice</p>
       default_outcome:
         dest: Multiple Choice
-        feedback: []
+        feedback:
+          audio_translations: {}
+          html: ''
         param_changes: []
-      hints: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          audio_translations: {}
+          html: <p>sfd</p>
       id: MultipleChoiceInput
       solution: null
     param_changes: []
@@ -594,12 +776,14 @@ states:
         the scale?</p>
     interaction:
       answer_groups:
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: World Map
           feedback:
-          - <p>You found the next C! Excellent.</p>
+            audio_translations: {}
+            html: <p>You found the next C! Excellent.</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -621,11 +805,15 @@ states:
       default_outcome:
         dest: Music Notes Input
         feedback:
-        - <p>That's not the next C. Try again?</p>
+          audio_translations: {}
+          html: <p>That's not the next C. Try again?</p>
         param_changes: []
+        refresher_exploration_id: null
       hints:
-      - hint_text: '<p>Hint: The acronym ''FACE'' is very helpful for remembering
-          notes on the C major scale.</p>'
+      - hint_content:
+          audio_translations: {}
+          html: '<p>Hint: The acronym ''FACE'' is very helpful for remembering notes
+            on the C major scale.</p>'
       id: MusicNotesInput
       solution: null
     param_changes: []
@@ -636,12 +824,14 @@ states:
       html: <p>Number Input. Enter a two or higher digit number.</p>
     interaction:
       answer_groups:
-      - correct: false
+      - labelled_as_correct: false
         outcome:
-          dest: Set Input
+          dest: Fraction Input
           feedback:
-          - <p>That number has more than one digit. Right!</p>
+            audio_translations: {}
+            html: <p>That number has more than one digit. Right!</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 9.0
@@ -651,8 +841,10 @@ states:
       default_outcome:
         dest: Number Input
         feedback:
-        - <p>That's only one digit! Try again.</p>
+          audio_translations: {}
+          html: <p>That's only one digit! Try again.</p>
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -665,22 +857,26 @@ states:
         message to me.</p>
     interaction:
       answer_groups:
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Music Notes Input
           feedback:
-          - <p>Goodbye! Well, not quite. We still have a little more to explore.</p>
+            audio_translations: {}
+            html: <p>Goodbye! Well, not quite. We still have a little more to explore.</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: Bye Oppia
           rule_type: OutputEquals
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Music Notes Input
           feedback:
-          - <p>Goodbye! Well, not quite. We still have a little more to explore.<br></p>
+            audio_translations: {}
+            html: <p>Goodbye! Well, not quite. We still have a little more to explore.<br></p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: Goodbye Oppia
@@ -692,9 +888,11 @@ states:
       default_outcome:
         dest: Pencil Code Editor
         feedback:
-        - <p>Where are your manners? You should say goodbye to me. We've explored
-          so much, together!</p>
+          audio_translations: {}
+          html: <p>Where are your manners? You should say goodbye to me. We've explored
+            so much, together!</p>
         param_changes: []
+        refresher_exploration_id: null
       hints: []
       id: PencilCodeEditor
       solution: null
@@ -707,13 +905,15 @@ states:
         looking for any of three popular ones.</p>
     interaction:
       answer_groups:
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Math Expression Input
           feedback:
-          - <p>Nice! Orange, purple, and silver are all words that are exceptionally
-            hard to use in rhyming devices.</p>
+            audio_translations: {}
+            html: <p>Nice! Orange, purple, and silver are all words that are exceptionally
+              hard to use in rhyming devices.</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -726,13 +926,21 @@ states:
       default_outcome:
         dest: Set Input
         feedback:
-        - <p>Not quite.</p>
+          audio_translations: {}
+          html: <p>Not quite.</p>
         param_changes: []
+        refresher_exploration_id: null
       hints:
-      - hint_text: '<p>Hint #1: One of them is a precious metal and another is a color.<br></p>'
-      - hint_text: <p>A third one is both a color and a fruit. This fruit is of particular
-          importance to the state of Florida.<br></p>
-      - hint_text: <p>Try orange. :) There are still two others, however!<br></p>
+      - hint_content:
+          audio_translations: {}
+          html: '<p>Hint #1: One of them is a precious metal and another is a color.<br></p>'
+      - hint_content:
+          audio_translations: {}
+          html: <p>A third one is both a color and a fruit. This fruit is of particular
+            importance to the state of Florida.<br></p>
+      - hint_content:
+          audio_translations: {}
+          html: <p>Try orange. :) There are still two others, however!<br></p>
       id: SetInput
       solution: null
     param_changes: []
@@ -743,12 +951,14 @@ states:
       html: <p>Text input. Please add a word containing "ate".</p>
     interaction:
       answer_groups:
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: Multiple Choice
           feedback:
-          - <p>Omnomnom.</p>
+            audio_translations: {}
+            html: <p>Omnomnom.</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: ate
@@ -762,9 +972,14 @@ states:
       default_outcome:
         dest: "Text Input state name with unicode \u0105\u0142"
         feedback:
-        - <p>The answer needs to contain "ate".</p>
+          audio_translations: {}
+          html: <p>The answer needs to contain "ate".</p>
         param_changes: []
-      hints: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          audio_translations: {}
+          html: <p>Hint 1</p>
       id: TextInput
       solution: null
     param_changes: []
@@ -776,12 +991,14 @@ states:
         States?</p>
     interaction:
       answer_groups:
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: End Exploration
           feedback:
-          - <p>That's Washington, D.C., the capital of the United States.</p>
+            audio_translations: {}
+            html: <p>That's Washington, D.C., the capital of the United States.</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             d: 100.0
@@ -789,12 +1006,14 @@ states:
             - 38.89103282648846
             - -76.90361022949219
           rule_type: Within
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: End Exploration
           feedback:
-          - <p>Ottawa, the capital of Canada!</p>
+            audio_translations: {}
+            html: <p>Ottawa, the capital of Canada!</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             d: 100.0
@@ -802,12 +1021,14 @@ states:
             - 45.42929873257377
             - -75.62919616699219
           rule_type: Within
-      - correct: false
+      - labelled_as_correct: false
         outcome:
           dest: End Exploration
           feedback:
-          - <p>Mexico City, Mexico. The capital of Mexico.</p>
+            audio_translations: {}
+            html: <p>Mexico City, Mexico. The capital of Mexico.</p>
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             d: 100.0
@@ -826,14 +1047,18 @@ states:
       default_outcome:
         dest: World Map
         feedback:
-        - <p>Not quite. Try again!</p>
+          audio_translations: {}
+          html: <p>Not quite. Try again!</p>
         param_changes: []
+        refresher_exploration_id: null
       hints:
-      - hint_text: '<p>Hint: Try looking in the middle of Mexico. Capitals also have
-          special markings on a map.</p>'
+      - hint_content:
+          audio_translations: {}
+          html: '<p>Hint: Try looking in the middle of Mexico. Capitals also have
+            special markings on a map.</p>'
       id: InteractiveMap
       solution: null
     param_changes: []
-states_schema_version: 13
+states_schema_version: 16
 tags: []
 title: Test of all interactions

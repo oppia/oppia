@@ -28,7 +28,7 @@ describe('StateImprovementSuggestionService', function() {
     var siss;
     var ssof;
 
-    //A self-looping state
+    // A self-looping state.
     var statesDict1 = {
       state: {
         content: {
@@ -41,7 +41,9 @@ describe('StateImprovementSuggestionService', function() {
             outcome: {
               dest: 'unused',
               feedback: [''],
-              param_changes: []
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {
@@ -49,7 +51,6 @@ describe('StateImprovementSuggestionService', function() {
               },
               rule_type: 'Equals'
             }],
-            labelled_as_correct: false
           }],
           default_outcome: {
             dest: 'state',
@@ -62,7 +63,7 @@ describe('StateImprovementSuggestionService', function() {
       }
     };
 
-    // A non-looping state
+    // A non-looping state.
     var statesDict2 = {
       initial: {
         content: {
@@ -75,15 +76,16 @@ describe('StateImprovementSuggestionService', function() {
             outcome: {
               dest: 'unused',
               feedback: [''],
-              param_changes: []
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {
                 x: 10
               },
               rule_type: 'Equals'
-            }],
-            labelled_as_correct: false
+            }]
           }],
           default_outcome: {
             dest: 'end',
@@ -105,15 +107,16 @@ describe('StateImprovementSuggestionService', function() {
             outcome: {
               dest: 'unused',
               feedback: [''],
-              param_changes: []
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {
                 x: 10
               },
               rule_type: 'Equals'
-            }],
-            labelled_as_correct: false
+            }]
           }],
           default_outcome: {
             dest: null,
@@ -139,15 +142,16 @@ describe('StateImprovementSuggestionService', function() {
             outcome: {
               dest: 'next state',
               feedback: [''],
-              param_changes: []
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {
                 x: 10
               },
               rule_type: 'Equals'
-            }],
-            labelled_as_correct: false
+            }]
           }],
           default_outcome: {
             dest: 'State 1',
@@ -169,15 +173,16 @@ describe('StateImprovementSuggestionService', function() {
             outcome: {
               dest: 'next state',
               feedback: [''],
-              param_changes: []
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {
                 x: 10
               },
               rule_type: 'Equals'
-            }],
-            labelled_as_correct: false
+            }]
           }],
           default_outcome: {
             dest: 'State 2',
@@ -188,7 +193,7 @@ describe('StateImprovementSuggestionService', function() {
         },
         param_changes: []
       }
-    }
+    };
 
     var _createState = function(destStateName) {
       // Only a partial state definition is needed for these tests.

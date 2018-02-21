@@ -16,9 +16,9 @@
 
 """Domain objects relating to questions."""
 
+from constants import constants
 from core.domain import exp_domain
 from core.platform import models
-from constants import constants
 import feconf
 import utils
 
@@ -37,6 +37,7 @@ CMD_UPDATE_QUESTION_PROPERTY = 'update_question_property'
 
 CMD_ADD_QUESTION_SKILL = 'add_question_skill'
 CMD_REMOVE_QUESTION_SKILL = 'remove_question_skill'
+
 
 class QuestionChange(object):
     """Domain object for changes made to question object."""

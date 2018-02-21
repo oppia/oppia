@@ -18,15 +18,15 @@
 
 from core.domain import activity_jobs_one_off
 from core.domain import collection_jobs_one_off
+from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
-from core.domain import feedback_jobs_one_off
 from core.domain import feedback_jobs_continuous
+from core.domain import feedback_jobs_one_off
+from core.domain import recommendations_jobs_one_off
 from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
-from core.domain import email_jobs_one_off
-from core.domain import recommendations_jobs_one_off
 
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
@@ -41,10 +41,12 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationMigrationJobManager,
     exp_jobs_one_off.ExplorationValidityJobManager,
     exp_jobs_one_off.ExplorationStateIdMappingJob,
+    exp_jobs_one_off.HintsAuditOneOffJob,
     exp_jobs_one_off.ItemSelectionInteractionOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
+    stats_jobs_one_off.RecomputeStatisticsOneOffJob,
     stats_jobs_one_off.GenerateV1StatisticsJob,
     stats_jobs_one_off.StatisticsAuditV1,
     stats_jobs_one_off.StatisticsAudit,

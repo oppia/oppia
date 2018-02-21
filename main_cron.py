@@ -19,9 +19,11 @@ from core.controllers import cron
 from core.platform import models
 import feconf
 import main
-# pylint: enable=relative-import
 
 import webapp2
+
+# pylint: enable=relative-import
+
 
 transaction_services = models.Registry.import_transaction_services()
 

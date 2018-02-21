@@ -14,8 +14,8 @@
 
 """Base constants and handlers."""
 
-import base64
 import Cookie
+import base64
 import datetime
 import hmac
 import json
@@ -26,10 +26,6 @@ import time
 import traceback
 import urlparse
 
-import jinja2
-import webapp2
-from google.appengine.api import users
-
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
@@ -39,6 +35,10 @@ from core.platform import models
 import feconf
 import jinja_utils
 import utils
+
+from google.appengine.api import users
+import jinja2
+import webapp2
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
@@ -132,6 +132,11 @@ class BaseHandler(webapp2.RequestHandler):
 
     @webapp2.cached_property
     def jinja2_env(self):
+        """Returns a Jinja2 environment cached for frontend templates.
+
+        Returns:
+            Environment. A Jinja2 environment object used to load templates.
+        """
         return jinja_utils.get_jinja_env(feconf.FRONTEND_TEMPLATES_DIR)
 
     def __init__(self, request, response):  # pylint: disable=super-init-not-called
@@ -265,7 +270,7 @@ class BaseHandler(webapp2.RequestHandler):
         Args:
             values: dict. The key-value pairs to encode in the JSON response.
         """
-        self.response.content_type = 'application/javascript; charset=utf-8'
+        self.response.content_type = 'application/json; charset=utf-8'
         self.response.headers['Content-Disposition'] = (
             'attachment; filename="oppia-attachment.txt"')
         self.response.headers['Strict-Transport-Security'] = (
@@ -311,7 +316,6 @@ class BaseHandler(webapp2.RequestHandler):
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'DEV_MODE': feconf.DEV_MODE,
-            'MINIFICATION': feconf.IS_MINIFIED,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
             'ACTIVITY_STATUS_PRIVATE': (
                 rights_manager.ACTIVITY_STATUS_PRIVATE),
@@ -512,7 +516,7 @@ class CsrfTokenManager(object):
         """Creates a new CSRF token.
 
         Args:
-            user_id: str. The user_id for whom the token is generated.
+            user_id: str. The user_id for which the token is generated.
             issued_on: float. The timestamp at which the token was issued.
 
         Returns:
@@ -541,10 +545,23 @@ class CsrfTokenManager(object):
 
     @classmethod
     def _get_current_time(cls):
+        """Returns the current server time.
+
+        Returns:
+            float. The time in seconds as floating point number.
+        """
         return time.time()
 
     @classmethod
     def create_csrf_token(cls, user_id):
+        """Creates a CSRF token for the given user_id.
+
+        Args:
+            user_id: str. The user_id for whom the token is generated.
+
+        Returns:
+            str. The generated CSRF token.
+        """
         return cls._create_token(user_id, cls._get_current_time())
 
     @classmethod

@@ -29,6 +29,8 @@ oppia.controller('StateResponses', [
       ExplorationContextService, TrainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
       INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
+    $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
+      GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
     $scope.EditorStateService = EditorStateService;
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
@@ -126,6 +128,14 @@ oppia.controller('StateResponses', [
       return outcome.isConfusing(EditorStateService.getActiveStateName());
     };
 
+    $scope.isSelfLoopThatIsMarkedCorrect = function(outcome) {
+      if (!outcome) {
+        return false;
+      }
+      var currentStateName = EditorStateService.getActiveStateName();
+      return ((outcome.dest === currentStateName) && outcome.labelledAsCorrect);
+    };
+
     $scope.changeActiveAnswerGroupIndex = function(newIndex) {
       $rootScope.$broadcast('externalSave');
       ResponsesService.changeActiveAnswerGroupIndex(newIndex);
@@ -164,6 +174,10 @@ oppia.controller('StateResponses', [
     };
 
     $scope.getOutcomeTooltip = function(outcome) {
+      if ($scope.isSelfLoopThatIsMarkedCorrect(outcome)) {
+        return 'Self-loops should not be labelled as correct.';
+      }
+
       // Outcome tooltip depends on whether feedback is displayed
       if ($scope.isLinearWithNoFeedback(outcome)) {
         return 'Please direct the learner to a different card.';
@@ -248,20 +262,20 @@ oppia.controller('StateResponses', [
           'ExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'ExplorationContextService', 'EditorStateService',
-          'explorationStatesService', 'TrainingDataService',
+          'ExplorationStatesService', 'TrainingDataService',
           'AnswerClassificationService', 'FocusManagerService',
-          'angularNameService', 'RULE_TYPE_CLASSIFIER',
+          'AngularNameService', 'RULE_TYPE_CLASSIFIER',
           function(
               $scope, $injector, $uibModalInstance,
               ExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
               ExplorationContextService, EditorStateService,
-              explorationStatesService, TrainingDataService,
+              ExplorationStatesService, TrainingDataService,
               AnswerClassificationService, FocusManagerService,
-              angularNameService, RULE_TYPE_CLASSIFIER) {
+              AngularNameService, RULE_TYPE_CLASSIFIER) {
             var _explorationId = ExplorationContextService.getExplorationId();
             var _stateName = EditorStateService.getActiveStateName();
-            var _state = explorationStatesService.getState(_stateName);
+            var _state = ExplorationStatesService.getState(_stateName);
 
             $scope.stateContent = _state.content.getHtml();
             $scope.inputTemplate = (
@@ -282,7 +296,7 @@ oppia.controller('StateResponses', [
 
             var rulesServiceName =
               AngularNameService.getNameOfInteractionRulesService(
-                interactionId)
+                interactionId);
 
             // Inject RulesService dynamically.
             var rulesService = $injector.get(rulesServiceName);
@@ -364,6 +378,7 @@ oppia.controller('StateResponses', [
               EditorStateService, EditorFirstTimeEventsService,
               RuleObjectFactory, OutcomeObjectFactory) {
             $scope.feedbackEditorIsOpen = false;
+
             $scope.openFeedbackEditor = function() {
               $scope.feedbackEditorIsOpen = true;
             };
@@ -475,16 +490,15 @@ oppia.controller('StateResponses', [
       });
     };
 
-    $scope.saveActiveAnswerGroupRules = function(updatedRules) {
+    $scope.saveActiveAnswerGroupCorrectnessLabel = function(updatedOutcome) {
       ResponsesService.updateActiveAnswerGroup({
-        rules: updatedRules
+        labelledAsCorrect: updatedOutcome.labelledAsCorrect
       });
     };
 
-    $scope.saveActiveAnswerGroupCorrectnessLabel = function(
-      updatedCorrectnessLabel) {
+    $scope.saveActiveAnswerGroupRules = function(updatedRules) {
       ResponsesService.updateActiveAnswerGroup({
-        labelledAsCorrect: updatedCorrectnessLabel
+        rules: updatedRules
       });
     };
 
@@ -498,6 +512,12 @@ oppia.controller('StateResponses', [
       ResponsesService.updateDefaultOutcome({
         dest: updatedOutcome.dest,
         refresherExplorationId: updatedOutcome.refresherExplorationId
+      });
+    };
+
+    $scope.saveDefaultOutcomeCorrectnessLabel = function(updatedOutcome) {
+      ResponsesService.updateDefaultOutcome({
+        labelledAsCorrect: updatedOutcome.labelledAsCorrect
       });
     };
 

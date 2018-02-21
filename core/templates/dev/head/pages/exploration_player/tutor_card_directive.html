@@ -1,6 +1,4 @@
-<audio-bar audio-translations="contentAudioTranslations"
-           content-html="activeCard.contentHtml">
-</audio-bar>
+<audio-bar ng-if="!isIframed"></audio-bar>
 <div class="conversation-skin-tutor-card"
      ng-class="{'animate-card-width': startCardChangeAnimation}">
   <div class="conversation-skin-tutor-card-content conversation-skin-animate-tutor-card-content"
@@ -9,6 +7,7 @@
       <img class="conversation-skin-oppia-avatar"
            ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
       <div class="conversation-skin-tutor-card-top-content"
+           ng-class="getContentAudioHighlightClass()"
            focus-on="<[getContentFocusLabel($index)]>">
         <div class="protractor-test-conversation-content"
              angular-html-bind="activeCard.contentHtml">
@@ -40,7 +39,8 @@
           <input-response-pair data="responsePair"
                                 profile-picture="profilePicture"
                                 oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
-                                input-response-pair-id="getInputResponsePairId($index)">
+                                input-response-pair-id="getInputResponsePairId($index)"
+                                is-last-pair="false">
           </input-response-pair>
         </div>
       </div>
@@ -51,15 +51,14 @@
       <input-response-pair data="activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1]"
                             profile-picture="profilePicture"
                             oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
-                            input-response-pair-id="getInputResponsePairId(activeCard.inputResponsePairs.length - 1)">
+                            input-response-pair-id="getInputResponsePairId(activeCard.inputResponsePairs.length - 1)"
+                            is-last-pair="true">
       </input-response-pair>
     </div>
 
     <!--
-      Show the interaction (if it is inline), the interaction instructions
-      (if the interaction is supplemental), or a continuation button (if
-      Oppia has given feedback and the learner is being asked to move on
-      to the next card).
+      Show the interaction (if it is inline) or the interaction instructions
+      (if the interaction is supplemental).
 
       In addition, if the exploration is iframed, the terminal card will
       have no learner input section, so we do not show it.
@@ -68,12 +67,6 @@
     ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
     (!isOnTerminalCard() || !isIframed || activeCard.destStateName)">
       <div class="conversation-skin-inline-interaction">
-        <div ng-if="!isWindowNarrow() && activeCard.destStateName && activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1].oppiaResponse">
-          <continue-button ng-if="!isIframed"
-                           focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
-                           ng-click="onClickContinueButton()">
-          </continue-button>
-        </div>
         <!-- The seemingly redundant check for isInteractionInline is necessary
           because the parent ng-show does not remove the element from the DOM.
           This can lead to two conflicting copies of the interaction for
@@ -81,18 +74,6 @@
         <div ng-if="isInteractionInline && activeCard.interactionHtml && !activeCard.destStateName">
           <div class="protractor-test-conversation-input"
                angular-html-bind="activeCard.interactionHtml">
-          </div>
-          <div ng-if="hintsExist && !windowDimensionsService.isWindowNarrow()" style="text-align: right">
-            <hint-button ng-show="!areAllHintsExhausted() || (areAllHintsExhausted() && !solutionExists)"
-                         on-click-hint-button="consumeHint()"
-                         current-hint-is-available="isHintAvailable()"
-                         all-hints-are-exhausted="areAllHintsExhausted()"
-                         is-supplemental-card="false">
-            </hint-button>
-            <solution-button ng-if="areAllHintsExhausted()"
-                             on-click-solution-button="viewSolution()"
-                             solution-is-available="isCurrentSolutionAvailable()">
-            </solution-button>
           </div>
         </div>
       </div>
@@ -102,8 +83,8 @@
         class="conversation-skin-inline-interaction" style="opacity: 0.8;">
       <div style="padding: 6px 12px;">
         <span ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}"> <[interactionInstructions]> </span>
-        <i ng-if="!isViewportNarrow()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
-        <i ng-if="isViewportNarrow()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
+        <i ng-if="canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
+        <i ng-if="!canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5DB;</i>
       </div>
     </div>
 
@@ -145,28 +126,6 @@
     white-space: normal;
   }
 
-  .conversation-skin-tutor-card .hint-button {
-    background-color: #0D48A1;
-    border: none;
-    color: #ffffff;
-  }
-
-  .conversation-skin-tutor-card .solution-button {
-    background-color: #d9534f;
-    border-color: #d43f3a;
-    color: #fff;
-  }
-
-  .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:focus,
-  .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:hover {
-    background-color: #115FD4;
-  }
-
-  .conversation-skin-tutor-card button.md-button.md-default-theme.solution-button:focus,
-  .conversation-skin-tutor-card button.md-button.md-default-theme.solution-button:hover {
-    background-color: #da190b;
-  }
-
   .conversation-skin-tutor-card.animate-card-width {
     -webkit-transition: width 500ms;
     transition: width 500ms;
@@ -181,12 +140,17 @@
   }
 
   .conversation-skin-tutor-card-top-content p:not(:last-child) {
-    line-height: 28px;
+    line-height: 1.5;
     margin-bottom: 18px;
   }
 
   .conversation-skin-tutor-card-top-content {
     width: 100%;
+  }
+
+  /* This should match the value defined in AUDIO_HIGHLIGHT_CSS_CLASS. */
+  .conversation-skin-audio-highlight {
+    border: 3px solid #f3d140;
   }
 
   .conversation-skin-tutor-card,
@@ -263,6 +227,16 @@
     top: 14px;
   }
 
+  /* When the size of the browser is reduced, and the answer submitted is
+     correct, the continue button (in the tutor card) hides under the
+     Correctness footer and the page cannot be scrolled down further.
+     So this padding allows to scroll down the tutor card. */
+  @media(max-width: 770px) {
+    .conversation-skin-tutor-card {
+      padding-bottom: 30px;
+    }
+  }
+
   @media screen and (max-width: 959px) {
     .conversation-skin-tutor-card .instructions-button {
       background-color: #0D48A1;
@@ -271,32 +245,9 @@
       white-space: normal;
     }
 
-    .conversation-skin-tutor-card .hint-button {
-      background-color: #0D48A1;
-      color: #ffffff;
-      padding: 6px 12px;
-    }
-
-    .conversation-skin-tutor-card .solution-button {
-      background-color: #d9534f;
-      border-color: #d43f3a;
-      color: #fff;
-      padding: 6px 12px;
-    }
-
-    .has-shadow {
-      box-shadow: 0 10px 10px rgba(0,0,0,0.24), 0 10px 10px rgba(0,0,0,0.24);
-    }
-
     .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:focus,
-    .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:hover,
-    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:focus,
-    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:hover {
+    .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:hover {
       background-color: #115FD4;
-    }
-    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:focus,
-    .conversation-skin-tutor-card button.md-button.md-default-theme.hint-button:hover {
-      background-color: #da190b;
     }
   }
 </style>

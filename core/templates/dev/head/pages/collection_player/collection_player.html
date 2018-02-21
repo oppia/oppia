@@ -317,7 +317,7 @@
             <div ng-class="{'oppia-activity-summary-tile-mobile-background-mask': explorationCardIsShown}" ng-click="closeOnClickingOutside()">
               <exploration-summary-tile ng-if="explorationCardIsShown"
                                         ng-click="onClickStopPropagation($event)"
-                                        collection-id="getCollectionId()"
+                                        collection-id="collectionId"
                                         exploration-id="currentExplorationId"
                                         exploration-title="summaryToPreview.title"
                                         last-updated-msec="summaryToPreview.last_updated_msec"
@@ -347,7 +347,7 @@
           </div>
         </md-card>
         <exploration-summary-tile ng-if="explorationCardIsShown"
-                                  collection-id="getCollectionId()"
+                                  collection-id="collectionId"
                                   exploration-id="currentExplorationId"
                                   exploration-title="summaryToPreview.title"
                                   last-updated-msec="summaryToPreview.last_updated_msec"
@@ -381,8 +381,12 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionPlaythroughObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/CollectionSkillObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/GuestCollectionProgressObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/GuestCollectionProgressService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/collection/ReadOnlyCollectionBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/BrowserCheckerService.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/objects/FractionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/collectionFooterDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
 `  <script src="{{TEMPLATE_DIR_PREFIX}}/components/HintAndSolutionButtonsDirective.js"></script>

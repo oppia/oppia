@@ -52,7 +52,7 @@ describe('Solution Verification Service', function() {
   });
 
   beforeEach(inject(function($rootScope, $controller, $injector) {
-    ess = $injector.get('explorationStatesService');
+    ess = $injector.get('ExplorationStatesService');
     siis = $injector.get('stateInteractionIdService');
     scas = $injector.get('stateCustomizationArgsService');
     idc = $injector.get('InteractionDetailsCacheService');
@@ -70,14 +70,15 @@ describe('Solution Verification Service', function() {
         interaction: {
           id: 'TextInput',
           answer_groups: [{
-            labelled_as_correct: false,
             outcome: {
               dest: 'End State',
               feedback: {
                 html: '',
                 audio_translations: {}
               },
-              param_changes: []
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
             },
             rule_specs: [{
               inputs: {x: 'abc'},
@@ -90,7 +91,9 @@ describe('Solution Verification Service', function() {
               html: '',
               audio_translations: {}
             },
-            param_changes: []
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null
           },
           hints: [{
             hint_content: 'one'
@@ -115,9 +118,10 @@ describe('Solution Verification Service', function() {
                 html: '',
                 audio_translations: {}
               },
-              param_changes: []
-            },
-            labelled_as_correct: false
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            }
           }],
           default_outcome: {
             dest: 'default',

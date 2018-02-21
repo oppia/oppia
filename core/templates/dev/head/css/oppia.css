@@ -86,9 +86,7 @@ md-input-group.long > input {
   height: 45px;
 }
 
-
-md-input-group.md-default-theme label
-{
+md-input-group.md-default-theme label {
   font-size: 16px;
   font-weight: 200;
   margin-bottom: 0;
@@ -99,7 +97,8 @@ md-input-group.md-default-theme label
 }
 
 .md-button.oppia-learner-confirm-button,
-.md-button.oppia-learner-got-it-button {
+.md-button.oppia-learner-got-it-button,
+.md-button.oppia-learner-hint-solution-button {
   background: #0D48A1;
   color: #ffffff;
   padding: 6px 12px;
@@ -108,7 +107,9 @@ md-input-group.md-default-theme label
 .md-button.md-default-theme.oppia-learner-confirm-button:focus,
 .md-button.md-default-theme.oppia-learner-confirm-button:hover,
 .md-button.md-default-theme.oppia-learner-got-it-button:focus,
-.md-button.md-default-theme.oppia-learner-got-it-button:hover {
+.md-button.md-default-theme.oppia-learner-got-it-button:hover,
+.md-button.md-default-theme.oppia-learner-hint-solution-button:focus,
+.md-button.md-default-theme.oppia-learner-hint-solution-button:hover {
   background-color: #115FD4;
   text-decoration: none;
 }
@@ -116,10 +117,6 @@ md-input-group.md-default-theme label
 .oppia-learner-got-it-button {
   margin-bottom: 25px;
   margin-right: 20px;
-}
-
-.oppia-learner-hint-and-solution-modal-body {
-  word-wrap: break-word;
 }
 
 /* Attributes for material-icons. */
@@ -648,15 +645,6 @@ body {
   }
 }
 
-.oppia-learner-hint-title {
-  color: #00786D;
-  font-family: 'Capriola', 'Roboto', 'Arial', 'sans-serif';
-  font-size: 1.75em;
-  font-weight: bold;
-  padding-top: 20px;
-  text-align: center;
-}
-
 .oppia-profile-container {
   margin: 0 auto 30px auto;
   max-width: 980px;
@@ -951,6 +939,7 @@ p {
   margin: 0;
   text-align: left;
   word-spacing: 0;
+  word-break: break-word;
 }
 
 .oppia-long-text p {
@@ -2181,8 +2170,8 @@ pre.oppia-pre-wrapped-text {
     the same line-height, margin-top and margin-bottom attributes)
 */
 .oppia-rte-editor > p,
-.form-control.oppia-rte-content > div > p {
-  line-height: 28px;
+.oppia-rte-content > div > p {
+  line-height: 1.5;
   margin-bottom: 18px;
   margin-top: 18px;
 }
@@ -2518,7 +2507,8 @@ pre.oppia-pre-wrapped-text {
 .oppia-rule-block.active {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   margin: -2px;
-  z-index: 1;
+  position: relative;
+  z-index: 100;
 }
 
 .oppia-rule-sort-handle, .oppia-fallback-sort-handle, .oppia-hint-sort-handle, .oppia-learner-playlist-sort-handle {
@@ -3767,10 +3757,10 @@ md-card.preview-conversation-skin-supplemental-card {
     z-index: 10;
   }
   .oppia-splash-button-heading {
-    left: -webkit-calc(-70px + 15%);
-    left: -moz-calc(-70px + 15%);
-    left: -o-calc(-70px + 15%);
-    left: calc(-70px + 15%);
+    left: -webkit-calc(-70px - -15%);
+    left: -moz-calc(-70px - -15%);
+    left: -o-calc(-70px - -15%);
+    left: calc(-70px - -15%);
     position: relative;
   }
 
@@ -3781,10 +3771,10 @@ md-card.preview-conversation-skin-supplemental-card {
 
 @media (min-width: 575px) {
   .oppia-splash-button {
-    left: -webkit-calc(130px + 15%);
-    left: -moz-calc(130px + 15%);
-    left: -o-calc(130px + 15%);
-    left: calc(130px + 15%);
+    left: -webkit-calc(130px - -15%);
+    left: -moz-calc(130px - -15%);
+    left: -o-calc(130px - -15%);
+    left: calc(130px - -15%);
   }
 }
 

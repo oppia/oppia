@@ -115,7 +115,7 @@ oppia.factory('ThreadDataService', [
         });
       },
       addNewMessage: function(
-        threadId, newMessage, newStatus, successCallback, errorCallback) {
+          threadId, newMessage, newStatus, successCallback, errorCallback) {
         var url = _THREAD_HANDLER_PREFIX + threadId;
         var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
         var thread = null;
@@ -170,8 +170,8 @@ oppia.factory('ThreadDataService', [
         });
       },
       resolveSuggestion: function(
-        threadId, action, commitMsg, audioUpdateRequired, onSuccess,
-        onFailure) {
+          threadId, action, commitMsg, audioUpdateRequired, onSuccess,
+          onFailure) {
         var payload = {
           action: action
         };

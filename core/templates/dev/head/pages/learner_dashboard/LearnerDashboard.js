@@ -293,7 +293,7 @@ oppia.controller('LearnerDashboard', [
       constants.ACTIVITY_TYPE_EXPLORATION);
 
     $scope.onClickThread = function(
-      threadStatus, explorationId, threadId, explorationTitle) {
+        threadStatus, explorationId, threadId, explorationTitle) {
       var threadDataUrl = UrlInterpolationService.interpolateUrl(
         '/learnerdashboardthreadhandler/<explorationId>/<threadId>', {
           explorationId: explorationId,
@@ -380,7 +380,7 @@ oppia.controller('LearnerDashboard', [
           '$scope', '$uibModalInstance', 'newContent', 'oldContent',
           'description',
           function($scope, $uibModalInstance, newContent, oldContent,
-            description) {
+              description) {
             $scope.newContent = newContent;
             $scope.oldContent = oldContent;
             $scope.description = description;
@@ -393,7 +393,7 @@ oppia.controller('LearnerDashboard', [
     };
 
     $scope.openRemoveActivityModal = function(
-      sectionNameI18nId, subsectionName, activity) {
+        sectionNameI18nId, subsectionName, activity) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/learner_dashboard/' +
@@ -584,14 +584,14 @@ oppia.controller('LearnerDashboard', [
   var NG_HIDE_CLASS = 'ng-hide';
   return {
     beforeAddClass: function(element, className, done) {
-      if(className === NG_HIDE_CLASS) {
+      if (className === NG_HIDE_CLASS) {
         element.slideUp(done);
       }
     },
     removeClass: function(element, className, done) {
-      if(className === NG_HIDE_CLASS) {
+      if (className === NG_HIDE_CLASS) {
         element.hide().slideDown(done);
       }
     }
-  }
+  };
 });

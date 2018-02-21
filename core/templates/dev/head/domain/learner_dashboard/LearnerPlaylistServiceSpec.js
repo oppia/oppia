@@ -49,7 +49,7 @@ describe('Learner playlist service factory', function() {
           activityType: activityType,
           activityId: activityId
         }));
-  })
+  });
   afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();

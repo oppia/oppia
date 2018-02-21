@@ -18,12 +18,12 @@
 
 import numbers
 import sys
-import utils
 
 from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.platform import models
 import feconf
+import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
@@ -45,6 +45,7 @@ MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC = 0.0
 CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST = 'AnswerFrequencyList'
 CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS = (
     'CategorizedAnswerFrequencyLists')
+
 
 class ExplorationStats(object):
     """Domain object representing analytics data for an exploration."""

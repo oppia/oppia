@@ -30,6 +30,7 @@ class PencilCodeEditor(base.BaseInteraction):
     narrow_instructions = 'Show code editor'
     needs_summary = True
     can_have_solution = True
+    show_generic_submit_button = False
 
     _customization_arg_specs = [{
         'name': 'initial_code',

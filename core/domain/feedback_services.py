@@ -18,12 +18,12 @@
 
 import datetime
 
+from core.domain import email_manager
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
-from core.domain import email_manager
 from core.platform import models
 import feconf
 import utils
@@ -303,6 +303,7 @@ def get_next_page_of_all_feedback_messages(
 
     result_messages = [_get_message_from_model(m) for m in results]
     return (result_messages, new_urlsafe_start_cursor, more)
+
 
 def get_thread_analytics_multi(exploration_ids):
     """Fetches all FeedbackAnalytics, for all the given exploration ids.

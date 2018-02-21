@@ -19,7 +19,8 @@
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
-var collectionEditor = require('../protractor_utils/collectionEditor.js');
+var CollectionEditorPage =
+  require('../protractor_utils/CollectionEditorPage.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
@@ -28,6 +29,8 @@ var ExplorationPlayerPage =
 var users = require('../protractor_utils/users.js');
 var LearnerDashboardPage =
   require('../protractor_utils/LearnerDashboardPage.js');
+var SubscriptionDashboardPage =
+  require('../protractor_utils/SubscriptionDashboardPage.js');
 
 describe('Learner dashboard functionality', function() {
   var creatorDashboardPage = null;
@@ -35,11 +38,15 @@ describe('Learner dashboard functionality', function() {
   var libraryPage = null;
   var learnerDashboardPage = null;
   var explorationPlayerPage = null;
+  var subscriptionDashboardPage = null;
 
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    subscriptionDashboardPage = (
+      new SubscriptionDashboardPage.SubscriptionDashboardPage());
   });
 
   beforeAll(function() {
@@ -65,14 +72,14 @@ describe('Learner dashboard functionality', function() {
     // Create new collection.
     element(by.css('.protractor-test-create-collection')).click();
     browser.waitForAngular();
-    collectionEditor.addExistingExploration('14');
-    collectionEditor.saveDraft();
-    collectionEditor.closeSaveModal();
-    collectionEditor.publishCollection();
-    collectionEditor.setTitle('Test Collection');
-    collectionEditor.setObjective('This is a test collection.');
-    collectionEditor.setCategory('Algebra');
-    collectionEditor.saveChanges();
+    collectionEditorPage.addExistingExploration('14');
+    collectionEditorPage.saveDraft();
+    collectionEditorPage.closeSaveModal();
+    collectionEditorPage.publishCollection();
+    collectionEditorPage.setTitle('Test Collection');
+    collectionEditorPage.setObjective('This is a test collection.');
+    collectionEditorPage.setCategory('Algebra');
+    collectionEditorPage.saveChanges();
     browser.waitForAngular();
     users.logout();
   });
@@ -175,15 +182,15 @@ describe('Learner dashboard functionality', function() {
     creatorDashboardPage.navigateToCollectionEditor();
     browser.waitForAngular();
     general.waitForSystem();
-    collectionEditor.addExistingExploration('0');
+    collectionEditorPage.addExistingExploration('0');
     browser.waitForAngular();
     general.waitForSystem();
-    collectionEditor.saveDraft();
+    collectionEditorPage.saveDraft();
     browser.waitForAngular();
     general.waitForSystem();
     element(by.css('.protractor-test-commit-message-input')).sendKeys('Update');
     browser.driver.sleep(300);
-    collectionEditor.closeSaveModal();
+    collectionEditorPage.closeSaveModal();
     general.waitForSystem();
     browser.driver.sleep(300);
     users.logout();
@@ -203,10 +210,10 @@ describe('Learner dashboard functionality', function() {
     // Subscribe to both the creators.
     browser.get('/profile/creator1learnerDashboard');
     browser.waitForAngular();
-    element(by.css('.protractor-test-subscription-button')).click();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
     browser.get('/profile/creator2learnerDashboard');
     browser.waitForAngular();
-    element(by.css('.protractor-test-subscription-button')).click();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
 
     // Both creators should be present in the subscriptions section of the
     // dashboard.

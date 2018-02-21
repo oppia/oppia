@@ -124,12 +124,6 @@ class JinjaUtilsUnitTests(test_utils.GenericTestBase):
             parsed_str = jinja_utils.interpolate_cache_slug('{{cache_slug}}')
             self.assertEqual(parsed_str, '%s' % cache_slug)
 
-        with self.swap(feconf, 'IS_MINIFIED', True):
-            utils.ASSET_DIR_PREFIX = None
-            cache_slug = utils.get_asset_dir_prefix()
-            parsed_str = jinja_utils.interpolate_cache_slug('{{cache_slug}}')
-            self.assertEqual(parsed_str, '%s' % cache_slug)
-
         cache_slug = utils.get_asset_dir_prefix()
         parsed_str = jinja_utils.interpolate_cache_slug(
             '{{cache_slug}}/test/test.css')

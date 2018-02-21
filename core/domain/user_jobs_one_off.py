@@ -95,6 +95,7 @@ class UserDefaultDashboardOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(item):
         pass
 
+
 class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for calculating the distribution of username lengths."""
 
