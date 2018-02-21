@@ -36,6 +36,8 @@ oppia.directive('subtitledHtmlEditor', [
           $scope.subtiledHtmlEditorIsOpen = false;
           $scope.subtitledMemento = null;
 
+          $scope.COMPONENT_NAME_HTMLCONTENT = COMPONENT_NAME_HTMLCONTENT;
+
           var openMarkAllAudioAsNeedingUpdateModal = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
