@@ -342,13 +342,23 @@ oppia.filter('summarizeNonnegativeNumber', [function() {
   };
 }]);
 
-// Note that this filter removes additional new lines or <p><br></p> tags.
+// Note that this filter removes additional new lines or <p><br></p> tags 
+// at the end of the string.
 oppia.filter('removeExtraLines', [function() {
   return function(string) {
     if (!angular.isString(string)) {
       return string;
     }
-    return string.replace(/<p><br><\/p>/g, '');
+    while (1) {
+      var lastIndex = string.lastIndexOf('>');
+      if (string.substring(lastIndex - 10, lastIndex + 1) === '<p><br></p>') {
+        string = string.substring(0, lastIndex - 10);
+      }
+      else {
+        break;
+      }
+    }
+    return string;
   };
 }]);
 
