@@ -342,7 +342,7 @@ oppia.filter('summarizeNonnegativeNumber', [function() {
   };
 }]);
 
-// Note that this filter removes additional new lines or <p><br></p> tags 
+// Note that this filter removes additional new lines or <p><br></p> tags
 // at the end of the string.
 oppia.filter('removeExtraLines', [function() {
   return function(string) {
