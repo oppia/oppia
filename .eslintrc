@@ -6,6 +6,10 @@
     "html"
   ],
   "rules": {
+    "brace-style":[
+      "error",
+      "1tbs"
+    ],
     "camelcase": [
       "error",
       {
