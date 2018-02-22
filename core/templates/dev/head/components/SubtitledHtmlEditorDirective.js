@@ -22,7 +22,7 @@ oppia.directive('subtitledHtmlEditor', [
     return {
       restrict: 'E',
       scope: {
-        subtitled: '=',
+        subtitledHtml: '=',
         getOnSaveFn: '&onSaveFn'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -35,7 +35,6 @@ oppia.directive('subtitledHtmlEditor', [
             COMPONENT_NAME_HTML) {
           $scope.subtitledHtmlEditorIsOpen = false;
           $scope.subtitledMemento = null;
-          $scope.savedOutcome = angular.copy($scope.outcome);
 
           $scope.COMPONENT_NAME_HTML = COMPONENT_NAME_HTML;
 
@@ -48,9 +47,9 @@ oppia.directive('subtitledHtmlEditor', [
               resolve: {},
               controller: 'MarkAllAudioAsNeedingUpdateController'
             }).result.then(function() {
-              $scope.subtitled.html.markAllAudioAsNeedingUpdate();
+              $scope.subtitledHtml.html.markAllAudioAsNeedingUpdate();
               $scope.subtitledMemento.html = angular.copy(
-                $scope.subtitled.html);
+                $scope.subtitledHtml.html);
               $scope.getOnSaveFn()();
             });
           };
@@ -59,11 +58,11 @@ oppia.directive('subtitledHtmlEditor', [
             $scope.subtitledHtmlEditorIsOpen = false;
             var contentHasChanged = (
               $scope.subtitledMemento.html.getHtml() !==
-              $scope.subtitled.html.getHtml());
+              $scope.subtitledHtml.html.getHtml());
             $scope.subtitledMemento.html = angular.copy(
-               $scope.subtitled.html);
+               $scope.subtitledHtml.html);
             if (
-              $scope.subtitled.html.hasUnflaggedAudioTranslations() &&
+              $scope.subtitledHtml.html.hasUnflaggedAudioTranslations() &&
               contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
