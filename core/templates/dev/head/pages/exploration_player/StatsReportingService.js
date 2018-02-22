@@ -295,6 +295,14 @@ oppia.factory('StatsReportingService', [
               stateName].useful_feedback_count += 1;
           }
         }
+
+        MessengerService.sendMessage(MessengerService.ANSWER_SUBMIT, {
+          explorationVersion: explorationVersion,
+          jsonAnswer: JSON.stringify(answer),
+          stateName: stateName,
+          paramValues: params
+        });
+
         $http.post(getFullStatsUrl('ANSWER_SUBMITTED'), {
           answer: answer,
           params: params,
