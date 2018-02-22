@@ -30,10 +30,8 @@
   <form ng-if="stateInteractionIdService.displayed && hasCustomizationArgs" name="form.schemaForm" class="protractor-test-interaction-editor">
     <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
       <div ng-if="customizationArgSpec.schema.type !== 'bool'" class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
-      <div>
-        <schema-based-editor ng-class="{'align-checkbox-left': customizationArgSpec.schema.type === 'bool'}" local-value="stateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema">
+        <schema-based-editor ng-class="{'boolean-checkbox': customizationArgSpec.schema.type === 'bool'}" local-value="stateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema">
         </schema-based-editor>
-      </div>
       <div ng-if="customizationArgSpec.schema.type === 'bool'" class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
       <div style="margin-bottom: 15px;"></div>
     </div>
@@ -68,3 +66,9 @@
     Okay
   </button>
 </div>
+<style>
+  .boolean-checkbox {
+    float: left;
+    margin-right: 4px;
+  }
+</style>
