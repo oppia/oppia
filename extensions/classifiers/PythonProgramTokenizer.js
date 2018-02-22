@@ -198,10 +198,8 @@ oppia.factory('PythonProgramTokenizer', [
               contline = contline + line;
               continue;
             }
-          } // eslint-disable-line brace-style
-
-          // New statement.
-          else if (parenlev === 0 && !continued) {
+          } else if (parenlev === 0 && !continued) {
+            // New statement.
             if (!line) {
               break;
             }
@@ -257,10 +255,8 @@ oppia.factory('PythonProgramTokenizer', [
               indents = indents.slice(0, -1);
               tokenizedProgram.push([PythonProgramTokenType.DEDENT, '']);
             }
-          } // eslint-disable-line brace-style
-
-          // Continued statement.
-          else {
+          } else {
+            // Continued statement.
             if (!line) {
               $log.error('EOF in multi-line statement');
             }
@@ -301,19 +297,17 @@ oppia.factory('PythonProgramTokenizer', [
                   token = line.slice(start, pos);
                   tokenizedProgram.push(
                     [PythonProgramTokenType.STRING, token]);
-                } // eslint-disable-line brace-style
-                // Multiple lines.
-                else {
+                } else {
+                  // Multiple lines.
                   contstr = line.slice(start);
                   contline = line;
                   break;
                 }
-              } // eslint-disable-line brace-style
-              // Continued string.
-              else if (
+              } else if (
                   singleQuoted.indexOf(initial) !== -1 ||
                   singleQuoted.indexOf(token.slice(0, 2)) !== -1 ||
                   singleQuoted.indexOf(token.slice(0, 3)) !== -1) {
+                // Continued string.
                 if (token.slice(-1) === '\n') {
                   endprog = (
                     endprogs[initial] || endprogs[token[1]] ||
@@ -326,13 +320,11 @@ oppia.factory('PythonProgramTokenizer', [
                   tokenizedProgram.push(
                     [PythonProgramTokenType.STRING, token]);
                 }
-              } // eslint-disable-line brace-style
-              // Ordinary name
-              else if (namechars.indexOf(initial) !== -1) {
+              } else if (namechars.indexOf(initial) !== -1) {
+                // Ordinary name
                 tokenizedProgram.push([PythonProgramTokenType.NAME, token]);
-              } // eslint-disable-line brace-style
-              // Continued stmt
-              else if (initial === '\\') {
+              } else if (initial === '\\') {
+                // Continued statement.
                 continued = 1;
               } else {
                 if ('([{'.indexOf(initial) !== -1) {
