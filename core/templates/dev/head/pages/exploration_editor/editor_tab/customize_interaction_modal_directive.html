@@ -29,20 +29,10 @@
 
   <form ng-if="stateInteractionIdService.displayed && hasCustomizationArgs" name="form.schemaForm" class="protractor-test-interaction-editor">
     <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
-      <div ng-if="customizationArgSpec.schema.type !== 'bool'">
       <div class="oppia-interaction-customization-label"><[customizationArgSpec.description]></div>
-        <div>
-          <schema-based-editor local-value="stateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema">
-          </schema-based-editor>
-          <div style="margin-bottom: 15px;"></div>
-        </div>
-      </div>
-      <div ng-if="customizationArgSpec.schema.type === 'bool'" class="oppia-interaction-customization-label">
-        <div style="float:left;margin-right:4px;">
-          <schema-based-editor local-value="stateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema">
-          </schema-based-editor>
-        </div>
-        <[customizationArgSpec.description]>
+      <div>
+        <schema-based-editor ng-class="{'align-checkbox-left': customizationArgSpec.schema.type === 'bool'}" local-value="stateCustomizationArgsService.displayed[customizationArgSpec.name].value" schema="customizationArgSpec.schema">
+        </schema-based-editor>
         <div style="margin-bottom: 15px;"></div>
       </div>
     </div>
