@@ -29,14 +29,15 @@ oppia.directive('subtitledHtmlEditor', [
         '/components/subtitled_html_editor_directive.html'),
       controller: [
         '$scope', '$uibModal', 'EditabilityService',
-        'COMPONENT_NAME_HTMLCONTENT',
+        'COMPONENT_NAME_HTML',
         function(
             $scope, $uibModal, EditabilityService,
-            COMPONENT_NAME_HTMLCONTENT) {
+            COMPONENT_NAME_HTML) {
           $scope.subtitledHtmlEditorIsOpen = false;
           $scope.subtitledMemento = null;
+          $scope.savedOutcome = angular.copy($scope.outcome);
 
-          $scope.COMPONENT_NAME_HTMLCONTENT = COMPONENT_NAME_HTMLCONTENT;
+          $scope.COMPONENT_NAME_HTML = COMPONENT_NAME_HTML;
 
           var openMarkAllAudioAsNeedingUpdateModal = function() {
             $uibModal.open({
@@ -47,9 +48,9 @@ oppia.directive('subtitledHtmlEditor', [
               resolve: {},
               controller: 'MarkAllAudioAsNeedingUpdateController'
             }).result.then(function() {
-              $scope.subtitled.htmlContent.markAllAudioAsNeedingUpdate();
-              $scope.subtitledMemento.htmlContent = angular.copy(
-                $scope.subtitled.htmlContent);
+              $scope.subtitled.html.markAllAudioAsNeedingUpdate();
+              $scope.subtitledMemento.html = angular.copy(
+                $scope.subtitled.html);
               $scope.getOnSaveFn()();
             });
           };
@@ -57,12 +58,12 @@ oppia.directive('subtitledHtmlEditor', [
           $scope.saveThisSubtitledHtml = function() {
             $scope.subtitledHtmlEditorIsOpen = false;
             var contentHasChanged = (
-              $scope.subtitledMemento.htmlContent.getHtml() !==
-              $scope.subtitled.htmlContent.getHtml());
-            $scope.subtitledMemento.htmlContent = angular.copy(
-               $scope.subtitled.htmlContent);
+              $scope.subtitledMemento.html.getHtml() !==
+              $scope.subtitled.html.getHtml());
+            $scope.subtitledMemento.html = angular.copy(
+               $scope.subtitled.html);
             if (
-              $scope.subtitled.htmlContent.hasUnflaggedAudioTranslations() &&
+              $scope.subtitled.html.hasUnflaggedAudioTranslations() &&
               contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
