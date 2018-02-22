@@ -293,6 +293,8 @@ oppia.directive('graphViz', [
 
           $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
           $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
+          $scope.selectedEdgeWeightValue = 0;
+          $scope.shouldShowWrongWeightWarning = false;
 
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.state.currentMode = null;
@@ -643,6 +645,9 @@ oppia.directive('graphViz', [
 
           var beginEditEdgeWeight = function(index) {
             $scope.state.selectedEdge = index;
+            $scope.selectedEdgeWeightValue = (
+              $scope.graph.edges[$scope.state.selectedEdge].weight);
+            $scope.shouldShowWrongWeightWarning = false;
             FocusManagerService.setFocus('edgeWeightEditBegun');
           };
 
@@ -698,10 +703,25 @@ oppia.directive('graphViz', [
             if ($scope.state.selectedEdge === null) {
               return '';
             }
-            if (angular.isDefined(weight) && angular.isNumber(weight)) {
-              $scope.graph.edges[$scope.state.selectedEdge].weight = weight;
+            if (weight === null) {
+              $scope.selectedEdgeWeightValue = '';
             }
-            return $scope.graph.edges[$scope.state.selectedEdge].weight;
+            if (angular.isNumber(weight)) {
+              $scope.selectedEdgeWeightValue = weight;
+            }
+            return $scope.selectedEdgeWeightValue;
+          };
+
+          $scope.isValidEdgeWeight = function() {
+            return angular.isNumber($scope.selectedEdgeWeightValue);
+          };
+
+          $scope.onUpdateEdgeWeight = function() {
+            if (angular.isNumber($scope.selectedEdgeWeightValue)) {
+              $scope.graph.edges[$scope.state.selectedEdge].weight = (
+                $scope.selectedEdgeWeightValue);
+            }
+            $scope.state.selectedEdge = null;
           };
 
           // Styling functions
