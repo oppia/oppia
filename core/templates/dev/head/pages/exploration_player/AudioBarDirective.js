@@ -73,14 +73,6 @@ oppia.directive('audioBar', [
               $scope.languagesInExploration.length > 0);
           };
 
-          $scope.getProgressBarMode = function() {
-            if ($scope.audioLoadingIndicatorIsShown) {
-              return 'indeterminate';
-            } else {
-              return 'determinate';
-            }
-          };
-
           $scope.onNewLanguageSelected = function() {
             AudioTranslationLanguageService.setCurrentAudioLanguageCode(
               $scope.selectedLanguage.value);
@@ -185,6 +177,17 @@ oppia.directive('audioBar', [
                 playPauseUploadedAudioTranslation(
                   getCurrentAudioLanguageCode());
               }
+            }
+          };
+
+          $scope.track = {
+            progress: function(progressPercentage) {
+              // Returns the current track progress. In addition, sets the
+              // track progress if the progressPercentage argument is defined.
+              if (angular.isDefined(progressPercentage)) {
+                AudioPlayerService.setProgress(progressPercentage / 100);
+              }
+              return AudioPlayerService.getProgress() * 100;
             }
           };
 

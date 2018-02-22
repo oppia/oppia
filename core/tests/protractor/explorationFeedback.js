@@ -86,6 +86,7 @@ describe('ExplorationFeedback', function() {
     ).toEqual(1);
     creatorDashboardPage.navigateToExplorationEditor();
 
+    editor.expectCurrentTabToBeFeedbackTab();
     editor.readFeedbackMessages().then(function(messages) {
       expect(messages.length).toEqual(1);
       expect(messages[0]).toEqual(feedback);

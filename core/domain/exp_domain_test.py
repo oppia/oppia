@@ -29,128 +29,6 @@ import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
-# Dictionary-like data structures within sample YAML must be formatted
-# alphabetically to match string equivalence with the YAML generation
-# methods tested below.
-#
-# If evaluating differences in YAML, conversion to dict form via
-# utils.dict_from_yaml can isolate differences quickly.
-
-SAMPLE_YAML_CONTENT = ("""author_notes: ''
-auto_tts_enabled: true
-blurb: ''
-category: Category
-correctness_feedback_enabled: false
-init_state_name: %s
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: %d
-states:
-  %s:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: %s
-        feedback:
-          audio_translations: {}
-          html: ''
-        labelled_as_correct: false
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: null
-      solution: null
-    param_changes: []
-  New state:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: ''
-    interaction:
-      answer_groups: []
-      confirmed_unclassified_answers: []
-      customization_args: {}
-      default_outcome:
-        dest: New state
-        feedback:
-          audio_translations: {}
-          html: ''
-        labelled_as_correct: false
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: null
-      solution: null
-    param_changes: []
-states_schema_version: %d
-tags: []
-title: Title
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME,
-    exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
-
-SAMPLE_UNTITLED_YAML_CONTENT = ("""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: %s
-language_code: en
-objective: ''
-param_changes: []
-param_specs: {}
-schema_version: %d
-states:
-  %s:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      customization_args: {}
-      default_outcome:
-        dest: %s
-        feedback: []
-        labelled_as_correct: false
-        param_changes: []
-        refresher_exploration_id: null
-      fallbacks: []
-      id: null
-    param_changes: []
-  New state:
-    content:
-    - type: text
-      value: ''
-    interaction:
-      answer_groups: []
-      customization_args: {}
-      default_outcome:
-        dest: New state
-        feedback: []
-        labelled_as_correct: false
-        param_changes: []
-        refresher_exploration_id: null
-      fallbacks: []
-      id: null
-    param_changes: []
-states_schema_version: %d
-tags: []
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME,
-    exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
-
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
@@ -1043,12 +921,17 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         yaml_content = exploration.to_yaml()
-        self.assertEqual(yaml_content, SAMPLE_YAML_CONTENT)
+        self.assertEqual(yaml_content, self.SAMPLE_YAML_CONTENT)
 
         exploration2 = exp_domain.Exploration.from_yaml('exp2', yaml_content)
         self.assertEqual(len(exploration2.states), 2)
         yaml_content_2 = exploration2.to_yaml()
         self.assertEqual(yaml_content_2, yaml_content)
+
+        # Verify SAMPLE_UNTITLED_YAML_CONTENT can be converted to an exploration
+        # without error
+        exp_domain.Exploration.from_untitled_yaml(
+            'exp4', 'Title', 'Category', self.SAMPLE_UNTITLED_YAML_CONTENT)
 
         with self.assertRaises(Exception):
             exp_domain.Exploration.from_yaml('exp3', 'No_initial_state_name')
@@ -1065,13 +948,13 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected a YAML version >= 10, received: 9'
             ):
             exp_domain.Exploration.from_yaml(
-                'exp4', SAMPLE_UNTITLED_YAML_CONTENT)
+                'exp4', self.SAMPLE_UNTITLED_YAML_CONTENT)
 
         with self.assertRaisesRegexp(
             Exception, 'Expected a YAML version <= 9'
             ):
             exp_domain.Exploration.from_untitled_yaml(
-                'exp4', 'Title', 'Category', SAMPLE_YAML_CONTENT)
+                'exp4', 'Title', 'Category', self.SAMPLE_YAML_CONTENT)
 
 
 class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
@@ -2844,8 +2727,101 @@ states_schema_version: 17
 tags: []
 title: Title
 """)
-
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V22
+    YAML_CONTENT_V23 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 23
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            audio_translations: {}
+            html: Correct!
+          labelled_as_correct: false
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 18
+tags: []
+title: Title
+""")
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V23
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -2977,6 +2953,12 @@ title: Title
         """Test direct loading from a v22 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V22)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v23(self):
+        """Test direct loading from a v23 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V23)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
 

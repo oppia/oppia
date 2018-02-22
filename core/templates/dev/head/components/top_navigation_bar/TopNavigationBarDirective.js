@@ -63,6 +63,9 @@ oppia.directive('topNavigationBar', [
               $window.location = GLOBALS.loginUrl;
             }, 150);
           };
+          $scope.onLogoutButtonClicked = function() {
+            $window.localStorage.removeItem('last_uploaded_audio_lang');
+          };
 
           $scope.profileDropdownIsActive = false;
           $scope.onMouseoverProfilePictureOrDropdown = function(evt) {

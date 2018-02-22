@@ -95,6 +95,12 @@ handlers:
   static_files: extensions/\1/\2
   upload: extensions/(interactions|rich_text_components|objects|classifiers)/(.*\.(js|png))$
   secure: always
+- url: /extensions/visualizations/(.*\.html)
+  static_files: extensions/visualizations/\1
+  upload: extensions/visualizations/(.*\.html)
+  secure: always
+  http_headers:
+    Cache-Control: 'no-cache'
 - url: /mapreduce/pipeline/images
   static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
   secure: always
