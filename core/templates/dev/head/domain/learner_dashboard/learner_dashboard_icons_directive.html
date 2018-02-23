@@ -1,5 +1,5 @@
 <i class="oppia-learner-dashboard-icon fa fa-clock-o"
-   ng-show="canActivityBeAddedToLearnerPlaylist(getActivityId())"
+   ng-show="false"
    ng-click="addToLearnerPlaylist(getActivityId(), getActivityType())"
    ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)"
    aria-hidden="true"
@@ -19,15 +19,15 @@
    uib-tooltip="<['I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate]>"
    tooltip-placement="left"></i>
 <i class="oppia-learner-dashboard-icon fa fa-spinner"
-   ng-if="belongsToIncompleteActivities()"
+   ng-if="true"
    aria-hidden="true"
    tooltip-append-to-body="true"
    tooltip-class="library-incomplete-activity-tooltip"
    uib-tooltip="<['I18N_LIBRARY_INCOMPLETE_ACTIVITY_ICON' | translate]>"
    tooltip-placement="left"></i>
 <style>
-   .library-incomplete-activity-tooltip .tooltip-inner {
-        max-width: none;
-        white-space: nowrap;
-    }
+  .library-incomplete-activity-tooltip .tooltip-inner {
+    max-width: none;
+    white-space: nowrap;
+  }
 </style>
