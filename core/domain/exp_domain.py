@@ -1611,6 +1611,57 @@ class State(object):
                 default_dest_state_name))
 
 
+class ExplorationVersionsDiff(object):
+    """Domain object for the difference between two versions of an Oppia
+    exploration.
+
+    Attributes:
+        states_added: list(str). The states added to the exploration from
+            prev_exp_version to current_exp_version.
+        states_deleted: list(str). The states deleted from the exploration from
+            prev_exp_version to current_exp_version.
+        states_renamed: dict. Dictionary mapping state names of
+            current_exp_version to the state names of prev_exp_version.
+    """
+
+    def __init__(self, change_list):
+        """Constructs an ExplorationVersionsDiff domain object.
+
+        Args:
+            change_list: list(dict). A list of all of the commit cmds from the
+                old_stats_model up to the next version.
+        """
+
+        states_added = []
+        states_deleted = []
+        states_renamed = {}
+
+        for change_dict in change_list:
+            if change_dict['cmd'] == CMD_ADD_STATE:
+                states_added.append(change_dict['state_name'])
+            elif change_dict['cmd'] == CMD_DELETE_STATE:
+                state_name = change_dict['state_name']
+                if state_name in states_added:
+                    states_added.remove(state_name)
+                else:
+                    states_deleted.append(state_name)
+            elif change_dict['cmd'] == CMD_RENAME_STATE:
+                old_state_name = change_dict['old_state_name']
+                new_state_name = change_dict['new_state_name']
+                if old_state_name in states_added:
+                    states_added.remove(old_state_name)
+                    states_added.append(new_state_name)
+                elif old_state_name in states_renamed:
+                    states_renamed[new_state_name] = states_renamed.pop(
+                        old_state_name)
+                else:
+                    states_renamed[new_state_name] = old_state_name
+
+        self.states_added = states_added
+        self.states_deleted = states_deleted
+        self.states_renamed = states_renamed
+
+
 class Exploration(object):
     """Domain object for an Oppia exploration."""
 

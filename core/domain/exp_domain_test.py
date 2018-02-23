@@ -30,6 +30,119 @@ import utils
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
+class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
+    """Test the exploration versions difference domain object."""
+
+    def setUp(self):
+        super(ExplorationVersionsDiffDomainUnitTests, self).setUp()
+        self.exp_id = 'exp_id1'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, self.exp_id,
+            assets_list)
+        self.exploration = exp_services.get_exploration_by_id(self.exp_id)
+
+    def test_correct_creation_of_version_diffs(self):
+        # Rename a state.
+        self.exploration.rename_state('Home', 'Renamed state')
+        change_list = [{
+            'cmd': 'rename_state',
+            'old_state_name': 'Home',
+            'new_state_name': 'Renamed state'
+        }]
+
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+
+        self.assertEqual(exp_versions_diff.states_added, [])
+        self.assertEqual(exp_versions_diff.states_deleted, [])
+        self.assertEqual(exp_versions_diff.states_renamed, {
+            'Renamed state': 'Home'
+        })
+        self.exploration.version += 1
+
+        # Add a state
+        self.exploration.add_states(['New state'])
+        self.exploration.states['New state'] = copy.deepcopy(
+            self.exploration.states['Renamed state'])
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }]
+
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+
+        self.assertEqual(exp_versions_diff.states_added, ['New state'])
+        self.assertEqual(exp_versions_diff.states_deleted, [])
+        self.assertEqual(exp_versions_diff.states_renamed, {})
+        self.exploration.version += 1
+
+        # Delete state.
+        self.exploration.delete_state('New state')
+        change_list = [{
+            'cmd': 'delete_state',
+            'state_name': 'New state'
+        }]
+
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+
+        self.assertEqual(exp_versions_diff.states_added, [])
+        self.assertEqual(exp_versions_diff.states_deleted, ['New state'])
+        self.assertEqual(exp_versions_diff.states_renamed, {})
+        self.exploration.version += 1
+
+        # Test addition and multiple renames.
+        self.exploration.add_states(['New state'])
+        self.exploration.states['New state'] = copy.deepcopy(
+            self.exploration.states['Renamed state'])
+        self.exploration.rename_state('New state', 'New state2')
+        self.exploration.rename_state('New state2', 'New state3')
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state',
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state',
+            'new_state_name': 'New state2'
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state2',
+            'new_state_name': 'New state3'
+        }]
+
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+
+        self.assertEqual(exp_versions_diff.states_added, ['New state3'])
+        self.assertEqual(exp_versions_diff.states_deleted, [])
+        self.assertEqual(exp_versions_diff.states_renamed, {})
+        self.exploration.version += 1
+
+        # Test addition, rename and deletion.
+        self.exploration.add_states(['New state 2'])
+        self.exploration.rename_state('New state 2', 'Renamed state 2')
+        self.exploration.delete_state('Renamed state 2')
+        change_list = [{
+            'cmd': 'add_state',
+            'state_name': 'New state 2'
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'New state 2',
+            'new_state_name': 'Renamed state 2'
+        }, {
+            'cmd': 'delete_state',
+            'state_name': 'Renamed state 2'
+        }]
+
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+
+        self.assertEqual(exp_versions_diff.states_added, [])
+        self.assertEqual(exp_versions_diff.states_deleted, [])
+        self.assertEqual(exp_versions_diff.states_renamed, {})
+        self.exploration.version += 1
+
+
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
 
