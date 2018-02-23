@@ -350,9 +350,11 @@ oppia.filter('removeExtraLines', [function() {
       return string;
     }
     while (1) {
-      var lastIndex = string.lastIndexOf('>');
-      if (string.substring(lastIndex - 10, lastIndex + 1) === '<p><br></p>') {
-        string = string.substring(0, lastIndex - 10);
+      var lastIndex = string.length;
+      var BLANK_LINES_TEXT = '<p><br></p>';
+      if (string.substring(
+        lastIndex - BLANK_LINES_TEXT.length, lastIndex) === BLANK_LINES_TEXT) {
+        string = string.substring(0, lastIndex - BLANK_LINES_TEXT.length);
       }
       else {
         break;

@@ -488,6 +488,13 @@ describe('Testing filters', function() {
     var filter = $filter('removeExtraLines');
 
     expect(filter('<p><br></p>')).toEqual('');
+    expect(filter('<p>abc</p>')).toEqual('<p>abc</p>');
+    expect(filter('<p>abc</p><p><br></p><p>abc</p>')
+    ).toEqual('<p>abc</p><p><br></p><p>abc</p>');
+    expect(filter('<p>abc</p><p><br></p><p>abc</p><p><br></p>')
+    ).toEqual('<p>abc</p><p><br></p><p>abc</p>');
+    expect(filter('<p>abc</p><p><br></p><p>abc</p><p><br></p><p><br></p>')
+    ).toEqual('<p>abc</p><p><br></p><p>abc</p>');
     expect(filter(null)).toEqual(null);
     expect(filter(undefined)).toEqual(undefined);
   }));
