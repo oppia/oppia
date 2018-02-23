@@ -317,7 +317,7 @@ oppia.directive('graphViz', [
             pt.x = event.clientX;
             pt.y = event.clientY;
             var svgp = pt.matrixTransform(
-              vizContainer[0].getScreenCTM().inverse())
+              vizContainer[0].getScreenCTM().inverse());
             $scope.state.mouseX = svgp.x;
             $scope.state.mouseY = svgp.y;
             // We use vertexDragStartX/Y and mouseDragStartX/Y to make
@@ -771,7 +771,8 @@ oppia.directive('graphViz', [
               var svgContainer = $($element).find('.oppia-graph-viz-svg')[0];
               var boundingBox = svgContainer.getBBox();
               var viewBoxHeight = Math.max(
-                boundingBox.height + boundingBox.y, svgContainer.getAttribute('height'));
+                boundingBox.height + boundingBox.y,
+                svgContainer.getAttribute('height'));
               $scope.svgViewBox = (
                 0 + ' ' + 0 + ' ' + (boundingBox.width + boundingBox.x) +
                 ' ' + (viewBoxHeight));
