@@ -734,7 +734,8 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         """Returns the categorized frequency dict in its raw type.
 
         Returns:
-            dict. Categorized answer frequency dict.
+            dict(str, list). Categorized answer frequency dict with category
+                type as the keys and answer frequency list as the values.
         """
         return {
             category: answer_frequency_list.to_raw_type()
@@ -748,7 +749,9 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         a given dict.
 
         Args:
-            categorized_frequency_dict: dict. The categorized frequency dict.
+            categorized_frequency_dict: dict(str, list). The categorized
+                frequency dict with category type as the keys and answer
+                frequency list as the values.
 
         Returns:
             CategorizedAnswerFrequencyLists. The domain object for categorized
