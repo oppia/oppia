@@ -3,15 +3,13 @@
     "eslint:recommended",
   ],
   "plugins": [
-    "html",
     "angular"
   ],
   "rules": {
     "angular/directive-restrict": [
-      "error",
+      2,
       {
-        "restrict": "E",
-        "explicit": "always"
+        "restrict": "E"
       }
     ],
     "brace-style":[
