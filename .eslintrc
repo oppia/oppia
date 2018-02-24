@@ -3,6 +3,7 @@
     "eslint:recommended",
   ],
   "plugins": [
+    "html",
     "angular"
   ],
   "rules": {
