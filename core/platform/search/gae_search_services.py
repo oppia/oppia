@@ -51,7 +51,7 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
           the document's rank.
           By default, search results are returned ordered by descending rank.
           If there is a key named 'language_code', its value will be used as
-          the document's language. Otherwise, feconf.DEFAULT_LANGUAGE_CODE is
+          the document's language. Otherwise, constants.DEFAULT_LANGUAGE_CODE is
           used.
       - index: the name of the index to insert the document into, a string.
       - retries: the number of times to retry inserting the documents.
@@ -126,8 +126,7 @@ def _make_fields(key, value):
     if isinstance(value, numbers.Number):
         return [gae_search.NumberField(name=key, value=value)]
 
-    if isinstance(value, datetime.datetime) or isinstance(
-            value, datetime.date):
+    if isinstance(value, (datetime.datetime, datetime.date)):
         return [gae_search.DateField(name=key, value=value)]
 
     raise ValueError(
@@ -141,10 +140,8 @@ def _validate_list(key, value):
     passed in to make better error messages."""
 
     for ind, element in enumerate(value):
-        if not (isinstance(element, basestring) or
-                isinstance(element, datetime.date) or
-                isinstance(element, datetime.datetime) or
-                isinstance(element, numbers.Number)):
+        if not isinstance(element, (
+                basestring, datetime.date, datetime.datetime, numbers.Number)):
             raise ValueError(
                 'All values of a multi-valued field must be numbers, strings, '
                 'date or datetime instances, The %dth value for field %s has'
@@ -276,7 +273,7 @@ def search(query_string, index, cursor=None,
     try:
         logging.debug('attempting a search with query %s' % query)
         results = index.search(query)
-    except gae_search.TransientError as e:
+    except Exception as e:
         logging.exception('something went wrong while searching.')
         if retries > 1:
             logging.debug('%d attempts left, retrying...' % (retries - 1))

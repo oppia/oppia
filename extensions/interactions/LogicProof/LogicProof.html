@@ -1,46 +1,4 @@
-<style>
-  .logic-proof-input-box {
-    border: 1px solid #ccc;
-  }
-  .logic-proof-erroneous-line {
-    font-weight: bold;
-  }
-  .logic-proof-error-message {
-    color: red;
-  }
-</style>
+<link rel="stylesheet" href="{{cache_slug}}/extensions/interactions/LogicProof/static/logic_proof.css">
 
-<script type="text/ng-template" id="interaction/LogicProof">
-  <div>
-    <[questionString]>
-    <div class="logic-proof-input-box">
-      <div ui-codemirror="{onLoad: codeEditor}">
-        <textarea ng-trim="false" rows="10"></textarea>
-      </div>
-    </div>
-    <button class="btn btn-default" ng-click="submitProof()">Submit</button>
-    <button class="btn btn-default" ng-click="showHelp()">Possible lines</button>
-    <p class="logic-proof-error-message"> <[errorMessage]>  </p>
-  </div>
-</script>
-
-<script type="text/ng-template" id="response/LogicProof">
-  <div>
-    <[answer.displayed_question]>
-    <div ng-if="answer.correct">
-      <pre><[answer.displayed_proof[0]]></pre>
-    </div>
-
-    <div ng-if="!answer.correct">
-      <div>
-        <pre><[answer.displayed_proof[0]]><div class="logic-proof-erroneous-line"><[answer.displayed_proof[1]]></div><[answer.displayed_proof[2]]></pre>
-      </div>
-      <p class="logic-proof-error-message"><[answer.displayed_message]></p>
-    </div>
-  </div>
-</script>
-
-<script type="text/ng-template" id="shortResponse/LogicProof">
-  <span ng-if="answer.correct">Correct: <pre><[answer.displayed_proof[0] | truncateAtFirstLine]></pre></span>
-  <span ng-if="!answer.correct">Incorrect: <pre><[answer.displayed_proof[1] | truncateAtFirstLine]></pre></span>
-</script>
+<script src="{{cache_slug}}/extensions/interactions/LogicProof/directives/LogicProof.js"></script>
+<script src="{{cache_slug}}/extensions/interactions/LogicProof/directives/LogicProofValidationService.js"></script>

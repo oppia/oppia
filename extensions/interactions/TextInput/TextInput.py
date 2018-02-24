@@ -24,12 +24,13 @@ class TextInput(base.BaseInteraction):
     description = 'Allows learners to enter arbitrary text strings.'
     display_mode = base.DISPLAY_MODE_INLINE
     is_trainable = True
-    is_string_classifier_trainable = True
-    _dependency_ids = []
+    _dependency_ids = ['text_input_prediction']
     answer_type = 'NormalizedString'
     instructions = None
     narrow_instructions = None
     needs_summary = False
+    can_have_solution = True
+    show_generic_submit_button = True
 
     # NB: There used to be an integer-typed parameter here called 'columns'
     # that was removed in revision 628942010573. Some text interactions in
@@ -59,4 +60,15 @@ class TextInput(base.BaseInteraction):
             }]
         },
         'default_value': 1,
+    }]
+
+    _answer_visualization_specs = [{
+        # Table with answer counts for top N answers.
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top answers',
+        },
+        'calculation_id': 'Top10AnswerFrequencies',
+        'show_addressed_info': True,
     }]

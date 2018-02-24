@@ -25,20 +25,11 @@
  */
 
 describe('Interaction validator', function() {
-  var scope, filter, bivs, WARNING_TYPES;
+  var scope, filter, bivs, WARNING_TYPES, agof;
 
   var currentState, otherState, goodOutcomeDest, goodOutcomeFeedback;
   var badOutcome, goodAnswerGroups, goodDefaultOutcome;
-
-  var createAnswerGroup = function(outcome, ruleSpecs) {
-    if (!ruleSpecs) {
-      ruleSpecs = [];
-    }
-    return {
-      rule_specs: ruleSpecs,
-      outcome: outcome
-    };
-  };
+  var agof, oof;
 
   beforeEach(function() {
     module('oppia');
@@ -49,24 +40,45 @@ describe('Interaction validator', function() {
     filter = $injector.get('$filter');
     bivs = $injector.get('baseInteractionValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
+    agof = $injector.get('AnswerGroupObjectFactory');
+    oof = $injector.get('OutcomeObjectFactory');
 
     currentState = 'First State';
     otherState = 'Second State';
-    goodOutcomeDest = {
+    goodOutcomeDest = oof.createFromBackendDict({
       dest: otherState,
-      feedback: []
-    };
-    goodOutcomeFeedback = {
+      feedback: {
+        html: '',
+        audio_translations: {}
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null
+    });
+    goodOutcomeFeedback = oof.createFromBackendDict({
       dest: currentState,
-      feedback: ['Feedback']
-    };
-    badOutcome = {
+      feedback: {
+        html: 'Feedback',
+        audio_translations: {}
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null
+    });
+    badOutcome = oof.createFromBackendDict({
       dest: currentState,
-      feedback: []
-    };
+      feedback: {
+        html: '',
+        audio_translations: {}
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null
+    });
 
     goodAnswerGroups = [
-      createAnswerGroup(goodOutcomeDest), createAnswerGroup(goodOutcomeFeedback)
+      agof.createNew([], goodOutcomeDest, false),
+      agof.createNew([], goodOutcomeFeedback, false)
     ];
     goodDefaultOutcome = goodOutcomeDest;
   }));
@@ -80,36 +92,38 @@ describe('Interaction validator', function() {
     });
 
     it('should have a warning for an answer group with a confusing outcome',
-        function() {
-      var answerGroups = [
-        createAnswerGroup(goodOutcomeDest),
-        createAnswerGroup(badOutcome),
-        createAnswerGroup(goodOutcomeFeedback)
-      ];
-      var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: 'Please specify what Oppia should do in answer group 2.'
-      }]);
-    });
+      function() {
+        var answerGroups = [
+          agof.createNew([], goodOutcomeDest, false),
+          agof.createNew([], badOutcome, false),
+          agof.createNew([], goodOutcomeFeedback, false)
+        ];
+        var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
+        expect(warnings).toEqual([{
+          type: WARNING_TYPES.ERROR,
+          message: 'Please specify what Oppia should do in answer group 2.'
+        }]);
+      }
+    );
 
     it('should not have any warnings for a non-confusing default outcome',
-        function() {
-      var warnings = bivs.getDefaultOutcomeWarnings(
-        goodOutcomeDest, currentState);
-      expect(warnings).toEqual([]);
+      function() {
+        var warnings = bivs.getDefaultOutcomeWarnings(
+          goodOutcomeDest, currentState);
+        expect(warnings).toEqual([]);
 
-      warnings = bivs.getDefaultOutcomeWarnings(
-        goodOutcomeFeedback, currentState);
-      expect(warnings).toEqual([]);
-    });
+        warnings = bivs.getDefaultOutcomeWarnings(
+          goodOutcomeFeedback, currentState);
+        expect(warnings).toEqual([]);
+      }
+    );
 
     it('should have a warning for a confusing default outcome', function() {
       var warnings = bivs.getDefaultOutcomeWarnings(badOutcome, currentState);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Please add feedback for the user if they are to return ' +
-          'to the same state again.'
+        message: 'Please add feedback for the user in the [All other ' +
+          'answers] rule.'
       }]);
     });
 
@@ -122,24 +136,23 @@ describe('Interaction validator', function() {
     it('should be able to concatenate warnings for both answer groups and ' +
         'the default outcome', function() {
       var badAnswerGroups = [
-        createAnswerGroup(goodOutcomeDest),
-        createAnswerGroup(badOutcome),
-        createAnswerGroup(badOutcome)
+        agof.createNew([], goodOutcomeDest, false),
+        agof.createNew([], badOutcome, false),
+        agof.createNew([], badOutcome, false)
       ];
       var warnings = bivs.getAllOutcomeWarnings(
         badAnswerGroups, badOutcome, currentState);
       expect(warnings).toEqual([{
-          type: WARNING_TYPES.ERROR,
-          message: 'Please specify what Oppia should do in answer group 2.'
-        }, {
-          type: WARNING_TYPES.ERROR,
-          message: 'Please specify what Oppia should do in answer group 3.'
-        }, {
-          type: WARNING_TYPES.ERROR,
-          message: (
-            'Please add feedback for the user if they are to return ' +
-            'to the same state again.')
-        }
+        type: WARNING_TYPES.ERROR,
+        message: 'Please specify what Oppia should do in answer group 2.'
+      }, {
+        type: WARNING_TYPES.ERROR,
+        message: 'Please specify what Oppia should do in answer group 3.'
+      }, {
+        type: WARNING_TYPES.ERROR,
+        message: (
+          'Please add feedback for the user in the [All other answers] rule.')
+      }
       ]);
     });
   });
@@ -156,12 +169,13 @@ describe('Interaction validator', function() {
     });
 
     it('should throw warnings for multiple missing top-level fields',
-        function() {
-      var expectedArgs = ['first', 'second'];
-      expect(function() {
-        bivs.requireCustomizationArguments({}, expectedArgs);
-      }).toThrow(
-        'Expected customization arguments to have properties: first, second');
-    });
+      function() {
+        var expectedArgs = ['first', 'second'];
+        expect(function() {
+          bivs.requireCustomizationArguments({}, expectedArgs);
+        }).toThrow(
+          'Expected customization arguments to have properties: first, second');
+      }
+    );
   });
 });

@@ -1,0 +1,50 @@
+<learner-dashboard-icons ng-if="showLearnerDashboardIconsIfPossible() && userIsLoggedIn"
+                         activity-type="ACTIVITY_TYPE_COLLECTION"
+                         activity-id="getCollectionId()"
+                         activity-title="getCollectionTitle()"
+                         activity-active="collectionIsCurrentlyHoveredOver">
+</learner-dashboard-icons>
+<md-card class="oppia-activity-summary-tile"
+         ng-class="{'oppia-activity-playlist-tile': isPlaylistTile()}"
+         style="position: relative; z-index: 5;">
+  <a ng-href="<[getCollectionLink()]>" style="text-decoration: none;">
+    <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
+      <img class="collection-corner-image" ng-src="<[getStaticImageUrl('/general/collection_corner.svg')]>" alt="">
+      <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>" alt="<[getCategory()]>" ng-style="isPlaylistTile() && {'top': '6px', 'width': '60px'}">
+      <h3 class="activity-title protractor-test-collection-summary-tile-title" ng-style="isPlaylistTile() && {'width': '93%', 'text-align': 'center'}"><[getCollectionTitle() || DEFAULT_EMPTY_TITLE]></h3>
+    </div>
+
+    <div ng-style="isPlaylistTile() && {'float': 'right', 'width': '67%', 'margin-top': '3%'}">
+      <div class="objective">
+        <[getObjective() | truncateAndCapitalize: 95]>
+        <span ng-if="!getObjective()">No objective specified.</span>
+      </div>
+      <ul layout="row" class="metrics" layout-align="space-between center">
+        <li>
+          <span>
+            COLLECTION (<[getNodeCount()]>)
+          </span>
+        </li>
+        <li>
+          <span>
+            <span class="oppia-icon-accessibility-label">Last Updated</span>
+            <[getLastUpdatedDatetime()]>
+          </span>
+        </li>
+      </ul>
+    </div>
+    <div ng-if="!isPlaylistTile()" class="title-section-mask"
+         ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)"></div>
+  </a>
+</md-card>
+
+<style>
+  .oppia-activity-summary-tile .thumbnail-image {
+    top: 15.5%;
+  }
+
+  .oppia-activity-summary-tile .collection-corner-image {
+    position: absolute;
+    width: 36px;
+  }
+</style>

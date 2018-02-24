@@ -1,26 +1,2 @@
-<script type="text/ng-template" id="interaction/InteractiveMap">
-  <style>
-    /* Fixes for Google Maps zoom controls. */
-    .gm-style img {
-      max-width: none;
-    }
-    .gm-style label {
-      width: auto; display:inline;
-    }
-  </style>
-
-  <div>
-    <div id="map_canvas" ui-map="map" ui-options="mapOptions"
-         style="width: 100%; height: 400px; max-width: 600px; max-height: 400px; margin: auto"
-         ui-event="{'map-click': 'registerClick($event, $params)'}">
-    </div>
-  </div>
-</script>
-
-<script type="text/ng-template" id="response/InteractiveMap">
-  <img ng-src="<[staticMapUrl]>" style="margin: 3px auto; display: block;">
-</script>
-
-<script type="text/ng-template" id="shortResponse/InteractiveMap">
-  <span><[formattedCoords]></span>
-</script>
+<script src="{{cache_slug}}/extensions/interactions/InteractiveMap/directives/InteractiveMap.js"></script>
+<script src="{{cache_slug}}/extensions/interactions/InteractiveMap/directives/InteractiveMapValidationService.js"></script>

@@ -1,0 +1,125 @@
+/* The container around the staff and noteChoices.
+ * This keeps the note from dropping on top of the clef.
+ */
+
+.oppia-music-input-valid-note-area {
+  position: relative;
+  float:left;
+  margin: 0 0 0 11.0784%;
+  width: 87.34525%;
+  height: 43%;
+  /* Hide valid note area until page loads */
+  visibility: hidden;
+}
+
+/* The box around staff */
+
+.oppia-music-input-staff {
+  clear: both;
+  background: transparent;
+  max-width: 673px;
+}
+
+/* The box around note choices */
+
+.oppia-music-input-note-choices {
+  clear: both;
+  float: right;
+  background: rgba(0, 0, 0, 0.04); /* Color of noteChoices box */
+  width: 5%;
+  padding: 2.3% 9% 5.83% 1.1%;
+  margin-bottom: 15px;
+  border: 0.2em solid #333;
+  -moz-border-radius: 11%;
+  -webkit-border-radius: 11%;
+  border-radius: 11%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* The invisible box around droppable staff */
+
+.oppia-music-input-staff {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  clear: both;
+  float: right;
+  width: 110.1%;
+  padding: 1.5% 0 3% 0;
+}
+
+/* The staff lines and ledger lines */
+
+.oppia-music-input-staff div.oppia-music-staff-position {
+  position: relative;
+  width: 100%;
+  margin: 0 0;
+  background: transparent;
+  color: transparent;
+  float: right;
+}
+
+.oppia-music-input-staff div.oppia-music-input-hovered {
+  background: #aaa;
+}
+
+.oppia-music-input-staff div.oppia-music-staff-line {
+  background: #000000;
+  height: 2px;
+  position: absolute;
+  width: 100%;
+}
+
+.oppia-music-input-staff {
+  background-image: url(/extensions/interactions/MusicNotesInput/static/images/treble_clef.png);
+  background-repeat: no-repeat;
+  background-position: 0.1% 62%;
+  background-size: 8.5% 89%;
+}
+
+/* Individual notes */
+
+.oppia-music-input-note-choices div {
+  width: 7.8%;
+  height: 9.2%;
+  position: relative;
+  background: transparent;
+}
+
+.oppia-music-input-note-choices div.oppia-music-input-natural-note {
+  float: left;
+  background-image: url(/extensions/interactions/MusicNotesInput/static/images/whole_note.png);
+  background-repeat: no-repeat;
+  background-size: 71%;
+  background-position: center;
+  position: absolute;
+}
+
+.oppia-music-input-staff .oppia-music-input-ledger-line {
+  position: absolute;
+  width: 8%;
+  padding-bottom: 0.35%;
+  background-color: #000000;
+}
+
+.oppia-music-input-on-staff {
+  position: absolute;
+  /* Maximum 14, otherwise it will be above
+     the tutorcard if viewport is less than 960 */
+  z-index: 14;
+}
+
+.oppia-music-input-control-buttons {
+  padding: 40% 0 5% 2%;
+}
+
+.oppia-music-input-btn {
+  padding: 6px 10px;
+}
+
+.oppia-music-input-play-btn {
+  margin-left: -55px;
+  margin-top: 0;
+}

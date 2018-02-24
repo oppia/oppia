@@ -26,6 +26,12 @@ class ItemSelectionInput(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
     answer_type = 'SetOfHtmlString'
+    # Radio buttons get unselected when specifying a solution. This needs to be
+    # fixed before solution feature can support this interaction.
+    can_have_solution = False
+    # ItemSelectionInput's submit button is dynamic and is handled
+    # separately.
+    show_generic_submit_button = False
 
     _customization_arg_specs = [{
         'name': 'minAllowableSelectionCount',
@@ -58,11 +64,23 @@ class ItemSelectionInput(base.BaseInteraction):
                 'type': 'html',
                 'ui_config': {
                     'hide_complex_extensions': True,
+                    'placeholder': 'Sample item answer',
                 },
             },
             'ui_config': {
                 'add_element_text': 'Add item for selection',
             }
         },
-        'default_value': ['Sample item answer'],
+        'default_value': [''],
+    }]
+
+    _answer_visualization_specs = [{
+        # Table with keyed answer counts for top N answers.
+        'id': 'EnumeratedFrequencyTable',
+        'options': {
+            'column_headers': ['Answer (click to expand/collapse)', 'Count'],
+            'title': 'Top answers',
+        },
+        'calculation_id': 'Top10AnswerFrequencies',
+        'show_addressed_info': True,
     }]

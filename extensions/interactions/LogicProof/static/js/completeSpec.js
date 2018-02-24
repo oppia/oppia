@@ -43,6 +43,15 @@ var errorWrapper = function(
   };
 };
 
+var sharedErrorWrapper = function(message, line, code, category) {
+  return {
+    message: message,
+    line: line,
+    code: code,
+    category: category
+  };
+};
+
 describe('Full system', function() {
   var completeCheck = function(assumptionsString, targetString, proofString) {
     var questionInstance = logicProofStudent.buildInstance(
@@ -81,15 +90,18 @@ describe('Full system', function() {
     expect(function() {
       completeCheck('p', 'p', 'we knew p');
     }).toThrow(
-      'The phrase starting \'we\' could not be identified; please ' +
-      'make sure you are only using phrases from the given list of vocabulary.'
+        sharedErrorWrapper(
+          'The phrase starting \'we\' could not be identified; please ' +
+          'make sure you are only using phrases from the given list of ' +
+          'vocabulary.', 0, 'unidentified_phrase_starting_at', 'formattting')
     );
 
     expect(function() {
       completeCheck('p', 'p', 'we know q');
     }).toThrow(
-      'This line uses q, so you need to have an earlier line proving that q ' +
-      'is true.');
+      sharedErrorWrapper(
+        'This line uses q, so you need to have an earlier line proving ' +
+        'that q is true.', 0, 'missing_antecedent', 'logic'));
 
     expect(function() {
       completeCheck('∀x.(A(x)∧B(x)), p', '(∀x.A(x))', [
@@ -98,8 +110,10 @@ describe('Full system', function() {
         '  from A(c)∧B(c) we have A(c)',
         'c was arbitrary so ∀x.A(x)',
         'from ∀x.A(x) and p have (∀x.A(x))∧p'].join('\n'));
-    }).toThrow('We are trying to prove ∀x.A(x) so it should be given by the ' +
-      'final line of the proof.');
+    }).toThrow(
+      sharedErrorWrapper(
+        'We are trying to prove ∀x.A(x) so it should be given by the ' +
+        'final line of the proof.', 4, 'last_line_not_target', 'target'));
 
     expect(function() {
       completeCheck('∀x.(A(x)∧B(x))', '(∀x.A(x))', [
@@ -108,9 +122,11 @@ describe('Full system', function() {
         '  from A(c)∧B(c) we have A(c)',
         'd was arbitrary so ∀x.A(x)'].join('\n'));
     }).toThrow(
-      'You haven\'t said where d comes from; if you want it to be arbitrary ' +
-      'then add a preceding line saying \'Given d\'; alternatively you might ' +
-      'want to take a particular d witnessing some existential formula.');
+      sharedErrorWrapper(
+        'You haven\'t said where d comes from; if you want it to be ' +
+        'arbitrary then add a preceding line saying \'Given d\'; ' +
+        'alternatively you might want to take a particular d witnessing ' +
+        'some existential formula.', 3, 'unspecified_variable', 'variables'));
   });
 
   it('should check proofs in less than 10 seconds', function() {

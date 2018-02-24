@@ -1,0 +1,39 @@
+<div>
+  <form id="<[inputFieldFormId]>">
+    <input type="file" ng-class="inputFieldClassName">
+  </form>
+  <div class="license-warning">
+    Please only upload audio files that you created yourself and that you are willing to license under the site's
+    <a href="/about#license" target="_blank">license terms</a>.
+    Audio translation files should be less than <b>five minutes</b> long.
+  </div>
+
+  <div ng-if="errorMessage" class="error-message">
+    <i class="material-icons">&#xE002;</i>
+    <[errorMessage]>
+  </div>
+</div>
+
+<style>
+  audio-file-uploader .license-warning {
+    background-color: rgba(225, 250, 89, 0.41);
+    border: 1px solid rgba(200, 230, 59, 0.41);
+    border-radius: 6px;
+    font-size: 12px;
+    font-style: italic;
+    left: 8px;
+    margin-top: 6px;
+    text-align: left;
+    padding: 4px 6px;
+  }
+
+  audio-file-uploader .error-message {
+    color: red;
+    display: inline-block;
+    font-size: 14px;
+    padding: 4px;
+  }
+  audio-file-uploader .error-message i {
+    margin-right: 4px;
+  }
+</style>

@@ -24,24 +24,33 @@ CMD_CHANGE_PROPERTY_VALUE = 'change_property_value'
 
 
 def set_property(committer_id, name, value):
-    """Sets a property value. The property must already be registered."""
+    """Sets a property value. The property must already be registered.
+    Args:
+        committer_id: str. The user ID of the committer.
+        name: str. The name of the property.
+        value: str. The value of the property.
+    Raises:
+        Exception: No config property with the specified name is found.
+    """
 
     config_property = config_domain.Registry.get_config_property(name)
     if config_property is None:
-        raise Exception('No config property with name %s found.')
-
-    if not config_property.is_directly_settable:
-        raise Exception(
-            'Cannot modify value of config property %s directly' % name)
+        raise Exception('No config property with name %s found.' % name)
 
     config_property.set_value(committer_id, value)
 
 
 def revert_property(committer_id, name):
-    """Reverts a property value to the default value."""
+    """Reverts a property value to the default value.
+    Args:
+        committer_id: str. The user ID of the committer.
+        name: str. The name of the property.
+    Raises:
+        Exception: No config property with the specified name is found.
+    """
 
     config_property = config_domain.Registry.get_config_property(name)
     if config_property is None:
-        raise Exception('No config property with name %s found.')
+        raise Exception('No config property with name %s found.' % name)
 
     set_property(committer_id, name, config_property.default_value)

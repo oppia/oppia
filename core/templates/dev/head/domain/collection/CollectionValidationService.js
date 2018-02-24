@@ -20,7 +20,8 @@
  */
 
 oppia.factory('CollectionValidationService', [
-  'SkillListObjectFactory', function(SkillListObjectFactory) {
+  'CollectionLinearizerService',
+  function(CollectionLinearizerService) {
     var _getStartingExplorationIds = function(collection) {
       var startingCollectionNodes = collection.getStartingCollectionNodes();
       return startingCollectionNodes.map(function(collectionNode) {
@@ -28,49 +29,30 @@ oppia.factory('CollectionValidationService', [
       });
     };
 
-    var _getOverlappingPrerequisiteAcquiredSkills = function(collectionNode) {
-      var prerequisiteSkillList = collectionNode.getPrerequisiteSkillList();
-      var acquiredSkillList = collectionNode.getAcquiredSkillList();
-      var overlappingSkillList = SkillListObjectFactory.create([]);
-      prerequisiteSkillList.getSkills().forEach(function(skill) {
-        if (acquiredSkillList.containsSkill(skill)) {
-          overlappingSkillList.addSkill(skill);
+    var _getOverlappingPrerequisiteAcquiredSkillIds = function(collectionNode) {
+      var prerequisiteSkillIds = collectionNode.getPrerequisiteSkillIds();
+      var acquiredSkillIds = collectionNode.getAcquiredSkillIds();
+      var overlappingSkillIds = [];
+      collectionNode.getPrerequisiteSkillIds().forEach(function(skillId) {
+        if (collectionNode.containsAcquiredSkillId(skillId)) {
+          overlappingSkillIds.push(skillId);
         }
       });
-      return overlappingSkillList.getSkills();
-    };
-
-    var _getNextExplorationIds = function(collection, completedExpIds) {
-      var acquiredSkillList = completedExpIds.reduce(
-        function(skillList, explorationId) {
-          var collectionNode = collection.getCollectionNodeByExplorationId(
-            explorationId);
-          skillList.addSkillsFromSkillList(
-            collectionNode.getAcquiredSkillList());
-          return skillList;
-        }, SkillListObjectFactory.create([]));
-
-      // Pick all collection nodes whose prerequisite skills are satisified by
-      // the currently acquired skills and which have not yet been completed.
-      return collection.getExplorationIds().filter(function(explorationId) {
-        var collectionNode = collection.getCollectionNodeByExplorationId(
-          explorationId);
-        return completedExpIds.indexOf(explorationId) == -1 &&
-          acquiredSkillList.isSupersetOfSkillList(
-            collectionNode.getPrerequisiteSkillList());
-      });
+      return overlappingSkillIds;
     };
 
     var _getUnreachableExplorationIds = function(collection) {
       var completedExpIds = _getStartingExplorationIds(collection);
-      var nextExpIds = _getNextExplorationIds(collection, completedExpIds);
+      var nextExpIds = CollectionLinearizerService.getNextExplorationIds(
+        collection, completedExpIds);
       while (nextExpIds.length > 0) {
         completedExpIds = completedExpIds.concat(nextExpIds);
-        nextExpIds = _getNextExplorationIds(collection, completedExpIds);
+        nextExpIds = CollectionLinearizerService.getNextExplorationIds(
+          collection, completedExpIds);
       }
 
       return collection.getExplorationIds().filter(function(explorationId) {
-        return completedExpIds.indexOf(explorationId) == -1;
+        return completedExpIds.indexOf(explorationId) === -1;
       });
     };
 
@@ -90,6 +72,33 @@ oppia.factory('CollectionValidationService', [
       });
     };
 
+    // Validates that the tags for the collection are in the proper format,
+    // returns true if all tags are in the correct format.
+    var validateTagFormat = function(tags) {
+      // Check to ensure that all tags follow the format specified in
+      // TAG_REGEX.
+      var tagRegex = new RegExp(GLOBALS.TAG_REGEX);
+      return tags.every(function(tag) {
+        return tag.match(tagRegex);
+      });
+    };
+
+    // Validates that the tags for the collection do not have duplicates,
+    // returns true if there are no duplicates.
+    var validateDuplicateTags = function(tags) {
+      return tags.every(function(tag, idx) {
+        return tags.indexOf(tag, idx + 1) === -1;
+      });
+    };
+
+    // Validates that the tags for the collection are normalized,
+    // returns true if all tags were normalized.
+    var validateTagsNormalized = function(tags) {
+      return tags.every(function(tag) {
+        return tag === tag.trim().replace(/\s+/g, ' ');
+      });
+    };
+
     var _validateCollection = function(collection, isPublic) {
       // NOTE TO DEVELOPERS: Please ensure that this validation logic is the
       // same as that in core.domain.collection_domain.Collection.validate().
@@ -98,35 +107,52 @@ oppia.factory('CollectionValidationService', [
       var collectionHasNodes = collection.getCollectionNodeCount() > 0;
       if (!collectionHasNodes) {
         issues.push(
-          'There should be at least 1 exploration in the collection');
+          'There should be at least 1 exploration in the collection.');
       }
 
       var startingExpIds = _getStartingExplorationIds(collection);
-      if (collectionHasNodes && startingExpIds.length == 0) {
+      if (collectionHasNodes && startingExpIds.length !== 1) {
         issues.push(
-          'There should be at least 1 exploration initially available to the ' +
-          'learner');
+          'There should be exactly 1 exploration initially available to the ' +
+          'learner.');
       }
 
+      var collectionSkills = collection.getCollectionSkills();
+      var skillNames = [];
+      for (var skillId in collectionSkills) {
+        if (collectionSkills.hasOwnProperty(skillId)) {
+          skillNames.push(collectionSkills[skillId].getName());
+        }
+      }
+      skillNames.forEach(function(skillName, index) {
+        if (skillNames.indexOf(skillName) !== index) {
+          issues.push('Skill name \'' + skillName + '\' is not unique.');
+        }
+      });
+
       collection.getCollectionNodes().forEach(function(collectionNode) {
-        var overlappingSkills = _getOverlappingPrerequisiteAcquiredSkills(
+        var overlappingSkillIds = _getOverlappingPrerequisiteAcquiredSkillIds(
           collectionNode);
-        if (overlappingSkills.length > 0) {
+        if (overlappingSkillIds.length > 0) {
+          var overlappingSkillNames = overlappingSkillIds.map(
+            function(skillId) {
+              return collectionSkills[skillId].getName();
+            });
           issues.push('Exploration ' + collectionNode.getExplorationId() +
             ' has skills which are both required for playing it and acquired ' +
-            'after playing it: ' + overlappingSkills.join(', '));
+            'after playing it: ' + overlappingSkillNames.join(', '));
         }
       });
 
       var unreachableExpIds = _getUnreachableExplorationIds(collection);
-      if (unreachableExpIds.length != 0) {
+      if (unreachableExpIds.length !== 0) {
         issues.push(
           'The following exploration(s) are unreachable from the initial ' +
           'exploration(s): ' + unreachableExpIds.join(', '));
       }
 
       var nonexistentExpIds = _getNonexistentExplorationIds(collection);
-      if (nonexistentExpIds.length != 0) {
+      if (nonexistentExpIds.length !== 0) {
         issues.push(
           'The following exploration(s) either do not exist, or you do not ' +
           'have edit access to add them to this collection: ' +
@@ -135,13 +161,31 @@ oppia.factory('CollectionValidationService', [
 
       if (isPublic) {
         var privateExpIds = _getPrivateExplorationIds(collection);
-        if (privateExpIds.length != 0) {
+        if (privateExpIds.length !== 0) {
           issues.push(
             'Private explorations cannot be added to a public collection: ' +
             privateExpIds.join(', '));
         }
       }
 
+      var completedExpIds = _getStartingExplorationIds(collection);
+      var nextExpIds = CollectionLinearizerService.getNextExplorationIds(
+        collection, completedExpIds);
+      if (nextExpIds.length > 1) {
+        issues.push('The collection should have linear progression. The ' +
+          'following explorations are a part of a branch: ' +
+          nextExpIds.join(', '));
+      }
+      while (nextExpIds.length > 0) {
+        completedExpIds = completedExpIds.concat(nextExpIds);
+        nextExpIds = CollectionLinearizerService.getNextExplorationIds(
+          collection, completedExpIds);
+        if (nextExpIds.length > 1) {
+          issues.push('The collection should have linear progression. The ' +
+            'following explorations are a part of a branch: ' +
+            nextExpIds.join(', '));
+        }
+      }
       return issues;
     };
 
@@ -164,6 +208,14 @@ oppia.factory('CollectionValidationService', [
        */
       findValidationIssuesForPublicCollection: function(collection) {
         return _validateCollection(collection, true);
+      },
+
+      /**
+       * Returns false if the tags are not validate.
+       */
+      isTagValid: function(tags) {
+        return validateTagFormat(tags) && validateDuplicateTags(tags) &&
+          validateTagsNormalized(tags);
       }
     };
   }]);

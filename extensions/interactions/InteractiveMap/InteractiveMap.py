@@ -23,12 +23,17 @@ class InteractiveMap(base.BaseInteraction):
     name = 'World Map'
     description = 'Allows learners to specify a position on a world map.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
-    is_trainable = True
+    is_trainable = False
     _dependency_ids = ['google_maps']
     answer_type = 'CoordTwoDim'
     instructions = 'Click on the map'
     narrow_instructions = 'View map'
     needs_summary = True
+    # There needs to be a way to pass marker location so that an answer can be
+    # conveyed meaningfully to the learner. Once this issue is fixed,
+    # InteractiveMap interaction can be supported by the solution feature.
+    can_have_solution = False
+    show_generic_submit_button = False
 
     _customization_arg_specs = [{
         'name': 'latitude',
@@ -65,4 +70,15 @@ class InteractiveMap(base.BaseInteraction):
             'type': 'float',
         },
         'default_value': 0.0,
+    }]
+
+    _answer_visualization_specs = [{
+        # Table with answer counts for top N answers.
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top 10 answers',
+        },
+        'calculation_id': 'Top10AnswerFrequencies',
+        'show_addressed_info': True,
     }]

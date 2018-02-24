@@ -15,23 +15,28 @@
 """Controllers for the feedback thread page."""
 
 from core.controllers import base
-from core.controllers import editor
+from core.domain import acl_decorators
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.platform import models
+import feconf
+
+transaction_services = models.Registry.import_transaction_services()
 
 
 class ThreadListHandler(base.BaseHandler):
     """Handles operations relating to feedback thread lists."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         self.values.update({
             'threads': [t.to_dict() for t in feedback_services.get_all_threads(
                 exploration_id, False)]})
         self.render_json(self.values)
 
-    @base.require_user
+    @acl_decorators.can_comment_on_feedback_thread
     def post(self, exploration_id):
         subject = self.payload.get('subject')
         if not subject:
@@ -55,18 +60,23 @@ class ThreadListHandler(base.BaseHandler):
 class ThreadHandler(base.BaseHandler):
     """Handles operations relating to feedback threads."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
+        messages = [m.to_dict() for m in feedback_services.get_messages(
+            exploration_id, thread_id)]
+        message_ids = [message['message_id'] for message in messages]
+        feedback_services.update_messages_read_by_the_user(
+            self.user_id, exploration_id, thread_id, message_ids)
         self.values.update({
-            'messages': [m.to_dict() for m in feedback_services.get_messages(
-                exploration_id, thread_id)],
+            'messages': messages,
             'suggestion': suggestion.to_dict() if suggestion else None
         })
         self.render_json(self.values)
 
-    @base.require_user
+    @acl_decorators.can_comment_on_feedback_thread
     def post(self, exploration_id, thread_id):  # pylint: disable=unused-argument
         suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
         text = self.payload.get('text')
@@ -95,7 +105,9 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
     explorations.
     """
 
-    @base.require_moderator
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_moderator_page
     def get(self):
         urlsafe_start_cursor = self.request.get('cursor')
 
@@ -116,9 +128,13 @@ class FeedbackStatsHandler(base.BaseHandler):
         - Number of total threads
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
-        feedback_thread_analytics = feedback_services.get_thread_analytics(
-            exploration_id)
+        feedback_thread_analytics = (
+            feedback_services.get_thread_analytics(
+                exploration_id))
         self.values.update({
             'num_open_threads': (
                 feedback_thread_analytics.num_open_threads),
@@ -131,9 +147,7 @@ class FeedbackStatsHandler(base.BaseHandler):
 class SuggestionHandler(base.BaseHandler):
     """"Handles operations relating to learner suggestions."""
 
-    PAGE_NAME_FOR_CSRF = 'player'
-
-    @base.require_user
+    @acl_decorators.can_suggest_changes_to_exploration
     def post(self, exploration_id):
         feedback_services.create_suggestion(
             exploration_id,
@@ -141,18 +155,17 @@ class SuggestionHandler(base.BaseHandler):
             self.payload.get('exploration_version'),
             self.payload.get('state_name'),
             self.payload.get('description'),
-            self.payload.get('suggestion_content'))
+            self.payload.get('suggestion_html'))
         self.render_json(self.values)
 
 
 class SuggestionActionHandler(base.BaseHandler):
     """"Handles actions performed on threads with suggestions."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
     _ACCEPT_ACTION = 'accept'
     _REJECT_ACTION = 'reject'
 
-    @editor.require_editor
+    @acl_decorators.can_edit_exploration
     def put(self, exploration_id, thread_id):
         action = self.payload.get('action')
         if action == self._ACCEPT_ACTION:
@@ -160,7 +173,8 @@ class SuggestionActionHandler(base.BaseHandler):
                 self.user_id,
                 thread_id,
                 exploration_id,
-                self.payload.get('commit_message'))
+                self.payload.get('commit_message'),
+                self.payload.get('audio_update_required'))
         elif action == self._REJECT_ACTION:
             exp_services.reject_suggestion(
                 self.user_id, thread_id, exploration_id)
@@ -173,10 +187,11 @@ class SuggestionActionHandler(base.BaseHandler):
 class SuggestionListHandler(base.BaseHandler):
     """Handles operations relating to list of threads with suggestions."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
     _LIST_TYPE_OPEN = 'open'
     _LIST_TYPE_CLOSED = 'closed'
     _LIST_TYPE_ALL = 'all'
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def _string_to_bool(self, has_suggestion):
         if has_suggestion == 'true':
@@ -186,7 +201,7 @@ class SuggestionListHandler(base.BaseHandler):
         else:
             return None
 
-    @base.require_user
+    @acl_decorators.can_comment_on_feedback_thread
     def get(self, exploration_id):
         threads = None
         list_type = self.request.get('list_type')
@@ -208,4 +223,18 @@ class SuggestionListHandler(base.BaseHandler):
             raise self.InvalidInputException('Invalid list type.')
 
         self.values.update({'threads': [t.to_dict() for t in threads]})
+        self.render_json(self.values)
+
+
+class FeedbackThreadViewEventHandler(base.BaseHandler):
+    """Records when the given user views a feedback thread, in order to clear
+    viewed feedback messages from emails that might be sent in future to this
+    user."""
+
+    @acl_decorators.can_comment_on_feedback_thread
+    def post(self, exploration_id):
+        thread_id = self.payload.get('thread_id')
+        transaction_services.run_in_transaction(
+            feedback_services.clear_feedback_message_references, self.user_id,
+            exploration_id, thread_id)
         self.render_json(self.values)

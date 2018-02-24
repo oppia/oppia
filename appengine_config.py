@@ -78,12 +78,16 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'gae-cloud-storage-1.9.15.0'),
     os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.17.0'),
     os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'requests-2.10.0'),
     os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.7.1'),
+    os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.6.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.38'),
 ]
 
 # In the GAE production environment, numpy is automatically provided, and
 # trying to access a path outside the oppia/ directory will lead to an error.
 # So, we only add numpy to the system path in development mode.
+# Or, if we pass the flag to emulate production mode while in development mode.
 if feconf.DEV_MODE:
     THIRD_PARTY_LIBS.append(
         os.path.abspath(os.path.join(

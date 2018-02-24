@@ -1,23 +1,2 @@
-<script type="text/ng-template" id="interaction/EndExploration">
-  <div ng-if="!isIframed && !isInEditorPreviewMode">
-    <a ng-href="/collection/<[collectionId]>" ng-if="collectionId">
-      <md-button class="oppia-learner-continue-button">
-        Return to "<[collectionTitle]>"
-      </md-button>
-    </a>
-    <a href="/library">
-      <md-button class="oppia-learner-continue-button" ng-if="!collectionId">
-        Return to Library
-      </md-button>
-    </a>
-  </div>
-  <div ng-if="isInEditorPage" style="color: red; font-size: 0.8em; margin-top: 20px;">
-    <span><[errorMessage]></span>
-  </div>
-</script>
-
-<script type="text/ng-template" id="response/EndExploration">
-</script>
-
-<script type="text/ng-template" id="shortResponse/EndExploration">
-</script>
+<script src="{{cache_slug}}/extensions/interactions/EndExploration/directives/EndExploration.js"></script>
+<script src="{{cache_slug}}/extensions/interactions/EndExploration/directives/EndExplorationValidationService.js"></script>

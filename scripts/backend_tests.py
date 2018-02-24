@@ -29,6 +29,7 @@ import re
 import subprocess
 import threading
 import time
+
 # pylint: enable=wrong-import-order
 
 
@@ -39,6 +40,7 @@ LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
 # This should be the same as core.test_utils.LOG_LINE_PREFIX.
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
+_LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
 
 _PARSER = argparse.ArgumentParser()
@@ -54,6 +56,15 @@ _PARSER.add_argument(
     '--test_path',
     help='optional subdirectory path containing the test(s) to run',
     type=str)
+_PARSER.add_argument(
+    '--exclude_load_tests',
+    help='optional; if specified, exclude load tests from being run',
+    action='store_true')
+_PARSER.add_argument(
+    '-v',
+    '--verbose',
+    help='optional; if specified, display the output of the tests being run',
+    action='store_true')
 
 
 def log(message, show_time=False):
@@ -96,17 +107,22 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
 class TaskThread(threading.Thread):
     """Runs a task in its own thread."""
 
-    def __init__(self, func, name=None):
+    def __init__(self, func, verbose, name=None):
         super(TaskThread, self).__init__()
         self.func = func
         self.output = None
         self.exception = None
+        self.verbose = verbose
         self.name = name
         self.finished = False
 
     def run(self):
         try:
             self.output = self.func()
+            if self.verbose:
+                log('LOG %s:' % self.name, show_time=True)
+                log(self.output)
+                log('----------------------------------------')
             log('FINISHED %s: %.1f secs' %
                 (self.name, time.time() - self.start_time), show_time=True)
             self.finished = True
@@ -189,7 +205,7 @@ def _execute_tasks(tasks, batch_size=24):
         log('----------------------------------------')
 
 
-def _get_all_test_targets(test_path=None):
+def _get_all_test_targets(test_path=None, include_load_tests=True):
     """Returns a list of test targets for all classes under test_path
     containing tests.
     """
@@ -206,6 +222,12 @@ def _get_all_test_targets(test_path=None):
             result.append(_convert_to_test_target(
                 os.path.join(base_path, root)))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
+            if _LOAD_TESTS_DIR in subroot and include_load_tests:
+                for f in files:
+                    if f.endswith('_test.py'):
+                        result.append(_convert_to_test_target(
+                            os.path.join(subroot, f)))
+
             for f in files:
                 if (f.endswith('_test.py') and
                         os.path.join('core', 'tests') not in subroot):
@@ -229,8 +251,10 @@ def main():
     if parsed_args.test_target:
         all_test_targets = [parsed_args.test_target]
     else:
+        include_load_tests = not parsed_args.exclude_load_tests
         all_test_targets = _get_all_test_targets(
-            test_path=parsed_args.test_path)
+            test_path=parsed_args.test_path,
+            include_load_tests=include_load_tests)
 
     # Prepare tasks.
     task_to_taskspec = {}
@@ -238,7 +262,7 @@ def main():
     for test_target in all_test_targets:
         test = TestingTaskSpec(
             test_target, parsed_args.generate_coverage_report)
-        task = TaskThread(test.run, name=test_target)
+        task = TaskThread(test.run, parsed_args.verbose, name=test_target)
         task_to_taskspec[task] = test
         tasks.append(task)
 

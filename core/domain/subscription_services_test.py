@@ -24,6 +24,7 @@ from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import subscription_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -36,6 +37,7 @@ EXP_ID_2 = 'exp_id_2'
 FEEDBACK_THREAD_ID = 'fthread_id'
 FEEDBACK_THREAD_ID_2 = 'fthread_id_2'
 USER_ID = 'user_id'
+USER_ID_2 = 'user_id_2'
 
 
 class SubscriptionsTest(test_utils.GenericTestBase):
@@ -55,6 +57,8 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)
+
+        self.owner = user_services.UserActionsInfo(self.owner_id)
 
     def _get_thread_ids_subscribed_to(self, user_id):
         subscriptions_model = user_models.UserSubscriptionsModel.get(
@@ -127,6 +131,21 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             subscription_services.get_exploration_ids_subscribed_to(USER_ID),
             [EXP_ID, EXP_ID_2])
 
+    def test_get_all_threads_subscribed_to(self):
+        self.assertEqual(
+            subscription_services.get_all_threads_subscribed_to(
+                USER_ID), [])
+
+        subscription_services.subscribe_to_thread(USER_ID, FEEDBACK_THREAD_ID)
+        self.assertEqual(
+            subscription_services.get_all_threads_subscribed_to(USER_ID),
+            [FEEDBACK_THREAD_ID])
+
+        subscription_services.subscribe_to_thread(USER_ID, FEEDBACK_THREAD_ID_2)
+        self.assertEqual(
+            subscription_services.get_all_threads_subscribed_to(USER_ID),
+            [FEEDBACK_THREAD_ID, FEEDBACK_THREAD_ID_2])
+
     def test_thread_and_exp_subscriptions_are_tracked_individually(self):
         self.assertEqual(self._get_thread_ids_subscribed_to(USER_ID), [])
 
@@ -171,46 +190,41 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [])
         exp_services.save_new_exploration(
-            USER_ID,
-            exp_domain.Exploration.create_default_exploration(
-                EXP_ID, 'Title', 'Category'))
+            USER_ID, exp_domain.Exploration.create_default_exploration(EXP_ID))
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [EXP_ID])
 
     def test_adding_new_exploration_owner_or_editor_role_results_in_subscription(self): # pylint: disable=line-too-long
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'Title', 'Category')
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_2_id), [])
         rights_manager.assign_role_for_exploration(
-            self.owner_id, EXP_ID, self.owner_2_id, rights_manager.ROLE_OWNER)
+            self.owner, EXP_ID, self.owner_2_id, rights_manager.ROLE_OWNER)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_2_id), [EXP_ID])
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.editor_id), [])
         rights_manager.assign_role_for_exploration(
-            self.owner_id, EXP_ID, self.editor_id, rights_manager.ROLE_EDITOR)
+            self.owner, EXP_ID, self.editor_id, rights_manager.ROLE_EDITOR)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.editor_id), [EXP_ID])
 
     def test_adding_new_exploration_viewer_role_does_not_result_in_subscription(self): # pylint: disable=line-too-long
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'Title', 'Category')
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
         rights_manager.assign_role_for_exploration(
-            self.owner_id, EXP_ID, self.viewer_id, rights_manager.ROLE_VIEWER)
+            self.owner, EXP_ID, self.viewer_id, rights_manager.ROLE_VIEWER)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
 
     def test_deleting_exploration_does_not_delete_subscription(self):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'Title', 'Category')
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_id), [EXP_ID])
@@ -265,7 +279,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.owner_2_id), [])
         rights_manager.assign_role_for_collection(
-            self.owner_id, COLLECTION_ID, self.owner_2_id,
+            self.owner, COLLECTION_ID, self.owner_2_id,
             rights_manager.ROLE_OWNER)
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.owner_2_id),
@@ -274,7 +288,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.editor_id), [])
         rights_manager.assign_role_for_collection(
-            self.owner_id, COLLECTION_ID, self.editor_id,
+            self.owner, COLLECTION_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.editor_id),
@@ -287,7 +301,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.viewer_id), [])
         rights_manager.assign_role_for_collection(
-            self.owner_id, COLLECTION_ID, self.viewer_id,
+            self.owner, COLLECTION_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.viewer_id), [])
@@ -332,3 +346,134 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             [COLLECTION_ID])
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_2_id), [EXP_ID])
+
+
+class UserSubscriptionsTest(test_utils.GenericTestBase):
+    """Tests for subscription management."""
+
+    OWNER_2_EMAIL = 'owner2@example.com'
+    OWNER2_USERNAME = 'owner2'
+
+    def setUp(self):
+        super(UserSubscriptionsTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.OWNER_2_EMAIL, self.OWNER2_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)
+
+
+    def _get_all_subscribers_of_creators(self, user_id):
+        subscribers_model = user_models.UserSubscribersModel.get(
+            user_id, strict=False)
+        return (
+            subscribers_model.subscriber_ids
+            if subscribers_model else [])
+
+    def _get_all_creators_subscribed_to(self, user_id):
+        subscriptions_model = user_models.UserSubscriptionsModel.get(
+            user_id, strict=False)
+        return (
+            subscriptions_model.creator_ids
+            if subscriptions_model else [])
+
+
+    def test_subscribe_to_creator(self):
+        self.assertEqual(self._get_all_subscribers_of_creators(
+            self.owner_id), [])
+
+        # Subscribe a user to a creator.
+        subscription_services.subscribe_to_creator(USER_ID, self.owner_id)
+        self.assertEqual(
+            self._get_all_subscribers_of_creators(self.owner_id), [USER_ID])
+        self.assertEqual(
+            self._get_all_creators_subscribed_to(USER_ID),
+            [self.owner_id])
+
+        # Repeated subscriptions to the same creator has no effect.
+        subscription_services.subscribe_to_creator(USER_ID, self.owner_id)
+        self.assertEqual(
+            self._get_all_subscribers_of_creators(self.owner_id), [USER_ID])
+        self.assertEqual(
+            self._get_all_creators_subscribed_to(USER_ID),
+            [self.owner_id])
+
+        # Subscribe another creator.
+        subscription_services.subscribe_to_creator(USER_ID_2,
+                                                   self.owner_id)
+        self.assertEqual(
+            self._get_all_subscribers_of_creators(self.owner_id),
+            [USER_ID, USER_ID_2])
+        self.assertEqual(
+            self._get_all_creators_subscribed_to(
+                USER_ID_2), [self.owner_id])
+
+    def test_unsubscribe_from_creator(self):
+        self.assertEqual(self._get_all_subscribers_of_creators(
+            self.owner_id), [])
+
+        # Add subscribers to a creator.
+        subscription_services.subscribe_to_creator(USER_ID, self.owner_id)
+        subscription_services.subscribe_to_creator(USER_ID_2, self.owner_id)
+        self.assertEqual(
+            self._get_all_subscribers_of_creators(self.owner_id), [
+                USER_ID, USER_ID_2])
+        self.assertEqual(
+            self._get_all_creators_subscribed_to(USER_ID),
+            [self.owner_id])
+        self.assertEqual(
+            self._get_all_creators_subscribed_to(USER_ID_2),
+            [self.owner_id])
+
+        # Unsubscribing a user from a creator.
+        subscription_services.unsubscribe_from_creator(USER_ID, self.owner_id)
+        self.assertEqual(
+            self._get_all_subscribers_of_creators(self.owner_id), [USER_ID_2])
+        self.assertEqual(
+            self._get_all_creators_subscribed_to(USER_ID), [])
+
+        # Unsubscribing the same user again has no effect.
+        subscription_services.unsubscribe_from_creator(USER_ID, self.owner_id)
+        self.assertEqual(
+            self._get_all_subscribers_of_creators(self.owner_id), [USER_ID_2])
+        self.assertEqual(
+            self._get_all_creators_subscribed_to(USER_ID), [])
+
+        # Unsubscribing the second user.
+        subscription_services.unsubscribe_from_creator(
+            USER_ID_2, self.owner_id)
+        self.assertEqual(self._get_all_subscribers_of_creators(
+            self.owner_id), [])
+        self.assertEqual(
+            self._get_all_creators_subscribed_to(USER_ID_2),
+            [])
+
+    def test_get_all_subscribers_of_creators(self):
+        self.assertEqual(
+            subscription_services.get_all_subscribers_of_creator(
+                self.owner_id), [])
+
+        subscription_services.subscribe_to_creator(USER_ID, self.owner_id)
+        self.assertEqual(
+            subscription_services.get_all_subscribers_of_creator(self.owner_id),
+            [USER_ID])
+
+        subscription_services.subscribe_to_creator(USER_ID_2, self.owner_id)
+        self.assertEqual(
+            subscription_services.get_all_subscribers_of_creator(self.owner_id),
+            [USER_ID, USER_ID_2])
+
+    def test_get_all_creators_subscribed_to(self):
+        self.assertEqual(
+            subscription_services.get_all_creators_subscribed_to(
+                USER_ID), [])
+
+        subscription_services.subscribe_to_creator(USER_ID, self.owner_id)
+        self.assertEqual(
+            subscription_services.get_all_creators_subscribed_to(
+                USER_ID), [self.owner_id])
+
+        subscription_services.subscribe_to_creator(USER_ID, self.owner_2_id)
+        self.assertEqual(
+            subscription_services.get_all_creators_subscribed_to(
+                USER_ID), [self.owner_id, self.owner_2_id])

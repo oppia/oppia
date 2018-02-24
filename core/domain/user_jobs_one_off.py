@@ -16,7 +16,9 @@
 
 import ast
 
+from constants import constants
 from core import jobs
+from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -29,7 +31,7 @@ import utils
         models.NAMES.feedback, models.NAMES.user]))
 
 
-class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
+class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating and populating UserContributionsModels for
     all registered users that have contributed.
     """
@@ -39,11 +41,10 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        if isinstance(item, exp_models.ExplorationSnapshotMetadataModel):
-            yield (item.committer_id, {
-                'exploration_id': item.get_unversioned_instance_id(),
-                'version_string': item.get_version_string(),
-            })
+        yield (item.committer_id, {
+            'exploration_id': item.get_unversioned_instance_id(),
+            'version_string': item.get_version_string(),
+        })
 
     @staticmethod
     def reduce(key, version_and_exp_ids):
@@ -68,7 +69,75 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceJobManager):
                     edited_exploration_ids))
 
 
-class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
+class UserDefaultDashboardOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for populating the default dashboard field for users.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        user_contributions = user_services.get_user_contributions(item.id)
+        user_is_creator = user_contributions and (
+            user_contributions.created_exploration_ids or
+            user_contributions.edited_exploration_ids)
+
+        if user_is_creator:
+            user_services.update_user_default_dashboard(
+                item.id, constants.DASHBOARD_TYPE_CREATOR)
+        else:
+            user_services.update_user_default_dashboard(
+                item.id, constants.DASHBOARD_TYPE_LEARNER)
+
+    @staticmethod
+    def reduce(item):
+        pass
+
+
+class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for calculating the distribution of username lengths."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        if item.username is not None:
+            yield (len(item.username), 1)
+
+    @staticmethod
+    def reduce(key, stringified_username_counter):
+        username_counter = [
+            ast.literal_eval(v) for v in stringified_username_counter]
+        yield (key, len(username_counter))
+
+
+class LongUserBiosOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for calculating the length of user_bios."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        if item.user_bio is None:
+            user_bio_length = 0
+        else:
+            user_bio_length = len(item.user_bio)
+
+        yield (user_bio_length, item.username)
+
+    @staticmethod
+    def reduce(userbio_length, stringified_usernames):
+        if int(userbio_length) > 500:
+            yield (userbio_length, stringified_usernames)
+
+
+class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for subscribing users to explorations, collections, and
     feedback threads.
     """
@@ -175,7 +244,24 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
                 subscription_services.subscribe_to_collection(key, item['id'])
 
 
-class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceJobManager):
+class DashboardStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for populating weekly dashboard stats for all registered
+    users who have a non-None value of UserStatsModel.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        user_services.update_dashboard_stats_log(item.id)
+
+    @staticmethod
+    def reduce(item):
+        pass
+
+
+class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that updates first contribution time in milliseconds for
     current users. This job makes the assumption that once an exploration is
     published, it remains published. This job is not completely precise in that
@@ -218,7 +304,7 @@ class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceJobManager):
             user_id, first_contribution_msec)
 
 
-class UserProfilePictureOneOffJob(jobs.BaseMapReduceJobManager):
+class UserProfilePictureOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that updates profile pictures for users which do not
     currently have them. Users who already have profile pictures are
     unaffected.
@@ -234,6 +320,39 @@ class UserProfilePictureOneOffJob(jobs.BaseMapReduceJobManager):
             return
 
         user_services.generate_initial_profile_picture(item.id)
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        pass
+
+
+class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(user_model):
+        user_id = user_model.id
+        contributions = user_models.UserContributionsModel.get(user_id)
+
+        created_explorations = exp_services.get_multiple_explorations_by_id(
+            contributions.created_exploration_ids)
+        if created_explorations:
+            user_model.last_created_an_exploration = max(
+                [model.created_on for model in created_explorations.values()])
+
+        user_commits = (
+            exp_models.ExplorationCommitLogEntryModel.query(
+                exp_models.ExplorationCommitLogEntryModel.user_id == user_id).
+            order(-exp_models.ExplorationCommitLogEntryModel.created_on).
+            fetch(1))
+
+        if user_commits:
+            user_model.last_edited_an_exploration = user_commits[0].created_on
+
+        user_model.put()
 
     @staticmethod
     def reduce(key, stringified_values):

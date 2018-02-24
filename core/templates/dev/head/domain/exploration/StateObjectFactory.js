@@ -17,32 +17,44 @@
  * domain objects.
  */
 
-oppia.factory('StateObjectFactory', [function() {
-  var State = function(name, content, interaction, paramChanges) {
-    this.name = name;
-    this.content = content;
-    this.interaction = interaction;
-    this.paramChanges = paramChanges;
-  };
-
-  // Instance methods.
-  State.prototype.toBackendDict = function() {
-    return {
-      content: this.content,
-      interaction: this.interaction,
-      param_changes: this.paramChanges
+oppia.factory('StateObjectFactory', [
+  'AnswerGroupObjectFactory', 'InteractionObjectFactory',
+  'SubtitledHtmlObjectFactory', 'ParamChangesObjectFactory',
+  function(AnswerGroupObjectFactory, InteractionObjectFactory,
+      SubtitledHtmlObjectFactory, ParamChangesObjectFactory) {
+    var State = function(name, classifierModelId, content, interaction,
+        paramChanges) {
+      this.name = name;
+      this.classifierModelId = classifierModelId;
+      this.content = content;
+      this.interaction = interaction;
+      this.paramChanges = paramChanges;
     };
-  };
 
-  // Static class methods. Note that "this" is not available in
-  // static contexts.
-  State.create = function(stateName, stateDict) {
-    return new State(
-      stateName,
-      stateDict.content,
-      stateDict.interaction,
-      stateDict.param_changes);
-  };
+    // Instance methods.
+    State.prototype.toBackendDict = function() {
+      return {
+        content: this.content.toBackendDict(),
+        classifier_model_id: this.classifierModelId,
+        interaction: this.interaction.toBackendDict(),
+        param_changes: this.paramChanges.map(function(paramChange) {
+          return paramChange.toBackendDict();
+        })
+      };
+    };
 
-  return State;
-}]);
+    // Static class methods. Note that "this" is not available in
+    // static contexts.
+    State.createFromBackendDict = function(stateName, stateDict) {
+      return new State(
+        stateName,
+        stateDict.classifier_model_id,
+        SubtitledHtmlObjectFactory.createFromBackendDict(stateDict.content),
+        InteractionObjectFactory.createFromBackendDict(stateDict.interaction),
+        ParamChangesObjectFactory.createFromBackendList(
+          stateDict.param_changes));
+    };
+
+    return State;
+  }
+]);

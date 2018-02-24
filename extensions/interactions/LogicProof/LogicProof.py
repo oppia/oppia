@@ -29,6 +29,8 @@ class LogicProof(base.BaseInteraction):
     instructions = 'Construct a proof'
     narrow_instructions = 'Construct a proof'
     needs_summary = True
+    can_have_solution = True
+    show_generic_submit_button = True
 
     _customization_arg_specs = [{
         'name': 'question',
@@ -52,4 +54,15 @@ class LogicProof(base.BaseInteraction):
             }],
             'default_proof_string': ''
         },
+    }]
+
+    _answer_visualization_specs = [{
+        # Table with answer counts for top N answers.
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top 10 answers',
+        },
+        'calculation_id': 'Top10AnswerFrequencies',
+        'show_addressed_info': True,
     }]

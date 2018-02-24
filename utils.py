@@ -14,7 +14,9 @@
 
 """Common utility functions."""
 
+import StringIO
 import base64
+import collections
 import datetime
 import hashlib
 import imghdr
@@ -23,16 +25,16 @@ import os
 import random
 import re
 import string
-import StringIO
 import time
 import unicodedata
 import urllib
 import urlparse
 import zipfile
 
-import yaml
-
+from constants import constants  # pylint: disable=relative-import
 import feconf  # pylint: disable=relative-import
+
+import yaml
 
 
 class InvalidInputException(Exception):
@@ -53,12 +55,31 @@ class ExplorationConversionError(Exception):
 
 
 def create_enum(*sequential, **names):
+    """Creates a enumerated constant
+
+    Args:
+        sequential: *. Sequence List to generate the enumerations.
+        names: *. Names of the enumerration.
+
+    Returns:
+        dict. Dictionary containing the enumerated constants.
+    """
     enums = dict(zip(sequential, sequential), **names)
     return type('Enum', (), enums)
 
 
 def get_file_contents(filepath, raw_bytes=False, mode='r'):
-    """Gets the contents of a file, given a relative filepath from oppia/."""
+    """Gets the contents of a file, given a relative filepath from oppia/.
+
+    Args:
+        filepath: str. A full path to the file.
+        raw_bytes: bool. Flag for the raw_bytes output.
+        mode: str. File opening mode, default is in read mode.
+
+    Returns:
+        *. Either the raw_bytes stream if the flag is set or the
+            decoded stream in utf-8 format.
+    """
     with open(filepath, mode) as f:
         return f.read() if raw_bytes else f.read().decode('utf-8')
 
@@ -67,12 +88,12 @@ def get_exploration_components_from_dir(dir_path):
     """Gets the (yaml, assets) from the contents of an exploration data dir.
 
     Args:
-      dir_path: a full path to the exploration root directory.
+        dir_path: str. a full path to the exploration root directory.
 
     Returns:
-      a 2-tuple, the first element of which is a yaml string, and the second
-      element of which is a list of (filepath, content) 2-tuples. The filepath
-      does not include the assets/ prefix.
+        *. A 2-tuple, the first element of which is a yaml string, and the
+        second element of which is a list of (filepath, content) 2-tuples.
+        The filepath does not include the assets/ prefix.
 
     Raises:
       Exception: if the following condition doesn't hold: "There is exactly one
@@ -127,17 +148,17 @@ def get_exploration_components_from_zip(zip_file_contents):
     """Gets the (yaml, assets) from the contents of an exploration zip file.
 
     Args:
-      zip_file_contents: a string of raw bytes representing the contents of
-        a zip file that comprises the exploration.
+        zip_file_contents: a string of raw bytes representing the contents of
+            a zip file that comprises the exploration.
 
     Returns:
-      a 2-tuple, the first element of which is a yaml string, and the second
-      element of which is a list of (filepath, content) 2-tuples. The filepath
-      does not include the assets/ prefix.
+        a 2-tuple, the first element of which is a yaml string, and the second
+        element of which is a list of (filepath, content) 2-tuples. The filepath
+        does not include the assets/ prefix.
 
     Raises:
-      Exception: if the following condition doesn't hold: "There is exactly one
-        file not in assets/, and this file has a .yaml suffix".
+        Exception: if the following condition doesn't hold: "There is exactly
+            one file not in assets/, and this file has a .yaml suffix".
     """
     memfile = StringIO.StringIO()
     memfile.write(zip_file_contents)
@@ -168,7 +189,14 @@ def get_exploration_components_from_zip(zip_file_contents):
 
 
 def get_comma_sep_string_from_list(items):
-    """Turns a list of items into a comma-separated string."""
+    """Turns a list of items into a comma-separated string.
+
+    Args:
+        items: list. List of the items.
+
+    Returns:
+        str. String containing the items in the list separated by commas.
+    """
 
     if not items:
         return ''
@@ -180,18 +208,46 @@ def get_comma_sep_string_from_list(items):
 
 
 def to_ascii(input_string):
-    """Change unicode characters in a string to ascii if possible."""
+    """Change unicode characters in a string to ascii if possible.
+
+    Args:
+        input_string: str. String to convert.
+
+    Returns:
+        str. String containing the ascii representation of the input string.
+    """
     return unicodedata.normalize(
         'NFKD', unicode(input_string)).encode('ascii', 'ignore')
 
 
 def yaml_from_dict(dictionary, width=80):
-    """Gets the YAML representation of a dict."""
+    """Gets the YAML representation of a dict.
+
+    Args:
+        dictionary: dict. Dictionary for conversion into yaml.
+        width: int. Width for the yaml representation, default value
+            is set to be of 80.
+
+    Returns:
+        str. Converted yaml of the passed dictionary.
+    """
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
 
 
 def dict_from_yaml(yaml_str):
-    """Gets the dict representation of a YAML string."""
+    """Gets the dict representation of a YAML string.
+
+    Args:
+        yaml_str: str. Yaml string for conversion into dict.
+
+    Returns:
+        dict. Parsed dict representation of the yaml string.
+
+    Raises:
+        InavlidInputException: If the yaml string sent as the
+            parameter is unable to get parsed, them this error gets
+            raised.
+    """
     try:
         retrieved_dict = yaml.safe_load(yaml_str)
         assert isinstance(retrieved_dict, dict)
@@ -201,7 +257,16 @@ def dict_from_yaml(yaml_str):
 
 
 def recursively_remove_key(obj, key_to_remove):
-    """Recursively removes keys from a list or dict."""
+    """Recursively removes keys from a list or dict.
+
+    Args:
+        obj: *. List or dict passed for which the keys has to
+            be removed.
+        key_to_remove: str. Key value that has to be removed.
+
+    Returns:
+        *. Dict or list with a particular key value removed.
+    """
     if isinstance(obj, list):
         for item in obj:
             recursively_remove_key(item, key_to_remove)
@@ -213,7 +278,15 @@ def recursively_remove_key(obj, key_to_remove):
 
 
 def get_random_int(upper_bound):
-    """Returns a random integer in [0, upper_bound)."""
+    """Returns a random integer in [0, upper_bound).
+
+    Args:
+        upper_bound: int. Upper limit for generation of random
+            integer.
+
+    Returns:
+        int. Randomly generated integer less than the upper_bound.
+    """
     assert upper_bound >= 0 and isinstance(upper_bound, int)
 
     generator = random.SystemRandom()
@@ -221,7 +294,14 @@ def get_random_int(upper_bound):
 
 
 def get_random_choice(alist):
-    """Gets a random element from a list."""
+    """Gets a random element from a list.
+
+    Args:
+       alist: list(*). Input to get a random choice.
+
+    Returns:
+       *. Random element choosen from the passed input list.
+    """
     assert isinstance(alist, list) and len(alist) > 0
 
     index = get_random_int(len(alist))
@@ -229,7 +309,17 @@ def get_random_choice(alist):
 
 
 def convert_png_binary_to_data_url(content):
-    """Converts a png image string (represented by 'content') to a data URL."""
+    """Converts a png image string (represented by 'content') to a data URL.
+
+    Args:
+        content: str. PNG binary file content.
+
+    Returns:
+        *. Data url created from the binary content of the PNG.
+
+    Raises:
+        Exception: If the given binary string is not of a PNG image.
+    """
     if imghdr.what(None, content) == 'png':
         return 'data:image/png;base64,%s' % urllib.quote(
             content.encode('base64'))
@@ -244,12 +334,46 @@ def convert_png_to_data_url(filepath):
 
 
 def camelcase_to_hyphenated(camelcase_str):
+    """Camelcase to hyhpenated conversion of the passed string.
+
+    Args:
+        camelcase_str: str. Camelcase string representation.
+
+    Returns:
+        str. Hypenated string representation of the camelcase string.
+    """
     intermediate_str = re.sub('(.)([A-Z][a-z]+)', r'\1-\2', camelcase_str)
     return re.sub('([a-z0-9])([A-Z])', r'\1-\2', intermediate_str).lower()
 
 
+def camelcase_to_snakecase(camelcase_str):
+    """Camelcase to snake case conversion of the passed string.
+
+    Args:
+        camelcase_str: str. Camelcase string representation.
+
+    Returns:
+        str. Snakecase representation of the passed camelcase string.
+    """
+    intermediate_str = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', camelcase_str)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', intermediate_str).lower()
+
+
 def set_url_query_parameter(url, param_name, param_value):
-    """Set or replace a query parameter, and return the modified URL."""
+    """Set or replace a query parameter, and return the modified URL.
+
+    Args:
+        url: str. URL string which contains the query parameter.
+        param_name: str. Parameter name to be removed.
+        param_value: str. Set the parameter value, if it exists.
+
+    Returns:
+        str. Formated URL that has query parameter set or replaced.
+
+    Raises:
+        Exception: If the query parameter sent is not of string type,
+            them this exception is raised.
+    """
     if not isinstance(param_name, basestring):
         raise Exception(
             'URL query parameter name must be a string, received %s'
@@ -280,7 +404,20 @@ class JSONEncoderForHTML(json.JSONEncoder):
 
 
 def convert_to_hash(input_string, max_length):
-    """Convert a string to a SHA1 hash."""
+    """Convert a string to a SHA1 hash.
+
+    Args:
+        input_string: str. Input string for conversion to hash.
+        max_length: int. Maximum Length of the generated hash.
+
+    Returns:
+        str. Hash Value generated from the input_String of the
+            specified length.
+
+    Raises:
+        Exception: If the input string is not the instance of the basestring,
+            them this exception is raised.
+    """
     if not isinstance(input_string, basestring):
         raise Exception(
             'Expected string, received %s of type %s' %
@@ -293,6 +430,14 @@ def convert_to_hash(input_string, max_length):
 
 
 def base64_from_int(value):
+    """Converts the number into base64 representation.
+
+    Args:
+        value: int. Integer value for conversion into base64.
+
+    Returns:
+        *. Returns the base64 representation of the number passed.
+    """
     return base64.b64encode(bytes([value]))
 
 
@@ -300,7 +445,10 @@ def get_time_in_millisecs(datetime_obj):
     """Returns time in milliseconds since the Epoch.
 
     Args:
-      datetime_obj: An object of type datetime.datetime.
+        datetime_obj: datetime. An object of type datetime.datetime.
+
+    Returns:
+        float. This returns the time in the millisecond since the Epoch.
     """
     seconds = time.mktime(datetime_obj.timetuple()) * 1000
     return seconds + datetime_obj.microsecond / 1000.0
@@ -318,11 +466,32 @@ def get_human_readable_time_string(time_msec):
     return time.strftime('%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
 
 
+def are_datetimes_close(later_datetime, earlier_datetime):
+    """Given two datetimes, determines whether they are separated by less than
+    feconf.PROXIMAL_TIMEDELTA_SECS seconds.
+    """
+    difference_in_secs = (later_datetime - earlier_datetime).total_seconds()
+    return difference_in_secs < feconf.PROXIMAL_TIMEDELTA_SECS
+
+
 def generate_random_string(length):
+    """Generates a random string of the specified length.
+
+    Args:
+        length: int. Length of the string to be generated.
+
+    Returns:
+        str. Random string of specified length.
+    """
     return base64.urlsafe_b64encode(os.urandom(length))
 
 
 def generate_new_session_id():
+    """Generates a new session id.
+
+    Returns:
+        str. Random string of length 24.
+    """
     return generate_random_string(24)
 
 
@@ -369,14 +538,21 @@ def vfs_normpath(path):
     return path or dot
 
 
-def require_valid_name(name, name_type):
+def require_valid_name(name, name_type, allow_empty=False):
     """Generic name validation.
 
     Args:
-      name: the name to validate.
-      name_type: a human-readable string, like 'the exploration title' or
-        'a state name'. This will be shown in error messages.
+        name: str. The name to validate.
+        name_type: str. A human-readable string, like 'the exploration title' or
+            'a state name'. This will be shown in error messages.
+        allow_empty: bool. If True, empty strings are allowed.
     """
+    if not isinstance(name, basestring):
+        raise ValidationError('%s must be a string.' % name_type)
+
+    if allow_empty and name == '':
+        return
+
     # This check is needed because state names are used in URLs and as ids
     # for statistics, so the name length should be bounded above.
     if len(name) > 50 or len(name) < 1:
@@ -402,6 +578,12 @@ def require_valid_name(name, name_type):
 def capitalize_string(input_string):
     """Converts the first character of a string to its uppercase equivalent (if
     it's a letter), and returns the result.
+
+    Args:
+        input_string: str. String to process (to capitalize).
+
+    Returns:
+        str. Capitalizes the string.
     """
     # This guards against empty strings.
     if input_string:
@@ -410,34 +592,45 @@ def capitalize_string(input_string):
         return input_string
 
 
-def get_info_card_url_for_category(category):
-    info_card_color = (
-        feconf.CATEGORIES_TO_COLORS[category] if
-        category in feconf.CATEGORIES_TO_COLORS else feconf.DEFAULT_COLOR)
-    return (
-        '/images/library/exploration_background_%s_large.png' %
-        info_card_color)
-
-
 def get_hex_color_for_category(category):
-    color = (
-        feconf.CATEGORIES_TO_COLORS[category]
-        if category in feconf.CATEGORIES_TO_COLORS
-        else feconf.DEFAULT_COLOR)
-    return feconf.COLORS_TO_HEX_VALUES[color]
+    """Returns the category, it returns the color associated with the category,
+    if the category is present in the app constants else given a default color.
+
+    Args:
+        category: str. Category to get color.
+
+    Returns:
+        str. Color assigned to that category.
+    """
+    return (
+        constants.CATEGORIES_TO_COLORS[category]
+        if category in constants.CATEGORIES_TO_COLORS
+        else constants.DEFAULT_COLOR)
 
 
 def get_thumbnail_icon_url_for_category(category):
+    """Returns the category, it returns the associated thumbnail icon, if the
+    category is present in the app constants else given a default thumbnail.
+
+    Args:
+        category: str. Category to get Thumbnail icon.
+
+    Returns:
+        str. Path to the Thumbnail Icon assigned to that category.
+    """
     icon_name = (
-        category if category in feconf.DEFAULT_CATEGORIES
-        else feconf.DEFAULT_THUMBNAIL_ICON)
+        category if category in constants.CATEGORIES_TO_COLORS
+        else constants.DEFAULT_THUMBNAIL_ICON)
     # Remove all spaces from the string.
-    return '/images/library/thumbnails/%s.svg' % icon_name.replace(' ', '')
+    return '/subjects/%s.svg' % (icon_name.replace(' ', ''))
 
 
 def _get_short_language_description(full_language_description):
-    """Given one of the descriptions in feconf.ALL_LANGUAGE_CODES, generates
+    """Given one of the descriptions in constants.ALL_LANGUAGE_CODES, generates
     the corresponding short description.
+
+    Args:
+        full_language_description: str. Short description of the language.
     """
     if ' (' not in full_language_description:
         return full_language_description
@@ -447,12 +640,87 @@ def _get_short_language_description(full_language_description):
 
 
 def get_all_language_codes_and_names():
+    """It parses the list of language codes and their corresponding names,
+    defined in the app constants.
+
+    Returns:
+        list(dict(str, str)). List of dictionary containing language code and
+            name mapped to their corresponding value.
+    """
     return [{
         'code': lc['code'],
         'name': _get_short_language_description(lc['description']),
-    } for lc in feconf.ALL_LANGUAGE_CODES]
+    } for lc in constants.ALL_LANGUAGE_CODES]
 
 
 def unescape_encoded_uri_component(escaped_string):
     """Unescape a string that is encoded with encodeURIComponent."""
     return urllib.unquote(escaped_string).decode('utf-8')
+
+
+def get_asset_dir_prefix():
+    """Returns prefix for asset directory depending whether dev or prod.
+    It is used as a prefix in urls for images, css and script files.
+    """
+    asset_dir_prefix = ''
+    if not feconf.DEV_MODE:
+        asset_dir_prefix = '/build'
+
+    return asset_dir_prefix
+
+
+def get_template_dir_prefix():
+    """Returns prefix for template directory depending whether dev or prod.
+    It is used as a prefix in urls for js script files under the templates
+    directory.
+    """
+    template_path = (
+        '/templates/head' if not feconf.DEV_MODE else '/templates/dev/head')
+    return '%s%s' % (get_asset_dir_prefix(), template_path)
+
+
+def convert_to_str(string_to_convert):
+    """Converts the given unicode string to a string. If the string is not
+    unicode, we return the string.
+
+    Args:
+        string_to_convert: unicode|str.
+
+    Returns:
+        str. The encoded string.
+    """
+    if isinstance(string_to_convert, unicode):
+        return string_to_convert.encode('utf-8')
+    return string_to_convert
+
+
+def get_hashable_value(value):
+    """This function returns a hashable version of the input JSON-like value.
+
+    It converts the built-in sequences into their hashable counterparts
+    {list: tuple, dict: (sorted tuple of pairs)}. Additionally, their
+    elements are converted to hashable values through recursive calls. All
+    other value types are assumed to already be hashable.
+
+    Args:
+        value: *. Some JSON-like object, that is, an object made-up of only:
+            lists, dicts, strings, ints, bools, None. Types can be nested in
+            each other.
+
+    Returns:
+        hashed_value: *. A new object that will always have the same hash for
+            "equivalent" values.
+    """
+    if isinstance(value, list):
+        return tuple(get_hashable_value(e) for e in value)
+    elif isinstance(value, dict):
+        return tuple(sorted(
+            # Dict keys are already hashable, only values need converting.
+            (k, get_hashable_value(v)) for k, v in value.iteritems()))
+    else:
+        return value
+
+
+class OrderedCounter(collections.Counter, collections.OrderedDict):
+    """Counter that remembers the order elements are first encountered."""
+    pass

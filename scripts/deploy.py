@@ -12,26 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Deployment script for Oppia.
+"""This is a deployment script for Oppia that should only be used by release
+coordinators.
 
-USE THIS SCRIPT AT YOUR OWN RISK! A safe option is to modify app.yaml manually
-and run the 'appcfg.py update' command.
-
-This script performs a deployment of Oppia to a Google App Engine appspot
-instance. It creates a build with unnecessary files removed, and saves a copy
-of the uploaded files to a deployment folder in the parent directory of the
-oppia/ folder. It then pushes this build to the production server.
+The script creates a build with unnecessary files removed, and saves a copy of
+the uploaded files to a deployment folder in the parent directory of the oppia/
+folder. It then pushes this build to the production server.
 
 IMPORTANT NOTES:
-
 1.  You will need to first create a folder called ../deploy_data/[APP_NAME],
     where [APP_NAME] is the name of your app as defined in app.yaml. This
     folder should contain a folder called /images, which in turn should
     contain:
-    - one file: favicon.ico
-    - five folders: /avatar, /general, /logo, /splash and /sidebar, containing
-        images used for the avatar, general-purpose usage, logo, splash
-        carousel and sidebar, respectively.
+    - four folders: /avatar, /general, /logo and /sidebar, containing
+        images used for the avatar, general-purpose usage, logo and sidebar,
+        respectively.
+    It should also contain a folder called /common, which should contain:
+    - favicon.ico and robots.txt.
+    - one folder images/general which contains:
+        - warning.png
 
 2.  Before running this script, you must install third-party dependencies by
     running
@@ -53,39 +52,58 @@ IMPORTANT NOTES:
 import argparse
 import datetime
 import os
+import random
 import shutil
+import string
 import subprocess
+
+import common  # pylint: disable=relative-import
+
 # pylint: enable=wrong-import-order
 
-import common
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--app_name', help='name of the app to deploy to', type=str)
 
+APP_NAME_OPPIASERVER = 'oppiaserver'
+APP_NAME_OPPIATESTSERVER = 'oppiatestserver'
+
 PARSED_ARGS = _PARSER.parse_args()
 if PARSED_ARGS.app_name:
     APP_NAME = PARSED_ARGS.app_name
+    if APP_NAME not in [
+            APP_NAME_OPPIASERVER, APP_NAME_OPPIATESTSERVER] and (
+                'migration' not in APP_NAME):
+        raise Exception('Invalid app name: %s' % APP_NAME)
 else:
     raise Exception('No app name specified.')
 
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
-RELEASE_DIR_NAME = 'deploy-%s-%s' % (
+CURRENT_BRANCH_NAME = common.get_current_branch_name()
+
+RELEASE_DIR_NAME = 'deploy-%s-%s-%s' % (
     '-'.join('-'.join(APP_NAME.split('.')).split(':')),
+    CURRENT_BRANCH_NAME,
     CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
 RELEASE_DIR_PATH = os.path.join(os.getcwd(), '..', RELEASE_DIR_NAME)
 
 APPCFG_PATH = os.path.join(
-    '..', 'oppia_tools', 'google_appengine_1.9.19', 'google_appengine',
+    '..', 'oppia_tools', 'google_appengine_1.9.50', 'google_appengine',
     'appcfg.py')
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
-DEPLOY_DATA_PATH = os.path.join(os.getcwd(), '..', 'deploy_data', APP_NAME)
+DEPLOY_DATA_PATH = os.path.join(
+    os.getcwd(), os.pardir, 'release-scripts', 'deploy_data', APP_NAME)
 
-SPLASH_PAGE_FILES = ['favicon.ico']
-IMAGE_DIRS = ['avatar', 'general', 'splash', 'sidebar', 'logo']
+FILES_AT_ROOT_IN_COMMON = ['favicon.ico', 'robots.txt']
+IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
+
+# Denotes length for cache slug used in production mode. It consists of
+# lowercase alphanumeric characters.
+CACHE_SLUG_PROD_LENGTH = 6
 
 
 def preprocess_release():
@@ -95,7 +113,7 @@ def preprocess_release():
     does the following:
 
     (1) Changes the app name in app.yaml to APP_NAME.
-    (2) Substitutes image files in the images/ directory.
+    (2) Substitutes files from the per-app deployment data.
     """
     # Change the app name in app.yaml.
     f = open('app.yaml', 'r')
@@ -105,14 +123,14 @@ def preprocess_release():
     d = open('app.yaml', 'w+')
     d.write(content)
 
-    # Substitute image files for the splash page.
     if not os.path.exists(DEPLOY_DATA_PATH):
         raise Exception(
             'Could not find deploy_data directory at %s' % DEPLOY_DATA_PATH)
 
-    for filename in SPLASH_PAGE_FILES:
-        src = os.path.join(DEPLOY_DATA_PATH, 'images', filename)
-        dst = os.path.join(os.getcwd(), 'static', 'images', filename)
+    # Copies files in common folder to assets/common.
+    for filename in FILES_AT_ROOT_IN_COMMON:
+        src = os.path.join(DEPLOY_DATA_PATH, 'common', filename)
+        dst = os.path.join(os.getcwd(), 'assets', 'common', filename)
         if not os.path.exists(src):
             raise Exception(
                 'Could not find source path %s. Please check your deploy_data '
@@ -123,9 +141,10 @@ def preprocess_release():
                 'updated in the meantime?' % dst)
         shutil.copyfile(src, dst)
 
+    # Copies files in images to /assets/images
     for dir_name in IMAGE_DIRS:
         src_dir = os.path.join(DEPLOY_DATA_PATH, 'images', dir_name)
-        dst_dir = os.path.join(os.getcwd(), 'static', 'images', dir_name)
+        dst_dir = os.path.join(os.getcwd(), 'assets', 'images', dir_name)
 
         if not os.path.exists(src_dir):
             raise Exception(
@@ -139,15 +158,42 @@ def preprocess_release():
             shutil.copyfile(src, dst)
 
 
+def _get_served_version():
+    """Retrieves the default version being served on the specified application
+    being served on app engine.
+
+    Returns:
+        (str): The current serving version.
+    """
+    listed_versions = subprocess.check_output(
+        [APPCFG_PATH, '--application=%s' % APP_NAME, 'list_versions'])
+    default_version_line_start_str = 'default: ['
+    listed_versions = listed_versions[
+        listed_versions.index(default_version_line_start_str) + len(
+            default_version_line_start_str):]
+    return listed_versions[:listed_versions.index(',')].replace('-', '.')
+
+
+def _get_current_release_version():
+    """Retrieves the current branch's release version.
+
+    Returns:
+        (str): The current (local) Oppia release version.
+    """
+    release_branch_name_prefix = 'release-'
+    if not CURRENT_BRANCH_NAME.startswith(release_branch_name_prefix):
+        raise Exception('Deploy script must be run from a release branch.')
+    return CURRENT_BRANCH_NAME[len(
+        release_branch_name_prefix):].replace('-', '.')
+
+
 def _execute_deployment():
-    # Check that the current directory is correct.
+    # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
+    common.ensure_release_scripts_folder_exists_and_is_up_to_date()
 
     current_git_revision = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD']).strip()
-
-    print ''
-    print 'Starting deployment process.'
 
     if not os.path.exists(THIRD_PARTY_DIR):
         raise Exception(
@@ -179,20 +225,8 @@ def _execute_deployment():
         print 'Building and minifying scripts...'
         subprocess.check_output(['python', 'scripts/build.py'])
 
-        # Run the tests; ensure there are no errors.
-        print 'Running tests...'
-        tests_proc = subprocess.Popen([
-            'bash', os.path.join('scripts', 'run_tests.sh')
-        ], stdout=subprocess.PIPE)
-        tests_stdout, tests_stderr = tests_proc.communicate()
-        print tests_stdout
-        print tests_stderr
-
-        if tests_proc.returncode != 0:
-            raise Exception('Tests failed. Halting deployment.')
-
         # Deploy to GAE.
-        subprocess.check_output([APPCFG_PATH, 'update', '.', '--oauth2'])
+        subprocess.check_output([APPCFG_PATH, 'update', '.'])
 
         # Writing log entry.
         common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
@@ -204,7 +238,26 @@ def _execute_deployment():
 
         print 'Returning to oppia/ root directory.'
 
+    # If this is a test server deployment and the current release version is
+    # already serving, open the library page (for sanity checking) and the GAE
+    # error logs.
+    if (APP_NAME == APP_NAME_OPPIATESTSERVER or 'migration' in APP_NAME) and (
+            _get_served_version() == _get_current_release_version()):
+        common.open_new_tab_in_browser_if_possible(
+            'https://console.cloud.google.com/logs/viewer?'
+            'project=%s&key1=default&minLogLevel=500'
+            % APP_NAME_OPPIATESTSERVER)
+        common.open_new_tab_in_browser_if_possible(
+            'https://%s.appspot.com/library' % APP_NAME_OPPIATESTSERVER)
+
     print 'Done!'
+
+
+def get_unique_id():
+    """Returns a unique id."""
+    unique_id = ''.join(random.choice(string.ascii_lowercase + string.digits)
+                        for _ in range(CACHE_SLUG_PROD_LENGTH))
+    return unique_id
 
 
 if __name__ == '__main__':

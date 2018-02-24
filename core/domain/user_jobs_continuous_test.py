@@ -20,14 +20,17 @@ from collections import defaultdict
 
 from core import jobs_registry
 from core.domain import collection_services
+from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rating_services
 from core.domain import rights_manager
-from core.domain import stats_jobs_continuous
+from core.domain import stats_domain
+from core.domain import stats_services
 from core.domain import user_jobs_continuous
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -128,8 +131,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -171,8 +173,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
             ModifiedRecentUpdatesAggregator.stop_computation(USER_ID)
 
@@ -198,8 +199,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -229,8 +229,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -256,8 +255,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -309,8 +307,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -361,8 +358,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications_for_user_a = (
@@ -403,6 +399,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
             self.signup(USER_B_EMAIL, USER_B_USERNAME)
             user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
+            user_a = user_services.UserActionsInfo(user_a_id)
+
 
             # User A creates an exploration.
             self.save_new_valid_exploration(
@@ -420,13 +418,12 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User A adds user B as an editor of the exploration.
             rights_manager.assign_role_for_exploration(
-                user_a_id, EXP_ID, user_b_id, rights_manager.ROLE_EDITOR)
+                user_a, EXP_ID, user_b_id, rights_manager.ROLE_EDITOR)
 
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications_for_user_a = (
@@ -472,8 +469,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -506,8 +502,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -534,8 +529,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
@@ -557,80 +551,80 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 recent_notifications[0]['last_updated_ms'])
 
 
-class ModifiedUserImpactAggregator(
-        user_jobs_continuous.UserImpactAggregator):
-    """A modified UserImpactAggregator that does not start a new
+class ModifiedUserStatsAggregator(
+        user_jobs_continuous.UserStatsAggregator):
+    """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
     @classmethod
     def _get_batch_job_manager_class(cls):
-        return ModifiedUserImpactMRJobManager
+        return ModifiedUserStatsMRJobManager
 
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
 
 
-class ModifiedUserImpactMRJobManager(
-        user_jobs_continuous.UserImpactMRJobManager):
+class ModifiedUserStatsMRJobManager(
+        user_jobs_continuous.UserStatsMRJobManager):
 
     @classmethod
     def _get_continuous_computation_class(cls):
-        return ModifiedUserImpactAggregator
+        return ModifiedUserStatsAggregator
 
 
-class UserImpactAggregatorTest(test_utils.GenericTestBase):
-    """ Tests the calculation of a user's impact score from the
-    continuous computation of UserImpactAggregator.
+class UserStatsAggregatorTest(test_utils.GenericTestBase):
+    """ Tests the calculation of a user's statistics -
+    impact score, average ratings, total plays
+    from the continuous computation of UserStatsAggregator.
     """
 
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     EXP_ID_3 = 'exp_id_3'
+    EXP_DEFAULT_VERSION = 1
+
+    USER_SESSION_ID = 'session1'
     USER_A_EMAIL = 'a@example.com'
     USER_B_EMAIL = 'b@example.com'
     USER_A_USERNAME = 'a'
     USER_B_USERNAME = 'b'
+
     MIN_NUM_COMPLETIONS = 2
     EXPONENT = 2.0/3
 
     def setUp(self):
-        super(UserImpactAggregatorTest, self).setUp()
+        super(UserStatsAggregatorTest, self).setUp()
         self.num_completions = defaultdict(int)
+        self.num_starts = defaultdict(int)
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
+
+        self.user_a = user_services.UserActionsInfo(self.user_a_id)
 
     def _mock_get_statistics(self, exp_id, unused_version):
         current_completions = {
-            self.EXP_ID_1: {
-                'complete_exploration_count': (
-                    self.num_completions[self.EXP_ID_1]),
-                'state_hit_counts': {
-                    'state1': {
-                        'first_entry_count': 3,
-                        'no_answer_count': 1
-                    },
-                    'state2': {
-                        'first_entry_count': 7,
-                        'no_answer_count': 1
-                    },
+            self.EXP_ID_1: stats_domain.ExplorationStats(
+                self.EXP_ID_1, self.EXP_DEFAULT_VERSION, 5, 2, 0, 0, 0, 0, {
+                    'state1': stats_domain.StateStats(
+                        0, 0, 0, 0, 0, 0, 3, 1, 0, 0, 0),
+                    'state2': stats_domain.StateStats(
+                        0, 0, 0, 0, 0, 0, 7, 1, 0, 0, 0),
                 }
-            },
-            self.EXP_ID_2: {
-                'complete_exploration_count': (
-                    self.num_completions[self.EXP_ID_2]),
-                'state_hit_counts': {
-                    'state1': {
-                        'first_entry_count': 3,
-                        'no_answer_count': 1
-                    },
-                    'state2': {
-                        'first_entry_count': 7,
-                        'no_answer_count': 1
-                    },
+            ),
+            self.EXP_ID_2: stats_domain.ExplorationStats(
+                self.EXP_ID_2, self.EXP_DEFAULT_VERSION, 5, 2, 0, 0, 0, 0, {
+                    'state1': stats_domain.StateStats(
+                        0, 0, 0, 0, 0, 0, 3, 1, 0, 0, 0),
+                    'state2': stats_domain.StateStats(
+                        0, 0, 0, 0, 0, 0, 7, 1, 0, 0, 0),
                 }
-            },
-            self.EXP_ID_3: {
-                'state_hit_counts': {}
-            }
+            ),
+            self.EXP_ID_3: stats_domain.ExplorationStats(
+                self.EXP_ID_3, self.EXP_DEFAULT_VERSION, 0, 0, 0, 0, 0, 0, {})
         }
         return current_completions[exp_id]
 
@@ -650,22 +644,32 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         """Runs the MapReduce job after running the continuous
         statistics aggregator for explorations to get the correct num
         completion events."""
-        with self.swap(stats_jobs_continuous.StatisticsAggregator,
-                       'get_statistics', self._mock_get_statistics):
-            ModifiedUserImpactAggregator.start_computation()
-            self.process_and_flush_pending_tasks()
+        with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
+            with self.swap(
+                stats_services, 'get_exploration_stats',
+                self._mock_get_statistics):
+                ModifiedUserStatsAggregator.start_computation()
+                self.process_and_flush_pending_tasks()
 
-
-    def _sign_up_user(self, user_email, username):
-        # Sign up a user, have them create an exploration.
-        self.signup(user_email, username)
-        return self.get_user_id_from_email(user_email)
+    def _generate_user_ids(self, count):
+        """Generate unique user ids to rate an exploration. Each user id needs
+        to be unique since each user can only give an exploration one rating.
+        """
+        return ['user%d' % i for i in range(count)]
 
     def _create_exploration(self, exp_id, user_id):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            exp_id, 'A title', 'A category')
+        exploration = exp_domain.Exploration.create_default_exploration(exp_id)
         exp_services.save_new_exploration(user_id, exploration)
         return exploration
+
+    def _record_start(self, exp_id, exp_version, state):
+        """Record start event to an exploration.
+        Completing the exploration is not necessary here since the total_plays
+        are currently being counted taking into account only the # of starts.
+        """
+        event_services.StartExplorationEventHandler.record(
+            exp_id, exp_version, state, self.USER_SESSION_ID, {},
+            feconf.PLAY_TYPE_NORMAL)
 
     def _rate_exploration(self, exp_id, num_ratings, rating):
         """Create num_ratings ratings for exploration with exp_id,
@@ -673,57 +677,64 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         """
         # Each user id needs to be unique since each user can only give an
         # exploration one rating.
-        user_ids = ['user%d' % i for i in range(num_ratings)]
+        user_ids = self._generate_user_ids(num_ratings)
         for user_id in user_ids:
             rating_services.assign_rating_to_exploration(
                 user_id, exp_id, rating)
 
-    def test_user_with_no_explorations_has_no_impact(self):
+    def _record_exploration_rating(self, exp_id, ratings):
+        user_ids = self._generate_user_ids(len(ratings))
+        self.process_and_flush_pending_tasks()
+        for ind, user_id in enumerate(user_ids):
+            event_services.RateExplorationEventHandler.record(
+                exp_id, user_id, ratings[ind], None)
+        self.process_and_flush_pending_tasks()
+
+    def _record_exploration_rating_for_user(
+            self, exp_id, user_id, rating, old_rating=None):
+        self.process_and_flush_pending_tasks()
+        event_services.RateExplorationEventHandler.record(
+            exp_id, user_id, rating, old_rating)
+        self.process_and_flush_pending_tasks()
+
+    def test_stats_for_user_with_no_explorations(self):
         """Test that a user who is not a contributor on any exploration
-        is not assigned an impact score by the UserImpactMRJobManager.
+        is not assigned value of impact score, total plays and average ratings.
         """
-        user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
         self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(
-            user_a_id, strict=False)
+            self.user_a_id, strict=False)
         self.assertIsNone(user_stats_model)
 
-    def test_standard_user_impact_calculation_one_exploration(self):
-        # Sign up a user and have them create an exploration.
-        user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        exploration = self._create_exploration(self.EXP_ID_1, user_a_id)
+    def test_standard_user_stats_calculation_one_exploration(self):
+        exploration = self._create_exploration(self.EXP_ID_1, self.user_a_id)
         # Give this exploration an average rating of 4
         avg_rating = 4
         self._rate_exploration(exploration.id, 5, avg_rating)
 
-        # See state counts in _mock_get_statistics(), above.
-        expected_answer_count = 8
+        # The expected answer count is the sum of the first hit counts in the
+        # statistics defined in _get_mock_statistics() method above.
+        expected_answer_count = 15
         reach = expected_answer_count ** self.EXPONENT
         expected_user_impact_score = round(
             ((avg_rating - 2) * reach) ** self.EXPONENT)
 
         # Verify that the impact score matches the expected.
         self._run_computation()
-        user_stats_model = user_models.UserStatsModel.get(user_a_id)
+        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
         self.assertEqual(
             user_stats_model.impact_score, expected_user_impact_score)
 
     def test_exploration_multiple_contributors(self):
-        # Sign up a user and have them create an exploration.
-        user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        user_b_id = self._sign_up_user(
-            self.USER_B_EMAIL, self.USER_B_USERNAME)
-        exploration = self._create_exploration(self.EXP_ID_1, user_a_id)
+        exploration = self._create_exploration(self.EXP_ID_1, self.user_a_id)
         # Give this exploration an average rating of 4
         avg_rating = 4
         self._rate_exploration(exploration.id, 5, avg_rating)
-        exp_services.update_exploration(user_b_id, self.EXP_ID_1, [], '')
+        exp_services.update_exploration(self.user_b_id, self.EXP_ID_1, [], '')
 
-        # See state counts in _mock_get_statistics(), above.
-        expected_answer_count = 8
+        # The expected answer count is the sum of the first hit counts in the
+        # statistics defined in _get_mock_statistics() method above.
+        expected_answer_count = 15
         reach = expected_answer_count ** self.EXPONENT
         contrib = 0.5
         expected_user_impact_score = round(
@@ -731,25 +742,23 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
 
         # Verify that the impact score matches the expected.
         self._run_computation()
-        user_stats_model = user_models.UserStatsModel.get(user_a_id)
+        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
         self.assertEqual(
             user_stats_model.impact_score, expected_user_impact_score)
-        user_stats_model = user_models.UserStatsModel.get(user_b_id)
+        user_stats_model = user_models.UserStatsModel.get(self.user_b_id)
         self.assertEqual(
             user_stats_model.impact_score, expected_user_impact_score)
 
-    def test_standard_user_impact_calculation_multiple_explorations(self):
-        # Sign up a user and have them create two explorations.
-        user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        exploration_1 = self._create_exploration(self.EXP_ID_1, user_a_id)
-        exploration_2 = self._create_exploration(self.EXP_ID_2, user_a_id)
+    def test_standard_user_stats_calculation_multiple_explorations(self):
+        exploration_1 = self._create_exploration(self.EXP_ID_1, self.user_a_id)
+        exploration_2 = self._create_exploration(self.EXP_ID_2, self.user_a_id)
         avg_rating = 4
         self._rate_exploration(exploration_1.id, 2, avg_rating)
         self._rate_exploration(exploration_2.id, 2, avg_rating)
 
-        # See state counts in _mock_get_statistics(), above.
-        expected_answer_count = 8
+        # The expected answer count is the sum of the first hit counts in the
+        # statistics defined in _get_mock_statistics() method above.
+        expected_answer_count = 15
         reach = expected_answer_count ** self.EXPONENT
         impact_per_exp = ((avg_rating - 2) * reach) # * 1 for contribution
         expected_user_impact_score = round(
@@ -757,39 +766,36 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
 
         # Verify that the impact score matches the expected.
         self._run_computation()
-        user_stats_model = user_models.UserStatsModel.get(user_a_id)
+        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
         self.assertEqual(
             user_stats_model.impact_score, expected_user_impact_score)
 
     def test_only_yield_when_rating_greater_than_two(self):
         """Tests that map only yields an impact score for an
         exploration when the impact score is greater than 0."""
-        # Sign up a user and have them create an exploration.
-        user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self._create_exploration(self.EXP_ID_1, user_a_id)
+        self._create_exploration(self.EXP_ID_1, self.user_a_id)
 
         # Give two ratings of 1.
         self._rate_exploration(self.EXP_ID_1, 2, 1)
         self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(
-            user_a_id, strict=False)
-        self.assertIsNone(user_stats_model)
-        ModifiedUserImpactAggregator.stop_computation(user_a_id)
+            self.user_a_id, strict=False)
+        self.assertEqual(user_stats_model.impact_score, 0)
+        ModifiedUserStatsAggregator.stop_computation(self.user_a_id)
 
         # Give two ratings of 2.
         self._rate_exploration(self.EXP_ID_1, 2, 2)
         self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(
-            user_a_id, strict=False)
-        self.assertIsNone(user_stats_model)
-        ModifiedUserImpactAggregator.stop_computation(user_a_id)
+            self.user_a_id, strict=False)
+        self.assertEqual(user_stats_model.impact_score, 0)
+        ModifiedUserStatsAggregator.stop_computation(self.user_a_id)
 
         # Give two ratings of 3. The impact score should now be nonzero.
         self._rate_exploration(self.EXP_ID_1, 2, 3)
         self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(
-            user_a_id, strict=False)
+            self.user_a_id, strict=False)
         self.assertIsNotNone(user_stats_model)
         self.assertGreater(user_stats_model.impact_score, 0)
 
@@ -797,23 +803,185 @@ class UserImpactAggregatorTest(test_utils.GenericTestBase):
         """Test that when an exploration has no answers, it is considered to
         have no reach.
         """
-        # Sign up a user and have them create an exploration.
-        user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        exploration = self._create_exploration(self.EXP_ID_3, user_a_id)
+        exploration = self._create_exploration(self.EXP_ID_3, self.user_a_id)
         self._rate_exploration(exploration.id, 5, 3)
         self._run_computation()
-        user_stats_model = user_models.UserStatsModel.get(user_a_id)
+        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
         self.assertEqual(user_stats_model.impact_score, 0)
 
     def test_impact_for_exp_with_no_ratings(self):
         """Test that when an exploration has no ratings, the impact returned
         from the impact function is 0.
         """
-        # Sign up a user and have them create an exploration.
-        user_a_id = self._sign_up_user(
-            self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self._create_exploration(self.EXP_ID_1, user_a_id)
+        self._create_exploration(self.EXP_ID_1, self.user_a_id)
         user_stats_model = user_models.UserStatsModel.get(
-            user_a_id, strict=False)
+            self.user_a_id, strict=False)
         self.assertEqual(user_stats_model, None)
+
+    def test_realtime_layer_batch_job_no_ratings_plays(self):
+        self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        self.assertEquals(
+            user_stats['total_plays'], 0)
+        self.assertEquals(
+            user_stats['num_ratings'], 0)
+        self.assertEquals(
+            user_stats['average_ratings'], None)
+
+    def test_realtime_layer_batch_job_single_rating(self):
+        self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+        self._record_exploration_rating(self.EXP_ID_1, [4])
+
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        self.assertEquals(user_stats['total_plays'], 0)
+        self.assertEquals(user_stats['num_ratings'], 1)
+        self.assertEquals(user_stats['average_ratings'], 4)
+
+    def test_realtime_layer_batch_job_single_exploration_one_owner(self):
+        exploration = self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+
+        exp_id = self.EXP_ID_1
+        exp_version = self.EXP_DEFAULT_VERSION
+        state = exploration.init_state_name
+
+        self._record_start(exp_id, exp_version, state)
+        self._record_start(exp_id, exp_version, state)
+        self._record_exploration_rating(exp_id, [2, 5])
+
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        self.assertEquals(user_stats['total_plays'], 2)
+        self.assertEquals(user_stats['num_ratings'], 2)
+        self.assertEquals(user_stats['average_ratings'], 3.5)
+
+    def test_realtime_layer_batch_job_single_exploration_multiple_owners(self):
+        exploration = self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID_1, self.user_b_id,
+            rights_manager.ROLE_OWNER)
+
+        exp_version = self.EXP_DEFAULT_VERSION
+        exp_id = self.EXP_ID_1
+        state = exploration.init_state_name
+
+        self._record_start(exp_id, exp_version, state)
+        self._record_start(exp_id, exp_version, state)
+        self._record_exploration_rating(exp_id, [3, 4, 5])
+        self._record_exploration_rating(exp_id, [1, 5, 4])
+
+        expected_results = {
+            'total_plays': 2,
+            'num_ratings': 6,
+            'average_ratings': 22/6.0
+        }
+
+        user_stats_1 = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        self.assertEquals(
+            user_stats_1['total_plays'], expected_results['total_plays'])
+        self.assertEquals(
+            user_stats_1['num_ratings'], expected_results['num_ratings'])
+        self.assertEquals(
+            user_stats_1['average_ratings'],
+            expected_results['average_ratings'])
+
+        user_stats_2 = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_b_id))
+        self.assertEquals(
+            user_stats_2['total_plays'], expected_results['total_plays'])
+        self.assertEquals(
+            user_stats_2['num_ratings'], expected_results['num_ratings'])
+        self.assertEquals(
+            user_stats_2['average_ratings'],
+            expected_results['average_ratings'])
+
+    def test_realtime_layer_batch_job_multiple_explorations_one_owner(self):
+        self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+        self._create_exploration(
+            self.EXP_ID_2, self.user_a_id)
+
+        self._record_exploration_rating(self.EXP_ID_1, [4, 5, 2])
+        self._record_exploration_rating(self.EXP_ID_2, [5, 2])
+
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        self.assertEquals(user_stats['total_plays'], 0)
+        self.assertEquals(user_stats['num_ratings'], 5)
+        self.assertEquals(user_stats['average_ratings'], 18/5.0)
+
+    def test_realtime_layer_batch_job_user_rate_same_exp_multiple_times(self):
+        self._create_exploration(
+            self.EXP_ID_1, self.user_a_id)
+
+        exp_id_1 = self.EXP_ID_1
+
+        self._record_exploration_rating_for_user(exp_id_1, self.user_b_id, 5)
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        self.assertEquals(user_stats['total_plays'], 0)
+        self.assertEquals(user_stats['num_ratings'], 1)
+        self.assertEquals(user_stats['average_ratings'], 5)
+
+        self._record_exploration_rating_for_user(
+            exp_id_1, self.user_b_id, 3, old_rating=5)
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        self.assertEquals(user_stats['total_plays'], 0)
+        self.assertEquals(user_stats['num_ratings'], 1)
+        self.assertEquals(user_stats['average_ratings'], 3)
+
+    def test_both_realtime_layer_and_batch_data(self):
+        exploration_1 = self._create_exploration(self.EXP_ID_1, self.user_a_id)
+        exploration_2 = self._create_exploration(self.EXP_ID_2, self.user_a_id)
+
+        exp_id_1 = self.EXP_ID_1
+        exp_id_2 = self.EXP_ID_2
+        exp_version = self.EXP_DEFAULT_VERSION
+        state_1 = exploration_1.init_state_name
+        state_2 = exploration_2.init_state_name
+
+        self._rate_exploration(exp_id_1, 2, 4)
+        self._rate_exploration(exp_id_2, 4, 3)
+
+        # Run the computation and check data from batch job.
+        self._run_computation()
+        user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
+        # The total plays is the sum of the number of starts of both the
+        # exploration_1 and exploration_2 as defined in the
+        # _mock_get_statistics() method above.
+        self.assertEqual(user_stats_model.total_plays, 14)
+        self.assertEqual(user_stats_model.num_ratings, 6)
+        self.assertEqual(user_stats_model.average_ratings, 20/6.0)
+
+        # Stop the batch job. Fire up a few events and check data from realtime
+        # job.
+        ModifiedUserStatsAggregator.stop_computation(self.user_a_id)
+        self._record_start(exp_id_1, exp_version, state_1)
+        self._record_start(exp_id_2, exp_version, state_2)
+        self._record_exploration_rating(exp_id_1, [2, 5])
+        self._record_exploration_rating(exp_id_2, [4, 1])
+
+        user_stats = (
+            user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
+                self.user_a_id))
+        # After recording two start events, the total plays is now increased by
+        # two.
+        self.assertEquals(user_stats['total_plays'], 16)
+        self.assertEquals(user_stats['num_ratings'], 10)
+        self.assertEquals(user_stats['average_ratings'], 32/10.0)

@@ -1,6 +1,4 @@
-# coding: utf-8
-#
-# Copyright 2015 The Oppia Authors. All Rights Reserved.
+# Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,512 +12,415 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import copy
+"""Services for classifier data models."""
 
-import numpy
+import datetime
+import logging
+
+from core.domain import classifier_domain
+from core.platform import models
+import feconf
+
+(classifier_models, exp_models) = models.Registry.import_models(
+    [models.NAMES.classifier, models.NAMES.exploration])
 
 
-class StringClassifier(object):
-    """A classifier that uses supervised learning to match free-form text
-    answers to answer groups. The classifier trains on answers that exploration
-    editors have assigned to an answer group. Given a new answer, it predicts
-    the answer group using Latent Dirichlet Allocation
-    (https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation) with Gibbs
-    Sampling.
+def handle_trainable_states(exploration, state_names):
+    """Creates ClassifierTrainingJobModel instances for all the state names
+    passed into the function. If this function is called with version number 1,
+    we are creating jobs for all trainable states in the exploration. Otherwise,
+    a new job is being created for the states where retraining is required.
 
-    Below is an example workflow for running a batch job that builds a new
-    classifier and outputs it to a dictionary.
-
-        # Examples are formatted as a list. Each element is a doc followed by a
-        # list of labels.
-        examples = [
-            ['i eat fish and vegetables', ['food']],
-            ['fish are pets', ['pets']],
-            ['my kitten eats fish', ['food', 'pets']]
-        ]
-        string_classifier = StringClassifier()
-        string_classifier.load_examples(examples)
-        classifier_dict = string_classifier.to_dict()
-        save_to_data_store(classifier_dict)
-
-    Below is an example workflow for using an existing classifier to predict a
-    document's label.
-
-        # A list of docs to classify.
-        prediction_examples = [
-            'i only eat fish and vegetables'
-        ]
-        classifier_dict = load_from_data_store()
-        string_classifier = StringClassifier()
-        string_classifier.from_dict(classifier_dict)
-        doc_ids = string_classifier.add_examples_for_predicting(
-            prediction_examples)
-        label = string_classifier.predict_label_for_doc(doc_ids[0])
-        print label
-
-    Below are some concepts used in this class.
-    doc - A student free form response, represented as a string of arbitrary
-        non-whitespace characters (a "word") separated by single spaces.
-    word - A string of arbitrary non-whitespace characters.
-    word id - A unique word. Each unique word has one word id that is used
-        to represent the word in the classifier model.
-    word instance - An instance of a word id. Each word id can have multiple
-        instances corresponding to its occurrences in all docs.
-    label - An answer group that the doc should correspond to. If a doc is
-        being added to train a model, labels are provided. If a doc is being
-        added for prediction purposes, no labels are provided. If a doc does
-        not match any label, the doc should have only one label, '_default'.
-    label bit vector - A bit vector corresponding to a doc, indexed by label
-        id. A one in the vector means the label id matches some word instance
-        in the doc; a zero in the vector means the label id does not match any
-        word instance in the doc.
-    example - A doc with a list of labels it should be matched to.
-
-    This class uses index notation with the format "_V_XY", where V is the
-    element of an array, and X and Y are the indices used to measure V.
-    https://en.wikipedia.org/wiki/Index_notation
-
-    The following maps index notation letters to their meanings:
-    b - boolean value for whether Y is set in X
-    c - count of Y's in X
-    p - position of a value V in X
-    l - label id
-    w - word id
-    d - doc id
-
-    Internal model representation:
-    _w_dp - lists of word ids, where each list represents a doc
-    _b_dl - lists of booleans, where each boolean represents whether a
-        label is contained within a doc.
-    _l_dp - lists of label ids, where each list represents what label
-        is assigned to a word instance.
-    _c_dl - lists of counts, where each list represents the number of
-        word instances assigned to each label in a doc.
-    _c_lw - lists of counts, where each list represents the number of
-        word instances assigned to each label for a given word id (aggregated
-        across all docs).
-    _c_l - a list of counts, where each count is the number of times
-        a label was assigned (aggregated over all word instances in all docs).
-
-    There are two internal learning rates, _DEFAULT_ALPHA and _DEFAULT_BETA.
-    These are initialized to Wikipedia's recommendations. Do not change these
-    unless you know what you're doing.
-
-    It is possible for a word instance in a doc to not have an explicit label
-    assigned to it. This is characterized by assigning DEFAULT_LABEL to the
-    word instance.
+    Args:
+        exploration: Exploration. The Exploration domain object.
+        state_names: list(str). List of state names.
     """
+    job_dicts_list = []
+    exp_id = exploration.id
+    exp_version = exploration.version
+    for state_name in state_names:
+        state = exploration.states[state_name]
+        training_data = state.get_training_data()
+        interaction_id = state.interaction.id
+        algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
+            interaction_id]['algorithm_id']
+        next_scheduled_check_time = datetime.datetime.utcnow()
+        classifier_data = None
+        data_schema_version = 1
 
-    _DEFAULT_ALPHA = 0.1
-    _DEFAULT_BETA = 0.001
+        # Validate the job.
+        dummy_classifier_training_job = classifier_domain.ClassifierTrainingJob(
+            'job_id_dummy', algorithm_id, interaction_id, exp_id, exp_version,
+            next_scheduled_check_time, state_name,
+            feconf.TRAINING_JOB_STATUS_NEW, training_data, classifier_data,
+            data_schema_version)
+        dummy_classifier_training_job.validate()
 
-    _DEFAULT_TRAINING_ITERATIONS = 25
-    _DEFAULT_PREDICTION_ITERATIONS = 5
+        job_dicts_list.append({
+            'algorithm_id': algorithm_id,
+            'interaction_id': interaction_id,
+            'exp_id': exp_id,
+            'exp_version': exp_version,
+            'next_scheduled_check_time': next_scheduled_check_time,
+            'state_name': state_name,
+            'training_data': training_data,
+            'status': feconf.TRAINING_JOB_STATUS_NEW,
+            'classifier_data': classifier_data,
+            'data_schema_version': data_schema_version
+        })
 
-    _DEFAULT_PREDICTION_THRESHOLD = 0.5
+    # Create all the classifier training jobs.
+    job_ids = classifier_models.ClassifierTrainingJobModel.create_multi(
+        job_dicts_list)
 
-    """Classifiers built with less than _DEFAULT_MIN_DOCS_TO_PREDICT will
-    likely not be useful for predicting as there are not enough examples to
-    build a generalized model. The value 20 was chosen as a balance between a
-    reasonable number of data to learn from and a low entry barrier to using
-    the classifier.
+    # Create mapping for each job. For TrainingJobExplorationMapping, we can
+    # append Domain objects to send to the job_exploration_mappings dict because
+    # we know all the attributes required for creating the Domain object unlike
+    # ClassifierTrainingJob class where we don't know the job_id.
+    job_exploration_mappings = []
+    for job_id_index, job_id in enumerate(job_ids):
+        job_exploration_mapping = (
+            classifier_domain.TrainingJobExplorationMapping(
+                job_dicts_list[job_id_index]['exp_id'],
+                job_dicts_list[job_id_index]['exp_version'],
+                job_dicts_list[job_id_index]['state_name'],
+                job_id))
+        job_exploration_mapping.validate()
+        job_exploration_mappings.append(job_exploration_mapping)
+
+    classifier_models.TrainingJobExplorationMappingModel.create_multi(
+        job_exploration_mappings)
+
+
+def handle_non_retrainable_states(exploration, state_names,
+                                  new_to_old_state_names):
+    """Creates new TrainingJobExplorationMappingModel instances for all the
+    state names passed into the function. The mapping is created from the
+    state in the new version of the exploration to the ClassifierTrainingJob of
+    the state in the older version of the exploration. If there's been a change
+    in the state name, we retrieve the old state name and create the mapping
+    accordingly.
+    This method is called only from exp_services._save_exploration() method and
+    is never called from exp_services._create_exploration().
+    In this method, the current_state_name refers to the name of the state in
+    the current version of the exploration whereas the old_state_name refers to
+    the name of the state in the previous version of the exploration.
+
+    Args:
+        exploration: Exploration. The Exploration domain object.
+        state_names: list(str). List of state names.
+        new_to_old_state_names: dict. Dict mapping new state names to their
+            corresponding state names in previous version.
+
+    Raises:
+        Exception. This method should not be called by exploration with version
+            number 1.
     """
-    _DEFAULT_MIN_DOCS_TO_PREDICT = 20
-    """Because prediction uses Prob(the doc should be assigned this label | the
-    doc is not assigned DEFAULT_LABEL), if there are only two labels (the
-    default label and one other) then the one other label will always be
-    predicted. Therefore, a minimum of 3 labels are needed to perform a valid
-    prediction.
+    exp_id = exploration.id
+    current_exp_version = exploration.version
+    old_exp_version = current_exp_version - 1
+    if old_exp_version <= 0:
+        raise Exception(
+            'This method should not be called by exploration with version '
+            'number %s' % (current_exp_version))
+
+    state_names_to_retrieve = []
+    for current_state_name in state_names:
+        old_state_name = new_to_old_state_names[current_state_name]
+        state_names_to_retrieve.append(old_state_name)
+    classifier_training_jobs = get_classifier_training_jobs(
+        exp_id, old_exp_version, state_names_to_retrieve)
+
+    job_exploration_mappings = []
+    for index, classifier_training_job in enumerate(classifier_training_jobs):
+        if classifier_training_job is None:
+            logging.error(
+                'The ClassifierTrainingJobModel for the %s state of Exploration'
+                ' with exp_id %s and exp_version %s does not exist.' % (
+                    state_names_to_retrieve[index], exp_id, old_exp_version))
+            continue
+        new_state_name = state_names[index]
+        job_exploration_mapping = (
+            classifier_domain.TrainingJobExplorationMapping(
+                exp_id, current_exp_version, new_state_name,
+                classifier_training_job.job_id))
+        job_exploration_mapping.validate()
+        job_exploration_mappings.append(job_exploration_mapping)
+
+    classifier_models.TrainingJobExplorationMappingModel.create_multi(
+        job_exploration_mappings)
+
+
+def get_classifier_training_job_from_model(classifier_training_job_model):
+    """Gets a classifier training job domain object from a classifier
+    training job model.
+
+    Args:
+        classifier_training_job_model: ClassifierTrainingJobModel. Classifier
+            training job instance in datastore.
+
+    Returns:
+        classifier_training_job: ClassifierTrainingJob. Domain object for the
+            classifier training job.
     """
-    _DEFAULT_MIN_LABELS_TO_PREDICT = 3
+    return classifier_domain.ClassifierTrainingJob(
+        classifier_training_job_model.id,
+        classifier_training_job_model.algorithm_id,
+        classifier_training_job_model.interaction_id,
+        classifier_training_job_model.exp_id,
+        classifier_training_job_model.exp_version,
+        classifier_training_job_model.next_scheduled_check_time,
+        classifier_training_job_model.state_name,
+        classifier_training_job_model.status,
+        classifier_training_job_model.training_data,
+        classifier_training_job_model.classifier_data,
+        classifier_training_job_model.data_schema_version)
 
-    DEFAULT_LABEL = '_default'
 
-    def __init__(self):
-        """Initializes constants for the classifier.
+def get_classifier_training_job_by_id(job_id):
+    """Gets a classifier training job by a job_id.
 
-        Setting a seed ensures that results are deterministic. There is nothing
-        special about the value 4. These should not be changed unless you know
-        what you're doing.
-        """
-        numpy.random.seed(seed=4)
+    Args:
+        job_id: str. ID of the classifier training job.
 
-        self._alpha = self._DEFAULT_ALPHA
-        self._beta = self._DEFAULT_BETA
+    Returns:
+        classifier_training_job: ClassifierTrainingJob. Domain object for the
+            classifier training job.
 
-        # These should be initialized in load_examples() or from_dict().
-        self._b_dl = None
-        self._c_dl = None
-        self._c_l = None
-        self._c_lw = None
-        self._l_dp = None
-        self._w_dp = None
-        self._label_to_id = None
-        self._word_to_id = None
-        self._num_docs = None
-        self._num_labels = None
-        self._num_words = None
+    Raises:
+        Exception: Entity for class ClassifierTrainingJobModel with id not
+            found.
+    """
+    classifier_training_job_model = (
+        classifier_models.ClassifierTrainingJobModel.get(job_id))
+    classifier_training_job = get_classifier_training_job_from_model(
+        classifier_training_job_model)
+    return classifier_training_job
 
-        self._training_iterations = self._DEFAULT_TRAINING_ITERATIONS
-        self._prediction_iterations = self._DEFAULT_PREDICTION_ITERATIONS
 
-        self._prediction_threshold = self._DEFAULT_PREDICTION_THRESHOLD
+def create_classifier_training_job(algorithm_id, interaction_id, exp_id,
+                                   exp_version, state_name, training_data,
+                                   status):
+    """Creates a ClassifierTrainingJobModel in data store.
 
-    def _get_word_id(self, word):
-        """Returns a word's id if it exists, otherwise assigns
-        a new id to the word and returns it.
-        """
-        if word not in self._word_to_id:
-            self._word_to_id[word] = self._num_words
-            self._num_words += 1
-        return self._word_to_id[word]
+    Args:
+        algorithm_id: str. ID of the algorithm used to generate the model.
+        interaction_id: str. ID of the interaction to which the algorithm
+            belongs.
+        exp_id: str. ID of the exploration.
+        exp_version: int. The exploration version at the time
+            this training job was created.
+        state_name: str. The name of the state to which the classifier
+            belongs.
+        training_data: dict. The data used in training phase.
+        status: str. The status of the training job (
+            feconf.TRAINING_JOB_STATUS_NEW by default).
 
-    def _get_label_id(self, label):
-        """Returns a label's id if it exists, otherwise assigns
-        a new id to the label and returns it.
-        """
-        if label not in self._label_to_id:
-            self._label_to_id[label] = self._num_labels
-            self._num_labels += 1
-        return self._label_to_id[label]
+    Returns:
+        job_id: str. ID of the classifier training job.
+    """
+    next_scheduled_check_time = datetime.datetime.utcnow()
+    dummy_classifier_training_job = classifier_domain.ClassifierTrainingJob(
+        'job_id_dummy', algorithm_id, interaction_id, exp_id, exp_version,
+        next_scheduled_check_time, state_name, status, training_data, None, 1)
+    dummy_classifier_training_job.validate()
+    job_id = classifier_models.ClassifierTrainingJobModel.create(
+        algorithm_id, interaction_id, exp_id, exp_version,
+        next_scheduled_check_time, training_data, state_name, status, None, 1)
+    return job_id
 
-    def _get_label_name(self, l):
-        """Returns a label's string name given its internal id.
 
-        If the id does not have a corresponding name, an exception is
-        raised.
-        """
-        for label_name, label_id in self._label_to_id.iteritems():
-            if label_id == l:
-                return label_name
+def _update_classifier_training_jobs_status(job_ids, status):
+    """Checks for the existence of the model and then updates it.
 
-        raise Exception('Label id %d does not exist.' % l)
+    Args:
+        job_id: list(str). list of ID of the ClassifierTrainingJob domain
+            objects.
+        status: str. The status to which the job needs to be updated.
 
-    def _get_doc_with_label_vector(self, d):
-        """Given a doc id, return the doc and its label bit vector."""
-        return self._w_dp[d], self._b_dl[d]
+    Raises:
+        Exception. The ClassifierTrainingJobModel corresponding to the job_id
+            of the ClassifierTrainingJob does not exist.
+    """
+    classifier_training_job_models = (
+        classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
 
-    def _get_label_vector(self, labels):
-        """Generate and return a label bit vector given a list of labels that
-        are turned on for the vector.
-        """
-        label_vector = numpy.zeros(self._num_labels)
-        for label in labels:
-            label_vector[self._get_label_id(label)] = 1
-        label_vector[self._label_to_id[self.DEFAULT_LABEL]] = 1
-        return label_vector
+    for index in range(len(job_ids)):
+        if classifier_training_job_models[index] is None:
+            raise Exception(
+                'The ClassifierTrainingJobModel corresponding to the job_id '
+                'of the ClassifierTrainingJob does not exist.')
 
-    def _update_counting_matrices(self, d, w, l, val):
-        """Updates counting matrices (ones that begin with _c) when a label
-        is assigned and unassigned to a word.
-        """
-        self._c_dl[d, l] += val
-        self._c_lw[l, w] += val
-        self._c_l[l] += val
+        classifier_training_job = get_classifier_training_job_from_model(
+            classifier_training_job_models[index])
+        classifier_training_job.update_status(status)
+        classifier_training_job.validate()
 
-    def _increment_counting_matrices(self, d, w, l):
-        """Updates counting matrices when a label is assigned to a word
-        instance in a doc.
-        """
-        self._update_counting_matrices(d, w, l, 1)
+        classifier_training_job_models[index].status = status
 
-    def _decrement_counting_matrices(self, d, w, l):
-        """Updates counting matrices when a label is unassigned from a word
-        instance in a doc.
-        """
-        self._update_counting_matrices(d, w, l, -1)
+    classifier_models.ClassifierTrainingJobModel.put_multi(
+        classifier_training_job_models)
 
-    def _run_gibbs_sampling(self, doc_ids):
-        """Runs one iteration of Gibbs sampling on the provided docs.
 
-        The statez variable is used for debugging, and possibly convergence
-        testing in the future.
-        """
-        if doc_ids is None:
-            doc_ids = xrange(self._num_docs)
 
-        statez = {
-            'updates': 0,
-            'computes': 0
-        }
+def mark_training_job_complete(job_id):
+    """Updates the training job's status to complete.
 
-        for d in doc_ids:
-            doc, labels = self._get_doc_with_label_vector(d)
-            for p, w in enumerate(doc):
-                l = self._l_dp[d][p]
+    Args:
+        job_id: str. ID of the ClassifierTrainingJob.
+    """
+    _update_classifier_training_jobs_status(
+        [job_id], feconf.TRAINING_JOB_STATUS_COMPLETE)
 
-                self._decrement_counting_matrices(d, w, l)
 
-                coeff_a = 1.0 / (
-                    self._c_dl[d].sum() + self._num_labels * self._alpha)
-                coeff_b = 1.0 / (
-                    self._c_lw.sum(axis=1) + self._num_words * self._beta)
-                label_probabilities = (
-                    labels *
-                    coeff_a * (self._c_dl[d] + self._alpha) *
-                    coeff_b * (self._c_lw[:, w] + self._beta))
-                new_label = numpy.random.multinomial(
-                    1,
-                    label_probabilities / label_probabilities.sum()).argmax()
+def mark_training_jobs_failed(job_ids):
+    """Updates the training job's status to failed.
 
-                statez['computes'] += 1
-                if l != new_label:
-                    statez['updates'] += 1
+    Args:
+        job_ids: list(str). list of ID of the ClassifierTrainingJobs.
+    """
+    _update_classifier_training_jobs_status(
+        job_ids, feconf.TRAINING_JOB_STATUS_FAILED)
 
-                self._l_dp[d][p] = new_label
-                self._increment_counting_matrices(d, w, new_label)
 
-        return statez
+def mark_training_job_pending(job_id):
+    """Updates the training job's status to pending.
 
-    def _get_label_probabilities(self, d):
-        """Returns a list of label probabilities for a given doc, indexed by
-        label id.
-        """
-        unnormalized_label_probs = (
-            self._c_dl[d] + (self._b_dl[d] * self._alpha))
-        label_probabilities = (
-            unnormalized_label_probs / unnormalized_label_probs.sum())
-        return label_probabilities
+    Args:
+        job_id: str. ID of the ClassifierTrainingJob.
+    """
+    _update_classifier_training_jobs_status(
+        [job_id], feconf.TRAINING_JOB_STATUS_PENDING)
 
-    def _get_prediction_report_for_doc(self, d):
-        """Generates and returns a prediction report for a given doc.
 
-        The prediction report is a dict with the following keys:
-        - 'prediction_label_id': the document's predicted label id
-        - 'prediction_label_name': prediction_label_id's label name
-        - 'prediction_confidence': the prediction confidence. This is
-        Prob(the doc should be assigned this label |
-        the doc is not assigned DEFAULT_LABEL).
-        - 'all_predictions': a dict mapping each label to
-        Prob(the doc should be assigned to this label).
+def _update_scheduled_check_time_for_new_training_job(job_id):
+    """Updates the next scheduled check time of job with status NEW.
 
-        Because DEFAULT_LABEL is a special label that captures unspecial
-        tokens (how ironic), its probability is not a good predicting
-        indicator. For the current normalization process, it has on
-        average a higher probability than other labels. To combat this,
-        all other labels are normalized as if the default label did not
-        exist. For example, if we have two labels with probability 0.2
-        and 0.3 with the default label having probability 0.5, the
-        normalized probability for the two labels without the default
-        label is 0.4 and 0.6, respectively.
+    Args:
+        job_id: str. ID of the ClassifierTrainingJob.
+    """
+    classifier_training_job_model = (
+        classifier_models.ClassifierTrainingJobModel.get(job_id))
 
-        The prediction threshold is currently defined at the classifier level.
-        A higher prediction threshold indicates that the predictor needs
-        more confidence prior to making a prediction, otherwise it will
-        predict DEFAULT_LABEL. This will make non-default predictions more
-        accurate, but result in fewer of them.
-        """
-        default_label_id = self._get_label_id(self.DEFAULT_LABEL)
-        prediction_label_id = default_label_id
-        prediction_confidence = 0
-        label_probabilities = self._get_label_probabilities(d)
-        normalization_coeff = (
-            1.0 / (1.0 - label_probabilities[default_label_id]))
+    if not classifier_training_job_model:
+        raise Exception(
+            'The ClassifierTrainingJobModel corresponding to the job_id '
+            'of the ClassifierTrainingJob does not exist.')
 
-        for l, prob in enumerate(label_probabilities):
-            if (l != default_label_id and
-                    prob * normalization_coeff > self._prediction_threshold and
-                    prob * normalization_coeff > prediction_confidence):
-                prediction_label_id = l
-                prediction_confidence = prob * normalization_coeff
+    classifier_training_job_model.next_scheduled_check_time = (
+        datetime.datetime.utcnow() + datetime.timedelta(
+            minutes=feconf.CLASSIFIER_JOB_TTL_MINS))
+    classifier_training_job_model.put()
 
-        return {
-            'prediction_label_id': prediction_label_id,
-            'prediction_label_name':
-                self._get_label_name(prediction_label_id),
-            'prediction_confidence': prediction_confidence,
-            'all_predictions': label_probabilities
-        }
 
-    def _parse_examples(self, examples):
-        """Unzips docs and label lists from examples and returns the two lists.
+def fetch_next_job():
+    """Gets next job model in the job queue.
 
-        Docs are split on whitespace. Order is preserved.
-        """
-        docs = []
-        labels_list = []
-        for example in examples:
-            doc_string = example[0]
-            doc = doc_string.split()
-            if len(doc) > 0:
-                labels = example[1]
-                docs.append(doc)
-                labels_list.append(labels)
-        return docs, labels_list
+    Returns:
+        ClassifierTrainingJob. Domain object of the next training Job.
+    """
+    classifier_training_jobs = []
+    # Initially the cursor for query is set to None.
+    cursor = None
+    valid_jobs = []
+    timed_out_job_ids = []
 
-    def _iterate_gibbs_sampling(self, iterations, doc_ids):
-        """Runs Gibbs sampling for "iterations" number of times on the provided
-        docs.
-        """
-        for _ in xrange(iterations):
-            self._run_gibbs_sampling(doc_ids)
+    while len(valid_jobs) == 0:
+        classifier_training_jobs, cursor, more = (
+            classifier_models.ClassifierTrainingJobModel.
+            query_new_and_pending_training_jobs(cursor))
+        for training_job in classifier_training_jobs:
+            if (training_job.status == (
+                    feconf.TRAINING_JOB_STATUS_PENDING)):
+                if (training_job.next_scheduled_check_time <= (
+                        datetime.datetime.utcnow())):
+                    timed_out_job_ids.append(training_job.id)
+            else:
+                valid_jobs.append(training_job)
+        if not more:
+            break
 
-    def _add_examples(self, examples, iterations):
-        """Adds examples to the internal state of the classifier, assigns
-        random initial labels to only the added docs, and runs Gibbs sampling
-        for iterations number of iterations.
-        """
-        if len(examples) == 0:
-            return
+    if timed_out_job_ids:
+        mark_training_jobs_failed(timed_out_job_ids)
 
-        docs, labels_list = self._parse_examples(examples)
+    if valid_jobs:
+        next_job = get_classifier_training_job_from_model(valid_jobs[0])
+        _update_scheduled_check_time_for_new_training_job(next_job.job_id)
+    else:
+        next_job = None
+    return next_job
 
-        last_num_labels = self._num_labels
-        last_num_docs = self._num_docs
-        last_num_words = self._num_words
 
-        # Increments _num_labels with any new labels
-        for labels in labels_list:
-            for label in labels:
-                self._get_label_id(label)
-        self._num_docs += len(docs)
+def store_classifier_data(job_id, classifier_data):
+    """Checks for the existence of the model and then updates it.
 
-        self._b_dl = numpy.concatenate(
-            (self._b_dl, numpy.zeros(
-                (last_num_docs, self._num_labels - last_num_labels),
-                dtype=int)), axis=1)
-        self._b_dl = numpy.concatenate(
-            (self._b_dl, [
-                self._get_label_vector(labels) for labels in labels_list
-            ]), axis=0)
-        self._w_dp.extend([map(self._get_word_id, doc) for doc in docs])
-        self._c_dl = numpy.concatenate(
-            (self._c_dl, numpy.zeros(
-                (last_num_docs, self._num_labels - last_num_labels),
-                dtype=int)), axis=1)
-        self._c_dl = numpy.concatenate(
-            (self._c_dl, numpy.zeros(
-                (self._num_docs - last_num_docs, self._num_labels),
-                dtype=int)), axis=0)
-        self._c_lw = numpy.concatenate(
-            (self._c_lw, numpy.zeros(
-                (last_num_labels, self._num_words - last_num_words),
-                dtype=int)), axis=1)
-        self._c_lw = numpy.concatenate(
-            (self._c_lw, numpy.zeros(
-                (self._num_labels - last_num_labels, self._num_words),
-                dtype=int)), axis=0)
-        self._c_l = numpy.concatenate(
-            (self._c_l, numpy.zeros(
-                self._num_labels - last_num_labels, dtype=int)))
+    Args:
+        job_id: str. ID of the ClassifierTrainingJob domain object.
+        classifier_data: dict. The classification model which needs to be stored
+            in the job.
 
-        for d in xrange(last_num_docs, self._num_docs):
-            doc, _ = self._get_doc_with_label_vector(d)
-            l_p = numpy.random.random_integers(
-                0, self._num_labels - 1, size=len(doc)).tolist()
-            self._l_dp.append(l_p)
-            for w, l in zip(doc, l_p):
-                self._increment_counting_matrices(d, w, l)
-            self._iterate_gibbs_sampling(iterations, [d])
+    Raises:
+        Exception. The ClassifierTrainingJobModel corresponding to the job_id
+            of the ClassifierTrainingJob does not exist.
+    """
+    classifier_training_job_model = (
+        classifier_models.ClassifierTrainingJobModel.get(job_id, strict=False))
+    if not classifier_training_job_model:
+        raise Exception(
+            'The ClassifierTrainingJobModel corresponding to the job_id of the'
+            'ClassifierTrainingJob does not exist.')
 
-        return xrange(last_num_docs, self._num_docs)
+    classifier_training_job = get_classifier_training_job_from_model(
+        classifier_training_job_model)
+    classifier_training_job.update_classifier_data(classifier_data)
+    classifier_training_job.validate()
 
-    def add_examples_for_training(self, training_examples):
-        """Adds examples to the classifier with _training_iterations number of
-        iterations.
-        """
-        return self._add_examples(training_examples, self._training_iterations)
+    classifier_training_job_model.classifier_data = classifier_data
+    classifier_training_job_model.put()
 
-    def add_examples_for_predicting(self, prediction_examples):
-        """Adds examples to the classifier with _prediction_iterations number
-        of iterations.
-        """
-        all_labels = self._label_to_id.keys()
-        return self._add_examples(
-            zip(prediction_examples, [
-                copy.deepcopy(all_labels) for _ in prediction_examples]),
-            self._prediction_iterations)
 
-    def load_examples(self, examples):
-        """Sets the internal state of the classifier, assigns random initial
-        labels to the docs, and runs Gibbs sampling for _training_iterations
-        number of iterations.
-        """
-        docs, labels_list = self._parse_examples(examples)
+def delete_classifier_training_job(job_id):
+    """Deletes classifier training job model in the datastore given job_id.
 
-        label_set = set(
-            [self.DEFAULT_LABEL] +
-            [label for labels in labels_list for label in labels])
+    Args:
+        job_id: str. ID of the classifier training job.
+    """
+    classifier_training_job_model = (
+        classifier_models.ClassifierTrainingJobModel.get(job_id))
+    if classifier_training_job_model is not None:
+        classifier_training_job_model.delete()
 
-        self._num_labels = len(label_set)
-        self._label_to_id = dict(zip(label_set, xrange(self._num_labels)))
 
-        self._num_words = 0
-        self._word_to_id = {}
+def get_classifier_training_jobs(exp_id, exp_version, state_names):
+    """Gets the classifier training job object from the exploration attributes.
 
-        self._num_docs = len(docs)
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. The exploration version.
+        state_names: list(str). The state names for which we retrieve the job.
 
-        self._b_dl = numpy.array(
-            map(self._get_label_vector, labels_list), dtype=int)
-        self._w_dp = [map(self._get_word_id, doc) for doc in docs]
-        self._c_dl = numpy.zeros(
-            (self._num_docs, self._num_labels), dtype=int)
-        self._c_lw = numpy.zeros(
-            (self._num_labels, self._num_words), dtype=int)
-        self._c_l = numpy.zeros(self._num_labels, dtype=int)
-        self._l_dp = []
+    Returns:
+        list(ClassifierTrainingJob). Domain objects for the Classifier training
+            job model.
+    """
+    training_job_exploration_mapping_models = (
+        classifier_models.TrainingJobExplorationMappingModel.get_models(
+            exp_id, exp_version, state_names))
+    job_ids = []
+    for mapping_model in training_job_exploration_mapping_models:
+        if mapping_model is None:
+            continue
+        job_ids.append(mapping_model.job_id)
+    classifier_training_job_models = (
+        classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
+    classifier_training_jobs = []
+    for job_model in classifier_training_job_models:
+        classifier_training_jobs.append(get_classifier_training_job_from_model(
+            job_model))
 
-        for d in xrange(self._num_docs):
-            doc, _ = self._get_doc_with_label_vector(d)
-            l_p = numpy.random.random_integers(
-                0, self._num_labels - 1, size=len(doc)).tolist()
-            self._l_dp.append(l_p)
-            for w, l in zip(doc, l_p):
-                self._increment_counting_matrices(d, w, l)
-        self._iterate_gibbs_sampling(
-            self._training_iterations,
-            xrange(self._num_docs))
-
-    def predict_label_for_doc(self, d):
-        """Returns the predicted label from a doc's prediction report.
-        """
-        if (self._num_docs < self._DEFAULT_MIN_DOCS_TO_PREDICT or
-                self._num_labels < self._DEFAULT_MIN_LABELS_TO_PREDICT):
-            return self.DEFAULT_LABEL
-        return self._get_prediction_report_for_doc(d)['prediction_label_name']
-
-    def to_dict(self):
-        """Converts a classifier into a dict model."""
-        model = {}
-        model['_alpha'] = copy.deepcopy(self._alpha)
-        model['_beta'] = copy.deepcopy(self._beta)
-        model['_prediction_threshold'] = copy.deepcopy(
-            self._prediction_threshold)
-        model['_training_iterations'] = copy.deepcopy(
-            self._training_iterations)
-        model['_prediction_iterations'] = copy.deepcopy(
-            self._prediction_iterations)
-        model['_num_labels'] = copy.deepcopy(self._num_labels)
-        model['_num_docs'] = copy.deepcopy(self._num_docs)
-        model['_num_words'] = copy.deepcopy(self._num_words)
-        model['_label_to_id'] = copy.deepcopy(self._label_to_id)
-        model['_word_to_id'] = copy.deepcopy(self._word_to_id)
-        model['_w_dp'] = copy.deepcopy(self._w_dp)
-        model['_b_dl'] = copy.deepcopy(self._b_dl)
-        model['_l_dp'] = copy.deepcopy(self._l_dp)
-        model['_c_dl'] = copy.deepcopy(self._c_dl)
-        model['_c_lw'] = copy.deepcopy(self._c_lw)
-        model['_c_l'] = copy.deepcopy(self._c_l)
-        return model
-
-    def from_dict(self, model):
-        """Converts a dict model into a classifier."""
-        self._alpha = copy.deepcopy(model['_alpha'])
-        self._beta = copy.deepcopy(model['_beta'])
-        self._prediction_threshold = copy.deepcopy(
-            model['_prediction_threshold'])
-        self._training_iterations = copy.deepcopy(
-            model['_training_iterations'])
-        self._prediction_iterations = copy.deepcopy(
-            model['_prediction_iterations'])
-        self._num_labels = copy.deepcopy(model['_num_labels'])
-        self._num_docs = copy.deepcopy(model['_num_docs'])
-        self._num_words = copy.deepcopy(model['_num_words'])
-        self._label_to_id = copy.deepcopy(model['_label_to_id'])
-        self._word_to_id = copy.deepcopy(model['_word_to_id'])
-        self._w_dp = copy.deepcopy(model['_w_dp'])
-        self._b_dl = copy.deepcopy(model['_b_dl'])
-        self._l_dp = copy.deepcopy(model['_l_dp'])
-        self._c_dl = copy.deepcopy(model['_c_dl'])
-        self._c_lw = copy.deepcopy(model['_c_lw'])
-        self._c_l = copy.deepcopy(model['_c_l'])
+    # Backfill None's to maintain indexes.
+    for index, mapping_model in enumerate(
+            training_job_exploration_mapping_models):
+        if mapping_model is None:
+            classifier_training_jobs.insert(index, None)
+    return classifier_training_jobs

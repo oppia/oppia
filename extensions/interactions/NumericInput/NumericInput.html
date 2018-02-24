@@ -1,20 +1,2 @@
-<script type="text/ng-template" id="interaction/NumericInput">
-  <div class="row numeric-input-container">
-    <form ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
-      <div class="col-lg-12 col-md-12 col-sm-12">
-        <ng-form name="numericInputForm">
-          <schema-based-editor schema="NUMERIC_INPUT_FORM_SCHEMA" local-value="answer" label-for-focus-target="labelForFocusTarget">
-          </schema-based-editor>
-        </ng-form>
-      </div>
-    </form>
-  </div>
-</script>
-
-<script type="text/ng-template" id="response/NumericInput">
-  <[answer]>
-</script>
-
-<script type="text/ng-template" id="shortResponse/NumericInput">
-  <[answer]>
-</script>
+<script src="{{cache_slug}}/extensions/interactions/NumericInput/directives/NumericInput.js"></script>
+<script src="{{cache_slug}}/extensions/interactions/NumericInput/directives/NumericInputValidationService.js"></script>

@@ -15,7 +15,9 @@
 """Controllers for queries relating to recent commits."""
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import exp_services
+import feconf
 
 
 class RecentCommitsHandler(base.BaseHandler):
@@ -25,6 +27,9 @@ class RecentCommitsHandler(base.BaseHandler):
     # exploration_id. For the former, do a check to ensure that the user is
     # allowed to see this data (as it may include private explorations).
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_moderator_page
     def get(self):
         """Handles GET requests."""
         urlsafe_start_cursor = self.request.get('cursor')

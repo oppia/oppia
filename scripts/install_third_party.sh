@@ -22,15 +22,16 @@ echo Installing third-party JS libraries and zip files.
 $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
+install_node_module eslint 3.18.0
+install_node_module eslint-plugin-html 2.0.1
 install_node_module gulp 3.9.0
 install_node_module through2 2.0.0
 install_node_module yargs 3.29.0
 install_node_module gulp-concat 2.6.0
 install_node_module gulp-clean-css 2.0.2
 install_node_module gulp-util 3.0.7
-install_node_module jscs 2.3.0
 install_node_module gulp-sourcemaps 1.6.0
-install_node_module gulp-minify 0.0.5
+install_node_module gulp-uglify 2.0.1
 
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
@@ -106,10 +107,13 @@ if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
 fi
 
 echo Checking if pylint is installed in $TOOLS_DIR/pip_packages
-if [ ! -d "$TOOLS_DIR/pylint-1.5.2" ]; then
+if [ ! -d "$TOOLS_DIR/pylint-1.7.1" ]; then
   echo Installing Pylint
 
-  pip install pylint==1.5.2 --target="$TOOLS_DIR/pylint-1.5.2"
+  pip install pylint==1.7.1 --target="$TOOLS_DIR/pylint-1.7.1"
+  # Add __init__.py file so that pylint dependency backports are resolved
+  # correctly.
+  touch $TOOLS_DIR/pylint-1.7.1/backports/__init__.py
 fi
 
 # Install webtest.
@@ -117,9 +121,44 @@ echo Checking if webtest is installed in third_party
 if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
   echo Installing webtest framework
   # Note that the github URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl --silent -L https://github.com/Pylons/webtest/archive/1.4.2.zip -o webtest-download.zip
+  curl -o webtest-download.zip -L https://github.com/Pylons/webtest/archive/1.4.2.zip
   unzip webtest-download.zip -d $TOOLS_DIR
   rm webtest-download.zip
+fi
+
+# Install isort.
+echo Checking if isort is installed in third_party
+if [ ! -d "$TOOLS_DIR/isort-4.2.15" ]; then
+  echo Installing isort
+  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl -o isort-4.2.15.tar.gz -L https://pypi.python.org/packages/4d/d5/7c8657126a43bcd3b0173e880407f48be4ac91b4957b51303eab744824cf/isort-4.2.15.tar.gz
+  tar xzf isort-4.2.15.tar.gz -C $TOOLS_DIR
+  rm isort-4.2.15.tar.gz
+fi
+
+# Install pycodestyle.
+echo Checking if pycodestyle is installed in third_party
+if [ ! -d "$TOOLS_DIR/pycodestyle-2.3.1" ]; then
+  echo Installing pycodestyle
+  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl -o pycodestyle-2.3.1.tar.gz -L https://pypi.python.org/packages/e1/88/0e2cbf412bd849ea6f1af1f97882add46a374f4ba1d2aea39353609150ad/pycodestyle-2.3.1.tar.gz
+  tar xzf pycodestyle-2.3.1.tar.gz -C $TOOLS_DIR
+  rm pycodestyle-2.3.1.tar.gz
+fi
+
+# Python API for browsermob-proxy.
+echo Checking if browsermob-proxy is installed in $TOOLS_DIR/pip_packages
+if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
+  echo Installing browsermob-proxy
+
+  pip install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
+fi
+
+echo Checking if selenium is installed in $TOOLS_DIR/pip_packages
+if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
+  echo Installing selenium
+
+  pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
 fi
 
 # install pre-push script

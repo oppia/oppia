@@ -567,7 +567,8 @@ var logicProofTeacher2 = (function() {
       formulaLHS, formulaRHS, language) {
     if (language.operators.hasOwnProperty(formulaLHS.top_operator_name)) {
       throw new logicProofShared.UserError('duplicate_function_name', {
-        function: formulaLHS.top_operator_name
+        // eslint-disable-next-line quote-props
+        'function': formulaLHS.top_operator_name
       });
     }
     if (formulaLHS.top_operator_name === 'n') {

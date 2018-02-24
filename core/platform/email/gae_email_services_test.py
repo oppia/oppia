@@ -24,21 +24,22 @@ import feconf
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
-    def test_sending_email_to_admin(self):
-        # Emails are not sent if the CAN_SEND_EMAILS_TO_ADMIN setting
-        # is not turned on.
-        with self.swap(feconf, 'CAN_SEND_EMAILS_TO_ADMIN', False):
-            gae_email_services.send_mail_to_admin('subject', 'body')
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(0, len(messages))
+    def test_sending_email(self):
+        # Emails are not sent if the CAN_SEND_EMAILS setting is not turned on.
+        email_exception = (
+            self.assertRaisesRegexp(Exception, 'This app cannot send emails.'))
+        with self.swap(feconf, 'CAN_SEND_EMAILS', False), email_exception:
+            gae_email_services.send_mail(
+                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
+                'subject', 'body', 'html', bcc_admin=False)
+        messages = self.mail_stub.get_sent_messages(
+            to=feconf.ADMIN_EMAIL_ADDRESS)
+        self.assertEqual(0, len(messages))
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS_TO_ADMIN', True):
-            gae_email_services.send_mail_to_admin('subject', 'body')
-            messages = self.mail_stub.get_sent_messages(
-                to=feconf.ADMIN_EMAIL_ADDRESS)
-            self.assertEqual(1, len(messages))
-            self.assertEqual(feconf.ADMIN_EMAIL_ADDRESS, messages[0].to)
-            self.assertIn(
-                '(Sent from %s)' % self.EXPECTED_TEST_APP_ID,
-                messages[0].body.decode())
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            gae_email_services.send_mail(
+                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
+                'subject', 'body', 'html', bcc_admin=False)
+        messages = self.mail_stub.get_sent_messages(
+            to=feconf.ADMIN_EMAIL_ADDRESS)
+        self.assertEqual(1, len(messages))

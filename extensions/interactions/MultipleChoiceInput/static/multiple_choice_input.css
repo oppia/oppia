@@ -1,0 +1,50 @@
+.multiple-choice-option-container {
+  padding: 4px 0;
+}
+
+.multiple-choice-option {
+  background: none;
+  border: none;
+  color: #0D48A1;
+  text-align: left;
+  /* This is needed so that images stay bounded by the container in Firefox. */
+  width: 100%;
+}
+
+.multiple-choice-radio-button-container {
+  display: table-cell;
+}
+
+.multiple-choice-content-container {
+  display: table-cell;
+  vertical-align: top;
+}
+
+.multiple-choice-option:hover {
+  color: #115FD4;
+}
+
+.multiple-choice-option:hover .multiple-choice-inner-radio-button,
+.multiple-choice-option:focus .multiple-choice-inner-radio-button {
+  background-color: #115FD4;
+  border-radius: 50%;
+  display: block;
+  height: 8px;
+  margin: 2px;
+  width: 8px;
+}
+
+.multiple-choice-option:hover .multiple-choice-outer-radio-button,
+.multiple-choice-option:focus .multiple-choice-outer-radio-button {
+  border-color: #115FD4;
+}
+
+.multiple-choice-outer-radio-button {
+  border: 2px solid #0D48A1;
+  border-radius: 50%;
+  display: inline-block;
+  height: 16px;
+  margin-bottom: -7px;
+  margin-right: 12px;
+  width: 16px;
+}

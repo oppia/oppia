@@ -66,8 +66,7 @@ logicDemo.controller('TestCtrl', function($scope) {
         $scope.questionData);
       try {
         logicProofStudent.validateProof($scope.proofString, questionInstance);
-      }
-      catch (err) {
+      } catch (err) {
         $scope.displayMessage(err.message, err.line);
       }
     } else {
@@ -84,8 +83,7 @@ logicDemo.controller('TestCtrl', function($scope) {
       logicProofStudent.checkProof(proof, questionInstance);
       $scope.proofError = '';
       $scope.checkSuccess = true;
-    }
-    catch (err) {
+    } catch (err) {
       $scope.displayMessage(err.message, err.line);
       $scope.checkSuccess = false;
     }
@@ -138,8 +136,7 @@ logicDemo.controller('TestCtrl', function($scope) {
       $scope.targetDisplay = logicProofShared.displayExpression(
         $scope.questionData.results[0],
         $scope.questionData.language.operators);
-    }
-    catch (err) {
+    } catch (err) {
       $scope.questionError = err.message;
       $scope.questionSuccess = false;
     }
@@ -163,8 +160,7 @@ logicDemo.controller('TestCtrl', function($scope) {
       $scope.lineTemplateSuccess = true;
       $scope.LineTemplateErrors = $scope.buildErrors(
         $scope.lineTemplateStrings.length);
-    }
-    catch (err) {
+    } catch (err) {
       $scope.LineTemplateErrors = err;
       $scope.lineTemplateSuccess = false;
     }
@@ -211,8 +207,7 @@ logicDemo.controller('TestCtrl', function($scope) {
       $scope.mistakeSuccess[sectionNumber] = true;
       $scope.mistakeErrors[sectionNumber] = $scope.buildErrors(
         $scope.mistakeStrings[sectionNumber].entries.length);
-    }
-    catch (err) {
+    } catch (err) {
       $scope.mistakeSuccess[sectionNumber] = false;
       $scope.mistakeErrors[sectionNumber] = err;
     }
@@ -234,8 +229,7 @@ logicDemo.controller('TestCtrl', function($scope) {
         logicProofTeacher2.buildControlFunctionTable(
           $scope.controlFunctionStrings));
       $scope.controlFunctionSuccess = true;
-    }
-    catch (err) {
+    } catch (err) {
       $scope.controlFunctionErrors[err.line] = err.message;
       $scope.controlFunctionSuccess = false;
     }
@@ -249,19 +243,21 @@ logicDemo.controller('TestCtrl', function($scope) {
 
   $scope.REPLACEMENT_PAIRS = [{
     old: '\u2227',
-    new: '\\u2227'
+    // eslint-disable quote-props
+    'new': '\\u2227'
   }, {
     old: '\u2228',
-    new: '\\u2228'
+    'new': '\\u2228'
   }, {
     old: '\u2200',
-    new: '\\u2200'
+    'new': '\\u2200'
   }, {
     old: '\u2203',
-    new: '\\u2203'
+    'new': '\\u2203'
   }, {
     old: '\u2208',
-    new: '\\u2208'
+    'new': '\\u2208'
+    // eslint-enable quote-props
   }];
 
   // JSON.stringify will display '\u2227' from strings.js as '∧'. We do not
@@ -272,7 +268,7 @@ logicDemo.controller('TestCtrl', function($scope) {
     for (var i = 0; i < $scope.REPLACEMENT_PAIRS.length; i++) {
       // We use this as .replace() only replaces one instance.
       output = output.split($scope.REPLACEMENT_PAIRS[i].old).join(
-        $scope.REPLACEMENT_PAIRS[i].new);
+        $scope.REPLACEMENT_PAIRS[i]['new']);
     }
     return output;
   };

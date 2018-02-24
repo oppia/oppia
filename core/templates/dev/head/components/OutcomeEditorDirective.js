@@ -16,136 +16,207 @@
  * @fileoverview Directives for the outcome editor.
  */
 
-oppia.directive('outcomeEditor', [function() {
-  return {
-    restrict: 'E',
-    scope: {
-      isEditable: '&isEditable',
-      displayFeedback: '=',
-      getOnSaveDestFn: '&onSaveDest',
-      getOnSaveFeedbackFn: '&onSaveFeedback',
-      outcome: '=outcome',
-      suppressWarnings: '&suppressWarnings'
-    },
-    templateUrl: 'components/outcomeEditor',
-    controller: [
-      '$scope', 'editorContextService',
-      'stateInteractionIdService',
-      function($scope, editorContextService,
-        stateInteractionIdService) {
-        $scope.editOutcomeForm = {};
-        $scope.feedbackEditorIsOpen = false;
-        $scope.destinationEditorIsOpen = false;
-        // TODO(sll): Investigate whether this line can be removed, due to
-        // $scope.savedOutcome now being set in onExternalSave().
-        $scope.savedOutcome = angular.copy($scope.outcome);
+oppia.directive('outcomeEditor', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        isEditable: '&isEditable',
+        displayFeedback: '=',
+        getOnSaveDestFn: '&onSaveDest',
+        getOnSaveFeedbackFn: '&onSaveFeedback',
+        getOnSaveCorrectnessLabelFn: '&onSaveCorrectnessLabel',
+        outcome: '=outcome',
+        suppressWarnings: '&suppressWarnings'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/outcome_editor_directive.html'),
+      controller: [
+        '$scope', '$uibModal', 'EditorStateService',
+        'stateInteractionIdService', 'COMPONENT_NAME_FEEDBACK',
+        'ExplorationCorrectnessFeedbackService', 'INTERACTION_SPECS',
+        function(
+            $scope, $uibModal, EditorStateService,
+            stateInteractionIdService, COMPONENT_NAME_FEEDBACK,
+            ExplorationCorrectnessFeedbackService, INTERACTION_SPECS) {
+          $scope.editOutcomeForm = {};
+          $scope.feedbackEditorIsOpen = false;
+          $scope.destinationEditorIsOpen = false;
+          $scope.correctnessLabelEditorIsOpen = false;
+          // TODO(sll): Investigate whether this line can be removed, due to
+          // $scope.savedOutcome now being set in onExternalSave().
+          $scope.savedOutcome = angular.copy($scope.outcome);
 
-        var onExternalSave = function() {
-          // The reason for this guard is because, when the editor page for an
-          // exploration is first opened, the 'initializeAnswerGroups' event
-          // (which fires an 'externalSave' event) only fires after the
-          // $scope.savedOutcome is set above. Until then, $scope.savedOutcome
-          // is undefined.
-          if ($scope.savedOutcome === undefined) {
-            $scope.savedOutcome = angular.copy($scope.outcome);
-          }
+          $scope.COMPONENT_NAME_FEEDBACK = COMPONENT_NAME_FEEDBACK;
 
-          if ($scope.feedbackEditorIsOpen) {
-            if ($scope.editOutcomeForm.editFeedbackForm.$valid &&
-                !$scope.invalidStateAfterFeedbackSave()) {
-              $scope.saveThisFeedback();
-            } else {
-              $scope.cancelThisFeedbackEdit();
+          $scope.getCurrentInteractionId = function() {
+            return stateInteractionIdService.savedMemento;
+          };
+
+          // This returns false if the current interaction ID is null.
+          $scope.isCurrentInteractionLinear = function() {
+            var interactionId = $scope.getCurrentInteractionId();
+            return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+          };
+
+          $scope.isCorrectnessFeedbackEnabled = function() {
+            return ExplorationCorrectnessFeedbackService.isEnabled();
+          };
+
+          var openMarkAllAudioAsNeedingUpdateModal = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/forms/' +
+                'mark_all_audio_as_needing_update_modal_directive.html'),
+              backdrop: true,
+              resolve: {},
+              controller: 'MarkAllAudioAsNeedingUpdateController'
+            }).result.then(function() {
+              $scope.outcome.feedback.markAllAudioAsNeedingUpdate();
+              $scope.savedOutcome.feedback = angular.copy(
+                $scope.outcome.feedback);
+              $scope.getOnSaveFeedbackFn()($scope.savedOutcome);
+            });
+          };
+
+          var onExternalSave = function() {
+            // The reason for this guard is because, when the editor page for an
+            // exploration is first opened, the 'initializeAnswerGroups' event
+            // (which fires an 'externalSave' event) only fires after the
+            // $scope.savedOutcome is set above. Until then, $scope.savedOutcome
+            // is undefined.
+            if ($scope.savedOutcome === undefined) {
+              $scope.savedOutcome = angular.copy($scope.outcome);
             }
-          }
 
-          if ($scope.destinationEditorIsOpen) {
-            if ($scope.editOutcomeForm.editDestForm.$valid &&
-                !$scope.invalidStateAfterDestinationSave()) {
-              $scope.saveThisDestination();
-            } else {
-              $scope.cancelThisDestinationEdit();
+            if ($scope.feedbackEditorIsOpen) {
+              if ($scope.editOutcomeForm.editFeedbackForm.$valid &&
+                  !$scope.invalidStateAfterFeedbackSave()) {
+                $scope.saveThisFeedback(false);
+              } else {
+                $scope.cancelThisFeedbackEdit();
+              }
             }
-          }
-        };
 
-        $scope.$on('externalSave', function() {
-          onExternalSave();
-        });
+            if ($scope.destinationEditorIsOpen) {
+              if ($scope.editOutcomeForm.editDestForm.$valid &&
+                  !$scope.invalidStateAfterDestinationSave()) {
+                $scope.saveThisDestination();
+              } else {
+                $scope.cancelThisDestinationEdit();
+              }
+            }
+          };
 
-        $scope.$on('onInteractionIdChanged', function() {
-          onExternalSave();
-        });
-
-        $scope.isSelfLoop = function(outcome) {
-          return (
-            outcome &&
-            outcome.dest === editorContextService.getActiveStateName());
-        };
-
-        $scope.getCurrentInteractionId = function() {
-          return stateInteractionIdService.savedMemento;
-        };
-
-        $scope.isSelfLoopWithNoFeedback = function(outcome) {
-          if (!outcome) {
-            return false;
-          }
-          var hasFeedback = outcome.feedback.some(function(feedbackItem) {
-            return Boolean(feedbackItem);
+          $scope.$on('externalSave', function() {
+            onExternalSave();
           });
-          return $scope.isSelfLoop(outcome) && !hasFeedback;
-        };
 
-        $scope.invalidStateAfterFeedbackSave = function() {
-          var tmpOutcome = angular.copy($scope.savedOutcome);
-          tmpOutcome.feedback = angular.copy($scope.outcome.feedback);
-          return $scope.isSelfLoopWithNoFeedback(tmpOutcome);
-        };
-        $scope.invalidStateAfterDestinationSave = function() {
-          var tmpOutcome = angular.copy($scope.savedOutcome);
-          tmpOutcome.dest = angular.copy($scope.outcome.dest);
-          return $scope.isSelfLoopWithNoFeedback(tmpOutcome);
-        };
-        $scope.openFeedbackEditor = function() {
-          if ($scope.isEditable()) {
-            $scope.feedbackEditorIsOpen = true;
-            if ($scope.outcome.feedback.length === 0) {
-              $scope.outcome.feedback.push('');
+          $scope.$on('onInteractionIdChanged', function() {
+            onExternalSave();
+          });
+
+          $scope.isSelfLoop = function(outcome) {
+            return (
+              outcome &&
+              outcome.dest === EditorStateService.getActiveStateName());
+          };
+
+          $scope.getCurrentInteractionId = function() {
+            return stateInteractionIdService.savedMemento;
+          };
+
+          $scope.isSelfLoopWithNoFeedback = function(outcome) {
+            if (!outcome) {
+              return false;
             }
-          }
-        };
+            return $scope.isSelfLoop(outcome) &&
+              !outcome.hasNonemptyFeedback();
+          };
 
-        $scope.openDestinationEditor = function() {
-          if ($scope.isEditable()) {
-            $scope.destinationEditorIsOpen = true;
-          }
-        };
+          $scope.invalidStateAfterFeedbackSave = function() {
+            var tmpOutcome = angular.copy($scope.savedOutcome);
+            tmpOutcome.feedback = angular.copy($scope.outcome.feedback);
+            return $scope.isSelfLoopWithNoFeedback(tmpOutcome);
+          };
+          $scope.invalidStateAfterDestinationSave = function() {
+            var tmpOutcome = angular.copy($scope.savedOutcome);
+            tmpOutcome.dest = angular.copy($scope.outcome.dest);
+            return $scope.isSelfLoopWithNoFeedback(tmpOutcome);
+          };
+          $scope.openFeedbackEditor = function() {
+            if ($scope.isEditable()) {
+              $scope.feedbackEditorIsOpen = true;
+            }
+          };
 
-        $scope.saveThisFeedback = function() {
-          $scope.$broadcast('saveOutcomeFeedbackDetails');
-          $scope.feedbackEditorIsOpen = false;
-          $scope.savedOutcome.feedback = angular.copy($scope.outcome.feedback);
-          $scope.getOnSaveFeedbackFn()($scope.savedOutcome);
-        };
+          $scope.openDestinationEditor = function() {
+            if ($scope.isEditable()) {
+              $scope.destinationEditorIsOpen = true;
+            }
+          };
 
-        $scope.saveThisDestination = function() {
-          $scope.$broadcast('saveOutcomeDestDetails');
-          $scope.destinationEditorIsOpen = false;
-          $scope.savedOutcome.dest = angular.copy($scope.outcome.dest);
-          $scope.getOnSaveDestFn()($scope.savedOutcome);
-        };
+          $scope.saveThisFeedback = function(fromClickSaveFeedbackButton) {
+            $scope.$broadcast('saveOutcomeFeedbackDetails');
+            $scope.feedbackEditorIsOpen = false;
+            var contentHasChanged = (
+              $scope.savedOutcome.feedback.getHtml() !==
+              $scope.outcome.feedback.getHtml());
+            $scope.savedOutcome.feedback = angular.copy(
+              $scope.outcome.feedback);
+            if ($scope.savedOutcome.feedback.hasUnflaggedAudioTranslations() &&
+                fromClickSaveFeedbackButton && contentHasChanged) {
+              openMarkAllAudioAsNeedingUpdateModal();
+            }
+            $scope.getOnSaveFeedbackFn()($scope.savedOutcome);
+          };
 
-        $scope.cancelThisFeedbackEdit = function() {
-          $scope.outcome.feedback = angular.copy($scope.savedOutcome.feedback);
-          $scope.feedbackEditorIsOpen = false;
-        };
+          $scope.saveThisDestination = function() {
+            $scope.$broadcast('saveOutcomeDestDetails');
+            $scope.destinationEditorIsOpen = false;
+            $scope.savedOutcome.dest = angular.copy($scope.outcome.dest);
+            if (!$scope.isSelfLoop($scope.outcome)) {
+              $scope.outcome.refresherExplorationId = null;
+            }
+            $scope.savedOutcome.refresherExplorationId = (
+              $scope.outcome.refresherExplorationId);
 
-        $scope.cancelThisDestinationEdit = function() {
-          $scope.outcome.dest = angular.copy($scope.savedOutcome.dest);
-          $scope.destinationEditorIsOpen = false;
-        };
-      }
-    ]
-  };
-}]);
+            $scope.getOnSaveDestFn()($scope.savedOutcome);
+          };
+
+          $scope.onChangeCorrectnessLabel = function() {
+            $scope.savedOutcome.labelledAsCorrect = (
+              $scope.outcome.labelledAsCorrect);
+
+            $scope.getOnSaveCorrectnessLabelFn()($scope.savedOutcome);
+          };
+
+          $scope.cancelThisFeedbackEdit = function() {
+            $scope.outcome.feedback = angular.copy(
+              $scope.savedOutcome.feedback);
+            $scope.feedbackEditorIsOpen = false;
+          };
+
+          $scope.cancelThisDestinationEdit = function() {
+            $scope.outcome.dest = angular.copy($scope.savedOutcome.dest);
+            $scope.outcome.refresherExplorationId = (
+              $scope.savedOutcome.refresherExplorationId);
+            $scope.destinationEditorIsOpen = false;
+          };
+
+
+          $scope.onAudioTranslationsStartEditAction = function() {
+            // Close the content editor and save all existing changes to the
+            // HTML.
+            if ($scope.feedbackEditorIsOpen) {
+              $scope.saveThisFeedback(false);
+            }
+          };
+
+          $scope.onAudioTranslationsEdited = function() {
+            $scope.saveThisFeedback(false);
+          };
+        }
+      ]
+    };
+  }]);

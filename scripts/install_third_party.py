@@ -14,18 +14,24 @@
 
 """Installation script for Oppia third-party libraries."""
 
+import StringIO
 import contextlib
 import json
 import os
 import shutil
-import StringIO
 import sys
 import tarfile
 import urllib
 import urllib2
 import zipfile
 
-import common
+import common  # pylint: disable=relative-import
+
+#These two lines prevent a "IOError: [Errno socket error]
+#[Errno -2] Name or service not known" error
+# in urllib.urlretrieve, if the user is behind a proxy.
+if 'VAGRANT' in os.environ:
+    os.environ['http_proxy'] = ''
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
@@ -68,6 +74,7 @@ DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
         'optional_key_pairs': []
     }
 }
+
 
 def download_files(source_url_root, target_dir, source_filenames):
     """Downloads a group of files and saves them to a given directory.
@@ -254,6 +261,10 @@ def validate_manifest(filepath):
     dependencies = manifest_data['dependencies']
     for _, dependency in dependencies.items():
         for _, dependency_contents in dependency.items():
+            if 'downloadFormat' not in dependency_contents:
+                raise Exception(
+                    'downloadFormat not specified in %s' %
+                    dependency_contents)
             download_format = dependency_contents['downloadFormat']
             test_manifest_syntax(download_format, dependency_contents)
 
@@ -326,6 +337,7 @@ def _install_third_party_libs():
         if os.path.isdir(full_dir):
             print 'Removing unnecessary MathJax directory \'%s\'' % subdir
             shutil.rmtree(full_dir)
+
 
 if __name__ == '__main__':
     _install_third_party_libs()

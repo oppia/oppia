@@ -14,6 +14,8 @@
 
 """Tests for the moderator page."""
 
+from core.domain import rights_manager
+from core.domain import user_services
 from core.tests import test_utils
 
 
@@ -46,4 +48,57 @@ class ModeratorTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get('/moderator')
         self.assertEqual(response.status_int, 200)
+        self.logout()
+
+
+class FeaturedActivitiesHandlerTest(test_utils.GenericTestBase):
+
+    EXP_ID_1 = 'exp_id_1'
+    EXP_ID_2 = 'exp_id_2'
+    username = 'albert'
+    user_email = 'albert@example.com'
+
+    def setUp(self):
+        super(FeaturedActivitiesHandlerTest, self).setUp()
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.user_id = self.get_user_id_from_email(self.user_email)
+        self.user = user_services.UserActionsInfo(self.user_id)
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_id)
+        rights_manager.publish_exploration(self.user, self.EXP_ID_1)
+
+        self.save_new_valid_exploration(self.EXP_ID_2, self.user_id)
+
+    def test_unpublished_activities_cannot_be_added_to_featured_list(self):
+        self.login(self.MODERATOR_EMAIL)
+        response = self.testapp.get('/moderator')
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Posting a list that includes private activities results in an error.
+        self.post_json('/moderatorhandler/featured', {
+            'featured_activity_reference_dicts': [{
+                'type': 'exploration',
+                'id': self.EXP_ID_2,
+            }],
+        }, csrf_token, expect_errors=True, expected_status_int=400)
+        self.post_json('/moderatorhandler/featured', {
+            'featured_activity_reference_dicts': [{
+                'type': 'exploration',
+                'id': self.EXP_ID_1,
+            }, {
+                'type': 'exploration',
+                'id': self.EXP_ID_2,
+            }],
+        }, csrf_token, expect_errors=True, expected_status_int=400)
+
+        # Posting a list that only contains public activities succeeds.
+        self.post_json('/moderatorhandler/featured', {
+            'featured_activity_reference_dicts': [{
+                'type': 'exploration',
+                'id': self.EXP_ID_1,
+            }],
+        }, csrf_token)
+
         self.logout()

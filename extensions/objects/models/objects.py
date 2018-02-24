@@ -20,6 +20,7 @@ import copy
 import os
 
 import feconf
+import jinja_utils
 import schema_utils
 import utils
 
@@ -77,9 +78,10 @@ class BaseObject(object):
             raise Exception(
                 'There is no editor template defined for objects of type %s' %
                 cls.__name__)
-        return utils.get_file_contents(os.path.join(
+        html_templates = utils.get_file_contents(os.path.join(
             os.getcwd(), feconf.OBJECT_TEMPLATES_DIR,
             '%s.html' % cls.edit_html_filename))
+        return jinja_utils.interpolate_cache_slug('%s' % html_templates)
 
 
 class Boolean(BaseObject):
@@ -170,6 +172,21 @@ class NonnegativeInt(BaseObject):
     }
 
 
+class PositiveInt(BaseObject):
+    """Nonnegative integer class."""
+
+    description = 'A positive integer.'
+    default_value = 1
+
+    SCHEMA = {
+        'type': 'int',
+        'validators': [{
+            'id': 'is_at_least',
+            'min_value': 1
+        }]
+    }
+
+
 class CodeString(BaseObject):
     """Code string class. This is like a normal string, but it should not
     contain tab characters.
@@ -222,6 +239,7 @@ class ListOfCodeEvaluation(BaseObject):
     """Class for lists of CodeEvaluations."""
 
     description = 'A list of code and its evaluation results.'
+    default_value = []
 
     SCHEMA = {
         'type': 'list',
@@ -774,5 +792,38 @@ class MathExpression(BaseObject):
         }, {
             'name': 'latex',
             'schema': UnicodeString.SCHEMA,
+        }]
+    }
+
+
+class Fraction(BaseObject):
+    """Fraction class."""
+
+    description = 'A fraction type'
+    edit_html_filename = 'fraction_editor'
+    edit_js_filename = 'FractionEditor'
+    default_value = {
+        'isNegative': False,
+        'wholeNumber': 0,
+        'numerator': 0,
+        'denominator': 1
+    }
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'isNegative',
+            'schema': {
+                'type': 'bool'
+            }
+        }, {
+            'name': 'wholeNumber',
+            'schema': NonnegativeInt.SCHEMA
+        }, {
+            'name': 'numerator',
+            'schema': NonnegativeInt.SCHEMA
+        }, {
+            'name': 'denominator',
+            'schema': PositiveInt.SCHEMA
         }]
     }

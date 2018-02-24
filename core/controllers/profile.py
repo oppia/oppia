@@ -15,41 +15,21 @@
 """Controllers for the profile page."""
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import email_manager
+from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_services
 import feconf
 import utils
 
 
-def require_user_id_else_redirect_to_homepage(handler):
-    """Decorator that checks if a user_id is associated to the current
-    session. If not, the user is redirected to the main page.
-
-    Note that the user may not yet have registered.
-    """
-    def test_login(self, **kwargs):
-        """Checks if the user for the current session is logged in.
-
-        If not, redirects the user to the home page.
-        """
-        if not self.user_id:
-            self.redirect('/')
-            return
-        return handler(self, **kwargs)
-
-    return test_login
-
-
 class ProfilePage(base.BaseHandler):
     """The world-viewable profile page."""
 
-    PAGE_NAME_FOR_CSRF = 'profile'
-
+    @acl_decorators.open_access
     def get(self, username):
         """Handles GET requests for the publicly-viewable profile page."""
-        if not username:
-            raise self.PageNotFoundException
 
         user_settings = user_services.get_user_settings_from_username(username)
 
@@ -60,18 +40,17 @@ class ProfilePage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_PROFILE,
             'PROFILE_USERNAME': user_settings.username,
         })
-        self.render_template('profile/profile.html')
+        self.render_template('pages/profile/profile.html')
 
 
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
 
-    PAGE_NAME_FOR_CSRF = 'profile'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.open_access
     def get(self, username):
         """Handles GET requests."""
-        if not username:
-            raise self.PageNotFoundException
 
         user_settings = user_services.get_user_settings_from_username(username)
         if not user_settings:
@@ -79,6 +58,11 @@ class ProfileHandler(base.BaseHandler):
 
         created_exp_summary_dicts = []
         edited_exp_summary_dicts = []
+
+        subscriber_ids = subscription_services.get_all_subscribers_of_creator(
+            user_settings.user_id)
+        is_already_subscribed = (self.user_id in subscriber_ids)
+        is_user_visiting_own_profile = (self.user_id == user_settings.user_id)
 
         user_contributions = user_services.get_user_contributions(
             user_settings.user_id)
@@ -89,8 +73,10 @@ class ProfileHandler(base.BaseHandler):
             edited_exp_summary_dicts = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
                     user_contributions.edited_exploration_ids))
+        profile_is_of_current_user = (self.username == username)
 
         self.values.update({
+            'profile_is_of_current_user': profile_is_of_current_user,
             'profile_username': user_settings.username,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
@@ -98,10 +84,12 @@ class ProfileHandler(base.BaseHandler):
                 user_settings.first_contribution_msec
                 if user_settings.first_contribution_msec else None),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
-            'user_impact_score':user_services.get_user_impact_score(
+            'user_impact_score': user_services.get_user_impact_score(
                 user_settings.user_id),
             'created_exp_summary_dicts': created_exp_summary_dicts,
             'edited_exp_summary_dicts': edited_exp_summary_dicts,
+            'is_already_subscribed': is_already_subscribed,
+            'is_user_visiting_own_profile': is_user_visiting_own_profile
         })
         self.render_json(self.values)
 
@@ -109,61 +97,104 @@ class ProfileHandler(base.BaseHandler):
 class PreferencesPage(base.BaseHandler):
     """The preferences page."""
 
-    PAGE_NAME_FOR_CSRF = 'preferences'
-
-    @base.require_user
+    @acl_decorators.can_manage_own_profile
     def get(self):
         """Handles GET requests."""
         self.values.update({
+            'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_PROFILE,
             'LANGUAGE_CODES_AND_NAMES': (
                 utils.get_all_language_codes_and_names()),
         })
         self.render_template(
-            'profile/preferences.html', redirect_url_on_logout='/')
+            'pages/preferences/preferences.html', redirect_url_on_logout='/')
 
 
 class PreferencesHandler(base.BaseHandler):
     """Provides data for the preferences page."""
 
-    PAGE_NAME_FOR_CSRF = 'preferences'
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @base.require_user
+    @acl_decorators.can_manage_own_profile
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
         user_email_preferences = user_services.get_email_preferences(
             self.user_id)
+
+        creators_subscribed_to = subscription_services.get_all_creators_subscribed_to( # pylint: disable=line-too-long
+            self.user_id)
+        creators_settings = user_services.get_users_settings(
+            creators_subscribed_to)
+        subscription_list = []
+
+        for index, creator_settings in enumerate(creators_settings):
+            subscription_summary = {
+                'creator_picture_data_url': (
+                    creator_settings.profile_picture_data_url),
+                'creator_username': creator_settings.username,
+                'creator_impact': (
+                    user_services.get_user_impact_score(
+                        creators_subscribed_to[index]))
+            }
+
+            subscription_list.append(subscription_summary)
+
         self.values.update({
             'preferred_language_codes': user_settings.preferred_language_codes,
+            'preferred_site_language_code': (
+                user_settings.preferred_site_language_code),
+            'preferred_audio_language_code': (
+                user_settings.preferred_audio_language_code),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'default_dashboard': user_settings.default_dashboard,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
             'can_receive_email_updates': (
-                user_email_preferences['can_receive_email_updates']),
+                user_email_preferences.can_receive_email_updates),
             'can_receive_editor_role_email': (
-                user_email_preferences['can_receive_editor_role_email'])
+                user_email_preferences.can_receive_editor_role_email),
+            'can_receive_feedback_message_email': (
+                user_email_preferences.can_receive_feedback_message_email),
+            'can_receive_subscription_email': (
+                user_email_preferences.can_receive_subscription_email),
+            'subscription_list': subscription_list
         })
         self.render_json(self.values)
 
-    @base.require_user
+    @acl_decorators.can_manage_own_profile
     def put(self):
         """Handles POST requests."""
         update_type = self.payload.get('update_type')
         data = self.payload.get('data')
 
         if update_type == 'user_bio':
-            user_services.update_user_bio(self.user_id, data)
+            if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
+                raise self.InvalidInputException(
+                    'User bio exceeds maximum character limit: %s'
+                    % feconf.MAX_BIO_LENGTH_IN_CHARS)
+            else:
+                user_services.update_user_bio(self.user_id, data)
         elif update_type == 'subject_interests':
             user_services.update_subject_interests(self.user_id, data)
         elif update_type == 'preferred_language_codes':
             user_services.update_preferred_language_codes(self.user_id, data)
+        elif update_type == 'preferred_site_language_code':
+            user_services.update_preferred_site_language_code(
+                self.user_id, data)
+        elif update_type == 'preferred_audio_language_code':
+            user_services.update_preferred_audio_language_code(
+                self.user_id, data)
         elif update_type == 'profile_picture_data_url':
             user_services.update_profile_picture_data_url(self.user_id, data)
+        elif update_type == 'default_dashboard':
+            user_services.update_user_default_dashboard(self.user_id, data)
         elif update_type == 'email_preferences':
             user_services.update_email_preferences(
                 self.user_id, data['can_receive_email_updates'],
-                data['can_receive_editor_role_email'])
+                data['can_receive_editor_role_email'],
+                data['can_receive_feedback_message_email'],
+                data['can_receive_subscription_email'])
         else:
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)
@@ -175,7 +206,9 @@ class ProfilePictureHandler(base.BaseHandler):
     """Provides the dataURI of the user's profile picture, or none if no user
     picture is uploaded."""
 
-    @base.require_user
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_manage_own_profile
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
@@ -188,6 +221,10 @@ class ProfilePictureHandler(base.BaseHandler):
 class ProfilePictureHandlerByUsername(base.BaseHandler):
     """ Provides the dataURI of the profile picture of the specified user,
     or None if no user picture is uploaded for the user with that ID."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
     def get(self, username):
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
@@ -204,10 +241,9 @@ class ProfilePictureHandlerByUsername(base.BaseHandler):
 class SignupPage(base.BaseHandler):
     """The page which prompts for username and acceptance of terms."""
 
-    PAGE_NAME_FOR_CSRF = 'signup'
     REDIRECT_UNFINISHED_SIGNUPS = False
 
-    @require_user_id_else_redirect_to_homepage
+    @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
         return_url = str(self.request.get('return_url', self.request.uri))
@@ -217,19 +253,21 @@ class SignupPage(base.BaseHandler):
             return
 
         self.values.update({
+            'meta_description': feconf.SIGNUP_PAGE_DESCRIPTION,
             'nav_mode': feconf.NAV_MODE_SIGNUP,
-            'CAN_SEND_EMAILS_TO_USERS': feconf.CAN_SEND_EMAILS_TO_USERS,
+            'CAN_SEND_EMAILS': feconf.CAN_SEND_EMAILS,
         })
-        self.render_template('profile/signup.html')
+        self.render_template('pages/signup/signup.html')
 
 
 class SignupHandler(base.BaseHandler):
     """Provides data for the editor prerequisites page."""
 
-    PAGE_NAME_FOR_CSRF = 'signup'
     REDIRECT_UNFINISHED_SIGNUPS = False
 
-    @require_user_id_else_redirect_to_homepage
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
@@ -243,11 +281,12 @@ class SignupHandler(base.BaseHandler):
             'username': user_settings.username,
         })
 
-    @require_user_id_else_redirect_to_homepage
+    @acl_decorators.require_user_id_else_redirect_to_homepage
     def post(self):
         """Handles POST requests."""
         username = self.payload.get('username')
         agreed_to_terms = self.payload.get('agreed_to_terms')
+        default_dashboard = self.payload.get('default_dashboard')
         can_receive_email_updates = self.payload.get(
             'can_receive_email_updates')
 
@@ -274,14 +313,21 @@ class SignupHandler(base.BaseHandler):
         if can_receive_email_updates is not None:
             user_services.update_email_preferences(
                 self.user_id, can_receive_email_updates,
-                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
         # Note that an email is only sent when the user registers for the first
         # time.
-        if feconf.CAN_SEND_EMAILS_TO_USERS and not has_ever_registered:
+        if feconf.CAN_SEND_EMAILS and not has_ever_registered:
             email_manager.send_post_signup_email(self.user_id)
 
         user_services.generate_initial_profile_picture(self.user_id)
+
+        if not has_ever_registered:
+            # Set the default dashboard for new users.
+            user_services.update_user_default_dashboard(
+                self.user_id, default_dashboard)
 
         self.render_json({})
 
@@ -289,10 +335,9 @@ class SignupHandler(base.BaseHandler):
 class UsernameCheckHandler(base.BaseHandler):
     """Checks whether a username has already been taken."""
 
-    PAGE_NAME_FOR_CSRF = 'signup'
     REDIRECT_UNFINISHED_SIGNUPS = False
 
-    @require_user_id_else_redirect_to_homepage
+    @acl_decorators.require_user_id_else_redirect_to_homepage
     def post(self):
         """Handles POST requests."""
         username = self.payload.get('username')
@@ -305,3 +350,15 @@ class UsernameCheckHandler(base.BaseHandler):
         self.render_json({
             'username_is_taken': username_is_taken,
         })
+
+
+class SiteLanguageHandler(base.BaseHandler):
+    """Changes the preferred system language in the user's preferences."""
+
+    @acl_decorators.can_manage_own_profile
+    def put(self):
+        """Handles PUT requests."""
+        site_language_code = self.payload.get('site_language_code')
+        user_services.update_preferred_site_language_code(
+            self.user_id, site_language_code)
+        self.render_json({})

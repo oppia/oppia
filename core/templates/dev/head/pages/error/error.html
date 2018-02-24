@@ -1,0 +1,81 @@
+{% extends 'pages/base.html' %}
+
+{% block navbar_breadcrumb %}
+{% endblock navbar_breadcrumb %}
+
+{% block maintitle %}
+  {% if status_code == 400 %}
+    I18N_ERROR_PAGE_TITLE_400
+  {% elif status_code == 401 %}
+    I18N_ERROR_PAGE_TITLE_401
+  {% elif status_code == 404 %}
+    I18N_ERROR_PAGE_TITLE_404
+  {% elif status_code == 500 %}
+    I18N_ERROR_PAGE_TITLE_500
+  {% endif %}
+{% endblock maintitle %}
+
+
+{% block content %}
+  <div class="oppia-content oppia-error-page-main-content" ng-controller="Error">
+    <br>
+
+    <div class="oppia-wide-panel oppia-error-wide-container">
+      <div class="oppia-wide-panel-content protractor-test-error-container">
+        <h1 class="oppia-error-h1">
+          <div ng-if="statusCode === 400">
+            <span translate="I18N_ERROR_HEADER_400"></span>
+            - Bad Request
+          </div>
+          <div ng-if="statusCode === 401">
+            <span translate="I18N_ERROR_HEADER_401"></span>
+            - Unauthorized
+          </div>
+          <div ng-if="statusCode === 404">
+            <span translate="I18N_ERROR_HEADER_404"></span>
+            - Page Not Found
+          </div>
+          <div ng-if="statusCode === 500">
+            <span translate="I18N_ERROR_HEADER_500"></span>
+            - System Error
+          </div>
+        </h1>
+
+        <br>
+
+        <img ng-src="<[oopsMintImgUrl]>" alt="Oops!" width="299" height="142"/>
+        <p>
+          <h2 ng-if="statusCode === 400" class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_400"></h2>
+          <h2 ng-if="statusCode === 401" class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_401"></h2>
+          <h2 ng-if="statusCode === 404" class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_404"></h2>
+          <h2 ng-if="statusCode === 500" class="oppia-error-h2" translate="I18N_ERROR_MESSAGE_500"></h2>
+        </p>
+        <p><span translate="I18N_ERROR_NEXT_STEPS" translate-values="{issueTrackerUrl: 'https://github.com/oppia/oppia/issues/new', homeUrl: '/'}"></span></p>
+      </div>
+    </div>
+  </div>
+  <style>
+    .oppia-error-h1 {
+      font-size: 1em;
+      margin: 1.33em 0;
+    }
+    .oppia-error-h2 {
+      font-size: 1.17em;
+      font-weight: 700;
+    }
+    @media screen and (min-width: 768px) {
+      .oppia-footer {
+        position: relative;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/error/Error.js"></script>
+{% endblock footer_js %}
+
+{% block footer %}
+  {% include 'pages/footer.html' %}
+{% endblock %}

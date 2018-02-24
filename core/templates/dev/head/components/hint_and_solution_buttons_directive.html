@@ -1,0 +1,92 @@
+<div ng-if="isHintButtonVisible(0) && currentlyOnLatestCard" class="oppia-hint-and-solution-buttons pull-left">
+  <span class="pull-left footer-hints-label">HINTS</span>
+  <ul class="list-inline pull-right">
+    <li ng-repeat="hintIndex in hintIndexes track by $index">
+      <button class="oppia-learner-hint-solution-button md-button md-default-theme protractor-test-view-hint"
+              popover-trigger="'none'"
+              popover-is-open="isTooltipVisible()"
+              uib-popover="Click here for a hint!"
+              ng-if="hintIndex === 0 && isHintButtonVisible(hintIndex)"
+              ng-class="{'viewed': isHintConsumed(hintIndex)}"
+              ng-click="displayHintModal(hintIndex)">
+        <i class="material-icons">&#xE90F;</i>
+      </button>
+      <button class="oppia-learner-hint-solution-button md-button md-default-theme protractor-test-view-hint"
+              ng-if="hintIndex && isHintButtonVisible(hintIndex)"
+              ng-class="{'viewed': isHintConsumed(hintIndex)}"
+              ng-click="displayHintModal(hintIndex)">
+        <i class="material-icons">&#xE90F;</i>
+      </button>
+    </li>
+    <li ng-if="isSolutionButtonVisible()">
+      <button class="oppia-learner-hint-solution-button md-button md-default-theme protractor-test-view-solution"
+              ng-class="{'viewed': isSolutionConsumed()}"
+              ng-click="onClickSolutionButton()">
+        <i class="material-icons oppia-lightbulb-yellow">&#xE90F;</i>
+      </button>
+    </li>
+  </ul>
+</div>
+
+<style>
+  .oppia-hint-and-solution-buttons ul {
+    padding: 0 10px 0 10px;
+  }
+  .oppia-hint-and-solution-buttons .footer-hints-label {
+    margin-left: 10px;
+    margin-top: 21px;
+  }
+
+  .oppia-hint-and-solution-buttons .popover-content {
+    color: #000000;
+  }
+
+  .oppia-hint-and-solution-buttons .uib-position-measure {
+    visibility: visible !important;
+  }
+
+  @media screen and (min-width: 769px) {
+    .oppia-hint-and-solution-buttons .popover.top.fade.in {
+      top: -40px !important;
+      right: 25px !important;
+    }
+
+    .oppia-hint-and-solution-buttons .popover.top > .arrow {
+      left: 80%;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .oppia-hint-and-solution-buttons .popover.top.fade.in {
+      top: -40px !important;
+      left: 35px !important;
+    }
+
+    .oppia-hint-and-solution-buttons .popover.top > .arrow {
+      left: 35%;
+    }
+  }
+
+  .md-button.md-default-theme.oppia-learner-hint-solution-button {
+    border-radius: 50%;
+    height: 32px;
+    margin-top: 5px;
+    padding: inherit;
+    width: 32px;
+  }
+  .md-button.md-default-theme.oppia-learner-hint-solution-button.viewed {
+    background: #009688;
+  }
+  .md-button.md-default-theme.oppia-learner-hint-solution-button.viewed:hover,
+  .md-button.md-default-theme.oppia-learner-hint-solution-button.viewed:focus {
+    background: #038a7d;
+  }
+
+  .md-button.md-default-theme.oppia-learner-hint-solution-button .material-icons {
+    font-size: 22px;
+  }
+  .md-button.md-default-theme.oppia-learner-hint-solution-button .material-icons.oppia-lightbulb-yellow {
+    color: #f5da57;
+    font-size: 23px;
+  }
+</style>

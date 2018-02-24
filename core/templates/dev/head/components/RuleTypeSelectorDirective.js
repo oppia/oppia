@@ -23,20 +23,22 @@ oppia.directive('ruleTypeSelector', [function() {
       localValue: '@',
       onSelectionChange: '&'
     },
-    template: '<input type="hidden">',
+    template: '<select></select>',
     controller: [
       '$scope', '$element', '$rootScope', '$filter',
-      'stateInteractionIdService', 'INTERACTION_SPECS', 'FUZZY_RULE_TYPE',
+      'stateInteractionIdService', 'INTERACTION_SPECS',
+      'RULE_TYPE_CLASSIFIER',
       function(
           $scope, $element, $rootScope, $filter,
-          stateInteractionIdService, INTERACTION_SPECS, FUZZY_RULE_TYPE) {
+          stateInteractionIdService, INTERACTION_SPECS,
+          RULE_TYPE_CLASSIFIER) {
         var choices = [];
         var numberOfRuleTypes = 0;
 
         var ruleTypesToDescriptions = INTERACTION_SPECS[
           stateInteractionIdService.savedMemento].rule_descriptions;
         for (var ruleType in ruleTypesToDescriptions) {
-          if (ruleType == FUZZY_RULE_TYPE) {
+          if (ruleType === RULE_TYPE_CLASSIFIER) {
             continue;
           }
           numberOfRuleTypes++;
@@ -67,7 +69,7 @@ oppia.directive('ruleTypeSelector', [function() {
           // Suppress the search box.
           minimumResultsForSearch: -1,
           width: '350px',
-          formatSelection: function(object) {
+          templateSelection: function(object) {
             return $filter('truncateAtFirstEllipsis')(object.text);
           }
         });
@@ -79,10 +81,10 @@ oppia.directive('ruleTypeSelector', [function() {
         }
 
         // Initialize the dropdown.
-        $(select2Node).select2('val', $scope.localValue);
+        $(select2Node).val($scope.localValue).trigger('change');
 
         $(select2Node).on('change', function(e) {
-          $scope.onSelectionChange()(e.val);
+          $scope.onSelectionChange()($(select2Node).val());
           // This is needed to propagate the change and display input fields
           // for parameterizing the rule. Otherwise, the input fields do not
           // get updated when the rule type is changed.

@@ -27,20 +27,30 @@
 #   --sharding=true/false Disables/Enables parallelization of protractor tests.
 #   --sharding-instances=# Sets the number of parallel browsers to open while
 #         sharding.
+#   --prod_env Run the tests in prod mode. Static resources are served from
+#         build directory and use cache slugs.
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
 # --sharding-instances) if running any tests in isolation (iit or ddescribe).
+#   --suite=suite_name Performs test for different suites.
+#   For performing a full test, no argument is required.
+#   For performing tests on mainEditors, use --suite=mainEditor
+#   For performing tests on editorFeatures, use --suite=editorFeatures
+#   For performing tests on extensions, use --suite=extensions
+#   For performing tests on library, use --suite=library
+#   For performing tests on learnerDashboard, use --suite=learnerDashboard
+#   For performing users tests, use --suite=users
+#   For performing miscellaneous tests, use --suite=misc
+#   For performing embedding tests, use --suite=embedding
 #
 # The root folder MUST be named 'oppia'.
 
 function cleanup {
   # Send a kill signal to the dev server.
-  #
-  # The [Pp] is to avoid the grep finding the 'grep protractor/selenium' process
-  # as well. The awk command gets just the process ID from the grepped line.
-  kill `ps aux | grep [Pp]rotractor/selenium | awk '{print $2}'`
-
-  # Send a kill signal to the dev server.
   kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=9001" | awk '{print $2}'`
+
+  # The [Pp] is to avoid the grep finding the 'grep protractor/node_modules/webdriver-manager/selenium' process
+  # as well. The awk command gets just the process ID from the grepped line.
+  kill `ps aux | grep [Pp]rotractor/node_modules/webdriver-manager/selenium | awk '{print $2}'`
 
   # Wait for the servers to go down; suppress "connection refused" error output
   # from nc since that is exactly what we are expecting to happen.
@@ -91,6 +101,23 @@ fi
 # the top of the file is run.
 trap cleanup EXIT
 
+
+# Argument passed to feconf.py to help choose production templates folder.
+FORCE_PROD_MODE=False
+for arg in "$@"; do
+  # Used to emulate running Oppia in a production environment.
+  if [ "$arg" == "--prod_env" ]; then
+    FORCE_PROD_MODE=True
+    echo "  Generating files for production mode..."
+    $PYTHON_CMD scripts/build.py
+  fi
+done
+
+feconf_env_variable="FORCE_PROD_MODE = $FORCE_PROD_MODE"
+sed -i.bak -e s/"FORCE_PROD_MODE = .*"/"$feconf_env_variable"/ feconf.py
+# Delete the modified feconf.py file(-i.bak)
+rm feconf.py.bak
+
 # Start a selenium process. The program sends thousands of lines of useless
 # info logs to stderr so we discard them.
 # TODO(jacob): Find a webdriver or selenium argument that controls log level.
@@ -109,30 +136,41 @@ fi
 
 # Parse additional command line arguments that may be passed to protractor.
 # Credit: http://stackoverflow.com/questions/192249
+# Passing different suites and sharding parameters for tests.
+SUITE="full"
 SHARDING=true
 SHARD_INSTANCES=3
-for i in "$@"; do
+for j in "$@"; do
   # Match each space-separated argument passed to the shell file to a separate
-  # case label, based on a pattern. E.g. Match to -sharding=*, where the
+  # case label, based on a pattern. E.g. Match to -suite=*, -sharding=*, where the
   # asterisk refers to any characters following the equals sign, other than
   # whitespace.
-  case $i in
-    --sharding=*)
+  case $j in
+    --suite=*)
     # Extract the value right of the equal sign by substringing the $i variable
     # at the equal sign.
     # http://tldp.org/LDP/abs/html/string-manipulation.html
-    SHARDING="${i#*=}"
+    SUITE="${j#*=}"
     # Shifts the argument parameters over by one. E.g. $2 becomes $1, etc.
     shift
     ;;
 
+    --sharding=*)
+    SHARDING="${j#*=}"
+    shift
+    ;;
+
     --sharding-instances=*)
-    SHARD_INSTANCES="${i#*=}"
+    SHARD_INSTANCES="${j#*=}"
+    shift
+    ;;
+
+    --prod_env*)
     shift
     ;;
 
     *)
-    echo "Error: Unknown command line option: $i"
+    echo "Error: Unknown command line option: $j"
     ;;
   esac
 done
@@ -143,7 +181,7 @@ done
 # in at all.
 # TODO(bhenning): Figure out if this is a bug with protractor.
 if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js
+  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --suite "$SUITE"
 else
-  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES
+  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
 fi

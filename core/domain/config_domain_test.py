@@ -17,7 +17,6 @@
 """Tests for the config property registry."""
 
 from core.domain import config_domain
-from core.domain import config_services
 from core.tests import test_utils
 import schema_utils_test
 
@@ -30,37 +29,3 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
             schema = config_domain.Registry.get_config_property(
                 property_name).schema
             schema_utils_test.validate_schema(schema)
-
-
-class DerivedConfigPropertyTests(test_utils.GenericTestBase):
-    """Tests for derived config properties (i.e., those that are not directly
-    settable)."""
-
-    def test_derived_config_properties_cannot_be_set_directly(self):
-        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'Cannot modify value of config property moderator_ids directly'
-            ):
-            config_services.set_property(
-                self.MODERATOR_EMAIL, config_domain.MODERATOR_IDS.name,
-                [self.get_user_id_from_email(self.MODERATOR_EMAIL)])
-
-    def test_setting_derived_config_properties(self):
-        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-
-        self.assertEqual(config_domain.MODERATOR_USERNAMES.value, [])
-        self.assertEqual(config_domain.MODERATOR_IDS.value, [])
-
-        self.set_moderators([self.MODERATOR_USERNAME])
-        self.assertEqual(
-            config_domain.MODERATOR_USERNAMES.value,
-            [self.MODERATOR_USERNAME])
-        self.assertEqual(
-            config_domain.MODERATOR_IDS.value,
-            [self.get_user_id_from_email(self.MODERATOR_EMAIL)])
-
-        self.set_moderators([])
-        self.assertEqual(config_domain.MODERATOR_USERNAMES.value, [])
-        self.assertEqual(config_domain.MODERATOR_IDS.value, [])

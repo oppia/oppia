@@ -21,13 +21,20 @@ var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 
 describe('Exploration history', function() {
+  var explorationPlayerPage = null;
+
+  beforeEach(function() {
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
+
   it('should display the history', function() {
     users.createUser('user@historyTab.com', 'userHistoryTab');
     users.login('user@historyTab.com');
-    workflow.createExploration('history', 'history');
+    workflow.createExploration();
 
     // Constants for colors of nodes in history graph
     var COLOR_ADDED = 'rgb(78, 162, 78)';
@@ -37,7 +44,6 @@ describe('Exploration history', function() {
     var COLOR_RENAMED_UNCHANGED = 'rgb(255, 215, 0)';
 
     // Check renaming state, editing text, editing interactions and adding state
-    editor.moveToState(general.FIRST_STATE_DEFAULT_NAME);
     editor.setStateName('first');
     editor.setContent(forms.toRichText('enter 6 to continue'));
     editor.setInteraction('NumericInput');
@@ -55,94 +61,134 @@ describe('Exploration history', function() {
 
     var VERSION_1_STATE_1_CONTENTS = {
       1: {
-        text: 'content:',
+        text: 'classifier_model_id: null',
         highlighted: false
       },
       2: {
-        text: '- type: text',
+        text: 'content:',
         highlighted: false
       },
       3: {
-        text: '  value: <p>enter 6 to continue</p>',
-        highlighted: true
+        text: '  audio_translations: {}',
+        highlighted: false
       },
       4: {
+        text: '  html: <p>enter 6 to continue</p>',
+        highlighted: true
+      },
+      5: {
         text: 'interaction:',
         highlighted: false
       },
-      5: {
+      6: {
         text: '  answer_groups:',
         highlighted: true
       },
-      6: {
+      7: {
         text: '  - outcome:',
         highlighted: true
       },
-      7: {
+      8: {
         text: '      dest: second',
         highlighted: true
       },
-      8: {
-        text: '      feedback: []',
-        highlighted: true
-      },
       9: {
-        text: '      param_changes: []',
+        text: '      feedback:',
         highlighted: true
       },
       10: {
-        text: '    rule_specs:',
+        text: '        audio_translations: {}',
         highlighted: true
       },
       11: {
-        text: '    - inputs:',
+        text: '        html: \'\'',
         highlighted: true
       },
       12: {
-        text: '        x: 6.0',
+        text: '      labelled_as_correct: false',
         highlighted: true
       },
       13: {
-        text: '      rule_type: Equals',
+        text: '      param_changes: []',
         highlighted: true
       },
       14: {
-        text: '  confirmed_unclassified_answers: []',
-        highlighted: false
+        text: '      refresher_exploration_id: null',
+        highlighted: true
       },
       15: {
-        text: '  customization_args: {}',
-        highlighted: false
+        text: '    rule_specs:',
+        highlighted: true
       },
       16: {
-        text: '  default_outcome:',
-        highlighted: false
+        text: '    - inputs:',
+        highlighted: true
       },
       17: {
-        text: '    dest: first',
+        text: '        x: 6',
         highlighted: true
       },
       18: {
-        text: '    feedback: []',
-        highlighted: false
+        text: '      rule_type: Equals',
+        highlighted: true
       },
       19: {
-        text: '    param_changes: []',
+        text: '  confirmed_unclassified_answers: []',
         highlighted: false
       },
       20: {
-        text: '  fallbacks: []',
+        text: '  customization_args: {}',
         highlighted: false
       },
       21: {
+        text: '  default_outcome:',
+        highlighted: false
+      },
+      22: {
+        text: '    dest: first',
+        highlighted: true
+      },
+      23: {
+        text: '    feedback:',
+        highlighted: false
+      },
+      24: {
+        text: '      audio_translations: {}',
+        highlighted: false
+      },
+      25: {
+        text: '      html: \'\'',
+        highlighted: false
+      },
+      26: {
+        text: '    labelled_as_correct: false',
+        highlighted: false
+      },
+      27: {
+        text: '    param_changes: []',
+        highlighted: false
+      },
+      28: {
+        text: '    refresher_exploration_id: null',
+        highlighted: false
+      },
+      29: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      30: {
         text: '  id: NumericInput',
         highlighted: true
       },
-      22: {
+      31: {
+        text: '  solution: null',
+        highlighted: false
+      },
+      32: {
         text: 'param_changes: []',
         highlighted: false
       },
-      23: {
+      33: {
         text: ' ',
         highlighted: false
       }
@@ -150,73 +196,98 @@ describe('Exploration history', function() {
 
     var VERSION_2_STATE_1_CONTENTS = {
       1: {
-        text: 'content:',
+        text: 'classifier_model_id: null',
         highlighted: false
       },
       2: {
-        text: '- type: text',
+        text: 'content:',
         highlighted: false
       },
       3: {
-        text: '  value: \'\'',
-        highlighted: true
+        text: '  audio_translations: {}',
+        highlighted: false
       },
       4: {
+        text: '  html: \'\'',
+        highlighted: true
+      },
+      5: {
         text: 'interaction:',
         highlighted: false
       },
-      5: {
+      6: {
         text: '  answer_groups: []',
         highlighted: true
       },
-      6: {
+      7: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: false
       },
-      7: {
+      8: {
         text: '  customization_args: {}',
         highlighted: false
       },
-      8: {
+      9: {
         text: '  default_outcome:',
         highlighted: false
       },
       // Note that highlighting *underneath* a line is still considered a
       // highlight.
-      9: {
+      10: {
         text: '    dest: ' + general.FIRST_STATE_DEFAULT_NAME,
         highlighted: true
       },
-      10: {
-        text: '    feedback: []',
-        highlighted: false
-      },
       11: {
-        text: '    param_changes: []',
+        text: '    feedback:',
         highlighted: false
       },
       12: {
-        text: '  fallbacks: []',
+        text: '      audio_translations: {}',
         highlighted: false
       },
       13: {
-        text: '  id: null',
-        highlighted: true
+        text: '      html: \'\'',
+        highlighted: false
       },
       14: {
-        text: 'param_changes: []',
+        text: '    labelled_as_correct: false',
         highlighted: false
       },
       15: {
+        text: '    param_changes: []',
+        highlighted: false
+      },
+      16: {
+        text: '    refresher_exploration_id: null',
+        highlighted: false
+      },
+      17: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      18: {
+        text: '  id: null',
+        highlighted: true
+      },
+      19: {
+        text: '  solution: null',
+        highlighted: false
+      },
+      20: {
+        text: 'param_changes: []',
+        highlighted: false
+      },
+      21: {
         text: ' ',
         highlighted: false
       }
     };
 
     var STATE_2_STRING =
+      'classifier_model_id: null\n' +
       'content:\n' +
-      '- type: text\n' +
-      '  value: <p>this is card 2</p>\n' +
+      '  audio_translations: {}\n' +
+      '  html: <p>this is card 2</p>\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
       '  confirmed_unclassified_answers: []\n' +
@@ -225,15 +296,20 @@ describe('Exploration history', function() {
       '      value: Continue\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
-      '    feedback: []\n' +
+      '    feedback:\n' +
+      '      audio_translations: {}\n' +
+      '      html: \'\'\n' +
+      '    labelled_as_correct: false\n' +
       '    param_changes: []\n' +
-      '  fallbacks: []\n' +
+      '    refresher_exploration_id: null\n' +
+      '  hints: []\n' +
       '  id: Continue\n' +
+      '  solution: null\n' +
       'param_changes: []\n' +
       ' ';
 
     editor.expectGraphComparisonOf(1, 2).toBe([{
-      label: 'first (was: First ...',
+      label: 'first (was: Introd...',
       color: COLOR_CHANGED
     }, {
       label: 'second',
@@ -243,14 +319,14 @@ describe('Exploration history', function() {
       color: COLOR_ADDED
     }], [2, 2, 0]);
     editor.expectTextComparisonOf(
-      1, 2, 'first (was: First ...'
+      1, 2, 'first (was: Introd...'
     ).toBeWithHighlighting(
       VERSION_1_STATE_1_CONTENTS, VERSION_2_STATE_1_CONTENTS);
     editor.expectTextComparisonOf(1, 2, 'second').toBe(STATE_2_STRING, ' ');
 
     // Switching the 2 compared versions should give the same result.
     editor.expectGraphComparisonOf(2, 1).toBe([{
-      label: 'first (was: First ...',
+      label: 'first (was: Introd...',
       color: COLOR_CHANGED
     }, {
       label: 'second',
@@ -263,7 +339,7 @@ describe('Exploration history', function() {
     // Check deleting a state
     editor.deleteState('second');
     editor.moveToState('first');
-    editor.ResponseEditor(0).setDestination('final card', false);
+    editor.ResponseEditor(0).setDestination('final card', false, null);
     editor.saveChanges();
 
     editor.expectGraphComparisonOf(2, 3).toBe([{
@@ -293,7 +369,7 @@ describe('Exploration history', function() {
 
     // Check re-inserting a deleted state
     editor.moveToState('third');
-    editor.ResponseEditor(0).setDestination('second', true);
+    editor.ResponseEditor(0).setDestination('second', true, null);
     editor.moveToState('second');
     editor.setContent(forms.toRichText('this is card 2'));
     editor.setInteraction('Continue');
@@ -314,13 +390,15 @@ describe('Exploration history', function() {
     // Check that reverting works
     editor.revertToVersion(2);
     general.moveToPlayer();
-    player.expectContentToMatch(forms.toRichText('enter 6 to continue'));
-    player.submitAnswer('NumericInput', 6);
-    player.expectExplorationToNotBeOver();
-    player.expectContentToMatch(forms.toRichText('this is card 2'));
-    player.expectInteractionToMatch('Continue', 'CONTINUE');
-    player.submitAnswer('Continue', null);
-    player.expectExplorationToBeOver();
+    explorationPlayerPage.expectContentToMatch(
+      forms.toRichText('enter 6 to continue'));
+    explorationPlayerPage.submitAnswer('NumericInput', 6);
+    explorationPlayerPage.expectExplorationToNotBeOver();
+    explorationPlayerPage.expectContentToMatch(
+      forms.toRichText('this is card 2'));
+    explorationPlayerPage.expectInteractionToMatch('Continue', 'CONTINUE');
+    explorationPlayerPage.submitAnswer('Continue', null);
+    explorationPlayerPage.expectExplorationToBeOver();
 
     general.moveToEditor();
     editor.expectGraphComparisonOf(4, 6).toBe([{

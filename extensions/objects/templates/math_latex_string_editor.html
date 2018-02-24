@@ -7,9 +7,10 @@
 
 <div ng-if="active || alwaysEditable">
   <div>
-    <textarea ng-model="localValue.label"></textarea>
+    <textarea ng-model="localValue.label" placeholder="\frac{x}{y}"></textarea>
   </div>
-  Preview: <span mathjax-bind="localValue.label"></span>
+  Preview: <span ng-if="localValue.label" mathjax-bind="localValue.label"></span>
+           <span ng-if="!localValue.label" mathjax-bind="placeholderText" style="color: #808080;"></span>
   <button type="button" class="btn btn-default"  ng-if="!alwaysEditable" ng-click="replaceValue(localValue.label)">
     Close
   </button>

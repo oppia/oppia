@@ -15,11 +15,13 @@
 /**
  * @fileoverview End-to-end tests of the exploration rating feature.
  */
+
 var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
-var library = require('../protractor_utils/library.js');
-var player = require('../protractor_utils/player.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
@@ -28,15 +30,21 @@ describe('Library index page', function() {
   var CATEGORY_BUSINESS = 'Business';
   var LANGUAGE_ENGLISH = 'English';
   var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1;
+  var libraryPage = null;
+  var explorationPlayerPage = null;
+
+  beforeEach(function() {
+    libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
+
   var addRating = function(userEmail, userName, explorationName, ratingValue) {
     users.createUser(userEmail, userName);
     users.login(userEmail);
-    browser.get(general.LIBRARY_URL_SUFFIX);
-    library.playExploration(EXPLORATION_RATINGTEST);
-    player.expectExplorationNameToBe(explorationName);
-    player.submitAnswer('Continue');
-    player.rateExploration(ratingValue);
-
+    libraryPage.get();
+    libraryPage.playExploration(EXPLORATION_RATINGTEST);
+    explorationPlayerPage.expectExplorationNameToBe(explorationName);
+    explorationPlayerPage.rateExploration(ratingValue);
     users.logout();
   };
 
@@ -47,7 +55,7 @@ describe('Library index page', function() {
     users.login('user1@explorationRating.com');
     workflow.createAndPublishExploration(
       EXPLORATION_RATINGTEST, CATEGORY_BUSINESS,
-      'an objective', LANGUAGE_ENGLISH);
+      'this is an objective', LANGUAGE_ENGLISH);
     users.logout();
 
     // Create test users, play exploration and review them after completion
@@ -57,19 +65,21 @@ describe('Library index page', function() {
       addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
     }
 
-    browser.get(general.LIBRARY_URL_SUFFIX);
-    library.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, 'N/A');
+    libraryPage.get();
+    libraryPage.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, 'N/A');
 
     var userEmail = 'Display@explorationRating.com';
     var username = 'Display';
     addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
 
-    browser.get(general.LIBRARY_URL_SUFFIX);
-    library.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, '4.0');
+    libraryPage.get();
+    libraryPage.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, '4.0');
 
-    library.playExploration(EXPLORATION_RATINGTEST);
-    player.expectExplorationRatingOnInformationCardToEqual('4.0');
+    libraryPage.playExploration(EXPLORATION_RATINGTEST);
+    explorationPlayerPage.expectExplorationRatingOnInformationCardToEqual(
+      '4.0');
   });
+
   afterEach(function() {
     general.checkForConsoleErrors([]);
   });

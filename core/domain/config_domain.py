@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +16,8 @@
 
 """Domain objects for configuration properties."""
 
-from core.domain import user_services
 from core.platform import models
+import feconf
 import schema_utils
 
 (config_models,) = models.Registry.import_models([models.NAMES.config])
@@ -33,30 +35,77 @@ SET_OF_STRINGS_SCHEMA = {
     }],
 }
 
+VMID_SHARED_SECRET_KEY_SCHEMA = {
+    'type': 'list',
+    'items': {
+        'type': 'dict',
+        'properties': [{
+            'name': 'vm_id',
+            'schema': {
+                'type': 'unicode'
+            }
+        }, {
+            'name': 'shared_secret_key',
+            'schema': {
+                'type': 'unicode'
+            }
+        }]
+    }
+}
+
+BOOL_SCHEMA = {
+    'type': schema_utils.SCHEMA_TYPE_BOOL
+}
+
+UNICODE_SCHEMA = {
+    'type': schema_utils.SCHEMA_TYPE_UNICODE
+}
+
 
 class ConfigProperty(object):
     """A property with a name and a default value.
 
     NOTE TO DEVELOPERS: These config properties are deprecated. Do not reuse
     these names:
+    - about_page_youtube_video_id
     - admin_email_address
+    - admin_ids
+    - admin_usernames
+    - allow_yaml_file_upload
+    - banned_usernames
     - banner_alt_text
+    - before_end_body_tag_hook
     - carousel_slides_config
+    - collection_editor_whitelist
+    - contact_email_address
     - contribute_gallery_page_announcement
+    - disabled_explorations
     - editor_page_announcement
     - editor_prerequisites_agreement
+    - embedded_google_group_url
     - full_site_url
+    - moderator_ids
+    - moderator_request_forum_url
+    - moderator_usernames
+    - publicize_exploration_email_html_body
+    - sharing_options
     - sharing_options_twitter_text
+    - sidebar_menu_additional_links
+    - site_forum_url
+    - social_media_buttons
     - splash_page_exploration_id
     - splash_page_exploration_version
     - splash_page_youtube_video_id
+    - ssl_challenge_responses
+    - whitelisted_email_senders
     """
 
     def refresh_default_value(self, default_value):
+        """Refreshes the configuration property to the default value."""
+
         pass
 
-    def __init__(self, name, schema, description, default_value,
-                 post_set_hook=None, is_directly_settable=True):
+    def __init__(self, name, schema, description, default_value):
         if Registry.get_config_property(name):
             raise Exception('Property with name %s already exists' % name)
 
@@ -65,30 +114,32 @@ class ConfigProperty(object):
         self._description = description
         self._default_value = schema_utils.normalize_against_schema(
             default_value, self._schema)
-        self._post_set_hook = post_set_hook
-        self._is_directly_settable = is_directly_settable
 
         Registry.init_config_property(self.name, self)
 
     @property
     def name(self):
+        """Returns the name of the configuration property."""
+
         return self._name
 
     @property
     def schema(self):
+        """Returns the schema of the configuration property."""
+
         return self._schema
 
     @property
     def description(self):
+        """Returns the description of the configuration property."""
+
         return self._description
 
     @property
     def default_value(self):
-        return self._default_value
+        """Returns the default value of the configuration property."""
 
-    @property
-    def is_directly_settable(self):
-        return self._is_directly_settable
+        return self._default_value
 
     @property
     def value(self):
@@ -129,10 +180,16 @@ class ConfigProperty(object):
         memcache_services.set_multi({
             model_instance.id: model_instance.value})
 
-        if self._post_set_hook is not None:
-            self._post_set_hook(committer_id, value)
-
     def normalize(self, value):
+        """Validates the given object using the schema and normalizes if
+        necessary.
+
+        Args:
+            value: The value of the configuration property.
+
+        Returns:
+            instance. The normalized object.
+        """
         return schema_utils.normalize_against_schema(value, self._schema)
 
 
@@ -145,10 +202,25 @@ class Registry(object):
 
     @classmethod
     def init_config_property(cls, name, instance):
+        """Initializes _config_registry with keys as the property names and
+        values as instances of the specified property.
+
+        Args:
+            name: str. The name of the configuration property.
+        """
         cls._config_registry[name] = instance
 
     @classmethod
     def get_config_property(cls, name):
+        """Returns the instance of the specified name of the configuration
+        property.
+
+        Args:
+            name: str. The name of the configuration property.
+
+        Returns:
+            instance. The instance of the specified configuration property.
+        """
         return cls._config_registry.get(name)
 
     @classmethod
@@ -161,68 +233,26 @@ class Registry(object):
         schemas_dict = {}
 
         for (property_name, instance) in cls._config_registry.iteritems():
-            if instance.is_directly_settable:
-                schemas_dict[property_name] = {
-                    'schema': instance.schema,
-                    'description': instance.description,
-                    'value': instance.value
-                }
+            schemas_dict[property_name] = {
+                'schema': instance.schema,
+                'description': instance.description,
+                'value': instance.value
+            }
 
         return schemas_dict
 
 
-def update_admin_ids(committer_id, admin_usernames):
-    """Refresh the list of admin user_ids based on the usernames entered."""
-    admin_ids = []
-    for username in admin_usernames:
-        user_id = user_services.get_user_id_from_username(username)
-        if user_id is not None:
-            admin_ids.append(user_id)
-        else:
-            raise Exception('Bad admin username: %s' % username)
+PROMO_BAR_ENABLED = ConfigProperty(
+    'promo_bar_enabled', BOOL_SCHEMA,
+    'Whether the promo bar should be enabled for all users', False)
+PROMO_BAR_MESSAGE = ConfigProperty(
+    'promo_bar_message', UNICODE_SCHEMA,
+    'The message to show to all users if the promo bar is enabled', '')
 
-    Registry.get_config_property('admin_ids').set_value(
-        committer_id, admin_ids)
-
-
-def update_moderator_ids(committer_id, moderator_usernames):
-    """Refresh the list of moderator user_ids based on the usernames
-    entered.
-    """
-    moderator_ids = []
-    for username in moderator_usernames:
-        user_id = user_services.get_user_id_from_username(username)
-        if user_id is not None:
-            moderator_ids.append(user_id)
-        else:
-            raise Exception('Bad moderator username: %s' % username)
-
-    Registry.get_config_property('moderator_ids').set_value(
-        committer_id, moderator_ids)
-
-
-ADMIN_IDS = ConfigProperty(
-    'admin_ids', SET_OF_STRINGS_SCHEMA, 'Admin ids', [],
-    is_directly_settable=False)
-MODERATOR_IDS = ConfigProperty(
-    'moderator_ids', SET_OF_STRINGS_SCHEMA, 'Moderator ids', [],
-    is_directly_settable=False)
-
-ADMIN_USERNAMES = ConfigProperty(
-    'admin_usernames', SET_OF_STRINGS_SCHEMA, 'Usernames of admins', [],
-    post_set_hook=update_admin_ids)
-MODERATOR_USERNAMES = ConfigProperty(
-    'moderator_usernames', SET_OF_STRINGS_SCHEMA, 'Usernames of moderators',
-    [], post_set_hook=update_moderator_ids)
-
-BANNED_USERNAMES = ConfigProperty(
-    'banned_usernames',
-    SET_OF_STRINGS_SCHEMA,
-    'Banned usernames (editing permissions for these users have been removed)',
-    [])
-
-WHITELISTED_COLLECTION_EDITOR_USERNAMES = ConfigProperty(
-    'collection_editor_whitelist',
-    SET_OF_STRINGS_SCHEMA,
-    'Names of users allowed to use the collection editor',
-    [])
+VMID_SHARED_SECRET_KEY_MAPPING = ConfigProperty(
+    'vmid_shared_secret_key_mapping', VMID_SHARED_SECRET_KEY_SCHEMA,
+    'VMID and shared secret key corresponding to that VM',
+    [{
+        'vm_id': feconf.DEFAULT_VM_ID,
+        'shared_secret_key': feconf.DEFAULT_VM_SHARED_SECRET
+    }])

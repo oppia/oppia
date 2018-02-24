@@ -16,7 +16,6 @@
 
 """Provides memcache services."""
 
-from core import counters
 from google.appengine.api import memcache
 
 
@@ -32,12 +31,6 @@ def get_multi(keys):
     """
     assert isinstance(keys, list)
     result = memcache.get_multi(keys)
-
-    if result is not None:
-        counters.MEMCACHE_HIT.inc()
-    else:
-        counters.MEMCACHE_MISS.inc()
-
     return result
 
 
@@ -55,12 +48,6 @@ def set_multi(key_value_mapping):
     """
     assert isinstance(key_value_mapping, dict)
     unset_keys = memcache.set_multi(key_value_mapping)
-
-    if unset_keys:
-        counters.MEMCACHE_SET_FAILURE.inc()
-    else:
-        counters.MEMCACHE_SET_SUCCESS.inc()
-
     return unset_keys
 
 
@@ -76,14 +63,6 @@ def delete(key):
     """
     assert isinstance(key, basestring)
     return_code = memcache.delete(key)
-
-    if return_code == 0:
-        counters.MEMCACHE_DELETE_FAILURE.inc()
-    elif return_code == 1:
-        counters.MEMCACHE_DELETE_MISSING.inc()
-    else:
-        counters.MEMCACHE_DELETE_SUCCESS.inc()
-
     return return_code
 
 
@@ -99,10 +78,4 @@ def delete_multi(keys):
     for key in keys:
         assert isinstance(key, basestring)
     return_value = memcache.delete_multi(keys)
-
-    if return_value is True:
-        counters.MEMCACHE_DELETE_SUCCESS.inc()
-    else:
-        counters.MEMCACHE_DELETE_FAILURE.inc()
-
     return return_value

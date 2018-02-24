@@ -16,44 +16,62 @@
 
 """Job registries."""
 
-from core.domain import exp_jobs_continuous
+from core.domain import activity_jobs_one_off
+from core.domain import collection_jobs_one_off
+from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
-from core.domain import recommendations_jobs_continuous
+from core.domain import feedback_jobs_one_off
+from core.domain import recommendations_jobs_one_off
 from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
-from core.domain import email_jobs_one_off
 
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
-    user_jobs_one_off.DashboardSubscriptionsOneOffJob,
-    exp_jobs_one_off.IndexAllExplorationsJobManager,
-    exp_jobs_one_off.ExpSummariesCreationOneOffJob,
-    exp_jobs_one_off.ExplorationValidityJobManager,
-    stats_jobs_one_off.StatisticsAudit,
-    user_jobs_one_off.UserContributionsOneOffJob,
-    exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
-    exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
-    user_jobs_one_off.UserFirstContributionMsecOneOffJob,
-    exp_jobs_one_off.ExplorationMigrationJobManager,
-    exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
+    activity_jobs_one_off.IndexAllActivitiesJobManager,
+    collection_jobs_one_off.CollectionMigrationJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
-    user_jobs_one_off.UserProfilePictureOneOffJob]
+    exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
+    exp_jobs_one_off.ExpSummariesCreationOneOffJob,
+    exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
+    exp_jobs_one_off.ExplorationFirstPublishedOneOffJob,
+    exp_jobs_one_off.ExplorationMigrationJobManager,
+    exp_jobs_one_off.ExplorationValidityJobManager,
+    exp_jobs_one_off.ExplorationStateIdMappingJob,
+    exp_jobs_one_off.HintsAuditOneOffJob,
+    exp_jobs_one_off.ItemSelectionInteractionOneOffJob,
+    exp_jobs_one_off.ViewableExplorationsAuditJob,
+    feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob,
+    recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
+    stats_jobs_one_off.RecomputeStatisticsOneOffJob,
+    stats_jobs_one_off.GenerateV1StatisticsJob,
+    stats_jobs_one_off.StatisticsAuditV1,
+    stats_jobs_one_off.StatisticsAudit,
+    stats_jobs_one_off.GenerateAllStatsModelsOneOffJob,
+    user_jobs_one_off.DashboardSubscriptionsOneOffJob,
+    user_jobs_one_off.LongUserBiosOneOffJob,
+    user_jobs_one_off.UserContributionsOneOffJob,
+    user_jobs_one_off.UserDefaultDashboardOneOffJob,
+    user_jobs_one_off.UserFirstContributionMsecOneOffJob,
+    user_jobs_one_off.UserLastExplorationActivityOneOffJob,
+    user_jobs_one_off.UserProfilePictureOneOffJob,
+    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
+]
 
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.
 # NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
 # it should be registered here.
 ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
-    exp_jobs_continuous.SearchRanker,
+    feedback_jobs_continuous.FeedbackAnalyticsAggregator,
+    stats_jobs_continuous.InteractionAnswerSummariesAggregator,
     stats_jobs_continuous.StatisticsAggregator,
     user_jobs_continuous.DashboardRecentUpdatesAggregator,
-    user_jobs_continuous.UserImpactAggregator,
-    feedback_jobs_continuous.FeedbackAnalyticsAggregator,
-    recommendations_jobs_continuous.ExplorationRecommendationsAggregator]
+    user_jobs_continuous.UserStatsAggregator,
+]
 
 
 class ContinuousComputationEventDispatcher(object):

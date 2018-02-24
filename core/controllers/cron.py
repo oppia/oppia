@@ -16,14 +16,18 @@
 
 import logging
 
-from pipeline import pipeline
-
 from core import jobs
 from core.controllers import base
+from core.domain import acl_decorators
+from core.domain import activity_jobs_one_off
+from core.domain import email_manager
+from core.domain import recommendations_jobs_one_off
+from core.domain import user_jobs_one_off
 from core.platform import models
 import utils
 
-email_services = models.Registry.import_email_services()
+from pipeline import pipeline
+
 (job_models,) = models.Registry.import_models([models.NAMES.job])
 
 # The default retention time is 2 days.
@@ -32,25 +36,10 @@ TWENTY_FIVE_HOURS_IN_MSECS = 25 * 60 * 60 * 1000
 MAX_JOBS_TO_REPORT_ON = 50
 
 
-def require_cron_or_superadmin(handler):
-    """Decorator to ensure that the handler is being called by cron or by a
-    superadmin of the application.
-    """
-    def _require_cron_or_superadmin(self, *args, **kwargs):
-        if (self.request.headers.get('X-AppEngine-Cron') is None
-                and not self.is_super_admin):
-            raise self.UnauthorizedUserException(
-                'You do not have the credentials to access this page.')
-        else:
-            return handler(self, *args, **kwargs)
-
-    return _require_cron_or_superadmin
-
-
 class JobStatusMailerHandler(base.BaseHandler):
     """Handler for mailing admin about job failures."""
 
-    @require_cron_or_superadmin
+    @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Get the 50 most recent failed shards, not all of them.
@@ -83,11 +72,44 @@ class JobStatusMailerHandler(base.BaseHandler):
             email_subject = 'MapReduce status report'
             email_message = 'All MapReduce jobs are running fine.'
 
-        email_services.send_mail_to_admin(email_subject, email_message)
+        email_manager.send_mail_to_admin(email_subject, email_message)
+
+
+class CronDashboardStatsHandler(base.BaseHandler):
+    """Handler for appending dashboard stats to a list."""
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        user_jobs_one_off.DashboardStatsOneOffJob.enqueue(
+            user_jobs_one_off.DashboardStatsOneOffJob.create_new())
+
+
+class CronExplorationRecommendationsHandler(base.BaseHandler):
+    """Handler for computing exploration recommendations."""
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        job_class = (
+            recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob)
+        job_class.enqueue(job_class.create_new())
+
+
+class CronActivitySearchRankHandler(base.BaseHandler):
+    """Handler for computing activity search ranks."""
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        activity_jobs_one_off.IndexAllActivitiesJobManager.enqueue(
+            activity_jobs_one_off.IndexAllActivitiesJobManager.create_new())
 
 
 class CronMapreduceCleanupHandler(base.BaseHandler):
+    """Handler for cleaning up data items of completed map/reduce jobs."""
 
+    @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Clean up intermediate data items for completed M/R jobs that
         started more than MAX_MAPREDUCE_METADATA_RETENTION_MSECS milliseconds

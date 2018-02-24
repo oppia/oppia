@@ -16,8 +16,6 @@
 
 """Configuration for JavaScript library dependencies."""
 
-__author__ = 'Sean Lip'
-
 
 # A dict mapping dependency ids to the Angular module names they
 # should insert when the Angular app is first initialized.

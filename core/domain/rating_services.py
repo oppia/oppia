@@ -18,9 +18,11 @@
 
 import datetime
 
+from core.domain import event_services
 from core.domain import exp_services
 from core.platform import models
 import feconf
+
 (exp_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.user])
 transaction_services = models.Registry.import_transaction_services()
@@ -32,9 +34,14 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
     """Records the rating awarded by the user to the exploration in both the
     user-specific data and exploration summary.
 
-    It validates the exploration id but not the user id.
+    This function validates the exploration id but not the user id.
 
-     - 'new_rating' should be an integer between 1 and 5
+    Args:
+        user_id: str. The id of the user assigning the rating.
+        exploration_id: str. The id of the exploration that is
+            assigned a rating.
+        new_rating: int. Value of assigned rating, should be between
+            1 and 5 inclusive.
     """
 
     if not isinstance(new_rating, int):
@@ -71,14 +78,28 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
     exploration_summary.ratings[str(new_rating)] += 1
     if old_rating:
         exploration_summary.ratings[str(old_rating)] -= 1
+
+    event_services.RateExplorationEventHandler.record(
+        exploration_id, user_id, new_rating, old_rating)
+
+    exploration_summary.scaled_average_rating = (
+        exp_services.get_scaled_average_rating(
+            exploration_summary.ratings))
+
     exp_services.save_exploration_summary(exploration_summary)
 
 
 def get_user_specific_rating_for_exploration(user_id, exploration_id):
-    """
+    """Fetches a rating for the specified exploration from the specified user
+    if one exists.
+
+    Args:
+        user_id: str. The id of the user.
+        exploration_id: str. The id of the exploration.
+
     Returns:
-        An integer 1-5, or None if there is no rating of this exploration by
-        this user.
+        int or None. An integer between 1 and 5 inclusive, or None if the user
+        has not previously rated the exploration.
     """
     exp_user_data_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
@@ -86,11 +107,19 @@ def get_user_specific_rating_for_exploration(user_id, exploration_id):
 
 
 def get_when_exploration_rated(user_id, exploration_id):
-    """Returns the date-time the exploration was lasted rated by this user, or
-    None if no such rating has been awarded.
+    """Fetches the datetime the exploration was last rated by this user, or
+    None if no rating has been awarded.
 
-    Currently this function is only used for testing since the times ratings
-    were awarded are not used for anything.
+    Currently this function is only used for testing purposes.
+
+    Args:
+        user_id: str. The id of the user.
+        exploration_id: str. The id of the exploration.
+
+    Returns:
+        datetime.datetime or None. When the exploration was last
+        rated by the user, or None if the user has not previously
+        rated the exploration.
     """
     exp_user_data_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
@@ -98,5 +127,15 @@ def get_when_exploration_rated(user_id, exploration_id):
 
 
 def get_overall_ratings_for_exploration(exploration_id):
+    """Fetches all ratings for an exploration.
+
+    Args:
+        exploration_id: str. The id of the exploration.
+
+    Returns:
+        a dict whose keys are '1', '2', '3', '4', '5' and whose
+        values are nonnegative integers representing the frequency counts
+        of each rating.
+    """
     exp_summary = exp_services.get_exploration_summary_by_id(exploration_id)
     return exp_summary.ratings

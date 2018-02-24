@@ -24,16 +24,20 @@ var argv = yargs
   .command('build', 'generate optimimized third party library for production',
     function(yargs) {
       argv = yargs
-        .usage('Usage: $0 build [--minify]')
+        .usage('Usage: $0 build [--minify] [--output_directory]')
         .option('minify', {
           describe: 'Whether to minify third-party dependencies'
+        })
+        .option('output_directory', {
+          describe: 'A path to the directory where the files will be generated'
         }).argv;
     })
   .command('start_devserver', 'start GAE development server',
     function(yargs) {
       argv = yargs
         .usage('Usage: $0 start_devserver [--gae_devserver_path]' +
-         '[--clear_datastore] [--enable_sendmail]')
+         '[--clear_datastore] [--enable_sendmail] [--use_minification]' +
+         '[--prod_env]')
         .option('gae_devserver_path', {
           describe: 'A path to app engine'
         })
@@ -42,6 +46,12 @@ var argv = yargs
         })
         .option('clear_datastore', {
           describe: 'Whether to clear all data storage'
+        })
+        .option('use_minification', {
+          describe: 'Whether to build with minification'
+        })
+        .option('prod_env', {
+          describe: 'Whether to run server in prod mode'
         })
         .demand(['gae_devserver_path'])
         .argv;
@@ -54,7 +64,7 @@ var manifest = require('./manifest.json');
 var cleanCss = require('gulp-clean-css');
 var path = require('path');
 var sourcemaps = require('gulp-sourcemaps');
-var minify = require('gulp-minify');
+var uglify = require('gulp-uglify');
 
 var gaeDevserverPath = argv.gae_devserver_path;
 var params = {
@@ -78,7 +88,7 @@ if (argv.enable_sendmail) {
 var requireFilesExist = function(filePaths) {
   filePaths.forEach(function(filePath) {
     if (!fs.lstatSync(filePath).isFile()) {
-      console.log(filePath + ' is not a valid filepath, check spelling');
+      console.error(filePath + ' is not a valid filepath, check spelling');
       process.exit();
     }
   });
@@ -88,7 +98,7 @@ var requireFilesExist = function(filePaths) {
 var checkCommands = function(yargs, argv, numRequired) {
   if (argv._.length < numRequired) {
     // Display help(usage) message.
-    console.log(yargs.help());
+    console.error(yargs.help());
     // Stop gulp and exit.
     process.exit();
   }
@@ -96,22 +106,36 @@ var checkCommands = function(yargs, argv, numRequired) {
 // There should atleast be minimum of one defined task.
 checkCommands(yargs, argv, 1);
 
-var isMinificationNeeded = (argv.minify == 'True');
+var isMinificationNeeded = (
+  argv.minify === 'True' || argv.use_minification === 'True');
 var frontendDependencies = manifest.dependencies.frontend;
 var cssFilePaths = [];
 var jsFilePaths = [];
 var fontFolderPaths = [];
-var cssBackgroundFilepaths = [];
-var generatedTargetDir = path.join(
-  'third_party', 'generated',
-  isMinificationNeeded ? 'prod' : 'dev');
+
+// TODO(gvishal): Issue: https://github.com/oppia/oppia/issues/2324
+// This code needs refactoring, reasons for which are documented in the above
+// issue. The issue also contains a complete description of the build process
+// for clarity.
+
+// If output_directory argument is specified we generate files there, otherwise
+// we generate files in /third_party/generated.
+// In non-dev mode (prod mode), we serve files from a separate build directory
+// specified by the output_directory argument.
+// And for dev mode without minification, we do it from /third_party/generated.
+var generatedTargetDir = path.join('third_party', 'generated');
+if ('output_directory' in argv && argv.output_directory !== undefined) {
+  generatedTargetDir = argv.output_directory;
+}
 var generatedCssTargetDir = path.join(generatedTargetDir, 'css');
 var generatedJsTargetDir = path.join(generatedTargetDir, 'js');
 
 gulp.task('collectDependencyFilepaths', function() {
   for (var dependencyId in frontendDependencies) {
     var dependency = frontendDependencies[dependencyId];
-    var dependencyDir = dependency.targetDirPrefix + dependency.version;
+    var dependencyDir = (
+      dependency.targetDir ? dependency.targetDir :
+      dependency.targetDirPrefix + dependency.version);
     if (dependency.hasOwnProperty('bundle')) {
       if (dependency.bundle.hasOwnProperty('css')) {
         dependency.bundle.css.forEach(function(cssFiles) {
@@ -130,12 +154,6 @@ gulp.task('collectDependencyFilepaths', function() {
         fontFolderPaths.push(path.join('third_party', 'static', dependencyDir,
           dependency.bundle.fontsPath, fontPrefix));
       }
-      if (dependency.bundle.hasOwnProperty('cssBackgroundImage')) {
-        dependency.bundle.cssBackgroundImage.forEach(function(imagePath) {
-          cssBackgroundFilepaths.push(path.join(
-            'third_party', 'static', dependencyDir, imagePath));
-        });
-      }
     }
   }
 });
@@ -143,48 +161,35 @@ gulp.task('collectDependencyFilepaths', function() {
 gulp.task('generateCss', function() {
   requireFilesExist(cssFilePaths);
   gulp.src(cssFilePaths)
+    .pipe(isMinificationNeeded ? sourcemaps.init() : gulpUtil.noop())
+    .pipe(isMinificationNeeded ? concat('third_party.min.css') :
+        concat('third_party.css'))
     .pipe(isMinificationNeeded ? cleanCss({}) : gulpUtil.noop())
-    .pipe(concat('third_party.css'))
+    .pipe(isMinificationNeeded ? sourcemaps.write('.') : gulpUtil.noop())
     .pipe(gulp.dest(generatedCssTargetDir));
 });
 
 gulp.task('generateJs', function() {
   requireFilesExist(jsFilePaths);
   gulp.src(jsFilePaths)
-    .pipe(sourcemaps.init())
-      .pipe(concat('third_party.js'))
-      .pipe(isMinificationNeeded ? minify({
-        ext: {
-          src: '.js',
-          min: '.min.js'
-        }
-      }) : gulpUtil.noop())
+    .pipe(isMinificationNeeded ? sourcemaps.init() : gulpUtil.noop())
+    .pipe(isMinificationNeeded ? concat('third_party.min.js') :
+        concat('third_party.js'))
+    .pipe(isMinificationNeeded ? uglify() : gulpUtil.noop())
     // This maps a combined/minified file back to an unbuilt state by holding
     // information about original files. When you query a certain line and
     // column number in your generated JavaScript, you can do a lookup in the
     // source map which returns the original location.
     // http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
-    .pipe(sourcemaps.write())
+    .pipe(isMinificationNeeded ? sourcemaps.write('.') : gulpUtil.noop())
     .pipe(gulp.dest(generatedJsTargetDir));
 });
 // This task is used to copy all fonts which are used by
 // Bootstrap and font-Awesome to one folder
+var generatedFontsTargetDir = path.join(generatedTargetDir, 'fonts');
 gulp.task('copyFonts', function() {
   gulp.src(fontFolderPaths)
-    .pipe(gulp.dest(path.join(
-      'third_party', 'generated',
-      isMinificationNeeded ? 'prod' : 'dev', 'fonts')));
-});
-
-// This is a task which copies background image used by css.
-// TODO(Barnabas) find a way of removing this task. It is a bit of a hack,
-// because it depends on the relative location of the CSS background images
-// of a third-party library with respect to the CSS file that uses them.
-// The currently-affected libraries include select2.css.
-gulp.task('copyCssBackgroundImages', function() {
-  requireFilesExist(cssBackgroundFilepaths);
-  gulp.src(cssBackgroundFilepaths)
-    .pipe(gulp.dest(generatedCssTargetDir));
+    .pipe(gulp.dest(path.join(generatedFontsTargetDir)));
 });
 
 gulp.task('gulpStartGae', function() {
@@ -195,8 +200,7 @@ gulp.task('gulpStartGae', function() {
 // This takes all functions  that are required for the build
 // e.g css, Js and Images
 gulp.task('build', [
-  'collectDependencyFilepaths', 'generateCss', 'copyFonts',
-  'copyCssBackgroundImages', 'generateJs']);
+  'collectDependencyFilepaths', 'generateCss', 'copyFonts', 'generateJs']);
 
 gulp.slurped = false;
 gulp.task('watch', function() {
@@ -212,4 +216,9 @@ gulp.task('watch', function() {
 // This task starts google app engine development server.
 // TODO(Barnabas Makonda): check if files are already generated and if so
 // do not build.
-gulp.task('start_devserver', ['build', 'gulpStartGae', 'watch']);
+var isProdMode = argv.prod_env === 'True';
+if (isProdMode) {
+  gulp.task('start_devserver', ['gulpStartGae', 'watch']);
+} else {
+  gulp.task('start_devserver', ['build', 'gulpStartGae', 'watch']);
+}

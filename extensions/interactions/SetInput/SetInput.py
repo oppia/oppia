@@ -28,7 +28,32 @@ class SetInput(base.BaseInteraction):
     instructions = None
     narrow_instructions = None
     needs_summary = False
+    can_have_solution = True
+    show_generic_submit_button = True
 
     # NB: There used to be a UnicodeString-typed parameter here called
     # 'element_type'. This has since been removed.
     _customization_arg_specs = []
+
+    _answer_visualization_specs = [{
+        # Table with answer counts for top N answers.
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Answer', 'Count'],
+            'title': 'Top 10 answers',
+        },
+        'calculation_id': 'Top10AnswerFrequencies',
+        'show_addressed_info': True,
+    }, {
+        # Table with most commonly submitted elements of set.
+        'id': 'FrequencyTable',
+        'options': {
+            'column_headers': ['Element', 'Count'],
+            'title': 'Commonly submitted elements',
+        },
+        'calculation_id': 'FrequencyCommonlySubmittedElements',
+        # Since individual answer elements are not generally intended to be
+        # used as a single response to SetInput interactions, we omit the
+        # addressed column entirely.
+        'show_addressed_info': False,
+    }]

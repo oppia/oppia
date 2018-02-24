@@ -17,27 +17,44 @@
  */
 
 var general = require('../protractor_utils/general.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('Account creation', function() {
+  var libraryPage = null;
+
+  beforeEach(function() {
+    libraryPage = new LibraryPage.LibraryPage();
+  });
+
   it('should create users', function() {
     users.createUser(
       'ordinaryuser@userManagement.com', 'ordinaryUserManagement');
+
+    users.login('ordinaryuser@userManagement.com');
+    libraryPage.get();
+    general.checkForConsoleErrors([]);
+
+    browser.get(general.MODERATOR_URL_SUFFIX);
+    general.checkForConsoleErrors([
+      'Failed to load resource: the server responded with a status of 401']);
+    users.logout();
   });
 
   it('should create moderators', function() {
-    users.createModerator(
-      'mod@userManagement.com', 'moderatorUserManagement');
+    users.createModerator('mod@userManagement.com', 'moderatorUserManagement');
+
+    users.login('mod@userManagement.com');
+    browser.get(general.MODERATOR_URL_SUFFIX);
+    users.logout();
+
+    general.checkForConsoleErrors([]);
   });
 
   // Usernames containing "admin" are not permitted.
   it('should create admins', function() {
-    users.createAdmin(
-      'admin@userManagement.com', 'adm1nUserManagement');
-  });
-
-  afterEach(function() {
+    users.createAdmin('admin@userManagement.com', 'adm1nUserManagement');
     general.checkForConsoleErrors([]);
   });
 });

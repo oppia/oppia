@@ -1,0 +1,57 @@
+<schema-based-choices-editor ng-if="schema().choices" local-value="$parent.localValue"
+                             schema="schema()" choices="schema().choices"
+                             is-disabled="isDisabled()">
+</schema-based-choices-editor>
+
+<schema-based-bool-editor ng-if="schema().type === 'bool' && !schema().choices"
+                          local-value="$parent.localValue" is-disabled="isDisabled()"
+                          label-for-focus-target="labelForFocusTarget()">
+</schema-based-bool-editor>
+
+<schema-based-int-editor ng-if="schema().type === 'int' && !schema().choices"
+                         local-value="$parent.localValue" is-disabled="isDisabled()"
+                         validators="schema().validators"
+                         label-for-focus-target="labelForFocusTarget()"
+                         on-input-blur="onInputBlur"
+                         on-input-focus="onInputFocus">
+</schema-based-int-editor>
+
+<schema-based-float-editor ng-if="schema().type === 'float' && !schema().choices"
+                           local-value="$parent.localValue" is-disabled="isDisabled()"
+                           validators="schema().validators"
+                           label-for-focus-target="labelForFocusTarget()"
+                           on-input-blur="onInputBlur"
+                           on-input-focus="onInputFocus">
+</schema-based-float-editor>
+
+<schema-based-unicode-editor ng-if="schema().type === 'unicode' && !schema().choices"
+                             local-value="$parent.localValue" is-disabled="isDisabled()"
+                             validators="schema().validators" ui-config="schema().ui_config"
+                             label-for-focus-target="labelForFocusTarget()"
+                             on-input-blur="onInputBlur"
+                             on-input-focus="onInputFocus">
+</schema-based-unicode-editor>
+
+<schema-based-html-editor ng-if="schema().type === 'html' && !schema().choices"
+                          local-value="$parent.localValue" is-disabled="isDisabled()"
+                          label-for-focus-target="labelForFocusTarget()"
+                          ui-config="schema().ui_config">
+</schema-based-html-editor>
+
+<schema-based-list-editor ng-if="schema().type === 'list' && !schema().choices"
+                          local-value="$parent.localValue" is-disabled="isDisabled()"
+                          item-schema="schema().items" len="schema().len"
+                          ui-config="schema().ui_config" validators="schema().validators"
+                          label-for-focus-target="labelForFocusTarget()">
+</schema-based-list-editor>
+
+<schema-based-dict-editor ng-if="schema().type === 'dict' && !schema().choices"
+                          local-value="$parent.localValue" is-disabled="isDisabled()"
+                          property-schemas="schema().properties"
+                          label-for-focus-target="labelForFocusTarget()">
+</schema-based-dict-editor>
+
+<schema-based-custom-editor ng-if="schema().type === 'custom' && !schema().choices"
+                            obj-type="schema().obj_type" local-value="$parent.localValue"
+                            is-disabled="isDisabled()">
+</schema-based-custom-editor>

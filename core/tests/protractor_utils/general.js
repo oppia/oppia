@@ -33,13 +33,13 @@ var waitForSystem = function() {
   browser.sleep(waitTime);
 };
 
+var scrollToTop = function() {
+  browser.executeScript('window.scrollTo(0,0);');
+};
+
 // We will report all console logs of level greater than this.
 var CONSOLE_LOG_THRESHOLD = 900;
-var CONSOLE_ERRORS_TO_IGNORE = [
-  // This error arises when a logout event takes place before a page has fully
-  // loaded.
-  'http://localhost:9001/third_party/static/angularjs-1.4.7/angular.js 12477:24'
-];
+var CONSOLE_ERRORS_TO_IGNORE = [];
 
 var checkForConsoleErrors = function(errorsToIgnore) {
   var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
@@ -63,15 +63,16 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 };
 
 var SERVER_URL_PREFIX = 'http://localhost:9001';
-var LIBRARY_URL_SUFFIX = '/library';
 var EDITOR_URL_SLICE = '/create/';
 var PLAYER_URL_SLICE = '/explore/';
+var USER_PREFERENCES_URL = '/preferences';
 var LOGIN_URL_SUFFIX = '/_ah/login';
-var ADMIN_URL_SUFFIX = '/admin';
-var SCRIPTS_URL_SLICE = '/scripts/';
+var MODERATOR_URL_SUFFIX = '/moderator';
+// Note that this only works in dev, due to the use of cache slugs in prod.
+var SCRIPTS_URL_SLICE = '/assets/scripts/';
 var EXPLORATION_ID_LENGTH = 12;
 
-var FIRST_STATE_DEFAULT_NAME = 'First Card';
+var FIRST_STATE_DEFAULT_NAME = 'Introduction';
 
 var _getExplorationId = function(currentUrlPrefix) {
   return {
@@ -126,14 +127,47 @@ var expect404Error = function() {
     toMatch('Error 404');
 };
 
+// Checks no untranslated values are shown in the page.
+var ensurePageHasNoTranslationIds = function() {
+  // The use of the InnerHTML is hacky, but is faster than checking each
+  // individual component that contains text.
+  element(by.css('.oppia-base-container')).getAttribute('innerHTML').then(
+    function(promiseValue) {
+      // First remove all the attributes translate and variables that are
+      // not displayed
+      var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
+      var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
+      var REGEX_NG_TOP_NAV_VISIBILITY =
+        new RegExp('ng-show="navElementsVisibilityStatus.I18N_', 'g');
+      expect(promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
+        .replace(REGEX_NG_VARIABLE, '')
+        .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
+    });
+};
+
+var acceptAlert = function() {
+  browser.wait(function() {
+    return browser.switchTo().alert().accept().then(
+      function() {
+        return true;
+      },
+      function() {
+        return false;
+      }
+    );
+  });
+};
+
+exports.acceptAlert = acceptAlert;
 exports.waitForSystem = waitForSystem;
+exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
 
 exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
-exports.LIBRARY_URL_SUFFIX = LIBRARY_URL_SUFFIX;
+exports.USER_PREFERENCES_URL = USER_PREFERENCES_URL;
 exports.EDITOR_URL_SLICE = EDITOR_URL_SLICE;
 exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;
-exports.ADMIN_URL_SUFFIX = ADMIN_URL_SUFFIX;
+exports.MODERATOR_URL_SUFFIX = MODERATOR_URL_SUFFIX;
 exports.SCRIPTS_URL_SLICE = SCRIPTS_URL_SLICE;
 exports.FIRST_STATE_DEFAULT_NAME = FIRST_STATE_DEFAULT_NAME;
 
@@ -144,3 +178,5 @@ exports.openPlayer = openPlayer;
 exports.moveToPlayer = moveToPlayer;
 exports.moveToEditor = moveToEditor;
 exports.expect404Error = expect404Error;
+
+exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;

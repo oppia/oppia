@@ -1,33 +1,4 @@
-<link rel="stylesheet" type="text/css" href="/extensions/interactions/MusicNotesInput/static/css/musicNotesInput.css">
+<link rel="stylesheet" type="text/css" href="{{cache_slug}}/extensions/interactions/MusicNotesInput/static/music_notes_input.css">
 
-<script type="text/ng-template" id="interaction/MusicNotesInput">
-  <div class="oppia-music-input-valid-note-area">
-    <button type="button" class="btn btn-default oppia-music-input-btn oppia-music-input-play-btn"
-            ng-click="playCurrentSequence()">
-      <span class="glyphicon glyphicon-play"></span>
-      Play
-    </button>
-    <div class="oppia-music-input-note-choices"></div>
-    <div class="oppia-music-input-staff"></div>
-  </div>
-  <div class="oppia-music-input-control-buttons">
-    <button type="button" class="btn btn-default oppia-music-input-btn"
-            ng-click="playSequenceToGuess()">Play Target Sequence</button>
-    <div class="pull-right">
-      <button type="button" class="btn btn-default oppia-music-input-btn"
-              ng-click="clearSequence()">Clear</button>
-      <button type="button" class="btn btn-default oppia-music-input-btn"
-              ng-click="submitAnswer(noteSequence)">Submit</button>
-    </div>
-  </div>
-</script>
-
-<script type="text/ng-template" id="response/MusicNotesInput">
-  <div>
-    <[displayedAnswer]>
-  </div>
-</script>
-
-<script type="text/ng-template" id="shortResponse/MusicNotesInput">
-  <span><[displayedAnswer]></span>
-</script>
+<script src="{{cache_slug}}/extensions/interactions/MusicNotesInput/directives/MusicNotesInput.js"></script>
+<script src="{{cache_slug}}/extensions/interactions/MusicNotesInput/directives/MusicNotesInputValidationService.js"></script>

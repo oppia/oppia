@@ -35,7 +35,7 @@ oppia.filter('underscoresToCamelCase', [function() {
 oppia.filter('camelCaseToHyphens', [function() {
   return function(input) {
     var result = input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
-    if (result[0] == '-') {
+    if (result[0] === '-') {
       result = result.substring(1);
     }
     return result;
@@ -119,144 +119,173 @@ oppia.filter('truncateAtFirstEllipsis', [function() {
   };
 }]);
 
-oppia.filter('wrapTextWithEllipsis', ['$filter', function($filter) {
-  return function(input, characterCount) {
-    if (typeof input == 'string' || input instanceof String) {
-      input = $filter('normalizeWhitespace')(input);
-      if (input.length <= characterCount || characterCount < 3) {
-        // String fits within the criteria; no wrapping is necessary.
+oppia.filter('wrapTextWithEllipsis', [
+  '$filter', 'UtilsService', function($filter, UtilsService) {
+    return function(input, characterCount) {
+      if (UtilsService.isString(input)) {
+        input = $filter('normalizeWhitespace')(input);
+        if (input.length <= characterCount || characterCount < 3) {
+          // String fits within the criteria; no wrapping is necessary.
+          return input;
+        }
+
+        // Replace characters counting backwards from character count with an
+        // ellipsis, then trim the string.
+        return input.substr(0, characterCount - 3).trim() + '...';
+      } else {
         return input;
       }
-
-      // Replace characters counting backwards from character count with an
-      // ellipsis, then trim the string.
-      return input.substr(0, characterCount - 3).trim() + '...';
-    } else {
-      return input;
-    }
-  };
-}]);
-
-// Filter that returns true iff an outcome has a self-loop and no feedback.
-oppia.filter('isOutcomeConfusing', [function() {
-  return function(outcome, currentStateName) {
-    return (
-      outcome.dest === currentStateName &&
-      !outcome.feedback.some(function(feedbackItem) {
-        return feedbackItem.trim().length > 0;
-      })
-    );
-  };
-}]);
+    };
+  }
+]);
 
 // Filter that changes {{...}} tags into the corresponding parameter input
 // values. Note that this returns an HTML string to accommodate the case of
 // multiple-choice input and image-click input.
 oppia.filter('parameterizeRuleDescription', [
-    'INTERACTION_SPECS', function(INTERACTION_SPECS) {
-  return function(rule, interactionId, choices) {
-    if (!rule) {
-      return '';
-    }
-
-    if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
-      console.error('Cannot find interaction with id ' + interactionId);
-      return '';
-    }
-
-    var description = INTERACTION_SPECS[interactionId].rule_descriptions[
-      rule.rule_type];
-    if (!description) {
-      console.error(
-        'Cannot find description for rule ' + rule.rule_type +
-        ' for interaction ' + interactionId);
-      return '';
-    }
-
-    var inputs = rule.inputs;
-    var finalDescription = description;
-
-    var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-    var iter = 0;
-    while (true) {
-      if (!description.match(PATTERN) || iter == 100) {
-        break;
-      }
-      iter++;
-
-      var varName = description.match(PATTERN)[1];
-      var varType = description.match(PATTERN)[2];
-      if (varType) {
-        varType = varType.substring(1);
+  '$filter', 'INTERACTION_SPECS', 'FractionObjectFactory',
+  function( $filter, INTERACTION_SPECS, FractionObjectFactory) {
+    return function(rule, interactionId, choices) {
+      if (!rule) {
+        return '';
       }
 
-      var replacementText = '[INVALID]';
-      // Special case for MultipleChoiceInput, ImageClickInput, and
-      // ItemSelectionInput.
-      if (choices) {
-        if (varType === 'SetOfHtmlString') {
-          replacementText = '[';
-          var key = inputs[varName];
-          for (var i = 0; i < key.length; i++) {
-            replacementText += key[i];
-            if (i < key.length - 1) {
-              replacementText += ',';
+      if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
+        console.error('Cannot find interaction with id ' + interactionId);
+        return '';
+      }
+      var description = INTERACTION_SPECS[interactionId].rule_descriptions[
+        rule.type];
+      if (!description) {
+        console.error(
+          'Cannot find description for rule ' + rule.type +
+          ' for interaction ' + interactionId);
+        return '';
+      }
+
+      var inputs = rule.inputs;
+      var finalDescription = description;
+
+      var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+      var iter = 0;
+      while (true) {
+        if (!description.match(PATTERN) || iter === 100) {
+          break;
+        }
+        iter++;
+
+        var varName = description.match(PATTERN)[1];
+        var varType = description.match(PATTERN)[2];
+        if (varType) {
+          varType = varType.substring(1);
+        }
+
+        var replacementText = '[INVALID]';
+        // Special case for MultipleChoiceInput, ImageClickInput, and
+        // ItemSelectionInput.
+        if (choices) {
+          if (varType === 'SetOfHtmlString') {
+            replacementText = '[';
+            var key = inputs[varName];
+            for (var i = 0; i < key.length; i++) {
+              replacementText += $filter('formatRtePreview')(key[i]);
+              if (i < key.length - 1) {
+                replacementText += ',';
+              }
             }
+            replacementText += ']';
+          } else {
+            // The following case is for MultipleChoiceInput
+            for (var i = 0; i < choices.length; i++) {
+              if (choices[i].val === inputs[varName]) {
+                var filteredLabelText =
+                  $filter('formatRtePreview')(choices[i].label);
+                replacementText = '\'' + filteredLabelText + '\'';
+              }
+            }
+          }
+          // TODO(sll): Generalize this to use the inline string representation
+          // of an object type.
+        } else if (varType === 'MusicPhrase') {
+          replacementText = '[';
+          for (var i = 0; i < inputs[varName].length; i++) {
+            if (i !== 0) {
+              replacementText += ', ';
+            }
+            replacementText += inputs[varName][i].readableNoteName;
+          }
+          replacementText += ']';
+        } else if (varType === 'CoordTwoDim') {
+          var latitude = inputs[varName][0] || 0.0;
+          var longitude = inputs[varName][1] || 0.0;
+          replacementText = '(';
+          replacementText += (
+            inputs[varName][0] >= 0.0 ?
+            latitude.toFixed(2) + '°N' :
+            -latitude.toFixed(2) + '°S');
+          replacementText += ', ';
+          replacementText += (
+            inputs[varName][1] >= 0.0 ?
+            longitude.toFixed(2) + '°E' :
+            -longitude.toFixed(2) + '°W');
+          replacementText += ')';
+        } else if (varType === 'NormalizedString') {
+          replacementText = '"' + inputs[varName] + '"';
+        } else if (varType === 'Graph') {
+          replacementText = '[reference graph]';
+        } else if (varType === 'Fraction') {
+          replacementText = FractionObjectFactory
+            .fromDict(inputs[varName]).toString();
+        } else if (
+          varType === 'SetOfUnicodeString' ||
+          varType === 'SetOfNormalizedString') {
+          replacementText = '[';
+          for (var i = 0; i < inputs[varName].length; i++) {
+            if (i !== 0) {
+              replacementText += ', ';
+            }
+            replacementText += inputs[varName][i];
+          }
+          replacementText += ']';
+        } else if (
+          varType === 'Real' || varType === 'NonnegativeInt' ||
+          varType === 'Int') {
+          replacementText = inputs[varName] + '';
+        } else if (
+          varType === 'CodeString' || varType === 'UnicodeString' ||
+          varType === 'LogicErrorCategory' || varType === 'NormalizedString') {
+          replacementText = inputs[varName];
+        } else if (varType === 'ListOfCodeEvaluation') {
+          replacementText = '[';
+          for (var i = 0; i < inputs[varName].length; i++) {
+            if (i !== 0) {
+              replacementText += ', ';
+            }
+            replacementText += inputs[varName][i].code;
           }
           replacementText += ']';
         } else {
-          // The following case is for MultipleChoiceInput
-          for (var i = 0; i < choices.length; i++) {
-            if (choices[i].val === inputs[varName]) {
-              replacementText = '\'' + choices[i].label + '\'';
-            }
-          }
+          throw Error('Unknown variable type in rule description');
         }
-      // TODO(sll): Generalize this to use the inline string representation of
-      // an object type.
-      } else if (varType === 'MusicPhrase') {
-        replacementText = '[';
-        for (var i = 0; i < inputs[varName].length; i++) {
-          if (i !== 0) {
-            replacementText += ', ';
-          }
-          replacementText += inputs[varName][i].readableNoteName;
-        }
-        replacementText += ']';
-      } else if (varType === 'CoordTwoDim') {
-        var latitude = inputs[varName][0] || 0.0;
-        var longitude = inputs[varName][1] || 0.0;
-        replacementText = '(';
-        replacementText += (
-          inputs[varName][0] >= 0.0 ?
-          latitude.toFixed(2) + '°N' :
-          -latitude.toFixed(2) + '°S');
-        replacementText += ', ';
-        replacementText += (
-          inputs[varName][1] >= 0.0 ?
-          longitude.toFixed(2) + '°E' :
-          -longitude.toFixed(2) + '°W');
-        replacementText += ')';
-      } else if (varType === 'NormalizedString') {
-        replacementText = '"' + inputs[varName] + '"';
-      } else if (varType === 'Graph') {
-        replacementText = '[reference graph]';
-      } else {
-        replacementText = inputs[varName];
-      }
 
-      description = description.replace(PATTERN, ' ');
-      finalDescription = finalDescription.replace(PATTERN, replacementText);
-    }
-    return finalDescription;
-  };
-}]);
+        // Replaces all occurances of $ with $$.
+        // This makes sure that the next regex matching will yield
+        // the same $ sign pattern as the input.
+        replacementText = replacementText.split('$').join('$$');
+
+        description = description.replace(PATTERN, ' ');
+        finalDescription = finalDescription.replace(PATTERN, replacementText);
+      }
+      return finalDescription;
+    };
+  }
+]);
 
 // Filter that removes whitespace from the beginning and end of a string, and
 // replaces interior whitespace with a single space character.
-oppia.filter('normalizeWhitespace', [function() {
+oppia.filter('normalizeWhitespace', ['UtilsService', function(UtilsService) {
   return function(input) {
-    if (typeof input == 'string' || input instanceof String) {
+    if (UtilsService.isString(input)) {
       // Remove whitespace from the beginning and end of the string, and
       // replace interior whitespace with a single space character.
       input = input.trim();
@@ -268,10 +297,55 @@ oppia.filter('normalizeWhitespace', [function() {
   };
 }]);
 
+// Filter that takes a string, trims and normalizes spaces within each
+// line, and removes blank lines. Note that any spaces whose removal does not
+// result in two alphanumeric "words" being joined together are also removed,
+// so "hello ? " becomes "hello?".
+oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
+  return function(input) {
+    if (typeof input === 'string' || input instanceof String) {
+      var isAlphanumeric = function(character) {
+        return 'qwertyuiopasdfghjklzxcvbnm0123456789'.indexOf(
+          character.toLowerCase()) !== -1;
+      };
+
+      input = input.trim();
+      var inputLines = input.split('\n');
+      var resultLines = [];
+      for (var i = 0; i < inputLines.length; i++) {
+        var result = '';
+
+        var inputLine = inputLines[i].trim().replace(/\s{2,}/g, ' ');
+        for (var j = 0; j < inputLine.length; j++) {
+          var currentChar = inputLine.charAt(j).toLowerCase();
+          if (currentChar === ' ') {
+            if (j > 0 && j < inputLine.length - 1 &&
+                isAlphanumeric(inputLine.charAt(j - 1)) &&
+                isAlphanumeric(inputLine.charAt(j + 1))) {
+              result += currentChar;
+            }
+          } else {
+            result += currentChar;
+          }
+        }
+
+        if (result) {
+          resultLines.push(result);
+        }
+      }
+
+      return resultLines.join('\n');
+    } else {
+      return input;
+    }
+  };
+}]);
+
 oppia.filter('convertToPlainText', [function() {
   return function(input) {
     var strippedText = input.replace(/(<([^>]+)>)/ig, '');
-    strippedText = strippedText.replace('&nbsp;', ' ');
+    strippedText = strippedText.replace(/&nbsp;/ig, ' ');
+    strippedText = strippedText.replace(/&quot;/ig, '');
 
     var trimmedText = strippedText.trim();
     if (trimmedText.length === 0) {
@@ -279,68 +353,6 @@ oppia.filter('convertToPlainText', [function() {
     } else {
       return trimmedText;
     }
-  };
-}]);
-
-oppia.filter('summarizeAnswerGroup', [
-    '$filter', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
-    function($filter, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
-  return function(answerGroup, interactionId, answerChoices, shortenRule) {
-    var summary = '';
-    var outcome = answerGroup.outcome;
-    var hasFeedback = outcome.feedback.length > 0 && outcome.feedback[0];
-
-    if (answerGroup.rule_specs) {
-      var firstRule = $filter('convertToPlainText')(
-        $filter('parameterizeRuleDescription')(
-          answerGroup.rule_specs[0], interactionId, answerChoices));
-      summary = 'Answer ' + firstRule;
-
-      if (hasFeedback && shortenRule) {
-        summary = $filter('wrapTextWithEllipsis')(
-          summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
-      }
-      summary = '[' + summary + '] ';
-    }
-
-    if (hasFeedback) {
-      summary += $filter('convertToPlainText')(outcome.feedback[0]);
-    }
-    return summary;
-  };
-}]);
-
-oppia.filter('summarizeDefaultOutcome', [
-    '$filter', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
-    function($filter, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
-  return function(
-      defaultOutcome, interactionId, answerGroupCount, shortenRule) {
-    if (!defaultOutcome) {
-      return '';
-    }
-
-    var summary = '';
-    var feedback = defaultOutcome.feedback;
-    var hasFeedback = feedback.length > 0 && feedback[0];
-
-    if (interactionId === 'Continue') {
-      summary = 'When the button is clicked';
-    } else if (answerGroupCount > 0) {
-      summary = 'All other answers';
-    } else {
-      summary = 'All answers';
-    }
-
-    if (hasFeedback && shortenRule) {
-      summary = $filter('wrapTextWithEllipsis')(
-        summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
-    }
-    summary = '[' + summary + '] ';
-
-    if (hasFeedback) {
-      summary += $filter('convertToPlainText')(defaultOutcome.feedback[0]);
-    }
-    return summary;
   };
 }]);
 
@@ -366,6 +378,9 @@ oppia.filter('summarizeNonnegativeNumber', [function() {
 // Note that this filter does not truncate at the middle of a word.
 oppia.filter('truncateAndCapitalize', [function() {
   return function(input, maxNumberOfCharacters) {
+    if (!input) {
+      return input;
+    }
     var words = input.trim().match(/\S+/g);
 
     // Capitalize the first word and add it to the result.
@@ -388,10 +403,63 @@ oppia.filter('truncateAndCapitalize', [function() {
   };
 }]);
 
+oppia.filter('capitalize', [function() {
+  return function(input) {
+    if (!input) {
+      return input;
+    }
+
+    var trimmedInput = input.trim();
+    return trimmedInput.charAt(0).toUpperCase() + trimmedInput.slice(1);
+  };
+}]);
+
 oppia.filter('removeDuplicatesInArray', [function() {
   return function(input) {
     return input.filter(function(val, pos) {
-      return input.indexOf(val) == pos;
+      return input.indexOf(val) === pos;
     });
+  };
+}]);
+
+oppia.filter('stripFormatting', [function() {
+  return function(html, whitelistedImgClasses) {
+    // Oppia RTE adds style attribute to bold and italics tags that
+    // must be removed.
+    var styleRegex = new RegExp(' style=\"[^\"]+\"', 'gm');
+    // Strip out anything between and including <>,
+    // unless it is an img whose class includes one of the whitelisted classes
+    // or is the bold or italics or paragraph or breakline tags.
+    var tagRegex = new RegExp(
+      '(?!<img.*class=".*(' + whitelistedImgClasses.join('|') +
+      ').*".*>)(?!<b>|<\/b>|<i>|<\/i>|<p>|<\/p>|<br>)<[^>]+>', 'gm');
+    var strippedText = html ? String(html).replace(styleRegex, '') : '';
+    strippedText = strippedText ? String(strippedText).replace(
+      tagRegex, '') : '';
+    return strippedText;
+  };
+}]);
+
+/* The following filter replaces each RTE element occurrence in the input html
+   by its corresponding name in square brackets and returns a string
+   which contains the name in the same location as in the input html.
+   eg: <p>Sample1 <oppia-noninteractive-math></oppia-noninteractive-math>
+        Sample2 </p>
+   will give as output: Sample1 [Math] Sample2 */
+oppia.filter('formatRtePreview', ['$filter', function($filter) {
+  return function(html) {
+    html = html.replace(/&nbsp;/ig, ' ');
+    html = html.replace(/&quot;/ig, '');
+    //Replace all html tags other than <oppia-noninteractive-**> ones to ''
+    html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
+    var formattedOutput = html.replace(/(<([^>]+)>)/g, function(rteTag) {
+      var replaceString = $filter(
+        'capitalize')(rteTag.split('-')[2].split(' ')[0]);
+      if (replaceString[replaceString.length - 1] === '>') {
+        replaceString = replaceString.slice(0, -1);
+      }
+      return ' [' + replaceString + '] ';
+    });
+    return formattedOutput.trim();
   };
 }]);

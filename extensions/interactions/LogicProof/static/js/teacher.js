@@ -196,7 +196,8 @@ var logicProofTeacher = (function() {
         content: ' has already been defined.'
       }]],
       parameters: {
-        function: {
+        // eslint-disable-next-line quote-props
+        'function': {
           format: 'string'
         }
       }

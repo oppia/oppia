@@ -20,15 +20,22 @@ var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
-var player = require('../protractor_utils/player.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var workflow = require('../protractor_utils/workflow.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 
 describe('Interactions', function() {
+  var explorationPlayerPage = null;
+
+  beforeEach(function() {
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
+
   it('should pass their own test suites', function() {
     users.createUser('user@interactions.com', 'userInteractions');
     users.login('user@interactions.com');
-    workflow.createExploration('interactions', 'userInteractions');
+    workflow.createExploration();
     editor.setStateName('first');
     editor.setContent(forms.toRichText('some content'));
 
@@ -53,15 +60,19 @@ describe('Interactions', function() {
         }
 
         editor.navigateToPreviewTab();
-        player.expectInteractionToMatch.apply(
+        explorationPlayerPage.expectInteractionToMatch.apply(
           null, [interactionId].concat(test.expectedInteractionDetails));
         for (var j = 0; j < test.wrongAnswers.length; j++) {
-          player.submitAnswer(interactionId, test.wrongAnswers[j]);
-          player.expectLatestFeedbackToMatch(forms.toRichText('no'));
+          explorationPlayerPage.submitAnswer(
+            interactionId, test.wrongAnswers[j]);
+          explorationPlayerPage.expectLatestFeedbackToMatch(
+            forms.toRichText('no'));
         }
         for (var j = 0; j < test.correctAnswers.length; j++) {
-          player.submitAnswer(interactionId, test.correctAnswers[j]);
-          player.expectLatestFeedbackToMatch(forms.toRichText('yes'));
+          explorationPlayerPage.submitAnswer(
+            interactionId, test.correctAnswers[j]);
+          explorationPlayerPage.expectLatestFeedbackToMatch(
+            forms.toRichText('yes'));
         }
         editor.navigateToMainTab();
       }
@@ -75,4 +86,3 @@ describe('Interactions', function() {
     general.checkForConsoleErrors([]);
   });
 });
-

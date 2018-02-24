@@ -37,10 +37,11 @@ var DictionaryEditor = function(elem) {
 var ListEditor = function(elem) {
   // NOTE: this returns a promise, not an integer.
   var _getLength = function() {
-    return elem.all(by.repeater('item in localValue track by $index')).
-        then(function(items) {
-      return items.length;
-    });
+    return elem.all(by.repeater('item in localValue track by $index'))
+      .then(function(items) {
+        return items.length;
+      }
+    );
   };
   // If objectType is specified this returns an editor for objects of that type
   // which can be used to make changes to the newly-added item (for example
@@ -133,11 +134,6 @@ var RichTextEditor = function(elem) {
       _appendContentText(text);
       _clickToolbarButton('italics');
     },
-    appendUnderlineText: function(text) {
-      _clickToolbarButton('underline');
-      _appendContentText(text);
-      _clickToolbarButton('underline');
-    },
     appendOrderedList: function(textArray) {
       _appendContentText('\n');
       _clickToolbarButton('ol');
@@ -196,14 +192,14 @@ var AutocompleteDropdownEditor = function(elem) {
     setValue: function(text) {
       elem.element(by.css('.select2-container')).click();
       // NOTE: the input field is top-level in the DOM, and is outside the
-      // context of 'elem'. The 'select2-drop' id is assigned to the input
+      // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
-      element(by.id('select2-drop')).element(by.css('.select2-input')).
-        sendKeys(text + '\n');
+      element(by.css('.select2-dropdown')).element(
+        by.css('.select2-search input')).sendKeys(text + '\n');
     },
     expectOptionsToBe: function(expectedOptions) {
       elem.element(by.css('.select2-container')).click();
-      element(by.id('select2-drop')).all(by.tagName('li')).map(
+      element(by.css('.select2-dropdown')).all(by.tagName('li')).map(
         function(optionElem) {
           return optionElem.getText();
         }
@@ -211,8 +207,8 @@ var AutocompleteDropdownEditor = function(elem) {
         expect(actualOptions).toEqual(expectedOptions);
       });
       // Re-close the dropdown.
-      element(by.id('select2-drop')).element(by.css('.select2-input')).
-        sendKeys('\n');
+      element(by.css('.select2-dropdown')).element(
+        by.css('.select2-search input')).sendKeys('\n');
     }
   };
 };
@@ -221,33 +217,37 @@ var AutocompleteMultiDropdownEditor = function(elem) {
   return {
     setValues: function(texts) {
       // Clear all existing choices.
-      elem.element(by.css('.select2-choices'))
-          .all(by.tagName('li')).map(function(choiceElem) {
-        return choiceElem.element(by.css('.select2-search-choice-close'));
-      }).then(function(deleteButtons) {
-        // We iterate in descending order, because clicking on a delete button
-        // removes the element from the DOM. We also omit the last element
-        // because it is the field for new input.
-        for (var i = deleteButtons.length - 2; i >= 0; i--) {
-          deleteButtons[i].click();
+      elem.element(by.css('.select2-selection__rendered'))
+        .all(by.tagName('li')).map(function(choiceElem) {
+          return choiceElem.element(
+            by.css('.select2-selection__choice__remove'));
+        }).then(function(deleteButtons) {
+          // We iterate in descending order, because clicking on a delete button
+          // removes the element from the DOM. We also omit the last element
+          // because it is the field for new input.
+          for (var i = deleteButtons.length - 2; i >= 0; i--) {
+            deleteButtons[i].click();
+          }
         }
-      });
+      );
 
       for (var i = 0; i < texts.length; i++) {
         elem.element(by.css('.select2-container')).click();
-        elem.element(by.css('.select2-input')).sendKeys(texts[i] + '\n');
+        elem.element(by.css('.select2-search__field')).sendKeys(
+          texts[i] + '\n');
       }
     },
     expectCurrentSelectionToBe: function(expectedCurrentSelection) {
-      elem.element(by.css('.select2-choices'))
-          .all(by.tagName('li')).map(function(choiceElem) {
-        return choiceElem.getText();
-      }).then(function(actualSelection) {
-        // Remove the element corresponding to the last <li>, which actually
-        // corresponds to the field for new input.
-        actualSelection.pop();
-        expect(actualSelection).toEqual(expectedCurrentSelection);
-      });
+      elem.element(by.css('.select2-selection__rendered'))
+        .all(by.tagName('li')).map(function(choiceElem) {
+          return choiceElem.getText();
+        }).then(function(actualSelection) {
+          // Remove the element corresponding to the last <li>, which actually
+          // corresponds to the field for new input.
+          actualSelection.pop();
+          expect(actualSelection).toEqual(expectedCurrentSelection);
+        }
+      );
     }
   };
 };
@@ -258,10 +258,10 @@ var MultiSelectEditor = function(elem) {
   var _toggleElementStatusesAndVerifyExpectedClass = function(
       texts, expectedClassBeforeToggle) {
     // Open the dropdown menu.
-    elem.element(by.css('.dropdown-toggle')).click();
+    elem.element(by.css('.protractor-test-search-bar-dropdown-toggle')).click();
 
-    elem.element(by.css('.dropdown-menu')).all(by.tagName('span')).filter(
-      function(choiceElem) {
+    elem.element(by.css('.protractor-test-search-bar-dropdown-menu'))
+      .all(by.tagName('span')).filter(function(choiceElem) {
         return choiceElem.getText().then(function(choiceText) {
           return texts.indexOf(choiceText) !== -1;
         });
@@ -278,13 +278,11 @@ var MultiSelectEditor = function(elem) {
         expect(filteredElements[i].getAttribute('class')).toMatch(
           expectedClassBeforeToggle);
         filteredElements[i].click();
-        // Reopen the dropdown menu, since it closes after an item is
-        // toggled.
-        elem.element(by.css('.dropdown-toggle')).click();
       }
 
       // Close the dropdown menu at the end.
-      elem.element(by.css('.dropdown-toggle')).click();
+      elem.element(by.css(
+        '.protractor-test-search-bar-dropdown-toggle')).click();
     });
   };
 
@@ -299,18 +297,21 @@ var MultiSelectEditor = function(elem) {
     },
     expectCurrentSelectionToBe: function(expectedCurrentSelection) {
       // Open the dropdown menu.
-      elem.element(by.css('.dropdown-toggle')).click();
+      elem.element(by.css(
+        '.protractor-test-search-bar-dropdown-toggle')).click();
 
       // Find the selected elements.
-      elem.element(by.css('.dropdown-menu'))
-          .all(by.css('.protractor-test-selected')).map(function(selectedElem) {
-        return selectedElem.getText();
-      }).then(function(actualSelection) {
-        expect(actualSelection).toEqual(expectedCurrentSelection);
+      elem.element(by.css('.protractor-test-search-bar-dropdown-menu'))
+        .all(by.css('.protractor-test-selected')).map(function(selectedElem) {
+          return selectedElem.getText();
+        }).then(function(actualSelection) {
+          expect(actualSelection).toEqual(expectedCurrentSelection);
 
-        // Close the dropdown menu at the end.
-        elem.element(by.css('.dropdown-toggle')).click();
-      });
+          // Close the dropdown menu at the end.
+          elem.element(by.css(
+            '.protractor-test-search-bar-dropdown-toggle')).click();
+        }
+      );
     }
   };
 };
@@ -390,7 +391,9 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
 
   var _readFormattedText = function(text, tagName) {
     expect(arrayOfElems[arrayPointer].getTagName()).toBe(tagName);
-    expect(arrayOfElems[arrayPointer].getInnerHtml()).toBe(text);
+    expect(
+      arrayOfElems[arrayPointer].getAttribute('innerHTML')
+      ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
     textPointer = textPointer + text.length;
@@ -411,9 +414,6 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     },
     readItalicText: function(text) {
       _readFormattedText(text, 'i');
-    },
-    readUnderlineText: function(text) {
-      _readFormattedText(text, 'u');
     },
     // TODO(Jacob): add functions for other rich text components.
     // Additional arguments may be sent to this function, and they will be
@@ -500,26 +500,28 @@ var CodeMirrorChecker = function(elem) {
     general.waitForSystem();
     elem.all(by.xpath('./div')).map(function(lineElement) {
       return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
-          .then(function(lineNumber) {
-        // Note: the last line in codemirror will have an empty string for line
-        // number and for text. This is to skip that line.
-        if (lineNumber == '') {
+        .then(function(lineNumber) {
+          // Note: the last line in codemirror will have an empty string for
+          // line number and for text. This is to skip that line.
+          if (lineNumber === '') {
+            return lineNumber;
+          }
+          if (!compareDict.hasOwnProperty(lineNumber)) {
+            throw Error('Line ' + lineNumber + ' not found in CodeMirror');
+          }
+          expect(lineElement.element(by.xpath('./pre')).getText())
+            .toEqual(compareDict[lineNumber].text);
+          expect(
+            lineElement.element(
+              by.css('.CodeMirror-linebackground')).isPresent())
+            .toEqual(compareDict[lineNumber].highlighted);
+          compareDict[lineNumber].checked = true;
           return lineNumber;
         }
-        if (!compareDict.hasOwnProperty(lineNumber)) {
-          throw Error('Line ' + lineNumber + ' not found in CodeMirror');
-        }
-        expect(lineElement.element(by.xpath('./pre')).getText())
-          .toEqual(compareDict[lineNumber].text);
-        expect(
-          lineElement.element(by.css('.CodeMirror-linebackground')).isPresent())
-          .toEqual(compareDict[lineNumber].highlighted);
-        compareDict[lineNumber].checked = true;
-        return lineNumber;
-      });
+      );
     }).then(function(lineNumbers) {
       var largestLineNumber = lineNumbers[lineNumbers.length - 1];
-      if (largestLineNumber != currentLineNumber) {
+      if (largestLineNumber !== currentLineNumber) {
         _compareTextAndHighlightingFromLine(
           largestLineNumber,
           scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,

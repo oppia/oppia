@@ -16,8 +16,11 @@
 
 import copy
 import inspect
+import json
 
 from extensions.objects.models import objects
+import feconf
+import utils
 
 
 class Registry(object):
@@ -61,13 +64,9 @@ class Registry(object):
         return cls.objects_dict[obj_type]
 
 
-def get_all_object_editor_js_templates():
-    """Returns a string containing the JS templates for all objects."""
-    object_editors_js = ''
+def get_default_object_values():
+    """Returns a dictionary containing the default object values."""
+    # TODO(wxy): Cache this as it is accessed many times.
 
-    all_object_classes = Registry.get_all_object_classes()
-    for obj_cls in all_object_classes.values():
-        if obj_cls.has_editor_js_template():
-            object_editors_js += obj_cls.get_editor_js_template()
-
-    return object_editors_js
+    return json.loads(
+        utils.get_file_contents(feconf.OBJECT_DEFAULT_VALUES_FILE_PATH))

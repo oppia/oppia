@@ -24,23 +24,24 @@ import os
 import re
 import unittest
 
-import webtest
-
+from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import rule_domain
 from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 import feconf
-import jinja_utils
 import main
+import main_mail
+import main_taskqueue
 import utils
 
 from google.appengine.api import apiproxy_stub
 from google.appengine.api import apiproxy_stub_map
+from google.appengine.api import mail
+import webtest
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
@@ -62,8 +63,9 @@ def empty_environ():
     os.environ['DEFAULT_VERSION_HOSTNAME'] = '%s:%s' % (
         os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
 
+
 class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
-    """Mock for google.appengine.api.urlfetch"""
+    """Mock for google.appengine.api.urlfetch."""
 
     def __init__(self, service_name='urlfetch'):
         super(URLFetchServiceMock, self).__init__(service_name)
@@ -72,11 +74,30 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
         self.request = None
 
     def set_return_values(self, content='', status_code=200, headers=None):
+        """Set the content, status_code and headers to return in subsequent
+        calls to the urlfetch mock.
+
+        Args:
+            content: str. The content to return in subsequent calls to the
+                urlfetch mock.
+            status_code: int. The status_code to return in subsequent calls to
+                the urlfetch mock.
+            headers: dict. The headers to return in subsequent calls to the
+                urlfetch mock. The keys of this dict are strings that represent
+                the header name and each value represents the corresponding
+                value of that header.
+        """
         self.return_values['content'] = content
         self.return_values['status_code'] = status_code
         self.return_values['headers'] = headers
 
     def _Dynamic_Fetch(self, request, response): # pylint: disable=invalid-name
+        """Simulates urlfetch mock by setting request & response object.
+
+        Args:
+            request: dict. Request object for the URLMock.
+            response: dict. Response object for the URLMock.
+        """
         return_values = self.return_values
         response.set_content(return_values.get('content', ''))
         response.set_statuscode(return_values.get('status_code', 200))
@@ -136,26 +157,158 @@ class TestBase(unittest.TestCase):
                         'definition': {'rule_type': 'default'}
                     }]
                 }]
-            }
+            },
         }
     }
 
+    # Dictionary-like data structures within sample YAML must be formatted
+    # alphabetically to match string equivalence with YAML generation tests.
+    #
+    # If evaluating differences in YAML, conversion to dict form via
+    # utils.dict_from_yaml can isolate differences quickly.
+
+    SAMPLE_YAML_CONTENT = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: %s
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: %d
+states:
+  %s:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: %s
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: New state
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    param_changes: []
+states_schema_version: %d
+tags: []
+title: Title
+""") % (
+    feconf.DEFAULT_INIT_STATE_NAME,
+    exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+
+    SAMPLE_UNTITLED_YAML_CONTENT = ("""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: %s
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: %d
+states:
+  %s:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: %s
+        feedback: []
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      fallbacks: []
+      id: null
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: New state
+        feedback: []
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      fallbacks: []
+      id: null
+    param_changes: []
+states_schema_version: %d
+tags: []
+""") % (
+    feconf.DEFAULT_INIT_STATE_NAME,
+    exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+
     def _get_unicode_test_string(self, suffix):
+        """Returns a string that contains unicode characters and ends with the
+        given suffix. This is used to test that functions behave correctly
+        when handling strings with unicode characters.
+
+        Args:
+            suffix: str. The suffix to append to the UNICODE_TEST_STRING.
+
+        Returns:
+            str. A string that contains unicode characters and ends with the
+                given suffix.
+        """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
     def setUp(self):
+        """Initializes the fixture for the test suite. Subclasses of TestBase
+        should override this method.
+        """
         raise NotImplementedError
 
     def tearDown(self):
+        """Cleans up the fixture after the test runs. Subclasses of
+        TestBase should override this method.
+        """
         raise NotImplementedError
-
-    def assertFuzzyTrue(self, value):  # pylint: disable=invalid-name
-        self.assertEqual(value, rule_domain.CERTAIN_TRUE_VALUE)
-        self.assertTrue(isinstance(value, float))
-
-    def assertFuzzyFalse(self, value):  # pylint: disable=invalid-name
-        self.assertEqual(value, rule_domain.CERTAIN_FALSE_VALUE)
-        self.assertTrue(isinstance(value, float))
 
     def _assert_validation_error(self, item, error_substring):
         """Checks that the given item passes default validation."""
@@ -174,6 +327,9 @@ class TestBase(unittest.TestCase):
         print '%s%s' % (LOG_LINE_PREFIX, line)
 
     def _delete_all_models(self):
+        """Deletes all keys from the NDB datastore. Subclasses of TestBase
+        should override this method.
+        """
         raise NotImplementedError
 
     def _stash_current_user_env(self):
@@ -203,11 +359,18 @@ class TestBase(unittest.TestCase):
         self.stashed_user_env = None  # pylint: disable=attribute-defined-outside-init
 
     def login(self, email, is_super_admin=False):
+        """Sets the environment variables to simulate a login.
+
+        Args:
+            email: str. The email of the user who is to be logged in.
+            is_super_admin: bool. Whether the user is a super admin.
+       """
         os.environ['USER_EMAIL'] = email
         os.environ['USER_ID'] = self.get_user_id_from_email(email)
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
 
     def logout(self):
+        """Simulates a logout by resetting the environment variables."""
         os.environ['USER_EMAIL'] = ''
         os.environ['USER_ID'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
@@ -231,18 +394,17 @@ class TestBase(unittest.TestCase):
             self.assertEqual(json_response.status_int, 200)
 
         self.assertEqual(
-            json_response.content_type, 'application/javascript')
+            json_response.content_type, 'application/json')
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
-    def get_json(self, url, params=None):
-        """Get a JSON response, transformed to a Python object. This method
-        does not support calling testapp.get() with errors expected in response
-        because testapp.get() in that case does not return a JSON object."""
-        json_response = self.testapp.get(url, params)
-        self.assertEqual(json_response.status_int, 200)
-        return self._parse_json_response(json_response, expect_errors=False)
+    def get_json(self, url, params=None, expect_errors=False):
+        """Get a JSON response, transformed to a Python object."""
+        json_response = self.testapp.get(
+            url, params, expect_errors=expect_errors)
+        return self._parse_json_response(
+            json_response, expect_errors=expect_errors)
 
     def post_json(self, url, payload, csrf_token=None, expect_errors=False,
                   expected_status_int=200, upload_files=None):
@@ -251,13 +413,41 @@ class TestBase(unittest.TestCase):
         if csrf_token:
             data['csrf_token'] = csrf_token
 
-        json_response = self.testapp.post(
-            str(url), data, expect_errors=expect_errors,
-            upload_files=upload_files)
+        json_response = self._send_post_request(
+            self.testapp, url, data, expect_errors, expected_status_int,
+            upload_files)
 
-        self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
+
+    def _send_post_request(
+            self, app, url, data, expect_errors=False, expected_status_int=200,
+            upload_files=None, headers=None):
+        json_response = app.post(
+            str(url), data, expect_errors=expect_errors,
+            upload_files=upload_files, headers=headers)
+        self.assertEqual(json_response.status_int, expected_status_int)
+        return json_response
+
+    def post_email(
+            self, recipient_email, sender_email, subject, body, html_body=None,
+            expect_errors=False, expected_status_int=200):
+        email = mail.EmailMessage(
+            sender=sender_email, to=recipient_email, subject=subject,
+            body=body)
+        if html_body is not None:
+            email.html = html_body
+
+        mime_email = email.to_mime_message()
+        headers = {'content-type': mime_email.get_content_type()}
+        data = mime_email.as_string()
+        app = webtest.TestApp(main_mail.app)
+        incoming_email_url = '/_ah/mail/%s' % recipient_email
+
+        return self._send_post_request(
+            app, incoming_email_url, data, headers=headers,
+            expect_errors=expect_errors,
+            expected_status_int=expected_status_int)
 
     def put_json(self, url, payload, csrf_token=None, expect_errors=False,
                  expected_status_int=200):
@@ -278,7 +468,12 @@ class TestBase(unittest.TestCase):
         return re.search(CSRF_REGEX, response.body).group(1)
 
     def signup(self, email, username):
-        """Complete the signup process for the user with the given username."""
+        """Complete the signup process for the user with the given username.
+
+        Args:
+            email: str. Email of the given user.
+            username: str. Username of the given user.
+        """
         self.login(email)
         # Signup uses a custom urlfetch mock (URLFetchServiceMock), instead
         # of the stub provided by testbed. This custom mock is disabled
@@ -318,46 +513,123 @@ class TestBase(unittest.TestCase):
 
         self._restore_stashed_user_env()
 
+    def set_user_role(self, username, user_role):
+        """Sets the given role for this user.
+
+        Args:
+            username: str. Username of the given user.
+            user_role: str. Role of the given user.
+        """
+        self._stash_current_user_env()
+
+        self.login('tmpsuperadmin@example.com', is_super_admin=True)
+        response = self.testapp.get('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json('/adminrolehandler', {
+            'username': username,
+            'role': user_role
+        }, csrf_token)
+        self.logout()
+
+        self._restore_stashed_user_env()
+
     def set_admins(self, admin_usernames):
-        """Set the ADMIN_USERNAMES property."""
-        self.set_config_property(
-            config_domain.ADMIN_USERNAMES, admin_usernames)
+        """Sets role of given users as ADMIN.
+
+        Args:
+            admin_usernames: list(str). List of usernames.
+        """
+        for name in admin_usernames:
+            self.set_user_role(name, feconf.ROLE_ID_ADMIN)
 
     def set_moderators(self, moderator_usernames):
-        """Set the MODERATOR_USERNAMES property."""
-        self.set_config_property(
-            config_domain.MODERATOR_USERNAMES, moderator_usernames)
+        """Sets role of given users as MODERATOR.
+
+        Args:
+            moderator_usernames: list(str). List of usernames.
+        """
+        for name in moderator_usernames:
+            self.set_user_role(name, feconf.ROLE_ID_MODERATOR)
+
+    def set_banned_users(self, banned_usernames):
+        """Sets role of given users as BANNED_USER.
+
+        Args:
+            banned_usernames: list(str). List of usernames.
+        """
+        for name in banned_usernames:
+            self.set_user_role(name, feconf.ROLE_ID_BANNED_USER)
+
+    def set_collection_editors(self, collection_editor_usernames):
+        """Sets role of given users as COLLECTION_EDITOR.
+
+        Args:
+            collection_editor_usernames: list(str). List of usernames.
+        """
+        for name in collection_editor_usernames:
+            self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def get_current_logged_in_user_id(self):
+        """Gets the user_id of the current logged-in user.
+
+        Returns:
+            str. The user_id of the currently logged-in user. In tests, we
+                simulate this using a USER_ID env variable.
+        """
         return os.environ['USER_ID']
 
     def get_user_id_from_email(self, email):
+        """Gets the user_id corresponding to the given email.
+
+        Args:
+            email: str. A valid email stored in the App Engine database.
+
+        Returns:
+            user_id: str. ID of the user possessing the given email.
+        """
         return current_user_services.get_user_id_from_email(email)
 
     def save_new_default_exploration(
             self, exploration_id, owner_id, title='A title'):
         """Saves a new default exploration written by owner_id.
 
-        Returns the exploration domain object.
+        Args:
+            exploration_id: str. The id of the new validated exploration.
+            owner_id: str. The user_id of the creator of the exploration.
+            title: str. The title of the exploration.
+
+        Returns:
+            Exploration. The exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title, 'A category')
+            exploration_id, title=title, category='A category')
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
     def save_new_valid_exploration(
             self, exploration_id, owner_id, title='A title',
             category='A category', objective='An objective',
-            language_code=feconf.DEFAULT_LANGUAGE_CODE,
-            end_state_name=None):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            end_state_name=None,
+            interaction_id='TextInput'):
         """Saves a new strictly-validated exploration.
 
-        Returns the exploration domain object.
+        Args:
+            exploration_id: str. The id of the new validated exploration.
+            owner_id: str. The user_id of the creator of the exploration.
+            title: str. The title of the exploration.
+            category: str. The category this exploration belongs to.
+            objective: str. The objective of this exploration.
+            language_code: str. The language_code of this exploration.
+
+        Returns:
+            Exploration. The exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title, category, language_code=language_code)
+            exploration_id, title=title, category=category,
+            language_code=language_code)
         exploration.states[exploration.init_state_name].update_interaction_id(
-            'TextInput')
+            interaction_id)
         exploration.objective = objective
 
         # If an end state name is provided, add terminal node with that name
@@ -387,6 +659,11 @@ class TestBase(unittest.TestCase):
         the usual functions for updating and creating explorations. This is
         because the latter approach would result in an exploration with the
         *current* states schema version.
+
+        Args:
+            exp_id: str. The exploration ID.
+            user_id: str. The user_id of the creator.
+            title: str. The title of the exploration.
         """
         exp_model = exp_models.ExplorationModel(
             id=exp_id,
@@ -397,7 +674,6 @@ class TestBase(unittest.TestCase):
             tags=[],
             blurb='',
             author_notes='',
-            skin_customizations={'panels_contents': {}},
             states_schema_version=0,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             states=self.VERSION_0_STATES_DICT,
@@ -412,33 +688,110 @@ class TestBase(unittest.TestCase):
             'title': 'title',
             'category': 'category',
         }])
+        exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exp_id,
+            title=title,
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            tags=[],
+            ratings=feconf.get_empty_ratings(),
+            scaled_average_rating=feconf.EMPTY_SCALED_AVERAGE_RATING,
+            status=exp_rights.status,
+            community_owned=exp_rights.community_owned,
+            owner_ids=exp_rights.owner_ids,
+            contributor_ids=[],
+            contributors_summary={},
+        )
+        exp_summary_model.put()
+
+        # Note: Also save state id mappping model for new exploration. If not
+        # saved, it may cause errors in test cases.
+        exploration = exp_services.get_exploration_from_model(exp_model)
+        exp_services.create_and_save_state_id_mapping_model(exploration, [])
+
+    def publish_exploration(self, owner_id, exploration_id):
+        """Publish the exploration with the given exploration_id.
+
+        Args:
+            exploration_id: str. The ID of the new exploration.
+            owner_id: str. The user_id of the owner of the exploration.
+        """
+        committer = user_services.UserActionsInfo(owner_id)
+        rights_manager.publish_exploration(committer, exploration_id)
 
     def save_new_default_collection(
             self, collection_id, owner_id, title='A title',
-            category='A category', objective='An objective'):
+            category='A category', objective='An objective',
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default collection written by owner_id.
 
-        Returns the collection domain object.
+        Args:
+            collection_id: str. The id of the new default collection.
+            owner_id: str. The user_id of the creator of the collection.
+            title: str. The title of the collection.
+            category: str. The category this collection belongs to.
+            objective: str. The objective of this collection.
+            language_code: str. The language_code of this collection.
+
+        Returns:
+            Collection. The collection domain object.
         """
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, title, category, objective)
+            collection_id, title=title, category=category, objective=objective,
+            language_code=language_code)
         collection_services.save_new_collection(owner_id, collection)
         return collection
 
     def save_new_valid_collection(
             self, collection_id, owner_id, title='A title',
             category='A category', objective='An objective',
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
             exploration_id='an_exploration_id',
             end_state_name=DEFAULT_END_STATE_NAME):
+        """Creates an Oppia collection and adds a node saving the
+        exploration details.
+
+        Args:
+            collection_id: str. ID for the collection to be created.
+            owner_id: str. The user_id of the creator of the collection.
+            title: str. Title for the collection.
+            category: str. The category of the exploration.
+            objective: str. Objective for the exploration.
+            language_code: str. The language code for the exploration.
+            exploration_id: str. The exploration_id for the Oppia exploration.
+            end_state_name: str. The name of the end state for the exploration.
+
+        Returns:
+            Collection. A newly-created collection containing the corresponding
+                exploration details.
+        """
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, title, category, objective=objective)
-        collection.add_node(
-            self.save_new_valid_exploration(
+            collection_id, title, category, objective,
+            language_code=language_code)
+
+        # Check whether exploration with given exploration_id exists or not.
+        exploration = exp_services.get_exploration_by_id(
+            exploration_id, strict=False)
+        if exploration is None:
+            exploration = self.save_new_valid_exploration(
                 exploration_id, owner_id, title, category, objective,
-                end_state_name=end_state_name).id)
+                end_state_name=end_state_name)
+        collection.add_node(exploration.id)
 
         collection_services.save_new_collection(owner_id, collection)
         return collection
+
+    def publish_collection(self, owner_id, collection_id):
+        """Publish the collection with the given collection_id.
+
+        Args:
+            owner_id: str. The user_id of the owner of the collection.
+            collection_id: str. ID of the collection to be published.
+        """
+        committer = user_services.UserActionsInfo(owner_id)
+        rights_manager.publish_collection(committer, collection_id)
 
     def get_updated_param_dict(
             self, param_dict, param_changes, exp_param_specs):
@@ -458,58 +811,22 @@ class TestBase(unittest.TestCase):
                 obj_type, new_param_dict)
         return new_param_dict
 
-    def submit_answer(
-            self, exploration_id, state_name, answer,
-            params=None, unused_exploration_version=None):
-        """Submits an answer as an exploration player and returns the
-        corresponding dict. This function has strong parallels to code in
-        PlayerServices.js which has the non-test code to perform the same
-        functionality. This is replicated here so backend tests may utilize the
-        functionality of PlayerServices.js without being able to access it.
-
-        TODO(bhenning): Replicate this in an end-to-end Protractor test to
-        protect against code skew here.
+    def get_static_asset_filepath(self):
+        """Returns filepath for referencing static files on disk.
+        examples: '' or 'build/'
         """
-        if params is None:
-            params = {}
+        filepath = ''
+        if not feconf.DEV_MODE:
+            filepath = os.path.join('build')
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        return filepath
 
-        # First, the answer must be classified.
-        classify_result = self.post_json(
-            '/explorehandler/classify/%s' % exploration_id, {
-                'old_state': exploration.states[state_name].to_dict(),
-                'params': params,
-                'answer': answer
-            }
-        )
-
-        # Next, ensure the submission is recorded.
-        self.post_json(
-            '/explorehandler/answer_submitted_event/%s' % exploration_id, {
-                'answer': answer,
-                'params': params,
-                'version': exploration.version,
-                'old_state_name': state_name,
-                'answer_group_index': classify_result['answer_group_index'],
-                'rule_spec_index': classify_result['rule_spec_index']
-            }
-        )
-
-        # Now the next state's data must be calculated.
-        outcome = classify_result['outcome']
-        new_state = exploration.states[outcome['dest']]
-        params['answer'] = answer
-        new_params = self.get_updated_param_dict(
-            params, new_state.param_changes, exploration.param_specs)
-
-        return {
-            'feedback_html': jinja_utils.parse_string(
-                utils.get_random_choice(outcome['feedback'])
-                if outcome['feedback'] else '', params),
-            'question_html': new_state.content[0].to_html(new_params),
-            'state_name': outcome['dest']
-        }
+    def get_static_asset_url(self, asset_suffix):
+        """Returns the relative path for the asset, appending it to the
+        corresponding cache slug. asset_suffix should have a leading
+        slash.
+        """
+        return '/assets%s%s' % (utils.get_asset_dir_prefix(), asset_suffix)
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
@@ -550,6 +867,7 @@ class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
     def _delete_all_models(self):
+        """Deletes all models from the NDB datastore."""
         from google.appengine.ext import ndb
         ndb.delete_multi(ndb.Query().iter(keys_only=True))
 
@@ -596,6 +914,11 @@ class AppEngineTestBase(TestBase):
         self.testbed.deactivate()
 
     def _get_all_queue_names(self):
+        """Returns all the queue names.
+
+        Returns:
+            list(str). All the queue names.
+        """
         return [q['name'] for q in self.taskqueue_stub.GetQueues()]
 
     @contextlib.contextmanager
@@ -608,10 +931,13 @@ class AppEngineTestBase(TestBase):
         requests to fetch the Gravatar profile picture for new users while the
         backend tests are being run.
 
-        args:
-          - content: Response content or body.
-          - status_code: Response status code.
-          - headers: Response headers.
+        Args:
+            content: str. Response content or body.
+            status_code: int. Response status code.
+            headers: dict. The headers in subsequent calls to the
+                urlfetch mock. The keys of this dict are strings that represent
+                the header name and the value represents corresponding value of
+                that header.
         """
         if headers is None:
             response_headers = {}
@@ -630,15 +956,19 @@ class AppEngineTestBase(TestBase):
             # Enables the testbed urlfetch mock
             self.testbed.init_urlfetch_stub()
 
-    def count_jobs_in_taskqueue(self, queue_name=None):
-        """Counts the jobs in the given queue. If queue_name is None,
-        defaults to counting the jobs in all queues available.
+    def count_jobs_in_taskqueue(self, queue_name):
+        """Counts the jobs in the given queue."""
+        return len(self.get_pending_tasks(queue_name))
+
+    def get_pending_tasks(self, queue_name=None):
+        """Returns the jobs in the given queue. If queue_name is None, defaults
+        to returning the jobs in all available queues.
         """
-        if queue_name:
-            return len(self.taskqueue_stub.get_filtered_tasks(
-                queue_names=[queue_name]))
+        if queue_name is not None:
+            return self.taskqueue_stub.get_filtered_tasks(
+                queue_names=[queue_name])
         else:
-            return len(self.taskqueue_stub.get_filtered_tasks())
+            return self.taskqueue_stub.get_filtered_tasks()
 
     def process_and_flush_pending_tasks(self, queue_name=None):
         """Runs and flushes pending tasks. If queue_name is None, does so for
@@ -662,12 +992,18 @@ class AppEngineTestBase(TestBase):
                     from google.appengine.ext import deferred
                     deferred.run(task.payload)
                 else:
-                    # All other tasks are expected to be mapreduce ones.
+                    # All other tasks are expected to be mapreduce ones, or
+                    # Oppia-taskqueue-related ones.
                     headers = {
                         key: str(val) for key, val in task.headers.iteritems()
                     }
                     headers['Content-Length'] = str(len(task.payload or ''))
-                    response = self.testapp.post(
+
+                    app = (
+                        webtest.TestApp(main_taskqueue.app)
+                        if task.url.startswith('/task')
+                        else self.testapp)
+                    response = app.post(
                         url=str(task.url), params=(task.payload or ''),
                         headers=headers)
                     if response.status_code != 200:
@@ -695,15 +1031,20 @@ class FunctionWrapper(object):
     def __init__(self, func):
         """Creates a new FunctionWrapper instance.
 
-        args:
-          - func: a callable, or data descriptor. If it's a descriptor, its
-            __get__ should return a bound method. For example, func can be a
-            function, a method, a static or class method, but not a @property.
+        Args:
+            func: a callable, or data descriptor. If it's a descriptor, its
+                __get__ should return a bound method. For example, func can be
+                a function, a method, a static or class method, but not a
+                @property.
         """
         self._func = func
         self._instance = None
 
     def __call__(self, *args, **kwargs):
+        """Overrides the call method for the function to call pre_call_hook
+        method which would be called before the function is executed and
+        post_call_hook which would be called after the function is executed.
+        """
         if self._instance is not None:
             args = [self._instance] + list(args)
 
@@ -725,9 +1066,22 @@ class FunctionWrapper(object):
         return self
 
     def pre_call_hook(self, args):
+        """Override this to do tasks that should be executed before the
+        actual function call.
+
+        Args:
+            args: list(*). Set of arguments that the function accepts.
+        """
         pass
 
     def post_call_hook(self, args, result):
+        """Override this to do tasks that should be executed after the
+        actual function call.
+
+        Args:
+            args: list(*). Set of arguments that the function accepts.
+            result: *. Result returned from the function.
+        """
         pass
 
 
@@ -746,9 +1100,22 @@ class CallCounter(FunctionWrapper):
 
     @property
     def times_called(self):
+        """Property that returns the number of times the wrapped function has
+        been called.
+
+        Returns:
+            int. The number of times the wrapped function has been called.
+        """
         return self._times_called
 
     def pre_call_hook(self, args):
+        """Method that is called before each function call to increment the
+        counter tracking the number of times a function is called. This
+        will also be called even when the function raises an exception.
+
+        Args:
+            args: list(*). Set of arguments that the function accepts.
+        """
         self._times_called += 1
 
 
@@ -762,12 +1129,13 @@ class FailingFunction(FunctionWrapper):
     def __init__(self, f, exception, num_tries_before_success):
         """Create a new Failing function.
 
-        args:
-          - f: see FunctionWrapper.
-          - exception: the exception to be raised.
-          - num_tries_before_success: the number of times to raise an
-            exception, before a call succeeds. If this is 0, all calls will
-            succeed, if it is FailingFunction.INFINITY, all calls will fail.
+        Args:
+            f: func. See FunctionWrapper.
+            exception: Exception. The exception to be raised.
+            num_tries_before_success: int. The number of times to raise an
+                exception, before a call succeeds. If this is 0, all calls will
+                succeed, if it is FailingFunction. INFINITY, all calls will
+                fail.
         """
         super(FailingFunction, self).__init__(f)
         self._exception = exception
@@ -783,6 +1151,13 @@ class FailingFunction(FunctionWrapper):
                 'or FailingFunction.INFINITY')
 
     def pre_call_hook(self, args):
+        """Method that is called each time before the actual function call
+        to check if the exception is to be raised based on the number of
+        tries before success.
+
+        Args:
+            args: list(*). Set of arguments this function accepts.
+        """
         self._times_called += 1
         call_should_fail = (
             self._num_tries_before_success >= self._times_called)

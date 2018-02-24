@@ -1,0 +1,14 @@
+<script src="{{ASSET_DIR_PREFIX}}/assets/rich_text_components_definitions.js"></script>
+<script src="{{ASSET_DIR_PREFIX}}/assets/constants.js"></script>
+{% if not DEV_MODE %}
+  <script src="{{ASSET_DIR_PREFIX}}/assets/hashes.js"></script>
+{% endif %}
+<!-- jquery.js, angular.js and jquery-ui.js are removed from bundled js because
+they need to be at the header. Including bundled js at the header will block
+rendering.-->
+<script src="/third_party/static/jquery-3.2.1/jquery.min.js"></script>
+<script src="/third_party/static/jqueryui-1.12.1/jquery-ui.min.js"></script>
+<script src="/third_party/static/angularjs-1.5.8/angular.min.js"></script>
+<script src="/third_party/static/jquery-ui-touch-punch-0.3.1/jquery.ui.touch-punch-improved.js"></script>
+<script src="/third_party/static/headroom-js-0.9.4/headroom.min.js"></script>
+<script src="/third_party/static/headroom-js-0.9.4/angular.headroom.min.js"></script>

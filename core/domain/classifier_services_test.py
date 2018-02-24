@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2015 The Oppia Authors. All Rights Reserved.
+# Copyright 2017 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,223 +14,412 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for classifier services"""
+
+import datetime
+import os
+
 from core.domain import classifier_services
+from core.domain import exp_services
+from core.platform import models
 from core.tests import test_utils
+import feconf
+import utils
 
-# pylint: disable=protected-access
+(classifier_models,) = models.Registry.import_models(
+    [models.NAMES.classifier])
 
 
-class StringClassifierUnitTests(test_utils.GenericTestBase):
+class ClassifierServicesTests(test_utils.GenericTestBase):
+    """Test "classify" using the sample explorations.
 
-    _EXAMPLES_TRAIN = [
-        ['i eat fish and vegetables', ['food']],
-        ['fish are pets', ['pets']]
-    ]
-
-    _NEW_EXAMPLES_TRAIN = [
-        ['my kitten eats fish', ['food', 'pets']]
-    ]
-
-    _EXAMPLES_TEST = [
-        'i only eat fish and vegetables',
-        'pets are friends',
-        'a b c d e f g h i j k l m n o p q r s t u v w x y z'
-    ]
-
+    Since the end to end tests cover correct classification, and frontend tests
+    test hard rules, ReaderClassifyTests is only checking that the string
+    classifier is actually called.
+    """
     def setUp(self):
-        super(StringClassifierUnitTests, self).setUp()
-        self.string_classifier = classifier_services.StringClassifier()
-        self.string_classifier.load_examples(self._EXAMPLES_TRAIN)
+        super(ClassifierServicesTests, self).setUp()
+        self._init_classify_inputs('16')
 
-    def _validate_instance(self):
-        self.assertIn('_alpha', dir(self.string_classifier))
-        self.assertIn('_beta', dir(self.string_classifier))
-        self.assertIn('_prediction_threshold', dir(self.string_classifier))
-        self.assertIn('_training_iterations', dir(self.string_classifier))
-        self.assertIn('_prediction_iterations', dir(self.string_classifier))
+    def _init_classify_inputs(self, exploration_id):
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.save_new_exploration_from_yaml_and_assets(
+                feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+                assets_list)
 
-        for d in xrange(self.string_classifier._num_docs):
-            self.assertEquals(
-                len(self.string_classifier._l_dp[d]),
-                len(self.string_classifier._w_dp[d]))
+        self.exp_id = exploration_id
+        self.exp_state = (
+            exp_services.get_exploration_by_id(exploration_id).states['Home'])
 
-        self.assertEquals(
-            len(self.string_classifier._label_to_id),
-            self.string_classifier._num_labels)
-        self.assertEquals(
-            len(self.string_classifier._word_to_id),
-            self.string_classifier._num_words)
-        self.assertEquals(
-            len(self.string_classifier._w_dp),
-            self.string_classifier._num_docs)
-        self.assertEquals(
-            len(self.string_classifier._b_dl),
-            self.string_classifier._num_docs)
-        if self.string_classifier._num_docs > 0:
-            self.assertEquals(
-                len(self.string_classifier._b_dl[0]),
-                self.string_classifier._num_labels)
-        self.assertEquals(
-            len(self.string_classifier._l_dp),
-            self.string_classifier._num_docs)
-        self.assertEquals(
-            len(self.string_classifier._c_dl),
-            self.string_classifier._num_docs)
-        if self.string_classifier._num_docs > 0:
-            self.assertEquals(
-                len(self.string_classifier._c_dl[0]),
-                self.string_classifier._num_labels)
-        self.assertEquals(
-            len(self.string_classifier._c_lw),
-            self.string_classifier._num_labels)
-        if self.string_classifier._num_labels > 0:
-            self.assertEquals(
-                len(self.string_classifier._c_lw[0]),
-                self.string_classifier._num_words)
-        self.assertEquals(
-            len(self.string_classifier._c_l),
-            self.string_classifier._num_labels)
-
-    def test_valid_state(self):
-        self.assertEquals(self.string_classifier._num_labels, 3)
-        self.assertEquals(self.string_classifier._num_docs, 2)
-        self.assertEquals(self.string_classifier._num_words, 7)
-        self._validate_instance()
-
-    def test_add_train_examples(self):
-        self.string_classifier.add_examples_for_training(
-            self._NEW_EXAMPLES_TRAIN)
-        self.assertEquals(self.string_classifier._num_labels, 3)
-        self.assertEquals(self.string_classifier._num_docs, 3)
-        self.assertEquals(self.string_classifier._num_words, 10)
-        self._validate_instance()
-
-    def test_add_test_examples(self):
-        self.string_classifier.add_examples_for_predicting(self._EXAMPLES_TEST)
-        self.assertEquals(self.string_classifier._num_labels, 3)
-        self.assertEquals(self.string_classifier._num_docs, 5)
-        self.assertEquals(self.string_classifier._num_words, 34)
-        self._validate_instance()
-
-    def test_empty_load(self):
-        self.string_classifier.load_examples([])
-        # Still got the default label
-        self.assertEquals(self.string_classifier._num_labels, 1)
-        self.assertEquals(self.string_classifier._num_docs, 0)
-        self.assertEquals(self.string_classifier._num_words, 0)
-        self._validate_instance()
-
-    def test_empty_add(self):
-        self.string_classifier.add_examples_for_training([])
-        self.assertEquals(self.string_classifier._num_labels, 3)
-        self.assertEquals(self.string_classifier._num_docs, 2)
-        self.assertEquals(self.string_classifier._num_words, 7)
-        self._validate_instance()
-
-    def test_model_to_and_from_dict(self):
-        self.assertEquals(
-            self.string_classifier._num_docs,
-            len(self._EXAMPLES_TRAIN))
-
-        # When the model is converted into a dictionary, check that updating
-        # the dictionary does not alter the model.
-        model = self.string_classifier.to_dict()
-        model['_num_docs'] = 9
-        self.assertEquals(model['_num_docs'], 9)
-        self.assertEquals(
-            self.string_classifier._num_docs,
-            len(self._EXAMPLES_TRAIN))
-
-        # When the model is updated, check that the dictionary remains
-        # unchanged.
-        self.string_classifier.add_examples_for_predicting(self._EXAMPLES_TEST)
-        self.assertEquals(
-            self.string_classifier._num_docs,
-            len(self._EXAMPLES_TRAIN) + len(self._EXAMPLES_TEST))
-        self.assertEquals(model['_num_docs'], 9)
-
-        # When a dictionary is loaded into a model, check that the altered
-        # values are now consistent.
-        self.string_classifier.from_dict(model)
-        self.assertEquals(self.string_classifier._num_docs, 9)
-        self.assertEquals(model['_num_docs'], 9)
-
-    def test_get_word_id(self):
-        word_count = self.string_classifier._num_words
-        self.string_classifier._get_word_id('_non_existent_word_1')
-        self.assertEquals(self.string_classifier._num_words, word_count + 1)
-        self.string_classifier._get_word_id('i')
-        self.assertEquals(self.string_classifier._num_words, word_count + 1)
-        self.string_classifier._get_word_id('_non_existent_word_2')
-        self.assertEquals(self.string_classifier._num_words, word_count + 2)
-
-    def test_get_label_id(self):
-        label_count = self.string_classifier._num_labels
-        self.string_classifier._get_label_id('_non_existent_label_1')
-        self.assertEquals(self.string_classifier._num_labels, label_count + 1)
-        self.string_classifier._get_label_id('food')
-        self.assertEquals(self.string_classifier._num_labels, label_count + 1)
-        self.string_classifier._get_label_id('_non_existent_label_2')
-        self.assertEquals(self.string_classifier._num_labels, label_count + 2)
-
-    def test_get_label_name(self):
-        label_id = self.string_classifier._get_label_id('food')
-        label_name = self.string_classifier._get_label_name(label_id)
-        self.assertEquals(label_name, 'food')
-        with self.assertRaises(Exception):
-            label_id = self.string_classifier._get_label_name(-1)
-
-    def test_reload_valid_state(self):
-        self.string_classifier.load_examples(self._NEW_EXAMPLES_TRAIN)
-        self.assertEquals(self.string_classifier._num_labels, 3)
-        self.assertEquals(
-            self.string_classifier._num_docs,
-            len(self._NEW_EXAMPLES_TRAIN))
-        self.assertEquals(self.string_classifier._num_words, 4)
-        self._validate_instance()
-
-    def test_prediction_report(self):
-        def _mock_get_label_probabilities(d):
-            self.assertEquals(d, -1)
-            return [0.5, 0.3, 0.2]
-
-        def _mock_get_label_id(unused_label):
-            return 0
-
-        def _mock_get_label_name(unused_label):
-            return 'fake_label'
-
-        self.string_classifier._prediction_threshold = 0
-        self.string_classifier._get_label_probabilities = (
-            _mock_get_label_probabilities)
-        self.string_classifier._get_label_id = _mock_get_label_id
-        prediction_report = (
-            self.string_classifier._get_prediction_report_for_doc(-1))
-        self.assertEquals(prediction_report['prediction_label_id'], 1)
-
-    def test_predict_label_for_doc(self):
-        """This test ensures that the predictor is predicting the labels that
-        are provided (in this case, 'food', 'pets', and the generic label
-        '_default'). This test does not cover prediction accuracy, so
-        _DEFAULT_MIN_DOCS_TO_PREDICT and _DEFAULT_MIN_LABELS_TO_PREDICT have
-        been set to zero. This allows the predictor to predict on smaller data
-        sets, which is useful for testing purposes. Setting the above constants
-        to zero is not recommended in a serving system.
+    def test_creation_of_jobs_and_mappings(self):
+        """Test the handle_trainable_states method and
+        handle_non_retrainable_states method by triggering
+        update_exploration() method.
         """
-        self.string_classifier._DEFAULT_MIN_DOCS_TO_PREDICT = 0
-        self.string_classifier._DEFAULT_MIN_LABELS_TO_PREDICT = 0
+        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        state = exploration.states['Home']
 
-        doc_ids = self.string_classifier.add_examples_for_predicting(
-            self._EXAMPLES_TEST)
-        predicted_label = self.string_classifier.predict_label_for_doc(
-            doc_ids[0])
-        self.assertEquals(predicted_label, 'food')
-        predicted_label = self.string_classifier.predict_label_for_doc(
-            doc_ids[1])
-        self.assertEquals(predicted_label, 'pets')
-        # Testing a doc predicted with the default label
-        self.string_classifier._prediction_threshold = 0.7
-        predicted_label = self.string_classifier.predict_label_for_doc(
-            doc_ids[2])
-        self.assertEquals(predicted_label, '_default')
-        self._validate_instance()
+        # There is one job and one mapping in the data store now as a result of
+        # creating the exploration.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        self.assertEqual(all_jobs.count(), 1)
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 1)
+
+        # Modify such that job creation is triggered.
+        state.interaction.answer_groups.insert(
+            3, state.interaction.answer_groups[1])
+        answer_groups = []
+        for answer_group in state.interaction.answer_groups:
+            answer_groups.append(answer_group.to_dict())
+        change_list = [{
+            'cmd': 'edit_state_property',
+            'state_name': 'Home',
+            'property_name': 'answer_groups',
+            'new_value': answer_groups
+        }]
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        # There should be two jobs and two mappings in the data store now.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        self.assertEqual(all_jobs.count(), 2)
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 2)
+
+        # Make a change to the exploration without changing the answer groups
+        # to trigger mapping update.
+        change_list = [{
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'new_value': 'New title'
+        }]
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        # There should be two jobs and three mappings in the data store now.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        self.assertEqual(all_jobs.count(), 2)
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 3)
+
+        # Check that renaming a state does not create an extra job.
+        change_list = [{
+            'cmd': 'rename_state',
+            'old_state_name': 'Home',
+            'new_state_name': 'Home2'
+        }, {
+            'cmd': 'rename_state',
+            'old_state_name': 'Home2',
+            'new_state_name': 'Home3'
+        }]
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+
+        # There should still be only two jobs and four mappings in the data
+        # store now.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        self.assertEqual(all_jobs.count(), 2)
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 4)
+
+    def test_handle_trainable_states(self):
+        """Test the handle_trainable_states method."""
+        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        state_names = ['Home']
+        classifier_services.handle_trainable_states(
+            exploration, state_names)
+
+        # There should be two jobs (the first job because of the creation of the
+        # exploration) in the data store now.
+        all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
+        self.assertEqual(all_jobs.count(), 2)
+        for index, job in enumerate(all_jobs):
+            if index == 1:
+                job_id = job.id
+
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.exp_id, self.exp_id)
+        self.assertEqual(classifier_training_job.state_name, 'Home')
+
+    def test_handle_non_retrainable_states(self):
+        """Test the handle_non_retrainable_states method."""
+        exploration = exp_services.get_exploration_by_id(self.exp_id)
+        next_scheduled_check_time = datetime.datetime.utcnow()
+        state_names = ['Home']
+        new_to_old_state_names = {
+            'Home': 'Old home'
+        }
+
+        # Test that Exception is raised if this method is called with version
+        # number 1.
+        exploration.version = 1
+        with self.assertRaisesRegexp(
+            Exception, 'This method should not be called by exploration with '
+                       'version number 1'):
+            classifier_services.handle_non_retrainable_states(
+                exploration, state_names, new_to_old_state_names)
+
+        exploration.version += 1
+        # Test that mapping cant be created if job doesn't exist.
+        classifier_services.handle_non_retrainable_states(
+            exploration, state_names, new_to_old_state_names)
+        # There will be only one mapping (because of the creation of the
+        # exploration).
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 1)
+
+        # Create job and mapping for previous version.
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
+            'TextInput', self.exp_id, exploration.version-1,
+            next_scheduled_check_time, [], 'Old home',
+            feconf.TRAINING_JOB_STATUS_COMPLETE, None, 1)
+        classifier_models.TrainingJobExplorationMappingModel.create(
+            self.exp_id, exploration.version-1, 'Old home', job_id)
+        classifier_services.handle_non_retrainable_states(
+            exploration, state_names, new_to_old_state_names)
+
+        # There should be three mappings (the first mapping because of the
+        # creation of the exploration) in the data store now.
+        all_mappings = (
+            classifier_models.TrainingJobExplorationMappingModel.get_all())
+        self.assertEqual(all_mappings.count(), 3)
+        for index, mapping in enumerate(all_mappings):
+            if index == 2:
+                mapping_id = mapping.id
+
+        job_exploration_mapping = (
+            classifier_models.TrainingJobExplorationMappingModel.get(
+                mapping_id))
+        self.assertEqual(job_exploration_mapping.exp_id, self.exp_id)
+        self.assertEqual(job_exploration_mapping.state_name, 'Home')
+
+    def test_retrieval_of_classifier_training_jobs(self):
+        """Test the get_classifier_training_job_by_id method."""
+
+        with self.assertRaisesRegexp(Exception, (
+            'Entity for class ClassifierTrainingJobModel with id fake_id '
+            'not found')):
+            classifier_services.get_classifier_training_job_by_id('fake_id')
+
+        exp_id = u'1'
+        state_name = 'Home'
+        interaction_id = 'TextInput'
+        next_scheduled_check_time = datetime.datetime.utcnow()
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
+            interaction_id, exp_id, 1, next_scheduled_check_time, [],
+            state_name, feconf.TRAINING_JOB_STATUS_NEW, {}, 1)
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.algorithm_id,
+                         feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                             'algorithm_id'])
+        self.assertEqual(classifier_training_job.interaction_id, interaction_id)
+        self.assertEqual(classifier_training_job.exp_id, exp_id)
+        self.assertEqual(classifier_training_job.exp_version, 1)
+        self.assertEqual(classifier_training_job.next_scheduled_check_time,
+                         next_scheduled_check_time)
+        self.assertEqual(classifier_training_job.training_data, [])
+        self.assertEqual(classifier_training_job.state_name, state_name)
+        self.assertEqual(classifier_training_job.status,
+                         feconf.TRAINING_JOB_STATUS_NEW)
+        self.assertEqual(classifier_training_job.classifier_data, {})
+        self.assertEqual(classifier_training_job.data_schema_version, 1)
+
+    def test_deletion_of_classifier_training_jobs(self):
+        """Test the delete_classifier_training_job method."""
+
+        exp_id = u'1'
+        state_name = 'Home'
+        interaction_id = 'TextInput'
+        next_scheduled_check_time = datetime.datetime.utcnow()
+
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
+            interaction_id, exp_id, 1, next_scheduled_check_time, [],
+            state_name, feconf.TRAINING_JOB_STATUS_NEW, {}, 1)
+        self.assertTrue(job_id)
+        classifier_services.delete_classifier_training_job(job_id)
+        with self.assertRaisesRegexp(Exception, (
+            'Entity for class ClassifierTrainingJobModel '
+            'with id %s not found' %(
+                job_id))):
+            classifier_services.get_classifier_training_job_by_id(job_id)
+
+    def test_mark_training_job_complete(self):
+        """Test the mark_training_job_complete method."""
+        exp_id = u'1'
+        next_scheduled_check_time = datetime.datetime.utcnow()
+        state_name = 'Home'
+        interaction_id = 'TextInput'
+
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
+            interaction_id, exp_id, 1, next_scheduled_check_time, [],
+            state_name, feconf.TRAINING_JOB_STATUS_PENDING, {}, 1)
+
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.status,
+                         feconf.TRAINING_JOB_STATUS_PENDING)
+
+        classifier_services.mark_training_job_complete(job_id)
+
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.status,
+                         feconf.TRAINING_JOB_STATUS_COMPLETE)
+
+        # Test that invalid status changes cannot be made.
+        with self.assertRaisesRegexp(Exception, (
+            'The status change %s to %s is not valid.' % (
+                feconf.TRAINING_JOB_STATUS_COMPLETE,
+                feconf.TRAINING_JOB_STATUS_COMPLETE))):
+            classifier_services.mark_training_job_complete(job_id)
+
+    def test_mark_training_job_pending(self):
+        """Test the mark_training_job_pending method."""
+        exp_id = u'1'
+        state_name = 'Home'
+        interaction_id = 'TextInput'
+
+        job_id = classifier_services.create_classifier_training_job(
+            feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
+                'algorithm_id'], interaction_id, exp_id, 1, state_name,
+            [], feconf.TRAINING_JOB_STATUS_NEW)
+
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.status,
+                         feconf.TRAINING_JOB_STATUS_NEW)
+
+        classifier_services.mark_training_job_pending(job_id)
+
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.status,
+                         feconf.TRAINING_JOB_STATUS_PENDING)
+
+        # Test that invalid status changes cannot be made.
+        with self.assertRaisesRegexp(Exception, (
+            'The status change %s to %s is not valid.' % (
+                feconf.TRAINING_JOB_STATUS_PENDING,
+                feconf.TRAINING_JOB_STATUS_PENDING))):
+            classifier_services.mark_training_job_pending(job_id)
+
+    def test_mark_training_jobs_failed(self):
+        """Test the mark_training_job_failed method."""
+        exp_id = u'1'
+        state_name = 'Home'
+        interaction_id = 'TextInput'
+
+        job_id = classifier_services.create_classifier_training_job(
+            feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
+                'algorithm_id'], interaction_id, exp_id, 1, state_name,
+            [], feconf.TRAINING_JOB_STATUS_PENDING)
+
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.status,
+                         feconf.TRAINING_JOB_STATUS_PENDING)
+
+        classifier_services.mark_training_jobs_failed([job_id])
+
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.status,
+                         feconf.TRAINING_JOB_STATUS_FAILED)
+
+        # Test that invalid status changes cannot be made.
+        with self.assertRaisesRegexp(Exception, (
+            'The status change %s to %s is not valid.' % (
+                feconf.TRAINING_JOB_STATUS_FAILED,
+                feconf.TRAINING_JOB_STATUS_FAILED))):
+            classifier_services.mark_training_jobs_failed([job_id])
+
+    def test_fetch_next_job(self):
+        """Test the fetch_next_jobs method."""
+        exp1_id = u'1'
+        state_name = 'Home'
+        interaction_id = 'TextInput'
+        exp2_id = u'2'
+
+        job1_id = classifier_services.create_classifier_training_job(
+            feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
+                'algorithm_id'], interaction_id, exp1_id, 1, state_name,
+            [], feconf.TRAINING_JOB_STATUS_NEW)
+        classifier_services.create_classifier_training_job(
+            feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
+                'algorithm_id'], interaction_id, exp2_id, 1, state_name,
+            [], feconf.TRAINING_JOB_STATUS_PENDING)
+        # This will get the job_id of the exploration created in setup.
+        classifier_services.fetch_next_job()
+        next_job = classifier_services.fetch_next_job()
+        self.assertEqual(job1_id, next_job.job_id)
+
+    def test_store_classifier_data(self):
+        """Test the store_classifier_data method."""
+        exp_id = u'1'
+        next_scheduled_check_time = datetime.datetime.utcnow()
+        state_name = 'Home'
+        interaction_id = 'TextInput'
+
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
+            interaction_id, exp_id, 1, next_scheduled_check_time, [],
+            state_name, feconf.TRAINING_JOB_STATUS_PENDING, None, 1)
+
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.classifier_data, None)
+
+        classifier_services.store_classifier_data(job_id, {})
+
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(classifier_training_job.classifier_data, {})
+
+    def test_retrieval_of_classifier_training_jobs_from_exploration_attributes(
+            self):
+        """Test the get_classifier_training_jobs method."""
+
+        exp_id = u'1'
+        next_scheduled_check_time = datetime.datetime.utcnow()
+        state_name = u'टेक्स्ट'
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
+            'TextInput', exp_id, 1, next_scheduled_check_time, [], state_name,
+            feconf.TRAINING_JOB_STATUS_NEW, None, 1)
+        classifier_models.TrainingJobExplorationMappingModel.create(
+            exp_id, 1, state_name, job_id)
+        classifier_training_jobs = (
+            classifier_services.get_classifier_training_jobs(
+                exp_id, 1, [state_name]))
+        self.assertEqual(len(classifier_training_jobs), 1)
+        self.assertEqual(classifier_training_jobs[0].exp_id, exp_id)
+        self.assertEqual(classifier_training_jobs[0].exp_version, 1)
+        self.assertEqual(classifier_training_jobs[0].state_name, state_name)
+        self.assertEqual(classifier_training_jobs[0].job_id, job_id)
+
+        # Test that method returns a list with None as elements when job does
+        # not exist.
+        false_state_name = 'false_name'
+        classifier_training_jobs = (
+            classifier_services.get_classifier_training_jobs(
+                exp_id, 1, [false_state_name]))
+        self.assertEqual(classifier_training_jobs, [None])

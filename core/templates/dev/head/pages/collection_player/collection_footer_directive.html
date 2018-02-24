@@ -1,0 +1,91 @@
+<div class="footer navbar-fixed-bottom oppia-collection-footer">
+  <div class="row">
+    <div class="col-sm-5">
+      <ul>
+        <li>
+          <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>" class="collection-footer-img" alt="">
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm-7">
+      <div class="pull-right">
+        <ul>
+          <li>
+            <h4 translate="I18N_PLAYER_SHARE_THIS_COLLECTION" class="oppia-share-collection-footer"></h4>
+          </li>
+          <li>
+            <sharing-links ng-click="$event.stopPropagation()"
+                           twitter-text="getTwitterText()"
+                           collection-id="collectionId"
+                           layout-type="row"
+                           share-type="collection"
+                           class="oppia-collection-footer-sharing-links">
+            </sharing-links>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .oppia-collection-footer {
+    background-color: #094142;
+    color: #FFF;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 13px;
+    height: 42px;
+    line-height: 0;
+    margin-top: 30px;
+    width: 100%;
+  }
+
+  .oppia-collection-footer .collection-footer-img {
+    height: 60px;
+    margin: -25px 0 0 10px;
+    width: 60px;
+  }
+
+  .oppia-collection-footer ul {
+    color: #fff;
+    list-style-type: none;
+    padding-left: 0;
+  }
+
+  .oppia-collection-footer li {
+    float: left;
+  }
+
+  .oppia-collection-footer .oppia-share-collection-footer {
+    line-height: 0.6;
+    padding-right: 20px;
+    text-transform: uppercase;
+  }
+
+  .oppia-collection-footer .oppia-collection-footer-container {
+    max-width: 800px;
+  }
+
+  .oppia-collection-footer .oppia-collection-footer-sharing-links ul {
+    display: block;
+    float: right;
+    padding-right: 20px;
+    margin: -8px;
+  }
+
+  .oppia-collection-footer .oppia-collection-footer-sharing-links li {
+    float: left;
+  }
+
+  @media (max-width: 475px) {
+    .oppia-collection-footer-sharing-links {
+      display: none;
+    }
+  }
+
+  @media (max-width: 658px) {
+    .oppia-share-collection-footer {
+      display: none;
+    }
+  }
+</style>

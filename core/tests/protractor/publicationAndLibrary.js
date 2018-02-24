@@ -20,17 +20,26 @@
 var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
-var library = require('../protractor_utils/library.js');
-var player = require('../protractor_utils/player.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('Library index page', function() {
-  it('should display private, published and featured explorations', function() {
+  var libraryPage = null;
+  var explorationPlayerPage = null;
+
+  beforeEach(function() {
+    libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
+
+  it('should display private and published explorations', function() {
     var EXPLORATION_SILMARILS = 'silmarils';
     var EXPLORATION_VINGILOT = 'Vingilot';
+    var CATEGORY_ARCHITECTURE = 'Architecture';
     var CATEGORY_BUSINESS = 'Business';
-    var CATEGORY_ENVIRONMENT = 'Environment';
     var LANGUAGE_ENGLISH = 'English';
     var LANGUAGE_FRANCAIS = 'français';
     var LANGUAGE_DEUTSCH = 'Deutsch';
@@ -46,7 +55,7 @@ describe('Library index page', function() {
 
     users.login('feanor@publicationAndLibrary.com');
     workflow.createAndPublishExploration(
-      EXPLORATION_SILMARILS, CATEGORY_ENVIRONMENT,
+      EXPLORATION_SILMARILS, CATEGORY_ARCHITECTURE,
       'hold the light of the two trees', LANGUAGE_DEUTSCH);
     users.logout();
 
@@ -56,17 +65,16 @@ describe('Library index page', function() {
     users.logout();
 
     users.login('varda@publicationAndLibrary.com');
-    browser.get(general.LIBRARY_URL_SUFFIX);
-    library.playExploration(EXPLORATION_VINGILOT);
+    libraryPage.get();
+    libraryPage.playExploration(EXPLORATION_VINGILOT);
     general.moveToEditor();
-    // Moderators can edit explorations and mark them as featured.
+    // Moderators can edit explorations.
     editor.setLanguage(LANGUAGE_FRANCAIS);
     editor.saveChanges('change language');
-    workflow.markExplorationAsFeatured();
     users.logout();
 
     users.login('celebrimor@publicationAndLibrary.com');
-    workflow.createExploration('Vilya', 'rings');
+    workflow.createExploration();
     editor.setContent(forms.toRichText('Celebrimbor wrote this'));
     editor.setInteraction('EndExploration');
     editor.setObjective('preserve the works of the elves');
@@ -93,19 +101,19 @@ describe('Library index page', function() {
       languages: [LANGUAGE_ENGLISH, LANGUAGE_DEUTSCH, LANGUAGE_FRANCAIS],
       expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
     }, {
-      categories: [CATEGORY_ENVIRONMENT],
+      categories: [CATEGORY_ARCHITECTURE],
       languages: [],
       expectVisible: [EXPLORATION_SILMARILS]
     }, {
-      categories: [CATEGORY_ENVIRONMENT, CATEGORY_BUSINESS],
+      categories: [CATEGORY_ARCHITECTURE, CATEGORY_BUSINESS],
       languages: [],
       expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
     }, {
-      categories: [CATEGORY_ENVIRONMENT],
+      categories: [CATEGORY_ARCHITECTURE],
       languages: [LANGUAGE_DEUTSCH],
       expectVisible: [EXPLORATION_SILMARILS]
     }, {
-      categories: [CATEGORY_ENVIRONMENT],
+      categories: [CATEGORY_ARCHITECTURE],
       languages: [LANGUAGE_FRANCAIS],
       expectVisible: []
     }];
@@ -113,41 +121,65 @@ describe('Library index page', function() {
     // We now check explorations are visible under the right conditions.
     browser.get('/search/find?q=&language_code=("en")');
     // The initial language selection should be just English.
-    library.expectCurrentLanguageSelectionToBe([LANGUAGE_ENGLISH]);
+    libraryPage.expectCurrentLanguageSelectionToBe([LANGUAGE_ENGLISH]);
     // At the start, no categories are selected.
-    library.expectCurrentCategorySelectionToBe([]);
+    libraryPage.expectCurrentCategorySelectionToBe([]);
 
     // Reset the language selector.
-    library.deselectLanguages([LANGUAGE_ENGLISH]);
+    libraryPage.deselectLanguages([LANGUAGE_ENGLISH]);
 
     testCases.forEach(function(testCase) {
-      library.selectLanguages(testCase.languages);
-      library.selectCategories(testCase.categories);
+      libraryPage.selectLanguages(testCase.languages);
+      libraryPage.selectCategories(testCase.categories);
 
       for (var explorationTitle in ALL_PUBLIC_EXPLORATION_TITLES) {
         if (testCase.expectVisible.indexOf(explorationTitle) !== -1) {
-          library.expectExplorationToBeVisible(explorationTitle);
+          libraryPage.expectExplorationToBeVisible(explorationTitle);
         } else {
-          library.expectExplorationToBeHidden(explorationTitle);
+          libraryPage.expectExplorationToBeHidden(explorationTitle);
         }
       }
 
-      library.deselectLanguages(testCase.languages);
-      library.deselectCategories(testCase.categories);
+      libraryPage.deselectLanguages(testCase.languages);
+      libraryPage.deselectCategories(testCase.categories);
     });
 
     // Private explorations are not shown in the library.
-    library.expectExplorationToBeHidden('Vilya');
+    libraryPage.expectExplorationToBeHidden('Vilya');
 
     // The first letter of the objective is automatically capitalized.
-    expect(library.getExplorationObjective(EXPLORATION_VINGILOT)).toBe(
+    expect(libraryPage.getExplorationObjective(EXPLORATION_VINGILOT)).toBe(
       'Seek the aid of the Valar');
     general.waitForSystem();
-    library.playExploration(EXPLORATION_SILMARILS);
-    player.expectExplorationNameToBe('silmarils');
-    player.submitAnswer('Continue');
+    libraryPage.playExploration(EXPLORATION_SILMARILS);
+    explorationPlayerPage.expectExplorationNameToBe('silmarils');
 
     users.logout();
+  });
+
+  it('should not have any non translated strings', function() {
+    var EXPLORATION_SILMARILS = 'silmarils';
+    var EXPLORATION_VINGILOT = 'Vingilot';
+    var CATEGORY_ENVIRONMENT = 'Environment';
+    var CATEGORY_BUSINESS = 'Business';
+    var LANGUAGE_FRANCAIS = 'français';
+    users.createUser('aule@example.com', 'Aule');
+
+    users.login('aule@example.com');
+    workflow.createAndPublishExploration(
+      EXPLORATION_SILMARILS, CATEGORY_BUSINESS,
+      'hold the light of the two trees', LANGUAGE_FRANCAIS);
+    workflow.createAndPublishExploration(
+      EXPLORATION_VINGILOT, CATEGORY_ENVIRONMENT, 'seek the aid of the Valar');
+    users.logout();
+
+    libraryPage.get();
+    expect(browser.getTitle()).toEqual('Exploration Library - Oppia');
+    general.ensurePageHasNoTranslationIds();
+
+    // Filter library explorations
+    libraryPage.selectLanguages([LANGUAGE_FRANCAIS]);
+    general.ensurePageHasNoTranslationIds();
   });
 
   afterEach(function() {
