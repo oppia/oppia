@@ -13,7 +13,8 @@
     ng-mousedown="onSvgMouseDown($event)"
     ng-mousemove="onSvgMouseMove($event)"
     ng-mouseup="onSvgMouseUp($event)">
-    <image xlink:href="<[getPreviewUrl($parent.$parent.value.imagePath)]>"
+    <image ng-href="<[getPreviewUrl($parent.$parent.value.imagePath)]>"
+      xlink:href=""
       x="0"
       y="0"
       ng-attr-height="<[getImageHeight()]>"

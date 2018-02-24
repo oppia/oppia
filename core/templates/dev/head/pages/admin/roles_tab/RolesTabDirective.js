@@ -84,8 +84,7 @@ oppia.directive('adminRolesTab', [
             if (Object.keys($scope.result).length === 0) {
               $scope.resultRolesVisible = false;
               $scope.setStatusMessage('No results.');
-            }
-            else {
+            } else {
               $scope.resultRolesVisible = true;
               $scope.setStatusMessage('Success.');
             }
