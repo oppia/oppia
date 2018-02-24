@@ -34,11 +34,7 @@ oppia.directive('topNavigationBar', [
             $scope, $http, $window, $timeout, $translate, $cookies,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS,
             siteAnalyticsService, WindowDimensionsService, DebouncerService) {
-          $cookies.remove('NG_TRANSLATE_LANG_KEY');
-          $cookies.put('test', 'value', {path: '/'});
-          console.log("tsss");
           if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
-            //$cookies.remove('NG_TRANSLATE_LANG_KEY', {path: '/'});
             $translate.use(GLOBALS.preferredSiteLanguageCode);
           }
 
