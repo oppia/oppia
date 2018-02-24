@@ -3,12 +3,8 @@
     "eslint:recommended"
   ],
   "plugins": [
-    "html",
     "angular"
   ],
-  "globals":{
-    "angular":true
-  },
   "rules": {
     "angular/directive-restrict": [
       "error",
