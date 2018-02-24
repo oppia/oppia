@@ -71,7 +71,8 @@ oppia.controller('I18nFooter', [
         // path each time a non-logged-in user changes their site language.
         $cookies.put(
           'NG_TRANSLATE_LANG_KEY',
-          '"' + $scope.currentLanguageCode + '"',  {path: '/'});      }
+          '"' + $scope.currentLanguageCode + '"', {path: '/'});
+      }
     };
   }
 ]);
