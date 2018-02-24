@@ -5,6 +5,9 @@
   "plugins": [
     "angular"
   ],
+  "globals":{
+    "angular":true
+  },
   "rules": {
     "angular/directive-restrict": [
       2,
