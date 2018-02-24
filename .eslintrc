@@ -3,64 +3,28 @@
     "eslint:recommended",
   ],
   "plugins": [
+    "angular",
     "html"
   ],
   "rules": {
-    "camelcase": [
-      "error",
-      {
-        "properties": "never"
-      }
-    ],
-    "comma-spacing": [
-      "error",
-      {
-        "before": false,
-        "after": true
-      }
-    ],
-    "curly": [
-      "error",
-      "all"
-    ],
-    "dot-notation": [
-      "error",
-      {
-        "allowKeywords": false
-      }
-    ],
-    "eqeqeq": [
-      "error",
-      "always"
-    ],
-    "func-style": [
-      "error",
-      "expression"
-    ],
-    "indent": [
-      "error",
+    "angular/directive-restrict": [
       2,
       {
-        "ArrayExpression": "first",
-        "FunctionExpression": {
-          "body": 1,
-          "parameters": 2
-        },
-        "MemberExpression": 1,
-        "SwitchCase": 1
+        "restrict": "E",
+        "explicit": "always"
       }
     ],
-    "keyword-spacing": [
+    "no-empty": [
       "error",
       {
-        "before": true,
-        "after": true
+        "allowEmptyCatch": true
       }
     ],
-    "max-len": [
-      "error",
-      "code": 80,
-      "ignoreUrls": true
+    "no-redeclare": [
+      "off"
+    ],
+    "no-unused-vars": [
+      "off"
     ],
     "no-console": [
       "error",
@@ -74,47 +38,25 @@
     "no-constant-condition": [
       "off"
     ],
-    "no-empty": [
+    "func-style": [
       "error",
-      {
-        "allowEmptyCatch": true
-      }
-    ],
-    "no-multi-spaces": [
-      "error"
+      "expression"
     ],
     "no-multi-str": [
       "error"
     ],
-    "no-redeclare": [
-      "off"
-    ],
-    "no-trailing-spaces": [
+    "no-multi-spaces": [
       "error"
     ],
     "no-undef": [
       "off"
     ],
-    "no-unused-vars": [
-      "off"
-    ],
     "one-var": [
       "off"
-    ],
-    "operator-linebreak": [
-      "error",
-      "after"
     ],
     "padded-blocks": [
       "error",
       "never"
-    ],
-    "quotes": [
-      "error",
-      "single",
-      {
-        "avoidEscape": true
-      }
     ],
     "quote-props": [
       "error",
@@ -123,9 +65,12 @@
         "keywords": true
       }
     ],
-    "semi": [
+    "space-unary-ops": [
       "error",
-      "always"
+      {
+        "words": true,
+        "nonwords": false,
+      }
     ],
     "space-before-function-paren": [
       "error",
@@ -134,19 +79,53 @@
         "named": "never"
       }
     ],
-    "space-infix-ops": [
-      "error"
+    "indent": [
+      "error",
+      2,
+      {
+        "ArrayExpression": "first",
+        "MemberExpression": 1,
+        "SwitchCase": 1
+      }
     ],
-    "space-unary-ops": [
+    "max-len": [
+      "error",
+      "code": 80,
+      "ignoreUrls": true
+    ],
+    "camelcase": [
       "error",
       {
-        "words": true,
-        "nonwords": false,
+        "properties": "never"
       }
+    ],
+    "curly": [
+      "error",
+      "all"
+    ],
+    "dot-notation": [
+      "error",
+      {
+        "allowKeywords": false
+      }
+    ],
+    "operator-linebreak": [
+      "error",
+      "after"
     ],
     "wrap-iife": [
       "error",
       "any"
+    ],
+    "space-infix-ops": [
+      "error"
+    ],
+    "quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true
+      }
     ]
   }
 }
