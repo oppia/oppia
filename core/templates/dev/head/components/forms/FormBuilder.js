@@ -308,7 +308,7 @@ oppia.filter('isFloat', [function() {
 oppia.directive('applyValidation', ['$filter', function($filter) {
   return {
     require: 'ngModel',
-    restrict: 'A',
+    restrict: 'E',
     link: function(scope, elm, attrs, ctrl) {
       // Add validators in reverse order.
       if (scope.validators()) {
