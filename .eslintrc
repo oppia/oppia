@@ -1,11 +1,13 @@
 {
   "extends": [
-    "eslint:recommended",
+    "eslint:recommended"
   ],
   "plugins": [
-    "angular",
-    "html"
+    "angular"
   ],
+  "globals":{
+    "angular":true
+  },
   "rules": {
     "angular/directive-restrict": [
       2,
