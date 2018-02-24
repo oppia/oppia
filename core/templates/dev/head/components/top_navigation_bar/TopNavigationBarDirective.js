@@ -37,7 +37,6 @@ oppia.directive('topNavigationBar', [
           if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
             $translate.use(GLOBALS.preferredSiteLanguageCode);
           }
-
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection'];
