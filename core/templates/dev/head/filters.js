@@ -375,6 +375,29 @@ oppia.filter('summarizeNonnegativeNumber', [function() {
   };
 }]);
 
+// Note that this filter removes additional new lines or <p><br></p> tags
+// at the end of the string.
+oppia.filter('removeExtraLines', [function() {
+  return function(string) {
+    if (!angular.isString(string)) {
+      return string;
+    }
+    while (1) {
+      var lastIndex = string.length;
+      var BLANK_LINES_TEXT = '<p><br></p>';
+      if (string.substring(
+        lastIndex - BLANK_LINES_TEXT.length, lastIndex
+      ) === BLANK_LINES_TEXT) {
+        string = string.substring(0, lastIndex - BLANK_LINES_TEXT.length);
+      }
+      else {
+        break;
+      }
+    }
+    return string;
+  };
+}]);
+
 // Note that this filter does not truncate at the middle of a word.
 oppia.filter('truncateAndCapitalize', [function() {
   return function(input, maxNumberOfCharacters) {
