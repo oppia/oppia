@@ -33,7 +33,9 @@ describe('ParamType objects', function() {
   });
 
   it('should throw for non-existant types', function() {
-    expect(function() { ParamType.getTypeFromBackendName('MissingType'); })
+    expect(function() {
+      ParamType.getTypeFromBackendName('MissingType');
+    })
       .toThrowError(/not a registered parameter type/);
   });
 
@@ -41,7 +43,9 @@ describe('ParamType objects', function() {
     expect(function() {
       // Defines a "Natural Number" type but gives it a negative default value.
       new ParamType({
-        validate: function(v) { return v >= 0; },
+        validate: function(v) {
+          return v >= 0;
+        },
         default_value: -1,
       });
     }).toThrowError(/default value is invalid/);
