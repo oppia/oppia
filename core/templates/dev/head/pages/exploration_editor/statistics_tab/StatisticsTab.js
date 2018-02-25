@@ -24,13 +24,15 @@ oppia.controller('StatisticsTab', [
   'ExplorationDataService', 'ComputeGraphService', 'DateTimeFormatService',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
-  'RouterService', 'IMPROVE_TYPE_INCOMPLETE', 'ENABLE_NEW_STATS_FRAMEWORK',
+  'RouterService', 'StateRulesStatsService', 'IMPROVE_TYPE_INCOMPLETE',
+  'ENABLE_NEW_STATS_FRAMEWORK',
   function(
       $scope, $http, $uibModal, AlertsService, ExplorationStatesService,
       ExplorationDataService, ComputeGraphService, DateTimeFormatService,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-      RouterService, IMPROVE_TYPE_INCOMPLETE, ENABLE_NEW_STATS_FRAMEWORK) {
+      RouterService, StateRulesStatsService, IMPROVE_TYPE_INCOMPLETE,
+    ENABLE_NEW_STATS_FRAMEWORK) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
@@ -171,10 +173,9 @@ oppia.controller('StatisticsTab', [
     $scope.showStateStatsModal = function(stateName, improvementType) {
       AlertsService.clearWarnings();
 
-      $http.get(
-        '/createhandler/state_rules_stats/' + $scope.explorationId + '/' +
-        encodeURIComponent(stateName)
-      ).then(function(response) {
+      StateRulesStatsService.getStateRulesStatsPromise(
+        stateName, $scope.explorationId
+      ).then(function(stateRulesStats) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/statistics_tab/' +
@@ -191,7 +192,7 @@ oppia.controller('StatisticsTab', [
               return improvementType;
             },
             visualizationsInfo: function() {
-              return response.data.visualizations_info;
+              return stateRulesStats.visualizations_info;
             }
           },
           controller: [
