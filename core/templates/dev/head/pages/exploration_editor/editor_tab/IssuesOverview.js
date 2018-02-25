@@ -17,10 +17,17 @@
  */
 
 oppia.controller('IssuesOverview', [
-  '$scope',
-  function($scope) {
+  '$scope', '$interval',
+  function($scope, $interval) {
+    var issueTableRowsHtml_ = '<tr><td>TEMP</td></tr>';
+
     $scope.isIssuesOverviewShown = function() {
-      return true;
+      console.log(Boolean(issueTableRowsHtml_));
+      return Boolean(issueTableRowsHtml_);
+    };
+
+    $scope.getIssuesTableRowsHtml = function() {
+      return issueTableRowsHtml_;
     };
   }
 ]);
