@@ -20,7 +20,7 @@ oppia.factory('StateRulesStatsService', ['$http', function($http) {
   var StateRulesStatsService = {};
 
   StateRulesStatsService.getStateRulesStatsPromise =
-    function(stateName, explorationId) {
+    function(explorationId, stateName) {
       return $http.get(
         '/createhandler/state_rules_stats/' + explorationId + '/' +
         encodeURIComponent(stateName)

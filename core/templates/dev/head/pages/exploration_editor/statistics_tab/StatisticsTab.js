@@ -174,7 +174,7 @@ oppia.controller('StatisticsTab', [
       AlertsService.clearWarnings();
 
       StateRulesStatsService.getStateRulesStatsPromise(
-        stateName, $scope.explorationId
+        $scope.explorationId, stateName
       ).then(function(stateRulesStats) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
