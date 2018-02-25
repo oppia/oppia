@@ -130,7 +130,6 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
 class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
     """Tests for the one-off feedback subject update job."""
     EXP_ID_1 = 'eid1'
-    EXP_ID_2 = 'eid1'
 
     EXPECTED_THREAD_DICT1 = {
         'status': u'open',
@@ -183,17 +182,14 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
             self.user_id, self.EXPECTED_THREAD_DICT1['subject'],
             'not used here')
         feedback_services.create_thread(
-            self.EXP_ID_2, self.EXPECTED_THREAD_DICT2['state_name'],
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT2['state_name'],
             self.user_id, self.EXPECTED_THREAD_DICT2['subject'],
             'not used here')
 
-        thread_ids = subscription_services.get_all_threads_subscribed_to(
-            self.user_id)
-
         self._run_one_off_job()
 
-        thread_summaries, _ = feedback_services.get_thread_summaries(
-            self.user_id, thread_ids)
+        threads = feedback_services.get_threads(
+            self.EXP_ID_1)
 
-        self.assertEqual(thread_summaries[0]['subject'], 'a small summary')
-        self.assertEqual(thread_summaries[1]['subject'], 'Some subject')
+        self.assertEqual(threads[0].subject, 'a small summary')
+        self.assertEqual(threads[1].subject, 'Some subject')

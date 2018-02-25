@@ -36,7 +36,7 @@ oppia.directive('feedbackPopup', [
         '/pages/exploration_player/feedback_popup_directive.html'),
       controller: [
         '$scope', '$element', '$http', '$timeout', '$filter',
-        'FocusManagerService', 'AlertsService', 'BackgroundMaskService', 
+        'FocusManagerService', 'AlertsService', 'BackgroundMaskService',
         'PlayerPositionService', 'WindowDimensionsService',
         'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
         function(
@@ -112,7 +112,7 @@ oppia.directive('feedbackPopup', [
             if ($scope.feedbackText) {
               $http.post(feedbackUrl, {
                 subject: $filter('getAbbreviatedText')(
-                  $scope.feedbackText, SUMMARRY_TITLE_CHARACTER_COUNT),
+                  $scope.feedbackText, FEEDBACK_SUBJECT_MAX_CHAR_LIMIT),
                 feedback: $scope.feedbackText,
                 include_author: (
                   !$scope.isSubmitterAnonymized && $scope.isLoggedIn),

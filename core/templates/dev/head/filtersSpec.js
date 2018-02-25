@@ -458,23 +458,23 @@ describe('Testing filters', function() {
     expect($filter('getAbbreviatedText')('It will remain unchanged.', 50))
       .toBe('It will remain unchanged.');
     expect($filter('getAbbreviatedText')(
-      'Itisjustaverylongsinglewordfortesting', 
+      'Itisjustaverylongsinglewordfortesting',
       50)).toBe('Itisjustaverylongsinglewordfortesting');
   }));
 
   it('should shorten the length of text', inject(function($filter) {
     expect($filter('getAbbreviatedText')(
-      'It has to convert to a substring as it exceeds the character limit.', 
+      'It has to convert to a substring as it exceeds the character limit.',
       50)).toBe('It has to convert to a substring as it exceeds...');
     expect($filter('getAbbreviatedText')(
-      'ItisjustaverylongsinglewordfortestinggetAbbreviatedText', 
+      'ItisjustaverylongsinglewordfortestinggetAbbreviatedText',
       50)).toBe('ItisjustaverylongsinglewordfortestinggetAbbreviate...');
     expect($filter('getAbbreviatedText')(
       'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od; /⏬®;😁☕😁:☝)😁😁😍1!@#',
       50)).toBe('â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od;...');
     expect($filter('getAbbreviatedText')(
-      'It is just a very long singlewordfortestinggetAbbreviatedText', 
-      50)).toBe('It is just a very long...');    
+      'It is just a very long singlewordfortestinggetAbbreviatedText',
+      50)).toBe('It is just a very long...');
   }));
 
 
