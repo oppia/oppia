@@ -349,12 +349,15 @@ oppia.filter('removeExtraLines', [function() {
       return string;
     }
     var BLANK_LINES_TEXT = '<p><br></p>';
+    var EMPTY_PARA_TEXT = '<p></p>';
     while (1) {
-      var lastIndex = string.length;
-      if (string.substring(
-           lastIndex - BLANK_LINES_TEXT.length, lastIndex
-          ) === BLANK_LINES_TEXT) {
-        string = string.substring(0, lastIndex - BLANK_LINES_TEXT.length);
+      var endIndex = string.length;
+      var bStr = string.substring(endIndex - BLANK_LINES_TEXT.length, endIndex);
+      var pStr = string.substring(endIndex - EMPTY_PARA_TEXT.length, endIndex);
+      if (bStr === BLANK_LINES_TEXT) {
+        string = string.substring(0, endIndex - BLANK_LINES_TEXT.length);
+      } else if (pStr === EMPTY_PARA_TEXT) {
+        string = string.substring(0, endIndex - EMPTY_PARA_TEXT.length);
       } else {
         break;
       }
