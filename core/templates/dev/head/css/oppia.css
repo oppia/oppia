@@ -2753,7 +2753,19 @@ ul.oppia-dashboard-tiles {
   height: 60vh;
 }
 
+.oppia-editable-section .oppia-unicode-form-mic-button {
+  height: 35px;
+  margin-left: 575px;
+  margin-top: -62px;
+  padding-top: 5px;
+}
 
+.conversation-skin-tutor-card .oppia-unicode-form-mic-button {
+  height: 35px;
+  margin-left: 400px;
+  margin-top: -62px;
+  padding-top: 5px;
+}
 
 .oppia-version-mismatch-modal .oppia-content {
   max-height: 700px;

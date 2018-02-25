@@ -1,13 +1,14 @@
 <span>
-  <textarea ng-if="!getCodingMode() && getRows()"
-            ng-model="$parent.localValue"
-            rows="<[getRows()]>"
-            placeholder="<[getPlaceholder()]>"
-            ng-disabled="isDisabled()"
-            class="form-control" focus-on="<[labelForFocusTarget()]>"
-            ng-blur="onInputBlur()"
-            ng-focus="onInputFocus()">
-  </textarea>
+  <span ng-if="!getCodingMode() && getRows()">
+    <textarea ng-model="$parent.localValue"
+              rows="<[getRows()]>"
+              placeholder="<[getPlaceholder()]>"
+              ng-disabled="isDisabled()"
+              class="form-control" focus-on="<[labelForFocusTarget()]>"
+              ng-blur="onInputBlur()"
+              ng-focus="onInputFocus()">
+    </textarea>
+  </span>
 
   <span ng-if="!getCodingMode() && !getRows()">
     <input type="text" ng-disabled="isDisabled()" class="form-control"
@@ -15,6 +16,17 @@
            ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>"
            ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>" apply-validation="validators()"
            style="display: inline;">
+  </span>
+
+  <span ng-if="allowSpeechRecognition && !getCodingMode()" ng-click="toggleSpeechRecognition()">
+    <div style="height:35px;"">
+      <img ng-if="!isCurrentlyRecording"
+           ng-src="<[microphoneUrl]>"
+           class="oppia-unicode-form-mic-button">
+      <img ng-if="isCurrentlyRecording"
+           ng-src="<[microphoneOpenUrl]>"
+           class="oppia-unicode-form-mic-button">
+    </div>
   </span>
 
   <!-- Note that we do not yet support ng-blur for the code editor. -->
