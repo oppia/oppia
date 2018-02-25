@@ -341,6 +341,28 @@ oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
   };
 }]);
 
+// Note that this filter removes additional new lines or <p><br></p> tags
+// at the end of the string.
+oppia.filter('removeExtraLines', [function() {
+  return function(string) {
+    if (!angular.isString(string)) {
+      return string;
+    }
+    var BLANK_LINES_TEXT = '<p><br></p>';
+    while (1) {
+      var lastIndex = string.length;
+      if (string.substring(
+           lastIndex - BLANK_LINES_TEXT.length, lastIndex
+          ) === BLANK_LINES_TEXT) {
+        string = string.substring(0, lastIndex - BLANK_LINES_TEXT.length);
+      } else {
+        break;
+      }
+    }
+    return string;
+  };
+}]);
+
 oppia.filter('convertToPlainText', [function() {
   return function(input) {
     var strippedText = input.replace(/(<([^>]+)>)/ig, '');
