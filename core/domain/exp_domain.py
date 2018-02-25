@@ -1616,11 +1616,11 @@ class ExplorationVersionsDiff(object):
     exploration.
 
     Attributes:
-        states_added: list(str). The states added to the exploration from
-            prev_exp_version to current_exp_version.
-        states_deleted: list(str). The states deleted from the exploration from
-            prev_exp_version to current_exp_version.
-        states_renamed: dict. Dictionary mapping state names of
+        added_state_names: list(str). Name of the states added to the
+            exploration from prev_exp_version to current_exp_version.
+        deleted_state_names: list(str). Name of the states deleted from the
+            exploration from prev_exp_version to current_exp_version.
+        new_to_old_state_names: dict. Dictionary mapping state names of
             current_exp_version to the state names of prev_exp_version.
     """
 
@@ -1629,37 +1629,41 @@ class ExplorationVersionsDiff(object):
 
         Args:
             change_list: list(dict). A list of all of the commit cmds from the
-                old_stats_model up to the next version.
+                old version of the exploration up to the next version.
         """
 
-        states_added = []
-        states_deleted = []
-        states_renamed = {}
+        added_state_names = []
+        deleted_state_names = []
+        new_to_old_state_names = {}
 
         for change_dict in change_list:
             if change_dict['cmd'] == CMD_ADD_STATE:
-                states_added.append(change_dict['state_name'])
+                added_state_names.append(change_dict['state_name'])
             elif change_dict['cmd'] == CMD_DELETE_STATE:
                 state_name = change_dict['state_name']
-                if state_name in states_added:
-                    states_added.remove(state_name)
+                if state_name in added_state_names:
+                    added_state_names.remove(state_name)
                 else:
-                    states_deleted.append(state_name)
+                    original_state_name = state_name
+                    while original_state_name in new_to_old_state_names:
+                        original_state_name = new_to_old_state_names.pop(
+                            original_state_name)
+                    deleted_state_names.append(original_state_name)
             elif change_dict['cmd'] == CMD_RENAME_STATE:
                 old_state_name = change_dict['old_state_name']
                 new_state_name = change_dict['new_state_name']
-                if old_state_name in states_added:
-                    states_added.remove(old_state_name)
-                    states_added.append(new_state_name)
-                elif old_state_name in states_renamed:
-                    states_renamed[new_state_name] = states_renamed.pop(
-                        old_state_name)
+                if old_state_name in added_state_names:
+                    added_state_names.remove(old_state_name)
+                    added_state_names.append(new_state_name)
+                elif old_state_name in new_to_old_state_names:
+                    new_to_old_state_names[new_state_name] = (
+                        new_to_old_state_names.pop(old_state_name))
                 else:
-                    states_renamed[new_state_name] = old_state_name
+                    new_to_old_state_names[new_state_name] = old_state_name
 
-        self.states_added = states_added
-        self.states_deleted = states_deleted
-        self.states_renamed = states_renamed
+        self.added_state_names = added_state_names
+        self.deleted_state_names = deleted_state_names
+        self.new_to_old_state_names = new_to_old_state_names
 
 
 class Exploration(object):
