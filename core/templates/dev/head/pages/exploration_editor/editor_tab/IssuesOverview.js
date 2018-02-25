@@ -22,7 +22,6 @@ oppia.controller('IssuesOverview', [
     var issueTableRowsHtml_ = '<tr><td>TEMP</td></tr>';
 
     $scope.isIssuesOverviewShown = function() {
-      console.log(Boolean(issueTableRowsHtml_));
       return Boolean(issueTableRowsHtml_);
     };
 
