@@ -255,7 +255,7 @@ oppia.controller('StatisticsTab', [
               ];
 
               var _getVisualizationsHtml = function() {
-                htmlSnippets = visualizationsInfo.map(
+                var htmlSnippets = visualizationsInfo.map(
                   function(visualizationInfo) {
                     var isAddressedResults = null;
                     if (visualizationInfo.show_addressed_info) {
