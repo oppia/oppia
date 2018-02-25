@@ -17,7 +17,7 @@
  */
 
 oppia.factory('CompareVersionsService', [
-  '$http', '$q','VersionTreeService', 'ExplorationDataService',
+  '$http', '$q', 'VersionTreeService', 'ExplorationDataService',
   'ExplorationDiffService', 'StateObjectFactory', 'StatesObjectFactory',
   'ReadOnlyExplorationBackendApiService',
   function(
