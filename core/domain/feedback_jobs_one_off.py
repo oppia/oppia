@@ -66,3 +66,32 @@ class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'next_message_id': next_message_id,
                 'message_count': len(message_ids)
             })
+
+
+class FeedbackSubjectOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for updating the feedback subject."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [feedback_models.FeedbackThreadModel]
+
+    @staticmethod
+    def map(item):
+        if item.summary != '(Feedback from a learner)':
+            return
+        characterCount = 50
+        if item.summary.length > characterCount:
+            subject = item.summary[0:characterCount]
+
+            if subject.index(' ') > -1:
+                s = ' '
+                subject = s.join(subject.split(' ')[:-1])
+
+            item.subject = subject + '...'
+        else:
+            item.subject = item.summary
+        item.put(update_last_updated_time=False)
+
+    @staticmethod
+    def reduce(key, value):
+        pass

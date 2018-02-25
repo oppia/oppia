@@ -125,3 +125,75 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
         # Check if the quantities have the correct values.
         self.assertEqual(output[0][1]['message_count'], 1)
         self.assertEqual(output[0][1]['next_message_id'], 2)
+
+
+class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
+    """Tests for the one-off feedback subject update job."""
+    EXP_ID_1 = 'eid1'
+    EXP_ID_2 = 'eid1'
+
+    EXPECTED_THREAD_DICT1 = {
+        'status': u'open',
+        'state_name': u'a_state_name',
+        'summary': "a small summary",
+        'original_author_username': None,
+        'subject': u'(Feedback from a learner)'
+    }
+
+    EXPECTED_THREAD_DICT2 = {
+        'status': u'open',
+        'state_name': u'a_state_name',
+        'summary': "a small summary",
+        'original_author_username': None,
+        'subject': u'Some subject'
+    }
+
+    USER_EMAIL = 'user@example.com'
+    USER_USERNAME = 'user'
+
+    def setUp(self):
+        super(FeedbackSubjectOneOffJobTest, self).setUp()
+
+        self.signup(self.USER_EMAIL, self.USER_USERNAME)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.save_new_valid_exploration(
+            self.EXP_ID_1, self.owner_id, title='Bridges in England',
+            category='Architecture', language_code='en')
+        self.save_new_valid_exploration(
+            self.EXP_ID_2, self.owner_id, title='Sillat Suomi',
+            category='Architecture', language_code='fi')
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = feedback_jobs_one_off.FeedbackSubjectOneOffJob.create_new() # pylint: disable=line-too-long
+        feedback_jobs_one_off.FeedbackSubjectOneOffJob.enqueue(
+            job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+    def test_feedback_subject(self):
+        """Test if the job returns the correct feedback subject."""
+        feedback_services.create_thread(
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT1['state_name'],
+            self.user_id, self.EXPECTED_THREAD_DICT1['subject'],
+            'not used here')
+        feedback_services.create_thread(
+            self.EXP_ID_2, self.EXPECTED_THREAD_DICT2['state_name'],
+            self.user_id, self.EXPECTED_THREAD_DICT2['subject'],
+            'not used here')
+
+        thread_ids = subscription_services.get_all_threads_subscribed_to(
+            self.user_id)
+
+        self._run_one_off_job()
+
+        thread_summaries, _ = feedback_services.get_thread_summaries(
+            self.user_id, thread_ids)
+
+        self.assertEqual(thread_summaries[0]['subject'], 'a small summary')
+        self.assertEqual(thread_summaries[1]['subject'], 'Some subject')
