@@ -26,7 +26,7 @@ oppia.factory('SearchExplorationsBackendApiService', [
         searchQuery, successCallback, errorCallback) {
       queryUrl = UrlInterpolationService.interpolateUrl(
         SEARCH_EXPLORATION_URL_TEMPLATE, {
-          query: searchQuery
+          query: btoa(searchQuery)
         }
       );
       $http.get(queryUrl).then(function(response) {

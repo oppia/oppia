@@ -128,7 +128,7 @@ BAD_PATTERNS_JS_REGEXP = [
     }
 ]
 
-BAD_PATTERNS_HTML_REGEXP = [
+BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': r"text\/ng-template",
         'message': "The directives must be directly referenced.",
@@ -141,10 +141,14 @@ BAD_PATTERNS_HTML_REGEXP = [
         'excluded_dirs': (
             'extensions/answer_summarizers/',
             'extensions/classifiers/',
-            'extensions/dependencies/',
             'extensions/objects/',
-            'extensions/value_generators/',
-            'extensions/visualizations/')
+            'extensions/value_generators/')
+    },
+    {
+        'regexp': r"[ \t]+$",
+        'message': "There should not be any trailing whitespaces.",
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
@@ -565,9 +569,13 @@ def _check_bad_pattern_in_file(filename, content, pattern):
     if not (any(filename.startswith(excluded_dir)
                 for excluded_dir in pattern['excluded_dirs'])
             or filename in pattern['excluded_files']):
-        if re.search(regexp, content):
-            print '%s --> %s' % (
-                filename, pattern['message'])
+        bad_pattern_count = 0
+        for line_num, line in enumerate(content.split('\n'), 1):
+            if re.search(regexp, line):
+                print '%s --> Line %s: %s' % (
+                    filename, line_num, pattern['message'])
+                bad_pattern_count += 1
+        if bad_pattern_count:
             return True
     return False
 
@@ -604,7 +612,7 @@ def _check_bad_patterns(all_files):
                         total_error_count += 1
 
             if filename.endswith('.html'):
-                for regexp in BAD_PATTERNS_HTML_REGEXP:
+                for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
                     if _check_bad_pattern_in_file(filename, content, regexp):
                         failed = True
                         total_error_count += 1
@@ -654,7 +662,8 @@ def _check_import_order(all_files):
         # and returns True if it finds an error else returns False
         # If check is set to True, isort simply checks the file and
         # if check is set to False, it autocorrects import-order errors.
-        if isort.SortImports(filename, check=True).incorrectly_sorted:
+        if (isort.SortImports(
+                filename, check=True, show_diff=True).incorrectly_sorted):
             failed = True
     print ''
     print '----------------------------------------'
@@ -671,11 +680,12 @@ def _check_import_order(all_files):
     return summary_messages
 
 
-def _check_def_spacing(all_files):
+def _check_spacing(all_files):
     """This function checks the number of blank lines
     above each class, function and method defintion.
+    It also checks for whitespace after ',', ';' and ':'.
     """
-    print 'Starting def-spacing checks'
+    print 'Starting spacing checks'
     print '----------------------------------------'
     print ''
     pycodestyle_config_path = os.path.join(os.getcwd(), 'tox.ini')
@@ -692,12 +702,12 @@ def _check_def_spacing(all_files):
     print ''
     if report.get_count() != 0:
         summary_message = (
-            '%s   Def spacing checks failed' % _MESSAGE_TYPE_FAILED)
+            '%s   Spacing checks failed' % _MESSAGE_TYPE_FAILED)
         print summary_message
         summary_messages.append(summary_message)
     else:
         summary_message = (
-            '%s   Def spacing checks passed' % _MESSAGE_TYPE_SUCCESS)
+            '%s   Spacing checks passed' % _MESSAGE_TYPE_SUCCESS)
         print summary_message
         summary_messages.append(summary_message)
     print ''
@@ -706,14 +716,14 @@ def _check_def_spacing(all_files):
 
 def main():
     all_files = _get_all_files()
-    def_spacing_messages = _check_def_spacing(all_files)
+    def_spacing_messages = _check_spacing(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
         def_spacing_messages + import_order_messages +
-        linter_messages + newline_messages + pattern_messages)
+        newline_messages + linter_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)

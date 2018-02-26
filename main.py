@@ -335,8 +335,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorehandler/stats_events/<exploration_id>',
         reader.StatsEventsHandler),
     get_redirect_route(
-        r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler),
-    get_redirect_route(
         r'/explorehandler/rating/<exploration_id>', reader.RatingHandler),
     get_redirect_route(
         r'/explorehandler/recommendations/<exploration_id>',

@@ -40,6 +40,3 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
 
         for visualization_id in all_visualization_ids:
             self.assertIn('oppiaVisualization%s' % visualization_id, full_html)
-            self.assertIn(
-                '<script type="text/ng-template" id="visualizations/%s">' %
-                visualization_id, full_html)

@@ -23,7 +23,7 @@ var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 
 describe('Preferences', function() {
   var preferencesPage = null;
-  
+
   beforeEach(function() {
     preferencesPage = new PreferencesPage.PreferencesPage();
   });

@@ -26,7 +26,7 @@ oppia.factory('WinnowingPreprocessingService', [function() {
     var hashVal = 0;
     var n = tokens.length - 1;
     var base = Math.pow(Object.keys(tokenToId).length, n);
-    
+
     tokens.forEach(function(token) {
       hashVal += tokenToId[token] * base;
       base /= Object.keys(tokenToId).length;

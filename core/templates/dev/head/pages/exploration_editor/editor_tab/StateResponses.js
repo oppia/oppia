@@ -264,7 +264,7 @@ oppia.controller('StateResponses', [
           'ExplorationContextService', 'EditorStateService',
           'ExplorationStatesService', 'TrainingDataService',
           'AnswerClassificationService', 'FocusManagerService',
-          'angularNameService', 'RULE_TYPE_CLASSIFIER',
+          'AngularNameService', 'RULE_TYPE_CLASSIFIER',
           function(
               $scope, $injector, $uibModalInstance,
               ExplorationHtmlFormatterService,
@@ -272,7 +272,7 @@ oppia.controller('StateResponses', [
               ExplorationContextService, EditorStateService,
               ExplorationStatesService, TrainingDataService,
               AnswerClassificationService, FocusManagerService,
-              angularNameService, RULE_TYPE_CLASSIFIER) {
+              AngularNameService, RULE_TYPE_CLASSIFIER) {
             var _explorationId = ExplorationContextService.getExplorationId();
             var _stateName = EditorStateService.getActiveStateName();
             var _state = ExplorationStatesService.getState(_stateName);
@@ -378,6 +378,7 @@ oppia.controller('StateResponses', [
               EditorStateService, EditorFirstTimeEventsService,
               RuleObjectFactory, OutcomeObjectFactory) {
             $scope.feedbackEditorIsOpen = false;
+
             $scope.openFeedbackEditor = function() {
               $scope.feedbackEditorIsOpen = true;
             };

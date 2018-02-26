@@ -56,17 +56,14 @@ oppia.factory('CodeReplPredictionService', [
             tokenId === PythonProgramTokenType.COMMENT ||
             tokenName.trim() === '') {
             continue;
-          }
-          else if (
+          } else if (
             tokenId === PythonProgramTokenType.NAME &&
             KW_LIST.indexOf(tokenName) === -1) {
             tokenizedProgram.push(TOKEN_NAME_VAR);
-          }
-          else {
+          } else {
             if (tokenToId.hasOwnProperty(tokenName)) {
               tokenizedProgram.push(tokenName);
-            }
-            else {
+            } else {
               tokenizedProgram.push(TOKEN_NAME_UNK);
             }
           }
@@ -89,13 +86,11 @@ oppia.factory('CodeReplPredictionService', [
             tokenId === PythonProgramTokenType.COMMENT ||
             tokenName.trim() === '') {
             continue;
-          }
-          else if (
+          } else if (
             tokenId === PythonProgramTokenType.NAME &&
             KW_LIST.indexOf(tokenName) === -1) {
             tokenizedProgram.push(TOKEN_NAME_VAR);
-          }
-          else {
+          } else {
             tokenizedProgram.push(tokenName);
           }
         }
@@ -127,8 +122,7 @@ oppia.factory('CodeReplPredictionService', [
           }
           if (index >= unionSet.length || elem < unionSet[index]) {
             extraElements.push(elem);
-          }
-          else if (elem === unionSet[index]) {
+          } else if (elem === unionSet[index]) {
             index += 1;
           }
         });
@@ -231,7 +225,7 @@ oppia.factory('CodeReplPredictionService', [
         var nearestNeighborsIndexes = (
           predictionService.findNearestNeighborsIndexes(knnData, program));
         var nearesNeighborsClasses = [];
-        
+
         // Find classes of nearest neighbor programs.
         nearestNeighborsIndexes.forEach(function(neighbor) {
           var index = neighbor[0];
@@ -247,8 +241,7 @@ oppia.factory('CodeReplPredictionService', [
           var outputClass = neighbor[0];
           if (classCount.hasOwnProperty(outputClass)) {
             classCount[outputClass] += 1;
-          }
-          else {
+          } else {
             classCount[outputClass] = 1;
           }
         });
@@ -265,14 +258,13 @@ oppia.factory('CodeReplPredictionService', [
 
         if (predictedClassOccurrence >= occurrence) {
           if (classCountArray.length > 1) {
-            if (predictedClassOccurrence != classCountArray[1][1]) {
+            if (predictedClassOccurrence !== classCountArray[1][1]) {
               // Check whether second most likely prediction does not have same
               // occurrence count. If it does, then we assume that KNN has
               // failed.
               return predictedClass.toString();
             }
-          }
-          else {
+          } else {
             return predictedClass.toString();
           }
         }
