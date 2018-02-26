@@ -17,16 +17,15 @@
  */
 
 oppia.controller('IssuesOverview', [
-  '$scope', '$interval', 'IssuesOverviewDataService',
-  function($scope, $interval, IssuesOverviewDataService) {
-    var issueTableRowsHtml_ = '<tr><td>TODO</td></tr>';
-
+  '$scope', 'IssuesOverviewDataService',
+  function($scope, IssuesOverviewDataService) {
     $scope.isIssuesOverviewShown = function() {
-      return Boolean(issueTableRowsHtml_);
+      return Boolean(
+        IssuesOverviewDataService.getHtmlRowsForUnaddressedAnswers());
     };
 
     $scope.getIssuesTableRowsHtml = function() {
-      return issueTableRowsHtml_;
+      return IssuesOverviewDataService.getHtmlRowsForUnaddressedAnswers();
     };
   }
 ]);
