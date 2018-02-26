@@ -17,9 +17,9 @@
  */
 
 oppia.controller('IssuesOverview', [
-  '$scope', '$interval',
-  function($scope, $interval) {
-    var issueTableRowsHtml_ = '<tr><td>TEMP</td></tr>';
+  '$scope', '$interval', 'IssuesOverviewDataService',
+  function($scope, $interval, IssuesOverviewDataService) {
+    var issueTableRowsHtml_ = '<tr><td>TODO</td></tr>';
 
     $scope.isIssuesOverviewShown = function() {
       return Boolean(issueTableRowsHtml_);
