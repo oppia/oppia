@@ -25,6 +25,7 @@ oppia.factory('RouterService', [
       ExplorationInitStateNameService, EditorStateService,
       ExplorationStatesService) {
     var MAIN_TAB = 'main';
+    var AUDIO_TAB = 'audio';
     var PREVIEW_TAB = 'preview';
     var SETTINGS_TAB = 'settings';
     var STATS_TAB = 'stats';
@@ -57,7 +58,10 @@ oppia.factory('RouterService', [
       // _savePendingChanges() is called by each of the navigateTo... functions
       $rootScope.$broadcast('externalSave');
 
-      if (newPath.indexOf('/preview/') === 0) {
+      if (newPath.indexOf('/audio') === 0) {
+        _tabs.active = AUDIO_TAB;
+        $rootScope.$broadcast('refreshAudioTab');
+      } else if (newPath.indexOf('/preview/') === 0) {
         _tabs.active = PREVIEW_TAB;
         _doNavigationWithState(newPath, SLUG_PREVIEW);
       } else if (newPath === '/settings') {
@@ -150,9 +154,9 @@ oppia.factory('RouterService', [
       isLocationSetToNonStateEditorTab: function() {
         var currentPath = $location.path();
         return (
-          currentPath === '/preview' || currentPath === '/stats' ||
-          currentPath === '/settings' || currentPath === '/history' ||
-          currentPath === '/feedback');
+          currentPath === '/audio' || currentPath === '/preview' ||
+          currentPath === '/stats' || currentPath === '/settings' ||
+          currentPath === '/history' || currentPath === '/feedback');
       },
       getCurrentStateFromLocationPath: function() {
         return _getCurrentStateFromLocationPath();
@@ -181,6 +185,10 @@ oppia.factory('RouterService', [
         } else {
           _actuallyNavigate(SLUG_GUI, stateName);
         }
+      },
+      navigateToAudioTab: function() {
+          _savePendingChanges();
+        $location.path('/audio');
       },
       navigateToPreviewTab: function() {
         if (_tabs.active !== PREVIEW_TAB) {
