@@ -5,7 +5,7 @@
 
   <md-card style="background-color: white; margin: 20px 0px; padding: 8px;">
     <!-- TODO(brianrodri): Make refresh automatically happen when necessary. -->
-    <strong>Unaddressed Student Answers</strong> (<em>Max of 5</em>, <a ng-click="computeUnaddressedAnswers()">Refresh</a>)
+    <strong>Unaddressed Student Answers</strong> (<em>5 max</em>; <a ng-click="computeUnaddressedAnswers()">Refresh</a>)
     <ul>
       <li ng-repeat="data in unaddressedAnswerData">
         <[data.answer]>
