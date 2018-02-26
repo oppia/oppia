@@ -51,8 +51,7 @@ oppia.controller('IssuesOverview', [
     $scope.unaddressedAnswersData = [];
 
     $scope.$on('refreshStateEditor', function() {
-      computeUnaddressedAnswers(
-      ).then(function(updatedData) {
+      computeUnaddressedAnswers().then(function(updatedData) {
         $scope.unaddressedAnswersData = updatedData;
       });
     });
