@@ -22,9 +22,9 @@ oppia.controller('IssuesOverview', [
   function(
       $scope, EditorStateService, ExplorationStatesService,
       StateStatsService) {
-    $scope.unaddressedAnswersData = [];
+    $scope.unresolvedAnswersData = [];
 
-    $scope.computeUnaddressedAnswers = function() {
+    $scope.computeUnresolvedAnswers = function() {
       var state = ExplorationStatesService.getState(
         EditorStateService.getActiveStateName());
 
@@ -32,27 +32,27 @@ oppia.controller('IssuesOverview', [
       // as a helper function.
       if (state.interaction.id === 'TextInput') {
         StateStatsService.computeStateStats(state).then(function(stateStats) {
-          var unaddressedAnswersData = [];
+          var unresolvedAnswersData = [];
 
           stateStats.visualizations_info.forEach(function(vizInfo) {
             if (vizInfo.show_addressed_info) {
-              var unaddressedVizInfoData =
+              var unresolvedVizInfoData =
                 vizInfo.data.filter(function(vizInfoDatum) {
                   return !vizInfoDatum.is_addressed;
                 });
-              unaddressedAnswersData =
-                unaddressedAnswersData.concat(unaddressedVizInfoData);
+              unresolvedAnswersData =
+                unresolvedAnswersData.concat(unresolvedVizInfoData);
             }
           });
 
-          // Only keep 5 unaddressed answers.
-          $scope.unaddressedAnswersData = unaddressedAnswersData.slice(0, 5);
+          // Only keep 5 unresolved answers.
+          $scope.unresolvedAnswersData = unresolvedAnswersData.slice(0, 5);
         });
       } else {
-        $scope.unaddressedAnswersData = [];
+        $scope.unresolvedAnswersData = [];
       }
     };
 
-    $scope.$on('refreshStateEditor', $scope.computeUnaddressedAnswers);
+    $scope.$on('refreshStateEditor', $scope.computeUnresolvedAnswers);
   }
 ]);
