@@ -6,8 +6,8 @@
   <md-card style="background-color: white; margin: 20px 0px; padding: 8px;">
     <strong>Unaddressed Student Answers</strong>
     <table>
-      <tr ng-repeat="data in unaddressedAnswersData">
-        <td ng-bind-html="data"></td>
+      <tr ng-repeat="answer in unaddressedAnswers">
+        <td ng-bind-html="answer"></td>
       </tr>
       <tr ng-if="unaddressedAnswersData.length === 0">
         <td><em>No Student answers require attention</em></td>

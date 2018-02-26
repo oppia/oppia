@@ -22,9 +22,14 @@ oppia.controller('IssuesOverview', [
   function(
       $scope, EditorStateService, ExplorationStatesService,
       StateStatsService) {
+    var htmlifyUnaddressedTextInputData = function(textInputAnswerData) {
+      return textInputAnswerData;
+    };
+
     var computeUnaddressedAnswers = function() {
       var state = ExplorationStatesService.getState(
         EditorStateService.getActiveStateName());
+
       // TODO(brianrodri): Move this check into a helper function in the
       // interaction interface.
       if (state.interaction.id === 'TextInput') {
@@ -32,27 +37,27 @@ oppia.controller('IssuesOverview', [
       } else {
         return StateStatsService.computeStateStats(state).then(
           function(stateRulesStats) {
-            var unaddressedAnswersData = [];
+            var unaddressedAnswers = [];
             stateRulesStats.visualizations_info.forEach(function(vizInfo) {
               if (vizInfo.show_addressed_info) {
-                vizInfo.data.forEach(function(vizInfoData) {
-                  if (!vizInfoData.is_addressed) {
-                    var htmlify = vizInfoAnswerDataToHtml[state.interaction.id];
-                    unaddressedAnswersData.push(htmlify(vizInfoData));
+                vizInfo.data.forEach(function(vizInfoDatum) {
+                  if (!vizInfoDatum.is_addressed) {
+                    unaddressedAnswers.push(
+                      htmlifyUnaddressedTextInputData(vizInfoDatum));
                   }
                 });
               }
             });
-            return unaddressedAnswersData;
+            return unaddressedAnswers;
           });
       }
     };
 
-    $scope.unaddressedAnswersData = [];
+    $scope.unaddressedAnswers = [];
 
     $scope.$on('refreshStateEditor', function() {
       computeUnaddressedAnswers().then(function(updatedData) {
-        $scope.unaddressedAnswersData = updatedData;
+        $scope.unaddressedAnswers = updatedData;
       });
     });
   }
