@@ -43,11 +43,11 @@ oppia.factory('StateRulesStatsService', [
           };
           stateRulesStats.visualizations_info.forEach(function(vizInfo) {
             if (vizInfo.show_addressed_info) {
-              vizInfo.data.forEach(function(datum) {
-                datum.is_addressed = (
+              vizInfo.data.forEach(function(answer) {
+                answer.is_addressed = (
                   AnswerClassificationService
                     .isClassifiedExplicitlyOrGoesToNewState(
-                      explorationId, stateName, state, datum.answer,
+                      explorationId, stateName, state, answer.answer,
                       rulesService));
               });
             }
