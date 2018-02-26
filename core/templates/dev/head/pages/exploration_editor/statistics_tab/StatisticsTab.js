@@ -24,14 +24,14 @@ oppia.controller('StatisticsTab', [
   'ExplorationDataService', 'ComputeGraphService', 'DateTimeFormatService',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
-  'RouterService', 'StateRulesStatsService', 'IMPROVE_TYPE_INCOMPLETE',
+  'RouterService', 'StateStatsService', 'IMPROVE_TYPE_INCOMPLETE',
   'ENABLE_NEW_STATS_FRAMEWORK',
   function(
       $scope, $http, $uibModal, AlertsService, ExplorationStatesService,
       ExplorationDataService, ComputeGraphService, DateTimeFormatService,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-      RouterService, StateRulesStatsService, IMPROVE_TYPE_INCOMPLETE,
+      RouterService, StateStatsService, IMPROVE_TYPE_INCOMPLETE,
       ENABLE_NEW_STATS_FRAMEWORK) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
@@ -173,7 +173,7 @@ oppia.controller('StatisticsTab', [
     $scope.showStateStatsModal = function(stateName, improvementType) {
       AlertsService.clearWarnings();
 
-      StateRulesStatsService.computeStateRulesStats(
+      StateStatsService.computeStateRulesStats(
         ExplorationStatesService.getState(stateName)
       ).then(function(stateRulesStats) {
         $uibModal.open({

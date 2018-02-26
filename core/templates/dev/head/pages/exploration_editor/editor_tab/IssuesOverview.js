@@ -18,10 +18,10 @@
 
 oppia.controller('IssuesOverview', [
   '$scope', 'EditorStateService', 'ExplorationStatesService',
-  'StateRulesStatsService',
+  'StateStatsService',
   function(
       $scope, EditorStateService, ExplorationStatesService,
-      StateRulesStatsService) {
+      StateStatsService) {
     var computeUnaddressedAnswers = function() {
       var state = ExplorationStatesService.getState(
         EditorStateService.getActiveStateName());
@@ -30,7 +30,7 @@ oppia.controller('IssuesOverview', [
       if (state.interaction.id === 'TextInput') {
         return Promise.resolve([]);
       } else {
-        return StateRulesStatsService.computeStateRulesStats(state).then(
+        return StateStatsService.computeStateRulesStats(state).then(
           function(stateRulesStats) {
             var unaddressedAnswersData = [];
             stateRulesStats.visualizations_info.forEach(function(vizInfo) {

@@ -16,7 +16,7 @@
  * @fileoverview Factory for handling warnings and info messages.
  */
 
-oppia.factory('StateRulesStatsService', [
+oppia.factory('StateStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
   'ExplorationContextService',
   function(
