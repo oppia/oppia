@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for handling warnings and info messages.
+ * @fileoverview Factory for calculating the statistics of a particular state.
  */
 
 oppia.factory('StateStatsService', [
