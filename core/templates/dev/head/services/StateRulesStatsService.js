@@ -40,16 +40,16 @@ oppia.factory('StateRulesStatsService', [
             exploration_id: explorationId,
             visualizations_info: response.data.visualizations_info
           };
-          stateRulesStats.visualizations_info.filter(function(vizInfo) {
-            return vizInfo.show_addressed_info;
-          }).forEach(function(vizInfo) {
-            vizInfo.data.forEach(function(datum) {
-              datum.is_addressed = (
-                AnswerClassificationService
-                  .isClassifiedExplicitlyOrGoesToNewState(
-                    explorationId, stateName, state, datum.answer,
-                    rulesService));
-            });
+          stateRulesStats.visualizations_info.forEach(function(vizInfo) {
+            if (vizInfo.show_addressed_info) {
+              vizInfo.data.forEach(function(datum) {
+                datum.is_addressed = (
+                  AnswerClassificationService
+                    .isClassifiedExplicitlyOrGoesToNewState(
+                      explorationId, stateName, state, datum.answer,
+                      rulesService));
+              });
+            }
           });
 
           return stateRulesStats;
