@@ -17,15 +17,50 @@
  */
 
 oppia.controller('IssuesOverview', [
-  '$scope', 'IssuesOverviewDataService',
-  function($scope, IssuesOverviewDataService) {
-    $scope.isIssuesOverviewShown = function() {
-      return Boolean(
-        IssuesOverviewDataService.getHtmlRowsForUnaddressedAnswers());
+  '$scope', 'EditorStateService', 'ExplorationStatesService',
+  'StateRulesStatsService',
+  function(
+      $scope, EditorStateService, ExplorationStatesService,
+      StateRulesStatsService) {
+    // TODO(brianrodri): Refactor this function to be part of a visualization's
+    // interface. The result will be placed inside of a table's <tr> element.
+    var vizInfoAnswerDataToHtml = {
+      TextInput: function(vizInfoData) {
+        return JSON.stringify(vizInfoData, null, 2);
+      }
     };
 
-    $scope.getIssuesTableRowsHtml = function() {
-      return IssuesOverviewDataService.getHtmlRowsForUnaddressedAnswers();
-    };
+    var computeUnaddressedAnswers = function(state) {
+      // TODO(brianrodri): This check should be part of a visuzlization's
+      // interface.
+      if (!vizInfoAnswerDataToHtml.hasOwnProperty(state.interaction.id)) {
+        return Promise.resolve([]);
+      } else {
+        return StateRulesStatsService.computeStateRulesStats(state).then(
+          function(stateRulesStats) {
+            var unaddressedAnswersLists = [];
+            stateRulesStats.visualizations_info.forEach(function(vizInfo) {
+              if (vizInfo.show_addressed_info) {
+                unaddressedAnswersLists = unaddressedAnswersLists.concat(
+                  vizInfo.data.filter(function(vizInfoData) {
+                    return !vizInfoData.is_addressed;
+                  }).map(vizInfoAnswerDataToHtml[state.interaction.id]));
+              }
+            });
+            return [].concat(...unaddressedAnswersLists);
+          });
+      }
+    }
+
+    $scope.unaddressedAnswerData = [];
+
+    $scope.$on('refreshStateEditor', function() {
+      computeUnaddressedAnswers(
+        ExplorationStatesService.getState(
+          EditorStateService.getActiveStateName())
+      ).then(function(updatedData) {
+        $scope.unaddressedAnswerData = updatedData;
+      });
+    });
   }
 ]);
