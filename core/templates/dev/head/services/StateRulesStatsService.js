@@ -18,14 +18,15 @@
 
 oppia.factory('StateRulesStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'ExplorationStatesService',
+  'ExplorationContextService', 'ExplorationStatesService',
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
-      ExplorationStatesService) {
+      ExplorationContextService, ExplorationStatesService) {
     return {
       // Returns a promise which will provide details of a particular state's
       // answer-statistics and rules.
-      getStateRulesStatsPromise: function(explorationId, stateName) {
+      getStateRulesStatsPromise: function(stateName) {
+        var explorationId = ExplorationContextService.getExplorationId();
         return $http.get(
           '/createhandler/state_rules_stats/' + explorationId + '/' +
           encodeURIComponent(stateName)
