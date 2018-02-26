@@ -33,20 +33,19 @@ oppia.controller('IssuesOverview', [
       if (state.interaction.id !== 'TextInput') {
         $scope.unaddressedAnswersData = [];
       } else {
-        return StateStatsService.computeStateStats(state).then(
-          function(stateStats) {
-            var unaddressedAnswersData = [];
-            stateStats.visualizations_info.forEach(function(vizInfo) {
-              if (vizInfo.show_addressed_info) {
-                unaddressedAnswersData = unaddressedAnswersData.concat(
-                  vizInfo.data.filter(function(vizInfoDatum) {
-                    return !vizInfoDatum.is_addressed;
-                  }));
-              }
-            });
-            // Only keep 5 unaddressed answers.
-            $scope.unaddressedAnswersData = unaddressedAnswersData.slice(0, 5);
+        StateStatsService.computeStateStats(state).then(function(stateStats) {
+          var unaddressedAnswersData = [];
+          stateStats.visualizations_info.forEach(function(vizInfo) {
+            if (vizInfo.show_addressed_info) {
+              unaddressedAnswersData = unaddressedAnswersData.concat(
+                vizInfo.data.filter(function(vizInfoDatum) {
+                  return !vizInfoDatum.is_addressed;
+                }));
+            }
           });
+          // Only keep 5 unaddressed answers.
+          $scope.unaddressedAnswersData = unaddressedAnswersData.slice(0, 5);
+        });
       }
     };
 
