@@ -32,7 +32,7 @@ oppia.controller('IssuesOverview', [
 
       // TODO(brianrodri): Move this check into a helper function in the
       // interaction interface.
-      if (state.interaction.id === 'TextInput') {
+      if (state.interaction.id !== 'TextInput') {
         return Promise.resolve([]);
       } else {
         return StateStatsService.computeStateStats(state).then(
