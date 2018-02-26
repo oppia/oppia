@@ -256,24 +256,21 @@ oppia.controller('StatisticsTab', [
               ];
 
               var _getVisualizationsHtml = function() {
-                var htmlSnippets = visualizationsInfo.map(
-                  function(visualizationInfo) {
-                    var escapedData = HtmlEscaperService.objToEscapedJson(
-                      visualizationInfo.data);
-                    var escapedOptions = HtmlEscaperService.objToEscapedJson(
-                      visualizationInfo.options);
+                var htmlSnippets = visualizationsInfo.map(function(vizInfo) {
+                  var escapedData =
+                    HtmlEscaperService.objToEscapedJson(vizInfo.data);
+                  var escapedOptions =
+                    HtmlEscaperService.objToEscapedJson(vizInfo.options);
 
-                    var el = $(
-                      '<oppia-visualization-' +
-                      $filter('camelCaseToHyphens')(visualizationInfo.id) +
-                      '/>');
-                    el.attr('data', escapedData);
-                    el.attr('options', escapedOptions);
-                    el.attr(
-                      'show-addressed-info',
-                      visualizationInfo.show_addressed_info);
-                    return el.get(0).outerHTML;
-                  });
+                  var el = $(
+                    '<oppia-visualization-' +
+                    $filter('camelCaseToHyphens')(vizInfo.id) +
+                    '/>');
+                  el.attr('data', escapedData);
+                  el.attr('options', escapedOptions);
+                  el.attr('show-addressed-info', vizInfo.show_addressed_info);
+                  return el.get(0).outerHTML;
+                });
 
                 return htmlSnippets.join('');
               };
