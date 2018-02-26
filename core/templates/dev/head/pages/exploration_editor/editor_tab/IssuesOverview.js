@@ -38,28 +38,30 @@ oppia.controller('IssuesOverview', [
       } else {
         return StateRulesStatsService.computeStateRulesStats(state).then(
           function(stateRulesStats) {
-            var unaddressedAnswersLists = [];
+            var unaddressedAnswersData = [];
             stateRulesStats.visualizations_info.forEach(function(vizInfo) {
               if (vizInfo.show_addressed_info) {
-                unaddressedAnswersLists = unaddressedAnswersLists.concat(
-                  vizInfo.data.filter(function(vizInfoData) {
-                    return !vizInfoData.is_addressed;
-                  }).map(vizInfoAnswerDataToHtml[state.interaction.id]));
+                vizInfo.data.forEach(function(vizInfoData) {
+                  if (!vizInfoData.is_addressed) {
+                    var htmlify = vizInfoAnswerDataToHtml[state.interaction.id];
+                    unaddressedAnswersData.push(htmlify(vizInfoData));
+                  }
+                });
               }
             });
-            return [].concat(...unaddressedAnswersLists);
+            return unaddressedAnswersData;
           });
       }
     }
 
-    $scope.unaddressedAnswerData = [];
+    $scope.unaddressedAnswersData = [];
 
     $scope.$on('refreshStateEditor', function() {
       computeUnaddressedAnswers(
         ExplorationStatesService.getState(
           EditorStateService.getActiveStateName())
       ).then(function(updatedData) {
-        $scope.unaddressedAnswerData = updatedData;
+        $scope.unaddressedAnswersData = updatedData;
       });
     });
   }

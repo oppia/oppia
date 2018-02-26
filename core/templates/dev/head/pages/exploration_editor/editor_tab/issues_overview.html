@@ -6,10 +6,10 @@
   <md-card style="background-color: white; margin: 20px 0px; padding: 8px;">
     <strong>Unaddressed Student Answers</strong>
     <table>
-      <tr ng-repeat="data in unaddressedAnswerData">
+      <tr ng-repeat="data in unaddressedAnswersData">
         <td ng-bind-html="data"></td>
       </tr>
-      <tr ng-if="unaddressedAnswerData.length === 0">
+      <tr ng-if="unaddressedAnswersData.length === 0">
         <td><em>No Student answers require attention</em></td>
       </tr>
     </table>
