@@ -234,9 +234,9 @@ oppia.controller('StatisticsTab', [
               $scope.ENABLE_NEW_STATS_FRAMEWORK = ENABLE_NEW_STATS_FRAMEWORK;
 
               var usefulFeedbackCount = (
-              $scope.stateStats.useful_feedback_count);
+                $scope.stateStats.useful_feedback_count);
               var totalAnswersCount = (
-              $scope.stateStats.total_answers_count);
+                $scope.stateStats.total_answers_count);
               if (totalAnswersCount > 0) {
                 $scope.hasExplorationBeenAnswered = true;
               }
@@ -266,7 +266,7 @@ oppia.controller('StatisticsTab', [
                       visualizationInfo.show_addressed_info;
 
                     var el = $(
-                    '<oppia-visualization-' +
+                      '<oppia-visualization-' +
                       $filter('camelCaseToHyphens')(visualizationInfo.id) +
                       '/>');
                     el.attr('data', escapedData);
