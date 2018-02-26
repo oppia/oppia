@@ -18,26 +18,25 @@
 
 oppia.factory('StateRulesStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'ExplorationContextService', 'ExplorationStatesService',
+  'ExplorationContextService',
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
-      ExplorationContextService, ExplorationStatesService) {
+      ExplorationContextService) {
     return {
       // Returns a promise which will provide details of a particular state's
       // answer-statistics and rules.
-      getStateRulesStatsPromise: function(stateName) {
+      getStateRulesStatsPromise: function(state) {
         var explorationId = ExplorationContextService.getExplorationId();
         return $http.get(
           '/createhandler/state_rules_stats/' + explorationId + '/' +
-          encodeURIComponent(stateName)
+          encodeURIComponent(state.name)
         ).then(function(response) {
-          var state = ExplorationStatesService.getState(stateName);
           var rulesService = $injector.get(
             AngularNameService.getNameOfInteractionRulesService(
               state.interaction.id));
 
           var stateRulesStats = {
-            state_name: stateName,
+            state_name: state.name,
             exploration_id: explorationId,
             visualizations_info: response.data.visualizations_info
           };
@@ -47,7 +46,7 @@ oppia.factory('StateRulesStatsService', [
                 answer.is_addressed = (
                   AnswerClassificationService
                     .isClassifiedExplicitlyOrGoesToNewState(
-                      explorationId, stateName, state, answer.answer,
+                      explorationId, state.name, state, answer.answer,
                       rulesService));
               });
             }
