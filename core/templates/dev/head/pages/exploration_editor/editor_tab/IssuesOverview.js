@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the exploration graph.
+ * @fileoverview Controller for the issues overview card.
  */
 
 oppia.controller('IssuesOverview', [
