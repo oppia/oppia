@@ -173,7 +173,7 @@ oppia.controller('StatisticsTab', [
     $scope.showStateStatsModal = function(stateName, improvementType) {
       AlertsService.clearWarnings();
 
-      StateStatsService.computeStateRulesStats(
+      StateStatsService.computeStateStats(
         ExplorationStatesService.getState(stateName)
       ).then(function(stateRulesStats) {
         $uibModal.open({

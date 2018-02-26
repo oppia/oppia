@@ -30,7 +30,7 @@ oppia.controller('IssuesOverview', [
       if (state.interaction.id === 'TextInput') {
         return Promise.resolve([]);
       } else {
-        return StateStatsService.computeStateRulesStats(state).then(
+        return StateStatsService.computeStateStats(state).then(
           function(stateRulesStats) {
             var unaddressedAnswersData = [];
             stateRulesStats.visualizations_info.forEach(function(vizInfo) {
