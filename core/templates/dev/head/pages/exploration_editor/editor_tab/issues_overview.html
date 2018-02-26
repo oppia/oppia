@@ -5,13 +5,13 @@
 
   <md-card style="background-color: white; margin: 20px 0px; padding: 8px;">
     <strong>Unaddressed Student Answers</strong>
-    <table>
-      <tr ng-repeat="answer in unaddressedAnswers">
-        <td ng-bind-html="answer"></td>
-      </tr>
-      <tr ng-if="unaddressedAnswersData.length === 0">
-        <td><em>No Student answers require attention</em></td>
-      </tr>
-    </table>
+    <ul>
+      <li ng-repeat="data in unaddressedAnswerData">
+        <[data.answer]>
+      </li>
+      <li ng-if="unaddressedAnswerData.length === 0">
+        <em>No Student answers require attention</em>
+      </li>
+    </ul>
   </md-card>
 </div>

@@ -22,43 +22,33 @@ oppia.controller('IssuesOverview', [
   function(
       $scope, EditorStateService, ExplorationStatesService,
       StateStatsService) {
-    var htmlifyUnaddressedTextInputData = function(textInputAnswerData) {
-      return textInputAnswerData;
-    };
-
     var computeUnaddressedAnswers = function() {
       var state = ExplorationStatesService.getState(
         EditorStateService.getActiveStateName());
 
-      // TODO(brianrodri): Move this check into a helper function in the
-      // interaction interface.
+      // TODO(brianrodri): Move this check into the state interaction interface
+      // as a helper function.
       if (state.interaction.id !== 'TextInput') {
-        return Promise.resolve([]);
+        $scope.unaddressedAnswerData = [];
       } else {
         return StateStatsService.computeStateStats(state).then(
           function(stateRulesStats) {
-            var unaddressedAnswers = [];
+            var unaddressedAnswerData = [];
             stateRulesStats.visualizations_info.forEach(function(vizInfo) {
               if (vizInfo.show_addressed_info) {
-                vizInfo.data.forEach(function(vizInfoDatum) {
-                  if (!vizInfoDatum.is_addressed) {
-                    unaddressedAnswers.push(
-                      htmlifyUnaddressedTextInputData(vizInfoDatum));
-                  }
-                });
+                unaddressedAnswerData = unaddressedAnswerData.concat(
+                  vizInfo.data.filter(function(vizInfoDatum) {
+                    return !vizInfoDatum.is_addressed;
+                  }));
               }
             });
-            return unaddressedAnswers;
+            $scope.unaddressedAnswerData = unaddressedAnswerData;
           });
       }
     };
 
-    $scope.unaddressedAnswers = [];
+    $scope.unaddressedAnswerData = [];
 
-    $scope.$on('refreshStateEditor', function() {
-      computeUnaddressedAnswers().then(function(updatedData) {
-        $scope.unaddressedAnswers = updatedData;
-      });
-    });
+    $scope.$on('refreshStateEditor', computeUnaddressedAnswers);
   }
 ]);
