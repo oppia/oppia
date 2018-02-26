@@ -22,7 +22,9 @@ oppia.controller('IssuesOverview', [
   function(
       $scope, EditorStateService, ExplorationStatesService,
       StateRulesStatsService) {
-    var computeUnaddressedAnswers = function(state) {
+    var computeUnaddressedAnswers = function() {
+      var state = ExplorationStatesService.getState(
+        EditorStateService.getActiveStateName());
       // TODO(brianrodri): Move this check into a helper function in the
       // interaction interface.
       if (state.interaction.id === 'TextInput') {
@@ -50,8 +52,6 @@ oppia.controller('IssuesOverview', [
 
     $scope.$on('refreshStateEditor', function() {
       computeUnaddressedAnswers(
-        ExplorationStatesService.getState(
-          EditorStateService.getActiveStateName())
       ).then(function(updatedData) {
         $scope.unaddressedAnswersData = updatedData;
       });
