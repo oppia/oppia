@@ -73,8 +73,7 @@ oppia.directive('oppiaVisualizationFrequencyTable', [
         function($scope, $attrs, HtmlEscaperService) {
           $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
           $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
-          $scope.isAddressed = HtmlEscaperService.escapedJsonToObj(
-            $attrs.isAddressed);
+          $scope.showAddressedInfo = $attrs.showAddressedInfo;
         }
       ]
     };
@@ -93,9 +92,9 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [
         function($scope, $attrs, HtmlEscaperService) {
           $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
           $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
-          $scope.isAddressed = HtmlEscaperService.escapedJsonToObj(
-            $attrs.isAddressed);
+          $scope.showAddressedInfo = $attrs.showAddressedInfo;
 
+          // Enumerated Frequency Tables always support addressed info.
           $scope.answerVisible = $scope.data.map(function(_, i) {
             // First element is shown while all others are hidden by default.
             return i === 0;

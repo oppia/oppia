@@ -16,22 +16,45 @@
  * @fileoverview Factory for handling warnings and info messages.
  */
 
-oppia.factory('StateRulesStatsService', ['$http', function($http) {
-  var StateRulesStatsService = {};
+oppia.factory('StateRulesStatsService', [
+  '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
+  'ExplorationStatesService',
+  function(
+      $http, $injector, AngularNameService, AnswerClassificationService,
+      ExplorationStatesService) {
+    return {
+      // Returns a promise which will provide details of a particular state's
+      // answer-statistics and rules.
+      getStateRulesStatsPromise: function(explorationId, stateName) {
+        return $http.get(
+          '/createhandler/state_rules_stats/' + explorationId + '/' +
+          encodeURIComponent(stateName)
+        ).then(function(response) {
+          var state = ExplorationStatesService.getState(stateName);
+          var rulesService = $injector.get(
+            AngularNameService.getNameOfInteractionRulesService(
+              state.interaction.id));
 
-  StateRulesStatsService.getStateRulesStatsPromise =
-    function(explorationId, stateName) {
-      return $http.get(
-        '/createhandler/state_rules_stats/' + explorationId + '/' +
-        encodeURIComponent(stateName)
-      ).then(function(response) {
-        return {
-          state_name: stateName,
-          exploration_id: explorationId,
-          visualizations_info: response.data.visualizations_info
-        };
-      });
+          var stateRulesStats = {
+            state_name: stateName,
+            exploration_id: explorationId,
+            visualizations_info: response.data.visualizations_info
+          };
+          stateRulesStats.visualizations_info.filter(function(vizInfo) {
+            return vizInfo.show_addressed_info;
+          }).forEach(function(vizInfo) {
+            vizInfo.data.forEach(function(datum) {
+              datum.is_addressed = (
+                AnswerClassificationService
+                  .isClassifiedExplicitlyOrGoesToNewState(
+                    explorationId, stateName, state, datum.answer,
+                    rulesService));
+            });
+          });
+
+          return stateRulesStats;
+        });
+      }
     };
-
-  return StateRulesStatsService;
-}]);
+  }
+]);

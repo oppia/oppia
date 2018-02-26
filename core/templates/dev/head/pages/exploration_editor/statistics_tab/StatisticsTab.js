@@ -257,36 +257,12 @@ oppia.controller('StatisticsTab', [
               var _getVisualizationsHtml = function() {
                 var htmlSnippets = visualizationsInfo.map(
                   function(visualizationInfo) {
-                    var isAddressedResults = null;
-                    if (visualizationInfo.show_addressed_info) {
-                      var explorationId = ExplorationDataService.explorationId;
-                      var state = ExplorationStatesService.getState(
-                        $scope.stateName);
-
-                      isAddressedResults = visualizationInfo.data.map(
-                        function(datum) {
-                          var interactionId = state.interaction.id;
-                          var rulesServiceName = (
-                            AngularNameService.getNameOfInteractionRulesService(
-                              interactionId));
-                          var rulesService = $injector.get(rulesServiceName);
-                          return (
-                            AnswerClassificationService
-                              .isClassifiedExplicitlyOrGoesToNewState(
-                                explorationId, state.name, state,
-                                datum.answer, rulesService
-                              )
-                          );
-                        }
-                      );
-                    }
-
                     var escapedData = HtmlEscaperService.objToEscapedJson(
                       visualizationInfo.data);
                     var escapedOptions = HtmlEscaperService.objToEscapedJson(
                       visualizationInfo.options);
-                    var escapedIsAddressedResults =
-                      HtmlEscaperService.objToEscapedJson(isAddressedResults);
+                    var showAddressedInfo =
+                      visualizationInfo.show_addressed_info;
 
                     var el = $(
                       '<oppia-visualization-' +
@@ -294,7 +270,7 @@ oppia.controller('StatisticsTab', [
                       '/>');
                     el.attr('data', escapedData);
                     el.attr('options', escapedOptions);
-                    el.attr('is-addressed', escapedIsAddressedResults);
+                    el.attr('show-addressed-info', showAddressedInfo);
                     return el.get(0).outerHTML;
                   });
 
