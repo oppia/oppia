@@ -77,17 +77,19 @@ class FeedbackSubjectOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if item.summary != '(Feedback from a learner)':
+        if item.subject != '(Feedback from a learner)':
+            return
+        if not item.summary:
             return
         characterCount = 50
-        if item.summary.length > characterCount:
-            subject = item.summary[0:characterCount]
+        if len(item.summary) > characterCount:
+            updated_subject = item.summary[0:characterCount]
 
-            if subject.index(' ') > -1:
+            if updated_subject.index(' ') > -1:
                 s = ' '
-                subject = s.join(subject.split(' ')[:-1])
-
-            item.subject = subject + '...'
+                updated_subject = s.join(updated_subject.split(' ')[:-1])
+            updated_subject = updated_subject + '...'
+            item.subject = updated_subject
         else:
             item.subject = item.summary
         item.put(update_last_updated_time=False)

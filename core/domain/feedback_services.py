@@ -94,6 +94,18 @@ def create_thread(
         exploration_id, state_name, original_author_id, subject, text, False)
 
 
+def add_summary_to_feedback(thread_id, summary):
+    """Adds Summary to Feedback Thread
+
+    Args:
+        thread_id: str. The thread id the message belongs to.
+        summary: str. The summary of feedback.
+    """
+    thread = feedback_models.FeedbackThreadModel.get(thread_id)
+    thread.summary = summary
+    thread.put()
+
+
 def create_message(
         exploration_id, thread_id, author_id, updated_status, updated_subject,
         text, received_via_email=False):

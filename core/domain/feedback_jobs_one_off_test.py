@@ -134,7 +134,7 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
     EXPECTED_THREAD_DICT1 = {
         'status': u'open',
         'state_name': u'a_state_name',
-        'summary': "a small summary",
+        'summary': u'a small summary',
         'original_author_username': None,
         'subject': u'(Feedback from a learner)'
     }
@@ -142,9 +142,17 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
     EXPECTED_THREAD_DICT2 = {
         'status': u'open',
         'state_name': u'a_state_name',
-        'summary': "a small summary",
+        'summary': u'a small summary',
         'original_author_username': None,
         'subject': u'Some subject'
+    }
+
+    EXPECTED_THREAD_DICT3 = {
+        'status': u'open',
+        'state_name': u'a_state_name',
+        'summary': u'It has to convert to a substring as it exceeds the character limit.', # pylint: disable=line-too-long
+        'original_author_username': None,
+        'subject': u'(Feedback from a learner)'
     }
 
     USER_EMAIL = 'user@example.com'
@@ -162,7 +170,7 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
             self.EXP_ID_1, self.owner_id, title='Bridges in England',
             category='Architecture', language_code='en')
         self.save_new_valid_exploration(
-            self.EXP_ID_2, self.owner_id, title='Sillat Suomi',
+            self.EXP_ID_1, self.owner_id, title='Sillat Suomi',
             category='Architecture', language_code='fi')
 
     def _run_one_off_job(self):
@@ -185,11 +193,28 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
             self.EXP_ID_1, self.EXPECTED_THREAD_DICT2['state_name'],
             self.user_id, self.EXPECTED_THREAD_DICT2['subject'],
             'not used here')
+        feedback_services.create_thread(
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT3['state_name'],
+            self.user_id, self.EXPECTED_THREAD_DICT3['subject'],
+            'not used here')
 
+        thread_ids = subscription_services.get_all_threads_subscribed_to(
+            self.user_id)
+        feedback_services.add_summary_to_feedback(
+            thread_ids[0], self.EXPECTED_THREAD_DICT1['summary']
+            )
+        feedback_services.add_summary_to_feedback(
+            thread_ids[1], self.EXPECTED_THREAD_DICT2['summary']
+            )
+        feedback_services.add_summary_to_feedback(
+            thread_ids[2], self.EXPECTED_THREAD_DICT3['summary']
+            )
         self._run_one_off_job()
 
-        threads = feedback_services.get_threads(
-            self.EXP_ID_1)
+        threads = feedback_services.get_threads(self.EXP_ID_1)
 
-        self.assertEqual(threads[0].subject, 'a small summary')
-        self.assertEqual(threads[1].subject, 'Some subject')
+        self.assertEqual(threads[0].subject, u'a small summary')
+        self.assertEqual(threads[1].subject, u'Some subject')
+        self.assertEqual(
+            threads[2].subject,
+            u'It has to convert to a substring as it exceeds...')
