@@ -173,125 +173,125 @@ oppia.controller('StatisticsTab', [
     $scope.showStateStatsModal = function(stateName, improvementType) {
       AlertsService.clearWarnings();
 
-      StateRulesStatsService.getStateRulesStatsPromise(
-        $scope.explorationId, stateName
-      ).then(function(stateRulesStats) {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/statistics_tab/' +
-            'state_stats_modal_directive.html'),
-          backdrop: true,
-          resolve: {
-            stateName: function() {
-              return stateName;
-            },
-            stateStats: function() {
-              return $scope.stateStats[stateName];
-            },
-            improvementType: function() {
-              return improvementType;
-            },
-            visualizationsInfo: function() {
-              return stateRulesStats.visualizations_info;
-            }
-          },
-          controller: [
-            '$scope', '$uibModalInstance', '$filter', '$injector', 'stateName',
-            'stateStats', 'improvementType', 'visualizationsInfo',
-            'HtmlEscaperService', 'AngularNameService',
-            'AnswerClassificationService', 'ENABLE_NEW_STATS_FRAMEWORK',
-            function($scope, $uibModalInstance, $filter, $injector, stateName,
-                stateStats, improvementType, visualizationsInfo,
-                HtmlEscaperService, AngularNameService,
-                AnswerClassificationService, ENABLE_NEW_STATS_FRAMEWORK) {
-              var COMPLETION_RATE_PIE_CHART_OPTIONS = {
-                left: 20,
-                pieHole: 0.6,
-                pieSliceTextStyleColor: 'black',
-                pieSliceBorderColor: 'black',
-                chartAreaWidth: 240,
-                colors: ['#d8d8d8', '#008808', 'blue'],
-                height: 270,
-                legendPosition: 'right',
-                width: 240
-              };
-
-              var title1 = 'Answer feedback statistics';
-              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1 = angular.copy(
-                COMPLETION_RATE_PIE_CHART_OPTIONS);
-              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1.title = title1;
-
-              var title2 = 'Solution usage statistics';
-              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2 = angular.copy(
-                COMPLETION_RATE_PIE_CHART_OPTIONS);
-              $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2.title = title2;
-
-              $scope.stateName = stateName;
-              $scope.stateStats = stateStats;
-              $scope.improvementType = improvementType;
-
-              $scope.ENABLE_NEW_STATS_FRAMEWORK = ENABLE_NEW_STATS_FRAMEWORK;
-
-              var usefulFeedbackCount = (
-                $scope.stateStats.useful_feedback_count);
-              var totalAnswersCount = (
-                $scope.stateStats.total_answers_count);
-              if (totalAnswersCount > 0) {
-                $scope.hasExplorationBeenAnswered = true;
+      StateRulesStatsService.getStateRulesStatsPromise(stateName).then(
+        function(stateRulesStats) {
+          $uibModal.open({
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration_editor/statistics_tab/' +
+              'state_stats_modal_directive.html'),
+            backdrop: true,
+            resolve: {
+              stateName: function() {
+                return stateName;
+              },
+              stateStats: function() {
+                return $scope.stateStats[stateName];
+              },
+              improvementType: function() {
+                return improvementType;
+              },
+              visualizationsInfo: function() {
+                return stateRulesStats.visualizations_info;
               }
-              $scope.pieChartData1 = [
-                ['Type', 'Number'],
-                ['Default feedback', totalAnswersCount - usefulFeedbackCount],
-                ['Specific feedback', usefulFeedbackCount],
-              ];
+            },
+            controller: [
+              '$scope', '$uibModalInstance', '$filter', '$injector',
+              'stateName', 'stateStats', 'improvementType',
+              'visualizationsInfo', 'HtmlEscaperService', 'AngularNameService',
+              'AnswerClassificationService', 'ENABLE_NEW_STATS_FRAMEWORK',
+              function(
+                  $scope, $uibModalInstance, $filter, $injector,
+                  stateName, stateStats, improvementType,
+                  visualizationsInfo, HtmlEscaperService, AngularNameService,
+                  AnswerClassificationService, ENABLE_NEW_STATS_FRAMEWORK) {
+                var COMPLETION_RATE_PIE_CHART_OPTIONS = {
+                  left: 20,
+                  pieHole: 0.6,
+                  pieSliceTextStyleColor: 'black',
+                  pieSliceBorderColor: 'black',
+                  chartAreaWidth: 240,
+                  colors: ['#d8d8d8', '#008808', 'blue'],
+                  height: 270,
+                  legendPosition: 'right',
+                  width: 240
+                };
 
-              var numTimesSolutionViewed = (
-                $scope.stateStats.num_times_solution_viewed);
-              $scope.pieChartData2 = [
-                ['Type', 'Number'],
-                ['Solutions used to answer', numTimesSolutionViewed],
-                ['Solutions not used', totalAnswersCount - (
-                  numTimesSolutionViewed)]
-              ];
+                var title1 = 'Answer feedback statistics';
+                $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1 = angular.copy(
+                  COMPLETION_RATE_PIE_CHART_OPTIONS);
+                $scope.COMPLETION_RATE_PIE_CHART_OPTIONS1.title = title1;
 
-              var _getVisualizationsHtml = function() {
-                var htmlSnippets = visualizationsInfo.map(
-                  function(visualizationInfo) {
-                    var escapedData = HtmlEscaperService.objToEscapedJson(
-                      visualizationInfo.data);
-                    var escapedOptions = HtmlEscaperService.objToEscapedJson(
-                      visualizationInfo.options);
-                    var showAddressedInfo =
-                      visualizationInfo.show_addressed_info;
+                var title2 = 'Solution usage statistics';
+                $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2 = angular.copy(
+                  COMPLETION_RATE_PIE_CHART_OPTIONS);
+                $scope.COMPLETION_RATE_PIE_CHART_OPTIONS2.title = title2;
 
-                    var el = $(
+                $scope.stateName = stateName;
+                $scope.stateStats = stateStats;
+                $scope.improvementType = improvementType;
+
+                $scope.ENABLE_NEW_STATS_FRAMEWORK = ENABLE_NEW_STATS_FRAMEWORK;
+
+                var usefulFeedbackCount = (
+                $scope.stateStats.useful_feedback_count);
+                var totalAnswersCount = (
+                $scope.stateStats.total_answers_count);
+                if (totalAnswersCount > 0) {
+                  $scope.hasExplorationBeenAnswered = true;
+                }
+                $scope.pieChartData1 = [
+                  ['Type', 'Number'],
+                  ['Default feedback', totalAnswersCount - usefulFeedbackCount],
+                  ['Specific feedback', usefulFeedbackCount],
+                ];
+
+                var numTimesSolutionViewed = (
+                  $scope.stateStats.num_times_solution_viewed);
+                $scope.pieChartData2 = [
+                  ['Type', 'Number'],
+                  ['Solutions used to answer', numTimesSolutionViewed],
+                  ['Solutions not used', totalAnswersCount - (
+                    numTimesSolutionViewed)]
+                ];
+
+                var _getVisualizationsHtml = function() {
+                  var htmlSnippets = visualizationsInfo.map(
+                    function(visualizationInfo) {
+                      var escapedData = HtmlEscaperService.objToEscapedJson(
+                        visualizationInfo.data);
+                      var escapedOptions = HtmlEscaperService.objToEscapedJson(
+                        visualizationInfo.options);
+                      var showAddressedInfo =
+                        visualizationInfo.show_addressed_info;
+
+                      var el = $(
                       '<oppia-visualization-' +
-                      $filter('camelCaseToHyphens')(visualizationInfo.id) +
-                      '/>');
-                    el.attr('data', escapedData);
-                    el.attr('options', escapedOptions);
-                    el.attr('show-addressed-info', showAddressedInfo);
-                    return el.get(0).outerHTML;
-                  });
+                        $filter('camelCaseToHyphens')(visualizationInfo.id) +
+                        '/>');
+                      el.attr('data', escapedData);
+                      el.attr('options', escapedOptions);
+                      el.attr('show-addressed-info', showAddressedInfo);
+                      return el.get(0).outerHTML;
+                    });
 
-                return htmlSnippets.join('');
-              };
+                  return htmlSnippets.join('');
+                };
 
-              $scope.visualizationsHtml = _getVisualizationsHtml();
+                $scope.visualizationsHtml = _getVisualizationsHtml();
 
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-                AlertsService.clearWarnings();
-              };
+                $scope.cancel = function() {
+                  $uibModalInstance.dismiss('cancel');
+                  AlertsService.clearWarnings();
+                };
 
-              $scope.navigateToStateEditor = function() {
-                $scope.cancel();
-                RouterService.navigateToMainTab(stateName);
-              };
-            }
-          ]
+                $scope.navigateToStateEditor = function() {
+                  $scope.cancel();
+                  RouterService.navigateToMainTab(stateName);
+                };
+              }
+            ]
+          });
         });
-      });
     };
   }
 ]);
