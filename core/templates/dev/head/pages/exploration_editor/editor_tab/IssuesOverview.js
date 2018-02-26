@@ -22,18 +22,10 @@ oppia.controller('IssuesOverview', [
   function(
       $scope, EditorStateService, ExplorationStatesService,
       StateRulesStatsService) {
-    // TODO(brianrodri): Refactor this function to be part of a visualization's
-    // interface. The result will be placed inside of a table's <tr> element.
-    var vizInfoAnswerDataToHtml = {
-      TextInput: function(vizInfoData) {
-        return JSON.stringify(vizInfoData, null, 2);
-      }
-    };
-
     var computeUnaddressedAnswers = function(state) {
-      // TODO(brianrodri): This check should be part of a visuzlization's
-      // interface.
-      if (!vizInfoAnswerDataToHtml.hasOwnProperty(state.interaction.id)) {
+      // TODO(brianrodri): Move this check into a helper function in the
+      // interaction interface.
+      if (state.interaction.id === 'TextInput') {
         return Promise.resolve([]);
       } else {
         return StateRulesStatsService.computeStateRulesStats(state).then(
