@@ -27,12 +27,11 @@ oppia.controller('IssuesOverview', [
     $scope.computeUnaddressedAnswers = function() {
       var state = ExplorationStatesService.getState(
         EditorStateService.getActiveStateName());
-      var stateStatsPromise = StateStatsService.computeStateStats(state);
 
       // TODO(brianrodri): Move this check into the state interaction interface
       // as a helper function.
       if (state.interaction.id === 'TextInput') {
-        stateStatsPromise.then(function(stateStats) {
+        StateStatsService.computeStateStats(state).then(function(stateStats) {
           var unaddressedAnswersData = [];
 
           stateStats.visualizations_info.forEach(function(vizInfo) {
