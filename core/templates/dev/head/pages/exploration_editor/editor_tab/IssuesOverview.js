@@ -22,7 +22,7 @@ oppia.controller('IssuesOverview', [
   function(
       $scope, EditorStateService, ExplorationStatesService,
       StateStatsService) {
-    $scope.unaddressedAnswerData = [];
+    $scope.unaddressedAnswersData = [];
 
     $scope.computeUnaddressedAnswers = function() {
       var state = ExplorationStatesService.getState(
@@ -31,21 +31,21 @@ oppia.controller('IssuesOverview', [
       // TODO(brianrodri): Move this check into the state interaction interface
       // as a helper function.
       if (state.interaction.id !== 'TextInput') {
-        $scope.unaddressedAnswerData = [];
+        $scope.unaddressedAnswersData = [];
       } else {
         return StateStatsService.computeStateStats(state).then(
           function(stateStats) {
-            var unaddressedAnswerData = [];
+            var unaddressedAnswersData = [];
             stateStats.visualizations_info.forEach(function(vizInfo) {
               if (vizInfo.show_addressed_info) {
-                unaddressedAnswerData = unaddressedAnswerData.concat(
+                unaddressedAnswersData = unaddressedAnswersData.concat(
                   vizInfo.data.filter(function(vizInfoDatum) {
                     return !vizInfoDatum.is_addressed;
                   }));
               }
             });
             // Only keep 5 unaddressed answers.
-            $scope.unaddressedAnswerData = unaddressedAnswerData.slice(0, 5);
+            $scope.unaddressedAnswersData = unaddressedAnswersData.slice(0, 5);
           });
       }
     };
