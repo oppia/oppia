@@ -34,9 +34,9 @@ oppia.controller('IssuesOverview', [
         $scope.unaddressedAnswerData = [];
       } else {
         return StateStatsService.computeStateStats(state).then(
-          function(stateRulesStats) {
+          function(stateStats) {
             var unaddressedAnswerData = [];
-            stateRulesStats.visualizations_info.forEach(function(vizInfo) {
+            stateStats.visualizations_info.forEach(function(vizInfo) {
               if (vizInfo.show_addressed_info) {
                 unaddressedAnswerData = unaddressedAnswerData.concat(
                   vizInfo.data.filter(function(vizInfoDatum) {

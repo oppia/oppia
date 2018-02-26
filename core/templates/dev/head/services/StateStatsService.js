@@ -35,12 +35,12 @@ oppia.factory('StateStatsService', [
             AngularNameService.getNameOfInteractionRulesService(
               state.interaction.id));
 
-          var stateRulesStats = {
+          var stateStats = {
             state_name: state.name,
             exploration_id: explorationId,
             visualizations_info: response.data.visualizations_info
           };
-          stateRulesStats.visualizations_info.forEach(function(vizInfo) {
+          stateStats.visualizations_info.forEach(function(vizInfo) {
             if (vizInfo.show_addressed_info) {
               vizInfo.data.forEach(function(answerData) {
                 answerData.is_addressed = (
@@ -52,7 +52,7 @@ oppia.factory('StateStatsService', [
             }
           });
 
-          return stateRulesStats;
+          return stateStats;
         });
       }
     };

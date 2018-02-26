@@ -175,7 +175,7 @@ oppia.controller('StatisticsTab', [
 
       StateStatsService.computeStateStats(
         ExplorationStatesService.getState(stateName)
-      ).then(function(stateRulesStats) {
+      ).then(function(stateStats) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/statistics_tab/' +
@@ -192,7 +192,7 @@ oppia.controller('StatisticsTab', [
               return improvementType;
             },
             visualizationsInfo: function() {
-              return stateRulesStats.visualizations_info;
+              return stateStats.visualizations_info;
             }
           },
           controller: [
