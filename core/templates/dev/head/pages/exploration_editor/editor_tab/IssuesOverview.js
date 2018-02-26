@@ -52,7 +52,7 @@ oppia.controller('IssuesOverview', [
             return unaddressedAnswersData;
           });
       }
-    }
+    };
 
     $scope.unaddressedAnswersData = [];
 
