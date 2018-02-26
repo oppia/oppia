@@ -201,10 +201,10 @@ oppia.controller('StatisticsTab', [
             'visualizationsInfo', 'HtmlEscaperService', 'AngularNameService',
             'AnswerClassificationService', 'ENABLE_NEW_STATS_FRAMEWORK',
             function(
-              $scope, $uibModalInstance, $filter, $injector,
-              stateName, stateStats, improvementType,
-              visualizationsInfo, HtmlEscaperService, AngularNameService,
-              AnswerClassificationService, ENABLE_NEW_STATS_FRAMEWORK) {
+                $scope, $uibModalInstance, $filter, $injector,
+                stateName, stateStats, improvementType,
+                visualizationsInfo, HtmlEscaperService, AngularNameService,
+                AnswerClassificationService, ENABLE_NEW_STATS_FRAMEWORK) {
               var COMPLETION_RATE_PIE_CHART_OPTIONS = {
                 left: 20,
                 pieHole: 0.6,
