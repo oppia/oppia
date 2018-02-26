@@ -262,8 +262,6 @@ oppia.controller('StatisticsTab', [
                       visualizationInfo.data);
                     var escapedOptions = HtmlEscaperService.objToEscapedJson(
                       visualizationInfo.options);
-                    var showAddressedInfo =
-                      visualizationInfo.show_addressed_info;
 
                     var el = $(
                       '<oppia-visualization-' +
@@ -271,7 +269,9 @@ oppia.controller('StatisticsTab', [
                       '/>');
                     el.attr('data', escapedData);
                     el.attr('options', escapedOptions);
-                    el.attr('show-addressed-info', showAddressedInfo);
+                    el.attr(
+                      'show-addressed-info',
+                      visualizationInfo.show_addressed_info);
                     return el.get(0).outerHTML;
                   });
 
