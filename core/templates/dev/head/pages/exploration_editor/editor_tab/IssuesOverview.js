@@ -44,7 +44,8 @@ oppia.controller('IssuesOverview', [
                   }));
               }
             });
-            $scope.unaddressedAnswerData = unaddressedAnswerData;
+            // Only keep 5 unaddressed answers.
+            $scope.unaddressedAnswerData = unaddressedAnswerData.slice(0, 5);
           });
       }
     };
