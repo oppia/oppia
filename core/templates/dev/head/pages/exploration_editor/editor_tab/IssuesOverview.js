@@ -22,7 +22,9 @@ oppia.controller('IssuesOverview', [
   function(
       $scope, EditorStateService, ExplorationStatesService,
       StateStatsService) {
-    var computeUnaddressedAnswers = function() {
+    $scope.unaddressedAnswerData = [];
+
+    $scope.computeUnaddressedAnswers = function() {
       var state = ExplorationStatesService.getState(
         EditorStateService.getActiveStateName());
 
@@ -47,8 +49,6 @@ oppia.controller('IssuesOverview', [
       }
     };
 
-    $scope.unaddressedAnswerData = [];
-
-    $scope.$on('refreshStateEditor', computeUnaddressedAnswers);
+    $scope.$on('refreshStateEditor', $scope.computeUnaddressedAnswers);
   }
 ]);
