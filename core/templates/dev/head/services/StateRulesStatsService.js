@@ -25,7 +25,7 @@ oppia.factory('StateRulesStatsService', [
     return {
       // Returns a promise which will provide details of a particular state's
       // answer-statistics and rules.
-      getStateRulesStatsPromise: function(state) {
+      computeStateRulesStats: function(state) {
         var explorationId = ExplorationContextService.getExplorationId();
         return $http.get(
           '/createhandler/state_rules_stats/' + explorationId + '/' +
