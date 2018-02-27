@@ -8,9 +8,10 @@
   ],
   "rules": {
     "angular/directive-restrict": [
-      "error",
+      2,
       {
-        "restrict": "E"
+        "restrict": "E",
+        "explicit": "always"
       }
     ],
     "brace-style":[
