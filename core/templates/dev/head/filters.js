@@ -471,7 +471,7 @@ oppia.filter('getAbbreviatedText', [function () {
   return function (text, characterCount) {
     if (text.length > characterCount) {
       var subject = text.substr(0, characterCount);
-        
+
       if (subject.indexOf(' ') > -1) {
         subject = subject.split(' ').slice(0, -1).join(' ');
       }
