@@ -541,7 +541,7 @@ def get_collection_summaries_matching_ids(collection_ids):
 
 
 def get_nodes_in_playable_order(nodes_list):
-    """Returns the nodes list in playble order.
+    """Returns the nodes list in playable order.
 
     Args:
         nodes_list: list(dict). An unordered list of collection nodes.
@@ -550,7 +550,7 @@ def get_nodes_in_playable_order(nodes_list):
         Exception: Unable to sort the collection nodes in playable order.
 
     Returns:
-        list(dict). A list of collection nodes in playble order.
+        list(dict). A list of collection nodes in playable order.
     """
     unsorted_nodes = nodes_list
     accumulated_skill_ids = set()
@@ -569,7 +569,7 @@ def get_nodes_in_playable_order(nodes_list):
             if index + 1 == len(unsorted_nodes):
                 raise Exception(
                     'Cannot arrange the explorations of this collection in'
-                    'playble order.')
+                    'playable order.')
     return sorted_nodes
 
 

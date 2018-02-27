@@ -1744,3 +1744,77 @@ class GetCollectionAndCollectionRightsTest(CollectionServicesUnitTests):
                 'fake_id'))
         self.assertIsNone(collection)
         self.assertIsNone(collection_rights)
+
+
+class GetCollectionNodeInPlayableOrderTest(CollectionServicesUnitTests):
+
+    def test_get_nodes_in_playable_order(self):
+
+        self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
+
+        # Creating and publishing explorations.
+        self.save_new_valid_exploration('exp_id_0', self.owner_id)
+        self.save_new_valid_exploration('exp_id_1', self.owner_id)
+        rights_manager.publish_exploration(self.owner, 'exp_id_0')
+        rights_manager.publish_exploration(self.owner, 'exp_id_1')
+
+        # Adding skills to collection.
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'skill0'
+            }, {
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'skill1'
+            }], 'Add 2 skills')
+
+        # Adding expxlorations/nodes in collection.
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID,
+            _get_added_exploration_change_list('exp_id_1'),
+            'Add an exploration')
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'exploration_id': 'exp_id_1',
+                'property_name': 'acquired_skill_ids',
+                'new_value': ['skill1']
+            }, {
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'exploration_id': 'exp_id_1',
+                'property_name': 'prerequisite_skill_ids',
+                'new_value': ['skill0']
+            }], 'Changed the collection node property of exp_id_0')
+
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID,
+            _get_added_exploration_change_list('exp_id_0'),
+            'Add an exploration')
+        collection_services.update_collection(
+            self.owner_id, self.COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'exploration_id': 'exp_id_0',
+                'property_name': 'acquired_skill_ids',
+                'new_value': ['skill0']
+            }, {
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'exploration_id': 'exp_id_0',
+                'property_name': 'prerequisite_skill_ids',
+                'new_value': []
+            }], 'Changed the collection node property of exp_id_1')
+
+
+        collection = collection_services.get_collection_by_id(
+            self.COLLECTION_ID).to_dict()
+
+        initial_expected_order = ['exp_id_1', 'exp_id_0']
+        initial_order = [node['exploration_id'] for node in collection['nodes']]
+
+        self.assertEqual(initial_expected_order, initial_order)
+
+        expected_playable_order = ['exp_id_0', 'exp_id_1']
+        nodes_list = collection_services.get_nodes_in_playable_order(
+            collection['nodes'])
+        playable_order = [node['exploration_id'] for node in nodes_list]
+
+        self.assertEqual(expected_playable_order, playable_order)
