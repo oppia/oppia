@@ -36,7 +36,7 @@ describe('Testing filters', function() {
     'truncateAndCapitalize',
     'capitalize',
     'stripFormatting',
-    'removeExtraLines'
+    'removeExtraLinesAndSpace'
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -504,9 +504,6 @@ describe('Testing filters', function() {
       '<p>test</p><p><br></p><p>&nbsp;test</p>');
     expect(filter(
       '<p>test</p><p><br></p><p>&nbsp;test</p><p>&nbsp; &nbsp;</p>')).toEqual(
-      '<p>test</p><p><br></p><p>&nbsp;test</p>');
-    expect(filter(
-      '<p>test</p><p><br></p><p>&nbsp;test</p><p></p>')).toEqual(
       '<p>test</p><p><br></p><p>&nbsp;test</p>');
     expect(filter(null)).toEqual(null);
     expect(filter(undefined)).toEqual(undefined);

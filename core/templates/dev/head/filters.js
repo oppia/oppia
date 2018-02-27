@@ -369,13 +369,13 @@ oppia.filter('removeExtraLinesAndSpace', [function() {
         }
       }
       while (1) {
-        var endIDX = string.length;
-        var bStr = string.substring(endIDX - BLANK_LINES_TEXT.length, endIdx);
-        var pStr = string.substring(endIDX - EMPTY_PARA_TEXT.length, endIdx);
+        var endIdx = string.length;
+        var bStr = string.substring(endIdx - BLANK_LINES_TEXT.length, endIdx);
+        var pStr = string.substring(endIdx - EMPTY_PARA_TEXT.length, endIdx);
         if (bStr === BLANK_LINES_TEXT) {
-          string = string.substring(0, endIDX - BLANK_LINES_TEXT.length);
+          string = string.substring(0, endIdx - BLANK_LINES_TEXT.length);
         } else if (pStr === EMPTY_PARA_TEXT) {
-          string = string.substring(0, endIDX - EMPTY_PARA_TEXT.length);
+          string = string.substring(0, endIdx - EMPTY_PARA_TEXT.length);
         } else {
           break;
         }
