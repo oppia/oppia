@@ -1645,7 +1645,7 @@ class ExplorationVersionsDiff(object):
                     added_state_names.remove(state_name)
                 else:
                     original_state_name = state_name
-                    while original_state_name in new_to_old_state_names:
+                    if original_state_name in new_to_old_state_names:
                         original_state_name = new_to_old_state_names.pop(
                             original_state_name)
                     deleted_state_names.append(original_state_name)
@@ -2485,35 +2485,7 @@ class Exploration(object):
         del self.states[state_name]
 
 
-    def get_state_names_mapping(self, change_list):
-        """Creates a mapping from the current state names of the exploration
-        to their corresponding state names of the older version.
-
-        Args:
-            change_list: list(dict). A list of changes introduced in this
-                commit.
-
-        Returns:
-            dict. The new_to_old_state_names mapping dict.
-        """
-        old_to_new_state_names = {}
-
-        for state_name in self.states:
-            old_to_new_state_names[state_name] = state_name
-
-        exp_versions_diff = ExplorationVersionsDiff(change_list)
-
-        for old_state_name, new_state_name in (
-                exp_versions_diff.old_to_new_state_names.iteritems()):
-            old_to_new_state_names[old_state_name] = new_state_name
-
-        new_to_old_state_names = {
-            value: key for key, value in old_to_new_state_names.iteritems()
-        }
-        return new_to_old_state_names
-
-
-    def get_trainable_states_dict(self, old_states, new_to_old_state_names):
+    def get_trainable_states_dict(self, old_states, exp_versions_diff):
         """Retrieves the state names of all trainable states in an exploration
         segregated into state names with changed and unchanged answer groups.
         In this method, the new_state_name refers to the name of the state in
@@ -2522,8 +2494,8 @@ class Exploration(object):
 
         Args:
             old_states: dict. Dictionary containing all State domain objects.
-            new_to_old_state_names: dict. A mapping from current state names to
-                state names from previous version of the exploration.
+            exp_versions_diff: ExplorationVersionsDiff. An instance of the
+                exploration versions diff class.
 
         Returns:
             dict. The trainable states dict. This dict has three keys
@@ -2541,7 +2513,19 @@ class Exploration(object):
             if not new_state.can_undergo_classification():
                 continue
 
-            old_state_name = new_to_old_state_names[new_state_name]
+            old_state_name = new_state_name
+            if new_state_name in (
+                    exp_versions_diff.old_to_new_state_names.values()):
+                # The structure of ExplorationVersionsDiff's
+                # old_to_new_state_names mapping is that between two versions,
+                # there will always be only one-one correspondence between
+                # states which assure us that we can do reverse lookups in the
+                # dict.
+                old_state_name = [
+                    state_name
+                    for state_name in exp_versions_diff.old_to_new_state_names
+                    if exp_versions_diff.old_to_new_state_names[
+                        state_name] == new_state_name][0]
 
             # The case where a new state is added. When this happens, the
             # old_state_name will be equal to the new_state_name and it will not

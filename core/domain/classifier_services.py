@@ -93,7 +93,7 @@ def handle_trainable_states(exploration, state_names):
 
 
 def handle_non_retrainable_states(exploration, state_names,
-                                  new_to_old_state_names):
+                                  exp_versions_diff):
     """Creates new TrainingJobExplorationMappingModel instances for all the
     state names passed into the function. The mapping is created from the
     state in the new version of the exploration to the ClassifierTrainingJob of
@@ -109,8 +109,8 @@ def handle_non_retrainable_states(exploration, state_names,
     Args:
         exploration: Exploration. The Exploration domain object.
         state_names: list(str). List of state names.
-        new_to_old_state_names: dict. Dict mapping new state names to their
-            corresponding state names in previous version.
+        exp_versions_diff: ExplorationVersionsDiff. An instance of the
+            exploration versions diff class.
 
     Raises:
         Exception. This method should not be called by exploration with version
@@ -126,7 +126,19 @@ def handle_non_retrainable_states(exploration, state_names,
 
     state_names_to_retrieve = []
     for current_state_name in state_names:
-        old_state_name = new_to_old_state_names[current_state_name]
+        old_state_name = current_state_name
+        if current_state_name in (
+                exp_versions_diff.old_to_new_state_names.values()):
+            # The structure of ExplorationVersionsDiff's
+            # old_to_new_state_names mapping is that between two versions,
+            # there will always be only one-one correspondence between
+            # states which assure us that we can do reverse lookups in the
+            # dict.
+            old_state_name = [
+                state_name
+                for state_name in exp_versions_diff.old_to_new_state_names
+                if exp_versions_diff.old_to_new_state_names[
+                    state_name] == current_state_name][0]
         state_names_to_retrieve.append(old_state_name)
     classifier_training_jobs = get_classifier_training_jobs(
         exp_id, old_exp_version, state_names_to_retrieve)

@@ -741,114 +741,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                            {'invalid-code': audio_translation}):
                 subtitled_html.validate()
 
-    def test_get_state_names_mapping(self):
-        """Test the get_state_names_mapping() method."""
-        exp_id = 'exp_id1'
-        test_exp_filepath = os.path.join(
-            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
-        yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list = []
-        exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-            assets_list)
-        exploration = exp_services.get_exploration_by_id(exp_id)
-
-        # Rename a state.
-        exploration.rename_state('Home', 'Renamed state')
-        change_list = [{
-            'cmd': 'rename_state',
-            'old_state_name': 'Home',
-            'new_state_name': 'Renamed state'
-        }]
-
-        expected_dict = {
-            'Renamed state': 'Home',
-            'End': 'End'
-        }
-        actual_dict = exploration.get_state_names_mapping(change_list)
-        self.assertEqual(actual_dict, expected_dict)
-
-        # Add a state
-        exploration.add_states(['New state'])
-        exploration.states['New state'] = copy.deepcopy(
-            exploration.states['Renamed state'])
-        change_list = [{
-            'cmd': 'add_state',
-            'state_name': 'New state',
-        }]
-
-        expected_dict = {
-            'New state': 'New state',
-            'Renamed state': 'Renamed state',
-            'End': 'End'
-        }
-        actual_dict = exploration.get_state_names_mapping(change_list)
-        self.assertEqual(actual_dict, expected_dict)
-
-        # Delete state.
-        exploration.delete_state('New state')
-        change_list = [{
-            'cmd': 'delete_state',
-            'state_name': 'New state'
-        }]
-
-        expected_dict = {
-            'Renamed state': 'Renamed state',
-            'End': 'End'
-        }
-        actual_dict = exploration.get_state_names_mapping(change_list)
-        self.assertEqual(actual_dict, expected_dict)
-
-        # Test addition and multiple renames.
-        exploration.add_states(['New state'])
-        exploration.states['New state'] = copy.deepcopy(
-            exploration.states['Renamed state'])
-        exploration.rename_state('New state', 'New state2')
-        exploration.rename_state('New state2', 'New state3')
-        change_list = [{
-            'cmd': 'add_state',
-            'state_name': 'New state',
-        }, {
-            'cmd': 'rename_state',
-            'old_state_name': 'New state',
-            'new_state_name': 'New state2'
-        }, {
-            'cmd': 'rename_state',
-            'old_state_name': 'New state2',
-            'new_state_name': 'New state3'
-        }]
-
-        expected_dict = {
-            'New state3': 'New state3',
-            'Renamed state': 'Renamed state',
-            'End': 'End'
-        }
-        actual_dict = exploration.get_state_names_mapping(change_list)
-        self.assertEqual(actual_dict, expected_dict)
-
-        # Test addition, rename and deletion.
-        exploration.add_states(['New state 2'])
-        exploration.rename_state('New state 2', 'Renamed state 2')
-        exploration.delete_state('Renamed state 2')
-        change_list = [{
-            'cmd': 'add_state',
-            'state_name': 'New state 2'
-        }, {
-            'cmd': 'rename_state',
-            'old_state_name': 'New state 2',
-            'new_state_name': 'Renamed state 2'
-        }, {
-            'cmd': 'delete_state',
-            'state_name': 'Renamed state 2'
-        }]
-        expected_dict = {
-            'New state3': 'New state3',
-            'Renamed state': 'Renamed state',
-            'End': 'End'
-        }
-        actual_dict = exploration.get_state_names_mapping(change_list)
-        self.assertEqual(actual_dict, expected_dict)
-
     def test_get_trainable_states_dict(self):
         """Test the get_trainable_states_dict() method."""
         exp_id = 'exp_id1'
@@ -878,10 +770,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'state_names_with_changed_answer_groups': [],
             'state_names_with_unchanged_answer_groups': ['Renamed state']
         }
-        new_to_old_state_names = exploration.get_state_names_mapping(
-            change_list)
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         actual_dict = exploration.get_trainable_states_dict(
-            old_states, new_to_old_state_names)
+            old_states, exp_versions_diff)
         self.assertEqual(actual_dict, expected_dict)
 
         # Modify answer groups to trigger change in answer groups.
@@ -902,10 +793,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'state_names_with_changed_answer_groups': ['Renamed state'],
             'state_names_with_unchanged_answer_groups': []
         }
-        new_to_old_state_names = exploration.get_state_names_mapping(
-            change_list)
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         actual_dict = exploration.get_trainable_states_dict(
-            old_states, new_to_old_state_names)
+            old_states, exp_versions_diff)
         self.assertEqual(actual_dict, expected_dict)
 
         # Add new state to trigger change in answer groups.
@@ -922,10 +812,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'New state', 'Renamed state'],
             'state_names_with_unchanged_answer_groups': []
         }
-        new_to_old_state_names = exploration.get_state_names_mapping(
-            change_list)
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         actual_dict = exploration.get_trainable_states_dict(
-            old_states, new_to_old_state_names)
+            old_states, exp_versions_diff)
         self.assertEqual(actual_dict, expected_dict)
 
         # Delete state.
@@ -939,10 +828,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'state_names_with_changed_answer_groups': ['Renamed state'],
             'state_names_with_unchanged_answer_groups': []
         }
-        new_to_old_state_names = exploration.get_state_names_mapping(
-            change_list)
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         actual_dict = exploration.get_trainable_states_dict(
-            old_states, new_to_old_state_names)
+            old_states, exp_versions_diff)
         self.assertEqual(actual_dict, expected_dict)
 
         # Test addition and multiple renames.
@@ -969,10 +857,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'Renamed state', 'New state3'],
             'state_names_with_unchanged_answer_groups': []
         }
-        new_to_old_state_names = exploration.get_state_names_mapping(
-            change_list)
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         actual_dict = exploration.get_trainable_states_dict(
-            old_states, new_to_old_state_names)
+            old_states, exp_versions_diff)
         self.assertEqual(actual_dict, expected_dict)
 
     def test_is_demo_property(self):

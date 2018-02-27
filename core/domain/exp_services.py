@@ -874,10 +874,9 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             change_list)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
-        new_to_old_state_names = exploration.get_state_names_mapping(
-            change_list)
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         trainable_states_dict = exploration.get_trainable_states_dict(
-            old_states, new_to_old_state_names)
+            old_states, exp_versions_diff)
         state_names_with_changed_answer_groups = trainable_states_dict[
             'state_names_with_changed_answer_groups']
         state_names_with_unchanged_answer_groups = trainable_states_dict[
@@ -888,7 +887,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         if state_names_with_unchanged_answer_groups:
             classifier_services.handle_non_retrainable_states(
                 exploration, state_names_with_unchanged_answer_groups,
-                new_to_old_state_names)
+                exp_versions_diff)
 
     # Save state id mapping model for exploration.
     create_and_save_state_id_mapping_model(exploration, change_list)

@@ -234,9 +234,6 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
         # Handling state additions, deletions and renames.
-        for state_name in exp_versions_diff.added_state_names:
-            prev_stats_dict['state_stats_mapping'][state_name] = (
-                stats_domain.StateStats.create_default())
 
         for state_name in exp_versions_diff.deleted_state_names:
             prev_stats_dict['state_stats_mapping'].pop(state_name)
@@ -245,6 +242,10 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 exp_versions_diff.old_to_new_state_names.iteritems()):
             prev_stats_dict['state_stats_mapping'][new_state_name] = (
                 prev_stats_dict['state_stats_mapping'].pop(old_state_name))
+
+        for state_name in exp_versions_diff.added_state_names:
+            prev_stats_dict['state_stats_mapping'][state_name] = (
+                stats_domain.StateStats.create_default())
 
         prev_stats_dict['exp_version'] += 1
 
