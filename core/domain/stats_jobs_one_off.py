@@ -241,8 +241,8 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         for state_name in exp_versions_diff.deleted_state_names:
             prev_stats_dict['state_stats_mapping'].pop(state_name)
 
-        for new_state_name, old_state_name in (
-                exp_versions_diff.new_to_old_state_names.iteritems()):
+        for old_state_name, new_state_name in (
+                exp_versions_diff.old_to_new_state_names.iteritems()):
             prev_stats_dict['state_stats_mapping'][new_state_name] = (
                 prev_stats_dict['state_stats_mapping'].pop(old_state_name))
 

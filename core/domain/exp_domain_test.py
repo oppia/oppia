@@ -58,8 +58,8 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(exp_versions_diff.added_state_names, [])
         self.assertEqual(exp_versions_diff.deleted_state_names, [])
-        self.assertEqual(exp_versions_diff.new_to_old_state_names, {
-            'Renamed state': 'Home'
+        self.assertEqual(exp_versions_diff.old_to_new_state_names, {
+            'Home': 'Renamed state'
         })
         self.exploration.version += 1
 
@@ -76,7 +76,7 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(exp_versions_diff.added_state_names, ['New state'])
         self.assertEqual(exp_versions_diff.deleted_state_names, [])
-        self.assertEqual(exp_versions_diff.new_to_old_state_names, {})
+        self.assertEqual(exp_versions_diff.old_to_new_state_names, {})
         self.exploration.version += 1
 
         # Delete state.
@@ -90,7 +90,7 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(exp_versions_diff.added_state_names, [])
         self.assertEqual(exp_versions_diff.deleted_state_names, ['New state'])
-        self.assertEqual(exp_versions_diff.new_to_old_state_names, {})
+        self.assertEqual(exp_versions_diff.old_to_new_state_names, {})
         self.exploration.version += 1
 
         # Test addition and multiple renames.
@@ -116,7 +116,7 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(exp_versions_diff.added_state_names, ['New state3'])
         self.assertEqual(exp_versions_diff.deleted_state_names, [])
-        self.assertEqual(exp_versions_diff.new_to_old_state_names, {})
+        self.assertEqual(exp_versions_diff.old_to_new_state_names, {})
         self.exploration.version += 1
 
         # Test addition, rename and deletion.
@@ -139,7 +139,7 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(exp_versions_diff.added_state_names, [])
         self.assertEqual(exp_versions_diff.deleted_state_names, [])
-        self.assertEqual(exp_versions_diff.new_to_old_state_names, {})
+        self.assertEqual(exp_versions_diff.old_to_new_state_names, {})
         self.exploration.version += 1
 
         # Test multiple renames and deletion.
@@ -164,7 +164,7 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exp_versions_diff.added_state_names, [])
         self.assertEqual(
             exp_versions_diff.deleted_state_names, ['New state3'])
-        self.assertEqual(exp_versions_diff.new_to_old_state_names, {})
+        self.assertEqual(exp_versions_diff.old_to_new_state_names, {})
         self.exploration.version += 1
 
 
@@ -819,7 +819,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }]
 
         expected_dict = {
-            'New state3': 'New state',
+            'New state3': 'New state3',
             'Renamed state': 'Renamed state',
             'End': 'End'
         }

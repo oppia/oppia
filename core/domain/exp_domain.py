@@ -1620,8 +1620,8 @@ class ExplorationVersionsDiff(object):
             exploration from prev_exp_version to current_exp_version.
         deleted_state_names: list(str). Name of the states deleted from the
             exploration from prev_exp_version to current_exp_version.
-        new_to_old_state_names: dict. Dictionary mapping state names of
-            current_exp_version to the state names of prev_exp_version.
+        old_to_new_state_names: dict. Dictionary mapping state names of
+            prev_exp_version to the state names of current_exp_version.
     """
 
     def __init__(self, change_list):
@@ -1663,7 +1663,9 @@ class ExplorationVersionsDiff(object):
 
         self.added_state_names = added_state_names
         self.deleted_state_names = deleted_state_names
-        self.new_to_old_state_names = new_to_old_state_names
+        self.old_to_new_state_names = {
+            value: key for key, value in new_to_old_state_names.iteritems()
+        }
 
 
 class Exploration(object):
@@ -2499,12 +2501,11 @@ class Exploration(object):
         for state_name in self.states:
             old_to_new_state_names[state_name] = state_name
 
-        for change_dict in reversed(change_list):
-            if change_dict['cmd'] == CMD_RENAME_STATE:
-                if change_dict['new_state_name'] in old_to_new_state_names:
-                    old_to_new_state_names[change_dict['old_state_name']] = (
-                        old_to_new_state_names.pop(change_dict[
-                            'new_state_name']))
+        exp_versions_diff = ExplorationVersionsDiff(change_list)
+
+        for old_state_name, new_state_name in (
+                exp_versions_diff.old_to_new_state_names.iteritems()):
+            old_to_new_state_names[old_state_name] = new_state_name
 
         new_to_old_state_names = {
             value: key for key, value in old_to_new_state_names.iteritems()
