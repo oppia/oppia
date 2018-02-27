@@ -1620,6 +1620,8 @@ class ExplorationVersionsDiff(object):
             exploration from prev_exp_version to current_exp_version.
         deleted_state_names: list(str). Name of the states deleted from the
             exploration from prev_exp_version to current_exp_version.
+        new_to_old_state_names: dict. Dictionary mapping state names of
+            current_exp_version to the state names of prev_exp_version.
         old_to_new_state_names: dict. Dictionary mapping state names of
             prev_exp_version to the state names of current_exp_version.
     """
@@ -1663,6 +1665,7 @@ class ExplorationVersionsDiff(object):
 
         self.added_state_names = added_state_names
         self.deleted_state_names = deleted_state_names
+        self.new_to_old_state_names = new_to_old_state_names
         self.old_to_new_state_names = {
             value: key for key, value in new_to_old_state_names.iteritems()
         }
@@ -2514,18 +2517,9 @@ class Exploration(object):
                 continue
 
             old_state_name = new_state_name
-            if new_state_name in (
-                    exp_versions_diff.old_to_new_state_names.values()):
-                # The structure of ExplorationVersionsDiff's
-                # old_to_new_state_names mapping is that between two versions,
-                # there will always be only one-one correspondence between
-                # states which assure us that we can do reverse lookups in the
-                # dict.
-                old_state_name = [
-                    state_name
-                    for state_name in exp_versions_diff.old_to_new_state_names
-                    if exp_versions_diff.old_to_new_state_names[
-                        state_name] == new_state_name][0]
+            if new_state_name in exp_versions_diff.new_to_old_state_names:
+                old_state_name = exp_versions_diff.new_to_old_state_names[
+                    new_state_name]
 
             # The case where a new state is added. When this happens, the
             # old_state_name will be equal to the new_state_name and it will not

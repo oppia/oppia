@@ -126,18 +126,9 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
     state_names_to_retrieve = []
     for current_state_name in state_names:
         old_state_name = current_state_name
-        if current_state_name in (
-                exp_versions_diff.old_to_new_state_names.values()):
-            # The structure of ExplorationVersionsDiff's
-            # old_to_new_state_names mapping is that between two versions,
-            # there will always be only one-one correspondence between
-            # states which assure us that we can do reverse lookups in the
-            # dict.
-            old_state_name = [
-                state_name
-                for state_name in exp_versions_diff.old_to_new_state_names
-                if exp_versions_diff.old_to_new_state_names[
-                    state_name] == current_state_name][0]
+        if current_state_name in exp_versions_diff.new_to_old_state_names:
+            old_state_name = exp_versions_diff.new_to_old_state_names[
+                current_state_name]
         state_names_to_retrieve.append(old_state_name)
     classifier_training_jobs = get_classifier_training_jobs(
         exp_id, old_exp_version, state_names_to_retrieve)
