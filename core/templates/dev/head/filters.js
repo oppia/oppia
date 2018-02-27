@@ -341,9 +341,7 @@ oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
   };
 }]);
 
-// Note that this filter removes additional new lines or <p><br></p> tags
-// at the end of the string.
-oppia.filter('removeExtraLines', [function() {
+oppia.filter('remove', [function() {
   return function(string) {
     if (!angular.isString(string)) {
       return string;
@@ -351,15 +349,33 @@ oppia.filter('removeExtraLines', [function() {
     var BLANK_LINES_TEXT = '<p><br></p>';
     var EMPTY_PARA_TEXT = '<p></p>';
     while (1) {
-      var endIndex = string.length;
-      var bStr = string.substring(endIndex - BLANK_LINES_TEXT.length, endIndex);
-      var pStr = string.substring(endIndex - EMPTY_PARA_TEXT.length, endIndex);
-      if (bStr === BLANK_LINES_TEXT) {
-        string = string.substring(0, endIndex - BLANK_LINES_TEXT.length);
-      } else if (pStr === EMPTY_PARA_TEXT) {
-        string = string.substring(0, endIndex - EMPTY_PARA_TEXT.length);
-      } else {
+      var strlength = string.lastIndexOf('<');
+      if (string[strlength - 1] !== ' ' &&
+          string.substring(strlength - 4, strlength) !== '<br>' &&
+          string.substring(strlength - 6, strlength) !== '&nbsp;') {
         break;
+      }
+      while (1) {
+        var lng = string.lastIndexOf('<');
+        if (string[lng - 1] === ' ') {
+          string = string.substring(0, lng - 1) + '</p>';
+        } else if (string.substring(lng - 6, lng) === '&nbsp;') {
+          string = string.substring(0, lng - 6) + '</p>';
+        } else {
+          break;
+        }
+      }
+      while (1) {
+        var endIDX = string.length;
+        var bStr = string.substring(endIDX - BLANK_LINES_TEXT.length, endIdx);
+        var pStr = string.substring(endIDX - EMPTY_PARA_TEXT.length, endIdx);
+        if (bStr === BLANK_LINES_TEXT) {
+          string = string.substring(0, endIDX - BLANK_LINES_TEXT.length);
+        } else if (pStr === EMPTY_PARA_TEXT) {
+          string = string.substring(0, endIDX - EMPTY_PARA_TEXT.length);
+        } else {
+          break;
+        }
       }
     }
     return string;
