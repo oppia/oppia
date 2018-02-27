@@ -27,11 +27,11 @@ oppia.directive('topNavigationBar', [
         '/components/top_navigation_bar/' +
         'top_navigation_bar_directive.html'),
       controller: [
-        '$scope', '$http', '$window', '$timeout', '$translate', '$cookies',
+        '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS',
         'siteAnalyticsService', 'WindowDimensionsService', 'DebouncerService',
         function(
-            $scope, $http, $window, $timeout, $translate, $cookies,
+            $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS,
             siteAnalyticsService, WindowDimensionsService, DebouncerService) {
           if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
