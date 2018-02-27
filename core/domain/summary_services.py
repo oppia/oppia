@@ -148,6 +148,8 @@ def get_learner_collection_dict_by_id(
         completed_exp_ids = []
 
     collection_dict = collection.to_dict()
+    collection_dict["nodes"] = collection_services.get_nodes_in_playable_order(
+        collection_dict['nodes'])
     collection_dict['playthrough_dict'] = {
         'next_exploration_ids': next_exploration_ids,
         'completed_exploration_ids': completed_exp_ids
