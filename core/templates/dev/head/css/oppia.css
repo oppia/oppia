@@ -1064,6 +1064,7 @@ textarea {
 }
 
 .oppia-sidebar-menu-open .oppia-sidebar-menu {
+  height: 100vh;
   box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
   overflow-y: scroll;
   -ms-transform: translate(0, 0);
