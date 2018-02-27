@@ -341,7 +341,10 @@ oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
   };
 }]);
 
-oppia.filter('remove', [function() {
+// Filter that targets to remove occurance of blank lines, empty paragraphs
+// and spaces at the end of string. It'll remove <p></p>, <p><br></p>, spaces
+// and &nbsp; occurances from the end of the string.
+oppia.filter('removeExtraLinesAndSpace', [function() {
   return function(string) {
     if (!angular.isString(string)) {
       return string;
