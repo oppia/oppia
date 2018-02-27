@@ -92,8 +92,7 @@ def handle_trainable_states(exploration, state_names):
         job_exploration_mappings)
 
 
-def handle_non_retrainable_states(exploration, state_names,
-                                  exp_versions_diff):
+def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
     """Creates new TrainingJobExplorationMappingModel instances for all the
     state names passed into the function. The mapping is created from the
     state in the new version of the exploration to the ClassifierTrainingJob of
