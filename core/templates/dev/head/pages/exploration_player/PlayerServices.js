@@ -346,9 +346,6 @@ oppia.factory('ExplorationPlayerService', [
       getCorrectCount: function() {
         return correctCount;
       },
-      incrementCorrectCount: function() {
-        correctCount = correctCount + 1;
-      },
       submitAnswer: function(answer, interactionRulesService, successCallback) {
         if (answerIsBeingProcessed) {
           return;

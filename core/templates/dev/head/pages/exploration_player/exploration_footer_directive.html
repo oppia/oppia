@@ -183,7 +183,7 @@
 <div class="footer navbar-fixed-bottom oppia-exploration-footer">
   <div class="row">
     <div class="col-sm-5">
-      <ul class="author-profile" ng-if="!windowIsNarrow">
+      <ul class="author-profile" ng-if="!windowIsNarrow && getNumberOfCorrectAnswers() == 0">
         <li>
           <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>"
                class="exploration-footer-img"
@@ -215,15 +215,15 @@
           </div>
         </li>
       </ul>
-      <hint-and-solution-buttons ng-if="windowIsNarrow"></hint-and-solution-buttons>
-      <div class="star-container" ng-if="windowIsNarrow">
-        <i class="material-icons star">&#xE838;</i>
-        <span class="star-content">{{getNumberOfCorrectAnswers()}}</span>
-      </div>
+      <hint-and-solution-buttons ng-if="windowIsNarrow || getNumberOfCorrectAnswers()"></hint-and-solution-buttons>
     </div>
     <div class="col-sm-7">
       <div class="pull-right">
-        <hint-and-solution-buttons ng-if="!windowIsNarrow"></hint-and-solution-buttons>
+        <hint-and-solution-buttons ng-if="!windowIsNarrow && getNumberOfCorrectAnswers() == 0"></hint-and-solution-buttons>
+      </div>
+      <div class="star-container pull-right" ng-if="getNumberOfCorrectAnswers()">
+        <i class="material-icons star">&#xE838;</i>
+        <span class="star-content">{{getNumberOfCorrectAnswers()}}</span>
       </div>
     </div>
   </div>
