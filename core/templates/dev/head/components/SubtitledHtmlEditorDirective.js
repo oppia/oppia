@@ -22,23 +22,21 @@ oppia.directive('subtitledHtmlEditor', [
     return {
       restrict: 'E',
       scope: {
-        componentName: '@',
         subtitledHtml: '=',
         getOnSaveFn: '&onSaveFn'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/subtitled_html_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'stateContentService',
-        'EditabilityService', 'componentName',
+        '$scope', '$uibModal', 'EditabilityService',
+        'COMPONENT_NAME_HTML',
         function(
             $scope, $uibModal, EditabilityService,
-            componentName) {
+            COMPONENT_NAME_HTML) {
           $scope.subtitledHtmlEditorIsOpen = false;
           $scope.subtitledMemento = null;
 
-          $scope.componentName = componentName;
-          $scope.subtitledHtml = subtitledHtml;
+          $scope.COMPONENT_NAME_HTML = COMPONENT_NAME_HTML;
 
           var openMarkAllAudioAsNeedingUpdateModal = function() {
             $uibModal.open({
