@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import astroid
+
 from pylint.checkers import BaseChecker
 from pylint.interfaces import IAstroidChecker
 
