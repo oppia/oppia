@@ -31,7 +31,9 @@ oppia.controller('LearnerViewInfo', [
       } else {
         $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
           params: {
-            stringified_exp_ids: JSON.stringify([explorationId])
+            stringified_exp_ids: JSON.stringify([explorationId]),
+            include_private_explorations: JSON.stringify(
+              true)
           }
         }).then(function(response) {
           expInfo = response.data.summaries[0];
