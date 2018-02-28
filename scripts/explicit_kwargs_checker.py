@@ -13,12 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-#
-#
-# Assumptions:
-# 1. No two functions have the same name.
-# 2. Any function has only two types of arguments: positional and keyword.
 
 import astroid
 from pylint.checkers import BaseChecker
