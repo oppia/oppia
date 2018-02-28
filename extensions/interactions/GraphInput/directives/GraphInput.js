@@ -759,7 +759,7 @@ oppia.directive('graphViz', [
           $scope.getEdgeCentre = function(index) {
             return graphDetailService.getEdgeCentre($scope.graph, index);
           };
-          
+
           // Initial value of SVG view box.
           $scope.svgViewBox = '';
           
