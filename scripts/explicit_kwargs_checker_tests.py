@@ -15,10 +15,9 @@
 # limitations under the License.
 
 import astroid
+import explicit_kwargs_checker  # pylint: disable=relative-import
 
 import pylint.testutils
-
-import explicit_kwargs_checker
 
 
 class ExplicitKwargsCheckerTests(pylint.testutils.CheckerTestCase):
