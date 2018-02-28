@@ -1,11 +1,9 @@
-<form ng-disabled="FractionInputForm.$invalid" ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
+<form ng-disabled="FractionInputForm.$invalid" ng-submit="submitAnswer(answer)" role="form" class="form-horizontal fraction-input-interaction">
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
-  <fraction-input-interaction>
-    <ng-form name="FractionInputForm" class="input">
-      <input type="text" name="answer" ng-model="answer" class="form-control"
-            ng-attr-placeholder="<[customPlaceholder !== '' ? customPlaceholder : (allowNonzeroIntegerPart ? ('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER' | translate) : ('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER' | translate))]>">
-    </ng-form>
-  </fraction-input-interaction>
+  <ng-form name="FractionInputForm" class="input">
+    <input type="text" name="answer" ng-model="answer" class="form-control"
+          ng-attr-placeholder="<[customPlaceholder !== '' ? customPlaceholder : (allowNonzeroIntegerPart ? ('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER' | translate) : ('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER' | translate))]>">
+  </ng-form>
 
   <div class="oppia-form-error oppia-fraction-input-error">
     <[getWarningText()]>
@@ -23,7 +21,7 @@
     outline-color: red;
   }
 
-  fraction-input-interaction .input .form-control {
+  .fraction-input-interaction .input .form-control {
     width: 100%;
   }
 </style>
