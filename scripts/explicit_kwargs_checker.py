@@ -61,9 +61,9 @@ class ExplicitKwargsChecker(BaseChecker):
         Args:
             node. Arguments. The current function arguments node.
         """
-        if node.defaults != None:
+        if node.defaults is not None:
             self._defaults_count = len(node.defaults)
-            if node.args != None:
+            if node.args is not None:
                 self._positional_arguments_count = (
                     len(node.args) - len(node.defaults))
 
@@ -75,7 +75,7 @@ class ExplicitKwargsChecker(BaseChecker):
         """
         if (isinstance(node.func, astroid.Name) and
                 node.func.name == self._function_name):
-            if (node.args != None and
+            if (node.args is not None and
                     len(node.args) > self._positional_arguments_count):
                 self.add_message('non-explicit-kwargs', node=node)
 
