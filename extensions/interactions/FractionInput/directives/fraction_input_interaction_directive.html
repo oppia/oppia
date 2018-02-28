@@ -8,7 +8,7 @@
   <div class="oppia-form-error oppia-fraction-input-error">
     <[getWarningText()]>
   </div>
-  <private-info-tooltip></private-info-tooltip>
+  <private-info-tooltip id="fraction-input-tooltip"></private-info-tooltip>
 </form>
 
 <style>
@@ -19,5 +19,11 @@
   .ng-invalid {
     border-color: red;
     outline-color: red;
+  }
+
+  #fraction-input-tooltip {
+    padding-left: 410px;
+    padding-top: 18px;
+    position: absolute;
   }
 </style>

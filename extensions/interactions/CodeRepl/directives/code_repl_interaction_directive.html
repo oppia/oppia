@@ -7,6 +7,7 @@
         </div>
       </div>
       <md-button type="button" class="md-raised" ng-disabled="!interactionIsActive" ng-click="runCode(code)" ng-disabled="!hasLoaded">Test Run</md-button>
+      <private-info-tooltip id="code-repl-tooltip"></private-info-tooltip>
       <span class="code-repl-language">
         <em>Language: <[language]></em>
       </span>
@@ -22,5 +23,11 @@
     <pre ng-if="output" class="code-repl-terminal"><[output]></pre>
     <pre ng-if="!output" class="code-repl-terminal">[No terminal output]</pre>
   </div>
-  <private-info-tooltip></private-info-tooltip>
 </div>
+
+
+<style>
+  #code-repl-tooltip {
+    padding-left: 5px;
+  }
+</style>

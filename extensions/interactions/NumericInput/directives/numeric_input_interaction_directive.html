@@ -5,8 +5,16 @@
       <ng-form name="numericInputForm">
         <schema-based-editor schema="NUMERIC_INPUT_FORM_SCHEMA" local-value="answer" label-for-focus-target="labelForFocusTarget">
         </schema-based-editor>
-        <private-info-tooltip></private-info-tooltip>
+        <private-info-tooltip id="numeric-input-tooltip"></private-info-tooltip>
       </ng-form>
     </div>
   </form>
 </div>
+
+<style>
+  #numeric-input-tooltip {
+    padding-left: 410px;
+    padding-top: 18px;
+    position: absolute;
+  }
+</style>
