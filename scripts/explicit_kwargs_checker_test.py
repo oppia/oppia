@@ -20,7 +20,7 @@ import explicit_kwargs_checker  # pylint: disable=relative-import
 import pylint.testutils
 
 
-class ExplicitKwargsCheckerTests(pylint.testutils.CheckerTestCase):
+class ExplicitKwargsCheckerTest(pylint.testutils.CheckerTestCase):
     CHECKER_CLASS = explicit_kwargs_checker.ExplicitKwargsChecker
 
     def finds_non_explicit_kwargs_test(self):
