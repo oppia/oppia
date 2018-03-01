@@ -802,6 +802,39 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def require_non_negative(
             cls, exp_id, exp_version, property_name, value, state_name=None):
+        """Data regarding negative counts.
+
+        Args:
+            exp_id: str. id of the exploration
+            exp_version: str. version of the exploration
+            property_name: str. name of the property is the key in dict value
+            value: dict. its structure is as follows:
+                {
+                    'num_starts_v1': int. # of times exploration was
+                        started.
+                    'num_completions_v1': int. # of times exploration was
+                        completed.
+                    'num_actual_starts_v1': int. # of times exploration was
+                        actually started.
+                    'state_stats_mapping': A dict containing the values of
+                        stats for the states of the exploration. It is
+                        formatted as follows:
+                        {
+                            state_name: {
+                                'total_answers_count_v1',
+                                'useful_feedback_count_v1',
+                                'total_hit_count_v1',
+                                'first_hit_count_v1',
+                                'num_completions_v1'
+                            }
+                        }
+                }
+            state_name: str or None. name of the state is the key in dict
+                state_stats_mapping, which in turn is the key of dict value.
+
+        Yield:
+            string. Gives a string determining negative count.
+        """
         state_name = state_name if state_name else ''
         if value[property_name] < 0:
             yield (
