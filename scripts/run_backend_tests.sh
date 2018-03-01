@@ -88,7 +88,7 @@ for arg in "$@"; do
   fi
 done
 
-$PYTHON_CMD scripts/backend_tests.py --test_target core.domain.feedback_jobs_one_off_test $@
+$PYTHON_CMD scripts/backend_tests.py $@
 
 for arg in "$@"; do
   if [ "$arg" == "--generate_coverage_report" ]; then

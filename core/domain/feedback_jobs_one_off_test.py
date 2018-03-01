@@ -132,49 +132,45 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
     EXP_ID_1 = 'eid1'
 
     EXPECTED_THREAD_DICT1 = {
-        'status': u'open',
-        'unused_state_name': u'a_state_name',
         'summary': u'a small summary',
-        'original_author_username': None,
         'subject': u'(Feedback from a learner)'
     }
 
     EXPECTED_THREAD_DICT2 = {
-        'status': u'open',
-        'unused_state_name': u'a_state_name',
         'summary': u'a small summary',
-        'original_author_username': None,
         'subject': u'Some subject'
     }
 
     EXPECTED_THREAD_DICT3 = {
-        'status': u'open',
-        'unused_state_name': u'a_state_name',
         'summary': (
             u'It has to convert to a substring as it exceeds the '
             u'character limit.'),
-        'original_author_username': None,
         'subject': u'(Feedback from a learner)'
     }
 
     EXPECTED_THREAD_DICT4 = {
-        'status': u'open',
-        'unused_state_name': u'a_state_name',
         'summary': (
             u'Itisjustaverylongsinglewordfortestingget'
             u'AbbreviatedText.'),
-        'original_author_username': None,
         'subject': u'(Feedback from a learner)'
     }
 
     EXPECTED_THREAD_DICT5 = {
-        'status': u'open',
-        'unused_state_name': u'a_state_name',
         'summary': '',
-        'original_author_username': None,
         'subject': u'(Feedback from a learner)'
     }
 
+    EXPECTED_THREAD_DICT6 = {
+        'summary': 'Itisjustaverylongsinglewordfortesting',
+        'subject': u'(Feedback from a learner)'
+    }
+
+    EXPECTED_THREAD_DICT7 = {
+        'summary': (
+            u'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od; '
+            u'/⏬®;😁☕😁:☝)😁😁😍1!@#'),
+        'subject': u'(Feedback from a learner)'
+    }
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
 
@@ -205,25 +201,26 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
     def test_that_job_returns_correct_feedback_subject(self):
         """Test if the job returns the correct feedback subject."""
         feedback_services.create_thread(
-            self.EXP_ID_1, self.EXPECTED_THREAD_DICT1['unused_state_name'],
-            self.user_id, self.EXPECTED_THREAD_DICT1['subject'],
-            'not used here')
+            self.EXP_ID_1, 'unused_state_name', self.user_id,
+            self.EXPECTED_THREAD_DICT1['subject'], 'not used here')
         feedback_services.create_thread(
-            self.EXP_ID_1, self.EXPECTED_THREAD_DICT2['unused_state_name'],
-            self.user_id, self.EXPECTED_THREAD_DICT2['subject'],
-            'not used here')
+            self.EXP_ID_1, 'unused_state_name', self.user_id,
+            self.EXPECTED_THREAD_DICT2['subject'], 'not used here')
         feedback_services.create_thread(
-            self.EXP_ID_1, self.EXPECTED_THREAD_DICT3['unused_state_name'],
-            self.user_id, self.EXPECTED_THREAD_DICT3['subject'],
-            'not used here')
+            self.EXP_ID_1, 'unused_state_name', self.user_id,
+            self.EXPECTED_THREAD_DICT3['subject'], 'not used here')
         feedback_services.create_thread(
-            self.EXP_ID_1, self.EXPECTED_THREAD_DICT4['unused_state_name'],
-            self.user_id, self.EXPECTED_THREAD_DICT4['subject'],
-            'not used here')
+            self.EXP_ID_1, 'unused_state_name', self.user_id,
+            self.EXPECTED_THREAD_DICT4['subject'], 'not used here')
         feedback_services.create_thread(
-            self.EXP_ID_1, self.EXPECTED_THREAD_DICT5['unused_state_name'],
-            self.user_id, self.EXPECTED_THREAD_DICT5['subject'],
-            'not used here')
+            self.EXP_ID_1, 'unused_state_name', self.user_id,
+            self.EXPECTED_THREAD_DICT5['subject'], 'not used here')
+        feedback_services.create_thread(
+            self.EXP_ID_1, 'unused_state_name', self.user_id,
+            self.EXPECTED_THREAD_DICT6['subject'], 'not used here')
+        feedback_services.create_thread(
+            self.EXP_ID_1, 'unused_state_name', self.user_id,
+            self.EXPECTED_THREAD_DICT6['subject'], 'not used here')
         thread_ids = subscription_services.get_all_threads_subscribed_to(
             self.user_id)
         feedback_services.add_summary_to_feedback(
@@ -236,7 +233,10 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
             thread_ids[3], self.EXPECTED_THREAD_DICT4['summary'])
         feedback_services.add_summary_to_feedback(
             thread_ids[4], self.EXPECTED_THREAD_DICT5['summary'])
-
+        feedback_services.add_summary_to_feedback(
+            thread_ids[5], self.EXPECTED_THREAD_DICT6['summary'])
+        feedback_services.add_summary_to_feedback(
+            thread_ids[6], self.EXPECTED_THREAD_DICT7['summary'])
         self._run_one_off_job()
 
         threads = feedback_services.get_threads(self.EXP_ID_1)
@@ -250,3 +250,9 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
             threads[3].subject,
             u'ItisjustaverylongsinglewordfortestinggetAbbreviate...')
         self.assertEqual(threads[4].subject, u'(Feedback from a learner)')
+        self.assertEqual(
+            threads[5].subject,
+            u'Itisjustaverylongsinglewordfortesting')
+        self.assertEqual(
+            threads[6].subject,
+            u'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od;...')
