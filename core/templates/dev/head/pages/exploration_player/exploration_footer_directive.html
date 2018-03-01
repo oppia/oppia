@@ -142,17 +142,17 @@
     font-size: 44px;
     padding: 0 0 4px 0;
     position: absolute;
-    right: 0;
-    top: -4px;
+    right: 10px;
+    top: -1px;
     width: 45px;
   }
 
   .oppia-exploration-footer .star-content {
     color: #094142;
-    font-size: 12px;
+    font-size: 18px;
     position: absolute;
-    right: 19px;
-    top: 17px;
+    right: 27px;
+    top: 21px;
   }
 
   @media (max-width: 475px) {
@@ -183,45 +183,10 @@
 <div class="footer navbar-fixed-bottom oppia-exploration-footer">
   <div class="row">
     <div class="col-sm-5">
-      <ul class="author-profile" ng-if="!windowIsNarrow && getNumberOfCorrectAnswers() == 0">
-        <li>
-          <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>"
-               class="exploration-footer-img"
-               alt="">
-        </li>
-        <li class="hover-link"
-            ng-mouseenter="hovering = true"
-            ng-mouseleave="hovering = false"
-            tabindex="0"
-            aria-haspopup="true"
-            aria-expanded="false">
-          <div uib-dropdown class="dropup" ng-class="{'open':hovering}">
-            <a uib-dropdown-toggle id="dropdownMenu2"
-               ng-class="{'hovered-text':hovering}"
-               data-toggle="dropdown"
-               ng-if="contributorNames.length > 0"
-               role="menuitem"
-               aria-haspopup="true"
-               aria-expanded="false">
-              <h4 translate="I18N_FOOTER_AUTHOR_PROFILES" class="author-profile-text"
-                  ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}"></h4>
-            </a>
-            <ul uib-dropdown-menu class="author-profile-dropdown-menu uib-dropdown-menu"
-                aria-labelledby="dropdownMenu2" role="menu">
-              <li ng-repeat="name in contributorNames | limitTo: 5">
-                <a href="/profile/<[name]>" target="_blank"><[name]></a>
-              </li>
-            </ul>
-          </div>
-        </li>
-      </ul>
-      <hint-and-solution-buttons ng-if="windowIsNarrow || getNumberOfCorrectAnswers()"></hint-and-solution-buttons>
+      <hint-and-solution-buttons ng-if="windowIsNarrow || getNumberOfCorrectAnswers() > 0"></hint-and-solution-buttons>
     </div>
     <div class="col-sm-7">
-      <div class="pull-right">
-        <hint-and-solution-buttons ng-if="!windowIsNarrow && getNumberOfCorrectAnswers() == 0"></hint-and-solution-buttons>
-      </div>
-      <div class="star-container pull-right" ng-if="getNumberOfCorrectAnswers()">
+      <div class="star-container pull-right" ng-if="getNumberOfCorrectAnswers() > 0">
         <i class="material-icons star">&#xE838;</i>
         <span class="star-content">{{getNumberOfCorrectAnswers()}}</span>
       </div>
