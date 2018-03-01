@@ -13,17 +13,30 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# For details on how to write such tests, please refer to
+# https://github.com/oppia/oppia/wiki/Writing-Tests
+
+import os
+import sys
 
 import astroid
 import explicit_kwargs_checker  # pylint: disable=relative-import
 
-import pylint.testutils
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_ISORT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'isort-4.2.15')
+sys.path.insert(0, _ISORT_PATH)
+
+# Since this module needs to be imported after adding Isort path,
+# we need to disable isort for this line.
+# pylint: disable=wrong-import-position
+import pylint.testutils  # isort:skip
 
 
 class ExplicitKwargsCheckerTest(pylint.testutils.CheckerTestCase):
     CHECKER_CLASS = explicit_kwargs_checker.ExplicitKwargsChecker
 
-    def finds_non_explicit_kwargs_test(self):
+    def test_finds_non_explicit_kwargs(self):
         func_node = astroid.extract_node("""
         def test(test_var_one, test_var_two=4, test_var_three=5, test_var_four="test_checker"): #@
             test_var_five = test_var_two + test_var_three
