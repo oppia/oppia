@@ -1,4 +1,6 @@
 {
+	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "Создать исследование",
+	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT": "о теме, о которой вы заботитесь.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_HEADING": "Об Oppia",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE": "Опубликовать &amp; поделиться",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_DONATE_BUTTON": "Пожертвовать",
