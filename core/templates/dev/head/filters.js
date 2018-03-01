@@ -341,9 +341,9 @@ oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
   };
 }]);
 
-// Filter that targets to remove occurance of blank lines, empty paragraphs
+// Filter that targets to remove occurrence of blank lines, empty paragraphs
 // and spaces at the end of string. It'll remove <p></p>, <p><br></p>, spaces
-// and &nbsp; occurances from the end of the string.
+// and &nbsp; occurrences from the end of the string.
 oppia.filter('removeExtraLinesAndSpace', [function() {
   return function(string) {
     if (!angular.isString(string)) {
@@ -351,19 +351,29 @@ oppia.filter('removeExtraLinesAndSpace', [function() {
     }
     var BLANK_LINES_TEXT = '<p><br></p>';
     var EMPTY_PARA_TEXT = '<p></p>';
+    var BLANK_CHAR = ' ';
+    var BREAK_LINE_TAG = '<br>';
+    var SPACE_ENTITY = '&nbsp;';
     while (1) {
-      var strlength = string.lastIndexOf('<');
-      if (string[strlength - 1] !== ' ' &&
-          string.substring(strlength - 4, strlength) !== '<br>' &&
-          string.substring(strlength - 6, strlength) !== '&nbsp;') {
+      var lastIndexOfClosingTag = string.lastIndexOf('<');
+      if (string[lastIndexOfClosingTag - 1] !== BLANK_CHAR &&
+          string.substring(
+            lastIndexOfClosingTag - 4, lastIndexOfClosingTag
+          ) !== BREAK_LINE_TAG &&
+          string.substring(
+            lastIndexOfClosingTag - 6, lastIndexOfClosingTag
+          ) !== SPACE_ENTITY) {
         break;
       }
       while (1) {
         var lng = string.lastIndexOf('<');
-        if (string[lng - 1] === ' ') {
-          string = string.substring(0, lng - 1) + '</p>';
-        } else if (string.substring(lng - 6, lng) === '&nbsp;') {
-          string = string.substring(0, lng - 6) + '</p>';
+        if (string[lastIndexOfClosingTag - 1] === BLANK_CHAR) {
+          string = string.substring(0, lastIndexOfClosingTag - 1) + '</p>';
+        } else if (
+          string.substring(
+            lastIndexOfClosingTag - 6, lastIndexOfClosingTag
+          ) === SPACE_ENTITY) {
+          string = string.substring(0, lastIndexOfClosingTag - 6) + '</p>';
         } else {
           break;
         }
