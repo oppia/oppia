@@ -236,7 +236,9 @@ oppia.filter('parameterizeRuleDescription', [
         } else if (varType === 'Fraction') {
           replacementText = FractionObjectFactory
             .fromDict(inputs[varName]).toString();
-        } else if (varType === 'SetOfUnicodeString') {
+        } else if (
+          varType === 'SetOfUnicodeString' ||
+          varType === 'SetOfNormalizedString') {
           replacementText = '[';
           for (var i = 0; i < inputs[varName].length; i++) {
             if (i !== 0) {
@@ -251,9 +253,17 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = inputs[varName] + '';
         } else if (
           varType === 'CodeString' || varType === 'UnicodeString' ||
-          varType === 'LogicErrorCategory' || varType === 'NormalizedString' ||
-          varType === 'SetOfNormalizedString') {
+          varType === 'LogicErrorCategory' || varType === 'NormalizedString') {
           replacementText = inputs[varName];
+        } else if (varType === 'ListOfCodeEvaluation') {
+          replacementText = '[';
+          for (var i = 0; i < inputs[varName].length; i++) {
+            if (i !== 0) {
+              replacementText += ', ';
+            }
+            replacementText += inputs[varName][i].code;
+          }
+          replacementText += ']';
         } else {
           throw Error('Unknown variable type in rule description');
         }
@@ -328,6 +338,31 @@ oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
     } else {
       return input;
     }
+  };
+}]);
+
+// Note that this filter removes additional new lines or <p><br></p> tags
+// at the end of the string.
+oppia.filter('removeExtraLines', [function() {
+  return function(string) {
+    if (!angular.isString(string)) {
+      return string;
+    }
+    var BLANK_LINES_TEXT = '<p><br></p>';
+    var EMPTY_PARA_TEXT = '<p></p>';
+    while (1) {
+      var endIndex = string.length;
+      var bStr = string.substring(endIndex - BLANK_LINES_TEXT.length, endIndex);
+      var pStr = string.substring(endIndex - EMPTY_PARA_TEXT.length, endIndex);
+      if (bStr === BLANK_LINES_TEXT) {
+        string = string.substring(0, endIndex - BLANK_LINES_TEXT.length);
+      } else if (pStr === EMPTY_PARA_TEXT) {
+        string = string.substring(0, endIndex - EMPTY_PARA_TEXT.length);
+      } else {
+        break;
+      }
+    }
+    return string;
   };
 }]);
 

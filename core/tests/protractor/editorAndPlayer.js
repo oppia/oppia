@@ -21,7 +21,8 @@ var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
-var collectionEditor = require('../protractor_utils/collectionEditor.js');
+var CollectionEditorPage =
+  require('../protractor_utils/CollectionEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var CreatorDashboardPage =
@@ -37,6 +38,7 @@ describe('Full exploration editor', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
   });
 
   it('should prevent going back when help card is shown', function() {
@@ -223,15 +225,15 @@ describe('Full exploration editor', function() {
       creatorDashboardPage.clickCreateCollectionButton();
       general.waitForSystem();
       browser.waitForAngular();
-      collectionEditor.searchForAndAddExistingExploration(
+      collectionEditorPage.searchForAndAddExistingExploration(
         'Parent Exploration in collection');
-      collectionEditor.saveDraft();
-      collectionEditor.closeSaveModal();
-      collectionEditor.publishCollection();
-      collectionEditor.setTitle('Test Collection');
-      collectionEditor.setObjective('This is a test collection.');
-      collectionEditor.setCategory('Algebra');
-      collectionEditor.saveChanges();
+      collectionEditorPage.saveDraft();
+      collectionEditorPage.closeSaveModal();
+      collectionEditorPage.publishCollection();
+      collectionEditorPage.setTitle('Test Collection');
+      collectionEditorPage.setObjective('This is a test collection.');
+      collectionEditorPage.setCategory('Algebra');
+      collectionEditorPage.saveChanges();
       browser.waitForAngular();
 
       browser.get('/search/find?q=');

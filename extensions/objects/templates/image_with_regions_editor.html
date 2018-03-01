@@ -1,6 +1,6 @@
 <div ng-if="$parent.value.imagePath === ''">
-  <schema-based-editor 
-    local-value="$parent.$parent.value.imagePath" 
+  <schema-based-editor
+    local-value="$parent.$parent.value.imagePath"
     schema="{type: 'custom', obj_type: 'Filepath'}">
   </schema-based-editor>
 </div>
@@ -13,7 +13,8 @@
     ng-mousedown="onSvgMouseDown($event)"
     ng-mousemove="onSvgMouseMove($event)"
     ng-mouseup="onSvgMouseUp($event)">
-    <image xlink:href="<[getPreviewUrl($parent.$parent.value.imagePath)]>"
+    <image ng-href="<[getPreviewUrl($parent.$parent.value.imagePath)]>"
+      xlink:href=""
       x="0"
       y="0"
       ng-attr-height="<[getImageHeight()]>"
@@ -66,7 +67,7 @@
   <div style="color: red; margin-bottom: 4px"><[errorText]></div>
   <button type="button" class="btn btn-danger" ng-click="resetEditor()">Clear Image and Regions</button>
 </div>
-<script type="text/ng-template" id="modals/imageRegionsResetConfirmation">    
+<script type="text/ng-template" id="modals/imageRegionsResetConfirmation">
   <div class="modal-header">
     <h4 class="modal-title">Clear Image and Regions</h4>
   </div>
