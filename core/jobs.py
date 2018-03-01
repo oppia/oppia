@@ -401,7 +401,7 @@ class BaseJobManager(object):
 
         Returns:
             float. The time the job got finished in milliseconds after the
-                Epoch.
+                epoch.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
@@ -928,7 +928,7 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         Raises:
             BadReaderParamsError: Required parameters are missing or invalid.
         """
-        return True  # TODO
+        return True  # TODO.
 
 
 class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
@@ -945,7 +945,7 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
     @staticmethod
     def _get_job_queued_msec():
         """Returns the time when the job got queued, in milliseconds past the
-        Epoch.
+        epoch.
         """
         return float(context.get().mapreduce_spec.mapper.params[
             MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])

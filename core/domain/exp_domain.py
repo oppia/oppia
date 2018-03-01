@@ -1443,7 +1443,7 @@ class State(object):
                     if (isinstance(value, basestring) and
                             '{{' in value and '}}' in value):
                         # TODO(jacobdavis11): Create checks that all parameters
-                        # referred to exist and have the correct types
+                        # referred to exist and have the correct types.
                         normalized_param = value
                     else:
                         try:

@@ -579,6 +579,98 @@ def _check_bad_pattern_in_file(filename, content, pattern):
     return False
 
 
+def _check_bad_pattern_in_comments(filename, content):
+    """Detects whether comments end with a period.
+
+    Args:
+        filename: str. Name of the file.
+        content: str. Contents of the file.
+
+    Returns:
+        bool. True if there is bad pattern else false.
+    """
+    regexp_comment = r'#[^\n]*[^.,\n]\n( |\t)*(#(( |\t)*[A-Z])|[^#\s]|[\n])'
+    message = 'There should be a period at the end of the comment.'
+    punctuations = ['.', ',', ';', ':', '?']
+    excluded_words = ['utf', 'pylint:', 'http://', 'https://']
+    excluded_dirs = ()
+    excluded_files = ()
+    if not (
+        any(filename.startswith(excluded_dir)
+        for excluded_dir in excluded_dirs)
+        or filename in excluded_files):
+        bad_pattern_count = 0
+        # Finds comments with a missing period.
+        for matchobj in re.finditer(regexp_comment, content):
+            start = matchobj.start() + 1
+            position_counter = 0
+            for line_index, line in enumerate(content.splitlines(True)):
+                if (position_counter + len(line.rstrip())) >= start:
+                    line_num = line_index + 1
+                    break
+                else:
+                    position_counter += len(line)
+            line = content.splitlines(True)[line_num-1].rstrip()
+            if (
+                not any(word in line
+                for word in excluded_words)
+                and line[-1] not in punctuations):
+                print '%s --> Line %s: %s' % (
+                    filename, line_num, message)
+                bad_pattern_count += 1
+    if bad_pattern_count:
+        return True
+    return False
+
+
+def _check_bad_pattern_in_docstrings(filename, content):
+    """Detects whether docstrings end with a period.
+
+    Args:
+        filename: str. Name of the file.
+        content: str. Contents of the file.
+
+    Returns:
+        bool. True if there is bad pattern else false.
+    """
+    message = 'There should be a period at the end of the docstring.'
+    punctuations = ['.', ',', ';', ':', '?']
+    excluded_words = ['utf', 'pylint:', 'http://', 'https://']
+    excluded_dirs = ()
+    excluded_files = ()
+    if (
+        not (any(filename.startswith(excluded_dir)
+        for excluded_dir in excluded_dirs)
+        or filename in excluded_files)):
+        bad_pattern_count = 0
+        # Finds docstrings with a missing period.
+        content = content.splitlines(True)
+        length = len(content)
+        index = 0
+        while index < length:
+            line = content[index].lstrip().rstrip()
+            if (
+                line.startswith('"""') and line.endswith('"""')
+                and len(line) > 6):
+                if line[-4] != '.':
+                   print '%s --> Line %s: %s' % (
+                filename, index + 1, message)
+                   bad_pattern_count += 1
+            elif line.startswith('"""'):
+                while index < length and not '"""' in line:
+                    index += 1
+                line = content[index-1].lstrip().rstrip()
+                if len(line) and line[-1] not in punctuations:
+                    print '%s --> Line %s: %s' % (
+                filename, index, message)
+                    bad_pattern_count += 1
+            index += 1
+
+        if bad_pattern_count:
+            return True
+    return False
+
+
 def _check_bad_patterns(all_files):
     """This function is used for detecting bad patterns.
     """
@@ -614,6 +706,14 @@ def _check_bad_patterns(all_files):
                 for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
                     if _check_bad_pattern_in_file(filename, content, regexp):
                         failed = True
+                        total_error_count += 1
+
+            if filename.endswith('.py'):
+                    if _check_bad_pattern_in_comments(filename, content):
+                        #failed = True
+                        total_error_count += 1
+                    if _check_bad_pattern_in_docstrings(filename, content):
+                        #failed = True
                         total_error_count += 1
 
             if filename == 'feconf.py':

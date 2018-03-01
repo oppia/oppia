@@ -907,7 +907,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
 
-            # Enqueue the batch computation. (It is running on 0 events.)
+            # Enqueue the batch computation. (It is running on 0 events).
             StartExplorationEventCounter._kickoff_batch_job()  # pylint: disable=protected-access
             # Record an event while this job is in the queue. Simulate
             # this by directly calling on_incoming_event(), because using
