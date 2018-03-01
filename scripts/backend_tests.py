@@ -30,7 +30,9 @@ import subprocess
 import threading
 import time
 
+# pylint: disable=relative-import
 from explicit_kwargs_checker_test import ExplicitKwargsCheckerTest
+
 # pylint: enable=wrong-import-order
 
 
@@ -242,9 +244,12 @@ def main():
     """Run the tests."""
 
     # Run the tests for explicit_kwargs_checker.
-    explicit_kwargs_checker_test_obj = ExplicitKwargsCheckerTest()  # Create  an instance of the class.
-    explicit_kwargs_checker_test_obj.setup_method()  # Initialize the test object.
-    explicit_kwargs_checker_test_obj.test_finds_non_explicit_kwargs()  # Call the test method.
+    # Create  an instance of the class.
+    explicit_kwargs_checker_test_obj = ExplicitKwargsCheckerTest()
+    # Initialize the test object.
+    explicit_kwargs_checker_test_obj.setup_method()
+    # Call the test method.
+    explicit_kwargs_checker_test_obj.test_finds_non_explicit_kwargs()
 
     parsed_args = _PARSER.parse_args()
     if parsed_args.test_target and parsed_args.test_path:
