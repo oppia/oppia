@@ -133,7 +133,7 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
 
     EXPECTED_THREAD_DICT1 = {
         'status': u'open',
-        'state_name': u'a_state_name',
+        'unused_state_name': u'a_state_name',
         'summary': u'a small summary',
         'original_author_username': None,
         'subject': u'(Feedback from a learner)'
@@ -141,7 +141,7 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
 
     EXPECTED_THREAD_DICT2 = {
         'status': u'open',
-        'state_name': u'a_state_name',
+        'unused_state_name': u'a_state_name',
         'summary': u'a small summary',
         'original_author_username': None,
         'subject': u'Some subject'
@@ -149,8 +149,28 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
 
     EXPECTED_THREAD_DICT3 = {
         'status': u'open',
-        'state_name': u'a_state_name',
-        'summary': u'It has to convert to a substring as it exceeds the character limit.', # pylint: disable=line-too-long
+        'unused_state_name': u'a_state_name',
+        'summary': (
+            u'It has to convert to a substring as it exceeds the '
+            u'character limit.'),
+        'original_author_username': None,
+        'subject': u'(Feedback from a learner)'
+    }
+
+    EXPECTED_THREAD_DICT4 = {
+        'status': u'open',
+        'unused_state_name': u'a_state_name',
+        'summary': (
+            u'Itisjustaverylongsinglewordfortestingget'
+            u'AbbreviatedText.'),
+        'original_author_username': None,
+        'subject': u'(Feedback from a learner)'
+    }
+
+    EXPECTED_THREAD_DICT5 = {
+        'status': u'open',
+        'unused_state_name': u'a_state_name',
+        'summary': '',
         'original_author_username': None,
         'subject': u'(Feedback from a learner)'
     }
@@ -169,13 +189,12 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.owner_id, title='Bridges in England',
             category='Architecture', language_code='en')
-        self.save_new_valid_exploration(
-            self.EXP_ID_1, self.owner_id, title='Sillat Suomi',
-            category='Architecture', language_code='fi')
+
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        job_id = feedback_jobs_one_off.FeedbackSubjectOneOffJob.create_new() # pylint: disable=line-too-long
+        job_id = (
+            feedback_jobs_one_off.FeedbackSubjectOneOffJob.create_new())
         feedback_jobs_one_off.FeedbackSubjectOneOffJob.enqueue(
             job_id)
         self.assertEqual(
@@ -183,32 +202,41 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
-    def test_feedback_subject(self):
+    def test_that_job_returns_correct_feedback_subject(self):
         """Test if the job returns the correct feedback subject."""
         feedback_services.create_thread(
-            self.EXP_ID_1, self.EXPECTED_THREAD_DICT1['state_name'],
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT1['unused_state_name'],
             self.user_id, self.EXPECTED_THREAD_DICT1['subject'],
             'not used here')
         feedback_services.create_thread(
-            self.EXP_ID_1, self.EXPECTED_THREAD_DICT2['state_name'],
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT2['unused_state_name'],
             self.user_id, self.EXPECTED_THREAD_DICT2['subject'],
             'not used here')
         feedback_services.create_thread(
-            self.EXP_ID_1, self.EXPECTED_THREAD_DICT3['state_name'],
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT3['unused_state_name'],
             self.user_id, self.EXPECTED_THREAD_DICT3['subject'],
             'not used here')
-
+        feedback_services.create_thread(
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT4['unused_state_name'],
+            self.user_id, self.EXPECTED_THREAD_DICT4['subject'],
+            'not used here')
+        feedback_services.create_thread(
+            self.EXP_ID_1, self.EXPECTED_THREAD_DICT5['unused_state_name'],
+            self.user_id, self.EXPECTED_THREAD_DICT5['subject'],
+            'not used here')
         thread_ids = subscription_services.get_all_threads_subscribed_to(
             self.user_id)
         feedback_services.add_summary_to_feedback(
-            thread_ids[0], self.EXPECTED_THREAD_DICT1['summary']
-            )
+            thread_ids[0], self.EXPECTED_THREAD_DICT1['summary'])
         feedback_services.add_summary_to_feedback(
-            thread_ids[1], self.EXPECTED_THREAD_DICT2['summary']
-            )
+            thread_ids[1], self.EXPECTED_THREAD_DICT2['summary'])
         feedback_services.add_summary_to_feedback(
-            thread_ids[2], self.EXPECTED_THREAD_DICT3['summary']
-            )
+            thread_ids[2], self.EXPECTED_THREAD_DICT3['summary'])
+        feedback_services.add_summary_to_feedback(
+            thread_ids[3], self.EXPECTED_THREAD_DICT4['summary'])
+        feedback_services.add_summary_to_feedback(
+            thread_ids[4], self.EXPECTED_THREAD_DICT5['summary'])
+
         self._run_one_off_job()
 
         threads = feedback_services.get_threads(self.EXP_ID_1)
@@ -218,3 +246,7 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             threads[2].subject,
             u'It has to convert to a substring as it exceeds...')
+        self.assertEqual(
+            threads[3].subject,
+            u'ItisjustaverylongsinglewordfortestinggetAbbreviate...')
+        self.assertEqual(threads[4].subject, u'(Feedback from a learner)')

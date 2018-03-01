@@ -19,6 +19,7 @@
 import ast
 import logging
 
+from constants import constants
 from core import jobs
 from core.domain import feedback_services
 from core.platform import models
@@ -71,23 +72,26 @@ class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class FeedbackSubjectOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for updating the feedback subject."""
 
+    DEFAULT_SUBJECT = '(Feedback from a learner)'
+
     @classmethod
     def entity_classes_to_map_over(cls):
         return [feedback_models.FeedbackThreadModel]
 
     @staticmethod
     def map(item):
-        if item.subject != '(Feedback from a learner)':
+        if item.subject != FeedbackSubjectOneOffJob.DEFAULT_SUBJECT:
             return
         if not item.summary:
             return
-        characterCount = 50
-        if len(item.summary) > characterCount:
-            updated_subject = item.summary[0:characterCount]
 
-            if updated_subject.index(' ') > -1:
-                s = ' '
-                updated_subject = s.join(updated_subject.split(' ')[:-1])
+        if len(item.summary) > constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT:
+            updated_subject = item.summary[
+                :constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT
+                ]
+
+            if ' ' in updated_subject:
+                updated_subject = ' '.join(updated_subject.split(' ')[:-1])
             updated_subject = updated_subject + '...'
             item.subject = updated_subject
         else:
