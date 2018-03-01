@@ -358,10 +358,10 @@ oppia.filter('removeExtraLinesAndSpace', [function() {
       var lastIndexOfClosingTag = string.lastIndexOf('<');
       if (string[lastIndexOfClosingTag - 1] !== BLANK_CHAR &&
           string.substring(
-            lastIndexOfClosingTag - 4, lastIndexOfClosingTag
+            lastIndexOfClosingTag - BREAK_LINE_TAG.length, lastIndexOfClosingTag
           ) !== BREAK_LINE_TAG &&
           string.substring(
-            lastIndexOfClosingTag - 6, lastIndexOfClosingTag
+            lastIndexOfClosingTag - SPACE_ENTITY.length, lastIndexOfClosingTag
           ) !== SPACE_ENTITY) {
         break;
       }
@@ -371,9 +371,10 @@ oppia.filter('removeExtraLinesAndSpace', [function() {
           string = string.substring(0, lastIndexOfClosingTag - 1) + '</p>';
         } else if (
           string.substring(
-            lastIndexOfClosingTag - 6, lastIndexOfClosingTag
+            lastIndexOfClosingTag - SPACE_ENTITY.length, lastIndexOfClosingTag
           ) === SPACE_ENTITY) {
-          string = string.substring(0, lastIndexOfClosingTag - 6) + '</p>';
+          string = string.substring(
+            0, lastIndexOfClosingTag - SPACE_ENTITY.length) + '</p>';
         } else {
           break;
         }
