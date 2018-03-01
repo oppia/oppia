@@ -307,7 +307,7 @@ oppia.directive('graphViz', [
 
           var vizContainer = $($element).find('.oppia-graph-viz-svg');
           $scope.vizWidth = vizContainer.width();
-          
+
           $scope.mousemoveGraphSVG = function(event) {
             if (!$scope.isInteractionActive()) {
               return;
@@ -782,10 +782,10 @@ oppia.directive('graphViz', [
 
           // Initial value of SVG view box.
           $scope.svgViewBox = '';
-          
+
           if ($scope.isInteractionActive()) {
             $scope.init();
-            
+
             // Set the SVG viewBox to appropriate size.
             $timeout(function() {
               var svgContainer = $($element).find('.oppia-graph-viz-svg')[0];
