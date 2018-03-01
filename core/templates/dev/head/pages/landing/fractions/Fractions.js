@@ -28,6 +28,6 @@ oppia.controller('Fractions', [
       $timeout(function() {
         $window.location = '/explore/ereONiVLp-VE';
       }, 150);
-    };  
+    };
   }
 ]);
