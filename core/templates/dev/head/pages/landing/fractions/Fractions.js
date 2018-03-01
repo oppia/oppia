@@ -17,8 +17,17 @@
  */
 
 oppia.controller('Fractions', [
-  '$scope', 'UrlInterpolationService',
-  function($scope, UrlInterpolationService) {
+  '$scope', '$timeout', '$window', 'UrlInterpolationService',
+  function($scope, $timeout, $window, UrlInterpolationService) {
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+    $scope.getStaticSubjectImageUrl = function(subjectName) {
+      return UrlInterpolationService.getStaticImageUrl('/subjects/' +
+        subjectName + '.svg');
+    };
+    $scope.onClickGetStartedButton = function() {
+      $timeout(function() {
+        $window.location = '/explore/ereONiVLp-VE';
+      }, 150);
+    };  
   }
 ]);

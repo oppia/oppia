@@ -30,12 +30,11 @@ class FractionLandingPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        version_id = self.request.get('v')
+        viewerType = self.request.get('viewerType')
 
-        if not version_id:
-            version_ids = ['a', 'b', 'c', 'd']
-            version_id = random.choice(version_ids)
-            self.redirect('/fractions?v=%s' % version_id)
+        if not viewerType:
+            viewerType = 'student'
+            self.redirect('/fractions?viewerType=%s' % viewerType)
 
         self.render_template(
-            'pages/landing/fractions/landing_page_%s.html' % version_id)
+            'pages/landing/fractions/landing_page_%s.html' % viewerType)
