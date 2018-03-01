@@ -116,6 +116,7 @@ oppia.controller('LearnerViewInfo', [
               expInfo.last_updated_msec);
             $scope.numViews = expInfo.num_views;
             $scope.objective = expInfo.objective;
+            $scope.status = expInfo.status;
 
             $scope.cancel = function() {
               $uibModalInstance.dismiss();
