@@ -557,8 +557,8 @@ def get_nodes_in_playable_order(nodes_list):
     sorted_nodes = []
     while len(unsorted_nodes):
         for index, node in enumerate(unsorted_nodes):
-            prerequisite_skill_ids = set(node["prerequisite_skill_ids"])
-            acquired_skill_ids = set(node["acquired_skill_ids"])
+            prerequisite_skill_ids = set(node['prerequisite_skill_ids'])
+            acquired_skill_ids = set(node['acquired_skill_ids'])
 
             if prerequisite_skill_ids <= accumulated_skill_ids:
                 sorted_nodes.append(node)
