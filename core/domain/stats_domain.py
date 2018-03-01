@@ -303,8 +303,7 @@ class StateStats(object):
 
     @property
     def num_completions(self):
-        """Returns total number of times the state was completed (both for
-        versions 1 and 2).
+        """Returns total number of times the state was completed.
 
         Returns:
             int. The total number of times the state was completed.
@@ -316,8 +315,8 @@ class StateStats(object):
         """Returns the number of times the solution button was triggered.
 
         Returns:
-            int. Number of times the solution
-                button was triggered to answer a state (only for version 2).
+            int. Number of times the solution button was triggered to answer a
+                state (only for version 2).
         """
         return self.num_times_solution_viewed_v2
 
@@ -517,7 +516,7 @@ class SubmittedAnswer(object):
         """Returns the dict of submitted answer.
 
         Returns:
-            dict(str, *). The submitted answer dict.
+            dict. The submitted answer dict.
         """
         submitted_answer_dict = {
             'answer': self.answer,
@@ -734,7 +733,7 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         """Returns the categorized frequency dict in its raw type.
 
         Returns:
-            dict(str, list). Categorized answer frequency dict with category
+            dict. Categorized answer frequency dict with category
                 type as the keys and answer frequency list as the values.
         """
         return {
