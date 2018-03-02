@@ -18,9 +18,9 @@
 
 oppia.controller('Fractions', [
   '$scope', '$timeout', '$window',
-  'siteAnalyticsService','UrlInterpolationService',
+  'siteAnalyticsService', 'UrlInterpolationService',
   function($scope, $timeout, $window,
-    siteAnalyticsService, UrlInterpolationService) {
+      siteAnalyticsService, UrlInterpolationService) {
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.getStaticSubjectImageUrl = function(subjectName) {
       return UrlInterpolationService.getStaticImageUrl('/subjects/' +
