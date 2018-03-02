@@ -592,7 +592,8 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
       _sendEventToGoogleAnalytics('PlayerFinishExploration', 'click', '');
     },
     registerOpenFractionsFromLandingPageEvent: function(viewerType) {
-      _sendEventToGoogleAnalytics('OpenFractionsFromLandingPage', 'click', viewerType);
+      _sendEventToGoogleAnalytics(
+        'OpenFractionsFromLandingPage', 'click', viewerType);
     }
   };
 }]);
