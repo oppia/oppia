@@ -18,7 +18,8 @@
 
 oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT', 30);
 
-oppia.constant('FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
+oppia.constant(
+  'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
   constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT);
 
 oppia.filter('spacesToUnderscores', [function() {

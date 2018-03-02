@@ -72,7 +72,7 @@ class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class FeedbackSubjectOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for updating the feedback subject."""
 
-    DEFAULT_SUBJECT = '(Feedback from a learner)'
+    DEFAULT_SUBJECT = u'(Feedback from a learner)'
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -80,24 +80,27 @@ class FeedbackSubjectOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if item.subject != FeedbackSubjectOneOffJob.DEFAULT_SUBJECT:
+        yield (item.id, item.subject)
+
+    @staticmethod
+    def reduce(key, stringified_subject):
+        if stringified_subject[0] != FeedbackSubjectOneOffJob.DEFAULT_SUBJECT:
             return
-        if not item.summary:
+        thread_model = feedback_models.FeedbackThreadModel.get(key)
+        first_message = feedback_services.get_message(
+            thread_model.exploration_id, thread_model.thread_id, 0)
+
+        if not first_message.text:
             return
 
-        if len(item.summary) > constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT:
-            updated_subject = item.summary[
-                :constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT
-                ]
+        if len(first_message.text) > constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT:
+            updated_subject = first_message.text[
+                :constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT]
 
             if ' ' in updated_subject:
                 updated_subject = ' '.join(updated_subject.split(' ')[:-1])
             updated_subject = updated_subject + '...'
-            item.subject = updated_subject
+            thread_model.subject = updated_subject
         else:
-            item.subject = item.summary
-        item.put(update_last_updated_time=False)
-
-    @staticmethod
-    def reduce(key, value):
-        pass
+            thread_model.subject = first_message.text
+        thread_model.put(update_last_updated_time=False)
