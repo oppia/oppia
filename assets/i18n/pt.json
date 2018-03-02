@@ -208,6 +208,7 @@
 	"I18N_PLAYER_LEAVE_FEEDBACK": "Deixa a tua opinião aos autores...",
 	"I18N_PLAYER_LOADING": "A carregar...",
 	"I18N_PLAYER_NO_OBJECTIVE": "Nenhum objectivo específicado.",
+	"I18N_PLAYER_IS_PRIVATE": "Esta exploração é privada.",
 	"I18N_PLAYER_NO_TAGS": "Não foram especificadas etiquetas.",
 	"I18N_PLAYER_PLUS_TAGS": "<[additionalTagNumber]>+ mais etiquetas",
 	"I18N_PLAYER_PREVIOUS_RESPONSES": "Respostas anteriores (<[previousResponses]>)",

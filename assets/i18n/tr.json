@@ -203,6 +203,7 @@
 	"I18N_PLAYER_LEAVE_FEEDBACK": "Yazarlar için dönüt bırak...",
 	"I18N_PLAYER_LOADING": "Yükleniyor...",
 	"I18N_PLAYER_NO_OBJECTIVE": "Hedef belirtilmedi.",
+	"I18N_PLAYER_IS_PRIVATE": "Bu keşif özel.",
 	"I18N_PLAYER_NO_TAGS": "Etiketler belirtilmedi.",
 	"I18N_PLAYER_PLUS_TAGS": "<[additionalTagNumber]>+ daha fazla etiket",
 	"I18N_PLAYER_PREVIOUS_RESPONSES": "Önceki cevaplar (<[previousResponses]>)",

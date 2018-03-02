@@ -202,6 +202,7 @@
 	"I18N_PLAYER_LEAVE_FEEDBACK": "Visszajelzés az alkotóknak…",
 	"I18N_PLAYER_LOADING": "Betöltés…",
 	"I18N_PLAYER_NO_OBJECTIVE": "Nincs meghatározva cél.",
+	"I18N_PLAYER_IS_PRIVATE": "Ez a felfedezés privát.",
 	"I18N_PLAYER_NO_TAGS": "Nincs megadva címke.",
 	"I18N_PLAYER_PLUS_TAGS": "<[additionalTagNumber]>+ több kategória",
 	"I18N_PLAYER_PREVIOUS_RESPONSES": "Előző válaszok (<[previousResponses]>)",

@@ -351,6 +351,7 @@
 	"I18N_PLAYER_LOADING": "載入中...",
 	"I18N_PLAYER_NEXT_LESSON": "下一個課程",
 	"I18N_PLAYER_NO_OBJECTIVE": "未指明對象。",
+	"I18N_PLAYER_IS_PRIVATE": "這項探索是私人的 ",
 	"I18N_PLAYER_NO_TAGS": "未指明標籤。",
 	"I18N_PLAYER_PLAY_EXPLORATION": "遊玩探索",
 	"I18N_PLAYER_PLUS_TAGS": "<[additionalTagNumber]>+更多標籤",

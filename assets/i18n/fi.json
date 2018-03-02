@@ -165,6 +165,7 @@
 	"I18N_PLAYER_LEAVE_FEEDBACK": "Jätä palautetta tekijöille...",
 	"I18N_PLAYER_LOADING": "Ladataan...",
 	"I18N_PLAYER_NO_OBJECTIVE": "Tavoitetta ei ole määritelty.",
+	"I18N_PLAYER_IS_PRIVATE": "Tämä etsintä on yksityistä.",
 	"I18N_PLAYER_NO_TAGS": "Arvoja ei ole määritetty.",
 	"I18N_PLAYER_RATINGS_TOOLTIP": "Arvioinnit",
 	"I18N_PLAYER_REPORT_MODAL_BODY_OTHER": "Muu",

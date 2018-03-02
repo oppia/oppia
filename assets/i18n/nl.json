@@ -181,6 +181,7 @@
 	"I18N_PLAYER_LEAVE_FEEDBACK": "Terugkoppeling geven voor de auteurs",
 	"I18N_PLAYER_LOADING": "Bezig met laden…",
 	"I18N_PLAYER_NO_OBJECTIVE": "Geen doel opgegeven.",
+	"I18N_PLAYER_IS_PRIVATE": "Deze verkenning is privé.",
 	"I18N_PLAYER_NO_TAGS": "Geen labels opgegeven.",
 	"I18N_PLAYER_PLUS_TAGS": "<[additionalTagNumber]>+ extra labels",
 	"I18N_PLAYER_PREVIOUS_RESPONSES": "Eerdere antwoorden (<[previousResponses]>)",
