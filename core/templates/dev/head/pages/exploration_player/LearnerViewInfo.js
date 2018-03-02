@@ -116,7 +116,8 @@ oppia.controller('LearnerViewInfo', [
               expInfo.last_updated_msec);
             $scope.numViews = expInfo.num_views;
             $scope.objective = expInfo.objective;
-            $scope.status = expInfo.status;
+            $scope.isExplorationPrivate = (
+              expInfo.status === 'private' ? true : false);
 
             $scope.cancel = function() {
               $uibModalInstance.dismiss();
