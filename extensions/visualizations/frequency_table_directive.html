@@ -1,13 +1,28 @@
-<strong><[options.title]></strong>
+<strong>
+  <[options.title]>
+</strong>
 <table class="table">
+  <colgroup>
+    <col span="1" style="width: 70%;">
+    <col span="1" style="width: 15%;">
+    <col span="1" style="width: 15%;">
+  </colgroup>
   <tr>
-    <th><[options.column_headers[0]]></th>
-    <th><[options.column_headers[1]]></th>
+    <th>
+      <[options.column_headers[0]]>
+    </th>
+    <th>
+      <[options.column_headers[1]]>
+    </th>
     <th ng-if="isAddressed !== null">Addressed specifically?</th>
   </tr>
   <tr ng-repeat="row in data track by $index">
-    <td><[row.answer]></td>
-    <td><[row.frequency]></td>
+    <td>
+      <[row.answer]>
+    </td>
+    <td>
+      <[row.frequency]>
+    </td>
     <td ng-if="isAddressed !== null">
       <span ng-if="isAddressed[$index]">Yes</span>
       <span ng-if="!isAddressed[$index]">No</span>
@@ -20,6 +35,7 @@
     margin-top: 12px;
     table-layout: fixed;
   }
+
   oppia-visualization-frequency-table table td:first-child {
     width: 60%;
     word-wrap: break-word;
