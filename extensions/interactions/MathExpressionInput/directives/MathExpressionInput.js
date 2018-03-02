@@ -47,7 +47,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
 
           // Dynamically assigns a unique id to the guppy-div
           guppyDivElt.setAttribute(
-            'id', 'guppy_' + (Object.keys(Guppy.instances).length).toString());
+            'id', 'guppy_' + (Math.floor(Math.random() * 10000)).toString());
           var guppyDivId = guppyDivElt.id;
 
           /**
