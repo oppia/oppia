@@ -834,8 +834,8 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
 
         Yield:
             str. Negative count: exp_id:? version:? state:? ?:?,
-                where ? is the placeholder for exp_id, exp_version, 
-                property_name, state_name and value. 
+                where ? is the placeholder for exp_id, exp_version,
+                property_name, state_name and value.
         """
         state_name = state_name if state_name else ''
         if value[property_name] < 0:
