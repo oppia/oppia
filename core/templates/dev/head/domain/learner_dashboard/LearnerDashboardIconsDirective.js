@@ -24,7 +24,9 @@ oppia.directive('learnerDashboardIcons', [
         getActivityType: '&activityType',
         getActivityId: '&activityId',
         getActivityTitle: '&activityTitle',
-        activityActive: '=activityActive'
+        activityActive: '=activityActive',
+        isWindowNarrow: (
+          '&libraryWindowIsNarrow')
       },
       templateUrl:  UrlInterpolationService.getDirectiveTemplateUrl(
         '/domain/learner_dashboard/' +
@@ -39,7 +41,7 @@ oppia.directive('learnerDashboardIcons', [
             LearnerPlaylistService) {
           $scope.activityIsCurrentlyHoveredOver = true;
           $scope.playlistTooltipIsEnabled = false;
-
+          console.log($scope.isWindowNarrow());
           $scope.enablePlaylistTooltip = function() {
             $scope.playlistTooltipIsEnabled = true;
           };
@@ -70,7 +72,11 @@ oppia.directive('learnerDashboardIcons', [
                 activityId)) {
                 return false;
               } else {
-                return $scope.activityIsCurrentlyHoveredOver;
+                if ($scope.isWindowNarrow()){
+                  return true;
+                }else{
+                  return $scope.activityIsCurrentlyHoveredOver;                  
+                }
               }
             }
           };

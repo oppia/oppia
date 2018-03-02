@@ -47,7 +47,9 @@ oppia.directive('explorationSummaryTile', [
         isPlaylistTile: '&isPlaylistTile',
         getParentExplorationIds: '&parentExplorationIds',
         showLearnerDashboardIconsIfPossible: (
-          '&showLearnerDashboardIconsIfPossible')
+          '&showLearnerDashboardIconsIfPossible'),
+        isLibraryWindowNarrow : (
+          '&libraryWindowIsNarrow')
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +
@@ -111,11 +113,6 @@ oppia.directive('explorationSummaryTile', [
 
           $scope.MAX_AVATARS_TO_DISPLAY = 5;
 
-          $scope.waitAndRemove = function(){
-            $timeout(function(){
-              $scope.setHoverState(false);
-            },2000);
-          };
           $scope.setHoverState = function(hoverState) {
             console.log(hoverState);
             $scope.explorationIsCurrentlyHoveredOver = hoverState;
@@ -191,22 +188,3 @@ oppia.directive('explorationSummaryTile', [
       ]
     };
   }]);
-
-oppia.directive('touchStart', [function () {
-  return function (scope, element, attr) {
-    element.on('touchstart', function (event) {
-      scope.$apply(function () {
-        scope.$eval(attr.touchStart);
-      });
-    });
-  };
-}]);
-oppia.directive('touchEnd', [function () {
-  return function (scope, element, attr) {
-    element.on('touchend', function (event) {
-      scope.$apply(function () {
-        scope.$eval(attr.touchEnd);
-      });
-    });
-  };
-}]);
