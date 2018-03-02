@@ -649,12 +649,12 @@ ENABLE_STATE_ID_MAPPING = False
 
 # Bool to enable update of analytics models.
 # NOTE TO DEVELOPERS: This should be synchronized with app.js
-ENABLE_NEW_STATS_FRAMEWORK = False
+ENABLE_NEW_STATS_FRAMEWORK = True
 # Current event models schema version. All event models with
 # event_schema_version as 1 are the events collected before the rework of the
 # statistics framework which brought about the recording of new event models.
-# This includes all models recorded before Nov 2017.
-CURRENT_EVENT_MODELS_SCHEMA_VERSION = 1
+# This includes all models recorded before Feb 2018.
+CURRENT_EVENT_MODELS_SCHEMA_VERSION = 2
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
