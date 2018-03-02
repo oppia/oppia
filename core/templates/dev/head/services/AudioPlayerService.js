@@ -42,6 +42,10 @@ oppia.factory('AudioPlayerService', [
             // to grab native audio.
             // TODO(tjiang11): Look for a better way to handle this.
             $timeout(function() {
+              // _currentTrack could be null if the learner stops audio
+              // shortly after loading a new card or language. In such
+              // cases, we do not want to attempt setting the 'onended'
+              // property of the audio.
               if (_currentTrack !== null) {
                 _currentTrack.audio.onended = function() {
                   _currentTrack = null;

@@ -231,21 +231,23 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             dict. A dict representation of an ExplorationStatsModel
                 with updated state_stats_mapping and version.
         """
-        # Handling state additions, deletions and renames.
-        for change_dict in change_list:
-            if change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
-                prev_stats_dict['state_stats_mapping'][change_dict[
-                    'state_name']] = (stats_domain.StateStats
-                                      .create_default())
-            elif change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
-                prev_stats_dict['state_stats_mapping'].pop(change_dict[
-                    'state_name'])
-            elif change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
-                prev_stats_dict['state_stats_mapping'][
-                    change_dict['new_state_name']] = (
-                        prev_stats_dict['state_stats_mapping'].pop(
-                            change_dict['old_state_name']))
+        # Handling state deletions, renames and additions (in that order). The
+        # order in which the above changes are handled is important.
+
+        for state_name in exp_versions_diff.deleted_state_names:
+            prev_stats_dict['state_stats_mapping'].pop(state_name)
+
+        for old_state_name, new_state_name in (
+                exp_versions_diff.old_to_new_state_names.iteritems()):
+            prev_stats_dict['state_stats_mapping'][new_state_name] = (
+                prev_stats_dict['state_stats_mapping'].pop(old_state_name))
+
+        for state_name in exp_versions_diff.added_state_names:
+            prev_stats_dict['state_stats_mapping'][state_name] = (
+                stats_domain.StateStats.create_default())
+
         prev_stats_dict['exp_version'] += 1
 
         return prev_stats_dict
