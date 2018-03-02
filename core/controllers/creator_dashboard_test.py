@@ -100,6 +100,12 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         event_services.StartExplorationEventHandler.record(
             exp_id, exp_version, state, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
+        event_services.StatsEventsHandler.record(exp_id, exp_version, {
+            'num_starts': 1,
+            'num_actual_starts': 0,
+            'num_completions': 0,
+            'state_stats_mapping': {}
+        })
 
     def _rate_exploration(self, exp_id, ratings):
         """Create num_ratings ratings for exploration with exp_id,
