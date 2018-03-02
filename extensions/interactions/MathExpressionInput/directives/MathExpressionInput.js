@@ -45,7 +45,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             EVENT_PROGRESS_NAV_SUBMITTED) {
           var guppyDivElt = $element[0].querySelector('.guppy-div');
 
-          //Dynamically assigns a unique id to the guppy-div
+          // Dynamically assigns a unique id to the guppy-div
           guppyDivElt.setAttribute(
             'id', 'guppy_' + (Object.keys(Guppy.instances).length).toString());
           var guppyDivId = guppyDivElt.id;
@@ -136,16 +136,16 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             });
           };
           var guppyInstance = new Guppy(guppyDivId, {
-            settings:{
-              empty_content:
-              '\\color{grey}{\\text{\\small{Type a formula here.}}}',
-              buttons:[]
+            settings: {
+              empty_content: (
+              '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
+              buttons: []
             },
-            events:{
-              done:function(e){
+            events: {
+              done: function(e) {
                 $scope.submitAnswer();
               },
-              change:function(e) {
+              change: function(e) {
                 $scope.setAnswerValidity({
                   answerValidity: $scope.isCurrentAnswerValid()
                 });
@@ -157,8 +157,8 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                 var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
                   '/overrides/guppy/oppia_symbols.json');
                 Guppy.init({
-                  symbols:['/third_party/static/guppy-b5055b/sym/symbols.json',
-                           oppiaSymbolsUrl]});
+                  symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
+                            oppiaSymbolsUrl]});
                 $scope.setAnswerValidity({
                   answerValidity: false
                 });

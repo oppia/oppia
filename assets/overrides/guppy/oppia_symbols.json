@@ -7,30 +7,47 @@
             "small_latex": "\\frac{{$1}}{{$2}}",
             "text": "({$1})/({$2})"
         },
-        "input":1,
-        "keys":["/"],
-        "attrs":{
-        "type":"fraction",
-        "group":"functions"},
-        "args":[
-        {"up":"1","down":"2","name":"numerator","small":"yes"},
-        {"up":"1","down":"2","delete":"1","name":"denominator","small":"yes"}
-        ]
+        "input": 1,
+        "keys": ["/"],
+        "attrs": {
+        "type": "fraction",
+        "group": "functions"},
+        "args": [{
+            "up": "1",
+            "down": "2",
+            "name": "numerator",
+            "small": "yes"
+        }, {
+            "up": "1",
+            "down": "2",
+            "delete": "1",
+            "name": "denominator",
+            "small": "yes"
+        }]
     },
     "slash": {
         "output": {
-            "latex":"\\frac{{$1}}{{$2}}",
-            "small_latex":"\\frac{{$1}}{{$2}}",
-            "text":"({$1})/({$2})"
+            "latex": "\\frac{{$1}}{{$2}}",
+            "small_latex": "\\frac{{$1}}{{$2}}",
+            "text": "({$1})/({$2})"
         },
-        "input":1,
-        "attrs":{
-            "type":"fraction",
-            "group":"functions"},
-        "keys":["/"],
-        "args":[
-            {"up":"1","down":"2","name":"numerator","small":"yes"},
-            {"up":"1","down":"2","delete":"1","name":"denominator","small":"yes"}
-            ]
+        "input": 1,
+        "attrs": {
+            "type": "fraction",
+            "group": "functions"
+        },
+        "keys": ["/"],
+        "args": [{
+            "up": "1",
+            "down": "2",
+            "name": "numerator",
+            "small": "yes"
+        }, {
+            "up": "1",
+            "down": "2",
+            "delete": "1",
+            "name": "denominator",
+            "small": "yes"
+        }]
     }
 }
