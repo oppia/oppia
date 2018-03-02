@@ -21,7 +21,6 @@ from core import jobs
 from core.domain import exp_services
 from core.domain import feedback_domain
 from core.domain import feedback_services
-from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.platform import models
 import feconf

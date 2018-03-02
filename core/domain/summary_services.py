@@ -23,10 +23,8 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import search_services
-from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.domain import user_services
-import feconf
 import utils
 
 _LIBRARY_INDEX_GROUPS = [{

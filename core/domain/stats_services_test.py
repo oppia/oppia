@@ -209,8 +209,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
         self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), [
-                'Home', 'New state 2', 'End', 'New state'])
+            set(exploration_stats.state_stats_mapping.keys()), set([
+                'Home', 'New state 2', 'End', 'New state']))
         self.assertEqual(
             exploration_stats.state_stats_mapping['New state'].to_dict(),
             stats_domain.StateStats.create_default().to_dict())
@@ -234,8 +234,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration.id, exploration.version)
         self.assertEqual(exploration_stats.exp_version, 3)
         self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), [
-                'Home', 'End', 'Renamed state', 'New state'])
+            set(exploration_stats.state_stats_mapping.keys()), set([
+                'Home', 'End', 'Renamed state', 'New state']))
 
         # Test deletion of states.
         exploration.delete_state('New state')
@@ -252,8 +252,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration.id, exploration.version)
         self.assertEqual(exploration_stats.exp_version, 4)
         self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), [
-                'Home', 'Renamed state', 'End'])
+            set(exploration_stats.state_stats_mapping.keys()),
+            set(['Home', 'Renamed state', 'End']))
 
         # Test addition, renaming and deletion of states.
         exploration.add_states(['New state 2'])
@@ -279,8 +279,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration.id, exploration.version)
         self.assertEqual(exploration_stats.exp_version, 5)
         self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), [
-                'Home', 'End', 'Renamed state'])
+            set(exploration_stats.state_stats_mapping.keys()),
+            set(['Home', 'End', 'Renamed state']))
 
         # Test addition and multiple renames.
         exploration.add_states(['New state 2'])
@@ -307,8 +307,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration.id, exploration.version)
         self.assertEqual(exploration_stats.exp_version, 6)
         self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), [
-                'Home', 'New state 4', 'Renamed state', 'End'])
+            set(exploration_stats.state_stats_mapping.keys()),
+            set(['Home', 'New state 4', 'Renamed state', 'End']))
 
         # Set some values for the the stats in the ExplorationStatsModel
         # instance.
@@ -350,8 +350,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration.id, exploration.version)
         self.assertEqual(exploration_stats.exp_version, 7)
         self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), [
-                'Home', 'New state 4', 'Renamed state', 'End'])
+            set(exploration_stats.state_stats_mapping.keys()),
+            set(['Home', 'New state 4', 'Renamed state', 'End']))
 
         # Test the values of the stats carried over from the last version.
         self.assertEqual(exploration_stats.num_actual_starts_v2, 5)
@@ -482,29 +482,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(exp_stats_list[1].exp_version, 2)
 
 
-class ModifiedStatisticsAggregator(stats_jobs_continuous.StatisticsAggregator):
-    """A modified StatisticsAggregator that does not start a new batch
-    job when the previous one has finished.
-    """
-    @classmethod
-    def _get_batch_job_manager_class(cls):
-        return ModifiedStatisticsMRJobManager
-
-    @classmethod
-    def _kickoff_batch_job_after_previous_one_ends(cls):
-        pass
-
-
-class ModifiedStatisticsMRJobManager(
-        stats_jobs_continuous.StatisticsMRJobManager):
-
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return ModifiedStatisticsAggregator
-
-
 class ModifiedInteractionAnswerSummariesAggregator(
-        stats_jobs_continuous.StatisticsAggregator):
+        stats_jobs_continuous.InteractionAnswerSummariesAggregator):
     """A modified InteractionAnswerSummariesAggregator that does not start
     a new batch job when the previous one has finished.
     """
@@ -1129,7 +1108,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
     """Tests for functionality related to retrieving visualization information
     for answers.
     """
-    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedStatisticsAggregator]
+    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedInteractionAnswerSummariesAggregator]
     INIT_STATE_NAME = feconf.DEFAULT_INIT_STATE_NAME
     TEXT_INPUT_EXP_ID = 'exp_id0'
     SET_INPUT_EXP_ID = 'exp_id1'
