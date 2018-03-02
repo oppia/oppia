@@ -1,10 +1,40 @@
 <h2>v0.0.1 (unminified)</h2>
 <p>For instructions: see the README file in /assets/scripts.</p>
 
+<style type="text/css">
+  .protractor-test-results {
+    display: none;
+  }
+</style>
+
 <script src="/assets/scripts/oppia-player-0.0.1.js"></script>
 <script src="/assets/scripts/embedding_tests.js"></script>
+<script src="../../third_party/static/jquery-3.2.1/jquery.min.js"></script>
 
-<div class="protractor-test-embedded-exploration">
-  <h3>Standard embedding of the latest version</h3>
-  <oppia oppia-id="12"></oppia>
+<input class="protractor-test-exploration-id-input-field" type="text" placeholder="explorationId">
+<input class="protractor-test-exploration-id-submit-button" type="submit" value="Update Exploration ID" onclick="onChangeExpId()">
+
+<div class="protractor-test-results">
+  <div class="protractor-test-embedded-exploration">
+    <h3>Standard embedding of the latest version</h3>
+    <oppia oppia-id="idToBeReplaced"></oppia>
+  </div>
 </div>
+
+<script type="text/javascript">
+  // To keep track of next exploration id to be replaced.
+  var placeholderExplorationId = 'idToBeReplaced';
+  var onChangeExpId = function() {
+    var newExplorationId = $(
+      '.protractor-test-exploration-id-input-field').val();
+    $('div > iframe').each(function(index) {
+      var src = $(this).attr('src');
+      src = src.replace(placeholderExplorationId, newExplorationId);
+      $(this).attr('src', src);
+    });
+    placeholderExplorationId = newExplorationId;
+
+    // Show the contents.
+    $('.protractor-test-results').show();
+  };
+</script>

@@ -54,6 +54,9 @@
     },
     "HasNoFractionalPart": {
       "description": "has no fractional part"
+    },
+    "HasFractionalPartExactlyEqualTo": {
+      "description": "has fractional part exactly equal to {{f|Fraction}}"
     }
   },
   "GraphInput": {

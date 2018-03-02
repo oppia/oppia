@@ -236,9 +236,42 @@ oppia.filter('parameterizeRuleDescription', [
         } else if (varType === 'Fraction') {
           replacementText = FractionObjectFactory
             .fromDict(inputs[varName]).toString();
-        } else {
+        } else if (
+          varType === 'SetOfUnicodeString' ||
+          varType === 'SetOfNormalizedString') {
+          replacementText = '[';
+          for (var i = 0; i < inputs[varName].length; i++) {
+            if (i !== 0) {
+              replacementText += ', ';
+            }
+            replacementText += inputs[varName][i];
+          }
+          replacementText += ']';
+        } else if (
+          varType === 'Real' || varType === 'NonnegativeInt' ||
+          varType === 'Int') {
+          replacementText = inputs[varName] + '';
+        } else if (
+          varType === 'CodeString' || varType === 'UnicodeString' ||
+          varType === 'LogicErrorCategory' || varType === 'NormalizedString') {
           replacementText = inputs[varName];
+        } else if (varType === 'ListOfCodeEvaluation') {
+          replacementText = '[';
+          for (var i = 0; i < inputs[varName].length; i++) {
+            if (i !== 0) {
+              replacementText += ', ';
+            }
+            replacementText += inputs[varName][i].code;
+          }
+          replacementText += ']';
+        } else {
+          throw Error('Unknown variable type in rule description');
         }
+
+        // Replaces all occurances of $ with $$.
+        // This makes sure that the next regex matching will yield
+        // the same $ sign pattern as the input.
+        replacementText = replacementText.split('$').join('$$');
 
         description = description.replace(PATTERN, ' ');
         finalDescription = finalDescription.replace(PATTERN, replacementText);
@@ -305,6 +338,31 @@ oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
     } else {
       return input;
     }
+  };
+}]);
+
+// Note that this filter removes additional new lines or <p><br></p> tags
+// at the end of the string.
+oppia.filter('removeExtraLines', [function() {
+  return function(string) {
+    if (!angular.isString(string)) {
+      return string;
+    }
+    var BLANK_LINES_TEXT = '<p><br></p>';
+    var EMPTY_PARA_TEXT = '<p></p>';
+    while (1) {
+      var endIndex = string.length;
+      var bStr = string.substring(endIndex - BLANK_LINES_TEXT.length, endIndex);
+      var pStr = string.substring(endIndex - EMPTY_PARA_TEXT.length, endIndex);
+      if (bStr === BLANK_LINES_TEXT) {
+        string = string.substring(0, endIndex - BLANK_LINES_TEXT.length);
+      } else if (pStr === EMPTY_PARA_TEXT) {
+        string = string.substring(0, endIndex - EMPTY_PARA_TEXT.length);
+      } else {
+        break;
+      }
+    }
+    return string;
   };
 }]);
 
@@ -396,10 +454,10 @@ oppia.filter('stripFormatting', [function() {
     var styleRegex = new RegExp(' style=\"[^\"]+\"', 'gm');
     // Strip out anything between and including <>,
     // unless it is an img whose class includes one of the whitelisted classes
-    // or is the bold or italics tags.
+    // or is the bold or italics or paragraph or breakline tags.
     var tagRegex = new RegExp(
       '(?!<img.*class=".*(' + whitelistedImgClasses.join('|') +
-      ').*".*>)(?!<b>|<\/b>|<i>|<\/i>)<[^>]+>', 'gm');
+      ').*".*>)(?!<b>|<\/b>|<i>|<\/i>|<p>|<\/p>|<br>)<[^>]+>', 'gm');
     var strippedText = html ? String(html).replace(styleRegex, '') : '';
     strippedText = strippedText ? String(strippedText).replace(
       tagRegex, '') : '';
@@ -428,5 +486,5 @@ oppia.filter('formatRtePreview', ['$filter', function($filter) {
       return ' [' + replaceString + '] ';
     });
     return formattedOutput.trim();
-  }
+  };
 }]);

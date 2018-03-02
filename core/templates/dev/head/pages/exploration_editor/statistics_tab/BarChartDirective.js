@@ -42,7 +42,7 @@ oppia.directive('barChart', [function() {
             // This ignores the above error since the bar chart directive is to
             // be deprecated soon.
             chart = new google.visualization.BarChart($element[0]);
-          } catch(e) {
+          } catch (e) {
             return;
           }
         }

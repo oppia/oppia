@@ -73,6 +73,6 @@ oppia.factory('RefresherExplorationConfirmationModalService', [
           ]
         });
       }
-    }
+    };
   }
 ]);

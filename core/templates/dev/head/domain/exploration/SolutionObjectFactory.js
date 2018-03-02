@@ -21,7 +21,7 @@ oppia.factory('SolutionObjectFactory', [
   '$filter', 'HtmlEscaperService', 'ExplorationHtmlFormatterService',
   'SubtitledHtmlObjectFactory', 'FractionObjectFactory',
   function($filter, HtmlEscaperService, ExplorationHtmlFormatterService,
-    SubtitledHtmlObjectFactory, FractionObjectFactory) {
+      SubtitledHtmlObjectFactory, FractionObjectFactory) {
     var Solution = function(answerIsExclusive, correctAnswer, explanation) {
       this.answerIsExclusive = answerIsExclusive;
       this.correctAnswer = correctAnswer;

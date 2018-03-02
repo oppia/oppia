@@ -17,15 +17,15 @@
  */
 
 oppia.directive('schemaBasedListEditor', [
-  'SchemaDefaultValueService', 
+  'SchemaDefaultValueService',
   'NestedDirectivesRecursionTimeoutPreventionService',
   'FocusManagerService', 'SchemaUndefinedLastElementService',
-  'IdGenerationService', 'UrlInterpolationService', 
+  'IdGenerationService', 'UrlInterpolationService',
   function(
-    SchemaDefaultValueService, 
-    NestedDirectivesRecursionTimeoutPreventionService,
-    FocusManagerService, SchemaUndefinedLastElementService,
-    IdGenerationService, UrlInterpolationService) {
+      SchemaDefaultValueService,
+      NestedDirectivesRecursionTimeoutPreventionService,
+      FocusManagerService, SchemaUndefinedLastElementService,
+      IdGenerationService, UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',

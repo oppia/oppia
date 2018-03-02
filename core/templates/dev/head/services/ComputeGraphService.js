@@ -81,7 +81,7 @@ oppia.factory('ComputeGraphService', [
         return _computeGraphData(initStateId, states);
       },
       computeBfsTraversalOfStates: function(
-        initStateId, states, sourceStateName) {
+          initStateId, states, sourceStateName) {
         return _computeBfsTraversalOfStates(
           initStateId, states, sourceStateName);
       }

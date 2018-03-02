@@ -131,7 +131,7 @@ describe('Answer classification service with string classifier disabled',
 
     it('should fail if no frontend rules are provided', function() {
       expect(function() {
-        acs.getMatchingClassificationResult(explorationId, stateName, state, 0)
+        acs.getMatchingClassificationResult(explorationId, stateName, state, 0);
       }).toThrow();
     });
 
@@ -212,7 +212,7 @@ describe('Answer classification service with string classifier disabled',
 
       expect(function() {
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 0)
+          explorationId, stateName, state, 0);
       }).toThrow();
     });
   });
@@ -330,7 +330,7 @@ describe('Answer classification service with string classifier enabled',
 
       stateClassifierMapping = {
         stateName: {
-          algorithm_id: 'LDAStringClassifier',
+          algorithm_id: 'TestClassifier',
           classifier_data: {},
           data_schema_version: 1
         }
@@ -338,7 +338,7 @@ describe('Answer classification service with string classifier enabled',
       scms.init(stateClassifierMapping);
 
       registryService.setMapping({
-        LDAStringClassifier: {
+        TestClassifier: {
           v1: 'PredictionSampleService'
         }
       });

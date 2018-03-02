@@ -19,15 +19,15 @@
 oppia.controller('FeedbackTab', [
   '$scope', '$http', '$uibModal', '$timeout', '$rootScope', 'AlertsService',
   'DateTimeFormatService', 'ThreadStatusDisplayService',
-  'ThreadDataService', 'explorationStatesService', 'ExplorationDataService',
+  'ThreadDataService', 'ExplorationStatesService', 'ExplorationDataService',
   'ChangeListService', 'StateObjectFactory', 'UrlInterpolationService',
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   function(
-    $scope, $http, $uibModal, $timeout, $rootScope, AlertsService,
-    DateTimeFormatService, ThreadStatusDisplayService,
-    ThreadDataService, explorationStatesService, ExplorationDataService,
-    ChangeListService, StateObjectFactory, UrlInterpolationService,
-    ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
+      $scope, $http, $uibModal, $timeout, $rootScope, AlertsService,
+      DateTimeFormatService, ThreadStatusDisplayService,
+      ThreadDataService, ExplorationStatesService, ExplorationDataService,
+      ChangeListService, StateObjectFactory, UrlInterpolationService,
+      ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
     $scope.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
     $scope.threadData = ThreadDataService.data;
     $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
@@ -63,7 +63,7 @@ oppia.controller('FeedbackTab', [
         backdrop: true,
         resolve: {},
         controller: ['$scope', '$uibModalInstance', function(
-          $scope, $uibModalInstance) {
+            $scope, $uibModalInstance) {
           $scope.newThreadSubject = '';
           $scope.newThreadText = '';
 
@@ -101,7 +101,7 @@ oppia.controller('FeedbackTab', [
     };
 
     var _isSuggestionValid = function() {
-      return explorationStatesService.hasState(
+      return ExplorationStatesService.hasState(
         $scope.activeThread.suggestion.state_name);
     };
 
@@ -139,7 +139,7 @@ oppia.controller('FeedbackTab', [
             return $scope.activeThread.suggestion.description;
           },
           currentContent: function() {
-            var state = explorationStatesService.getState(
+            var state = ExplorationStatesService.getState(
               $scope.activeThread.suggestion.state_name);
             return state !== undefined ? state.content.getHtml() : null;
           },
@@ -148,13 +148,13 @@ oppia.controller('FeedbackTab', [
           }
         },
         controller: [
-          '$scope', '$uibModalInstance', 'suggestionIsOpen', 
+          '$scope', '$uibModalInstance', 'suggestionIsOpen',
           'suggestionIsValid', 'unsavedChangesExist', 'suggestionStatus',
           'description', 'currentContent', 'newContent', 'EditabilityService',
           function(
-            $scope, $uibModalInstance, suggestionIsOpen, 
-            suggestionIsValid, unsavedChangesExist, suggestionStatus, 
-            description, currentContent, newContent, EditabilityService) {
+              $scope, $uibModalInstance, suggestionIsOpen,
+              suggestionIsValid, unsavedChangesExist, suggestionStatus,
+              description, currentContent, newContent, EditabilityService) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
               'accepted.';
             var SUGGESTION_REJECTED_MSG = 'This suggestion has already been ' +
@@ -232,14 +232,14 @@ oppia.controller('FeedbackTab', [
                 state.content.markAllAudioAsNeedingUpdate();
               }
               ExplorationDataService.data.version += 1;
-              explorationStatesService.setState(stateName, state);
+              ExplorationStatesService.setState(stateName, state);
               $rootScope.$broadcast('refreshVersionHistory', {
                 forceRefresh: true
               });
               $rootScope.$broadcast('refreshStateEditor');
             }
           }, function() {
-            console.log('Error resolving suggestion');
+            $log.error('Error resolving suggestion');
           });
       });
     };

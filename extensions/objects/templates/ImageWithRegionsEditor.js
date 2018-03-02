@@ -21,7 +21,7 @@ oppia.directive('imageWithRegionsEditor', [
   '$sce', '$compile', 'AlertsService', '$document', 'ExplorationContextService',
   'OBJECT_EDITOR_URL_PREFIX',
   function($sce, $compile, AlertsService, $document, ExplorationContextService,
-           OBJECT_EDITOR_URL_PREFIX) {
+      OBJECT_EDITOR_URL_PREFIX) {
     return {
       link: function(scope, element) {
         scope.getTemplateUrl = function() {
@@ -33,7 +33,7 @@ oppia.directive('imageWithRegionsEditor', [
       scope: true,
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: [
-        '$scope', '$element', '$uibModal', 
+        '$scope', '$element', '$uibModal',
         function($scope, $element, $uibModal) {
           $scope.alwaysEditable = true;
 

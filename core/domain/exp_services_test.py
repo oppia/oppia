@@ -627,6 +627,227 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
             exp_models.ExplorationModel.get_exploration_count(), 0)
 
 
+class ExplorationYamlImportingTests(test_utils.GenericTestBase):
+    """Tests for loading explorations using imported YAML."""
+    EXP_ID = 'exp_id0'
+    DEMO_EXP_ID = '0'
+    TEST_ASSET_PATH = 'test_asset.file'
+    TEST_ASSET_CONTENT = 'Hello Oppia'
+
+    INTRO_AUDIO_FILE = 'introduction_state.mp3'
+    ANSWER_GROUP_AUDIO_FILE = 'correct_answer_feedback.mp3'
+    DEFAULT_OUTCOME_AUDIO_FILE = 'unknown_answer_feedback.mp3'
+    HINT_AUDIO_FILE = 'answer_hint.mp3'
+    SOLUTION_AUDIO_FILE = 'answer_solution.mp3'
+
+    YAML_WITH_AUDIO_TRANSLATIONS = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 23
+states:
+  Introduction:
+    classifier_model_id: null
+    content:
+      audio_translations:
+        en:
+            filename: %s
+            file_size_bytes: 99999
+            needs_update: false
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: New state
+          feedback:
+            audio_translations:
+                en:
+                    filename: %s
+                    file_size_bytes: 99999
+                    needs_update: false
+            html: Correct!
+          labelled_as_correct: false
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Introduction
+        feedback:
+          audio_translations:
+            en:
+                filename: %s
+                file_size_bytes: 99999
+                needs_update: false
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+        - hint_content:
+            html: hint one,
+            audio_translations:
+                en:
+                    filename: %s
+                    file_size_bytes: 99999
+                    needs_update: false
+      id: TextInput
+      solution:
+        answer_is_exclusive: false
+        correct_answer: helloworld!
+        explanation:
+            html: hello_world is a string
+            audio_translations:
+                en:
+                    filename: %s
+                    file_size_bytes: 99999
+                    needs_update: false
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: New state
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    param_changes: []
+states_schema_version: 18
+tags: []
+title: Title
+""") % (
+    INTRO_AUDIO_FILE, ANSWER_GROUP_AUDIO_FILE, DEFAULT_OUTCOME_AUDIO_FILE,
+    HINT_AUDIO_FILE, SOLUTION_AUDIO_FILE)
+
+    def setUp(self):
+        super(ExplorationYamlImportingTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_loading_recent_yaml_loads_exploration_for_user(self):
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            self.owner_id, self.SAMPLE_YAML_CONTENT, self.EXP_ID, [])
+        exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(exp.to_yaml(), self.SAMPLE_YAML_CONTENT)
+
+    def test_loading_recent_yaml_does_not_default_exp_title_category(self):
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            self.owner_id, self.SAMPLE_YAML_CONTENT, self.EXP_ID, [])
+        exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertNotEqual(exp.title, feconf.DEFAULT_EXPLORATION_TITLE)
+        self.assertNotEqual(exp.category, feconf.DEFAULT_EXPLORATION_CATEGORY)
+
+    def test_loading_exploration_from_yaml_does_not_override_existing_id(self):
+        # Load a a demo exploration.
+        exp_services.load_demo(self.DEMO_EXP_ID)
+
+        # Override the demo exploration using the import method.
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            self.owner_id, self.SAMPLE_YAML_CONTENT, self.DEMO_EXP_ID, [])
+
+        # The demo exploration should not have been overwritten.
+        exp = exp_services.get_exploration_by_id(self.DEMO_EXP_ID)
+        self.assertNotEqual(exp.to_yaml(), self.SAMPLE_YAML_CONTENT)
+
+    def test_loading_untitled_yaml_defaults_exploration_title_category(self):
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            self.owner_id, self.SAMPLE_UNTITLED_YAML_CONTENT, self.EXP_ID, [])
+        exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(exp.title, feconf.DEFAULT_EXPLORATION_TITLE)
+        self.assertEqual(exp.category, feconf.DEFAULT_EXPLORATION_CATEGORY)
+
+    def test_loading_old_yaml_migrates_exp_to_latest_schema_version(self):
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            self.owner_id, self.SAMPLE_UNTITLED_YAML_CONTENT, self.EXP_ID, [])
+        exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            exp.states_schema_version,
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+
+    def test_loading_yaml_with_assets_loads_assets_from_filesystem(self):
+        test_asset = (self.TEST_ASSET_PATH, self.TEST_ASSET_CONTENT)
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            self.owner_id, self.SAMPLE_YAML_CONTENT, self.EXP_ID, [test_asset])
+
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(self.EXP_ID))
+        self.assertEqual(fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
+
+    def test_can_load_yaml_with_audio_translations(self):
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            self.owner_id, self.YAML_WITH_AUDIO_TRANSLATIONS, self.EXP_ID, [])
+        exp = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        state = exp.states[exp.init_state_name]
+        interaction = state.interaction
+        content_translations = state.content.audio_translations
+        answer_group_translations = (
+            interaction.answer_groups[0].outcome.feedback.audio_translations)
+        default_outcome_translations = (
+            interaction.default_outcome.feedback.audio_translations)
+        hint_translations = interaction.hints[0].hint_content.audio_translations
+        solution_translations = (
+            interaction.solution.explanation.audio_translations)
+
+        self.assertEqual(
+            content_translations['en'].filename, self.INTRO_AUDIO_FILE)
+        self.assertEqual(
+            answer_group_translations['en'].filename,
+            self.ANSWER_GROUP_AUDIO_FILE)
+        self.assertEqual(
+            default_outcome_translations['en'].filename,
+            self.DEFAULT_OUTCOME_AUDIO_FILE)
+        self.assertEqual(
+            hint_translations['en'].filename, self.HINT_AUDIO_FILE)
+        self.assertEqual(
+            solution_translations['en'].filename, self.SOLUTION_AUDIO_FILE)
+
+    def test_can_load_yaml_with_stripped_audio_translations(self):
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            self.owner_id, self.YAML_WITH_AUDIO_TRANSLATIONS, self.EXP_ID, [],
+            strip_audio_translations=True)
+        exp = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        state = exp.states[exp.init_state_name]
+        interaction = state.interaction
+        content_translations = state.content.audio_translations
+        answer_group_translations = (
+            interaction.answer_groups[0].outcome.feedback.audio_translations)
+        default_outcome_translations = (
+            interaction.default_outcome.feedback.audio_translations)
+        hint_translations = interaction.hints[0].hint_content.audio_translations
+        solution_translations = (
+            interaction.solution.explanation.audio_translations)
+
+        self.assertEqual(content_translations, {})
+        self.assertEqual(answer_group_translations, {})
+        self.assertEqual(default_outcome_translations, {})
+        self.assertEqual(hint_translations, {})
+        self.assertEqual(solution_translations, {})
+
+
 # pylint: disable=protected-access
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""

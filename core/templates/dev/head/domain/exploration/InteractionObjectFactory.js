@@ -21,8 +21,8 @@ oppia.factory('InteractionObjectFactory', [
   'AnswerGroupObjectFactory', 'HintObjectFactory', 'OutcomeObjectFactory',
   'SolutionObjectFactory',
   function(
-    AnswerGroupObjectFactory, HintObjectFactory, OutcomeObjectFactory,
-    SolutionObjectFactory) {
+      AnswerGroupObjectFactory, HintObjectFactory, OutcomeObjectFactory,
+      SolutionObjectFactory) {
     var Interaction = function(
         answerGroups, confirmedUnclassifiedAnswers, customizationArgs,
         defaultOutcome, hints, id, solution) {
@@ -73,7 +73,7 @@ oppia.factory('InteractionObjectFactory', [
 
     var generateAnswerGroupsFromBackend = function(answerGroupBackendDicts) {
       return answerGroupBackendDicts.map(function(
-        answerGroupBackendDict) {
+          answerGroupBackendDict) {
         return AnswerGroupObjectFactory.createFromBackendDict(
           answerGroupBackendDict);
       });

@@ -64,6 +64,12 @@ oppia.directive('oppiaInteractiveSetInput', [
             return false;
           };
 
+          var hasBlankOption = function(answer) {
+            return answer.some(function(element) {
+              return (element === '');
+            });
+          };
+
           $scope.submitAnswer = function(answer) {
             if (hasDuplicates(answer)) {
               $scope.errorMessage = (
@@ -78,20 +84,23 @@ oppia.directive('oppiaInteractiveSetInput', [
           };
 
           $scope.isAnswerValid = function() {
-            return ($scope.answer.length > 0);
+            return ($scope.answer.length > 0 &&
+              !hasBlankOption($scope.answer));
           };
 
           $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
             $scope.submitAnswer($scope.answer);
           });
 
+          // Third parameter is set to true to enable deep watching.
+          // https://stackoverflow.com/questions/14712089/
           $scope.$watch(function() {
             return $scope.answer;
           }, function() {
             $scope.setAnswerValidity({
               answerValidity: $scope.isAnswerValid()
             });
-          });
+          }, true);
         }
       ]
     };

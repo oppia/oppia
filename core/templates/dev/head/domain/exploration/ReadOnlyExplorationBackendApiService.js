@@ -21,7 +21,7 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
   '$http', '$q', 'EXPLORATION_DATA_URL_TEMPLATE',
   'EXPLORATION_VERSION_DATA_URL_TEMPLATE', 'UrlInterpolationService',
   function($http, $q, EXPLORATION_DATA_URL_TEMPLATE,
-    EXPLORATION_VERSION_DATA_URL_TEMPLATE, UrlInterpolationService) {
+      EXPLORATION_VERSION_DATA_URL_TEMPLATE, UrlInterpolationService) {
     // Maps previously loaded explorations to their IDs.
     var _explorationCache = [];
 

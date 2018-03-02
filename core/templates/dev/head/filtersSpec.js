@@ -35,7 +35,8 @@ describe('Testing filters', function() {
     'summarizeNonnegativeNumber',
     'truncateAndCapitalize',
     'capitalize',
-    'stripFormatting'
+    'stripFormatting',
+    'removeExtraLines'
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -335,6 +336,41 @@ describe('Testing filters', function() {
       'white-space: normal; widows: 2; word-spacing: 0px; ' +
       '-webkit-text-stroke-width: 0px;">' +
       'MVP Ben Zobrist pictured</i>');
+      var PARAGRAPH_TEXT = ('<p style="box-sizing: border-box; margin: 18px ' +
+      '0px; line-height: 1.5; text-align: left; word-spacing: 0px; color: ' +
+      'rgb(85, 85, 85); font-family: Roboto, Arial, sans-serif; font-size: ' +
+      '16px; font-style: normal; font-variant-ligatures: normal; font-variant' +
+      '-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; ' +
+      'text-indent: 0px; text-transform: none; white-space: normal; widows: ' +
+      '2; -webkit-text-stroke-width: 0px; background-color: rgb(255, 255, ' +
+      '255); text-decoration-style: initial; text-decoration-color: initial;' +
+      '">Oppia makes it easy to create interactive lessons.</p>');
+      var BREAKLINE_TEXT = ('<p style="box-sizing: border-box; margin: 0px ' +
+      '0px 18px; line-height: 1.5; text-align: left; word-spacing: 0px; ' +
+      'color: rgb(85, 85, 85); font-family: Roboto, Arial, sans-serif; ' +
+      'font-size: 16px; font-style: normal; font-variant-ligatures: normal; ' +
+      'font-variant-caps: normal; font-weight: 400; letter-spacing: normal; ' +
+      'orphans: 2; text-indent: 0px; text-transform: none; white-space: ' +
+      'normal; widows: 2; -webkit-text-stroke-width: 0px; background-color: ' +
+      'rgb(255, 255, 255); text-decoration-style: initial; text-decoration-' +
+      'color: initial;">Oppia makes it easy to create interactive lessons ' +
+      '</p><p style="box-sizing: border-box; margin: 18px 0px; line-height: ' +
+      '1.5; text-align: left; word-spacing: 0px; color: rgb(85, 85, 85); font' +
+      '-family: Roboto, Arial, sans-serif; font-size: 16px; font-style: norma' +
+      'l; font-variant-ligatures: normal; font-variant-caps: normal; font-wei' +
+      'ght: 400; letter-spacing: normal; orphans: 2; text-indent: 0px; text-t' +
+      'ransform: none; white-space: normal; widows: 2; -webkit-text-stroke-wi' +
+      'dth: 0px; background-color: rgb(255, 255, 255); text-decoration-style' +
+      ': initial; text-decoration-color: initial;"><br style="box-sizing: bor' +
+      'der-box;"></p><p style="box-sizing: border-box; margin: 18px 0px 0px; ' +
+      'line-height: 1.5; text-align: left; word-spacing: 0px; color: rgb(85, ' +
+      '85, 85); font-family: Roboto, Arial, sans-serif; font-size: 16px; font' +
+      '-style: normal; font-variant-ligatures: normal; font-variant-caps: nor' +
+      'mal; font-weight: 400; letter-spacing: normal; orphans: 2; text-indent' +
+      ': 0px; text-transform: none; white-space: normal; widows: 2; -webkit-' +
+      'text-stroke-width: 0px; background-color: rgb(255, 255, 255); text-dec' +
+      'oration-style: initial; text-decoration-color: initial;">that educate ' +
+      'and engage.</p>');
       var whitelistedImgClasses = [
         'oppia-noninteractive-collapsible',
         'oppia-noninteractive-image',
@@ -389,6 +425,13 @@ describe('Testing filters', function() {
       expect(
         $filter('stripFormatting')(ITALIC_TEXT, whitelistedImgClasses)
       ).toEqual('<i>MVP Ben Zobrist pictured</i>');
+      expect(
+        $filter('stripFormatting')(PARAGRAPH_TEXT, whitelistedImgClasses)
+      ).toEqual('<p>Oppia makes it easy to create interactive lessons.</p>');
+      expect(
+        $filter('stripFormatting')(BREAKLINE_TEXT, whitelistedImgClasses)
+      ).toEqual('<p>Oppia makes it easy to create interactive lessons </p>' +
+      '<p><br></p><p>that educate and engage.</p>');
     }
   ));
 
@@ -440,6 +483,22 @@ describe('Testing filters', function() {
       ).toEqual('[Math] Text input [Collapsible] Text input 2 [Image]  ' +
       'Text Input 3');
     }));
+
+  it('should remove extra new lines', inject(function($filter) {
+    var filter = $filter('removeExtraLines');
+
+    expect(filter('<p><br></p>')).toEqual('');
+    expect(filter('<p>abc</p>')).toEqual('<p>abc</p>');
+    expect(filter('<p>abc</p><p><br></p><p>abc</p>')).toEqual(
+      '<p>abc</p><p><br></p><p>abc</p>');
+    expect(filter('<p>abc</p><p><br></p><p>abc</p><p><br></p>')).toEqual(
+      '<p>abc</p><p><br></p><p>abc</p>');
+    expect(filter(
+      '<p>abc</p><p><br></p><p>abc</p><p><br></p><p><br></p>')).toEqual(
+      '<p>abc</p><p><br></p><p>abc</p>');
+    expect(filter(null)).toEqual(null);
+    expect(filter(undefined)).toEqual(undefined);
+  }));
 
   it('should correctly display RTE components in Answer Group Header',
     inject(function($filter) {
@@ -515,4 +574,34 @@ describe('Testing filters', function() {
         'input. [Image]  [Link]\'');
     }
   ));
+
+  it('should correctly parameterize rule description filter',
+    inject(function($filter) {
+      var ruleMultipleChoice = {
+        type: 'Equals',
+        inputs: {
+          x: 0
+        }
+      };
+      var interactionIdMultipleChoice = 'TextInput';
+      var choicesMultipleChoice = [
+        {
+          label: '$10 should not become $$10',
+          val: 0
+        }
+      ];
+      expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
+        interactionIdMultipleChoice, choicesMultipleChoice)
+      ).toEqual('is equal to \'$10 should not become $$10\'');
+
+      choicesMultipleChoice = [
+        {
+          label: '$xyz should not become $$xyz',
+          val: 0
+        }
+      ];
+      expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
+        interactionIdMultipleChoice, choicesMultipleChoice)
+      ).toEqual('is equal to \'$xyz should not become $$xyz\'');
+    }));
 });

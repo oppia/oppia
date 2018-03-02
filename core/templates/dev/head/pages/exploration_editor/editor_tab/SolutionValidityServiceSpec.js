@@ -42,6 +42,6 @@ describe('Solution Validity Service', function() {
           svs.updateValidity('State 1', false);
           expect(svs.isSolutionValid('State 1')).toBe(false);
         });
-    }))
-  })
+    }));
+  });
 });
