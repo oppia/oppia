@@ -1226,11 +1226,10 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
 
     def test_stats_events_handler(self):
         """Test the handler for handling batched events."""
-        with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-            self.post_json('/explorehandler/stats_events/%s' % (
-                self.exp_id), {
-                    'aggregated_stats': self.aggregated_stats,
-                    'exp_version': self.exp_version})
+        self.post_json('/explorehandler/stats_events/%s' % (
+            self.exp_id), {
+                'aggregated_stats': self.aggregated_stats,
+                'exp_version': self.exp_version})
 
         self.assertEqual(self.count_jobs_in_taskqueue(
             taskqueue_services.QUEUE_NAME_STATS), 1)

@@ -120,10 +120,9 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         with self.swap(
             stats_services, 'handle_stats_creation_for_new_exploration',
             stats_for_new_exploration_log):
-            with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-                exp_services.save_new_exploration_from_yaml_and_assets(
-                    feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-                    assets_list)
+            exp_services.save_new_exploration_from_yaml_and_assets(
+                feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+                assets_list)
 
         # Now, the stats creation for new explorations method will be called
         # once and stats creation for new exploration version won't be called.
@@ -138,9 +137,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         with self.swap(
             stats_services, 'handle_stats_creation_for_new_exp_version',
             stats_for_new_exp_version_log):
-            with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-                exp_services.update_exploration(
-                    feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
 
         # Now, the stats creation for new explorations method will be called
         # once and stats creation for new exploration version will also be

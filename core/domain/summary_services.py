@@ -371,22 +371,13 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
             'title': u'Exploration 2 Albert title',
         }, ]
     """
-    exploration_ids = [
-        exploration_summary.id
-        for exploration_summary in exploration_summaries]
+    exp_version_references = [
+        exp_domain.ExpVersionReference(exp_summary.id, exp_summary.version)
+        for exp_summary in exploration_summaries]
+    exp_stats_list = stats_services.get_exploration_stats_multi(
+        exp_version_references)
+    view_counts = [exp_stats.num_starts for exp_stats in exp_stats_list]
 
-    if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-        exp_version_references = [
-            exp_domain.ExpVersionReference(exp_summary.id, exp_summary.version)
-            for exp_summary in exploration_summaries]
-        exp_stats_list = stats_services.get_exploration_stats_multi(
-            exp_version_references)
-        view_counts = [
-            exp_stats.num_starts for exp_stats in exp_stats_list]
-    else:
-        view_counts = (
-            stats_jobs_continuous.StatisticsAggregator.get_views_multi(
-                exploration_ids))
     displayable_exp_summaries = []
 
     for ind, exploration_summary in enumerate(exploration_summaries):
