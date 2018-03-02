@@ -802,13 +802,13 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def require_non_negative(
             cls, exp_id, exp_version, property_name, value, state_name=None):
-        """Data regarding negative counts.
+        """Ensures that all the statistical data is non-negative.
 
         Args:
-            exp_id: str. id of the exploration
-            exp_version: str. version of the exploration
-            property_name: str. name of the property is the key in dict value
-            value: dict. its structure is as follows:
+            exp_id: str. ID of the exploration.
+            exp_version: str. Version of the exploration.
+            property_name: str. Name of the property is the key in dict value.
+            value: dict. Its structure is as follows:
                 {
                     'num_starts_v1': int. # of times exploration was
                         started.
@@ -829,11 +829,13 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
                             }
                         }
                 }
-            state_name: str or None. name of the state is the key in dict
+            state_name: str|None. Name of the state is the key in dict
                 state_stats_mapping, which in turn is the key of dict value.
 
         Yield:
-            string. Gives a string determining negative count.
+            str. Negative count: exp_id:? version:? state:? ?:?,
+                where ? is the placeholder for exp_id, exp_version, 
+                property_name, state_name and value. 
         """
         state_name = state_name if state_name else ''
         if value[property_name] < 0:
@@ -1021,14 +1023,14 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                 (_STATE_COUNTER_ERROR_KEY, error message).
             tuple. For ExplorationAnnotationModel, a 2-tuple in the form
                 ('exploration_id', value).
-                'exploration_id': str. the id of the exploration.
-                'value': a dict, whose structure is as follows:
+                'exploration_id': str. The id of the exploration.
+                'value': dict. Its structure is as follows:
                     {
-                        'version': str. version of the exploration.
+                        'version': str. Version of the exploration.
                         'starts': int. # of times exploration was started.
                         'completions': int. # of times exploration was
                             completed.
-                        'state_hit': a dict containing the hit counts for the
+                        'state_hit': dict. It contains the hit counts for the
                             states in the exploration. It is formatted as
                             follows:
                             {
@@ -1070,11 +1072,11 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                 associated with the given key. An element of stringified_values
                 would be of the form:
                     {
-                        'version': str. version of the exploration.
+                        'version': str. Version of the exploration.
                         'starts': int. # of times exploration was started.
                         'completions': int. # of times exploration was
                             completed.
-                        'state_hit': dict. a dict containing the hit counts
+                        'state_hit': dict. A dict containing the hit counts
                             for the states in the exploration. It is formatted
                             as follows:
                             {
