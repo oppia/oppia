@@ -753,7 +753,6 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
                 ['exp_id_0', 'exp_id_1', 'exp_id_2', 'exp_id_3']), [])
 
     def test_next_explorations_in_sequence(self):
-
         collection = collection_domain.Collection.create_default_collection(
             'collection_id')
         exploration_id = 'exp_id_0'
@@ -813,6 +812,53 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             collection.get_next_exploration_ids_in_sequence('exp_id_3'),
             [])
+
+    def test_nodes_are_in_playble_order(self):
+        # Create collection.
+        collection = collection_domain.Collection.create_default_collection(
+            'collection_id')
+
+        # Add nodes to collection.
+        collection.add_node('exp_id_1')
+        collection.add_node('exp_id_2')
+        collection.add_node('exp_id_0')
+
+        # Add skills to collection.
+        collection.add_skill('skill0')
+        collection.add_skill('skill1')
+        collection.add_skill('skill2')
+
+        # Updating node's prerequisite and acquired skill_ids.
+        collection_node0 = collection.get_node('exp_id_1')
+        collection_node0.update_prerequisite_skill_ids(['skill0'])
+        collection_node0.update_acquired_skill_ids(['skill1'])
+
+        collection_node1 = collection.get_node('exp_id_2')
+        collection_node1.update_prerequisite_skill_ids(['skill1'])
+        collection_node1.update_acquired_skill_ids(['skill2'])
+
+        collection_node2 = collection.get_node('exp_id_0')
+        collection_node2.update_prerequisite_skill_ids([])
+        collection_node2.update_acquired_skill_ids(['skill0'])
+
+        # Validating collection.
+        collection.validate(strict=False)
+
+        # Sorting nodes in linear and playable order.
+        sorted_nodes = collection.get_nodes_in_playable_order()
+
+        # Expected order of explorations.
+        expected_explorations_list = ['exp_id_0', 'exp_id_1', 'exp_id_2']
+
+        # Observed order of exploration.
+        observed_explration_list = [
+            node['exploration_id'] for node in sorted_nodes]
+
+        # Validates the number of nodes present in collection after sorting.
+        self.assertEqual(len(sorted_nodes), 3)
+
+        # Checks the order of exploration.
+        self.assertEqual(observed_explration_list, expected_explorations_list)
 
     def test_next_explorations_with_invalid_exploration_ids(self):
         collection = collection_domain.Collection.create_default_collection(

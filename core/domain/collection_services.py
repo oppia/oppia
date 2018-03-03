@@ -540,39 +540,6 @@ def get_collection_summaries_matching_ids(collection_ids):
             collection_ids)]
 
 
-def get_nodes_in_playable_order(nodes_list):
-    """Returns the nodes list in playable order.
-
-    Args:
-        nodes_list: list(dict). An unordered list of collection nodes.
-
-    Raises:
-        Exception: Unable to sort the collection nodes in playable order.
-
-    Returns:
-        list(dict). A list of collection nodes in playable order.
-    """
-    unsorted_nodes = nodes_list
-    accumulated_skill_ids = set()
-    sorted_nodes = []
-    while len(unsorted_nodes):
-        for index, node in enumerate(unsorted_nodes):
-            prerequisite_skill_ids = set(node['prerequisite_skill_ids'])
-            acquired_skill_ids = set(node['acquired_skill_ids'])
-
-            if prerequisite_skill_ids <= accumulated_skill_ids:
-                sorted_nodes.append(node)
-                accumulated_skill_ids |= acquired_skill_ids
-                unsorted_nodes.pop(index)
-                break
-
-            if index + 1 == len(unsorted_nodes):
-                raise Exception(
-                    'Cannot arrange the explorations of this collection in'
-                    'playable order.')
-    return sorted_nodes
-
-
 # TODO(bhenning): Update this function to support also matching the query to
 # explorations contained within this collection. Introduce tests to verify this
 # behavior.
