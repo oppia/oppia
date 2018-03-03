@@ -45,12 +45,11 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ItemSelectionInteractionOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
     feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob,
+    feedback_jobs_one_off.FeedbackSubjectOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
-    stats_jobs_one_off.GenerateV1StatisticsJob,
     stats_jobs_one_off.StatisticsAuditV1,
     stats_jobs_one_off.StatisticsAudit,
-    stats_jobs_one_off.GenerateAllStatsModelsOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
     user_jobs_one_off.UserContributionsOneOffJob,
@@ -68,7 +67,6 @@ ONE_OFF_JOB_MANAGERS = [
 ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
     feedback_jobs_continuous.FeedbackAnalyticsAggregator,
     stats_jobs_continuous.InteractionAnswerSummariesAggregator,
-    stats_jobs_continuous.StatisticsAggregator,
     user_jobs_continuous.DashboardRecentUpdatesAggregator,
     user_jobs_continuous.UserStatsAggregator,
 ]

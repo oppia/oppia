@@ -349,6 +349,7 @@
     "I18N_PLAYER_HINT_REQUEST_STRING_2": "I'm a little stuck, any hints?",
     "I18N_PLAYER_HINT_REQUEST_STRING_3": "I'm having some trouble.",
     "I18N_PLAYER_INFO_TOOLTIP": "Info",
+    "I18N_PLAYER_IS_PRIVATE": "This exploration is private.",
     "I18N_PLAYER_LAST_UPDATED_TOOLTIP": "Last Updated",
     "I18N_PLAYER_LEARN_AGAIN_BUTTON": "Learn Again",
     "I18N_PLAYER_LEAVE_FEEDBACK": "Leave feedback for the authors...",
