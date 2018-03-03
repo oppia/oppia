@@ -30,11 +30,11 @@ oppia.directive('learnerDashboardIcons', [
         '/domain/learner_dashboard/' +
         'learner_dashboard_icons_directive.html'),
       controller: [
-        '$scope', 'LearnerDashboardIdsBackendApiService',
+        '$scope', '$http', 'LearnerDashboardIdsBackendApiService',
         'LearnerDashboardActivityIdsObjectFactory',
         'LearnerPlaylistService',
         function(
-            $scope, LearnerDashboardIdsBackendApiService,
+            $scope, $http, LearnerDashboardIdsBackendApiService,
             LearnerDashboardActivityIdsObjectFactory,
             LearnerPlaylistService) {
           $scope.activityIsCurrentlyHoveredOver = true;
@@ -59,6 +59,20 @@ oppia.directive('learnerDashboardIcons', [
                   response.data.learner_dashboard_activity_ids));
             }
           );
+          var learnerPlaylistUrl = (
+            UrlInterpolationService.interpolateUrl(
+              '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
+                activityType: $scope.getActivityType(),
+                activityId: $scope.getActivityId()
+              }));
+          $http.post(learnerPlaylistUrl, {})
+            .then(function(response) {
+              if (response.data.belongs_to_subscribed_activities) {
+                $scope.canAdd = false;
+              } else {
+                $scope.canAdd = true;
+              }
+            });
 
           $scope.setHoverState = function(hoverState) {
             $scope.activityIsCurrentlyHoveredOver = hoverState;
