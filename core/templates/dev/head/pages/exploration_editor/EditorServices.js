@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Standalone services for the exploration editor page.
+ */
 
 // A data service that stores the current state content.
 // TODO(sll): Add validation.
