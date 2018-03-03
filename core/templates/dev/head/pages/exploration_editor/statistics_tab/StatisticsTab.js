@@ -68,7 +68,13 @@ oppia.controller('StatisticsTab', [
       $scope.explorationStatisticsUrl = (
         '/createhandler/statistics/' + ExplorationDataService.explorationId);
 
-      $http.get($scope.explorationStatisticsUrl).then(function(response) {
+      $http.get($scope.explorationStatisticsUrl).then(function(statsResponse) {
+        var data = statsResponse.data;
+        var numStarts = data.num_starts;
+        var numActualStarts = data.num_actual_starts;
+        var numCompletions = data.num_completions;
+        $scope.stateStats = data.state_stats_mapping;
+
         ReadOnlyExplorationBackendApiService.loadLatestExploration(
           ExplorationDataService.explorationId).then(function(response) {
             var statesDict = response.exploration.states;
@@ -92,12 +98,6 @@ oppia.controller('StatisticsTab', [
             });
           }
         );
-
-        var data = response.data;
-        var numStarts = data.num_starts;
-        var numActualStarts = data.num_actual_starts;
-        var numCompletions = data.num_completions;
-        $scope.stateStats = data.state_stats_mapping;
 
         if (numActualStarts > 0) {
           $scope.explorationHasBeenVisited = true;

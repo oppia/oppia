@@ -29,6 +29,10 @@ oppia.factory('StateImprovementSuggestionService', [
 
         var rankedStates = [];
         explorationStates.getStateNames().forEach(function(stateName) {
+          if (!allStateStats.hasOwnProperty(stateName)) {
+            return;
+          }
+
           var stateStats = allStateStats[stateName];
           var totalEntryCount = stateStats.total_entry_count;
           var noAnswerSubmittedCount = stateStats.no_submitted_answer_count;
