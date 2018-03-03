@@ -109,14 +109,13 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
                 rule_spec_index, classification_categorization, params,
                 session_id, time_spent_in_secs))
 
-        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            feedback_is_useful = (
-                classification_categorization != (
-                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION))
+        feedback_is_useful = (
+            classification_categorization != (
+                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION))
 
-            stats_models.AnswerSubmittedEventLogEntryModel.create(
-                exploration_id, exploration_version, state_name, session_id,
-                time_spent_in_secs, feedback_is_useful)
+        stats_models.AnswerSubmittedEventLogEntryModel.create(
+            exploration_id, exploration_version, state_name, session_id,
+            time_spent_in_secs, feedback_is_useful)
 
 
 class ExplorationActualStartEventHandler(BaseEventHandler):
