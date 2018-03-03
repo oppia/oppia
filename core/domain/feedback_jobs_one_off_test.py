@@ -165,6 +165,11 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
         'subject': u'(Feedback from a learner)'
     }
 
+    EXPECTED_THREAD_DICT7 = {
+        'text': u'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od; /⏬®;😁☕😁:☝)😁😁😍1!@#',
+        'subject': u'(Feedback from a learner)'
+    }
+
     USER_EMAIL = 'user@example.com'
     USER_USERNAME = 'user'
 
@@ -218,6 +223,10 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
             self.EXP_ID_1, 'unused_state_name', self.user_id,
             self.EXPECTED_THREAD_DICT6['subject'],
             self.EXPECTED_THREAD_DICT6['text'])
+        feedback_services.create_thread(
+            self.EXP_ID_1, 'unused_state_name', self.user_id,
+            self.EXPECTED_THREAD_DICT7['subject'],
+            self.EXPECTED_THREAD_DICT7['text'])
         threads_old = feedback_services.get_threads(self.EXP_ID_1)
 
         self._run_one_off_job()
@@ -236,6 +245,10 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             threads[5].subject,
             u'Itisjustaverylongsinglewordfortesting')
+        self.assertEqual(
+            threads[6].subject,
+            u'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od;...')
+
         self.assertEqual(threads[0].last_updated, threads_old[0].last_updated)
         self.assertEqual(threads[1].last_updated, threads_old[1].last_updated)
         self.assertEqual(threads[2].last_updated, threads_old[2].last_updated)

@@ -80,15 +80,11 @@ class FeedbackSubjectOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        yield (item.id, item.subject)
-
-    @staticmethod
-    def reduce(key, stringified_subject):
-        if stringified_subject[0] != FeedbackSubjectOneOffJob.DEFAULT_SUBJECT:
+        if item.subject != FeedbackSubjectOneOffJob.DEFAULT_SUBJECT:
             return
-        thread_model = feedback_models.FeedbackThreadModel.get(key)
+
         first_message = feedback_services.get_message(
-            thread_model.exploration_id, thread_model.thread_id, 0)
+            item.exploration_id, item.thread_id, 0)
 
         if not first_message.text:
             return
@@ -100,7 +96,11 @@ class FeedbackSubjectOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if ' ' in updated_subject:
                 updated_subject = ' '.join(updated_subject.split(' ')[:-1])
             updated_subject = updated_subject + '...'
-            thread_model.subject = updated_subject
+            item.subject = updated_subject
         else:
-            thread_model.subject = first_message.text
-        thread_model.put(update_last_updated_time=False)
+            item.subject = first_message.text
+        item.put(update_last_updated_time=False)
+
+    @staticmethod
+    def reduce(key, value):
+        pass
