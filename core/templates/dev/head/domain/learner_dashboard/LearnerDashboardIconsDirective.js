@@ -68,9 +68,9 @@ oppia.directive('learnerDashboardIcons', [
           $http.post(learnerPlaylistUrl, {})
             .then(function(response) {
               if (response.data.belongs_to_subscribed_activities) {
-                $scope.availableToAddByCreator = false;
+                $scope.shouldShowAddToPlaylistIcon = false;
               } else {
-                $scope.availableToAddByCreator = true;
+                $scope.shouldShowAddToPlaylistIcon = true;
               }
             });
 
