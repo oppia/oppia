@@ -95,8 +95,8 @@ class FeedbackSubjectOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
             if ' ' in updated_subject:
                 updated_subject = ' '.join(updated_subject.split(' ')[:-1])
-            updated_subject = updated_subject + '...'
-            item.subject = updated_subject
+
+            item.subject = updated_subject + '...'
         else:
             item.subject = first_message.text
         item.put(update_last_updated_time=False)

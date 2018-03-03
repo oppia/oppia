@@ -185,7 +185,6 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
             self.EXP_ID_1, self.owner_id, title='Bridges in England',
             category='Architecture', language_code='en')
 
-
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
