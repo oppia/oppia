@@ -680,11 +680,12 @@ def _check_import_order(all_files):
     return summary_messages
 
 
-def _check_def_spacing(all_files):
+def _check_spacing(all_files):
     """This function checks the number of blank lines
     above each class, function and method defintion.
+    It also checks for whitespace after ',', ';' and ':'.
     """
-    print 'Starting def-spacing checks'
+    print 'Starting spacing checks'
     print '----------------------------------------'
     print ''
     pycodestyle_config_path = os.path.join(os.getcwd(), 'tox.ini')
@@ -701,12 +702,12 @@ def _check_def_spacing(all_files):
     print ''
     if report.get_count() != 0:
         summary_message = (
-            '%s   Def spacing checks failed' % _MESSAGE_TYPE_FAILED)
+            '%s   Spacing checks failed' % _MESSAGE_TYPE_FAILED)
         print summary_message
         summary_messages.append(summary_message)
     else:
         summary_message = (
-            '%s   Def spacing checks passed' % _MESSAGE_TYPE_SUCCESS)
+            '%s   Spacing checks passed' % _MESSAGE_TYPE_SUCCESS)
         print summary_message
         summary_messages.append(summary_message)
     print ''
@@ -715,7 +716,7 @@ def _check_def_spacing(all_files):
 
 def main():
     all_files = _get_all_files()
-    def_spacing_messages = _check_def_spacing(all_files)
+    def_spacing_messages = _check_spacing(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     linter_messages = _pre_commit_linter(all_files)
