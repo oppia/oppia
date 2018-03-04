@@ -345,25 +345,55 @@ oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
   };
 }]);
 
-// Note that this filter removes additional new lines or <p><br></p> tags
-// at the end of the string.
-oppia.filter('removeExtraLines', [function() {
+// Filter that targets to remove occurrence of blank lines, empty paragraphs
+// and spaces at the end of string. It'll remove <p></p>, <p><br></p>, spaces
+// and &nbsp; occurrences from the end of the string.
+oppia.filter('removeExtraLinesAndSpace', [function() {
   return function(string) {
     if (!angular.isString(string)) {
       return string;
     }
     var BLANK_LINES_TEXT = '<p><br></p>';
     var EMPTY_PARA_TEXT = '<p></p>';
+    var BLANK_CHAR = ' ';
+    var BREAK_LINE_TAG = '<br>';
+    var SPACE_ENTITY = '&nbsp;';
     while (1) {
-      var endIndex = string.length;
-      var bStr = string.substring(endIndex - BLANK_LINES_TEXT.length, endIndex);
-      var pStr = string.substring(endIndex - EMPTY_PARA_TEXT.length, endIndex);
-      if (bStr === BLANK_LINES_TEXT) {
-        string = string.substring(0, endIndex - BLANK_LINES_TEXT.length);
-      } else if (pStr === EMPTY_PARA_TEXT) {
-        string = string.substring(0, endIndex - EMPTY_PARA_TEXT.length);
-      } else {
+      var lastIndexOfClosingTag = string.lastIndexOf('<');
+      if (string[lastIndexOfClosingTag - 1] !== BLANK_CHAR &&
+          string.substring(
+            lastIndexOfClosingTag - BREAK_LINE_TAG.length, lastIndexOfClosingTag
+          ) !== BREAK_LINE_TAG &&
+          string.substring(
+            lastIndexOfClosingTag - SPACE_ENTITY.length, lastIndexOfClosingTag
+          ) !== SPACE_ENTITY) {
         break;
+      }
+      while (1) {
+        var lng = string.lastIndexOf('<');
+        if (string[lastIndexOfClosingTag - 1] === BLANK_CHAR) {
+          string = string.substring(0, lastIndexOfClosingTag - 1) + '</p>';
+        } else if (
+          string.substring(
+            lastIndexOfClosingTag - SPACE_ENTITY.length, lastIndexOfClosingTag
+          ) === SPACE_ENTITY) {
+          string = string.substring(
+            0, lastIndexOfClosingTag - SPACE_ENTITY.length) + '</p>';
+        } else {
+          break;
+        }
+      }
+      while (1) {
+        var endIdx = string.length;
+        var bStr = string.substring(endIdx - BLANK_LINES_TEXT.length, endIdx);
+        var pStr = string.substring(endIdx - EMPTY_PARA_TEXT.length, endIdx);
+        if (bStr === BLANK_LINES_TEXT) {
+          string = string.substring(0, endIdx - BLANK_LINES_TEXT.length);
+        } else if (pStr === EMPTY_PARA_TEXT) {
+          string = string.substring(0, endIdx - EMPTY_PARA_TEXT.length);
+        } else {
+          break;
+        }
       }
     }
     return string;
