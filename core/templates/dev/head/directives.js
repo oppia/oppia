@@ -74,7 +74,7 @@ oppia.directive('selectOnClick', [function() {
 oppia.directive('customPopover', [
   'UrlInterpolationService', '$sce', function(UrlInterpolationService, $sce) {
     return {
-      restrict: 'A',
+      restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/custom_popover_directive.html'),
       link: function(scope, elt, attrs) {
