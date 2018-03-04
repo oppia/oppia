@@ -20,6 +20,7 @@ import datetime
 import os
 
 from core.domain import classifier_services
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
@@ -159,9 +160,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         exploration = exp_services.get_exploration_by_id(self.exp_id)
         next_scheduled_check_time = datetime.datetime.utcnow()
         state_names = ['Home']
-        new_to_old_state_names = {
-            'Home': 'Old home'
-        }
+        change_list = [{
+            'cmd': 'rename_state',
+            'old_state_name': 'Old home',
+            'new_state_name': 'Home'
+        }]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
         # Test that Exception is raised if this method is called with version
         # number 1.
@@ -170,12 +174,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             Exception, 'This method should not be called by exploration with '
                        'version number 1'):
             classifier_services.handle_non_retrainable_states(
-                exploration, state_names, new_to_old_state_names)
+                exploration, state_names, exp_versions_diff)
 
         exploration.version += 1
         # Test that mapping cant be created if job doesn't exist.
         classifier_services.handle_non_retrainable_states(
-            exploration, state_names, new_to_old_state_names)
+            exploration, state_names, exp_versions_diff)
         # There will be only one mapping (because of the creation of the
         # exploration).
         all_mappings = (
@@ -191,7 +195,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         classifier_models.TrainingJobExplorationMappingModel.create(
             self.exp_id, exploration.version-1, 'Old home', job_id)
         classifier_services.handle_non_retrainable_states(
-            exploration, state_names, new_to_old_state_names)
+            exploration, state_names, exp_versions_diff)
 
         # There should be three mappings (the first mapping because of the
         # creation of the exploration) in the data store now.
