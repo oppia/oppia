@@ -383,12 +383,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/snapshots/<exploration_id>',
         editor.ExplorationSnapshotsHandler),
     get_redirect_route(
-        r'/createhandler/statisticsversion/<exploration_id>',
-        editor.ExplorationStatsVersionsHandler),
-    get_redirect_route(
-        r'/createhandler/statistics_old/<exploration_id>/<exploration_version>',
-        editor.OldExplorationStatisticsHandler),
-    get_redirect_route(
         r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler),
     get_redirect_route(

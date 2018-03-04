@@ -311,9 +311,17 @@ def get_exploration_stats_multi(exp_version_references):
         stats_models.ExplorationStatsModel.get_multi_stats_models(
             exp_version_references))
 
-    exploration_stats_list = [
-        get_exploration_stats_from_model(exploration_stats_model)
-        for exploration_stats_model in exploration_stats_models]
+    exploration_stats_list = []
+    for index, exploration_stats_model in enumerate(exploration_stats_models):
+        if exploration_stats_model is None:
+            exploration_stats_list.append(
+                stats_domain.ExplorationStats.create_default(
+                    exp_version_references[index].exp_id,
+                    exp_version_references[index].version,
+                    {}))
+        else:
+            exploration_stats_list.append(
+                get_exploration_stats_from_model(exploration_stats_model))
 
     return exploration_stats_list
 

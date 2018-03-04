@@ -252,12 +252,12 @@ oppia.directive('graphViz', [
         '/interactions/GraphInput/directives/' +
         'graph_viz_directive.html'),
       controller: [
-        '$scope', '$element', '$attrs', '$document', 'FocusManagerService',
-        'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
+        '$scope', '$element', '$attrs', '$document', '$timeout',
+        'FocusManagerService', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
         'EVENT_NEW_CARD_AVAILABLE', 'DeviceInfoService',
         function(
-            $scope, $element, $attrs, $document, FocusManagerService,
-            graphDetailService, GRAPH_INPUT_LEFT_MARGIN,
+            $scope, $element, $attrs, $document, $timeout,
+            FocusManagerService, graphDetailService, GRAPH_INPUT_LEFT_MARGIN,
             EVENT_NEW_CARD_AVAILABLE, DeviceInfoService) {
           var _MODES = {
             MOVE: 0,
@@ -307,12 +307,21 @@ oppia.directive('graphViz', [
 
           var vizContainer = $($element).find('.oppia-graph-viz-svg');
           $scope.vizWidth = vizContainer.width();
+
           $scope.mousemoveGraphSVG = function(event) {
             if (!$scope.isInteractionActive()) {
               return;
             }
-            $scope.state.mouseX = event.pageX - vizContainer.offset().left;
-            $scope.state.mouseY = event.pageY - vizContainer.offset().top;
+            // Note: Transform client (X, Y) to SVG (X, Y). This has to be
+            // done so that changes due to viewBox attribute are
+            // propagated nicely.
+            var pt = vizContainer[0].createSVGPoint();
+            pt.x = event.clientX;
+            pt.y = event.clientY;
+            var svgp = pt.matrixTransform(
+              vizContainer[0].getScreenCTM().inverse());
+            $scope.state.mouseX = svgp.x;
+            $scope.state.mouseY = svgp.y;
             // We use vertexDragStartX/Y and mouseDragStartX/Y to make
             // mouse-dragging by label more natural, by moving the vertex
             // according to the difference from the original position.
@@ -320,12 +329,12 @@ oppia.directive('graphViz', [
             // awkwardly jump to the mouse.
             if ($scope.state.currentlyDraggedVertex !== null &&
                 ($scope.state.mouseX > GRAPH_INPUT_LEFT_MARGIN)) {
-              $scope.graph.vertices[$scope.state.currentlyDraggedVertex].x =
+              $scope.graph.vertices[$scope.state.currentlyDraggedVertex].x = (
                 $scope.state.vertexDragStartX + (
-                  $scope.state.mouseX - $scope.state.mouseDragStartX);
-              $scope.graph.vertices[$scope.state.currentlyDraggedVertex].y =
+                  $scope.state.mouseX - $scope.state.mouseDragStartX));
+              $scope.graph.vertices[$scope.state.currentlyDraggedVertex].y = (
                 $scope.state.vertexDragStartY + (
-                  $scope.state.mouseY - $scope.state.mouseDragStartY);
+                  $scope.state.mouseY - $scope.state.mouseDragStartY));
             }
           };
 
@@ -770,8 +779,24 @@ oppia.directive('graphViz', [
           $scope.getEdgeCentre = function(index) {
             return graphDetailService.getEdgeCentre($scope.graph, index);
           };
+
+          // Initial value of SVG view box.
+          $scope.svgViewBox = '';
+
           if ($scope.isInteractionActive()) {
             $scope.init();
+
+            // Set the SVG viewBox to appropriate size.
+            $timeout(function() {
+              var svgContainer = $($element).find('.oppia-graph-viz-svg')[0];
+              var boundingBox = svgContainer.getBBox();
+              var viewBoxHeight = Math.max(
+                boundingBox.height + boundingBox.y,
+                svgContainer.getAttribute('height'));
+              $scope.svgViewBox = (
+                0 + ' ' + 0 + ' ' + (boundingBox.width + boundingBox.x) +
+                ' ' + (viewBoxHeight));
+            }, 1000);
           }
         }
       ]
