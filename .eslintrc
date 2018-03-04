@@ -8,7 +8,7 @@
   ],
   "rules": {
     "angular/directive-restrict": [
-      2,
+      "error",
       {
         "restrict": "E",
         "explicit": "always"
