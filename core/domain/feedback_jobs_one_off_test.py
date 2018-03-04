@@ -166,9 +166,7 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
     }
 
     EXPECTED_THREAD_DICT7 = {
-        'text': (
-            u'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od; '
-            u'/⏬®;😁☕😁:☝)😁😁😍1!@#',
+        'text': u'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od; /⏬®;😁☕😁:☝)😁😁😍1!@#',  # pylint: disable=line-too-long
         'subject': u'(Feedback from a learner)'
     }
 
