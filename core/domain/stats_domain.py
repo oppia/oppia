@@ -647,7 +647,8 @@ class AnswerOccurrence(object):
         """Returns dict for specific answer in its raw type.
 
         Returns:
-            dict(str, str). The specific answer dict.
+            dict(str, *). The specific answer dict containing answer and 
+                frequency as keys and their values as the values.
         """
         return {
             'answer': self.answer,
@@ -660,7 +661,9 @@ class AnswerOccurrence(object):
         some number of times.
 
         Args:
-            answer_occurrence_dict: dict(str, str). The answer occurrences dict.
+            answer_occurrence_dict: dict(str, *). The answer occurrences dict 
+                containing answer and frequency as keys and their values as the 
+                values.
 
         Returns:
             AnswerOccurrence. The AnswerOccurrence domain object.
@@ -701,7 +704,7 @@ class AnswerFrequencyList(AnswerCalculationOutput):
 
     @classmethod
     def from_raw_type(cls, answer_occurrence_list):
-        """Returns domain object that represents an output list of
+        """Creates a domain object that represents an output list of
         AnswerOccurrences.
 
         Args:
