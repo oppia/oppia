@@ -36,7 +36,8 @@ describe('Testing filters', function() {
     'truncateAndCapitalize',
     'capitalize',
     'stripFormatting',
-    'removeExtraLines'
+    'getAbbreviatedText',
+    'removeExtraLinesAndSpace'
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -454,6 +455,31 @@ describe('Testing filters', function() {
       'Only First lettEr is  Affected');
   }));
 
+  it('should not shorten the length of text', inject(function($filter) {
+    expect($filter('getAbbreviatedText')('It will remain unchanged.', 50))
+      .toBe('It will remain unchanged.');
+    expect($filter('getAbbreviatedText')(
+      'Itisjustaverylongsinglewordfortesting',
+      50)).toBe('Itisjustaverylongsinglewordfortesting');
+  }));
+
+  it('should shorten the length of text', inject(function($filter) {
+    expect($filter('getAbbreviatedText')(
+      'It has to convert to a substring as it exceeds the character limit.',
+      50)).toBe('It has to convert to a substring as it exceeds...');
+    expect($filter('getAbbreviatedText')(
+      'ItisjustaverylongsinglewordfortestinggetAbbreviatedText',
+      50)).toBe('ItisjustaverylongsinglewordfortestinggetAbbreviate...');
+    expect($filter('getAbbreviatedText')(
+      'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od; /⏬®;😁☕😁:☝)😁😁😍1!@#',
+      50)).toBe('â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od;...');
+    expect($filter('getAbbreviatedText')(
+      'It is just a very long singlewordfortestinggetAbbreviatedText',
+      50)).toBe('It is just a very long...');
+  }));
+
+
+
   it('should get correct list of RTE components from HTML input',
     inject(function($filter) {
       var filter = $filter('formatRtePreview');
@@ -484,8 +510,8 @@ describe('Testing filters', function() {
       'Text Input 3');
     }));
 
-  it('should remove extra new lines', inject(function($filter) {
-    var filter = $filter('removeExtraLines');
+  it('should remove extra new lines and spaces', inject(function($filter) {
+    var filter = $filter('removeExtraLinesAndSpace');
 
     expect(filter('<p><br></p>')).toEqual('');
     expect(filter('<p>abc</p>')).toEqual('<p>abc</p>');
@@ -496,6 +522,15 @@ describe('Testing filters', function() {
     expect(filter(
       '<p>abc</p><p><br></p><p>abc</p><p><br></p><p><br></p>')).toEqual(
       '<p>abc</p><p><br></p><p>abc</p>');
+    expect(filter(
+      '<p>test</p><p><br></p><p>&nbsp;test</p><p><br></p><p>&nbsp; &nbsp;</p>'))
+      .toEqual('<p>test</p><p><br></p><p>&nbsp;test</p>');
+    expect(filter(
+      '<p>test</p><p><br></p><p>&nbsp;test</p><p>&nbsp;&nbsp;</p>')).toEqual(
+      '<p>test</p><p><br></p><p>&nbsp;test</p>');
+    expect(filter(
+      '<p>test</p><p><br></p><p>&nbsp;test</p><p>&nbsp; &nbsp;</p>')).toEqual(
+      '<p>test</p><p><br></p><p>&nbsp;test</p>');
     expect(filter(null)).toEqual(null);
     expect(filter(undefined)).toEqual(undefined);
   }));
