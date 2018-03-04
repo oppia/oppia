@@ -818,31 +818,63 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         collection = collection_domain.Collection.create_default_collection(
             'collection_id')
 
+        # There should be an empty node list in playable order for an empty
+        # collection.
+        self.assertEqual(collection.get_nodes_in_playable_order(), [])
+
         # Add nodes to collection.
         collection.add_node('exp_id_1')
         collection.add_node('exp_id_2')
         collection.add_node('exp_id_0')
+
+        # Without updating prerequisite and acquired skills the
+        # prerequisite and acquired skill_ids list is empty in each node, so
+        # the playable order will be equal to the order in which they are
+        # adeed.
+        sorted_nodes = collection.get_nodes_in_playable_order()
+        expected_explorations_list = ['exp_id_1', 'exp_id_2', 'exp_id_0']
+        observed_explration_list = [
+            node.exploration_id for node in sorted_nodes]
+
+        self.assertEqual(expected_explorations_list, observed_explration_list)
 
         # Add skills to collection.
         collection.add_skill('skill0')
         collection.add_skill('skill1')
         collection.add_skill('skill2')
 
-        # Updating node's prerequisite and acquired skill_ids.
+        # Updating 1st node's prerequisite and acquired skill_ids.
         collection_node0 = collection.get_node('exp_id_1')
         collection_node0.update_prerequisite_skill_ids(['skill0'])
         collection_node0.update_acquired_skill_ids(['skill1'])
 
-        collection_node1 = collection.get_node('exp_id_2')
-        collection_node1.update_prerequisite_skill_ids(['skill1'])
-        collection_node1.update_acquired_skill_ids(['skill2'])
+        # The 1st node will be removed from the playable order as this node
+        # is not acheivable i.e, there is no way to fullfil the prerequisite
+        # of this node.
+        sorted_nodes = collection.get_nodes_in_playable_order()
+        expected_explorations_list = ['exp_id_2', 'exp_id_0']
+        observed_explration_list = [
+            node.exploration_id for node in sorted_nodes]
 
+        self.assertEqual(expected_explorations_list, observed_explration_list)
+
+        # Updating 3rd node's prerequisite and acquired skill_ids.
         collection_node2 = collection.get_node('exp_id_0')
         collection_node2.update_prerequisite_skill_ids([])
         collection_node2.update_acquired_skill_ids(['skill0'])
 
-        # Validating collection.
-        collection.validate(strict=False)
+        # Now the 1st node's prerequisite skills can be acheived through the
+        # 3rd node (exp_id_0 ---> exp_id_1).
+        sorted_nodes = collection.get_nodes_in_playable_order()
+        expected_explorations_list = ['exp_id_2', 'exp_id_0', 'exp_id_1']
+        observed_explration_list = [
+            node.exploration_id for node in sorted_nodes]
+        self.assertEqual(observed_explration_list, expected_explorations_list)
+
+        # Updating 2nd node's prerequisite and acquired skill_ids.
+        collection_node1 = collection.get_node('exp_id_2')
+        collection_node1.update_prerequisite_skill_ids(['skill1'])
+        collection_node1.update_acquired_skill_ids(['skill2'])
 
         # Sorting nodes in linear and playable order.
         sorted_nodes = collection.get_nodes_in_playable_order()
@@ -852,7 +884,7 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
 
         # Observed order of exploration.
         observed_explration_list = [
-            node['exploration_id'] for node in sorted_nodes]
+            node.exploration_id for node in sorted_nodes]
 
         # Validates the number of nodes present in collection after sorting.
         self.assertEqual(len(sorted_nodes), 3)

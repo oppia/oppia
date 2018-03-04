@@ -1020,11 +1020,11 @@ class Collection(object):
             return []
 
     def get_nodes_in_playable_order(self):
-        """Returns a list of collection node_dict in linear, playable order and
+        """Returns a list of collection nodes in linear, playable order and
         assumes the nodes can fit a linear structure.
 
         Returns:
-            list(dict). A sorted list of collection nodes in dict.
+            list(CollectionNode). A sorted list of collection nodes.
         """
         sorted_exp_ids = self.init_exploration_ids
         next_exp_ids = self.get_next_exploration_ids(sorted_exp_ids)
@@ -1034,10 +1034,10 @@ class Collection(object):
                     sorted_exp_ids.append(next_exp_id)
             next_exp_ids = self.get_next_exploration_ids(sorted_exp_ids)
 
-        sorted_node_dicts = [
-            self.get_node(exp_id).to_dict() for exp_id in sorted_exp_ids]
+        sorted_nodes_list = [
+            copy.deepcopy(self.get_node(exp_id)) for exp_id in sorted_exp_ids]
 
-        return sorted_node_dicts
+        return sorted_nodes_list
 
     @classmethod
     def is_demo_collection_id(cls, collection_id):
