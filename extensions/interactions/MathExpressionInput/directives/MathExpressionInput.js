@@ -134,6 +134,11 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
               setGuppyContentFromInput();
             });
           };
+          var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
+            '/overrides/guppy/oppia_symbols.json');
+          Guppy.init({
+            symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
+                      oppiaSymbolsUrl]});
           var guppyInstance = new Guppy(guppyDivId, {
             settings: {
               empty_content: (
@@ -153,11 +158,6 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                 $scope.$apply();
               },
               ready: function() {
-                var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
-                  '/overrides/guppy/oppia_symbols.json');
-                Guppy.init({
-                  symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
-                            oppiaSymbolsUrl]});
                 $scope.setAnswerValidity({
                   answerValidity: false
                 });
