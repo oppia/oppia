@@ -149,9 +149,18 @@
 
   .oppia-exploration-footer .star-content {
     color: #094142;
-    font-size: 18px;
     position: absolute;
+  }
+
+  .oppia-exploration-footer .single-digit {
+    font-size: 17px;
     right: 28px;
+    top: 20px;
+  }
+
+  .oppia-exploration-footer .double-digit {
+    font-size: 14px;
+    right: 27px;
     top: 21px;
   }
 
@@ -188,7 +197,7 @@
     <div class="col-sm-7">
       <div class="star-container pull-right" ng-if="getNumberOfCorrectAnswers() > 0">
         <i class="material-icons star">&#xE838;</i>
-        <span class="star-content">{{getNumberOfCorrectAnswers()}}</span>
+        <span ng-class="getClassForStarContent()">{{getNumberOfCorrectAnswers()}}</span>
       </div>
     </div>
   </div>

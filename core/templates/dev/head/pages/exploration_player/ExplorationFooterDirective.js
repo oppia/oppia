@@ -47,11 +47,14 @@ oppia.directive('explorationFooter', [
           $scope.getNumberOfCorrectAnswers = function () {
             return ExplorationPlayerService.getCorrectCount();
           };
-          var star = document.getElementsByClassName("star-content");
-          if()
-          {
-            star.style.fontSize = 10px;
-          }
+
+          $scope.getClassForStarContent = function() {
+            if($scope.getNumberOfCorrectAnswers() > 9) {
+              return "star-content double-digit";
+            }
+            return "star-content single-digit";
+          };
+
           $scope.contributorNames = [];
           ExplorationSummaryBackendApiService
             .loadPublicAndPrivateExplorationSummaries([$scope.explorationId])
