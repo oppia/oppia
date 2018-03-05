@@ -49,10 +49,10 @@ oppia.directive('explorationFooter', [
           };
 
           $scope.getClassForStarContent = function() {
-            if($scope.getNumberOfCorrectAnswers() > 9) {
-              return "star-content double-digit";
+            if ($scope.getNumberOfCorrectAnswers() > 9) {
+              return 'star-content double-digit';
             }
-            return "star-content single-digit";
+            return 'star-content single-digit';
           };
 
           $scope.contributorNames = [];
