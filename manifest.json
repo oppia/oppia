@@ -63,13 +63,6 @@
         "rootDirPrefix": "simplejson-",
         "targetDirPrefix": "simplejson-"
       },
-      "sourcemaps": {
-        "version": "1.1",
-        "downloadFormat": "zip",
-        "url": "https://pypi.python.org/packages/84/d5/67e53b324fb50beafce8226030bc4158f5fcee2671fc868e035d13a4c082/python-sourcemaps-1.1.zip#md5=27326a7533f4b446bf0f24dcd97cc282",
-        "rootDirPrefix": "python-sourcemaps-",
-        "targetDirPrefix": "python-sourcemaps-"
-      },
       "beautifulSoup": {
         "version": "4.6.0",
         "downloadFormat": "tar",
@@ -85,6 +78,14 @@
         "tarRootDirPrefix": "mutagen-",
         "rootDirPrefix": "mutagen-",
         "targetDirPrefix": "mutagen-"
+      },
+      "watchdog": {
+        "version": "0.8.3",
+        "downloadFormat": "tar",
+        "url": "https://pypi.python.org/packages/54/7d/c7c0ad1e32b9f132075967fc353a244eb2b375a3d2f5b0ce612fd96e107e/watchdog-0.8.3.tar.gz#md5=bb16926bccc98eae2a04535e4512ddf1",
+        "tarRootDirPrefix": "watchdog-",
+        "rootDirPrefix": "watchdog-",
+        "targetDirPrefix": "watchdog-"
       }
     },
     "frontend": {

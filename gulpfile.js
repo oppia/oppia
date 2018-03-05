@@ -169,21 +169,6 @@ gulp.task('generateCss', function() {
     .pipe(gulp.dest(generatedCssTargetDir));
 });
 
-gulp.task('generateJs', function() {
-  requireFilesExist(jsFilePaths);
-  gulp.src(jsFilePaths)
-    .pipe(isMinificationNeeded ? sourcemaps.init() : gulpUtil.noop())
-    .pipe(isMinificationNeeded ? concat('third_party.min.js') :
-        concat('third_party.js'))
-    .pipe(isMinificationNeeded ? uglify() : gulpUtil.noop())
-    // This maps a combined/minified file back to an unbuilt state by holding
-    // information about original files. When you query a certain line and
-    // column number in your generated JavaScript, you can do a lookup in the
-    // source map which returns the original location.
-    // http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/
-    .pipe(isMinificationNeeded ? sourcemaps.write('.') : gulpUtil.noop())
-    .pipe(gulp.dest(generatedJsTargetDir));
-});
 // This task is used to copy all fonts which are used by
 // Bootstrap and font-Awesome to one folder
 var generatedFontsTargetDir = path.join(generatedTargetDir, 'fonts');
@@ -200,14 +185,13 @@ gulp.task('gulpStartGae', function() {
 // This takes all functions  that are required for the build
 // e.g css, Js and Images
 gulp.task('build', [
-  'collectDependencyFilepaths', 'generateCss', 'copyFonts', 'generateJs']);
+  'collectDependencyFilepaths', 'generateCss', 'copyFonts']);
 
 gulp.slurped = false;
 gulp.task('watch', function() {
   if (!gulp.slurped) {
     gulp.watch('gulpfile.js', ['build']);
     gulp.watch(cssFilePaths, ['generateCss']);
-    gulp.watch(jsFilePaths, ['generateJs']);
     gulp.watch('manifest.json', ['build']);
     gulp.slurped = true;
   }

@@ -14,23 +14,31 @@
 
 """Build file for production version of Oppia. Minifies JS and CSS."""
 
+import collections
 import fnmatch
+import glob
 import hashlib
 import json
 import os
 import re
 import shutil
 import subprocess
-import sys
+import time
+
+import watchdog.events
+import watchdog.observers
+
+import feconf
 
 ASSETS_SRC_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
 
 THIRD_PARTY_STATIC_DIR = os.path.join('third_party', 'static')
+THIRD_PARTY_GENERATED_DEV_DIR = os.path.join('third_party', 'generated', '')
 THIRD_PARTY_GENERATED_STAGING_DIR = os.path.join(
-    'backend_prod_files', 'third_party', 'generated', 'js', 'third_party.min.js')
+    'backend_prod_files', 'third_party', 'generated', '')
 THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
-    'build', 'third_party', 'generated', 'js', 'third_party.min.js')
+    'build', 'third_party', 'generated', '')
 
 EXTENSIONS_DEV_DIR = os.path.join('extensions', '')
 EXTENSIONS_STAGING_DIR = (
@@ -43,13 +51,19 @@ TEMPLATES_STAGING_DIR = (
 TEMPLATES_OUT_DIR = os.path.join('build', 'templates', 'head', '')
 
 HASHES_JSON = os.path.join('build', 'assets', 'hashes.js')
+MANIFEST_FILE_PATH = os.path.join('manifest.json')
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
 YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
+PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+NODE_FILE = os.path.join(
+    PARENT_DIR, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
+
+FONT_EXTENSIONS = ('*.eot', '*.woff2', '*.ttf', '*.woff', '*.eof', '*.svg')
 
 # Files with this extension shouldn't be moved to build directory.
-FILE_EXTENSIONS_TO_IGNORE = ('.py')
+FILE_EXTENSIONS_TO_IGNORE = ('.py',)
 
 # Files with this paths should be moved to build directory but shouldn't be
 # renamed (i.e. the filepath shouldn't contain hash)
@@ -66,7 +80,6 @@ FILEPATHS_PROVIDED_TO_FRONTEND = (
     'images/*', 'i18n/*', '*_directive.html', '*.png', '*.json')
 
 HASH_BLOCK_SIZE = 2**20
-MANIFEST_FILE_PATH = os.path.join('manifest.json')
 
 
 def _minify(source_path, target_path):
@@ -81,7 +94,15 @@ def _minify(source_path, target_path):
         YUICOMPRESSOR_DIR, source_path, target_path)
     subprocess.check_call(cmd, shell=True)
 
-def minify_and_create_sourcemap(source_paths, target_path):
+
+def _join_files(source_paths, target_path):
+    with open(target_path, 'w') as target_file:
+        for source_path in source_paths:
+            with open(source_path, 'r') as source_file:
+                target_file.write(source_file.read())
+
+
+def _minify_and_create_sourcemap(source_paths, target_path):
     """Runs the given file through a minifier and outputs it to target_path.
 
     Args:
@@ -89,14 +110,22 @@ def minify_and_create_sourcemap(source_paths, target_path):
         target_path: str. Absolute path to location where to copy
             the minified file.
     """
-    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-    node_path = os.path.join(
-        parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
     uglify_path = os.path.join(
-        parent_dir, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
-    cmd = '%s %s %s --compress --mangle --source-map --output %s ' % (
-        node_path, uglify_path, " ".join(source_paths), target_path)
+        PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
+
+    source_map_properties = "includeSources,url=\'third_party.min.js.map\'"
+    cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
+        NODE_FILE, uglify_path, " ".join(source_paths),
+        source_map_properties, target_path)
     subprocess.check_call(cmd, shell=True)
+
+
+def _copy_fonts(source_paths, target_path):
+    for font_wildcard in source_paths:
+        font_paths = glob.glob(font_wildcard)
+        for font_path in font_paths:
+            shutil.copy(font_path, target_path)
+
 
 def _insert_hash(filepath, file_hash):
     """Inserts hash into filepath before the file extension.
@@ -173,58 +202,85 @@ def process_js(source_path, target_path):
     ensure_directory_exists(target_path)
     _minify(source_path, target_path)
 
-def get_dependency_filepaths():
+
+def get_dependency_filepaths(dependency, filepaths):
+    if "targetDir" in dependency:
+        dependency_dir = dependency["targetDir"]
+    else:
+        dependency_dir = (
+            dependency["targetDirPrefix"] + dependency["version"])
+    if "bundle" in dependency:
+        dependency_bundle = dependency["bundle"]
+        for css_file in dependency_bundle.get("css", []):
+            filepaths["css"].append(
+                os.path.join(
+                    THIRD_PARTY_STATIC_DIR, dependency_dir, css_file))
+        for js_file in dependency_bundle.get("js", []):
+            filepaths["js"].append(
+                os.path.join(
+                    THIRD_PARTY_STATIC_DIR, dependency_dir, js_file))
+        if "fontsPath" in dependency_bundle:
+            for extension in FONT_EXTENSIONS:
+                filepaths["fonts"].append(
+                    os.path.join(
+                        THIRD_PARTY_STATIC_DIR, dependency_dir,
+                        dependency_bundle["fontsPath"], extension))
+
+
+def get_dependencies_filepaths():
     filepaths = {
         "css": [],
         "js": [],
         "fonts": []
     }
     with open(MANIFEST_FILE_PATH, 'r') as json_file:
-        manifest = json.loads(json_file.read())
+        manifest = json.loads(
+            json_file.read(), object_pairs_hook=collections.OrderedDict)
     frontend_dependencies = manifest["dependencies"]["frontend"]
     for dependency in frontend_dependencies.values():
-        if "targetDir" in dependency:
-            dependency_dir = dependency["targetDir"]
-        else:
-            dependency_dir = (
-                dependency["targetDirPrefix"] + dependency["version"])
-        if "bundle" in dependency:
-            dependency_bundle = dependency["bundle"]
-            for css_file in dependency_bundle.get("css", []):
-                filepaths["css"].append(
-                    os.path.join(
-                        THIRD_PARTY_STATIC_DIR, dependency_dir, css_file))
-            for js_file in dependency_bundle.get("js", []):
-                filepaths["js"].append(
-                    os.path.join(
-                        THIRD_PARTY_STATIC_DIR, dependency_dir, js_file))
-            #TODO fonts
+        get_dependency_filepaths(dependency, filepaths)
     return filepaths
 
-def build_minified_third_party_libs(output_directory):
+
+def build_minified_third_party_libs():
     """Generates third party files via Gulp.
 
     Args:
         output_directory: str. Path to directory where to generate files.
     """
-    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-    node_path = os.path.join(
-        parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
-    gulp_path = os.path.join(
-        parent_dir, 'node_modules', 'gulp', 'bin', 'gulp.js')
-    gulp_build_cmd = [node_path, gulp_path, 'build', '--minify=True',
-                      '--output_directory=%s' % output_directory]
-    proc = subprocess.Popen(
-        gulp_build_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    gulp_stdout, gulp_stderr = proc.communicate()
-    if gulp_stdout:
-        print gulp_stdout
-    if gulp_stderr:
-        print 'Gulp build process failed.Exiting'
-        print '----------------------------------------'
-        print gulp_stderr
-        sys.exit(1)
 
+    third_party_js = os.path.join(
+        THIRD_PARTY_GENERATED_STAGING_DIR, 'js', 'third_party.min.js')
+    third_party_css = os.path.join(
+        THIRD_PARTY_GENERATED_STAGING_DIR, 'css', 'third_party.min.css')
+    fonts_dir = os.path.join(THIRD_PARTY_GENERATED_STAGING_DIR, "fonts")
+
+    dependency_filepaths = get_dependencies_filepaths()
+    _minify_and_create_sourcemap(dependency_filepaths["js"], third_party_js)
+
+    _join_files(dependency_filepaths["css"], third_party_css)
+    _minify(third_party_css, third_party_css)
+
+    _copy_fonts(dependency_filepaths["fonts"], fonts_dir)
+
+
+def build_third_party_libs():
+    """Generates third party files via Gulp.
+
+    Args:
+        output_directory: str. Path to directory where to generate files.
+    """
+
+    third_party_js = os.path.join(
+        THIRD_PARTY_GENERATED_DEV_DIR, 'js', 'third_party.js')
+    third_party_css = os.path.join(
+        THIRD_PARTY_GENERATED_DEV_DIR, 'css', 'third_party.css')
+    fonts_dir = os.path.join(THIRD_PARTY_GENERATED_DEV_DIR, "fonts")
+
+    dependency_filepaths = get_dependencies_filepaths()
+    _join_files(dependency_filepaths["js"], third_party_js)
+    _join_files(dependency_filepaths["css"], third_party_css)
+    _copy_fonts(dependency_filepaths["fonts"], fonts_dir)
 
 def hash_should_be_inserted(filepath):
     """Returns if the file should be renamed to include hash in
@@ -448,7 +504,7 @@ def generate_build_directory():
 
     # Process third_party resources, create hashes for them and copy them into
     # build/third_party/generated
-    build_minified_third_party_libs(THIRD_PARTY_GENERATED_STAGING_DIR)
+    build_minified_third_party_libs()
     hashes.update(get_file_hashes(THIRD_PARTY_GENERATED_STAGING_DIR))
     copy_files_source_to_target(
         THIRD_PARTY_GENERATED_STAGING_DIR,
@@ -473,6 +529,20 @@ def generate_build_directory():
     copy_files_source_to_target(
         TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)
 
+class MyHandler(watchdog.events.PatternMatchingEventHandler):
+    def on_modified(self, event):
+        print "Got it!"
+
+def watch_directories():
+    observer = watchdog.observers.Observer()
+    event_handler = MyHandler()
+    observer.schedule(event_handler, THIRD_PARTY_GENERATED_OUT_DIR, True)
+    observer.start()
+
 
 if __name__ == '__main__':
-    generate_build_directory()
+    if feconf.FORCE_PROD_MODE:
+        generate_build_directory()
+    else:
+        build_third_party_libs()
+        watch_directories()
