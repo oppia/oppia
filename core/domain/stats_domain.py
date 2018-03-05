@@ -316,7 +316,7 @@ class StateStats(object):
 
         Returns:
             int. Number of times the solution button was triggered to answer a
-                state (only for version 2).
+                state only for events for schema version 2.
         """
         return self.num_times_solution_viewed_v2
 
@@ -644,13 +644,13 @@ class AnswerOccurrence(object):
         self.frequency = frequency
 
     def to_raw_type(self):
-        """Returns dict for specific answer in its raw type.
+        """Returns Python dict for specific answer.
 
         Returns:
-            dict(str, *). The specific answer dict in the following format:
+            dict. The specific answer dict in the following format:
             {
-                answer: The answer submitted by the learner.
-                frequency: The number of occurrences of the answer.
+                'answer': *.The answer submitted by the learner.
+                'frequency': int. The number of occurrences of the answer.
             }
         """
         return {
@@ -664,11 +664,11 @@ class AnswerOccurrence(object):
         some number of times.
 
         Args:
-            answer_occurrence_dict: dict(str, *). The specific answer dict in 
-                the following format:
+            answer_occurrence_dict: dict. The specific answer dict in the
+                following format:
                 {
-                    answer: The answer submitted by the learner.
-                    frequency: The number of occurrences of the answer.
+                    'answer': *. The answer submitted by the learner.
+                    'frequency': int. The number of occurrences of the answer.
                 }
 
         Returns:
@@ -703,11 +703,11 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         a Python dict.
 
         Returns:
-            list. A list containing answer occurrences dict in the following
-                format:
+            list(dict). A list of answer occurrence dicts. Each dict has the 
+                following format:
                 {
-                    answer: The answer submitted by the learner.
-                    frequency: The number of occurrences of the answer.
+                    'answer': *. The answer submitted by the learner.
+                    'frequency': int. The number of occurrences of the answer.
                 }
         """
         return [
@@ -720,11 +720,11 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         AnswerOccurrences.
 
         Args:
-            answer_occurrence_list: list. A list containing answer occurrences 
-                dict in the following format:
+            answer_occurrence_list: list(dict). A list containing answer
+                occurrence dicts in the following format:
                 {
-                    answer: The answer submitted by the learner.
-                    frequency: The number of occurrences of the answer.
+                    'answer': *. The answer submitted by the learner.
+                    'frequency': int. The number of occurrences of the answer.
                 }
 
         Returns:
@@ -749,16 +749,17 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
             if categorized_answer_freq_lists else {})
 
     def to_raw_type(self):
-        """Returns the categorized frequency dict in its raw type.
+        """Returns the categorized frequency Python dict.
 
         Returns:
             dict. The categorized answer frequency dict of the following format:
                 {
-                    category: The answer frequency list containing dict in the
-                        following format:
+                    'category': list. The answer frequency list containing dict
+                        in the following format:
                         {
-                            answer: The answer submitted by the learner.
-                            frequency: The number of occurrences of the answer.
+                            'answer': *. The answer submitted by the learner.
+                            'frequency': int. The number of occurrences of the
+                                answer.
                         }
                 }
         """
@@ -777,11 +778,12 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
             categorized_frequency_dict: dict. The categorized answer frequency
                 dict of the following format:
                 {
-                    category: The answer frequency list containing dict in the
-                        following format:
+                    'category': list. The answer frequency list containing dict
+                        in the following format:
                         {
-                            answer: The answer submitted by the learner.
-                            frequency: The number of occurrences of the answer.
+                            'answer': *. The answer submitted by the learner.
+                            'frequency': int. The number of occurrences of the
+                                answer.
                         }
                 }
 
