@@ -21,12 +21,12 @@
   }
   editor-navigation .oppia-exploration-open-threads-indicator {
     border-radius: 10%;
-    bottom: 3px;
-    height: 23px;
+    bottom: 5px;
+    height: 15px;
     position: absolute;
-    right: 5px;
+    right: 1px;
     text-align: center;
-    width: 25px;
+    width: 34px;
   }
 </style>
 <ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak" style="margin-left: 20px;">
@@ -90,10 +90,7 @@
     </a>
     <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
       <span class="oppia-exploration-open-threads-count">
-        <[getOpenThreadsCount()]>
-      </span>
-      <span class="feedback-open-thread-static-text">
-        open
+        <[getOpenThreadsCount()]>&nbsp;open
       </span>
     </div>
   </li>
