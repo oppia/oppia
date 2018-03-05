@@ -647,8 +647,11 @@ class AnswerOccurrence(object):
         """Returns dict for specific answer in its raw type.
 
         Returns:
-            dict(str, *). The specific answer dict containing answer and 
-                frequency as keys and their values as the values.
+            dict(str, *). The specific answer dict in the following format:
+            {
+                answer: The answer submitted by the learner.
+                frequency: The number of occurrences of the answer.
+            }
         """
         return {
             'answer': self.answer,
@@ -661,9 +664,12 @@ class AnswerOccurrence(object):
         some number of times.
 
         Args:
-            answer_occurrence_dict: dict(str, *). The answer occurrences dict 
-                containing answer and frequency as keys and their values as the 
-                values.
+            answer_occurrence_dict: dict(str, *). The specific answer dict in 
+                the following format:
+                {
+                    answer: The answer submitted by the learner.
+                    frequency: The number of occurrences of the answer.
+                }
 
         Returns:
             AnswerOccurrence. The AnswerOccurrence domain object.
@@ -693,10 +699,16 @@ class AnswerFrequencyList(AnswerCalculationOutput):
             answer_occurrences if answer_occurrences else [])
 
     def to_raw_type(self):
-        """Returns the answer occurrences list in its raw type.
+        """Returns the answer occurrences list with each answer represented as
+        a Python dict.
 
         Returns:
-            list. The answer occurrences list in raw type.
+            list. A list containing answer occurrences dict in the following
+                format:
+                {
+                    answer: The answer submitted by the learner.
+                    frequency: The number of occurrences of the answer.
+                }
         """
         return [
             answer_occurrence.to_raw_type()
@@ -708,8 +720,12 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         AnswerOccurrences.
 
         Args:
-            answer_occurrence_list: list(dict). The answer occurrences
-                list.
+            answer_occurrence_list: list. A list containing answer occurrences 
+                dict in the following format:
+                {
+                    answer: The answer submitted by the learner.
+                    frequency: The number of occurrences of the answer.
+                }
 
         Returns:
             AnswerFrequencyList. The domain object for answer occurrences list.
@@ -736,8 +752,15 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         """Returns the categorized frequency dict in its raw type.
 
         Returns:
-            dict. Categorized answer frequency dict with category
-                type as the keys and answer frequency list as the values.
+            dict. The categorized answer frequency dict of the following format:
+                {
+                    category: The answer frequency list containing dict in the
+                        following format:
+                        {
+                            answer: The answer submitted by the learner.
+                            frequency: The number of occurrences of the answer.
+                        }
+                }
         """
         return {
             category: answer_frequency_list.to_raw_type()
@@ -751,9 +774,16 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         a given dict.
 
         Args:
-            categorized_frequency_dict: dict(str, list). The categorized
-                frequency dict with category type as the keys and answer
-                frequency list as the values.
+            categorized_frequency_dict: dict. The categorized answer frequency
+                dict of the following format:
+                {
+                    category: The answer frequency list containing dict in the
+                        following format:
+                        {
+                            answer: The answer submitted by the learner.
+                            frequency: The number of occurrences of the answer.
+                        }
+                }
 
         Returns:
             CategorizedAnswerFrequencyLists. The domain object for categorized
