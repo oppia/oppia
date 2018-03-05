@@ -49,7 +49,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
           guppyDivElt.setAttribute(
             'id', 'guppy_' + (Math.floor(Math.random() * 10000)).toString());
           var guppyDivId = guppyDivElt.id;
-                    /**
+          /**
            * Adds a button overlay and invisible text field used to bring up
            * the keyboard on mobile devices.
            *
