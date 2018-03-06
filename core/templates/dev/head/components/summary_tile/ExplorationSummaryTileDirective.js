@@ -83,11 +83,11 @@ oppia.directive('explorationSummaryTile', [
       controller: [
         '$scope', '$http', '$window',
         'DateTimeFormatService', 'RatingComputationService',
-        'WindowDimensionsService', 'UrlService', '$timeout',
+        'WindowDimensionsService', 'UrlService',
         function(
             $scope, $http, $window,
             DateTimeFormatService, RatingComputationService,
-            WindowDimensionsService, UrlService, $timeout) {
+            WindowDimensionsService, UrlService) {
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           $scope.ACTIVITY_TYPE_EXPLORATION = (
             constants.ACTIVITY_TYPE_EXPLORATION);
@@ -114,7 +114,6 @@ oppia.directive('explorationSummaryTile', [
           $scope.MAX_AVATARS_TO_DISPLAY = 5;
 
           $scope.setHoverState = function(hoverState) {
-            console.log(hoverState);
             $scope.explorationIsCurrentlyHoveredOver = hoverState;
           };
 

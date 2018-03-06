@@ -5,13 +5,13 @@
    aria-hidden="true"
    uib-tooltip="<['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]>"
    tooltip-placement="left"></i>
-<div ng-show="isWindowNarrow() && !belongsToLearnerPlaylist()" class="btn-group dropdown oppia-learner-dashboard-icon" uib-dropdown="" is-open="status.isopen" style="">
+<div ng-show="isWindowNarrow() && !belongsToLearnerPlaylist()" class="btn-group dropdown oppia-learner-dashboard-icon" uib-dropdown>
   <ul style="left:-150px;top:0" class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
     <li role="menuitem" ng-click="addToLearnerPlaylist(getActivityId(), getActivityType())">
       <a>Add to Playlist</a>
     </li>
   </ul>
-  <i class="fa fa-ellipsis-v dropdown-toggle" uib-dropdown-toggle="" ng-disabled="disabled"></i>
+  <i class="fa fa-ellipsis-v dropdown-toggle" uib-dropdown-toggle></i>
 </div>
 <i class="oppia-learner-dashboard-icon fa fa-clock-o"
    ng-if="belongsToLearnerPlaylist()"

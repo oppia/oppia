@@ -41,7 +41,6 @@ oppia.directive('learnerDashboardIcons', [
             LearnerPlaylistService) {
           $scope.activityIsCurrentlyHoveredOver = true;
           $scope.playlistTooltipIsEnabled = false;
-          console.log($scope.isWindowNarrow());
           $scope.enablePlaylistTooltip = function() {
             $scope.playlistTooltipIsEnabled = true;
           };
