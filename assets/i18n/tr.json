@@ -198,6 +198,7 @@
 	"I18N_PLAYER_GIVE_UP_TOOLTIP": "Yanıt için buraya tıklayın.",
 	"I18N_PLAYER_HINT": "İpucu",
 	"I18N_PLAYER_INFO_TOOLTIP": "Bilgi",
+	"I18N_PLAYER_IS_PRIVATE": "Bu keşif özel.",
 	"I18N_PLAYER_LAST_UPDATED_TOOLTIP": "Son güncellenmiş",
 	"I18N_PLAYER_LEARN_AGAIN_BUTTON": "Tekrar Et",
 	"I18N_PLAYER_LEAVE_FEEDBACK": "Yazarlar için dönüt bırak...",

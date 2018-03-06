@@ -3,9 +3,14 @@
     "eslint:recommended",
   ],
   "plugins": [
-    "html"
+    "html",
+    "angular"
   ],
   "rules": {
+    "brace-style":[
+      "error",
+      "1tbs"
+    ],
     "camelcase": [
       "error",
       {
@@ -17,6 +22,12 @@
       {
         "before": false,
         "after": true
+      }
+    ],
+    "angular/no-inline-template": [
+      "error",
+      {
+        "allowSimple": true
       }
     ],
     "curly": [
