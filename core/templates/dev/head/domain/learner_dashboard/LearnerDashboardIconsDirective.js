@@ -71,9 +71,9 @@ oppia.directive('learnerDashboardIcons', [
                 activityId)) {
                 return false;
               } else {
-                if ($scope.isWindowNarrow()){
+                if ($scope.isWindowNarrow()) {
                   return true;
-                }else{
+                } else {
                   return $scope.activityIsCurrentlyHoveredOver;                  
                 }
               }
