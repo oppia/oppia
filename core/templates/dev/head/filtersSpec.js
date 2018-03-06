@@ -37,7 +37,7 @@ describe('Testing filters', function() {
     'capitalize',
     'stripFormatting',
     'getAbbreviatedText',
-    'removeExtraLines'
+    'removeExtraLinesAndSpaces'
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -511,7 +511,7 @@ describe('Testing filters', function() {
     }));
 
   it('should remove extra new lines', inject(function($filter) {
-    var filter = $filter('removeExtraLines');
+    var filter = $filter('removeExtraLinesAndSpaces');
 
     expect(filter('<p><br></p>')).toEqual('');
     expect(filter('<p>abc</p>')).toEqual('<p>abc</p>');
