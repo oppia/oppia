@@ -1,5 +1,5 @@
 <style>
-  .nav > li > a:focus {
+  admin-navbar .nav > li > a:focus:not(.active) {
     background-color: #00376d;
     color: #fff;
   }
@@ -112,7 +112,6 @@
         <ul class="nav oppia-navbar-tabs-admin">
           <li class="oppia-clickable-navbar-element pull-right">
             <a class="oppia-navbar-tab"
-               ng-click="showTab(ADMIN_TAB_URLS.MISC)"
                ng-href="<[::ADMIN_TAB_URLS.MISC]>"
                ng-class="{active: isMiscTabOpen()}"
                uib-tooltip="Miscellaneous"
@@ -122,7 +121,6 @@
           </li>
           <li class="oppia-clickable-navbar-element pull-right">
             <a class="oppia-navbar-tab protractor-test-admin-roles-tab"
-               ng-click="showTab(ADMIN_TAB_URLS.ROLES)"
                ng-href="<[::ADMIN_TAB_URLS.ROLES]>"
                ng-class="{active: isRolesTabOpen()}"
                uib-tooltip="Roles"
@@ -132,7 +130,6 @@
           </li>
           <li class="oppia-clickable-navbar-element pull-right">
             <a class="oppia-navbar-tab protractor-test-admin-config-tab"
-               ng-click="showTab(ADMIN_TAB_URLS.CONFIG)"
                ng-href="<[::ADMIN_TAB_URLS.CONFIG]>"
                ng-class="{active: isConfigTabOpen()}"
                uib-tooltip="Config"
@@ -151,7 +148,6 @@
           </li>
           <li class="oppia-clickable-navbar-element pull-right">
             <a class="oppia-navbar-tab"
-               ng-click="showTab(ADMIN_TAB_URLS.ACTIVITIES)"
                ng-href="<[::ADMIN_TAB_URLS.ACTIVITIES]>"
                ng-class="{active: isActivitiesTabOpen()}"
                uib-tooltip="Activities"
