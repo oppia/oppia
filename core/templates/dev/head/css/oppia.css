@@ -3958,8 +3958,9 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-activity-summary-tile.oppia-activity-playlist-tile .summary-section {
   display: inline-block;
+  float: right;
   margin-top: 3%;
-  width: 67%;
+  width: 65%;
 }
 
 .oppia-activity-summary-tile.oppia-activity-playlist-tile .activity-title {
