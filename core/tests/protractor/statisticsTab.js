@@ -22,8 +22,8 @@
  * User 1 views the statistics for the learners using the exploration.
  */
 
- var CreatorDashboardPage =
-   require('../protractor_utils/CreatorDashboardPage.js');
+var CreatorDashboardPage =
+ require('../protractor_utils/CreatorDashboardPage.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var forms = require('../protractor_utils/forms.js');
