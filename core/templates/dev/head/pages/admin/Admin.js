@@ -47,7 +47,7 @@ oppia.controller('Admin', [
     };
 
     $scope.$on('$locationChangeSuccess', function() {
-      AdminRouterService.showTab(location.hash.replace('/', ''));
+      AdminRouterService.showTab($location.path().replace('/', '#'));
     });
   }
 ]);
