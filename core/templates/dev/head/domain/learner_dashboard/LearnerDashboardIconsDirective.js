@@ -73,9 +73,8 @@ oppia.directive('learnerDashboardIcons', [
               } else {
                 if ($scope.isWindowNarrow()) {
                   return true;
-                } else {
-                  return $scope.activityIsCurrentlyHoveredOver;                  
                 }
+                return $scope.activityIsCurrentlyHoveredOver;                  
               }
             }
           };
