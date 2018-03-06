@@ -209,14 +209,14 @@ otherwise they will interfere with the iframed conversation skin directive.
     max-width: 560px;
     /* NOTE TO DEVELOPERS: If min-width is changed, max-width in media query
        below should be changed to match. */
-    min-width: 360px;
+    min-width: 447px;
     width: 100%;
     z-index: 3;
   }
 
   /* Some mobile devices have CSS width below 360px, use a responsive min-width
      when under 360px to prevent pushing things offscreen. */
-  @media(max-width: 360px) {
+  @media(max-width: 447px) {
     .conversation-skin-tutor-card-container {
       min-width: 100vw;
     }
@@ -451,6 +451,10 @@ otherwise they will interfere with the iframed conversation skin directive.
     }
     .conversation-skin-oppia-avatar.show-tutor-card:hover {
       opacity: 0.8;
+    }
+
+    .conversation-skin-tutor-card {
+      padding-left: 0px;
     }
   }
 </style>
