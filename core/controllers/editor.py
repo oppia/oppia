@@ -345,7 +345,7 @@ class ExplorationRightsHandler(EditorHandler):
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
 
-        make_community_owned = self.payload.get('is_community_owned')
+        make_community_owned = self.payload.get('make_community_owned')
         new_member_username = self.payload.get('new_member_username')
         new_member_role = self.payload.get('new_member_role')
         viewable_if_private = self.payload.get('viewable_if_private')
