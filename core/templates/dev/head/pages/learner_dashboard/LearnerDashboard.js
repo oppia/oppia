@@ -295,8 +295,8 @@ oppia.controller('LearnerDashboard', [
 
     $scope.onClickThread = function(
         threadStatus, explorationId, threadId, explorationTitle) {
-        $scope.loadingFeedbacks = true;
-        var threadDataUrl = UrlInterpolationService.interpolateUrl(
+      $scope.loadingFeedbacks = true;
+      var threadDataUrl = UrlInterpolationService.interpolateUrl(
         '/learnerdashboardthreadhandler/<explorationId>/<threadId>', {
           explorationId: explorationId,
           threadId: threadId
