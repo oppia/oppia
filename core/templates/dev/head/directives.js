@@ -44,7 +44,7 @@ oppia.directive('mathjaxBind', [function() {
     restrict: 'E',
     controller: [
       '$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-        $scope.$watch($attrs.mathjaxBind, function(value) {
+        $scope.$watch($attrs.mathData, function(value) {
           var $script = angular.element(
             '<script type="math/tex">'
           ).html(value === undefined ? '' : value);
