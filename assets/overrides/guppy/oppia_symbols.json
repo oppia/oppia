@@ -10,8 +10,9 @@
         "input": 1,
         "keys": ["/"],
         "attrs": {
-        "type": "fraction",
-        "group": "functions"},
+            "type": "fraction",
+            "group": "functions"
+        },
         "args": [{
             "up": "1",
             "down": "2",
