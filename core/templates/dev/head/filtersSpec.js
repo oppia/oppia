@@ -516,12 +516,12 @@ describe('Testing filters', function() {
     expect(filter('<p><br></p>')).toEqual('');
     expect(filter('<p>abc</p>')).toEqual('<p>abc</p>');
     expect(filter('<p>abc</p><p><br></p><p>abc</p>')).toEqual(
-      '<p>abc</p><p><br></p><p>abc</p>');
+      '<p>abc<br>abc</p>');
     expect(filter('<p>abc</p><p><br></p><p>abc</p><p><br></p>')).toEqual(
-      '<p>abc</p><p><br></p><p>abc</p>');
+      '<p>abc<br>abc</p>');
     expect(filter(
       '<p>abc</p><p><br></p><p>abc</p><p><br></p><p><br></p>')).toEqual(
-      '<p>abc</p><p><br></p><p>abc</p>');
+      '<p>abc<br>abc</p>');
     expect(filter(null)).toEqual(null);
     expect(filter(undefined)).toEqual(undefined);
   }));

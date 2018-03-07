@@ -357,27 +357,32 @@ oppia.filter('removeExtraLinesAndSpaces', [function() {
     var SPACE_CHAR = ' ';
     var SPACE_ENTITY = '&nbsp;';
     var NEW_LINE = '<br>';
-
-    string = string.replace(/<p>/gi, '');
-    string = string.replace(/<\/p>/gi, '');
-    for (var i = string.length; i > 0; i--) {
-      if (string.substring(
-        i - SPACE_CHAR.length, string.length) === SPACE_CHAR) {
-        string = string.substring(0, i - SPACE_CHAR.length);
-        i = i - SPACE_CHAR.length + 1;
-      } else if (string.substring(
-        i - SPACE_ENTITY.length, string.length) === SPACE_ENTITY) {
-        string = string.substring(0, i - SPACE_ENTITY.length);
-        i = i - SPACE_ENTITY.length + 1;
-      } else if (string.substring(
-        i - NEW_LINE.length, string.length) === NEW_LINE) {
-        string = string.substring(0, i - NEW_LINE.length);
-        i = i - NEW_LINE.length + 1;
-      } else {
-        break;
+    // To check if it wrapped around <p> and doesn't hinder with
+    // conversion between HTML and RTE.
+    if (string[0] === '<' && string[1] === 'p' && string[2] === '>') {
+      string = string.replace(/<p>/gi, '');
+      string = string.replace(/<\/p>/gi, '');
+      for (var i = string.length; i > 0;) {
+        if (string.substring(
+          i - SPACE_CHAR.length, string.length) === SPACE_CHAR) {
+          string = string.substring(0, i - SPACE_CHAR.length);
+          i = i - SPACE_CHAR.length;
+        } else if (string.substring(
+          i - SPACE_ENTITY.length, string.length) === SPACE_ENTITY) {
+          string = string.substring(0, i - SPACE_ENTITY.length);
+          i = i - SPACE_ENTITY.length;
+        } else if (string.substring(
+          i - NEW_LINE.length, string.length) === NEW_LINE) {
+          string = string.substring(0, i - NEW_LINE.length);
+          i = i - NEW_LINE.length;
+        } else {
+          break;
+        }
+      }
+      if (string !== '') {
+        string = PARA_START + string + PARA_CLOSE;
       }
     }
-    string = PARA_START + string + PARA_CLOSE;
     return string;
   };
 }]);
