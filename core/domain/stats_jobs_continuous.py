@@ -54,6 +54,9 @@ OLD_END_DEST = 'END'
 
 class StatisticsRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
+    """ num_starts and num_completions ia an 64 bit integer that counts
+        'start exploration' and 'complete exploration' events.
+    """
     num_starts = ndb.IntegerProperty(default=0)
     num_completions = ndb.IntegerProperty(default=0)
 
@@ -64,16 +67,21 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
     """
     @classmethod
     def get_event_types_listened_to(cls):
+        """ Returns a events type of start exploration and complete exploration
+        """
         return [
             feconf.EVENT_TYPE_START_EXPLORATION,
             feconf.EVENT_TYPE_COMPLETE_EXPLORATION]
 
     @classmethod
     def _get_realtime_datastore_class(cls):
+      """  It will give realtime from datastore """
         return StatisticsRealtimeModel
 
     @classmethod
     def _get_batch_job_manager_class(cls):
+              """return a batch from job manager """
+
         return StatisticsMRJobManager
 
     @classmethod
@@ -93,6 +101,10 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
         exp_id = args[0]
 
         def _increment_visit_counter():
+            """ It will find model using realtime_class and realtime_model_id,
+             if it is none then set a realtime_class, if not it increase visit counter by one.
+             """
+            
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, exp_id)
@@ -107,6 +119,11 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
                 model.put()
 
         def _increment_completion_counter():
+            """ It will find model using realtime_class and realtime_model_id,
+             if it is none then set a realtime_class, if not it increase visit counter by one.
+             if event_type is start_exploration increase visit counter by one,
+             if not, increase completions counter by one.
+             """
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, exp_id)
@@ -229,10 +246,19 @@ class StatisticsMRJobManager(
 
     @classmethod
     def _get_continuous_computation_class(cls):
+       """ return a continuous-computation job that counts 
+       'start exploration' and 'complete exploration' events.
+         """
         return StatisticsAggregator
 
     @classmethod
     def entity_classes_to_map_over(cls):
+         """ return entities of map function that is 
+        StartExplorationEventLogEntryModel,
+        MaybeLeaveExplorationEventLogEntryModel,
+        CompleteExplorationEventLogEntryModel,
+        StateHitEventLogEntryModel and StateCounterModel.
+                """
         return [stats_models.StartExplorationEventLogEntryModel,
                 stats_models.MaybeLeaveExplorationEventLogEntryModel,
                 stats_models.CompleteExplorationEventLogEntryModel,
@@ -510,10 +536,15 @@ class InteractionAnswerSummariesMRJobManager(
     """
     @classmethod
     def _get_continuous_computation_class(cls):
+         """A continuous-computation job that listens to answers to states and
+    updates StateAnswer view calculations.
+    """
         return InteractionAnswerSummariesAggregator
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """return an entity_id of map of stats_models
+        """
         return [stats_models.StateAnswersModel]
 
     # TODO(bhenning): Update this job to persist results for all older
@@ -523,6 +554,24 @@ class InteractionAnswerSummariesMRJobManager(
     # recomputing results from scratch each time.
     @staticmethod
     def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item: StartExplorationEventLogEntryModel or
+                MaybeLeaveExplorationEventLogEntryModel or
+                CompleteExplorationEventLogEntryModel or
+                StateHitEventLogEntryModel or StateCounterModel. If item is of
+                type StateCounterModel the information yielded corresponds to
+                the various counts related to the exploration. If it is of any
+                LogEntryModel type the information yielded corresponds to the
+                type of the event and other details related to the exploration.
+
+        Yields:
+            tuple. 2-tuple in the form ('exploration_id:version', value).
+                `state_answers_model_id` corresponds to the id of the exploration.
+                `interaction_id` corresponds to the interaction_id of the exploration.
+                `exploration_version` corresponds to the interaction_id of the exploration.
+                    """
         if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued( # pylint: disable=line-too-long
                 item):
             # Output answers submitted to the exploration for this exp version.
@@ -547,6 +596,17 @@ class InteractionAnswerSummariesMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Updates statistics for the given (exploration, version) and list of
+        events and creates batch model(ExplorationAnnotationsModel) for storing
+        this output.
+
+        Args:
+            key: str. The exploration id and version of the exploration in the
+                form 'exploration_id.version'.
+            stringified_values: list(str). A list of stringified values
+                associated with the given key. It includes information depending
+                on the type of event.
+        """
         exploration_id, exploration_version, state_name = key.split(':')
 
         value_dicts = [
@@ -697,8 +757,10 @@ class InteractionAnswerSummariesMRJobManager(
 
 class InteractionAnswerSummariesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    # TODO(bhenning): Implement a real-time model for
-    # InteractionAnswerSummariesAggregator.
+    """
+     TODO(bhenning): Implement a real-time model for
+     InteractionAnswerSummariesAggregator.
+    """
     pass
 
 
@@ -709,12 +771,21 @@ class InteractionAnswerSummariesAggregator(
     """
     @classmethod
     def get_event_types_listened_to(cls):
+        """
+        return a event_type from EVENT_TYPE_ANSWER_SUBMITTED
+        """
         return [feconf.EVENT_TYPE_ANSWER_SUBMITTED]
 
     @classmethod
     def _get_realtime_datastore_class(cls):
+        """
+        return realtime from InteractionAnswerSummariesRealtimeModel
+        """
         return InteractionAnswerSummariesRealtimeModel
 
     @classmethod
     def _get_batch_job_manager_class(cls):
+        """
+        return batch_job from InteractionAnswerSummariesMRJobManager
+        """
         return InteractionAnswerSummariesMRJobManager
