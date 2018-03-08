@@ -47,7 +47,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
 
           // Dynamically assigns a unique id to the guppy-div
           guppyDivElt.setAttribute(
-            'id', 'guppy_' + (Math.floor(Math.random() * 10000)).toString());
+            'id', 'guppy_' + Math.floor(Math.random() * 100000000));
           var guppyDivId = guppyDivElt.id;
           /**
            * Adds a button overlay and invisible text field used to bring up
@@ -142,7 +142,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
           var guppyInstance = new Guppy(guppyDivId, {
             settings: {
               empty_content: (
-              '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
+                '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
               buttons: []
             },
             events: {
