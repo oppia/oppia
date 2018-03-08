@@ -105,7 +105,6 @@ describe('StatisticsTab', function() {
     libraryPage.get();
     libraryPage.playExploration(EXPLORATION_TITLE);
 
-    explorationPlayerPage.expectContentToMatch(forms.toRichText('One'));
     explorationPlayerPage.submitAnswer('TextInput', 'One');
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.submitAnswer('TextInput', '2');
@@ -128,7 +127,6 @@ describe('StatisticsTab', function() {
     libraryPage.get();
     libraryPage.playExploration(EXPLORATION_TITLE);
 
-    explorationPlayerPage.expectContentToMatch(forms.toRichText('One'));
     explorationPlayerPage.expectExplorationToNotBeOver();
 
     users.logout();
@@ -141,7 +139,7 @@ describe('StatisticsTab', function() {
 
     // Now, there should be one passerby for this exploration since only learner
     // 3 quit at the first state.
-    editor.expectNumPassersbyToBe(1);
+    editor.expectNumPassersbyToBe("1");
 
     users.logout();
   });
