@@ -139,7 +139,7 @@ describe('StatisticsTab', function() {
 
     // Now, there should be one passerby for this exploration since only learner
     // 3 quit at the first state.
-    editor.expectNumPassersbyToBe("1");
+    editor.expectNumPassersbyToBe('1');
 
     users.logout();
   });
