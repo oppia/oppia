@@ -233,6 +233,7 @@
 	"I18N_PLAYER_HINT_REQUEST_STRING_2": "Sono un po' bloccato, qualche indizio?",
 	"I18N_PLAYER_HINT_REQUEST_STRING_3": "Ho qualche problema.",
 	"I18N_PLAYER_INFO_TOOLTIP": "Info",
+	"I18N_PLAYER_IS_PRIVATE": "Questa esplorazione è privata.",
 	"I18N_PLAYER_LAST_UPDATED_TOOLTIP": "Ultimo aggiornamento",
 	"I18N_PLAYER_LEARN_AGAIN_BUTTON": "Impara di nuovo",
 	"I18N_PLAYER_LEAVE_FEEDBACK": "Lascia un commento per gli autori...",
