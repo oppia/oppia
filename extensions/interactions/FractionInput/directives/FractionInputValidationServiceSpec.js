@@ -25,7 +25,7 @@ describe('FractionInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     validatorService = $injector.get('FractionInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');
     agof = $injector.get('AnswerGroupObjectFactory');
