@@ -6,7 +6,7 @@
 
 {% block header_js %}
   {{ super() }}
-    <script ng-if="explorationVersion" type="text/javascript">
+    <script ng-if="explorationVersion" ng-controller="exploration_player" type="text/javascript">
       GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
       GLOBALS.collectionTitle = JSON.parse('{{collection_title|js_string}}');
       GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = JSON.parse(
@@ -55,7 +55,7 @@
   <div>
     <background-banner></background-banner>
     <conversation-skin></conversation-skin>
-      <attribution-guide ng-if="!iframed"></attribution-guide>
+      <attribution-guide ng-controller="exploration_player" ng-if="!iframed"></attribution-guide>
   </div>
   <style>
     .oppia-exploration-h1 {
@@ -77,7 +77,7 @@
 {% endblock %}
 
 {% block footer %}
-    <exploration-footer ng-if="!iframed" twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
+    <exploration-footer ng-controller="exploration_player" ng-if="!iframed" twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
 {% endblock %}
 
 {% block footer_js %}
