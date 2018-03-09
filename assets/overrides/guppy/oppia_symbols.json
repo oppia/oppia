@@ -1,31 +1,54 @@
 {
+    "_version": "2.0.0-alpha.2",
+    "_name": "base",
     "frac": {
         "output": {
             "latex": "\\frac{{$1}}{{$2}}",
             "small_latex": "\\frac{{$1}}{{$2}}",
             "text": "({$1})/({$2})"
         },
-        "current": 0,
-        "type": "fraction",
+        "input": 1,
+        "keys": ["/"],
         "attrs": {
-            "up": [1, 1],
-            "down": [2, 2],
-            "name": ["numerator", "denominator"]
-        }
+            "type": "fraction",
+            "group": "functions"
+        },
+        "args": [{
+            "up": "1",
+            "down": "2",
+            "name": "numerator",
+            "small": "yes"
+        }, {
+            "up": "1",
+            "down": "2",
+            "delete": "1",
+            "name": "denominator",
+            "small": "yes"
+        }]
     },
     "slash": {
         "output": {
-            "latex":"\\frac{{$1}}{{$2}}",
-            "small_latex":"\\frac{{$1}}{{$2}}",
-            "text":"({$1})/({$2})"
+            "latex": "\\frac{{$1}}{{$2}}",
+            "small_latex": "\\frac{{$1}}{{$2}}",
+            "text": "({$1})/({$2})"
         },
-        "current": 1,
-        "current_type": "token",
-        "type": "fraction",
+        "input": 1,
         "attrs": {
-            "up": [1, 1],
-            "down": [2, 2],
-            "name": ["numerator", "denominator"]
-        }
+            "type": "fraction",
+            "group": "functions"
+        },
+        "keys": ["/"],
+        "args": [{
+            "up": "1",
+            "down": "2",
+            "name": "numerator",
+            "small": "yes"
+        }, {
+            "up": "1",
+            "down": "2",
+            "delete": "1",
+            "name": "denominator",
+            "small": "yes"
+        }]
     }
 }
