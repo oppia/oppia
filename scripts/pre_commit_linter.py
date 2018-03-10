@@ -160,6 +160,10 @@ REQUIRED_STRINGS_FECONF = {
     }
 }
 
+PUNCTUATIONS = ['.', ',', ';', ':', '?', ')', ']', '}']
+
+EXCLUDED_WORDS = ['utf', 'pylint:', 'http://', 'https://']
+
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'scripts/pre_commit_linter.py', 'integrations/*',
@@ -579,98 +583,6 @@ def _check_bad_pattern_in_file(filename, content, pattern):
     return False
 
 
-def _check_bad_pattern_in_comments(filename, content):
-    """Detects whether comments end with a period.
-
-    Args:
-        filename: str. Name of the file.
-        content: str. Contents of the file.
-
-    Returns:
-        bool. True if there is bad pattern else false.
-    """
-    regexp_comment = r'#[^\n]*[^.,\n]\n( |\t)*(#(( |\t)*[A-Z])|[^#\s]|[\n])'
-    message = 'There should be a period at the end of the comment.'
-    punctuations = ['.', ',', ';', ':', '?']
-    excluded_words = ['utf', 'pylint:', 'http://', 'https://']
-    excluded_dirs = ()
-    excluded_files = ()
-    if not (
-        any(filename.startswith(excluded_dir)
-        for excluded_dir in excluded_dirs)
-        or filename in excluded_files):
-        bad_pattern_count = 0
-        # Finds comments with a missing period.
-        for matchobj in re.finditer(regexp_comment, content):
-            start = matchobj.start() + 1
-            position_counter = 0
-            for line_index, line in enumerate(content.splitlines(True)):
-                if (position_counter + len(line.rstrip())) >= start:
-                    line_num = line_index + 1
-                    break
-                else:
-                    position_counter += len(line)
-            line = content.splitlines(True)[line_num-1].rstrip()
-            if (
-                not any(word in line
-                for word in excluded_words)
-                and line[-1] not in punctuations):
-                print '%s --> Line %s: %s' % (
-                    filename, line_num, message)
-                bad_pattern_count += 1
-    if bad_pattern_count:
-        return True
-    return False
-
-
-def _check_bad_pattern_in_docstrings(filename, content):
-    """Detects whether docstrings end with a period.
-
-    Args:
-        filename: str. Name of the file.
-        content: str. Contents of the file.
-
-    Returns:
-        bool. True if there is bad pattern else false.
-    """
-    message = 'There should be a period at the end of the docstring.'
-    punctuations = ['.', ',', ';', ':', '?']
-    excluded_words = ['utf', 'pylint:', 'http://', 'https://']
-    excluded_dirs = ()
-    excluded_files = ()
-    if (
-        not (any(filename.startswith(excluded_dir)
-        for excluded_dir in excluded_dirs)
-        or filename in excluded_files)):
-        bad_pattern_count = 0
-        # Finds docstrings with a missing period.
-        content = content.splitlines(True)
-        length = len(content)
-        index = 0
-        while index < length:
-            line = content[index].lstrip().rstrip()
-            if (
-                line.startswith('"""') and line.endswith('"""')
-                and len(line) > 6):
-                if line[-4] != '.':
-                   print '%s --> Line %s: %s' % (
-                filename, index + 1, message)
-                   bad_pattern_count += 1
-            elif line.startswith('"""'):
-                while index < length and not '"""' in line:
-                    index += 1
-                line = content[index-1].lstrip().rstrip()
-                if len(line) and line[-1] not in punctuations:
-                    print '%s --> Line %s: %s' % (
-                filename, index, message)
-                    bad_pattern_count += 1
-            index += 1
-
-        if bad_pattern_count:
-            return True
-    return False
-
-
 def _check_bad_patterns(all_files):
     """This function is used for detecting bad patterns.
     """
@@ -706,14 +618,6 @@ def _check_bad_patterns(all_files):
                 for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
                     if _check_bad_pattern_in_file(filename, content, regexp):
                         failed = True
-                        total_error_count += 1
-
-            if filename.endswith('.py'):
-                    if _check_bad_pattern_in_comments(filename, content):
-                        #failed = True
-                        total_error_count += 1
-                    if _check_bad_pattern_in_docstrings(filename, content):
-                        #failed = True
                         total_error_count += 1
 
             if filename == 'feconf.py':
@@ -813,11 +717,142 @@ def _check_spacing(all_files):
     return summary_messages
 
 
+def _check_comments(all_files):
+    """This functions checks for a period at the end of comment."""
+    print 'Starting comment checks'
+    print '----------------------------------------'
+    summary_messages = []
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.py')]
+    message = 'There should be a period at the end of the comment.'
+    failed = False
+    for filename in files_to_check:
+        f = open(filename, 'r')
+        content = f.readlines()
+        length = len(content)
+        line_num = 0
+        while line_num < length:
+            line = content[line_num].lstrip().rstrip()
+            if line.startswith('#'):
+                if line_num + 1 == length:
+                    if line[-1] not in PUNCTUATIONS and line[1:].lstrip()[0].isupper():
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                            filename, line_num + 1, message)
+                    break                        
+
+                next_line = content[line_num + 1].lstrip().rstrip()
+
+                if not next_line.startswith('#'):
+                    if line[-1] not in PUNCTUATIONS and line[1:].lstrip()[0].isupper():
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                            filename, line_num + 1, message)
+
+                else:
+                    while line_num + 1 < length and next_line.startswith('#'):
+                        line_num += 1
+                        next_line = content[line_num].lstrip().rstrip()
+                    if next_line.startswith('#'):
+                        line = next_line
+                        line_num += 1
+                    else:
+                        line = content[line_num - 1].lstrip().rstrip()
+                    if (
+                        line[-1] not in PUNCTUATIONS and
+                        not any(word in line
+                        for word in EXCLUDED_WORDS)):
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                            filename, line_num, message)
+
+            line_num += 1
+
+    print ''
+    print '----------------------------------------'
+    print ''
+    if failed:
+        summary_message = (
+            '%s   Comments check failed' % _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = (
+            '%s   Comments check passed' % _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    return summary_messages
+
+
+def _check_docstrings(all_files):
+    """This functions checks for a period at the end of docstring."""
+    print 'Starting docstring checks'
+    print '----------------------------------------'
+    summary_messages = []
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.py')]
+    message = 'There should be a period at the end of the docstring.'
+    failed = False
+    for filename in files_to_check:
+        f = open(filename, 'r')
+        content = f.readlines()
+        length = len(content)
+        line_num = 0
+        while line_num < length:
+            line = content[line_num].lstrip().rstrip()
+
+            # Check for single line docstring.
+            if (
+                line.startswith('"""') and line.endswith('"""')
+                and len(line) > 6):
+                if line[-4] not in PUNCTUATIONS:
+                   failed = True
+                   print '%s --> Line %s: %s' % (
+                filename, line_num + 1, message)
+
+            # Check for multiline docstring.
+            elif line.startswith('"""'):
+                line =  content[line_num + 1]
+                while line_num + 1 < length and not '"""' in line:
+                    line_num += 1
+                    line = content[line_num]
+                line = content[line_num - 1].lstrip().rstrip()
+                if len(line) and line[-1] not in PUNCTUATIONS and line[0].isupper():
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                filename, line_num , message)
+
+            line_num += 1
+
+    print ''
+    print '----------------------------------------'
+    print ''
+    if failed:
+        summary_message = (
+            '%s   Docstring check failed' % _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = (
+            '%s   Docstring check passed' % _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    return summary_messages
+
+
 def main():
     all_files = _get_all_files()
     def_spacing_messages = _check_spacing(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
+    docstring_messages = _check_docstrings(all_files)
+    comment_messages = _check_comments(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
