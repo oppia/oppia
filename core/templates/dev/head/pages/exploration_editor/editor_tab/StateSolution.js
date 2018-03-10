@@ -172,7 +172,7 @@ oppia.controller('StateSolution', [
           currentStateName, solutionIsValid);
         ExplorationWarningsService.updateWarnings();
         if (!solutionIsValid) {
-          AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+          AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID, 4000);
         }
 
         stateSolutionService.displayed = result.solution;

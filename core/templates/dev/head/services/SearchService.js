@@ -19,8 +19,8 @@
 oppia.constant('SEARCH_DATA_URL', '/searchhandler/data');
 
 oppia.factory('SearchService', [
-  '$http', '$rootScope', '$translate', 'SEARCH_DATA_URL',
-  function($http, $rootScope, $translate, SEARCH_DATA_URL) {
+  '$http', '$rootScope', '$log', '$translate', 'SEARCH_DATA_URL',
+  function($http, $rootScope, $log, $translate, SEARCH_DATA_URL) {
     var _lastQuery = null;
     var _lastSelectedCategories = {};
     var _lastSelectedLanguageCodes = {};

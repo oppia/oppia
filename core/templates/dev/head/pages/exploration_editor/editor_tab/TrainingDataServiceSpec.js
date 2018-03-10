@@ -46,7 +46,7 @@ describe('TrainingDataService', function() {
     spyOn(mockExplorationData, 'autosaveChangeList');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($rootScope, $injector) {
     scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
     siis = $injector.get('stateInteractionIdService');

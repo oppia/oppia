@@ -345,6 +345,7 @@
 	"I18N_PLAYER_HINT_REQUEST_STRING_2": "أنا عالق قليلا، أية تلميحات؟",
 	"I18N_PLAYER_HINT_REQUEST_STRING_3": "أواجه بعض المشاكل.",
 	"I18N_PLAYER_INFO_TOOLTIP": "معلومات",
+	"I18N_PLAYER_IS_PRIVATE": "الاستكشاف خاصة.",
 	"I18N_PLAYER_LAST_UPDATED_TOOLTIP": "آخر تحديث",
 	"I18N_PLAYER_LEARN_AGAIN_BUTTON": "تعلم مرة أخرى",
 	"I18N_PLAYER_LEAVE_FEEDBACK": "ترك تغذية مرتدة للمؤلفين...",

@@ -301,6 +301,7 @@
 	"I18N_PLAYER_HINT_REQUEST_STRING_2": "Jag har fastnat, några tips?",
 	"I18N_PLAYER_HINT_REQUEST_STRING_3": "Jag har lite problem.",
 	"I18N_PLAYER_INFO_TOOLTIP": "Info",
+	"I18N_PLAYER_IS_PRIVATE": "Denna utforskning är privat.",
 	"I18N_PLAYER_LAST_UPDATED_TOOLTIP": "Senaste uppdaterad",
 	"I18N_PLAYER_LEAVE_FEEDBACK": "Lämna återkoppling till författarna...",
 	"I18N_PLAYER_LOADING": "Läser in...",

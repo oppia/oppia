@@ -60,6 +60,9 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
             // screen.
             pce.setupScript([{
               code: [
+                'window.onerror = function() {',
+                '  return true;',
+                '};',
                 'debug.hide();',
                 'window.removeEventListener("error", debug)',
                 '',
