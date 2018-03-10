@@ -42,7 +42,7 @@ search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # TODO(msl): test ExpSummaryModel changes if explorations are updated,
-# reverted, deleted, created, rights changed
+# reverted, deleted, created, rights changed.
 
 
 def _count_at_least_editable_exploration_summaries(user_id):
@@ -442,7 +442,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 include_deleted=True)]
         )
 
-        # The exploration summary is deleted however
+        # The exploration summary is deleted however.
         self.assertNotIn(
             self.EXP_ID,
             [exp.id for exp in exp_models.ExpSummaryModel.get_all(
@@ -1076,13 +1076,13 @@ title: A title
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 3)
 
-        # Download version 2
+        # Download version 2.
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID, 2)
         zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
 
-        # Download version 3
+        # Download version 3.
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID, 3)
         zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
         self.assertEqual(
@@ -1231,12 +1231,12 @@ param_changes: []
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 3)
 
-        # Download version 2
+        # Download version 2.
         dict_output = exp_services.export_states_to_yaml(
             self.EXP_ID, version=2, width=50)
         self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
 
-        # Download version 3
+        # Download version 3.
         dict_output = exp_services.export_states_to_yaml(
             self.EXP_ID, version=3, width=50)
         self.assertEqual(dict_output, self.UPDATED_SAMPLE_DICT)
@@ -1312,7 +1312,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertIn('new state', exploration.states)
 
     def test_rename_state_cmd(self):
-        """Test updating of state name"""
+        """Test updating of state name."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
         self.assertIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
@@ -1467,7 +1467,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_interaction_answer_groups(self):
         """Test updating of interaction_answer_groups."""
-        # We create a second state to use as a rule destination
+        # We create a second state to use as a rule destination.
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exploration.add_states(['State 2'])
         exploration.states['State 2'].update_interaction_id('TextInput')
@@ -1615,7 +1615,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
             'A message')
 
     def test_demand_commit_message(self):
-        """Check published explorations demand commit messages"""
+        """Check published explorations demand commit messages."""
         rights_manager.publish_exploration(self.owner, self.EXP_ID)
 
         with self.assertRaisesRegexp(
@@ -1629,7 +1629,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
                     exp_domain.STATE_PROPERTY_INTERACTION_STICKY, False), '')
 
     def test_unpublished_explorations_can_accept_commit_message(self):
-        """Test unpublished explorations can accept optional commit messages"""
+        """Test unpublished explorations can accept optional commit messages."""
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name,
@@ -2305,11 +2305,11 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
-        # Have Albert create a new exploration. Version 1
+        # Have Albert create a new exploration. Version 1.
         self.save_new_valid_exploration(self.EXP_ID_1, albert_id)
         self._check_contributors_summary(self.EXP_ID_1, {albert_id: 1})
 
-         # Have Bob update that exploration. Version 2
+         # Have Bob update that exploration. Version 2.
         exp_services.update_exploration(
             bob_id, self.EXP_ID_1, [{
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -2318,7 +2318,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             }], 'Changed title.')
         self._check_contributors_summary(self.EXP_ID_1,
                                          {albert_id: 1, bob_id: 1})
-        # Have Bob update that exploration. Version 3
+        # Have Bob update that exploration. Version 3.
         exp_services.update_exploration(
             bob_id, self.EXP_ID_1, [{
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -2328,7 +2328,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self._check_contributors_summary(self.EXP_ID_1,
                                          {albert_id: 1, bob_id: 2})
 
-        # Have Albert update that exploration. Version 4
+        # Have Albert update that exploration. Version 4.
         exp_services.update_exploration(
             albert_id, self.EXP_ID_1, [{
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
@@ -2338,7 +2338,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self._check_contributors_summary(self.EXP_ID_1,
                                          {albert_id: 2, bob_id: 2})
 
-        # Have Albert revert to version 3. Version 5
+        # Have Albert revert to version 3. Version 5.
         exp_services.revert_exploration(albert_id, self.EXP_ID_1, 4, 3)
         self._check_contributors_summary(self.EXP_ID_1,
                                          {albert_id: 1, bob_id: 2})

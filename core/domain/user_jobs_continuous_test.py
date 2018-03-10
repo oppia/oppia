@@ -706,7 +706,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def test_standard_user_stats_calculation_one_exploration(self):
         exploration = self._create_exploration(self.EXP_ID_1, self.user_a_id)
-        # Give this exploration an average rating of 4
+        # Give this exploration an average rating of 4.
         avg_rating = 4
         self._rate_exploration(exploration.id, 5, avg_rating)
 
@@ -725,7 +725,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def test_exploration_multiple_contributors(self):
         exploration = self._create_exploration(self.EXP_ID_1, self.user_a_id)
-        # Give this exploration an average rating of 4
+        # Give this exploration an average rating of 4.
         avg_rating = 4
         self._rate_exploration(exploration.id, 5, avg_rating)
         exp_services.update_exploration(self.user_b_id, self.EXP_ID_1, [], '')

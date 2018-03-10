@@ -130,7 +130,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 0, 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session2',
                 time_spent, params, 'answer3')
 
-            # Run job on exploration with answers
+            # Run job on exploration with answers.
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(

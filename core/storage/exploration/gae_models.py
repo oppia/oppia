@@ -414,7 +414,7 @@ class ExpSummaryModel(base_models.BaseModel):
     # Tags associated with this exploration.
     tags = ndb.StringProperty(repeated=True, indexed=True)
 
-    # Aggregate user-assigned ratings of the exploration
+    # Aggregate user-assigned ratings of the exploration.
     ratings = ndb.JsonProperty(default=None, indexed=False)
 
     # Scaled average rating for the exploration.

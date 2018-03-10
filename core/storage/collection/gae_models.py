@@ -346,7 +346,7 @@ class CollectionSummaryModel(base_models.BaseModel):
     # Tags associated with this collection.
     tags = ndb.StringProperty(repeated=True, indexed=True)
 
-    # Aggregate user-assigned ratings of the collection
+    # Aggregate user-assigned ratings of the collection.
     ratings = ndb.JsonProperty(default=None, indexed=False)
 
     # Time when the collection model was last updated (not to be

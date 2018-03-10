@@ -183,7 +183,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
 
     def test_get_topic_similarities_as_csv(self):
         # The splitlines() is needed because a carriage return is added in
-        # the returned string
+        # the returned string.
         topic_similarities = (
             recommendations_services.get_topic_similarities_as_csv())
 

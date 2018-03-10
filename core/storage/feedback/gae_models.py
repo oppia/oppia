@@ -401,7 +401,7 @@ class FeedbackThreadUserModel(base_models.BaseModel):
     """Model for storing the ids of the messages in the thread that are read by
     the user.
 
-    Instances of this class have keys of the form [user_id].[thread_id]
+    Instances of this class have keys of the form [user_id].[thread_id].
     """
     message_ids_read_by_user = ndb.IntegerProperty(repeated=True, indexed=True)
 
@@ -626,7 +626,8 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     sent.
 
     The id of each model instance is the user_id of the user who should receive
-    the messages."""
+    the messages.
+    """
 
     # The list of feedback messages that need to be sent to this user.
     # Each element in this list is a dict with keys 'exploration_id',

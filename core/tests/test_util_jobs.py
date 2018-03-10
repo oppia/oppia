@@ -16,7 +16,8 @@
 
 """Jobs operating on explorations that can be used for production tests.
 To use these jobs, first need to register them in jobs_registry (at
-the moment they are not displayed there to avoid accidental use)."""
+the moment they are not displayed there to avoid accidental use).
+"""
 
 from core import jobs
 from core.domain import exp_domain

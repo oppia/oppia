@@ -30,7 +30,7 @@ class SignupTest(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get(feconf.SIGNUP_URL)
         self.assertEqual(response.status_int, 200)
-        # Sign in can't be inside an html tag, but can appear inside js code
+        # Sign in can't be inside an html tag, but can appear inside js code.
         response.mustcontain(no=['Logout'])
         self.logout()
 
@@ -493,7 +493,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response['subject_interests'], ['editor', 'editing'])
         self.logout()
 
-        # Looged-out user looks at editor's profile page/
+        # Looged-out user looks at editor's profile page.
         response = self.get_json(
             '/profilehandler/data/%s' % self.EDITOR_USERNAME)
         self.assertEqual(response['user_bio'], 'My new editor bio')

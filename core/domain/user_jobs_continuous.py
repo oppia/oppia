@@ -535,7 +535,7 @@ class UserStatsMRJobManager(
         # valid to be calculated.
         calculate_exploration_impact_score = True
 
-        # Get average rating and value per user
+        # Get average rating and value per user.
         total_rating = 0
         for ratings_value in item.ratings:
             total_rating += item.ratings[ratings_value] * int(ratings_value)
@@ -560,7 +560,7 @@ class UserStatsMRJobManager(
         answer_count = exploration_stats.get_sum_of_first_hit_counts()
         num_starts = exploration_stats.num_starts
 
-        # Turn answer count into reach
+        # Turn answer count into reach.
         reach = answer_count**exponent
 
         exploration_summary = exp_services.get_exploration_summary_by_id(
@@ -577,11 +577,11 @@ class UserStatsMRJobManager(
             # Set the value of exploration impact score only if it needs to be
             # calculated.
             if calculate_exploration_impact_score:
-                # Find fractional contribution for each contributor
+                # Find fractional contribution for each contributor.
                 contribution = (
                     contributors[contrib_id] / float(total_commits))
 
-                # Find score for this specific exploration
+                # Find score for this specific exploration.
                 exploration_data.update({
                     'exploration_impact_score': (
                         value_per_user * reach * contribution)
@@ -591,7 +591,7 @@ class UserStatsMRJobManager(
             # 'average ratings' and 'total plays' as well.
             if contrib_id in exploration_summary.owner_ids:
                 mapped_owner_ids.append(contrib_id)
-                # Get num starts (total plays) for the exploration
+                # Get num starts (total plays) for the exploration.
                 exploration_data.update({
                     'total_plays_for_owned_exp': num_starts,
                 })
@@ -606,7 +606,7 @@ class UserStatsMRJobManager(
         for owner_id in exploration_summary.owner_ids:
             if owner_id not in mapped_owner_ids:
                 mapped_owner_ids.append(owner_id)
-                # Get num starts (total plays) for the exploration
+                # Get num starts (total plays) for the exploration.
                 exploration_data = {
                     'total_plays_for_owned_exp': num_starts,
                 }
@@ -644,19 +644,19 @@ class UserStatsMRJobManager(
         values = [ast.literal_eval(v) for v in stringified_values]
         exponent = 2.0/3
 
-        # Find the final score and round to a whole number
+        # Find the final score and round to a whole number.
         user_impact_score = int(round(sum(
             value['exploration_impact_score'] for value in values
             if value.get('exploration_impact_score')) ** exponent))
 
-        # Sum up the total plays for all explorations
+        # Sum up the total plays for all explorations.
         total_plays = sum(
             value['total_plays_for_owned_exp'] for value in values
             if value.get('total_plays_for_owned_exp'))
 
-        # Sum of ratings across all explorations
+        # Sum of ratings across all explorations.
         sum_of_ratings = 0
-        # Number of ratings across all explorations
+        # Number of ratings across all explorations.
         num_ratings = 0
 
         for value in values:

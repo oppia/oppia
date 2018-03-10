@@ -208,7 +208,7 @@ def test_manifest_syntax(dependency_type, dependency_dict):
     mandatory_keys = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
         dependency_type]['mandatory_keys']
     # Optional keys requires exactly one member of the pair
-    # to be available as a key in the dependency_dict
+    # to be available as a key in the dependency_dict.
     optional_key_pairs = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
         dependency_type]['optional_key_pairs']
     for key in mandatory_keys:

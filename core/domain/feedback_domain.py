@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain objects for feedback models"""
+"""Domain objects for feedback models."""
 
 from core.domain import user_services
 import utils

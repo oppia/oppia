@@ -76,11 +76,11 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     exp_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
+    # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
-    # Whether the submitted answer received useful feedback
+    # Whether the submitted answer received useful feedback.
     is_feedback_useful = ndb.BooleanProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(
@@ -125,7 +125,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     exp_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
+    # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(
@@ -164,7 +164,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     exp_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
+    # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
@@ -216,7 +216,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         params: Current parameter values, in the form of a map of parameter
             name to value.
     """
-    # Which specific type of event this is
+    # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
     exploration_id = ndb.StringProperty(indexed=True)
@@ -224,11 +224,11 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     exploration_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
+    # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
-    # Current parameter values, map of parameter name to value
+    # Current parameter values, map of parameter name to value.
     params = ndb.JsonProperty(indexed=False)
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
@@ -323,7 +323,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         client_time_spent_in_secs: Time spent in this state before the event
             was triggered.
     """
-    # Which specific type of event this is
+    # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
     exploration_id = ndb.StringProperty(indexed=True)
@@ -331,14 +331,14 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     exploration_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
+    # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     # Note: Some of these events were migrated from StateHit event instances
     # which did not record timestamp data. For this, we use a placeholder
     # value of 0.0 for client_time_spent_in_secs.
     client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
-    # Current parameter values, map of parameter name to value
+    # Current parameter values, map of parameter name to value.
     params = ndb.JsonProperty(indexed=False)
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
@@ -427,7 +427,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     have the wrong 'last updated' timestamp. However, the 'created_on'
     timestamp is the same as that of the original model.
     """
-    # Which specific type of event this is
+    # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
     exploration_id = ndb.StringProperty(indexed=True)
@@ -435,14 +435,14 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     exploration_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
+    # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     # Note: Some of these events were migrated from StateHit event instances
     # which did not record timestamp data. For this, we use a placeholder
     # value of 0.0 for client_time_spent_in_secs.
     client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
-    # Current parameter values, map of parameter name to value
+    # Current parameter values, map of parameter name to value.
     params = ndb.JsonProperty(indexed=False)
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
@@ -514,11 +514,11 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         exploration_id: ID of exploration which is being rated.
         rating: Value of rating assigned to exploration.
     """
-    # Which specific type of event this is
+    # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration which has been rated.
     exploration_id = ndb.StringProperty(indexed=True)
-    # Value of rating assigned
+    # Value of rating assigned.
     rating = ndb.IntegerProperty(indexed=True)
     # Value of rating previously assigned by the same user. Will be None when a
     # user rates an exploration for the first time.
@@ -584,7 +584,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     amount of time between this event (i.e., the learner entering the
     state) and the other event.
     """
-    # Which specific type of event this is
+    # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
     exploration_id = ndb.StringProperty(indexed=True)
@@ -592,9 +592,9 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     exploration_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
+    # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
-    # Current parameter values, map of parameter name to value
+    # Current parameter values, map of parameter name to value.
     params = ndb.JsonProperty(indexed=False)
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
@@ -932,9 +932,9 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     exploration_id = ndb.StringProperty(indexed=True)
     # Version of exploration.
     version = ndb.StringProperty(indexed=False)
-    # Number of students who started the exploration
+    # Number of students who started the exploration.
     num_starts = ndb.IntegerProperty(indexed=False)
-    # Number of students who have completed the exploration
+    # Number of students who have completed the exploration.
     num_completions = ndb.IntegerProperty(indexed=False)
     # Keyed by state name that describes the numbers of hits for each state
     # {state_name: {'first_entry_count': ...,
@@ -1026,7 +1026,7 @@ class StateAnswersModel(base_models.BaseModel):
     # shards look similar to the master shard except they do not populate
     # shard_count.
     shard_id = ndb.IntegerProperty(indexed=True, required=True)
-    # Store interaction type to know which calculations should be performed
+    # Store interaction type to know which calculations should be performed.
     interaction_id = ndb.StringProperty(indexed=True, required=True)
     # Store how many extra shards are associated with this state. This is only
     # present when shard_id is 0. This starts at 0 (the main shard is not

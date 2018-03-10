@@ -31,7 +31,8 @@ class SearchFailureError(Exception):
     """This error is raised when a search operation fails.
        The original_exception will point to what went wrong inside the gae sdk.
        Other platform implementations should have a similar way of revealing
-       platform specific errors."""
+       platform specific errors.
+    """
     def __init__(self, original_exception=None):
         super(SearchFailureError, self).__init__(
             '%s: %s' % (type(original_exception), original_exception.message))

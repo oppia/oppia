@@ -632,14 +632,14 @@ tags: []
             interaction_id)
         exploration.objective = objective
 
-        # If an end state name is provided, add terminal node with that name
+        # If an end state name is provided, add terminal node with that name.
         if end_state_name is not None:
             exploration.add_states([end_state_name])
             end_state = exploration.states[end_state_name]
             end_state.update_interaction_id('EndExploration')
             end_state.interaction.default_outcome = None
 
-            # Link first state to ending state (to maintain validity)
+            # Link first state to ending state (to maintain validity).
             init_state = exploration.states[exploration.init_state_name]
             init_interaction = init_state.interaction
             init_interaction.default_outcome.dest = end_state_name
@@ -951,9 +951,9 @@ class AppEngineTestBase(TestBase):
         try:
             yield
         finally:
-            # Disables the custom mock
+            # Disables the custom mock.
             self.testbed.init_urlfetch_stub(enable=False)
-            # Enables the testbed urlfetch mock
+            # Enables the testbed urlfetch mock.
             self.testbed.init_urlfetch_stub()
 
     def count_jobs_in_taskqueue(self, queue_name):

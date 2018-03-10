@@ -132,7 +132,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'search_cursor': None,
         }, response_dict)
 
-        # Create exploration A
+        # Create exploration A.
         exploration = self.save_new_valid_exploration(
             'A', self.admin_id, title='Title A', category='Category A',
             objective='Objective A')
@@ -143,7 +143,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual(response_dict['activity_list'], [])
 
-        # Create exploration B
+        # Create exploration B.
         exploration = self.save_new_valid_exploration(
             'B', self.admin_id, title='Title B', category='Category B',
             objective='Objective B')
@@ -151,7 +151,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             self.admin_id, exploration, 'Exploration B', [])
         rights_manager.publish_exploration(self.admin, 'B')
 
-        # Publish exploration A
+        # Publish exploration A.
         rights_manager.publish_exploration(self.admin, 'A')
 
         exp_services.index_explorations_given_ids(['A', 'B'])
@@ -176,7 +176,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
 
-        # Delete exploration A
+        # Delete exploration A.
         exp_services.delete_exploration(self.admin_id, 'A')
 
         # Load the search results with an empty query.

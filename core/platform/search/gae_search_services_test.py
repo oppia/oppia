@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the appengine search api wrapper. """
+"""Tests for the appengine search api wrapper."""
 
 import datetime
 import time
@@ -26,7 +26,7 @@ from google.appengine.api import search
 
 
 class SearchAddToIndexTests(test_utils.GenericTestBase):
-    """Test inserting documents into search indexes"""
+    """Test inserting documents into search indexes."""
 
     def test_insert_document_with_id(self):
         date = datetime.date(year=2015, month=3, day=14)
@@ -428,7 +428,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
                 'my_index')
 
         # assert that the method only gets called once, since the error is not
-        # transient
+        # transient.
         self.assertEqual(delete_docs_counter.times_called, 1)
         self.assertEqual(e.exception.original_exception, error)
 

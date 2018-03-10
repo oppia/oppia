@@ -172,8 +172,8 @@ def get_topic_similarities_as_csv():
     string which contains the contents of a csv file.
 
     The first line is a list of the current topics. The next lines are an
-    adjacency matrix of similarities."""
-
+    adjacency matrix of similarities.
+    """
     output = StringIO.StringIO()
     writer = csv.writer(output)
     writer.writerow(RECOMMENDATION_CATEGORIES)
@@ -196,8 +196,8 @@ def _validate_topic_similarities(data):
     between 0.0 and 1.0.
 
     This function checks whether topics belong in the current list of
-    known topics, and if the adjacency matrix is valid."""
-
+    known topics, and if the adjacency matrix is valid.
+    """
     data = data.splitlines()
     data = list(csv.reader(data))
     topics_list = data[0]

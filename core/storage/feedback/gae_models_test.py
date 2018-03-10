@@ -215,7 +215,7 @@ class SuggestionModelTest(test_utils.GenericTestBase):
 
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
-    """Tests for FeedbackMessageEmailDataModel class"""
+    """Tests for FeedbackMessageEmailDataModel class."""
 
     def test_new_instances_stores_correct_data(self):
         user_id = 'A'

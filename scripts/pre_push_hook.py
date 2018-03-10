@@ -82,7 +82,7 @@ class ChangedBranch(object):
 
 
 def _start_subprocess_for_result(cmd):
-    """Starts subprocess and returns (stdout, stderr)"""
+    """Starts subprocess and returns (stdout, stderr)."""
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
     out, err = task.communicate()
@@ -98,7 +98,7 @@ def _git_diff_name_status(left, right, diff_filter=''):
     Returns:
         List of FileDiffs (tuple with name/status)
     Raises:
-        ValueError if git command fails
+        ValueError if git command fails.
     """
     git_cmd = ['git', 'diff', '--name-status']
     if diff_filter:
@@ -133,7 +133,7 @@ def _compare_to_remote(remote, local_branch, remote_branch=None):
         List of file names that are modified, changed, renamed or added
         but not deleted
     Raises:
-        ValueError if git command fails
+        ValueError if git command fails.
     """
     remote_branch = remote_branch if remote_branch else local_branch
     git_remote = '%s/%s' % (remote, remote_branch)
@@ -141,7 +141,7 @@ def _compare_to_remote(remote, local_branch, remote_branch=None):
 
 
 def _extract_files_to_lint(file_diffs):
-    """Grab only files out of a list of FileDiffs that have a ACMRT status"""
+    """Grab only files out of a list of FileDiffs that have a ACMRT status."""
     if not file_diffs:
         return []
     lint_files = [f.name for f in file_diffs
@@ -172,7 +172,7 @@ def _collect_files_being_pushed(ref_list, remote):
     # flag. Therefore we need to loop over the ref_list provided.
     for branch, sha1, remote_sha1 in zip(branches, hashes, remote_hashes):
         # git reports the following for an empty / non existing branch
-        # sha1: '0000000000000000000000000000000000000000'
+        # sha1: '0000000000000000000000000000000000000000'.
         if set(remote_sha1) != {'0'}:
             try:
                 modified_files = _compare_to_remote(remote, branch)
@@ -180,7 +180,7 @@ def _collect_files_being_pushed(ref_list, remote):
                 print e.message
                 sys.exit(1)
         else:
-            # Get the difference to origin/develop instead
+            # Get the difference to origin/develop instead.
             try:
                 modified_files = _compare_to_remote(remote, branch,
                                                     remote_branch='develop')
@@ -206,7 +206,7 @@ def _collect_files_being_pushed(ref_list, remote):
 
 
 def _get_refs():
-    # Git provides refs in STDIN
+    # Git provides refs in STDIN.
     ref_list = [GitRef(*ref_str.split()) for ref_str in sys.stdin]
     if ref_list:
         print 'ref_list:'

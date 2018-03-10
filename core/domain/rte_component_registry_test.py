@@ -130,7 +130,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             # an icon .png file and a protractor.js file, and an optional
             # preview .png file.
             # In /directives directory should be HTML file, a JS file,
-            # there could be multiple JS and HTML files
+            # there could be multiple JS and HTML files.
             dir_contents = self._listdir_omit_ignored(component_dir)
             self.assertLessEqual(len(dir_contents), 4)
 

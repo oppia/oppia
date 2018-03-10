@@ -330,7 +330,7 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         exp_services.update_exploration(
             user_a_id, self.EXP_ID, change_list, 'Changed title.')
 
-        # Have the second user revert version 2 to version 1
+        # Have the second user revert version 2 to version 1.
         exp_services.revert_exploration(user_b_id, self.EXP_ID, 2, 1)
 
         # Run the job to compute the contributor ids.
@@ -425,7 +425,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
                 'new_value': 'New Objective'
             }], 'Changed Objective.')
 
-        # Run the job to compute contributors summary
+        # Run the job to compute contributors summary.
         job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
@@ -461,7 +461,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
                 'new_value': 'New Objective'
             }], 'Changed Objective.')
 
-        # Let the second user revert version 3 to version 2
+        # Let the second user revert version 3 to version 2.
         exp_services.revert_exploration(user_b_id, self.EXP_ID, 3, 2)
 
         # Run the job to compute the contributors summary.
@@ -472,11 +472,11 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         exploration_summary = exp_services.get_exploration_summary_by_id(
             exploration.id)
 
-        # Check that the contributors_summary does not contains user_b_id
+        # Check that the contributors_summary does not contains user_b_id.
         self.assertNotIn(user_b_id, exploration_summary.contributors_summary)
 
         # Check that the User A has only 2 commits after user b has reverted
-        # to version 2
+        # to version 2.
         self.assertEquals(2, exploration_summary.contributors_summary[user_a_id]) # pylint: disable=line-too-long
 
     def test_reverts_not_counted(self):
@@ -489,7 +489,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
 
         user_a_id = self.get_user_id_from_email(self.EMAIL_A)
 
-        # Let USER A make 3 non-revert commits
+        # Let USER A make 3 non-revert commits.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, user_a_id, title='Exploration Title')
         exp_services.update_exploration(
@@ -505,7 +505,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
                 'new_value': 'New Objective'
             }], 'Changed Objective.')
 
-        # Let USER A revert version 3 to version 2
+        # Let USER A revert version 3 to version 2.
         exp_services.revert_exploration(user_a_id, self.EXP_ID, 3, 2)
 
         # Run the job to compute the contributor summary.
@@ -513,7 +513,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()
 
-        # Check that USER A's number of contributions is equal to 2
+        # Check that USER A's number of contributions is equal to 2.
         exploration_summary = exp_services.get_exploration_summary_by_id(
             exploration.id)
         self.assertEqual(2, exploration_summary.contributors_summary[user_a_id])
@@ -525,7 +525,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
 
-        # Create commits with all the system user ids
+        # Create commits with all the system user ids.
         for system_id in feconf.SYSTEM_USER_IDS:
             exp_services.update_exploration(
                 system_id, self.EXP_ID, [{
@@ -540,7 +540,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         # Check that no system id was added to the exploration's
-        # contributor's summary
+        # contributor's summary.
 
         exploration_summary = exp_services.get_exploration_summary_by_id(
             exploration.id)
