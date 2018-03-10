@@ -99,6 +99,7 @@ oppia.controller('LearnerDashboard', [
     $scope.Math = window.Math;
     $scope.profilePictureDataUrl = GLOBALS.profilePictureDataUrl;
     $scope.username = GLOBALS.username;
+    $scope.loadingFeedbacks = false;
     var threadIndex = null;
 
     $scope.newMessage = {
@@ -294,6 +295,7 @@ oppia.controller('LearnerDashboard', [
 
     $scope.onClickThread = function(
         threadStatus, explorationId, threadId, explorationTitle) {
+      $scope.loadingFeedbacks = true;
       var threadDataUrl = UrlInterpolationService.interpolateUrl(
         '/learnerdashboardthreadhandler/<explorationId>/<threadId>', {
           explorationId: explorationId,
@@ -325,6 +327,7 @@ oppia.controller('LearnerDashboard', [
             FeedbackMessageSummaryObjectFactory.createFromBackendDict(
               messageSummaryDicts[index]));
         }
+        $scope.loadingFeedbacks = false;
       });
     };
 
