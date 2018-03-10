@@ -91,7 +91,7 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class ExplorationContributorsSummaryOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job that computes the number of commits
-    done by contributors for each Exploration
+    done by contributors for each Exploration.
     """
     @classmethod
     def entity_classes_to_map_over(cls):

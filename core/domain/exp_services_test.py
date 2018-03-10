@@ -1092,7 +1092,8 @@ title: A title
 class YAMLExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as a dict whose keys
     are state names and whose values are YAML strings representing the state's
-    contents."""
+    contents.
+    """
     _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
 content:
   audio_translations: {}
@@ -2370,9 +2371,9 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         - (6) Bob reverts Albert's last edit to EXP_ID_1.
         - Bob tries to publish EXP_ID_2, and is denied access.
         - (7) Albert publishes EXP_ID_2.
-        - (8) Albert creates EXP_ID_3
-        - (9) Albert publishes EXP_ID_3
-        - (10) Albert deletes EXP_ID_3
+        - (8) Albert creates EXP_ID_3.
+        - (9) Albert publishes EXP_ID_3.
+        - (10) Albert deletes EXP_ID_3.
         """
         super(ExplorationSummaryGetTests, self).setUp()
 
@@ -2439,7 +2440,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 actual_summaries[self.EXP_ID_2].first_published_msec
                 )}
 
-        # check actual summaries equal expected summaries
+        # check actual summaries equal expected summaries.
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
@@ -2483,7 +2484,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             )
         }
 
-        # check actual summaries equal expected summaries
+        # check actual summaries equal expected summaries.
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',

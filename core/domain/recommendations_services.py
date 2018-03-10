@@ -154,7 +154,8 @@ def get_topic_similarity(topic_1, topic_2):
 
     It checks whether the two topics are in the list of default topics. If
     not, it returns the default similarity if the topics are different or 1 if
-    the topics are the same."""
+    the topics are the same.
+    """
 
     if (topic_1 in RECOMMENDATION_CATEGORIES and
             topic_2 in RECOMMENDATION_CATEGORIES):
@@ -247,7 +248,8 @@ def update_topic_similarities(data):
 
     The topic names should belong to the current list of topics, but they need
     not include every current topic. If a topic name is not in the data, its
-    similarities remain as the previous value or the default."""
+    similarities remain as the previous value or the default.
+    """
 
     _validate_topic_similarities(data)
 
@@ -281,7 +283,8 @@ def get_item_similarity(
 
     Comparison of similarity is based on the similarity of exploration topics
     and whether the explorations have the same language or author. It
-    returns 0.0 if compared_exp is private."""
+    returns 0.0 if compared_exp is private.
+    """
 
     similarity_score = 0
 

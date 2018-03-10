@@ -402,7 +402,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
     def test_contributors_for_valid_nonrevert_contribution(self):
         """Test that if only non-revert commits are made by
         contributor then the contributions summary shows same
-        exact number of commits for that contributor's ID
+        exact number of commits for that contributor's ID.
         """
 
         user_a_id = self.get_user_id_from_email(self.EMAIL_A)
@@ -438,7 +438,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
 
     def test_contributors_with_only_reverts_not_included(self):
         """Test that if only reverts are made by contributor then the
-        contributions summary shouldn’t contain that contributor’s ID
+        contributions summary shouldn’t contain that contributor’s ID.
         """
 
         user_a_id = self.get_user_id_from_email(self.EMAIL_A)

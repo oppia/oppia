@@ -124,8 +124,8 @@ class RecentFeedbackMessagesHandler(base.BaseHandler):
 
 class FeedbackStatsHandler(base.BaseHandler):
     """Returns Feedback stats for an exploration.
-        - Number of open threads
-        - Number of total threads
+        - Number of open threads.
+        - Number of total threads.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -229,7 +229,8 @@ class SuggestionListHandler(base.BaseHandler):
 class FeedbackThreadViewEventHandler(base.BaseHandler):
     """Records when the given user views a feedback thread, in order to clear
     viewed feedback messages from emails that might be sent in future to this
-    user."""
+    user.
+    """
 
     @acl_decorators.can_comment_on_feedback_thread
     def post(self, exploration_id):

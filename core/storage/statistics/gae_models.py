@@ -1375,7 +1375,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             exploration_id, exploration_version, state_name, calculation_id)
         instance = cls.get(instance_id, strict=False)
         if not instance:
-            # create new instance
+            # create new instance.
             instance = cls(
                 id=instance_id, exploration_id=exploration_id,
                 exploration_version=exploration_version,

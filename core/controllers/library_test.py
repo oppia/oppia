@@ -91,7 +91,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
 
-        # change title and category
+        # change title and category.
         exp_services.update_exploration(
             self.editor_id, '0', [{
                 'cmd': 'edit_exploration_property',

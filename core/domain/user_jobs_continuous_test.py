@@ -643,7 +643,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
     def _run_computation(self):
         """Runs the MapReduce job after running the continuous
         statistics aggregator for explorations to get the correct num
-        completion events."""
+        completion events.
+        """
         with self.swap(
             stats_services, 'get_exploration_stats', self._mock_get_statistics):
             ModifiedUserStatsAggregator.start_computation()

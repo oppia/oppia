@@ -162,7 +162,7 @@ REQUIRED_STRINGS_FECONF = {
 
 PUNCTUATIONS = ['.', ',', ';', ':', '?', ')', ']', '}']
 
-EXCLUDED_PHRASES = ['utf', 'pylint:', 'http://', 'https://']
+EXCLUDED_PHRASES = ['utf', 'pylint:', 'http://', 'https://', 'title:', 'scripts/']
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
@@ -742,8 +742,9 @@ def _check_comments(all_files):
 
             if line.startswith('#') and not next_line.startswith('#'):
                 if (
-                    line[-1] != '.'
-                    and line[1:].lstrip()[0].isupper()):
+                    line[-1] not in PUNCTUATIONS
+                    and not any (word in line
+                    for word in EXCLUDED_PHRASES)):
                     failed = True
                     print '%s --> Line %s: %s' % (
                         filename, line_num + 1, message)
@@ -801,7 +802,10 @@ def _check_docstrings(all_files):
                     line_num += 1
                     line = file_content[line_num]
                 line = file_content[line_num - 1].lstrip().rstrip()
-                if len(line) and line[-1] not in PUNCTUATIONS and line[0].isupper():
+                if (
+                    len(line) and line[-1] not in PUNCTUATIONS
+                    and not any (word in line
+                    for word in EXCLUDED_PHRASES)):
                     failed = True
                     print '%s --> Line %s: %s' % (
                 filename, line_num , message)

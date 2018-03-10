@@ -123,9 +123,10 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
     def _get_put_error(self, num_res, transient=None):
         """returns a PutError. with num_res results.
-           If transient is given, it should be an index in the
-           results array. The result at that index will have a transient
-           error code."""
+        If transient is given, it should be an index in the
+        results array. The result at that index will have a transient
+        error code.
+        """
         non_trans_code = search.OperationResult.INVALID_REQUEST
         trans_code = search.OperationResult.TRANSIENT_ERROR
         results = [
@@ -295,9 +296,10 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
 
     def _get_delete_error(self, num_res, transient=None):
         """returns a DeleteError. with num_res results.
-           If transient is given, it should be an index in the
-           results array. The result at that index will have a transient
-           error code."""
+        If transient is given, it should be an index in the
+        results array. The result at that index will have a transient
+        error code.
+        """
         non_trans_code = search.OperationResult.INVALID_REQUEST
         trans_code = search.OperationResult.TRANSIENT_ERROR
         results = [
@@ -684,7 +686,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertEqual(search_counter.times_called, 4)
         self.assertEqual(result, ['doc2', 'doc1'])
 
-        # also check that the cursor is preserved
+        # also check that the cursor is preserved.
         self.assertEqual(search_counter2.times_called, 4)
         self.assertEqual(result2, ['doc0'])
 

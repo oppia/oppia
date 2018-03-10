@@ -44,10 +44,10 @@ GitRef = collections.namedtuple('GitRef', ['local_ref', 'local_sha1',
                                            'remote_ref', 'remote_sha1'])
 FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 
-# git hash of /dev/null, refers to an 'empty' commit
+# git hash of /dev/null, refers to an 'empty' commit.
 GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
-# caution, __file__ is here *OPPiA/.git/hooks* and not in *OPPIA/scripts*
+# caution, __file__ is here *OPPiA/.git/hooks* and not in *OPPIA/scripts*.
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
 SCRIPTS_DIR = os.path.join(OPPIA_DIR, 'scripts')
@@ -160,10 +160,10 @@ def _collect_files_being_pushed(ref_list, remote):
     """
     if not ref_list:
         return {}
-    # avoid testing of non branch pushes (tags for instance) or deletions
+    # avoid testing of non branch pushes (tags for instance) or deletions.
     ref_heads_only = [ref for ref in ref_list
                       if ref.local_ref.startswith('refs/heads/')]
-    # get branch name from e.g. local_ref='refs/heads/lint_hook'
+    # get branch name from e.g. local_ref='refs/heads/lint_hook'.
     branches = [ref.local_ref.split('/')[-1] for ref in ref_heads_only]
     hashes = [ref.local_sha1 for ref in ref_heads_only]
     remote_hashes = [ref.remote_sha1 for ref in ref_heads_only]
@@ -185,7 +185,7 @@ def _collect_files_being_pushed(ref_list, remote):
                 modified_files = _compare_to_remote(remote, branch,
                                                     remote_branch='develop')
             except ValueError:
-                # give up, return all files in repo
+                # give up, return all files in repo.
                 try:
                     modified_files = _git_diff_name_status(GIT_NULL_COMMIT,
                                                            sha1)
@@ -230,13 +230,14 @@ def _start_sh_script(scriptname):
 
 def _has_uncommitted_files():
     """Returns true if the repo contains modified files that are uncommitted.
-    Ignores untracked files."""
+    Ignores untracked files.
+    """
     uncommitted_files = subprocess.check_output(GIT_IS_DIRTY_CMD.split(' '))
     return bool(len(uncommitted_files))
 
 
 def _install_hook():
-    # install script ensures that oppia is root
+    # install script ensures that oppia is root.
     oppia_dir = os.getcwd()
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
     pre_push_file = os.path.join(hooks_dir, 'pre-push')
@@ -246,7 +247,7 @@ def _install_hook():
     try:
         os.symlink(os.path.abspath(__file__), pre_push_file)
         print 'Created symlink in .git/hooks directory'
-    # raises AttributeError on windows, OSError added as failsafe
+    # raises AttributeError on windows, OSError added as failsafe.
     except (OSError, AttributeError):
         shutil.copy(__file__, pre_push_file)
         print 'Copied file to .git/hooks directory'

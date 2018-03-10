@@ -813,7 +813,7 @@ tags: []
 
     def get_static_asset_filepath(self):
         """Returns filepath for referencing static files on disk.
-        examples: '' or 'build/'
+        examples: '' or 'build/'.
         """
         filepath = ''
         if not feconf.DEV_MODE:

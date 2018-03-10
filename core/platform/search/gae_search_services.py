@@ -325,11 +325,11 @@ def get_document_from_index(doc_id, index):
     """Returns a document with a give doc_id(s) from the index.
 
     args:
-      - doc_id: a doc_id as a string
+      - doc_id: a doc_id as a string.
       - index: the name of an index, a string.
 
     returns
-      - the requested document as a dict
+      - the requested document as a dict.
     """
     index = gae_search.Index(index)
     return _search_document_to_dict(index.get(doc_id))
