@@ -644,12 +644,12 @@ class AnswerOccurrence(object):
         self.frequency = frequency
 
     def to_raw_type(self):
-        """Returns Python dict for specific answer.
+        """Returns a Python dict representing the specific answer.
 
         Returns:
             dict. The specific answer dict in the following format:
             {
-                'answer': *.The answer submitted by the learner.
+                'answer': *. The answer submitted by the learner.
                 'frequency': int. The number of occurrences of the answer.
             }
         """
@@ -752,15 +752,12 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         """Returns the categorized frequency Python dict.
 
         Returns:
-            dict. The categorized answer frequency dict of the following format:
+            dict. A dict whose keys are category names and whose corresponding
+                values are lists of answer frequency dicts. Each answer
+                frequency dict has the following keys and values:
                 {
-                    'category': list. The answer frequency list containing dict
-                        in the following format:
-                        {
-                            'answer': *. The answer submitted by the learner.
-                            'frequency': int. The number of occurrences of the
-                                answer.
-                        }
+                    'answer': *. The answer submitted by the learner.
+                    'frequency': int. The number of occurrences of the answer.
                 }
         """
         return {
@@ -776,15 +773,12 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
 
         Args:
             categorized_frequency_dict: dict. The categorized answer frequency
-                dict of the following format:
+                dict whose keys are category names and whose corresponding
+                values are lists of answer frequency dicts. Each answer
+                frequency dict has the following keys and values:
                 {
-                    'category': list. The answer frequency list containing dict
-                        in the following format:
-                        {
-                            'answer': *. The answer submitted by the learner.
-                            'frequency': int. The number of occurrences of the
-                                answer.
-                        }
+                    'answer': *. The answer submitted by the learner.
+                    'frequency': int. The number of occurrences of the answer.
                 }
 
         Returns:
