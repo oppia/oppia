@@ -23,7 +23,7 @@ describe('SetInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     validatorService = $injector.get('SetInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');
     agof = $injector.get('AnswerGroupObjectFactory');

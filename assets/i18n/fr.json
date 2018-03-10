@@ -345,6 +345,7 @@
 	"I18N_PLAYER_HINT_REQUEST_STRING_2": "Je suis coincé, est-il possible d'avoir un indice ?",
 	"I18N_PLAYER_HINT_REQUEST_STRING_3": "J'ai un problème.",
 	"I18N_PLAYER_INFO_TOOLTIP": "Info",
+	"I18N_PLAYER_IS_PRIVATE": "Cette exploration est privée.",
 	"I18N_PLAYER_LAST_UPDATED_TOOLTIP": "Dernière mise à jour",
 	"I18N_PLAYER_LEARN_AGAIN_BUTTON": "Apprendre de nouveau",
 	"I18N_PLAYER_LEAVE_FEEDBACK": "Laisser un commentaire pour les auteurs…",
