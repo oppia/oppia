@@ -2241,7 +2241,7 @@ class Exploration(object):
                 'It is impossible to complete the exploration from the '
                 'following states: %s' % ', '.join(dead_end_states))
 
-    # Derived attributes of an exploration,
+    # Derived attributes of an exploration.
     @property
     def init_state(self):
         """The state which forms the start of this exploration.

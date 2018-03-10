@@ -162,7 +162,7 @@ REQUIRED_STRINGS_FECONF = {
 
 PUNCTUATIONS = ['.', ',', ';', ':', '?', ')', ']', '}']
 
-EXCLUDED_WORDS = ['utf', 'pylint:', 'http://', 'https://']
+EXCLUDED_PHRASES = ['utf', 'pylint:', 'http://', 'https://']
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
@@ -718,7 +718,7 @@ def _check_spacing(all_files):
 
 
 def _check_comments(all_files):
-    """This functions checks for a period at the end of comment."""
+    """This functions ensures that comments end in a period."""
     print 'Starting comment checks'
     print '----------------------------------------'
     summary_messages = []
@@ -730,45 +730,24 @@ def _check_comments(all_files):
     failed = False
     for filename in files_to_check:
         f = open(filename, 'r')
-        content = f.readlines()
-        length = len(content)
+        file_content = f.readlines()
+        file_length = len(file_content)
         line_num = 0
-        while line_num < length:
-            line = content[line_num].lstrip().rstrip()
-            if line.startswith('#'):
-                if line_num + 1 == length:
-                    if line[-1] not in PUNCTUATIONS and line[1:].lstrip()[0].isupper():
-                        failed = True
-                        print '%s --> Line %s: %s' % (
-                            filename, line_num + 1, message)
-                    break                        
+        for line_num in range(file_length):
 
-                next_line = content[line_num + 1].lstrip().rstrip()
+            line = file_content[line_num].lstrip().rstrip()
+            next_line = ""
+            if line_num + 1 < file_length:
+                next_line = file_content[line_num + 1].lstrip().rstrip()
 
-                if not next_line.startswith('#'):
-                    if line[-1] not in PUNCTUATIONS and line[1:].lstrip()[0].isupper():
-                        failed = True
-                        print '%s --> Line %s: %s' % (
-                            filename, line_num + 1, message)
+            if line.startswith('#') and not next_line.startswith('#'):
+                if (
+                    line[-1] != '.'
+                    and line[1:].lstrip()[0].isupper()):
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num + 1, message)
 
-                else:
-                    while line_num + 1 < length and next_line.startswith('#'):
-                        line_num += 1
-                        next_line = content[line_num].lstrip().rstrip()
-                    if next_line.startswith('#'):
-                        line = next_line
-                        line_num += 1
-                    else:
-                        line = content[line_num - 1].lstrip().rstrip()
-                    if (
-                        line[-1] not in PUNCTUATIONS and
-                        not any(word in line
-                        for word in EXCLUDED_WORDS)):
-                        failed = True
-                        print '%s --> Line %s: %s' % (
-                            filename, line_num, message)
-
-            line_num += 1
 
     print ''
     print '----------------------------------------'
@@ -788,7 +767,7 @@ def _check_comments(all_files):
 
 
 def _check_docstrings(all_files):
-    """This functions checks for a period at the end of docstring."""
+    """This functions ensures that docstrings end in a period."""
     print 'Starting docstring checks'
     print '----------------------------------------'
     summary_messages = []
@@ -800,28 +779,28 @@ def _check_docstrings(all_files):
     failed = False
     for filename in files_to_check:
         f = open(filename, 'r')
-        content = f.readlines()
-        length = len(content)
+        file_content = f.readlines()
+        file_length = len(file_content)
         line_num = 0
-        while line_num < length:
-            line = content[line_num].lstrip().rstrip()
+        while line_num < file_length:
+            line = file_content[line_num].lstrip().rstrip()
 
             # Check for single line docstring.
-            if (
-                line.startswith('"""') and line.endswith('"""')
-                and len(line) > 6):
-                if line[-4] not in PUNCTUATIONS:
-                   failed = True
-                   print '%s --> Line %s: %s' % (
+            # Punctuation will be at line[-4] since last three characters would
+            # be """.
+            if line.startswith('"""') and line.endswith('"""'):
+                if len(line) > 6 and line[-4] not in PUNCTUATIONS:
+                    failed = True
+                    print '%s --> Line %s: %s' % (
                 filename, line_num + 1, message)
 
             # Check for multiline docstring.
             elif line.startswith('"""'):
-                line =  content[line_num + 1]
-                while line_num + 1 < length and not '"""' in line:
+                line =  file_content[line_num + 1]
+                while line_num + 1 < file_length and not '"""' in line:
                     line_num += 1
-                    line = content[line_num]
-                line = content[line_num - 1].lstrip().rstrip()
+                    line = file_content[line_num]
+                line = file_content[line_num - 1].lstrip().rstrip()
                 if len(line) and line[-1] not in PUNCTUATIONS and line[0].isupper():
                     failed = True
                     print '%s --> Line %s: %s' % (

@@ -945,7 +945,7 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
     @staticmethod
     def _get_job_queued_msec():
         """Returns the time when the job got queued, in milliseconds past the
-        epoch.
+        Epoch.
         """
         return float(context.get().mapreduce_spec.mapper.params[
             MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
