@@ -628,7 +628,6 @@ oppia.directive('graphViz', [
               dst: endIndex,
               weight: 1
             });
-            return;
           };
 
           var beginDragVertex = function(index) {

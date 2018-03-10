@@ -154,7 +154,6 @@ oppia.factory('MessengerService', ['$log', '$window', function($log, $window) {
           $window.parent.postMessage(JSON.stringify(objToSendToParent), '*');
         } else {
           $log.error('Unknown version for embedding: ' + hashDict.version);
-          return;
         }
       }
     }
