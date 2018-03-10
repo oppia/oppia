@@ -703,7 +703,7 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         a Python dict.
 
         Returns:
-            list(dict). A list of answer occurrence dicts. Each dict has the 
+            list(dict). A list of answer occurrence dicts. Each dict has the
                 following format:
                 {
                     'answer': *. The answer submitted by the learner.
