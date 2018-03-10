@@ -242,15 +242,6 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
 
 def main():
     """Run the tests."""
-
-    # Run the tests for explicit_kwargs_checker.
-    # Create  an instance of the class.
-    explicit_kwargs_checker_test_obj = ExplicitKwargsCheckerTest()
-    # Initialize the test object.
-    explicit_kwargs_checker_test_obj.setup_method()
-    # Call the test method.
-    explicit_kwargs_checker_test_obj.test_finds_non_explicit_kwargs()
-
     parsed_args = _PARSER.parse_args()
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '

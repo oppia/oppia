@@ -20,16 +20,17 @@
 import os
 import sys
 
-import astroid
-import explicit_kwargs_checker  # pylint: disable=relative-import
-
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_ISORT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'isort-4.2.15')
-sys.path.insert(0, _ISORT_PATH)
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.7.1')
+sys.path.insert(0, _PYLINT_PATH)
 
 # Since this module needs to be imported after adding Isort path,
 # we need to disable isort for this line.
 # pylint: disable=wrong-import-position
+# pylint: disable=relative-import
+import astroid  #isort:skip
+import explicit_kwargs_checker  #isort:skip
+
 import pylint.testutils  # isort:skip
 
 
@@ -67,3 +68,16 @@ class ExplicitKwargsCheckerTest(pylint.testutils.CheckerTestCase):
             ),
         ):
             self.checker.visit_call(func_call_node_three)
+
+
+def main():
+    # Create  an instance of the class.
+    explicit_kwargs_checker_test_obj = ExplicitKwargsCheckerTest()
+    # Initialize the test object.
+    explicit_kwargs_checker_test_obj.setup_method()
+    # Call the test method.
+    explicit_kwargs_checker_test_obj.test_finds_non_explicit_kwargs()
+
+
+if __name__ == '__main__':
+    main()
