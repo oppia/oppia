@@ -83,7 +83,6 @@ module.exports = function(action, args, params) {
 
   var endStream = function(cb) {
     cb();
-    return;
   };
 
   return through.obj(bufferContents, endStream);

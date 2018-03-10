@@ -109,6 +109,9 @@
     "no-unused-vars": [
       "off"
     ],
+    "no-useless-return": [
+      "error"
+    ],
     "one-var": [
       "off"
     ],

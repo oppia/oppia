@@ -218,8 +218,6 @@ oppia.animation('.conversation-skin-animate-cards', function() {
           jQuery(element).removeClass('animate-to-one-card');
         }
       };
-    } else {
-      return;
     }
   };
 
