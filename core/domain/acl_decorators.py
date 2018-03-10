@@ -29,6 +29,7 @@ def open_access(handler):
     """Decorator to give access to everyone."""
 
     def test_can_access(self, *args, **kwargs):
+        """Check whether the access is open or not."""
         return handler(self, *args, **kwargs)
     test_can_access.__wrapped__ = True
 
@@ -39,6 +40,19 @@ def can_play_exploration(handler):
     """Decorator to check whether user can play given exploration."""
 
     def test_can_play(self, exploration_id, **kwargs):
+        """Check whether the user can play the exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+
+        Returns:
+            bool. Whether the exploration can be
+                accessed and played.
+
+        Raises:
+            PageNotFoundException: The exploration is disabled, or cannot be
+                accessed by this user.
+        """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise self.PageNotFoundException
 
@@ -59,6 +73,19 @@ def can_play_collection(handler):
     """Decorator to check whether user can play given collection."""
 
     def test_can_play(self, collection_id, **kwargs):
+        """Check whether the user can play the given collection.
+
+        Args:
+            collection_id: str. The collection id.
+
+        Returns:
+            bool. Whether the collection can be accessed
+                and able to be played by the user.
+
+        Raises:
+            PageNotFoundException: The collection is disabled or cannot be
+                accessed by the user.
+        """
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False)
 
@@ -78,6 +105,20 @@ def can_download_exploration(handler):
     """
 
     def test_can_download(self, exploration_id, **kwargs):
+        """Check whether the user can download the given exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+
+        Returns:
+            bool. Whether the user is authorized and was able to download the
+                given exploration. If that's not the case them it returns
+                False.
+
+        Raises:
+            PageNotFoundException: The exploration is disabled or cannot be
+                used by the user.
+        """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -99,6 +140,21 @@ def can_view_exploration_stats(handler):
     """
 
     def test_can_view_stats(self, exploration_id, **kwargs):
+        """Check whether only the authenticated user can view the
+        exploration stats.
+
+        Args:
+            exploration_id: str. Exploration id.
+
+        Returns:
+            bool. Whether the user is authenticated and able to
+                access and view the exploration stats. False, if
+                that's not the case.
+
+        Raises:
+            PageNotFoundException: The exploration is disabled or cannot
+                be used by the user.
+        """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -118,6 +174,22 @@ def can_edit_collection(handler):
     """Decorator to check whether the user can edit collection."""
 
     def test_can_edit(self, collection_id, **kwargs):
+        """Check whether the user can edit collection or not.
+
+        Args:
+            collection_id: str. Collection id.
+
+        Returns:
+            bool. Whether the user is able to edit the collection.
+                False, if that's not the case.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user is not authorized to
+                perform current action.
+            PageNotFoundException: The collection is disabled or cannot
+                be used by the user.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -140,6 +212,17 @@ def can_manage_email_dashboard(handler):
     """Decorator to check whether user can access email dashboard."""
 
     def test_can_manage_emails(self, **kwargs):
+        """Check whether the user can manage email dashboard.
+
+        Returns:
+            bool. Whether the user is authenticated and can view email
+                dashboard. False, if that's not the case.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user is not authorized to
+                perform current action.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -157,6 +240,17 @@ def can_access_moderator_page(handler):
     """Decorator to check whether user can access moderator page."""
 
     def test_can_access_moderator_page(self, **kwargs):
+        """Check whether the user can access moderator page.
+
+        Returns:
+            bool. Whether the user is authenticated to access the
+                moderator page. False, if that's not the case.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user is not authorized
+                to perform current action.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -174,6 +268,16 @@ def can_send_moderator_emails(handler):
     """Decorator to check whether user can send moderator emails."""
 
     def test_can_send_moderator_emails(self, **kwargs):
+        """Check whether the user can send moderator emails.
+
+        Returns:
+            bool. Whether the user can send moderator emails.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user is not authorized to
+                perform the current action.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -191,6 +295,17 @@ def can_manage_own_profile(handler):
     """Decorator to check whether user can manage his profile."""
 
     def test_can_manage_profile(self, **kwargs):
+        """Check whether the user can manage his profile.
+
+        Returns:
+            bool. True , if the user is able to access and manage
+                his profile.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorisedException: The user is not authorised to perform
+                current action.
+        """
         if not self.user_id:
             raise self.NotLoggedInException
 
@@ -207,7 +322,16 @@ def can_manage_own_profile(handler):
 def can_access_admin_page(handler):
     """Decorator that checks if the current user is a super admin."""
     def test_super_admin(self, **kwargs):
-        """Checks if the user is logged in and is a super admin."""
+        """Check whether the user is logged in and is a super admin.
+
+        Returns:
+            bool. Whether the user is super admin.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorisedUserException: The user is not authorised to
+                perform current action.
+        """
         if not self.user_id:
             raise self.NotLoggedInException
 
@@ -224,6 +348,16 @@ def can_upload_exploration(handler):
     """Decorator that checks if the current user can upload exploration."""
 
     def test_can_upload(self, **kwargs):
+        """Check whether the user can upload exploration.
+
+        Returns:
+            bool. Whether the user can upload exploration.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorisedUserException: The user is not authorised
+                to perform current action.
+        """
         if not self.user_id:
             raise self.NotLoggedInException
 
@@ -240,6 +374,16 @@ def can_create_exploration(handler):
     """Decorator to check whether the user can create an exploration."""
 
     def test_can_create(self, **kwargs):
+        """Check whether the user can create exploration.
+
+        Returns:
+            bool. Whether the user is able to create an exploration.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorisedUserException: The user is not authorised
+                to perform current action.
+        """
         if self.user_id is None:
             raise self.NotLoggedInException
 
@@ -257,6 +401,16 @@ def can_create_collection(handler):
     """Decorator to check whether the user can create a collection."""
 
     def test_can_create(self, **kwargs):
+        """Check whether the user can create collection.
+
+        Returns:
+            bool. Whether the user is able to create a collection.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorisedUserException: The user is not authorised to
+                perform current action.
+        """
         if self.user_id is None:
             raise self.NotLoggedInException
 
@@ -276,6 +430,16 @@ def can_access_creator_dashboard(handler):
     """
 
     def test_can_access(self, **kwargs):
+        """Check whether the user can aceess creator dashboard page.
+
+        Returns:
+            bool. Whether the user can access creator dashboard page.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorisedUserException: The user is not authorised to
+                perform current action.
+        """
         if self.user_id is None:
             raise self.NotLoggedInException
 
@@ -295,6 +459,22 @@ def can_comment_on_feedback_thread(handler):
     """
 
     def test_can_access(self, exploration_id, **kwargs):
+        """Check whether the user can view feedback for a given exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+
+        Returns:
+            bool. Whether the user can view feedback for a
+                given exploration.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorisedException: The user is not authorised to
+                perform current action.
+            PageNotFoundException: The exploration page is disabled, or
+                cannot be accessed by this user.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -321,6 +501,19 @@ def can_rate_exploration(handler):
     """
 
     def test_can_rate(self, exploration_id, **kwargs):
+        """Check whether the user can give rating to given
+        exploration.
+
+        Args:
+            exploration_id: str. Exploration id.
+
+        Returns:
+            bool. Whether the user can give rating to exploration.
+
+        Raises:
+            UnauthorisedUserException: The user is not authorized to
+                perform current action.
+        """
         if (role_services.ACTION_RATE_ANY_PUBLIC_EXPLORATION in
                 self.user.actions):
             return handler(self, exploration_id, **kwargs)
@@ -336,6 +529,18 @@ def can_flag_exploration(handler):
     """Decorator to check whether user can flag given exploration."""
 
     def test_can_flag(self, exploration_id, **kwargs):
+        """Check whether the user can flag the given exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+
+        Returns:
+            bool. Whether the user can flag exploration.
+
+        Raises:
+            UnauthorizedUserException: The user is not authorized
+                to perform current action.
+        """
         if role_services.ACTION_FLAG_EXPLORATION in self.user.actions:
             return handler(self, exploration_id, **kwargs)
         else:
@@ -350,6 +555,15 @@ def can_subscribe_to_users(handler):
     """Decorator to check whether user can subscribe/unsubscribe a creator."""
 
     def test_can_subscribe(self, **kwargs):
+        """Check whether the user can subscribe/unsubscribe a creator.
+
+        Returns:
+            bool. Whether the user can subscribe/unsubscribe a creator.
+
+        Raises:
+            UnauthorizedUserException: The user is not authorized
+                to perform current action.
+        """
         if role_services.ACTION_SUBSCRIBE_TO_USERS in self.user.actions:
             return handler(self, **kwargs)
         else:
@@ -364,6 +578,21 @@ def can_edit_exploration(handler):
     """Decorator to check whether the user can edit given exploration."""
 
     def test_can_edit(self, exploration_id, **kwargs):
+        """Check whether the user can edit given exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+
+        Returns:
+            bool. Whether the user is able to edit any given exploration.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The exploration page is disabled, or cannot
+                be accessed by this user.
+            UnauthorizedUserException: The user is not authorized
+                to perform current action.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -387,6 +616,19 @@ def can_delete_exploration(handler):
     """Decorator to check whether user can delete exploration."""
 
     def test_can_delete(self, exploration_id, **kwargs):
+        """Check whether the user can delete exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+
+        Returns:
+            bool. Whether the user can delete an exploration.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user is not authorized
+                to perform current action.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -410,6 +652,20 @@ def can_suggest_changes_to_exploration(handler):
     exploration.
     """
     def test_can_suggest(self, exploration_id, **kwargs):
+        """Check whether a user can make suggestions to an
+        exploration.
+
+        Args:
+            exploration_id: str. Exploration id.
+
+        Returns:
+            bool. Whether the user can make suggestions to an
+                exploration.
+
+        Raises:
+            UnauthorizedUserException: The user is not authorized
+                to perform current action.
+        """
         if (role_services.ACTION_SUGGEST_CHANGES_TO_EXPLORATION in
                 self.user.actions):
             return handler(self, exploration_id, **kwargs)
@@ -426,6 +682,20 @@ def can_publish_exploration(handler):
     """Decorator to check whether user can publish exploration."""
 
     def test_can_publish(self, exploration_id, *args, **kwargs):
+        """Check whether the user can publish exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+
+        Returns:
+            bool. Whether the user can publish exploration.
+
+        Raises:
+            PageNotFoundException: The exploration page is disabled, or
+                cannot be accessed by this user.
+            UnauthorizedUserException: The user is not authorized
+                to perform current action.
+        """
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
@@ -447,6 +717,20 @@ def can_publish_collection(handler):
     """Decorator to check whether user can publish collection."""
 
     def test_can_publish_collection(self, collection_id, **kwargs):
+        """Check whether the user can publish collection.
+
+        Args:
+            collection_id: str. The collection id.
+
+        Returns:
+            bool. Whether the user can publish collection.
+
+        Raises:
+            PageNotFoundException: The collection page is disabled, or cannot
+                be accessed by this user.
+            UnauthorizedUserException: The user is not authorized
+                to perform current action.
+        """
         collection_rights = rights_manager.get_collection_rights(
             collection_id)
         if collection_rights is None:
@@ -467,6 +751,20 @@ def can_unpublish_collection(handler):
     """Decorator to check whether user can unpublish collection."""
 
     def test_can_unpublish_collection(self, collection_id, **kwargs):
+        """Check whether the user can unpublish the given collection.
+
+        Args:
+            collection_id: str. Collection ID.
+
+        Returns:
+            bool. Whether the user can unpublish the collection.
+
+        Raises:
+            PageNotFoundException: The collection page is disabled, or cannot
+                be accessed by the user.
+            UnauthorizedUserException: The user is not authorized
+                to perform current action.
+        """
         collection_rights = rights_manager.get_collection_rights(
             collection_id)
         if collection_rights is None:
@@ -489,6 +787,20 @@ def can_modify_exploration_roles(handler):
     """
 
     def test_can_modify(self, exploration_id, **kwargs):
+        """Check whether user can manage rights related to an
+        exploration.
+
+        Args:
+            exploration_id: str. Exploration Id.
+
+        Returns:
+            bool. Whether the user can manage rights related to an
+                exploration.
+
+        Raises:
+            UnauthorizedUserException: The user is not authorized
+                to perform current action.
+        """
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
@@ -510,6 +822,17 @@ def can_perform_cron_tasks(handler):
     """
 
     def test_can_perform(self, **kwargs):
+        """Check whether the handler is being called by cron or by a
+        superadmin of the application.
+
+        Returns:
+            bool. Whether the handler is called by cron or superadmin
+                of the application.
+
+        Raises:
+            UnauthorizedUserException: The user is not authorized
+                to perform current action.
+        """
         if (self.request.headers.get('X-AppEngine-Cron') is None and
                 not self.is_super_admin):
             raise self.UnauthorizedUserException(
@@ -525,6 +848,14 @@ def can_access_learner_dashboard(handler):
     """Decorator to check access to learner dashboard."""
 
     def test_can_access(self, **kwargs):
+        """Check whether the access to the learner dashboard.
+
+        Returns:
+            bool. Whether the learner dashboard can be accessed.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+        """
         if role_services.ACTION_ACCESS_LEARNER_DASHBOARD in self.user.actions:
             return handler(self, **kwargs)
         else:
@@ -540,7 +871,7 @@ def require_user_id_else_redirect_to_homepage(handler):
     Note that the user may not yet have registered.
     """
     def test_login(self, **kwargs):
-        """Checks if the user for the current session is logged in.
+        """Check whether the user for the current session is logged in.
         If not, redirects the user to the home page.
         """
         if not self.user_id:
