@@ -96,7 +96,8 @@ RECOMMENDATION_CATEGORIES = [
 
 def get_topic_similarities_dict():
     """Returns a 2d dict of topic similarities. Creates the default similarity
-    dict if it does not exist yet."""
+    dict if it does not exist yet.
+    """
 
     topic_similarities_entity = (
         recommendations_models.TopicSimilaritiesModel.get(
@@ -109,7 +110,8 @@ def get_topic_similarities_dict():
 
 def save_topic_similarities(topic_similarities):
     """Stores topic similarities in the datastore. Returns the newly created or
-    changed entity."""
+    changed entity.
+    """
 
     topic_similarities_entity = (
         recommendations_models.TopicSimilaritiesModel.get(
@@ -308,7 +310,8 @@ def get_item_similarity(
 
 def set_recommendations(exp_id, new_recommendations):
     """Stores a list of exploration ids of recommended explorations to play
-    after completing the exploration keyed by exp_id."""
+    after completing the exploration keyed by exp_id.
+    """
 
     recommendations_models.ExplorationRecommendationsModel(
         id=exp_id, recommended_exploration_ids=new_recommendations).put()
@@ -316,7 +319,8 @@ def set_recommendations(exp_id, new_recommendations):
 
 def get_exploration_recommendations(exp_id):
     """Gets a list of ids of at most 10 recommended explorations to play
-    after completing the exploration keyed by exp_id."""
+    after completing the exploration keyed by exp_id.
+    """
 
     recommendations_model = (
         recommendations_models.ExplorationRecommendationsModel.get(

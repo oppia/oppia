@@ -190,8 +190,8 @@ def _validate_customization_args_and_values(
                     ca_spec.schema))
         except Exception:
             # TODO(sll): Raise an actual exception here if parameters are not
-            # involved. (If they are, can we get sample values for the state
-            # context parameters?)
+            # involved (If they are, can we get sample values for the state
+            # context parameters?).
             pass
 
 
@@ -2606,7 +2606,7 @@ class Exploration(object):
         # to an 'END' state before, then they would only be receiving warnings
         # about not being able to complete the exploration. The introduction of
         # a real END state would produce additional warnings (state cannot be
-        # reached from other states, etc.)
+        # reached from other states, etc.).
         targets_end_state = False
         has_end_state = False
         for (state_name, sdict) in states_dict.iteritems():
@@ -2621,7 +2621,7 @@ class Exploration(object):
                             break
 
         # Ensure any explorations pointing to an END state has a valid END
-        # state to end with (in case it expects an END state)
+        # state to end with (in case it expects an END state).
         if targets_end_state and not has_end_state:
             states_dict[old_end_dest] = {
                 'content': [{

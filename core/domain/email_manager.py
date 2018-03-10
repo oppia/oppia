@@ -34,8 +34,9 @@ transaction_services = models.Registry.import_transaction_services()
 
 
 def log_new_error(*args, **kwargs):
-    """Logs an error message. (This is a stub for logging.error(), so that the
-    latter can be swapped out in tests.)"""
+    """Logs an error message (This is a stub for logging.error(), so that the
+    latter can be swapped out in tests).
+    """
     logging.error(*args, **kwargs)
 
 
@@ -585,7 +586,7 @@ def send_feedback_message_email(recipient_id, feedback_messages):
                     'title': 'Exploration 1234',
                     'messages': ['Feedback message 1', 'Feedback message 2']
                 }
-            }
+            }.
     """
     email_subject_template = (
         'You\'ve received %s new message%s on your explorations')

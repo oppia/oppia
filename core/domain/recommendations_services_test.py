@@ -232,7 +232,8 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, set up dummy explorations, users
-        and admin."""
+        and admin.
+        """
         super(RecommendationsServicesUnitTests, self).setUp()
 
         for name, user in self.USER_DATA.iteritems():

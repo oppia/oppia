@@ -3196,7 +3196,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
     EXP_ID = 'eid'
 
     def setUp(self):
-        """Initialize owner and store default exploration before each test case.
+        """Initialize owner and store default exploration before each
+        test case.
         """
         super(StateIdMappingTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -3224,7 +3225,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_mapping_remains_same_when_exp_params_changes(self):
         """Test that state id mapping is unchanged when exploration params are
-        changed."""
+        changed.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, [{
@@ -3247,7 +3249,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_mapping_is_correct_when_new_state_is_added(self):
         """Test that new state id is added in state id mapping when new state is
-        added in exploration."""
+        added in exploration.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, [{
@@ -3270,7 +3273,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_mapping_is_correct_when_old_state_is_deleted(self):
         """Test that state id is removed from state id mapping when the
-        state is removed from exploration."""
+        state is removed from exploration.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, [{
@@ -3297,7 +3301,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_mapping_remains_when_state_is_renamed(self):
         """Test that state id mapping is changed accordingly when a state
-        is renamed in exploration."""
+        is renamed in exploration.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, [{
@@ -3326,7 +3331,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_mapping_is_changed_when_interaction_id_is_changed(self):
         """Test that state id mapping is changed accordingly when interaction
-        id of state is changed."""
+        id of state is changed.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, [{
@@ -3351,7 +3357,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_mapping_is_correct_for_series_of_changes(self):
         """Test that state id mapping is changed accordingly for series
-        of add, rename, remove and update state changes."""
+        of add, rename, remove and update state changes.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, [{

@@ -66,12 +66,12 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserContributionsOneOffJobTests, self).setUp()
-        # User A has no created or edited explorations
-        # User B has one created exploration
-        # User C has one edited exploration
+        # User A has no created or edited explorations.
+        # User B has one created exploration.
+        # User C has one edited exploration.
         # User D has created an exploration and then edited it.
         # (This is used to check that there are no duplicate
-        # entries in the contribution lists.)
+        # entries in the contribution lists).
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
@@ -110,7 +110,8 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_created_exp(self):
         """Tests the case where user has created (and therefore edited)
-        an exploration."""
+        an exploration.
+        """
 
         self._run_one_off_job()
         user_b_contributions_model = user_models.UserContributionsModel.get(
@@ -133,7 +134,8 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_for_duplicates(self):
         """Tests the case where user has an edited exploration, and edits
-        it again making sure it is not duplicated."""
+        it again making sure it is not duplicated.
+        """
 
         self._run_one_off_job()
         user_d_contributions_model = user_models.UserContributionsModel.get(

@@ -337,7 +337,7 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
                                     'num_completions_v1'
                                 }
                             }
-                    }
+                    }.
         """
         reduced_state_stats_mapping = {
             state_name: {
@@ -507,7 +507,7 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                                         answer for this state.
                                 }
                             }
-                    }
+                    }.
         """
         if isinstance(item, stats_models.StateCounterModel):
             if item.first_entry_count < 0:

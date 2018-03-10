@@ -160,9 +160,9 @@ REQUIRED_STRINGS_FECONF = {
     }
 }
 
-PUNCTUATIONS = ['.', ',', ';', ':', '?', ')', ']', '}']
+PUNCTUATIONS = ['.', '?']
 
-EXCLUDED_PHRASES = ['utf', 'pylint:', 'http://', 'https://', 'title:', 'scripts/']
+EXCLUDED_PHRASES = ['utf', 'pylint:', 'http://', 'https://', 'scripts/']
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
@@ -796,11 +796,11 @@ def _check_docstrings(all_files):
                 filename, line_num + 1, message)
 
             # Check for multiline docstring.
-            elif line.startswith('"""'):
-                line =  file_content[line_num + 1]
-                while line_num + 1 < file_length and not '"""' in line:
+            elif line.startswith('"""') and line[3].isupper():
+                line =  file_content[line_num + 1].lstrip().rstrip()
+                while line_num + 1 < file_length and not line == '"""':
                     line_num += 1
-                    line = file_content[line_num]
+                    line = file_content[line_num].lstrip().rstrip()
                 line = file_content[line_num - 1].lstrip().rstrip()
                 if (
                     len(line) and line[-1] not in PUNCTUATIONS

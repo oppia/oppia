@@ -221,7 +221,7 @@ class ClassifierTrainingJob(object):
                     'answer_group_index': 2,
                     'answers': ['a2', 'a3']
                 }
-            ]
+            ].
         """
         return self._training_data
 

@@ -771,7 +771,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def test_only_yield_when_rating_greater_than_two(self):
         """Tests that map only yields an impact score for an
-        exploration when the impact score is greater than 0."""
+        exploration when the impact score is greater than 0.
+        """
         self._create_exploration(self.EXP_ID_1, self.user_a_id)
 
         # Give two ratings of 1.

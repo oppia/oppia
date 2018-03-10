@@ -156,7 +156,7 @@ def _collect_files_being_pushed(ref_list, remote):
         remote: the remote being pushed to
     Returns:
         dict: Dict mapping branch names to 2-tuples of the form (list of
-            changed files, list of files to lint)
+            changed files, list of files to lint).
     """
     if not ref_list:
         return {}
@@ -266,7 +266,7 @@ def main():
         sys.exit(0)
     refs = _get_refs()
     collected_files = _collect_files_being_pushed(refs, remote)
-    # only interfere if we actually have something to lint (prevents annoyances)
+    # only interfere if we actually have something to lint (prevent annoyances).
     if collected_files and _has_uncommitted_files():
         print ('Your repo is in a dirty state which prevents the linting from'
                ' working.\nStash your changes or commit them.\n')

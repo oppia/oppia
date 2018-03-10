@@ -173,11 +173,11 @@ class ExplorationDisplayableSummariesTest(
 
     def test_get_displayable_exp_summary_dicts_matching_ids(self):
         # A list of exp_id's are passed in:
-        # EXP_ID_1 -- private exploration owned by Albert
-        # EXP_ID_2 -- pubished exploration owned by Albert
-        # EXP_ID_3 -- deleted exploration
-        # EXP_ID_5 -- private exploration owned by Bob
-        # Should only return [EXP_ID_2]
+        # EXP_ID_1 -- private exploration owned by Albert.
+        # EXP_ID_2 -- pubished exploration owned by Albert.
+        # EXP_ID_3 -- deleted exploration.
+        # EXP_ID_5 -- private exploration owned by Bob.
+        # Should only return [EXP_ID_2].
 
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
@@ -605,8 +605,7 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.set_admins([self.ADMIN_USERNAME])
 
     def test_at_most_eight_top_rated_explorations(self):
-        """Note that at most 8 explorations should be returned.
-        """
+        """Note that at most 8 explorations should be returned."""
         rating_services.assign_rating_to_exploration(
             self.bob_id, self.EXP_ID_2, 5)
         rating_services.assign_rating_to_exploration(
@@ -666,8 +665,8 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.assertEqual(expected_ordering, actual_ordering)
 
     def test_only_explorations_with_ratings_are_returned(self):
-        """Note that only explorations with ratings will be included
-        """
+        """Note that only explorations with ratings will be included."""
+
         rating_services.assign_rating_to_exploration(
             self.bob_id, self.EXP_ID_2, 5)
 
@@ -753,8 +752,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         self.set_admins([self.ADMIN_USERNAME])
 
     def test_for_recently_published_explorations(self):
-        """ Tests for recently published explorations.
-        """
+        """ Tests for recently published explorations."""
 
         recently_published_exploration_summaries = (
             summary_services.get_recently_published_exp_summary_dicts(

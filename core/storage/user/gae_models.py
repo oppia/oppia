@@ -162,7 +162,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     explorations.
 
     Instances of this class have keys of the form
-    [user_id].[exploration_id]
+    [user_id].[exploration_id].
     """
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
@@ -281,8 +281,8 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
 
 class UserSubscribersModel(base_models.BaseModel):
-    """The list of subscribers of the user.
-    """
+    """The list of subscribers of the user."""
+
     # IDs of the learners who have subscribed to this user.
     subscriber_ids = ndb.StringProperty(repeated=True, indexed=True)
 
@@ -341,7 +341,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     #    "total_plays": 60
     #   }
     #  },
-    # ]
+    # ].
     weekly_creator_stats_list = ndb.JsonProperty(repeated=True)
     # The version of dashboard stats schema.
     schema_version = (
@@ -371,7 +371,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
     """User-specific data pertaining to a specific exploration.
 
     Instances of this class have keys of the form
-    [USER_ID].[EXPLORATION_ID]
+    [USER_ID].[EXPLORATION_ID].
     """
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)

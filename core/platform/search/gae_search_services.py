@@ -138,7 +138,8 @@ def _make_fields(key, value):
 
 def _validate_list(key, value):
     """Validates a list to be included as document fields. The key is just
-    passed in to make better error messages."""
+    passed in to make better error messages.
+    """
 
     for ind, element in enumerate(value):
         if not isinstance(element, (

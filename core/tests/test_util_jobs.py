@@ -121,8 +121,8 @@ class DeleteExpCopiesAggregator(jobs.BaseContinuousComputationManager):
 
 class DeleteExpCopiesMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):
-    """Job that deletes all explorations in category 'Copies'.
-    """
+    """Job that deletes all explorations in category 'Copies'."""
+
     @classmethod
     def _get_continuous_computation_class(cls):
         return DeleteExpCopiesAggregator

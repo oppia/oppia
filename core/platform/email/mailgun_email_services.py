@@ -46,7 +46,7 @@ def send_mail(
       Exception: if mailgun api key is not stored in feconf.MAILGUN_API_KEY.
       Exception: if mailgun domain name is not stored in
         feconf.MAILGUN_DOMAIN_NAME.
-      (and possibly other exceptions, due to mail.send_mail() failures)
+      (and possibly other exceptions, due to mail.send_mail() failures).
     """
     if not feconf.MAILGUN_API_KEY:
         raise Exception('Mailgun API key is not available.')
@@ -103,7 +103,7 @@ def send_bulk_mail(
       Exception: if mailgun api key is not stored in feconf.MAILGUN_API_KEY.
       Exception: if mailgun domain name is not stored in
         feconf.MAILGUN_DOMAIN_NAME.
-      (and possibly other exceptions, due to mail.send_mail() failures)
+      (and possibly other exceptions, due to mail.send_mail() failures).
     """
     if not feconf.MAILGUN_API_KEY:
         raise Exception('Mailgun API key is not available.')

@@ -36,7 +36,7 @@ class QuestionModel(base_models.VersionedModel):
     """Model for storing Questions.
 
     The ID of instances of this class has the form
-    {{collection_id}}.{{random_hash_of_16_chars}}
+    {{collection_id}}.{{random_hash_of_16_chars}}.
     """
     SNAPSHOT_METADATA_CLASS = QuestionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = QuestionSnapshotContentModel

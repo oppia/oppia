@@ -618,7 +618,8 @@ class UserContributionsTests(test_utils.GenericTestBase):
 class SiteLanguageHandlerTests(test_utils.GenericTestBase):
 
     def test_save_site_language_handler(self):
-        """Test the language is saved in the preferences when handler is called.
+        """Test the language is saved in the preferences when handler is
+        called.
         """
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         language_code = 'es'

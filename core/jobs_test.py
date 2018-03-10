@@ -770,7 +770,8 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         """Override this method so that it does not immediately start a
-        new MapReduce job. Non-test subclasses should not do this."""
+        new MapReduce job. Non-test subclasses should not do this.
+        """
         pass
 
     @classmethod

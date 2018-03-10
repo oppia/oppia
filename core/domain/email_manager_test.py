@@ -1547,7 +1547,8 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
 
 
 class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
-    """Test that email is send to submitter when query has completed or failed.
+    """Test that email is send to submitter when query has completed
+    or failed.
     """
     SUBMITTER_USERNAME = 'submit'
     SUBMITTER_EMAIL = 'submit@example.com'

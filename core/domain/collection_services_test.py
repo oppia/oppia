@@ -1723,7 +1723,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         # collection_services.revert_collection(albert_id,
         #       self.COLLECTION_ID, 4, 3)
         # self._check_contributors_summary(self.COLLECTION_ID,
-        #                                 {albert_id: 1, bob_id: 2})
+        #                                 {albert_id: 1, bob_id: 2}).
 
 
 class GetCollectionAndCollectionRightsTest(CollectionServicesUnitTests):

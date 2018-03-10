@@ -316,7 +316,8 @@ tags: []
             item.validate()
 
     def signup_superadmin_user(self):
-        """Signs up a superadmin user. Should be called at the end of setUp().
+        """Signs up a superadmin user. Should be called at the end of
+        setUp().
         """
         self.signup('tmpsuperadmin@example.com', 'tmpsuperadm1n')
 

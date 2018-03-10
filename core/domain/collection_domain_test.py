@@ -456,7 +456,8 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(collection_from_dict.to_dict(), collection_dict)
 
     def test_add_delete_node(self):
-        """Test that add_node and delete_node fail in the correct situations.
+        """Test that add_node and delete_node fail in the correct
+        situations.
         """
         collection = collection_domain.Collection.create_default_collection(
             '0')

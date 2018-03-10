@@ -85,7 +85,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
     def _listdir_omit_ignored(self, directory):
         """List all files and directories within 'directory', omitting the ones
-        whose name ends in one of the IGNORED_FILE_SUFFIXES."""
+        whose name ends in one of the IGNORED_FILE_SUFFIXES.
+        """
         names = os.listdir(directory)
         for suffix in IGNORED_FILE_SUFFIXES:
             names = [name for name in names if not name.endswith(suffix)]
@@ -175,7 +176,8 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
     def test_html_contains_all_imports(self):
         """Test that the rich_text_components.html file contains script-imports
-        for all directives of all RTE components."""
+        for all directives of all RTE components.
+        """
 
         js_files_paths = []
         for component_id in feconf.ALLOWED_RTE_EXTENSIONS:

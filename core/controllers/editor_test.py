@@ -1077,7 +1077,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         # Ban joe.
         self.set_banned_users(['joe'])
 
-        # Test that Joe is banned. (He can still access the library page.)
+        # Test that Joe is banned (He can still access the library page).
         response = self.testapp.get(
             feconf.LIBRARY_INDEX_URL, expect_errors=True)
         self.assertEqual(response.status_int, 200)

@@ -121,7 +121,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
 
                 # Do not include user_id here, so all explorations are not
                 # editable for now (will be updated depending on user_id
-                # in galleries)
+                # in galleries).
                 exp_rights_model = exp_models.ExplorationRightsModel.get(
                     exp_id)
 
@@ -346,8 +346,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual([user_a_id], exploration_summary.contributor_ids)
 
     def test_nonhuman_committers_not_counted(self):
-        """Test that only human committers are counted as contributors.
-        """
+        """Test that only human committers are counted as contributors."""
+
         # Create a commit with the system user id.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
@@ -519,8 +519,8 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(2, exploration_summary.contributors_summary[user_a_id])
 
     def test_nonhuman_committers_not_counted(self):
-        """Test that only human committers are counted as contributors.
-        """
+        """Test that only human committers are counted as contributors."""
+
         # Create a commit with the system user id.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
@@ -667,7 +667,8 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
 
     def test_that_mapreduce_job_works_for_first_version_of_exploration(self):
         """Tests that mapreduce job works correctly when the only first
-        exploration version exists."""
+        exploration version exists.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', False):
             exploration = self.save_new_valid_exploration(
                 self.EXP_ID, self.owner_id)

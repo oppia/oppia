@@ -474,7 +474,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_summaries_of_hard_deleted_explorations(self):
         """Test that summaries of hard deleted explorations are
-        correctly deleted."""
+        correctly deleted.
+        """
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         exp_services.delete_exploration(
@@ -851,6 +852,7 @@ title: Title
 # pylint: disable=protected-access
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
+
     SAMPLE_YAML_CONTENT = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -3097,7 +3099,8 @@ class GetExplorationAndExplorationRightsTest(ExplorationServicesUnitTests):
 
 class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
     """Tests for functions associated with creating and updating state id
-    mapping."""
+    mapping.
+    """
 
     EXP_ID = 'eid'
 
@@ -3178,7 +3181,8 @@ class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_mapping_is_correct_when_exploration_is_reverted(self):
         """Test that state id mapping is correct when exploration is reverted
-        to old version."""
+        to old version.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exploration = self.save_new_valid_exploration(
                 self.EXP_ID, self.owner_id)
