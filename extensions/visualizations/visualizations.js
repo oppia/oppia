@@ -73,7 +73,7 @@ oppia.directive('oppiaVisualizationFrequencyTable', [
         function($scope, $attrs, HtmlEscaperService) {
           $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
           $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
-          $scope.showAddressedInfo = $attrs.showAddressedInfo;
+          $scope.addressedColumnIsShown = $attrs.addressedColumnIsShown;
         }
       ]
     };
@@ -92,7 +92,7 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [
         function($scope, $attrs, HtmlEscaperService) {
           $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
           $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
-          $scope.showAddressedInfo = $attrs.showAddressedInfo;
+          $scope.addressedColumnIsShown = $attrs.addressedColumnIsShown;
 
           $scope.answerVisible = $scope.data.map(function(_, i) {
             // First element is shown while all others are hidden by default.
