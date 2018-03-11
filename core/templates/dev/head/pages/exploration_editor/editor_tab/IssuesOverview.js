@@ -22,6 +22,8 @@ oppia.controller('IssuesOverview', [
   function(
       $scope, EditorStateService, ExplorationStatesService,
       StateStatsService) {
+    var MAXIMUM_UNRESOLVED_ANSWERS = 5;
+
     $scope.unresolvedAnswersData = [];
 
     $scope.computeUnresolvedAnswers = function() {
@@ -46,7 +48,8 @@ oppia.controller('IssuesOverview', [
           });
 
           // Only keep 5 unresolved answers.
-          $scope.unresolvedAnswersData = unresolvedAnswersData.slice(0, 5);
+          $scope.unresolvedAnswersData =
+            unresolvedAnswersData.slice(0, MAXIMUM_UNRESOLVED_ANSWERS);
         });
       } else {
         $scope.unresolvedAnswersData = [];
