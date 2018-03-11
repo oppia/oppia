@@ -23,6 +23,7 @@ oppia.controller('IssuesOverview', [
       $scope, EditorStateService, ExplorationStatesService,
       StateStatsService) {
     var MAXIMUM_UNRESOLVED_ANSWERS = 5;
+    var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
     $scope.unresolvedAnswersData = [];
 
@@ -40,7 +41,8 @@ oppia.controller('IssuesOverview', [
             if (vizInfo.show_addressed_info) {
               var unresolvedVizInfoData =
                 vizInfo.data.filter(function(vizInfoDatum) {
-                  return !vizInfoDatum.is_addressed;
+                  return !vizInfoDatum.is_addressed && vizInfoDatum.frequency >=
+                    MINIMUM_UNRESOLVED_ANSWER_FREQUENCY;
                 });
               unresolvedAnswersData =
                 unresolvedAnswersData.concat(unresolvedVizInfoData);
