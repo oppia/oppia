@@ -134,7 +134,8 @@ def _create_default_topic_similarities():
     DEFAULT_TOPIC_SIMILARITY if the keys are different and
     SAME_TOPIC_SIMILARITY if the keys are the same.
 
-    Returns the newly created TopicSimilaritiesModel."""
+    Returns the newly created TopicSimilaritiesModel.
+    """
 
     topic_similarities_dict = {
         topic: {} for topic in RECOMMENDATION_CATEGORIES

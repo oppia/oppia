@@ -67,13 +67,15 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
 
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
-        editable."""
+        editable.
+        """
         self.assertIn(self.CAN_EDIT_STR, response_body)
         self.assertNotIn(self.CANNOT_EDIT_STR, response_body)
 
     def assert_cannot_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
-        not editable."""
+        not editable.
+        """
         self.assertIn(self.CANNOT_EDIT_STR, response_body)
         self.assertNotIn(self.CAN_EDIT_STR, response_body)
 

@@ -3112,7 +3112,8 @@ class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_correct_state_id_mapping_model_is_stored(self):
         """Test that correct mapping model is stored for new and edited
-        exploration."""
+        exploration.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exploration = self.save_new_valid_exploration(
                 self.EXP_ID, self.owner_id)

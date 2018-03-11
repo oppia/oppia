@@ -160,7 +160,7 @@ REQUIRED_STRINGS_FECONF = {
     }
 }
 
-PUNCTUATIONS = ['.', '?']
+ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?']
 
 EXCLUDED_PHRASES = ['utf', 'pylint:', 'http://', 'https://', 'scripts/']
 
@@ -732,9 +732,7 @@ def _check_comments(all_files):
         f = open(filename, 'r')
         file_content = f.readlines()
         file_length = len(file_content)
-        line_num = 0
         for line_num in range(file_length):
-
             line = file_content[line_num].lstrip().rstrip()
             next_line = ""
             if line_num + 1 < file_length:
@@ -742,7 +740,7 @@ def _check_comments(all_files):
 
             if line.startswith('#') and not next_line.startswith('#'):
                 if (
-                    line[-1] not in PUNCTUATIONS
+                    line[-1] not in ALLOWED_TERMINATING_PUNCTUATIONS
                     and not any (word in line
                     for word in EXCLUDED_PHRASES)):
                     failed = True
@@ -782,35 +780,39 @@ def _check_docstrings(all_files):
         f = open(filename, 'r')
         file_content = f.readlines()
         file_length = len(file_content)
-        line_num = 0
-        while line_num < file_length:
+        for line_num in range(file_length):
             line = file_content[line_num].lstrip().rstrip()
 
             # Check for single line docstring.
             # Punctuation will be at line[-4] since last three characters would
             # be """.
             if line.startswith('"""') and line.endswith('"""'):
-                if len(line) > 6 and line[-4] not in PUNCTUATIONS:
+                if (
+                    len(line) > 6 and
+                    line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
                     failed = True
                     print '%s --> Line %s: %s' % (
                 filename, line_num + 1, message)
 
             # Check for multiline docstring.
-            elif line.startswith('"""') and line[3].isupper():
-                line =  file_content[line_num + 1].lstrip().rstrip()
-                while line_num + 1 < file_length and not line == '"""':
-                    line_num += 1
-                    line = file_content[line_num].lstrip().rstrip()
-                line = file_content[line_num - 1].lstrip().rstrip()
-                if (
-                    len(line) and line[-1] not in PUNCTUATIONS
-                    and not any (word in line
-                    for word in EXCLUDED_PHRASES)):
+            elif line.endswith('"""'):
+                # Case1: line is """. This is correct for multiline docstring.
+                if line == '"""':
+                    line = file_content[line_num - 1].lstrip().rstrip()
+                    if (
+                        line[-1] not in ALLOWED_TERMINATING_PUNCTUATIONS
+                        and not any (word in line
+                        for word in EXCLUDED_PHRASES)):
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                    filename, line_num , message)
+
+                # Case2. line contains some words before """. """ should shift to
+                # next line.
+                else:
                     failed = True
                     print '%s --> Line %s: %s' % (
-                filename, line_num , message)
-
-            line_num += 1
+                filename, line_num + 1, 'Multiline docstring should end in a new line.')
 
     print ''
     print '----------------------------------------'
