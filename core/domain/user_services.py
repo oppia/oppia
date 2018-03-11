@@ -51,7 +51,7 @@ class UserSettings(object):
     """Value object representing a user's settings.
 
     Attributes:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         email: str. The user email.
         role: str. Role of the user. This is used in conjunction with
             PARENT_ROLES to determine which actions the user can perform.
@@ -92,7 +92,7 @@ class UserSettings(object):
         """Constructs a UserSettings domain object.
 
         Args:
-            user_id: str. The user id.
+            user_id: str. The unique ID of the user.
             email: str. The user email.
             role: str. Role of the user. This is used in conjunction with
                 PARENT_ROLES to determine which actions the user can perform.
@@ -295,7 +295,7 @@ def get_email_from_user_id(user_id):
     """Gets the email from a given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
 
     Returns:
         str. user_email corresponding to the given user_id.
@@ -418,7 +418,7 @@ def generate_initial_profile_picture(user_id):
     updates the user's settings in the datastore.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
     """
     user_email = get_email_from_user_id(user_id)
     user_gravatar = fetch_gravatar(user_email)
@@ -498,7 +498,7 @@ def get_user_settings(user_id, strict=False):
     """Return the user settings for a single user.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         strict: bool. Whether to fail noisily if no user with the given
             id exists in the datastore. Defaults to False.
 
@@ -522,7 +522,7 @@ def get_user_role_from_id(user_id):
     """Returns role of the user with given user_id.
 
     Args:
-        user_id: str. The User id.
+        user_id: str. The unique ID of the user.
 
     Returns:
         str. Role of the user with given id.
@@ -560,6 +560,13 @@ def get_user_ids_by_role(role):
 
 
 class UserActionsInfo(object):
+    """A class representing information of user actions.
+
+    Attributes:
+        user_id: str. The unique ID of the user.
+        role: str. The role ID of the user.
+        actions: list(str). A list of actions accessible to the role.
+    """
 
     def __init__(self, user_id=None):
         self._user_id = user_id
@@ -568,19 +575,38 @@ class UserActionsInfo(object):
 
     @property
     def user_id(self):
+        """Returns the unique ID of the user.
+
+        Returns:
+            user_id: str. The unique ID of the user.
+        """
         return self._user_id
 
     @property
     def role(self):
+        """Returns the role ID of user.
+
+        Returns:
+            role: str. The role ID of the user.
+        """
         return self._role
 
     @property
     def actions(self):
+        """Returns list of actions accessible to a user.
+
+        Returns:
+            actions: list(str). List of actions accessible to a user ID.
+        """
         return self._actions
 
 
 def get_system_user():
-    """Returns user object with system committer user id."""
+    """Returns user object with system committer user id.
+
+    Returns:
+        system_user: user object with system committer user id.
+    """
     system_user = UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
     return system_user
 
@@ -621,10 +647,10 @@ def _save_user_settings(user_settings):
 
 
 def is_user_registered(user_id):
-    """Checks if a user is registered with given user_id.
+    """Checks if a user is registered with the given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
 
     Returns:
         bool. Whether a user with the given user_id is registered.
@@ -639,7 +665,7 @@ def has_ever_registered(user_id):
     """Checks if a user has ever been registered with given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
 
     Returns:
         bool. Whether a user with the given user_id has ever been registered.
@@ -652,7 +678,7 @@ def has_fully_registered(user_id):
     """Checks if a user has fully registered.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
 
     Returns:
         bool. Whether a user with the given user_id has fully registered.
@@ -670,7 +696,7 @@ def create_new_user(user_id, email):
     """Creates a new user.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         email: str. The user email.
 
     Returns:
@@ -695,7 +721,7 @@ def get_username(user_id):
     """Gets username corresponding to the given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
 
     Returns:
         str. Username corresponding to the given user_id.
@@ -742,7 +768,7 @@ def set_username(user_id, new_username):
     """Updates the username of the user with the given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         new_username: str. The new username to set.
 
     Raises:
@@ -763,7 +789,7 @@ def record_agreement_to_terms(user_id):
     """Records that the user with given user_id has agreed to the license terms.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_agreed_to_terms = datetime.datetime.utcnow()
@@ -774,7 +800,7 @@ def update_profile_picture_data_url(user_id, profile_picture_data_url):
     """Updates profile_picture_data_url of user with given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         profile_picture_data_url: str. New profile picture url to be set.
     """
     user_settings = get_user_settings(user_id, strict=True)
@@ -786,7 +812,7 @@ def update_user_bio(user_id, user_bio):
     """Updates user_bio of user with given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         user_bio: str. New user biography to be set.
     """
     user_settings = get_user_settings(user_id, strict=True)
@@ -798,7 +824,7 @@ def update_user_default_dashboard(user_id, default_dashboard):
     """Updates the default dashboard of user with given user id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         default_dashboard: str. The dashboard the user wants.
     """
     user_settings = get_user_settings(user_id, strict=True)
@@ -811,7 +837,7 @@ def update_user_creator_dashboard_display(
     """Updates the creator dashboard preference of user with given user id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         creator_dashboard_display_pref: str. The creator dashboard preference
             the user wants.
     """
@@ -825,7 +851,7 @@ def update_subject_interests(user_id, subject_interests):
     """Updates subject_interests of user with given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         subject_interests: list(str). New subject interests to be set.
     """
     if not isinstance(subject_interests, list):
@@ -856,7 +882,7 @@ def _update_first_contribution_msec(user_id, first_contribution_msec):
     """Updates first_contribution_msec of user with given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         first_contribution_msec: float. New time to set in milliseconds
             representing user's first contribution to Oppia.
     """
@@ -870,7 +896,7 @@ def update_first_contribution_msec_if_not_set(user_id, first_contribution_msec):
     if it is set to None.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         first_contribution_msec: float. New time to set in milliseconds
             representing user's first contribution to Oppia.
     """
@@ -884,7 +910,7 @@ def update_preferred_language_codes(user_id, preferred_language_codes):
     """Updates preferred_language_codes of user with given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         preferred_language_codes: list(str). New exploration language
             preferences to set.
     """
@@ -897,7 +923,7 @@ def update_preferred_site_language_code(user_id, preferred_site_language_code):
     """Updates preferred_site_language_code of user with given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         preferred_site_language_code: str. New system language preference
             to set.
     """
@@ -912,7 +938,7 @@ def update_preferred_audio_language_code(
     """Updates preferred_audio_language_code of user with given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         preferred_audio_language_code: str. New audio language preference
             to set.
     """
@@ -926,7 +952,7 @@ def update_user_role(user_id, role):
     """Updates the role of the user with given user_id.
 
     Args:
-        user_id: str. Id of user whose role is to be updated.
+        user_id: str. The unique ID of the user whose role is to be updated.
         role: str. The role to be assigned to user with given id.
 
     Raises:
@@ -979,7 +1005,7 @@ def record_user_started_state_editor_tutorial(user_id):
     for the user with given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_started_state_editor_tutorial = (
@@ -992,7 +1018,7 @@ def record_user_logged_in(user_id):
     given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
     """
 
     user_settings = get_user_settings(user_id, strict=True)
@@ -1005,7 +1031,7 @@ def record_user_edited_an_exploration(user_id):
     the user with given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
     """
     user_settings = get_user_settings(user_id)
     if user_settings:
@@ -1018,7 +1044,7 @@ def record_user_created_an_exploration(user_id):
     the user with given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
     """
     user_settings = get_user_settings(user_id)
     if user_settings:
@@ -1035,7 +1061,7 @@ def update_email_preferences(
     be created.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         can_receive_email_updates: bool. Whether the given user can receive
             email updates.
         can_receive_editor_role_email: bool. Whether the given user can receive
@@ -1065,7 +1091,7 @@ def get_email_preferences(user_id):
     """Gives email preferences of user with given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
 
     Returns:
         UserGlobalPrefs. Representing whether the user has chosen to receive
@@ -1122,7 +1148,7 @@ def set_email_preferences_for_exploration(
     a new one will be created.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         exploration_id: str. The exploration id.
         mute_feedback_notifications: bool. Whether the given user has muted
             feedback emails. Defaults to None.
@@ -1148,7 +1174,7 @@ def get_email_preferences_for_exploration(user_id, exploration_id):
     with given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         exploration_id: str. The exploration id.
 
     Returns:
@@ -1171,7 +1197,7 @@ def get_users_email_preferences_for_exploration(user_ids, exploration_id):
     with given user_id.
 
     Args:
-        user_id: list. A list of user IDs for whom we want to get email
+        user_ids: list. A list of user IDs for whom we want to get email
             preferences.
         exploration_id: str. The exploration id.
 
@@ -1200,7 +1226,7 @@ class UserContributions(object):
     """Value object representing a user's contributions.
 
     Attributes:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         created_exploration_ids: list(str). IDs of explorations that this
             user has created.
         edited_exploration_ids: list(str). IDs of explorations that this
@@ -1212,7 +1238,7 @@ class UserContributions(object):
         """Constructs a UserContributions domain object.
 
         Args:
-            user_id: str. The user id.
+            user_id: str. The unique ID of the user.
             created_exploration_ids: list(str). IDs of explorations that this
                 user has created.
             edited_exploration_ids: list(str). IDs of explorations that this
@@ -1269,7 +1295,7 @@ def get_user_contributions(user_id, strict=False):
     """Gets domain object representing the contributions for the given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         strict: bool. Whether to fail noisily if no user with the given
             id exists in the datastore. Defaults to False.
 
@@ -1293,7 +1319,7 @@ def create_user_contributions(
     """Creates a new UserContributionsModel and returns the domain object.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         created_exploration_ids: list(str). IDs of explorations that this
             user has created.
         edited_exploration_ids: list(str). IDs of explorations that this
@@ -1324,7 +1350,7 @@ def update_user_contributions(user_id, created_exploration_ids,
     contributions.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         created_exploration_ids: list(str). IDs of explorations that this
             user has created.
         edited_exploration_ids: list(str). IDs of explorations that this
@@ -1350,7 +1376,7 @@ def add_created_exploration_id(user_id, exploration_id):
     of created explorations.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         exploration_id: str. The exploration id.
     """
     user_contributions = get_user_contributions(user_id, strict=False)
@@ -1368,7 +1394,7 @@ def add_edited_exploration_id(user_id, exploration_id):
     of edited explorations.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
         exploration_id: str. The exploration id.
     """
     user_contributions = get_user_contributions(user_id, strict=False)
@@ -1448,7 +1474,7 @@ def get_user_impact_score(user_id):
     """Gets the user impact score for the given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
 
     Returns:
         float. The user impact score associated with the given user_id.
@@ -1466,7 +1492,7 @@ def get_weekly_dashboard_stats(user_id):
     """Gets weekly dashboard stats for a given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
 
     Returns:
         list(dict): The weekly dashboard stats for the given user. Each dict in
@@ -1508,7 +1534,7 @@ def get_last_week_dashboard_stats(user_id):
     """Gets last week's dashboard stats for a given user_id.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
 
     Returns:
         list(dict): The weekly dashboard stats for the given user. Each dict
@@ -1527,7 +1553,7 @@ def update_dashboard_stats_log(user_id):
     keyed by a datetime string.
 
     Args:
-        user_id: str. The user id.
+        user_id: str. The unique ID of the user.
     """
     model = user_models.UserStatsModel.get_or_create(user_id)
 
@@ -1546,6 +1572,14 @@ def update_dashboard_stats_log(user_id):
 
 
 def is_at_least_moderator(user_id):
+    """Checks if a user with given user_id is at least a moderator.
+
+    Args:
+        user_id: str. The unique ID of the user.
+
+    Returns:
+        bool. True if user is atleast a moderator, False otherwise.
+    """
     user_role = get_user_role_from_id(user_id)
     if (user_role == feconf.ROLE_ID_MODERATOR or
             user_role == feconf.ROLE_ID_ADMIN):
@@ -1554,6 +1588,14 @@ def is_at_least_moderator(user_id):
 
 
 def is_admin(user_id):
+    """Checks if a user with given user_id is an admin.
+
+    Args:
+        user_id: str. The unique ID of the user.
+
+    Returns:
+        bool. True if user is an admin, False otherwise.
+    """
     user_role = get_user_role_from_id(user_id)
     if user_role == feconf.ROLE_ID_ADMIN:
         return True
