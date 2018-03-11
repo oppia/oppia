@@ -739,6 +739,7 @@ def _check_comments(all_files):
                 next_line = file_content[line_num + 1].lstrip().rstrip()
 
             if line.startswith('#') and not next_line.startswith('#'):
+                # Check for '.' or '?' at end of comment.
                 if (
                     line[-1] not in ALLOWED_TERMINATING_PUNCTUATIONS
                     and not any (word in line
@@ -784,9 +785,9 @@ def _check_docstrings(all_files):
             line = file_content[line_num].lstrip().rstrip()
 
             # Check for single line docstring.
-            # Punctuation will be at line[-4] since last three characters would
-            # be """.
             if line.startswith('"""') and line.endswith('"""'):
+                # Check for '.' or '?' at line[-4] since last three characters
+                # would be """.
                 if (
                     len(line) > 6 and
                     line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
@@ -796,9 +797,10 @@ def _check_docstrings(all_files):
 
             # Check for multiline docstring.
             elif line.endswith('"""'):
-                # Case1: line is """. This is correct for multiline docstring.
+                # Case 1: line is """. This is correct for multiline docstring.
                 if line == '"""':
                     line = file_content[line_num - 1].lstrip().rstrip()
+                    # Check for '.' or '?' at end of docstring.
                     if (
                         line[-1] not in ALLOWED_TERMINATING_PUNCTUATIONS
                         and not any (word in line
@@ -807,7 +809,7 @@ def _check_docstrings(all_files):
                         print '%s --> Line %s: %s' % (
                     filename, line_num , message)
 
-                # Case2. line contains some words before """. """ should shift to
+                # Case 2: line contains some words before """. """ should shift to
                 # next line.
                 else:
                     failed = True
