@@ -37,13 +37,15 @@ oppia.controller('IssuesOverview', [
         StateStatsService.computeStateStats(state).then(function(stateStats) {
           var unresolvedAnswersData = [];
 
-          for (vizInfo of stateStats.visualizations_info) {
+          for (var i = 0; i !== stateStats.visualizations_info.length; ++i) {
+            var vizInfo = stateStats.visualizations_info[i];
             if (!vizInfo.show_addressed_info) {
               // Skip visualizations which don't support addressed information.
               continue;
             }
 
-            for (datum of vizInfo.data) {
+            for (var j = 0; j !== vizInfo.data.length; ++j) {
+              var datum = vizInfo.data[j];
               if (datum.is_addressed ||
                   datum.frequency < MINIMUM_UNRESOLVED_ANSWER_FREQUENCY) {
                 continue;
