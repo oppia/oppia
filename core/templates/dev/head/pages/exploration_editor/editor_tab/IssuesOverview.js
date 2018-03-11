@@ -56,9 +56,8 @@ oppia.controller('IssuesOverview', [
                 break;
               }
             }
-            if (unresolvedAnswersData.length === MAXIMUM_UNRESOLVED_ANSWERS) {
-              break;
-            }
+            // Only take the first visualization with addressable answer data.
+            break;
           }
 
           // Only keep 5 unresolved answers.
