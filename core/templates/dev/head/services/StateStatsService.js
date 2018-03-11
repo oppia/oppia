@@ -18,19 +18,25 @@
 
 oppia.factory('StateStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'ExplorationContextService',
+  'ExplorationContextService', 'UrlInterpolationService',
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
-      ExplorationContextService) {
+      ExplorationContextService, UrlInterpolationService) {
+    var STATE_RULES_STATS_URL_TEMPLATE =
+      '/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>';
+
     return {
       // Returns a promise which will provide details of a particular state's
       // answer-statistics and rules.
       computeStateStats: function(state) {
         var explorationId = ExplorationContextService.getExplorationId();
-        return $http.get(
-          '/createhandler/state_rules_stats/' + explorationId + '/' +
-          encodeURIComponent(state.name)
-        ).then(function(response) {
+        var stateRulesStatsUrl = UrlInterpolationService.interpolateUrl(
+          STATE_RULES_STATS_URL_TEMPLATE, {
+            exploration_id: explorationId,
+            escaped_state_name: encodeURIComponent(state.name)
+          }
+        );
+        return $http.get(stateRulesStatsUrl).then(function(response) {
           var rulesService = $injector.get(
             AngularNameService.getNameOfInteractionRulesService(
               state.interaction.id));
