@@ -661,8 +661,15 @@
                   <span style="margin-left: 7px; font-size: 105%;"><[explorationTitle]></span>
                 </td>
               </tr>
-
-              <tr ng-repeat="message in messageSummaries" style="padding: 13px 8px 7px 8px;">
+              <tr ng-if="loadingFeedbacks">
+                <td style="text-align: center;">
+                  <span>
+                    Loading
+                    <loading-dots></loading-dots>
+                  </span>
+                </td>
+              </tr>
+              <tr ng-if="!loadingFeedbacks" ng-repeat="message in messageSummaries" style="padding: 13px 8px 7px 8px;">
                 <td>
                   <div class="row">
                     <div class="col-sm-9">
@@ -766,6 +773,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/feedback_thread/FeedbackThreadSummaryObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/feedback_message/FeedbackMessageSummaryObjectFactory.js"></script>
