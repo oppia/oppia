@@ -2164,11 +2164,8 @@ pre.oppia-pre-wrapped-text {
 
 /* These rules must be kept in sync with corresponding rules in
    pages/exploration_player/conversation_skin_directive.html
-   (those with '.conversation-skin-tutor-card-top-content > p,
-   .conversation-skin-oppia-feedback-content > p,
-   .conversation-skin-learner-answer-content > p,
-   .conversation-skin-help-card-content > p' selectors specifying
-    the same line-height, margin-top and margin-bottom attributes)
+   (those with '.rte-viewer > p' selectors specifying the same
+   line-height, margin-top and margin-bottom attributes)
 */
 .oppia-rte-editor > p,
 .oppia-rte-content > div > p {
