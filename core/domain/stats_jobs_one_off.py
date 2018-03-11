@@ -265,6 +265,42 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def require_non_negative(
             cls, exp_id, exp_version, property_name, value, state_name=None):
+        """Ensures that all the statistical data is non-negative.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: str. Version of the exploration.
+            property_name: str. The name used as the property's key in the
+                value dict.
+            value: dict. Its structure is as follows:
+                {
+                    'num_starts_v1': int. # of times exploration was
+                        started.
+                    'num_completions_v1': int. # of times exploration was
+                        completed.
+                    'num_actual_starts_v1': int. # of times exploration was
+                        actually started.
+                    'state_stats_mapping': A dict containing the values of
+                        stats for the states of the exploration. It is
+                        formatted as follows:
+                        {
+                            state_name: {
+                                'total_answers_count_v1',
+                                'useful_feedback_count_v1',
+                                'total_hit_count_v1',
+                                'first_hit_count_v1',
+                                'num_completions_v1'
+                            }
+                        }
+                }
+            state_name: str|None. The name of the state whose statistics should
+                be checked.
+
+        Yield:
+            str. "Negative count: exp_id:? version:? state:? ?:?",
+                where ? is the placeholder for exp_id, exp_version,
+                property_name, state_name and value.
+        """
         state_name = state_name if state_name else ''
         if value[property_name] < 0:
             yield (
@@ -451,14 +487,14 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                 (_STATE_COUNTER_ERROR_KEY, error message).
             tuple. For ExplorationAnnotationModel, a 2-tuple in the form
                 ('exploration_id', value).
-                'exploration_id': str. the id of the exploration.
-                'value': a dict, whose structure is as follows:
+                'exploration_id': str. The id of the exploration.
+                'value': dict. Its structure is as follows:
                     {
-                        'version': str. version of the exploration.
+                        'version': str. Version of the exploration.
                         'starts': int. # of times exploration was started.
                         'completions': int. # of times exploration was
                             completed.
-                        'state_hit': a dict containing the hit counts for the
+                        'state_hit': dict. It contains the hit counts for the
                             states in the exploration. It is formatted as
                             follows:
                             {
@@ -500,11 +536,11 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                 associated with the given key. An element of stringified_values
                 would be of the form:
                     {
-                        'version': str. version of the exploration.
+                        'version': str. Version of the exploration.
                         'starts': int. # of times exploration was started.
                         'completions': int. # of times exploration was
                             completed.
-                        'state_hit': dict. a dict containing the hit counts
+                        'state_hit': dict. A dict containing the hit counts
                             for the states in the exploration. It is formatted
                             as follows:
                             {
