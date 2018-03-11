@@ -270,7 +270,8 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
         Args:
             exp_id: str. ID of the exploration.
             exp_version: str. Version of the exploration.
-            property_name: str. Name of the property is the key in dict value.
+            property_name: str. The name used as the property's key in the
+                value dict.
             value: dict. Its structure is as follows:
                 {
                     'num_starts_v1': int. # of times exploration was
@@ -292,11 +293,11 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
                             }
                         }
                 }
-            state_name: str|None. Name of the state is the key in dict
-                state_stats_mapping, which in turn is the key of dict value.
+            state_name: str|None. The name of the state whose statistics should
+                be checked.
 
         Yield:
-            str. Negative count: exp_id:? version:? state:? ?:?,
+            str. "Negative count: exp_id:? version:? state:? ?:?",
                 where ? is the placeholder for exp_id, exp_version,
                 property_name, state_name and value.
         """
