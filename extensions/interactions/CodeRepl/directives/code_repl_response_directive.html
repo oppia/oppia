@@ -7,9 +7,9 @@
     <pre><[answer.output]></pre>
   </span>
 
-  <span ng-if="answer.error" focus-on="<[errorFocusLabel]>">
+  <focus-on ng-if="answer.error" focus-name="<[errorFocusLabel]>">
     <font color=red>Error: <[answer.error]></font><br>
-  </span>
+  </focus-on>
 
   <span ng-if="answer.evaluation">
     &gt;&gt; <[answer.evaluation]>

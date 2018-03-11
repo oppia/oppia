@@ -7,6 +7,13 @@
     "angular"
   ],
   "rules": {
+    "angular/directive-restrict": [
+      "error",
+      {
+        "restrict": "E",
+        "explicit": "always"
+      }
+    ],
     "brace-style":[
       "error",
       "1tbs"
