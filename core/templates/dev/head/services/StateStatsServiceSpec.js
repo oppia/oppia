@@ -54,29 +54,22 @@ describe('State Stats Service', function() {
         name: 'Hola',
         interaction: {
           answerGroups: [
-            {rules: [{type: "Equals", inputs: {x: "hola!"}}]},
-            {rules: [{type: "Contains", inputs: {x: "hola"}}]},
-            {rules: [{type: "FuzzyEquals", inputs: {x: "hola"}}]}
+            {rules: [{type: 'Equals', inputs: {x: 'hola!'}}]},
+            {rules: [{type: 'Contains', inputs: {x: 'hola'}}]},
+            {rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}]}
           ],
-          defaultOutcome: {dest: "Hola"},
-          id: "TextInput"
+          defaultOutcome: {dest: 'Hola'},
+          id: 'TextInput'
         }
       };
       HOLA_STATE_RULES_STATS_RESPONSE = {
         visualizations_info: [{
           data: [
-            {answer: "Ni Hao", frequency: 2},
-            {answer: "Aloha", frequency: 1}
+            {answer: 'Ni Hao', frequency: 2},
+            {answer: 'Aloha', frequency: 1}
           ],
-          id: "FrequencyTable",
+          id: 'FrequencyTable',
           addressed_info_is_supported: true,
-          options: {
-            title: "Top answers",
-            column_headers: [
-              "Answer",
-              "Count"
-            ]
-          }
         }]
       };
     });
@@ -97,8 +90,8 @@ describe('State Stats Service', function() {
         jasmine.objectContaining({
           visualizations_info: [jasmine.objectContaining({
             data: [
-              {answer: "Ni Hao", frequency: 2, is_addressed: false},
-              {answer: "Aloha", frequency: 1, is_addressed: false}
+              {answer: 'Ni Hao', frequency: 2, is_addressed: false},
+              {answer: 'Aloha', frequency: 1, is_addressed: false}
             ],
           })]
         })
