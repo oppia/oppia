@@ -1,28 +1,24 @@
 <style>
-  div.refreshContainer a {
-    margin-right: 8px;
-    font-weight: bold;
-  }
-  div.refreshContainer em {
-    color: rgba(0,0,0,0.38);
+  div.refreshContainer {
     font-size: 0.8em;
+    text-align: right;
   }
-  div.refreshContainer hr {
-    margin: 8px 0;
+  div.refreshContainer a {
+    font-weight: bold;
   }
 </style>
 
 <div>
   <strong>Unresolved Student Answers</strong>
-  <ul>
+  <ul ng-show="unresolvedAnswersData !== null">
     <li ng-repeat="data in unresolvedAnswersData">
-      <[data.answer]> (submitted <[data.frequency]> times)
+      <strong>By <[data.frequency]> students:</strong> <span><[data.answer]></span>
     </li>
     <li ng-if="unresolvedAnswersData === null || unresolvedAnswersData.length === 0">
-      <em>There are no outstanding answers requiring attention.</em>
+      <em>No answers require attention.</em>
     </li>
   </ul>
-  <div ng-show="unresolvedAnswersData !== null" class='refreshContainer'>
-    <a ng-click="computeUnresolvedAnswers()">Refresh</a> <em class="latestRefreshMsg">Latest refresh: <[latestRefreshDate.toLocaleString()]>.</em>
+  <div ng-show="unresolvedAnswersData !== null" class="refreshContainer">
+    <a ng-click="computeUnresolvedAnswers()">Refresh</a>; last updated: <[latestRefreshDate.toLocaleString()]>.
   </div>
 </div>
