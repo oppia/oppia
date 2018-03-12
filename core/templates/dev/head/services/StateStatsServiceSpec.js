@@ -24,13 +24,13 @@ describe('State Stats Service', function() {
     StateStatsService = $injector.get('StateStatsService');
   }));
 
-  describe('Identifying Interactions Eligible for Issues Overview', function() {
-    it('should support TextInput interactions', function() {
+  it('should claim text-input interaction states support issues overview',
+    function() {
       expect(
         StateStatsService.stateSupportsIssuesOverview({
           interaction: {id: 'TextInput'}
         })
       ).toBe(true);
     });
-  });
+
 });
