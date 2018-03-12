@@ -26,13 +26,13 @@ oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier');
 oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome');
 
 oppia.factory('AnswerClassificationService', [
-  '$http', 'LearnerParamsService', 'AlertsService',
+  'LearnerParamsService', 'AlertsService',
   'AnswerClassificationResultObjectFactory',
   'PredictionAlgorithmRegistryService', 'StateClassifierMappingService',
   'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION', 'STATISTICAL_CLASSIFICATION',
   'RULE_TYPE_CLASSIFIER',
-  function($http, LearnerParamsService, AlertsService,
+  function(LearnerParamsService, AlertsService,
       AnswerClassificationResultObjectFactory,
       PredictionAlgorithmRegistryService, StateClassifierMappingService,
       INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
