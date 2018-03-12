@@ -347,23 +347,40 @@ oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
 
 // Note that this filter removes additional new lines or <p><br></p> tags
 // at the end of the string.
-oppia.filter('removeExtraLines', [function() {
+oppia.filter('removeExtraLinesAndSpaces', [function() {
   return function(string) {
     if (!angular.isString(string)) {
       return string;
     }
-    var BLANK_LINES_TEXT = '<p><br></p>';
-    var EMPTY_PARA_TEXT = '<p></p>';
-    while (1) {
-      var endIndex = string.length;
-      var bStr = string.substring(endIndex - BLANK_LINES_TEXT.length, endIndex);
-      var pStr = string.substring(endIndex - EMPTY_PARA_TEXT.length, endIndex);
-      if (bStr === BLANK_LINES_TEXT) {
-        string = string.substring(0, endIndex - BLANK_LINES_TEXT.length);
-      } else if (pStr === EMPTY_PARA_TEXT) {
-        string = string.substring(0, endIndex - EMPTY_PARA_TEXT.length);
-      } else {
-        break;
+    var PARA_START = '<p>';
+    var PARA_CLOSE = '</p>';
+    var SPACE_CHAR = ' ';
+    var SPACE_ENTITY = '&nbsp;';
+    var NEW_LINE = '<br>';
+    // To check if it wrapped around <p> and doesn't hinder with
+    // conversion between HTML and RTE.
+    if (string[0] === '<' && string[1] === 'p' && string[2] === '>') {
+      string = string.replace(/<p>/gi, '');
+      string = string.replace(/<\/p>/gi, '');
+      for (var i = string.length; i > 0;) {
+        if (string.substring(
+          i - SPACE_CHAR.length, string.length) === SPACE_CHAR) {
+          string = string.substring(0, i - SPACE_CHAR.length);
+          i = i - SPACE_CHAR.length;
+        } else if (string.substring(
+          i - SPACE_ENTITY.length, string.length) === SPACE_ENTITY) {
+          string = string.substring(0, i - SPACE_ENTITY.length);
+          i = i - SPACE_ENTITY.length;
+        } else if (string.substring(
+          i - NEW_LINE.length, string.length) === NEW_LINE) {
+          string = string.substring(0, i - NEW_LINE.length);
+          i = i - NEW_LINE.length;
+        } else {
+          break;
+        }
+      }
+      if (string !== '') {
+        string = PARA_START + string + PARA_CLOSE;
       }
     }
     return string;
