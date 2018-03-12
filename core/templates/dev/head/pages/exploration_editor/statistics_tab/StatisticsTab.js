@@ -120,7 +120,7 @@ oppia.controller('StatisticsTab', [
       AlertsService.clearWarnings();
 
       StateStatsService.computeStateStats(
-        $sope.stateStats[stateName]
+        $scope.stateStats[stateName]
       ).then(function(stateStats) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
