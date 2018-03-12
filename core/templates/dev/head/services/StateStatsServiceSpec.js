@@ -45,12 +45,10 @@ describe('State Stats Service', function() {
       $httpBackend.verifyNoOutstandingRequest();
     });
 
-    var EXPLORATION_ID = '0';
-    var HOLA_STATE = null;
-    var HOLA_STATE_RULES_STATS_RESPONSE = null;
-
-    beforeEach(function() {
-      HOLA_STATE = {
+    it('should work for TextInput', function() {
+      var EXPLORATION_ID = '0';
+      var HOLA_STATE = {
+        // Only including properties required for stat computation.
         name: 'Hola',
         interaction: {
           answerGroups: [
@@ -62,24 +60,24 @@ describe('State Stats Service', function() {
           id: 'TextInput'
         }
       };
-      HOLA_STATE_RULES_STATS_RESPONSE = {
+      var HOLA_STATE_RULES_STATS_RESPONSE = {
+        // Only including properties required for stat computation.
         visualizations_info: [{
           data: [
-            {answer: 'Ni Hao', frequency: 2},
-            {answer: 'Aloha', frequency: 1}
+            {answer: 'Ni Hao', frequency: 5},
+            {answer: 'Aloha', frequency: 3},
+            {answer: 'Hola!', frequency: 1},
           ],
           id: 'FrequencyTable',
           addressed_info_is_supported: true,
         }]
       };
-    });
 
-    it('should work for TextInput', function() {
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
-      $httpBackend.expectGET('/createhandler/state_rules_stats/0/Hola').respond(
-        HOLA_STATE_RULES_STATS_RESPONSE
-      );
+      $httpBackend.expectGET(
+        '/createhandler/state_rules_stats/0/Hola'
+      ).respond(HOLA_STATE_RULES_STATS_RESPONSE);
 
       StateStatsService.computeStateStats(
         HOLA_STATE, EXPLORATION_ID
@@ -90,8 +88,9 @@ describe('State Stats Service', function() {
         jasmine.objectContaining({
           visualizations_info: [jasmine.objectContaining({
             data: [
-              {answer: 'Ni Hao', frequency: 2, is_addressed: false},
-              {answer: 'Aloha', frequency: 1, is_addressed: false}
+              {answer: 'Ni Hao', frequency: 5, is_addressed: false},
+              {answer: 'Aloha', frequency: 3, is_addressed: false}
+              {answer: 'Hola!', frequency: 1, is_addressed: true}
             ],
           })]
         })
