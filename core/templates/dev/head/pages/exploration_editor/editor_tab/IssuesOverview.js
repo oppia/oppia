@@ -32,36 +32,38 @@ oppia.controller('IssuesOverview', [
         EditorStateService.getActiveStateName());
 
       $scope.unresolvedAnswersData = [];
-      StateStatsService.computeStateStats(state).then(function(stateStats) {
-        var calculatedUnresolvedAnswersData = [];
+      if (StateStatsService.stateSupportsIssuesOverview(state)) {
+        StateStatsService.computeStateStats(state).then(function(stateStats) {
+          var calculatedUnresolvedAnswersData = [];
 
-        for (var i = 0; i !== stateStats.visualizations_info.length; ++i) {
-          var vizInfo = stateStats.visualizations_info[i];
-          if (!vizInfo.show_addressed_info) {
-            // Skip visualizations which don't support addressed information.
-            continue;
-          }
-
-          for (var j = 0; j !== vizInfo.data.length; ++j) {
-            var datum = vizInfo.data[j];
-            if (datum.is_addressed ||
-                datum.frequency < MINIMUM_UNRESOLVED_ANSWER_FREQUENCY) {
+          for (var i = 0; i !== stateStats.visualizations_info.length; ++i) {
+            var vizInfo = stateStats.visualizations_info[i];
+            if (!vizInfo.show_addressed_info) {
+              // Skip visualizations which don't support addressed information.
               continue;
             }
 
-            calculatedUnresolvedAnswersData.push(datum);
-            if (calculatedUnresolvedAnswersData.length ===
-                MAXIMUM_UNRESOLVED_ANSWERS) {
-              break;
-            }
-          }
-          // Only take the first visualization with addressable answer data.
-          break;
-        }
+            for (var j = 0; j !== vizInfo.data.length; ++j) {
+              var datum = vizInfo.data[j];
+              if (datum.is_addressed ||
+                  datum.frequency < MINIMUM_UNRESOLVED_ANSWER_FREQUENCY) {
+                continue;
+              }
 
-        // Only keep 5 unresolved answers.
-        $scope.unresolvedAnswersData = calculatedUnresolvedAnswersData;
-      });
+              calculatedUnresolvedAnswersData.push(datum);
+              if (calculatedUnresolvedAnswersData.length ===
+                  MAXIMUM_UNRESOLVED_ANSWERS) {
+                break;
+              }
+            }
+            // Only take the first visualization with addressable answer data.
+            break;
+          }
+
+          // Only keep 5 unresolved answers.
+          $scope.unresolvedAnswersData = calculatedUnresolvedAnswersData;
+        });
+      }
     };
 
     $scope.$on('refreshStateEditor', $scope.computeUnresolvedAnswers);

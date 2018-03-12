@@ -25,25 +25,23 @@ oppia.factory('StateStatsService', [
     var STATE_RULES_STATS_URL_TEMPLATE =
       '/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>';
 
-    /**
-     * @param {state} state
-     * @return {Boolean} whether given state can have its addressed answers
-     *     calculated.
-     */
-    var stateSupportsAddressedInfo = function(state) {
-      return state.interaction.id === 'TextInput';
-    };
-
     return {
-      // Returns a promise which will provide details of a particular state's
-      // answer-statistics and rules.
+      /**
+       * TODO(brianrodri): Consider moving this into a visualization domain
+       * object.
+       *
+       * @param {state} state
+       * @return {Boolean} whether given state has an implementation for
+       *     displaying the issues overview tab in the State Editor.
+       */
+      stateSupportsIssuesOverview: function(state) {
+        return state.interaction.id === 'TextInput';
+      },
+      /**
+       * Returns a promise which will provide details of the given state's
+       * answer-statistics.
+       */
       computeStateStats: function(state) {
-        if (!stateSupportsAddressedInfo(state)) {
-          return Promise.reject(
-            new Error('Given state does not support calculating addressed info')
-          );
-        }
-
         var explorationId = ExplorationContextService.getExplorationId();
         var stateRulesStatsUrl = UrlInterpolationService.interpolateUrl(
           STATE_RULES_STATS_URL_TEMPLATE, {
