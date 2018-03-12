@@ -16,4 +16,22 @@
  * @fileoverview Unit tests for state stats service.
  */
 
-// TODO(brianrodri).
+describe('State Stats Service', function() {
+  var StateStatsService = null;
+
+  beforeEach(module('oppia'));
+  beforeEach(inject(function($injector) {
+    StateStatsService = $injector.get('StateStatsService');
+  }));
+
+  describe('Identify States that Support Issues Overview', function() {
+    it('should support TextInput interactions', function() {
+      var STATE_SKELETON = ;
+      expect(
+        StateStatsService.stateSupportsIssuesOverview({
+          interaction: {id: 'TextInput'}
+        })
+      ).toBe(true);
+    });
+  });
+});
