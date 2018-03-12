@@ -9,22 +9,20 @@
     <div class="oppia-fractions-landing-section text-center" style="background-color: #afd2eb">
       <div class="oppia-fractions-landing-section-inner">
         <h1 class="oppia-fractions-landing-h1">Fractions just got easier.</h1>
-        <div class="oppia-fractions-landing-row">
-          <div class="oppia-fractions-landing-column">
-            <img ng-src="<[getStaticImageUrl('/fractions_landing/student/hero_bakery.svg')]>" class="oppia-fractions-landing-image" style="right: 10%; width: 40%" alt="">
-            <img ng-src="<[getStaticImageUrl('/fractions_landing/student/hero_matthew.svg')]>" class="oppia-fractions-landing-image" style="width: 30%; right: 40%; top: 85%" alt="">
-            <img ng-src="<[getStaticImageUrl('/fractions_landing/student/Arrow.svg')]>" class="oppia-fractions-landing-image oppia-fractions-landing-arrow"  style="right: 62%; width: 15%; top: 250%;" alt="">
-            <h2 class="oppia-fractions-landing-h2 oppia-fractions-landing-say-hi" style="right: 683px; top: 454px; text-align: right">Say hi to Matthew!</h2>
-          </div>
-          <div style="clear: both;"></div>
-          <div class="oppia-fractions-landing-column">
-            <h2 class="oppia-fractions-landing-h2">Jump into our interactive lessons and get the help you need to tackle the material.</h2>
-            <button class="btn oppia-fractions-landing-get-started" ng-click="onClickGetStartedButton()">Get Started</button>
-            <button class="btn oppia-fractions-landing-learn-more">Learn More</button>
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-sm-6 col-sm-push-6 oppia-fractions-landing-image-div" style="height: auto">
+              <img ng-src="<[getStaticImageUrl('/fractions_landing/student/hero_bakery_combined.png')]>" class="oppia-fractions-landing-image oppia-fractions-landing-image-desktop" alt="">
+              <img ng-src="<[getStaticImageUrl('/fractions_landing/student/hero_bakery_combined_mobile.png')]>" class="oppia-fractions-landing-image oppia-fractions-landing-image-mobile" alt="">
+            </div>
+            <div class="col-sm-6 col-sm-pull-6">
+              <h2 class="oppia-fractions-landing-h2">Jump into our interactive lessons and get the help you need to tackle the material.</h2>
+              <button class="btn oppia-fractions-landing-get-started" ng-click="onClickGetStartedButton('student')">Get Started</button>
+              <button class="btn oppia-fractions-landing-learn-more" ng-click="onClickLearnMoreButton()">Learn More</button>
+            </div>
           </div>
         </div>
-
-        <div style="position: absolute; top: 115px"> 
+        <div style="position: absolute; top: 115px">
           <div class="oppia-fractions-landing-background-icon-row">
             <img ng-src="<[getStaticSubjectImageUrl('Humor')]>" class="oppia-fractions-landing-background-icon" alt="">
             <img ng-src="<[getStaticSubjectImageUrl('Combinatorics')]>" class="oppia-fractions-landing-background-icon" alt="">
@@ -120,43 +118,41 @@
             <img ng-src="<[getStaticSubjectImageUrl('Astronomy')]>" class="oppia-fractions-landing-background-icon" alt="">
             <img ng-src="<[getStaticSubjectImageUrl('Chess')]>" class="oppia-fractions-landing-background-icon" alt="">
           </div>
-        </div>  
-
+        </div>
       </div>
     </div>
 
     <div class="oppia-fractions-landing-section text-center" style="background-color: #E8E7E3">
       <div class="oppia-fractions-landing-section-inner">
         <h1 class="oppia-fractions-landing-h1" style="color: #242424">Fractions don’t have to be hard</h1>
-        <div class="oppia-fractions-landing-row">
-          <div class="oppia-fractions-landing-column">
-            <img ng-src="<[getStaticImageUrl('/fractions_landing/student/intro_matthew.svg')]>" class="oppia-fractions-landing-image" style="width: 50%; position: relative;" alt="">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-sm-6 col-sm-push-6 oppia-fractions-landing-image-div">
+              <img ng-src="<[getStaticImageUrl('/fractions_landing/student/intro_matthew.svg')]>" class="oppia-fractions-landing-image" style="width: 60%" alt="">
+            </div>
+            <div class="col-sm-6 col-sm-pull-6">
+              <h2 class="oppia-fractions-landing-h2" style="color: #242424">Learning about fractions can be tricky. With so much to understand, it’s easy to get confused with the concepts.
+                <br><br>That’s where we come in! Oppia makes it easy to quickly jump in and learn the fundamentals of fractions.
+              </h2>
+            </div>
           </div>
-          <div style="clear: both;"></div>
-          <div class="oppia-fractions-landing-column">
-            <h2 class="oppia-fractions-landing-h2" style="color: #242424">Learning about fractions can be tricky. With so much to understand, it’s easy to get confused with the concepts.
-              <br><br>That’s where we come in! Oppia makes it easy to quickly jump in and learn the fundamentals of fractions.
-            </h2>
-          </div>
+        </div>
       </div>
     </div>
 
     <div class="oppia-fractions-landing-section text-center" style="background-color: #429488">
       <div class="oppia-fractions-landing-section-inner">
         <h1 class="oppia-fractions-landing-h1" style="color: #FFFFFF">Fun storytelling for all</h1>
-        <div class="oppia-fractions-landing-row">
-          <div class="oppia-fractions-landing-column">
-            <div style="position: relative;">
-              <img ng-src="<[getStaticImageUrl('/fractions_landing/student/storytelling_matthew.svg')]>" class="oppia-fractions-landing-image" style="right: 50%; top: 50px; width: 50%; z-index: 20" alt="">
-              <img ng-src="<[getStaticImageUrl('/fractions_landing/student/storytelling_dessert.svg')]>" class="oppia-fractions-landing-image" style="right: 0.1%; top: 100px; width: 60%; z-index: 20" alt="">
-              <img ng-src="<[getStaticImageUrl('/fractions_landing/student/storytelling_pizza.svg')]>" class="oppia-fractions-landing-image" style="right: 15%; top: -20px; width: 60%; z-index: 10" alt="">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-sm-6 col-sm-push-6 oppia-fractions-landing-image-div">
+              <img ng-src="<[getStaticImageUrl('/fractions_landing/student/storytelling_combined.png')]>" class="oppia-fractions-landing-image" alt="">
             </div>
-          </div>
-          <div style="clear: both;"></div>
-          <div class="oppia-fractions-landing-column" style="float: left;">
-            <h2 class="oppia-fractions-landing-h2" style="color: #FFFFFF">Every fractions lesson follows our friend, Matthew, as he works hard to become a great baker!
-              <br><br> We’ll make sure you’re not confused along the way with helpful hints at every step.
-            </h2>
+            <div class="col-sm-6 col-sm-pull-6">
+              <h2 class="oppia-fractions-landing-h2" style="color: #FFFFFF">Every fractions lesson follows our friend, Matthew, as he works hard to become a great baker!
+                <br><br> We’ll make sure you’re not confused along the way with helpful hints at every step.
+              </h2>
+            </div>
           </div>
         </div>
       </div>
@@ -165,15 +161,16 @@
     <div class="oppia-fractions-landing-section text-center">
       <div class="oppia-fractions-landing-section-inner">
         <h1 class="oppia-fractions-landing-h1" style="color: #242424; text-align: right; padding-right: 10%">Easy to follow lessons</h1>
-        <div class="oppia-fractions-landing-row">
-          <div class="oppia-fractions-landing-column" style="float: left;">
-            <img ng-src="<[getStaticImageUrl('/fractions_landing/student/lessons_lessons.svg')]>" class="oppia-fractions-landing-image" style="width: 50%; position: relative;" alt="">
-          </div>
-          <div style="clear: both;"></div>
-          <div class="oppia-fractions-landing-column" style="float: left;">
-            <h2 class="oppia-fractions-landing-h2" style="color: #242424; text-align: right; right: 10%">With Oppia, we make it easy to go through the lessons and learn something new!
-              <br><br>You will work to learn new concepts and help Matt become a great baker along the way. We make it fun and easy to get started.
-            </h2>
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-sm-6 oppia-fractions-landing-image-div">
+              <img ng-src="<[getStaticImageUrl('/fractions_landing/student/lessons_lessons.svg')]>" class="oppia-fractions-landing-image" alt="">
+            </div>
+            <div class="col-sm-6">
+              <h2 class="oppia-fractions-landing-h2" style="color: #242424; text-align: right; right: 10%">With Oppia, we make it easy to go through the lessons and learn something new!
+                <br><br>You will work to learn new concepts and help Matt become a great baker along the way. We make it fun and easy to get started.
+              </h2>
+            </div>
           </div>
         </div>
       </div>
@@ -182,7 +179,7 @@
     <div class="oppia-fractions-landing-section text-center" style="background-color: #afd2eb">
       <div class="oppia-fractions-landing-section-inner">
         <h1 class="oppia-fractions-landing-h1" style="text-align: center; padding-left: 0px">Start your learning today</h1>
-        <h2 class="oppia-fractions-landing-h2" style="text-align: center; width: 50%; margin-left: 25%; margin-right: 25%; padding-left: 0px; left: 0px">Fractions are important to learn, and with our lessons you can improve a lot! Matthew needs your help!</h2>
+        <h2 class="oppia-fractions-landing-h2 oppia-fractions-landing-centered-h2" style="text-align: center; width: 50%;">Fractions are important to learn, and with our lessons you can improve a lot! Matthew needs your help!</h2>
         
         <div style="position: absolute; top: 115px">
           <div class="oppia-fractions-landing-background-icon-row">
@@ -249,7 +246,7 @@
             <img ng-src="<[getStaticSubjectImageUrl('Chemistry')]>" class="oppia-fractions-landing-background-icon" alt="">
           </div>
         </div>
-        <button class="btn oppia-fractions-landing-get-started" style="left: 0" ng-click="onClickGetStartedButton()">Get Started</button>
+        <button class="btn oppia-fractions-landing-get-started" style="left: 0" ng-click="onClickGetStartedButton('student')">Get Started</button>
       </div>
     </div>
   </div>
@@ -257,10 +254,15 @@
   <style>
     .oppia-fractions-landing-section {
       overflow: hidden;
+      height: 650px;
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 2000px;
+      position: relative;
     }
     .oppia-fractions-landing-h1 {
       font-size: 2.4em;
-      left: 80px;
+      left: 10%;
       margin: 0px;
       padding-left: 80px;
       padding-top: 60px;
@@ -276,7 +278,7 @@
     }
     .oppia-fractions-landing-h2{
       font-size: 1.6em;
-      left: 80px;
+      left: 10%;
       line-height: 1.6em;
       position: relative;
       text-align: left;
@@ -297,7 +299,7 @@
       position: relative;
       text-align: center;
       text-transform: uppercase;
-      width: 40%;
+      width: 45%;
       z-index: 20;
     }
     .oppia-fractions-landing-get-started {
@@ -318,6 +320,12 @@
     .oppia-fractions-landing-get-started:active {
       background-color: rgba(5, 190, 178, 1);
       color: #fff;
+    }
+    .oppia-fractions-landing-centered-h2 {
+      left: 0px;
+      margin-left: 25%;
+      margin-right: 25%;
+      padding-left: 0px;
     }
     .oppia-fractions-landing-background-icon-row {
       margin-top: 0;
@@ -341,42 +349,53 @@
       width: 10%;
     }
     .oppia-fractions-landing-image {
-      position: absolute;
-      z-index: 20;
-    }
-    .oppia-fractions-landing-row:after {
-      content: "";
-      display: table;
-      clear: both;
-    }
-    .oppia-fractions-landing-row {
-      overflow: hidden;
-      height: 100%;
-      width: 100%;
-    }
-    .oppia-fractions-landing-column {
-      float: right;
       position: relative;
-      width: 50%; 
+      z-index: 20;
+      width: 80%;
+    }
+    .oppia-fractions-landing-image-mobile {
+      display: none;
     }
     @media screen and (max-width: 900px) {
-      .oppia-fractions-landing-column {
-        float: none;
+      .oppia-fractions-landing-section-inner,
+      .oppia-fractions-landing-section {
+        height: auto;
       }
       .oppia-fractions-landing-h1 {
-        font-size: 1.2em;
+        font-size: 1.6em;
+        margin-left: 20%;
+        margin-right: 20%;
+        padding-bottom: 30px;
+        padding-left: 0;
+        padding-top: 40px;
+        text-align: center !important;
+        width: 60%;
       }
       .oppia-fractions-landing-h2 {
         font-size: 1em;
+        text-align: left !important;
+        width: 80% !important;
       }
       .oppia-fractions-landing-learn-more,
-      .oppia-fractions-landing-get-started, {
-        font-size: 1em;
+      .oppia-fractions-landing-get-started {
+        font-size: 0.8em;
+        margin-bottom: 30px;
         width: auto;
       }
-      .oppia-fractions-landing-arrow,
-      .oppia-fractions-landing-say-hi {
+      .oppia-fractions-landing-get-started {
+        left: 10%;
+        margin-right: 5%;
+      }
+      .oppia-fractions-landing-image-mobile {
+        display: block;
+        margin-left: 5%;
+      }
+      .oppia-fractions-landing-image-desktop {
         display: none;
+      }
+      .oppia-fractions-landing-centered-h2 {
+        margin-left: 10%;
+        margin-right: 10%;
       }
     }
   </style>
