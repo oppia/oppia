@@ -19,10 +19,10 @@
       <[data.answer]> (submitted <[data.frequency]> times)
     </li>
     <li ng-if="unresolvedAnswersData === null || unresolvedAnswersData.length === 0">
-      <em>No student answers require attention.</em>
+      <em>No outstanding answers requiring attention.</em>
     </li>
   </ul>
   <div ng-show="unresolvedAnswersData !== null" class='refreshContainer'>
-    <a ng-click="computeUnresolvedAnswers()">Refresh</a> <em class="latestRefreshMsg">Lastest refresh: <[latestRefreshDate.toLocaleString()]>.</em>
+    <a ng-click="computeUnresolvedAnswers()">Refresh</a> <em class="latestRefreshMsg">Latest refresh: <[latestRefreshDate.toLocaleString()]>.</em>
   </div>
 </div>
