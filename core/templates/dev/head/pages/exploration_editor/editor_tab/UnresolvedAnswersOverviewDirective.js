@@ -71,8 +71,12 @@ oppia.directive('unresolvedAnswersOverview', [
                   // data.
                   break;
                 }
+                // Finally, sort answers by *decreasing* frequency.
+                calculatedUnresolvedAnswersData.sort(function(lhs, rhs) {
+                  return rhs.frequency - lhs.frequency;
+                });
 
-                // Only keep 5 unresolved answers.
+                // Done! Expose the data.
                 $scope.unresolvedAnswersData = calculatedUnresolvedAnswersData;
                 $scope.latestRefreshDate = new Date();
               });
