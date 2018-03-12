@@ -42,8 +42,9 @@ oppia.factory('StateStatsService', [
        * answer-statistics.
        */
       computeStateStats: function(state, explorationId) {
-        var explorationId = explorationId ||
-          ExplorationContextService.getExplorationId();
+        if (explorationId === undefined) {
+           explorationId = ExplorationContextService.getExplorationId();
+        }
         var stateRulesStatsUrl = UrlInterpolationService.interpolateUrl(
           STATE_RULES_STATS_URL_TEMPLATE, {
             exploration_id: explorationId,
