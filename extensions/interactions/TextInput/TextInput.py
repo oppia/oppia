@@ -70,5 +70,5 @@ class TextInput(base.BaseInteraction):
             'title': 'Top answers',
         },
         'calculation_id': 'Top10AnswerFrequencies',
-        'show_addressed_info': True,
+        'addressed_info_is_supported': True,
     }]

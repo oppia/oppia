@@ -68,5 +68,5 @@ class MultipleChoiceInput(base.BaseInteraction):
         # Bar charts don't have any useful way to display which answers are
         # addressed yet. By setting this option to False, we consequentially
         # avoid doing extra computation.
-        'show_addressed_info': False,
+        'addressed_info_is_supported': False,
     }]

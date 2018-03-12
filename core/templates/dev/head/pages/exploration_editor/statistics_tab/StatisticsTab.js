@@ -212,7 +212,8 @@ oppia.controller('StatisticsTab', [
                   el.attr('data', escapedData);
                   el.attr('options', escapedOptions);
                   el.attr(
-                    'addressed-column-is-shown', vizInfo.show_addressed_info);
+                    'addressed-column-is-shown',
+                    vizInfo.addressed_info_is_supported);
                   return el.get(0).outerHTML;
                 });
 

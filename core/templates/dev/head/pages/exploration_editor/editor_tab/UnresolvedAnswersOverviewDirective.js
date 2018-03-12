@@ -48,7 +48,7 @@ oppia.directive('unresolvedAnswersOverview', [
 
                 for (var i = 0; i !== stats.visualizations_info.length; ++i) {
                   var vizInfo = stats.visualizations_info[i];
-                  if (!vizInfo.show_addressed_info) {
+                  if (!vizInfo.addressed_info_is_supported) {
                     // Skip visualizations which don't support addressed
                     // information.
                     continue;

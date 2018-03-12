@@ -60,7 +60,7 @@ oppia.factory('StateStatsService', [
           };
 
           stateStats.visualizations_info.forEach(function(vizInfo) {
-            if (vizInfo.show_addressed_info) {
+            if (vizInfo.addressed_info_is_supported) {
               vizInfo.data.forEach(function(vizInfoDatum) {
                 vizInfoDatum.is_addressed = (
                   AnswerClassificationService

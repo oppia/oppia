@@ -144,7 +144,7 @@ class BaseInteraction(object):
             result.append(
                 factory_cls(
                     spec['calculation_id'], spec['options'],
-                    spec['show_addressed_info']))
+                    spec['addressed_info_is_supported']))
         return result
 
     @property
