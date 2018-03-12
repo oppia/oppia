@@ -87,9 +87,7 @@ oppia.directive('unresolvedAnswersOverviewViz', [
 
             $scope.unresolvedAnswersData = [];
             if (StateStatsService.stateSupportsIssuesOverview(state)) {
-              StateStatsService.computeStateStats(
-                state
-              ).then(function(stats) {
+              StateStatsService.computeStateStats(state).then(function(stats) {
                 var calculatedUnresolvedAnswersData = [];
 
                 for (var i = 0; i !== stats.visualizations_info.length; ++i) {
@@ -103,13 +101,13 @@ oppia.directive('unresolvedAnswersOverviewViz', [
                   for (var j = 0; j !== vizInfo.data.length; ++j) {
                     var datum = vizInfo.data[j];
                     if (datum.is_addressed ||
-                      datum.frequency < MINIMUM_UNRESOLVED_ANSWER_FREQUENCY) {
+                        datum.frequency < MINIMUM_UNRESOLVED_ANSWER_FREQUENCY) {
                       continue;
                     }
 
                     calculatedUnresolvedAnswersData.push(datum);
                     if (calculatedUnresolvedAnswersData.length ===
-                      MAXIMUM_UNRESOLVED_ANSWERS) {
+                        MAXIMUM_UNRESOLVED_ANSWERS) {
                       break;
                     }
                   }
