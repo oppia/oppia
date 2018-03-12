@@ -32,13 +32,13 @@ oppia.controller('Fractions', [
       siteAnalyticsService.registerOpenFractionsFromLandingPageEvent(
         viewerType);
       $timeout(function() {
-        $window.location = ' /collection/4UgTQUc1tala';
+        $window.location = '/collection/4UgTQUc1tala';
       }, 150);
     };
 
     $scope.onClickLearnMoreButton = function() {
       $timeout(function() {
-        $window.location = 'https://www.oppia.org/splash';
+        $window.location = '/splash';
       }, 150);
     };
   }
