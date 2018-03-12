@@ -38,6 +38,11 @@ oppia.directive('adminNavbar', [
       controller: ['$scope', function($scope) {
         $scope.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
         $scope.showTab = AdminRouterService.showTab;
+        $scope.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
+        $scope.isJobsTabOpen = AdminRouterService.isJobsTabOpen;
+        $scope.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
+        $scope.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
+        $scope.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
 
         $scope.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
           '/logo/288x128_logo_white.png');

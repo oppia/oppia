@@ -107,6 +107,7 @@ class CronActivitySearchRankHandler(base.BaseHandler):
 
 
 class CronMapreduceCleanupHandler(base.BaseHandler):
+    """Handler for cleaning up data items of completed map/reduce jobs."""
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):

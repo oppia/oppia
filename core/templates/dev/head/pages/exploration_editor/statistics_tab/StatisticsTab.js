@@ -20,17 +20,17 @@
 oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.controller('StatisticsTab', [
-  '$scope', '$http', '$uibModal', 'AlertsService', 'explorationStatesService',
+  '$scope', '$http', '$uibModal', 'AlertsService', 'ExplorationStatesService',
   'ExplorationDataService', 'ComputeGraphService', 'DateTimeFormatService',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
-  'IMPROVE_TYPE_INCOMPLETE', 'ENABLE_NEW_STATS_FRAMEWORK',
+  'RouterService', 'IMPROVE_TYPE_INCOMPLETE',
   function(
-      $scope, $http, $uibModal, AlertsService, explorationStatesService,
+      $scope, $http, $uibModal, AlertsService, ExplorationStatesService,
       ExplorationDataService, ComputeGraphService, DateTimeFormatService,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-      IMPROVE_TYPE_INCOMPLETE, ENABLE_NEW_STATS_FRAMEWORK) {
+      RouterService, IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
@@ -58,31 +58,23 @@ oppia.controller('StatisticsTab', [
         millisSinceEpoch);
     };
 
-    $scope.ENABLE_NEW_STATS_FRAMEWORK = ENABLE_NEW_STATS_FRAMEWORK;
     $scope.hasTabLoaded = false;
     $scope.$on('refreshStatisticsTab', function() {
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
-      $scope.explorationVersionUrl = (
-        '/createhandler/statisticsversion/' +
-        ExplorationDataService.explorationId);
-      $http.get($scope.explorationVersionUrl).then(function(response) {
-        $scope.versions = response.data.versions;
-        $scope.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
-      });
     });
 
     $scope.explorationHasBeenVisited = false;
     $scope.refreshExplorationStatistics = function(version) {
-      if ($scope.ENABLE_NEW_STATS_FRAMEWORK) {
-        $scope.explorationStatisticsUrl = (
-          '/createhandler/statistics/' + ExplorationDataService.explorationId);
-      } else {
-        $scope.explorationStatisticsUrl = (
-          '/createhandler/statistics_old/' +
-          ExplorationDataService.explorationId + '/' + version);
-      }
+      $scope.explorationStatisticsUrl = (
+        '/createhandler/statistics/' + ExplorationDataService.explorationId);
 
-      $http.get($scope.explorationStatisticsUrl).then(function(response) {
+      $http.get($scope.explorationStatisticsUrl).then(function(statsResponse) {
+        var data = statsResponse.data;
+        var numStarts = data.num_starts;
+        var numActualStarts = data.num_actual_starts;
+        var numCompletions = data.num_completions;
+        $scope.stateStats = data.state_stats_mapping;
+
         ReadOnlyExplorationBackendApiService.loadLatestExploration(
           ExplorationDataService.explorationId).then(function(response) {
             var statesDict = response.exploration.states;
@@ -106,61 +98,17 @@ oppia.controller('StatisticsTab', [
             });
           }
         );
-        // From this point on, all computation done is for the new stats
-        // framework under a development flag.
-        if ($scope.ENABLE_NEW_STATS_FRAMEWORK) {
-          var data = response.data;
-          var numStarts = data.num_starts;
-          var numActualStarts = data.num_actual_starts;
-          var numCompletions = data.num_completions;
-          $scope.stateStats = data.state_stats_mapping;
 
-          if (numActualStarts > 0) {
-            $scope.explorationHasBeenVisited = true;
-          }
-
-          $scope.numPassersby = numStarts - numActualStarts;
-          $scope.pieChartData = [
-            ['Type', 'Number'],
-            ['Completions', numCompletions],
-            ['Non-Completions', numActualStarts - numCompletions]
-          ];
-        } else {
-          var data = response.data;
-          var numVisits = data.num_starts;
-          var numCompletions = data.num_completions;
-          var improvements = data.improvements;
-          $scope.stateStats = data.state_stats;
-          $scope.lastUpdated = data.last_updated;
-
-          if (numVisits > 0) {
-            $scope.explorationHasBeenVisited = true;
-          }
-
-          $scope.chartData = [
-            ['', 'Completions', 'Non-completions'],
-            ['', numCompletions, numVisits - numCompletions]
-          ];
-
-          $scope.statsGraphOpacities = {
-            legend: 'Students entering state'
-          };
-          // TODO(bhenning): before, there was a special opacity computed for
-          // the ending (numCompletions/numVisits), should we do this for all
-          // terminal nodes, instead? If so, explorationStatesService needs to
-          // be able to provide whether given states are terminal
-
-          explorationStatesService.getStateNames().forEach(function(stateName) {
-            var visits = 0;
-            if ($scope.stateStats.hasOwnProperty(stateName)) {
-              visits = $scope.stateStats[stateName].first_entry_count;
-            }
-            $scope.statsGraphOpacities[stateName] = Math.max(
-              visits / numVisits, 0.05);
-          });
-
-          $scope.hasTabLoaded = true;
+        if (numActualStarts > 0) {
+          $scope.explorationHasBeenVisited = true;
         }
+
+        $scope.numPassersby = numStarts - numActualStarts;
+        $scope.pieChartData = [
+          ['Type', 'Number'],
+          ['Completions', numCompletions],
+          ['Non-Completions', numActualStarts - numCompletions]
+        ];
       });
     };
 
@@ -198,11 +146,11 @@ oppia.controller('StatisticsTab', [
             '$scope', '$uibModalInstance', '$filter', '$injector', 'stateName',
             'stateStats', 'improvementType', 'visualizationsInfo',
             'HtmlEscaperService', 'AngularNameService',
-            'AnswerClassificationService', 'ENABLE_NEW_STATS_FRAMEWORK',
+            'AnswerClassificationService',
             function($scope, $uibModalInstance, $filter, $injector, stateName,
                 stateStats, improvementType, visualizationsInfo,
                 HtmlEscaperService, AngularNameService,
-                AnswerClassificationService, ENABLE_NEW_STATS_FRAMEWORK) {
+                AnswerClassificationService) {
               var COMPLETION_RATE_PIE_CHART_OPTIONS = {
                 left: 20,
                 pieHole: 0.6,
@@ -228,8 +176,6 @@ oppia.controller('StatisticsTab', [
               $scope.stateName = stateName;
               $scope.stateStats = stateStats;
               $scope.improvementType = improvementType;
-
-              $scope.ENABLE_NEW_STATS_FRAMEWORK = ENABLE_NEW_STATS_FRAMEWORK;
 
               var usefulFeedbackCount = (
                 $scope.stateStats.useful_feedback_count);
@@ -259,7 +205,7 @@ oppia.controller('StatisticsTab', [
                     var isAddressedResults = null;
                     if (visualizationInfo.show_addressed_info) {
                       var explorationId = ExplorationDataService.explorationId;
-                      var state = explorationStatesService.getState(
+                      var state = ExplorationStatesService.getState(
                         $scope.stateName);
 
                       isAddressedResults = visualizationInfo.data.map(
@@ -305,6 +251,11 @@ oppia.controller('StatisticsTab', [
               $scope.cancel = function() {
                 $uibModalInstance.dismiss('cancel');
                 AlertsService.clearWarnings();
+              };
+
+              $scope.navigateToStateEditor = function() {
+                $scope.cancel();
+                RouterService.navigateToMainTab(stateName);
               };
             }
           ]

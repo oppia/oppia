@@ -35,19 +35,25 @@ oppia.factory('AudioPlayerService', [
             _currentTrack = ngAudio.load(blobUrl);
             _currentTrackFilename = filename;
 
-            // ngAudio doesn't seem to be provide any way of detecting
+            // ngAudio doesn't seem to provide any way of detecting
             // when native audio object has finished loading. It seems
             // that after creating an ngAudio object, the native audio
             // object is asynchronously loaded. So we use a timeout
             // to grab native audio.
             // TODO(tjiang11): Look for a better way to handle this.
             $timeout(function() {
-              _currentTrack.audio.onended = function() {
-                _currentTrack = null;
-                _currentTrackFilename = null;
-                AudioTranslationManagerService
-                  .clearSecondaryAudioTranslations();
-              };
+              // _currentTrack could be null if the learner stops audio
+              // shortly after loading a new card or language. In such
+              // cases, we do not want to attempt setting the 'onended'
+              // property of the audio.
+              if (_currentTrack !== null) {
+                _currentTrack.audio.onended = function() {
+                  _currentTrack = null;
+                  _currentTrackFilename = null;
+                  AudioTranslationManagerService
+                    .clearSecondaryAudioTranslations();
+                };
+              }
             }, 100);
 
             successCallback();
@@ -109,6 +115,11 @@ oppia.factory('AudioPlayerService', [
           return 0;
         }
         return _currentTrack.progress;
+      },
+      setProgress: function(progress) {
+        if (_currentTrack) {
+          _currentTrack.progress = progress;
+        }
       },
       isPlaying: function() {
         return Boolean(_currentTrack && !_currentTrack.paused);

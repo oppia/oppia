@@ -4,16 +4,16 @@
     <div ng-if="getShortAnswerHtml()"
          popover-placement="bottom" uib-popover-template="'popover/answer'"
          popover-trigger="click" style="cursor: pointer;">
-      <div class="conversation-skin-learner-answer-content" angular-html-bind="getShortAnswerHtml()">
+      <div class="rte-viewer conversation-skin-learner-answer-content" angular-html-bind="getShortAnswerHtml()">
       </div>
     </div>
     <div ng-if="!getShortAnswerHtml()">
-      <div class="conversation-skin-learner-answer-content" angular-html-bind="getAnswerHtml()">
+      <div class="rte-viewer conversation-skin-learner-answer-content" angular-html-bind="getAnswerHtml()">
       </div>
     </div>
   </div>
   <div ng-if="data.isHint">
-    <div class="conversation-skin-learner-answer-content">
+    <div class="rte-viewer conversation-skin-learner-answer-content">
       <[data.learnerInput | translate]>
     </div>
   </div>
@@ -29,7 +29,7 @@
     <span id="<[getInputResponsePairId()]>"></span>
     <div ng-if="data.oppiaResponse !== null"
          angular-html-bind="data.oppiaResponse"
-         class="conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
+         class="rte-viewer conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
          ng-class="getFeedbackAudioHighlightClass()">
     </div>
 </div>

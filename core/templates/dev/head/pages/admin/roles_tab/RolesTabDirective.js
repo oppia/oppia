@@ -53,10 +53,10 @@ oppia.directive('adminRolesTab', [
         var finalStateIds = [];
         for (var role in $scope.graphData.nodes) {
           if ($scope.graphData.nodes.hasOwnProperty(role)) {
-            if (hasIncomingEdge.indexOf(role) == -1) {
+            if (hasIncomingEdge.indexOf(role) === -1) {
               $scope.graphData.initStateId = role;
             }
-            if (hasOutgoingEdge.indexOf(role) == -1) {
+            if (hasOutgoingEdge.indexOf(role) === -1) {
               finalStateIds.push(role);
             }
           }
@@ -81,11 +81,10 @@ oppia.directive('adminRolesTab', [
             }
           }).then(function(response) {
             $scope.result = response.data;
-            if (Object.keys($scope.result).length == 0) {
+            if (Object.keys($scope.result).length === 0) {
               $scope.resultRolesVisible = false;
               $scope.setStatusMessage('No results.');
-            }
-            else {
+            } else {
               $scope.resultRolesVisible = true;
               $scope.setStatusMessage('Success.');
             }
@@ -102,7 +101,7 @@ oppia.directive('adminRolesTab', [
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
-          
+
           $scope.setStatusMessage('Updating User Role');
           AdminTaskManagerService.startTask();
           $http.post(ADMIN_ROLE_HANDLER_URL, {

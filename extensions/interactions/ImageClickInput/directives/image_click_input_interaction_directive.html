@@ -44,4 +44,17 @@
            z-index: 10;">
     </div>
   </div>
+  <div ng-if="!highlightRegionsOnHover && !interactionIsActive"
+       style="
+       border-radius: 50%;
+       width: 10px;
+       height: 10px;
+       background: red;
+       border: 1px solid #000;
+       z-index: 10;
+       position: absolute;
+       display: <[getDotDisplay()]>;
+       left: <[getDotLocation().left]>px;
+       top: <[getDotLocation().top]>px;">
+  </div>
 </div>

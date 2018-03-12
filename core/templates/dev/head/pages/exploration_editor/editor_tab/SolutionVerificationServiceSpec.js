@@ -51,8 +51,8 @@ describe('Solution Verification Service', function() {
     spyOn(mockExplorationData, 'autosaveChangeList');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
-    ess = $injector.get('explorationStatesService');
+  beforeEach(inject(function($injector) {
+    ess = $injector.get('ExplorationStatesService');
     siis = $injector.get('stateInteractionIdService');
     scas = $injector.get('stateCustomizationArgsService');
     idc = $injector.get('InteractionDetailsCacheService');

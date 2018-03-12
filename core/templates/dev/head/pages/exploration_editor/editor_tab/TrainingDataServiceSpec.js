@@ -46,13 +46,13 @@ describe('TrainingDataService', function() {
     spyOn(mockExplorationData, 'autosaveChangeList');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($rootScope, $injector) {
     scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
     siis = $injector.get('stateInteractionIdService');
     ecs = $injector.get('EditorStateService');
     cls = $injector.get('ChangeListService');
-    ess = $injector.get('explorationStatesService');
+    ess = $injector.get('ExplorationStatesService');
     rs = $injector.get('ResponsesService');
     tds = $injector.get('TrainingDataService');
     IS = $injector.get('INTERACTION_SPECS');

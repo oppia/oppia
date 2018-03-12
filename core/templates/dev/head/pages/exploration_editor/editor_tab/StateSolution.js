@@ -19,7 +19,7 @@
 oppia.controller('StateSolution', [
   '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
   'AlertsService', 'INTERACTION_SPECS', 'stateSolutionService',
-  'explorationStatesService', 'SolutionVerificationService',
+  'ExplorationStatesService', 'SolutionVerificationService',
   'ExplorationHtmlFormatterService', 'stateInteractionIdService',
   'stateHintsService', 'UrlInterpolationService', 'SolutionObjectFactory',
   'ExplorationContextService', 'ExplorationWarningsService',
@@ -27,7 +27,7 @@ oppia.controller('StateSolution', [
   function(
       $scope, $rootScope, $uibModal, $filter, EditorStateService,
       AlertsService, INTERACTION_SPECS, stateSolutionService,
-      explorationStatesService, SolutionVerificationService,
+      ExplorationStatesService, SolutionVerificationService,
       ExplorationHtmlFormatterService, stateInteractionIdService,
       stateHintsService, UrlInterpolationService, SolutionObjectFactory,
       ExplorationContextService, ExplorationWarningsService,
@@ -45,14 +45,14 @@ oppia.controller('StateSolution', [
     ExplorationWarningsService.updateWarnings();
 
     $scope.isSolutionValid = function() {
-      return explorationStatesService.isSolutionValid(
+      return ExplorationStatesService.isSolutionValid(
         EditorStateService.getActiveStateName());
     };
 
     $scope.correctAnswerEditorHtml = (
       ExplorationHtmlFormatterService.getInteractionHtml(
         stateInteractionIdService.savedMemento,
-        explorationStatesService.getInteractionCustomizationArgsMemento(
+        ExplorationStatesService.getInteractionCustomizationArgsMemento(
           EditorStateService.getActiveStateName()),
         false,
         $scope.SOLUTION_EDITOR_FOCUS_LABEL));
@@ -97,7 +97,7 @@ oppia.controller('StateSolution', [
             $scope.correctAnswerEditorHtml = (
               ExplorationHtmlFormatterService.getInteractionHtml(
                 stateInteractionIdService.savedMemento,
-                explorationStatesService.getInteractionCustomizationArgsMemento(
+                ExplorationStatesService.getInteractionCustomizationArgsMemento(
                   EditorStateService.getActiveStateName()),
                 false,
                 $scope.SOLUTION_EDITOR_FOCUS_LABEL));
@@ -164,15 +164,15 @@ oppia.controller('StateSolution', [
       }).result.then(function(result) {
         var correctAnswer = result.solution.correctAnswer;
         var currentStateName = EditorStateService.getActiveStateName();
-        var state = explorationStatesService.getState(currentStateName);
+        var state = ExplorationStatesService.getState(currentStateName);
         var solutionIsValid = SolutionVerificationService.verifySolution(
           ExplorationContextService.getExplorationId(), state, correctAnswer);
 
-        explorationStatesService.updateSolutionValidity(
+        ExplorationStatesService.updateSolutionValidity(
           currentStateName, solutionIsValid);
         ExplorationWarningsService.updateWarnings();
         if (!solutionIsValid) {
-          AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+          AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID, 4000);
         }
 
         stateSolutionService.displayed = result.solution;
@@ -205,7 +205,7 @@ oppia.controller('StateSolution', [
       }).result.then(function() {
         stateSolutionService.displayed = null;
         stateSolutionService.saveDisplayedValue();
-        explorationStatesService.deleteSolutionValidity(
+        ExplorationStatesService.deleteSolutionValidity(
           EditorStateService.getActiveStateName());
       });
     };

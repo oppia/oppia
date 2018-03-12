@@ -1,8 +1,8 @@
 <div class="modal-header">
-  <h3>Statistics for "<[stateName]>"</h3>
+  <h3>Statistics for "<a ng-click="navigateToStateEditor()"><[stateName]></a>"</h3>
 </div>
 
-<div class="modal-body oppia-state-stats-modal-body" ng-if="ENABLE_NEW_STATS_FRAMEWORK">
+<div class="modal-body oppia-state-stats-modal-body">
   <div class="oppia-state-stats-warning" ng-if="improvementType">
     <div ng-if="improvementType == 'May be confusing'">
       <i class="material-icons">&#xE002;</i>
@@ -41,32 +41,6 @@
                  options="COMPLETION_RATE_PIE_CHART_OPTIONS2">
       </pie-chart>
     </div>
-  </div>
-
-  <div class="section" angular-html-bind="visualizationsHtml"></div>
-</div>
-
-<div class="modal-body oppia-state-stats-modal-body" ng-if="!ENABLE_NEW_STATS_FRAMEWORK">
-  <div class="oppia-state-stats-warning" ng-if="improvementType">
-    <div ng-if="improvementType == 'May be confusing'">
-      <i class="material-icons">&#xE002;</i>
-      <em>
-        This state may be confusing. Learners often leave the exploration when encountering it.
-      </em>
-    </div>
-
-    <div ng-if="improvementType == 'Needs more feedback'">
-      <i class="material-icons">&#xE002;</i>
-      <em>
-        This state may need more feedback. Learners often return to it after giving an answer.
-      </em>
-    </div>
-  </div>
-
-  <div class="section">
-    <p>
-      <strong>Times entered</strong>: <[stateStats.total_entry_count]>
-    </p>
   </div>
 
   <div class="section" angular-html-bind="visualizationsHtml"></div>

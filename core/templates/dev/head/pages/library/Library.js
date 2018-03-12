@@ -94,7 +94,7 @@ oppia.controller('Library', [
         // If not produce an error that would be caught by e2e tests.
         $timeout(function () {
           var actualWidth = $('exploration-summary-tile').width();
-          if (actualWidth && actualWidth != LIBRARY_TILE_WIDTH_PX) {
+          if (actualWidth && actualWidth !== LIBRARY_TILE_WIDTH_PX) {
             console.error(
               'The actual width of tile is different than the expected width.' +
               ' Actual size: ' + actualWidth + ', Expected size: ' +

@@ -43,13 +43,13 @@ describe('Sidebar state name controller', function() {
     });
 
     beforeEach(inject(function(
-        $rootScope, $q, $filter, $controller, $injector) {
+        $rootScope, $filter, $controller, $injector) {
       scope = $rootScope.$new();
       filter = $filter;
       rootScope = $rootScope;
       ecs = $injector.get('EditorStateService');
       fs = $injector.get('FocusManagerService');
-      ess = $injector.get('explorationStatesService');
+      ess = $injector.get('ExplorationStatesService');
       $httpBackend = $injector.get('$httpBackend');
 
       GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
@@ -123,7 +123,7 @@ describe('Sidebar state name controller', function() {
         },
         EditorStateService: ecs,
         FocusManagerService: fs,
-        explorationStatesService: ess,
+        ExplorationStatesService: ess,
         RouterService: {}
       });
     }));

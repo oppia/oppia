@@ -1,10 +1,11 @@
-<div layout="row" layout-align="space-between center" style="background-color: white;">
+<!-- 87px is used to move the opppia avatar inside the conversation-skin-tutor-card div (so that it does not goes out of screen during zoom in). -->
+<div layout="row" layout-align="space-between center" style="background-color: white; margin-left: 87px;">
   <!-- Wrapping div on first button keeps the second button right-aligned
     even when the first button is not present. -->
   <div>
     <!-- ng-if on this second wrapping div because ng-if lags on buttons. -->
     <div ng-if="hasPrevious && !helpCardHasContinueButton">
-      <md-button ng-click="changeCard(activeCardIndex-1)" class="md-raised" style="margin: 0 0 12px 12px;">
+      <md-button ng-click="changeCard(activeCardIndex-1)" class="md-raised protractor-test-back-button" style="margin: 0 0 12px 12px;">
         <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
       </div>
     </md-button>

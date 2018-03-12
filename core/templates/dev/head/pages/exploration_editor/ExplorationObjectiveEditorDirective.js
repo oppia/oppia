@@ -32,9 +32,9 @@ oppia.directive('explorationObjectiveEditor', [
         '/pages/exploration_editor/' +
         'exploration_objective_editor_directive.html'),
       controller: [
-        '$scope', 'explorationObjectiveService',
-        function ($scope, explorationObjectiveService) {
-          $scope.explorationObjectiveService = explorationObjectiveService;
+        '$scope', 'ExplorationObjectiveService',
+        function ($scope, ExplorationObjectiveService) {
+          $scope.explorationObjectiveService = ExplorationObjectiveService;
         }
       ]
     };

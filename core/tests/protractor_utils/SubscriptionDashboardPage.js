@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Page object for the subscription dashboard, 
+ * @fileoverview Page object for the subscription dashboard,
  * for use in Protractor tests.
  */
 

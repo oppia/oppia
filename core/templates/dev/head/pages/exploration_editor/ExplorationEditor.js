@@ -36,34 +36,36 @@ oppia.constant(
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
-  'ExplorationDataService', 'EditorStateService', 'explorationTitleService',
-  'explorationCategoryService', 'explorationObjectiveService',
-  'explorationLanguageCodeService', 'ExplorationRightsService',
-  'explorationInitStateNameService', 'explorationTagsService',
-  'EditabilityService', 'explorationStatesService', 'RouterService',
+  'ExplorationDataService', 'EditorStateService', 'ExplorationTitleService',
+  'ExplorationCategoryService', 'ExplorationObjectiveService',
+  'ExplorationLanguageCodeService', 'ExplorationRightsService',
+  'ExplorationInitStateNameService', 'ExplorationTagsService',
+  'EditabilityService', 'ExplorationStatesService', 'RouterService',
   'GraphDataService', 'StateEditorTutorialFirstTimeService',
-  'explorationParamSpecsService', 'explorationParamChangesService',
+  'ExplorationParamSpecsService', 'ExplorationParamChangesService',
   'ExplorationWarningsService', '$templateCache', 'ExplorationContextService',
   'ExplorationAdvancedFeaturesService', '$uibModal', 'ChangeListService',
   'AutosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
-  'ParamSpecsObjectFactory', 'explorationAutomaticTextToSpeechService',
-  'UrlInterpolationService', 'explorationCorrectnessFeedbackService',
+  'ParamSpecsObjectFactory', 'ExplorationAutomaticTextToSpeechService',
+  'UrlInterpolationService', 'ExplorationCorrectnessFeedbackService',
+  'ThreadDataService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
-      ExplorationDataService, EditorStateService, explorationTitleService,
-      explorationCategoryService, explorationObjectiveService,
-      explorationLanguageCodeService, ExplorationRightsService,
-      explorationInitStateNameService, explorationTagsService,
-      EditabilityService, explorationStatesService, RouterService,
+      ExplorationDataService, EditorStateService, ExplorationTitleService,
+      ExplorationCategoryService, ExplorationObjectiveService,
+      ExplorationLanguageCodeService, ExplorationRightsService,
+      ExplorationInitStateNameService, ExplorationTagsService,
+      EditabilityService, ExplorationStatesService, RouterService,
       GraphDataService, StateEditorTutorialFirstTimeService,
-      explorationParamSpecsService, explorationParamChangesService,
+      ExplorationParamSpecsService, ExplorationParamChangesService,
       ExplorationWarningsService, $templateCache, ExplorationContextService,
       ExplorationAdvancedFeaturesService, $uibModal, ChangeListService,
       AutosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
-      ParamSpecsObjectFactory, explorationAutomaticTextToSpeechService,
-      UrlInterpolationService, explorationCorrectnessFeedbackService) {
+      ParamSpecsObjectFactory, ExplorationAutomaticTextToSpeechService,
+      UrlInterpolationService, ExplorationCorrectnessFeedbackService,
+      ThreadDataService) {
     $scope.EditabilityService = EditabilityService;
     $scope.EditorStateService = EditorStateService;
 
@@ -108,28 +110,28 @@ oppia.controller('ExplorationEditor', [
             lostChanges, explorationId);
         }
       }).then(function(data) {
-        explorationStatesService.init(data.states);
+        ExplorationStatesService.init(data.states);
 
-        explorationTitleService.init(data.title);
-        explorationCategoryService.init(data.category);
-        explorationObjectiveService.init(data.objective);
-        explorationLanguageCodeService.init(data.language_code);
-        explorationInitStateNameService.init(data.init_state_name);
-        explorationTagsService.init(data.tags);
-        explorationParamSpecsService.init(
+        ExplorationTitleService.init(data.title);
+        ExplorationCategoryService.init(data.category);
+        ExplorationObjectiveService.init(data.objective);
+        ExplorationLanguageCodeService.init(data.language_code);
+        ExplorationInitStateNameService.init(data.init_state_name);
+        ExplorationTagsService.init(data.tags);
+        ExplorationParamSpecsService.init(
           ParamSpecsObjectFactory.createFromBackendDict(data.param_specs));
-        explorationParamChangesService.init(
+        ExplorationParamChangesService.init(
           ParamChangesObjectFactory.createFromBackendList(data.param_changes));
-        explorationAutomaticTextToSpeechService.init(data.auto_tts_enabled);
-        explorationCorrectnessFeedbackService.init(
+        ExplorationAutomaticTextToSpeechService.init(data.auto_tts_enabled);
+        ExplorationCorrectnessFeedbackService.init(
           data.correctness_feedback_enabled);
 
-        $scope.explorationTitleService = explorationTitleService;
-        $scope.explorationCategoryService = explorationCategoryService;
-        $scope.explorationObjectiveService = explorationObjectiveService;
+        $scope.explorationTitleService = ExplorationTitleService;
+        $scope.explorationCategoryService = ExplorationCategoryService;
+        $scope.explorationObjectiveService = ExplorationObjectiveService;
         $scope.ExplorationRightsService = ExplorationRightsService;
         $scope.explorationInitStateNameService = (
-          explorationInitStateNameService);
+          ExplorationInitStateNameService);
 
         $scope.currentUserIsAdmin = data.is_admin;
         $scope.currentUserIsModerator = data.is_moderator;
@@ -154,16 +156,20 @@ oppia.controller('ExplorationEditor', [
         GraphDataService.recompute();
 
         if (!EditorStateService.getActiveStateName() ||
-            !explorationStatesService.getState(
+            !ExplorationStatesService.getState(
               EditorStateService.getActiveStateName())) {
           EditorStateService.setActiveStateName(
-            explorationInitStateNameService.displayed);
+            ExplorationInitStateNameService.displayed);
         }
 
         if (!RouterService.isLocationSetToNonStateEditorTab() &&
             !data.states.hasOwnProperty(
               RouterService.getCurrentStateFromLocationPath('gui'))) {
-          RouterService.navigateToMainTab();
+          if (ThreadDataService.getOpenThreadsCount() > 0) {
+            RouterService.navigateToFeedbackTab();
+          } else {
+            RouterService.navigateToMainTab();
+          }
         }
 
         ExplorationWarningsService.updateWarnings();
@@ -188,7 +194,7 @@ oppia.controller('ExplorationEditor', [
           forceRefresh: true
         });
 
-        if (explorationStatesService.getState(
+        if (ExplorationStatesService.getState(
               EditorStateService.getActiveStateName())) {
           $scope.$broadcast('refreshStateEditor');
         }

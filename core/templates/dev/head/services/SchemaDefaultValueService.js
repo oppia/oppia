@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service provides correct default value for 
+ * @fileoverview Service provides correct default value for
  * SchemaBasedList item.
  */
 

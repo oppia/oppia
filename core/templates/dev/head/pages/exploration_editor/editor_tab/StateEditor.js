@@ -17,11 +17,11 @@
  */
 
 oppia.controller('StateEditor', [
-  '$scope', '$rootScope', 'EditorStateService', 'explorationStatesService',
+  '$scope', '$rootScope', 'EditorStateService', 'ExplorationStatesService',
   'INTERACTION_SPECS', 'ExplorationAdvancedFeaturesService',
   'UrlInterpolationService', 'stateContentService',
   function(
-      $scope, $rootScope, EditorStateService, explorationStatesService,
+      $scope, $rootScope, EditorStateService, ExplorationStatesService,
       INTERACTION_SPECS, ExplorationAdvancedFeaturesService,
       UrlInterpolationService, stateContentService) {
     $scope.areParametersEnabled = (
@@ -50,13 +50,13 @@ oppia.controller('StateEditor', [
 
     $scope.initStateEditor = function() {
       var stateName = EditorStateService.getActiveStateName();
-      var stateData = explorationStatesService.getState(stateName);
+      var stateData = ExplorationStatesService.getState(stateName);
       if (stateName && stateData) {
         stateContentService.init(
           EditorStateService.getActiveStateName(), stateData.content);
 
         $rootScope.$broadcast('stateEditorInitialized', stateData);
-        var interactionId = explorationStatesService.getInteractionIdMemento(
+        var interactionId = ExplorationStatesService.getInteractionIdMemento(
           stateName);
         $scope.interactionIdIsSet = Boolean(interactionId);
         $scope.currentInteractionCanHaveSolution = Boolean(
@@ -66,7 +66,7 @@ oppia.controller('StateEditor', [
           $scope.interactionIdIsSet &&
           INTERACTION_SPECS[interactionId].is_terminal);
 
-        var content = explorationStatesService.getStateContentMemento(
+        var content = ExplorationStatesService.getStateContentMemento(
           stateName);
         if (content.getHtml() || stateData.interaction.id) {
           $scope.interactionIsShown = true;
@@ -111,21 +111,21 @@ oppia.directive('trainingPanel', [
         'training_answer_modal_directive.html'),
       controller: [
         '$scope', 'ExplorationHtmlFormatterService',
-        'EditorStateService', 'explorationStatesService',
-        'trainingDataService', 'responsesService', 'stateInteractionIdService',
+        'EditorStateService', 'ExplorationStatesService',
+        'TrainingDataService', 'ResponsesService', 'stateInteractionIdService',
         'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
         'OutcomeObjectFactory',
         function($scope, ExplorationHtmlFormatterService,
-            EditorStateService, explorationStatesService,
-            trainingDataService, responsesService, stateInteractionIdService,
+            EditorStateService, ExplorationStatesService,
+            TrainingDataService, ResponsesService, stateInteractionIdService,
             stateCustomizationArgsService, AnswerGroupObjectFactory,
             OutcomeObjectFactory) {
           $scope.changingAnswerGroupIndex = false;
           $scope.addingNewResponse = false;
 
           var _stateName = EditorStateService.getActiveStateName();
-          var _state = explorationStatesService.getState(_stateName);
-          $scope.allOutcomes = trainingDataService.getAllPotentialOutcomes(
+          var _state = ExplorationStatesService.getState(_stateName);
+          $scope.allOutcomes = TrainingDataService.getAllPotentialOutcomes(
             _state);
 
           var _updateAnswerTemplate = function() {
@@ -155,10 +155,10 @@ oppia.directive('trainingPanel', [
           $scope.confirmAnswerGroupIndex = function(index) {
             $scope.classification.answerGroupIndex = index;
 
-            if (index === responsesService.getAnswerGroupCount()) {
-              trainingDataService.trainDefaultResponse($scope.answer);
+            if (index === ResponsesService.getAnswerGroupCount()) {
+              TrainingDataService.trainDefaultResponse($scope.answer);
             } else {
-              trainingDataService.trainAnswerGroup(index, $scope.answer);
+              TrainingDataService.trainAnswerGroup(index, $scope.answer);
             }
 
             $scope.onFinishTraining();
@@ -166,15 +166,15 @@ oppia.directive('trainingPanel', [
           $scope.confirmNewFeedback = function() {
             if ($scope.classification.newOutcome) {
               // Create a new answer group with the given feedback.
-              var answerGroups = responsesService.getAnswerGroups();
+              var answerGroups = ResponsesService.getAnswerGroups();
               answerGroups.push(AnswerGroupObjectFactory.createNew(
                 [], angular.copy($scope.classification.newOutcome), false));
-              responsesService.save(
-                answerGroups, responsesService.getDefaultOutcome());
+              ResponsesService.save(
+                answerGroups, ResponsesService.getDefaultOutcome());
 
               // Train the group with the answer.
-              var index = responsesService.getAnswerGroupCount() - 1;
-              trainingDataService.trainAnswerGroup(index, $scope.answer);
+              var index = ResponsesService.getAnswerGroupCount() - 1;
+              TrainingDataService.trainAnswerGroup(index, $scope.answer);
             }
 
             $scope.onFinishTraining();
