@@ -17,7 +17,7 @@
  * properties
  */
 
-oppia.factory('statePropertyService', [
+oppia.factory('StatePropertyService', [
   '$log', 'ChangeListService', 'AlertsService', 'ExplorationStatesService',
   function($log, ChangeListService, AlertsService, ExplorationStatesService) {
     // Public base API for data services corresponding to state properties
