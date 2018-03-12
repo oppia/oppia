@@ -36,12 +36,7 @@ describe('Testing filters', function() {
     'truncateAndCapitalize',
     'capitalize',
     'stripFormatting',
-<<<<<<< HEAD
     'getAbbreviatedText'
-=======
-    'getAbbreviatedText',
-    'removeExtraLinesAndSpace'
->>>>>>> 523b0905008e206c857854d15a22511a9e46b51a
   ];
 
   beforeEach(angular.mock.module('oppia'));
