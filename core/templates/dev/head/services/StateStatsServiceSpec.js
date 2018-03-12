@@ -24,7 +24,7 @@ describe('State Stats Service', function() {
     StateStatsService = $injector.get('StateStatsService');
   }));
 
-  describe('Identify States that Support Issues Overview', function() {
+  describe('Identifying Interactions Eligible for Issues Overview', function() {
     it('should support TextInput interactions', function() {
       expect(
         StateStatsService.stateSupportsIssuesOverview({
