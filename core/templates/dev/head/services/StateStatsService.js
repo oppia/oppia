@@ -25,10 +25,25 @@ oppia.factory('StateStatsService', [
     var STATE_RULES_STATS_URL_TEMPLATE =
       '/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>';
 
+    /**
+     * @param {state} state
+     * @return {Boolean} whether given state can have its addressed answers
+     *     calculated.
+     */
+    var stateSupportsAddressedInfo = function(state) {
+      return state.interaction.id === 'TextInput';
+    };
+
     return {
       // Returns a promise which will provide details of a particular state's
       // answer-statistics and rules.
       computeStateStats: function(state) {
+        if (!stateSupportsAddressedInfo(state)) {
+          return Promise.reject(
+            new Error('Given state does not support calculating addressed info')
+          );
+        }
+
         var explorationId = ExplorationContextService.getExplorationId();
         var stateRulesStatsUrl = UrlInterpolationService.interpolateUrl(
           STATE_RULES_STATS_URL_TEMPLATE, {
@@ -40,12 +55,12 @@ oppia.factory('StateStatsService', [
           var rulesService = $injector.get(
             AngularNameService.getNameOfInteractionRulesService(
               state.interaction.id));
-
           var stateStats = {
             state_name: state.name,
             exploration_id: explorationId,
             visualizations_info: response.data.visualizations_info
           };
+
           stateStats.visualizations_info.forEach(function(vizInfo) {
             if (vizInfo.show_addressed_info) {
               vizInfo.data.forEach(function(vizInfoDatum) {
