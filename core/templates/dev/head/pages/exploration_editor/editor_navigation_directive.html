@@ -9,18 +9,24 @@
     font-size: 9px;
     position: relative;
   }
+  editor-navigation .feedback-open-thread-static-text {
+    bottom: 22px;
+    color: white;
+    font-size: 9px;
+    position: relative;
+  }
   editor-navigation .oppia-exploration-open-threads-color {
     background-color: #4078C0;
     border: 1px solid rgb(243, 243, 243);
   }
   editor-navigation .oppia-exploration-open-threads-indicator {
     border-radius: 10%;
-    bottom: 10px;
-    height: 13px;
+    bottom: 5px;
+    height: 15px;
     position: absolute;
-    right: 5px;
+    right: 1px;
     text-align: center;
-    width: 16px;
+    width: 34px;
   }
 </style>
 <ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak" style="margin-left: 20px;">
@@ -84,7 +90,7 @@
     </a>
     <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
       <span class="oppia-exploration-open-threads-count">
-        <[getOpenThreadsCount()]>
+        <[getOpenThreadsCount()]>&nbsp;open
       </span>
     </div>
   </li>

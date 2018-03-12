@@ -20,7 +20,7 @@ describe('GraphInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     validatorService = $injector.get('GraphInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');

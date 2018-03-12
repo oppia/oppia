@@ -84,7 +84,7 @@ class ProfileHandler(base.BaseHandler):
                 user_settings.first_contribution_msec
                 if user_settings.first_contribution_msec else None),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
-            'user_impact_score':user_services.get_user_impact_score(
+            'user_impact_score': user_services.get_user_impact_score(
                 user_settings.user_id),
             'created_exp_summary_dicts': created_exp_summary_dicts,
             'edited_exp_summary_dicts': edited_exp_summary_dicts,

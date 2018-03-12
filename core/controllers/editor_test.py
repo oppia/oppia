@@ -851,7 +851,7 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
 
         def add_logging_info(msg, *_):
             # Message logged by function clear_all_pending() in
-            # oppia_tools/google_appengine_1.9.50/google_appengine/google/
+            # oppia_tools/google_appengine_1.9.67/google_appengine/google/
             # appengine/ext/ndb/tasklets.py, not to be checked here.
             log_from_google_app_engine = 'all_pending: clear %s'
 
@@ -1105,11 +1105,12 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
     COLLABORATOR2_USERNAME = 'collab2'
     COLLABORATOR3_EMAIL = 'collaborator3@example.com'
     COLLABORATOR3_USERNAME = 'collab3'
+    RANDOM_USER_EMAIL = 'randomuser@example.com'
+    RANDOM_USER_USERNAME = 'randomuser'
 
-    def test_exploration_rights_handler(self):
-        """Test exploration rights handler."""
-
-        # Create several users
+    def test_for_assign_role_for_exploration(self):
+        """Test exploration rights handler for assign role for exploration."""
+        # Create several users.
         self.signup(
             self.COLLABORATOR_EMAIL, username=self.COLLABORATOR_USERNAME)
         self.signup(
@@ -1171,7 +1172,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.assert_can_edit(response.body)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        # Check that collaborator can add a new state called 'State 4'
+        # Check that collaborator can add a new state called 'State 4'.
         add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
         response_dict = self.put_json(
             add_url,
@@ -1193,7 +1194,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         )
         self.assertIn('State 4', response_dict['states'])
 
-        # Check that collaborator cannot add new members
+        # Check that collaborator cannot add new members.
         exploration = exp_services.get_exploration_by_id(exp_id)
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
         response_dict = self.put_json(
@@ -1213,7 +1214,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.assert_can_edit(response.body)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        # Check that collaborator2 can add a new state called 'State 5'
+        # Check that collaborator2 can add a new state called 'State 5'.
         add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
         response_dict = self.put_json(
             add_url,
@@ -1245,6 +1246,48 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'new_member_role': rights_manager.ROLE_EDITOR,
                 }, csrf_token, expect_errors=True, expected_status_int=401)
         self.assertEqual(response_dict['status_code'], 401)
+
+        self.logout()
+
+    def test_transfering_ownership_to_the_community(self):
+        """Test exploration rights handler for transfering ownership to the
+        community.
+        """
+        # Owner creates an exploration.
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'exp_id'
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, title='My Exploration',
+            end_state_name='END')
+        response = self.testapp.get('/create/%s' % exp_id)
+        csrf_token = self.get_csrf_token_from_response(response)
+        rights_manager.publish_exploration(self.owner, exp_id)
+
+        # Owner transfers ownership to the community.
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'make_community_owned': True
+            }, csrf_token)
+
+        self.logout()
+
+        # Create a random user.
+        self.signup(
+            self.RANDOM_USER_EMAIL, username=self.RANDOM_USER_USERNAME)
+
+        # Check community_owned_status value.
+        exp_summary = exp_services.get_exploration_summary_by_id(exp_id)
+        community_owned_status = exp_summary.community_owned
+        self.assertTrue(community_owned_status)
+
+        # Check that any random user can access editor page and can edit.
+        self.login(self.RANDOM_USER_EMAIL)
+        response = self.testapp.get('/create/%s' % exp_id)
+        self.assertEqual(response.status_int, 200)
+        self.assert_can_edit(response.body)
 
         self.logout()
 
