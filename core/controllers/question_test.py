@@ -434,6 +434,7 @@ class QuestionIntegrationTest(test_utils.GenericTestBase):
             '%s' % feconf.QUESTION_POST_URL, self.payload,
             expect_errors=False)
         self.assertIn('question_id', response_json.keys())
+        another_question_id = response_json['question_id']
 
         del self.payload['question']
         del self.payload['skill_id']

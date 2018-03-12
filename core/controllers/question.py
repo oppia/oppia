@@ -118,6 +118,6 @@ class QuestionManagerHandler(base.BaseHandler):
                 collection_id))
         return self.render_json({
             'question_summary_dicts': [
-            question_summary.to_dict()
-            for question_summary in question_summaries]
+                question_summary.to_dict()
+                for question_summary in question_summaries]
             })
