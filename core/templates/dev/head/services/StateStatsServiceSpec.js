@@ -66,7 +66,7 @@ describe('State Stats Service', function() {
           data: [
             {answer: 'Ni Hao', frequency: 5},
             {answer: 'Aloha', frequency: 3},
-            {answer: 'Hola!', frequency: 1},
+            {answer: 'Hola!', frequency: 1}
           ],
           id: 'FrequencyTable',
           addressed_info_is_supported: true,
@@ -89,7 +89,7 @@ describe('State Stats Service', function() {
           visualizations_info: [jasmine.objectContaining({
             data: [
               {answer: 'Ni Hao', frequency: 5, is_addressed: false},
-              {answer: 'Aloha', frequency: 3, is_addressed: false}
+              {answer: 'Aloha', frequency: 3, is_addressed: false},
               {answer: 'Hola!', frequency: 1, is_addressed: true}
             ],
           })]
