@@ -53,6 +53,8 @@ oppia.directive('unresolvedAnswersOverview', [
                     continue;
                   }
 
+                  // NOTE: vizInfo.data is already sorted in descending order by
+                  // frequency.
                   for (var j = 0; j !== vizInfo.data.length; ++j) {
                     var answer = vizInfo.data[j];
                     if (answer.is_addressed ||
@@ -67,16 +69,12 @@ oppia.directive('unresolvedAnswersOverview', [
                       break;
                     }
                   }
-                  // Only take the first visualization with addressable answer
-                  // data.
+
+                  // Will only take the answers from first eligible
+                  // visualization.
                   break;
                 }
-                // Finally, sort answers by *decreasing* frequency.
-                calculatedUnresolvedAnswersData.sort(function(lhs, rhs) {
-                  return rhs.frequency - lhs.frequency;
-                });
 
-                // Done! Expose the data.
                 $scope.unresolvedAnswersData = calculatedUnresolvedAnswersData;
                 $scope.latestRefreshDate = new Date();
               });
