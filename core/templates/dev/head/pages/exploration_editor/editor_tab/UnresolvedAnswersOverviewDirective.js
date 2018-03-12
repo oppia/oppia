@@ -30,13 +30,13 @@ oppia.directive('unresolvedAnswersOverview', [
         function(
             $scope, EditorStateService, ExplorationStatesService,
             StateStatsService) {
-          var MAXIMUM_UNRESOLVED_ANSWERS = 5;
-          var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
+          let MAXIMUM_UNRESOLVED_ANSWERS = 5;
+          let MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
           $scope.unresolvedAnswersData = [];
 
           $scope.computeUnresolvedAnswers = function() {
-            var state = ExplorationStatesService.getState(
+            let state = ExplorationStatesService.getState(
               EditorStateService.getActiveStateName());
 
             $scope.unresolvedAnswersData = [];
@@ -44,10 +44,10 @@ oppia.directive('unresolvedAnswersOverview', [
 
             if (StateStatsService.stateSupportsIssuesOverview(state)) {
               StateStatsService.computeStateStats(state).then(function(stats) {
-                var calculatedUnresolvedAnswersData = [];
+                let calculatedUnresolvedAnswersData = [];
 
                 for (var i = 0; i !== stats.visualizations_info.length; ++i) {
-                  var vizInfo = stats.visualizations_info[i];
+                  let vizInfo = stats.visualizations_info[i];
                   if (!vizInfo.show_addressed_info) {
                     // Skip visualizations which don't support addressed
                     // information.
@@ -55,13 +55,14 @@ oppia.directive('unresolvedAnswersOverview', [
                   }
 
                   for (var j = 0; j !== vizInfo.data.length; ++j) {
-                    var datum = vizInfo.data[j];
-                    if (datum.is_addressed ||
-                        datum.frequency < MINIMUM_UNRESOLVED_ANSWER_FREQUENCY) {
+                    let answer = vizInfo.data[j];
+                    if (answer.is_addressed ||
+                        answer.frequency <
+                          MINIMUM_UNRESOLVED_ANSWER_FREQUENCY) {
                       continue;
                     }
 
-                    calculatedUnresolvedAnswersData.push(datum);
+                    calculatedUnresolvedAnswersData.push(answer);
                     if (calculatedUnresolvedAnswersData.length ===
                         MAXIMUM_UNRESOLVED_ANSWERS) {
                       break;
