@@ -8,9 +8,9 @@
   }
 </style>
 
-<div>
+<div ng-show="unresolvedAnswersData !== null">
   <strong>Unresolved Student Answers</strong>
-  <ul ng-show="unresolvedAnswersData !== null">
+  <ul>
     <li ng-repeat="data in unresolvedAnswersData">
       <strong>By <[data.frequency]> students:</strong> <span><[data.answer]></span>
     </li>
@@ -18,7 +18,7 @@
       <em>No answers require attention.</em>
     </li>
   </ul>
-  <div ng-show="unresolvedAnswersData !== null" class="refreshContainer">
+  <div class="refreshContainer">
     <a ng-click="computeUnresolvedAnswers()">Refresh</a>; last updated: <[latestRefreshDate.toLocaleString()]>.
   </div>
 </div>
