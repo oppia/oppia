@@ -181,14 +181,16 @@ class QuestionsHandlerTest(test_utils.GenericTestBase):
 
         del self.payload['change_list']
         self.put_json(
-            '%s/%s/%s' % (feconf.QUESTION_DATA_URL, self.collection_id,
+            '%s/%s/%s' % (
+                feconf.QUESTION_DATA_URL, self.collection_id,
                 question_id), self.payload, expect_errors=True,
             expected_status_int=404)
 
         del self.payload['commit_message']
         self.payload['change_list'] = json.dumps(change_list)
         self.put_json(
-            '%s/%s/%s' % (feconf.QUESTION_DATA_URL, self.collection_id,
+            '%s/%s/%s' % (
+                feconf.QUESTION_DATA_URL, self.collection_id,
                 question_id), self.payload, expect_errors=True,
             expected_status_int=404)
 
@@ -281,13 +283,13 @@ class QuestionsPostHandlerTest(test_utils.GenericTestBase):
         self.assertIn('question_id', response_json.keys())
 
         del self.payload['skill_id']
-        response = self.post_json(
+        self.post_json(
             '%s' % feconf.QUESTION_POST_URL, {'payload': (
                 json.dumps(self.payload))}, expect_errors=True,
             expected_status_int=404)
 
         del self.payload['question']
-        response = self.post_json(
+        self.post_json(
             '%s' % feconf.QUESTION_POST_URL, {'payload': (
                 json.dumps(self.payload))}, expect_errors=True,
             expected_status_int=404)
@@ -409,9 +411,9 @@ class QuestionIntegrationTest(test_utils.GenericTestBase):
 
     def test_black_box(self):
         question = question_domain.Question(
-                'dummy', 'A Question',
-                exp_domain.State.create_default_state('ABC').to_dict(), 1,
-                self.collection_id, 'en')
+            'dummy', 'A Question',
+            exp_domain.State.create_default_state('ABC').to_dict(), 1,
+            self.collection_id, 'en')
         self.payload['question'] = question.to_dict()
         self.payload['skill_id'] = self.skill_id
         self.login(self.NEW_USER_EMAIL)
@@ -425,14 +427,13 @@ class QuestionIntegrationTest(test_utils.GenericTestBase):
             'dummy', 'Question 2',
             exp_domain.State.create_default_state('ABC').to_dict(), 1,
             self.collection_id, 'en')
-        self.payload['question'] = question.to_dict()
+        self.payload['question'] = another_question.to_dict()
         self.payload['skill_id'] = self.skill_id
         self.login(self.NEW_USER_EMAIL)
         response_json = self.post_json(
             '%s' % feconf.QUESTION_POST_URL, self.payload,
             expect_errors=False)
         self.assertIn('question_id', response_json.keys())
-        another_question_id = response_json['question_id']
 
         del self.payload['question']
         del self.payload['skill_id']

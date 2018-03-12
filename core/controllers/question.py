@@ -65,7 +65,7 @@ class QuestionsHandler(base.BaseHandler):
             for change in json.loads(self.payload.get('change_list'))]
         question_services.update_question(
             self.user_id, collection_id, question_id, change_list,
-                commit_message)
+            commit_message)
         return self.render_json({
             'question_id': question_id
         })
@@ -117,6 +117,7 @@ class QuestionManagerHandler(base.BaseHandler):
             question_services.get_question_summaries_for_collection(
                 collection_id))
         return self.render_json({
-            'question_summary_dicts': [question_summary.to_dict()
+            'question_summary_dicts': [
+            question_summary.to_dict()
             for question_summary in question_summaries]
             })
