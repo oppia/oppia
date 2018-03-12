@@ -1,8 +1,6 @@
 <style>
-  div.refreshContainer {
-    text-align: right;
-  }
   div.refreshContainer a {
+    margin-right: 8px;
     font-weight: bold;
   }
   div.refreshContainer em {
@@ -25,8 +23,6 @@
     </li>
   </ul>
   <div ng-show="unresolvedAnswersData !== null" class='refreshContainer'>
-    <hr/>
-    <a ng-click="computeUnresolvedAnswers()">Refresh</a><br/>
-    <em class="latestRefreshMsg">Lastest refresh: <[latestRefreshDate.toLocaleString()]>.</em>
+    <a ng-click="computeUnresolvedAnswers()">Refresh</a> <em class="latestRefreshMsg">Lastest refresh: <[latestRefreshDate.toLocaleString()]>.</em>
   </div>
 </div>
