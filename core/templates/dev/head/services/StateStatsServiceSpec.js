@@ -66,7 +66,7 @@ describe('State Stats Service', function() {
           data: [
             {answer: 'Ni Hao', frequency: 5},
             {answer: 'Aloha', frequency: 3},
-            {answer: 'Hola!', frequency: 1}
+            {answer: 'Hola', frequency: 1}
           ],
           id: 'FrequencyTable',
           addressed_info_is_supported: true,
@@ -75,9 +75,9 @@ describe('State Stats Service', function() {
 
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
-      $httpBackend.expectGET(
-        '/createhandler/state_rules_stats/0/Hola'
-      ).respond(HOLA_STATE_RULES_STATS_RESPONSE);
+      $httpBackend.expectGET('/createhandler/state_rules_stats/0/Hola').respond(
+        HOLA_STATE_RULES_STATS_RESPONSE
+      );
 
       StateStatsService.computeStateStats(
         HOLA_STATE, EXPLORATION_ID
