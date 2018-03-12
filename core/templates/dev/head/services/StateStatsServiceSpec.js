@@ -32,4 +32,78 @@ describe('State Stats Service', function() {
         })
       ).toBe(true);
     });
+
+  describe('Stats Computation', function() {
+    var $httpBackend = null;
+
+    beforeEach(inject(function($injector) {
+      $httpBackend = $injector.get('$httpBackend');
+    }));
+
+    afterEach(function() {
+      $httpBackend.verifyNoOutstandingExpectation();
+      $httpBackend.verifyNoOutstandingRequest();
+    });
+
+    var EXPLORATION_ID = '0';
+    var HOLA_STATE = null;
+    var HOLA_STATE_RULES_STATS_RESPONSE = null;
+
+    beforeEach(function() {
+      HOLA_STATE = {
+        name: 'Hola',
+        interaction: {
+          answerGroups: [
+            {rules: [{type: "Equals", inputs: {x: "hola!"}}]},
+            {rules: [{type: "Contains", inputs: {x: "hola"}}]},
+            {rules: [{type: "FuzzyEquals", inputs: {x: "hola"}}]}
+          ],
+          defaultOutcome: {dest: "Hola"},
+          id: "TextInput"
+        }
+      };
+      HOLA_STATE_RULES_STATS_RESPONSE = {
+        visualizations_info: [{
+          data: [
+            {answer: "Ni Hao", frequency: 2},
+            {answer: "Aloha", frequency: 1}
+          ],
+          id: "FrequencyTable",
+          addressed_info_is_supported: true,
+          options: {
+            title: "Top answers",
+            column_headers: [
+              "Answer",
+              "Count"
+            ]
+          }
+        }]
+      };
+    });
+
+    it('should work for TextInput', function() {
+      var successHandler = jasmine.createSpy('success');
+      var failureHandler = jasmine.createSpy('failure');
+      $httpBackend.expectGET('/createhandler/state_rules_stats/0/Hola').respond(
+        HOLA_STATE_RULES_STATS_RESPONSE
+      );
+
+      StateStatsService.computeStateStats(
+        HOLA_STATE, EXPLORATION_ID
+      ).then(successHandler, failureHandler);
+
+      $httpBackend.flush();
+      expect(successHandler).toHaveBeenCalledWith(
+        jasmine.objectContaining({
+          visualizations_info: [jasmine.objectContaining({
+            data: [
+              {answer: "Ni Hao", frequency: 2, is_addressed: false},
+              {answer: "Aloha", frequency: 1, is_addressed: false}
+            ],
+          })]
+        })
+      );
+      expect(failureHandler).not.toHaveBeenCalled();
+    });
+  });
 });
