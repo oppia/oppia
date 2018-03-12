@@ -41,8 +41,9 @@ oppia.factory('StateStatsService', [
        * Returns a promise which will provide details of the given state's
        * answer-statistics.
        */
-      computeStateStats: function(state) {
-        var explorationId = ExplorationContextService.getExplorationId();
+      computeStateStats: function(state, explorationId) {
+        var explorationId = explorationId ||
+          ExplorationContextService.getExplorationId();
         var stateRulesStatsUrl = UrlInterpolationService.interpolateUrl(
           STATE_RULES_STATS_URL_TEMPLATE, {
             exploration_id: explorationId,
