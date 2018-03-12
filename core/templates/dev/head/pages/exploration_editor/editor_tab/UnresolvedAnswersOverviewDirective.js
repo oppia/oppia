@@ -33,8 +33,8 @@ oppia.directive('unresolvedAnswersOverview', [
           var MAXIMUM_UNRESOLVED_ANSWERS = 5;
           var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
-          $scope.unresolvedAnswersData = [];
-          $scope.lastRefreshDate = new Date();
+          $scope.unresolvedAnswersData = null;
+          $scope.latestRefreshDate = new Date();
 
           $scope.computeUnresolvedAnswers = function() {
             var state = ExplorationStatesService.getState(
@@ -74,7 +74,7 @@ oppia.directive('unresolvedAnswersOverview', [
 
                 // Only keep 5 unresolved answers.
                 $scope.unresolvedAnswersData = calculatedUnresolvedAnswersData;
-                $scope.lastRefreshDate = new Date();
+                $scope.latestRefreshDate = new Date();
               });
             }
           };

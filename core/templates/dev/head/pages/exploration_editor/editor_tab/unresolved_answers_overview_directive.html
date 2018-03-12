@@ -1,17 +1,32 @@
 <style>
-  /* TODO(brianrodri). */
+  div.refreshContainer {
+    text-align: right;
+  }
+  div.refreshContainer a {
+    font-weight: bold;
+  }
+  div.refreshContainer em {
+    color: #AAA;
+    font-size: 0.8em;
+  }
+  div.refreshContainer hr {
+    margin: 8px 0;
+  }
 </style>
 
 <div>
-  <!-- TODO(brianrodri): Make refresh automatically happen when necessary. -->
   <strong>Unresolved Student Answers</strong>
   <ul>
     <li ng-repeat="data in unresolvedAnswersData">
       <[data.answer]> (submitted <[data.frequency]> times)
     </li>
-    <li ng-if="unresolvedAnswersData.length === 0">
+    <li ng-if="unresolvedAnswersData === null || unresolvedAnswersData.length === 0">
       <em>No student answers require attention.</em>
     </li>
   </ul>
-  <a ng-click="computeUnresolvedAnswers()">Refresh</a> <em>Last updated at: <[lastRefreshDate.toUTCString()]>.</em>
+  <div ng-show="unresolvedAnswersData !== null" class='refreshContainer'>
+    <hr/>
+    <a ng-click="computeUnresolvedAnswers()">Refresh</a><br/>
+    <em class="latestRefreshMsg">Lastest refresh: <[latestRefreshDate.toLocaleString()]>.</em>
+  </div>
 </div>
