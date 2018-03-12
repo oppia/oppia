@@ -181,9 +181,20 @@ oppia.factory('RteHelperService', [
           });
         });
 
-        text = elt.html();
-        text = $filter('removeExtraLinesAndSpaces')(text);
-        return text;
+        var textElt = elt[0].childNodes;
+        for (var i = textElt.length - 1; i > 0; i--) {
+          test = textElt[ i].innerHTML;
+          test = test.replace(/<br>/g, '');
+          test = test.replace(/&nbsp;/g, '');
+          test = test.replace(/ /g, '');
+          if (test === '') {
+            textElt[i].remove();
+          } else {
+            break;
+          }
+        }
+
+        return elt.html();
       },
       getRichTextComponents: function() {
         return angular.copy(_RICH_TEXT_COMPONENTS);

@@ -345,43 +345,6 @@ oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
   };
 }]);
 
-// Note that this filter removes additional new lines or <p><br></p> tags
-// at the end of the string.
-oppia.filter('removeExtraLinesAndSpaces', [function() {
-  return function(string) {
-    if (!angular.isString(string)) {
-      return string;
-    }
-    var PARA_START = '<p>';
-    var PARA_CLOSE = '</p>';
-    var SPACE_CHAR = ' ';
-    var SPACE_ENTITY = '&nbsp;';
-    var NEW_LINE = '<br>';
-
-    string = string.replace(/<p>/gi, '');
-    string = string.replace(/<\/p>/gi, '');
-    for (var i = string.length; i > 0; i--) {
-      if (string.substring(
-        i - SPACE_CHAR.length, string.length) === SPACE_CHAR) {
-        string = string.substring(0, i - SPACE_CHAR.length);
-        i = i - SPACE_CHAR.length + 1;
-      } else if (string.substring(
-        i - SPACE_ENTITY.length, string.length) === SPACE_ENTITY) {
-        string = string.substring(0, i - SPACE_ENTITY.length);
-        i = i - SPACE_ENTITY.length + 1;
-      } else if (string.substring(
-        i - NEW_LINE.length, string.length) === NEW_LINE) {
-        string = string.substring(0, i - NEW_LINE.length);
-        i = i - NEW_LINE.length + 1;
-      } else {
-        break;
-      }
-    }
-    string = PARA_START + string + PARA_CLOSE;
-    return string;
-  };
-}]);
-
 oppia.filter('convertToPlainText', [function() {
   return function(input) {
     var strippedText = input.replace(/(<([^>]+)>)/ig, '');
