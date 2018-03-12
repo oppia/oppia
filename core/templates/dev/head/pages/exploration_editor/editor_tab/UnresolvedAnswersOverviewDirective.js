@@ -19,9 +19,6 @@
 oppia.directive('unresolvedAnswersOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
-      // Note: This directive is used as attribute because pannability does not
-      //    work when directive is used as element. (Convention in the codebase
-      //    is to use directive as element.)
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
