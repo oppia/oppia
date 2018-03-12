@@ -1,0 +1,15 @@
+{
+  "name": "eslint-plugin-angular-npm-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "node_modules/.bin/eslint app/"
+  },
+  "author": "emmanueldemey <demey.emmanuel@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^1.1.0",
+    "eslint-plugin-angular": "file:../../"
+  }
+}

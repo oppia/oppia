@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Public base API for data services corresponding to state properties
+ * @fileoverview Public base API for data services corresponding to state
+ * properties
  */
 
 oppia.factory('statePropertyService', [
