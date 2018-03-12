@@ -211,7 +211,8 @@ oppia.controller('StatisticsTab', [
                     $filter('camelCaseToHyphens')(vizInfo.id) + '/>');
                   el.attr('data', escapedData);
                   el.attr('options', escapedOptions);
-                  el.attr('addressed-info-is-shown', vizInfo.show_addressed_info);
+                  el.attr(
+                    'addressed-column-is-shown', vizInfo.show_addressed_info);
                   return el.get(0).outerHTML;
                 });
 
