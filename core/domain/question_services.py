@@ -16,6 +16,7 @@
 
 """Services for questions data model."""
 
+import collections
 import logging
 import random
 
@@ -84,13 +85,18 @@ def delete_question(
             one.
 
     Raises:
-        Exception. The question with ID is not present in collection with ID.
+        Exception. The question with ID is not present in the given collection.
     """
     question = get_question_by_id(question_id)
     if collection_id != question.collection_id:
         raise Exception(
-            'The question with ID %s is not present in collection with ID %s' % ( # pylint: disable=line-too-long
-                question_id, collection_id))
+            'The question with ID %s is not present'
+            ' in the given collection' % question_id)
+    collection = collection_services.get_collection_by_id(collection_id)
+    for skill in collection.skills.values():
+        if question_id in skill.question_ids:
+            remove_question_id_from_skill(
+                question_id, collection_id, skill.id, committer_id)
     question_model = question_models.QuestionModel.get(question_id)
     question_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_QUESTION_DELETED,
@@ -244,13 +250,13 @@ def update_question(
             question.
 
     Raises:
-        Exception. The question with ID is not present in collection with ID.
+        Exception. The question with ID is not present in the given collection.
     """
     question = get_question_by_id(question_id)
     if collection_id != question.collection_id:
         raise Exception(
-            'The question with ID %s is not present in collection with ID %s' % ( # pylint: disable=line-too-long
-                question_id, collection_id))
+            'The question with ID %s is not present'
+            ' in the given collection' % question_id)
     updated_question = apply_change_list(question_id, change_list)
     _save_question(
         committer_id, updated_question, change_list, commit_message)
@@ -337,18 +343,16 @@ def get_question_summaries_for_collection(collection_id):
         list(QuestionSummary). A list of Question Summary objects.
     """
     collection = collection_services.get_collection_by_id(collection_id)
-    skill_ids_of_question = {}
+    questions_to_skills = collections.defaultdict(list)
     for skill in collection.skills.values():
         for question_id in skill.question_ids:
-            if question_id not in skill_ids_of_question:
-                skill_ids_of_question[question_id] = []
-            skill_ids_of_question[question_id].append(skill.name)
-    questions = get_questions_by_ids(skill_ids_of_question.keys())
+            questions_to_skills[question_id].append(skill.name)
+    questions = get_questions_by_ids(questions_to_skills.keys())
 
     question_summaries = []
     for question in questions:
         question_summaries.append(
             question_domain.QuestionSummary(
                 question.question_id, question.title, (
-                    skill_ids_of_question[question.question_id])))
+                    questions_to_skills[question.question_id])))
     return question_summaries

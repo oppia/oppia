@@ -168,11 +168,11 @@ class QuestionSummaryDomainTest(test_utils.GenericTestBase):
     """Test for Question Summary Domain object."""
 
     def test_to_dict(self):
-        expected_object = {
+        expected_object_dict = {
             'question_id': 'col1.abc',
             'question_title': 'hello',
             'skills': ['skill1', 'skill2']
         }
         observed_object = question_domain.QuestionSummary(
             'col1.abc', 'hello', ['skill1', 'skill2'])
-        self.assertEqual(expected_object, observed_object.to_dict())
+        self.assertEqual(expected_object_dict, observed_object.to_dict())

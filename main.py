@@ -469,13 +469,13 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/batch' % feconf.QUESTION_DATA_URL,
         question.QuestionsBatchHandler),
     get_redirect_route(
-        r'%s' % feconf.QUESTION_DATA_URL,
-        question.QuestionsHandler),
+        r'%s' % feconf.QUESTION_POST_URL,
+        question.QuestionsPostHandler),
     get_redirect_route(
         r'%s/<collection_id>/<question_id>' % feconf.QUESTION_DATA_URL,
         question.QuestionsHandler),
     get_redirect_route(
-        r'%s' % feconf.QUESTION_MANAGE_URL,
+        r'%s' % feconf.QUESTION_MANAGER_URL,
         question.QuestionManagerHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
