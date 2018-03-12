@@ -31,7 +31,6 @@ oppia.controller('StatisticsTab', [
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
       RouterService, StateStatsService, IMPROVE_TYPE_INCOMPLETE) {
-    console.log("uhh...");
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
