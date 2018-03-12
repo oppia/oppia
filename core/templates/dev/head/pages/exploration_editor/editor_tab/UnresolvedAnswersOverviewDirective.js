@@ -86,6 +86,8 @@ oppia.directive('unresolvedAnswersOverviewViz', [
               EditorStateService.getActiveStateName());
 
             $scope.unresolvedAnswersData = [];
+            $scope.lastRefreshDate = null;
+
             if (StateStatsService.stateSupportsIssuesOverview(state)) {
               StateStatsService.computeStateStats(state).then(function(stats) {
                 var calculatedUnresolvedAnswersData = [];
@@ -118,6 +120,7 @@ oppia.directive('unresolvedAnswersOverviewViz', [
 
                 // Only keep 5 unresolved answers.
                 $scope.unresolvedAnswersData = calculatedUnresolvedAnswersData;
+                $scope.lastRefreshDate = new Date();
               });
             }
           };
