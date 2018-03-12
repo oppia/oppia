@@ -167,7 +167,7 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
 
     EXPECTED_THREAD_DICT7 = {
         'text': (u'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od; /⏬®;😁☕😁:☝)'
-            u'😁😁😍1!@#'),
+                 u'😁😁😍1!@#'),
         'subject': u'(Feedback from a learner)'
     }
 
