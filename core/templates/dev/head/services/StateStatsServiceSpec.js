@@ -26,7 +26,6 @@ describe('State Stats Service', function() {
 
   describe('Identify States that Support Issues Overview', function() {
     it('should support TextInput interactions', function() {
-      var STATE_SKELETON = ;
       expect(
         StateStatsService.stateSupportsIssuesOverview({
           interaction: {id: 'TextInput'}
