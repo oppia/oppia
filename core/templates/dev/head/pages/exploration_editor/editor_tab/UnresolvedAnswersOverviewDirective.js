@@ -30,13 +30,13 @@ oppia.directive('unresolvedAnswersOverview', [
         function(
             $scope, EditorStateService, ExplorationStatesService,
             StateStatsService) {
-          let MAXIMUM_UNRESOLVED_ANSWERS = 5;
-          let MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
+          var MAXIMUM_UNRESOLVED_ANSWERS = 5;
+          var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
           $scope.unresolvedAnswersData = [];
 
           $scope.computeUnresolvedAnswers = function() {
-            let state = ExplorationStatesService.getState(
+            var state = ExplorationStatesService.getState(
               EditorStateService.getActiveStateName());
 
             $scope.unresolvedAnswersData = [];
@@ -44,10 +44,10 @@ oppia.directive('unresolvedAnswersOverview', [
 
             if (StateStatsService.stateSupportsIssuesOverview(state)) {
               StateStatsService.computeStateStats(state).then(function(stats) {
-                let calculatedUnresolvedAnswersData = [];
+                var calculatedUnresolvedAnswersData = [];
 
                 for (var i = 0; i !== stats.visualizations_info.length; ++i) {
-                  let vizInfo = stats.visualizations_info[i];
+                  var vizInfo = stats.visualizations_info[i];
                   if (!vizInfo.show_addressed_info) {
                     // Skip visualizations which don't support addressed
                     // information.
@@ -55,7 +55,7 @@ oppia.directive('unresolvedAnswersOverview', [
                   }
 
                   for (var j = 0; j !== vizInfo.data.length; ++j) {
-                    let answer = vizInfo.data[j];
+                    var answer = vizInfo.data[j];
                     if (answer.is_addressed ||
                         answer.frequency <
                           MINIMUM_UNRESOLVED_ANSWER_FREQUENCY) {
