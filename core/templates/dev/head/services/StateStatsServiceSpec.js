@@ -51,11 +51,16 @@ describe('State Stats Service', function() {
         // Only including properties required for stat computation.
         name: 'Hola',
         interaction: {
-          answerGroups: [
-            {rules: [{type: 'Equals', inputs: {x: 'hola!'}}]},
-            {rules: [{type: 'Contains', inputs: {x: 'hola'}}]},
-            {rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}]}
-          ],
+          answerGroups: [{
+            rules: [{type: 'Equals', inputs: {x: 'hola!'}}],
+            outcome: {dest: 'Me Llamo'}
+          }, {
+            rules: [{type: 'Contains', inputs: {x: 'hola'}}],
+            outcome: {dest: 'Me Llamo'}
+          }, {
+            rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}],
+            outcome: {dest: 'Hola'}
+          }],
           defaultOutcome: {dest: 'Hola'},
           id: 'TextInput'
         }
@@ -69,7 +74,7 @@ describe('State Stats Service', function() {
             {answer: 'Hola', frequency: 1}
           ],
           id: 'FrequencyTable',
-          addressed_info_is_supported: true,
+          addressed_info_is_supported: true
         }]
       };
 
@@ -90,7 +95,7 @@ describe('State Stats Service', function() {
             data: [
               {answer: 'Ni Hao', frequency: 5, is_addressed: false},
               {answer: 'Aloha', frequency: 3, is_addressed: false},
-              {answer: 'Hola!', frequency: 1, is_addressed: true}
+              {answer: 'Hola', frequency: 1, is_addressed: true}
             ],
           })]
         })
