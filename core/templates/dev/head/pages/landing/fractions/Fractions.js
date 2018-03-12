@@ -40,6 +40,6 @@ oppia.controller('Fractions', [
       $timeout(function() {
         $window.location = 'https://www.oppia.org/splash';
       }, 150);
-    }
+    };
   }
 ]);
