@@ -32,5 +32,4 @@ describe('State Stats Service', function() {
         })
       ).toBe(true);
     });
-
 });
