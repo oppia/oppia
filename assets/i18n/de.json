@@ -345,6 +345,7 @@
 	"I18N_PLAYER_HINT_REQUEST_STRING_2": "Ich bin ein bisschen stecken geblieben. Irgendwelche Hinweise?",
 	"I18N_PLAYER_HINT_REQUEST_STRING_3": "Ich habe ein kleines Problem.",
 	"I18N_PLAYER_INFO_TOOLTIP": "Information",
+	"I18N_PLAYER_IS_PRIVATE": "Diese Erkundung ist privat.",
 	"I18N_PLAYER_LAST_UPDATED_TOOLTIP": "Zuletzt aktualisiert",
 	"I18N_PLAYER_LEARN_AGAIN_BUTTON": "Erneut lernen",
 	"I18N_PLAYER_LEAVE_FEEDBACK": "Hinterlasse eine Rückmeldung für die Autoren …",

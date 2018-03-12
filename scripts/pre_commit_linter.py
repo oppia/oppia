@@ -183,16 +183,16 @@ _PATHS_TO_INSERT = [
     _PYLINT_PATH,
     os.getcwd(),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine', 'lib', 'webapp2-2.3'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine', 'lib', 'yaml-3.10'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine', 'lib', 'jinja2-2.6'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'numpy-1.6.1'),

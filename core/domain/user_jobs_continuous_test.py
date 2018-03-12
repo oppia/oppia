@@ -644,12 +644,10 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         """Runs the MapReduce job after running the continuous
         statistics aggregator for explorations to get the correct num
         completion events."""
-        with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-            with self.swap(
-                stats_services, 'get_exploration_stats',
-                self._mock_get_statistics):
-                ModifiedUserStatsAggregator.start_computation()
-                self.process_and_flush_pending_tasks()
+        with self.swap(
+            stats_services, 'get_exploration_stats', self._mock_get_statistics):
+            ModifiedUserStatsAggregator.start_computation()
+            self.process_and_flush_pending_tasks()
 
     def _generate_user_ids(self, count):
         """Generate unique user ids to rate an exploration. Each user id needs

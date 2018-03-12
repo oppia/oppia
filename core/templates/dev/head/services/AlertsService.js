@@ -86,18 +86,20 @@ oppia.factory('AlertsService', ['$log', function($log) {
     AlertsService.warnings = [];
   };
 
-  /**
-   * Adds a message, can be info messages or success messages.
-   * @param {string} type - Type of message
-   * @param {string} message - Message content
-   */
-  AlertsService.addMessage = function(type, message) {
+    /**
+     * Adds a message, can be info messages or success messages.
+     * @param {string} type - Type of message
+     * @param {string} message - Message content
+     * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
+     */
+  AlertsService.addMessage = function(type, message, timeoutMilliseconds) {
     if (AlertsService.messages.length >= MAX_TOTAL_MESSAGES) {
       return;
     }
     AlertsService.messages.push({
       type: type,
-      content: message
+      content: message,
+      timeout: timeoutMilliseconds
     });
   };
 
@@ -117,20 +119,28 @@ oppia.factory('AlertsService', ['$log', function($log) {
     AlertsService.messages = newMessages;
   };
 
-  /**
-   * Adds an info message.
-   * @param {string} message - Info message to display.
-   */
-  AlertsService.addInfoMessage = function(message) {
-    AlertsService.addMessage('info', message);
+    /**
+     * Adds an info message.
+     * @param {string} message - Info message to display.
+     * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
+     */
+  AlertsService.addInfoMessage = function(message, timeoutMilliseconds) {
+    if (timeoutMilliseconds === undefined) {
+      timeoutMilliseconds = 1500;
+    }
+    AlertsService.addMessage('info', message, timeoutMilliseconds);
   };
 
-  /**
-   * Adds a success message.
-   * @param {string} message - Success message to display
-   */
-  AlertsService.addSuccessMessage = function(message) {
-    AlertsService.addMessage('success', message);
+    /**
+     * Adds a success message.
+     * @param {string} message - Success message to display
+     * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
+     */
+  AlertsService.addSuccessMessage = function(message, timeoutMilliseconds) {
+    if (timeoutMilliseconds === undefined) {
+      timeoutMilliseconds = 1500;
+    }
+    AlertsService.addMessage('success', message, timeoutMilliseconds);
   };
 
   /**

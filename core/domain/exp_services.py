@@ -868,16 +868,14 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration.version += 1
 
     # Trigger statistics model update.
-    if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-        stats_services.handle_stats_creation_for_new_exp_version(
-            exploration.id, exploration.version, exploration.states,
-            change_list)
+    stats_services.handle_stats_creation_for_new_exp_version(
+        exploration.id, exploration.version, exploration.states,
+        change_list)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
-        new_to_old_state_names = exploration.get_state_names_mapping(
-            change_list)
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         trainable_states_dict = exploration.get_trainable_states_dict(
-            old_states, new_to_old_state_names)
+            old_states, exp_versions_diff)
         state_names_with_changed_answer_groups = trainable_states_dict[
             'state_names_with_changed_answer_groups']
         state_names_with_unchanged_answer_groups = trainable_states_dict[
@@ -888,7 +886,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         if state_names_with_unchanged_answer_groups:
             classifier_services.handle_non_retrainable_states(
                 exploration, state_names_with_unchanged_answer_groups,
-                new_to_old_state_names)
+                exp_versions_diff)
 
     # Save state id mapping model for exploration.
     create_and_save_state_id_mapping_model(exploration, change_list)
@@ -939,9 +937,8 @@ def _create_exploration(
     exploration.version += 1
 
     # Trigger statistics model creation.
-    if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-        stats_services.handle_stats_creation_for_new_exploration(
-            exploration.id, exploration.version, exploration.states)
+    stats_services.handle_stats_creation_for_new_exploration(
+        exploration.id, exploration.version, exploration.states)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         # Find out all states that need a classifier to be trained.

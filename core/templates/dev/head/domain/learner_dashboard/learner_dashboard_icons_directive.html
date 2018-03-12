@@ -21,5 +21,13 @@
 <i class="oppia-learner-dashboard-icon fa fa-spinner"
    ng-if="belongsToIncompleteActivities()"
    aria-hidden="true"
+   tooltip-append-to-body="true"
+   tooltip-class="library-incomplete-activity-tooltip"
    uib-tooltip="<['I18N_LIBRARY_INCOMPLETE_ACTIVITY_ICON' | translate]>"
    tooltip-placement="left"></i>
+<style>
+  .library-incomplete-activity-tooltip .tooltip-inner {
+    max-width: none;
+    white-space: nowrap;
+  }
+</style>

@@ -800,6 +800,12 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         init_state_name = exploration.init_state_name
         self._record_play(exp_id, init_state_name)
         self._rate_exploration('user1', exp_id, 5)
+        event_services.StatsEventsHandler.record(self.EXP_ID_1, 1, {
+            'num_starts': 1,
+            'num_actual_starts': 0,
+            'num_completions': 0,
+            'state_stats_mapping': {}
+        })
 
         (user_jobs_continuous_test.ModifiedUserStatsAggregator.
          start_computation())
@@ -830,6 +836,12 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         self._record_play(exp_id_1, init_state_name_1)
         self._rate_exploration('user1', exp_id_1, 5)
         self._rate_exploration('user2', exp_id_2, 4)
+        event_services.StatsEventsHandler.record(self.EXP_ID_1, 1, {
+            'num_starts': 1,
+            'num_actual_starts': 0,
+            'num_completions': 0,
+            'state_stats_mapping': {}
+        })
 
         (user_jobs_continuous_test.ModifiedUserStatsAggregator.
          start_computation())
@@ -857,6 +869,12 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         self._rate_exploration('user1', exp_id, 4)
         self._record_play(exp_id, init_state_name)
         self._record_play(exp_id, init_state_name)
+        event_services.StatsEventsHandler.record(self.EXP_ID_1, 1, {
+            'num_starts': 2,
+            'num_actual_starts': 0,
+            'num_completions': 0,
+            'state_stats_mapping': {}
+        })
 
         (user_jobs_continuous_test.ModifiedUserStatsAggregator.
          start_computation())

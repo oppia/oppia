@@ -84,14 +84,32 @@ class ExplorationStats(object):
 
     @property
     def num_starts(self):
+        """Returns the number of learners who started the exploration.
+
+        Returns:
+            int. The number of learners who started the exploration.
+        """
         return self.num_starts_v1 + self.num_starts_v2
 
     @property
     def num_actual_starts(self):
+        """Returns the number of learners who actually attempted the
+        exploration. These are the learners who have completed the initial
+        state of the exploration and traversed to the next state.
+
+        Returns:
+            int. The number of learners who actually attempted
+                the exploration.
+        """
         return self.num_actual_starts_v1 + self.num_actual_starts_v2
 
     @property
     def num_completions(self):
+        """Returns the number of learners who completed the exploration.
+
+        Returns:
+            int. The number of learners who completed the exploration.
+        """
         return self.num_completions_v1 + self.num_completions_v2
 
     def to_dict(self):
@@ -249,26 +267,57 @@ class StateStats(object):
 
     @property
     def total_answers_count(self):
+        """Returns the total number of answers submitted to this state.
+
+        Returns:
+            int. The total number of answers submitted to this state.
+        """
         return self.total_answers_count_v1 + self.total_answers_count_v2
 
     @property
     def useful_feedback_count(self):
+        """Returns the total number of answers that received useful feedback.
+
+        Returns:
+            int. The total number of answers that received useful feedback.
+        """
         return self.useful_feedback_count_v1 + self.useful_feedback_count_v2
 
     @property
     def total_hit_count(self):
+        """Returns the total number of times the state was entered.
+
+        Returns:
+            int. The total number of times the state was entered.
+        """
         return self.total_hit_count_v1 + self.total_hit_count_v2
 
     @property
     def first_hit_count(self):
+        """Returns the number of times the state was entered for the first time.
+
+        Returns:
+            int. The number of times the state was entered for the first time.
+        """
         return self.first_hit_count_v1 + self.first_hit_count_v2
 
     @property
     def num_completions(self):
+        """Returns total number of times the state was completed.
+
+        Returns:
+            int. The total number of times the state was completed.
+        """
         return self.num_completions_v1 + self.num_completions_v2
 
     @property
     def num_times_solution_viewed(self):
+        """Returns the number of times the solution button was triggered.
+
+        Returns:
+            int. Number of times the solution button was triggered to answer a
+                state only for events for schema version 2.
+        """
         return self.num_times_solution_viewed_v2
 
     @classmethod
@@ -464,6 +513,11 @@ class SubmittedAnswer(object):
         self.answer_str = answer_str
 
     def to_dict(self):
+        """Returns the dict of submitted answer.
+
+        Returns:
+            dict. The submitted answer dict.
+        """
         submitted_answer_dict = {
             'answer': self.answer,
             'interaction_id': self.interaction_id,
@@ -482,6 +536,12 @@ class SubmittedAnswer(object):
 
     @classmethod
     def from_dict(cls, submitted_answer_dict):
+        """Returns the domain object representing an answer submitted to a
+        state.
+
+        Returns:
+            SubmittedAnswer. The SubmittedAnswer domin object.
+        """
         return cls(
             submitted_answer_dict['answer'],
             submitted_answer_dict['interaction_id'],
@@ -584,6 +644,15 @@ class AnswerOccurrence(object):
         self.frequency = frequency
 
     def to_raw_type(self):
+        """Returns a Python dict representing the specific answer.
+
+        Returns:
+            dict. The specific answer dict in the following format:
+            {
+                'answer': *. The answer submitted by the learner.
+                'frequency': int. The number of occurrences of the answer.
+            }
+        """
         return {
             'answer': self.answer,
             'frequency': self.frequency
@@ -591,6 +660,20 @@ class AnswerOccurrence(object):
 
     @classmethod
     def from_raw_type(cls, answer_occurrence_dict):
+        """Returns domain object that represents a specific answer that occurred
+        some number of times.
+
+        Args:
+            answer_occurrence_dict: dict. The specific answer dict in the
+                following format:
+                {
+                    'answer': *. The answer submitted by the learner.
+                    'frequency': int. The number of occurrences of the answer.
+                }
+
+        Returns:
+            AnswerOccurrence. The AnswerOccurrence domain object.
+        """
         return cls(
             answer_occurrence_dict['answer'],
             answer_occurrence_dict['frequency'])
@@ -616,12 +699,37 @@ class AnswerFrequencyList(AnswerCalculationOutput):
             answer_occurrences if answer_occurrences else [])
 
     def to_raw_type(self):
+        """Returns the answer occurrences list with each answer represented as
+        a Python dict.
+
+        Returns:
+            list(dict). A list of answer occurrence dicts. Each dict has the
+                following format:
+                {
+                    'answer': *. The answer submitted by the learner.
+                    'frequency': int. The number of occurrences of the answer.
+                }
+        """
         return [
             answer_occurrence.to_raw_type()
             for answer_occurrence in self.answer_occurrences]
 
     @classmethod
     def from_raw_type(cls, answer_occurrence_list):
+        """Creates a domain object that represents an output list of
+        AnswerOccurrences.
+
+        Args:
+            answer_occurrence_list: list(dict). A list containing answer
+                occurrence dicts in the following format:
+                {
+                    'answer': *. The answer submitted by the learner.
+                    'frequency': int. The number of occurrences of the answer.
+                }
+
+        Returns:
+            AnswerFrequencyList. The domain object for answer occurrences list.
+        """
         return cls([
             AnswerOccurrence.from_raw_type(answer_occurrence_dict)
             for answer_occurrence_dict in answer_occurrence_list])
@@ -641,6 +749,17 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
             if categorized_answer_freq_lists else {})
 
     def to_raw_type(self):
+        """Returns the categorized frequency Python dict.
+
+        Returns:
+            dict. A dict whose keys are category names and whose corresponding
+                values are lists of answer frequency dicts. Each answer
+                frequency dict has the following keys and values:
+                {
+                    'answer': *. The answer submitted by the learner.
+                    'frequency': int. The number of occurrences of the answer.
+                }
+        """
         return {
             category: answer_frequency_list.to_raw_type()
             for category, answer_frequency_list in (
@@ -649,6 +768,23 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
 
     @classmethod
     def from_raw_type(cls, categorized_frequency_dict):
+        """Returns the domain object for categorized answer frequency dict for
+        a given dict.
+
+        Args:
+            categorized_frequency_dict: dict. The categorized answer frequency
+                dict whose keys are category names and whose corresponding
+                values are lists of answer frequency dicts. Each answer
+                frequency dict has the following keys and values:
+                {
+                    'answer': *. The answer submitted by the learner.
+                    'frequency': int. The number of occurrences of the answer.
+                }
+
+        Returns:
+            CategorizedAnswerFrequencyLists. The domain object for categorized
+                answer frequency dict.
+        """
         return cls({
             category: AnswerFrequencyList.from_raw_type(answer_occurrence_list)
             for category, answer_occurrence_list in (
