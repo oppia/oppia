@@ -34,23 +34,22 @@ oppia.directive('unresolvedAnswersOverview', [
           var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
           $scope.unresolvedAnswersData = [];
+          $scope.lastRefreshDate = new Date();
 
           $scope.computeUnresolvedAnswers = function() {
             var state = ExplorationStatesService.getState(
-              EditorStateService.getActiveStateName());
+              EditorStateService.getActiveStateName()
+            );
 
-            $scope.unresolvedAnswersData = [];
-            $scope.lastRefreshDate = null;
-
-            if (StateStatsService.stateSupportsIssuesOverview(state)) {
+            if (!StateStatsService.stateSupportsIssuesOverview(state)) {
+              $scope.unresolvedAnswersData = [];
+            } else {
               StateStatsService.computeStateStats(state).then(function(stats) {
                 var calculatedUnresolvedAnswersData = [];
 
                 for (var i = 0; i !== stats.visualizations_info.length; ++i) {
                   var vizInfo = stats.visualizations_info[i];
                   if (!vizInfo.addressed_info_is_supported) {
-                    // Skip visualizations which don't support addressed
-                    // information.
                     continue;
                   }
 
@@ -64,7 +63,7 @@ oppia.directive('unresolvedAnswersOverview', [
 
                     calculatedUnresolvedAnswersData.push(answer);
                     if (calculatedUnresolvedAnswersData.length ===
-                        MAXIMUM_UNRESOLVED_ANSWERS) {
+                          MAXIMUM_UNRESOLVED_ANSWERS) {
                       break;
                     }
                   }
