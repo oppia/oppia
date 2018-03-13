@@ -3,12 +3,12 @@
   <tr>
     <th><[options.column_headers[0]]></th>
     <th><[options.column_headers[1]]></th>
-    <th ng-if="addressedColumnIsShown">Addressed specifically?</th>
+    <th ng-if="addressedInfoIsSupported">Addressed specifically?</th>
   </tr>
   <tr ng-repeat="row in data track by $index">
     <td><[row.answer]></td>
     <td><[row.frequency]></td>
-    <td ng-if="addressedColumnIsShown">
+    <td ng-if="addressedInfoIsSupported">
       <span ng-if="row.is_addressed">Yes</span>
       <span ng-if="!row.is_addressed">No</span>
     </td>
