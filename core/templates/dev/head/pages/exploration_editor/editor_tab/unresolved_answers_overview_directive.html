@@ -12,7 +12,7 @@
   <strong>Unresolved Student Answers</strong>
   <ul>
     <li ng-repeat="data in unresolvedAnswersData">
-      <strong>x<[data.frequency]></strong>: <span><[data.answer]></span>
+      <strong>x<[data.frequency]></strong>: <span ng-bind-html="data.answer"></span>
     </li>
     <li ng-if="unresolvedAnswersData.length === 0">
       <em>No answers require attention.</em>
