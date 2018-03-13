@@ -80,7 +80,7 @@ describe('State Rules Stats Service', function() {
         HOLA_STATE_RULES_STATS_RESPONSE
       );
 
-      StateRulesStatsService.computeStateStats(
+      StateRulesStatsService.computeStateRulesStats(
         HOLA_STATE, EXPLORATION_ID
       ).then(successHandler, failureHandler);
       $httpBackend.flush();

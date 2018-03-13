@@ -44,7 +44,7 @@ oppia.directive('unresolvedAnswersOverview', [
             if (!StateRulesStatsService.stateSupportsIssuesOverview(state)) {
               $scope.unresolvedAnswersData = [];
             } else {
-              StateRulesStatsService.computeStateStats(
+              StateRulesStatsService.computeStateRulesStats(
                 state
               ).then(function(stats) {
                 var calculatedUnresolvedAnswersData = [];
