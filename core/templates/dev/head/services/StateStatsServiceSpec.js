@@ -26,10 +26,11 @@ describe('State Stats Service', function() {
 
   it('should claim text-input interaction states support issues overview',
     function() {
+      // Only including properties required to identify supported states.
+      var TEXT_INPUT_STATE = {interaction: {id: 'TextInput'}};
+
       expect(
-        StateStatsService.stateSupportsIssuesOverview({
-          interaction: {id: 'TextInput'}
-        })
+        StateStatsService.stateSupportsIssuesOverview(TEXT_INPUT_STATE)
       ).toBe(true);
     });
 
