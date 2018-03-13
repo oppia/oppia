@@ -49,8 +49,8 @@ describe('State Stats Service', function() {
 
     it('should work for TextInput', function() {
       var EXPLORATION_ID = '0';
+      // Only including properties required for stat computation.
       var HOLA_STATE = {
-        // Only including properties required for stat computation.
         name: 'Hola',
         interaction: {
           answerGroups: [{
@@ -67,8 +67,8 @@ describe('State Stats Service', function() {
           id: 'TextInput'
         }
       };
+      // Only including properties required for stat computation.
       var HOLA_STATE_RULES_STATS_RESPONSE = {
-        // Only including properties required for stat computation.
         visualizations_info: [{
           data: [
             {answer: 'Ni Hao', frequency: 5},
