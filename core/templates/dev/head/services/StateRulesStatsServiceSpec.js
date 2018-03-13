@@ -47,7 +47,7 @@ describe('State Rules Stats Service', function() {
       $httpBackend.verifyNoOutstandingRequest();
     });
 
-    it('should work for TextInput', function() {
+    it('should handle addressed info for TextInput', function() {
       var EXPLORATION_ID = '0';
       // Only including properties required for stat computation.
       var HOLA_STATE = {
@@ -70,11 +70,7 @@ describe('State Rules Stats Service', function() {
       // Only including properties required for stat computation.
       var HOLA_STATE_RULES_STATS_RESPONSE = {
         visualizations_info: [{
-          data: [
-            {answer: 'Ni Hao'},
-            {answer: 'Aloha'},
-            {answer: 'Hola'}
-          ],
+          data: [{answer: 'Ni Hao'}, {answer: 'Aloha'}, {answer: 'Hola'}],
           addressed_info_is_supported: true
         }]
       };
