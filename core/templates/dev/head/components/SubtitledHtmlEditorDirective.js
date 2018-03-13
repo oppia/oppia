@@ -32,7 +32,7 @@ oppia.directive('subtitledHtmlEditor', [
         'COMPONENT_NAME_HTML', 'stateContentService',
         function(
             $scope, $uibModal, EditabilityService,
-            COMPONENT_NAME_HTML,stateContentService) {
+            COMPONENT_NAME_HTML, stateContentService) {
           $scope.subtitledHtmlEditorIsOpen = false;
           $scope.subtitledMemento = null;
 

@@ -51,6 +51,9 @@
       <div style="clear: both;"></div>
     </div>
   </div>
-
-  <subtitled-html-editor></subtitled-html-editor>
+  <div ng-if="stateHintsService.savedMemento[getIndexPlusOne() - 1] && !stateHintsService.savedMemento[getIndexPlusOne() - 1].isEmpty()">
+    <subtitled-html-editor component-name="<[COMPONENT_NAME_HINT]>"   
+                           subtitled-html="stateHintsService.displayed[getIndexPlusOne() - 1].hintContent">
+    </subtitled-html-editor>
+  </div>
 </div>

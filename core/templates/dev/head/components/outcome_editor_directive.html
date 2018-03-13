@@ -65,8 +65,11 @@
     <div style="clear: both;"></div>
   </div>
 </div>
-
-<subtitled-html-editor></subtitled-html-editor>
+<div ng-if="!outcome.feedback.getHtml().isEmpty() && displayFeedback">
+  <subtitled-html-editor component-name="<[COMPONENT_NAME_FEEDBACK]>"   
+                         subtitled-html="outcome.feedback">
+  </subtitled-html-editor>
+</div>
 
 <br ng-if="displayFeedback">
 
