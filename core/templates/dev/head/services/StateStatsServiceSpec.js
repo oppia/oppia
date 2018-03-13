@@ -71,9 +71,9 @@ describe('State Stats Service', function() {
       var HOLA_STATE_RULES_STATS_RESPONSE = {
         visualizations_info: [{
           data: [
-            {answer: 'Ni Hao', frequency: 5},
-            {answer: 'Aloha', frequency: 3},
-            {answer: 'Hola', frequency: 1}
+            {answer: 'Ni Hao'},
+            {answer: 'Aloha'},
+            {answer: 'Hola'}
           ],
           addressed_info_is_supported: true
         }]
@@ -93,9 +93,9 @@ describe('State Stats Service', function() {
         jasmine.objectContaining({
           visualizations_info: [jasmine.objectContaining({
             data: [
-              {answer: 'Ni Hao', frequency: 5, is_addressed: false},
-              {answer: 'Aloha', frequency: 3, is_addressed: false},
-              {answer: 'Hola', frequency: 1, is_addressed: true}
+              jasmine.objectContaining({answer: 'Ni Hao', is_addressed: false}),
+              jasmine.objectContaining({answer: 'Aloha', is_addressed: false}),
+              jasmine.objectContaining({answer: 'Hola', is_addressed: true})
             ],
           })]
         })
