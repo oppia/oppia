@@ -75,7 +75,6 @@ describe('State Stats Service', function() {
             {answer: 'Aloha', frequency: 3},
             {answer: 'Hola', frequency: 1}
           ],
-          id: 'FrequencyTable',
           addressed_info_is_supported: true
         }]
       };
