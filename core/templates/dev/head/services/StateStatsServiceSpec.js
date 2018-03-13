@@ -79,7 +79,6 @@ describe('State Stats Service', function() {
           addressed_info_is_supported: true
         }]
       };
-
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
       $httpBackend.expectGET('/createhandler/state_rules_stats/0/Hola').respond(
