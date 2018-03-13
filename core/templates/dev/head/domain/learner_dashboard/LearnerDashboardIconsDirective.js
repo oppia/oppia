@@ -25,8 +25,7 @@ oppia.directive('learnerDashboardIcons', [
         getActivityId: '&activityId',
         getActivityTitle: '&activityTitle',
         activityActive: '=activityActive',
-        isWindowNarrow: (
-          '&libraryWindowIsNarrow')
+        isContainerNarrow: '&containerIsNarrow'
       },
       templateUrl:  UrlInterpolationService.getDirectiveTemplateUrl(
         '/domain/learner_dashboard/' +
@@ -71,7 +70,7 @@ oppia.directive('learnerDashboardIcons', [
                 activityId)) {
                 return false;
               } else {
-                if ($scope.isWindowNarrow()) {
+                if ($scope.isContainerNarrow()) {
                   return true;
                 } else {
                   return $scope.activityIsCurrentlyHoveredOver;
