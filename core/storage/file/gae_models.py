@@ -140,7 +140,7 @@ class FileMetadataModel(base_models.VersionedModel):
                 followed by additional arguments for that command. For example:
 
                 {'cmd': 'AUTO_revert_version_number'
-                 'version_number': 4}.
+                 'version_number': 4}
         """
         super(FileMetadataModel, self).commit(
             committer_id, '', commit_cmds)
@@ -258,7 +258,7 @@ class FileModel(base_models.VersionedModel):
                 followed by additional arguments for that command. For example:
 
                 {'cmd': 'AUTO_revert_version_number'
-                 'version_number': 4}.
+                 'version_number': 4}
         """
         super(FileModel, self).commit(committer_id, '', commit_cmds)
 

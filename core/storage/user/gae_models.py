@@ -341,7 +341,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     #    "total_plays": 60
     #   }
     #  },
-    # ].
+    # ]
     weekly_creator_stats_list = ndb.JsonProperty(repeated=True)
     # The version of dashboard stats schema.
     schema_version = (

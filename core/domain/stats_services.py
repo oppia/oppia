@@ -344,7 +344,7 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
         An example of the returned value may be:
         [{'options': {'y_axis_label': 'Count', 'x_axis_label': 'Answer'},
         'id': 'BarChart',
-        'data': [{u'frequency': 1, u'answer': 0}]}].
+        'data': [{u'frequency': 1, u'answer': 0}]}]
     """
     if interaction_id is None:
         return []

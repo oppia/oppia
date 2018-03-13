@@ -401,7 +401,7 @@ class BaseJobManager(object):
 
         Returns:
             float. The time the job got finished in milliseconds after the
-                epoch.
+                Epoch.
         """
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)

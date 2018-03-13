@@ -160,7 +160,7 @@ REQUIRED_STRINGS_FECONF = {
     }
 }
 
-ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?']
+ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']']
 
 EXCLUDED_PHRASES = ['utf', 'pylint:', 'http://', 'https://', 'scripts/']
 
@@ -777,8 +777,10 @@ def _check_docstrings(all_files):
         and filename.endswith('.py')]
     message_for_period = 'There should be a period at the end of the docstring.'
     message_for_multiline_docstring = 'Multiline docstring should end in a new line.'
-    message_for_single_line_docstring = ('Single line docstring should not span two lines. '
-        'If line length exceeds 80 characters, convert it to a multiline docstring.')
+    message_for_single_line_docstring = (
+        'Single line docstring should not span two lines. '
+        'If line length exceeds 80 characters, '
+        'convert it to a multiline docstring.')
     failed = False
     for filename in files_to_check:
         f = open(filename, 'r')
@@ -793,8 +795,8 @@ def _check_docstrings(all_files):
 
             # Check for single line docstring.
             if line.startswith('"""') and line.endswith('"""'):
-                # Check for '.' or '?' at line[-4] since last three characters
-                # would be """.
+                # Check for punctuation at line[-4] since last three characters
+                # are double quotes.
                 if (
                     len(line) > 6 and
                     line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
@@ -813,7 +815,7 @@ def _check_docstrings(all_files):
                 # Case 1: line is """. This is correct for multiline docstring.
                 if line == '"""':
                     line = file_content[line_num - 1].lstrip().rstrip()
-                    # Check for '.' or '?' at end of docstring.
+                    # Check for punctuation at end of docstring.
                     if (
                         line[-1] not in ALLOWED_TERMINATING_PUNCTUATIONS
                         and not any (word in line
@@ -822,8 +824,8 @@ def _check_docstrings(all_files):
                         print '%s --> Line %s: %s' % (
                     filename, line_num, message_for_period)
 
-                # Case 2: line contains some words before """. """ should shift to
-                # next line.
+                # Case 2: line contains some words before """. """ should shift
+                # to next line.
                 else:
                     failed = True
                     print '%s --> Line %s: %s' % (
