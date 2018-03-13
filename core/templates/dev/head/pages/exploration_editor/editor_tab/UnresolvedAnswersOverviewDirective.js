@@ -26,10 +26,10 @@ oppia.directive('unresolvedAnswersOverview', [
         'unresolved_answers_overview_directive.html'),
       controller: [
         '$scope', 'EditorStateService', 'ExplorationStatesService',
-        'StateStatsService',
+        'StateRulesStatsService',
         function(
             $scope, EditorStateService, ExplorationStatesService,
-            StateStatsService) {
+            StateRulesStatsService) {
           var MAXIMUM_UNRESOLVED_ANSWERS = 5;
           var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
@@ -41,10 +41,12 @@ oppia.directive('unresolvedAnswersOverview', [
               EditorStateService.getActiveStateName()
             );
 
-            if (!StateStatsService.stateSupportsIssuesOverview(state)) {
+            if (!StateRulesStatsService.stateSupportsIssuesOverview(state)) {
               $scope.unresolvedAnswersData = [];
             } else {
-              StateStatsService.computeStateStats(state).then(function(stats) {
+              StateRulesStatsService.computeStateStats(
+                state
+              ).then(function(stats) {
                 var calculatedUnresolvedAnswersData = [];
 
                 for (var i = 0; i !== stats.visualizations_info.length; ++i) {

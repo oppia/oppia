@@ -16,7 +16,7 @@
  * @fileoverview Factory for calculating the statistics of a particular state.
  */
 
-oppia.factory('StateStatsService', [
+oppia.factory('StateRulesStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
   'ExplorationContextService', 'UrlInterpolationService',
   function(

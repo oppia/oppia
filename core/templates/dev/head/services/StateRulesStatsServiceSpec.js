@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for state stats service.
  */
 
-describe('State Stats Service', function() {
-  var StateStatsService = null;
+describe('State Rules Stats Service', function() {
+  var StateRulesStatsService = null;
 
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
-    StateStatsService = $injector.get('StateStatsService');
+    StateRulesStatsService = $injector.get('StateRulesStatsService');
   }));
 
   it(
@@ -31,7 +31,7 @@ describe('State Stats Service', function() {
       var TEXT_INPUT_STATE = {interaction: {id: 'TextInput'}};
 
       expect(
-        StateStatsService.stateSupportsIssuesOverview(TEXT_INPUT_STATE)
+        StateRulesStatsService.stateSupportsIssuesOverview(TEXT_INPUT_STATE)
       ).toBe(true);
     });
 
@@ -84,7 +84,7 @@ describe('State Stats Service', function() {
         HOLA_STATE_RULES_STATS_RESPONSE
       );
 
-      StateStatsService.computeStateStats(
+      StateRulesStatsService.computeStateStats(
         HOLA_STATE, EXPLORATION_ID
       ).then(successHandler, failureHandler);
       $httpBackend.flush();
