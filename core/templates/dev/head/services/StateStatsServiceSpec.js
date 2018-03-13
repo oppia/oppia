@@ -88,8 +88,8 @@ describe('State Stats Service', function() {
       StateStatsService.computeStateStats(
         HOLA_STATE, EXPLORATION_ID
       ).then(successHandler, failureHandler);
-
       $httpBackend.flush();
+
       expect(successHandler).toHaveBeenCalledWith(
         jasmine.objectContaining({
           visualizations_info: [jasmine.objectContaining({
