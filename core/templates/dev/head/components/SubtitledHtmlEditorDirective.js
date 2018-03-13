@@ -29,15 +29,14 @@ oppia.directive('subtitledHtmlEditor', [
         '/components/subtitled_html_editor_directive.html'),
       controller: [
         '$scope', '$uibModal', 'EditabilityService',
-        'COMPONENT_NAME_HTML', 'stateContentService',
+        'COMPONENT_NAME_HTML',
         function(
             $scope, $uibModal, EditabilityService,
-            COMPONENT_NAME_HTML, stateContentService) {
+            COMPONENT_NAME_HTML) {
           $scope.subtitledHtmlEditorIsOpen = false;
           $scope.subtitledMemento = null;
 
           $scope.COMPONENT_NAME_HTML = COMPONENT_NAME_HTML;
-          $scope.stateContentService = stateContentService;
 
           var openMarkAllAudioAsNeedingUpdateModal = function() {
             $uibModal.open({
