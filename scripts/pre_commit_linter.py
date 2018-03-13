@@ -775,10 +775,10 @@ def _check_docstrings(all_files):
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.py')]
-    message_period = 'There should be a period at the end of the docstring.'
-    message_multi = 'Multiline docstring should end in a new line.'
-    message_single = ('Single line docstring should not span two lines. '
-        'If line length exceeds 81 characters, convert it to a multiline docstring.')
+    message_for_period = 'There should be a period at the end of the docstring.'
+    message_for_multiline_docstring = 'Multiline docstring should end in a new line.'
+    message_for_single_line_docstring = ('Single line docstring should not span two lines. '
+        'If line length exceeds 80 characters, convert it to a multiline docstring.')
     failed = False
     for filename in files_to_check:
         f = open(filename, 'r')
@@ -800,13 +800,13 @@ def _check_docstrings(all_files):
                     line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
                     failed = True
                     print '%s --> Line %s: %s' % (
-                filename, line_num + 1, message_period)
+                filename, line_num + 1, message_for_period)
 
             # Check if single line docstring span two lines.
             elif line == '"""' and prev_line.startswith('"""'):
                 failed = True
                 print '%s --> Line %s: %s' % (
-            filename, line_num, message_single)
+            filename, line_num, message_for_single_line_docstring)
 
             # Check for multiline docstring.
             elif line.endswith('"""'):
@@ -820,14 +820,14 @@ def _check_docstrings(all_files):
                         for word in EXCLUDED_PHRASES)):
                         failed = True
                         print '%s --> Line %s: %s' % (
-                    filename, line_num, message_period)
+                    filename, line_num, message_for_period)
 
                 # Case 2: line contains some words before """. """ should shift to
                 # next line.
                 else:
                     failed = True
                     print '%s --> Line %s: %s' % (
-                filename, line_num + 1, message_multi)
+                filename, line_num + 1, message_for_multiline_docstring)
 
     print ''
     print '----------------------------------------'
