@@ -24,7 +24,8 @@ describe('State Stats Service', function() {
     StateStatsService = $injector.get('StateStatsService');
   }));
 
-  it('should claim text-input interaction states support issues overview',
+  it(
+    'should claim text-input interaction states support issues overview',
     function() {
       // Only including properties required to identify supported states.
       var TEXT_INPUT_STATE = {interaction: {id: 'TextInput'}};
