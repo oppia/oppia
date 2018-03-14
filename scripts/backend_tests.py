@@ -30,9 +30,6 @@ import subprocess
 import threading
 import time
 
-# pylint: disable=relative-import
-from explicit_kwargs_checker_test import ExplicitKwargsCheckerTest
-
 # pylint: enable=wrong-import-order
 
 
