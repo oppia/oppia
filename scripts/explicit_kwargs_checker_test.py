@@ -19,6 +19,7 @@
 
 import os
 import sys
+import unittest
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.7.1')
@@ -30,54 +31,47 @@ sys.path.insert(0, _PYLINT_PATH)
 # pylint: disable=relative-import
 import astroid  #isort:skip
 import explicit_kwargs_checker  #isort:skip
+import pylint  # isort:skip
+from pylint.testutils import CheckerTestCase  # isort:skip
 
-import pylint.testutils  # isort:skip
 
-
-class ExplicitKwargsCheckerTest(pylint.testutils.CheckerTestCase):
-    CHECKER_CLASS = explicit_kwargs_checker.ExplicitKwargsChecker
+class ExplicitKwargsCheckerTest(unittest.TestCase):
 
     def test_finds_non_explicit_kwargs(self):
+        explicit_kwargs_checker_test_object = CheckerTestCase()
+        explicit_kwargs_checker_test_object.CHECKER_CLASS = (
+            explicit_kwargs_checker.ExplicitKwargsChecker)
+        explicit_kwargs_checker_test_object.setup_method()
         func_node = astroid.extract_node("""
         def test(test_var_one, test_var_two=4, test_var_three=5, test_var_four="test_checker"): #@
             test_var_five = test_var_two + test_var_three
             return test_var_five
         """)
-        self.checker.visit_functiondef(func_node)
+        explicit_kwargs_checker_test_object.checker.visit_functiondef(func_node)
         func_args = func_node.args
-        self.checker.visit_arguments(func_args)
+        explicit_kwargs_checker_test_object.checker.visit_arguments(func_args)
         func_call_node_one, func_call_node_two, func_call_node_three = (
             astroid.extract_node("""
         test(2, 5, 6) #@
         test(2) #@
         test(2, 5, 6, test_var_four="test_string") #@
         """))
-        with self.assertAddsMessages(
+        with explicit_kwargs_checker_test_object.assertAddsMessages(
             pylint.testutils.Message(
                 msg_id='non-explicit-kwargs',
                 node=func_call_node_one,
             ),
         ):
-            self.checker.visit_call(func_call_node_one)
-        with self.assertNoMessages():
-            self.checker.visit_call(func_call_node_two)
-        with self.assertAddsMessages(
+            explicit_kwargs_checker_test_object.checker.visit_call(
+                func_call_node_one)
+        with explicit_kwargs_checker_test_object.assertNoMessages():
+            explicit_kwargs_checker_test_object.checker.visit_call(
+                func_call_node_two)
+        with explicit_kwargs_checker_test_object.assertAddsMessages(
             pylint.testutils.Message(
                 msg_id='non-explicit-kwargs',
                 node=func_call_node_three,
             ),
         ):
-            self.checker.visit_call(func_call_node_three)
-
-
-def main():
-    # Create  an instance of the class.
-    explicit_kwargs_checker_test_obj = ExplicitKwargsCheckerTest()
-    # Initialize the test object.
-    explicit_kwargs_checker_test_obj.setup_method()
-    # Call the test method.
-    explicit_kwargs_checker_test_obj.test_finds_non_explicit_kwargs()
-
-
-if __name__ == '__main__':
-    main()
+            explicit_kwargs_checker_test_object.checker.visit_call(
+                func_call_node_three)
