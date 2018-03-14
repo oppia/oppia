@@ -729,24 +729,23 @@ def _check_comments(all_files):
     message = 'There should be a period at the end of the comment.'
     failed = False
     for filename in files_to_check:
-        f = open(filename, 'r')
-        file_content = f.readlines()
-        file_length = len(file_content)
-        for line_num in range(file_length):
-            line = file_content[line_num].lstrip().rstrip()
-            next_line = ""
-            if line_num + 1 < file_length:
-                next_line = file_content[line_num + 1].lstrip().rstrip()
+        with open(filename, 'r') as f:
+            file_content = f.readlines()
+            file_length = len(file_content)
+            for line_num in range(file_length):
+                line = file_content[line_num].lstrip().rstrip()
+                next_line = ''
+                if line_num + 1 < file_length:
+                    next_line = file_content[line_num + 1].lstrip().rstrip()
 
-            if line.startswith('#') and not next_line.startswith('#'):
-                # Check for '.' or '?' at end of comment.
-                if (
-                    line[-1] not in ALLOWED_TERMINATING_PUNCTUATIONS
-                    and not any (word in line
-                    for word in EXCLUDED_PHRASES)):
-                    failed = True
-                    print '%s --> Line %s: %s' % (
-                        filename, line_num + 1, message)
+                if line.startswith('#') and not next_line.startswith('#'):
+                    # Check that the comment ends with the proper punctuation.
+                    if (
+                        line[-1] not in ALLOWED_TERMINATING_PUNCTUATIONS and
+                        not any (word in line for word in EXCLUDED_PHRASES)):
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                            filename, line_num + 1, message)
 
 
     print ''
@@ -775,61 +774,63 @@ def _check_docstrings(all_files):
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.py')]
-    message_for_period = 'There should be a period at the end of the docstring.'
-    message_for_multiline_docstring = 'Multiline docstring should end in a new line.'
-    message_for_single_line_docstring = (
+    missing_period_message = (
+        'There should be a period at the end of the docstring.')
+    multiline_docstring_message = (
+        'Multiline docstring should end with a new line.')
+    single_line_docstring_message = (
         'Single line docstring should not span two lines. '
         'If line length exceeds 80 characters, '
-        'convert it to a multiline docstring.')
+        'convert the single line docstring to a multiline docstring.')
     failed = False
     for filename in files_to_check:
-        f = open(filename, 'r')
-        file_content = f.readlines()
-        file_length = len(file_content)
-        for line_num in range(file_length):
-            line = file_content[line_num].lstrip().rstrip()
-            prev_line = ""
+        with open(filename, 'r') as f:
+            file_content = f.readlines()
+            file_length = len(file_content)
+            for line_num in range(file_length):
+                line = file_content[line_num].lstrip().rstrip()
+                prev_line = ''
 
-            if line_num > 0:
-                prev_line = file_content[line_num - 1].lstrip().rstrip()
+                if line_num > 0:
+                    prev_line = file_content[line_num - 1].lstrip().rstrip()
 
-            # Check for single line docstring.
-            if line.startswith('"""') and line.endswith('"""'):
-                # Check for punctuation at line[-4] since last three characters
-                # are double quotes.
-                if (
-                    len(line) > 6 and
-                    line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
-                    failed = True
-                    print '%s --> Line %s: %s' % (
-                filename, line_num + 1, message_for_period)
-
-            # Check if single line docstring span two lines.
-            elif line == '"""' and prev_line.startswith('"""'):
-                failed = True
-                print '%s --> Line %s: %s' % (
-            filename, line_num, message_for_single_line_docstring)
-
-            # Check for multiline docstring.
-            elif line.endswith('"""'):
-                # Case 1: line is """. This is correct for multiline docstring.
-                if line == '"""':
-                    line = file_content[line_num - 1].lstrip().rstrip()
-                    # Check for punctuation at end of docstring.
+                # Check for single line docstring.
+                if line.startswith('"""') and line.endswith('"""'):
+                    # Check for punctuation at line[-4] since last three
+                    # characters are double quotes.
                     if (
-                        line[-1] not in ALLOWED_TERMINATING_PUNCTUATIONS
-                        and not any (word in line
-                        for word in EXCLUDED_PHRASES)):
+                        len(line) > 6 and
+                        line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
                         failed = True
                         print '%s --> Line %s: %s' % (
-                    filename, line_num, message_for_period)
+                            filename, line_num + 1, missing_period_message)
 
-                # Case 2: line contains some words before """. """ should shift
-                # to next line.
-                else:
+                # Check if single line docstring span two lines.
+                elif line == '"""' and prev_line.startswith('"""'):
                     failed = True
                     print '%s --> Line %s: %s' % (
-                filename, line_num + 1, message_for_multiline_docstring)
+                        filename, line_num, single_line_docstring_message)
+
+                # Check for multiline docstring.
+                elif line.endswith('"""'):
+                    # Case 1: line is """. This is correct for multiline
+                    # docstring.
+                    if line == '"""':
+                        line = file_content[line_num - 1].lstrip().rstrip()
+                        # Check for punctuation at end of docstring.
+                        if (
+                            line[-1] not in ALLOWED_TERMINATING_PUNCTUATIONS and
+                            not any (word in line for word in EXCLUDED_PHRASES)):
+                            failed = True
+                            print '%s --> Line %s: %s' % (
+                                filename, line_num, missing_period_message)
+
+                    # Case 2: line contains some words before """. """ should
+                    # shift to next line.
+                    else:
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                            filename, line_num + 1, multiline_docstring_message)
 
     print ''
     print '----------------------------------------'
@@ -859,7 +860,8 @@ def main():
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
         def_spacing_messages + import_order_messages +
-        newline_messages + linter_messages + pattern_messages)
+        newline_messages + docstring_messages + comment_messages +
+        linter_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
