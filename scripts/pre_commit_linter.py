@@ -162,7 +162,8 @@ REQUIRED_STRINGS_FECONF = {
 
 ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 
-EXCLUDED_PHRASES = ['utf', 'pylint:', 'http://', 'https://', 'scripts/']
+EXCLUDED_PHRASES = [
+  'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
@@ -827,7 +828,7 @@ def _check_docstrings(all_files):
 
                     # Case 2: line contains some words before """. """ should
                     # shift to next line.
-                    else:
+                    elif not any (word in line for word in EXCLUDED_PHRASES):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, multiline_docstring_message)
