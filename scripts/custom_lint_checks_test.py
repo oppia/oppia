@@ -32,7 +32,6 @@ sys.path.insert(0, _PYLINT_PATH)
 # pylint: disable=relative-import
 import astroid  # isort:skip
 import custom_lint_checks  # isort:skip
-import pylint  # isort:skip
 from pylint import testutils  # isort:skip
 # pylint: enable=wrong-import-position
 # pylint: enable=relative-import
@@ -60,7 +59,7 @@ class ExplicitKwargsCheckerTest(unittest.TestCase):
         test(2, 5, 6, test_var_four="test_string") #@
         """))
         with checker_test_object.assertAddsMessages(
-            pylint.testutils.Message(
+            testutils.Message(
                 msg_id='non-explicit-kwargs',
                 node=func_call_node_one,
             ),
@@ -71,7 +70,7 @@ class ExplicitKwargsCheckerTest(unittest.TestCase):
             checker_test_object.checker.visit_call(
                 func_call_node_two)
         with checker_test_object.assertAddsMessages(
-            pylint.testutils.Message(
+            testutils.Message(
                 msg_id='non-explicit-kwargs',
                 node=func_call_node_three,
             ),
