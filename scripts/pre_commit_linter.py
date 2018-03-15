@@ -741,9 +741,9 @@ def _check_comments(all_files):
 
                 if line.startswith('#') and not next_line.startswith('#'):
                     # Check that the comment ends with the proper punctuation.
-                    if (
-                        line[-1] not in ALLOWED_TERMINATING_PUNCTUATIONS and
-                        not any (word in line for word in EXCLUDED_PHRASES)):
+                    if (line[-1] not in
+                            ALLOWED_TERMINATING_PUNCTUATIONS) and (
+                                not any(word in line for word in EXCLUDED_PHRASES)):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, message)
@@ -799,9 +799,8 @@ def _check_docstrings(all_files):
                 if line.startswith('"""') and line.endswith('"""'):
                     # Check for punctuation at line[-4] since last three
                     # characters are double quotes.
-                    if (
-                        len(line) > 6 and
-                        line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
+                    if (len(line) > 6) and (
+                            line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, missing_period_message)
@@ -819,16 +818,16 @@ def _check_docstrings(all_files):
                     if line == '"""':
                         line = file_content[line_num - 1].lstrip().rstrip()
                         # Check for punctuation at end of docstring.
-                        if (
-                            line[-1] not in ALLOWED_TERMINATING_PUNCTUATIONS and
-                            not any (word in line for word in EXCLUDED_PHRASES)):
+                        if (line[-1] not in
+                                ALLOWED_TERMINATING_PUNCTUATIONS) and (
+                                    not any(word in line for word in EXCLUDED_PHRASES)):
                             failed = True
                             print '%s --> Line %s: %s' % (
                                 filename, line_num, missing_period_message)
 
                     # Case 2: line contains some words before """. """ should
                     # shift to next line.
-                    elif not any (word in line for word in EXCLUDED_PHRASES):
+                    elif not any(word in line for word in EXCLUDED_PHRASES):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, multiline_docstring_message)
