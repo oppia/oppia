@@ -76,7 +76,7 @@ def get_human_readable_contributors_summary(contributors_summary):
             'albert': {
                 'num_commits': 10,
             },
-        }.
+        }
     """
     contributor_ids = contributors_summary.keys()
     contributor_usernames = user_services.get_human_readable_user_ids(
@@ -311,7 +311,7 @@ def get_displayable_exp_summary_dicts_matching_ids(exploration_ids, user=None):
             'thumbnail_icon_url': self.get_static_asset_url(
                 '/images/subjects/Lightbulb.svg'),
             'title': u'Exploration 2 Albert title',
-        }, ].
+        }, ]
     """
     exploration_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exploration_ids))
@@ -369,7 +369,7 @@ def get_displayable_exp_summary_dicts(exploration_summaries):
             'thumbnail_icon_url': self.get_static_asset_url(
                 '/images/subjects/Lightbulb.svg'),
             'title': u'Exploration 2 Albert title',
-        }, ].
+        }, ]
     """
     exp_version_references = [
         exp_domain.ExpVersionReference(exp_summary.id, exp_summary.version)
@@ -440,7 +440,7 @@ def _get_displayable_collection_summary_dicts(collection_summaries):
             'thumbnail_icon_url': self.get_static_asset_url(
                 '/images/subjects/Lightbulb.svg'),
             'title': u'Exploration 2 Albert title',
-        }, ].
+        }, ]
     """
     displayable_collection_summaries = []
     for collection_summary in collection_summaries:
@@ -631,7 +631,7 @@ def get_featured_activity_summary_dicts(language_codes):
             'title': 'A title',
             'num_views': 0,
             'objective': 'An objective',
-        }, ].
+        }, ]
     """
     activity_references = activity_services.get_featured_activity_references()
     exploration_ids, collection_ids = activity_services.split_by_type(
@@ -689,7 +689,7 @@ def get_top_rated_exploration_summary_dicts(language_codes, limit):
             'thumbnail_icon_url': self.get_static_asset_url(
                 '/images/subjects/Lightbulb.svg'),
             'title': u'Exploration 2 Albert title',
-        }, ].
+        }, ]
     """
     filtered_exp_summaries = [
         exp_summary for exp_summary in
@@ -728,7 +728,7 @@ def get_recently_published_exp_summary_dicts(limit):
             'thumbnail_icon_url': self.get_static_asset_url(
                 '/images/subjects/Lightbulb.svg'),
             'title': u'Exploration 2 Albert title',
-        }, ].
+        }, ]
     """
     recently_published_exploration_summaries = [
         exp_summary for exp_summary in

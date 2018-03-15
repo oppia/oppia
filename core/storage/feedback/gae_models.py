@@ -49,7 +49,7 @@ class FeedbackThreadModel(base_models.BaseModel):
     """Threads for each exploration.
 
     The id of instances of this class has the form
-        [EXPLORATION_ID].[THREAD_ID].
+        [EXPLORATION_ID].[THREAD_ID]
     """
     # ID of the exploration the thread is about.
     exploration_id = ndb.StringProperty(required=True, indexed=True)
@@ -223,10 +223,10 @@ class FeedbackMessageModel(base_models.BaseModel):
     """Feedback messages. One or more of these messages make a thread.
 
     The id of instances of this class has the form
-        [EXPLORATION_ID].[THREAD_ID].[MESSAGE_ID].
+        [EXPLORATION_ID].[THREAD_ID].[MESSAGE_ID]
     """
     # ID corresponding to an entry of FeedbackThreadModel in the form of
-    #   [EXPLORATION_ID].[THREAD_ID].
+    #   [EXPLORATION_ID].[THREAD_ID]
     thread_id = ndb.StringProperty(required=True, indexed=True)
     # 0-based sequential numerical ID. Sorting by this field will create the
     # thread in chronological order.
@@ -401,7 +401,7 @@ class FeedbackThreadUserModel(base_models.BaseModel):
     """Model for storing the ids of the messages in the thread that are read by
     the user.
 
-    Instances of this class have keys of the form [user_id].[thread_id].
+    Instances of this class have keys of the form [user_id].[thread_id]
     """
     message_ids_read_by_user = ndb.IntegerProperty(repeated=True, indexed=True)
 

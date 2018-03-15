@@ -29,7 +29,7 @@ class RoleQueryAuditModel(base_models.BaseModel):
     interface.
 
     Instances of this class are keyed by a custom Id.
-    [user_id].[timestamp_in_sec].[intent].[random_number].
+    [user_id].[timestamp_in_sec].[intent].[random_number]
     """
     # The id used to key this model.
     id = ndb.StringProperty(required=True)

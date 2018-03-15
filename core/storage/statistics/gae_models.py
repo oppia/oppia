@@ -786,7 +786,7 @@ class ExplorationStatsModel(base_models.BaseModel):
     #   'first_hit_count_v2': ...,
     #   'num_times_solution_viewed_v2': ...,
     #   'num_completions_v1': ...,
-    #   'num_completions_v2': ...}}.
+    #   'num_completions_v2': ...}}
     state_stats_mapping = ndb.JsonProperty(indexed=False)
 
     @classmethod
@@ -944,7 +944,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     # Keyed by state name that describes the numbers of hits for each state
     # {state_name: {'first_entry_count': ...,
     #               'total_entry_count': ...,
-    #               'no_answer_count': ...}}.
+    #               'no_answer_count': ...}}
     state_hit_counts = ndb.JsonProperty(indexed=False)
 
     @classmethod

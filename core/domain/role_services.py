@@ -199,7 +199,7 @@ def get_role_graph_data():
                     }
             nodes: dict(str:str). Mapping of role ID to its human readable
                 format.
-        }.
+        }
     """
     role_graph = {}
     role_graph['links'] = []

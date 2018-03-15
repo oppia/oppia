@@ -33,7 +33,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     """Model for storing classifier training jobs.
 
     The id of instances of this class has the form
-    {{exp_id}}.{{random_hash_of_16_chars}}.
+    {{exp_id}}.{{random_hash_of_16_chars}}
     """
 
     # The ID of the algorithm used to create the model.

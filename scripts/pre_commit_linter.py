@@ -160,7 +160,7 @@ REQUIRED_STRINGS_FECONF = {
     }
 }
 
-ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']']
+ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 
 EXCLUDED_PHRASES = ['utf', 'pylint:', 'http://', 'https://', 'scripts/']
 

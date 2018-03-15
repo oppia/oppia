@@ -162,7 +162,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
     explorations.
 
     Instances of this class have keys of the form
-    [user_id].[exploration_id].
+    [user_id].[exploration_id]
     """
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)
@@ -371,7 +371,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
     """User-specific data pertaining to a specific exploration.
 
     Instances of this class have keys of the form
-    [USER_ID].[EXPLORATION_ID].
+    [USER_ID].[EXPLORATION_ID]
     """
     # The user id.
     user_id = ndb.StringProperty(required=True, indexed=True)

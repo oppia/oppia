@@ -112,7 +112,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         latest_exp_version = exploration.version
         versions = range(1, latest_exp_version + 1)
 
-        # Get a copy of the corrupted statistics models to copy uncorrupted.
+        # Get a copy of the corrupted statistics models to copy uncorrupted
         # v1 fields.
         old_stats = stats_services.get_multiple_exploration_stats_by_version(
             exp_id, versions)

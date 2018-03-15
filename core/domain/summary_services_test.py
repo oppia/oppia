@@ -752,7 +752,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         self.set_admins([self.ADMIN_USERNAME])
 
     def test_for_recently_published_explorations(self):
-        """ Tests for recently published explorations."""
+        """Tests for recently published explorations."""
 
         recently_published_exploration_summaries = (
             summary_services.get_recently_published_exp_summary_dicts(

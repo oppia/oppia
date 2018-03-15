@@ -31,7 +31,7 @@ dicts, each representing a customization arg -- viz.:
         'value': ca_value,
         'default_value': ...,
         ...
-    }].
+    }]
 """
 
 import copy

@@ -34,7 +34,7 @@ calculation may look like this:
             'y_axis_label': 'Count',
         },
         'calculation_id': 'AnswerFrequencies',
-    }].
+    }]
 """
 
 import collections

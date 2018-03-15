@@ -291,7 +291,7 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     This unique_id is used in reply-to email address in outgoing feedback and
     suggestion emails. The id/key of instances of this model has form of
-    [USER_ID].[EXPLORATION_ID].[THREAD_ID].
+    [USER_ID].[EXPLORATION_ID].[THREAD_ID]
     """
     # The reply-to ID that is used in the reply-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
