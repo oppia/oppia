@@ -160,6 +160,11 @@ REQUIRED_STRINGS_FECONF = {
     }
 }
 
+ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
+
+EXCLUDED_PHRASES = [
+  'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
     'scripts/pre_commit_linter.py', 'integrations/*',
@@ -713,16 +718,150 @@ def _check_spacing(all_files):
     return summary_messages
 
 
+def _check_comments(all_files):
+    """This functions ensures that comments end in a period."""
+    print 'Starting comment checks'
+    print '----------------------------------------'
+    summary_messages = []
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.py')]
+    message = 'There should be a period at the end of the comment.'
+    failed = False
+    for filename in files_to_check:
+        with open(filename, 'r') as f:
+            file_content = f.readlines()
+            file_length = len(file_content)
+            for line_num in range(file_length):
+                line = file_content[line_num].lstrip().rstrip()
+                next_line = ''
+                if line_num + 1 < file_length:
+                    next_line = file_content[line_num + 1].lstrip().rstrip()
+
+                if line.startswith('#') and not next_line.startswith('#'):
+                    # Check that the comment ends with the proper punctuation.
+                    if (line[-1] not in
+                            ALLOWED_TERMINATING_PUNCTUATIONS) and (
+                                not any(word in line for word in EXCLUDED_PHRASES)):
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                            filename, line_num + 1, message)
+
+
+    print ''
+    print '----------------------------------------'
+    print ''
+    if failed:
+        summary_message = (
+            '%s   Comments check failed' % _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = (
+            '%s   Comments check passed' % _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    return summary_messages
+
+
+def _check_docstrings(all_files):
+    """This functions ensures that docstrings end in a period."""
+    print 'Starting docstring checks'
+    print '----------------------------------------'
+    summary_messages = []
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.py')]
+    missing_period_message = (
+        'There should be a period at the end of the docstring.')
+    multiline_docstring_message = (
+        'Multiline docstring should end with a new line.')
+    single_line_docstring_message = (
+        'Single line docstring should not span two lines. '
+        'If line length exceeds 80 characters, '
+        'convert the single line docstring to a multiline docstring.')
+    failed = False
+    for filename in files_to_check:
+        with open(filename, 'r') as f:
+            file_content = f.readlines()
+            file_length = len(file_content)
+            for line_num in range(file_length):
+                line = file_content[line_num].lstrip().rstrip()
+                prev_line = ''
+
+                if line_num > 0:
+                    prev_line = file_content[line_num - 1].lstrip().rstrip()
+
+                # Check for single line docstring.
+                if line.startswith('"""') and line.endswith('"""'):
+                    # Check for punctuation at line[-4] since last three
+                    # characters are double quotes.
+                    if (len(line) > 6) and (
+                            line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                            filename, line_num + 1, missing_period_message)
+
+                # Check if single line docstring span two lines.
+                elif line == '"""' and prev_line.startswith('"""'):
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num, single_line_docstring_message)
+
+                # Check for multiline docstring.
+                elif line.endswith('"""'):
+                    # Case 1: line is """. This is correct for multiline
+                    # docstring.
+                    if line == '"""':
+                        line = file_content[line_num - 1].lstrip().rstrip()
+                        # Check for punctuation at end of docstring.
+                        if (line[-1] not in
+                                ALLOWED_TERMINATING_PUNCTUATIONS) and (
+                                    not any(word in line for word in EXCLUDED_PHRASES)):
+                            failed = True
+                            print '%s --> Line %s: %s' % (
+                                filename, line_num, missing_period_message)
+
+                    # Case 2: line contains some words before """. """ should
+                    # shift to next line.
+                    elif not any(word in line for word in EXCLUDED_PHRASES):
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                            filename, line_num + 1, multiline_docstring_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+    if failed:
+        summary_message = (
+            '%s   Docstring check failed' % _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = (
+            '%s   Docstring check passed' % _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    return summary_messages
+
+
 def main():
     all_files = _get_all_files()
     def_spacing_messages = _check_spacing(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
+    docstring_messages = _check_docstrings(all_files)
+    comment_messages = _check_comments(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
         def_spacing_messages + import_order_messages +
-        newline_messages + linter_messages + pattern_messages)
+        newline_messages + docstring_messages + comment_messages +
+        linter_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)

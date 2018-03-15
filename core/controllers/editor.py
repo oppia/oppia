@@ -611,7 +611,7 @@ class ExplorationDownloadHandler(EditorHandler):
         output_format = self.request.get('output_format', default_value='zip')
         width = int(self.request.get('width', default_value=80))
 
-        # If the title of the exploration has changed, we use the new title
+        # If the title of the exploration has changed, we use the new title.
         filename = 'oppia-%s-v%s' % (
             utils.to_ascii(exploration.title.replace(' ', '')), version)
 

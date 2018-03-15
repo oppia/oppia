@@ -28,7 +28,7 @@ class RoleQueryAuditModel(base_models.BaseModel):
     """Records the data for query made to the role structure using admin
     interface.
 
-    Instances of this class are keyed by a custom Id
+    Instances of this class are keyed by a custom Id.
     [user_id].[timestamp_in_sec].[intent].[random_number]
     """
     # The id used to key this model.
