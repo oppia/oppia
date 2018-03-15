@@ -33,7 +33,7 @@ sys.path.insert(0, _PYLINT_PATH)
 import astroid  # isort:skip
 import custom_lint_checks  # isort:skip
 import pylint  # isort:skip
-from pylint.testutils import CheckerTestCase  # isort:skip
+from pylint import testutils  # isort:skip
 # pylint: enable=wrong-import-position
 # pylint: enable=relative-import
 
@@ -41,7 +41,7 @@ from pylint.testutils import CheckerTestCase  # isort:skip
 class ExplicitKwargsCheckerTest(unittest.TestCase):
 
     def test_finds_non_explicit_kwargs(self):
-        checker_test_object = CheckerTestCase()
+        checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
             custom_lint_checks.ExplicitKwargsChecker)
         checker_test_object.setup_method()
