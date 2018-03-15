@@ -67,7 +67,6 @@ before_install:
 - source /opt/jdk_switcher/jdk_switcher.sh
 - jdk_switcher use oraclejdk8
 - pip install codecov
-- pip install numpy==1.6.1
 - pip install pyyaml
 - export CHROME_BIN=/usr/bin/google-chrome-stable
 - export DISPLAY=:99.0
