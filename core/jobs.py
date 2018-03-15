@@ -33,8 +33,8 @@ from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
 from mapreduce import mapreduce_pipeline
-from mapreduce import output_writers
 from mapreduce import model as mapreduce_model
+from mapreduce import output_writers
 from mapreduce import util as mapreduce_util
 from pipeline import pipeline
 
