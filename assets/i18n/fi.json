@@ -222,7 +222,7 @@
 	"I18N_PLAYER_AUDIO_TRANSLATION_SETTINGS": "Äänen käännösasetukset",
 	"I18N_PLAYER_BACK": "Takaisin",
 	"I18N_PLAYER_BACK_TO_COLLECTION": "Takaisin kokoelmaan",
-	"I18N_PLAYER_BANDWIDTH_USAGE_WARNING_MODAL_DOWNLOAD_ALL_AUDIO": "Lataa kaikki <b><[languageDescription]></b> ääni tässä tutkimuksessa (<[fileSizeMB]>Mt)</b>",
+	"I18N_PLAYER_BANDWIDTH_USAGE_WARNING_MODAL_DOWNLOAD_ALL_AUDIO": "Lataa kaikki <b><[languageDescription]></b> ääni tässä tutkimuksessa <b>(<[fileSizeMB]>Mt)</b>",
 	"I18N_PLAYER_CARD_NUMBER_TOOLTIP": "Kortti #",
 	"I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP": "Yhteisön muokattavissa",
 	"I18N_PLAYER_CONTINUE_BUTTON": "Jatka",
