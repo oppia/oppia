@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview  End-to-end tests for testing accessibility features 
+ * @fileoverview  End-to-end tests for testing accessibility features
  * and check for any console errors
  */
 

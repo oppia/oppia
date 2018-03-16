@@ -35,7 +35,9 @@ describe('Testing filters', function() {
     'summarizeNonnegativeNumber',
     'truncateAndCapitalize',
     'capitalize',
-    'stripFormatting'
+    'stripFormatting',
+    'getAbbreviatedText',
+    'removeExtraLines'
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -453,6 +455,31 @@ describe('Testing filters', function() {
       'Only First lettEr is  Affected');
   }));
 
+  it('should not shorten the length of text', inject(function($filter) {
+    expect($filter('getAbbreviatedText')('It will remain unchanged.', 50))
+      .toBe('It will remain unchanged.');
+    expect($filter('getAbbreviatedText')(
+      'Itisjustaverylongsinglewordfortesting',
+      50)).toBe('Itisjustaverylongsinglewordfortesting');
+  }));
+
+  it('should shorten the length of text', inject(function($filter) {
+    expect($filter('getAbbreviatedText')(
+      'It has to convert to a substring as it exceeds the character limit.',
+      50)).toBe('It has to convert to a substring as it exceeds...');
+    expect($filter('getAbbreviatedText')(
+      'ItisjustaverylongsinglewordfortestinggetAbbreviatedText',
+      50)).toBe('ItisjustaverylongsinglewordfortestinggetAbbreviate...');
+    expect($filter('getAbbreviatedText')(
+      'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od; /⏬®;😁☕😁:☝)😁😁😍1!@#',
+      50)).toBe('â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od;...');
+    expect($filter('getAbbreviatedText')(
+      'It is just a very long singlewordfortestinggetAbbreviatedText',
+      50)).toBe('It is just a very long...');
+  }));
+
+
+
   it('should get correct list of RTE components from HTML input',
     inject(function($filter) {
       var filter = $filter('formatRtePreview');
@@ -482,6 +509,22 @@ describe('Testing filters', function() {
       ).toEqual('[Math] Text input [Collapsible] Text input 2 [Image]  ' +
       'Text Input 3');
     }));
+
+  it('should remove extra new lines', inject(function($filter) {
+    var filter = $filter('removeExtraLines');
+
+    expect(filter('<p><br></p>')).toEqual('');
+    expect(filter('<p>abc</p>')).toEqual('<p>abc</p>');
+    expect(filter('<p>abc</p><p><br></p><p>abc</p>')).toEqual(
+      '<p>abc</p><p><br></p><p>abc</p>');
+    expect(filter('<p>abc</p><p><br></p><p>abc</p><p><br></p>')).toEqual(
+      '<p>abc</p><p><br></p><p>abc</p>');
+    expect(filter(
+      '<p>abc</p><p><br></p><p>abc</p><p><br></p><p><br></p>')).toEqual(
+      '<p>abc</p><p><br></p><p>abc</p>');
+    expect(filter(null)).toEqual(null);
+    expect(filter(undefined)).toEqual(undefined);
+  }));
 
   it('should correctly display RTE components in Answer Group Header',
     inject(function($filter) {
@@ -557,4 +600,34 @@ describe('Testing filters', function() {
         'input. [Image]  [Link]\'');
     }
   ));
+
+  it('should correctly parameterize rule description filter',
+    inject(function($filter) {
+      var ruleMultipleChoice = {
+        type: 'Equals',
+        inputs: {
+          x: 0
+        }
+      };
+      var interactionIdMultipleChoice = 'TextInput';
+      var choicesMultipleChoice = [
+        {
+          label: '$10 should not become $$10',
+          val: 0
+        }
+      ];
+      expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
+        interactionIdMultipleChoice, choicesMultipleChoice)
+      ).toEqual('is equal to \'$10 should not become $$10\'');
+
+      choicesMultipleChoice = [
+        {
+          label: '$xyz should not become $$xyz',
+          val: 0
+        }
+      ];
+      expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
+        interactionIdMultipleChoice, choicesMultipleChoice)
+      ).toEqual('is equal to \'$xyz should not become $$xyz\'');
+    }));
 });

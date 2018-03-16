@@ -18,6 +18,10 @@
 
 oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT', 30);
 
+oppia.constant(
+  'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
+  constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT);
+
 oppia.filter('spacesToUnderscores', [function() {
   return function(input) {
     return input.trim().replace(/ /g, '_');
@@ -236,9 +240,42 @@ oppia.filter('parameterizeRuleDescription', [
         } else if (varType === 'Fraction') {
           replacementText = FractionObjectFactory
             .fromDict(inputs[varName]).toString();
-        } else {
+        } else if (
+          varType === 'SetOfUnicodeString' ||
+          varType === 'SetOfNormalizedString') {
+          replacementText = '[';
+          for (var i = 0; i < inputs[varName].length; i++) {
+            if (i !== 0) {
+              replacementText += ', ';
+            }
+            replacementText += inputs[varName][i];
+          }
+          replacementText += ']';
+        } else if (
+          varType === 'Real' || varType === 'NonnegativeInt' ||
+          varType === 'Int') {
+          replacementText = inputs[varName] + '';
+        } else if (
+          varType === 'CodeString' || varType === 'UnicodeString' ||
+          varType === 'LogicErrorCategory' || varType === 'NormalizedString') {
           replacementText = inputs[varName];
+        } else if (varType === 'ListOfCodeEvaluation') {
+          replacementText = '[';
+          for (var i = 0; i < inputs[varName].length; i++) {
+            if (i !== 0) {
+              replacementText += ', ';
+            }
+            replacementText += inputs[varName][i].code;
+          }
+          replacementText += ']';
+        } else {
+          throw Error('Unknown variable type in rule description');
         }
+
+        // Replaces all occurances of $ with $$.
+        // This makes sure that the next regex matching will yield
+        // the same $ sign pattern as the input.
+        replacementText = replacementText.split('$').join('$$');
 
         description = description.replace(PATTERN, ' ');
         finalDescription = finalDescription.replace(PATTERN, replacementText);
@@ -305,6 +342,31 @@ oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
     } else {
       return input;
     }
+  };
+}]);
+
+// Note that this filter removes additional new lines or <p><br></p> tags
+// at the end of the string.
+oppia.filter('removeExtraLines', [function() {
+  return function(string) {
+    if (!angular.isString(string)) {
+      return string;
+    }
+    var BLANK_LINES_TEXT = '<p><br></p>';
+    var EMPTY_PARA_TEXT = '<p></p>';
+    while (1) {
+      var endIndex = string.length;
+      var bStr = string.substring(endIndex - BLANK_LINES_TEXT.length, endIndex);
+      var pStr = string.substring(endIndex - EMPTY_PARA_TEXT.length, endIndex);
+      if (bStr === BLANK_LINES_TEXT) {
+        string = string.substring(0, endIndex - BLANK_LINES_TEXT.length);
+      } else if (pStr === EMPTY_PARA_TEXT) {
+        string = string.substring(0, endIndex - EMPTY_PARA_TEXT.length);
+      } else {
+        break;
+      }
+    }
+    return string;
   };
 }]);
 
@@ -404,6 +466,20 @@ oppia.filter('stripFormatting', [function() {
     strippedText = strippedText ? String(strippedText).replace(
       tagRegex, '') : '';
     return strippedText;
+  };
+}]);
+
+oppia.filter('getAbbreviatedText', [function() {
+  return function(text, characterCount) {
+    if (text.length > characterCount) {
+      var subject = text.substr(0, characterCount);
+
+      if (subject.indexOf(' ') !== -1) {
+        subject = subject.split(' ').slice(0, -1).join(' ');
+      }
+      return subject.concat('...');
+    }
+    return text;
   };
 }]);
 

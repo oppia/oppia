@@ -374,7 +374,7 @@ oppia.directive('filepathEditor', [
             $scope.cropAreaXWhenLastDown = $scope.cropArea.x1;
             $scope.cropAreaYWhenLastDown = $scope.cropArea.y1;
             $scope.userIsDraggingCropArea = true;
-          } else if(position !== null) {
+          } else if (position !== null) {
             $scope.lastMouseDownEventCoordinates = {x: coords.x, y: coords.y};
             $scope.userIsResizingCropArea = true;
             $scope.cropAreaResizeDirection = position;

@@ -45,6 +45,10 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             EVENT_PROGRESS_NAV_SUBMITTED) {
           var guppyDivElt = $element[0].querySelector('.guppy-div');
 
+          // Dynamically assigns a unique id to the guppy-div
+          guppyDivElt.setAttribute(
+            'id', 'guppy_' + Math.floor(Math.random() * 100000000));
+          var guppyDivId = guppyDivElt.id;
           /**
            * Adds a button overlay and invisible text field used to bring up
            * the keyboard on mobile devices.
@@ -130,30 +134,51 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
               setGuppyContentFromInput();
             });
           };
+          var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
+            '/overrides/guppy/oppia_symbols.json');
+          Guppy.init({
+            symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
+                      oppiaSymbolsUrl]});
+          var guppyInstance = new Guppy(guppyDivId, {
+            settings: {
+              empty_content: (
+                '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
+              buttons: []
+            },
+            events: {
+              done: function(e) {
+                $scope.submitAnswer();
+              },
+              change: function(e) {
+                $scope.setAnswerValidity({
+                  answerValidity: $scope.isCurrentAnswerValid()
+                });
+                // Need to manually trigger the digest cycle
+                // to make any 'watchers' aware of changes in answer.
+                $scope.$apply();
+              },
+              ready: function() {
+                $scope.setAnswerValidity({
+                  answerValidity: false
+                });
 
-          var guppyInstance = new Guppy(guppyDivElt, {
-            empty_content: (
-              '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
-            ready_callback: function() {
-              Guppy.get_symbols(
-                UrlInterpolationService.getStaticAssetUrl(
-                  '/overrides/guppy/oppia_symbols.json'));
-
-              if (DeviceInfoService.isMobileUserAgent() &&
-                DeviceInfoService.hasTouchEvents()) {
-                $scope.mobileOverlayIsShown = true;
-                // Wait for the scope change to apply. Since we interact with
-                // the DOM elements, they need to be added by angular before
-                // the function is called. Timeout of 0 to wait until the end
-                // of the current digest cycle, false to not start a new digest
-                // cycle. A new cycle is not needed since no angular variables
-                // are changed within the function.
-                $timeout(makeGuppyMobileFriendly, 0, false);
+                if (DeviceInfoService.isMobileUserAgent() &&
+                  DeviceInfoService.hasTouchEvents()) {
+                  $scope.mobileOverlayIsShown = true;
+                  // Wait for the scope change to apply. Since we interact with
+                  // the DOM elements, they need to be added by angular before
+                  // the function is called. Timeout of 0 to wait
+                  // until the end of the current digest cycle,
+                  // false to not start a new digest cycle.
+                  // A new cycle is not needed since no angular variables
+                  // are changed within the function.
+                  $timeout(makeGuppyMobileFriendly, 0, false);
+                }
               }
             }
           });
-          var guppyDivId = guppyInstance.editor.id;
 
+          guppyInstance.render();
           var labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
           $scope.$on('focusOn', function(e, name) {
@@ -168,19 +193,15 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             }
           });
 
-          guppyInstance.done_callback = function() {
-            $scope.submitAnswer();
-          };
-
           var answer = {
             ascii: '',
             latex: ''
           };
 
           $scope.isCurrentAnswerValid = function() {
-            var latexAnswer = Guppy.instances[guppyDivId].get_content('latex');
+            var latexAnswer = guppyInstance.latex();
             try {
-              MathExpression.fromLatex(answer.latex);
+              MathExpression.fromLatex(latexAnswer);
             } catch (e) {
               return false;
             }
@@ -189,13 +210,11 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
           };
 
           $scope.submitAnswer = function() {
-            answer.ascii = Guppy.instances[guppyDivId].get_content('text');
-            answer.latex = Guppy.instances[guppyDivId].get_content('latex');
-
             if (!$scope.isCurrentAnswerValid()) {
               return;
             }
-
+            answer.latex = guppyInstance.latex();
+            answer.ascii = guppyInstance.text();
             $scope.onSubmit({
               answer: answer,
               rulesService: mathExpressionInputRulesService

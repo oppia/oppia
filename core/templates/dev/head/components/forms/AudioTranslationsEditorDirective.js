@@ -98,12 +98,12 @@ oppia.directive('audioTranslationsEditor', [
                 }
               },
               controller: [
-                '$scope', '$uibModalInstance', 'LanguageUtilService',
+                '$scope', '$window', '$uibModalInstance', 'LanguageUtilService',
                 'allowedAudioLanguageCodes', 'AlertsService',
                 'ExplorationContextService', 'IdGenerationService',
                 'componentName',
                 function(
-                    $scope, $uibModalInstance, LanguageUtilService,
+                    $scope, $window, $uibModalInstance, LanguageUtilService,
                     allowedAudioLanguageCodes, AlertsService,
                     ExplorationContextService, IdGenerationService,
                     componentName) {
@@ -111,6 +111,8 @@ oppia.directive('audioTranslationsEditor', [
                     'There was an error uploading the audio file.');
                   var BUTTON_TEXT_SAVE = 'Save';
                   var BUTTON_TEXT_SAVING = 'Saving...';
+                  var prevLanguageCode = $window.localStorage.getItem(
+                    'last_uploaded_audio_lang');
 
                   $scope.languageCodesAndDescriptions = (
                     allowedAudioLanguageCodes.map(function(languageCode) {
@@ -126,8 +128,9 @@ oppia.directive('audioTranslationsEditor', [
                   $scope.errorMessage = null;
                   $scope.saveButtonText = BUTTON_TEXT_SAVE;
                   $scope.saveInProgress = false;
-
-                  $scope.languageCode = allowedAudioLanguageCodes[0];
+                  $scope.languageCode =
+                    allowedAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
+                    prevLanguageCode : allowedAudioLanguageCodes[0];
                   var uploadedFile = null;
 
                   $scope.isAudioTranslationValid = function() {
@@ -160,6 +163,8 @@ oppia.directive('audioTranslationsEditor', [
                       $scope.saveButtonText = BUTTON_TEXT_SAVING;
                       $scope.saveInProgress = true;
                       var generatedFilename = generateNewFilename();
+                      $window.localStorage.setItem(
+                        'last_uploaded_audio_lang', $scope.languageCode);
                       var explorationId = (
                         ExplorationContextService.getExplorationId());
                       AssetsBackendApiService.saveAudio(

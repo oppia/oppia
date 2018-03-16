@@ -225,7 +225,7 @@ describe('Exploration title service', function() {
     });
 
     beforeEach(inject(function($injector) {
-      ets = $injector.get('explorationTitleService');
+      ets = $injector.get('ExplorationTitleService');
       $httpBackend = $injector.get('$httpBackend');
 
       GLOBALS.INVALID_NAME_CHARS = '#@&^%$';

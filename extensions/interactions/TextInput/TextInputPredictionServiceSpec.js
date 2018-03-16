@@ -43,11 +43,11 @@ describe('Text Input Prediction Service', function() {
 
       // To keep things simple, we will calculate accuracy score
       // and not F1 score.
-      for(var i = 0; i < trainingData.length; i++) {
-        for(var j = 0; j < trainingData[i].answers.length; j++) {
+      for (var i = 0; i < trainingData.length; i++) {
+        for (var j = 0; j < trainingData[i].answers.length; j++) {
           predictedAnswerGroup = predictionService.predict(
             classifierData, trainingData[i].answers[j]);
-          if(predictedAnswerGroup == trainingData[i].answer_group_index) {
+          if (predictedAnswerGroup === trainingData[i].answer_group_index) {
             correctPredictions++;
           }
           totalAnswers++;

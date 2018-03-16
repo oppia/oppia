@@ -45,7 +45,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         expected_training_job_dict = {
             'job_id': 'exp_id1.SOME_RANDOM_STRING',
-            'algorithm_id': 'LDAStringClassifier',
+            'algorithm_id': 'TextClassifier',
             'interaction_id': 'TextInput',
             'exp_id': 'exp_id1',
             'exp_version': 1,
@@ -94,7 +94,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
                 datetime.datetime.strptime(
                     '2017-08-11 12:42:31', '%Y-%m-%d %H:%M:%S'),
             'state_name': 'some state',
-            'algorithm_id': 'LDAStringClassifier',
+            'algorithm_id': 'TextClassifier',
             'interaction_id': 'TextInput',
             'training_data': training_data,
             'status': 'NEW',
@@ -150,7 +150,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
             training_job.validate()
 
         # Verify validation error is raised when dict is provided for list.
-        training_job_dict['algorithm_id'] = 'LDAStringClassifier'
+        training_job_dict['algorithm_id'] = 'TextClassifier'
         training_job_dict['training_data'] = {}
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(utils.ValidationError, (
@@ -184,7 +184,8 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
 
     def test_validation(self):
         """Tests to verify validate method of TrainingJobExplorationMapping
-        domain."""
+        domain.
+        """
 
         # Verify no errors are raised for correct data.
         mapping_dict = {

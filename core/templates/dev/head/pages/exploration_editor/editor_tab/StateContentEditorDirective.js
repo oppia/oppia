@@ -35,11 +35,11 @@ oppia.directive('stateContentEditor', [
         'state_content_editor_directive.html'),
       controller: [
         '$scope', '$uibModal', 'stateContentService', 'EditabilityService',
-        'EditorFirstTimeEventsService', 'explorationInitStateNameService',
+        'EditorFirstTimeEventsService', 'ExplorationInitStateNameService',
         'EditorStateService', 'COMPONENT_NAME_CONTENT',
         function(
             $scope, $uibModal, stateContentService, EditabilityService,
-            EditorFirstTimeEventsService, explorationInitStateNameService,
+            EditorFirstTimeEventsService, ExplorationInitStateNameService,
             EditorStateService, COMPONENT_NAME_CONTENT) {
           $scope.HTML_SCHEMA = {
             type: 'html'
@@ -62,18 +62,7 @@ oppia.directive('stateContentEditor', [
                 'mark_all_audio_as_needing_update_modal_directive.html'),
               backdrop: true,
               resolve: {},
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.flagAll = function() {
-                    $uibModalInstance.close();
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
+              controller: 'MarkAllAudioAsNeedingUpdateController'
             }).result.then(function() {
               var currentStateContent = stateContentService.displayed;
               currentStateContent.markAllAudioAsNeedingUpdate();
@@ -90,7 +79,7 @@ oppia.directive('stateContentEditor', [
           $scope.isCurrentStateInitialState = function() {
             return (
               EditorStateService.getActiveStateName() ===
-              explorationInitStateNameService.savedMemento);
+              ExplorationInitStateNameService.savedMemento);
           };
 
           $scope.openStateContentEditor = function() {
@@ -102,12 +91,15 @@ oppia.directive('stateContentEditor', [
 
           $scope.onSaveContentButtonClicked = function() {
             EditorFirstTimeEventsService.registerFirstSaveContentEvent();
-            saveContent();
-
             var savedContent = stateContentService.savedMemento;
-            if (savedContent.hasUnflaggedAudioTranslations()) {
+            var contentHasChanged = (
+              savedContent.getHtml() !==
+              stateContentService.displayed.getHtml());
+            if (savedContent.hasUnflaggedAudioTranslations() &&
+              contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
+            saveContent();
             $scope.getOnSaveContentFn()();
           };
 

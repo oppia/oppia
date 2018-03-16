@@ -2,10 +2,12 @@
                          activity-type="ACTIVITY_TYPE_EXPLORATION"
                          activity-id="getExplorationId()"
                          activity-title="getExplorationTitle()"
+                         container-is-narrow="isContainerNarrow()"
                          activity-active="explorationIsCurrentlyHoveredOver">
 </learner-dashboard-icons>
+
 <md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}, {'oppia-activity-playlist-tile': isPlaylistTile()}]"
-         style="position: relative; z-index: 5;">
+         style="position: relative; z-index: 5;" ng-if="!isRefresherExploration">
   <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
     <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
       <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>" alt="<[getCategory()]>" ng-style="isPlaylistTile() && {'top': '4px', 'width': '50px'}">
@@ -76,3 +78,12 @@
     </div>
   </a>
 </md-card>
+<md-button class="oppia-learner-confirm-button protractor-test-return-to-parent-button"
+           style="margin-top: 12px;"
+           ng-if="isRefresherExploration"
+           ng-click="loadParentExploration()">
+  <span translate="I18N_PLAYER_RETURN_TO_PARENT"></span>
+  <i class="fa fa-arrow-right"
+     style="font-size: 19px; padding-top: 1.5px;">
+  </i>
+</md-button>

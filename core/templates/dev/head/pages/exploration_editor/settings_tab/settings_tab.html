@@ -165,7 +165,14 @@
               </span>
             </span>
             <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
-              Values that change as the learner moves between cards (<a href="http://oppia.github.io/#/Parameters" target="_blank">more info</a>).
+              Parameters are
+              <span ng-if="!areParametersEnabled()">
+                disabled.
+              </span>
+              <span ng-if="areParametersEnabled()">
+                enabled.
+              </span>
+              Parameters are values that change as the learner moves between cards (<a href="http://oppia.github.io/#/Parameters" target="_blank">more info</a>).
             </span>
           </div>
         </div>
@@ -186,8 +193,11 @@
                 </span>
               </button>
             </span>
-            <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
-              Automatic text-to-speech generates audio from your content for learners to listen to. This feature is enabled by default. It is recommended that you disable this feature if creating an exploration whose content consists of multiple languages.
+            <span ng-if="!isAutomaticTextToSpeechEnabled()" class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              Automatic text-to-speech is disabled. It generates audio from your content for learners to listen to.
+            </span>
+            <span ng-if="isAutomaticTextToSpeechEnabled()" class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              Automatic text-to-speech is enabled. It generates audio from your content for learners to listen to. It is recommended that you disable this feature if creating an exploration whose content consists of multiple languages.
             </span>
           </div>
         </div>
@@ -209,6 +219,13 @@
               </button>
             </span>
             <span class="col-lg-8 col-md-8 col-sm-8 help-block" style="font-size: smaller;">
+              This feature is
+              <span ng-if="!isCorrectnessFeedbackEnabled()">
+                disabled.
+              </span>
+              <span ng-if="isCorrectnessFeedbackEnabled()">
+                enabled.
+              </span>
               This allows the user to categorise answer groups as correct or incorrect.
             </span>
           </div>

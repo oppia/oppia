@@ -32,7 +32,7 @@ var PreferencesPage = function() {
   this.toggleEditorRoleEmailsCheckbox = function() {
     editorRoleEmailsCheckbox.click();
   };
-  
+
   this.toggleFeedbackEmailsCheckbox = function() {
     feedbackMessageEmailsCheckbox.click();
   };
@@ -44,7 +44,7 @@ var PreferencesPage = function() {
   this.isEditorRoleEmailsCheckboxSelected = function() {
     return editorRoleEmailsCheckbox.isSelected();
   };
-  
+
   // This function only compares the text displayed on the subscription (which
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.

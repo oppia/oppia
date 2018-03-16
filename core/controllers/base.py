@@ -127,7 +127,7 @@ class BaseHandler(webapp2.RequestHandler):
     # users have agreed to the latest terms.
     REDIRECT_UNFINISHED_SIGNUPS = True
 
-    # What format the get method returns when exception raised, json or html
+    # What format the get method returns when exception raised, json or html.
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
 
     @webapp2.cached_property
@@ -316,7 +316,6 @@ class BaseHandler(webapp2.RequestHandler):
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'DEV_MODE': feconf.DEV_MODE,
-            'MINIFICATION': feconf.IS_MINIFIED,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
             'ACTIVITY_STATUS_PRIVATE': (
                 rights_manager.ACTIVITY_STATUS_PRIVATE),

@@ -35,7 +35,7 @@ oppia.factory('VersionTreeService', [function() {
       for (var versionNum = 2; versionNum <= numberOfVersions; versionNum++) {
         if (_snapshots[versionNum].commit_type === 'revert') {
           for (var i = 0; i < _snapshots[versionNum].commit_cmds.length; i++) {
-            if (_snapshots[versionNum].commit_cmds[i].cmd ==
+            if (_snapshots[versionNum].commit_cmds[i].cmd ===
                 'AUTO_revert_version_number') {
               _treeParents[versionNum] =
                   _snapshots[versionNum].commit_cmds[i].version_number;

@@ -14,8 +14,6 @@
 
 """Tests for the page that allows learners to play through an exploration."""
 
-import os
-
 from constants import constants
 from core.domain import classifier_services
 from core.domain import collection_domain
@@ -121,54 +119,6 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
 
 
-class ClassifyHandlerTest(test_utils.GenericTestBase):
-    """Test the handler for classification."""
-
-    def setUp(self):
-        """Before the test, create an exploration_dict."""
-        super(ClassifyHandlerTest, self).setUp()
-        self.enable_ml_classifiers = self.swap(
-            feconf, 'ENABLE_ML_CLASSIFIERS', True)
-
-        # Reading YAML exploration into a dictionary.
-        yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                 '../tests/data/string_classifier_test.yaml')
-        with open(yaml_path, 'r') as yaml_file:
-            self.yaml_content = yaml_file.read()
-
-        self.login(self.VIEWER_EMAIL)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-
-        # Load demo exploration.
-        self.exp_id = '0'
-        self.title = 'Testing String Classifier'
-        self.category = 'Test'
-        exp_services.delete_demo(self.exp_id)
-        exp_services.load_demo(self.exp_id)
-
-        # Creating the exploration domain object.
-        self.exploration = exp_domain.Exploration.from_untitled_yaml(
-            self.exp_id,
-            self.title,
-            self.category,
-            self.yaml_content)
-
-    def test_classification_handler(self):
-        """Test the classification handler for a right answer."""
-
-        with self.enable_ml_classifiers:
-            # Testing the handler for a correct answer.
-            old_state_dict = self.exploration.states['Home'].to_dict()
-            answer = 'Permutations'
-            params = {}
-            res = self.post_json('/explorehandler/classify/%s' % self.exp_id,
-                                 {'params' : params,
-                                  'old_state' : old_state_dict,
-                                  'answer' : answer})
-            self.assertEqual(res['outcome']['feedback']['html'],
-                             '<p>Detected permutation.</p>')
-
-
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
     """Test the handler for giving feedback."""
 
@@ -176,18 +126,18 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         """Test giving feedback handler."""
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
-        # Load demo exploration
+        # Load demo exploration.
         exp_id = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
-        # Viewer opens exploration
+        # Viewer opens exploration.
         self.login(self.VIEWER_EMAIL)
         exploration_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
         state_name_1 = exploration_dict['exploration']['init_state_name']
 
-        # Viewer gives 1st feedback
+        # Viewer gives 1st feedback.
         self.post_json(
             '/explorehandler/give_feedback/%s' % exp_id,
             {
@@ -233,7 +183,7 @@ class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
 
         expected_state_classifier_mapping = {
             'text': {
-                'algorithm_id': 'LDAStringClassifier',
+                'algorithm_id': 'TextClassifier',
                 'classifier_data': {},
                 'data_schema_version': 1
             }
@@ -322,14 +272,14 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(
             self.testapp.get('/explore/%s' % self.EXP_ID))
 
-        # User checks rating
+        # User checks rating.
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], None)
         self.assertEqual(
             ratings['overall_ratings'],
             {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
 
-        # User rates and checks rating
+        # User rates and checks rating.
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
                 'user_rating': 2
@@ -341,7 +291,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
             ratings['overall_ratings'],
             {'1': 0, '2': 1, '3': 0, '4': 0, '5': 0})
 
-        # User re-rates and checks rating
+        # User re-rates and checks rating.
         self.login('user@example.com')
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
@@ -1276,11 +1226,10 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
 
     def test_stats_events_handler(self):
         """Test the handler for handling batched events."""
-        with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-            self.post_json('/explorehandler/stats_events/%s' % (
-                self.exp_id), {
-                    'aggregated_stats': self.aggregated_stats,
-                    'exp_version': self.exp_version})
+        self.post_json('/explorehandler/stats_events/%s' % (
+            self.exp_id), {
+                'aggregated_stats': self.aggregated_stats,
+                'exp_version': self.exp_version})
 
         self.assertEqual(self.count_jobs_in_taskqueue(
             taskqueue_services.QUEUE_NAME_STATS), 1)

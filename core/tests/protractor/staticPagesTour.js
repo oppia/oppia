@@ -68,6 +68,8 @@ describe('Oppia static pages tour', function() {
       // TODO (@pranavsid98) This error is caused by the upgrade from Chrome 60
       // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
       'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
+      'Error parsing header X-XSS-Protection: 1; mode=block; ' +
+      'report=https:\/\/www.google.com\/appserve\/security-bugs\/log\/youtube:',
     ]);
   });
 });

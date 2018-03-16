@@ -3,11 +3,17 @@
     <div style="width: 560px;">
       <i class="fa audio-controls-button-icon"
          ng-click="onPlayButtonClicked()"
-         ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play': !isAudioPlaying(), 'fa-pause': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
+         ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle': !isAudioPlaying(), 'fa-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
          uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
          tooltip-append-to-body="true" tooltip-placement="right"></i>
-      <div class="progress-bar-section" ng-if="hasPressedPlayButtonAtLeastOnce">
-        <md-progress-linear md-mode="<[getProgressBarMode()]>" value="<[AudioPlayerService.getProgress() * 100]>"></md-progress-linear>
+      <div class="slider-section" ng-if="hasPressedPlayButtonAtLeastOnce">
+        <div ng-if="audioLoadingIndicatorIsShown">
+          <md-progress-linear md-mode="indeterminate"></md-progress-linear>
+        </div>
+        <div ng-if="!audioLoadingIndicatorIsShown">
+          <md-slider ng-model="track.progress" ng-model-options="{ getterSetter: true }" aria-label="audio-slider">
+          </md-slider>
+        </div>
         <span ng-if="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_LOADING_AUDIO"></span>
         <span ng-if="isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message" translate="I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT"></span>
         <!--Filler space for message-->
@@ -19,15 +25,44 @@
               ng-style="hasPressedPlayButtonAtLeastOnce ? {'width': '30%'} : {'width': '60%'}"
               ng-change="onNewLanguageSelected()"></select>
     </div>
+    <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()"><i class="fa fa-sort-up"></i></div>
   </div>
-  <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()"><i class="fa fa-sort-up"></i></div>
   <div class="audio-expand-button audio-toggle-button" ng-if="!audioBarIsExpanded" ng-click="expandAudioBar()"><span class="audio-expand-button-text" translate="I18N_PLAYER_AUDIO_EXPAND_TEXT"></span> <i class="audio-expand-icon fa fa-sort-down"></i></div>
 </div>
 
 <style>
 
-  md-progress-linear.md-default-theme .md-bar {
+  .fa-play-circle:before {
+    font-size: 1.7em;
+  }
+
+  .fa-pause-circle:before {
+    font-size: 1.7em;
+  }
+
+  audio-bar md-progress-linear.md-default-theme .md-bar {
     background-color: #009688;
+  }
+
+  audio-bar md-slider {
+    height: 5px;
+  }
+
+  audio-bar md-slider.md-default-theme .md-track-fill {
+    background-color: #009688;
+  }
+
+  audio-bar md-slider.md-default-theme .md-thumb:after {
+    border-color: #009688;
+    background-color: #009688;
+  }
+
+  audio-bar md-slider .md-track-container {
+    top: 5px;
+  }
+
+  audio-bar md-slider .md-thumb-container {
+    top: -17px;
   }
 
   .audio-header .fa-sort-up, .audio-header .fa-sort-down {
@@ -42,7 +77,9 @@
 
   .audio-collapse-button {
     height: 10px;
+    position: absolute;
     width: 30px;
+    top: 44px;
   }
 
   .audio-toggle-button {
@@ -89,6 +126,32 @@
     width: 100%;
   }
 
+  .audio-controls.ng-enter,
+  .audio-controls.ng-leave {
+    -webkit-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -moz-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -ms-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -o-transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    transition: 300ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    position: absolute;
+  }
+
+  .audio-controls.ng-enter {
+    top: -44px;
+  }
+
+  .audio-controls.ng-enter.audio-controls.ng-enter-active {
+    top: 0;
+  }
+
+  .audio-controls.ng-leave {
+    top: 0;
+  }
+
+  .audio-controls.ng-leave.audio-controls.ng-leave-active {
+    top: -44px;
+  }
+
   .audio-controls-message {
     font-size: 10px;
     font-style: italic;
@@ -112,7 +175,7 @@
     padding-left: 3px;
   }
 
-  .progress-bar-section {
+  audio-bar .slider-section {
     display: inline-block;
     margin: 0 auto;
     padding: 0 4px;

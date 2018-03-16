@@ -27,22 +27,20 @@ DEBUG = False
 # code in core/platform.
 PLATFORM = 'gae'
 
-# This should be string comparison, since all environment variables
-# are converted to string
-IS_MINIFIED = os.environ.get('MINIFICATION') == 'True'
+# This variable is for serving minified resources
+# when set to True. It reflects we are emulating running Oppia in a production
+# environment.
+FORCE_PROD_MODE = False
 
 # Whether we should serve the development or production experience.
-# DEV_MODE should only be changed to False in the production environment.
-# To use minified resources in the development environment,
-# change the MINIFICATION env variable in app.yaml to True.
-# When DEV_MODE is True, this indicates that we are not running in
-# the production App Engine environment, which affects things like
-# login/logout URLs,as well as third-party libraries
-# that App Engine normally provides.
+# DEV_MODE should only be changed to False in the production environment,
+# or if you want to use minified resources in the development environment.
+
 if PLATFORM == 'gae':
     DEV_MODE = (
-        not os.environ.get('SERVER_SOFTWARE')
-        or os.environ['SERVER_SOFTWARE'].startswith('Development'))
+        (not os.environ.get('SERVER_SOFTWARE') or
+         os.environ['SERVER_SOFTWARE'].startswith('Development')) and
+        not FORCE_PROD_MODE)
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
@@ -52,7 +50,7 @@ SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 
 EXTENSIONS_DIR_PREFIX = (
-    'backend_prod_files' if (IS_MINIFIED or not DEV_MODE) else '')
+    'backend_prod_files' if not DEV_MODE else '')
 INTERACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
 RTE_EXTENSIONS_DIR = (
@@ -62,9 +60,8 @@ RTE_EXTENSIONS_DEFINITIONS_PATH = (
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
-# Choose production templates folder if minification flag is used or
-# if in production mode
-if IS_MINIFIED or not DEV_MODE:
+# Choose production templates folder when we are in production mode.
+if not DEV_MODE:
     FRONTEND_TEMPLATES_DIR = (
         os.path.join('backend_prod_files', 'templates', 'head'))
 else:
@@ -81,7 +78,7 @@ RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
 # A mapping of interaction ids to classifier properties.
 INTERACTION_CLASSIFIER_MAPPING = {
     'TextInput': {
-        'algorithm_id': 'LDAStringClassifier',
+        'algorithm_id': 'TextClassifier',
         'current_data_schema_version': 1
     },
     'CodeRepl': {
@@ -155,7 +152,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 17
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 18
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -416,13 +413,6 @@ ALLOWED_RTE_EXTENSIONS = {
     },
 }
 
-
-# This list contains the IDs of the classifiers used for obtaining instances
-# class of classifiers using classifier_registry.
-ANSWER_CLASSIFIER_CLASS_IDS = [
-    'LDAStringClassifier',
-]
-
 # These categories and interactions are displayed in the order in which they
 # appear in the interaction selector.
 ALLOWED_INTERACTION_CATEGORIES = [{
@@ -514,7 +504,7 @@ DISABLED_EXPLORATION_IDS = ['5']
 EMBEDDED_GOOGLE_GROUP_URL = (
     'https://groups.google.com/forum/embed/?place=forum/oppia')
 
-# External URL for the Foundation site
+# External URL for the Foundation site.
 FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
 
 # Whether to allow YAML file uploads.
@@ -633,7 +623,7 @@ EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 ACTIVITY_STATUS_PRIVATE = 'private'
 ACTIVITY_STATUS_PUBLIC = 'public'
 
-# Play type constants
+# Play type constants.
 PLAY_TYPE_PLAYTEST = 'playtest'
 PLAY_TYPE_NORMAL = 'normal'
 
@@ -649,7 +639,7 @@ SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with app.js
+# NOTE TO DEVELOPERS: This should be synchronized with app.js.
 ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
@@ -657,14 +647,11 @@ SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 # is created or updated.
 ENABLE_STATE_ID_MAPPING = False
 
-# Bool to enable update of analytics models.
-# NOTE TO DEVELOPERS: This should be synchronized with app.js
-ENABLE_NEW_STATS_FRAMEWORK = False
-# Current event models schema version. All event models with
-# event_schema_version as 1 are the events collected before the rework of the
-# statistics framework which brought about the recording of new event models.
-# This includes all models recorded before Nov 2017.
-CURRENT_EVENT_MODELS_SCHEMA_VERSION = 1
+# Current event models schema version. All event models with an
+# event_schema_version of 1 are the events collected before the rework of the
+# statistics framework which brought about the recording of new event models;
+# these models include all models recorded before Feb 2018.
+CURRENT_EVENT_MODELS_SCHEMA_VERSION = 2
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
@@ -677,7 +664,7 @@ UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
 # Possible values for user query status.
 # Valid status transitions are: processing --> completed --> archived
-# Or processing --> failed.
+# or processing --> failed.
 USER_QUERY_STATUS_PROCESSING = 'processing'
 USER_QUERY_STATUS_COMPLETED = 'completed'
 USER_QUERY_STATUS_ARCHIVED = 'archived'
@@ -737,7 +724,7 @@ LIBRARY_PAGE_MODE_INDEX = 'index'
 # Page mode for the search results page.
 LIBRARY_PAGE_MODE_SEARCH = 'search'
 
-# Defaults for topic similarities
+# Defaults for topic similarities.
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 

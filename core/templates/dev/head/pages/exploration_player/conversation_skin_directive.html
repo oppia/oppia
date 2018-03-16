@@ -5,7 +5,7 @@
 <div class="conversation-skin-future-tutor-card" aria-hidden="true">
   <div class="conversation-skin-tutor-card-content">
     <div class="conversation-skin-tutor-card-top-section">
-      <div class="conversation-skin-tutor-card-top-content"
+      <div class="rte-viewer conversation-skin-tutor-card-top-content"
            angular-html-bind="upcomingContentHtml">
       </div>
     </div>
@@ -89,10 +89,10 @@
   <div ng-if="recommendedExplorationSummaries !== null && (collectionSummary || recommendedExplorationSummaries.length > 0)"
        class="conversation-skin-final-recommendations">
     <div ng-if="recommendedExplorationSummaries.length > 0">
-      <span ng-if="collectionSummary" class="conversation-skin-final-recommendations-header"
+      <span ng-if="collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
             translate="I18N_PLAYER_NEXT_LESSON">
       </span>
-      <span ng-if="!collectionSummary" class="conversation-skin-final-recommendations-header"
+      <span ng-if="!collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
             translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS">
       </span>
 
@@ -114,7 +114,7 @@
         </exploration-summary-tile>
       </div>
 
-      <div ng-if="collectionSummary" class="conversation-skin-back-to-collection-container">
+      <div ng-if="collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
         <a ng-href="/collection/<[collectionId]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
       </div>
     </div>
@@ -138,7 +138,7 @@
     </div>
   </div>
 
-  <div ng-if="!collectionSummary" class="conversation-skin-back-to-collection-container">
+  <div ng-if="!collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
     <a ng-href="/library" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_LIBRARY"></a>
   </div>
 </div>
@@ -233,8 +233,7 @@ otherwise they will interfere with the iframed conversation skin directive.
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
     flex-shrink: 1;
     margin-left: 12px;
-    max-width: 1000px;
-    min-width: 560px;
+    width: 650px;
     position: relative;
     z-index: 2;
   }
@@ -244,30 +243,19 @@ otherwise they will interfere with the iframed conversation skin directive.
        .form-control.oppia-rte-content > div > p' selectors specifying
       the same line-height, margin-top and margin-bottom attributes)
   */
-  .conversation-skin-oppia-feedback-content > p,
-  .conversation-skin-learner-answer-content > p,
-  .conversation-skin-help-card-content > p {
+  .rte-viewer > p {
     line-height: 28px;
     margin-bottom: 18px;
     margin-top: 18px;
   }
-  .conversation-skin-tutor-card-top-content > p:first-child,
-  .conversation-skin-oppia-feedback-content > p:first-child,
-  .conversation-skin-learner-answer-content > p:first-child,
-  .conversation-skin-help-card-content > p:first-child {
+  .rte-viewer > p:first-child {
     margin-top: 0px;
   }
-  .conversation-skin-tutor-card-top-content > p:last-child,
-  .conversation-skin-oppia-feedback-content > p:last-child,
-  .conversation-skin-learner-answer-content > p:last-child,
-  .conversation-skin-help-card-content > p:last-child {
+  .rte-viewer > p:last-child {
     margin-bottom: 0px;
   }
 
-  .conversation-skin-tutor-card-top-content,
-  .conversation-skin-oppia-feedback-content,
-  .conversation-skin-learner-answer-content,
-  .conversation-skin-help-card-content {
+  .rte-viewer {
     border-radius: 2px;
     display: inline-block;
     max-width: 100%;
@@ -452,6 +440,10 @@ otherwise they will interfere with the iframed conversation skin directive.
     }
     .conversation-skin-oppia-avatar.show-tutor-card:hover {
       opacity: 0.8;
+    }
+
+    .conversation-skin-tutor-card {
+      padding-left: 0px;
     }
   }
 </style>

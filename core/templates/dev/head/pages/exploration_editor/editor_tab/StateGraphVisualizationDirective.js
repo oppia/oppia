@@ -154,7 +154,7 @@ oppia.directive('stateGraphViz', [
             $scope.augmentedLinks = StateGraphLayoutService.getAugmentedLinks(
               nodeData, links);
 
-            for(var i = 0; i < $scope.augmentedLinks.length; i++) {
+            for (var i = 0; i < $scope.augmentedLinks.length; i++) {
               // Style links if link properties and style mappings are
               // provided
               if (links[i].hasOwnProperty('linkProperty') &&

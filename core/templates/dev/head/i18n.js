@@ -44,9 +44,6 @@ oppia.controller('I18nFooter', [
     var preferencesDataUrl = '/preferenceshandler/data';
     var siteLanguageUrl = '/save_site_language';
     $scope.supportedSiteLanguages = constants.SUPPORTED_SITE_LANGUAGES;
-    if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
-      $translate.use(GLOBALS.preferredSiteLanguageCode);
-    }
 
     // The $timeout seems to be necessary for the dropdown to show anything
     // at the outset, if the default language is not English.

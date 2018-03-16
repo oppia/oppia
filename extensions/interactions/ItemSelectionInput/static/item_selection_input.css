@@ -10,9 +10,13 @@
 
 md-checkbox.item-selection-input-checkbox.md-default-theme .md-icon {
   border-color: #0d48a1;
+  top: 2px;
 }
 md-checkbox.item-selection-input-checkbox.md-default-theme.md-checked .md-icon {
   background-color: rgba(102, 187, 106, 0.87);
+}
+md-checkbox.item-selection-input-checkbox .md-label {
+  vertical-align: top;
 }
 
 .item-selection-input-form-container {
@@ -81,7 +85,7 @@ md-checkbox.item-selection-input-checkbox.md-default-theme.md-checked .md-icon {
   border-radius: 50%;
   display: inline-block;
   height: 16px;
-  margin-bottom: -2px;
+  margin-bottom: -7px;
   margin-right: 12px;
   width: 16px;
 }

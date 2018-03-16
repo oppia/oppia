@@ -939,6 +939,7 @@ p {
   margin: 0;
   text-align: left;
   word-spacing: 0;
+  word-break: break-word;
 }
 
 .oppia-long-text p {
@@ -1064,6 +1065,7 @@ textarea {
 
 .oppia-sidebar-menu-open .oppia-sidebar-menu {
   box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
+  height: 110vh;
   overflow-y: scroll;
   -ms-transform: translate(0, 0);
   -webkit-transform: translate3d(0, 0, 0);
@@ -2162,11 +2164,8 @@ pre.oppia-pre-wrapped-text {
 
 /* These rules must be kept in sync with corresponding rules in
    pages/exploration_player/conversation_skin_directive.html
-   (those with '.conversation-skin-tutor-card-top-content > p,
-   .conversation-skin-oppia-feedback-content > p,
-   .conversation-skin-learner-answer-content > p,
-   .conversation-skin-help-card-content > p' selectors specifying
-    the same line-height, margin-top and margin-bottom attributes)
+   (those with '.rte-viewer > p' selectors specifying the same
+   line-height, margin-top and margin-bottom attributes)
 */
 .oppia-rte-editor > p,
 .oppia-rte-content > div > p {
@@ -2506,7 +2505,8 @@ pre.oppia-pre-wrapped-text {
 .oppia-rule-block.active {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   margin: -2px;
-  z-index: 1;
+  position: relative;
+  z-index: 100;
 }
 
 .oppia-rule-sort-handle, .oppia-fallback-sort-handle, .oppia-hint-sort-handle, .oppia-learner-playlist-sort-handle {
@@ -4053,7 +4053,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-activity-summary-tile:hover .title-section-mask,
 .oppia-activity-summary-tile a:focus .title-section-mask {
   background-color: #eee;
-  height: 162px;
+  height: 100%;
   left: 0;
   opacity: 0.4;
   position: absolute;
@@ -4330,8 +4330,8 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-dashboard-card-view-item .mask-wrap {
-  height: 162px;
-  margin-top: -162px;
+  height: 64.8%;
+  margin-top: -88%;
   position: relative;
 }
 
@@ -4342,9 +4342,8 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-dashboard-card-view-item .metrics {
-  height: 50px;
-  margin: 13px 0 0 0;
-  padding-bottom: 10px;
+  margin: 0;
+  padding: 13px 0 10px;
 }
 
 .oppia-dashboard-card-view-item .metrics > li {

@@ -55,7 +55,7 @@ oppia.factory('AssetsBackendApiService', [
                          window.WebKitBlobBuilder ||
                          window.MozBlobBuilder ||
                          window.MSBlobBuilder;
-          if (exception.name == 'TypeError' && window.BlobBuilder) {
+          if (exception.name === 'TypeError' && window.BlobBuilder) {
             var blobBuilder = new BlobBuilder();
             blobBuilder.append(data);
             var audioBlob = blobBuilder.getBlob('audio/*');

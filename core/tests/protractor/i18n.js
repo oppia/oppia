@@ -19,8 +19,11 @@
  * @author Milagro Teruel (milagro.teruel@gmail.com)
  */
 
+var editor = require('../protractor_utils/editor.js');
+var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var workflow = require('../protractor_utils/workflow.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
@@ -112,15 +115,41 @@ describe('Site language', function() {
     users.login('mangue@example.com', true);
     browser.get('/about');
     _selectLanguage('Español');
-    adminPage.reloadExploration('protractor_test_1.yaml');
-    // Open exploration
-    general.openPlayer('12');
-    // Spanish is still selected
-    var placeholder = element(by.css('.protractor-test-float-form-input'))
-      .getAttribute('placeholder');
-    expect(placeholder).toEqual('Ingresa un número');
-    general.ensurePageHasNoTranslationIds();
-    users.logout();
+
+    // Create an exploration.
+    workflow.createExploration();
+    general.getExplorationIdFromEditor().then(function(expId) {
+      explorationId = expId;
+      editor.setContent(forms.toRichText('Language Test'));
+      editor.setInteraction('NumericInput');
+      editor.addResponse(
+        'NumericInput', forms.toRichText('Nice!!'),
+        'END', true, 'IsLessThanOrEqualTo', 0);
+      editor.setDefaultOutcome(forms.toRichText('Ok!!'), null, false);
+      editor.moveToState('END');
+      editor.setContent(forms.toRichText('END'));
+      editor.setInteraction('EndExploration');
+
+      // Save changes.
+      title = 'Language Test';
+      category = 'Languages';
+      objective = 'To test site language.';
+      editor.setTitle(title);
+      editor.setCategory(category);
+      editor.setObjective(objective);
+      editor.saveChanges('Done!');
+
+      // Publish changes.
+      workflow.publishExploration();
+      general.openEditor(expId);
+
+      // Spanish is still selected.
+      var placeholder = element(by.css('.protractor-test-float-form-input'))
+        .getAttribute('placeholder');
+      expect(placeholder).toEqual('Ingresa un número');
+      general.ensurePageHasNoTranslationIds();
+      users.logout();
+    });
   });
 
   afterEach(function() {

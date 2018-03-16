@@ -868,16 +868,14 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration.version += 1
 
     # Trigger statistics model update.
-    if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-        stats_services.handle_stats_creation_for_new_exp_version(
-            exploration.id, exploration.version, exploration.states,
-            change_list)
+    stats_services.handle_stats_creation_for_new_exp_version(
+        exploration.id, exploration.version, exploration.states,
+        change_list)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
-        new_to_old_state_names = exploration.get_state_names_mapping(
-            change_list)
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         trainable_states_dict = exploration.get_trainable_states_dict(
-            old_states, new_to_old_state_names)
+            old_states, exp_versions_diff)
         state_names_with_changed_answer_groups = trainable_states_dict[
             'state_names_with_changed_answer_groups']
         state_names_with_unchanged_answer_groups = trainable_states_dict[
@@ -888,7 +886,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         if state_names_with_unchanged_answer_groups:
             classifier_services.handle_non_retrainable_states(
                 exploration, state_names_with_unchanged_answer_groups,
-                new_to_old_state_names)
+                exp_versions_diff)
 
     # Save state id mapping model for exploration.
     create_and_save_state_id_mapping_model(exploration, change_list)
@@ -939,9 +937,8 @@ def _create_exploration(
     exploration.version += 1
 
     # Trigger statistics model creation.
-    if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-        stats_services.handle_stats_creation_for_new_exploration(
-            exploration.id, exploration.version, exploration.states)
+    stats_services.handle_stats_creation_for_new_exploration(
+        exploration.id, exploration.version, exploration.states)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         # Find out all states that need a classifier to be trained.
@@ -1244,7 +1241,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
 
     if contributor_id_to_add not in feconf.SYSTEM_USER_IDS:
         if contributor_id_to_add is None:
-            # Revert commit or other non-positive commit
+            # Revert commit or other non-positive commit.
             contributors_summary = compute_exploration_contributors_summary(
                 exploration.id)
         else:
@@ -1434,7 +1431,8 @@ def get_demo_exploration_components(demo_path):
 
 
 def save_new_exploration_from_yaml_and_assets(
-        committer_id, yaml_content, exploration_id, assets_list):
+        committer_id, yaml_content, exploration_id, assets_list,
+        strip_audio_translations=False):
     """Note that the default title and category will be used if the YAML
     schema version is less than
     exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
@@ -1447,6 +1445,8 @@ def save_new_exploration_from_yaml_and_assets(
         exploration_id: str. The id of the exploration.
         assets_list: list(list(str)). A list of lists of assets, which contains
             asset's filename and content.
+        strip_audio_translations: bool. Whether to strip away all audio
+            translations from the imported exploration.
 
     Raises:
         Exception: The yaml file is invalid due to a missing schema version.
@@ -1470,11 +1470,37 @@ def save_new_exploration_from_yaml_and_assets(
         exploration = exp_domain.Exploration.from_yaml(
             exploration_id, yaml_content)
 
-    commit_message = (
+    # Check whether audio translations should be stripped.
+    if strip_audio_translations:
+        for state in exploration.states.values():
+            # Strip away audio translations from the state content.
+            content = state.content
+            content.audio_translations = {}
+
+            if state.interaction is not None:
+                # Strip away audio translations from solutions.
+                solution = state.interaction.solution
+                if solution:
+                    solution.explanation.audio_translations = {}
+
+                # Strip away audio translations from hints.
+                for hint in state.interaction.hints:
+                    hint.hint_content.audio_translations = {}
+
+                # Strip away audio translations from answer groups (feedback).
+                for answer_group in state.interaction.answer_groups:
+                    answer_group.outcome.feedback.audio_translations = {}
+
+                # Strip away audio translations from the default outcome.
+                default_outcome = state.interaction.default_outcome
+                if default_outcome:
+                    default_outcome.feedback.audio_translations = {}
+
+    create_commit_message = (
         'New exploration created from YAML file with title \'%s\'.'
         % exploration.title)
 
-    _create_exploration(committer_id, exploration, commit_message, [{
+    _create_exploration(committer_id, exploration, create_commit_message, [{
         'cmd': CMD_CREATE_NEW,
         'title': exploration.title,
         'category': exploration.category,

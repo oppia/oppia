@@ -57,9 +57,8 @@ var ExplorationPlayerPage = function() {
       element(by.css('.protractor-test-confirm-redirection-button'));
   var cancelRedirectionButton = element(
     by.css('.protractor-test-cancel-redirection-button'));
-
-  var explorationSummaryTile = element(
-    by.css('.protractor-test-exp-summary-tile-title'));
+  var returnToParentButton = element(
+    by.css('.protractor-test-return-to-parent-button'));
 
   var feedbackPopupLink =
     element(by.css('.protractor-test-exploration-feedback-popup-link'));
@@ -93,14 +92,8 @@ var ExplorationPlayerPage = function() {
     cancelRedirectionButton.click();
   };
 
-  this.clickOnSummaryTileAtEnd = function() {
-    /* The summary tile for redirection has to be scrolled down in the
-       chrome window to be in view of the automated test,
-       hence the scrollTo. */
-    browser.executeScript('window.scrollTo(571,700);').then(function() {
-      explorationSummaryTile.click();
-    });
-    browser.waitForAngular();
+  this.clickOnReturnToParentButton = function() {
+    returnToParentButton.click();
   };
 
   // This verifies the question just asked, including formatting and

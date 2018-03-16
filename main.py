@@ -335,8 +335,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorehandler/stats_events/<exploration_id>',
         reader.StatsEventsHandler),
     get_redirect_route(
-        r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler),
-    get_redirect_route(
         r'/explorehandler/rating/<exploration_id>', reader.RatingHandler),
     get_redirect_route(
         r'/explorehandler/recommendations/<exploration_id>',
@@ -384,12 +382,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/snapshots/<exploration_id>',
         editor.ExplorationSnapshotsHandler),
-    get_redirect_route(
-        r'/createhandler/statisticsversion/<exploration_id>',
-        editor.ExplorationStatsVersionsHandler),
-    get_redirect_route(
-        r'/createhandler/statistics_old/<exploration_id>/<exploration_version>',
-        editor.OldExplorationStatisticsHandler),
     get_redirect_route(
         r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler),

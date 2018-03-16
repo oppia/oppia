@@ -6,36 +6,71 @@
   the Oppia iframe to the containing page.
 </p>
 
+<style type="text/css">
+  .protractor-test-results {
+    display: none;
+  }
+</style>
+
 <script src="/assets/scripts/oppia-player-0.0.1.js"></script>
 <script src="/assets/scripts/embedding_tests.js"></script>
+<script src="../../third_party/static/jquery-3.2.1/jquery.min.js"></script>
 
-<div>
-  <h3>Iframe embedding</h3>
-  <iframe src="/embed/exploration/12" width="700" height="600">
-  </iframe>
+<input class="protractor-test-exploration-id-input-field" type="text" placeholder="explorationId">
+<input class="protractor-test-exploration-id-submit-button" type="submit" value="Update Exploration ID" onclick="onChangeExpId()">
+
+<div class="protractor-test-results">
+  <div>
+    <h3>Iframe embedding</h3>
+    <iframe src="/embed/exploration/idToBeReplaced" width="700" height="600">
+    </iframe>
+  </div>
+
+  <div class="protractor-test-standard">
+    <h3>Standard embedding of the latest version</h3>
+    <oppia oppia-id="idToBeReplaced"></oppia>
+  </div>
+
+  <div class="protractor-test-old-version">
+    <h3>Standard embedding of version 2 of the exploration with deferred loading</h3>
+    <oppia oppia-id="idToBeReplaced" autoload="false" exploration-version="2"></oppia>
+  </div>
+
+  <div class="protractor-test-missing-id">
+    <h3>ERROR: No oppia id specified</h3>
+    <oppia></oppia>
+  </div>
+
+  <div class="protractor-test-invalid-id">
+    <h3>ERROR: 404 error</h3>
+    <oppia oppia-id="fake_id"></oppia>
+  </div>
+
+  <div class="protractor-test-invalid-id-deferred">
+    <h3>ERROR: 404 error with deferred loading</h3>
+    <oppia oppia-id="fake_id" autoload="false"></oppia>
+  </div>
 </div>
 
-<div class="protractor-test-standard">
-  <h3>Standard embedding of the latest version</h3>
-  <oppia oppia-id="12"></oppia>
-</div>
+<script type="text/javascript">
+  // To keep track of next exploration id to be replaced.
+  var placeholderExplorationId = 'idToBeReplaced';
+  var onChangeExpId = function() {
+    var newExplorationId = $(
+      '.protractor-test-exploration-id-input-field').val();
+    $('div > iframe').each(function(index) {
+      var src = $(this).attr('src');
+      src = src.replace(placeholderExplorationId, newExplorationId);
+      $(this).attr('src', src);
+    });
+    placeholderExplorationId = newExplorationId;
 
-<div class="protractor-test-old-version">
-  <h3>Standard embedding of version 1 of the exploration with deferred loading</h3>
-  <oppia oppia-id="12" autoload="false" exploration-version="1"></oppia>
-</div>
+    // For first time loading of deferred loading version.
+    $('oppia[oppia-id="idToBeReplaced"]').each(function(index) {
+      $(this).attr('oppia-id', newExplorationId);
+    });
 
-<div class="protractor-test-missing-id">
-  <h3>ERROR: No oppia id specified</h3>
-  <oppia></oppia>
-</div>
-
-<div class="protractor-test-invalid-id">
-  <h3>ERROR: 404 error</h3>
-  <oppia oppia-id="fake_id"></oppia>
-</div>
-
-<div class="protractor-test-invalid-id-deferred">
-  <h3>ERROR: 404 error with deferred loading</h3>
-  <oppia oppia-id="fake_id" autoload="false"></oppia>
-</div>
+    // Show the contents.
+    $('.protractor-test-results').show();
+  };
+</script>

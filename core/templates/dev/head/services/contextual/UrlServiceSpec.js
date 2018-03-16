@@ -23,7 +23,8 @@ describe('Url Service', function() {
   var mockLocation = {
     href: 'http://' + pathname,
     pathname: pathname,
-    hash: sampleHash
+    hash: sampleHash,
+    search: ''
   };
 
   beforeEach(module('oppia'));
@@ -35,7 +36,7 @@ describe('Url Service', function() {
   it('should return correct query value list for each query field', function() {
     expect(UrlService.getQueryFieldValuesAsList('field1')).toEqual([]);
 
-    mockLocation.href = 'http://' + pathname + '?field1=value1&' +
+    mockLocation.search = '?field1=value1&' +
       'field2=value2&field1=value3&field1=value4&field2=value5&' +
       'field1=value6&field1=value%3F%3D%20%266';
     var expectedList1 = ['value1', 'value3', 'value4', 'value6', 'value?= &6'];
@@ -52,8 +53,7 @@ describe('Url Service', function() {
         field1: '?value=1',
         field2: '?value&1'
       };
-      mockLocation.href = 'http://' + pathname +
-        '?field1=%3Fvalue%3D1&field2=%3Fvalue%261';
+      mockLocation.search = '?field1=%3Fvalue%3D1&field2=%3Fvalue%261';
       expect(UrlService.getUrlParams()).toEqual(expectedObject);
     });
 

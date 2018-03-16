@@ -18,7 +18,7 @@
 
 describe('Audio translation language service', function() {
   beforeEach(module('oppia'));
-  
+
   var atls;
   beforeEach(inject(function($injector) {
     atls = $injector.get('AudioTranslationLanguageService');
@@ -72,7 +72,7 @@ describe('Audio translation language service', function() {
       var explorationLanguageCode = 'en';
       atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
         explorationLanguageCode);
-      expect(atls.getCurrentAudioLanguageCode()).toEqual('en'); 
+      expect(atls.getCurrentAudioLanguageCode()).toEqual('en');
     }
   );
 });

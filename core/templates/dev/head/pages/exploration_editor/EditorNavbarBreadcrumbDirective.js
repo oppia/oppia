@@ -25,15 +25,15 @@ oppia.directive('editorNavbarBreadcrumb', [
         '/pages/exploration_editor/' +
         'editor_navbar_breadcrumb_directive.html'),
       controller: [
-        '$scope', 'explorationTitleService', 'RouterService',
+        '$scope', 'ExplorationTitleService', 'RouterService',
         'FocusManagerService', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
         function(
-            $scope, explorationTitleService, RouterService,
+            $scope, ExplorationTitleService, RouterService,
             FocusManagerService, EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
           $scope.navbarTitle = null;
           $scope.$on('explorationPropertyChanged', function() {
             var _MAX_TITLE_LENGTH = 20;
-            $scope.navbarTitle = explorationTitleService.savedMemento;
+            $scope.navbarTitle = ExplorationTitleService.savedMemento;
             if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
               $scope.navbarTitle = (
                 $scope.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...');

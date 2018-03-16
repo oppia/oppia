@@ -46,7 +46,7 @@ describe('Focus Manager Service', function() {
   it('should set focus label and broadcast it', function() {
     FocusManagerService.setFocus(focusLabel);
     $timeout(function () {
-      expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn',focusLabel);
+      expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn', focusLabel);
     });
     $timeout.flush();
   });
@@ -56,13 +56,13 @@ describe('Focus Manager Service', function() {
     expect(FocusManagerService.setFocus(focusLabelTwo)).toEqual(undefined);
     $timeout.flush();
     $timeout.verifyNoPendingTasks();
-    expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn',focusLabel);
+    expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn', focusLabel);
   });
 
   it('should set label to clear focus and broadcast it', function() {
     FocusManagerService.clearFocus();
     $timeout(function () {
-      expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn',clearLabel);
+      expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn', clearLabel);
     });
     $timeout.flush();
   });
@@ -71,7 +71,8 @@ describe('Focus Manager Service', function() {
     FocusManagerService.setFocusIfOnDesktop(focusLabel);
     if (!DeviceInfoService.isMobileDevice()) {
       $timeout(function () {
-        expect(rootScope.$broadcast).toHaveBeenCalledWith('focusOn',focusLabel);
+        expect(rootScope.$broadcast).toHaveBeenCalledWith(
+          'focusOn', focusLabel);
       });
       $timeout.flush();
     }

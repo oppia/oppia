@@ -128,7 +128,7 @@ BAD_PATTERNS_JS_REGEXP = [
     }
 ]
 
-BAD_PATTERNS_HTML_REGEXP = [
+BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': r"text\/ng-template",
         'message': "The directives must be directly referenced.",
@@ -141,19 +141,29 @@ BAD_PATTERNS_HTML_REGEXP = [
         'excluded_dirs': (
             'extensions/answer_summarizers/',
             'extensions/classifiers/',
-            'extensions/dependencies/',
             'extensions/objects/',
-            'extensions/value_generators/',
-            'extensions/visualizations/')
+            'extensions/value_generators/')
+    },
+    {
+        'regexp': r"[ \t]+$",
+        'message': "There should not be any trailing whitespaces.",
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
-BAD_PATTERNS_APP_YAML = {
-    'MINIFICATION: true': {
-        'message': 'Please set the MINIFICATION env variable in app.yaml'
+REQUIRED_STRINGS_FECONF = {
+    'FORCE_PROD_MODE = False': {
+        'message': 'Please set the FORCE_PROD_MODE variable in feconf.py'
                    'to False before committing.',
-        'excluded_files': ()}
+        'excluded_files': ()
+    }
 }
+
+ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
+
+EXCLUDED_PHRASES = [
+  'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
@@ -178,19 +188,18 @@ _PATHS_TO_INSERT = [
     _PYLINT_PATH,
     os.getcwd(),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine', 'lib', 'webapp2-2.3'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine', 'lib', 'yaml-3.10'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine', 'lib', 'jinja2-2.6'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'numpy-1.6.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.3.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
@@ -564,9 +573,13 @@ def _check_bad_pattern_in_file(filename, content, pattern):
     if not (any(filename.startswith(excluded_dir)
                 for excluded_dir in pattern['excluded_dirs'])
             or filename in pattern['excluded_files']):
-        if re.search(regexp, content):
-            print '%s --> %s' % (
-                filename, pattern['message'])
+        bad_pattern_count = 0
+        for line_num, line in enumerate(content.split('\n'), 1):
+            if re.search(regexp, line):
+                print '%s --> Line %s: %s' % (
+                    filename, line_num, pattern['message'])
+                bad_pattern_count += 1
+        if bad_pattern_count:
             return True
     return False
 
@@ -603,18 +616,18 @@ def _check_bad_patterns(all_files):
                         total_error_count += 1
 
             if filename.endswith('.html'):
-                for regexp in BAD_PATTERNS_HTML_REGEXP:
+                for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
                     if _check_bad_pattern_in_file(filename, content, regexp):
                         failed = True
                         total_error_count += 1
 
-            if filename == 'app.yaml':
-                for pattern in BAD_PATTERNS_APP_YAML:
-                    if pattern in content:
+            if filename == 'feconf.py':
+                for pattern in REQUIRED_STRINGS_FECONF:
+                    if pattern not in content:
                         failed = True
                         print '%s --> %s' % (
                             filename,
-                            BAD_PATTERNS_APP_YAML[pattern]['message'])
+                            REQUIRED_STRINGS_FECONF[pattern]['message'])
                         total_error_count += 1
     if failed:
         summary_message = '%s   Pattern checks failed' % _MESSAGE_TYPE_FAILED
@@ -653,7 +666,8 @@ def _check_import_order(all_files):
         # and returns True if it finds an error else returns False
         # If check is set to True, isort simply checks the file and
         # if check is set to False, it autocorrects import-order errors.
-        if isort.SortImports(filename, check=True).incorrectly_sorted:
+        if (isort.SortImports(
+                filename, check=True, show_diff=True).incorrectly_sorted):
             failed = True
     print ''
     print '----------------------------------------'
@@ -670,11 +684,12 @@ def _check_import_order(all_files):
     return summary_messages
 
 
-def _check_def_spacing(all_files):
+def _check_spacing(all_files):
     """This function checks the number of blank lines
     above each class, function and method defintion.
+    It also checks for whitespace after ',', ';' and ':'.
     """
-    print 'Starting def-spacing checks'
+    print 'Starting spacing checks'
     print '----------------------------------------'
     print ''
     pycodestyle_config_path = os.path.join(os.getcwd(), 'tox.ini')
@@ -691,28 +706,162 @@ def _check_def_spacing(all_files):
     print ''
     if report.get_count() != 0:
         summary_message = (
-            '%s   Def spacing checks failed' % _MESSAGE_TYPE_FAILED)
+            '%s   Spacing checks failed' % _MESSAGE_TYPE_FAILED)
         print summary_message
         summary_messages.append(summary_message)
     else:
         summary_message = (
-            '%s   Def spacing checks passed' % _MESSAGE_TYPE_SUCCESS)
+            '%s   Spacing checks passed' % _MESSAGE_TYPE_SUCCESS)
         print summary_message
         summary_messages.append(summary_message)
     print ''
     return summary_messages
 
 
+def _check_comments(all_files):
+    """This functions ensures that comments end in a period."""
+    print 'Starting comment checks'
+    print '----------------------------------------'
+    summary_messages = []
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.py')]
+    message = 'There should be a period at the end of the comment.'
+    failed = False
+    for filename in files_to_check:
+        with open(filename, 'r') as f:
+            file_content = f.readlines()
+            file_length = len(file_content)
+            for line_num in range(file_length):
+                line = file_content[line_num].lstrip().rstrip()
+                next_line = ''
+                if line_num + 1 < file_length:
+                    next_line = file_content[line_num + 1].lstrip().rstrip()
+
+                if line.startswith('#') and not next_line.startswith('#'):
+                    # Check that the comment ends with the proper punctuation.
+                    if (line[-1] not in
+                            ALLOWED_TERMINATING_PUNCTUATIONS) and (
+                                not any(word in line for word in EXCLUDED_PHRASES)):
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                            filename, line_num + 1, message)
+
+
+    print ''
+    print '----------------------------------------'
+    print ''
+    if failed:
+        summary_message = (
+            '%s   Comments check failed' % _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = (
+            '%s   Comments check passed' % _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    return summary_messages
+
+
+def _check_docstrings(all_files):
+    """This functions ensures that docstrings end in a period."""
+    print 'Starting docstring checks'
+    print '----------------------------------------'
+    summary_messages = []
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.py')]
+    missing_period_message = (
+        'There should be a period at the end of the docstring.')
+    multiline_docstring_message = (
+        'Multiline docstring should end with a new line.')
+    single_line_docstring_message = (
+        'Single line docstring should not span two lines. '
+        'If line length exceeds 80 characters, '
+        'convert the single line docstring to a multiline docstring.')
+    failed = False
+    for filename in files_to_check:
+        with open(filename, 'r') as f:
+            file_content = f.readlines()
+            file_length = len(file_content)
+            for line_num in range(file_length):
+                line = file_content[line_num].lstrip().rstrip()
+                prev_line = ''
+
+                if line_num > 0:
+                    prev_line = file_content[line_num - 1].lstrip().rstrip()
+
+                # Check for single line docstring.
+                if line.startswith('"""') and line.endswith('"""'):
+                    # Check for punctuation at line[-4] since last three
+                    # characters are double quotes.
+                    if (len(line) > 6) and (
+                            line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                            filename, line_num + 1, missing_period_message)
+
+                # Check if single line docstring span two lines.
+                elif line == '"""' and prev_line.startswith('"""'):
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num, single_line_docstring_message)
+
+                # Check for multiline docstring.
+                elif line.endswith('"""'):
+                    # Case 1: line is """. This is correct for multiline
+                    # docstring.
+                    if line == '"""':
+                        line = file_content[line_num - 1].lstrip().rstrip()
+                        # Check for punctuation at end of docstring.
+                        if (line[-1] not in
+                                ALLOWED_TERMINATING_PUNCTUATIONS) and (
+                                    not any(word in line for word in EXCLUDED_PHRASES)):
+                            failed = True
+                            print '%s --> Line %s: %s' % (
+                                filename, line_num, missing_period_message)
+
+                    # Case 2: line contains some words before """. """ should
+                    # shift to next line.
+                    elif not any(word in line for word in EXCLUDED_PHRASES):
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                            filename, line_num + 1, multiline_docstring_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+    if failed:
+        summary_message = (
+            '%s   Docstring check failed' % _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = (
+            '%s   Docstring check passed' % _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    return summary_messages
+
+
 def main():
     all_files = _get_all_files()
-    def_spacing_messages = _check_def_spacing(all_files)
+    def_spacing_messages = _check_spacing(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
+    docstring_messages = _check_docstrings(all_files)
+    comment_messages = _check_comments(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
         def_spacing_messages + import_order_messages +
-        linter_messages + newline_messages + pattern_messages)
+        newline_messages + docstring_messages + comment_messages +
+        linter_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)

@@ -27,13 +27,16 @@ oppia.directive('topNavigationBar', [
         '/components/top_navigation_bar/' +
         'top_navigation_bar_directive.html'),
       controller: [
-        '$scope', '$http', '$window', '$timeout',
+        '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS',
         'siteAnalyticsService', 'WindowDimensionsService', 'DebouncerService',
         function(
-            $scope, $http, $window, $timeout,
+            $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS,
             siteAnalyticsService, WindowDimensionsService, DebouncerService) {
+          if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
+            $translate.use(GLOBALS.preferredSiteLanguageCode);
+          }
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection'];
@@ -62,6 +65,9 @@ oppia.directive('topNavigationBar', [
             $timeout(function() {
               $window.location = GLOBALS.loginUrl;
             }, 150);
+          };
+          $scope.onLogoutButtonClicked = function() {
+            $window.localStorage.removeItem('last_uploaded_audio_lang');
           };
 
           $scope.profileDropdownIsActive = false;

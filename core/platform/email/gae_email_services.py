@@ -50,7 +50,7 @@ def send_mail(
         sent.
       ValueError: if 'sender_email' or 'recipient_email' is invalid, according
         to App Engine.
-      (and possibly other exceptions, due to mail.send_mail() failures)
+      (and possibly other exceptions, due to mail.send_mail() failures).
     """
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails.')
@@ -95,7 +95,7 @@ def send_bulk_mail(
         sent.
       ValueError: if 'sender_email' or 'recipient_email' is invalid, according
         to App Engine.
-      (and possibly other exceptions, due to mail.send_mail() failures)
+      (and possibly other exceptions, due to mail.send_mail() failures).
     """
     if not feconf.CAN_SEND_EMAILS:
         raise Exception('This app cannot send emails.')

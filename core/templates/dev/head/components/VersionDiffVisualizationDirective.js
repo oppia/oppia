@@ -125,7 +125,7 @@ oppia.directive('versionDiffVisualization', [
           } else if (nodeStateProperty === STATE_PROPERTY_CHANGED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
             $scope.diffGraphNodeColors[nodeId] = COLOR_CHANGED;
-            if (nodesData[nodeId].originalStateName !=
+            if (nodesData[nodeId].originalStateName !==
                 nodesData[nodeId].newestStateName) {
               $scope.diffGraphSecondaryLabels[nodeId] = '(was: ' +
                 nodesData[nodeId].originalStateName + ')';
@@ -137,7 +137,7 @@ oppia.directive('versionDiffVisualization', [
           } else if (nodeStateProperty === STATE_PROPERTY_UNCHANGED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
             $scope.diffGraphNodeColors[nodeId] = COLOR_UNCHANGED;
-            if (nodesData[nodeId].originalStateName !=
+            if (nodesData[nodeId].originalStateName !==
                 nodesData[nodeId].newestStateName) {
               $scope.diffGraphSecondaryLabels[nodeId] = '(was: ' +
                 nodesData[nodeId].originalStateName + ')';
@@ -189,7 +189,7 @@ oppia.directive('versionDiffVisualization', [
         // calculation of the state graph.
         $scope.onClickStateInDiffGraph = function(stateId) {
           var oldStateName = undefined;
-          if (nodesData[stateId].newestStateName !=
+          if (nodesData[stateId].newestStateName !==
               nodesData[stateId].originalStateName) {
             oldStateName = nodesData[stateId].originalStateName;
           }
@@ -248,9 +248,9 @@ oppia.directive('versionDiffVisualization', [
               }
             },
             controller: [
-              '$scope', '$http', '$uibModalInstance', '$timeout', 
-              'newStateName', 'oldStateName', 'newState', 'oldState', 
-              'headers', 'ExplorationContextService', 
+              '$scope', '$http', '$uibModalInstance', '$timeout',
+              'newStateName', 'oldStateName', 'newState', 'oldState',
+              'headers', 'ExplorationContextService',
               'UrlInterpolationService',
               function(
                   $scope, $http, $uibModalInstance, $timeout, newStateName,

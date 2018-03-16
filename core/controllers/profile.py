@@ -84,7 +84,7 @@ class ProfileHandler(base.BaseHandler):
                 user_settings.first_contribution_msec
                 if user_settings.first_contribution_msec else None),
             'profile_picture_data_url': user_settings.profile_picture_data_url,
-            'user_impact_score':user_services.get_user_impact_score(
+            'user_impact_score': user_services.get_user_impact_score(
                 user_settings.user_id),
             'created_exp_summary_dicts': created_exp_summary_dicts,
             'edited_exp_summary_dicts': edited_exp_summary_dicts,
@@ -204,7 +204,8 @@ class PreferencesHandler(base.BaseHandler):
 
 class ProfilePictureHandler(base.BaseHandler):
     """Provides the dataURI of the user's profile picture, or none if no user
-    picture is uploaded."""
+    picture is uploaded.
+    """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -220,7 +221,8 @@ class ProfilePictureHandler(base.BaseHandler):
 
 class ProfilePictureHandlerByUsername(base.BaseHandler):
     """ Provides the dataURI of the profile picture of the specified user,
-    or None if no user picture is uploaded for the user with that ID."""
+    or None if no user picture is uploaded for the user with that ID.
+    """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

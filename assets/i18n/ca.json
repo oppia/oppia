@@ -67,6 +67,7 @@
 	"I18N_LIBRARY_VIEW_ALL": "Mostra-ho tot",
 	"I18N_PLAYER_EDIT_TOOLTIP": "Modifica",
 	"I18N_PLAYER_INFO_TOOLTIP": "Informació",
+	"I18N_PLAYER_IS_PRIVATE": "Aquesta exploració és privada.",
 	"I18N_PLAYER_LAST_UPDATED_TOOLTIP": "Darrera actualització",
 	"I18N_PLAYER_LOADING": "S’està carregant…",
 	"I18N_PLAYER_NO_OBJECTIVE": "No s’ha especificat cap objectiu.",

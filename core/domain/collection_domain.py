@@ -1019,6 +1019,26 @@ class Collection(object):
         else:
             return []
 
+    def get_nodes_in_playable_order(self):
+        """Returns a list of collection nodes in linear, playable order and
+        assumes the nodes can fit a linear structure.
+
+        Returns:
+            list(CollectionNode). A sorted list of collection nodes.
+        """
+        sorted_exp_ids = self.init_exploration_ids
+        next_exp_ids = self.get_next_exploration_ids(sorted_exp_ids)
+        while next_exp_ids:
+            for next_exp_id in next_exp_ids:
+                if next_exp_id not in sorted_exp_ids:
+                    sorted_exp_ids.append(next_exp_id)
+            next_exp_ids = self.get_next_exploration_ids(sorted_exp_ids)
+
+        sorted_nodes_list = [
+            copy.deepcopy(self.get_node(exp_id)) for exp_id in sorted_exp_ids]
+
+        return sorted_nodes_list
+
     @classmethod
     def is_demo_collection_id(cls, collection_id):
         """Whether the collection id is that of a demo collection.
@@ -1394,7 +1414,7 @@ class Collection(object):
             skill.validate()
 
         # Check that prerequisite and acquired skill ids exist in the skill
-        # table
+        # table.
         for node in self.nodes:
             for skill_id in (
                     node.prerequisite_skill_ids + node.acquired_skill_ids):
@@ -1446,7 +1466,7 @@ class Collection(object):
                     'Some explorations are unreachable from the initial '
                     'explorations: %s' % unreachable_ids)
 
-            # Check that all skill ids are used
+            # Check that all skill ids are used.
             skill_ids_in_nodes = set()
             for node in self.nodes:
                 skill_ids_in_nodes.update(

@@ -35,11 +35,10 @@ THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(
-        OPPIA_TOOLS_DIR, 'google_appengine_1.9.50', 'google_appengine'),
-    os.path.join(OPPIA_TOOLS_DIR, 'numpy-1.6.1'),
+        OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine'),
     os.path.join(OPPIA_TOOLS_DIR, 'webtest-1.4.2'),
     os.path.join(
-        OPPIA_TOOLS_DIR, 'google_appengine_1.9.50', 'google_appengine',
+        OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine',
         'lib', 'webob_0_9'),
     os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.7.1'),
     os.path.join(OPPIA_TOOLS_DIR, 'selenium-2.53.2'),

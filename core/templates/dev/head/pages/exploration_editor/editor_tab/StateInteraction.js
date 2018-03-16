@@ -21,7 +21,7 @@ oppia.controller('StateInteraction', [
   'AlertsService', 'EditorStateService', 'HtmlEscaperService',
   'INTERACTION_SPECS', 'stateInteractionIdService',
   'stateCustomizationArgsService', 'EditabilityService',
-  'explorationStatesService', 'GraphDataService',
+  'ExplorationStatesService', 'GraphDataService',
   'InteractionDetailsCacheService',
   'ExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
@@ -29,7 +29,7 @@ oppia.controller('StateInteraction', [
       AlertsService, EditorStateService, HtmlEscaperService,
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, EditabilityService,
-      explorationStatesService, GraphDataService,
+      ExplorationStatesService, GraphDataService,
       InteractionDetailsCacheService,
       ExplorationHtmlFormatterService, UrlInterpolationService,
       SubtitledHtmlObjectFactory, stateSolutionService, stateContentService) {
@@ -348,7 +348,8 @@ oppia.controller('StateInteraction', [
         stateInteractionIdService.displayed = null;
         stateCustomizationArgsService.displayed = {};
         stateSolutionService.displayed = null;
-
+        InteractionDetailsCacheService.removeDetails(
+          stateInteractionIdService.savedMemento);
         stateInteractionIdService.saveDisplayedValue();
         stateCustomizationArgsService.saveDisplayedValue();
         stateSolutionService.saveDisplayedValue();
@@ -418,12 +419,12 @@ oppia.directive('testInteractionPanel', [
         '/pages/exploration_editor/editor_tab/' +
         'test_interaction_modal_directive.html'),
       controller: [
-        '$scope', 'EditorStateService', 'explorationStatesService',
+        '$scope', 'EditorStateService', 'ExplorationStatesService',
         'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
-        function($scope, EditorStateService, explorationStatesService,
+        function($scope, EditorStateService, ExplorationStatesService,
             INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE) {
           var _stateName = EditorStateService.getActiveStateName();
-          var _state = explorationStatesService.getState(_stateName);
+          var _state = ExplorationStatesService.getState(_stateName);
           $scope.interactionIsInline = (
             INTERACTION_SPECS[_state.interaction.id].display_mode ===
             INTERACTION_DISPLAY_MODE_INLINE);
