@@ -70,8 +70,7 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class UserDefaultDashboardOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for populating the default dashboard field for users.
-    """
+    """One-off job for populating the default dashboard field for users."""
 
     @classmethod
     def entity_classes_to_map_over(cls):

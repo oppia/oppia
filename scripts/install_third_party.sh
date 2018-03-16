@@ -99,14 +99,6 @@ if ! type pip > /dev/null 2>&1 ; then
     exit 1
 fi
 
-# Note that numpy needs to be built after downloading.
-echo Checking if numpy is installed in $TOOLS_DIR/pip_packages
-if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
-  echo Installing numpy
-
-  pip install numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
-fi
-
 echo Checking if pylint is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/pylint-1.7.1" ]; then
   echo Installing Pylint

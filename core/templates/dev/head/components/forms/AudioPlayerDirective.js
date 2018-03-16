@@ -17,21 +17,21 @@
  */
 
 oppia.directive('audioPlayer', [
-    'UrlInterpolationService', function(UrlInterpolationService) {
-      return {
-        restrict: 'E',
-        scope: {
-          src: '@',
-        },
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/components/forms/audio_player_directive.html'),
-        controller: ['$scope', '$element', function($scope, $element) {
-          var audio = $element.find('audio')[0];
-          $scope.$on('$locationChangeStart', function(event) {
-            // The audio is paused when a change in route is detected.
-            audio.pause();
-          });
-        }]
-      };
-    }
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        getSourceUrl: '&sourceUrl',
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/forms/audio_player_directive.html'),
+      controller: ['$scope', '$element', function($scope, $element) {
+        var audio = $element.find('audio')[0];
+        $scope.$on('$locationChangeStart', function(event) {
+          // The audio is paused when a change in route is detected.
+          audio.pause();
+        });
+      }]
+    };
+  }
 ]);

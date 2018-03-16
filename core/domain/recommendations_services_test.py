@@ -183,7 +183,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
 
     def test_get_topic_similarities_as_csv(self):
         # The splitlines() is needed because a carriage return is added in
-        # the returned string
+        # the returned string.
         topic_similarities = (
             recommendations_services.get_topic_similarities_as_csv())
 
@@ -232,7 +232,8 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, set up dummy explorations, users
-        and admin."""
+        and admin.
+        """
         super(RecommendationsServicesUnitTests, self).setUp()
 
         for name, user in self.USER_DATA.iteritems():

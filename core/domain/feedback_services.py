@@ -66,7 +66,7 @@ def _create_models_for_thread_and_first_message(
     thread.original_author_id = original_author_id
     # The feedback analytics jobs rely on the thread status being set to 'open'
     # when a new thread is created. If this is changed, changes need to be
-    # made there as well
+    # made there as well.
     thread.status = feedback_models.STATUS_CHOICES_OPEN
     thread.subject = subject
     thread.has_suggestion = has_suggestion

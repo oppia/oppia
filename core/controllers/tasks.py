@@ -117,7 +117,8 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
 
 class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
     """Handles task of sending email instantly when feedback thread status is
-    changed."""
+    changed.
+    """
 
     def post(self):
         payload = json.loads(self.request.body)

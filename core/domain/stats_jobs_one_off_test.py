@@ -266,7 +266,7 @@ class RecomputeAnswerSubmittedStatisticsTest(test_utils.GenericTestBase):
 class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
     exp_id = 'exp_id'
     # Start on version 2 as the update from version 1 to 2 is only to
-    # setup states for testing
+    # setup states for testing.
     exp_version = 1
     session_id_1 = 'session_id_1'
     session_id_2 = 'session_id_2'
@@ -547,7 +547,7 @@ class RecomputeActualStartStatisticsTest(test_utils.GenericTestBase):
         self.save_new_default_exploration(self.exp_id, 'owner')
 
         change_list = []
-        # Update exploration to version 3
+        # Update exploration to version 3.
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
         exp_services.update_exploration(
