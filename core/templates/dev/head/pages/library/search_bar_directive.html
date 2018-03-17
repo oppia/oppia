@@ -27,7 +27,7 @@
         ng-if="selectionDetails.categories.selections[item.id]">
       <a href ng-click="toggleSelection('categories', item.id)">
         <span translate="<[item.text]>" class="protractor-test-selected"></span>
-        <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18" style="margin-left: 5px;">&#xE876;</i>
+        <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 oppia-ticksymbol">&#xE876;</i>
       </a>
     </li>
     <li ng-if="selectionDetails.categories.numSelections > 1">
@@ -38,7 +38,7 @@
         ng-if="!selectionDetails.categories.selections[item.id]">
       <a href ng-click="toggleSelection('categories', item.id)">
         <span translate="<[item.text]>" class="protractor-test-deselected"></span>
-        <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18" style="margin-left: 5px;">&#xE876;</i>
+        <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 oppia-ticksymbol">&#xE876;</i>
       </a>
     </li>
   </ul>
@@ -57,7 +57,7 @@
         ng-if="selectionDetails.languageCodes.selections[item.id]">
       <a href ng-click="toggleSelection('languageCodes', item.id)">
         <span translate="<[item.text]>" class="protractor-test-selected"></span>
-        <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18" style="margin-left: 5px;">&#xE876;</i>
+        <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 oppia-ticksymbol">&#xE876;</i>
       </a>
     </li>
     <li ng-if="selectionDetails.languageCodes.numSelections > 1">
@@ -68,7 +68,7 @@
         ng-if="!selectionDetails.languageCodes.selections[item.id]">
       <a href ng-click="toggleSelection('languageCodes', item.id)">
         <span translate="<[item.text]>" class="protractor-test-deselected"></span>
-        <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18" style="margin-left: 5px;">&#xE876;</i>
+        <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 oppia-ticksymbol">&#xE876;</i>
       </a>
     </li>
   </ul>
@@ -140,5 +140,8 @@
     .oppia-search-bar-category-selector {
       display: none;
     }
+  }
+  .oppia-ticksymbol{
+    margin-left: 5px;
   }
 </style>
