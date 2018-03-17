@@ -2,8 +2,10 @@
                          activity-type="ACTIVITY_TYPE_EXPLORATION"
                          activity-id="getExplorationId()"
                          activity-title="getExplorationTitle()"
+                         container-is-narrow="isContainerNarrow()"
                          activity-active="explorationIsCurrentlyHoveredOver">
 </learner-dashboard-icons>
+
 <md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}, {'oppia-activity-playlist-tile': isPlaylistTile()}]"
          style="position: relative; z-index: 5;" ng-if="!isRefresherExploration">
   <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">

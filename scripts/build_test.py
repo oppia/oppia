@@ -59,7 +59,7 @@ class BuildTests(test_utils.GenericTestBase):
                 build.is_file_hash_provided_to_frontend('bad_end.css'))
 
     def test_filter_hashes(self):
-        # set constant to provide everything to frontend
+        # set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
             hashes = {'path/to/file.js': '123456',
                       'path/file.min.js': '123456'}
@@ -84,7 +84,7 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertFalse(filtered_hashes.has_key('/file.html'))
 
     def test_get_hashes_json_file_contents(self):
-        # set constant to provide everything to frontend
+        # set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
             hashes = {'path/file.js': '123456'}
             self.assertEqual(

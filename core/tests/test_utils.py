@@ -316,7 +316,8 @@ tags: []
             item.validate()
 
     def signup_superadmin_user(self):
-        """Signs up a superadmin user. Should be called at the end of setUp().
+        """Signs up a superadmin user. Should be called at the end of
+        setUp().
         """
         self.signup('tmpsuperadmin@example.com', 'tmpsuperadm1n')
 
@@ -632,14 +633,14 @@ tags: []
             interaction_id)
         exploration.objective = objective
 
-        # If an end state name is provided, add terminal node with that name
+        # If an end state name is provided, add terminal node with that name.
         if end_state_name is not None:
             exploration.add_states([end_state_name])
             end_state = exploration.states[end_state_name]
             end_state.update_interaction_id('EndExploration')
             end_state.interaction.default_outcome = None
 
-            # Link first state to ending state (to maintain validity)
+            # Link first state to ending state (to maintain validity).
             init_state = exploration.states[exploration.init_state_name]
             init_interaction = init_state.interaction
             init_interaction.default_outcome.dest = end_state_name
@@ -813,7 +814,7 @@ tags: []
 
     def get_static_asset_filepath(self):
         """Returns filepath for referencing static files on disk.
-        examples: '' or 'build/'
+        examples: '' or 'build/'.
         """
         filepath = ''
         if not feconf.DEV_MODE:
@@ -951,9 +952,9 @@ class AppEngineTestBase(TestBase):
         try:
             yield
         finally:
-            # Disables the custom mock
+            # Disables the custom mock.
             self.testbed.init_urlfetch_stub(enable=False)
-            # Enables the testbed urlfetch mock
+            # Enables the testbed urlfetch mock.
             self.testbed.init_urlfetch_stub()
 
     def count_jobs_in_taskqueue(self, queue_name):

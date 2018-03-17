@@ -310,6 +310,7 @@
 	"I18N_PLAYER_HINT_REQUEST_STRING_1": "मुझे इशारा पसंद है।",
 	"I18N_PLAYER_HINT_REQUEST_STRING_3": "मुझे कुछ परेशानी हो रही है।",
 	"I18N_PLAYER_INFO_TOOLTIP": "जानकारी",
+	"I18N_PLAYER_IS_PRIVATE": "यह अन्वेषण निजी है",
 	"I18N_PLAYER_LAST_UPDATED_TOOLTIP": "आखरी अपडेट",
 	"I18N_PLAYER_LEAVE_FEEDBACK": "लेखकों के लिए प्रतिक्रिया छोड़े...",
 	"I18N_PLAYER_LOADING": "लोड हो रहा है...",

@@ -272,16 +272,16 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # The directives directory should contain the following files:
             #  Required:
             #    * A JS file called {InteractionName}.js.
-            #    * A JS file called {InteractionName}ValidationService.js
+            #    * A JS file called {InteractionName}ValidationService.js.
             #    * A HTML file called
-            #      {InteractionName}_interaction_directive.html
+            #      {InteractionName}_interaction_directive.html.
             #    * A HTML file called
-            #      {InteractionName}_response_directive.html
+            #      {InteractionName}_response_directive.html.
             #    * A HTML file called
-            #      {InteractionName}_short_response_directive.html
+            #      {InteractionName}_short_response_directive.html.
             #  Optional:
-            #    * A JS file called {InteractionName}ValidationServiceSpecs.js
-            #    * A JS file called {InteractionName}RulesServiceSpecs.js
+            #    * A JS file called {InteractionName}ValidationServiceSpecs.js.
+            #    * A JS file called {InteractionName}RulesServiceSpecs.js.
 
             snakecase_interaction_id = (
                 utils.camelcase_to_snakecase(interaction_id))

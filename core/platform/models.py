@@ -42,7 +42,8 @@ class _Platform(object):
 
 
 class _Gae(_Platform):
-    """Provides platform-specific imports related to GAE (Google App Engine).
+    """Provides platform-specific imports related to
+    GAE (Google App Engine).
     """
 
     @classmethod
@@ -208,7 +209,8 @@ class _Gae(_Platform):
 
 
 class Registry(object):
-    """Platform-agnostic interface for retrieving platform-specific modules.
+    """Platform-agnostic interface for retrieving platform-specific
+    modules.
     """
 
     # Maps platform names to the corresponding module registry classes.

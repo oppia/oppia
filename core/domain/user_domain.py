@@ -200,7 +200,7 @@ class CompletedActivities(object):
 
 
 class LearnerPlaylist(object):
-    """Domain object for the learner playlist model,"""
+    """Domain object for the learner playlist model."""
 
     def __init__(self, user_id, exploration_ids,
                  collection_ids):

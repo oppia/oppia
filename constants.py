@@ -32,7 +32,7 @@ def parse_json_from_js(js_file):
 
 
 class Constants(dict):
-    """Transforms dict to object, attributes can be accesed by dot notation"""
+    """Transforms dict to object, attributes can be accesed by dot notation."""
     __getattr__ = dict.__getitem__
 
 

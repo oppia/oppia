@@ -36,7 +36,6 @@ from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import stats_services
-from core.domain import stats_services_old
 from core.domain import user_services
 from core.domain import value_generators_domain
 from core.domain import visualization_registry
@@ -346,7 +345,7 @@ class ExplorationRightsHandler(EditorHandler):
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
 
-        make_community_owned = self.payload.get('is_community_owned')
+        make_community_owned = self.payload.get('make_community_owned')
         new_member_username = self.payload.get('new_member_username')
         new_member_role = self.payload.get('new_member_role')
         viewable_if_private = self.payload.get('viewable_if_private')
@@ -612,7 +611,7 @@ class ExplorationDownloadHandler(EditorHandler):
         output_format = self.request.get('output_format', default_value='zip')
         width = int(self.request.get('width', default_value=80))
 
-        # If the title of the exploration has changed, we use the new title
+        # If the title of the exploration has changed, we use the new title.
         filename = 'oppia-%s-v%s' % (
             utils.to_ascii(exploration.title.replace(' ', '')), version)
 
@@ -723,25 +722,6 @@ class ExplorationRevertHandler(EditorHandler):
         self.render_json({})
 
 
-class OldExplorationStatisticsHandler(EditorHandler):
-    """Returns statistics for an exploration."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_view_exploration_stats
-    def get(self, exploration_id, exploration_version):
-        """Handles GET requests."""
-        try:
-            current_exploration = exp_services.get_exploration_by_id(
-                exploration_id)
-        except:
-            raise self.PageNotFoundException
-
-        self.render_json(stats_services_old.get_exploration_stats(
-            current_exploration.id, exploration_version,
-            current_exploration.states))
-
-
 class ExplorationStatisticsHandler(EditorHandler):
     """Returns statistics for an exploration. This is the handler for the new
     statistics framework.
@@ -760,24 +740,6 @@ class ExplorationStatisticsHandler(EditorHandler):
 
         self.render_json(stats_services.get_exploration_stats(
             exploration_id, current_exploration.version).to_frontend_dict())
-
-
-class ExplorationStatsVersionsHandler(EditorHandler):
-    """Returns statistics versions for an exploration."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_view_exploration_stats
-    def get(self, exploration_id):
-        """Handles GET requests."""
-        try:
-            exp_services.get_exploration_by_id(exploration_id)
-        except:
-            raise self.PageNotFoundException
-
-        self.render_json({
-            'versions': stats_services_old.get_versions_for_exploration_stats(
-                exploration_id)})
 
 
 class StateRulesStatsHandler(EditorHandler):

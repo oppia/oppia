@@ -318,7 +318,7 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
         self.state_answers = stats_domain.StateAnswers(
             'exp_id', 1, 'initial_state', 'TextInput', [])
 
-        # The canonical object should have no validation problems
+        # The canonical object should have no validation problems.
         self.state_answers.validate()
 
     def test_exploration_id_must_be_string(self):
@@ -582,7 +582,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
             'Text', 'TextInput', 0, 0, exp_domain.EXPLICIT_CLASSIFICATION, {},
             'session_id', 0.)
 
-        # The canonical object should have no validation problems
+        # The canonical object should have no validation problems.
         self.submitted_answer.validate()
 
     def test_answer_may_be_none_only_for_linear_interaction(self):
@@ -821,7 +821,7 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
             'exp_id', 1, 'initial_state', 'TextInput', 'AnswerFrequencies',
             stats_domain.AnswerFrequencyList.from_raw_type([]))
 
-        # The canonical object should have no validation problems
+        # The canonical object should have no validation problems.
         self.state_answers_calc_output.validate()
 
     def test_exploration_id_must_be_string(self):

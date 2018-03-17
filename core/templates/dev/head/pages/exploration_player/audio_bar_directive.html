@@ -3,7 +3,7 @@
     <div style="width: 560px;">
       <i class="fa audio-controls-button-icon"
          ng-click="onPlayButtonClicked()"
-         ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play': !isAudioPlaying(), 'fa-pause': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
+         ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle': !isAudioPlaying(), 'fa-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
          uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
          tooltip-append-to-body="true" tooltip-placement="right"></i>
       <div class="slider-section" ng-if="hasPressedPlayButtonAtLeastOnce">
@@ -31,6 +31,14 @@
 </div>
 
 <style>
+
+  .fa-play-circle:before {
+    font-size: 1.7em;
+  }
+
+  .fa-pause-circle:before {
+    font-size: 1.7em;
+  }
 
   audio-bar md-progress-linear.md-default-theme .md-bar {
     background-color: #009688;

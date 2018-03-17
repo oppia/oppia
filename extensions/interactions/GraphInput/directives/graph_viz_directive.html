@@ -19,7 +19,7 @@
   }
 </style>
 <div class="oppia-graph-input-viz-container">
-  <svg class="oppia-graph-viz-svg" width="100%" height="250" ng-mousemove="mousemoveGraphSVG($event)" ng-click="onClickGraphSVG($event)">
+  <svg class="oppia-graph-viz-svg" width="100%" height="250" ng-mousemove="mousemoveGraphSVG($event)" ng-click="onClickGraphSVG($event)" viewBox="<[svgViewBox]>">
     <svg viewBox="0 0 90 250" width="100%" height="250" preserveAspectRatio="xMaxYMin meet">
       <g ng-if="canEditOptions" ng-repeat="button in graphOptions">
         <rect width="70"

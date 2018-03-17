@@ -9,8 +9,9 @@
       <[objective | truncateAndCapitalize: 95]>
     </p>
     <p ng-if="!objective" translate="I18N_PLAYER_NO_OBJECTIVE">No objective specified.</p>
+    <p ng-if="explorationIsPrivate" class="private-card-info" translate="I18N_PLAYER_IS_PRIVATE">This exploration is private.</p>
 
-    <ul layout="row" class="card-metrics" layout-align="space-between center">
+    <ul ng-if="!explorationIsPrivate" layout="row" class="card-metrics" layout-align="space-between center">
       <li class="protractor-test-info-card-rating">
         <span class="fa fa-star fa-lg" uib-tooltip="<['I18N_PLAYER_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
           <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_RATINGS_TOOLTIP' | translate]></span>
@@ -54,7 +55,7 @@
       </ul>
     </ul>
 
-    <div class="oppia-info-card-bottom-row" layout="row">
+    <div ng-if="!explorationIsPrivate" class="oppia-info-card-bottom-row" layout="row">
       <div flex="40">
         <md-content layout="row">
           <div class="oppia-info-card-tag-icon">
@@ -95,3 +96,9 @@
     <span class="oppia-icon-accessibility-label">Close</span>
   </button>
 </md-card>
+
+<style>
+  .oppia-info-card-content .private-card-info {
+    color: red;
+  }
+</style>

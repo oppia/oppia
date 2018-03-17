@@ -13,7 +13,8 @@
 # limitations under the License.
 
 """Tests for the controllers that communicate with VM for training
-classifiers."""
+classifiers.
+"""
 
 import json
 import os

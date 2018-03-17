@@ -928,7 +928,7 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         Raises:
             BadReaderParamsError: Required parameters are missing or invalid.
         """
-        return True  # TODO
+        return True  # TODO.
 
 
 class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
