@@ -195,7 +195,7 @@ oppia.controller('ExplorationEditor', [
         });
 
         if (ExplorationStatesService.getState(
-              EditorStateService.getActiveStateName())) {
+          EditorStateService.getActiveStateName())) {
           $scope.$broadcast('refreshStateEditor');
         }
 
@@ -249,7 +249,7 @@ oppia.controller('ExplorationEditor', [
       fn: function(isGoingForward) {
         var idToScrollTo = (
           isGoingForward ? _ID_TUTORIAL_STATE_INTERACTION :
-          _ID_TUTORIAL_STATE_CONTENT);
+            _ID_TUTORIAL_STATE_CONTENT);
         $('html, body').animate({
           scrollTop: angular.element(idToScrollTo).offset().top - 200
         }, 1000);
@@ -281,7 +281,7 @@ oppia.controller('ExplorationEditor', [
       fn: function(isGoingForward) {
         var idToScrollTo = (
           isGoingForward ? _ID_TUTORIAL_PREVIEW_TAB :
-          _ID_TUTORIAL_STATE_INTERACTION);
+            _ID_TUTORIAL_STATE_INTERACTION);
         $('html, body').animate({
           scrollTop: angular.element(idToScrollTo).offset().top - 200
         }, 1000);
@@ -299,7 +299,7 @@ oppia.controller('ExplorationEditor', [
       fn: function(isGoingForward) {
         var idToScrollTo = (
           isGoingForward ? _ID_TUTORIAL_PREVIEW_TAB :
-          _ID_TUTORIAL_STATE_INTERACTION);
+            _ID_TUTORIAL_STATE_INTERACTION);
         $('html, body').animate({
           scrollTop: angular.element(idToScrollTo).offset().top - 200
         }, 1000);

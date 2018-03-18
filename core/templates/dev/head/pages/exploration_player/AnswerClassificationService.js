@@ -16,7 +16,7 @@
  * @fileoverview Classification service for answer groups.
  */
 
- // TODO(bhenning): Find a better place for these constants.
+// TODO(bhenning): Find a better place for these constants.
 
 // NOTE TO DEVELOPERS: These constants must be the same (in name and value) as
 // the corresponding classification constants defined in core.domain.exp_domain.

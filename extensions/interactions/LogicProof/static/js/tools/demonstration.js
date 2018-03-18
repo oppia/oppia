@@ -52,7 +52,7 @@ logicDemo.controller('TestCtrl', function($scope) {
       var nextSpace = message.slice(pointer, pointer + 70).lastIndexOf(' ');
       var breakPoint = (
         (nextSpace <= 0 || pointer + 70 >= message.length) ? 70 :
-        nextSpace + 1);
+          nextSpace + 1);
       $scope.proofError += (
         message.slice(pointer, pointer + breakPoint) + '\n');
       pointer += breakPoint;
@@ -101,7 +101,7 @@ logicDemo.controller('TestCtrl', function($scope) {
     };
     for (var i = 0; i < questionInstance.mistake_table.length; i++) {
       for (var j = 0;
-           j < questionInstance.mistake_table[i].entries.length; j++) {
+        j < questionInstance.mistake_table[i].entries.length; j++) {
         var mistake = questionInstance.mistake_table[i].entries[j];
         if (mistake.name === $scope.mistakeName) {
           $scope.localCheck = logicProofStudent.evaluate(

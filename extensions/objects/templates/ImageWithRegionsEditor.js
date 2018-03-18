@@ -144,7 +144,7 @@ oppia.directive('imageWithRegionsEditor', [
             // zero.
             var displayedImageHeight = (
               $scope.originalImageWidth === 0 ? 0.0 :
-              $scope.originalImageHeight * scalingRatio);
+                $scope.originalImageHeight * scalingRatio);
             return {
               width: displayedImageWidth,
               height: displayedImageHeight
@@ -404,7 +404,7 @@ oppia.directive('imageWithRegionsEditor', [
           };
           $scope.onMouseMoveRegion = function() {
             if (
-                $scope.userIsCurrentlyDragging ||
+              $scope.userIsCurrentlyDragging ||
                 $scope.userIsCurrentlyResizing) {
               return;
             }
@@ -415,7 +415,7 @@ oppia.directive('imageWithRegionsEditor', [
               if ($scope.mouseY <= region.y + $scope.resizableBorderWidthPx) {
                 $scope.yDirection = 1;
               } else if (
-                  $scope.mouseY >= region.height + region.y -
+                $scope.mouseY >= region.height + region.y -
                   $scope.resizableBorderWidthPx) {
                 $scope.yDirection = -1;
               } else {
@@ -424,7 +424,7 @@ oppia.directive('imageWithRegionsEditor', [
               if ($scope.mouseX <= region.x + $scope.resizableBorderWidthPx) {
                 $scope.xDirection = 1;
               } else if (
-                  $scope.mouseX >= region.width + region.x -
+                $scope.mouseX >= region.width + region.x -
                   $scope.resizableBorderWidthPx) {
                 $scope.xDirection = -1;
               } else {
@@ -464,7 +464,7 @@ oppia.directive('imageWithRegionsEditor', [
             if ($scope.xDirection || $scope.yDirection) {
               // User is resizing, so we figure out the direction.
               if (
-                  ($scope.xDirection === 1 && !$scope.xDirectionToggled) ||
+                ($scope.xDirection === 1 && !$scope.xDirectionToggled) ||
                   ($scope.xDirection === -1 && $scope.xDirectionToggled)) {
                 xDirectionCursor = 'w';
               } else if (
@@ -475,7 +475,7 @@ oppia.directive('imageWithRegionsEditor', [
                 xDirectionCursor = '';
               }
               if (
-                  ($scope.yDirection === 1 && !$scope.yDirectionToggled) ||
+                ($scope.yDirection === 1 && !$scope.yDirectionToggled) ||
                   ($scope.yDirection === -1 && $scope.yDirectionToggled)) {
                 yDirectionCursor = 'n';
               } else if (

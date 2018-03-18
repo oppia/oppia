@@ -160,7 +160,7 @@ oppia.directive('stateGraphViz', [
               if (links[i].hasOwnProperty('linkProperty') &&
                   $scope.linkPropertyMapping) {
                 if ($scope.linkPropertyMapping.hasOwnProperty(
-                      links[i].linkProperty)) {
+                  links[i].linkProperty)) {
                   $scope.augmentedLinks[i].style = (
                     $scope.linkPropertyMapping[links[i].linkProperty]);
                 }
@@ -172,8 +172,8 @@ oppia.directive('stateGraphViz', [
                 $scope.finalStateIds.indexOf(nodeId) !== -1);
               return (
                 nodeId === $scope.currentStateId() ? '3' :
-                (nodeId === $scope.initStateId2 || currentNodeIsTerminal) ?
-                '2' : '1');
+                  (nodeId === $scope.initStateId2 || currentNodeIsTerminal) ?
+                    '2' : '1');
             };
 
             var getNodeFillOpacity = function(nodeId) {
@@ -193,7 +193,7 @@ oppia.directive('stateGraphViz', [
               } else if (node.reachableFromEnd === false) {
                 warning = (
                   'Warning: there is no path from this state to the END state.'
-                  );
+                );
               }
 
               var tooltip = node.label;
@@ -261,11 +261,11 @@ oppia.directive('stateGraphViz', [
 
               nodeData[nodeId].nodeClass = (
                 currentNodeIsTerminal ? 'terminal-node' :
-                nodeId === $scope.currentStateId() ? 'current-node' :
-                nodeId === initStateId ? 'init-node' :
-                !(nodeData[nodeId].reachable &&
+                  nodeId === $scope.currentStateId() ? 'current-node' :
+                    nodeId === initStateId ? 'init-node' :
+                      !(nodeData[nodeId].reachable &&
                   nodeData[nodeId].reachableFromEnd) ? 'bad-node' :
-                                                       'normal-node');
+                        'normal-node');
 
               nodeData[nodeId].canDelete = (nodeId !== initStateId);
               $scope.nodeList.push(nodeData[nodeId]);
@@ -319,8 +319,8 @@ oppia.directive('stateGraphViz', [
                         'translate(' + d3.event.translate + ')');
                       $scope.$apply();
                     }
-                  )
-                );
+                    )
+                  );
               }, 10);
             }
 

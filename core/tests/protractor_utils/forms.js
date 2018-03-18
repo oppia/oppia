@@ -41,7 +41,7 @@ var ListEditor = function(elem) {
       .then(function(items) {
         return items.length;
       }
-    );
+      );
   };
   // If objectType is specified this returns an editor for objects of that type
   // which can be used to make changes to the newly-added item (for example
@@ -67,7 +67,7 @@ var ListEditor = function(elem) {
     editItem: function(index, objectType) {
       var item = elem.element(
         by.repeater('item in localValue track by $index'
-      ).row(index));
+        ).row(index));
       var editor = getEditor(objectType);
       return editor(item);
     },
@@ -229,7 +229,7 @@ var AutocompleteMultiDropdownEditor = function(elem) {
             deleteButtons[i].click();
           }
         }
-      );
+        );
 
       for (var i = 0; i < texts.length; i++) {
         elem.element(by.css('.select2-container')).click();
@@ -247,7 +247,7 @@ var AutocompleteMultiDropdownEditor = function(elem) {
           actualSelection.pop();
           expect(actualSelection).toEqual(expectedCurrentSelection);
         }
-      );
+        );
     }
   };
 };
@@ -266,24 +266,24 @@ var MultiSelectEditor = function(elem) {
           return texts.indexOf(choiceText) !== -1;
         });
       }
-    ).then(function(filteredElements) {
-      if (filteredElements.length !== texts.length) {
-        throw (
-          'Could not toggle element selection. Values requested: ' + texts +
+      ).then(function(filteredElements) {
+        if (filteredElements.length !== texts.length) {
+          throw (
+            'Could not toggle element selection. Values requested: ' + texts +
           '. Found ' + filteredElements.length + ' matching elements.');
-      }
+        }
 
-      for (var i = 0; i < filteredElements.length; i++) {
+        for (var i = 0; i < filteredElements.length; i++) {
         // Check that, before toggling, the element is in the correct state.
-        expect(filteredElements[i].getAttribute('class')).toMatch(
-          expectedClassBeforeToggle);
-        filteredElements[i].click();
-      }
+          expect(filteredElements[i].getAttribute('class')).toMatch(
+            expectedClassBeforeToggle);
+          filteredElements[i].click();
+        }
 
-      // Close the dropdown menu at the end.
-      elem.element(by.css(
-        '.protractor-test-search-bar-dropdown-toggle')).click();
-    });
+        // Close the dropdown menu at the end.
+        elem.element(by.css(
+          '.protractor-test-search-bar-dropdown-toggle')).click();
+      });
   };
 
   return {
@@ -311,7 +311,7 @@ var MultiSelectEditor = function(elem) {
           elem.element(by.css(
             '.protractor-test-search-bar-dropdown-toggle')).click();
         }
-      );
+        );
     }
   };
 };
@@ -393,7 +393,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     expect(arrayOfElems[arrayPointer].getTagName()).toBe(tagName);
     expect(
       arrayOfElems[arrayPointer].getAttribute('innerHTML')
-      ).toBe(text);
+    ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
     textPointer = textPointer + text.length;
@@ -518,7 +518,7 @@ var CodeMirrorChecker = function(elem) {
           compareDict[lineNumber].checked = true;
           return lineNumber;
         }
-      );
+        );
     }).then(function(lineNumbers) {
       var largestLineNumber = lineNumbers[lineNumbers.length - 1];
       if (largestLineNumber !== currentLineNumber) {
@@ -608,7 +608,7 @@ var CodeMirrorChecker = function(elem) {
       var expectedTextArray = expectedTextString.split('\n');
       var expectedDict = {};
       for (var lineNumber = 1; lineNumber <= expectedTextArray.length;
-           lineNumber++) {
+        lineNumber++) {
         expectedDict[lineNumber] = {
           text: expectedTextArray[lineNumber - 1],
           checked: false

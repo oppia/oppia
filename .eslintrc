@@ -7,6 +7,8 @@
     "angular"
   ],
   "rules": {
+    "no-compare-neg-zero": "off",
+    "no-useless-escape": "off",
     "brace-style":[
       "error",
       "1tbs"
@@ -143,7 +145,8 @@
       "error",
       {
         "anonymous": "ignore",
-        "named": "never"
+        "named": "never",
+        "asyncArrow": "ignore"
       }
     ],
     "space-infix-ops": [

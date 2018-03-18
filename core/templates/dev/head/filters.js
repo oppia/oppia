@@ -92,7 +92,7 @@ oppia.filter('truncateAtFirstLine', [function() {
     var suffix = otherNonemptyLinesExist ? '...' : '';
     return (
       firstNonemptyLineIndex !== -1 ?
-      lines[firstNonemptyLineIndex] + suffix : '');
+        lines[firstNonemptyLineIndex] + suffix : '');
   };
 }]);
 
@@ -225,13 +225,13 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = '(';
           replacementText += (
             inputs[varName][0] >= 0.0 ?
-            latitude.toFixed(2) + '°N' :
-            -latitude.toFixed(2) + '°S');
+              latitude.toFixed(2) + '°N' :
+              -latitude.toFixed(2) + '°S');
           replacementText += ', ';
           replacementText += (
             inputs[varName][1] >= 0.0 ?
-            longitude.toFixed(2) + '°E' :
-            -longitude.toFixed(2) + '°W');
+              longitude.toFixed(2) + '°E' :
+              -longitude.toFixed(2) + '°W');
           replacementText += ')';
         } else if (varType === 'NormalizedString') {
           replacementText = '"' + inputs[varName] + '"';
@@ -398,9 +398,9 @@ oppia.filter('summarizeNonnegativeNumber', [function() {
     // No change for small numbers (e.g. 12 --> 12).
     return (
       input >= 1.0e+9 ? (input / 1.0e+9).toFixed(1) + 'B' :
-      input >= 1.0e+6 ? (input / 1.0e+6).toFixed(1) + 'M' :
-      input >= 1.0e+3 ? (input / 1.0e+3).toFixed(1) + 'K' :
-      input);
+        input >= 1.0e+6 ? (input / 1.0e+6).toFixed(1) + 'M' :
+          input >= 1.0e+3 ? (input / 1.0e+3).toFixed(1) + 'K' :
+            input);
   };
 }]);
 

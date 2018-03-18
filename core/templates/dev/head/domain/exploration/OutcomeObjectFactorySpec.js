@@ -25,19 +25,19 @@ describe('Outcome object factory', function() {
 
   it('should correctly determine if an outcome is confusing given a ' +
     'source state',
-    function() {
-      var currentState = 'A';
-      var testOutcome1 = oof.createNew('B', 'feedback', []);
-      var testOutcome2 = oof.createNew('B', '', []);
-      var testOutcome3 = oof.createNew('A', 'feedback', []);
-      var testOutcome4 = oof.createNew('A', '', []);
-      var testOutcome5 = oof.createNew('A', '   ', []);
-      expect(testOutcome1.isConfusing(currentState)).toBe(false);
-      expect(testOutcome2.isConfusing(currentState)).toBe(false);
-      expect(testOutcome3.isConfusing(currentState)).toBe(false);
-      expect(testOutcome4.isConfusing(currentState)).toBe(true);
-      expect(testOutcome5.isConfusing(currentState)).toBe(true);
-    }
+  function() {
+    var currentState = 'A';
+    var testOutcome1 = oof.createNew('B', 'feedback', []);
+    var testOutcome2 = oof.createNew('B', '', []);
+    var testOutcome3 = oof.createNew('A', 'feedback', []);
+    var testOutcome4 = oof.createNew('A', '', []);
+    var testOutcome5 = oof.createNew('A', '   ', []);
+    expect(testOutcome1.isConfusing(currentState)).toBe(false);
+    expect(testOutcome2.isConfusing(currentState)).toBe(false);
+    expect(testOutcome3.isConfusing(currentState)).toBe(false);
+    expect(testOutcome4.isConfusing(currentState)).toBe(true);
+    expect(testOutcome5.isConfusing(currentState)).toBe(true);
+  }
   );
 
   it('should correctly output whether an outcome has nonempty feedback',

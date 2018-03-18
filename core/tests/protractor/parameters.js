@@ -60,7 +60,7 @@ describe('Parameters', function() {
     editor.addParameterChange('b', '{{answer}}');
     editor.setContent(forms.toRichText(
       'sum of {{z}} and {{b}} is {{z + b}},' + (
-      ' sum of {{a}} and {{b}} is {{a + b}}')));
+        ' sum of {{a}} and {{b}} is {{a + b}}')));
     editor.setInteraction(
       'MultipleChoiceInput',
       [forms.toRichText('return'), forms.toRichText('complete')]);

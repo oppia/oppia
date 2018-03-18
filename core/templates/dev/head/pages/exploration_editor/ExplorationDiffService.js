@@ -69,7 +69,7 @@ oppia.factory('ExplorationDiffService', [
       // Delete states not present in both v1 and v2
       for (var stateId in stateData) {
         if (!v1States.hasOwnProperty(
-              stateData[stateId].originalStateName) &&
+          stateData[stateId].originalStateName) &&
             !v2States.hasOwnProperty(stateData[stateId].newestStateName)) {
           delete stateData[stateId];
         }
@@ -186,7 +186,7 @@ oppia.factory('ExplorationDiffService', [
                 STATE_PROPERTY_CHANGED);
             }
           } else if (
-              change.cmd !== 'migrate_states_schema_to_latest_version' &&
+            change.cmd !== 'migrate_states_schema_to_latest_version' &&
               change.cmd !== 'AUTO_revert_version_number' &&
               change.cmd !== 'edit_exploration_property') {
             throw new Error('Invalid change command: ' + change.cmd);
@@ -256,7 +256,7 @@ oppia.factory('ExplorationDiffService', [
               target: j,
               linkProperty: (
                 adjMatrixV1[i][j] && adjMatrixV2[i][j] ? 'unchanged' :
-                !adjMatrixV1[i][j] && adjMatrixV2[i][j] ? 'added' : 'deleted')
+                  !adjMatrixV1[i][j] && adjMatrixV2[i][j] ? 'added' : 'deleted')
             });
           }
         }

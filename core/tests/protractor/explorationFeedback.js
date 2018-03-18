@@ -50,9 +50,9 @@ describe('ExplorationFeedback', function() {
 
   beforeEach(function() {
     users.createUser('user1@ExplorationFeedback.com',
-                     'creatorExplorationFeedback');
+      'creatorExplorationFeedback');
     users.createUser('user2@ExplorationFeedback.com',
-                     'learnerExplorationFeedback');
+      'learnerExplorationFeedback');
   });
 
   it('adds feedback to an exploration', function() {
@@ -62,9 +62,9 @@ describe('ExplorationFeedback', function() {
     // Creator creates and publishes an exploration
     users.login('user1@ExplorationFeedback.com');
     workflow.createAndPublishExploration(EXPLORATION_TITLE,
-                                         EXPLORATION_CATEGORY,
-                                         EXPLORATION_OBJECTIVE,
-                                         EXPLORATION_LANGUAGE);
+      EXPLORATION_CATEGORY,
+      EXPLORATION_OBJECTIVE,
+      EXPLORATION_LANGUAGE);
     creatorDashboardPage.get();
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()

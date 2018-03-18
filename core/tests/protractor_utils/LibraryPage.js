@@ -40,7 +40,7 @@ var LibraryPage = function(){
           getText().then(function(tileTitle) {
             return (tileTitle === name);
           }
-        );
+          );
       }
     );
   };

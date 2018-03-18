@@ -21,7 +21,7 @@ oppia.directive('collectionHistoryTab', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                   '/pages/collection_editor/history_tab/' +
+        '/pages/collection_editor/history_tab/' +
                    'collection_history_tab_directive.html'),
       controller: [function() {}]
     };

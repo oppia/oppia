@@ -77,26 +77,26 @@ oppia.controller('StatisticsTab', [
 
         ReadOnlyExplorationBackendApiService.loadLatestExploration(
           ExplorationDataService.explorationId).then(function(response) {
-            var statesDict = response.exploration.states;
-            var states = StatesObjectFactory.createFromBackendDict(statesDict);
-            var initStateName = response.exploration.init_state_name;
+          var statesDict = response.exploration.states;
+          var states = StatesObjectFactory.createFromBackendDict(statesDict);
+          var initStateName = response.exploration.init_state_name;
 
-            $scope.statsGraphData = ComputeGraphService.compute(
-              initStateName, states);
-            var improvements = (
-              StateImprovementSuggestionService.getStateImprovements(
-                states, $scope.stateStats));
-            $scope.highlightStates = {};
-            improvements.forEach(function(impItem) {
-              // TODO(bhenning): This is the feedback for improvement types
-              // and should be included with the definitions of the
-              // improvement types.
-              if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
-                $scope.highlightStates[impItem.stateName] = (
-                  'May be confusing');
-              }
-            });
-          }
+          $scope.statsGraphData = ComputeGraphService.compute(
+            initStateName, states);
+          var improvements = (
+            StateImprovementSuggestionService.getStateImprovements(
+              states, $scope.stateStats));
+          $scope.highlightStates = {};
+          improvements.forEach(function(impItem) {
+            // TODO(bhenning): This is the feedback for improvement types
+            // and should be included with the definitions of the
+            // improvement types.
+            if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
+              $scope.highlightStates[impItem.stateName] = (
+                'May be confusing');
+            }
+          });
+        }
         );
 
         if (numActualStarts > 0) {

@@ -99,8 +99,8 @@ oppia.directive('searchBar', [
 
             $scope.selectionDetails[itemsType].summary = (
               totalCount === 0 ? 'I18N_LIBRARY_ALL_' + itemsName.toUpperCase() :
-              totalCount === 1 ? selectedItems[0] :
-              'I18N_LIBRARY_N_' + itemsName.toUpperCase());
+                totalCount === 1 ? selectedItems[0] :
+                  'I18N_LIBRARY_N_' + itemsName.toUpperCase());
             $scope.translationData[itemsName + 'Count'] = totalCount;
 
             // TODO(milit): When the language changes, the translations won't
@@ -173,7 +173,7 @@ oppia.directive('searchBar', [
 
             $scope.searchQuery =
              SearchService.updateSearchFieldsBasedOnUrlQuery(
-              $window.location.search, $scope.selectionDetails);
+               $window.location.search, $scope.selectionDetails);
 
             updateSelectionDetails('categories');
             updateSelectionDetails('languageCodes');

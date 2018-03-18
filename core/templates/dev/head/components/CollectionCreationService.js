@@ -54,7 +54,7 @@ oppia.factory('CollectionCreationService', [
           }, function() {
             $rootScope.loadingMessage = '';
           }
-        );
+          );
       }
     };
   }

@@ -17,14 +17,14 @@
  * domain objects.
  */
 
- oppia.factory('ExplorationDraftObjectFactory', [
-   function() {
-     var ExplorationDraft = function(draftChanges, draftChangeListId) {
-       this.draftChanges = draftChanges;
-       this.draftChangeListId = draftChangeListId;
-     };
+oppia.factory('ExplorationDraftObjectFactory', [
+  function() {
+    var ExplorationDraft = function(draftChanges, draftChangeListId) {
+      this.draftChanges = draftChanges;
+      this.draftChangeListId = draftChangeListId;
+    };
 
-     /**
+    /**
      * Checks whether the draft object has been overwritten by another
      * draft which has been committed to the back-end. If the supplied draft id
      * has a different value then a newer changeList must have been committed
@@ -34,29 +34,29 @@
      * @returns {Boolean} - True iff the currentDraftId is the same as the
      * draftChangeListId corresponding to this draft.
      */
-     ExplorationDraft.prototype.isValid = function(currentDraftId) {
-       return (currentDraftId === this.draftChangeListId);
-     };
+    ExplorationDraft.prototype.isValid = function(currentDraftId) {
+      return (currentDraftId === this.draftChangeListId);
+    };
 
-     ExplorationDraft.prototype.getChanges = function() {
-       return this.draftChanges;
-     };
+    ExplorationDraft.prototype.getChanges = function() {
+      return this.draftChanges;
+    };
 
-     ExplorationDraft.createFromLocalStorageDict = function(
-         explorationDraftDict) {
-       return new ExplorationDraft(
-         explorationDraftDict.draftChanges,
-         explorationDraftDict.draftChangeListId);
-     };
+    ExplorationDraft.createFromLocalStorageDict = function(
+        explorationDraftDict) {
+      return new ExplorationDraft(
+        explorationDraftDict.draftChanges,
+        explorationDraftDict.draftChangeListId);
+    };
 
-     ExplorationDraft.toLocalStorageDict = function(
-         changeList, draftChangeListId) {
-       return {
-         draftChanges: changeList,
-         draftChangeListId: draftChangeListId
-       };
-     };
+    ExplorationDraft.toLocalStorageDict = function(
+        changeList, draftChangeListId) {
+      return {
+        draftChanges: changeList,
+        draftChangeListId: draftChangeListId
+      };
+    };
 
-     return ExplorationDraft;
-   }
- ]);
+    return ExplorationDraft;
+  }
+]);
