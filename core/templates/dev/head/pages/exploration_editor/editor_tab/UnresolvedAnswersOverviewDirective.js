@@ -66,7 +66,7 @@ oppia.directive('unresolvedAnswersOverview', [
                     }
 
                     calculatedUnresolvedAnswersData.push(answer);
-                    if (calculatedUnresolvedAnswersData.length ===
+                    if (calculatedUnresolvedAnswersData.length >=
                           MAXIMUM_UNRESOLVED_ANSWERS) {
                       break;
                     }
