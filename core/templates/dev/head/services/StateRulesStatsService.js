@@ -41,39 +41,41 @@ oppia.factory('StateRulesStatsService', [
        *
        * @param {state!} state
        * @param {string?} testOnlyExplorationId used to enforce a specific id
-       *     when testing.
+       *     while testing.
        */
       computeStateRulesStats: function(state, testOnlyExplorationId) {
-        var explorationId = testOnlyExplorationId !== undefined ?
-          testOnlyExplorationId : ExplorationContextService.getExplorationId();
         var interactionRulesService = $injector.get(
           AngularNameService.getNameOfInteractionRulesService(
             state.interaction.id));
-        var stateRulesStatsUrl = UrlInterpolationService.interpolateUrl(
-          '/createhandler/state_rules_stats/<exploration_id>/<state_name>',
-          {exploration_id: explorationId, state_name: state.name});
+        var explorationId = testOnlyExplorationId !== undefined ?
+          testOnlyExplorationId : ExplorationContextService.getExplorationId();
 
-        return $http.get(stateRulesStatsUrl).then(function(response) {
+        return $http.get(
+          UrlInterpolationService.interpolateUrl(
+            '/createhandler/state_rules_stats/<exploration_id>/<state_name>',
+            {exploration_id: explorationId, state_name: state.name})
+        ).then(function(response) {
           return {
             state_name: state.name,
             exploration_id: explorationId,
             visualizations_info: (
               response.data.visualizations_info.map(function(vizInfo) {
-                if (!vizInfo.addressed_info_is_supported) {
-                  return vizInfo;
-                } else {
-                  return Object.assign({}, vizInfo, {
+                var dataWithAddressedInfo;
+                if (vizInfo.addressed_info_is_supported) {
+                  dataWithAddressedInfo = {
                     data: vizInfo.data.map(function(vizInfoDatum) {
-                      return Object.assign({}, vizInfoDatum, {
+                      return Object.assign({
                         is_addressed: (
                           AnswerClassificationService
                             .isClassifiedExplicitlyOrGoesToNewState(
                               explorationId, state.name, state,
                               vizInfoDatum.answer, interactionRulesService))
-                      });
+                      }, vizInfoDatum);
                     })
-                  });
+                  };
                 }
+
+                return Object.assign({}, vizInfo, dataWithAddressedInfo || {});
               })
             )
           };
