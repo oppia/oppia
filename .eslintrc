@@ -3,8 +3,7 @@
     "eslint:recommended",
   ],
   "plugins": [
-    "angular",
-    "html"
+    "angular"
   ],
   "rules": {
     "angular/di-unused": 2,
