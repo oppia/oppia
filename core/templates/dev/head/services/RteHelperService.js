@@ -184,7 +184,9 @@ oppia.factory('RteHelperService', [
         var textElt = elt[0].childNodes;
         for (var i = textElt.length - 1; i > 0; i--) {
           if (textElt[i].localName === 'p') {
-            if (textElt[i].childNodes[0].nodeValue === null ||
+            if (textElt[i].childNodes[0] === undefined) {
+              textElt[i].remove();
+            } else if (textElt[i].childNodes[0].nodeValue === null ||
               $.trim(textElt[i].childNodes[0].nodeValue) === '') {
               textElt[i].remove();
             } else {
