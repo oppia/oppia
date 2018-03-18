@@ -209,8 +209,8 @@ oppia.controller('StatisticsTab', [
                   var el = $(
                     '<oppia-visualization-' +
                     $filter('camelCaseToHyphens')(vizInfo.id) + '/>');
-                  el.attr('data', escapedData);
-                  el.attr('options', escapedOptions);
+                  el.attr('escaped-data', escapedData);
+                  el.attr('escaped-options', escapedOptions);
                   el.attr(
                     'addressed-info-is-supported',
                     vizInfo.addressed_info_is_supported);
