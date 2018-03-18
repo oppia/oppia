@@ -22,15 +22,12 @@ oppia.factory('StateRulesStatsService', [
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
       ExplorationContextService, UrlInterpolationService) {
-    var STATE_RULES_STATS_URL_TEMPLATE =
-      '/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>';
-
     return {
       /**
        * TODO(brianrodri): Consider moving this into a visualization domain
        * object.
        *
-       * @param {state} state
+       * @param {state!} state
        * @return {Boolean} whether given state has an implementation for
        *     displaying the issues overview tab in the State Editor.
        */
@@ -42,42 +39,44 @@ oppia.factory('StateRulesStatsService', [
        * Returns a promise which will provide details of the given state's
        * answer-statistics.
        *
-       * @param {state} state
-       * @param {string} testOnlyExplorationId used to enforce a specific id
+       * @param {state!} state
+       * @param {string?} testOnlyExplorationId used to enforce a specific id
        *     when testing.
        */
       computeStateRulesStats: function(state, testOnlyExplorationId) {
         var explorationId = testOnlyExplorationId !== undefined ?
           testOnlyExplorationId : ExplorationContextService.getExplorationId();
+        var interactionRulesService = $injector.get(
+          AngularNameService.getNameOfInteractionRulesService(
+            state.interaction.id));
         var stateRulesStatsUrl = UrlInterpolationService.interpolateUrl(
-          STATE_RULES_STATS_URL_TEMPLATE, {
-            exploration_id: explorationId,
-            escaped_state_name: state.name
-          }
-        );
+          '/createhandler/state_rules_stats/<exploration_id>/<state_name>',
+          {exploration_id: explorationId, state_name: state.name});
+
         return $http.get(stateRulesStatsUrl).then(function(response) {
-          var rulesService = $injector.get(
-            AngularNameService.getNameOfInteractionRulesService(
-              state.interaction.id));
-          var stateRulesStats = {
+          return {
             state_name: state.name,
             exploration_id: explorationId,
-            visualizations_info: response.data.visualizations_info
+            visualizations_info: (
+              response.data.visualizations_info.map(function(vizInfo) {
+                if (!vizInfo.addressed_info_is_supported) {
+                  return vizInfo;
+                } else {
+                  return Object.assign({}, vizInfo, {
+                    data: vizInfo.data.map(function(vizInfoDatum) {
+                      return Object.assign({}, vizInfoDatum, {
+                        is_addressed: (
+                          AnswerClassificationService
+                            .isClassifiedExplicitlyOrGoesToNewState(
+                              explorationId, state.name, state,
+                              vizInfoDatum.answer, interactionRulesService))
+                      });
+                    })
+                  });
+                }
+              })
+            )
           };
-
-          stateRulesStats.visualizations_info.forEach(function(vizInfo) {
-            if (vizInfo.addressed_info_is_supported) {
-              vizInfo.data.forEach(function(vizInfoDatum) {
-                vizInfoDatum.is_addressed = (
-                  AnswerClassificationService
-                    .isClassifiedExplicitlyOrGoesToNewState(
-                      explorationId, state.name, state, vizInfoDatum.answer,
-                      rulesService));
-              });
-            }
-          });
-
-          return stateRulesStats;
         });
       }
     };
