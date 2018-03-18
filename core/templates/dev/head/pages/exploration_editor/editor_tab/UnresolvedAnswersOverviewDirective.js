@@ -49,7 +49,7 @@ oppia.directive('unresolvedAnswersOverview', [
               ).then(function(stats) {
                 var calculatedUnresolvedAnswersData = [];
 
-                for (var i = 0; i !== stats.visualizations_info.length; ++i) {
+                for (var i = 0; i < stats.visualizations_info.length; ++i) {
                   var vizInfo = stats.visualizations_info[i];
                   if (!vizInfo.addressed_info_is_supported) {
                     continue;
@@ -57,7 +57,7 @@ oppia.directive('unresolvedAnswersOverview', [
 
                   // NOTE: vizInfo.data is already sorted in descending order by
                   // frequency.
-                  for (var j = 0; j !== vizInfo.data.length; ++j) {
+                  for (var j = 0; j < vizInfo.data.length; ++j) {
                     var answer = vizInfo.data[j];
                     if (answer.is_addressed ||
                         answer.frequency <
