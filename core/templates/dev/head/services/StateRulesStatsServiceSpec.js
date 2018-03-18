@@ -57,7 +57,7 @@ describe('State Rules Stats Service', function() {
           data: [
             {answer: 'Ni Hao', frequency: 5},
             {answer: 'Aloha', frequency: 3},
-            {answer: 'Hola', frequency: 1},
+            {answer: 'Hola', frequency: 1}
           ]
         }]
       };
