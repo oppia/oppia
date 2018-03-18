@@ -58,8 +58,8 @@ oppia.factory('StateRulesStatsService', [
           return {
             state_name: state.name,
             exploration_id: explorationId,
-            visualizations_info: (
-              response.data.visualizations_info.map(function(vizInfo) {
+            visualizations_info: response.data.visualizations_info.map(
+              function(vizInfo) {
                 var dataWithAddressedInfo;
                 if (vizInfo.addressed_info_is_supported) {
                   dataWithAddressedInfo = {
@@ -77,7 +77,6 @@ oppia.factory('StateRulesStatsService', [
 
                 return Object.assign({}, vizInfo, dataWithAddressedInfo || {});
               })
-            )
           };
         });
       }
