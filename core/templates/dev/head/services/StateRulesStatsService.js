@@ -37,14 +37,18 @@ oppia.factory('StateRulesStatsService', [
       stateSupportsIssuesOverview: function(state) {
         return state.interaction.id === 'TextInput';
       },
+
       /**
        * Returns a promise which will provide details of the given state's
        * answer-statistics.
+       *
+       * @param {state} state
+       * @param {string} testOnlyExplorationId used to enforce a specific id
+       *     when testing.
        */
-      computeStateRulesStats: function(state, explorationId) {
-        if (explorationId === undefined) {
-          explorationId = ExplorationContextService.getExplorationId();
-        }
+      computeStateRulesStats: function(state, testOnlyExplorationId) {
+        var explorationId = testOnlyExplorationId !== undefined ?
+          testOnlyExplorationId : ExplorationContextService.getExplorationId();
         var stateRulesStatsUrl = UrlInterpolationService.interpolateUrl(
           STATE_RULES_STATS_URL_TEMPLATE, {
             exploration_id: explorationId,
