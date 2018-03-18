@@ -37,6 +37,7 @@ describe('State Rules Stats Service', function() {
 
   describe('Stats Computation', function() {
     var $httpBackend = null;
+    var EXPLORATION_ID = '0';
 
     beforeEach(inject(function($injector) {
       $httpBackend = $injector.get('$httpBackend');
@@ -47,8 +48,45 @@ describe('State Rules Stats Service', function() {
       $httpBackend.verifyNoOutstandingRequest();
     });
 
+    it('should respond with answer frequencies', function() {
+      // Only including properties required for stat computation.
+      var HOLA_STATE = {name: 'Hola', interaction: {id: 'TextInput'}};
+      // Only including properties required for stat computation.
+      var HOLA_STATE_RULES_STATS_RESPONSE = {
+        visualizations_info: [{
+          data: [
+            {answer: 'Ni Hao', frequency: 5},
+            {answer: 'Aloha', frequency: 3},
+            {answer: 'Hola', frequency: 1},
+          ]
+        }]
+      };
+      var successHandler = jasmine.createSpy('success');
+      var failureHandler = jasmine.createSpy('failure');
+      $httpBackend.expectGET('/createhandler/state_rules_stats/0/Hola').respond(
+        HOLA_STATE_RULES_STATS_RESPONSE
+      );
+
+      StateRulesStatsService.computeStateRulesStats(
+        HOLA_STATE, EXPLORATION_ID
+      ).then(successHandler, failureHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).toHaveBeenCalledWith(
+        jasmine.objectContaining({
+          visualizations_info: [jasmine.objectContaining({
+            data: [
+              {answer: 'Ni Hao', frequency: 5},
+              {answer: 'Aloha', frequency: 3},
+              {answer: 'Hola', frequency: 1}
+            ]
+          })]
+        })
+      );
+      expect(failureHandler).not.toHaveBeenCalled();
+    });
+
     it('should handle addressed info for TextInput', function() {
-      var EXPLORATION_ID = '0';
       // Only including properties required for stat computation.
       var HOLA_STATE = {
         name: 'Hola',
@@ -92,7 +130,7 @@ describe('State Rules Stats Service', function() {
               jasmine.objectContaining({answer: 'Ni Hao', is_addressed: false}),
               jasmine.objectContaining({answer: 'Aloha', is_addressed: false}),
               jasmine.objectContaining({answer: 'Hola', is_addressed: true})
-            ],
+            ]
           })]
         })
       );
