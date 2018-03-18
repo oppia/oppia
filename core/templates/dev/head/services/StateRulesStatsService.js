@@ -27,7 +27,7 @@ oppia.factory('StateRulesStatsService', [
        * TODO(brianrodri): Consider moving this into a visualization domain
        * object.
        *
-       * @param {state!} state
+       * @param {Object!} state
        * @return {Boolean} whether given state has an implementation for
        *     displaying the issues overview tab in the State Editor.
        */
@@ -39,8 +39,8 @@ oppia.factory('StateRulesStatsService', [
        * Returns a promise which will provide details of the given state's
        * answer-statistics.
        *
-       * @param {state!} state
-       * @param {string?} testOnlyExplorationId used to enforce a specific id
+       * @param {Object!} state
+       * @param {String?} testOnlyExplorationId used to enforce a specific id
        *     while testing.
        */
       computeStateRulesStats: function(state, testOnlyExplorationId) {
