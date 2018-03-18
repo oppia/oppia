@@ -1,12 +1,12 @@
 <style>
-  li.answerContainer {
+  unresolved-answers-overview .answer-container {
     vertical-align: text-bottom;
   }
-  div.refreshContainer {
+  unresolved-answers-overview .refresh-container {
     font-size: 0.8em;
     text-align: right;
   }
-  div.refreshContainer a {
+  unresolved-answers-overview .refresh-container a {
     font-weight: bold;
   }
 </style>
@@ -14,14 +14,14 @@
 <div ng-show="unresolvedAnswersData !== null">
   <strong>Unresolved Student Answers</strong>
   <ul>
-    <li ng-repeat="data in unresolvedAnswersData" class="answerContainer">
+    <li ng-repeat="data in unresolvedAnswersData" class="answer-container">
       <strong>(<[data.frequency]> times)</strong>: <span ng-bind-html="data.answer"></span>
     </li>
     <li ng-if="unresolvedAnswersData.length === 0">
       <em>No outstanding answers requiring attention.</em>
     </li>
   </ul>
-  <div class="refreshContainer">
+  <div class="refresh-container">
     <a ng-click="computeUnresolvedAnswers()">Refresh</a>; last updated: <[latestRefreshDate.toLocaleString()]>.
   </div>
 </div>
