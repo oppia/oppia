@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for state stats service.
+ * @fileoverview Unit tests for state rules stats service.
  */
 
 describe('State Rules Stats Service', function() {
