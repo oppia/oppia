@@ -67,7 +67,6 @@ describe('State Rules Stats Service', function() {
       };
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
-      // NOTE: 7 is the value of EXPLORATION_ID.
       $httpBackend.expectGET('/createhandler/state_rules_stats/7/Hola').respond(
         HOLA_STATE_RULES_STATS_RESPONSE
       );
