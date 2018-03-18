@@ -37,16 +37,20 @@ describe('State Rules Stats Service', function() {
 
   describe('Stats Computation', function() {
     var $httpBackend = null;
-    var EXPLORATION_ID = '0';
-
     beforeEach(inject(function($injector) {
       $httpBackend = $injector.get('$httpBackend');
     }));
-
     afterEach(function() {
       $httpBackend.verifyNoOutstandingExpectation();
       $httpBackend.verifyNoOutstandingRequest();
     });
+
+    var EXPLORATION_ID = '7';
+    beforeEach(inject(function(ExplorationContextService) {
+      spyOn(
+        ExplorationContextService, 'getExplorationId'
+      ).and.returnValue(EXPLORATION_ID);
+    }));
 
     it('should respond with answer frequencies', function() {
       // Only including properties required for stat computation.
@@ -63,12 +67,13 @@ describe('State Rules Stats Service', function() {
       };
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
-      $httpBackend.expectGET('/createhandler/state_rules_stats/0/Hola').respond(
+      // NOTE: 7 is the value of EXPLORATION_ID.
+      $httpBackend.expectGET('/createhandler/state_rules_stats/7/Hola').respond(
         HOLA_STATE_RULES_STATS_RESPONSE
       );
 
       StateRulesStatsService.computeStateRulesStats(
-        HOLA_STATE, EXPLORATION_ID
+        HOLA_STATE
       ).then(successHandler, failureHandler);
       $httpBackend.flush();
 
@@ -114,13 +119,11 @@ describe('State Rules Stats Service', function() {
       };
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
-      $httpBackend.expectGET('/createhandler/state_rules_stats/0/Hola').respond(
-        HOLA_STATE_RULES_STATS_RESPONSE
-      );
+      $httpBackend.expectGET('/createhandler/state_rules_stats/7/Hola').respond(
+        HOLA_STATE_RULES_STATS_RESPONSE);
 
-      StateRulesStatsService.computeStateRulesStats(
-        HOLA_STATE, EXPLORATION_ID
-      ).then(successHandler, failureHandler);
+      StateRulesStatsService.computeStateRulesStats(HOLA_STATE).then(
+        successHandler, failureHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(

@@ -40,15 +40,12 @@ oppia.factory('StateRulesStatsService', [
        * answer-statistics.
        *
        * @param {Object!} state
-       * @param {String?} testOnlyExplorationId used to enforce a specific id
-       *     while testing.
        */
-      computeStateRulesStats: function(state, testOnlyExplorationId) {
+      computeStateRulesStats: function(state) {
         var interactionRulesService = $injector.get(
           AngularNameService.getNameOfInteractionRulesService(
             state.interaction.id));
-        var explorationId = testOnlyExplorationId !== undefined ?
-          testOnlyExplorationId : ExplorationContextService.getExplorationId();
+        var explorationId = ExplorationContextService.getExplorationId();
 
         return $http.get(
           UrlInterpolationService.interpolateUrl(
