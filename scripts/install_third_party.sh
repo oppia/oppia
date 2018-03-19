@@ -24,6 +24,7 @@ $PYTHON_CMD scripts/install_third_party.py
 # Install third-party node modules needed for the build process.
 install_node_module eslint 4.19.0
 install_node_module eslint-plugin-angular 0.12.0
+install_node_module eslint-plugin-html 4.0.1
 install_node_module gulp 3.9.0
 install_node_module gulp-clean-css 2.0.2
 install_node_module gulp-concat 2.6.0
