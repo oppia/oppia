@@ -1,5 +1,10 @@
 <strong><[options.title]></strong>
 <table class="table">
+  <colgroup>
+    <col span="1" style="width: 75%;">
+    <col span="1" style="width: 10%;">
+    <col span="1" style="width: 15%;">
+  </colgroup>
   <tr>
     <th><[options.column_headers[0]]></th>
     <th><[options.column_headers[1]]></th>
@@ -18,8 +23,10 @@
 <style>
   oppia-visualization-frequency-table table {
     margin-top: 12px;
+    table-layout: fixed;
   }
   oppia-visualization-frequency-table table td:first-child {
     width: 60%;
+    word-wrap: break-word;
   }
 </style>
