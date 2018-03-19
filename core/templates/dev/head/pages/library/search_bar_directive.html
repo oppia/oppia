@@ -1,6 +1,6 @@
 <form class="navbar-form navbar-left oppia-search-bar-form" role="search">
   <div class="form-group">
-    <div class="input-group" style="max-width: 300px; width: 300px;">
+    <div class="input-group" style="max-width: 375px; width: 375px;">
       <div class="input-group-addon oppia-search-bar-icon">
         <i class="material-icons md-18" ng-if="!isSearchInProgress()">&#xE8B6;</i>
         <span ng-if="isSearchInProgress()">
@@ -139,6 +139,30 @@
 
     .oppia-search-bar-category-selector {
       display: none;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .oppia-search-bar-input {
+      background: #ffffff;
+    }
+
+    .oppia-search-bar-input::-webkit-input-placeholder {
+      color: #04857c;
+    }
+    .oppia-search-bar-input:-moz-placeholder {
+      color: #04857c;
+    }
+    .oppia-search-bar-input::-moz-placeholder {
+      color: #04857c;
+    }
+    .oppia-search-bar-input:-ms-input-placeholder {
+      color: #04857c;
+    }
+
+    .oppia-search-bar-icon {
+      background: #ffffff;
+      color: #04857c;
     }
   }
 </style>
