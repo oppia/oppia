@@ -24,13 +24,13 @@ oppia.controller('StatisticsTab', [
   'ExplorationDataService', 'ComputeGraphService', 'DateTimeFormatService',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
-  'RouterService', 'IMPROVE_TYPE_INCOMPLETE',
+  'RouterService', 'StateRulesStatsService', 'IMPROVE_TYPE_INCOMPLETE',
   function(
       $scope, $http, $uibModal, AlertsService, ExplorationStatesService,
       ExplorationDataService, ComputeGraphService, DateTimeFormatService,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-      RouterService, IMPROVE_TYPE_INCOMPLETE) {
+      RouterService, StateRulesStatsService, IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
@@ -119,10 +119,9 @@ oppia.controller('StatisticsTab', [
     $scope.showStateStatsModal = function(stateName, improvementType) {
       AlertsService.clearWarnings();
 
-      $http.get(
-        '/createhandler/state_rules_stats/' + $scope.explorationId + '/' +
-        encodeURIComponent(stateName)
-      ).then(function(response) {
+      StateRulesStatsService.computeStateRulesStats(
+        ExplorationStatesService.getState(stateName)
+      ).then(function(stateRulesStats) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/statistics_tab/' +
@@ -139,7 +138,7 @@ oppia.controller('StatisticsTab', [
               return improvementType;
             },
             visualizationsInfo: function() {
-              return response.data.visualizations_info;
+              return stateRulesStats.visualizations_info;
             }
           },
           controller: [
@@ -147,7 +146,8 @@ oppia.controller('StatisticsTab', [
             'stateStats', 'improvementType', 'visualizationsInfo',
             'HtmlEscaperService', 'AngularNameService',
             'AnswerClassificationService',
-            function($scope, $uibModalInstance, $filter, $injector, stateName,
+            function(
+                $scope, $uibModalInstance, $filter, $injector, stateName,
                 stateStats, improvementType, visualizationsInfo,
                 HtmlEscaperService, AngularNameService,
                 AnswerClassificationService) {
@@ -200,48 +200,22 @@ oppia.controller('StatisticsTab', [
               ];
 
               var _getVisualizationsHtml = function() {
-                htmlSnippets = visualizationsInfo.map(
-                  function(visualizationInfo) {
-                    var isAddressedResults = null;
-                    if (visualizationInfo.show_addressed_info) {
-                      var explorationId = ExplorationDataService.explorationId;
-                      var state = ExplorationStatesService.getState(
-                        $scope.stateName);
+                var htmlSnippets = visualizationsInfo.map(function(vizInfo) {
+                  var escapedData =
+                    HtmlEscaperService.objToEscapedJson(vizInfo.data);
+                  var escapedOptions =
+                    HtmlEscaperService.objToEscapedJson(vizInfo.options);
 
-                      isAddressedResults = visualizationInfo.data.map(
-                        function(datum) {
-                          var interactionId = state.interaction.id;
-                          var rulesServiceName = (
-                            AngularNameService.getNameOfInteractionRulesService(
-                              interactionId));
-                          var rulesService = $injector.get(rulesServiceName);
-                          return (
-                            AnswerClassificationService
-                              .isClassifiedExplicitlyOrGoesToNewState(
-                                explorationId, state.name, state,
-                                datum.answer, rulesService
-                              )
-                          );
-                        }
-                      );
-                    }
-
-                    var escapedData = HtmlEscaperService.objToEscapedJson(
-                      visualizationInfo.data);
-                    var escapedOptions = HtmlEscaperService.objToEscapedJson(
-                      visualizationInfo.options);
-                    var escapedIsAddressedResults =
-                      HtmlEscaperService.objToEscapedJson(isAddressedResults);
-
-                    var el = $(
-                      '<oppia-visualization-' +
-                      $filter('camelCaseToHyphens')(visualizationInfo.id) +
-                      '/>');
-                    el.attr('data', escapedData);
-                    el.attr('options', escapedOptions);
-                    el.attr('is-addressed', escapedIsAddressedResults);
-                    return el.get(0).outerHTML;
-                  });
+                  var el = $(
+                    '<oppia-visualization-' +
+                    $filter('camelCaseToHyphens')(vizInfo.id) + '/>');
+                  el.attr('escaped-data', escapedData);
+                  el.attr('escaped-options', escapedOptions);
+                  el.attr(
+                    'addressed-info-is-supported',
+                    vizInfo.addressed_info_is_supported);
+                  return el.get(0).outerHTML;
+                });
 
                 return htmlSnippets.join('');
               };
