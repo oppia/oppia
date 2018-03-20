@@ -37,8 +37,7 @@ describe('Outcome object factory', function() {
     expect(testOutcome3.isConfusing(currentState)).toBe(false);
     expect(testOutcome4.isConfusing(currentState)).toBe(true);
     expect(testOutcome5.isConfusing(currentState)).toBe(true);
-  }
-  );
+  });
 
   it('should correctly output whether an outcome has nonempty feedback',
     function() {

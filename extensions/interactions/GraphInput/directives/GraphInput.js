@@ -408,18 +408,19 @@ oppia.directive('graphViz', [
             }
           };
 
-          $scope.graphOptions = [{
-            text: 'Labeled',
-            option: 'isLabeled'
-          },
-                                 {
-                                   text: 'Directed',
-                                   option: 'isDirected'
-                                 },
-                                 {
-                                   text: 'Weighted',
-                                   option: 'isWeighted'
-                                 }];
+          $scope.graphOptions = [
+            {
+              text: 'Labeled',
+              option: 'isLabeled'
+            },
+            {
+              text: 'Directed',
+              option: 'isDirected'
+            },
+            {
+              text: 'Weighted',
+              option: 'isWeighted'
+            }];
           $scope.toggleGraphOption = function(option) {
             // Handle the case when we have two edges s -> d and d -> s
             if (option === 'isDirected' && $scope.graph[option]) {

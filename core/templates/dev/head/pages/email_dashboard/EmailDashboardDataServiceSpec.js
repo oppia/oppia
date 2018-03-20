@@ -28,14 +28,15 @@ describe('Email Dashboard Services', function() {
     }));
 
     it('should fetch correct data from backend', function() {
-      var recentQueries = [{
-        id: 'q123',
-        status: 'processing'
-      },
-                           {
-                             id: 'q456',
-                             status: 'processing'
-                           }];
+      var recentQueries = [
+        {
+          id: 'q123',
+          status: 'processing'
+        },
+        {
+          id: 'q456',
+          status: 'processing'
+        }];
       $httpBackend.expectGET(/.*?emaildashboarddatahandler?.*/g).respond({
         recent_queries: recentQueries,
         cursor: null
