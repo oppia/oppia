@@ -158,7 +158,8 @@
             </label>
             <span class="col-lg-2 col-md-2 col-sm-2">
               <div class="oppia-on-off-switch-switch">
-                <input type="checkbox" name="oppia-on-off-switch-switch" class="oppia-on-off-switch-switch-checkbox protractor-test-enable-parameters" id="parameter-switch" ng-click="enableParameters()">
+                <input span ng-if="areParametersEnabled()" type="checkbox" name="oppia-on-off-switch-switch" class="oppia-on-off-switch-switch-checkbox protractor-test-enable-parameters" id="parameter-switch" ng-click="enableParameters()" checked>
+                <input span ng-if="!areParametersEnabled()" type="checkbox" name="oppia-on-off-switch-switch" class="oppia-on-off-switch-switch-checkbox protractor-test-enable-parameters" id="parameter-switch" ng-click="enableParameters()">
                 <label class="oppia-on-off-switch-switch-label" for="parameter-switch">
                   <span class="oppia-on-off-switch-switch-inner"></span>
                   <span class="oppia-on-off-switch-switch-switch"></span>
@@ -180,7 +181,8 @@
             </label>
             <span class="col-lg-2 col-md-2 col-sm-2">
               <div class="oppia-on-off-switch-switch">
-                <input type="checkbox" name="oppia-on-off-switch-switch" class="oppia-on-off-switch-switch-checkbox" id="text-speech-switch" ng-click="toggleAutomaticTextToSpeech()" checked>
+                <input type="checkbox" ng-if="isAutomaticTextToSpeechEnabled()" name="oppia-on-off-switch-switch" class="oppia-on-off-switch-switch-checkbox" id="text-speech-switch" ng-click="toggleAutomaticTextToSpeech()" checked>
+                <input type="checkbox" ng-if="!isAutomaticTextToSpeechEnabled()" name="oppia-on-off-switch-switch" class="oppia-on-off-switch-switch-checkbox" id="text-speech-switch" ng-click="toggleAutomaticTextToSpeech()">
                 <label class="oppia-on-off-switch-switch-label" for="text-speech-switch">
                   <span class="oppia-on-off-switch-switch-inner"></span>
                   <span class="oppia-on-off-switch-switch-switch"></span>
@@ -202,7 +204,8 @@
             </label>
             <span class="col-lg-2 col-md-2 col-sm-2">
               <div class="oppia-on-off-switch-switch">
-                <input type="checkbox" name="oppia-on-off-switch-switch" class="oppia-on-off-switch-switch-checkbox" id="correctness-switch" ng-click="toggleCorrectnessFeedback()">
+                <input type="checkbox" ng-if="!isCorrectnessFeedbackEnabled()" name="oppia-on-off-switch-switch" class="oppia-on-off-switch-switch-checkbox" id="correctness-switch" ng-click="toggleCorrectnessFeedback()">
+                <input type="checkbox" ng-if="isCorrectnessFeedbackEnabled()" name="oppia-on-off-switch-switch" class="oppia-on-off-switch-switch-checkbox" id="correctness-switch" ng-click="toggleCorrectnessFeedback()" checked>
                 <label class="oppia-on-off-switch-switch-label" for="correctness-switch">
                   <span class="oppia-on-off-switch-switch-inner"></span>
                   <span class="oppia-on-off-switch-switch-switch"></span>
