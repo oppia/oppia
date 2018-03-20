@@ -4876,6 +4876,72 @@ md-card.preview-conversation-skin-supplemental-card {
   color: rgba(255,255,255,1);
 }
 
+.oppia-on-off-switch-switch {
+  position: relative;
+  width: 70px;
+}
+.oppia-on-off-switch-switch-checkbox {
+  display: none;
+}
+.oppia-on-off-switch-switch-label {
+  border: 2px solid #999999;
+  border-radius: 20px;
+  cursor: pointer;
+  display: block;
+  overflow: hidden;
+}
+.oppia-on-off-switch-switch-inner {
+  display: block;
+  margin-left: -100%;
+  transition: margin 0.3s ease-in 0s;
+  width: 200%;
+}
+.oppia-on-off-switch-switch-inner:before, .oppia-on-off-switch-switch-inner:after {
+  box-sizing: border-box;
+  color: white;
+  display: block;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  float: left;
+  height: 20px;
+  line-height: 20px;
+  padding: 0;
+  width: 50%;
+}
+.oppia-on-off-switch-switch-inner:before {
+  background-color: #04857C;
+  color: #FFFFFF;
+  content: "ON";
+  padding-left: 10px;
+}
+.oppia-on-off-switch-switch-inner:after {
+  background-color: #EEEEEE;
+  color: #999999;
+  content: "OFF";
+  padding-right: 10px;
+  text-align: right;
+}
+.oppia-on-off-switch-switch-switch {
+  background: #FFFFFF;
+  border: 2px solid #999999;
+  border-radius: 20px;
+  bottom: 0;
+  display: block;
+  margin: 3.5px;
+  position: absolute;
+  right: 41px;
+  top: 0;
+  transition: all 0.3s ease-in 0s;
+  width: 18px;
+}
+.oppia-on-off-switch-switch-checkbox:checked + .oppia-on-off-switch-switch-label .oppia-on-off-switch-switch-inner {
+  margin-left: 0;
+}
+.oppia-on-off-switch-switch-checkbox:checked + .oppia-on-off-switch-switch-label .oppia-on-off-switch-switch-switch {
+  right: 0px;
+}
+
 /*
   about/learners/creators media queries
 */

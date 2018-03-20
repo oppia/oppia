@@ -153,82 +153,64 @@
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div role="form" class="form-horizontal">
-            <label for="enableParameters" class="col-lg-12 col-md-12 col-sm-12">
+            <label for="enableParameters" class="col-lg-10 col-md-10 col-sm-10">
               Parameters
             </label>
+            <span class="col-lg-2 col-md-2 col-sm-2">
+              <div class="oppia-on-off-switch-switch">
+                <input type="checkbox" name="oppia-on-off-switch-switch" class="oppia-on-off-switch-switch-checkbox" id="parameter-switch" ng-click="enableParameters()">
+                <label class="oppia-on-off-switch-switch-label" for="parameter-switch">
+                  <span class="oppia-on-off-switch-switch-inner"></span>
+                  <span class="oppia-on-off-switch-switch-switch"></span>
+                </label>
+              </div>
+            </span>
             <span class="col-lg-12 col-md-12 col-sm-12 help-block" style="font-size: smaller;">
-              Parameters are
-              <span ng-if="!areParametersEnabled()">
-                disabled.
-              </span>
-              <span ng-if="areParametersEnabled()">
-                enabled.
-              </span>
               Parameters are values that change as the learner moves between cards (<a href="http://oppia.github.io/#/Parameters" target="_blank">more info</a>).
             </span>
-            <span class="col-lg-12 col-md-12 col-sm-12">
-              <button type="button" class="btn btn-default protractor-test-enable-parameters" ng-click="enableParameters()" ng-if="!areParametersEnabled()">
-                Enable
-              </button>
-              <span ng-if="areParametersEnabled()">
-                Enabled
-              </span>
-            </span>
           </div>
         </div>
       </div>
-      <br>
+      <hr>
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div role="form" class="form-horizontal">
-            <label for="enableAutomaticTextToSpeech" class="col-lg-12 col-md-12 col-sm-12">
+            <label for="enableAutomaticTextToSpeech" class="col-lg-10 col-md-10 col-sm-10">
               Automatic Text-to-speech
             </label>
-            <span ng-if="!isAutomaticTextToSpeechEnabled()" class="col-lg-12 col-md-12 col-sm-12 help-block" style="font-size: smaller;">
-              Automatic text-to-speech is disabled. It generates audio from your content for learners to listen to.
+            <span class="col-lg-2 col-md-2 col-sm-2">
+              <div class="oppia-on-off-switch-switch">
+                <input type="checkbox" name="oppia-on-off-switch-switch" class="oppia-on-off-switch-switch-checkbox" id="text-speech-switch" ng-click="toggleAutomaticTextToSpeech()" checked>
+                <label class="oppia-on-off-switch-switch-label" for="text-speech-switch">
+                  <span class="oppia-on-off-switch-switch-inner"></span>
+                  <span class="oppia-on-off-switch-switch-switch"></span>
+                </label>
+              </div>
             </span>
-            <span ng-if="isAutomaticTextToSpeechEnabled()" class="col-lg-12 col-md-12 col-sm-12 help-block" style="font-size: smaller;">
-              Automatic text-to-speech is enabled. It generates audio from your content for learners to listen to. It is recommended that you disable this feature if creating an exploration whose content consists of multiple languages.
-            </span>
-            <span class="col-lg-12 col-md-12 col-sm-12">
-              <button type="button" class="btn btn-default protractor-test-enable-automatic-text-to-speech" ng-click="toggleAutomaticTextToSpeech()">
-                <span ng-if="!isAutomaticTextToSpeechEnabled()">
-                  Enable
-                </span>
-                <span ng-if="isAutomaticTextToSpeechEnabled()">
-                  Disable
-                </span>
-              </button>
+            <span class="col-lg-12 col-md-12 col-sm-12 help-block" style="font-size: smaller;">
+              Automatic text-to-speech generates audio from your content for learners to listen to. It is recommended that you disable this feature if creating an exploration whose content consists of multiple languages.
             </span>
           </div>
         </div>
       </div>
-      <br>
+      <hr>
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div role="form" class="form-horizontal">
-            <label for="enableCorrectnessFeedback" class="col-lg-12 col-md-12 col-sm-12">
+            <label for="enableCorrectnessFeedback" class="col-lg-10 col-md-10 col-sm-10">
               Correctness Feedback
             </label>
-            <span class="col-lg-12 col-md-12 col-sm-12 help-block" style="font-size: smaller;">
-              This feature is
-              <span ng-if="!isCorrectnessFeedbackEnabled()">
-                disabled.
-              </span>
-              <span ng-if="isCorrectnessFeedbackEnabled()">
-                enabled.
-              </span>
-              This allows the user to categorise answer groups as correct or incorrect.
+            <span class="col-lg-2 col-md-2 col-sm-2">
+              <div class="oppia-on-off-switch-switch">
+                <input type="checkbox" name="oppia-on-off-switch-switch" class="oppia-on-off-switch-switch-checkbox" id="correctness-switch" ng-click="toggleCorrectnessFeedback()">
+                <label class="oppia-on-off-switch-switch-label" for="correctness-switch">
+                  <span class="oppia-on-off-switch-switch-inner"></span>
+                  <span class="oppia-on-off-switch-switch-switch"></span>
+                </label>
+              </div>
             </span>
-            <span class="col-lg-12 col-md-12 col-sm-12">
-              <button type="button" class="btn btn-default" ng-click="toggleCorrectnessFeedback()">
-                <span ng-if="!isCorrectnessFeedbackEnabled()">
-                  Enable
-                </span>
-                <span ng-if="isCorrectnessFeedbackEnabled()">
-                  Disable
-                </span>
-              </button>
+            <span class="col-lg-12 col-md-12 col-sm-12 help-block" style="font-size: smaller;">
+              Correctness feedback allows the user to categorise answer groups as correct or incorrect.
             </span>
           </div>
         </div>
