@@ -2,7 +2,7 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://github.com/oppia/oppia/commits/master
 
-v2.6.2 (19 Mar 2018)
+v2.6.2 (20 Mar 2018)
 --------------------
 Learner View:
 * Fix #4639: Changed the ending for refresher explorations (#4644)
