@@ -25,7 +25,7 @@
       <span class="caret"></span>
     </button>
     <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
-    <ul uib-dropdown-menu class="protractor-test-search-bar-dropdown-menu" role="menu" style="margin-top:-20px; max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
+    <ul uib-dropdown-menu class="protractor-test-search-bar-dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
       <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
         ng-if="selectionDetails.categories.selections[item.id]">
         <a href ng-click="toggleSelection('categories', item.id)">
@@ -166,6 +166,10 @@
 
     .oppia-search-bar-input.btn:hover, .oppia-search-bar-input.btn:focus {
       color: #04857c;
+    }
+
+    .protractor-test-search-bar-dropdown-menu{
+      margin-top:-25px;
     }
 
     .oppia-same-row{
