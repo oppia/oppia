@@ -4876,27 +4876,27 @@ md-card.preview-conversation-skin-supplemental-card {
   color: rgba(255,255,255,1);
 }
 
-.oppia-on-off-switch-switch {
+.oppia-on-off-switch {
   position: relative;
   width: 70px;
 }
-.oppia-on-off-switch-switch-checkbox {
+.oppia-on-off-switch-checkbox {
   display: none;
 }
-.oppia-on-off-switch-switch-label {
+.oppia-on-off-switch-label {
   border: 2px solid #999999;
   border-radius: 20px;
   cursor: pointer;
   display: block;
   overflow: hidden;
 }
-.oppia-on-off-switch-switch-inner {
+.oppia-on-off-switch-inner {
   display: block;
   margin-left: -100%;
   transition: margin 0.3s ease-in 0s;
   width: 200%;
 }
-.oppia-on-off-switch-switch-inner:before, .oppia-on-off-switch-switch-inner:after {
+.oppia-on-off-switch-inner:before, .oppia-on-off-switch-inner:after {
   box-sizing: border-box;
   color: white;
   display: block;
@@ -4909,20 +4909,20 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
   width: 50%;
 }
-.oppia-on-off-switch-switch-inner:before {
+.oppia-on-off-switch-inner:before {
   background-color: #04857C;
   color: #FFFFFF;
   content: "ON";
   padding-left: 10px;
 }
-.oppia-on-off-switch-switch-inner:after {
+.oppia-on-off-switch-inner:after {
   background-color: #EEEEEE;
   color: #999999;
   content: "OFF";
   padding-right: 10px;
   text-align: right;
 }
-.oppia-on-off-switch-switch-switch {
+.oppia-on-off-switch-main {
   background: #FFFFFF;
   border: 2px solid #999999;
   border-radius: 20px;
@@ -4935,11 +4935,11 @@ md-card.preview-conversation-skin-supplemental-card {
   transition: all 0.3s ease-in 0s;
   width: 18px;
 }
-.oppia-on-off-switch-switch-checkbox:checked + .oppia-on-off-switch-switch-label .oppia-on-off-switch-switch-inner {
+.oppia-on-off-switch-checkbox:checked + .oppia-on-off-switch-label .oppia-on-off-switch-inner {
   margin-left: 0;
 }
-.oppia-on-off-switch-switch-checkbox:checked + .oppia-on-off-switch-switch-label .oppia-on-off-switch-switch-switch {
-  right: 0px;
+.oppia-on-off-switch-checkbox:checked + .oppia-on-off-switch-label .oppia-on-off-switch-main {
+  right: 0;
 }
 
 /*
