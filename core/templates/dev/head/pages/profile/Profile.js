@@ -130,7 +130,7 @@ oppia.controller('Profile', [
       };
       $scope.goToNextPage = function() {
         if ($scope.currentPageNumber * $scope.PAGE_SIZE >= (
-            data.edited_exp_summary_dicts.length)) {
+          data.edited_exp_summary_dicts.length)) {
           $log.error('Error: Cannot increment page');
         } else {
           $scope.currentPageNumber++;
@@ -147,7 +147,7 @@ oppia.controller('Profile', [
         $scope.explorationIndexEnd = (
           $scope.explorationIndexStart + $scope.PAGE_SIZE - 1);
         for (var ind = $scope.explorationIndexStart;
-            ind <= $scope.explorationIndexEnd; ind++) {
+          ind <= $scope.explorationIndexEnd; ind++) {
           $scope.explorationsOnPage.push($scope.userEditedExplorations[ind]);
           if (ind === $scope.userEditedExplorations.length - 1) {
             break;

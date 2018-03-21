@@ -53,26 +53,26 @@ describe('Audio translation language service', function() {
   it('should initialize the current audio language when ' +
      'no preferred language is set and the exploration contains ' +
      'an audio language that is related to the exploration language',
-    function() {
-      var allAudioLanguageCodesInExploration = ['hi-en', 'en'];
-      var preferredLanguageCode = null;
-      var explorationLanguageCode = 'hi';
-      atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
-        explorationLanguageCode);
-      expect(atls.getCurrentAudioLanguageCode()).toEqual('hi-en');
-    }
+  function() {
+    var allAudioLanguageCodesInExploration = ['hi-en', 'en'];
+    var preferredLanguageCode = null;
+    var explorationLanguageCode = 'hi';
+    atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
+      explorationLanguageCode);
+    expect(atls.getCurrentAudioLanguageCode()).toEqual('hi-en');
+  }
   );
 
   it('should initialize the current audio language to the most ' +
      'relevant language when multiple audio languages are related ' +
      'to the exploration language',
-    function() {
-      var allAudioLanguageCodesInExploration = ['hi-en', 'en'];
-      var preferredLanguageCode = null;
-      var explorationLanguageCode = 'en';
-      atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
-        explorationLanguageCode);
-      expect(atls.getCurrentAudioLanguageCode()).toEqual('en');
-    }
+  function() {
+    var allAudioLanguageCodesInExploration = ['hi-en', 'en'];
+    var preferredLanguageCode = null;
+    var explorationLanguageCode = 'en';
+    atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
+      explorationLanguageCode);
+    expect(atls.getCurrentAudioLanguageCode()).toEqual('en');
+  }
   );
 });

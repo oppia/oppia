@@ -135,7 +135,7 @@ gulp.task('collectDependencyFilepaths', function() {
     var dependency = frontendDependencies[dependencyId];
     var dependencyDir = (
       dependency.targetDir ? dependency.targetDir :
-      dependency.targetDirPrefix + dependency.version);
+        dependency.targetDirPrefix + dependency.version);
     if (dependency.hasOwnProperty('bundle')) {
       if (dependency.bundle.hasOwnProperty('css')) {
         dependency.bundle.css.forEach(function(cssFiles) {
@@ -163,7 +163,7 @@ gulp.task('generateCss', function() {
   gulp.src(cssFilePaths)
     .pipe(isMinificationNeeded ? sourcemaps.init() : gulpUtil.noop())
     .pipe(isMinificationNeeded ? concat('third_party.min.css') :
-        concat('third_party.css'))
+      concat('third_party.css'))
     .pipe(isMinificationNeeded ? cleanCss({}) : gulpUtil.noop())
     .pipe(isMinificationNeeded ? sourcemaps.write('.') : gulpUtil.noop())
     .pipe(gulp.dest(generatedCssTargetDir));
@@ -174,7 +174,7 @@ gulp.task('generateJs', function() {
   gulp.src(jsFilePaths)
     .pipe(isMinificationNeeded ? sourcemaps.init() : gulpUtil.noop())
     .pipe(isMinificationNeeded ? concat('third_party.min.js') :
-        concat('third_party.js'))
+      concat('third_party.js'))
     .pipe(isMinificationNeeded ? uglify() : gulpUtil.noop())
     // This maps a combined/minified file back to an unbuilt state by holding
     // information about original files. When you query a certain line and

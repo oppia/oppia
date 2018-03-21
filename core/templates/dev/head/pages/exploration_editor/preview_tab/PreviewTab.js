@@ -54,7 +54,7 @@ oppia.controller('PreviewTab', [
         .then(function(manualParamChanges) {
           $scope.loadPreviewState(initStateNameForPreview, manualParamChanges);
         }
-      );
+        );
     });
 
     $scope.getManualParamChanges = function(initStateNameForPreview) {

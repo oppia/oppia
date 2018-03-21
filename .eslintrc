@@ -3,10 +3,17 @@
     "eslint:recommended",
   ],
   "plugins": [
-    "html",
-    "angular"
+    "angular",
+    "html"
   ],
   "rules": {
+    "angular/di-unused": 2,
+    "angular/no-inline-template": [
+      "error",
+      {
+        "allowSimple": true
+      }
+    ],
     "brace-style":[
       "error",
       "1tbs"
@@ -22,13 +29,6 @@
       {
         "before": false,
         "after": true
-      }
-    ],
-    "angular/di-unused": 2,
-    "angular/no-inline-template": [
-      "error",
-      {
-        "allowSimple": true
       }
     ],
     "curly": [
@@ -83,6 +83,7 @@
         ]
       }
     ],
+    "no-compare-neg-zero": "off",
     "no-constant-condition": [
       "off"
     ],
@@ -110,6 +111,7 @@
     "no-unused-vars": [
       "off"
     ],
+    "no-useless-escape": "off",
     "one-var": [
       "off"
     ],
@@ -143,7 +145,8 @@
       "error",
       {
         "anonymous": "ignore",
-        "named": "never"
+        "named": "never",
+        "asyncArrow": "ignore"
       }
     ],
     "space-infix-ops": [

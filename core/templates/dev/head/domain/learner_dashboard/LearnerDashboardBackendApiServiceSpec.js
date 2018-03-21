@@ -83,19 +83,19 @@ describe('Learner Dashboard Backend API Service', function() {
 
   it('should use rejection handler if learner dashboard data ' +
     'backend request failed',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', LEARNER_DASHBOARD_DATA_URL).respond(
-        ERROR_STATUS_CODE, 'Error loading dashboard data.');
-      LearnerDashboardBackendApiService.fetchLearnerDashboardData().then(
-        successHandler, failHandler);
-      $httpBackend.flush();
+    $httpBackend.expect('GET', LEARNER_DASHBOARD_DATA_URL).respond(
+      ERROR_STATUS_CODE, 'Error loading dashboard data.');
+    LearnerDashboardBackendApiService.fetchLearnerDashboardData().then(
+      successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(jasmine.objectContaining(
-        {data : 'Error loading dashboard data.'}));
-    }
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(jasmine.objectContaining(
+      {data : 'Error loading dashboard data.'}));
+  }
   );
 });

@@ -79,7 +79,7 @@ oppia.directive('feedbackPopup', [
             for (var i = 0; i < 10; i++) {
               elt = elt.parent();
               if (!angular.isUndefined(
-                    elt.attr('uib-popover-template-popup'))) {
+                elt.attr('uib-popover-template-popup'))) {
                 popoverChildElt = elt;
                 break;
               }

@@ -60,9 +60,9 @@ oppia.directive('ratingDisplay', [
           for (var i = 0; i < $scope.stars.length; i++) {
             $scope.stars[i].cssClass = (
               ratingValue === undefined ? 'fa-star-o' :
-              ratingValue < $scope.stars[i].value - 0.75 ? 'fa-star-o' :
-              ratingValue < $scope.stars[i].value - 0.25 ? 'fa-star-half-o' :
-              'fa-star');
+                ratingValue < $scope.stars[i].value - 0.75 ? 'fa-star-o' :
+                  ratingValue < $scope.stars[i].value - 0.25 ?
+                    'fa-star-half-o' : 'fa-star');
 
             if ($scope.status === STATUS_ACTIVE &&
                 ratingValue >= $scope.stars[i].value) {
@@ -86,7 +86,7 @@ oppia.directive('ratingDisplay', [
         };
         $scope.enterStar = function(starValue) {
           if (
-              $scope.isEditable &&
+            $scope.isEditable &&
               ($scope.status === STATUS_ACTIVE ||
                 $scope.status === STATUS_INACTIVE)) {
             $scope.status = STATUS_ACTIVE;

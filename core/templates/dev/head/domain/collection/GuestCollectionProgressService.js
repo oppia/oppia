@@ -43,7 +43,7 @@ oppia.factory('GuestCollectionProgressService', [
     var recordCompletedExploration = function(collectionId, explorationId) {
       var guestCollectionProgress = loadGuestCollectionProgress();
       if (guestCollectionProgress.addCompletedExplorationId(
-          collectionId, explorationId)) {
+        collectionId, explorationId)) {
         storeGuestCollectionProgress(guestCollectionProgress);
       }
     };

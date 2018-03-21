@@ -59,7 +59,7 @@ oppia.factory('ChangesInHumanReadableFormService', [
       if (angular.isArray(newValue) && angular.isArray(oldValue)) {
         result = (newValue.length > oldValue.length) ?
           'added' : (newValue.length === oldValue.length) ?
-          'edited' : 'deleted';
+            'edited' : 'deleted';
       } else {
         if (!UtilsService.isEmpty(oldValue)) {
           if (!UtilsService.isEmpty(newValue)) {
@@ -175,7 +175,7 @@ oppia.factory('ChangesInHumanReadableFormService', [
                   if (rulesList.length > 0) {
                     answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';
                     var rulesListHtml = (angular.element('<ol></ol>')
-                                         .addClass('rules-list'));
+                      .addClass('rules-list'));
                     for (var rule in rulesList) {
                       rulesListHtml.html(rulesList[rule][0].outerHTML);
                     }
@@ -193,8 +193,8 @@ oppia.factory('ChangesInHumanReadableFormService', [
                         newValue.outcome.dest + '</p>');
                   }
                   if (!angular.equals(
-                      newValue.outcome.feedback.getHtml(),
-                      oldValue.outcome.feedback.getHtml())) {
+                    newValue.outcome.feedback.getHtml(),
+                    oldValue.outcome.feedback.getHtml())) {
                     answerGroupHtml += (
                       '<div class="sub-edit"><i>Feedback: </i>' +
                         '<div class="feedback">' +
@@ -207,7 +207,7 @@ oppia.factory('ChangesInHumanReadableFormService', [
                       answerGroupHtml += (
                         '<p class="sub-edit"><i>Rules: </i></p>');
                       var rulesListHtml = (angular.element('<ol></ol>')
-                                           .addClass('rules-list'));
+                        .addClass('rules-list'));
                       for (var rule in rulesList) {
                         rulesListHtml.html(rulesList[rule][0].outerHTML);
                       }
@@ -216,7 +216,7 @@ oppia.factory('ChangesInHumanReadableFormService', [
                   }
                   stateWiseEditsMapping[stateName].push(
                     angular.element(
-                        '<div><strong>Edited answer group: <strong>' +
+                      '<div><strong>Edited answer group: <strong>' +
                         '</div>')
                       .append(answerGroupHtml)
                       .addClass('state-edit-desc answer-group'));

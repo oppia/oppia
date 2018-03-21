@@ -148,7 +148,7 @@ oppia.factory('StateGraphLayoutService', [
             if (numBacktrackingCalls <= MAX_BACKTRACKING_CALLS) {
               for (var i = 0; i < adjacencyLists[currentNodeId].length; i++) {
                 if (currentPath.indexOf(
-                      adjacencyLists[currentNodeId][i]) === -1) {
+                  adjacencyLists[currentNodeId][i]) === -1) {
                   backtrack(adjacencyLists[currentNodeId][i]);
                 }
               }
@@ -244,7 +244,7 @@ oppia.factory('StateGraphLayoutService', [
                 nodeData[linkTarget].depth = nodeData[currNodeId].depth + 1;
                 nodeData[linkTarget].offset = (
                   nodeData[linkTarget].depth in maxOffsetInEachLevel ?
-                  maxOffsetInEachLevel[nodeData[linkTarget].depth] + 1 : 0);
+                    maxOffsetInEachLevel[nodeData[linkTarget].depth] + 1 : 0);
 
                 maxDepth = Math.max(maxDepth, nodeData[linkTarget].depth);
                 maxOffsetInEachLevel[nodeData[linkTarget].depth] = (
@@ -497,10 +497,10 @@ oppia.factory('StateGraphLayoutService', [
             if (dx === 0 || dy !== 0) {
               startCutoff = (
                 (dx === 0) ? (sourceHeight / 2) / Math.abs(dy) :
-                Math.min(startCutoff, (sourceHeight / 2) / Math.abs(dy)));
+                  Math.min(startCutoff, (sourceHeight / 2) / Math.abs(dy)));
               endCutoff = (
                 (dx === 0) ? (targetHeight / 2) / Math.abs(dy) :
-                Math.min(endCutoff, (targetHeight / 2) / Math.abs(dy)));
+                  Math.min(endCutoff, (targetHeight / 2) / Math.abs(dy)));
             }
 
             var dxperp = targety - sourcey;

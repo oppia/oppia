@@ -91,8 +91,8 @@ oppia.factory('UrlInterpolationService', [
 
         // http://stackoverflow.com/questions/4775722
         if (!(interpolationValues instanceof Object) || (
-            Object.prototype.toString.call(
-              interpolationValues) === '[object Array]')) {
+          Object.prototype.toString.call(
+            interpolationValues) === '[object Array]')) {
           AlertsService.fatalWarning(
             'Expected an object of interpolation values to be passed into ' +
             'interpolateUrl.');

@@ -136,7 +136,7 @@ oppia.directive('oppiaShortResponseSetInput', [
         var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         $scope.displayedAnswer = (
           _answer.length > 0 ? _answer.join(', ') :
-          'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER');
+            'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER');
       }]
     };
   }
