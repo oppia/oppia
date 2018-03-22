@@ -33,10 +33,11 @@ class BaseVisualization(object):
     def id(self):
         return self.__class__.__name__
 
-    def __init__(self, calculation_id, options_dict, show_addressed_info):
+    def __init__(
+            self, calculation_id, options_dict, addressed_info_is_supported):
         self.options = options_dict
         self.calculation_id = calculation_id
-        self.show_addressed_info = show_addressed_info
+        self.addressed_info_is_supported = addressed_info_is_supported
 
     def validate(self):
         """Validates a visualization object.
@@ -61,11 +62,12 @@ class BaseVisualization(object):
             schema_utils.normalize_against_schema(
                 self.options[spec['name']], spec['schema'])
 
-        # Check that show_addressed_info is valid.
-        if not isinstance(self.show_addressed_info, bool):
+        # Check that addressed_info_is_supported is valid.
+        if not isinstance(self.addressed_info_is_supported, bool):
             raise utils.ValidationError(
                 'For visualization %s, expected a bool value for '
-                'show_addressed_info; received %s' % self.show_addressed_info)
+                'addressed_info_is_supported; received %s' %
+                self.addressed_info_is_supported)
 
 
 class BarChart(BaseVisualization):

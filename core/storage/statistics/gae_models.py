@@ -1186,7 +1186,7 @@ class StateAnswersModel(base_models.BaseModel):
         if sharded_answer_list_sizes[0] != (
                 last_shard.accumulated_answer_json_size_bytes):
             last_shard.submitted_answer_list = sharded_answer_lists[0]
-            last_shard.accumulated_answer_json_size_bytes = (
+            last_shard.accumulated_answer_json_size_bytes = (  # pylint: disable=invalid-name
                 sharded_answer_list_sizes[0])
             last_shard_updated = True
         else:
