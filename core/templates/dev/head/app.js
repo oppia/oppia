@@ -43,6 +43,9 @@ oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // Feature still in development.
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
 oppia.constant('ENABLE_ML_CLASSIFIERS', false);
+// NOTE: To use TRAINING_DATA_CLASSIFICATION, ENABLE_ML_CLASSIFIERS must be
+// True.
+oppia.constant('ENABLE_TRAINING_DATA_CLASSIFICATION', false);
 // Feature still in development.
 oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID',
   'The current solution does not lead to another card.');

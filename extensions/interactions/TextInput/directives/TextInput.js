@@ -169,6 +169,10 @@ oppia.factory('textInputRulesService', ['$filter', function($filter) {
       var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
       return normalizedAnswer.toLowerCase().indexOf(
         normalizedInput.toLowerCase()) !== -1;
+    },
+    TrainingDataClassification: function(answer, inputs) {
+      return $filter('normalizeWhitespace')(answer).toLowerCase() ===
+      $filter('normalizeWhitespace')(inputs).toLowerCase();
     }
   };
 }]);

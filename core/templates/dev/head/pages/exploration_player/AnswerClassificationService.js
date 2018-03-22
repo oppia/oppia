@@ -30,13 +30,15 @@ oppia.factory('AnswerClassificationService', [
   'PredictionAlgorithmRegistryService', 'StateClassifierMappingService',
   'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION', 'STATISTICAL_CLASSIFICATION',
-  'RULE_TYPE_CLASSIFIER',
+  'RULE_TYPE_CLASSIFIER', 'ENABLE_TRAINING_DATA_CLASSIFICATION',
+  'TRAINING_DATA_CLASSIFICATION',
   function(
       AlertsService, AnswerClassificationResultObjectFactory,
       PredictionAlgorithmRegistryService, StateClassifierMappingService,
       INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
       DEFAULT_OUTCOME_CLASSIFICATION, STATISTICAL_CLASSIFICATION,
-      RULE_TYPE_CLASSIFIER) {
+      RULE_TYPE_CLASSIFIER, ENABLE_TRAINING_DATA_CLASSIFICATION,
+      TRAINING_DATA_CLASSIFICATION) {
     /**
      * Finds the first answer group with a rule that returns true.
      *
@@ -134,6 +136,26 @@ oppia.factory('AnswerClassificationService', [
 
         if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
             ENABLE_ML_CLASSIFIERS) {
+          if (ENABLE_TRAINING_DATA_CLASSIFICATION) {
+            var objectFactory = AnswerClassificationResultObjectFactory;
+            for (var i = 0; i < answerGroups.length; i++) {
+              for (var j = 0; j < answerGroups[i].rules.length; j++) {
+                var rule = answerGroups[i].rules[j];
+                if (rule.type === RULE_TYPE_CLASSIFIER) {
+                  if (rule.inputs.training_data) {
+                    for (var k = 0; k < rule.inputs.training_data.length; k++) {
+                      if (interactionRulesService.TrainingDataClassification(
+                          answer, rule.inputs.training_data[k])) {
+                        return objectFactory.createNew(
+                          answerGroups[i].outcome, i, j,
+                          TRAINING_DATA_CLASSIFICATION);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
           var classifier = StateClassifierMappingService.getClassifier(
             stateName);
           if (classifier && classifier.classifierData && (

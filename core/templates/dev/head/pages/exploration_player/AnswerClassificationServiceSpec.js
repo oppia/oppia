@@ -383,3 +383,123 @@ describe('Answer classification service with string classifier enabled',
     });
   }
 );
+
+describe('Answer classification service with training data classification',
+  function() {
+    beforeEach(module('oppia'));
+
+    beforeEach(function() {
+      module(function($provide) {
+        $provide.constant('INTERACTION_SPECS', {
+          TrainableInteraction: {
+            is_trainable: true
+          }
+        });
+        $provide.constant('ENABLE_ML_CLASSIFIERS', true);
+        $provide.constant('ENABLE_TRAINING_DATA_CLASSIFICATION', true);
+      });
+    });
+
+    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+
+    var TRAINING_DATA_CLASSIFICATION, RULE_TYPE_CLASSIFIER;
+    var acs, sof, oof, acrof, $stateName, state, state2,
+      registryService, stateClassifierMapping;
+    beforeEach(inject(function($injector) {
+      acs = $injector.get('AnswerClassificationService');
+      sof = $injector.get('StateObjectFactory');
+      oof = $injector.get('OutcomeObjectFactory');
+      acrof = $injector.get('AnswerClassificationResultObjectFactory');
+      TRAINING_DATA_CLASSIFICATION = $injector.get(
+        'TRAINING_DATA_CLASSIFICATION');
+      RULE_TYPE_CLASSIFIER = $injector.get('RULE_TYPE_CLASSIFIER');
+
+      stateName = 'stateName';
+      state = sof.createFromBackendDict(stateName, {
+        content: {
+          html: 'content',
+          audio_translations: {}
+        },
+        interaction: {
+          id: 'TrainableInteraction',
+          answer_groups: [{
+            outcome: {
+              dest: 'outcome 1',
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            rule_specs: [{
+              inputs: {
+                training_data: ['abc', 'input']
+              },
+              rule_type: RULE_TYPE_CLASSIFIER
+            }]
+          }, {
+            outcome: {
+              dest: 'outcome 2',
+              feedback: {
+                html: '',
+                audio_translations: {}
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            rule_specs: [{
+              inputs: {
+                training_data: ['inputxyz']
+              },
+              rule_type: RULE_TYPE_CLASSIFIER
+            }]
+          }],
+          default_outcome: {
+            dest: 'default',
+            feedback: {
+              html: '',
+              audio_translations: {}
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null
+          },
+          hints: []
+        },
+        param_changes: []
+      });
+    }));
+
+    var explorationId = 'exploration';
+
+    var rules = {
+      TrainingDataClassification: function(answer, input) {
+        return answer === input;
+      }
+    };
+
+    it('should use training data classification if no answer group matches ' +
+       'and interaction is trainable', function() {
+      expect(
+        acs.getMatchingClassificationResult(
+          explorationId, stateName, state, 'abc', rules)
+      ).toEqual(
+        acrof.createNew(
+          state.interaction.answerGroups[0].outcome, 0, 0,
+          TRAINING_DATA_CLASSIFICATION)
+      );
+
+      expect(
+        acs.getMatchingClassificationResult(
+          explorationId, stateName, state, 'inputxyz', rules)
+      ).toEqual(
+        acrof.createNew(
+          state.interaction.answerGroups[1].outcome, 1, 0,
+          TRAINING_DATA_CLASSIFICATION)
+      );
+    });
+  }
+);
