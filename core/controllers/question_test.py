@@ -39,7 +39,9 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
 
         self.collection_id = 'coll_0'
         self.exp_id = 'exp_1'
-        self.owner_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.random_email = 'abc@example.com'
+        self.signup(self.random_email, 'abc')
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.set_moderators([self.NEW_USER_USERNAME])
@@ -98,11 +100,12 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 404)
 
         self.logout()
+        self.login(self.random_email)
         response = self.testapp.delete(
             '%s/%s/%s' % (
                 feconf.QUESTION_DATA_URL, self.collection_id, question_id),
-            expect_errors=False)
-        self.assertEqual(response.status_int, 302)
+            expect_errors=True)
+        self.assertEqual(response.status_int, 401)
 
     def test_post(self):
         payload = {}
@@ -127,10 +130,10 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
             expected_status_int=404)
 
         self.logout()
-        response = self.testapp.post(
+        self.login(self.random_email)
+        self.post_json(
             '%s' % feconf.QUESTION_CREATION_URL, payload,
-            expect_errors=True)
-        self.assertEqual(response.status_int, 302)
+            expect_errors=True, expected_status_int=401)
 
     def test_batch_get(self):
         """Tests get method of questions batch handler."""
@@ -168,6 +171,7 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 404)
 
         self.logout()
+        self.login(self.random_email)
         response_json = self.testapp.get(
             '%s/batch' % feconf.QUESTION_DATA_URL, payload,
             expect_errors=True)
@@ -206,10 +210,11 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 404)
 
         self.logout()
+        self.login(self.random_email)
         response = self.testapp.get(
             '%s/batch' % feconf.QUESTION_MANAGER_URL, payload,
             expect_errors=True)
-        self.assertEqual(response.status_int, 302)
+        self.assertEqual(response.status_int, 401)
 
     def test_put(self):
         question_id = question_services.add_question(
@@ -256,11 +261,11 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
             expected_status_int=404)
 
         self.logout()
-        response = self.testapp.put(
+        self.login(self.random_email)
+        self.put_json(
             '%s/%s/%s' % (
                 feconf.QUESTION_DATA_URL, self.collection_id, question_id),
-            payload, expect_errors=True)
-        self.assertEqual(response.status_int, 302)
+            payload, expect_errors=True, expected_status_int=401)
 
     def test_integration(self):
         """Tests to create, update, delete questions and fetch
