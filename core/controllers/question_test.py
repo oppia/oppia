@@ -265,6 +265,7 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
     def test_integration(self):
         """Tests to create, update, delete questions and fetch
         questions summaries only using handlers."""
+
         payload = {}
         payload['question'] = self.question.to_dict()
         payload['skill_id'] = self.skill_id
