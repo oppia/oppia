@@ -43,7 +43,7 @@ class SetInput(base.BaseInteraction):
             'title': 'Top 10 answers',
         },
         'calculation_id': 'Top10AnswerFrequencies',
-        'show_addressed_info': True,
+        'addressed_info_is_supported': True,
     }, {
         # Table with most commonly submitted elements of set.
         'id': 'FrequencyTable',
@@ -55,5 +55,5 @@ class SetInput(base.BaseInteraction):
         # Since individual answer elements are not generally intended to be
         # used as a single response to SetInput interactions, we omit the
         # addressed column entirely.
-        'show_addressed_info': False,
+        'addressed_info_is_supported': False,
     }]
