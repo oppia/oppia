@@ -44,19 +44,19 @@ describe('Suggestions on Explorations', function() {
 
   beforeEach(function() {
     users.createUser('user1@ExplorationSuggestions.com',
-                     'authorExplorationSuggestions');
+      'authorExplorationSuggestions');
     users.createUser('user2@ExplorationSuggestions.com',
-                     'suggesterExplorationSuggestions');
+      'suggesterExplorationSuggestions');
     users.createUser('user3@ExplorationSuggestions.com',
-                     'studentExplorationSuggestions');
+      'studentExplorationSuggestions');
   });
 
   it('accepts a suggestion on a published exploration', function() {
     users.login('user1@ExplorationSuggestions.com');
     workflow.createAndPublishExploration(EXPLORATION_TITLE,
-                                         EXPLORATION_CATEGORY,
-                                         EXPLORATION_OBJECTIVE,
-                                         EXPLORATION_LANGUAGE);
+      EXPLORATION_CATEGORY,
+      EXPLORATION_OBJECTIVE,
+      EXPLORATION_LANGUAGE);
     browser.get(general.SERVER_URL_PREFIX);
     users.logout();
 

@@ -22,6 +22,7 @@ echo Installing third-party JS libraries and zip files.
 $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
+install_node_module ajv 5.0.0
 install_node_module eslint 4.19.0
 install_node_module eslint-plugin-angular 0.12.0
 install_node_module eslint-plugin-html 4.0.1

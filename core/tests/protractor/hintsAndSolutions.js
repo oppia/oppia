@@ -33,7 +33,7 @@ describe('HintsAndSolutions', function() {
   beforeEach(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     users.createUser('user1@hintsAndSolutions.com',
-                     'hintsAndSolutions');
+      'hintsAndSolutions');
   });
 
   it('uses hints and solutions in an exploration', function() {

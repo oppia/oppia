@@ -35,7 +35,7 @@ var AdminPage = function(){
     '.protractor-test-reload-exploration-row'
   ));
   var reloadAllExplorationsButtons = element.all(by.css(
-      '.protractor-test-reload-all-explorations-button'
+    '.protractor-test-reload-all-explorations-button'
   ));
   var reloadCollectionButton = element.all(by.css(
     '.protractor-test-reload-collection-button')).first();
@@ -69,7 +69,7 @@ var AdminPage = function(){
           return true;
         }
       }
-    );
+      );
   };
 
   this.get = function(){
@@ -124,7 +124,7 @@ var AdminPage = function(){
             browser.waitForAngular();
           }
         }
-      );
+        );
     });
   };
 
