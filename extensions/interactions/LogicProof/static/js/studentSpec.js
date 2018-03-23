@@ -429,9 +429,9 @@ var sampleInteraction = {
         content: logicProofShared.assignTypesToExpression(
           logicProofParser.parse(
             'entry(1,variables(scoper(n-1)))', 'expression'),
-            ['formula'], sampleControlLanguage,
-            ['constant', 'variable']
-          )[0].typedExpression
+          ['formula'], sampleControlLanguage,
+          ['constant', 'variable']
+        )[0].typedExpression
       }, {
         format: 'string',
         content: ' as our arbitrary variable so this, rather than '
@@ -465,7 +465,7 @@ var sampleInteraction = {
             '\'given\'',
           'expression'),
         ['boolean'], sampleControlLanguage, ['constant', 'variable']
-        )[0].typedExpression,
+      )[0].typedExpression,
       message: [[{
         format: 'string',
         content: 'The last line of a proof should not be indented; you need ' +
@@ -492,11 +492,11 @@ describe('Match expression to expression template', function() {
   var matchThenDisplay = function(
       expressionString, templateString, oldMatchings) {
     return displayExpressionDictionary(
-        logicProofStudent.matchExpression(
-          logicProofParser.parse(expressionString, 'expression'),
-          logicProofParser.parse(templateString, 'expression'), oldMatchings),
-        logicProofData.BASE_STUDENT_LANGUAGE.operators
-      );
+      logicProofStudent.matchExpression(
+        logicProofParser.parse(expressionString, 'expression'),
+        logicProofParser.parse(templateString, 'expression'), oldMatchings),
+      logicProofData.BASE_STUDENT_LANGUAGE.operators
+    );
   };
 
   it('should match then display examples correctly', function() {
@@ -723,7 +723,7 @@ describe('Build, validate and display line', function() {
   it('should reject lines that cannot be parsed', function() {
     expect(
       errorWrapper(buildThenDisplay, 'fromj p we have q')).toThrowError(
-        'We could not identify either of \'fromj\' or \'p\' as words;' +
+      'We could not identify either of \'fromj\' or \'p\' as words;' +
         ' please make sure you are using vocabulary from the given list, and' +
         ' don\'t have two consecutive expressions.');
   });
@@ -943,9 +943,9 @@ describe('Check proof makes no mistakes from the mistake table', function() {
         '  from p and q we have p\u2227q',
         '  b was arbitrary hence \u2200x.q'].join('\n'));
     }).toThrow(
-    sharedErrorWrapper(
-      'We originally took a as our arbitrary variable so this, ' +
+      sharedErrorWrapper(
+        'We originally took a as our arbitrary variable so this, ' +
       'rather than b, needs to be the one that we quantify out over.', 2,
-      'incorrect_variable_forall', 'variables'));
+        'incorrect_variable_forall', 'variables'));
   });
 });
