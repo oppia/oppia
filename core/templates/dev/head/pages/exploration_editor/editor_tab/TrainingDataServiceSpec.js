@@ -143,8 +143,8 @@ describe('TrainingDataService', function() {
     // Ensure it handles receiving no unhandled answers correctly.
     $httpBackend.expect(
       'GET', '/createhandler/training_data/0/State').respond({
-        unhandled_answers: []
-      });
+      unhandled_answers: []
+    });
 
     tds.initializeTrainingData('0', 'State');
     $httpBackend.flush();

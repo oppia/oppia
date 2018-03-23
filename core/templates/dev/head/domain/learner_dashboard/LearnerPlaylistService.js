@@ -16,7 +16,7 @@
  * @fileoverview Service related to the learner playlist.
  */
 
- oppia.factory('LearnerPlaylistService', [
+oppia.factory('LearnerPlaylistService', [
   '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($http, $uibModal, AlertsService, UrlInterpolationService) {
     var _addToLearnerPlaylist = function(activityId, activityType) {

@@ -58,10 +58,10 @@ describe('Expression type parser service', function() {
       ['strNull != strXYZ', 'UnicodeString'],
       ['if boolFalse then 8 else numZero', 'Real'],
       ['if boolFalse then 8 else strXYZ', ests.ExprWrongArgTypeError,
-       'ExprWrongArgTypeError: Type Real does not match expected type ' +
+        'ExprWrongArgTypeError: Type Real does not match expected type ' +
        'UnicodeString'],
       ['strXYZ * 2', ests.ExprWrongArgTypeError,
-       'ExprWrongArgTypeError: Type UnicodeString does not match expected ' +
+        'ExprWrongArgTypeError: Type UnicodeString does not match expected ' +
        'type Real'],
       ['num100_001 / 0', 'Real'],
       ['abs(-3)', 'Real'],

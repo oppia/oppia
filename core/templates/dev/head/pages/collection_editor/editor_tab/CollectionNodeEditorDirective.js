@@ -42,7 +42,7 @@ oppia.directive('collectionNodeEditor', [
           $scope.deleteNode = function() {
             var explorationId = $scope.getCollectionNode().getExplorationId();
             if (!CollectionLinearizerService.removeCollectionNode(
-                $scope.collection, explorationId)) {
+              $scope.collection, explorationId)) {
               AlertsService.fatalWarning(
                 'Internal collection editor error. Could not delete ' +
                 'exploration by ID: ' + explorationId);
@@ -54,7 +54,7 @@ oppia.directive('collectionNodeEditor', [
           $scope.shiftNodeLeft = function() {
             var explorationId = $scope.getCollectionNode().getExplorationId();
             if (!CollectionLinearizerService.shiftNodeLeft(
-                $scope.collection, explorationId)) {
+              $scope.collection, explorationId)) {
               AlertsService.fatalWarning(
                 'Internal collection editor error. Could not shift node left ' +
                 'with ID: ' + explorationId);
@@ -66,7 +66,7 @@ oppia.directive('collectionNodeEditor', [
           $scope.shiftNodeRight = function() {
             var explorationId = $scope.getCollectionNode().getExplorationId();
             if (!CollectionLinearizerService.shiftNodeRight(
-                $scope.collection, explorationId)) {
+              $scope.collection, explorationId)) {
               AlertsService.fatalWarning(
                 'Internal collection editor error. Could not shift node ' +
                 'right with ID: ' + explorationId);

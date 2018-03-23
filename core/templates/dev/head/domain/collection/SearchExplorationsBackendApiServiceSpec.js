@@ -45,8 +45,8 @@ describe('Exploration search backend API service', function() {
 
     $httpBackend.expect(
       'GET', '/exploration/metadata_search?q=' + query).respond(200, {
-        collection_node_metadata_list: []
-      });
+      collection_node_metadata_list: []
+    });
     SearchExplorationsBackendApiService.fetchExplorations('three').then(
       successHandler, failHandler);
     $httpBackend.flush();

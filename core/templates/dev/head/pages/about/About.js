@@ -65,19 +65,19 @@ oppia.controller('About', [
     };
 
     var listOfNamesToThank = ['Alex Kauffmann', 'Allison Barros',
-                              'Amy Latten', 'Brett Barros',
-                              'Crystal Kwok', 'Daniel Hernandez',
-                              'Divya Siddarth', 'Ilwon Yoon',
-                              'Jennifer Chen', 'John Cox',
-                              'John Orr', 'Katie Berlent',
-                              'Michael Wawszczak', 'Mike Gainer',
-                              'Neil Fraser', 'Noah Falstein',
-                              'Nupur Jain', 'Peter Norvig',
-                              'Philip Guo', 'Piotr Mitros',
-                              'Rachel Chen', 'Rahim Nathwani',
-                              'Robyn Choo', 'Tricia Ngoon',
-                              'Vikrant Nanda', 'Vinamrata Singal',
-                              'Yarin Feigenbaum'];
+      'Amy Latten', 'Brett Barros',
+      'Crystal Kwok', 'Daniel Hernandez',
+      'Divya Siddarth', 'Ilwon Yoon',
+      'Jennifer Chen', 'John Cox',
+      'John Orr', 'Katie Berlent',
+      'Michael Wawszczak', 'Mike Gainer',
+      'Neil Fraser', 'Noah Falstein',
+      'Nupur Jain', 'Peter Norvig',
+      'Philip Guo', 'Piotr Mitros',
+      'Rachel Chen', 'Rahim Nathwani',
+      'Robyn Choo', 'Tricia Ngoon',
+      'Vikrant Nanda', 'Vinamrata Singal',
+      'Yarin Feigenbaum'];
 
     $scope.onTabClick = function(tabName) {
       // Update hash

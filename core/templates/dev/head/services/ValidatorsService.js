@@ -41,7 +41,7 @@ oppia.factory('ValidatorsService', [
           if (input.indexOf(GLOBALS.INVALID_NAME_CHARS[i]) !== -1) {
             if (showWarnings) {
               AlertsService.addWarning(
-               'Invalid input. Please use a non-empty description consisting ' +
+                'Invalid input. Please use a non-empty description consisting ' +
                'of alphanumeric characters, spaces and/or hyphens.'
               );
             }

@@ -274,7 +274,7 @@ oppia.directive('audioBar', [
                 playCachedAudioTranslation(
                   audioTranslation.filename);
               } else if (!AudioPreloaderService.isLoadingAudioFile(
-                  audioTranslation.filename)) {
+                audioTranslation.filename)) {
                 AudioPreloaderService.restartAudioPreloader(
                   PlayerPositionService.getCurrentStateName());
               }

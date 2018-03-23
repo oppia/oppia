@@ -51,7 +51,7 @@ oppia.directive('editorNavigation', [
               }, 5000);
             } else {
               $scope.popoverControlObject
-              .postTutorialHelpPopoverIsShown = false;
+                .postTutorialHelpPopoverIsShown = false;
             }
           });
 

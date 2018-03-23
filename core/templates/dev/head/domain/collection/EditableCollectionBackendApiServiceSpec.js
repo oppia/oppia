@@ -119,7 +119,7 @@ describe('Editable collection backend API service', function() {
       // Send a request to update collection
       EditableCollectionBackendApiService.updateCollection(
         collection.id, collection.version, collection.title, []).then(
-          successHandler, failHandler);
+        successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(collection);

@@ -195,7 +195,7 @@ oppia.controller('ExplorationEditor', [
         });
 
         if (ExplorationStatesService.getState(
-              EditorStateService.getActiveStateName())) {
+          EditorStateService.getActiveStateName())) {
           $scope.$broadcast('refreshStateEditor');
         }
 

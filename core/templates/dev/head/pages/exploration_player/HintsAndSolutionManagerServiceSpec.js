@@ -105,36 +105,35 @@ describe('HintsAndSolutionManager service', function() {
 
   it('should not continue to display hints after after a correct answer is' +
      'submitted',
-    function() {
-      expect(hasms.isHintViewable(0)).toBe(false);
-      expect(hasms.isHintViewable(1)).toBe(false);
-      expect(hasms.isSolutionViewable()).toBe(false);
+  function() {
+    expect(hasms.isHintViewable(0)).toBe(false);
+    expect(hasms.isHintViewable(1)).toBe(false);
+    expect(hasms.isSolutionViewable()).toBe(false);
 
-      $timeout.flush();
-      // The first hint becomes viewable.
-      expect(hasms.isHintViewable(0)).toBe(true);
-      expect(hasms.isHintViewable(1)).toBe(false);
-      expect(hasms.isSolutionViewable()).toBe(false);
+    $timeout.flush();
+    // The first hint becomes viewable.
+    expect(hasms.isHintViewable(0)).toBe(true);
+    expect(hasms.isHintViewable(1)).toBe(false);
+    expect(hasms.isSolutionViewable()).toBe(false);
 
-      // The first hint is consumed, but a delay is needed for the second hint
-      // to be viewable.
-      expect(hasms.displayHint(0).getHtml()).toBe('one');
-      expect(hasms.isHintViewable(0)).toBe(true);
-      expect(hasms.isHintViewable(1)).toBe(false);
-      expect(hasms.isSolutionViewable()).toBe(false);
+    // The first hint is consumed, but a delay is needed for the second hint
+    // to be viewable.
+    expect(hasms.displayHint(0).getHtml()).toBe('one');
+    expect(hasms.isHintViewable(0)).toBe(true);
+    expect(hasms.isHintViewable(1)).toBe(false);
+    expect(hasms.isSolutionViewable()).toBe(false);
 
-      $rootScope.$broadcast(EVENT_NEW_CARD_AVAILABLE);
-      $timeout.flush();
+    $rootScope.$broadcast(EVENT_NEW_CARD_AVAILABLE);
+    $timeout.flush();
 
-      // Because a correct answer was submitted, the next hint should not be
-      // available.
-      expect(hasms.isHintViewable(0)).toBe(true);
-      expect(hasms.isHintViewable(1)).toBe(false);
-      expect(hasms.isSolutionViewable()).toBe(false);
+    // Because a correct answer was submitted, the next hint should not be
+    // available.
+    expect(hasms.isHintViewable(0)).toBe(true);
+    expect(hasms.isHintViewable(1)).toBe(false);
+    expect(hasms.isSolutionViewable()).toBe(false);
 
-      $timeout.verifyNoPendingTasks();
-    }
-  );
+    $timeout.verifyNoPendingTasks();
+  });
 
   it('should show the correct number of hints', function() {
     expect(hasms.getNumHints()).toBe(2);
