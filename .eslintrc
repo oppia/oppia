@@ -78,7 +78,7 @@
     "multiline-ternary": [
       "error",
       "always-multiline"
-    ]
+    ],
     "no-compare-neg": "off",
     "no-console": [
       "error",
