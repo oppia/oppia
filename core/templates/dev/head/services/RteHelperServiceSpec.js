@@ -22,7 +22,7 @@ describe('RteHelperService', function() {
     RteHelperService = $injector.get('RteHelperService');
   }));
 
-  it('should return something something', function () {
+  it('should return text with no extra new lines or spaces', function () {
     expect(RteHelperService.convertRteToHtml(
       '<p>abc</p>')).toEqual('<p>abc</p>');
     expect(RteHelperService.convertRteToHtml('<p>abc</p><p><br></p><p>abc</p>'))
