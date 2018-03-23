@@ -245,21 +245,21 @@ class QuestionSummary(object):
     Attributes:
         question_id: str. The ID of the question.
         question_title: str. The title of the question.
-        skills: list(str). The list of skill names associated with the
+        skill_names: list(str). The list of skill names associated with the
             question.
     """
-    def __init__(self, question_id, question_title, skills):
+    def __init__(self, question_id, question_title, skill_names):
         """Constructs a Question Summary domain object.
 
         Args:
             question_id: str. The ID of the question.
             question_title: str. The title of the question.
-            skills: list(str). The list of skill names associated with the
+            skill_names: list(str). The list of skill names associated with the
                 question.
         """
         self.question_id = question_id
         self.question_title = question_title
-        self.skills = skills
+        self.skill_names = skill_names
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
@@ -270,5 +270,5 @@ class QuestionSummary(object):
         return {
             'question_id': self.question_id,
             'question_title': self.question_title,
-            'skills': self.skills
+            'skill_names': self.skill_names
         }

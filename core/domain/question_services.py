@@ -343,16 +343,16 @@ def get_question_summaries_for_collection(collection_id):
         list(QuestionSummary). A list of Question Summary objects.
     """
     collection = collection_services.get_collection_by_id(collection_id)
-    questions_to_skills = collections.defaultdict(list)
+    questions_to_skill_names = collections.defaultdict(list)
     for skill in collection.skills.values():
         for question_id in skill.question_ids:
-            questions_to_skills[question_id].append(skill.name)
-    questions = get_questions_by_ids(questions_to_skills.keys())
+            questions_to_skill_names[question_id].append(skill.name)
+    questions = get_questions_by_ids(questions_to_skill_names.keys())
 
     question_summaries = []
     for question in questions:
         question_summaries.append(
             question_domain.QuestionSummary(
                 question.question_id, question.title, (
-                    questions_to_skills[question.question_id])))
+                    questions_to_skill_names[question.question_id])))
     return question_summaries

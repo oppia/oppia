@@ -334,4 +334,4 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 coll_id_0))
         self.assertEqual(question_summaries[0].question_id, question_id)
         self.assertEqual(question_summaries[0].question_title, question.title)
-        self.assertEqual(question_summaries[0].skills, ['skill0'])
+        self.assertEqual(question_summaries[0].skill_names, ['skill0'])

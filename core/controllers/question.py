@@ -26,7 +26,7 @@ import feconf
 class QuestionsBatchHandler(base.BaseHandler):
     """This handler completes requests for questions batch."""
 
-    @acl_decorators.open_access
+    @acl_decorators.can_access_moderator_page
     def get(self):
         """Handles GET requests."""
         collection_id = self.request.get('collection_id')
@@ -48,7 +48,7 @@ class QuestionsHandler(base.BaseHandler):
     """This handler completes PUT/DELETE requests for questions."""
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @acl_decorators.open_access
+    @acl_decorators.can_access_moderator_page
     def put(self, collection_id, question_id):
         """Handles PUT requests."""
         commit_message = self.payload.get('commit_message')
@@ -70,7 +70,7 @@ class QuestionsHandler(base.BaseHandler):
             'question_id': question_id
         })
 
-    @acl_decorators.open_access
+    @acl_decorators.can_access_moderator_page
     def delete(self, collection_id, question_id):
         """Handles Delete requests."""
         if not collection_id:
@@ -81,11 +81,11 @@ class QuestionsHandler(base.BaseHandler):
             self.user_id, collection_id, question_id)
 
 
-class QuestionsPostHandler(base.BaseHandler):
+class QuestionCreationHandler(base.BaseHandler):
     """This handler completes POST requests for questions."""
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @acl_decorators.open_access
+    @acl_decorators.can_access_moderator_page
     def post(self):
         """Handles POST requests."""
         if not self.payload.get('question'):
@@ -107,7 +107,7 @@ class QuestionsPostHandler(base.BaseHandler):
 class QuestionManagerHandler(base.BaseHandler):
     """This handler completes requests for question summaries."""
 
-    @acl_decorators.open_access
+    @acl_decorators.can_access_moderator_page
     def get(self):
         """Handles GET requests."""
         collection_id = self.request.get('collection_id')
