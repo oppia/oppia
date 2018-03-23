@@ -134,8 +134,8 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
 
     def test_batch_get(self):
         """Tests get method of questions batch handler."""
-        question_id = question_services.add_question(self.owner_id,
-            self.question)
+        question_id = question_services.add_question(
+            self.owner_id, self.question)
         self.question = question_services.get_question_by_id(question_id)
         question_services.add_question_id_to_skill(
             self.question.question_id, self.question.collection_id,
@@ -175,8 +175,8 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
 
     def manager_get(self):
         """Tests get method of question manager handler."""
-        question_id = question_services.add_question(self.owner_id,
-            self.question)
+        question_id = question_services.add_question(
+            self.owner_id, self.question)
         self.question = question_services.get_question_by_id(question_id)
         question_services.add_question_id_to_skill(
             self.question.question_id, self.question.collection_id,
