@@ -405,7 +405,7 @@ oppia.directive('imageWithRegionsEditor', [
           $scope.onMouseMoveRegion = function() {
             if (
               $scope.userIsCurrentlyDragging ||
-                $scope.userIsCurrentlyResizing) {
+              $scope.userIsCurrentlyResizing) {
               return;
             }
             region = cornerAndDimensionsFromRegionArea(
@@ -416,7 +416,7 @@ oppia.directive('imageWithRegionsEditor', [
                 $scope.yDirection = 1;
               } else if (
                 $scope.mouseY >= region.height + region.y -
-                  $scope.resizableBorderWidthPx) {
+                $scope.resizableBorderWidthPx) {
                 $scope.yDirection = -1;
               } else {
                 $scope.yDirection = 0;
@@ -425,7 +425,7 @@ oppia.directive('imageWithRegionsEditor', [
                 $scope.xDirection = 1;
               } else if (
                 $scope.mouseX >= region.width + region.x -
-                  $scope.resizableBorderWidthPx) {
+                $scope.resizableBorderWidthPx) {
                 $scope.xDirection = -1;
               } else {
                 $scope.xDirection = 0;
@@ -476,7 +476,7 @@ oppia.directive('imageWithRegionsEditor', [
               }
               if (
                 ($scope.yDirection === 1 && !$scope.yDirectionToggled) ||
-                  ($scope.yDirection === -1 && $scope.yDirectionToggled)) {
+                ($scope.yDirection === -1 && $scope.yDirectionToggled)) {
                 yDirectionCursor = 'n';
               } else if (
                 ($scope.yDirection === -1 && !$scope.yDirectionToggled) ||

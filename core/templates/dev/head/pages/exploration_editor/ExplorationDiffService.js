@@ -70,7 +70,7 @@ oppia.factory('ExplorationDiffService', [
       for (var stateId in stateData) {
         if (!v1States.hasOwnProperty(
           stateData[stateId].originalStateName) &&
-            !v2States.hasOwnProperty(stateData[stateId].newestStateName)) {
+          !v2States.hasOwnProperty(stateData[stateId].newestStateName)) {
           delete stateData[stateId];
         }
       }
@@ -187,8 +187,8 @@ oppia.factory('ExplorationDiffService', [
             }
           } else if (
             change.cmd !== 'migrate_states_schema_to_latest_version' &&
-              change.cmd !== 'AUTO_revert_version_number' &&
-              change.cmd !== 'edit_exploration_property') {
+            change.cmd !== 'AUTO_revert_version_number' &&
+            change.cmd !== 'edit_exploration_property') {
             throw new Error('Invalid change command: ' + change.cmd);
           }
         });

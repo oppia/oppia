@@ -603,12 +603,12 @@ oppia.directive('graphViz', [
           var tryAddEdge = function(startIndex, endIndex) {
             if (
               startIndex === null ||
-                endIndex === null ||
-                startIndex === endIndex ||
-                startIndex < 0 ||
-                endIndex < 0 ||
-                startIndex >= $scope.graph.vertices.length ||
-                endIndex >= $scope.graph.vertices.length) {
+              endIndex === null ||
+              startIndex === endIndex ||
+              startIndex < 0 ||
+              endIndex < 0 ||
+              startIndex >= $scope.graph.vertices.length ||
+              endIndex >= $scope.graph.vertices.length) {
               return;
             }
             for (var i = 0; i < $scope.graph.edges.length; i++) {

@@ -79,7 +79,7 @@ oppia.directive('schemaBasedListEditor', [
             $scope.isOneLineInput = false;
           } else if (
             $scope.itemSchema().ui_config.hasOwnProperty('rows') &&
-              $scope.itemSchema().ui_config.rows > 2) {
+            $scope.itemSchema().ui_config.rows > 2) {
             $scope.isOneLineInput = false;
           }
         }

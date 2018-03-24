@@ -724,8 +724,8 @@ describe('Build, validate and display line', function() {
     expect(
       errorWrapper(buildThenDisplay, 'fromj p we have q')).toThrowError(
       'We could not identify either of \'fromj\' or \'p\' as words;' +
-        ' please make sure you are using vocabulary from the given list, and' +
-        ' don\'t have two consecutive expressions.');
+      ' please make sure you are using vocabulary from the given list, and' +
+      ' don\'t have two consecutive expressions.');
   });
 
   it('should reject lines that do not match a template', function() {
@@ -945,7 +945,7 @@ describe('Check proof makes no mistakes from the mistake table', function() {
     }).toThrow(
       sharedErrorWrapper(
         'We originally took a as our arbitrary variable so this, ' +
-      'rather than b, needs to be the one that we quantify out over.', 2,
+        'rather than b, needs to be the one that we quantify out over.', 2,
         'incorrect_variable_forall', 'variables'));
   });
 });

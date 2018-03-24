@@ -60,7 +60,7 @@
           "parameters": 2
         },
         "MemberExpression": 1,
-        "SwitchCase": 1,
+        "SwitchCase": 1
       }
     ],
     "keyword-spacing": [
@@ -119,12 +119,6 @@
     "operator-linebreak": [
       "error",
       "after",
-      {
-        "overrides": {
-          "?": "after",
-          ":": "after"
-        }
-      }
     ],
     "padded-blocks": [
       "error",

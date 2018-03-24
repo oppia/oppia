@@ -85,7 +85,7 @@ oppia.factory('CollectionEditorStateService', [
         }, function(error) {
           AlertsService.addWarning(
             error ||
-              'There was an error when loading the collection rights.');
+            'There was an error when loading the collection rights.');
           _isLoadingCollection = false;
         });
       },

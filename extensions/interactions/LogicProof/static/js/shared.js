@@ -137,8 +137,8 @@ var logicProofShared = (function() {
       expression, operators, desirabilityOfBrackets) {
     var desirabilityOfBracketsBelow = (
       expression.top_kind_name === 'binary_connective' ||
-        expression.top_kind_name === 'binary_relation' ||
-        expression.top_kind_name === 'binary_function'
+      expression.top_kind_name === 'binary_relation' ||
+      expression.top_kind_name === 'binary_function'
     ) ? 2 : (
         expression.top_kind_name === 'unary_connective' ||
         expression.top_kind_name === 'quantifier'
