@@ -475,16 +475,18 @@ oppia.directive('conversationSkin', [
             var nextSupplementalCardIsNonempty = isSupplementalCardNonempty(
               PlayerTranscriptService.getLastCard());
 
-            if (totalNumCards > 1 &&
-                ExplorationPlayerService.canWindowShowTwoCards() &&
-                !previousSupplementalCardIsNonempty &&
-                nextSupplementalCardIsNonempty) {
+            if (
+              totalNumCards > 1 &&
+              ExplorationPlayerService.canWindowShowTwoCards() &&
+              !previousSupplementalCardIsNonempty &&
+              nextSupplementalCardIsNonempty) {
               PlayerPositionService.setActiveCardIndex(numVisibleCards - 1);
               animateToTwoCards(function() {});
-            } else if (totalNumCards > 1 &&
-                ExplorationPlayerService.canWindowShowTwoCards() &&
-                previousSupplementalCardIsNonempty &&
-                !nextSupplementalCardIsNonempty) {
+            } else if (
+              totalNumCards > 1 &&
+              ExplorationPlayerService.canWindowShowTwoCards() &&
+              previousSupplementalCardIsNonempty &&
+              !nextSupplementalCardIsNonempty) {
               animateToOneCard(function() {
                 PlayerPositionService.setActiveCardIndex(numVisibleCards - 1);
               });
