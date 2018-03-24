@@ -23,19 +23,26 @@ describe('RteHelperService', function() {
   }));
 
   it('should return text with no extra new lines or spaces', function () {
-    expect(RteHelperService.convertRteToHtml(
-      '<p>abc</p>')).toEqual('<p>abc</p>');
-    expect(RteHelperService.convertRteToHtml('<p>abc</p><p><br></p><p>abc</p>'))
-      .toEqual('<p>abc</p><p><br></p><p>abc</p>');
-    expect(RteHelperService.convertRteToHtml(
-      '<p>abc</p><p><br></p><p>abc</p><p><br></p>'))
-      .toEqual('<p>abc</p><p><br></p><p>abc</p>');
-    expect(RteHelperService.convertRteToHtml(
-      '<p>abc</p><p><br></p><p>abc</p><p><br></p><p><br></p>'))
-      .toEqual('<p>abc</p><p><br></p><p>abc</p>');
-    expect(RteHelperService.convertRteToHtml('<p>abc</p><p><br><br></p>'))
-      .toEqual('<p>abc</p>');
-    expect(RteHelperService.convertRteToHtml('<p>abc</p><p>abc<br></p>'))
-      .toEqual('<p>abc</p><p>abc</p>');
+    var testData = [[
+      '<p>abc</p>', '<p>abc</p>'
+    ], [
+      '<p>abc</p><p><br></p><p>abc</p>', '<p>abc</p><p><br></p><p>abc</p>'
+    ], [
+      '<p>abc</p><p><br></p><p>abc</p><p><br></p>',
+      '<p>abc</p><p><br></p><p>abc</p>'
+    ], [
+      '<p>abc</p><p><br></p><p>abc</p><p><br></p><p><br></p>',
+      '<p>abc</p><p><br></p><p>abc</p>'
+    ], [
+      '<p>abc</p><p><br><br></p>', '<p>abc</p>'
+    ], [
+      '<p>abc</p><p>abc<br></p>', '<p>abc</p><p>abc</p>'
+    ], [
+      '<p>abc</p><br><br>', '<p>abc</p>'
+    ]];
+    for (var i = 0; i < testData.length; i++) {
+      expect(RteHelperService.convertRteToHtml(testData[i][0]))
+        .toEqual(testData[i][1]);
+    }
   });
 });

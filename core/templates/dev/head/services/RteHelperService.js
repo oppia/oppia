@@ -183,13 +183,6 @@ oppia.factory('RteHelperService', [
 
         var textElt = elt[0].childNodes;
         for (var i = textElt.length - 1; i > 0; i--) {
-          if (textElt[i].localName !== 'p') {
-            break;
-          }
-          if (textElt[i].childNodes.length === 0) {
-            textElt[i].remove();
-            continue;
-          }
           for (var j = textElt[i].childNodes.length; j > 0; j--) {
             if (textElt[i].childNodes[j - 1].nodeValue === null ||
               textElt[i].childNodes[j - 1].nodeValue.trim() === '') {
@@ -197,7 +190,11 @@ oppia.factory('RteHelperService', [
             }
           }
           if (textElt[i].childNodes.length === 0) {
-            textElt[i].remove();
+            if (textElt[i].nodeValue === null ||
+              textElt[i].nodeValue.trim() === '') {
+              textElt[i].remove();
+              continue;
+            }
           } else {
             break;
           }
