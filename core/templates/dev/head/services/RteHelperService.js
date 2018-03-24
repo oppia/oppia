@@ -154,7 +154,6 @@ oppia.factory('RteHelperService', [
           return rte;
         }
 
-
         var elt = $('<div>' + rte + '</div>');
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
