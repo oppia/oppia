@@ -22,7 +22,7 @@ oppia.directive('collectionHistoryTab', [
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/history_tab/' +
-                   'collection_history_tab_directive.html'),
+        'collection_history_tab_directive.html'),
       controller: [function() {}]
     };
   }]);

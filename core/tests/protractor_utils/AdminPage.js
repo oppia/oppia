@@ -68,8 +68,7 @@ var AdminPage = function(){
           browser.waitForAngular();
           return true;
         }
-      }
-      );
+      });
   };
 
   this.get = function(){
@@ -123,8 +122,7 @@ var AdminPage = function(){
             // Time is needed for the reloading to complete.
             browser.waitForAngular();
           }
-        }
-        );
+        });
     });
   };
 

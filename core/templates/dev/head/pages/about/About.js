@@ -64,7 +64,8 @@ oppia.controller('About', [
       }
     };
 
-    var listOfNamesToThank = ['Alex Kauffmann', 'Allison Barros',
+    var listOfNamesToThank = [
+      'Alex Kauffmann', 'Allison Barros',
       'Amy Latten', 'Brett Barros',
       'Crystal Kwok', 'Daniel Hernandez',
       'Divya Siddarth', 'Ilwon Yoon',

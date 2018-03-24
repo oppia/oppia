@@ -51,9 +51,8 @@ describe('Audio translation language service', function() {
   });
 
   it('should initialize the current audio language when ' +
-     'no preferred language is set and the exploration contains ' +
-     'an audio language that is related to the exploration language',
-  function() {
+     'no preferred language is set and the exploration contains an audio ' +
+     'language that is related to the exploration language', function() {
     var allAudioLanguageCodesInExploration = ['hi-en', 'en'];
     var preferredLanguageCode = null;
     var explorationLanguageCode = 'hi';
@@ -64,8 +63,7 @@ describe('Audio translation language service', function() {
 
   it('should initialize the current audio language to the most ' +
      'relevant language when multiple audio languages are related ' +
-     'to the exploration language',
-  function() {
+     'to the exploration language', function() {
     var allAudioLanguageCodesInExploration = ['hi-en', 'en'];
     var preferredLanguageCode = null;
     var explorationLanguageCode = 'en';

@@ -49,9 +49,11 @@ describe('ExplorationFeedback', function() {
   });
 
   beforeEach(function() {
-    users.createUser('user1@ExplorationFeedback.com',
+    users.createUser(
+      'user1@ExplorationFeedback.com',
       'creatorExplorationFeedback');
-    users.createUser('user2@ExplorationFeedback.com',
+    users.createUser(
+      'user2@ExplorationFeedback.com',
       'learnerExplorationFeedback');
   });
 

@@ -95,8 +95,7 @@ describe('Speech Synthesis Chunker Service', function() {
   );
 
   it ('Should properly convert trigonometric functions in LaTeX to ' +
-      'speakable text',
-  function() {
+      'speakable text', function() {
     var latex1 = '\\\\sin{90}';
     var latex2 = '\\\\cos{0}';
     var latex3 = '\\\\tan{uv}';
@@ -109,6 +108,5 @@ describe('Speech Synthesis Chunker Service', function() {
     expect(speakableLatex1).toEqual('the sine of 90');
     expect(speakableLatex2).toEqual('the cosine of 0');
     expect(speakableLatex3).toEqual('the tangent of u v');
-  }
-  );
+  });
 });

@@ -273,8 +273,8 @@ describe('Testing filters', function() {
       // return whole objective.
       expect(filter('please do not test empty string', 100)).toEqual(
         'Please do not test empty string');
-    }
-    ));
+    })
+  );
 
   it(
     'should remove all tags except img tags with the whitelisted classes',
@@ -433,8 +433,8 @@ describe('Testing filters', function() {
         $filter('stripFormatting')(BREAKLINE_TEXT, whitelistedImgClasses)
       ).toEqual('<p>Oppia makes it easy to create interactive lessons </p>' +
       '<p><br></p><p>that educate and engage.</p>');
-    }
-    ));
+    })
+  );
 
   it('should correctly capitalize strings', inject(function($filter) {
     var filter = $filter('capitalize');
@@ -598,8 +598,8 @@ describe('Testing filters', function() {
           choicesMixed)))
       ).toEqual('is ' + 'equal to \'[Image] This is a text ' +
         'input. [Image]  [Link]\'');
-    }
-    ));
+    })
+  );
 
   it('should correctly parameterize rule description filter',
     inject(function($filter) {

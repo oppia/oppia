@@ -43,11 +43,14 @@ describe('Suggestions on Explorations', function() {
   });
 
   beforeEach(function() {
-    users.createUser('user1@ExplorationSuggestions.com',
+    users.createUser(
+      'user1@ExplorationSuggestions.com',
       'authorExplorationSuggestions');
-    users.createUser('user2@ExplorationSuggestions.com',
+    users.createUser(
+      'user2@ExplorationSuggestions.com',
       'suggesterExplorationSuggestions');
-    users.createUser('user3@ExplorationSuggestions.com',
+    users.createUser(
+      'user3@ExplorationSuggestions.com',
       'studentExplorationSuggestions');
   });
 

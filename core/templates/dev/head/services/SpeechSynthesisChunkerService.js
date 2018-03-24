@@ -116,8 +116,7 @@ oppia.factory('SpeechSynthesisChunkerService', [
             return this.attributes['text-with-value'].textContent
               .replace(/&quot;/g, '');
           }
-        }
-        );
+        });
 
       // Convert LaTeX to speakable text.
       elt.find('oppia-noninteractive-' + RTE_COMPONENT_NAMES.Math)
@@ -126,8 +125,7 @@ oppia.factory('SpeechSynthesisChunkerService', [
             return _formatLatexToSpeakableText(
               this.attributes['raw_latex-with-value'].textContent);
           }
-        }
-        );
+        });
 
       html = elt.html();
       // Replace certain HTML elements with periods to indicate

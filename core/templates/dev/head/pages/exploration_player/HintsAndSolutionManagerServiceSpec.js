@@ -104,8 +104,7 @@ describe('HintsAndSolutionManager service', function() {
   });
 
   it('should not continue to display hints after after a correct answer is' +
-     'submitted',
-  function() {
+     'submitted', function() {
     expect(hasms.isHintViewable(0)).toBe(false);
     expect(hasms.isHintViewable(1)).toBe(false);
     expect(hasms.isSolutionViewable()).toBe(false);

@@ -174,8 +174,8 @@ oppia.factory('ChangesInHumanReadableFormService', [
                   var rulesList = makeRulesListHumanReadable(newValue);
                   if (rulesList.length > 0) {
                     answerGroupHtml += '<p class="sub-edit"><i>Rules: </i></p>';
-                    var rulesListHtml = (angular.element('<ol></ol>')
-                      .addClass('rules-list'));
+                    var rulesListHtml = (
+                      angular.element('<ol></ol>').addClass('rules-list'));
                     for (var rule in rulesList) {
                       rulesListHtml.html(rulesList[rule][0].outerHTML);
                     }

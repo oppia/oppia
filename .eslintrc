@@ -118,7 +118,13 @@
     ],
     "operator-linebreak": [
       "error",
-      "after"
+      "after",
+      {
+        "overrides": {
+          "?": "after",
+          ":": "after"
+        }
+      }
     ],
     "padded-blocks": [
       "error",

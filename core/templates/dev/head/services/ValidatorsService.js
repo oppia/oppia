@@ -42,7 +42,7 @@ oppia.factory('ValidatorsService', [
             if (showWarnings) {
               AlertsService.addWarning(
                 'Invalid input. Please use a non-empty description ' +
-               'consisting of alphanumeric characters, spaces and/or hyphens.'
+                'consisting of alphanumeric characters, spaces and/or hyphens.'
               );
             }
             return false;

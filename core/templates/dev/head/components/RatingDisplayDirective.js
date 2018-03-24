@@ -87,8 +87,8 @@ oppia.directive('ratingDisplay', [
         $scope.enterStar = function(starValue) {
           if (
             $scope.isEditable &&
-              ($scope.status === STATUS_ACTIVE ||
-                $scope.status === STATUS_INACTIVE)) {
+            ($scope.status === STATUS_ACTIVE ||
+            $scope.status === STATUS_INACTIVE)) {
             $scope.status = STATUS_ACTIVE;
             displayValue(starValue);
           }

@@ -32,7 +32,8 @@ describe('HintsAndSolutions', function() {
 
   beforeEach(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-    users.createUser('user1@hintsAndSolutions.com',
+    users.createUser(
+      'user1@hintsAndSolutions.com',
       'hintsAndSolutions');
   });
 

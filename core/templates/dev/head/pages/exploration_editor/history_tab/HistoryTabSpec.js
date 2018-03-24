@@ -71,6 +71,7 @@ describe('HistoryTab controller', function() {
         $scope.displayedCurrentPageNumber = 2;
         $scope.computeVersionsToDisplay();
         expect($scope.versionNumbersToDisplay).toEqual([2, 1]);
-      });
+      }
+    );
   });
 });

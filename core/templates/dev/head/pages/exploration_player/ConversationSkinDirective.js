@@ -42,7 +42,8 @@ oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
     tutorCardHeight = tutorCard.height();
 
     if (tutorCard.offset().left + tutorCardWidth > oppiaAvatar.offset().left) {
-      var animationLength = Math.min(oppiaAvatarLeft - tutorCard.offset().left,
+      var animationLength = Math.min(
+        oppiaAvatarLeft - tutorCard.offset().left,
         tutorCardWidth);
       tutorCardAnimatedLeft = tutorCardLeft + animationLength;
       tutorCardAnimatedWidth = tutorCardWidth - animationLength;
@@ -480,8 +481,7 @@ oppia.directive('conversationSkin', [
                 nextSupplementalCardIsNonempty) {
               PlayerPositionService.setActiveCardIndex(numVisibleCards - 1);
               animateToTwoCards(function() {});
-            } else if (
-              totalNumCards > 1 &&
+            } else if (totalNumCards > 1 &&
                 ExplorationPlayerService.canWindowShowTwoCards() &&
                 previousSupplementalCardIsNonempty &&
                 !nextSupplementalCardIsNonempty) {

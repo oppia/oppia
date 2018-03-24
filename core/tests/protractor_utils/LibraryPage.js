@@ -39,8 +39,7 @@ var LibraryPage = function(){
         return tile.element(by.css('.protractor-test-exp-summary-tile-title')).
           getText().then(function(tileTitle) {
             return (tileTitle === name);
-          }
-          );
+          });
       }
     );
   };
