@@ -78,14 +78,6 @@
         "tarRootDirPrefix": "mutagen-",
         "rootDirPrefix": "mutagen-",
         "targetDirPrefix": "mutagen-"
-      },
-      "watchdog": {
-        "version": "0.8.3",
-        "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/54/7d/c7c0ad1e32b9f132075967fc353a244eb2b375a3d2f5b0ce612fd96e107e/watchdog-0.8.3.tar.gz#md5=bb16926bccc98eae2a04535e4512ddf1",
-        "tarRootDirPrefix": "watchdog-",
-        "rootDirPrefix": "watchdog-",
-        "targetDirPrefix": "watchdog-"
       }
     },
     "frontend": {

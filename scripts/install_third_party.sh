@@ -28,11 +28,8 @@ install_node_module gulp 3.9.0
 install_node_module through2 2.0.0
 install_node_module yargs 3.29.0
 install_node_module gulp-concat 2.6.0
-install_node_module gulp-clean-css 2.0.2
-install_node_module gulp-util 3.0.7
-install_node_module gulp-sourcemaps 1.6.0
-install_node_module gulp-uglify 2.0.1
-install_node_module uglify-js 3.3.11 
+install_node_module gulp-shell 0.6.5
+install_node_module uglify-js 3.3.11
 
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires

@@ -23,10 +23,6 @@ import os
 import re
 import shutil
 import subprocess
-import time
-
-import watchdog.events
-import watchdog.observers
 
 import feconf
 
@@ -96,6 +92,12 @@ def _minify(source_path, target_path):
 
 
 def _join_files(source_paths, target_path):
+    """Writes multiple files into one file.
+
+    Args:
+        source_paths: list(str). Paths to files to joined together.
+        target_path: str. Path to location of the joined file.
+    """
     with open(target_path, 'w') as target_file:
         for source_path in source_paths:
             with open(source_path, 'r') as source_file:
@@ -103,12 +105,12 @@ def _join_files(source_paths, target_path):
 
 
 def _minify_and_create_sourcemap(source_paths, target_path):
-    """Runs the given file through a minifier and outputs it to target_path.
+    """Minifies multiple files into one file and generates source map
+    for that file.
 
     Args:
-        source_path: str. Absolute path to file to be minified.
-        target_path: str. Absolute path to location where to copy
-            the minified file.
+        source_paths: list(str). Paths to files to joined and minified.
+        target_path: str. Path to location of the joined file.
     """
     uglify_path = os.path.join(
         PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
@@ -121,6 +123,12 @@ def _minify_and_create_sourcemap(source_paths, target_path):
 
 
 def _copy_fonts(source_paths, target_path):
+    """Copies fonts at source paths to target path.
+
+    Args:
+        source_paths: list(str). Paths to fonts.
+        target_path: str. Path where the fonts should be copied.
+    """
     for font_wildcard in source_paths:
         font_paths = glob.glob(font_wildcard)
         for font_path in font_paths:
@@ -152,6 +160,15 @@ def ensure_directory_exists(filepath):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
+def _ensure_files_exist(filepaths):
+    """Ensures if files exist.
+
+    Args:
+        filepaths: list(str). Paths to files that we want to ensure exist.
+    """
+    for filepath in filepaths:
+        if not os.path.isfile(filepath):
+            raise Exception('File %s does not exist.' % filepath)
 
 def process_html(source_path, target_path, file_hashes):
     """Copies contents of HTML file, while removing whitespace and
@@ -204,6 +221,13 @@ def process_js(source_path, target_path):
 
 
 def get_dependency_filepaths(dependency, filepaths):
+    """Extracts dependency filepaths into filepaths object.
+
+    Args:
+        source_paths: dict(str, str). Dependency information object.
+        filepaths: dict(str, list(str)). Filepaths object with three lists each
+            for different file type (js, css, fonts).
+    """
     if "targetDir" in dependency:
         dependency_dir = dependency["targetDir"]
     else:
@@ -228,6 +252,12 @@ def get_dependency_filepaths(dependency, filepaths):
 
 
 def get_dependencies_filepaths():
+    """Extracts dependencies filepaths from manifes.json file into dictionary
+
+    Returns:
+        dict(str, list(str)). Filepaths object with three lists each for
+        different file type (js, css, fonts).
+    """
     filepaths = {
         "css": [],
         "js": [],
@@ -239,6 +269,10 @@ def get_dependencies_filepaths():
     frontend_dependencies = manifest["dependencies"]["frontend"]
     for dependency in frontend_dependencies.values():
         get_dependency_filepaths(dependency, filepaths)
+
+    _ensure_files_exist(filepaths["js"])
+    _ensure_files_exist(filepaths["css"])
+
     return filepaths
 
 
@@ -257,10 +291,8 @@ def build_minified_third_party_libs():
 
     dependency_filepaths = get_dependencies_filepaths()
     _minify_and_create_sourcemap(dependency_filepaths["js"], third_party_js)
-
     _join_files(dependency_filepaths["css"], third_party_css)
     _minify(third_party_css, third_party_css)
-
     _copy_fonts(dependency_filepaths["fonts"], fonts_dir)
 
 
@@ -281,6 +313,7 @@ def build_third_party_libs():
     _join_files(dependency_filepaths["js"], third_party_js)
     _join_files(dependency_filepaths["css"], third_party_css)
     _copy_fonts(dependency_filepaths["fonts"], fonts_dir)
+
 
 def hash_should_be_inserted(filepath):
     """Returns if the file should be renamed to include hash in
@@ -529,20 +562,9 @@ def generate_build_directory():
     copy_files_source_to_target(
         TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)
 
-class MyHandler(watchdog.events.PatternMatchingEventHandler):
-    def on_modified(self, event):
-        print "Got it!"
-
-def watch_directories():
-    observer = watchdog.observers.Observer()
-    event_handler = MyHandler()
-    observer.schedule(event_handler, THIRD_PARTY_GENERATED_OUT_DIR, True)
-    observer.start()
-
 
 if __name__ == '__main__':
     if feconf.FORCE_PROD_MODE:
         generate_build_directory()
     else:
         build_third_party_libs()
-        watch_directories()
