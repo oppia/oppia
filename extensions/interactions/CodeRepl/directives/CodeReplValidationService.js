@@ -57,6 +57,7 @@ oppia.factory('CodeReplValidationService', [
             message: 'PostCode text must be a string.'
           });
         }
+        return warningsList
       },
       getAllWarnings: function(stateName, customizationArgs, answerGroups,
           defaultOutcome) {
