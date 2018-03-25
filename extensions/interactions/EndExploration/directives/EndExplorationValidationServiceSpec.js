@@ -115,7 +115,18 @@ describe('EndExplorationValidationService', function() {
         currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Recommended Exploration ID must be a string.'
+        message: 'Recommended exploration ID must be a string.'
       }]);
     });
+
+  it('should have warnings for non-list format of recommended exploration IDs',
+    function() {
+      customizationArguments.recommendedExplorationIds.value = 'ExpID0';
+      warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, [], null);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Set of recommended exploration IDs must be in list format.'
+      }]);
+    })
 });

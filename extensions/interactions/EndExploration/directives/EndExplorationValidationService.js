@@ -27,11 +27,19 @@ oppia.factory('EndExplorationValidationService', [
 
         var recommendedExplorationIds = (
             customizationArgs.recommendedExplorationIds.value);
+
+        if(!angular.isArray(recommendedExplorationIds)) {
+          warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: 'Set of recommended exploration IDs must be in list ' +
+              'format.'
+          });
+        }
         for (var i = 0; i < recommendedExplorationIds.length; i++) {
           if (!angular.isString(recommendedExplorationIds[i])) {
             warningsList.push({
               type: WARNING_TYPES.ERROR,
-              message: 'Recommended Exploration ID must be a string.'
+              message: 'Recommended exploration ID must be a string.'
             });
           }
         }
