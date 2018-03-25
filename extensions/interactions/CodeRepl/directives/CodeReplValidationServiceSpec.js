@@ -60,7 +60,8 @@ describe('CodeReplValidationService', function() {
 
   it('should be able to perform basic validation', function() {
     var warnings = validatorService.getAllWarnings(
-      currentState, {}, goodAnswerGroups, goodDefaultOutcome);
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
