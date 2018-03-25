@@ -119,15 +119,13 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
 
         del payload['skill_id']
         self.post_json(
-            '%s' % feconf.QUESTION_CREATION_URL, {'payload': (
-                json.dumps(payload))}, expect_errors=True,
-            expected_status_int=404)
+            '%s' % feconf.QUESTION_CREATION_URL, payload,
+            expect_errors=True, expected_status_int=404)
 
         del payload['question']
         self.post_json(
-            '%s' % feconf.QUESTION_CREATION_URL, {'payload': (
-                json.dumps(payload))}, expect_errors=True,
-            expected_status_int=404)
+            '%s' % feconf.QUESTION_CREATION_URL, payload,
+            expect_errors=True, expected_status_int=404)
 
         self.logout()
         self.login(self.random_email)
