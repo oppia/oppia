@@ -182,17 +182,21 @@ oppia.factory('RteHelperService', [
         });
 
         var textElt = elt[0].childNodes;
-        for (var i = textElt.length - 1; i > 0; i--) {
-          for (var j = textElt[i].childNodes.length; j > 0; j--) {
-            if (textElt[i].childNodes[j - 1].nodeValue === null ||
-              textElt[i].childNodes[j - 1].nodeValue.trim() === '') {
-              textElt[i].childNodes[j - 1].remove();
+        for (var i = textElt.length; i > 0; i--) {
+          for (var j = textElt[i - 1].childNodes.length; j > 0; j--) {
+            if (textElt[i - 1].childNodes[j - 1].nodeName === 'BR' ||
+              (textElt[i - 1].childNodes[j - 1].nodeName === '#text' &&
+                textElt[i - 1].childNodes[j - 1].nodeValue.trim() === '')) {
+              textElt[i - 1].childNodes[j - 1].remove();
+            } else {
+              break;
             }
           }
-          if (textElt[i].childNodes.length === 0) {
-            if (textElt[i].nodeValue === null ||
-              textElt[i].nodeValue.trim() === '') {
-              textElt[i].remove();
+          if (textElt[i - 1].childNodes.length === 0) {
+            if (textElt[i - 1].nodeName === 'BR' ||
+              (textElt[i - 1].nodeName === '#text' &&
+                textElt[i - 1].nodeValue.trim() === '')) {
+              textElt[i - 1].remove();
               continue;
             }
           } else {
