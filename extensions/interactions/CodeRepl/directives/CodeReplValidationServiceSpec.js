@@ -38,6 +38,22 @@ describe('CodeReplValidationService', function() {
       param_changes: [],
       refresher_exploration_id: null
     });
+
+    customizationArguments = {
+      language: {
+        value: ''
+      },
+      placeholder: {
+        value: ''
+      },
+      preCode: {
+        value: ''
+      },
+      postCode: {
+        value: ''
+      }
+    };
+
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false)];
   }));
 
@@ -45,5 +61,45 @@ describe('CodeReplValidationService', function() {
     var warnings = validatorService.getAllWarnings(
       currentState, {}, goodAnswerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
+  });
+
+  it('should catch non-string value for programming language', function() {
+    customizationArguments.language.value = 1;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, [], null);
+    expect(warnings).toEqual({
+      type: WARNING_TYPES.ERROR,
+      message: 'Programming language name must be a string.'
+    });
+  });
+
+  it('should catch non-string value for placeholder text', function() {
+    customizationArguments.placeholder.value = 1;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, [], null);
+    expect(warnings).toEqual({
+      type: WARNING_TYPES.ERROR,
+      message: 'Placeholder text must be a string.'
+    });
+  });
+
+  it('should catch non-string value for preCode text', function() {
+    customizationArguments.preCode.value = 1;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, [], null);
+    expect(warnings).toEqual({
+      type: WARNING_TYPES.ERROR,
+      message: 'PreCode text must be a string.'
+    });
+  });
+
+  it('should catch non-string value for postCode text', function() {
+    customizationArguments.postCode.value = 1;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, [], null);
+    expect(warnings).toEqual({
+      type: WARNING_TYPES.ERROR,
+      message: 'PostCode text must be a string.'
+    });
   });
 });

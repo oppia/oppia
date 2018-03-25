@@ -17,12 +17,46 @@
  */
 
 oppia.factory('CodeReplValidationService', [
-  'baseInteractionValidationService',
-  function(baseInteractionValidationService) {
+  'WARNING_TYPES', 'baseInteractionValidationService',
+  function(WARNING_TYPES, baseInteractionValidationService) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
-        // TODO(juansaba): Implement customization args validations.
-        return [];
+        var warningsList = [];
+        baseInteractionValidationService.requireCustomizationArguments(
+          customizationArgs, ['language', 'placeholder', 'preCode',
+            'postCode']);
+
+        var language = customizationArgs.language.value;
+        if (!angular.isString(language)) {
+          warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: 'Programming language name must be a string.'
+          });
+        }
+
+        var placeholder = customizationArgs.placeholder.value;
+        if (!angular.isString(placeholder)) {
+          warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: 'Placeholder text must be a string.'
+          });
+        }
+
+        var preCode = customizationArgs.preCode.value;
+        if (!angular.isString(preCode)) {
+          warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: 'PreCode text must be a string.'
+          });
+        }
+
+        var postCode = customizationArgs.postCode.value;
+        if (!angular.isString(postCode)) {
+          warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: 'PostCode text must be a string.'
+          });
+        }
       },
       getAllWarnings: function(stateName, customizationArgs, answerGroups,
           defaultOutcome) {
