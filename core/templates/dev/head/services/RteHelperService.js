@@ -195,7 +195,8 @@ oppia.factory('RteHelperService', [
           if (textElt[i - 1].childNodes.length === 0) {
             if (textElt[i - 1].nodeName === 'BR' ||
               (textElt[i - 1].nodeName === '#text' &&
-                textElt[i - 1].nodeValue.trim() === '')) {
+                textElt[i - 1].nodeValue.trim() === '') ||
+                textElt[i - 1].nodeName === 'P') {
               textElt[i - 1].remove();
               continue;
             }

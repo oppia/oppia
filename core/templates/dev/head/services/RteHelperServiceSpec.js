@@ -39,6 +39,16 @@ describe('RteHelperService', function() {
       '<p>abc</p><p>abc<br></p>', '<p>abc</p><p>abc</p>'
     ], [
       '<p>abc</p><br><br>', '<p>abc</p>'
+    ], [
+      '<p>abc<br>abc<br></p>', '<p>abc<br>abc</p>'
+    ], [
+      '<p><p></p></p>', ''
+    ], [
+      '<p>abc<p></p></p>', '<p>abc</p>'
+    ], [
+      '<p>abc<p><br></p></p>', '<p>abc</p>'
+    ], [
+      '<p>abc<p><p><br></p></p></p>', '<p>abc</p>'
     ]];
     for (var i = 0; i < testData.length; i++) {
       expect(RteHelperService.convertRteToHtml(testData[i][0]))
