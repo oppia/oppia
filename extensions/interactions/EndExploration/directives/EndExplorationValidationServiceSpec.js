@@ -107,4 +107,15 @@ describe('EndExplorationValidationService', function() {
       currentState, customizationArguments, [], null);
     expect(warnings).toEqual([]);
   });
+
+  it('should catch non-string value for recommended exploration ID',
+    function() {
+      customizationArguments.recommendedExplorationIds.value = [1];
+      warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, [], null);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Recommended Exploration ID must be a string.'
+      }]);
+    });
 });
