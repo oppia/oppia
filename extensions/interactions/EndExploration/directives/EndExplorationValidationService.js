@@ -28,7 +28,7 @@ oppia.factory('EndExplorationValidationService', [
         var recommendedExplorationIds = (
             customizationArgs.recommendedExplorationIds.value);
 
-        if(!angular.isArray(recommendedExplorationIds)) {
+        if (!angular.isArray(recommendedExplorationIds)) {
           warningsList.push({
             type: WARNING_TYPES.ERROR,
             message: 'Set of recommended exploration IDs must be in list ' +

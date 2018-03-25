@@ -128,5 +128,5 @@ describe('EndExplorationValidationService', function() {
         type: WARNING_TYPES.ERROR,
         message: 'Set of recommended exploration IDs must be in list format.'
       }]);
-    })
+    });
 });
