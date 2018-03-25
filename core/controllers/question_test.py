@@ -83,28 +83,32 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
             question_id, self.collection_id, self.skill_id,
             self.new_user_id)
         self.login(self.NEW_USER_EMAIL)
+        response = self.testapp.get('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
         response = self.testapp.delete(
             '%s/%s/%s' % (
                 feconf.QUESTION_DATA_URL, self.collection_id, question_id),
-            expect_errors=False)
+            csrf_token, expect_errors=False)
         self.assertEqual(response.status_int, 200)
 
         response = self.testapp.delete(
             '%s/%s' % (
                 feconf.QUESTION_DATA_URL, self.collection_id),
-            expect_errors=True)
+            csrf_token, expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
         response = self.testapp.delete(
-            '%s/' % feconf.QUESTION_DATA_URL, expect_errors=True)
+            '%s/' % feconf.QUESTION_DATA_URL, csrf_token, expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
         self.logout()
         self.login(self.random_email)
+        response = self.testapp.get('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
         response = self.testapp.delete(
             '%s/%s/%s' % (
                 feconf.QUESTION_DATA_URL, self.collection_id, question_id),
-            expect_errors=True)
+            csrf_token, expect_errors=True)
         self.assertEqual(response.status_int, 401)
 
     def test_post(self):
@@ -112,25 +116,29 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
         payload['question'] = self.question.to_dict()
         payload['skill_id'] = self.skill_id
         self.login(self.NEW_USER_EMAIL)
+        response = self.testapp.get('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
         response_json = self.post_json(
-            '%s' % feconf.QUESTION_CREATION_URL, payload,
+            '%s' % feconf.QUESTION_CREATION_URL, payload, csrf_token,
             expect_errors=False)
         self.assertIn('question_id', response_json.keys())
 
         del payload['skill_id']
         self.post_json(
-            '%s' % feconf.QUESTION_CREATION_URL, payload,
+            '%s' % feconf.QUESTION_CREATION_URL, payload, csrf_token,
             expect_errors=True, expected_status_int=404)
 
         del payload['question']
         self.post_json(
-            '%s' % feconf.QUESTION_CREATION_URL, payload,
+            '%s' % feconf.QUESTION_CREATION_URL, payload, csrf_token,
             expect_errors=True, expected_status_int=404)
 
         self.logout()
         self.login(self.random_email)
+        response = self.testapp.get('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
-            '%s' % feconf.QUESTION_CREATION_URL, payload,
+            '%s' % feconf.QUESTION_CREATION_URL, payload, csrf_token,
             expect_errors=True, expected_status_int=401)
 
     def test_batch_get(self):
@@ -232,17 +240,19 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
         payload['change_list'] = json.dumps(change_list)
         payload['commit_message'] = 'update title'
         self.login(self.NEW_USER_EMAIL)
+        response = self.testapp.get('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
         response_json = self.put_json(
             '%s/%s/%s' % (
                 feconf.QUESTION_DATA_URL, self.collection_id, question_id),
-            payload, expect_errors=False)
+            payload, csrf_token, expect_errors=False)
         self.assertIn('question_id', response_json.keys())
 
         del payload['change_list']
         self.put_json(
             '%s/%s/%s' % (
                 feconf.QUESTION_DATA_URL, self.collection_id,
-                question_id), payload, expect_errors=True,
+                question_id), payload, csrf_token, expect_errors=True,
             expected_status_int=404)
 
         del payload['commit_message']
@@ -250,21 +260,24 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
         self.put_json(
             '%s/%s/%s' % (
                 feconf.QUESTION_DATA_URL, self.collection_id,
-                question_id), payload, expect_errors=True,
+                question_id), payload, csrf_token, expect_errors=True,
             expected_status_int=404)
 
         payload['commit_message'] = 'update title'
         self.put_json(
             '%s/%s' % (feconf.QUESTION_DATA_URL, self.collection_id),
-            payload, expect_errors=True,
+            payload, csrf_token, expect_errors=True,
             expected_status_int=404)
 
         self.logout()
         self.login(self.random_email)
+        response = self.testapp.get('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
         self.put_json(
             '%s/%s/%s' % (
                 feconf.QUESTION_DATA_URL, self.collection_id, question_id),
-            payload, expect_errors=True, expected_status_int=401)
+            payload, csrf_token, expect_errors=True,
+            expected_status_int=401)
 
     def test_integration(self):
         """Tests to create, update, delete questions and fetch
@@ -274,8 +287,10 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
         payload['question'] = self.question.to_dict()
         payload['skill_id'] = self.skill_id
         self.login(self.NEW_USER_EMAIL)
+        response = self.testapp.get('/preferences')
+        csrf_token = self.get_csrf_token_from_response(response)
         response_json = self.post_json(
-            '%s' % feconf.QUESTION_CREATION_URL, payload,
+            '%s' % feconf.QUESTION_CREATION_URL, payload, csrf_token,
             expect_errors=False)
         self.assertIn('question_id', response_json.keys())
         question_id = response_json['question_id']
@@ -287,7 +302,7 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
         payload['question'] = another_question.to_dict()
         payload['skill_id'] = self.skill_id
         response_json = self.post_json(
-            '%s' % feconf.QUESTION_CREATION_URL, payload,
+            '%s' % feconf.QUESTION_CREATION_URL, payload, csrf_token,
             expect_errors=False)
         self.assertIn('question_id', response_json.keys())
         another_question_id = response_json['question_id']
@@ -304,7 +319,7 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
         response = self.testapp.delete(
             '%s/%s/%s' % (
                 feconf.QUESTION_DATA_URL, self.collection_id,
-                str(another_question_id)),
+                str(another_question_id)), csrf_token,
             expect_errors=False)
         self.assertEqual(response.status_int, 200)
         response_json = self.get_json(

@@ -25,7 +25,6 @@ import feconf
 
 class QuestionsBatchHandler(base.BaseHandler):
     """This handler completes requests for questions batch."""
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_access_moderator_page
     def get(self):
@@ -47,7 +46,6 @@ class QuestionsBatchHandler(base.BaseHandler):
 
 class QuestionsHandler(base.BaseHandler):
     """This handler completes PUT/DELETE requests for questions."""
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_access_moderator_page
     def put(self, collection_id, question_id):
@@ -84,7 +82,6 @@ class QuestionsHandler(base.BaseHandler):
 
 class QuestionCreationHandler(base.BaseHandler):
     """This handler completes POST requests for questions."""
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_access_moderator_page
     def post(self):
@@ -107,7 +104,6 @@ class QuestionCreationHandler(base.BaseHandler):
 
 class QuestionManagerHandler(base.BaseHandler):
     """This handler completes requests for question summaries."""
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @acl_decorators.can_access_moderator_page
     def get(self):
