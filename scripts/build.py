@@ -160,6 +160,7 @@ def ensure_directory_exists(filepath):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
+
 def _ensure_files_exist(filepaths):
     """Ensures if files exist.
 
@@ -169,6 +170,7 @@ def _ensure_files_exist(filepaths):
     for filepath in filepaths:
         if not os.path.isfile(filepath):
             raise Exception('File %s does not exist.' % filepath)
+
 
 def process_html(source_path, target_path, file_hashes):
     """Copies contents of HTML file, while removing whitespace and
