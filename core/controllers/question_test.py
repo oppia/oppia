@@ -177,7 +177,7 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
             expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
-    def manager_get(self):
+    def test_manager_get(self):
         """Tests get method of question manager handler."""
         question_id = question_services.add_question(
             self.owner_id, self.question)
@@ -211,8 +211,9 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
 
         self.logout()
         self.login(self.random_email)
+        payload['collection_id'] = self.collection_id
         response = self.testapp.get(
-            '%s/batch' % feconf.QUESTION_MANAGER_URL, payload,
+            '%s' % feconf.QUESTION_MANAGER_URL, payload,
             expect_errors=True)
         self.assertEqual(response.status_int, 401)
 
