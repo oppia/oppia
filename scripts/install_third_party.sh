@@ -24,6 +24,7 @@ $PYTHON_CMD scripts/install_third_party.py
 # Install third-party node modules needed for the build process.
 install_node_module eslint 3.18.0
 install_node_module eslint-plugin-html 2.0.1
+install_node_module eslint-plugin-angular 0.12.0
 install_node_module gulp 3.9.0
 install_node_module through2 2.0.0
 install_node_module yargs 3.29.0
@@ -94,14 +95,6 @@ if ! type pip > /dev/null 2>&1 ; then
 
     # If pip is not installed, quit.
     exit 1
-fi
-
-# Note that numpy needs to be built after downloading.
-echo Checking if numpy is installed in $TOOLS_DIR/pip_packages
-if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
-  echo Installing numpy
-
-  pip install numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
 fi
 
 echo Checking if pylint is installed in $TOOLS_DIR/pip_packages

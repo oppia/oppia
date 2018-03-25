@@ -51,7 +51,8 @@ class LearnerProgress(object):
 
 class ActivityIdsInLearnerDashboard(object):
     """Domain object for ids of the activities completed, currently being
-    completed or in the playlist of the user."""
+    completed or in the playlist of the user.
+    """
 
     def __init__(
             self, completed_exploration_ids, completed_collection_ids,

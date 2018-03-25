@@ -17,9 +17,9 @@
  */
 
 oppia.controller('Profile', [
-  '$scope', '$http', '$rootScope', 'DateTimeFormatService',
+  '$scope', '$http', '$rootScope', '$log', 'DateTimeFormatService',
   'UrlInterpolationService',
-  function($scope, $http, $rootScope, DateTimeFormatService,
+  function($scope, $http, $rootScope, $log, DateTimeFormatService,
       UrlInterpolationService) {
     var profileDataUrl = '/profilehandler/data/' + GLOBALS.PROFILE_USERNAME;
     var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService.getStaticImageUrl(

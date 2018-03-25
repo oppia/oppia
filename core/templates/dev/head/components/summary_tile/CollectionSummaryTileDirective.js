@@ -37,7 +37,8 @@ oppia.directive('collectionSummaryTile', [
         getCategory: '&category',
         isPlaylistTile: '&isPlaylistTile',
         showLearnerDashboardIconsIfPossible: (
-          '&showLearnerDashboardIconsIfPossible')
+          '&showLearnerDashboardIconsIfPossible'),
+        isContainerNarrow: '&containerIsNarrow'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +

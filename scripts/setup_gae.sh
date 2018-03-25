@@ -22,7 +22,7 @@ if [ "$SETUP_GAE_DONE" ]; then
   return 0
 fi
 
-export GOOGLE_APP_ENGINE_HOME=$TOOLS_DIR/google_appengine_1.9.50/google_appengine
+export GOOGLE_APP_ENGINE_HOME=$TOOLS_DIR/google_appengine_1.9.67/google_appengine
 export COVERAGE_HOME=$TOOLS_DIR/coverage-4.0
 
 # Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
@@ -35,7 +35,7 @@ echo Checking whether Google App Engine is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
   echo "Downloading Google App Engine (this may take a little while)..."
   mkdir -p $GOOGLE_APP_ENGINE_HOME
-  curl -o gae-download.zip https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.50.zip
+  curl -o gae-download.zip https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.67.zip
   # $? contains the (exit) status code of previous command.
   # If curl was successful, $? will be 0 else non-zero.
   if [ 0 -eq $? ]; then
@@ -44,7 +44,7 @@ if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
     echo "Error downloading Google App Engine. Exiting."
     exit 1
   fi
-  unzip -q gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.50/
+  unzip -q gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.67/
   rm gae-download.zip
 fi
 

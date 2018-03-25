@@ -149,7 +149,8 @@ class LibraryIndexHandler(base.BaseHandler):
 
 
 class LibraryGroupPage(base.BaseHandler):
-    """The page for displaying top rated and recently published explorations.
+    """The page for displaying top rated and recently published
+    explorations.
     """
 
     @acl_decorators.open_access
@@ -303,8 +304,7 @@ class ExplorationSummariesHandler(base.BaseHandler):
 
 
 class CollectionSummariesHandler(base.BaseHandler):
-    """Returns collection summaries corresponding to collection ids.
-    """
+    """Returns collection summaries corresponding to collection ids."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

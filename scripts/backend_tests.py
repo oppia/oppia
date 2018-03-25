@@ -313,8 +313,8 @@ def main():
                 print 'FAILED    %s: %s errors, %s failures' % (
                     spec.test_target, errors, failures)
             except AttributeError:
-                # There was an internal error, and the tests did not run. (The
-                # error message did not match `tests_failed_regex_match`.)
+                # There was an internal error, and the tests did not run (The
+                # error message did not match `tests_failed_regex_match`).
                 test_count = 0
                 print ''
                 print '------------------------------------------------------'

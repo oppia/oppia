@@ -25,7 +25,7 @@ describe('Thread Status Display Service', function() {
     ThreadStatusDisplayService = _ThreadStatusDisplayService_;
   }));
 
-  it('should give human readable status for status choice',function() {
+  it('should give human readable status for status choice', function() {
     var mockStatusChoices = ThreadStatusDisplayService.STATUS_CHOICES;
 
     for (var i = 0; i < mockStatusChoices.length; i++) {
@@ -41,7 +41,7 @@ describe('Thread Status Display Service', function() {
         mockStatusID)).toBe('');
   });
 
-  it('should give appropriate label class for status id',function() {
+  it('should give appropriate label class for status id', function() {
     var mockStatusID = 'open';
     expect(ThreadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
       'label label-info');

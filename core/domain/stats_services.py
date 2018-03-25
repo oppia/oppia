@@ -311,9 +311,17 @@ def get_exploration_stats_multi(exp_version_references):
         stats_models.ExplorationStatsModel.get_multi_stats_models(
             exp_version_references))
 
-    exploration_stats_list = [
-        get_exploration_stats_from_model(exploration_stats_model)
-        for exploration_stats_model in exploration_stats_models]
+    exploration_stats_list = []
+    for index, exploration_stats_model in enumerate(exploration_stats_models):
+        if exploration_stats_model is None:
+            exploration_stats_list.append(
+                stats_domain.ExplorationStats.create_default(
+                    exp_version_references[index].exp_id,
+                    exp_version_references[index].version,
+                    {}))
+        else:
+            exploration_stats_list.append(
+                get_exploration_stats_from_model(exploration_stats_model))
 
     return exploration_stats_list
 
@@ -371,7 +379,8 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
         'id': visualization.id,
         'data': calculation_ids_to_outputs[visualization.calculation_id],
         'options': visualization.options,
-        'show_addressed_info': visualization.show_addressed_info,
+        'addressed_info_is_supported': (
+            visualization.addressed_info_is_supported),
     } for visualization in visualizations
             if visualization.calculation_id in calculation_ids_to_outputs]
 
@@ -470,9 +479,9 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
     if answers_model is None:
         return []
 
-    # Return at most 100 answers, and only answers from the initial shard. (If
+    # Return at most 100 answers, and only answers from the initial shard (If
     # we needed to use subsequent shards then the answers are probably too big
-    # anyway.)
+    # anyway).
     sample_answers = answers_model.submitted_answer_list[:100]
     return [
         stats_domain.SubmittedAnswer.from_dict(submitted_answer_dict).answer

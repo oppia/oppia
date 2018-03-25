@@ -94,8 +94,7 @@ oppia.factory('GraphInputValidationService', [
                     'of ' + VERTICES_LIMIT + '.')
                 });
               }
-            }
-            catch (e) {
+            } catch (e) {
               warningsList.push({
                 type: WARNING_TYPES.CRITICAL,
                 message: (

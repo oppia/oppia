@@ -358,7 +358,7 @@ def copy_files_source_to_target(source, target, file_hashes):
             if source not in source_path:
                 continue
 
-            # Ignore files with certain extensions
+            # Ignore files with certain extensions.
             if any(source_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 continue
 
@@ -533,12 +533,12 @@ def generate_build_directory():
     them into build directory.
     """
     hashes = dict()
-    # Create hashes for assets, copy directories and files to build/assets
+    # Create hashes for assets, copy directories and files to build/assets.
     hashes.update(get_file_hashes(ASSETS_SRC_DIR))
     copy_files_source_to_target(ASSETS_SRC_DIR, ASSETS_OUT_DIR, hashes)
 
     # Process third_party resources, create hashes for them and copy them into
-    # build/third_party/generated
+    # build/third_party/generated.
     build_minified_third_party_libs()
     hashes.update(get_file_hashes(THIRD_PARTY_GENERATED_STAGING_DIR))
     copy_files_source_to_target(
@@ -546,20 +546,20 @@ def generate_build_directory():
         THIRD_PARTY_GENERATED_OUT_DIR, hashes)
 
     # Minify extension static resources, create hashes for them and copy them
-    # into build/extensions
+    # into build/extensions.
     hashes.update(get_file_hashes(EXTENSIONS_DEV_DIR))
     build_files(EXTENSIONS_DEV_DIR, EXTENSIONS_STAGING_DIR, hashes)
     copy_files_source_to_target(
         EXTENSIONS_STAGING_DIR, EXTENSIONS_OUT_DIR, hashes)
 
-    # Create hashes for all template files
+    # Create hashes for all template files.
     hashes.update(get_file_hashes(TEMPLATES_DEV_DIR))
 
     # Save hashes as JSON and write the JSON into JS file
     # to make the hashes available to the frontend.
     save_hashes_as_json(HASHES_JSON, hashes)
 
-    # Minify all template files copy them into build/templates/head
+    # Minify all template files copy them into build/templates/head.
     build_files(TEMPLATES_DEV_DIR, TEMPLATES_STAGING_DIR, hashes)
     copy_files_source_to_target(
         TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)

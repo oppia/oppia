@@ -31,7 +31,7 @@ describe('Rule spec services', function() {
     );
   };
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     RULE_TYPE_CLASSIFIER = $injector.get('RULE_TYPE_CLASSIFIER');
     ruleTemplates =
       window.__fixtures__['extensions/interactions/rule_templates'];

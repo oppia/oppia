@@ -71,7 +71,8 @@ class Registry(object):
         """Gets an interaction by its id.
 
         Refreshes once if the interaction is not found; subsequently, throws a
-        KeyError."""
+        KeyError.
+        """
         if interaction_id not in cls._interactions:
             cls._refresh()
         return cls._interactions[interaction_id]

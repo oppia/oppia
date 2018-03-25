@@ -190,8 +190,8 @@ def _validate_customization_args_and_values(
                     ca_spec.schema))
         except Exception:
             # TODO(sll): Raise an actual exception here if parameters are not
-            # involved. (If they are, can we get sample values for the state
-            # context parameters?)
+            # involved (If they are, can we get sample values for the state
+            # context parameters?).
             pass
 
 
@@ -1443,7 +1443,7 @@ class State(object):
                     if (isinstance(value, basestring) and
                             '{{' in value and '}}' in value):
                         # TODO(jacobdavis11): Create checks that all parameters
-                        # referred to exist and have the correct types
+                        # referred to exist and have the correct types.
                         normalized_param = value
                     else:
                         try:
@@ -1609,6 +1609,66 @@ class State(object):
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name))
+
+
+class ExplorationVersionsDiff(object):
+    """Domain object for the difference between two versions of an Oppia
+    exploration.
+
+    Attributes:
+        added_state_names: list(str). Name of the states added to the
+            exploration from prev_exp_version to current_exp_version.
+        deleted_state_names: list(str). Name of the states deleted from the
+            exploration from prev_exp_version to current_exp_version.
+        new_to_old_state_names: dict. Dictionary mapping state names of
+            current_exp_version to the state names of prev_exp_version.
+        old_to_new_state_names: dict. Dictionary mapping state names of
+            prev_exp_version to the state names of current_exp_version.
+    """
+
+    def __init__(self, change_list):
+        """Constructs an ExplorationVersionsDiff domain object.
+
+        Args:
+            change_list: list(dict). A list of all of the commit cmds from the
+                old version of the exploration up to the next version.
+        """
+
+        added_state_names = []
+        deleted_state_names = []
+        new_to_old_state_names = {}
+
+        for change_dict in change_list:
+            if change_dict['cmd'] == CMD_ADD_STATE:
+                added_state_names.append(change_dict['state_name'])
+            elif change_dict['cmd'] == CMD_DELETE_STATE:
+                state_name = change_dict['state_name']
+                if state_name in added_state_names:
+                    added_state_names.remove(state_name)
+                else:
+                    original_state_name = state_name
+                    if original_state_name in new_to_old_state_names:
+                        original_state_name = new_to_old_state_names.pop(
+                            original_state_name)
+                    deleted_state_names.append(original_state_name)
+            elif change_dict['cmd'] == CMD_RENAME_STATE:
+                old_state_name = change_dict['old_state_name']
+                new_state_name = change_dict['new_state_name']
+                if old_state_name in added_state_names:
+                    added_state_names.remove(old_state_name)
+                    added_state_names.append(new_state_name)
+                elif old_state_name in new_to_old_state_names:
+                    new_to_old_state_names[new_state_name] = (
+                        new_to_old_state_names.pop(old_state_name))
+                else:
+                    new_to_old_state_names[new_state_name] = old_state_name
+
+        self.added_state_names = added_state_names
+        self.deleted_state_names = deleted_state_names
+        self.new_to_old_state_names = new_to_old_state_names
+        self.old_to_new_state_names = {
+            value: key for key, value in new_to_old_state_names.iteritems()
+        }
 
 
 class Exploration(object):
@@ -2181,7 +2241,7 @@ class Exploration(object):
                 'It is impossible to complete the exploration from the '
                 'following states: %s' % ', '.join(dead_end_states))
 
-    # Derived attributes of an exploration,
+    # Derived attributes of an exploration.
     @property
     def init_state(self):
         """The state which forms the start of this exploration.
@@ -2428,36 +2488,7 @@ class Exploration(object):
         del self.states[state_name]
 
 
-    def get_state_names_mapping(self, change_list):
-        """Creates a mapping from the current state names of the exploration
-        to their corresponding state names of the older version.
-
-        Args:
-            change_list: list(dict). A list of changes introduced in this
-                commit.
-
-        Returns:
-            dict. The new_to_old_state_names mapping dict.
-        """
-        old_to_new_state_names = {}
-
-        for state_name in self.states:
-            old_to_new_state_names[state_name] = state_name
-
-        for change_dict in reversed(change_list):
-            if change_dict['cmd'] == CMD_RENAME_STATE:
-                if change_dict['new_state_name'] in old_to_new_state_names:
-                    old_to_new_state_names[change_dict['old_state_name']] = (
-                        old_to_new_state_names.pop(change_dict[
-                            'new_state_name']))
-
-        new_to_old_state_names = {
-            value: key for key, value in old_to_new_state_names.iteritems()
-        }
-        return new_to_old_state_names
-
-
-    def get_trainable_states_dict(self, old_states, new_to_old_state_names):
+    def get_trainable_states_dict(self, old_states, exp_versions_diff):
         """Retrieves the state names of all trainable states in an exploration
         segregated into state names with changed and unchanged answer groups.
         In this method, the new_state_name refers to the name of the state in
@@ -2466,8 +2497,8 @@ class Exploration(object):
 
         Args:
             old_states: dict. Dictionary containing all State domain objects.
-            new_to_old_state_names: dict. A mapping from current state names to
-                state names from previous version of the exploration.
+            exp_versions_diff: ExplorationVersionsDiff. An instance of the
+                exploration versions diff class.
 
         Returns:
             dict. The trainable states dict. This dict has three keys
@@ -2485,7 +2516,10 @@ class Exploration(object):
             if not new_state.can_undergo_classification():
                 continue
 
-            old_state_name = new_to_old_state_names[new_state_name]
+            old_state_name = new_state_name
+            if new_state_name in exp_versions_diff.new_to_old_state_names:
+                old_state_name = exp_versions_diff.new_to_old_state_names[
+                    new_state_name]
 
             # The case where a new state is added. When this happens, the
             # old_state_name will be equal to the new_state_name and it will not
@@ -2531,7 +2565,7 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        # ensure widgets are renamed to be interactions
+        # ensure widgets are renamed to be interactions.
         for _, state_defn in states_dict.iteritems():
             if 'widget' not in state_defn:
                 continue
@@ -2572,7 +2606,7 @@ class Exploration(object):
         # to an 'END' state before, then they would only be receiving warnings
         # about not being able to complete the exploration. The introduction of
         # a real END state would produce additional warnings (state cannot be
-        # reached from other states, etc.)
+        # reached from other states, etc.).
         targets_end_state = False
         has_end_state = False
         for (state_name, sdict) in states_dict.iteritems():
@@ -2587,7 +2621,7 @@ class Exploration(object):
                             break
 
         # Ensure any explorations pointing to an END state has a valid END
-        # state to end with (in case it expects an END state)
+        # state to end with (in case it expects an END state).
         if targets_end_state and not has_end_state:
             states_dict[old_end_dest] = {
                 'content': [{

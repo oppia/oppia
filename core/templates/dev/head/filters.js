@@ -18,6 +18,10 @@
 
 oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT', 30);
 
+oppia.constant(
+  'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
+  constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT);
+
 oppia.filter('spacesToUnderscores', [function() {
   return function(input) {
     return input.trim().replace(/ /g, '_');
@@ -437,6 +441,20 @@ oppia.filter('stripFormatting', [function() {
     strippedText = strippedText ? String(strippedText).replace(
       tagRegex, '') : '';
     return strippedText;
+  };
+}]);
+
+oppia.filter('getAbbreviatedText', [function() {
+  return function(text, characterCount) {
+    if (text.length > characterCount) {
+      var subject = text.substr(0, characterCount);
+
+      if (subject.indexOf(' ') !== -1) {
+        subject = subject.split(' ').slice(0, -1).join(' ');
+      }
+      return subject.concat('...');
+    }
+    return text;
   };
 }]);
 

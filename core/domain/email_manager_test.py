@@ -708,7 +708,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
 
 
 class DuplicateEmailTests(test_utils.GenericTestBase):
-    """Test that duplicate emails are not sent"""
+    """Test that duplicate emails are not sent."""
 
     def setUp(self):
         super(DuplicateEmailTests, self).setUp()
@@ -853,7 +853,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             self.assertEqual(len(all_models), 1)
 
     def test_sending_email_with_different_recipient_but_same_hash(self):
-        """Hash for both messages is same but recipients are different"""
+        """Hash for both messages is same but recipients are different."""
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
 
@@ -905,7 +905,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
                 sent_email_model1.html_body, sent_email_model2.html_body)
 
     def test_sending_email_with_different_subject_but_same_hash(self):
-        """Hash for both messages is same but subjects are different"""
+        """Hash for both messages is same but subjects are different."""
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
 
@@ -957,7 +957,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
                 sent_email_model1.html_body, sent_email_model2.html_body)
 
     def test_sending_email_with_different_body_but_same_hash(self):
-        """Hash for both messages is same but body is different"""
+        """Hash for both messages is same but body is different."""
         can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
 
@@ -1547,7 +1547,8 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
 
 
 class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
-    """Test that email is send to submitter when query has completed or failed.
+    """Test that email is send to submitter when query has completed
+    or failed.
     """
     SUBMITTER_USERNAME = 'submit'
     SUBMITTER_EMAIL = 'submit@example.com'
