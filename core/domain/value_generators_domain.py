@@ -41,6 +41,11 @@ class BaseValueGenerator(object):
 
     @property
     def id(self):
+        """Returns the Class name as a string, i.e "BaseValueGenerator".
+
+        Returns:
+            str. Class name i.e "BaseValueGenerator".
+        """
         return self.__class__.__name__
 
     @classmethod
