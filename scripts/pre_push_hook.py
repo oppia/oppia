@@ -68,7 +68,8 @@ class ChangedBranch(object):
     def __enter__(self):
         if not self.is_same_branch:
             try:
-                subprocess.check_output(['git', 'checkout', self.new_branch])
+                subprocess.check_output(
+                    ['git', 'checkout', self.new_branch, '--'])
             except subprocess.CalledProcessError:
                 print ('\nCould not change branch to %s. This is most probably '
                        'because you are in a dirty state. Change manually to '
@@ -78,7 +79,7 @@ class ChangedBranch(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if not self.is_same_branch:
-            subprocess.check_output(['git', 'checkout', self.old_branch])
+            subprocess.check_output(['git', 'checkout', self.old_branch, '--'])
 
 
 def _start_subprocess_for_result(cmd):
