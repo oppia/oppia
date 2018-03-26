@@ -104,6 +104,9 @@ def _git_diff_name_status(left, right, diff_filter=''):
     if diff_filter:
         git_cmd.append('--diff-filter={}'.format(diff_filter))
     git_cmd.extend([left, right])
+    # append -- to avoid conflict between branch and directory name
+    # more here https://stackoverflow.com/questions/26349191
+    git_cmd.append('--')
     out, err = _start_subprocess_for_result(git_cmd)
     if not err:
         file_list = []
