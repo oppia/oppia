@@ -44,12 +44,16 @@ var argv = yargs
 
 var gulp = require('gulp');
 var concat = require('gulp-concat');
-var shell = require('gulp-shell');
+var exec = require('child_process').exec;
 var path = require('path');
 
 var gulpStartGae = require('./scripts/gulp-start-gae-devserver');
 var manifest = require('./manifest.json');
 
+var thirdPartyCssFiles = path.join('third_party', 'static', '**', '*.css');
+var thirdPartyJsFiles = path.join('third_party', 'static', '**', '*.js');
+
+var isProdMode = argv.prod_env === 'True';
 var gaeDevserverPath = argv.gae_devserver_path;
 var params = {
   admin_host: '0.0.0.0',
@@ -83,20 +87,21 @@ gulp.task('gulpStartGae', function() {
     .pipe(gulpStartGae(gaeDevserverPath, [], params));
 });
 
-gulp.task('build', shell.task(['$PYTHON_CMD scripts/build.py']));
+gulp.task('build', function() {
+  exec(['$PYTHON_CMD scripts/build.py']);
+});
 
 gulp.slurped = false;
 gulp.task('watch', function() {
   if (!gulp.slurped) {
     gulp.watch('gulpfile.js', ['build']);
-    gulp.watch(path.join('third_party', 'static', '**', '*.css'), ['build']);
-    gulp.watch(path.join('third_party', 'static', '**', '*.js'), ['build']);
+    gulp.watch(thirdPartyCssFiles, ['build']);
+    gulp.watch(thirdPartyJsFiles, ['build']);
     gulp.watch('manifest.json', ['build']);
     gulp.slurped = true;
   }
 });
 
-var isProdMode = argv.prod_env === 'True';
 if (isProdMode) {
   gulp.task('start_devserver', ['gulpStartGae']);
 } else {

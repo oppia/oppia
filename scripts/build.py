@@ -19,12 +19,11 @@ import fnmatch
 import glob
 import hashlib
 import json
+import optparse
 import os
 import re
 import shutil
 import subprocess
-
-import feconf
 
 ASSETS_SRC_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -98,7 +97,7 @@ def _join_files(source_paths, target_path):
         source_paths: list(str). Paths to files to joined together.
         target_path: str. Path to location of the joined file.
     """
-    with open(target_path, 'w') as target_file:
+    with open(target_path, 'w+') as target_file:
         for source_path in source_paths:
             with open(source_path, 'r') as source_file:
                 target_file.write(source_file.read())
@@ -115,9 +114,9 @@ def _minify_and_create_sourcemap(source_paths, target_path):
     uglify_path = os.path.join(
         PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
 
-    source_map_properties = "includeSources,url=\'third_party.min.js.map\'"
+    source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
     cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
-        NODE_FILE, uglify_path, " ".join(source_paths),
+        NODE_FILE, uglify_path, ' '.join(source_paths),
         source_map_properties, target_path)
     subprocess.check_call(cmd, shell=True)
 
@@ -230,27 +229,27 @@ def get_dependency_filepaths(dependency, filepaths):
         filepaths: dict(str, list(str)). Filepaths object with three lists each
             for different file type (js, css, fonts).
     """
-    if "targetDir" in dependency:
-        dependency_dir = dependency["targetDir"]
+    if 'targetDir' in dependency:
+        dependency_dir = dependency['targetDir']
     else:
         dependency_dir = (
-            dependency["targetDirPrefix"] + dependency["version"])
-    if "bundle" in dependency:
-        dependency_bundle = dependency["bundle"]
-        for css_file in dependency_bundle.get("css", []):
-            filepaths["css"].append(
+            dependency['targetDirPrefix'] + dependency['version'])
+    if 'bundle' in dependency:
+        dependency_bundle = dependency['bundle']
+        for css_file in dependency_bundle.get('css', []):
+            filepaths['css'].append(
                 os.path.join(
                     THIRD_PARTY_STATIC_DIR, dependency_dir, css_file))
-        for js_file in dependency_bundle.get("js", []):
-            filepaths["js"].append(
+        for js_file in dependency_bundle.get('js', []):
+            filepaths['js'].append(
                 os.path.join(
                     THIRD_PARTY_STATIC_DIR, dependency_dir, js_file))
-        if "fontsPath" in dependency_bundle:
+        if 'fontsPath' in dependency_bundle:
             for extension in FONT_EXTENSIONS:
-                filepaths["fonts"].append(
+                filepaths['fonts'].append(
                     os.path.join(
                         THIRD_PARTY_STATIC_DIR, dependency_dir,
-                        dependency_bundle["fontsPath"], extension))
+                        dependency_bundle['fontsPath'], extension))
 
 
 def get_dependencies_filepaths():
@@ -261,19 +260,19 @@ def get_dependencies_filepaths():
         different file type (js, css, fonts).
     """
     filepaths = {
-        "css": [],
-        "js": [],
-        "fonts": []
+        'css': [],
+        'js': [],
+        'fonts': []
     }
     with open(MANIFEST_FILE_PATH, 'r') as json_file:
         manifest = json.loads(
             json_file.read(), object_pairs_hook=collections.OrderedDict)
-    frontend_dependencies = manifest["dependencies"]["frontend"]
+    frontend_dependencies = manifest['dependencies']['frontend']
     for dependency in frontend_dependencies.values():
         get_dependency_filepaths(dependency, filepaths)
 
-    _ensure_files_exist(filepaths["js"])
-    _ensure_files_exist(filepaths["css"])
+    _ensure_files_exist(filepaths['js'])
+    _ensure_files_exist(filepaths['css'])
 
     return filepaths
 
@@ -289,13 +288,13 @@ def build_minified_third_party_libs():
         THIRD_PARTY_GENERATED_STAGING_DIR, 'js', 'third_party.min.js')
     third_party_css = os.path.join(
         THIRD_PARTY_GENERATED_STAGING_DIR, 'css', 'third_party.min.css')
-    fonts_dir = os.path.join(THIRD_PARTY_GENERATED_STAGING_DIR, "fonts")
+    fonts_dir = os.path.join(THIRD_PARTY_GENERATED_STAGING_DIR, 'fonts')
 
     dependency_filepaths = get_dependencies_filepaths()
-    _minify_and_create_sourcemap(dependency_filepaths["js"], third_party_js)
-    _join_files(dependency_filepaths["css"], third_party_css)
+    _minify_and_create_sourcemap(dependency_filepaths['js'], third_party_js)
+    _join_files(dependency_filepaths['css'], third_party_css)
     _minify(third_party_css, third_party_css)
-    _copy_fonts(dependency_filepaths["fonts"], fonts_dir)
+    _copy_fonts(dependency_filepaths['fonts'], fonts_dir)
 
 
 def build_third_party_libs():
@@ -309,12 +308,12 @@ def build_third_party_libs():
         THIRD_PARTY_GENERATED_DEV_DIR, 'js', 'third_party.js')
     third_party_css = os.path.join(
         THIRD_PARTY_GENERATED_DEV_DIR, 'css', 'third_party.css')
-    fonts_dir = os.path.join(THIRD_PARTY_GENERATED_DEV_DIR, "fonts")
+    fonts_dir = os.path.join(THIRD_PARTY_GENERATED_DEV_DIR, 'fonts')
 
     dependency_filepaths = get_dependencies_filepaths()
-    _join_files(dependency_filepaths["js"], third_party_js)
-    _join_files(dependency_filepaths["css"], third_party_css)
-    _copy_fonts(dependency_filepaths["fonts"], fonts_dir)
+    _join_files(dependency_filepaths['js'], third_party_js)
+    _join_files(dependency_filepaths['css'], third_party_css)
+    _copy_fonts(dependency_filepaths['fonts'], fonts_dir)
 
 
 def hash_should_be_inserted(filepath):
@@ -566,8 +565,18 @@ def generate_build_directory():
         TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)
 
 
-if __name__ == '__main__':
-    if feconf.FORCE_PROD_MODE:
+def build():
+    parser = optparse.OptionParser()
+    parser.add_option(
+        '--prod_env', action='store_true', default=False, dest='prod_mode')
+    options = parser.parse_args()[0]
+
+    print options.prod_mode
+    if options.prod_mode:
         generate_build_directory()
     else:
         build_third_party_libs()
+
+
+if __name__ == '__main__':
+    build()
