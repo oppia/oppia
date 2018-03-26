@@ -54,6 +54,8 @@ YUICOMPRESSOR_DIR = os.path.join(
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 NODE_FILE = os.path.join(
     PARENT_DIR, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
+UGLIFY_FILE = os.path.join(
+    PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
 
 FONT_EXTENSIONS = ('*.eot', '*.woff2', '*.ttf', '*.woff', '*.eof', '*.svg')
 
@@ -90,34 +92,35 @@ def _minify(source_path, target_path):
     subprocess.check_call(cmd, shell=True)
 
 
-def _join_files(source_paths, target_path):
+def _join_files(source_paths, target_file_path):
     """Writes multiple files into one file.
 
     Args:
         source_paths: list(str). Paths to files to joined together.
-        target_path: str. Path to location of the joined file.
+        target_file_path: str. Path to location of the joined file.
     """
-    with open(target_path, 'w+') as target_file:
+    ensure_directory_exists(target_file_path)
+    with open(target_file_path, 'w+') as target_file:
         for source_path in source_paths:
             with open(source_path, 'r') as source_file:
                 target_file.write(source_file.read())
 
 
-def _minify_and_create_sourcemap(source_paths, target_path):
+def _minify_and_create_sourcemap(source_paths, target_file_path):
     """Minifies multiple files into one file and generates source map
     for that file.
 
     Args:
         source_paths: list(str). Paths to files to joined and minified.
-        target_path: str. Path to location of the joined file.
+        target_file_path: str. Path to location of the joined file.
     """
-    uglify_path = os.path.join(
-        PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
+
+    ensure_directory_exists(target_file_path)
 
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
     cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
-        NODE_FILE, uglify_path, ' '.join(source_paths),
-        source_map_properties, target_path)
+        NODE_FILE, UGLIFY_FILE, ' '.join(source_paths),
+        source_map_properties, target_file_path)
     subprocess.check_call(cmd, shell=True)
 
 
@@ -128,6 +131,8 @@ def _copy_fonts(source_paths, target_path):
         source_paths: list(str). Paths to fonts.
         target_path: str. Path where the fonts should be copied.
     """
+    ensure_directory_exists(target_path)
+
     for font_wildcard in source_paths:
         font_paths = glob.glob(font_wildcard)
         for font_path in font_paths:
@@ -288,7 +293,7 @@ def build_minified_third_party_libs():
         THIRD_PARTY_GENERATED_STAGING_DIR, 'js', 'third_party.min.js')
     third_party_css = os.path.join(
         THIRD_PARTY_GENERATED_STAGING_DIR, 'css', 'third_party.min.css')
-    fonts_dir = os.path.join(THIRD_PARTY_GENERATED_STAGING_DIR, 'fonts')
+    fonts_dir = os.path.join(THIRD_PARTY_GENERATED_STAGING_DIR, 'fonts', '')
 
     dependency_filepaths = get_dependencies_filepaths()
     _minify_and_create_sourcemap(dependency_filepaths['js'], third_party_js)
@@ -308,7 +313,7 @@ def build_third_party_libs():
         THIRD_PARTY_GENERATED_DEV_DIR, 'js', 'third_party.js')
     third_party_css = os.path.join(
         THIRD_PARTY_GENERATED_DEV_DIR, 'css', 'third_party.css')
-    fonts_dir = os.path.join(THIRD_PARTY_GENERATED_DEV_DIR, 'fonts')
+    fonts_dir = os.path.join(THIRD_PARTY_GENERATED_DEV_DIR, 'fonts', '')
 
     dependency_filepaths = get_dependencies_filepaths()
     _join_files(dependency_filepaths['js'], third_party_js)
