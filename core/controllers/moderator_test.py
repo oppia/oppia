@@ -22,7 +22,7 @@ from core.tests import test_utils
 class ModeratorTest(test_utils.GenericTestBase):
 
     def test_moderator_page(self):
-        """Tests access to the Moderator page"""
+        """Tests access to the Moderator page."""
         # Try accessing the moderator page without logging in.
         response = self.testapp.get('/moderator')
         self.assertEqual(response.status_int, 302)

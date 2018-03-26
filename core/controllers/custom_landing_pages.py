@@ -16,8 +16,6 @@
 
 """Controllers for custom landing pages."""
 
-import random
-
 from core.controllers import base
 from core.domain import acl_decorators
 
@@ -30,12 +28,11 @@ class FractionLandingPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        version_id = self.request.get('v')
+        viewer_type = self.request.get('viewerType')
 
-        if not version_id:
-            version_ids = ['a', 'b', 'c', 'd']
-            version_id = random.choice(version_ids)
-            self.redirect('/fractions?v=%s' % version_id)
+        if not viewer_type:
+            viewer_type = 'student'
+            self.redirect('/fractions?viewerType=%s' % viewer_type)
 
         self.render_template(
-            'pages/landing/fractions/landing_page_%s.html' % version_id)
+            'pages/landing/fractions/landing_page_%s.html' % viewer_type)

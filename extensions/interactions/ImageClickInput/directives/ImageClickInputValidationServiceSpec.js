@@ -24,7 +24,7 @@ describe('ImageClickInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     var filter = $injector.get('$filter');
     validatorService = $injector.get('ImageClickInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');

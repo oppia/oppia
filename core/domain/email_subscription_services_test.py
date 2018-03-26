@@ -28,7 +28,8 @@ import feconf
 
 class InformSubscribersTest(test_utils.GenericTestBase):
     """Test for informing subscribers when an exploration is published by the
-    creator."""
+    creator.
+    """
 
     USER_NAME = 'user'
     USER_EMAIL = 'user@test.com'

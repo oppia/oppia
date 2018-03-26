@@ -360,7 +360,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_ids = ['exp1', 'exp2', 'exp3', 'exp4']
 
         # saving only first 3 explorations to check that None is returned for
-        # non-existing exploration
+        # non-existing exploration.
         for exp_id in exp_ids[:3]:
             self.save_new_valid_exploration(exp_id, self.user_id_admin)
         exp_rights = rights_manager.get_multiple_exploration_rights_by_ids(

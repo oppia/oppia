@@ -131,8 +131,6 @@ handlers:
 libraries:
 - name: jinja2
   version: '2.6'
-- name: numpy
-  version: '1.6.1'
 # This is needed for sending requests to a mailgun HTTPS URL.
 - name: ssl
   version: '2.7.11'
@@ -164,7 +162,7 @@ skip_files:
 - third_party/static/angular-audio-1.7.4
 - third_party/static/angular-scroll-1.0.0
 - third_party/static/angular-toastr-1.7.0
-- third_party/static/font-awesome-4.4.0
+- third_party/static/font-awesome-4.7.0
 - third_party/static/messageformat-0.3.1
 - third_party/static/ng-img-crop-0.3.2
 - third_party/static/nginfinitescroll-1.0.0
