@@ -281,6 +281,7 @@
 	"I18N_PLAYER_RETURN_TO_COLLECTION": "<[collectionTitle]> এ ফেরত আসুন",
 	"I18N_PLAYER_RETURN_TO_EDITOR": "সম্পাদকে ফেরত যান",
 	"I18N_PLAYER_RETURN_TO_LIBRARY": "গ্রন্থাগারে ফিরুন",
+	"I18N_PLAYER_RETURN_TO_PARENT": "প্রধান পাঠে ফিরে যান",
 	"I18N_PLAYER_SHARE_EXPLORATION": "এই অন্বেষণ উপভোগ করছেন? আপনার বন্ধুদের এটির কথা জানান!",
 	"I18N_PLAYER_SHARE_THIS_COLLECTION": "এই সংগ্রহ শেয়ার করুন",
 	"I18N_PLAYER_SHARE_THIS_EXPLORATION": "এই অন্বেষণ ভাগ করুন",

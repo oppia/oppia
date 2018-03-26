@@ -310,7 +310,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
-        # Upload empty audio
+        # Upload empty audio.
         response_dict = self.post_json(
             '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
             {'filename': 'test.mp3'},

@@ -1414,7 +1414,7 @@ class Collection(object):
             skill.validate()
 
         # Check that prerequisite and acquired skill ids exist in the skill
-        # table
+        # table.
         for node in self.nodes:
             for skill_id in (
                     node.prerequisite_skill_ids + node.acquired_skill_ids):
@@ -1466,7 +1466,7 @@ class Collection(object):
                     'Some explorations are unreachable from the initial '
                     'explorations: %s' % unreachable_ids)
 
-            # Check that all skill ids are used
+            # Check that all skill ids are used.
             skill_ids_in_nodes = set()
             for node in self.nodes:
                 skill_ids_in_nodes.update(

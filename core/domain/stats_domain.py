@@ -736,7 +736,8 @@ class AnswerFrequencyList(AnswerCalculationOutput):
 
 
 class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
-    """AnswerFrequencyLists that are categorized based on arbitrary categories.
+    """AnswerFrequencyLists that are categorized based on arbitrary
+    categories.
     """
     def __init__(self, categorized_answer_freq_lists=None):
         """Initialize domain object for categorized answer frequency lists for

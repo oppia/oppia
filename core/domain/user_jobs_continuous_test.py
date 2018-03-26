@@ -643,7 +643,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
     def _run_computation(self):
         """Runs the MapReduce job after running the continuous
         statistics aggregator for explorations to get the correct num
-        completion events."""
+        completion events.
+        """
         with self.swap(
             stats_services, 'get_exploration_stats', self._mock_get_statistics):
             ModifiedUserStatsAggregator.start_computation()
@@ -706,7 +707,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def test_standard_user_stats_calculation_one_exploration(self):
         exploration = self._create_exploration(self.EXP_ID_1, self.user_a_id)
-        # Give this exploration an average rating of 4
+        # Give this exploration an average rating of 4.
         avg_rating = 4
         self._rate_exploration(exploration.id, 5, avg_rating)
 
@@ -725,7 +726,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def test_exploration_multiple_contributors(self):
         exploration = self._create_exploration(self.EXP_ID_1, self.user_a_id)
-        # Give this exploration an average rating of 4
+        # Give this exploration an average rating of 4.
         avg_rating = 4
         self._rate_exploration(exploration.id, 5, avg_rating)
         exp_services.update_exploration(self.user_b_id, self.EXP_ID_1, [], '')
@@ -770,7 +771,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def test_only_yield_when_rating_greater_than_two(self):
         """Tests that map only yields an impact score for an
-        exploration when the impact score is greater than 0."""
+        exploration when the impact score is greater than 0.
+        """
         self._create_exploration(self.EXP_ID_1, self.user_a_id)
 
         # Give two ratings of 1.

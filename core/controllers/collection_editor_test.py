@@ -107,7 +107,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         self.assertEqual(response.status_int, 302)
 
         # Check that whitelisted users can access the data
-        # from the editable_collection_data_handler
+        # from the editable_collection_data_handler.
         self.login(self.EDITOR_EMAIL)
 
         json_response = self.get_json(
@@ -117,7 +117,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         self.logout()
 
     def test_editable_collection_handler_put_cannot_access(self):
-        """Check that non-editors cannot access editable put handler"""
+        """Check that non-editors cannot access editable put handler."""
         whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
         self.set_collection_editors(whitelisted_usernames)
 
@@ -148,7 +148,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         self.logout()
 
     def test_editable_collection_handler_put_can_access(self):
-        """Check that editors can access put handler"""
+        """Check that editors can access put handler."""
         whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
         self.set_collection_editors(whitelisted_usernames)
 
