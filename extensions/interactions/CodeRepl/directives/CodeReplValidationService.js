@@ -46,7 +46,7 @@ oppia.factory('CodeReplValidationService', [
         if (!angular.isString(preCode)) {
           warningsList.push({
             type: WARNING_TYPES.ERROR,
-            message: 'PreCode text must be a string.'
+            message: 'The pre-code text must be a string.'
           });
         }
 
@@ -54,7 +54,7 @@ oppia.factory('CodeReplValidationService', [
         if (!angular.isString(postCode)) {
           warningsList.push({
             type: WARNING_TYPES.ERROR,
-            message: 'PostCode text must be a string.'
+            message: 'The post-code text must be a string.'
           });
         }
         return warningsList;
