@@ -23,11 +23,29 @@ oppia.directive('schemaBasedHtmlEditor', [
         localValue: '=',
         isDisabled: '&',
         labelForFocusTarget: '&',
-        uiConfig: '&'
+        uiConfig: '&',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_editors/' +
         'schema_based_html_editor_directive.html'),
-      restrict: 'E'
+      restrict: 'E',
+      link: function($scope, element, $attrs) {
+        var observer = new MutationObserver(function(mutations) {
+          if (mutations[mutations.length - 1].addedNodes[0]) {
+            if (mutations[mutations.length - 1]
+              .addedNodes[0].nodeName === 'IMG'){
+              var imageRteComeponent =
+              mutations[mutations.length - 1].addedNodes[0];
+              imageRteComeponent.className =
+              'oppia-noninteractive-image block-element';
+              imageRteComeponent.click();
+            }
+          }
+        });
+        observer.observe(element[0], {
+          childList: true,
+          subtree: true
+        });
+      }
     };
   }]);
