@@ -30,7 +30,7 @@
         ng-if="selectionDetails.categories.selections[item.id]">
         <a href ng-click="toggleSelection('categories', item.id)">
           <span translate="<[item.text]>" class="protractor-test-selected"></span>
-          <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
+          <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
         </a>
       </li>
       <li ng-if="selectionDetails.categories.numSelections > 1">
@@ -41,7 +41,7 @@
           ng-if="!selectionDetails.categories.selections[item.id]">
         <a href ng-click="toggleSelection('categories', item.id)">
           <span translate="<[item.text]>" class="protractor-test-deselected"></span>
-          <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
+          <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
         </a>
       </li>
     </ul>
@@ -60,7 +60,7 @@
         ng-if="selectionDetails.languageCodes.selections[item.id]">
       <a href ng-click="toggleSelection('languageCodes', item.id)">
         <span translate="<[item.text]>" class="protractor-test-selected"></span>
-        <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
+        <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 pull-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
       </a>
     </li>
     <li ng-if="selectionDetails.languageCodes.numSelections > 1">
@@ -71,7 +71,7 @@
         ng-if="!selectionDetails.languageCodes.selections[item.id]">
       <a href ng-click="toggleSelection('languageCodes', item.id)">
         <span translate="<[item.text]>" class="protractor-test-deselected"></span>
-        <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
+        <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  pull-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
       </a>
     </li>
   </ul>
@@ -82,7 +82,6 @@
     margin-top: 10px;
     padding-right: 0;
   }
-
   .oppia-search-bar-input {
     background: #04857c;
     border: 1px solid #018c7f;
@@ -91,7 +90,6 @@
     font-size: 15px;
     height: 34px;
   }
-
   .oppia-search-bar-input.btn {
     color: rgba(255,255,255,0.7);
   }
@@ -99,12 +97,10 @@
   .oppia-search-bar-input.btn:focus {
     color: #fff;
   }
-
   .oppia-search-bar-input.btn:focus {
     outline: 1px dotted #fff;
     outline: auto 5px -webkit-focus-ring-color;
   }
-
   .oppia-search-bar-input::-webkit-input-placeholder {
     color: rgba(255,255,255,0.7);
   }
@@ -117,13 +113,11 @@
   .oppia-search-bar-input:-ms-input-placeholder {
     color: rgba(255,255,255,0.7);
   }
-
   .oppia-search-bar-icon {
     background: #04857c;
     border: 1px solid #018c7f;
     color: rgba(255,255,255,0.7);
   }
-
   @media (max-width: 1024px) {
     .oppia-search-bar-language-selector {
       display: none;
@@ -133,7 +127,6 @@
       border-top-right-radius: 4px;
     }
   }
-
   @media (max-width: 767px) {
     .oppia-search-bar-input {
       background: #ffffff;
@@ -170,7 +163,6 @@
        display: inline-block;
     }
   }
-
   @media (max-width: 629px) {
     .oppia-search-bar-text-input {
       border-bottom-right-radius: 4px;
@@ -178,6 +170,12 @@
     }
     .oppia-search-bar-category-selector {
       display: none;
+    }
+  }
+  /* This rule targets only Firefox browsers. */
+  @-moz-document url-prefix() {
+    .oppia-search-bar-category-selection-symbol {
+      margin-top: -18px;
     }
   }
 </style>
