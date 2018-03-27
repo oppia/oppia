@@ -27,8 +27,7 @@ describe('Classifier Object Factory', function() {
 
   it('should create a new classifier', function() {
     var classifierObject = (
-      ClassifierObjectFactory.create(
-        'TestClassifier', {}, 1));
+      ClassifierObjectFactory.create('TestClassifier', {}, 1));
 
     expect(classifierObject.algorithmId).toEqual('TestClassifier');
     expect(classifierObject.classifierData).toEqual({});

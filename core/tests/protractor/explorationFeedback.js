@@ -63,7 +63,8 @@ describe('ExplorationFeedback', function() {
 
     // Creator creates and publishes an exploration
     users.login('user1@ExplorationFeedback.com');
-    workflow.createAndPublishExploration(EXPLORATION_TITLE,
+    workflow.createAndPublishExploration(
+      EXPLORATION_TITLE,
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);

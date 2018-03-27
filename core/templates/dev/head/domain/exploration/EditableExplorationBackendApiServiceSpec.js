@@ -152,8 +152,8 @@ describe('Editable exploration backend API service', function() {
       // Send a request to update exploration
       EditableExplorationBackendApiService.updateExploration(
         exploration.exploration_id, exploration.version,
-        exploration.title, []).then(
-        successHandler, failHandler);
+        exploration.title, [])
+        .then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(exploration);
@@ -166,11 +166,11 @@ describe('Editable exploration backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/explorehandler/init/0').respond(
-        sampleDataResults);
+      $httpBackend.expect('GET', '/explorehandler/init/0')
+        .respond(sampleDataResults);
 
-      ReadOnlyExplorationBackendApiService.loadLatestExploration('0').then(
-        function(data) {
+      ReadOnlyExplorationBackendApiService.loadLatestExploration('0')
+        .then(function(data) {
           exploration = data;
         });
       $httpBackend.flush();
@@ -180,14 +180,16 @@ describe('Editable exploration backend API service', function() {
       exploration.title = 'New Title';
       exploration.version = '2';
 
-      $httpBackend.expect('PUT', '/createhandler/data/0').respond(
-        exploration);
+      $httpBackend.expect('PUT', '/createhandler/data/0')
+        .respond(exploration);
 
       // Send a request to update exploration
-      EditableExplorationBackendApiService.updateExploration(
-        exploration.exploration_id, exploration.version,
-        exploration.title, []).then(
-        successHandler, failHandler);
+      EditableExplorationBackendApiService
+        .updateExploration(
+          exploration.exploration_id,
+          exploration.version,
+          exploration.title, [])
+        .then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(exploration);
@@ -202,11 +204,11 @@ describe('Editable exploration backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/createhandler/data/0').respond(
-        sampleDataResults);
+      $httpBackend.expect('GET', '/createhandler/data/0')
+        .respond(sampleDataResults);
 
-      EditableExplorationBackendApiService.fetchExploration('0').then(
-        function(data) {
+      EditableExplorationBackendApiService.fetchExploration('0')
+        .then(function(data) {
           exploration = data;
         });
       $httpBackend.flush();
@@ -214,23 +216,26 @@ describe('Editable exploration backend API service', function() {
       exploration.title = 'New Title';
       exploration.version = '2';
 
-      $httpBackend.expect('PUT', '/createhandler/data/0').respond(
-        exploration);
+      $httpBackend.expect('PUT', '/createhandler/data/0')
+        .respond(exploration);
 
       // Send a request to update exploration
-      EditableExplorationBackendApiService.updateExploration(
-        exploration.exploration_id, exploration.version,
-        'Minor edits', []).then(
-        successHandler, failHandler);
+      EditableExplorationBackendApiService
+        .updateExploration(
+          exploration.exploration_id,
+          exploration.version,
+          'Minor edits', [])
+        .then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(exploration);
       expect(failHandler).not.toHaveBeenCalled();
 
-      $httpBackend.expect('DELETE', '/createhandler/data/0').respond({});
-      EditableExplorationBackendApiService.deleteExploration(
-        exploration.exploration_id).then(
-        successHandler, failHandler);
+      $httpBackend.expect('DELETE', '/createhandler/data/0')
+        .respond({});
+      EditableExplorationBackendApiService
+        .deleteExploration(exploration.exploration_id)
+        .then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith({});

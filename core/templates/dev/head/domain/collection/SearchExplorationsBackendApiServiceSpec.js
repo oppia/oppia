@@ -26,8 +26,8 @@ describe('Exploration search backend API service', function() {
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(inject(function($injector) {
-    SearchExplorationsBackendApiService = $injector.get(
-      'SearchExplorationsBackendApiService');
+    SearchExplorationsBackendApiService = $injector
+      .get('SearchExplorationsBackendApiService');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
@@ -43,12 +43,10 @@ describe('Exploration search backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
     var query = escape(btoa('three'));
 
-    $httpBackend.expect(
-      'GET', '/exploration/metadata_search?q=' + query).respond(200, {
-      collection_node_metadata_list: []
-    });
-    SearchExplorationsBackendApiService.fetchExplorations('three').then(
-      successHandler, failHandler);
+    $httpBackend.expect('GET', '/exploration/metadata_search?q=' + query)
+      .respond(200, {collection_node_metadata_list: []});
+    SearchExplorationsBackendApiService.fetchExplorations('three')
+      .then(successHandler, failHandler);
     $httpBackend.flush();
     $rootScope.$digest();
 
@@ -76,11 +74,11 @@ describe('Exploration search backend API service', function() {
       }]
     };
 
-    $httpBackend.expect(
-      'GET', '/exploration/metadata_search?q=' + query).respond(200,
-      searchResults);
-    SearchExplorationsBackendApiService.fetchExplorations('count').then(
-      successHandler, failHandler);
+    $httpBackend
+      .expect('GET', '/exploration/metadata_search?q=' + query)
+      .respond(200, searchResults);
+    SearchExplorationsBackendApiService.fetchExplorations('count')
+      .then(successHandler, failHandler);
     $httpBackend.flush();
     $rootScope.$digest();
 
@@ -93,10 +91,10 @@ describe('Exploration search backend API service', function() {
     var failHandler = jasmine.createSpy('fail');
     var query = escape(btoa('oppia'));
 
-    $httpBackend.expect(
-      'GET', '/exploration/metadata_search?q=' + query).respond(500);
-    SearchExplorationsBackendApiService.fetchExplorations('oppia').then(
-      successHandler, failHandler);
+    $httpBackend
+      .expect('GET', '/exploration/metadata_search?q=' + query).respond(500);
+    SearchExplorationsBackendApiService.fetchExplorations('oppia')
+      .then(successHandler, failHandler);
     $httpBackend.flush();
     $rootScope.$digest();
 
