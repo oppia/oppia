@@ -18,6 +18,9 @@
 </style>
 
 <div>
+  <div class="oppia-exp-summary-tiles-container" ng-if="pageMode === LIBRARY_PAGE_MODES.SEARCH">
+    <search-results></search-results>
+  </div>
   <div ng-if="!someResultsExist" class="oppia-search-results-intro" ng-cloak>
     <div class="oppia-search-results-no-match">
       <img ng-src="<[noExplorationsImgUrl]>" alt="No explorations found">
