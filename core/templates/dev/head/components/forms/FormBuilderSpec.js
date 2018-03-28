@@ -175,8 +175,6 @@ describe('RTE helper service', function() {
     ], [
       '<div>abc</div>', '<div>abc</div>'
     ], [
-      '<div>abc</div><br>', '<div>abc</div><br>'
-    ], [
       '<div>abc<span>def</span></div><b>ghi</b>',
       '<div>abc<span>def</span></div><b>ghi</b>'
     ], [

@@ -36,8 +36,7 @@ describe('Testing filters', function() {
     'truncateAndCapitalize',
     'capitalize',
     'stripFormatting',
-    'getAbbreviatedText',
-    'removeExtraLines'
+    'getAbbreviatedText'
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -509,22 +508,6 @@ describe('Testing filters', function() {
       ).toEqual('[Math] Text input [Collapsible] Text input 2 [Image]  ' +
       'Text Input 3');
     }));
-
-  it('should remove extra new lines', inject(function($filter) {
-    var filter = $filter('removeExtraLines');
-
-    expect(filter('<p><br></p>')).toEqual('');
-    expect(filter('<p>abc</p>')).toEqual('<p>abc</p>');
-    expect(filter('<p>abc</p><p><br></p><p>abc</p>')).toEqual(
-      '<p>abc</p><p><br></p><p>abc</p>');
-    expect(filter('<p>abc</p><p><br></p><p>abc</p><p><br></p>')).toEqual(
-      '<p>abc</p><p><br></p><p>abc</p>');
-    expect(filter(
-      '<p>abc</p><p><br></p><p>abc</p><p><br></p><p><br></p>')).toEqual(
-      '<p>abc</p><p><br></p><p>abc</p>');
-    expect(filter(null)).toEqual(null);
-    expect(filter(undefined)).toEqual(undefined);
-  }));
 
   it('should correctly display RTE components in Answer Group Header',
     inject(function($filter) {
