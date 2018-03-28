@@ -23,7 +23,7 @@ oppia.directive('schemaBasedHtmlEditor', [
         localValue: '=',
         isDisabled: '&',
         labelForFocusTarget: '&',
-        uiConfig: '&',
+        uiConfig: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_editors/' +
