@@ -26,8 +26,8 @@ describe('Exploration search backend API service', function() {
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(inject(function($injector) {
-    SearchExplorationsBackendApiService = $injector
-      .get('SearchExplorationsBackendApiService');
+    SearchExplorationsBackendApiService = $injector.get(
+      'SearchExplorationsBackendApiService');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');

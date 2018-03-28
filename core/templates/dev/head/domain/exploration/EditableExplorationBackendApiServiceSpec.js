@@ -152,8 +152,8 @@ describe('Editable exploration backend API service', function() {
       // Send a request to update exploration
       EditableExplorationBackendApiService.updateExploration(
         exploration.exploration_id, exploration.version,
-        exploration.title, [])
-        .then(successHandler, failHandler);
+        exploration.title, []
+      ).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(exploration);
@@ -184,12 +184,11 @@ describe('Editable exploration backend API service', function() {
         .respond(exploration);
 
       // Send a request to update exploration
-      EditableExplorationBackendApiService
-        .updateExploration(
-          exploration.exploration_id,
-          exploration.version,
-          exploration.title, [])
-        .then(successHandler, failHandler);
+      EditableExplorationBackendApiService.updateExploration(
+        exploration.exploration_id,
+        exploration.version,
+        exploration.title, []
+      ).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(exploration);
@@ -220,12 +219,11 @@ describe('Editable exploration backend API service', function() {
         .respond(exploration);
 
       // Send a request to update exploration
-      EditableExplorationBackendApiService
-        .updateExploration(
-          exploration.exploration_id,
-          exploration.version,
-          'Minor edits', [])
-        .then(successHandler, failHandler);
+      EditableExplorationBackendApiService.updateExploration(
+        exploration.exploration_id,
+        exploration.version,
+        'Minor edits', []
+      ).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(exploration);

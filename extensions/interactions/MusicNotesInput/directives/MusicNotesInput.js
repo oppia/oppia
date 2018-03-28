@@ -291,8 +291,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         // Creates the notes and helper-clone notes for the noteChoices div.
         var initPalette = function() {
           var noteChoicesDiv = element.find('.oppia-music-input-note-choices');
-          var validNoteArea = element
-            .find('.oppia-music-input-valid-note-area');
+          var validNoteArea = element.find(
+            '.oppia-music-input-valid-note-area');
           for (var i = 0; i < NOTE_TYPES.length; i++) {
             var innerDiv = $('<div></div>')
               .data('noteType', NOTE_TYPES[i])
