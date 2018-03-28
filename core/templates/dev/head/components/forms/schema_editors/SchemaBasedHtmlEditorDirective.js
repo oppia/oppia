@@ -29,19 +29,25 @@ oppia.directive('schemaBasedHtmlEditor', [
         '/components/forms/schema_editors/' +
         'schema_based_html_editor_directive.html'),
       restrict: 'E',
-      link: function($scope, element, $attrs) {
+      link: function(scope, element, attrs) {
+        // A mutation observer to detect changes in the RTE Editor
         var observer = new MutationObserver(function(mutations) {
+          // A condition to detect if mutation involves addition of node by
+          // drag and drop method.
           if (mutations[mutations.length - 1].addedNodes[0]) {
+            // This condition checks if added node is image type.
             if (mutations[mutations.length - 1]
               .addedNodes[0].nodeName === 'IMG'){
-              var imageRteComeponent =
-              mutations[mutations.length - 1].addedNodes[0];
-              imageRteComeponent.className =
-              'oppia-noninteractive-image block-element';
-              imageRteComeponent.click();
+              // Gets the added image node
+              var addedImgNode = mutations[mutations.length - 1]
+                                      .addedNodes[0];
+              addedImgNode.classList.add('oppia-noninteractive-image');
+              addedImgNode.classList.add('block-element');
+              addedImgNode.click();
             }
           }
         });
+
         observer.observe(element[0], {
           childList: true,
           subtree: true
