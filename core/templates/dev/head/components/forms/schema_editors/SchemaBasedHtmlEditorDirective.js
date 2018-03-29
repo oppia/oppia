@@ -174,6 +174,20 @@ oppia.directive('schemaBasedHtmlEditor', [
                   };
                   img.src = getTrustedResourceUrlForImageFileName(
                     data.filepath);
+
+                  addedImgNode.src = img.src.substring(
+                    SOURCE_SEPARATOR, img.src.length);
+
+                  addedImgNode.setAttribute(
+                    'exploration-id-with-value',
+                    '&quot;' + $scope.explorationId + '&quot;');
+                  addedImgNode.setAttribute(
+                      'filepath-with-value',
+                      '&quot;' + img.src.substring(
+                        FILEPATH_SAPERATOR, img.src.length) + '&quot;');
+                  // Triggering add image modal after the image has been
+                  // uploaded.
+                  addedImgNode.click();
                 }).fail(function(data) {
                   // Remove the XSSI prefix.
                   var transformedData = data.responseText.substring(5);
