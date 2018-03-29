@@ -3,10 +3,17 @@
     "eslint:recommended",
   ],
   "plugins": [
-    "html",
-    "angular"
+    "angular",
+    "html"
   ],
   "rules": {
+    "angular/di-unused": 2,
+    "angular/no-inline-template": [
+      "error",
+      {
+        "allowSimple": true
+      }
+    ],
     "brace-style":[
       "error",
       "1tbs"
@@ -22,13 +29,6 @@
       {
         "before": false,
         "after": true
-      }
-    ],
-    "angular/di-unused": 2,
-    "angular/no-inline-template": [
-      "error",
-      {
-        "allowSimple": true
       }
     ],
     "curly": [
@@ -53,7 +53,8 @@
       "error",
       2,
       {
-        "ArrayExpression": "first",
+        "ArrayExpression": 1,
+        "flatTernaryExpressions": true,
         "FunctionExpression": {
           "body": 1,
           "parameters": 2
@@ -74,6 +75,7 @@
       "code": 80,
       "ignoreUrls": true
     ],
+    "no-compare-neg": "off",
     "no-console": [
       "error",
       {
@@ -101,6 +103,7 @@
     "no-redeclare": [
       "off"
     ],
+    "no-useless-escape": "off",
     "no-trailing-spaces": [
       "error"
     ],
@@ -143,7 +146,8 @@
       "error",
       {
         "anonymous": "ignore",
-        "named": "never"
+        "asyncArrow": "ignore",
+        "named": "never",
       }
     ],
     "space-infix-ops": [
