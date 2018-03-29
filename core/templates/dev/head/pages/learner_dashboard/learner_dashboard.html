@@ -86,6 +86,24 @@
            style="min-width: 200px;">
         <md-card class="oppia-learner-dashboard-main-menu">
           <h4 class="oppia-learner-dashboard-menu"
+              ng-class="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST}"
+              ng-click="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST)">
+            <span translate="<[LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST]>"></span>
+            <span class="caret"></span>
+          </h4>
+          <div ng-show="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST" class="menu-sub-section">
+            <div class="oppia-learner-dashboard-submenu"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS}"
+                 ng-click="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)"
+                 translate="I18N_DASHBOARD_EXPLORATIONS">
+            </div>
+            <div class="oppia-learner-dashboard-submenu protractor-test-playlist-collection-section"
+                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS}"
+                 ng-click="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)"
+                 translate="I18N_DASHBOARD_COLLECTIONS">
+            </div>
+          </div>
+          <h4 class="oppia-learner-dashboard-menu"
               ng-class="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE}"
               ng-click="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE)">
             <span translate="<[LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE]>"></span>
@@ -132,24 +150,6 @@
             <span translate="<[LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK]>"></span>
             <span ng-if="numberOfUnreadThreads !== 0">(<[numberOfUnreadThreads]>)</span>
           </h4>
-          <h4 class="oppia-learner-dashboard-menu"
-              ng-class="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST}"
-              ng-click="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST)">
-            <span translate="<[LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST]>"></span>
-            <span class="caret"></span>
-          </h4>
-          <div ng-show="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST" class="menu-sub-section">
-            <div class="oppia-learner-dashboard-submenu"
-                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS}"
-                 ng-click="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)"
-                 translate="I18N_DASHBOARD_EXPLORATIONS">
-            </div>
-            <div class="oppia-learner-dashboard-submenu protractor-test-playlist-collection-section"
-                 ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS}"
-                 ng-click="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)"
-                 translate="I18N_DASHBOARD_COLLECTIONS">
-            </div>
-          </div>
         </md-card>
       </div>
 
@@ -661,8 +661,15 @@
                   <span style="margin-left: 7px; font-size: 105%;"><[explorationTitle]></span>
                 </td>
               </tr>
-
-              <tr ng-repeat="message in messageSummaries" style="padding: 13px 8px 7px 8px;">
+              <tr ng-if="loadingFeedbacks">
+                <td style="text-align: center;">
+                  <span>
+                    Loading
+                    <loading-dots></loading-dots>
+                  </span>
+                </td>
+              </tr>
+              <tr ng-if="!loadingFeedbacks" ng-repeat="message in messageSummaries" style="padding: 13px 8px 7px 8px;">
                 <td>
                   <div class="row">
                     <div class="col-sm-9">
@@ -766,6 +773,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/RatingComputationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/feedback_thread/FeedbackThreadSummaryObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/feedback_message/FeedbackMessageSummaryObjectFactory.js"></script>

@@ -749,6 +749,12 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
+        event_services.StatsEventsHandler.record(self.EXP_ID, 1, {
+            'num_starts': 1,
+            'num_actual_starts': 0,
+            'num_completions': 0,
+            'state_stats_mapping': {}
+        })
         self.assertEquals(
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.owner_id),
@@ -802,6 +808,13 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
+        event_services.StatsEventsHandler.record(self.EXP_ID, 1, {
+            'num_starts': 1,
+            'num_actual_starts': 0,
+            'num_completions': 0,
+            'state_stats_mapping': {}
+        })
+
         self.assertEquals(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
         self.assertEquals(
@@ -885,7 +898,7 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
 class LastLoginIntegrationTest(test_utils.GenericTestBase):
 
     def setUp(self):
-        """Create exploration with two versions"""
+        """Create exploration with two versions."""
         super(LastLoginIntegrationTest, self).setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)

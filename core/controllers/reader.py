@@ -432,11 +432,10 @@ class StateCompleteEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
-        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            event_services.StateCompleteEventHandler.record(
-                exploration_id, self.payload.get('exp_version'),
-                self.payload.get('state_name'), self.payload.get('session_id'),
-                self.payload.get('time_spent_in_state_secs'))
+        event_services.StateCompleteEventHandler.record(
+            exploration_id, self.payload.get('exp_version'),
+            self.payload.get('state_name'), self.payload.get('session_id'),
+            self.payload.get('time_spent_in_state_secs'))
         self.render_json({})
 
 
@@ -513,10 +512,9 @@ class ExplorationActualStartEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
-        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            event_services.ExplorationActualStartEventHandler.record(
-                exploration_id, self.payload.get('exploration_version'),
-                self.payload.get('state_name'), self.payload.get('session_id'))
+        event_services.ExplorationActualStartEventHandler.record(
+            exploration_id, self.payload.get('exploration_version'),
+            self.payload.get('state_name'), self.payload.get('session_id'))
         self.render_json({})
 
 
@@ -528,11 +526,10 @@ class SolutionHitEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
-        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            event_services.SolutionHitEventHandler.record(
-                exploration_id, self.payload.get('exploration_version'),
-                self.payload.get('state_name'), self.payload.get('session_id'),
-                self.payload.get('time_spent_in_state_secs'))
+        event_services.SolutionHitEventHandler.record(
+            exploration_id, self.payload.get('exploration_version'),
+            self.payload.get('state_name'), self.payload.get('session_id'),
+            self.payload.get('time_spent_in_state_secs'))
         self.render_json({})
 
 

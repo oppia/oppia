@@ -120,10 +120,9 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         with self.swap(
             stats_services, 'handle_stats_creation_for_new_exploration',
             stats_for_new_exploration_log):
-            with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-                exp_services.save_new_exploration_from_yaml_and_assets(
-                    feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
-                    assets_list)
+            exp_services.save_new_exploration_from_yaml_and_assets(
+                feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+                assets_list)
 
         # Now, the stats creation for new explorations method will be called
         # once and stats creation for new exploration version won't be called.
@@ -138,9 +137,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         with self.swap(
             stats_services, 'handle_stats_creation_for_new_exp_version',
             stats_for_new_exp_version_log):
-            with self.swap(feconf, 'ENABLE_NEW_STATS_FRAMEWORK', True):
-                exp_services.update_exploration(
-                    feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
 
         # Now, the stats creation for new explorations method will be called
         # once and stats creation for new exploration version will also be
@@ -211,8 +209,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
         self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), [
-                'Home', 'New state 2', 'End', 'New state'])
+            set(exploration_stats.state_stats_mapping.keys()), set([
+                'Home', 'New state 2', 'End', 'New state']))
         self.assertEqual(
             exploration_stats.state_stats_mapping['New state'].to_dict(),
             stats_domain.StateStats.create_default().to_dict())
@@ -236,8 +234,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration.id, exploration.version)
         self.assertEqual(exploration_stats.exp_version, 3)
         self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), [
-                'Home', 'End', 'Renamed state', 'New state'])
+            set(exploration_stats.state_stats_mapping.keys()), set([
+                'Home', 'End', 'Renamed state', 'New state']))
 
         # Test deletion of states.
         exploration.delete_state('New state')
@@ -254,8 +252,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration.id, exploration.version)
         self.assertEqual(exploration_stats.exp_version, 4)
         self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), [
-                'Home', 'Renamed state', 'End'])
+            set(exploration_stats.state_stats_mapping.keys()),
+            set(['Home', 'Renamed state', 'End']))
 
         # Test addition, renaming and deletion of states.
         exploration.add_states(['New state 2'])
@@ -281,8 +279,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration.id, exploration.version)
         self.assertEqual(exploration_stats.exp_version, 5)
         self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), [
-                'Home', 'End', 'Renamed state'])
+            set(exploration_stats.state_stats_mapping.keys()),
+            set(['Home', 'End', 'Renamed state']))
 
         # Test addition and multiple renames.
         exploration.add_states(['New state 2'])
@@ -309,8 +307,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration.id, exploration.version)
         self.assertEqual(exploration_stats.exp_version, 6)
         self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), [
-                'Home', 'New state 4', 'Renamed state', 'End'])
+            set(exploration_stats.state_stats_mapping.keys()),
+            set(['Home', 'New state 4', 'Renamed state', 'End']))
 
         # Set some values for the the stats in the ExplorationStatsModel
         # instance.
@@ -352,8 +350,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration.id, exploration.version)
         self.assertEqual(exploration_stats.exp_version, 7)
         self.assertEqual(
-            exploration_stats.state_stats_mapping.keys(), [
-                'Home', 'New state 4', 'Renamed state', 'End'])
+            set(exploration_stats.state_stats_mapping.keys()),
+            set(['Home', 'New state 4', 'Renamed state', 'End']))
 
         # Test the values of the stats carried over from the last version.
         self.assertEqual(exploration_stats.num_actual_starts_v2, 5)
@@ -484,29 +482,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(exp_stats_list[1].exp_version, 2)
 
 
-class ModifiedStatisticsAggregator(stats_jobs_continuous.StatisticsAggregator):
-    """A modified StatisticsAggregator that does not start a new batch
-    job when the previous one has finished.
-    """
-    @classmethod
-    def _get_batch_job_manager_class(cls):
-        return ModifiedStatisticsMRJobManager
-
-    @classmethod
-    def _kickoff_batch_job_after_previous_one_ends(cls):
-        pass
-
-
-class ModifiedStatisticsMRJobManager(
-        stats_jobs_continuous.StatisticsMRJobManager):
-
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return ModifiedStatisticsAggregator
-
-
 class ModifiedInteractionAnswerSummariesAggregator(
-        stats_jobs_continuous.StatisticsAggregator):
+        stats_jobs_continuous.InteractionAnswerSummariesAggregator):
     """A modified InteractionAnswerSummariesAggregator that does not start
     a new batch job when the previous one has finished.
     """
@@ -583,7 +560,7 @@ class AnswerEventTests(test_utils.GenericTestBase):
                 'eid', exp_version, state_name)
             self.assertEqual(state_answers, None)
 
-        # answer is a string
+        # answer is a string.
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, first_state_name, 'TextInput', 0, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
@@ -592,32 +569,32 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'eid', exp_version, first_state_name, 'TextInput', 0, 1,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid2', self.TIME_SPENT,
             self.PARAMS, 'answer1')
-        # answer is a dict
+        # answer is a dict.
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, first_state_name, 'TextInput', 1, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
             self.PARAMS, {'x': 1.0, 'y': 5.0})
-        # answer is a number
+        # answer is a number.
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, first_state_name, 'TextInput', 2, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
             self.PARAMS, 10)
-        # answer is a list of dicts
+        # answer is a list of dicts.
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, first_state_name, 'TextInput', 3, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', self.TIME_SPENT,
             self.PARAMS, [{'a': 'some', 'b': 'text'}, {'a': 1.0, 'c': 2.0}])
-        # answer is a list
+        # answer is a list.
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, second_state_name, 'TextInput', 2, 0,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid3', self.TIME_SPENT,
             self.PARAMS, [2, 4, 8])
-        # answer is a unicode string
+        # answer is a unicode string.
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, second_state_name, 'TextInput', 1, 1,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid4', self.TIME_SPENT,
             self.PARAMS, self.UNICODE_TEST_STRING)
-        # answer is None (such as for Continue)
+        # answer is None (such as for Continue).
         event_services.AnswerSubmissionEventHandler.record(
             'eid', exp_version, third_state_name, 'Continue', 1, 1,
             exp_domain.EXPLICIT_CLASSIFICATION, 'sid5', self.TIME_SPENT,
@@ -1131,7 +1108,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
     """Tests for functionality related to retrieving visualization information
     for answers.
     """
-    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedStatisticsAggregator]
+    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedInteractionAnswerSummariesAggregator]
     INIT_STATE_NAME = feconf.DEFAULT_INIT_STATE_NAME
     TEXT_INPUT_EXP_ID = 'exp_id0'
     SET_INPUT_EXP_ID = 'exp_id1'

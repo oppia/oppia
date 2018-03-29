@@ -88,11 +88,11 @@ oppia.directive('createActivityButton', [
 
                     $scope.explorationImgUrl = (
                       UrlInterpolationService.getStaticImageUrl(
-                      '/activity/exploration.svg'));
+                        '/activity/exploration.svg'));
 
                     $scope.collectionImgUrl = (
                       UrlInterpolationService.getStaticImageUrl(
-                      '/activity/collection.svg'));
+                        '/activity/collection.svg'));
                   }],
                 windowClass: 'oppia-creation-modal'
               }).result.then(function() {}, function() {

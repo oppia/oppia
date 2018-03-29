@@ -41,7 +41,7 @@ class SubscriptionTest(test_utils.GenericTestBase):
         self.user_id_2 = self.get_user_id_from_email(self.USER2_EMAIL)
 
     def test_subscribe_handler(self):
-        """Test handler for new subscriptions to creators"""
+        """Test handler for new subscriptions to creators."""
 
         self.login(self.USER_EMAIL)
         response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)

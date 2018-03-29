@@ -90,7 +90,7 @@ RELEASE_DIR_NAME = 'deploy-%s-%s-%s' % (
 RELEASE_DIR_PATH = os.path.join(os.getcwd(), '..', RELEASE_DIR_NAME)
 
 APPCFG_PATH = os.path.join(
-    '..', 'oppia_tools', 'google_appengine_1.9.50', 'google_appengine',
+    '..', 'oppia_tools', 'google_appengine_1.9.67', 'google_appengine',
     'appcfg.py')
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
@@ -141,7 +141,7 @@ def preprocess_release():
                 'updated in the meantime?' % dst)
         shutil.copyfile(src, dst)
 
-    # Copies files in images to /assets/images
+    # Copies files in images to /assets/images.
     for dir_name in IMAGE_DIRS:
         src_dir = os.path.join(DEPLOY_DATA_PATH, 'images', dir_name)
         dst_dir = os.path.join(os.getcwd(), 'assets', 'images', dir_name)

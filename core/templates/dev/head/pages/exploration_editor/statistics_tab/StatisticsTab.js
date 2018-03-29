@@ -24,13 +24,13 @@ oppia.controller('StatisticsTab', [
   'ExplorationDataService', 'ComputeGraphService', 'DateTimeFormatService',
   'StatesObjectFactory', 'StateImprovementSuggestionService',
   'ReadOnlyExplorationBackendApiService', 'UrlInterpolationService',
-  'RouterService', 'IMPROVE_TYPE_INCOMPLETE', 'ENABLE_NEW_STATS_FRAMEWORK',
+  'RouterService', 'StateRulesStatsService', 'IMPROVE_TYPE_INCOMPLETE',
   function(
       $scope, $http, $uibModal, AlertsService, ExplorationStatesService,
       ExplorationDataService, ComputeGraphService, DateTimeFormatService,
       StatesObjectFactory, StateImprovementSuggestionService,
       ReadOnlyExplorationBackendApiService, UrlInterpolationService,
-      RouterService, IMPROVE_TYPE_INCOMPLETE, ENABLE_NEW_STATS_FRAMEWORK) {
+      RouterService, StateRulesStatsService, IMPROVE_TYPE_INCOMPLETE) {
     $scope.COMPLETION_RATE_CHART_OPTIONS = {
       chartAreaWidth: 300,
       colors: ['green', 'firebrick'],
@@ -58,109 +58,56 @@ oppia.controller('StatisticsTab', [
         millisSinceEpoch);
     };
 
-    $scope.ENABLE_NEW_STATS_FRAMEWORK = ENABLE_NEW_STATS_FRAMEWORK;
     $scope.hasTabLoaded = false;
     $scope.$on('refreshStatisticsTab', function() {
       $scope.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
-      $scope.explorationVersionUrl = (
-        '/createhandler/statisticsversion/' +
-        ExplorationDataService.explorationId);
-      $http.get($scope.explorationVersionUrl).then(function(response) {
-        $scope.versions = response.data.versions;
-        $scope.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
-      });
     });
 
     $scope.explorationHasBeenVisited = false;
     $scope.refreshExplorationStatistics = function(version) {
-      if ($scope.ENABLE_NEW_STATS_FRAMEWORK) {
-        $scope.explorationStatisticsUrl = (
-          '/createhandler/statistics/' + ExplorationDataService.explorationId);
-      } else {
-        $scope.explorationStatisticsUrl = (
-          '/createhandler/statistics_old/' +
-          ExplorationDataService.explorationId + '/' + version);
-      }
+      $scope.explorationStatisticsUrl = (
+        '/createhandler/statistics/' + ExplorationDataService.explorationId);
 
-      $http.get($scope.explorationStatisticsUrl).then(function(response) {
+      $http.get($scope.explorationStatisticsUrl).then(function(statsResponse) {
+        var data = statsResponse.data;
+        var numStarts = data.num_starts;
+        var numActualStarts = data.num_actual_starts;
+        var numCompletions = data.num_completions;
+        $scope.stateStats = data.state_stats_mapping;
+
         ReadOnlyExplorationBackendApiService.loadLatestExploration(
           ExplorationDataService.explorationId).then(function(response) {
-            var statesDict = response.exploration.states;
-            var states = StatesObjectFactory.createFromBackendDict(statesDict);
-            var initStateName = response.exploration.init_state_name;
+          var statesDict = response.exploration.states;
+          var states = StatesObjectFactory.createFromBackendDict(statesDict);
+          var initStateName = response.exploration.init_state_name;
 
-            $scope.statsGraphData = ComputeGraphService.compute(
-              initStateName, states);
-            var improvements = (
-              StateImprovementSuggestionService.getStateImprovements(
-                states, $scope.stateStats));
-            $scope.highlightStates = {};
-            improvements.forEach(function(impItem) {
-              // TODO(bhenning): This is the feedback for improvement types
-              // and should be included with the definitions of the
-              // improvement types.
-              if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
-                $scope.highlightStates[impItem.stateName] = (
-                  'May be confusing');
-              }
-            });
-          }
-        );
-        // From this point on, all computation done is for the new stats
-        // framework under a development flag.
-        if ($scope.ENABLE_NEW_STATS_FRAMEWORK) {
-          var data = response.data;
-          var numStarts = data.num_starts;
-          var numActualStarts = data.num_actual_starts;
-          var numCompletions = data.num_completions;
-          $scope.stateStats = data.state_stats_mapping;
-
-          if (numActualStarts > 0) {
-            $scope.explorationHasBeenVisited = true;
-          }
-
-          $scope.numPassersby = numStarts - numActualStarts;
-          $scope.pieChartData = [
-            ['Type', 'Number'],
-            ['Completions', numCompletions],
-            ['Non-Completions', numActualStarts - numCompletions]
-          ];
-        } else {
-          var data = response.data;
-          var numVisits = data.num_starts;
-          var numCompletions = data.num_completions;
-          var improvements = data.improvements;
-          $scope.stateStats = data.state_stats;
-          $scope.lastUpdated = data.last_updated;
-
-          if (numVisits > 0) {
-            $scope.explorationHasBeenVisited = true;
-          }
-
-          $scope.chartData = [
-            ['', 'Completions', 'Non-completions'],
-            ['', numCompletions, numVisits - numCompletions]
-          ];
-
-          $scope.statsGraphOpacities = {
-            legend: 'Students entering state'
-          };
-          // TODO(bhenning): before, there was a special opacity computed for
-          // the ending (numCompletions/numVisits), should we do this for all
-          // terminal nodes, instead? If so, ExplorationStatesService needs to
-          // be able to provide whether given states are terminal
-
-          ExplorationStatesService.getStateNames().forEach(function(stateName) {
-            var visits = 0;
-            if ($scope.stateStats.hasOwnProperty(stateName)) {
-              visits = $scope.stateStats[stateName].first_entry_count;
+          $scope.statsGraphData = ComputeGraphService.compute(
+            initStateName, states);
+          var improvements = (
+            StateImprovementSuggestionService.getStateImprovements(
+              states, $scope.stateStats));
+          $scope.highlightStates = {};
+          improvements.forEach(function(impItem) {
+            // TODO(bhenning): This is the feedback for improvement types
+            // and should be included with the definitions of the
+            // improvement types.
+            if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
+              $scope.highlightStates[impItem.stateName] = (
+                'May be confusing');
             }
-            $scope.statsGraphOpacities[stateName] = Math.max(
-              visits / numVisits, 0.05);
           });
+        });
 
-          $scope.hasTabLoaded = true;
+        if (numActualStarts > 0) {
+          $scope.explorationHasBeenVisited = true;
         }
+
+        $scope.numPassersby = numStarts - numActualStarts;
+        $scope.pieChartData = [
+          ['Type', 'Number'],
+          ['Completions', numCompletions],
+          ['Non-Completions', numActualStarts - numCompletions]
+        ];
       });
     };
 
@@ -171,10 +118,9 @@ oppia.controller('StatisticsTab', [
     $scope.showStateStatsModal = function(stateName, improvementType) {
       AlertsService.clearWarnings();
 
-      $http.get(
-        '/createhandler/state_rules_stats/' + $scope.explorationId + '/' +
-        encodeURIComponent(stateName)
-      ).then(function(response) {
+      StateRulesStatsService.computeStateRulesStats(
+        ExplorationStatesService.getState(stateName)
+      ).then(function(stateRulesStats) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/statistics_tab/' +
@@ -191,18 +137,19 @@ oppia.controller('StatisticsTab', [
               return improvementType;
             },
             visualizationsInfo: function() {
-              return response.data.visualizations_info;
+              return stateRulesStats.visualizations_info;
             }
           },
           controller: [
             '$scope', '$uibModalInstance', '$filter', '$injector', 'stateName',
             'stateStats', 'improvementType', 'visualizationsInfo',
             'HtmlEscaperService', 'AngularNameService',
-            'AnswerClassificationService', 'ENABLE_NEW_STATS_FRAMEWORK',
-            function($scope, $uibModalInstance, $filter, $injector, stateName,
+            'AnswerClassificationService',
+            function(
+                $scope, $uibModalInstance, $filter, $injector, stateName,
                 stateStats, improvementType, visualizationsInfo,
                 HtmlEscaperService, AngularNameService,
-                AnswerClassificationService, ENABLE_NEW_STATS_FRAMEWORK) {
+                AnswerClassificationService) {
               var COMPLETION_RATE_PIE_CHART_OPTIONS = {
                 left: 20,
                 pieHole: 0.6,
@@ -229,8 +176,6 @@ oppia.controller('StatisticsTab', [
               $scope.stateStats = stateStats;
               $scope.improvementType = improvementType;
 
-              $scope.ENABLE_NEW_STATS_FRAMEWORK = ENABLE_NEW_STATS_FRAMEWORK;
-
               var usefulFeedbackCount = (
                 $scope.stateStats.useful_feedback_count);
               var totalAnswersCount = (
@@ -254,48 +199,22 @@ oppia.controller('StatisticsTab', [
               ];
 
               var _getVisualizationsHtml = function() {
-                htmlSnippets = visualizationsInfo.map(
-                  function(visualizationInfo) {
-                    var isAddressedResults = null;
-                    if (visualizationInfo.show_addressed_info) {
-                      var explorationId = ExplorationDataService.explorationId;
-                      var state = ExplorationStatesService.getState(
-                        $scope.stateName);
+                var htmlSnippets = visualizationsInfo.map(function(vizInfo) {
+                  var escapedData =
+                    HtmlEscaperService.objToEscapedJson(vizInfo.data);
+                  var escapedOptions =
+                    HtmlEscaperService.objToEscapedJson(vizInfo.options);
 
-                      isAddressedResults = visualizationInfo.data.map(
-                        function(datum) {
-                          var interactionId = state.interaction.id;
-                          var rulesServiceName = (
-                            AngularNameService.getNameOfInteractionRulesService(
-                              interactionId));
-                          var rulesService = $injector.get(rulesServiceName);
-                          return (
-                            AnswerClassificationService
-                              .isClassifiedExplicitlyOrGoesToNewState(
-                                explorationId, state.name, state,
-                                datum.answer, rulesService
-                              )
-                          );
-                        }
-                      );
-                    }
-
-                    var escapedData = HtmlEscaperService.objToEscapedJson(
-                      visualizationInfo.data);
-                    var escapedOptions = HtmlEscaperService.objToEscapedJson(
-                      visualizationInfo.options);
-                    var escapedIsAddressedResults =
-                      HtmlEscaperService.objToEscapedJson(isAddressedResults);
-
-                    var el = $(
-                      '<oppia-visualization-' +
-                      $filter('camelCaseToHyphens')(visualizationInfo.id) +
-                      '/>');
-                    el.attr('data', escapedData);
-                    el.attr('options', escapedOptions);
-                    el.attr('is-addressed', escapedIsAddressedResults);
-                    return el.get(0).outerHTML;
-                  });
+                  var el = $(
+                    '<oppia-visualization-' +
+                    $filter('camelCaseToHyphens')(vizInfo.id) + '/>');
+                  el.attr('escaped-data', escapedData);
+                  el.attr('escaped-options', escapedOptions);
+                  el.attr(
+                    'addressed-info-is-supported',
+                    vizInfo.addressed_info_is_supported);
+                  return el.get(0).outerHTML;
+                });
 
                 return htmlSnippets.join('');
               };

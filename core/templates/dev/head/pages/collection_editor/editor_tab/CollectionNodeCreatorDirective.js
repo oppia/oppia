@@ -115,8 +115,7 @@ oppia.directive('collectionNodeCreator', [
                 AlertsService.addWarning(
                   'There was an error while adding an exploration to the ' +
                   'collection.');
-              }
-            );
+              });
           };
 
           var convertTypeaheadToExplorationId = function(typeaheadOption) {

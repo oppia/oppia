@@ -174,7 +174,9 @@
                       node-count="group.activity_summary_dicts[leftmostCardIndices[$index]].node_count"
                       category="group.activity_summary_dicts[leftmostCardIndices[$index]].category"
                       thumbnail-icon-url="group.activity_summary_dicts[leftmostCardIndices[$index]].thumbnail_icon_url"
-                      thumbnail-bg-color="group.activity_summary_dicts[leftmostCardIndices[$index]].thumbnail_bg_color">
+                      thumbnail-bg-color="group.activity_summary_dicts[leftmostCardIndices[$index]].thumbnail_bg_color"
+                      show-learner-dashboard-icons-if-possible="true"
+                      container-is-narrow="true">
                   </collection-summary-tile>
                   <exploration-summary-tile ng-if="group.activity_summary_dicts[leftmostCardIndices[$index]].activity_type == 'exploration'"
                       exploration-id="group.activity_summary_dicts[leftmostCardIndices[$index]].id"
@@ -186,7 +188,9 @@
                       num-views="group.activity_summary_dicts[leftmostCardIndices[$index]].num_views"
                       thumbnail-icon-url="group.activity_summary_dicts[leftmostCardIndices[$index]].thumbnail_icon_url"
                       thumbnail-bg-color="group.activity_summary_dicts[leftmostCardIndices[$index]].thumbnail_bg_color"
-                      class="protractor-test-exp-summary-tile">
+                      class="protractor-test-exp-summary-tile"
+                      show-learner-dashboard-icons-if-possible="true"
+                      container-is-narrow="true">
                   </exploration-summary-tile>
                 </div>
               </div>

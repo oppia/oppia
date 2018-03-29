@@ -63,7 +63,7 @@ oppia.factory('CollectionLinearizerService', [
       while (nextExpIds.length > 0) {
         completedExpIds = completedExpIds.concat(nextExpIds);
         nodeList.push(collection.getCollectionNodeByExplorationId(
-            nextExpIds[0]));
+          nextExpIds[0]));
         nextExpIds = _getNextExplorationIds(collection, completedExpIds);
       }
       return nodeList;
