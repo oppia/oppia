@@ -23,7 +23,10 @@ oppia.factory('CodeReplValidationService', [
       getCustomizationArgsWarnings: function(customizationArgs) {
         var warningsList = [];
         baseInteractionValidationService.requireCustomizationArguments(
-          customizationArgs, ['language', 'placeholder', 'preCode',
+          customizationArgs, [
+            'language',
+            'placeholder',
+            'preCode',
             'postCode']);
 
         var language = customizationArgs.language.value;

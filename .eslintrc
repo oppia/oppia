@@ -118,7 +118,7 @@
     ],
     "operator-linebreak": [
       "error",
-      "after",
+      "after"
     ],
     "padded-blocks": [
       "error",
