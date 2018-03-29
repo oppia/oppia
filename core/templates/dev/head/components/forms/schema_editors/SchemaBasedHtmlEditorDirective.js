@@ -41,8 +41,7 @@ oppia.directive('schemaBasedHtmlEditor', [
             if (mutations[mutations.length - 1]
               .addedNodes[0].nodeName === 'IMG'){
               // Gets the added image node
-              var addedImgNode = mutations[
-                mutations.length - 1].addedNodes[0];
+              var addedImgNode = mutations[mutations.length - 1].addedNodes[0];
               addedImgNode.classList.add('oppia-noninteractive-image');
               addedImgNode.classList.add('block-element');
 
