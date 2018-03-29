@@ -23,8 +23,11 @@ oppia.factory('CodeReplValidationService', [
       getCustomizationArgsWarnings: function(customizationArgs) {
         var warningsList = [];
         baseInteractionValidationService.requireCustomizationArguments(
-          customizationArgs, ['language', 'placeholder', 'preCode',
-                              'postCode']);
+          customizationArgs, [
+            'language',
+            'placeholder',
+            'preCode',
+            'postCode']);
 
         var language = customizationArgs.language.value;
         if (!angular.isString(language)) {

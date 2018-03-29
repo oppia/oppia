@@ -232,8 +232,8 @@ describe('Testing filters', function() {
       expect(filter(12389654281)).toEqual('12.4B');
       expect(filter(897978581123)).toEqual('898.0B');
       expect(filter(476678)).toEqual('476.7K');
-    }
-  ));
+    })
+  );
 
   it(
     'should capitalize first letter and truncate string at a word break',
@@ -272,8 +272,8 @@ describe('Testing filters', function() {
       // return whole objective.
       expect(filter('please do not test empty string', 100)).toEqual(
         'Please do not test empty string');
-    }
-  ));
+    })
+  );
 
   it(
     'should remove all tags except img tags with the whitelisted classes',
@@ -432,8 +432,8 @@ describe('Testing filters', function() {
         $filter('stripFormatting')(BREAKLINE_TEXT, whitelistedImgClasses)
       ).toEqual('<p>Oppia makes it easy to create interactive lessons </p>' +
       '<p><br></p><p>that educate and engage.</p>');
-    }
-  ));
+    })
+  );
 
   it('should correctly capitalize strings', inject(function($filter) {
     var filter = $filter('capitalize');
@@ -578,11 +578,11 @@ describe('Testing filters', function() {
 
       expect($filter('convertToPlainText')($filter('formatRtePreview')(
         $filter('parameterizeRuleDescription')(ruleMixed, interactionIdMixed,
-        choicesMixed)))
+          choicesMixed)))
       ).toEqual('is ' + 'equal to \'[Image] This is a text ' +
         'input. [Image]  [Link]\'');
-    }
-  ));
+    })
+  );
 
   it('should correctly parameterize rule description filter',
     inject(function($filter) {

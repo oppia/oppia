@@ -72,7 +72,7 @@ oppia.directive('paramChangesEditor', [
           $scope.addParamChange = function() {
             var newParamName = (
               $scope.paramNameChoices.length > 0 ?
-              $scope.paramNameChoices[0].id : 'x');
+                $scope.paramNameChoices[0].id : 'x');
             var newParamChange = ParamChangeObjectFactory.createDefault(
               newParamName);
             // Add the new param name to $scope.paramNameChoices, if necessary,

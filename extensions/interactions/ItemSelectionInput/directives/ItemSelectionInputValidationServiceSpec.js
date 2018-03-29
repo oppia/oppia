@@ -82,7 +82,8 @@ describe('ItemSelectionInputValidationService', function() {
     }).toThrow('Expected customization arguments to have property: choices');
   });
 
-  it('should expect the minAllowableSelectionCount to be less than or ' +
+  it(
+    'should expect the minAllowableSelectionCount to be less than or ' +
     'equal to maxAllowableSelectionCount',
     function() {
       customizationArguments.minAllowableSelectionCount.value = 3;
@@ -98,7 +99,8 @@ describe('ItemSelectionInputValidationService', function() {
       }]);
     });
 
-  it('should expect maxAllowableSelectionCount to be less than the total ' +
+  it(
+    'should expect maxAllowableSelectionCount to be less than the total ' +
     'number of selections',
     function() {
       customizationArguments.maxAllowableSelectionCount.value = 3;
@@ -116,10 +118,11 @@ describe('ItemSelectionInputValidationService', function() {
       }]);
     });
 
-  it('should expect minAllowableSelectionCount to be less than the total ' +
+  it(
+    'should expect minAllowableSelectionCount to be less than the total ' +
     'number of selections',
     function() {
-      // Remove the last choice.
+    // Remove the last choice.
       customizationArguments.choices.value.splice(2, 1);
 
       customizationArguments.minAllowableSelectionCount.value = 3;

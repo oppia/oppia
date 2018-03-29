@@ -86,12 +86,12 @@ oppia.factory('AlertsService', ['$log', function($log) {
     AlertsService.warnings = [];
   };
 
-    /**
-     * Adds a message, can be info messages or success messages.
-     * @param {string} type - Type of message
-     * @param {string} message - Message content
-     * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
-     */
+  /**
+   * Adds a message, can be info messages or success messages.
+   * @param {string} type - Type of message
+   * @param {string} message - Message content
+   * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
+   */
   AlertsService.addMessage = function(type, message, timeoutMilliseconds) {
     if (AlertsService.messages.length >= MAX_TOTAL_MESSAGES) {
       return;
@@ -119,11 +119,11 @@ oppia.factory('AlertsService', ['$log', function($log) {
     AlertsService.messages = newMessages;
   };
 
-    /**
-     * Adds an info message.
-     * @param {string} message - Info message to display.
-     * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
-     */
+  /**
+   * Adds an info message.
+   * @param {string} message - Info message to display.
+   * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
+   */
   AlertsService.addInfoMessage = function(message, timeoutMilliseconds) {
     if (timeoutMilliseconds === undefined) {
       timeoutMilliseconds = 1500;
@@ -131,11 +131,11 @@ oppia.factory('AlertsService', ['$log', function($log) {
     AlertsService.addMessage('info', message, timeoutMilliseconds);
   };
 
-    /**
-     * Adds a success message.
-     * @param {string} message - Success message to display
-     * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
-     */
+  /**
+   * Adds a success message.
+   * @param {string} message - Success message to display
+   * @param {number|undefined} timeoutMilliseconds - Timeout for the toast.
+   */
   AlertsService.addSuccessMessage = function(message, timeoutMilliseconds) {
     if (timeoutMilliseconds === undefined) {
       timeoutMilliseconds = 1500;
