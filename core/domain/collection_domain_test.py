@@ -425,7 +425,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         # Passes non-strict validation.
         self.collection.validate(strict=False)
 
-        # Fails strict validation
+        # Fails strict validation.
         self._assert_validation_error(
             'Skill with ID skill1 is not a prerequisite or acquired '
             'skill of any node.')
@@ -456,7 +456,8 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(collection_from_dict.to_dict(), collection_dict)
 
     def test_add_delete_node(self):
-        """Test that add_node and delete_node fail in the correct situations.
+        """Test that add_node and delete_node fail in the correct
+        situations.
         """
         collection = collection_domain.Collection.create_default_collection(
             '0')
@@ -492,7 +493,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'exp_id')
         self.assertEqual(collection.skills, {})
 
-        # Add skills
+        # Add skills.
         collection.add_skill('skillname1')
         self.assertEqual(collection.skills.keys(), ['skill0'])
         self.assertEqual(collection.skills['skill0'].name, 'skillname1')
@@ -531,7 +532,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.add_skill('skillname1')
         collection.add_skill('skillname2')
 
-        # Names should be unique
+        # Names should be unique.
         with self.assertRaisesRegexp(
             ValueError, 'Skill with name "skillname1" already exists.'):
             collection.add_skill('skillname1')
@@ -543,16 +544,16 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.add_skill('skillname1')
         collection.add_skill('skillname2')
 
-        # Delete a skill
+        # Delete a skill.
         collection.delete_skill('skill1')
         self.assertEqual(collection.skills.keys(), ['skill0'])
 
-        # Should raise error if ID is not found
+        # Should raise error if ID is not found.
         with self.assertRaisesRegexp(
             ValueError, 'Skill with ID "skill1" does not exist.'):
             collection.delete_skill('skill1')
 
-        # New IDs should skip deleted IDs
+        # New IDs should skip deleted IDs.
         collection.add_skill('skillname3')
         self.assertEqual(sorted(collection.skills.keys()), ['skill0', 'skill2'])
 
@@ -562,7 +563,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'exp_id')
         self.assertEqual(collection.skills, {})
 
-        # Add prerequisite and acquired skills
+        # Add prerequisite and acquired skills.
         collection.add_skill('skillname1')
         self.assertEqual(collection.skills.keys(), ['skill0'])
         self.assertEqual(collection.skills['skill0'].name, 'skillname1')

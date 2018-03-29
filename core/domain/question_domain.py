@@ -80,7 +80,8 @@ class QuestionChange(object):
         """Returns a dict representing QuestionChange domain object.
 
         Returns:
-            dict. A dict representing QuestionChange instance."""
+            dict. A dict representing QuestionChange instance.
+        """
         return {
             'cmd': self.cmd,
             'property_name': self.property_name,

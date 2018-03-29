@@ -126,18 +126,18 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         """Test giving feedback handler."""
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
-        # Load demo exploration
+        # Load demo exploration.
         exp_id = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
-        # Viewer opens exploration
+        # Viewer opens exploration.
         self.login(self.VIEWER_EMAIL)
         exploration_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
         state_name_1 = exploration_dict['exploration']['init_state_name']
 
-        # Viewer gives 1st feedback
+        # Viewer gives 1st feedback.
         self.post_json(
             '/explorehandler/give_feedback/%s' % exp_id,
             {
@@ -272,14 +272,14 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(
             self.testapp.get('/explore/%s' % self.EXP_ID))
 
-        # User checks rating
+        # User checks rating.
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], None)
         self.assertEqual(
             ratings['overall_ratings'],
             {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
 
-        # User rates and checks rating
+        # User rates and checks rating.
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
                 'user_rating': 2
@@ -291,7 +291,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
             ratings['overall_ratings'],
             {'1': 0, '2': 1, '3': 0, '4': 0, '5': 0})
 
-        # User re-rates and checks rating
+        # User re-rates and checks rating.
         self.login('user@example.com')
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {

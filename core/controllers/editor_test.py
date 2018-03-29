@@ -67,13 +67,15 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
 
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
-        editable."""
+        editable.
+        """
         self.assertIn(self.CAN_EDIT_STR, response_body)
         self.assertNotIn(self.CANNOT_EDIT_STR, response_body)
 
     def assert_cannot_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
-        not editable."""
+        not editable.
+        """
         self.assertIn(self.CANNOT_EDIT_STR, response_body)
         self.assertNotIn(self.CAN_EDIT_STR, response_body)
 
@@ -281,7 +283,7 @@ class EditorTest(BaseEditorControllerTest):
             with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CC_MANAGERS_FOR_TESTS):
-                # Run job on exploration with answers
+                # Run job on exploration with answers.
                 stats_jobs_continuous_test.ModifiedInteractionAnswerSummariesAggregator.start_computation() # pylint: disable=line-too-long
                 self.assertEqual(
                     self.count_jobs_in_taskqueue(
@@ -681,7 +683,7 @@ param_changes: []
         self.login(self.EDITOR_EMAIL)
         owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        # Create a simple exploration
+        # Create a simple exploration.
         exp_id = 'eid'
         self.save_new_valid_exploration(
             exp_id, owner_id,
@@ -703,12 +705,12 @@ param_changes: []
             owner_id, exploration, '', [])
         response = self.testapp.get('/create/%s' % exp_id)
 
-        # Check download to zip file
-        # Download to zip file using download handler
+        # Check download to zip file.
+        # Download to zip file using download handler.
         download_url = '/createhandler/download/%s' % exp_id
         response = self.testapp.get(download_url)
 
-        # Check downloaded zip file
+        # Check downloaded zip file.
         self.assertEqual(response.headers['Content-Type'], 'text/plain')
         filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
         self.assertEqual(response.headers['Content-Disposition'],
@@ -718,33 +720,33 @@ param_changes: []
             zf_saved.namelist(),
             ['The title for ZIP download handler test!.yaml'])
 
-        # Load golden zip file
+        # Load golden zip file.
         with open(os.path.join(
             feconf.TESTS_DATA_DIR,
             'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip'),
                   'rb') as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(StringIO.StringIO(golden_zipfile))
-        # Compare saved with golden file
+        # Compare saved with golden file.
         self.assertEqual(
             zf_saved.open(
                 'The title for ZIP download handler test!.yaml').read(),
             zf_gold.open(
                 'The title for ZIP download handler test!.yaml').read())
 
-        # Check download to JSON
+        # Check download to JSON.
         exploration.update_objective('Test JSON download')
         exp_services._save_exploration(  # pylint: disable=protected-access
             owner_id, exploration, '', [])
 
-        # Download to JSON string using download handler
+        # Download to JSON string using download handler.
         self.maxDiff = None
         download_url = (
             '/createhandler/download/%s?output_format=%s&width=50' %
             (exp_id, feconf.OUTPUT_FORMAT_JSON))
         response = self.get_json(download_url)
 
-        # Check downloaded dict
+        # Check downloaded dict.
         self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
 
         self.logout()
@@ -753,7 +755,7 @@ param_changes: []
         self.login(self.EDITOR_EMAIL)
         owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        # Create a simple exploration
+        # Create a simple exploration.
         exp_id = 'eid'
         self.save_new_valid_exploration(
             exp_id, owner_id,
@@ -933,7 +935,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
     EXP_ID = '0'
 
     def setUp(self):
-        """Create exploration with two versions"""
+        """Create exploration with two versions."""
         super(VersioningIntegrationTest, self).setUp()
 
         exp_services.load_demo(self.EXP_ID)
@@ -962,12 +964,12 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
 
     def test_reverting_to_old_exploration(self):
         """Test reverting to old exploration versions."""
-        # Open editor page
+        # Open editor page.
         response = self.testapp.get(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, self.EXP_ID))
         csrf_token = self.get_csrf_token_from_response(response)
 
-        # May not revert to any version that's not 1
+        # May not revert to any version that's not 1.
         for rev_version in (-1, 0, 2, 3, 4, '1', ()):
             response_dict = self.post_json(
                 '/createhandler/revert/%s' % self.EXP_ID, {
@@ -975,14 +977,14 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
                     'revert_to_version': rev_version
                 }, csrf_token, expect_errors=True, expected_status_int=400)
 
-            # Check error message
+            # Check error message.
             if not isinstance(rev_version, int):
                 self.assertIn('Expected an integer', response_dict['error'])
             else:
                 self.assertIn('Cannot revert to version',
                               response_dict['error'])
 
-            # Check that exploration is really not reverted to old version
+            # Check that exploration is really not reverted to old version.
             reader_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
             init_state_name = reader_dict['exploration']['init_state_name']
@@ -992,7 +994,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
             self.assertIn('ABC', init_content)
             self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
-        # Revert to version 1
+        # Revert to version 1.
         rev_version = 1
         response_dict = self.post_json(
             '/createhandler/revert/%s' % self.EXP_ID, {
@@ -1000,7 +1002,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
                 'revert_to_version': rev_version
             }, csrf_token)
 
-        # Check that exploration is really reverted to version 1
+        # Check that exploration is really reverted to version 1.
         reader_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
 
@@ -1077,7 +1079,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         # Ban joe.
         self.set_banned_users(['joe'])
 
-        # Test that Joe is banned. (He can still access the library page.)
+        # Test that Joe is banned (He can still access the library page).
         response = self.testapp.get(
             feconf.LIBRARY_INDEX_URL, expect_errors=True)
         self.assertEqual(response.status_int, 200)
@@ -1118,7 +1120,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.signup(
             self.COLLABORATOR3_EMAIL, username=self.COLLABORATOR3_USERNAME)
 
-        # Owner creates exploration
+        # Owner creates exploration.
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
         self.save_new_valid_exploration(
@@ -1135,7 +1137,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
         csrf_token = self.get_csrf_token_from_response(response)
 
-        # Owner adds rights for other users
+        # Owner adds rights for other users.
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
         self.put_json(
             rights_url, {
@@ -1298,7 +1300,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
     def test_user_exploration_emails_handler(self):
         """Test user exploration emails handler."""
 
-        # Owner creates exploration
+        # Owner creates exploration.
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
         self.save_new_valid_exploration(
@@ -1317,7 +1319,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTest):
         self.assertFalse(exp_email_preferences.mute_feedback_notifications)
         self.assertFalse(exp_email_preferences.mute_suggestion_notifications)
 
-        # Owner changes email preferences
+        # Owner changes email preferences.
         emails_url = '%s/%s' % (feconf.USER_EXPLORATION_EMAILS_PREFIX, exp_id)
         self.put_json(
             emails_url, {
@@ -1656,7 +1658,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertEqual(
             exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
-            #id is incremented the first time but not the second
+            #id is incremented the first time but not the second.
         self.assertEqual(exp_user_data.draft_change_list_id, 2)
         self.assertEqual(
             response, {'status_code': 400,

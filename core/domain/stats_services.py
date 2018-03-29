@@ -379,7 +379,8 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
         'id': visualization.id,
         'data': calculation_ids_to_outputs[visualization.calculation_id],
         'options': visualization.options,
-        'show_addressed_info': visualization.show_addressed_info,
+        'addressed_info_is_supported': (
+            visualization.addressed_info_is_supported),
     } for visualization in visualizations
             if visualization.calculation_id in calculation_ids_to_outputs]
 
@@ -478,9 +479,9 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
     if answers_model is None:
         return []
 
-    # Return at most 100 answers, and only answers from the initial shard. (If
+    # Return at most 100 answers, and only answers from the initial shard (If
     # we needed to use subsequent shards then the answers are probably too big
-    # anyway.)
+    # anyway).
     sample_answers = answers_model.submitted_answer_list[:100]
     return [
         stats_domain.SubmittedAnswer.from_dict(submitted_answer_dict).answer

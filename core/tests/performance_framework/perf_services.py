@@ -118,8 +118,8 @@ class SeleniumPerformanceDataFetcher(object):
         self._stop_driver(driver)
 
     def get_page_metrics_from_uncached_session(self, page_url):
-        """Returns a PageSessionMetrics domain object for a given page URL.
-        """
+        """Returns a PageSessionMetrics domain object for a given page URL."""
+
         server, proxy = self._setup_proxy_server()
         driver = self._setup_driver(proxy=proxy, use_proxy=True)
 

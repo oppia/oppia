@@ -133,7 +133,7 @@ class ExplorationModel(base_models.VersionedModel):
 
         # TODO(msl): test if put_async() leads to any problems (make
         # sure summary dicts get updated correctly when explorations
-        # are changed)
+        # are changed).
         ExplorationCommitLogEntryModel(
             id=('exploration-%s-%s' % (self.id, self.version)),
             user_id=committer_id,
@@ -235,7 +235,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 if committer_user_settings_model else '')
             # TODO(msl): test if put_async() leads to any problems (make
             # sure summary dicts get updated correctly when explorations
-            # are changed)
+            # are changed).
             ExplorationCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
@@ -278,7 +278,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
     # The commit_cmds dict for this commit.
     commit_cmds = ndb.JsonProperty(indexed=False, required=True)
     # The version number of the exploration after this commit. Only populated
-    # for commits to an exploration (as opposed to its rights, etc.)
+    # for commits to an exploration (as opposed to its rights, etc.).
     version = ndb.IntegerProperty()
 
     # The status of the exploration after the edit event ('private', 'public').
@@ -414,7 +414,7 @@ class ExpSummaryModel(base_models.BaseModel):
     # Tags associated with this exploration.
     tags = ndb.StringProperty(repeated=True, indexed=True)
 
-    # Aggregate user-assigned ratings of the exploration
+    # Aggregate user-assigned ratings of the exploration.
     ratings = ndb.JsonProperty(default=None, indexed=False)
 
     # Scaled average rating for the exploration.
@@ -422,11 +422,11 @@ class ExpSummaryModel(base_models.BaseModel):
 
     # Time when the exploration model was last updated (not to be
     # confused with last_updated, which is the time when the
-    # exploration *summary* model was last updated)
+    # exploration *summary* model was last updated).
     exploration_model_last_updated = ndb.DateTimeProperty(indexed=True)
     # Time when the exploration model was created (not to be confused
     # with created_on, which is the time when the exploration *summary*
-    # model was created)
+    # model was created).
     exploration_model_created_on = ndb.DateTimeProperty(indexed=True)
     # Time when the exploration was first published.
     first_published_msec = ndb.FloatProperty(indexed=True)
@@ -450,14 +450,14 @@ class ExpSummaryModel(base_models.BaseModel):
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who have contributed (humans who have made a
-    # positive (not just a revert) change to the exploration's content)
+    # positive (not just a revert) change to the exploration's content).
     contributor_ids = ndb.StringProperty(indexed=True, repeated=True)
     # A dict representing the contributors of non-trivial commits to this
     # exploration. Each key of this dict is a user_id, and the corresponding
     # value is the number of non-trivial commits that the user has made.
     contributors_summary = ndb.JsonProperty(default={}, indexed=False)
     # The version number of the exploration after this commit. Only populated
-    # for commits to an exploration (as opposed to its rights, etc.)
+    # for commits to an exploration (as opposed to its rights, etc.).
     version = ndb.IntegerProperty()
 
     @classmethod

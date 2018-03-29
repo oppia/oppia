@@ -8,7 +8,7 @@ init-hook='import sys; sys.path.append("../oppia_tools/google_appengine_1.9.67/g
 [MASTER]
 
 # Checks for correct docstring style
-load-plugins=pylint.extensions.docstyle
+load-plugins=pylint.extensions.docstyle, scripts.custom_lint_checks
 
 [BASIC]
 

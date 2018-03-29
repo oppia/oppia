@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for classifier services"""
+"""Tests for classifier services."""
 
 import datetime
 import os
