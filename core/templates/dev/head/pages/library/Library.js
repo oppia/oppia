@@ -80,6 +80,31 @@ oppia.controller('Library', [
       $http.get('/libraryindexhandler').success(function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
 
+        $scope.data = {};
+
+        for (var i = 0; i < $scope.libraryGroups.length; i++) {
+          var categoryActivity = $scope.libraryGroups[i].activity_summary_dicts;
+          for (var j = 0; j < categoryActivity.length; j++) {
+            activityType = categoryActivity[j].activity_type;
+            activityId = categoryActivity[j].id;
+
+            var learnerPlaylistUrl = (
+              UrlInterpolationService.interpolateUrl(
+                '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
+                  activityType: activityType,
+                  activityId: activityId
+                }));
+            $http.post(learnerPlaylistUrl, {})
+              .then(function(response) {
+                if (response.data.belongs_to_subscribed_activities) {
+                  $scope.data[activityId] = false;
+                } else {
+                  $scope.data[activityId] = true;
+                }
+              });
+          }
+        }
+
         $rootScope.$broadcast(
           'preferredLanguageCodesLoaded', data.preferred_language_codes);
 

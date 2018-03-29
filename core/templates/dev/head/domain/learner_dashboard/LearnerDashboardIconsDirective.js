@@ -59,20 +59,6 @@ oppia.directive('learnerDashboardIcons', [
                   response.data.learner_dashboard_activity_ids));
             }
           );
-          var learnerPlaylistUrl = (
-            UrlInterpolationService.interpolateUrl(
-              '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
-                activityType: $scope.getActivityType(),
-                activityId: $scope.getActivityId()
-              }));
-          $http.post(learnerPlaylistUrl, {})
-            .then(function(response) {
-              if (response.data.belongs_to_subscribed_activities) {
-                $scope.shouldShowAddToPlaylistIcon = false;
-              } else {
-                $scope.shouldShowAddToPlaylistIcon = true;
-              }
-            });
 
           $scope.setHoverState = function(hoverState) {
             $scope.activityIsCurrentlyHoveredOver = hoverState;
