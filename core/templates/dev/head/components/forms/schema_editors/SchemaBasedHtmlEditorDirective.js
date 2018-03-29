@@ -182,9 +182,9 @@ oppia.directive('schemaBasedHtmlEditor', [
                     'exploration-id-with-value',
                     '&quot;' + $scope.explorationId + '&quot;');
                   addedImgNode.setAttribute(
-                      'filepath-with-value',
-                      '&quot;' + img.src.substring(
-                        FILEPATH_SAPERATOR, img.src.length) + '&quot;');
+                    'filepath-with-value',
+                    '&quot;' + img.src.substring(
+                      FILEPATH_SAPERATOR, img.src.length) + '&quot;');
                   // Triggering add image modal after the image has been
                   // uploaded.
                   addedImgNode.click();
