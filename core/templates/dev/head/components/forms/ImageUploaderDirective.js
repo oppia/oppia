@@ -98,7 +98,7 @@ oppia.directive('imageUploader', [
         scope.fileInputClassName = (
           'image-uploader-file-input' + IdGenerationService.generateNewId());
         angular.element(document).on(
-          'change', '.' + scope.fileInputClassName, function(evt) {            
+          'change', '.' + scope.fileInputClassName, function(evt) {
             var file = evt.currentTarget.files[0];
             var filename = evt.target.value.split(/(\\|\/)/g).pop();
             scope.errorMessage = validateUploadedFile(file, filename);
