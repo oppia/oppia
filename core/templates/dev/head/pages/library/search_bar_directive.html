@@ -1,7 +1,7 @@
 <div class="oppia-same-row-container">
   <form class="navbar-form navbar-left oppia-search-bar-form" role="search">
     <div class="form-group">
-      <div class="input-group" style="max-width: 375px; width: 375px;">
+      <div class="input-group" style="max-width: 375px; width: auto;">
         <div class="input-group-addon oppia-search-bar-icon">
           <i class="material-icons md-18" ng-if="!isSearchInProgress()">&#xE8B6;</i>
           <span ng-if="isSearchInProgress()">
@@ -82,6 +82,7 @@
     margin-top: 10px;
     padding-right: 0;
   }
+
   .oppia-search-bar-input {
     background: #04857c;
     border: 1px solid #018c7f;
@@ -90,6 +91,7 @@
     font-size: 15px;
     height: 34px;
   }
+
   .oppia-search-bar-input.btn {
     color: rgba(255,255,255,0.7);
   }
@@ -97,10 +99,12 @@
   .oppia-search-bar-input.btn:focus {
     color: #fff;
   }
+
   .oppia-search-bar-input.btn:focus {
     outline: 1px dotted #fff;
     outline: auto 5px -webkit-focus-ring-color;
   }
+
   .oppia-search-bar-input::-webkit-input-placeholder {
     color: rgba(255,255,255,0.7);
   }
@@ -113,11 +117,13 @@
   .oppia-search-bar-input:-ms-input-placeholder {
     color: rgba(255,255,255,0.7);
   }
+
   .oppia-search-bar-icon {
     background: #04857c;
     border: 1px solid #018c7f;
     color: rgba(255,255,255,0.7);
   }
+
   @media (max-width: 1024px) {
     .oppia-search-bar-language-selector {
       display: none;
@@ -127,6 +133,7 @@
       border-top-right-radius: 4px;
     }
   }
+
   @media (max-width: 767px) {
     .oppia-search-bar-input {
       background: #ffffff;
@@ -163,6 +170,7 @@
        display: inline-block;
     }
   }
+
   @media (max-width: 629px) {
     .oppia-search-bar-text-input {
       border-bottom-right-radius: 4px;
@@ -178,4 +186,5 @@
       margin-top: -18px;
     }
   }
+
 </style>
