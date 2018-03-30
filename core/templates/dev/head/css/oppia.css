@@ -3191,30 +3191,6 @@ div#ng-curtain {
   }
 }
 
-.oppia-about-anchor {
-  display: block;
-  position: relative;
-  top: -70px;
-  visibility: hidden;
-}
-
-.oppia-about-right-menu {
-  left: 50%;
-  margin-left: 360px;
-  position: fixed;
-  top: 100px;
-  width: 300px;
-}
-
-.oppia-about-right-menu p {
-  line-height: 1;
-  margin: 0.5em 0;
-}
-.oppia-about-right-menu ul {
-  list-style-type: none;
-  padding-left: 20px;
-}
-
 /* Hide the 'Skip' icon on the editor tutorial. */
 .skipBtn i {
   display: none;
@@ -4525,14 +4501,8 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 /*
-  About / learners / creators pages
+  learners / creators pages
 */
-.oppia-about-clearfix {
-  clear: both;
-  content: "";
-  display: table;
-}
-
 .oppia-static-header {
   align-items: center;
   display: flex;
@@ -4570,88 +4540,11 @@ md-card.preview-conversation-skin-supplemental-card {
   top: 250px;
 }
 
-.oppia-about-extra-container {
-  position: relative;
-  top: 50px;
-  width: 100%;
-}
-
-@media(max-width: 700px) {
-  .oppia-about-extra-container {
-    margin-bottom: -10px;
-  }
-}
-@media(max-width: 440px) {
-  .oppia-about-extra-container {
-    margin-bottom: 30px;
-  }
-}
-
 .oppia-static-extra-content {
   margin: 0 auto;
   position: relative;
   top: 0;
   width: 60%;
-}
-
-.oppia-about-otter-container {
-  bottom: -2.3em;
-  display: inline-block;
-  position: absolute;
-}
-
-.oppia-about-otter-speech-card {
-  float: right;
-  width: 65%;
-}
-
-.oppia-about-otter-speech-bubble {
-  background: #fff;
-  border-left: none;
-  border-radius: 5px;
-  margin: 1em 0 3em;
-  padding: 20px 10px;
-  position: relative;
-  text-align: center;
-}
-
-.oppia-about-otter-speech-bubble:before {
-  background: #fff;
-  border-bottom-right-radius: 80px 50px;
-  bottom: -1.7em;
-  content: "";
-  display: block;
-  height: 30px;
-  left: 1em;
-  position: absolute;
-  width: 50px;
-  z-index: 10;
-}
-
-.oppia-about-otter-speech-bubble:after {
-  background: #eee;
-  border-bottom-right-radius: 40px 50px;
-  bottom: -1.7em;
-  content: "";
-  display: block;
-  height: 30px;
-  left: 1em;
-  position: absolute;
-  width: 20px;
-  z-index: 10;
-}
-
-.oppia-about-extra-container h3 {
-  color: #fff;
-  text-align: center;
-}
-
-.oppia-about-otter-speech-bubble h3 {
-  color: #000;
-}
-
-.oppia-about-static-content p {
-  margin: 1.5em 0;
 }
 
 .oppia-static-card-content {
@@ -4668,56 +4561,8 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 70%;
 }
 
-.oppia-about-three-cols-feature,
-.oppia-about-three-cols-feature p {
-  text-align: center;
-}
-
-.oppia-about-three-cols-layout {
-  display: inline-block;
-  margin-right: 20px;
-  width: -webkit-calc((100% - 60px) / 3);
-  width: -moz-calc((100% - 60px) / 3);
-  width: -o-calc((100% - 60px) / 3);
-  width: calc((100% - 60px) / 3);
-}
-
-.oppia-about-three-cols-layout:last-of-type {
-  margin-right: 0;
-}
-
-.oppia-about-credits-letter-groups.three-col {
-  margin: 0 0 10% 0;
-  -moz-column-count: 3;
-  -moz-column-gap: 20px;
-  -webkit-column-count: 3;
-  -webkit-column-gap: 20px;
-  column-count: 3;
-  column-gap: 20px;
-}
-
-.oppia-about-extra-info {
-  background-color: #009788;
-  color: #fff;
-  height: 245px;
-  width: 100%;
-}
-
-.oppia-about-page-extra-info {
-  height: 245px;
-}
-
-.oppia-about-tab-content {
-  display: none;
-}
-
 .oppia-teach-tab-content{
   padding-bottom: 7%;
-}
-
-.oppia-about-visible-content {
-  display: block;
-  position: relative;
 }
 
 .oppia-static-content p {
@@ -4733,97 +4578,9 @@ md-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 
-.oppia-about-tabs {
-  border-bottom: 1px solid #eee;
-  display: -webkit-flex;
-  display: flex;
-  margin-bottom: 0;
-  text-align: center;
-}
-
-.oppia-about-tabs li {
-  display: -webkit-flex;
-  display: flex;
-  margin-bottom: 0;
-  width: -webkit-calc(100% / 3);
-  width: -moz-calc(100% / 3);
-  width: -o-calc(100% / 3);
-  width: calc(100% / 3);
-}
-
-.oppia-about-tabs-active .oppia-about-tabs-text,
-.oppia-about-tabs-text:focus {
-  color: #009688;
-  border-bottom: 2px solid #009688;
-}
-
-.oppia-about-tabs-text {
-  color: #009688;
-  border-bottom: none;
-  padding: 10px;
-  text-decoration: none;
-  width: 100%;
-}
-
-.oppia-about-tabs-text:hover,
-.oppia-about-tabs-text:focus
-{
-  color: #009688;
-  text-decoration: none;
-}
-
-.oppia-about-otter {
-  width: 200px;
-}
-
-.oppia-about-teach-tabs ul li {
-  width: -webkit-calc(100% / 2);
-  width: -moz-calc(100% / 2);
-  width: -o-calc(100% / 2);
-  width: calc(100% / 2);
-}
-
-.oppia-about-button {
-  background-color: rgb(0, 121, 109);
-  color: rgba(255,255,255,1.0);
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 18px;
-  margin: 0 15px 15px 15px;
-  max-width: 90%;
-  min-width: 200px;
-  padding: 15px;
-  text-transform: uppercase;
-  white-space: normal;
-  width: 366px;
-}
-
-.oppia-about-button:hover,
-.oppia-about-button:focus {
-  background-color: rgba(5,190,178,1);
-  color: rgba(255,255,255,1);
-}
-
 .oppia-teach-button{
   display: block;
   margin: 0px auto 0 auto;
-}
-
-.oppia-about-buttons-container {
-  text-align: center;
-}
-
-.oppia-about-credits-letter-groups span {
-  font-size: 1.8em;
-}
-
-.oppia-about-credits-letter-groups ul li {
-  list-style-type: none;
-}
-
-.oppia-about-extra-content{
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
 .oppia-donation-card {
@@ -4939,13 +4696,10 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 /*
-  about/learners/creators media queries
+  learners/creators media queries
 */
 
 @media only screen and (min-width: 1400px) {
-  .oppia-about-extra-info {
-    height: 245px;
-  }
   .oppia-static-content, .oppia-static-extra-content {
     width: 960px;
   }
@@ -4971,43 +4725,14 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-static-content, .oppia-static-extra-content {
     width: 90%;
   }
-  .oppia-about-otter-container {
-    left: -3em;
-    bottom: -1.8em;
-  }
-  .oppia-about-otter {
-    width: 200px;
-  }
-  .oppia-about-otter-speech-bubble {
-    padding: 10px;
-  }
-
 }
 
 @media only screen and (max-width: 500px) {
   .oppia-static-header h1 {
     font-size: 2.5em;
   }
-  .oppia-about-tabs li, .oppia-about-teach-tabs ul li {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-  }
   .oppia-static-card-content-wide, .oppia-static-card-content-narrow {
     width: 80%;
-  }
-  .oppia-about-otter-speech-card {
-    width: 50%;
-  }
-  .oppia-about-buttons {
-    width: 100%;
-    margin: 20px 0 0 0;
-  }
-  .oppia-about-buttons:first-child {
-    margin: 0;
-  }
-  .oppia-about-three-cols-layout {
-    width: 100%;
   }
 }
 
