@@ -163,7 +163,7 @@ REQUIRED_STRINGS_FECONF = {
 ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 
 EXCLUDED_PHRASES = [
-  'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+    'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
@@ -695,7 +695,7 @@ def _check_import_order(all_files):
 
 
 def _check_comments(all_files):
-    """This functions ensures that comments end in a period."""
+    """This function ensures that comments end in a period."""
     print 'Starting comment checks'
     print '----------------------------------------'
     summary_messages = []
@@ -743,7 +743,7 @@ def _check_comments(all_files):
 
 
 def _check_docstrings(all_files):
-    """This functions ensures that docstrings end in a period."""
+    """This function ensures that docstrings end in a period."""
     print 'Starting docstring checks'
     print '----------------------------------------'
     summary_messages = []
@@ -825,8 +825,65 @@ def _check_docstrings(all_files):
     return summary_messages
 
 
+def _check_html_directive_name(all_files):
+    """This function checks that all HTML directives end
+    with _directive.html.
+    """
+    print 'Starting HTML directive name check'
+    print '----------------------------------------'
+    total_files_checked = 0
+    total_error_count = 0
+    summary_messages = []
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.js')]
+    failed = False
+    summary_messages = []
+    # For RegExp explanation, please see https://regex101.com/r/gU7oT6/37.
+    pattern_to_match = (
+        r"templateUrl: UrlInterpolationService\.[A-z\(]+" +
+        r"(?P<directive_name>[^\)]+)")
+    for filename in files_to_check:
+        with open(filename) as f:
+            content = f.read()
+        total_files_checked += 1
+        matched_patterns = re.findall(pattern_to_match, content)
+        for matched_pattern in matched_patterns:
+            matched_pattern = matched_pattern.split()
+            directive_filename = ''.join(matched_pattern).replace(
+                '\'', '').replace('+', '')
+            if not directive_filename.endswith('_directive.html'):
+                failed = True
+                total_error_count += 1
+                print (
+                    '%s --> Please ensure that this file ends'
+                    'with _directive.html.' % directive_filename)
+    if failed:
+        summary_message = '%s   HTML directive name check failed' % (
+            _MESSAGE_TYPE_FAILED)
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s   HTML directive name check passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+    if total_files_checked == 0:
+        print 'There are no files to be checked.'
+    else:
+        print '(%s files checked, %s errors found)' % (
+            total_files_checked, total_error_count)
+        print summary_message
+
+    return summary_messages
+
+
 def main():
     all_files = _get_all_files()
+    html_directive_name_messages = _check_html_directive_name(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
@@ -834,7 +891,8 @@ def main():
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
-        import_order_messages + newline_messages + 
+        html_directive_name_messages +
+        import_order_messages + newline_messages +
         docstring_messages + comment_messages +
         linter_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
