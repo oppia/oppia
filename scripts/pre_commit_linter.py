@@ -341,11 +341,12 @@ def _lint_js_files(node_path, eslint_path, files_to_lint, stdout,
     print 'Js linting finished.'
 
 
-def _lint_py_files(config_pylint, files_to_lint, result):
+def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
     """Prints a list of lint errors in the given list of Python files.
 
     Args:
         config_pylint: str. Path to the .pylintrc file.
+        config_pycodestyle: str. Path to the tox.ini file.
         files_to_lint: list(str). A list of filepaths to lint.
         result: multiprocessing.Queue. A queue to put results of test.
 
@@ -376,12 +377,19 @@ def _lint_py_files(config_pylint, files_to_lint, result):
         print 'Linting Python files %s to %s...' % (
             current_batch_start_index + 1, current_batch_end_index)
 
-        try:
-            # This prints output to the console.
-            lint.Run(current_files_to_lint + [config_pylint])
-        except SystemExit as e:
-            if str(e) != '0':
-                are_there_errors = True
+        # These lines print output to the console.
+        # This line invokes Pylint.
+        pylinter = lint.Run(
+            current_files_to_lint + [config_pylint],
+            exit=False).linter
+
+        # These lines invoke Pycodestyle.
+        style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
+        report = style_guide.check_files(current_files_to_lint)
+        report.print_statistics()
+
+        if pylinter.msg_status != 0 or report.get_count() != 0:
+            are_there_errors = True
 
         current_batch_start_index = current_batch_end_index
 
@@ -445,6 +453,8 @@ def _pre_commit_linter(all_files):
 
     config_pylint = '--rcfile=%s' % pylintrc_path
 
+    config_pycodestyle = os.path.join(os.getcwd(), 'tox.ini')
+
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
     node_path = os.path.join(
@@ -473,7 +483,7 @@ def _pre_commit_linter(all_files):
     py_result = multiprocessing.Queue()
     linting_processes.append(multiprocessing.Process(
         target=_lint_py_files,
-        args=(config_pylint, py_files_to_lint, py_result)))
+        args=(config_pylint, config_pycodestyle, py_files_to_lint, py_result)))
     print 'Starting Javascript and Python Linting'
     print '----------------------------------------'
     for process in linting_processes:
@@ -684,40 +694,6 @@ def _check_import_order(all_files):
     return summary_messages
 
 
-def _check_spacing(all_files):
-    """This function checks the number of blank lines
-    above each class, function and method defintion.
-    It also checks for whitespace after ',', ';' and ':'.
-    """
-    print 'Starting spacing checks'
-    print '----------------------------------------'
-    print ''
-    pycodestyle_config_path = os.path.join(os.getcwd(), 'tox.ini')
-    summary_messages = []
-    # Select only Python files to check for errors
-    files_to_check = [
-        filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
-        and filename.endswith('.py')]
-    style_guide = pycodestyle.StyleGuide(config_file=pycodestyle_config_path)
-    report = style_guide.check_files(files_to_check)
-    report.print_statistics()
-    print '----------------------------------------'
-    print ''
-    if report.get_count() != 0:
-        summary_message = (
-            '%s   Spacing checks failed' % _MESSAGE_TYPE_FAILED)
-        print summary_message
-        summary_messages.append(summary_message)
-    else:
-        summary_message = (
-            '%s   Spacing checks passed' % _MESSAGE_TYPE_SUCCESS)
-        print summary_message
-        summary_messages.append(summary_message)
-    print ''
-    return summary_messages
-
-
 def _check_comments(all_files):
     """This functions ensures that comments end in a period."""
     print 'Starting comment checks'
@@ -851,7 +827,6 @@ def _check_docstrings(all_files):
 
 def main():
     all_files = _get_all_files()
-    def_spacing_messages = _check_spacing(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
@@ -859,8 +834,8 @@ def main():
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
-        def_spacing_messages + import_order_messages +
-        newline_messages + docstring_messages + comment_messages +
+        import_order_messages + newline_messages + 
+        docstring_messages + comment_messages +
         linter_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
