@@ -4,7 +4,6 @@
    ng-click="addToLearnerPlaylist(getActivityId(), getActivityType())"
    ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)"
    aria-hidden="true"
-   attr="tile.activity_type"
    uib-tooltip="<['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]>"
    tooltip-placement="left"></i>
 <div ng-show="isContainerNarrow() && !belongsToLearnerPlaylist()" class="btn-group dropdown oppia-learner-dashboard-icon" uib-dropdown>
