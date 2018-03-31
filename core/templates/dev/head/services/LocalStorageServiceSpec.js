@@ -16,54 +16,54 @@
  * @fileoverview unit tests for the local save services.
  */
 
- describe('LocalStorageService', function() {
-   beforeEach(module('oppia'));
+describe('LocalStorageService', function() {
+  beforeEach(module('oppia'));
 
-   describe('behavior in editor', function() {
-     var LocalStorageService = null;
-     var explorationIdOne = '100';
-     var draftChangeListIdOne = 2;
-     var changeList = [];
-     var explorationIdTwo = '101';
-     var draftChangeListIdTwo = 1;
-     var draftDictOne = {
-       draftChanges: changeList,
-       draftChangeListId: draftChangeListIdOne
-     };
-     var draftDictTwo = {
-       draftChanges: changeList,
-       draftChangeListId: draftChangeListIdTwo
-     };
-     var draftOne = null;
-     var draftTwo = null;
+  describe('behavior in editor', function() {
+    var LocalStorageService = null;
+    var explorationIdOne = '100';
+    var draftChangeListIdOne = 2;
+    var changeList = [];
+    var explorationIdTwo = '101';
+    var draftChangeListIdTwo = 1;
+    var draftDictOne = {
+      draftChanges: changeList,
+      draftChangeListId: draftChangeListIdOne
+    };
+    var draftDictTwo = {
+      draftChanges: changeList,
+      draftChangeListId: draftChangeListIdTwo
+    };
+    var draftOne = null;
+    var draftTwo = null;
 
-     beforeEach(inject(function($injector) {
-       LocalStorageService = $injector.get('LocalStorageService');
-       ExplorationDraftObjectFactory = $injector.get(
-         'ExplorationDraftObjectFactory');
-       draftOne = ExplorationDraftObjectFactory.createFromLocalStorageDict(
-         draftDictOne);
-       draftTwo = ExplorationDraftObjectFactory.createFromLocalStorageDict(
-         draftDictTwo);
-     }));
+    beforeEach(inject(function($injector) {
+      LocalStorageService = $injector.get('LocalStorageService');
+      ExplorationDraftObjectFactory = $injector.get(
+        'ExplorationDraftObjectFactory');
+      draftOne = ExplorationDraftObjectFactory.createFromLocalStorageDict(
+        draftDictOne);
+      draftTwo = ExplorationDraftObjectFactory.createFromLocalStorageDict(
+        draftDictTwo);
+    }));
 
-     it('should correctly save the draft', function() {
-       LocalStorageService.saveExplorationDraft(explorationIdOne,
-         changeList, draftChangeListIdOne);
-       LocalStorageService.saveExplorationDraft(explorationIdTwo,
-         changeList, draftChangeListIdTwo);
-       expect(LocalStorageService.getExplorationDraft(
-         explorationIdOne)).toEqual(draftOne);
-       expect(LocalStorageService.getExplorationDraft(
-         explorationIdTwo)).toEqual(draftTwo);
-     });
+    it('should correctly save the draft', function() {
+      LocalStorageService.saveExplorationDraft(explorationIdOne,
+        changeList, draftChangeListIdOne);
+      LocalStorageService.saveExplorationDraft(explorationIdTwo,
+        changeList, draftChangeListIdTwo);
+      expect(LocalStorageService.getExplorationDraft(
+        explorationIdOne)).toEqual(draftOne);
+      expect(LocalStorageService.getExplorationDraft(
+        explorationIdTwo)).toEqual(draftTwo);
+    });
 
-     it('should correctly remove the draft', function() {
-       LocalStorageService.saveExplorationDraft(explorationIdTwo,
-         changeList, draftChangeListIdTwo);
-       LocalStorageService.removeExplorationDraft(explorationIdTwo);
-       expect(LocalStorageService.getExplorationDraft(
-         explorationIdTwo)).toBeNull();
-     });
-   });
- });
+    it('should correctly remove the draft', function() {
+      LocalStorageService.saveExplorationDraft(explorationIdTwo,
+        changeList, draftChangeListIdTwo);
+      LocalStorageService.removeExplorationDraft(explorationIdTwo);
+      expect(LocalStorageService.getExplorationDraft(
+        explorationIdTwo)).toBeNull();
+    });
+  });
+});

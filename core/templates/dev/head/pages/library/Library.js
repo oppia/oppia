@@ -66,16 +66,16 @@ oppia.controller('Library', [
           group_name: $scope.groupName
         }
       }).success(
-      function(data) {
-        $scope.activityList = data.activity_list;
+        function(data) {
+          $scope.activityList = data.activity_list;
 
-        $scope.groupHeaderI18nId = data.header_i18n_id;
+          $scope.groupHeaderI18nId = data.header_i18n_id;
 
-        $rootScope.$broadcast(
-          'preferredLanguageCodesLoaded', data.preferred_language_codes);
+          $rootScope.$broadcast(
+            'preferredLanguageCodesLoaded', data.preferred_language_codes);
 
-        $rootScope.loadingMessage = '';
-      });
+          $rootScope.loadingMessage = '';
+        });
     } else {
       $http.get('/libraryindexhandler').success(function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;

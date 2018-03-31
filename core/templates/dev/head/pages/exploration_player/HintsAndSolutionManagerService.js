@@ -184,7 +184,7 @@ oppia.factory('HintsAndSolutionManagerService', [
               wrongAnswersSinceLastHintConsumed >= 2) {
             accelerateHintRelease();
           } else if (
-              numHintsReleased > 0 && wrongAnswersSinceLastHintConsumed >= 1) {
+            numHintsReleased > 0 && wrongAnswersSinceLastHintConsumed >= 1) {
             accelerateHintRelease();
           }
         }

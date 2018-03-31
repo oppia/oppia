@@ -37,11 +37,11 @@ describe('Build questions', function() {
       logicProofTeacher.buildQuestion(
         'R(albert)\u2227R(betty)', 'p', logicProofData.BASE_VOCABULARY
       ).results).toEqual([{
-        top_kind_name: 'variable',
-        top_operator_name: 'p',
-        arguments: [],
-        dummies: []
-      }]);
+      top_kind_name: 'variable',
+      top_operator_name: 'p',
+      arguments: [],
+      dummies: []
+    }]);
   });
 
   it('should reject mis-typed expressions', function() {

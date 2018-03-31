@@ -23,11 +23,11 @@ var CollectionEditorPage = function() {
   var addExplorationInput = element(
     by.css('.protractor-test-add-exploration-input'));
   var closeSaveModal = element(
-      by.css('.protractor-test-close-save-modal'));
+    by.css('.protractor-test-close-save-modal'));
   var collectionEditorObjectiveInput = element(
-        by.css('.protractor-collection-editor-objective-input'));
+    by.css('.protractor-collection-editor-objective-input'));
   var commitMessageInput = element(
-        by.css('.protractor-test-commit-message-input'));
+    by.css('.protractor-test-commit-message-input'));
   var editorCategoryDropdown = element.all(
     by.css('.protractor-test-collection-editor-category-dropdown'));
   var editorDeleteNode = element.all(

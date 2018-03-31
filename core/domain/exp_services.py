@@ -868,10 +868,9 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration.version += 1
 
     # Trigger statistics model update.
-    if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-        stats_services.handle_stats_creation_for_new_exp_version(
-            exploration.id, exploration.version, exploration.states,
-            change_list)
+    stats_services.handle_stats_creation_for_new_exp_version(
+        exploration.id, exploration.version, exploration.states,
+        change_list)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
@@ -938,9 +937,8 @@ def _create_exploration(
     exploration.version += 1
 
     # Trigger statistics model creation.
-    if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-        stats_services.handle_stats_creation_for_new_exploration(
-            exploration.id, exploration.version, exploration.states)
+    stats_services.handle_stats_creation_for_new_exploration(
+        exploration.id, exploration.version, exploration.states)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         # Find out all states that need a classifier to be trained.
@@ -1243,7 +1241,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
 
     if contributor_id_to_add not in feconf.SYSTEM_USER_IDS:
         if contributor_id_to_add is None:
-            # Revert commit or other non-positive commit
+            # Revert commit or other non-positive commit.
             contributors_summary = compute_exploration_contributors_summary(
                 exploration.id)
         else:

@@ -708,7 +708,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
                 'new_value': 'New title'
             }], 'Did migration.')
 
-        # Check that the version of the collection is incremented
+        # Check that the version of the collection is incremented.
         collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
         self.assertEqual(collection.version, 2)
@@ -1025,7 +1025,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         collection_node = collection.get_node(self.EXPLORATION_ID)
         self.assertEqual(collection_node.prerequisite_skill_ids, [])
 
-        # Add skills
+        # Add skills.
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_ID, [{
                 'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
@@ -1060,7 +1060,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         collection_node = collection.get_node(self.EXPLORATION_ID)
         self.assertEqual(collection_node.acquired_skill_ids, [])
 
-        # Add skills
+        # Add skills.
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_ID, [{
                 'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
@@ -1693,7 +1693,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
-        # Have Albert create a new collection. Version 1
+        # Have Albert create a new collection. Version 1.
         self.save_new_valid_collection(self.COLLECTION_ID, albert_id)
         self._check_contributors_summary(self.COLLECTION_ID, {albert_id: 1})
         changelist_cmds = [{
@@ -1701,18 +1701,18 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             'property_name': 'title',
             'new_value': 'Collection Bob title'
         }]
-         # Have Bob update that collection. Version 2
+         # Have Bob update that collection. Version 2.
         collection_services.update_collection(
             bob_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
         self._check_contributors_summary(self.COLLECTION_ID,
                                          {albert_id: 1, bob_id: 1})
-        # Have Bob update that collection. Version 3
+        # Have Bob update that collection. Version 3.
         collection_services.update_collection(
             bob_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
         self._check_contributors_summary(self.COLLECTION_ID,
                                          {albert_id: 1, bob_id: 2})
 
-        # Have Albert update that collection. Version 4
+        # Have Albert update that collection. Version 4.
         collection_services.update_collection(
             albert_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
         self._check_contributors_summary(self.COLLECTION_ID,

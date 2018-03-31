@@ -626,7 +626,8 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     sent.
 
     The id of each model instance is the user_id of the user who should receive
-    the messages."""
+    the messages.
+    """
 
     # The list of feedback messages that need to be sent to this user.
     # Each element in this list is a dict with keys 'exploration_id',

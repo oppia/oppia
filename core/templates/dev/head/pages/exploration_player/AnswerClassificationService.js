@@ -16,7 +16,7 @@
  * @fileoverview Classification service for answer groups.
  */
 
- // TODO(bhenning): Find a better place for these constants.
+// TODO(bhenning): Find a better place for these constants.
 
 // NOTE TO DEVELOPERS: These constants must be the same (in name and value) as
 // the corresponding classification constants defined in core.domain.exp_domain.
@@ -26,14 +26,13 @@ oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier');
 oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome');
 
 oppia.factory('AnswerClassificationService', [
-  '$http', 'LearnerParamsService', 'AlertsService',
-  'AnswerClassificationResultObjectFactory',
+  'AlertsService', 'AnswerClassificationResultObjectFactory',
   'PredictionAlgorithmRegistryService', 'StateClassifierMappingService',
   'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION', 'STATISTICAL_CLASSIFICATION',
   'RULE_TYPE_CLASSIFIER',
-  function($http, LearnerParamsService, AlertsService,
-      AnswerClassificationResultObjectFactory,
+  function(
+      AlertsService, AnswerClassificationResultObjectFactory,
       PredictionAlgorithmRegistryService, StateClassifierMappingService,
       INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
       DEFAULT_OUTCOME_CLASSIFICATION, STATISTICAL_CLASSIFICATION,

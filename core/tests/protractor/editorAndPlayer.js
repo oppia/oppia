@@ -69,13 +69,13 @@ describe('Full exploration editor', function() {
     explorationPlayerPage.submitAnswer('Continue');
     element.all(
       by.css('.protractor-test-back-button')).then(function(buttons){
-        expect(buttons.length).toBe(1);
-      });
+      expect(buttons.length).toBe(1);
+    });
     explorationPlayerPage.submitAnswer('LogicProof');
     element.all(
       by.css('.protractor-test-back-button')).then(function(buttons){
-        expect(buttons.length).toBe(0);
-      });
+      expect(buttons.length).toBe(0);
+    });
 
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToBeOver();

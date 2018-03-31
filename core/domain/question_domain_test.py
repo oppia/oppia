@@ -140,7 +140,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
     def test_update_methods(self):
         """Tests update_title, update_question_data and update_language_code
-        methods of the question domain object."""
+        methods of the question domain object.
+        """
         state = exp_domain.State.create_default_state('ABC')
         question_data = state.to_dict()
 

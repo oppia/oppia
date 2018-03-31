@@ -236,8 +236,7 @@ var customizeInteraction = function(interactionId) {
 
   // The save interaction button doesn't appear for interactions having no
   // options to customize.
-  var saveInteractionBtn = element(
-    by.css('.protractor-test-save-interaction'));
+  var saveInteractionBtn = element(by.css('.protractor-test-save-interaction'));
   saveInteractionBtn.isPresent().then(function(result) {
     if (result) {
       saveInteractionBtn.click();
@@ -380,7 +379,7 @@ var _getRuleParameterTypes = function(interactionId, ruleName) {
 
     var nextParameterStart =
       (ruleDescription.indexOf('{{', parameterEnd) === -1) ?
-      undefined : ruleDescription.indexOf('{{', parameterEnd);
+        undefined : ruleDescription.indexOf('{{', parameterEnd);
     parameterStart = nextParameterStart;
   }
   return parameterTypes;
@@ -400,9 +399,8 @@ var _setRuleParameters = function(ruleElement, interactionId, ruleName) {
   expect(parameterValues.length).toEqual(parameterTypes.length);
 
   for (var i = 0; i < parameterValues.length; i++) {
-    var parameterElement = ruleElement.all(
-      by.css('.protractor-test-answer-description-fragment'
-    )).get(i * 2 + 1);
+    var parameterElement = ruleElement.all(by.css(
+      '.protractor-test-answer-description-fragment')).get(i * 2 + 1);
     var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
 
     if (interactionId === 'MultipleChoiceInput') {
@@ -438,7 +436,7 @@ var _selectRule = function(ruleElement, interactionId, ruleName) {
     var parameterEnd = ruleDescription.indexOf('}}', parameterStart) + 2;
     var nextParameterStart =
       (ruleDescription.indexOf('{{', parameterEnd) === -1) ?
-      undefined : ruleDescription.indexOf('{{', parameterEnd);
+        undefined : ruleDescription.indexOf('{{', parameterEnd);
     ruleDescriptionInDropdown = ruleDescriptionInDropdown + '...' +
       ruleDescription.substring(parameterEnd, nextParameterStart);
     parameterStart = nextParameterStart;
@@ -484,9 +482,8 @@ var expectRuleParametersToBe = function(interactionId, ruleName) {
 
   // Now we enter the parameters
   for (var i = 0; i < parameterValues.length; i++) {
-    var parameterElement = element.all(
-      by.css('.protractor-test-answer-description-fragment'
-    )).get(i * 2 + 1);
+    var parameterElement = element.all(by.css(
+      '.protractor-test-answer-description-fragment')).get(i * 2 + 1);
     var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
     // TODO(maitbayev): implement expectValueToBe in all parameterEditors.
     parameterEditor.expectValueToBe(parameterValues[i]);
@@ -843,8 +840,7 @@ var expectAvailableFirstStatesToBe = function(names) {
         return elem.getText();
       }).then(function(options) {
         expect(options.sort()).toEqual(names.sort());
-      }
-    );
+      });
   });
 };
 
@@ -956,8 +952,7 @@ var _selectComparedVersions = function(v1, v2) {
       element.all(by.css('.protractor-test-history-checkbox-selector'))
         .get(v2Position).click();
       browser.waitForAngular();
-    }
-  );
+    });
 
   // Click button to show graph if necessary
   element(by.css('.protractor-test-show-history-graph')).isDisplayed()
@@ -965,8 +960,7 @@ var _selectComparedVersions = function(v1, v2) {
       if (isDisplayed) {
         element(by.css('.protractor-test-show-history-graph')).click();
       }
-    }
-  );
+    });
 };
 
 var expectGraphComparisonOf = function(v1, v2) {
@@ -992,8 +986,7 @@ var expectGraphComparisonOf = function(v1, v2) {
         for (var i = 0; i < states.length; i++) {
           expect(expectedStates).toContain(states[i]);
         }
-      }
-    );
+      });
   };
 
   // Checks that the history graph contains totalLinks links altogether,
@@ -1047,8 +1040,7 @@ var expectGraphComparisonOf = function(v1, v2) {
             'expected to find ' + deletedLinks + ' deleted links, ' +
             'but found ' + deletedCount);
         }
-      }
-    );
+      });
   };
 
   return {

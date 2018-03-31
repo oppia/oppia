@@ -20,7 +20,7 @@ describe('GraphInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     validatorService = $injector.get('GraphInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');
@@ -93,41 +93,41 @@ describe('GraphInputValidationService', function() {
 
   it('The graph used in customization exceeds supported maximum number of ' +
     'vertices of 50.',
-    function() {
-      customizationArguments.graph.value.vertices = new Array(51);
-      var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, answerGroups,
-        goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.CRITICAL,
-        message: 'The graph used in customization exceeds supported maximum ' +
+  function() {
+    customizationArguments.graph.value.vertices = new Array(51);
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: 'The graph used in customization exceeds supported maximum ' +
           'number of vertices of 50.'
-      }]);
-    });
+    }]);
+  });
 
   it('The graph used in the rule x in group y exceeds supported maximum ' +
     'number of vertices of 10 for isomorphism check.',
-    function() {
-      answerGroups[0].rules[0].inputs.g.vertices = new Array(11);
-      answerGroups[0].rules[1].inputs.g.vertices = new Array(11);
-      answerGroups[1].rules[0].inputs.g.vertices = new Array(11);
-      var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, answerGroups,
-        goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.CRITICAL,
-        message: 'The graph used in the rule 1 in group 1 exceeds supported ' +
+  function() {
+    answerGroups[0].rules[0].inputs.g.vertices = new Array(11);
+    answerGroups[0].rules[1].inputs.g.vertices = new Array(11);
+    answerGroups[1].rules[0].inputs.g.vertices = new Array(11);
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, answerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: 'The graph used in the rule 1 in group 1 exceeds supported ' +
           'maximum number of vertices of 10 for isomorphism check.'
-      }, {
-        type: WARNING_TYPES.CRITICAL,
-        message: 'The graph used in the rule 2 in group 1 exceeds supported ' +
+    }, {
+      type: WARNING_TYPES.CRITICAL,
+      message: 'The graph used in the rule 2 in group 1 exceeds supported ' +
           'maximum number of vertices of 10 for isomorphism check.'
-      }, {
-        type: WARNING_TYPES.CRITICAL,
-        message: 'The graph used in the rule 1 in group 2 exceeds supported ' +
+    }, {
+      type: WARNING_TYPES.CRITICAL,
+      message: 'The graph used in the rule 1 in group 2 exceeds supported ' +
           'maximum number of vertices of 10 for isomorphism check.'
-      }]);
-    });
+    }]);
+  });
 
   it('should verify edge weight edit permissions make sense', function() {
     customizationArguments.graph.value.isWeighted = false;
