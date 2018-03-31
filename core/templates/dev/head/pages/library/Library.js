@@ -96,13 +96,13 @@ oppia.controller('Library', [
               .then(function(response) {
                 for (var i = 0; i < $scope.libraryGroups.length; i++) {
                   var categoryActivity = $scope.libraryGroups[i]
-                  .activity_summary_dicts;
+                    .activity_summary_dicts;
                   for (var j = 0; j < categoryActivity.length; j++) {
                     url = response.config.url;
                     url = url.substring(url.lastIndexOf('/') + 1, url.length);
                     if (url === categoryActivity[j].id) {
                       categoryActivity[j].shouldShowAddToPlaylistIcon = response
-                      .data.belongs_to_subscribed_activities;
+                        .data.belongs_to_subscribed_activities;
                     }
                   }
                 }
