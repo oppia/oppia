@@ -201,7 +201,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
     )
 
     def save(self, committer_id, commit_message, commit_cmds):
-        """Calls super class method 'commit' to save the version of the 
+        """Calls super class method 'commit' to save the version of the
         exploration and update the model.
 
         Args:

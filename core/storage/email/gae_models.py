@@ -404,7 +404,7 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
         Returns:
             dict. The enteries correponding to the given list of user ids in
                 dict format having key as the unique user id and value as the
-                entery corresponding to the user id in the key. 
+                entery corresponding to the user id in the key.
         """
         instance_ids = [cls._generate_id(user_id, exploration_id, thread_id)
                         for user_id in user_ids]
