@@ -31,11 +31,11 @@ oppia.directive('learnerDashboardIcons', [
         '/domain/learner_dashboard/' +
         'learner_dashboard_icons_directive.html'),
       controller: [
-        '$scope', '$http', 'LearnerDashboardIdsBackendApiService',
+        '$scope', 'LearnerDashboardIdsBackendApiService',
         'LearnerDashboardActivityIdsObjectFactory',
         'LearnerPlaylistService',
         function(
-            $scope, $http, LearnerDashboardIdsBackendApiService,
+            $scope, LearnerDashboardIdsBackendApiService,
             LearnerDashboardActivityIdsObjectFactory,
             LearnerPlaylistService) {
           $scope.activityIsCurrentlyHoveredOver = true;
