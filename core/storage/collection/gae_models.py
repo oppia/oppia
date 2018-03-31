@@ -274,6 +274,16 @@ class CollectionCommitLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def get_commit(cls, collection_id, version):
+        """Returns the commit corresponding to the given collection id and
+        version number.
+
+        Args:
+            collection_id: str. The id of the collection being edited.
+            version: int. The version number of the collection after the commit.
+
+        Returns:
+            The commit with the given collection id and version number.
+        """
         return cls.get_by_id('collection-%s-%s' % (collection_id, version))
 
     @classmethod
@@ -306,6 +316,33 @@ class CollectionCommitLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_all_non_private_commits(
             cls, page_size, urlsafe_start_cursor, max_age=None):
+        """Fetches a list of all the non-private commits sorted by their last
+        updated attribute.
+
+        Args:
+            page_size: int. The maximum number of entities to be returned.
+            urlsafe_start_cursor: str or None. If provided, the list of
+                returned entities starts from this datastore cursor.
+                Otherwise, the returned entities start from the beginning
+                of the full list of entities.
+            max_age: datetime.timedelta. An instance of datetime.timedelta
+                representing the maximum age of the non-private commits to be
+                fetched.
+
+        Raises:
+            ValueError. max_age is neither an instance of datetime.timedelta nor
+                None.
+
+        Returns:
+            3-tuple of (results, cursor, more) where:
+                results: List of query results.
+                cursor: str or None. A query cursor pointing to the next
+                    batch of results. If there are no more results, this might
+                    be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results after
+                    this batch.
+        """
         if not isinstance(max_age, datetime.timedelta) and max_age is not None:
             raise ValueError(
                 'max_age must be a datetime.timedelta instance or None.')

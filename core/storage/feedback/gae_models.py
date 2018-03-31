@@ -265,9 +265,19 @@ class FeedbackMessageModel(base_models.BaseModel):
 
     @property
     def exploration_id(self):
+        """Extracts the exploration id from the message id.
+
+        Returns:
+            str. The exploration id.
+        """
         return self.id.split('.')[0]
 
     def get_thread_subject(self):
+        """Returns the subject of the thread corresponding to the thread id.
+
+        Returns:
+            str. The subject of the thread.
+        """
         return FeedbackThreadModel.get_by_id(self.thread_id).subject
 
     @classmethod
@@ -393,6 +403,26 @@ class FeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def get_all_messages(cls, page_size, urlsafe_start_cursor):
+        """Fetches a list of all the messages sorted by their last updated
+        attribute.
+
+        Args:
+            page_size: int. The maximum number of messages to be returned.
+            urlsafe_start_cursor: str or None. If provided, the list of
+                returned messages starts from this datastore cursor.
+                Otherwise, the returned messages start from the beginning
+                of the full list of messages.
+
+        Returns:
+            3-tuple of (results, cursor, more) where:
+                results: List of query results.
+                cursor: str or None. A query cursor pointing to the next
+                    batch of results. If there are no more results, this might
+                    be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results after
+                    this batch.
+        """
         return cls._fetch_page_sorted_by_last_updated(
             cls.query(), page_size, urlsafe_start_cursor)
 
@@ -407,6 +437,17 @@ class FeedbackThreadUserModel(base_models.BaseModel):
 
     @classmethod
     def generate_full_id(cls, user_id, exploration_id, thread_id):
+        """Generates the full message id of the format:
+            <user_id.exploration_id.thread_id>.
+
+         Args:
+            user_id: str. The user id.
+            exploration_id: str. The exploration id.
+            thread_id: str. The thread id.
+
+        Returns:
+            str. The full message id.
+        """
         full_thread_id = (
             FeedbackThreadModel.generate_full_thread_id(
                 exploration_id, thread_id))

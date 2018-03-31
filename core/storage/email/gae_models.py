@@ -298,10 +298,30 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id, thread_id):
+        """Returns the unique id corresponding to the given user id, exploration
+        id and thread id.
+
+        Args:
+            user_id: str. The user id.
+            exploration_id: str. The exploration id.
+            thread_id: str. The thread id.
+
+        Returns:
+            str. The unique id used in reply-to email address in outgoing
+                feedback and suggestion emails.
+        """
         return '.'.join([user_id, exploration_id, thread_id])
 
     @classmethod
     def _generate_unique_reply_to_id(cls):
+        """Generates the unique reply-to id.
+
+        Raises:
+            Exception. When unique id generator produces too many collisions.
+
+        Returns:
+            str. The unique reply-to id if there are no collisions.
+        """
         for _ in range(base_models.MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s' % (utils.get_random_int(base_models.RAND_RANGE)),
@@ -338,6 +358,15 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @classmethod
     def get_by_reply_to_id(cls, reply_to_id):
+        """Fetches the entry corresponding to the given 'reply-to' id.
+
+        Args:
+            reply_to_id: str. The unique 'reply-to' id.
+
+        Returns:
+            str or None. The entry corresponding to the given 'reply-to' id if
+                it is fetched else None.
+        """
         model = cls.query(cls.reply_to_id == reply_to_id).fetch()
         if not model:
             return None
@@ -345,12 +374,38 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, user_id, exploration_id, thread_id, strict=True):
+        """Gets the entry corresponding to the unique instance id.
+
+        Args:
+            user_id: str. The user id.
+            exploration_id: str. The exploration id.
+            thread_id: str. The thread id.
+            strict: bool. Whether to fail noisily if no entry with the given
+                instance id exists in the datastore. Default is True.
+
+        Returns:
+            An entry instance that corresponds to the given instance id if it is
+                present in the datastore. Otherwise, None.
+        """
         instance_id = cls._generate_id(user_id, exploration_id, thread_id)
         return super(
             FeedbackEmailReplyToIdModel, cls).get(instance_id, strict=strict)
 
     @classmethod
     def get_multi_by_user_ids(cls, user_ids, exploration_id, thread_id):
+        """Returns the entries corresponding to the given user ids in the dict
+        format.
+
+        Args:
+            user_ids: list(str). A list of user ids.
+            exploration_id: str. The exploration id.
+            thread_id: str. The thread id.
+
+        Returns:
+            dict. The enteries correponding to the given list of user ids in
+                dict format having key as the unique user id and value as the
+                entery corresponding to the user id in the key. 
+        """
         instance_ids = [cls._generate_id(user_id, exploration_id, thread_id)
                         for user_id in user_ids]
         user_models = cls.get_multi(instance_ids)
@@ -359,12 +414,27 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @property
     def user_id(self):
+        """Returns the user id extracted from the unique id.
+
+        Returns:
+            str. The user id.
+        """
         return self.id.split('.')[0]
 
     @property
     def exploration_id(self):
+        """Returns the exploration id extracted from the unique id.
+
+        Returns:
+            str. The exploration id.
+        """
         return self.id.split('.')[1]
 
     @property
     def thread_id(self):
+        """Returns the thread id extracted from the unique id.
+
+        Returns:
+            str. The thread id.
+        """
         return self.id.split('.')[2]
