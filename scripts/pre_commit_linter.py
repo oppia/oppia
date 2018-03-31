@@ -377,18 +377,18 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
         print 'Linting Python files %s to %s...' % (
             current_batch_start_index + 1, current_batch_end_index)
 
-        # These lines print output to the console.
-        # This line invokes Pylint.
+        # This line invokes Pylint and prints its output to the console.
         pylinter = lint.Run(
             current_files_to_lint + [config_pylint],
             exit=False).linter
 
         # These lines invoke Pycodestyle.
         style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
-        report = style_guide.check_files(current_files_to_lint)
-        report.print_statistics()
+        pycodestyle_report = style_guide.check_files(current_files_to_lint)
+        # This line prints Pycodestyle's output to the console.
+        pycodestyle_report.print_statistics()
 
-        if pylinter.msg_status != 0 or report.get_count() != 0:
+        if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
             are_there_errors = True
 
         current_batch_start_index = current_batch_end_index
