@@ -31,7 +31,7 @@ oppia.directive('schemaBasedDictViewer', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_viewers/' +
-        'schema_based_dict_viewer.html'),
+        'schema_based_dict_viewer_directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {

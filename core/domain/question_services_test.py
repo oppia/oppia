@@ -93,16 +93,37 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(model.language_code, language_code)
 
     def test_delete_question(self):
+        collection_id = 'col1'
+        exp_id = '0_exploration_id'
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        # Create a new collection and exploration.
+        self.save_new_valid_collection(
+            collection_id, owner_id, exploration_id=exp_id)
+
+        # Add a skill.
+        collection_services.update_collection(
+            owner_id, collection_id, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'skill0'
+            }], 'Add a new skill')
+
         question = question_domain.Question(
             'dummy', 'A Question',
             exp_domain.State.create_default_state('ABC').to_dict(),
-            1, 'col1', 'en')
+            1, collection_id, 'en')
 
         question_id = question_services.add_question(self.owner_id, question)
-        question_services.delete_question(self.owner_id, question_id)
+        with self.assertRaisesRegexp(Exception, (
+            'The question with ID %s is not present'
+            ' in the given collection' % question_id)):
+            question_services.delete_question(
+                self.owner_id, 'random', question_id)
+        question_services.delete_question(
+            self.owner_id, collection_id, question_id)
 
         with self.assertRaisesRegexp(Exception, (
-            'Entity for class QuestionModel with id %s not found' %(
+            'Entity for class QuestionModel with id %s not found' % (
                 question_id))):
             question_models.QuestionModel.get(question_id)
 
@@ -124,8 +145,15 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                        'new_value': 'ABC',
                        'old_value': 'A Question'}
         change_list = [question_domain.QuestionChange(change_dict)]
+        with self.assertRaisesRegexp(Exception, (
+            'The question with ID %s is not present'
+            ' in the given collection' % question_id)):
+            question_services.update_question(
+                self.owner_id, 'random', question_id, change_list, 'updated')
+
         question_services.update_question(
-            self.owner_id, question_id, change_list, 'updated title')
+            self.owner_id, collection_id, question_id, change_list, (
+                'updated title'))
 
         model = question_models.QuestionModel.get(question_id)
         self.assertEqual(model.title, 'ABC')
@@ -170,8 +198,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.add_question_id_to_skill(
             question.question_id, collection_id, skill_id, owner_id)
         collection = collection_services.get_collection_by_id(collection_id)
-        self.assertIn(question.question_id,
-                      collection.skills[skill_id].question_ids)
+        self.assertIn(
+            question.question_id, collection.skills[skill_id].question_ids)
 
     def test_remove_question_id_from_skill(self):
         """Tests to verify remove_question_id_from_skill method."""
@@ -210,8 +238,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question.question_id, collection_id, skill_id, owner_id)
         collection = collection_services.get_collection_by_id(
             collection_id)
-        self.assertIn(question.question_id,
-                      collection.skills[skill_id].question_ids)
+        self.assertIn(
+            question.question_id, collection.skills[skill_id].question_ids)
         skill_id = collection.get_skill_id_from_skill_name('skill0')
         question_services.remove_question_id_from_skill(
             question.question_id, collection_id, skill_id, owner_id)
@@ -242,8 +270,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         collection_services.update_collection(
             self.owner_id, coll_id_0, [{
                 'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
-                'property_name': (
-                    collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS), # pylint: disable=line-too-long
+                'property_name': collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS, # pylint: disable=line-too-long
                 'exploration_id': exp_id_0,
                 'new_value': [skill_id]
             }], 'Update skill')
@@ -262,3 +289,49 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_batch = question_services.get_questions_batch(
             coll_id_0, [skill_id], self.owner_id, 1)
         self.assertEqual(question_batch[0].title, question.title)
+
+    def test_get_question_summaries_for_collection(self):
+        """Tests to verify get_question_summaries_for_collection method."""
+        coll_id_0 = '0_collection_id'
+        exp_id_0 = '0_exploration_id'
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        # Create a new collection and exploration.
+        self.save_new_valid_collection(
+            coll_id_0, self.owner_id, exploration_id=exp_id_0)
+
+        # Add a skill.
+        collection_services.update_collection(
+            self.owner_id, coll_id_0, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
+                'name': 'skill0'
+            }], 'Add a new skill')
+        collection = collection_services.get_collection_by_id(
+            coll_id_0)
+        skill_id = collection.get_skill_id_from_skill_name('skill0')
+        collection_node = collection.get_node(exp_id_0)
+        collection_node.update_acquired_skill_ids([skill_id])
+        # Update the acquired skill IDs for the exploration.
+        collection_services.update_collection(
+            self.owner_id, coll_id_0, [{
+                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
+                'property_name': collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS, # pylint: disable=line-too-long
+                'exploration_id': exp_id_0,
+                'new_value': [skill_id]
+            }], 'Update skill')
+
+        question = question_domain.Question(
+            'dummy', 'A Question',
+            exp_domain.State.create_default_state('ABC').to_dict(),
+            1, coll_id_0, 'en')
+
+        question_id = question_services.add_question(self.owner_id, question)
+        question = question_services.get_question_by_id(question_id)
+        question_services.add_question_id_to_skill(
+            question.question_id, coll_id_0, skill_id, self.owner_id)
+        question_summaries = (
+            question_services.get_question_summaries_for_collection(
+                coll_id_0))
+        self.assertEqual(question_summaries[0].question_id, question_id)
+        self.assertEqual(question_summaries[0].question_title, question.title)
+        self.assertEqual(question_summaries[0].skill_names, ['skill0'])
