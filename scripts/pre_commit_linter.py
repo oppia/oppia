@@ -201,6 +201,7 @@ _PATHS_TO_INSERT = [
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'pyjsparser-2.5.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.3.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
@@ -215,6 +216,7 @@ for path in _PATHS_TO_INSERT:
 
 import isort             # pylint: disable=wrong-import-position
 import pycodestyle       # pylint: disable=wrong-import-position
+from pyjsparser import PyJsParser  # pylint: disable=wrong-import-position
 from pylint import lint  # pylint: disable=wrong-import-position
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
@@ -881,8 +883,83 @@ def _check_html_directive_name(all_files):
     return summary_messages
 
 
+def _check_directives(all_files):
+    """This function checks that all HTML directives end
+    with _directive.html.
+    """
+    print 'Starting directive checks'
+    print '----------------------------------------'
+    total_files_checked = 0
+    total_error_count = 0
+    summary_messages = []
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.js')]
+    failed = False
+    summary_messages = []
+    parser = PyJsParser()
+    for filename in files_to_check:
+        with open(filename) as f:
+            content = f.read()
+        total_files_checked += 1
+        parsed_nodes = parser.parse(content)['body']
+        #print parsed_nodes
+        for parsed_node in parsed_nodes:
+            if parsed_node['type'] == u'ExpressionStatement':
+                expression = parsed_node['expression']
+                if expression['type'] == u'CallExpression' and (
+                        expression['callee']['type'] == (
+                            u'MemberExpression')) and (
+                                expression['callee']['property']['name'] == (
+                                    u'directive')):
+                    arguments = expression['arguments']
+                    for argument in arguments:
+                        if argument['type'] == u'ArrayExpression':
+                            elements = argument['elements']
+                            for element in elements:
+                                if element['type'] == u'FunctionExpression':
+                                    body = element['body']
+                                    if body['type'] == u'BlockStatement':
+                                        body_elements = body['body']
+                                        for body_element in body_elements:
+                                            if body_element['type'] == u'ReturnStatement' and (
+                                                    body_element['argument']['type'] == u'ObjectExpression'):
+                                                return_node_properties = body_element['argument']['properties']
+                                                for return_node_property in return_node_properties:
+                                                    if return_node_property['key']['type'] == u'Identifier' and (
+                                                            return_node_property['key']['name'] == u'scope'):
+                                                        scope_value = return_node_property['value']
+                                                        if scope_value['type'] == u'Literal' and scope_value['value']:
+                                                            print "Cannot be True " + str(filename)
+                                                    else:
+                                                        print "No scope found. " + str(filename)
+
+    if failed:
+        summary_message = '%s   Directive checks failed' % (
+            _MESSAGE_TYPE_FAILED)
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s  Directive checks passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+    if total_files_checked == 0:
+        print 'There are no files to be checked.'
+    else:
+        print '(%s files checked, %s errors found)' % (
+            total_files_checked, total_error_count)
+        print summary_message
+
+    return summary_messages
+
+
 def main():
     all_files = _get_all_files()
+    _check_directives(all_files)
     html_directive_name_messages = _check_html_directive_name(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
