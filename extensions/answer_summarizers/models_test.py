@@ -312,7 +312,7 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
 
     def test_many_categories(self):
         answer_dicts_list = [
-            # EXPLICIT
+            # EXPLICIT.
             self._create_answer_dict(
                 'Explicit A',
                 classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
@@ -322,7 +322,7 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
             self._create_answer_dict(
                 'Explicit A',
                 classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
-            # TRAINING DATA
+            # TRAINING DATA.
             self._create_answer_dict(
                 'Trained data A',
                 classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
@@ -332,7 +332,7 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
             self._create_answer_dict(
                 'Trained data B',
                 classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
-            # STATS CLASSIFIER
+            # STATS CLASSIFIER.
             self._create_answer_dict(
                 'Stats B',
                 classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
@@ -345,7 +345,7 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
             self._create_answer_dict(
                 'Trained data B',
                 classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
-            # DEFAULT OUTCOMES
+            # DEFAULT OUTCOMES.
             self._create_answer_dict(
                 'Default C',
                 classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),

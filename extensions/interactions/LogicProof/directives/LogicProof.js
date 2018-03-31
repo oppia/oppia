@@ -82,15 +82,15 @@ oppia.directive('oppiaInteractiveLogicProof', [
             ) + ' and ' + logicProofShared.displayExpression(
               $scope.questionData.assumptions[
                 $scope.questionData.assumptions.length - 1],
-                $scope.questionData.language.operators);
+              $scope.questionData.language.operators);
           }
           $scope.targetString = logicProofShared.displayExpression(
             $scope.questionData.results[0],
             $scope.questionData.language.operators);
           $scope.questionString = (
             $scope.assumptionsString === '' ?
-            'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_NO_ASSUMPTION' :
-            'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_ASSUMPTIONS');
+              'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_NO_ASSUMPTION' :
+              'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_ASSUMPTIONS');
           $scope.questionStringData = {
             target: $scope.targetString,
             assumptions: $scope.assumptionsString
@@ -210,12 +210,12 @@ oppia.directive('oppiaInteractiveLogicProof', [
             // can make the invalid line bold.
             return (errorLineNum === undefined) ?
               [numberedLines.join('\n')] :
-            [
-              numberedLines.slice(0, errorLineNum).join('\n'),
-              numberedLines[errorLineNum],
-              numberedLines.slice(
-                errorLineNum + 1, numberedLines.length).join('\n')
-            ];
+              [
+                numberedLines.slice(0, errorLineNum).join('\n'),
+                numberedLines[errorLineNum],
+                numberedLines.slice(
+                  errorLineNum + 1, numberedLines.length).join('\n')
+              ];
           };
 
           // NOTE: proof_num_lines, displayed_question and displayed_proof are

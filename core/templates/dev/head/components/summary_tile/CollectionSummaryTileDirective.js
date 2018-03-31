@@ -37,7 +37,8 @@ oppia.directive('collectionSummaryTile', [
         getCategory: '&category',
         isPlaylistTile: '&isPlaylistTile',
         showLearnerDashboardIconsIfPossible: (
-          '&showLearnerDashboardIconsIfPossible')
+          '&showLearnerDashboardIconsIfPossible'),
+        isContainerNarrow: '&containerIsNarrow'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +
@@ -59,7 +60,7 @@ oppia.directive('collectionSummaryTile', [
           $scope.getCollectionLink = function() {
             var targetUrl = (
               $scope.isLinkedToEditorPage ?
-              COLLECTION_EDITOR_URL : COLLECTION_VIEWER_URL);
+                COLLECTION_EDITOR_URL : COLLECTION_VIEWER_URL);
             return UrlInterpolationService.interpolateUrl(
               targetUrl, {
                 collection_id: $scope.getCollectionId()

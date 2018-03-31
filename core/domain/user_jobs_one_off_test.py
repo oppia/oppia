@@ -66,12 +66,12 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserContributionsOneOffJobTests, self).setUp()
-        # User A has no created or edited explorations
-        # User B has one created exploration
-        # User C has one edited exploration
+        # User A has no created or edited explorations.
+        # User B has one created exploration.
+        # User C has one edited exploration.
         # User D has created an exploration and then edited it.
         # (This is used to check that there are no duplicate
-        # entries in the contribution lists.)
+        # entries in the contribution lists).
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
@@ -110,7 +110,8 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_created_exp(self):
         """Tests the case where user has created (and therefore edited)
-        an exploration."""
+        an exploration.
+        """
 
         self._run_one_off_job()
         user_b_contributions_model = user_models.UserContributionsModel.get(
@@ -133,7 +134,8 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
     def test_for_duplicates(self):
         """Tests the case where user has an edited exploration, and edits
-        it again making sure it is not duplicated."""
+        it again making sure it is not duplicated.
+        """
 
         self._run_one_off_job()
         user_d_contributions_model = user_models.UserContributionsModel.get(
@@ -221,7 +223,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         output = {}
         for stringified_distribution in stringified_output:
             value = re.findall(r'\d+', stringified_distribution)
-            # output['username length'] = number of users
+            # output['username length'] = number of users.
             output[value[0]] = int(value[1])
 
         return output
@@ -800,6 +802,12 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         init_state_name = exploration.init_state_name
         self._record_play(exp_id, init_state_name)
         self._rate_exploration('user1', exp_id, 5)
+        event_services.StatsEventsHandler.record(self.EXP_ID_1, 1, {
+            'num_starts': 1,
+            'num_actual_starts': 0,
+            'num_completions': 0,
+            'state_stats_mapping': {}
+        })
 
         (user_jobs_continuous_test.ModifiedUserStatsAggregator.
          start_computation())
@@ -830,6 +838,12 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         self._record_play(exp_id_1, init_state_name_1)
         self._rate_exploration('user1', exp_id_1, 5)
         self._rate_exploration('user2', exp_id_2, 4)
+        event_services.StatsEventsHandler.record(self.EXP_ID_1, 1, {
+            'num_starts': 1,
+            'num_actual_starts': 0,
+            'num_completions': 0,
+            'state_stats_mapping': {}
+        })
 
         (user_jobs_continuous_test.ModifiedUserStatsAggregator.
          start_computation())
@@ -857,6 +871,12 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
         self._rate_exploration('user1', exp_id, 4)
         self._record_play(exp_id, init_state_name)
         self._record_play(exp_id, init_state_name)
+        event_services.StatsEventsHandler.record(self.EXP_ID_1, 1, {
+            'num_starts': 2,
+            'num_actual_starts': 0,
+            'num_completions': 0,
+            'state_stats_mapping': {}
+        })
 
         (user_jobs_continuous_test.ModifiedUserStatsAggregator.
          start_computation())

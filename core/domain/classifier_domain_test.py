@@ -184,7 +184,8 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
 
     def test_validation(self):
         """Tests to verify validate method of TrainingJobExplorationMapping
-        domain."""
+        domain.
+        """
 
         # Verify no errors are raised for correct data.
         mapping_dict = {

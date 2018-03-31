@@ -32,7 +32,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
     USER_ID_2 = 'user_2'
 
     def test_rating_assignation(self):
-        """Check ratings are correctly assigned to an exploration"""
+        """Check ratings are correctly assigned to an exploration."""
 
         exp_services.save_new_exploration(
             self.EXP_ID,

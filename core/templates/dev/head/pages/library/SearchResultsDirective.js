@@ -48,7 +48,7 @@ oppia.directive('searchResults', [
 
           $scope.noExplorationsImgUrl =
            UrlInterpolationService.getStaticImageUrl(
-            '/general/no_explorations_found.png');
+             '/general/no_explorations_found.png');
         }
       ]
     };

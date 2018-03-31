@@ -63,7 +63,7 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         })
         self.exploration.version += 1
 
-        # Add a state
+        # Add a state.
         self.exploration.add_states(['New state'])
         self.exploration.states['New state'] = copy.deepcopy(
             self.exploration.states['Renamed state'])
@@ -230,7 +230,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         default_outcome.dest = exploration.init_state_name
         exploration.validate()
 
-        # Ensure an answer group with two classifier rules is invalid
+        # Ensure an answer group with two classifier rules is invalid.
         init_state.interaction.answer_groups.append(
             exp_domain.AnswerGroup.from_dict({
                 'outcome': {
@@ -536,7 +536,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exp_domain.Solution.from_dict(init_state.interaction.id, solution))
         exploration.validate()
 
-        # Add hint and delete hint
+        # Add hint and delete hint.
         init_state.add_hint(exp_domain.SubtitledHtml('new hint', {}))
         self.assertEquals(
             init_state.interaction.hints[1].hint_content.html,
@@ -569,7 +569,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        # Object type of answer must match that of correct_answer
+        # Object type of answer must match that of correct_answer.
         with self.assertRaises(AssertionError):
             init_state.interaction.solution = (
                 exp_domain.Solution.from_dict(
@@ -954,7 +954,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         self.assertEqual(yaml_content_2, yaml_content)
 
         # Verify SAMPLE_UNTITLED_YAML_CONTENT can be converted to an exploration
-        # without error
+        # without error.
         exp_domain.Exploration.from_untitled_yaml(
             'exp4', 'Title', 'Category', self.SAMPLE_UNTITLED_YAML_CONTENT)
 
@@ -3147,23 +3147,23 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         self.assertIn('Renamed state', exploration.states)
         self.assertIn('State 2', exploration.states)
 
-        # Can successfully add 'END' state
+        # Can successfully add 'END' state.
         exploration.add_states(['END'])
 
-        # Should fail to rename like any other state
+        # Should fail to rename like any other state.
         with self.assertRaisesRegexp(ValueError, 'Duplicate state name'):
             exploration.rename_state('State 2', 'END')
 
-        # Ensure the other states are connected to END
+        # Ensure the other states are connected to END.
         exploration.states[
             'Renamed state'].interaction.default_outcome.dest = 'State 2'
         exploration.states['State 2'].interaction.default_outcome.dest = 'END'
 
-        # Ensure the other states have interactions
+        # Ensure the other states have interactions.
         exploration.states['Renamed state'].update_interaction_id('TextInput')
         exploration.states['State 2'].update_interaction_id('TextInput')
 
-        # Other miscellaneous requirements for validation
+        # Other miscellaneous requirements for validation.
         exploration.title = 'Title'
         exploration.category = 'Category'
         exploration.objective = 'Objective'
@@ -3182,10 +3182,10 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         another_end_state.interaction.default_outcome = None
         exploration.validate(strict=True)
 
-        # Name it back for final tests
+        # Name it back for final tests.
         exploration.rename_state('AnotherEnd', 'END')
 
-        # Should be able to successfully delete it
+        # Should be able to successfully delete it.
         exploration.delete_state('END')
         self.assertNotIn('END', exploration.states)
 
@@ -3196,7 +3196,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
     EXP_ID = 'eid'
 
     def setUp(self):
-        """Initialize owner and store default exploration before each test case.
+        """Initialize owner and store default exploration before each
+        test case.
         """
         super(StateIdMappingTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -3224,7 +3225,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_mapping_remains_same_when_exp_params_changes(self):
         """Test that state id mapping is unchanged when exploration params are
-        changed."""
+        changed.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, [{
@@ -3247,7 +3249,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_mapping_is_correct_when_new_state_is_added(self):
         """Test that new state id is added in state id mapping when new state is
-        added in exploration."""
+        added in exploration.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, [{
@@ -3270,7 +3273,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_mapping_is_correct_when_old_state_is_deleted(self):
         """Test that state id is removed from state id mapping when the
-        state is removed from exploration."""
+        state is removed from exploration.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, [{
@@ -3297,7 +3301,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_mapping_remains_when_state_is_renamed(self):
         """Test that state id mapping is changed accordingly when a state
-        is renamed in exploration."""
+        is renamed in exploration.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, [{
@@ -3326,7 +3331,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_mapping_is_changed_when_interaction_id_is_changed(self):
         """Test that state id mapping is changed accordingly when interaction
-        id of state is changed."""
+        id of state is changed.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, [{
@@ -3351,7 +3357,8 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_mapping_is_correct_for_series_of_changes(self):
         """Test that state id mapping is changed accordingly for series
-        of add, rename, remove and update state changes."""
+        of add, rename, remove and update state changes.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, [{

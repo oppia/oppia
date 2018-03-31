@@ -44,7 +44,7 @@ describe('URL Interpolation Service', function() {
     );
     expect(
       uis._getCompleteUrl('/test_folder', '/path_test/hash_test.html')).toBe(
-        GLOBALS.ASSET_DIR_PREFIX + '/test_folder/path_test/hash_test.' +
+      GLOBALS.ASSET_DIR_PREFIX + '/test_folder/path_test/hash_test.' +
         hashes['/path_test/hash_test.html'] + '.html'
     );
     expect(uis._getCompleteUrl('/test_folder', '/hash_test.min.js')).toBe(
@@ -331,7 +331,7 @@ describe('URL Interpolation Service', function() {
         new Error(
           'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
       expect(
-         uis.getDirectiveTemplateUrl.bind(null, 'test_url/fail.html')).toThrow(
+        uis.getDirectiveTemplateUrl.bind(null, 'test_url/fail.html')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
 
@@ -346,7 +346,7 @@ describe('URL Interpolation Service', function() {
         new Error(
           'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
       expect(
-         uis.getExtensionResourceUrl.bind(null, 'test_url/fail.html')).toThrow(
+        uis.getExtensionResourceUrl.bind(null, 'test_url/fail.html')).toThrow(
         new Error(
           'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
     });
