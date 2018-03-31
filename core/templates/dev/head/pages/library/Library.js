@@ -80,8 +80,6 @@ oppia.controller('Library', [
       $http.get('/libraryindexhandler').success(function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
 
-        $scope.data = {};
-
         for (var i = 0; i < $scope.libraryGroups.length; i++) {
           var categoryActivity = $scope.libraryGroups[i].activity_summary_dicts;
           for (var j = 0; j < categoryActivity.length; j++) {
@@ -96,10 +94,17 @@ oppia.controller('Library', [
                 }));
             $http.post(learnerPlaylistUrl, {})
               .then(function(response) {
-                if (response.data.belongs_to_subscribed_activities) {
-                  $scope.data[activityId] = false;
-                } else {
-                  $scope.data[activityId] = true;
+                for (var i = 0; i < $scope.libraryGroups.length; i++) {
+                  var categoryActivity = $scope.libraryGroups[i]
+                  .activity_summary_dicts;
+                  for (var j = 0; j < categoryActivity.length; j++) {
+                    url = response.config.url;
+                    url = url.substring(url.lastIndexOf('/') + 1, url.length);
+                    if (url === categoryActivity[j].id) {
+                      categoryActivity[j].shouldShowAddToPlaylistIcon = response
+                      .data.belongs_to_subscribed_activities;
+                    }
+                  }
                 }
               });
           }
