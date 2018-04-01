@@ -644,7 +644,6 @@ oppia.directive('filepathEditor', [
             dataType: 'text'
           }).done(function(data) {
             // Pre-load image before marking the image as saved.
-            console.log(data);
             var img = new Image();
             img.onload = function() {
               $scope.setSavedImageFilename(data.filepath, true);
