@@ -164,3 +164,50 @@ oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
     }
   };
 }]);
+
+oppia.directive('handleDropdownNavigation', function () {
+  return {
+    restrict: 'A',
+    link: function (scope, elm, attrs) {
+      elm.on('focus', function (e) {
+        elm.bind('keydown keypress', function (e) {
+          if (e.keyCode === 13) {
+            // open the submenu on pressing enter
+            e.preventDefault();
+            if (!elm.closest('li').hasClass('open')) {
+              elm.closest('li').addClass('open');
+            }
+          }
+        });
+
+        elm.closest('li').find('ul').find('li')
+          .first().find('a').keydown(function (e) {
+            if (e.shiftKey && e.keyCode === 9) {
+              // If the user presses shift+tab on the first list item, 
+              //hide the menus
+              if (elm.closest('li').hasClass('open')) {
+                elm.closest('li').removeClass('open');
+              }
+            }
+          });
+
+        elm.closest('li').find('ul').find('li')
+          .last().find('a').keydown(function (e) {
+            if (e.keyCode === 9) {
+              // If the user presses shift+tab on the first list item, 
+              //hide the menus
+              if (elm.closest('li').hasClass('open')) {
+                elm.closest('li').removeClass('open');
+              }
+            }
+          });
+      });
+
+      angular.element(document).on('click', function () {
+        if (elm.closest('li').hasClass('open')) {
+          elm.closest('li').removeClass('open');
+        }
+      });
+    }
+  };
+});
