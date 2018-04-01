@@ -16,7 +16,7 @@
  * @fileoverview Service for uploading image to cache
  */
 
-oppia.service('CacheImageUploaderService', [
+oppia.factory('CacheImageUploaderService', [
   '$sce', 'AlertsService', function($sce, AlertsService) {
     var convertImageDataToImageFile = function(dataURI) {
       // Convert base64/URLEncoded data component to raw binary data
@@ -53,47 +53,50 @@ oppia.service('CacheImageUploaderService', [
           ('0' + date.getSeconds()).slice(-2) +
           '_' +
           Math.random().toString(36).substr(2, 10) +
-          '.' + OUTPUT_IMAGE_FORMAT;
+          '.' + 'png';
     };
 
-    $scope.imageData = {};
+    var generatedImageFilename;
+    var imageData = {};
 
     var sourceUrl = function(filename, explorationId) {
-      return $sce.trustAsResourceUrl(
-        '/imagehandler/' + explorationId + '/' + filename);
+      return '/imagehandler/' + explorationId + '/' + filename;
     };
 
     var _uploadImageToCache = function(imageData, explorationId) {
+      generatedImageFilename = _generateImageFilename();
       newImageFile = convertImageDataToImageFile(imageData);
 
-      $scope.imageData.uploadedFile = newImageFile;
-      $scope.imageData.uploadedImageData = imageData;
+      imageData.uploadedFile = newImageFile;
+      imageData.uploadedImageData = imageData;
 
-      $scope.generatedImageFilename = _generateImageFilename();
       var form = new FormData();
       form.append('image', newImageFile);
       form.append('payload', JSON.stringify({
-        filename: $scope.generatedImageFilename
+        filename: generatedImageFilename
       }));
       form.append('csrf_token', GLOBALS.csrf_token);
 
       $.ajax({
-        url: '/createhandler/imageupload/' + $scope.explorationId,
+        url: '/createhandler/imageupload/' + explorationId,
         data: form,
         processData: false,
         contentType: false,
+        async: false,
         type: 'POST',
+        dataFilter: function(data) {
+          // Remove the XSSI prefix.
+          var transformedData = data.substring(5);
+          return JSON.parse(transformedData);
+        },
         dataType: 'text'
-      }).done(function(data) {
-        src = sourceUrl($scope.generatedImageFilename, explorationId);
-        return src;
       }).fail(function(data) {
         var transformedData = data.responseText.substring(5);
         var parsedResponse = JSON.parse(transformedData);
         AlertsService.addWarning(
           parsedResponse.error || 'Error communicating with server.');
-        $scope.$apply();
       });
+      return sourceUrl(generatedImageFilename, explorationId);
     };
 
     return {
@@ -101,7 +104,7 @@ oppia.service('CacheImageUploaderService', [
         return _uploadImageToCache(imageData, explorationId);
       },
       filepath: function() {
-        return $scope.generatedImageFilename;
+        return generatedImageFilename;
       }
     };
   }]);

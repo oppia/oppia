@@ -17,9 +17,7 @@
  */
 
 oppia.directive('schemaBasedHtmlEditor', [
-  'UrlInterpolationService', 'CacheImageUploaderService ', 'AlertsService',
-  'ExplorationContextService', function(UrlInterpolationService,
-      CacheImageUploaderService, AlertsService, ExplorationContextService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
@@ -30,34 +28,6 @@ oppia.directive('schemaBasedHtmlEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_editors/' +
         'schema_based_html_editor_directive.html'),
-      restrict: 'E',
-      link: function($scope, element, attrs) {
-        // A mutation observer to detect changes in the RTE Editor
-        var observer = new MutationObserver(function(mutations) {
-          // A condition to detect if mutation involves addition of node by
-          // drag and drop method.
-          if (mutations[mutations.length - 1].addedNodes[0]) {
-            // This condition checks if added node is image type.
-            if (mutations[mutations.length - 1]
-              .addedNodes[0].nodeName === 'IMG'){
-              // Gets the added image node
-              var addedImgNode = mutations[mutations.length - 1].addedNodes[0];
-              addedImgNode.classList.add('oppia-noninteractive-image');
-              addedImgNode.classList.add('block-element');
-
-              var explorationId = ExplorationContextService.getExplorationId(
-              );
-
-              var uploadedImage = CacheImageUploaderService.uploadImageToCache(
-                addedImgNode.src, explorationId);
-            }
-          }
-        });
-
-        observer.observe(element[0], {
-          childList: true,
-          subtree: true
-        });
-      }
+      restrict: 'E'
     };
   }]);
