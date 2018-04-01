@@ -883,28 +883,25 @@ def _check_html_directive_name(all_files):
     return summary_messages
 
 
-def _check_directives(all_files):
-    """This function checks that all HTML directives end
-    with _directive.html.
+def _check_directive_scope(all_files):
+    """This function checks that all directives have an explicit
+    scope key and it should not be scope: true.
     """
-    print 'Starting directive checks'
+    print 'Starting directive scope check'
     print '----------------------------------------'
-    total_files_checked = 0
-    total_error_count = 0
     summary_messages = []
     files_to_check = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.js')]
     failed = False
+    directive_does_not_have_scope = True
     summary_messages = []
     parser = PyJsParser()
     for filename in files_to_check:
         with open(filename) as f:
             content = f.read()
-        total_files_checked += 1
         parsed_nodes = parser.parse(content)['body']
-        #print parsed_nodes
         for parsed_node in parsed_nodes:
             if parsed_node['type'] == u'ExpressionStatement':
                 expression = parsed_node['expression']
@@ -929,37 +926,34 @@ def _check_directives(all_files):
                                                 for return_node_property in return_node_properties:
                                                     if return_node_property['key']['type'] == u'Identifier' and (
                                                             return_node_property['key']['name'] == u'scope'):
+                                                        directive_does_not_have_scope = False
                                                         scope_value = return_node_property['value']
                                                         if scope_value['type'] == u'Literal' and scope_value['value']:
-                                                            print "Cannot be True " + str(filename)
-                                                    else:
-                                                        print "No scope found. " + str(filename)
-
+                                                            failed = True
+                                                            print "%s --> Please ensure that the directives in this file do not have scope set to true." %(filename)
+                    if directive_does_not_have_scope:
+                        failed = True
+                        print "%s --> Please ensure that the directives in this file have an explicit scope." %(filename)
+                                                                
     if failed:
-        summary_message = '%s   Directive checks failed' % (
+        summary_message = '%s   Directive scope check failed' % (
             _MESSAGE_TYPE_FAILED)
         summary_messages.append(summary_message)
     else:
-        summary_message = '%s  Directive checks passed' % (
+        summary_message = '%s  Directive scope check passed' % (
             _MESSAGE_TYPE_SUCCESS)
         summary_messages.append(summary_message)
 
     print ''
     print '----------------------------------------'
     print ''
-    if total_files_checked == 0:
-        print 'There are no files to be checked.'
-    else:
-        print '(%s files checked, %s errors found)' % (
-            total_files_checked, total_error_count)
-        print summary_message
 
     return summary_messages
 
 
 def main():
     all_files = _get_all_files()
-    _check_directives(all_files)
+    directive_scope_messages = _check_directive_scope(all_files)
     html_directive_name_messages = _check_html_directive_name(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
@@ -968,7 +962,7 @@ def main():
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
-        html_directive_name_messages +
+        directive_scope_messages + html_directive_name_messages +
         import_order_messages + newline_messages +
         docstring_messages + comment_messages +
         linter_messages + pattern_messages)
