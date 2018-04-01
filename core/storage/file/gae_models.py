@@ -47,7 +47,7 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def get_new_id(cls, entity_name):
-        """Base class to be implemented in sub classes.
+        """Base classmethod to be implemented in sub classes.
 
         Args:
             entity_name: str. The name of the entity.
@@ -202,7 +202,7 @@ class FileModel(base_models.VersionedModel):
 
     @classmethod
     def get_new_id(cls, entity_name):
-        """Base class to be implemented in sub classes.
+        """Base classmethod to be implemented in sub classes.
 
         Args:
             entity_name: str. The name of the entity.

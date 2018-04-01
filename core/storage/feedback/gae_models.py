@@ -265,7 +265,7 @@ class FeedbackMessageModel(base_models.BaseModel):
 
     @property
     def exploration_id(self):
-        """Extracts the exploration id from the message id.
+        """Returns the exploration id corresponding to this thread instance.
 
         Returns:
             str. The exploration id.
@@ -273,7 +273,8 @@ class FeedbackMessageModel(base_models.BaseModel):
         return self.id.split('.')[0]
 
     def get_thread_subject(self):
-        """Returns the subject of the thread corresponding to the thread id.
+        """Returns the subject of the thread corresponding to this
+        FeedbackMessageModel instance.
 
         Returns:
             str. The subject of the thread.

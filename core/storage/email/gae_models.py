@@ -307,7 +307,7 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
             thread_id: str. The thread id.
 
         Returns:
-            str. The unique id used in reply-to email address in outgoing
+            str. The unique id used in the reply-to email address in outgoing
                 feedback and suggestion emails.
         """
         return '.'.join([user_id, exploration_id, thread_id])
@@ -333,7 +333,7 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, user_id, exploration_id, thread_id):
-        """Creates a new FeedbackEmailUniqueIDModel entry.
+        """Creates a new FeedbackEmailReplyToIdModel instance.
 
         Args:
             user_id: str. ID of the corresponding user.
@@ -358,14 +358,15 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @classmethod
     def get_by_reply_to_id(cls, reply_to_id):
-        """Fetches the entry corresponding to the given 'reply-to' id.
+        """Fetches the FeedbackEmailReplyToIdModel instance corresponding to the
+        given 'reply-to' id.
 
         Args:
             reply_to_id: str. The unique 'reply-to' id.
 
         Returns:
-            str or None. The entry corresponding to the given 'reply-to' id if
-                it is fetched else None.
+            str or None. The FeedbackEmailReplyToIdModel instance corresponding
+                to the given 'reply-to' id if it is fetched else None.
         """
         model = cls.query(cls.reply_to_id == reply_to_id).fetch()
         if not model:
@@ -374,7 +375,8 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @classmethod
     def get(cls, user_id, exploration_id, thread_id, strict=True):
-        """Gets the entry corresponding to the unique instance id.
+        """Gets the FeedbackEmailReplyToIdModel instance corresponding to the
+        unique instance id.
 
         Args:
             user_id: str. The user id.
@@ -384,8 +386,8 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
                 instance id exists in the datastore. Default is True.
 
         Returns:
-            An entry instance that corresponds to the given instance id if it is
-                present in the datastore. Otherwise, None.
+            A FeedbackEmailReplyToIdModel instance that corresponds to the given
+                instance id if it is present in the datastore. Otherwise, None.
         """
         instance_id = cls._generate_id(user_id, exploration_id, thread_id)
         return super(
@@ -393,8 +395,8 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @classmethod
     def get_multi_by_user_ids(cls, user_ids, exploration_id, thread_id):
-        """Returns the entries corresponding to the given user ids in the dict
-        format.
+        """Returns the FeedbackEmailReplyToIdModel instance corresponding to the
+        given user ids in dict format.
 
         Args:
             user_ids: list(str). A list of user ids.
@@ -402,9 +404,10 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
             thread_id: str. The thread id.
 
         Returns:
-            dict. The enteries correponding to the given list of user ids in
-                dict format having key as the unique user id and value as the
-                entery corresponding to the user id in the key.
+            dict. The FeedbackEmailReplyToIdModel instances corresponding to the
+                given list of user ids in dict format. The key is the unique
+                user id, and value is the FeedbackEmailReplyToIdModel instance
+                corresponding to that user id.
         """
         instance_ids = [cls._generate_id(user_id, exploration_id, thread_id)
                         for user_id in user_ids]
@@ -414,7 +417,8 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @property
     def user_id(self):
-        """Returns the user id extracted from the unique id.
+        """Returns the user id corresponding to this FeedbackEmailReplyToIdModel
+        instance.
 
         Returns:
             str. The user id.
