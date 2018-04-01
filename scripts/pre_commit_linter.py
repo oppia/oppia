@@ -911,6 +911,10 @@ def _check_directive_scope(all_files):
                                 expression['callee']['property']['name'] == (
                                     u'directive')):
                     arguments = expression['arguments']
+                    directive_name = str(arguments[0]['value']) if (
+                        arguments[0]['type'] == u'Literal') else (
+                            "No such directive exists.")
+                    arguments = arguments[1:]
                     for argument in arguments:
                         if argument['type'] == u'ArrayExpression':
                             elements = argument['elements']
@@ -930,18 +934,20 @@ def _check_directive_scope(all_files):
                                                         scope_value = return_node_property['value']
                                                         if scope_value['type'] == u'Literal' and scope_value['value']:
                                                             failed = True
-                                                            print "%s --> Please ensure that the directives in this file do not have scope set to true." %(filename)
+                                                            print "Please ensure that %s directive in %s file does not have scope set to true." %(directive_name, filename)
                     if directive_does_not_have_scope:
                         failed = True
-                        print "%s --> Please ensure that the directives in this file have an explicit scope." %(filename)
+                        print "Please ensure that %s directive in %s file has an explicit scope." %(directive_name, filename)
                                                                 
     if failed:
         summary_message = '%s   Directive scope check failed' % (
             _MESSAGE_TYPE_FAILED)
+        print summary_message
         summary_messages.append(summary_message)
     else:
         summary_message = '%s  Directive scope check passed' % (
             _MESSAGE_TYPE_SUCCESS)
+        print summary_message
         summary_messages.append(summary_message)
 
     print ''
