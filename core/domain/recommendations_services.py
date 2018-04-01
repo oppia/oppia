@@ -96,7 +96,8 @@ RECOMMENDATION_CATEGORIES = [
 
 def get_topic_similarities_dict():
     """Returns a 2d dict of topic similarities. Creates the default similarity
-    dict if it does not exist yet."""
+    dict if it does not exist yet.
+    """
 
     topic_similarities_entity = (
         recommendations_models.TopicSimilaritiesModel.get(
@@ -109,7 +110,8 @@ def get_topic_similarities_dict():
 
 def save_topic_similarities(topic_similarities):
     """Stores topic similarities in the datastore. Returns the newly created or
-    changed entity."""
+    changed entity.
+    """
 
     topic_similarities_entity = (
         recommendations_models.TopicSimilaritiesModel.get(
@@ -132,7 +134,8 @@ def _create_default_topic_similarities():
     DEFAULT_TOPIC_SIMILARITY if the keys are different and
     SAME_TOPIC_SIMILARITY if the keys are the same.
 
-    Returns the newly created TopicSimilaritiesModel."""
+    Returns the newly created TopicSimilaritiesModel.
+    """
 
     topic_similarities_dict = {
         topic: {} for topic in RECOMMENDATION_CATEGORIES
@@ -154,7 +157,8 @@ def get_topic_similarity(topic_1, topic_2):
 
     It checks whether the two topics are in the list of default topics. If
     not, it returns the default similarity if the topics are different or 1 if
-    the topics are the same."""
+    the topics are the same.
+    """
 
     if (topic_1 in RECOMMENDATION_CATEGORIES and
             topic_2 in RECOMMENDATION_CATEGORIES):
@@ -172,8 +176,8 @@ def get_topic_similarities_as_csv():
     string which contains the contents of a csv file.
 
     The first line is a list of the current topics. The next lines are an
-    adjacency matrix of similarities."""
-
+    adjacency matrix of similarities.
+    """
     output = StringIO.StringIO()
     writer = csv.writer(output)
     writer.writerow(RECOMMENDATION_CATEGORIES)
@@ -196,8 +200,8 @@ def _validate_topic_similarities(data):
     between 0.0 and 1.0.
 
     This function checks whether topics belong in the current list of
-    known topics, and if the adjacency matrix is valid."""
-
+    known topics, and if the adjacency matrix is valid.
+    """
     data = data.splitlines()
     data = list(csv.reader(data))
     topics_list = data[0]
@@ -247,7 +251,8 @@ def update_topic_similarities(data):
 
     The topic names should belong to the current list of topics, but they need
     not include every current topic. If a topic name is not in the data, its
-    similarities remain as the previous value or the default."""
+    similarities remain as the previous value or the default.
+    """
 
     _validate_topic_similarities(data)
 
@@ -281,7 +286,8 @@ def get_item_similarity(
 
     Comparison of similarity is based on the similarity of exploration topics
     and whether the explorations have the same language or author. It
-    returns 0.0 if compared_exp is private."""
+    returns 0.0 if compared_exp is private.
+    """
 
     similarity_score = 0
 
@@ -305,7 +311,8 @@ def get_item_similarity(
 
 def set_recommendations(exp_id, new_recommendations):
     """Stores a list of exploration ids of recommended explorations to play
-    after completing the exploration keyed by exp_id."""
+    after completing the exploration keyed by exp_id.
+    """
 
     recommendations_models.ExplorationRecommendationsModel(
         id=exp_id, recommended_exploration_ids=new_recommendations).put()
@@ -313,7 +320,8 @@ def set_recommendations(exp_id, new_recommendations):
 
 def get_exploration_recommendations(exp_id):
     """Gets a list of ids of at most 10 recommended explorations to play
-    after completing the exploration keyed by exp_id."""
+    after completing the exploration keyed by exp_id.
+    """
 
     recommendations_model = (
         recommendations_models.ExplorationRecommendationsModel.get(

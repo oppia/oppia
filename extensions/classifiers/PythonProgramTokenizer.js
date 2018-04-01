@@ -304,7 +304,7 @@ oppia.factory('PythonProgramTokenizer', [
                   break;
                 }
               } else if (
-                  singleQuoted.indexOf(initial) !== -1 ||
+                singleQuoted.indexOf(initial) !== -1 ||
                   singleQuoted.indexOf(token.slice(0, 2)) !== -1 ||
                   singleQuoted.indexOf(token.slice(0, 3)) !== -1) {
                 // Continued string.

@@ -447,12 +447,12 @@ oppia.factory('ExplorationStatesService', [
             var result = (
               AnswerClassificationService.getMatchingClassificationResult(
                 ExplorationContextService.getExplorationId(),
-              stateName,
-              _states.getState(stateName),
-              solution.correctAnswer,
-              $injector.get(
-                AngularNameService.getNameOfInteractionRulesService(
-                  _states.getState(stateName).interaction.id))));
+                stateName,
+                _states.getState(stateName),
+                solution.correctAnswer,
+                $injector.get(
+                  AngularNameService.getNameOfInteractionRulesService(
+                    _states.getState(stateName).interaction.id))));
             var solutionIsValid = stateName !== result.outcome.dest;
             SolutionValidityService.updateValidity(
               stateName, solutionIsValid);

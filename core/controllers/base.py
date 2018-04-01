@@ -127,7 +127,7 @@ class BaseHandler(webapp2.RequestHandler):
     # users have agreed to the latest terms.
     REDIRECT_UNFINISHED_SIGNUPS = True
 
-    # What format the get method returns when exception raised, json or html
+    # What format the get method returns when exception raised, json or html.
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
 
     @webapp2.cached_property

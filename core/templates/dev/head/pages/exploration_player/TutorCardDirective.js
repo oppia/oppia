@@ -165,7 +165,7 @@ oppia.directive('tutorCard', [
 
           $scope.isContentAudioTranslationAvailable = function() {
             return ExplorationPlayerService.isContentAudioTranslationAvailable(
-                $scope.activeCard.stateName);
+              $scope.activeCard.stateName);
           };
 
           $scope.isCurrentCardAtEndOfTranscript = function() {

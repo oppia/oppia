@@ -140,7 +140,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
     def test_update_methods(self):
         """Tests update_title, update_question_data and update_language_code
-        methods of the question domain object."""
+        methods of the question domain object.
+        """
         state = exp_domain.State.create_default_state('ABC')
         question_data = state.to_dict()
 
@@ -162,3 +163,17 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         question.update_language_code('es')
         self.assertEqual(question.language_code, 'es')
+
+
+class QuestionSummaryDomainTest(test_utils.GenericTestBase):
+    """Test for Question Summary Domain object."""
+
+    def test_to_dict(self):
+        expected_object_dict = {
+            'question_id': 'col1.abc',
+            'question_title': 'hello',
+            'skill_names': ['skill1', 'skill2']
+        }
+        observed_object = question_domain.QuestionSummary(
+            'col1.abc', 'hello', ['skill1', 'skill2'])
+        self.assertEqual(expected_object_dict, observed_object.to_dict())

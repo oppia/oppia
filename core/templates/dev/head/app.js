@@ -372,7 +372,6 @@ oppia.config(['toastrConfig', function(toastrConfig) {
     messageClass: 'toast-message',
     progressBar: false,
     tapToDismiss: true,
-    timeOut: 1500,
     titleClass: 'toast-title'
   });
 }]);
