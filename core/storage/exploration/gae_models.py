@@ -211,8 +211,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains:
-                    cmd: str. Unique command as key.
-                and then additional arguments for that command as value.
+                    cmd: str. Unique command.
+                and then additional arguments for that command. For example:
+
+                {'cmd': 'AUTO_revert_version_number',
+                 'version_number': 4}
         """
         super(ExplorationRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)

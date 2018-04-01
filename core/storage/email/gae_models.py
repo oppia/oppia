@@ -395,8 +395,8 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
 
     @classmethod
     def get_multi_by_user_ids(cls, user_ids, exploration_id, thread_id):
-        """Returns the FeedbackEmailReplyToIdModel instance corresponding to the
-        given user ids in dict format.
+        """Returns the FeedbackEmailReplyToIdModel instances corresponding to
+        the given user ids in dict format.
 
         Args:
             user_ids: list(str). A list of user ids.
@@ -406,8 +406,8 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
         Returns:
             dict. The FeedbackEmailReplyToIdModel instances corresponding to the
                 given list of user ids in dict format. The key is the unique
-                user id, and value is the FeedbackEmailReplyToIdModel instance
-                corresponding to that user id.
+                user id, and the corresponding value is the list of
+                FeedbackEmailReplyToIdModel instances.
         """
         instance_ids = [cls._generate_id(user_id, exploration_id, thread_id)
                         for user_id in user_ids]
