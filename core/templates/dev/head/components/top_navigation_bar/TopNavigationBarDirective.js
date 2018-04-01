@@ -86,6 +86,83 @@ oppia.directive('topNavigationBar', [
             angular.element(evt.currentTarget).parent().removeClass('open');
           };
 
+          $scope.handleAboutDropdownNavigation = function () {
+            angular.element('.oppia-topnav-about').find('a').first()
+              .bind('keydown keypress', function (e) {
+                if (e.keyCode === 13) {
+                  // open the submenu on pressing enter
+                  e.preventDefault();
+                  $scope.onMouseoverDropdownMenu(e);
+                  $scope.$apply();
+                }
+              });
+            angular.element('.oppia-topnav-about').find('ul').find('li')
+              .find('a').first().keydown(function (e) {
+                if (e.shiftKey && e.keyCode === 9) {
+                  // If the user presses shift+tab on the first list item, 
+                  //hide the menus
+                  if (angular.element('.oppia-topnav-about').hasClass('open')) {
+                    angular.element('.oppia-topnav-about').removeClass('open');
+                  }
+                }
+              });
+
+            angular.element('.oppia-topnav-about').find('ul').find('li')
+              .find('a').last().keydown(function (e) {
+                if (e.keyCode === 9) {
+                  // If the user tabs out of the navigation hide the menu
+                  if (angular.element('.oppia-topnav-about').hasClass('open')) {
+                    angular.element('.oppia-topnav-about').removeClass('open');
+                  }
+                }
+              });
+          };
+
+          $scope.handleProfileDropdownNavigation = function () {
+            angular.element('.oppia-navbar-profile').find('li').first()
+              .find('a').bind('keydown keypress', function (e) {
+                if (e.keyCode === 13) {
+                  // open the submenu on pressing enter
+                  e.preventDefault();
+                  $scope.onMouseoverProfilePictureOrDropdown(e);
+                  $scope.$apply();
+                }
+              });
+            angular.element('.oppia-navbar-profile ul').find('a').first()
+              .keydown(function (e) {
+                if (e.shiftKey && e.keyCode === 9) {
+                  // If the user presses shift+tab on the first list item,
+                  //hide the menus
+                  if (angular.element('.oppia-navbar-profile li')
+                    .hasClass('open')) {
+                    angular.element('.oppia-navbar-profile li')
+                      .removeClass('open');
+                  }
+                }
+              });
+
+            angular.element('.oppia-navbar-profile ul').find('a').last()
+              .keydown(function (e) {
+                if (e.keyCode === 9) {
+                  // If the user tabs out of the navigation hide the menu
+                  if (angular.element('.oppia-navbar-profile li')
+                    .hasClass('open')) {
+                    angular.element('.oppia-navbar-profile li')
+                      .removeClass('open');
+                  }
+                }
+              });
+          };
+          angular.element(document).on('click', function () {
+            if (angular.element('.oppia-navbar-profile li').hasClass('open')) {
+              $scope.profileDropdownIsActive = false;
+              angular.element('.oppia-navbar-profile li').removeClass('open');
+            }
+            if (angular.element('.oppia-topnav-about').hasClass('open')) {
+              angular.element('.oppia-topnav-about').removeClass('open');
+            }
+          });
+
           if (GLOBALS.userIsLoggedIn) {
             // Show the number of unseen notifications in the navbar and page
             // title, unless the user is already on the dashboard page.

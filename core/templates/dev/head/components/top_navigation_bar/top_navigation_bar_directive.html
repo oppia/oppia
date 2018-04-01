@@ -25,12 +25,13 @@
       <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY" class="oppia-clickable-navbar-element">
         <a class="oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
       </li>
-      <li uib-dropdown ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
+      <li uib-dropdown ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="oppia-navbar-clickable-dropdown oppia-topnav-about protractor-test-about-oppia-list-item">
         <a class="oppia-navbar-tab"
            role="menuitem"
            aria-haspopup="true"
            aria-expanded="false"
            tabindex="0"
+           ng-focus="handleAboutDropdownNavigation()"
            ng-mouseleave="onMouseoutDropdownMenuAbout($event)">
           <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_ABOUT"></span>
           <span class="caret"></span>
@@ -63,6 +64,7 @@
       <a uib-dropdown-toggle class="oppia-navbar-dropdown-toggle"
          ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
          ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)"
+         ng-focus="handleProfileDropdownNavigation()"
          role="menuitem"
          aria-haspopup="true"
          aria-expanded="false"
