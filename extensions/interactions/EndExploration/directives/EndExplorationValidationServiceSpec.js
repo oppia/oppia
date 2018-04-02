@@ -126,7 +126,7 @@ describe('EndExplorationValidationService', function() {
         currentState, customizationArguments, [], null);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.ERROR,
-        message: 'Set of recommended exploration IDs must be a list.'
+        message: 'Set of recommended exploration IDs must be list.'
       }]);
     });
 });
