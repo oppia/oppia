@@ -47,7 +47,7 @@ describe('Answer Groups Cache Service', function() {
       expect(agcs.contains('InteractionId')).toBe(true);
     });
 
-    it('returns null when the specified value isnt available in the cache', function() {
+    it('returns null when value isnt available in the cache', function() {
       expect(agcs.get('NonPresentInteractionId')).toEqual(null);
     });
 
@@ -56,7 +56,7 @@ describe('Answer Groups Cache Service', function() {
       expect(agcs.get('InteractionId')).toEqual(answerGroup);
     });
 
-    it('successfully checks if the value is available in the cache', function() {
+    it('successfully checks if the value is available in cache', function() {
       agcs.set('InteractionId', answerGroup);
       expect(agcs.contains('InteractionId')).toBe(true);
       expect(agcs.contains('NonPresentInteractionId')).toBe(false);
