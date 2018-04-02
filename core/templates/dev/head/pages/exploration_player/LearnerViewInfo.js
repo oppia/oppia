@@ -104,6 +104,7 @@ oppia.controller('LearnerViewInfo', [
               }
             );
             $scope.explorationId = expInfo.id;
+            $scope.shouldAddToPlaylistIcon = expInfo.should_add_to_playlist_icon;
             $scope.explorationTags = getExplorationTagsSummary(expInfo.tags);
             $scope.explorationTitle = expInfo.title;
             $scope.infoCardBackgroundCss = {

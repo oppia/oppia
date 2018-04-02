@@ -98,11 +98,12 @@ oppia.controller('Library', [
                   var categoryActivity = $scope.libraryGroups[i]
                     .activity_summary_dicts;
                   for (var j = 0; j < categoryActivity.length; j++) {
-                    url = response.config.url;
-                    url = url.substring(url.lastIndexOf('/') + 1, url.length);
-                    if (url === categoryActivity[j].id) {
-                      categoryActivity[j].shouldShowAddToPlaylistIcon = response
-                        .data.belongs_to_subscribed_activities;
+                    requestUrl = response.config.url;
+                    requestUrl = requestUrl.substring(
+                      requestUrl.lastIndexOf('/') + 1, requestUrl.length);
+                    if (requestUrl === categoryActivity[j].id) {
+                      categoryActivity[j].should_add_to_playlist_icon =
+                        (!response.data.belongs_to_subscribed_activities);
                     }
                   }
                 }

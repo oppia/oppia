@@ -1,5 +1,5 @@
 <i class="oppia-learner-dashboard-icon fa fa-clock-o"
-   ng-if="tile.shouldShowAddToPlaylistIcon"
+   ng-if="shouldAddToPlaylistIcon()"
    ng-show="canActivityBeAddedToLearnerPlaylist(getActivityId()) && !isContainerNarrow()"
    ng-click="addToLearnerPlaylist(getActivityId(), getActivityType())"
    ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)"
