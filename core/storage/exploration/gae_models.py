@@ -211,7 +211,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains:
-                    cmd: str. Unique command.
+                    cmd: str. The type of the command. A full list of command
+                        types can be found in core/domain/exp_domain.py.
                 and then additional arguments for that command. For example:
 
                 {'cmd': 'AUTO_revert_version_number',
