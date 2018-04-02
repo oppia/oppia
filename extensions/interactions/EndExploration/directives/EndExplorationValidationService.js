@@ -31,8 +31,7 @@ oppia.factory('EndExplorationValidationService', [
         if (!angular.isArray(recommendedExplorationIds)) {
           warningsList.push({
             type: WARNING_TYPES.ERROR,
-            message: 'Set of recommended exploration IDs must be in list ' +
-              'format.'
+            message: 'Set of recommended exploration IDs must be a list.'
           });
         }
         for (var i = 0; i < recommendedExplorationIds.length; i++) {
