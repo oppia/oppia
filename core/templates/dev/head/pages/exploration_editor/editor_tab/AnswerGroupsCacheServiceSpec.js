@@ -15,8 +15,8 @@
 /**
  * @fileoverview Unit tests for Answer Groups Cache Service.
  */
-describe('Answer Groups Cache Service', function(){
-  describe('AnswerGroupsCache', function(){
+describe('Answer Groups Cache Service', function() {
+  describe('AnswerGroupsCache', function() {
     beforeEach(function() {
       module('oppia');
     });
@@ -42,21 +42,21 @@ describe('Answer Groups Cache Service', function(){
       agcs = $injector.get('AnswerGroupsCacheService');
     }));
 
-    it('Cache sets a value', function(){
+    it('sets a value in the cache', function() {
       agcs.set('InteractionId', answerGroup);
       expect(agcs.contains('InteractionId')).toBe(true);
     });
 
-    it('Cache returns null when the specified value isnt available', function(){
+    it('returns null when the specified value isnt available in the cache', function() {
       expect(agcs.get('NonPresentInteractionId')).toEqual(null);
     });
 
-    it('Cache gets a value', function(){
+    it('gets a value from the cache', function() {
       agcs.set('InteractionId', answerGroup);
       expect(agcs.get('InteractionId')).toEqual(answerGroup);
     });
 
-    it('Cache successfully checks if the value is available', function(){
+    it('successfully checks if the value is available in the cache', function() {
       agcs.set('InteractionId', answerGroup);
       expect(agcs.contains('InteractionId')).toBe(true);
       expect(agcs.contains('NonPresentInteractionId')).toBe(false);
@@ -64,7 +64,7 @@ describe('Answer Groups Cache Service', function(){
       expect(agcs.contains(1)).toBe(false);
     });
 
-    it('Cache resets', function(){
+    it('resets the cache', function() {
       agcs.set('InteractionId', answerGroup);
       expect(agcs.contains('InteractionId')).toBe(true);
       agcs.reset();
