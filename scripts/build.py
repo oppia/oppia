@@ -96,7 +96,7 @@ def _join_files(source_paths, target_file_path):
     """Writes multiple files into one file.
 
     Args:
-        source_paths: list(str). Paths to files to joined together.
+        source_paths: list(str). Paths to files to join together.
         target_file_path: str. Path to location of the joined file.
     """
     ensure_directory_exists(target_file_path)
@@ -166,10 +166,13 @@ def ensure_directory_exists(filepath):
 
 
 def _ensure_files_exist(filepaths):
-    """Ensures if files exist.
+    """Ensures that files exist at the given filepaths.
 
     Args:
         filepaths: list(str). Paths to files that we want to ensure exist.
+
+    Raises:
+        Exception: Raised if one or more of the files does not exist.
     """
     for filepath in filepaths:
         if not os.path.isfile(filepath):
@@ -226,35 +229,78 @@ def process_js(source_path, target_path):
     _minify(source_path, target_path)
 
 
-def get_dependency_filepaths(dependency, filepaths):
-    """Extracts dependency filepaths into filepaths object.
+def get_dependency_directory(dependency):
+    """Get dependency directory from dependecy dictionary.
 
     Args:
-        source_paths: dict(str, str). Dependency information object.
-        filepaths: dict(str, list(str)). Filepaths object with three lists each
-            for different file type (js, css, fonts).
+        dependency: dict(str, str). Dictionary representing single dependency
+            from manifest.json.
+
+    Returns:
+        str. Dependency directory.
     """
     if 'targetDir' in dependency:
         dependency_dir = dependency['targetDir']
     else:
-        dependency_dir = (
-            dependency['targetDirPrefix'] + dependency['version'])
-    if 'bundle' in dependency:
-        dependency_bundle = dependency['bundle']
-        for css_file in dependency_bundle.get('css', []):
-            filepaths['css'].append(
-                os.path.join(
-                    THIRD_PARTY_STATIC_DIR, dependency_dir, css_file))
-        for js_file in dependency_bundle.get('js', []):
-            filepaths['js'].append(
-                os.path.join(
-                    THIRD_PARTY_STATIC_DIR, dependency_dir, js_file))
-        if 'fontsPath' in dependency_bundle:
-            for extension in FONT_EXTENSIONS:
-                filepaths['fonts'].append(
-                    os.path.join(
-                        THIRD_PARTY_STATIC_DIR, dependency_dir,
-                        dependency_bundle['fontsPath'], extension))
+        dependency_dir = dependency['targetDirPrefix'] + dependency['version']
+    return os.path.join(THIRD_PARTY_STATIC_DIR, dependency_dir)
+
+
+def get_css_filepaths(dependency_bundle, dependency_dir):
+    """Gets dependency css filepaths.
+
+    Args:
+        dependency_bundle: dict(str, list(str) | str). The dict has three keys:
+            'js': List of paths to js files that need to be copied.
+            'css': List of paths to css files that need to be copied.
+            'fontsPath': Path to folder containing fonts that need to be copied.
+        dependency_dir: str. Path to directory where the files that need to
+            be copied are located.
+
+    Returns:
+        list(str). List of paths to css files that need to be copied.
+    """
+    css_files = dependency_bundle.get('css', [])
+    return [os.path.join(dependency_dir, css_file) for css_file in css_files]
+
+
+def get_js_filepaths(dependency_bundle, dependency_dir):
+    """Gets dependency js filepaths.
+
+    Args:
+        dependency_bundle: dict(str, list(str) | str). The dict has three keys:
+            'js': List of paths to js files that need to be copied.
+            'css': List of paths to css files that need to be copied.
+            'fontsPath': Path to folder containing fonts that need to be copied.
+        dependency_dir: str. Path to directory where the files that need to
+            be copied are located.
+
+    Returns:
+        list(str). List of paths to js files that need to be copied.
+    """
+    js_files = dependency_bundle.get('js', [])
+    return [os.path.join(dependency_dir, js_file) for js_file in js_files]
+
+
+def get_font_filepaths(dependency_bundle, dependency_dir):
+    """Gets dependency font filepaths.
+
+    Args:
+        dependency_bundle: dict(str, list(str) | str). The dict has three keys:
+            'js': List of paths to js files that need to be copied.
+            'css': List of paths to css files that need to be copied.
+            'fontsPath': Path to folder containing fonts that need to be copied.
+        dependency_dir: str. Path to directory where the files that need to
+            be copied are located.
+
+    Returns:
+        list(str). List of paths to font files that need to be copied.
+    """
+    if 'fontsPath' not in dependency_bundle:
+        return []
+    fonts_path = dependency_bundle['fontsPath']
+    return [os.path.join(dependency_dir, fonts_path, extension)
+            for extension in FONT_EXTENSIONS]
 
 
 def get_dependencies_filepaths():
@@ -265,8 +311,8 @@ def get_dependencies_filepaths():
         different file type (js, css, fonts).
     """
     filepaths = {
-        'css': [],
         'js': [],
+        'css': [],
         'fonts': []
     }
     with open(MANIFEST_FILE_PATH, 'r') as json_file:
@@ -274,7 +320,14 @@ def get_dependencies_filepaths():
             json_file.read(), object_pairs_hook=collections.OrderedDict)
     frontend_dependencies = manifest['dependencies']['frontend']
     for dependency in frontend_dependencies.values():
-        get_dependency_filepaths(dependency, filepaths)
+        if 'bundle' in dependency:
+            dependency_dir = get_dependency_directory(dependency)
+            filepaths['css'].extend(
+                get_css_filepaths(dependency['bundle'], dependency_dir))
+            filepaths['js'].extend(
+                get_js_filepaths(dependency['bundle'], dependency_dir))
+            filepaths['fonts'].extend(
+                get_font_filepaths(dependency['bundle'], dependency_dir))
 
     _ensure_files_exist(filepaths['js'])
     _ensure_files_exist(filepaths['css'])
@@ -283,11 +336,12 @@ def get_dependencies_filepaths():
 
 
 def build_minified_third_party_libs():
-    """Generates third party files via Gulp.
-
-    Args:
-        output_directory: str. Path to directory where to generate files.
+    """Joins all third party css files into single css file and js files into
+    single js file. Minifies both files. Copies both files and all fonts into
+    third party folder.
     """
+
+    print "Building minified third party libs..."
 
     third_party_js = os.path.join(
         THIRD_PARTY_GENERATED_STAGING_DIR, 'js', 'third_party.min.js')
@@ -303,11 +357,11 @@ def build_minified_third_party_libs():
 
 
 def build_third_party_libs():
-    """Generates third party files via Gulp.
-
-    Args:
-        output_directory: str. Path to directory where to generate files.
+    """Joins all third party css files into single css file and js files into
+    single js file. Copies both files and all fonts into third party folder.
     """
+
+    print "Building third party libs..."
 
     third_party_js = os.path.join(
         THIRD_PARTY_GENERATED_DEV_DIR, 'js', 'third_party.js')
@@ -536,6 +590,8 @@ def generate_build_directory():
     in HTMLs to include hashes. Renames the files to include hashes and copies
     them into build directory.
     """
+    print "Building Oppia in production mode..."
+
     hashes = dict()
 
     # Create hashes for assets, copy directories and files to build/assets.
@@ -569,6 +625,8 @@ def generate_build_directory():
     copy_files_source_to_target(
         TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)
 
+    print "Build completed."
+
 
 def build():
     parser = optparse.OptionParser()
@@ -576,7 +634,6 @@ def build():
         '--prod_env', action='store_true', default=False, dest='prod_mode')
     options = parser.parse_args()[0]
 
-    print options.prod_mode
     if options.prod_mode:
         generate_build_directory()
     else:

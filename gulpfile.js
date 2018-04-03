@@ -13,7 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview node module that automate tasks.
+ * @fileoverview We use this file to start GAE devserver, watch over third party
+ * related folders and files and to start rebuild process if needed. This file
+ * should be only used for the mentioned purposes until we devise a way how to
+ * start devserver and watch folders from Python, then it should be removed.
  */
 
 var fs = require('fs');
