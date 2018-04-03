@@ -80,36 +80,30 @@ oppia.controller('Library', [
       $http.get('/libraryindexhandler').success(function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
 
-        for (var i = 0; i < $scope.libraryGroups.length; i++) {
-          var categoryActivity = $scope.libraryGroups[i].activity_summary_dicts;
-          for (var j = 0; j < categoryActivity.length; j++) {
-            activityType = categoryActivity[j].activity_type;
-            activityId = categoryActivity[j].id;
-
-            var learnerPlaylistUrl = (
-              UrlInterpolationService.interpolateUrl(
-                '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
-                  activityType: activityType,
-                  activityId: activityId
-                }));
-            $http.post(learnerPlaylistUrl, {})
-              .then(function(response) {
-                for (var i = 0; i < $scope.libraryGroups.length; i++) {
-                  var categoryActivity = $scope.libraryGroups[i]
-                    .activity_summary_dicts;
-                  for (var j = 0; j < categoryActivity.length; j++) {
-                    requestUrl = response.config.url;
-                    requestUrl = requestUrl.substring(
-                      requestUrl.lastIndexOf('/') + 1, requestUrl.length);
-                    if (requestUrl === categoryActivity[j].id) {
-                      categoryActivity[j].should_add_to_playlist_icon = (
-                        !response.data.belongs_to_subscribed_activities);
+        $http.get('/creatordashboardhandler/data')
+          .then(function(response) {
+            if (response.data.explorations_list !== undefined) {
+              for (var i = 0; i < $scope.libraryGroups.length; i++) {
+                for (var j = 0; j < $scope.libraryGroups[i]
+                  .activity_summary_dicts.length; j++) {
+                  var activity = $scope.libraryGroups[i].activity_summary_dicts;
+                  activity[j].should_add_to_playlist_icon = true;
+                  for (var k = 0; k < response.data
+                    .explorations_list.length; k++) {
+                    if (response.data.explorations_list.id !== activity[j].id) {
+                      activity[j].should_add_to_playlist_icon = false;
+                    }
+                  }
+                  for (var k = 0; k < response.data
+                    .collections_list.length; k++) {
+                    if (response.data.collections_list.id !== activity[j].id) {
+                      activity[j].should_add_to_playlist_icon = false;
                     }
                   }
                 }
-              });
-          }
-        }
+              }
+            }
+          });
 
         $rootScope.$broadcast(
           'preferredLanguageCodesLoaded', data.preferred_language_codes);
