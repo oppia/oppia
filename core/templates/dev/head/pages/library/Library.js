@@ -102,8 +102,8 @@ oppia.controller('Library', [
                     requestUrl = requestUrl.substring(
                       requestUrl.lastIndexOf('/') + 1, requestUrl.length);
                     if (requestUrl === categoryActivity[j].id) {
-                      categoryActivity[j].should_add_to_playlist_icon =
-                        (!response.data.belongs_to_subscribed_activities);
+                      categoryActivity[j].should_add_to_playlist_icon = (
+                        !response.data.belongs_to_subscribed_activities);
                     }
                   }
                 }
