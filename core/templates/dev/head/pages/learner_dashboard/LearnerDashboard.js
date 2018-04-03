@@ -565,10 +565,10 @@ oppia.controller('LearnerDashboard', [
         $scope.feedbackThreadActive = false;
 
         $scope.noExplorationActivity = (
-            ($scope.completedExplorationsList.length === 0) &&
+          ($scope.completedExplorationsList.length === 0) &&
             ($scope.incompleteExplorationsList.length === 0));
         $scope.noCollectionActivity = (
-            ($scope.completedCollectionsList.length === 0) &&
+          ($scope.completedCollectionsList.length === 0) &&
             ($scope.incompleteCollectionsList.length === 0));
         $scope.noActivity = (
           ($scope.noExplorationActivity) && ($scope.noCollectionActivity) &&

@@ -138,7 +138,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             '/overrides/guppy/oppia_symbols.json');
           Guppy.init({
             symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
-                      oppiaSymbolsUrl]});
+              oppiaSymbolsUrl]});
           var guppyInstance = new Guppy(guppyDivId, {
             settings: {
               empty_content: (

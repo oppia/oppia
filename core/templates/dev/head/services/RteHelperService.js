@@ -91,13 +91,13 @@ oppia.factory('RteHelperService', [
         }
         var componentPreviewUrlTemplate = componentDefn.previewUrlTemplate;
         if (componentDefn.previewUrlTemplate.indexOf(
-            '/rich_text_components') === 0) {
+          '/rich_text_components') === 0) {
           var interpolatedUrl = UrlInterpolationService.getExtensionResourceUrl(
             componentPreviewUrlTemplate);
         } else {
           var interpolatedUrl = ($interpolate(
             componentPreviewUrlTemplate, false, null, true)(
-              customizationArgsDict));
+            customizationArgsDict));
         }
 
         if (!interpolatedUrl) {

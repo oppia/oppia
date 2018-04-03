@@ -133,7 +133,8 @@ describe('MultipleChoiceInputValidationService', function() {
       }]);
     });
 
-  it('should expect a non-confusing and non-null default outcome only when ' +
+  it(
+    'should expect a non-confusing and non-null default outcome only when ' +
     'not all choices are covered by rules',
     function() {
       var warnings = validatorService.getAllWarnings(

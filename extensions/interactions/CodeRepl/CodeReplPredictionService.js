@@ -109,10 +109,10 @@ oppia.factory('CodeReplPredictionService', [
 
         var smallSet = (
           (multisetA.length < multisetB.length) ?
-          multisetA.slice() : multisetB.slice());
+            multisetA.slice() : multisetB.slice());
         var unionSet = (
           (multisetA.length < multisetB.length) ?
-          multisetB.slice() : multisetA.slice());
+            multisetB.slice() : multisetA.slice());
         var index = 0;
         var extraElements = [];
 

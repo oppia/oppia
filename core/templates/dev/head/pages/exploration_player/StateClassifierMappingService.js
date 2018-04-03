@@ -16,36 +16,36 @@
  * @fileoverview Services for mapping state names to classifier details.
  */
 
- oppia.factory('StateClassifierMappingService', [
-   'ClassifierObjectFactory', function(ClassifierObjectFactory) {
-     var stateClassifierMapping = null;
+oppia.factory('StateClassifierMappingService', [
+  'ClassifierObjectFactory', function(ClassifierObjectFactory) {
+    var stateClassifierMapping = null;
 
-     return {
-       init: function(backendStateClassifierMapping) {
-         stateClassifierMapping = {};
-         var algorithmId, classifierData, dataSchemaVersion;
-         for (var stateName in backendStateClassifierMapping) {
-           if (backendStateClassifierMapping.hasOwnProperty(stateName)) {
-             algorithmId = backendStateClassifierMapping[
-               stateName].algorithm_id;
-             classifierData = backendStateClassifierMapping[
-               stateName].classifier_data;
-             dataSchemaVersion = backendStateClassifierMapping[
-               stateName].data_schema_version;
-             stateClassifierMapping[stateName] = ClassifierObjectFactory.create(
-               algorithmId, classifierData, dataSchemaVersion);
-           }
-         }
-       },
+    return {
+      init: function(backendStateClassifierMapping) {
+        stateClassifierMapping = {};
+        var algorithmId, classifierData, dataSchemaVersion;
+        for (var stateName in backendStateClassifierMapping) {
+          if (backendStateClassifierMapping.hasOwnProperty(stateName)) {
+            algorithmId = backendStateClassifierMapping[
+              stateName].algorithm_id;
+            classifierData = backendStateClassifierMapping[
+              stateName].classifier_data;
+            dataSchemaVersion = backendStateClassifierMapping[
+              stateName].data_schema_version;
+            stateClassifierMapping[stateName] = ClassifierObjectFactory.create(
+              algorithmId, classifierData, dataSchemaVersion);
+          }
+        }
+      },
 
-       getClassifier: function(stateName) {
-         if (stateClassifierMapping &&
+      getClassifier: function(stateName) {
+        if (stateClassifierMapping &&
              stateClassifierMapping.hasOwnProperty(stateName)) {
-           return stateClassifierMapping[stateName];
-         } else {
-           return null;
-         }
-       }
-     };
-   }
- ]);
+          return stateClassifierMapping[stateName];
+        } else {
+          return null;
+        }
+      }
+    };
+  }
+]);
