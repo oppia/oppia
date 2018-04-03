@@ -341,7 +341,7 @@ def build_minified_third_party_libs():
     third party folder.
     """
 
-    print "Building minified third party libs..."
+    print 'Building minified third party libs...'
 
     third_party_js = os.path.join(
         THIRD_PARTY_GENERATED_STAGING_DIR, 'js', 'third_party.min.js')
@@ -361,7 +361,7 @@ def build_third_party_libs():
     single js file. Copies both files and all fonts into third party folder.
     """
 
-    print "Building third party libs..."
+    print 'Building third party libs...'
 
     third_party_js = os.path.join(
         THIRD_PARTY_GENERATED_DEV_DIR, 'js', 'third_party.js')
@@ -590,7 +590,7 @@ def generate_build_directory():
     in HTMLs to include hashes. Renames the files to include hashes and copies
     them into build directory.
     """
-    print "Building Oppia in production mode..."
+    print 'Building Oppia in production mode...'
 
     hashes = dict()
 
@@ -625,7 +625,7 @@ def generate_build_directory():
     copy_files_source_to_target(
         TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)
 
-    print "Build completed."
+    print 'Build completed.'
 
 
 def build():
