@@ -36,7 +36,7 @@ oppia.directive('collectionSummaryTile', [
         isLinkedToEditorPage: '=?isLinkedToEditorPage',
         getCategory: '&category',
         isPlaylistTile: '&isPlaylistTile',
-        getShouldAddToPlaylistIcon: '@shouldAddToPlaylistIcon',
+        getShouldAddToPlaylistIcon: '&shouldAddToPlaylistIcon',
         showLearnerDashboardIconsIfPossible: (
           '&showLearnerDashboardIconsIfPossible'),
         isContainerNarrow: '&containerIsNarrow'
