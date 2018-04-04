@@ -40,7 +40,8 @@ oppia.directive('topNavigationBar', [
           $scope.NAV_MODE = GLOBALS.NAV_MODE;
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-
+          
+          $scope.activeMenu = '';
           $scope.username = GLOBALS.username;
           $scope.profilePictureDataUrl = GLOBALS.profilePictureDataUrl;
           $scope.isAdmin = GLOBALS.isAdmin;
@@ -66,21 +67,19 @@ oppia.directive('topNavigationBar', [
           $scope.onLogoutButtonClicked = function() {
             $window.localStorage.removeItem('last_uploaded_audio_lang');
           };
-
-          $scope.onMouseoverProfilePictureOrDropdown = function(evt) {
-            angular.element(evt.currentTarget).parent().addClass('open');
+          $scope.openSubMenu = function (menu) {
+            angular.element('.nav a').blur();
+            $scope.activeMenu = menu;
           };
-          $scope.onMouseoutProfilePictureOrDropdown = function(evt) {
-            angular.element(evt.currentTarget).parent().removeClass('open');
-          };
-          $scope.onMouseoutDropdownMenuAbout = function(evt) {
-            angular.element(evt.currentTarget)[0].blur();
-          };
-          $scope.onMouseoverDropdownMenu = function(evt) {
-            angular.element(evt.currentTarget).parent().addClass('open');
-          };
-          $scope.onMouseoutDropdownMenu = function(evt) {
-            angular.element(evt.currentTarget).parent().removeClass('open');
+          $scope.closeSubMenu = function (evt) {
+            $scope.activeMenu = '';
+            if (evt.currentTarget.nodeName === 'UL') {
+              if (angular.element(evt.currentTarget).closest('li')
+                .find('a').is(':focus')) {
+                angular.element(evt.currentTarget).closest('li')
+                  .find('a').blur();
+              }
+            }
           };
 
           if (GLOBALS.userIsLoggedIn) {

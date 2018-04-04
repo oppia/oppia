@@ -174,9 +174,8 @@ oppia.directive('handleDropdownNavigation', function () {
           if (e.keyCode === 13) {
             // open the submenu on pressing enter
             e.preventDefault();
-            if (!elm.closest('li').hasClass('open')) {
-              elm.closest('li').addClass('open');
-            }
+            scope.openSubMenu(attrs.handleDropdownNavigation);
+            scope.$apply();
           }
         });
 
@@ -184,29 +183,29 @@ oppia.directive('handleDropdownNavigation', function () {
           .first().find('a').keydown(function (e) {
             if (e.shiftKey && e.keyCode === 9) {
               // If the user presses shift+tab on the first list item, 
-              //hide the menus
-              if (elm.closest('li').hasClass('open')) {
-                elm.closest('li').removeClass('open');
-              }
+              //hide the menu
+              scope.closeSubMenu(e);
+              scope.$apply();
             }
           });
 
         elm.closest('li').find('ul').find('li')
           .last().find('a').keydown(function (e) {
             if (e.keyCode === 9) {
-              // If the user presses shift+tab on the first list item, 
-              //hide the menus
-              if (elm.closest('li').hasClass('open')) {
-                elm.closest('li').removeClass('open');
-              }
+              // If the user presses tab on the last list item, 
+              //hide the menu
+              scope.closeSubMenu(e);
+              scope.$apply();
             }
           });
-      });
 
-      angular.element(document).on('click', function () {
-        if (elm.closest('li').hasClass('open')) {
-          elm.closest('li').removeClass('open');
-        }
+        angular.element(document).on('click', function (e) {
+          //close the submenu if clicked outside of the submenu or list item.
+          if (!angular.element(e.target).closest('li').length) {
+            scope.closeSubMenu(e);
+            scope.$apply();
+          }
+        });
       });
     }
   };

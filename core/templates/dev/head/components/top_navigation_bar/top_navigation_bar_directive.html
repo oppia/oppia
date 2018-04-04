@@ -25,19 +25,20 @@
       <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY" class="oppia-clickable-navbar-element">
         <a class="oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
       </li>
-      <li uib-dropdown ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
-        <a handle-dropdown-navigation class="oppia-navbar-tab"
+      <li ng-class="{'open' : activeMenu === 'aboutMenu'}" uib-dropdown ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
+        <a handle-dropdown-navigation="aboutMenu" class="oppia-navbar-tab"
            role="menuitem"
            aria-haspopup="true"
            aria-expanded="false"
            tabindex="0"
-           ng-mouseleave="onMouseoutDropdownMenuAbout($event)">
+           ng-mouseover="openSubMenu('aboutMenu')"
+           ng-mouseleave="closeSubMenu($event)">
           <span class="oppia-navbar-tab-content" translate="I18N_TOPNAV_ABOUT"></span>
           <span class="caret"></span>
         </a>
         <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown"
-            ng-mouseover="onMouseoverDropdownMenu($event)"
-            ng-mouseleave="onMouseoutDropdownMenu($event)"
+            ng-mouseover="openSubMenu('aboutMenu')"
+            ng-mouseleave="closeSubMenu($event)"
             role="menu">
           <li><a class="oppia-navbar-tab-content protractor-test-about-link" href="/about" translate="I18N_TOPNAV_ABOUT_OPPIA"></a></li>
           <li><a class="oppia-navbar-tab-content protractor-test-get-started-link " href="/get_started" translate="I18N_TOPNAV_GET_STARTED"></a></li>
@@ -59,11 +60,11 @@
     </ul>
   </ul>
   <ul class="nav oppia-navbar-nav oppia-navbar-profile">
-    <li uib-dropdown ng-if="username" class="protractor-test-profile-dropdown">
+    <li ng-class="{'open' : activeMenu === 'profileMenu'}" uib-dropdown ng-if="username" class="protractor-test-profile-dropdown">
       <a uib-dropdown-toggle class="oppia-navbar-dropdown-toggle"
-         ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
-         ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)"
-         handle-dropdown-navigation
+         ng-mouseover="openSubMenu('profileMenu')"
+         ng-mouseleave="closeSubMenu($event)"
+         handle-dropdown-navigation="profileMenu"
          role="menuitem"
          aria-haspopup="true"
          aria-expanded="false"
@@ -99,8 +100,8 @@
       </a>
 
       <ul uib-dropdown-menu class="uib-dropdown-menu ng-cloak oppia-navbar-dropdown" role="menu"
-          ng-mouseover="onMouseoverProfilePictureOrDropdown($event)"
-          ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
+          ng-mouseover="openSubMenu('profileMenu')"
+          ng-mouseleave="closeSubMenu($event)">
         <li>
           <a ng-click="onMouseoutProfilePictureOrDropdown($event)" ng-href="<[profilePageUrl]>"
              class="protractor-test-profile-link">
@@ -166,8 +167,8 @@
       </div>
       <ul uib-dropdown-menu class="uib-dropdown-menu oppia-navbar-dropdown" role="menu"
           style="margin-right: 15px; padding: 0;"
-          ng-mouseover="onMouseoverDropdownMenu($event)"
-          ng-mouseleave="onMouseoutDropdownMenu($event)">
+          ng-mouseover="openSubMenu('loginMenu')"
+          ng-mouseleave="closeSubMenu($event)">
         <li>
           <a href style="padding: 0; width: 200px;" ng-click="onLoginButtonClicked()">
             <div class="oppia-signin-google">
