@@ -111,7 +111,7 @@ def _minify_and_create_sourcemap(source_paths, target_file_path):
     for that file.
 
     Args:
-        source_paths: list(str). Paths to files to joined and minified.
+        source_paths: list(str). Paths to files to join and minify.
         target_file_path: str. Path to location of the joined file.
     """
 
@@ -304,11 +304,14 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
 
 
 def get_dependencies_filepaths():
-    """Extracts dependencies filepaths from manifes.json file into dictionary
+    """Extracts dependencies filepaths from manifest.json file into
+    a dictionary.
 
     Returns:
-        dict(str, list(str)). Filepaths object with three lists each for
-        different file type (js, css, fonts).
+        dict(str, list(str)). A dict mapping file types to lists of filepaths.
+        The dict has three keys: 'js', 'css' and 'fonts'. Each of the
+        corresponding values is a full list of dependency file paths of the
+        given type.
     """
     filepaths = {
         'js': [],

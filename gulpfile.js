@@ -15,8 +15,8 @@
 /**
  * @fileoverview We use this file to start GAE devserver, watch over third party
  * related folders and files and to start rebuild process if needed. This file
- * should be only used for the mentioned purposes until we devise a way how to
- * start devserver and watch folders from Python, then it should be removed.
+ * should be only used for the mentioned purposes until we devise a way to start
+ * devserver and watch folders from Python, then it should be removed.
  */
 
 var fs = require('fs');
@@ -47,7 +47,7 @@ var argv = yargs
 
 var gulp = require('gulp');
 var concat = require('gulp-concat');
-var exec = require('child_process').exec;
+var childProcess = require('child_process');
 var path = require('path');
 
 var gulpStartGae = require('./scripts/gulp-start-gae-devserver');
@@ -91,7 +91,7 @@ gulp.task('gulpStartGae', function() {
 });
 
 gulp.task('build', function() {
-  exec(['$PYTHON_CMD scripts/build.py']);
+  childProcess.exec(['$PYTHON_CMD scripts/build.py']);
 });
 
 gulp.slurped = false;

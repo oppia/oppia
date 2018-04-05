@@ -27,10 +27,10 @@ install_node_module eslint 4.19.0
 install_node_module eslint-plugin-angular 0.12.0
 install_node_module eslint-plugin-html 4.0.1
 install_node_module gulp 3.9.0
-install_node_module through2 2.0.0
-install_node_module yargs 3.29.0
 install_node_module gulp-concat 2.6.0
+install_node_module through2 2.0.0
 install_node_module uglify-js 3.3.11
+install_node_module yargs 3.29.0
 
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
