@@ -5042,3 +5042,42 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
   width: 1px;
 }
+
+.oppia-tooltip {
+  display: inline-block;
+  position: relative;
+}
+
+.oppia-tooltip-text {
+  background-color: #009688;
+  border-radius: 6px;
+  bottom: 97%;
+  color: #fff;
+  font-size: 0.6em;
+  padding: 5px;
+  position: absolute;
+  text-align: center;
+  visibility: hidden;
+  width: auto;
+  z-index: 1;
+}
+
+@media screen and (max-width: 800px) {
+  .oppia-tooltip-text::after {
+    border-color: #009688 transparent transparent transparent;
+    border-style: solid;
+    border-width: 5px;
+    content: "";
+    left: 50%;
+    margin-left: -5px;
+    position: absolute;
+    top: 100%;
+  }
+  .oppia-tooltip-text {
+    width: 90%;
+  }
+}
+
+.oppia-tooltip:hover + .oppia-tooltip-text {
+  visibility: visible;
+}
