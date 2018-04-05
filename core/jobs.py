@@ -516,6 +516,9 @@ class BaseJobManager(object):
 
 
 class BaseDeferredJobManager(BaseJobManager):
+    """Base class to run a job/method as deferred task. These tasks will be
+    pushed to default taskqueue.
+    """
 
     @classmethod
     def _run(cls, additional_job_params):
@@ -579,7 +582,10 @@ class BaseDeferredJobManager(BaseJobManager):
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):
-
+    """MapreducePipeline class which will be used later to call map
+    and reduce calculations. It implements run method which is called
+    by inherited start method of this class.
+    """
     def run(self, job_id, job_class_str, kwargs):
         """Returns a coroutine which runs the job pipeline and stores results.
 
@@ -611,7 +617,7 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
 
 class StoreMapReduceResults(base_handler.PipelineBase):
-
+    """MapreducePipeline class to store output results."""
     def run(self, job_id, job_class_str, output):
         """Extracts the results of a MR job and registers its completion.
 
@@ -642,7 +648,7 @@ class StoreMapReduceResults(base_handler.PipelineBase):
 
 class GoogleCloudStorageConsistentJsonOutputWriter(
         output_writers.GoogleCloudStorageConsistentOutputWriter):
-
+    """Google Cloud Storage Consistent Output Writer."""
     def write(self, data):
         """Writes that data serialized in JSON format.
 
@@ -844,6 +850,9 @@ class BaseMapReduceOneOffJobManager(BaseMapReduceJobManager):
 
 
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
+    """Multiple Datastore Entities Input Reader, these are used to read values
+    from datastore and passed to mapper functions in MapReduce jobs.
+    """
     _ENTITY_KINDS_PARAM = MAPPER_PARAM_KEY_ENTITY_KINDS
     _READER_LIST_PARAM = 'readers'
 
@@ -932,7 +941,10 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
 
 
 class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
-
+    """Continuous Computation jobs which runs continuously, are used to perform
+    statistical, visualisation or any other real time calculations. These jobs
+    are triggered by events for which a particular job is subscribed to.
+    """
     @classmethod
     def _get_continuous_computation_class(cls):
         """Returns the ContinuousComputationManager class associated with this
