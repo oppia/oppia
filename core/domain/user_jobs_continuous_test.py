@@ -383,14 +383,16 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     exp_last_updated_ms))
 
             # User A sees A's commit and B's feedback thread.
-            self.assertEqual(recent_notifications_for_user_a, [
-                expected_thread_notification,
-                expected_creation_notification
-            ])
+            self.assertEqual(
+                recent_notifications_for_user_a, [
+                    expected_thread_notification,
+                    expected_creation_notification
+                ])
             # User B sees only her feedback thread, but no commits.
-            self.assertEqual(recent_notifications_for_user_b, [
-                expected_thread_notification,
-            ])
+            self.assertEqual(
+                recent_notifications_for_user_b, [
+                    expected_thread_notification,
+                ])
 
     def test_subscribing_to_exploration_subscribes_to_its_feedback_threads(
             self):
@@ -448,15 +450,17 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     exp_last_updated_ms))
 
             # User A sees A's commit and B's feedback thread.
-            self.assertEqual(recent_notifications_for_user_a, [
-                expected_thread_notification,
-                expected_creation_notification
-            ])
+            self.assertEqual(
+                recent_notifications_for_user_a, [
+                    expected_thread_notification,
+                    expected_creation_notification
+                ])
             # User B sees A's commit and B's feedback thread.
-            self.assertEqual(recent_notifications_for_user_b, [
-                expected_thread_notification,
-                expected_creation_notification,
-            ])
+            self.assertEqual(
+                recent_notifications_for_user_b, [
+                    expected_thread_notification,
+                    expected_creation_notification,
+                ])
 
     def test_basic_computation_for_collections(self):
         with self._get_test_context():

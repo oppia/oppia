@@ -137,8 +137,9 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
             expected_status_int=404)
 
         payload['commit_message'] = 'update title'
-        self.put_json(feconf.QUESTION_DATA_URL, payload, csrf_token,
-                      expect_errors=True, expected_status_int=404)
+        self.put_json(
+            feconf.QUESTION_DATA_URL, payload, csrf_token,
+            expect_errors=True, expected_status_int=404)
 
         self.logout()
         self.login(self.random_email)

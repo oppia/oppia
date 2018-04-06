@@ -100,8 +100,9 @@ class Question(object):
             question is written in.
     """
 
-    def __init__(self, question_id, title, question_data,
-                 question_data_schema_version, language_code):
+    def __init__(
+            self, question_id, title, question_data,
+            question_data_schema_version, language_code):
         """Constructs a Question domain object.
 
         Args:

@@ -763,14 +763,16 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             calculation_output_second = (
                 common_elements_calc_output_model.calculation_output)
 
-            self.assertEqual(calculation_output_first, [{
-                'answer': ['answer1', 'answer2'],
-                'frequency': 1
-            }])
-            self.assertEqual(calculation_output_second, [{
-                'answer': 'answer1',
-                'frequency': 1
-            }, {
-                'answer': 'answer2',
-                'frequency': 1
-            }])
+            self.assertEqual(
+                calculation_output_first, [{
+                    'answer': ['answer1', 'answer2'],
+                    'frequency': 1
+                }])
+            self.assertEqual(
+                calculation_output_second, [{
+                    'answer': 'answer1',
+                    'frequency': 1
+                }, {
+                    'answer': 'answer2',
+                    'frequency': 1
+                }])

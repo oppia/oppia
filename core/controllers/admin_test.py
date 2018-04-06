@@ -93,12 +93,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminhandler', {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                base.BEFORE_END_HEAD_TAG_HOOK.name: new_config_value
-            }
-        }, csrf_token)
+        self.post_json(
+            '/adminhandler', {
+                'action': 'save_config_properties',
+                'new_config_property_values': {
+                    base.BEFORE_END_HEAD_TAG_HOOK.name: new_config_value
+                }
+            }, csrf_token)
 
         response = self.testapp.get('/about')
         self.assertIn(new_config_value, response.body)
@@ -112,11 +113,12 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminhandler', {
-            'action': 'generate_dummy_explorations',
-            'num_dummy_exps_to_generate': 10,
-            'num_dummy_exps_to_publish': 3
-        }, csrf_token)
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_explorations',
+                'num_dummy_exps_to_generate': 10,
+                'num_dummy_exps_to_publish': 3
+            }, csrf_token)
         generated_exps = exp_services.get_all_exploration_summaries()
         published_exps = exp_services.get_recently_published_exp_summaries(5)
         self.assertEqual(len(generated_exps), 10)
@@ -127,11 +129,12 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminhandler', {
-            'action': 'generate_dummy_explorations',
-            'num_dummy_exps_to_generate': 2,
-            'num_dummy_exps_to_publish': 2
-        }, csrf_token)
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_explorations',
+                'num_dummy_exps_to_generate': 2,
+                'num_dummy_exps_to_publish': 2
+            }, csrf_token)
         generated_exps = exp_services.get_all_exploration_summaries()
         published_exps = exp_services.get_recently_published_exp_summaries(5)
         self.assertEqual(len(generated_exps), 2)

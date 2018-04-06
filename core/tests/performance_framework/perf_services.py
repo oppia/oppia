@@ -285,8 +285,8 @@ class SeleniumPerformanceDataFetcher(object):
         self._wait_until_page_load_is_finished()
         resulting_url = driver.current_url
 
-        if resulting_url == '%s%s' % (self.BASE_URL,
-                                      feconf.CREATOR_DASHBOARD_URL):
+        if resulting_url == '%s%s' % (
+                self.BASE_URL, feconf.CREATOR_DASHBOARD_URL):
             return False
 
         return True
