@@ -122,16 +122,16 @@
                 <div class="oppia-library-carousel-tiles">
                   <div ng-repeat="tile in group.activity_summary_dicts" style="display: inline-block;">
                     <collection-summary-tile ng-if="tile.activity_type == 'collection'"
-                                             collection-id="tile.id"
-                                             collection-title="tile.title"
-                                             last-updated-msec="tile.last_updated_msec"
-                                             objective="tile.objective"
-                                             node-count="tile.node_count"
-                                             category="tile.category"
-                                             thumbnail-icon-url="tile.thumbnail_icon_url"
-                                             thumbnail-bg-color="tile.thumbnail_bg_color"
-                                             should-add-to-playlist-icon="tile.should_add_to_playlist_icon"
-                                             show-learner-dashboard-icons-if-possible="true">
+                                              collection-id="tile.id"
+                                              collection-title="tile.title"
+                                              last-updated-msec="tile.last_updated_msec"
+                                              objective="tile.objective"
+                                              node-count="tile.node_count"
+                                              category="tile.category"
+                                              thumbnail-icon-url="tile.thumbnail_icon_url"
+                                              thumbnail-bg-color="tile.thumbnail_bg_color"
+                                              should-add-to-playlist-icon="activityPlaylistData.collections[tile.id]"
+                                              show-learner-dashboard-icons-if-possible="true">
                     </collection-summary-tile>
                     <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
                                               exploration-id="tile.id"
@@ -144,7 +144,7 @@
                                               thumbnail-icon-url="tile.thumbnail_icon_url"
                                               thumbnail-bg-color="tile.thumbnail_bg_color"
                                               class="protractor-test-exp-summary-tile"
-                                              should-add-to-playlist-icon="tile.should_add_to_playlist_icon"
+                                              should-add-to-playlist-icon="activityPlaylistData.explorations[tile.id]"
                                               show-learner-dashboard-icons-if-possible="true">
                     </exploration-summary-tile>
                   </div>

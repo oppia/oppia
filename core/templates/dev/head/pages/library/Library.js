@@ -80,30 +80,41 @@ oppia.controller('Library', [
       $http.get('/libraryindexhandler').success(function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
 
-        $http.get('/creatordashboardhandler/data')
-          .then(function(response) {
-            if (response.data.explorations_list !== undefined) {
+        $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+        var activityDetails = {};
+        if ($scope.userIsLoggedIn) {
+          $scope.activityPlaylistData = {explorations: {}, collections: {}};
+          $http.get('/creatordashboardhandler/data')
+            .then(function(response) {
               for (var i = 0; i < $scope.libraryGroups.length; i++) {
-                for (var j = 0; j < $scope.libraryGroups[i]
-                  .activity_summary_dicts.length; j++) {
-                  var activity = $scope.libraryGroups[i].activity_summary_dicts;
-                  activity[j].should_add_to_playlist_icon = true;
+                var activity = $scope.libraryGroups[i].activity_summary_dicts;
+                for (var j = 0; j < activity.length; j++) {
                   for (var k = 0; k < response.data
                     .explorations_list.length; k++) {
-                    if (response.data.explorations_list.id !== activity[j].id) {
-                      activity[j].should_add_to_playlist_icon = false;
+                    if (response.data
+                      .explorations_list[k].id !== activity[j].id) {
+                      $scope.activityPlaylistData
+                        .explorations[activity[j].id] = true;
+                    } else {
+                      $scope.activityPlaylistData
+                        .explorations[activity[j].id] = false;
                     }
                   }
                   for (var k = 0; k < response.data
                     .collections_list.length; k++) {
-                    if (response.data.collections_list.id !== activity[j].id) {
-                      activity[j].should_add_to_playlist_icon = false;
+                    if (response.data
+                      .collections_list[k].id !== activity[j].id) {
+                      $scope.activityPlaylistData
+                        .collections[activity[j].id] = true;
+                    } else {
+                      $scope.activityPlaylistData
+                        .collections[activity[j].id] = false;
                     }
                   }
                 }
               }
-            }
-          });
+            });
+        }
 
         $rootScope.$broadcast(
           'preferredLanguageCodesLoaded', data.preferred_language_codes);
