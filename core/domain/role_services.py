@@ -54,7 +54,7 @@ ACTION_SEND_MODERATOR_EMAILS = 'SEND_MODERATOR_EMAILS'
 ACTION_SUBSCRIBE_TO_USERS = 'SUBSCRIBE_TO_USERS'
 ACTION_SUGGEST_CHANGES_TO_EXPLORATION = 'SUGGEST_CHANGES_TO_EXPLORATION'
 ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY = 'UNPUBLISH_ANY_PUBLIC_ACTIVITY'
-
+ACTION_EDIT_OWNED_TOPIC = 'EDIT_OWNED_TOPIC'
 
 # Users can be updated to the following list of role IDs via admin interface.
 UPDATABLE_ROLES = [
@@ -62,7 +62,8 @@ UPDATABLE_ROLES = [
     feconf.ROLE_ID_BANNED_USER,
     feconf.ROLE_ID_COLLECTION_EDITOR,
     feconf.ROLE_ID_EXPLORATION_EDITOR,
-    feconf.ROLE_ID_MODERATOR
+    feconf.ROLE_ID_MODERATOR,
+    feconf.ROLE_ID_TOPIC_MANAGER
 ]
 
 # Users can be viewed by following list of role IDs via admin interface.
@@ -71,6 +72,7 @@ VIEWABLE_ROLES = [
     feconf.ROLE_ID_BANNED_USER,
     feconf.ROLE_ID_COLLECTION_EDITOR,
     feconf.ROLE_ID_MODERATOR,
+    feconf.ROLE_ID_TOPIC_MANAGER
 ]
 
 # The string corresponding to role IDs that should be visible to admin.
@@ -81,6 +83,7 @@ HUMAN_READABLE_ROLES = {
     feconf.ROLE_ID_EXPLORATION_EDITOR: 'exploration editor',
     feconf.ROLE_ID_GUEST: 'guest',
     feconf.ROLE_ID_MODERATOR: 'moderator',
+    feconf.ROLE_ID_TOPIC_MANAGER: 'topic manager'
 }
 
 # This dict represents how the actions are inherited among different
@@ -106,7 +109,8 @@ PARENT_ROLES = {
     feconf.ROLE_ID_COLLECTION_EDITOR: [feconf.ROLE_ID_EXPLORATION_EDITOR],
     feconf.ROLE_ID_EXPLORATION_EDITOR: [feconf.ROLE_ID_GUEST],
     feconf.ROLE_ID_GUEST: [],
-    feconf.ROLE_ID_MODERATOR: [feconf.ROLE_ID_COLLECTION_EDITOR],
+    feconf.ROLE_ID_MODERATOR: [feconf.ROLE_ID_TOPIC_MANAGER],
+    feconf.ROLE_ID_TOPIC_MANAGER: [feconf.ROLE_ID_COLLECTION_EDITOR]
 }
 
 # This dict represents the unique actions that belong to a particular role.
@@ -157,6 +161,9 @@ ROLE_ACTIONS = {
         ACTION_SEND_MODERATOR_EMAILS,
         ACTION_UNPUBLISH_ANY_PUBLIC_ACTIVITY,
     ],
+    feconf.ROLE_ID_TOPIC_MANAGER: [
+        ACTION_EDIT_OWNED_TOPIC,
+    ]
 }
 
 
