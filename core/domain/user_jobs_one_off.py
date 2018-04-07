@@ -350,8 +350,7 @@ class UserProfilePictureOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job that adds fields to record last exploration created and last
-    edited time, last_created_an_exploration and last_edited_an_exploration
-    are corresponding added properties.
+    edited times.
     """
     @classmethod
     def entity_classes_to_map_over(cls):

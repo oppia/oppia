@@ -206,7 +206,7 @@ class RecentUpdatesMRJobManager(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
+        """Returns a list of datastore class references to map over."""
         return [user_models.UserSubscriptionsModel]
 
     @staticmethod
@@ -510,7 +510,7 @@ class UserStatsMRJobManager(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
+        """Returns a list of datastore class references to map over."""
         return [exp_models.ExpSummaryModel]
 
     @staticmethod
