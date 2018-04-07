@@ -39,10 +39,13 @@ class InteractionAnswerSummariesMRJobManager(
     """
     @classmethod
     def _get_continuous_computation_class(cls):
+        """Returns the InteractionAnswerSummariesAggregator class associated
+        with this MapReduce job."""
         return InteractionAnswerSummariesAggregator
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Returns the StateAnswersModel object."""
         return [stats_models.StateAnswersModel]
 
     # TODO(bhenning): Update this job to persist results for all older
@@ -52,6 +55,22 @@ class InteractionAnswerSummariesMRJobManager(
     # recomputing results from scratch each time.
     @staticmethod
     def map(item):
+        """Returns the submitted answer in dict format:
+            {
+                'state_answers_model_id': The id of the submitted output
+                    answer.
+                'interaction_id': The interaction id to which the submitted
+                    output answer belongs to.
+                'exploration_version': The exploration version to which the
+                    submitted output answer belongs to.
+            }
+
+        Args:
+            item: The submitted answer.
+
+        Yields:
+            dict(str, str). The submitted answer in dict format.
+        """
         if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued( # pylint: disable=line-too-long
                 item):
             # Output answers submitted to the exploration for this exp version.
@@ -76,6 +95,14 @@ class InteractionAnswerSummariesMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Calculates and saves each answer submitted for the exploration.
+
+        Args:
+            key: str. The unique key of the form:
+                <exploration_id>:<exploration_version>:<state_name>
+            stringified_values: list(str). A list of stringified_values of the
+                submitted answers.
+        """
         exploration_id, exploration_version, state_name = key.split(':')
 
         value_dicts = [
@@ -228,6 +255,8 @@ class InteractionAnswerSummariesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     # TODO(bhenning): Implement a real-time model for
     # InteractionAnswerSummariesAggregator.
+    """Real-time model class for InteractionAnswerSummariesAggregator to be
+    implemented."""
     pass
 
 
@@ -238,12 +267,19 @@ class InteractionAnswerSummariesAggregator(
     """
     @classmethod
     def get_event_types_listened_to(cls):
+        """Returns a list of submitted answer events.
+
+        Returns:
+            list. A list of submitted answer events.
+        """
         return [feconf.EVENT_TYPE_ANSWER_SUBMITTED]
 
     @classmethod
     def _get_realtime_datastore_class(cls):
+        """Returns InteractionAnswerSummariesRealtimeModel class."""
         return InteractionAnswerSummariesRealtimeModel
 
     @classmethod
     def _get_batch_job_manager_class(cls):
+        """Returns InteractionAnswerSummariesMRJobManager class."""
         return InteractionAnswerSummariesMRJobManager
