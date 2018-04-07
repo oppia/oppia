@@ -221,9 +221,21 @@ def _execute_deployment():
         print 'Preprocessing release...'
         preprocess_release()
 
-        # Do a build; ensure there are no errors.
+        # Do a build, while outputting to the terminal.
         print 'Building and minifying scripts...'
-        subprocess.check_output(['python', 'scripts/build.py'])
+        build_process = subprocess.Popen(
+            ['python', 'scripts/build.py', '--prod_env'],
+            stdout=subprocess.PIPE)
+        while True:
+            line = build_process.stdout.readline().strip()
+            if not line:
+                break
+            print line
+
+        # Wait for process to terminate, then check return code.
+        build_process.communicate()
+        if build_process.returncode > 0:
+            raise Exception('Build failed.')
 
         # Deploy to GAE.
         subprocess.check_output([APPCFG_PATH, 'update', '.'])
