@@ -40,7 +40,8 @@ class InteractionAnswerSummariesMRJobManager(
     @classmethod
     def _get_continuous_computation_class(cls):
         """Returns the InteractionAnswerSummariesAggregator class associated
-        with this MapReduce job."""
+        with this MapReduce job.
+        """
         return InteractionAnswerSummariesAggregator
 
     @classmethod
@@ -256,7 +257,8 @@ class InteractionAnswerSummariesRealtimeModel(
     # TODO(bhenning): Implement a real-time model for
     # InteractionAnswerSummariesAggregator.
     """Real-time model class for InteractionAnswerSummariesAggregator to be
-    implemented."""
+    implemented.
+    """
     pass
 
 

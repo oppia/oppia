@@ -594,7 +594,8 @@ def can_perform_cron_tasks(handler):
 
     def test_can_perform(self, **kwargs):
         """Checks if the handler is called by cron or by a superadmin of the
-        application."""
+        application.
+        """
         if (self.request.headers.get('X-AppEngine-Cron') is None and
                 not self.is_super_admin):
             raise self.UnauthorizedUserException(

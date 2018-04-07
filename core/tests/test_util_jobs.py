@@ -33,7 +33,8 @@ import feconf
 class ExpCopiesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     """Storage class for copy of existing exploration in the realtime layer to
-    be implemented."""
+    be implemented.
+    """
     pass
 
 
@@ -74,7 +75,8 @@ class ExpCopiesMRJobManager(
     @classmethod
     def _get_continuous_computation_class(cls):
         """Returns the ExpCopiesAggregator class associated with this MapReduce
-        job."""
+        job.
+        """
         return ExpCopiesAggregator
 
     @classmethod
@@ -124,7 +126,8 @@ class ExpCopiesMRJobManager(
 class DeleteExpCopiesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     """Class for deleting the copies of existing exploration in the realtime
-    layer to be implemented."""
+    layer to be implemented.
+    """
     pass
 
 
@@ -161,7 +164,8 @@ class DeleteExpCopiesMRJobManager(
     @classmethod
     def _get_continuous_computation_class(cls):
         """Returns the DeleteExpCopiesAggregator class associated with this
-        MapReduce job."""
+        MapReduce job.
+        """
         return DeleteExpCopiesAggregator
 
     @classmethod
@@ -184,5 +188,6 @@ class DeleteExpCopiesMRJobManager(
     @staticmethod
     def reduce(exp_id, list_of_exps):
         """Deletes the saved and published copies of the existing exploration
-        to be implemented."""
+        to be implemented.
+        """
         pass
