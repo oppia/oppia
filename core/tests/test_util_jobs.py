@@ -160,8 +160,8 @@ class DeleteExpCopiesMRJobManager(
     """
     @classmethod
     def _get_continuous_computation_class(cls):
-        """Returns the DeleteExpCopiesAggregator class associated with this MapReduce
-        job."""
+        """Returns the DeleteExpCopiesAggregator class associated with this
+        MapReduce job."""
         return DeleteExpCopiesAggregator
 
     @classmethod
