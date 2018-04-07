@@ -30,7 +30,7 @@ transaction_services = models.Registry.import_transaction_services()
 class FeedbackAnalyticsRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     """A continuous-computation job that sets the number of open threads
-    and the total number of threads to the default integer value of zero.
+    and the total number of threads to the default integer value of zero
     in the realtime layer.
     """
     num_open_threads = ndb.IntegerProperty(default=0)
