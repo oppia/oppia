@@ -201,6 +201,23 @@ class ExplorationRightsModel(base_models.VersionedModel):
     )
 
     def save(self, committer_id, commit_message, commit_cmds):
+        """Saves a new version of the exploration, updating the Exploration
+        datastore model.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. The type of the command. A full list of command
+                        types can be found in core/domain/exp_domain.py.
+                and then additional arguments for that command. For example:
+
+                {'cmd': 'AUTO_revert_version_number',
+                 'version_number': 4}
+        """
         super(ExplorationRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 

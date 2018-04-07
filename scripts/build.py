@@ -14,18 +14,22 @@
 
 """Build file for production version of Oppia. Minifies JS and CSS."""
 
+import collections
 import fnmatch
+import glob
 import hashlib
 import json
+import optparse
 import os
 import re
 import shutil
 import subprocess
-import sys
 
 ASSETS_SRC_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
 
+THIRD_PARTY_STATIC_DIR = os.path.join('third_party', 'static')
+THIRD_PARTY_GENERATED_DEV_DIR = os.path.join('third_party', 'generated', '')
 THIRD_PARTY_GENERATED_STAGING_DIR = os.path.join(
     'backend_prod_files', 'third_party', 'generated', '')
 THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
@@ -42,13 +46,21 @@ TEMPLATES_STAGING_DIR = (
 TEMPLATES_OUT_DIR = os.path.join('build', 'templates', 'head', '')
 
 HASHES_JSON = os.path.join('build', 'assets', 'hashes.js')
+MANIFEST_FILE_PATH = os.path.join('manifest.json')
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
 YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
+PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+NODE_FILE = os.path.join(
+    PARENT_DIR, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
+UGLIFY_FILE = os.path.join(
+    PARENT_DIR, 'node_modules', 'uglify-js', 'bin', 'uglifyjs')
+
+FONT_EXTENSIONS = ('*.eot', '*.woff2', '*.ttf', '*.woff', '*.eof', '*.svg')
 
 # Files with this extension shouldn't be moved to build directory.
-FILE_EXTENSIONS_TO_IGNORE = ('.py')
+FILE_EXTENSIONS_TO_IGNORE = ('.py',)
 
 # Files with this paths should be moved to build directory but shouldn't be
 # renamed (i.e. the filepath shouldn't contain hash)
@@ -80,6 +92,53 @@ def _minify(source_path, target_path):
     subprocess.check_call(cmd, shell=True)
 
 
+def _join_files(source_paths, target_file_path):
+    """Writes multiple files into one file.
+
+    Args:
+        source_paths: list(str). Paths to files to join together.
+        target_file_path: str. Path to location of the joined file.
+    """
+    ensure_directory_exists(target_file_path)
+    with open(target_file_path, 'w+') as target_file:
+        for source_path in source_paths:
+            with open(source_path, 'r') as source_file:
+                target_file.write(source_file.read())
+
+
+def _minify_and_create_sourcemap(source_paths, target_file_path):
+    """Minifies multiple files into one file and generates source map
+    for that file.
+
+    Args:
+        source_paths: list(str). Paths to files to join and minify.
+        target_file_path: str. Path to location of the joined file.
+    """
+
+    ensure_directory_exists(target_file_path)
+
+    source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
+    cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
+        NODE_FILE, UGLIFY_FILE, ' '.join(source_paths),
+        source_map_properties, target_file_path)
+    subprocess.check_call(cmd, shell=True)
+
+
+def _copy_fonts(source_paths, target_path):
+    """Copies fonts at source paths to target path.
+
+    Args:
+        source_paths: list(str). Paths to fonts.
+        target_path: str. Path where the fonts should be copied.
+    """
+    ensure_directory_exists(target_path)
+
+    for font_wildcard in source_paths:
+        font_paths = glob.glob(font_wildcard)
+        for font_path in font_paths:
+            shutil.copy(font_path, target_path)
+
+
 def _insert_hash(filepath, file_hash):
     """Inserts hash into filepath before the file extension.
 
@@ -104,6 +163,20 @@ def ensure_directory_exists(filepath):
     directory = os.path.dirname(filepath)
     if not os.path.exists(directory):
         os.makedirs(directory)
+
+
+def _ensure_files_exist(filepaths):
+    """Ensures that files exist at the given filepaths.
+
+    Args:
+        filepaths: list(str). Paths to files that we want to ensure exist.
+
+    Raises:
+        Exception: Raised if one or more of the files does not exist.
+    """
+    for filepath in filepaths:
+        if not os.path.isfile(filepath):
+            raise Exception('File %s does not exist.' % filepath)
 
 
 def process_html(source_path, target_path, file_hashes):
@@ -156,29 +229,153 @@ def process_js(source_path, target_path):
     _minify(source_path, target_path)
 
 
-def build_minified_third_party_libs(output_directory):
-    """Generates third party files via Gulp.
+def get_dependency_directory(dependency):
+    """Get dependency directory from dependecy dictionary.
 
     Args:
-        output_directory: str. Path to directory where to generate files.
+        dependency: dict(str, str). Dictionary representing single dependency
+            from manifest.json.
+
+    Returns:
+        str. Dependency directory.
     """
-    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-    node_path = os.path.join(
-        parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
-    gulp_path = os.path.join(
-        parent_dir, 'node_modules', 'gulp', 'bin', 'gulp.js')
-    gulp_build_cmd = [node_path, gulp_path, 'build', '--minify=True',
-                      '--output_directory=%s' % output_directory]
-    proc = subprocess.Popen(
-        gulp_build_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    gulp_stdout, gulp_stderr = proc.communicate()
-    if gulp_stdout:
-        print gulp_stdout
-    if gulp_stderr:
-        print 'Gulp build process failed.Exiting'
-        print '----------------------------------------'
-        print gulp_stderr
-        sys.exit(1)
+    if 'targetDir' in dependency:
+        dependency_dir = dependency['targetDir']
+    else:
+        dependency_dir = dependency['targetDirPrefix'] + dependency['version']
+    return os.path.join(THIRD_PARTY_STATIC_DIR, dependency_dir)
+
+
+def get_css_filepaths(dependency_bundle, dependency_dir):
+    """Gets dependency css filepaths.
+
+    Args:
+        dependency_bundle: dict(str, list(str) | str). The dict has three keys:
+            'js': List of paths to js files that need to be copied.
+            'css': List of paths to css files that need to be copied.
+            'fontsPath': Path to folder containing fonts that need to be copied.
+        dependency_dir: str. Path to directory where the files that need to
+            be copied are located.
+
+    Returns:
+        list(str). List of paths to css files that need to be copied.
+    """
+    css_files = dependency_bundle.get('css', [])
+    return [os.path.join(dependency_dir, css_file) for css_file in css_files]
+
+
+def get_js_filepaths(dependency_bundle, dependency_dir):
+    """Gets dependency js filepaths.
+
+    Args:
+        dependency_bundle: dict(str, list(str) | str). The dict has three keys:
+            'js': List of paths to js files that need to be copied.
+            'css': List of paths to css files that need to be copied.
+            'fontsPath': Path to folder containing fonts that need to be copied.
+        dependency_dir: str. Path to directory where the files that need to
+            be copied are located.
+
+    Returns:
+        list(str). List of paths to js files that need to be copied.
+    """
+    js_files = dependency_bundle.get('js', [])
+    return [os.path.join(dependency_dir, js_file) for js_file in js_files]
+
+
+def get_font_filepaths(dependency_bundle, dependency_dir):
+    """Gets dependency font filepaths.
+
+    Args:
+        dependency_bundle: dict(str, list(str) | str). The dict has three keys:
+            'js': List of paths to js files that need to be copied.
+            'css': List of paths to css files that need to be copied.
+            'fontsPath': Path to folder containing fonts that need to be copied.
+        dependency_dir: str. Path to directory where the files that need to
+            be copied are located.
+
+    Returns:
+        list(str). List of paths to font files that need to be copied.
+    """
+    if 'fontsPath' not in dependency_bundle:
+        return []
+    fonts_path = dependency_bundle['fontsPath']
+    return [os.path.join(dependency_dir, fonts_path, extension)
+            for extension in FONT_EXTENSIONS]
+
+
+def get_dependencies_filepaths():
+    """Extracts dependencies filepaths from manifest.json file into
+    a dictionary.
+
+    Returns:
+        dict(str, list(str)). A dict mapping file types to lists of filepaths.
+        The dict has three keys: 'js', 'css' and 'fonts'. Each of the
+        corresponding values is a full list of dependency file paths of the
+        given type.
+    """
+    filepaths = {
+        'js': [],
+        'css': [],
+        'fonts': []
+    }
+    with open(MANIFEST_FILE_PATH, 'r') as json_file:
+        manifest = json.loads(
+            json_file.read(), object_pairs_hook=collections.OrderedDict)
+    frontend_dependencies = manifest['dependencies']['frontend']
+    for dependency in frontend_dependencies.values():
+        if 'bundle' in dependency:
+            dependency_dir = get_dependency_directory(dependency)
+            filepaths['css'].extend(
+                get_css_filepaths(dependency['bundle'], dependency_dir))
+            filepaths['js'].extend(
+                get_js_filepaths(dependency['bundle'], dependency_dir))
+            filepaths['fonts'].extend(
+                get_font_filepaths(dependency['bundle'], dependency_dir))
+
+    _ensure_files_exist(filepaths['js'])
+    _ensure_files_exist(filepaths['css'])
+
+    return filepaths
+
+
+def build_minified_third_party_libs():
+    """Joins all third party css files into single css file and js files into
+    single js file. Minifies both files. Copies both files and all fonts into
+    third party folder.
+    """
+
+    print 'Building minified third party libs...'
+
+    third_party_js = os.path.join(
+        THIRD_PARTY_GENERATED_STAGING_DIR, 'js', 'third_party.min.js')
+    third_party_css = os.path.join(
+        THIRD_PARTY_GENERATED_STAGING_DIR, 'css', 'third_party.min.css')
+    fonts_dir = os.path.join(THIRD_PARTY_GENERATED_STAGING_DIR, 'fonts', '')
+
+    dependency_filepaths = get_dependencies_filepaths()
+    _minify_and_create_sourcemap(dependency_filepaths['js'], third_party_js)
+    _join_files(dependency_filepaths['css'], third_party_css)
+    _minify(third_party_css, third_party_css)
+    _copy_fonts(dependency_filepaths['fonts'], fonts_dir)
+
+
+def build_third_party_libs():
+    """Joins all third party css files into single css file and js files into
+    single js file. Copies both files and all fonts into third party folder.
+    """
+
+    print 'Building third party libs...'
+
+    third_party_js = os.path.join(
+        THIRD_PARTY_GENERATED_DEV_DIR, 'js', 'third_party.js')
+    third_party_css = os.path.join(
+        THIRD_PARTY_GENERATED_DEV_DIR, 'css', 'third_party.css')
+    fonts_dir = os.path.join(THIRD_PARTY_GENERATED_DEV_DIR, 'fonts', '')
+
+    dependency_filepaths = get_dependencies_filepaths()
+    _join_files(dependency_filepaths['js'], third_party_js)
+    _join_files(dependency_filepaths['css'], third_party_css)
+    _copy_fonts(dependency_filepaths['fonts'], fonts_dir)
 
 
 def hash_should_be_inserted(filepath):
@@ -396,6 +593,8 @@ def generate_build_directory():
     in HTMLs to include hashes. Renames the files to include hashes and copies
     them into build directory.
     """
+    print 'Building Oppia in production mode...'
+
     hashes = dict()
 
     # Create hashes for assets, copy directories and files to build/assets.
@@ -404,7 +603,7 @@ def generate_build_directory():
 
     # Process third_party resources, create hashes for them and copy them into
     # build/third_party/generated.
-    build_minified_third_party_libs(THIRD_PARTY_GENERATED_STAGING_DIR)
+    build_minified_third_party_libs()
     hashes.update(get_file_hashes(THIRD_PARTY_GENERATED_STAGING_DIR))
     copy_files_source_to_target(
         THIRD_PARTY_GENERATED_STAGING_DIR,
@@ -429,6 +628,20 @@ def generate_build_directory():
     copy_files_source_to_target(
         TEMPLATES_STAGING_DIR, TEMPLATES_OUT_DIR, hashes)
 
+    print 'Build completed.'
+
+
+def build():
+    parser = optparse.OptionParser()
+    parser.add_option(
+        '--prod_env', action='store_true', default=False, dest='prod_mode')
+    options = parser.parse_args()[0]
+
+    if options.prod_mode:
+        generate_build_directory()
+    else:
+        build_third_party_libs()
+
 
 if __name__ == '__main__':
-    generate_build_directory()
+    build()
