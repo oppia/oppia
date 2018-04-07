@@ -365,7 +365,7 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
         try:
             exploration = exp_services.get_exploration_from_model(item)
         except Exception as e:
-            yield ('ERROR with exp_id %s' % item.id, str(e))
+            yield ('ERROR get_exp_from_model: exp_id %s' % item.id, str(e))
             return
 
         explorations = []
@@ -382,7 +382,9 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
                     exp_services.get_multiple_explorations_by_version(
                         exploration.id, versions))
             except Exception as e:
-                yield ('ERROR with exp_id %s' % item.id, str(e))
+                yield (
+                    'ERROR get_multiple_exp_by_version exp_id %s' % item.id,
+                    str(e))
                 return
 
         # Append latest exploration to the list of explorations.
@@ -420,7 +422,10 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
                     exp_services.create_and_save_state_id_mapping_model(
                         exploration, change_list)
             except Exception as e:
-                yield ('ERROR with exp_id %s' % item.id, str(e))
+                yield (
+                    'ERROR with exp_id %s version %s' % (
+                        item.id, exploration.version),
+                    str(e))
                 return
 
         yield (exploration.id, exploration.version)
