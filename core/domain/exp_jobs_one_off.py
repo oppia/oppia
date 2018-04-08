@@ -18,6 +18,7 @@
 
 import ast
 import logging
+import traceback
 
 from constants import constants
 from core import jobs
@@ -434,7 +435,7 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
                 yield (
                     'ERROR with exp_id %s version %s' % (
                         item.id, exploration.version),
-                    str(e))
+                    traceback.format_exc())
                 return
 
         yield (exploration.id, exploration.version)
