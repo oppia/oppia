@@ -46,7 +46,7 @@ COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS = 'acquired_skills'
 CMD_ADD_COLLECTION_NODE = 'add_collection_node'
 # This takes an additional 'exploration_id' parameter.
 CMD_DELETE_COLLECTION_NODE = 'delete_collection_node'
-# This takes 2 parameters corresponding to the node indices to be swapped
+# This takes 2 parameters corresponding to the node indices to be swapped.
 CMD_SWAP_COLLECTION_NODES = 'swap_nodes'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -936,8 +936,7 @@ class Collection(object):
         Returns:
             str. The next exploration id in the node list
         """
-        currently_completed_exp_ids =
-            [exp_id for exp_id in completed_exp_ids
+        currently_completed_exp_ids = [exp_id for exp_id in completed_exp_ids
             if exp_id in self.exploration_ids]
         if len(currently_completed_exp_ids) == len(self.exploration_ids):
             return False
@@ -959,11 +958,8 @@ class Collection(object):
         """
         exploration_just_unlocked = []
 
-        collection_node = self.get_node(current_exploration_id)
-
         for index in range(0, len(self.nodes)-1):
-            if self.nodes[index].exploration_id ==
-               collection_node.exploration_id:
+            if self.nodes[index].exploration_id == current_exploration_id:
                 exploration_just_unlocked = self.nodes[index+1].exploration_id
                 break
 
