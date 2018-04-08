@@ -650,7 +650,9 @@ class StoreMapReduceResults(base_handler.PipelineBase):
 class GoogleCloudStorageConsistentJsonOutputWriter(
         output_writers.GoogleCloudStorageConsistentOutputWriter):
     """This is an Output Writer which is used to consistently store MapReduce
-    job's results in json format.
+    job's results in json format. GoogleCloudStorageConsistentOutputWriter is
+    preferred as it's consistent. For more details please look here
+    https://github.com/GoogleCloudPlatform/appengine-mapreduce/wiki/3.4-Readers-and-Writers#googlecloudstorageoutputwriter
     """
     def write(self, data):
         """Writes that data serialized in JSON format.
