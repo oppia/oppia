@@ -216,7 +216,7 @@ for path in _PATHS_TO_INSERT:
 
 import isort             # pylint: disable=wrong-import-position
 import pycodestyle       # pylint: disable=wrong-import-position
-from pyjsparser import PyJsParser  # pylint: disable=wrong-import-position
+import pyjsparser        # pylint: disable=wrong-import-position
 from pylint import lint  # pylint: disable=wrong-import-position
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
@@ -885,7 +885,7 @@ def _check_html_directive_name(all_files):
 
 def _check_directive_scope(all_files):
     """This function checks that all directives have an explicit
-    scope key and it should not be scope: true.
+    scope: {} and it should not be scope: true.
     """
     print 'Starting directive scope check'
     print '----------------------------------------'
@@ -895,50 +895,57 @@ def _check_directive_scope(all_files):
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.js')]
     failed = False
-    directive_does_not_have_scope = True
+    directive_has_isolated_scope = False
     summary_messages = []
-    parser = PyJsParser()
+    parser = pyjsparser.PyJsParser()
     for filename in files_to_check:
         with open(filename) as f:
             content = f.read()
         parsed_nodes = parser.parse(content)['body']
         for parsed_node in parsed_nodes:
-            if parsed_node['type'] == u'ExpressionStatement':
-                expression = parsed_node['expression']
-                if expression['type'] == u'CallExpression' and (
-                        expression['callee']['type'] == (
-                            u'MemberExpression')) and (
-                                expression['callee']['property']['name'] == (
-                                    u'directive')):
-                    arguments = expression['arguments']
-                    directive_name = str(arguments[0]['value']) if (
-                        arguments[0]['type'] == u'Literal') else (
-                            "No such directive exists.")
-                    arguments = arguments[1:]
-                    for argument in arguments:
-                        if argument['type'] == u'ArrayExpression':
-                            elements = argument['elements']
-                            for element in elements:
-                                if element['type'] == u'FunctionExpression':
-                                    body = element['body']
-                                    if body['type'] == u'BlockStatement':
-                                        body_elements = body['body']
-                                        for body_element in body_elements:
-                                            if body_element['type'] == u'ReturnStatement' and (
-                                                    body_element['argument']['type'] == u'ObjectExpression'):
-                                                return_node_properties = body_element['argument']['properties']
-                                                for return_node_property in return_node_properties:
-                                                    if return_node_property['key']['type'] == u'Identifier' and (
-                                                            return_node_property['key']['name'] == u'scope'):
-                                                        directive_does_not_have_scope = False
-                                                        scope_value = return_node_property['value']
-                                                        if scope_value['type'] == u'Literal' and scope_value['value']:
-                                                            failed = True
-                                                            print "Please ensure that %s directive in %s file does not have scope set to true." %(directive_name, filename)
-                    if directive_does_not_have_scope:
-                        failed = True
-                        print "Please ensure that %s directive in %s file has an explicit scope." %(directive_name, filename)
-                                                                
+            if parsed_node['type'] != 'ExpressionStatement':
+                continue
+            expression = parsed_node['expression']
+            if not (expression['type'] == 'CallExpression' and (
+                    expression['callee']['type'] == (
+                        'MemberExpression')) and (
+                            expression['callee']['property']['name'] == (
+                                'directive'))):
+                continue
+            arguments = expression['arguments']
+            directive_name = str(arguments[0]['value']) if (
+                arguments[0]['type'] == 'Literal') else (
+                    "No such directive exists.")
+            arguments = arguments[1:]
+            for argument in arguments:
+                if argument['type'] != 'ArrayExpression':
+                    continue
+                elements = argument['elements']
+                for element in elements:
+                    if element['type'] != 'FunctionExpression':
+                        continue
+                    body = element['body']
+                    if body['type'] != 'BlockStatement':
+                        continue
+                    body_elements = body['body']
+                    for body_element in body_elements:
+                        if not (body_element['type'] == 'ReturnStatement' and (
+                                body_element['argument']['type'] == 'ObjectExpression')):
+                            continue
+                        return_node_properties = body_element['argument']['properties']
+                        for return_node_property in return_node_properties:
+                            if return_node_property['key']['type'] == 'Identifier' and (
+                                return_node_property['key']['name'] == 'scope'):
+                                scope_value = return_node_property['value']
+                                if scope_value['type'] == 'ObjectExpression':
+                                    directive_has_isolated_scope = True
+                                elif scope_value['type'] == 'Literal' and scope_value['value']:
+                                    failed = True
+                                    print 'Please ensure that %s directive in %s file does not have scope set to true.' %(directive_name, filename)
+            if not directive_has_isolated_scope:
+                failed = True
+                print 'Please ensure that %s directive in %s file has a scope: {}.' %(directive_name, filename)                                                
+
     if failed:
         summary_message = '%s   Directive scope check failed' % (
             _MESSAGE_TYPE_FAILED)
