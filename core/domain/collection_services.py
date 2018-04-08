@@ -153,15 +153,9 @@ def get_collection_from_model(collection_model, run_conversion=True):
             collection_domain.CollectionNode.from_dict(collection_node_dict)
             for collection_node_dict in
             versioned_collection_contents['collection_contents']['nodes']
-        ], {
-            skill_id: collection_domain.CollectionSkill.from_dict(
-                skill_id, skill_dict)
-            for skill_id, skill_dict in
-            versioned_collection_contents[
-                'collection_contents']['skills'].iteritems()
-        },
+        ],
         versioned_collection_contents[
-            'collection_contents']['next_skill_index'],
+            'collection_contents'],
         collection_model.version, collection_model.created_on,
         collection_model.last_updated)
 
@@ -458,26 +452,26 @@ def get_valid_completed_exploration_ids(user_id, collection):
     ]
 
 
-def get_next_exploration_ids_to_complete_by_user(user_id, collection_id):
-    """Returns a list of exploration IDs in the specified collection that the
-    given user has not yet attempted and has the prerequisite skills to play.
+def get_next_exploration_id_to_complete_by_user(user_id, collection_id):
+    """Returns the first exploration ID in the specified collection that the
+    given user has not yet attempted.
 
     Args:
         user_id: str. ID of the user.
         collection_id: str. ID of the collection.
 
     Returns:
-        list(str). A list of exploration IDs in the specified collection that
-        the given user has not completed and has the prerequisite skills to
-        play. Returns the collection's initial explorations if the user has yet
-        to complete any explorations within the collection.
+        str. The first exploration ID in the specified collection that
+        the given user has not completed. Returns the collection's initial
+        exploration if the user has yet to complete any explorations
+        within the collection.
     """
     completed_exploration_ids = get_completed_exploration_ids(
         user_id, collection_id)
 
     collection = get_collection_by_id(collection_id)
     if completed_exploration_ids:
-        return collection.get_next_exploration_ids(completed_exploration_ids)
+        return collection.get_next_exploration_id(completed_exploration_ids)
     else:
         # The user has yet to complete any explorations inside the collection.
         return collection.init_exploration_ids
@@ -605,7 +599,7 @@ def apply_change_list(collection_id, change_list):
     Args:
         collection_id: str. ID of the given collection.
         change_list: list(dict). A change list to be applied to the given
-            collection. Each entry in change_list is a dict that represents an
+            collection. Each entry in change_list is a dict that represents a
             CollectionChange.
     object.
 
@@ -622,6 +616,8 @@ def apply_change_list(collection_id, change_list):
                 collection.add_node(change.exploration_id)
             elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_NODE:
                 collection.delete_node(change.exploration_id)
+            elif change.cmd == collection_domain.CMD_SWAP_COLLECTION_NODES:
+                collection.swap_nodes(change.first_index, change.second_index)
             elif (
                     change.cmd ==
                     collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY):

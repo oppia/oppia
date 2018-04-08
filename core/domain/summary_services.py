@@ -136,7 +136,7 @@ def get_learner_collection_dict_by_id(
         completed_exp_ids = (
             collection_services.get_valid_completed_exploration_ids(
                 user.user_id, collection))
-        next_exploration_ids = collection.get_next_exploration_ids(
+        next_exploration_ids = collection.get_next_exploration_id(
             completed_exp_ids)
     else:
         # If the user is not logged in or they have not completed any of
@@ -148,6 +148,7 @@ def get_learner_collection_dict_by_id(
     collection_dict = collection.to_dict()
     collection_dict['nodes'] = [
         node.to_dict() for node in collection.get_nodes_in_playable_order()]
+
     collection_dict['playthrough_dict'] = {
         'next_exploration_ids': next_exploration_ids,
         'completed_exploration_ids': completed_exp_ids

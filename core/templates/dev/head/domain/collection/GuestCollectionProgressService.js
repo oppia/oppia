@@ -62,33 +62,15 @@ oppia.factory('GuestCollectionProgressService', [
       });
     };
 
-    // This method corresponds to collection_domain.get_next_exploration_ids.
+    // This method corresponds to collection_domain.get_next_exploration_id.
     var _getNextExplorationIds = function(collection, completedIds) {
-      // Given the completed exploration IDs, compile a list of acquired skills.
-      var acquiredSkillIds = completedIds.map(function(expId) {
-        var collectionNode = collection.getCollectionNodeByExplorationId(expId);
-        return collectionNode.getAcquiredSkillIds();
-      }).reduce(function(accumulator, value) {
-        return accumulator.concat(value);
-      }, []);
-
-      // Find remaining collection nodes which have yet to be completed.
       var collectionNodes = collection.getCollectionNodes();
-      var incompleteNodes = collectionNodes.filter(function(node) {
-        return completedIds.indexOf(node.getExplorationId()) === -1;
-      });
 
-      // Filter out nodes for which the guest does not have the prerequisite
-      // skills for, then map the leftover nodes to their corresponding
-      // exploration IDs.
-      // https://stackoverflow.com/a/15514975
-      return incompleteNodes.filter(function(node) {
-        return node.getPrerequisiteSkillIds().every(function(elem) {
-          return acquiredSkillIds.indexOf(elem) > -1;
-        });
-      }).map(function(node) {
-        return node.getExplorationId();
-      });
+      if (completedIds.length === collectionNodes.length) {
+        return [];
+      } else {
+        return [collectionNodes[completedIds.length].getExplorationId()];
+      }
     };
 
     return {

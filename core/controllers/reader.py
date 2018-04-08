@@ -571,7 +571,7 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             collection_services.record_played_exploration_in_collection_context(
                 user_id, collection_id, exploration_id)
             collections_left_to_complete = (
-                collection_services.get_next_exploration_ids_to_complete_by_user( # pylint: disable=line-too-long
+                collection_services.get_next_exploration_id_to_complete_by_user( # pylint: disable=line-too-long
                     user_id, collection_id))
 
             if not collections_left_to_complete:
@@ -709,9 +709,9 @@ class RecommendationsHandler(base.BaseHandler):
 
         if collection_id:
             if self.user_id:
-                auto_recommended_exp_ids = (
-                    collection_services.get_next_exploration_ids_to_complete_by_user(  # pylint: disable=line-too-long
-                        self.user_id, collection_id))
+                auto_recommended_exp_ids = [
+                    collection_services.get_next_exploration_id_to_complete_by_user(  # pylint: disable=line-too-long
+                        self.user_id, collection_id)]
             else:
                 collection = collection_services.get_collection_by_id(
                     collection_id)

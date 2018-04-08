@@ -20,7 +20,6 @@ describe('Guest collection progress service', function() {
   var GuestCollectionProgressService = null;
   var CollectionObjectFactory = null;
   var CollectionNodeObjectFactory = null;
-  var CollectionSkillObjectFactory = null;
 
   beforeEach(module('oppia'));
 
@@ -29,8 +28,6 @@ describe('Guest collection progress service', function() {
       'GuestCollectionProgressService');
     CollectionObjectFactory = $injector.get('CollectionObjectFactory');
     CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
-    CollectionSkillObjectFactory = $injector.get(
-      'CollectionSkillObjectFactory');
 
     _collectionId0 = 'sample_collection_id0';
     _collectionId1 = 'sample_collection_id1';
@@ -57,9 +54,7 @@ describe('Guest collection progress service', function() {
       objective: 'an objective',
       category: 'a category',
       version: '1',
-      nodes: [],
-      skills: {},
-      next_skill_index: 0
+      nodes: []
     };
     return CollectionObjectFactory.create(collectionBackendObject);
   };
@@ -67,8 +62,6 @@ describe('Guest collection progress service', function() {
   var _createCollectionNode = function(expId, expTitle) {
     var collectionNodeBackendObject = {
       exploration_id: expId,
-      prerequisite_skill_ids: [],
-      acquired_skill_ids: [],
       exploration_summary: {
         title: expTitle,
         category: 'exp category',
@@ -78,10 +71,6 @@ describe('Guest collection progress service', function() {
     return CollectionNodeObjectFactory.create(collectionNodeBackendObject);
   };
 
-  var _createCollectionSkill = function(collection, expTitle) {
-    return CollectionSkillObjectFactory.createFromIdAndName(
-      collection.getNewSkillId(), expTitle);
-  };
 
   // TODO(bhenning): Find a way to de-duplicate & share this with
   // CollectionLinearizerServiceSpec.
@@ -90,23 +79,12 @@ describe('Guest collection progress service', function() {
     var collection = _createCollection(collectionId, 'Collection title');
 
     var collectionNode0 = _createCollectionNode(_expId0, _expTitle0);
-    var collectionSkill0 = _createCollectionSkill(collection, _expTitle0);
-
     var collectionNode1 = _createCollectionNode(_expId1, _expTitle1);
-    var collectionSkill1 = _createCollectionSkill(collection, _expTitle1);
-
     var collectionNode2 = _createCollectionNode(_expId2, _expTitle2);
-    var collectionSkill2 = _createCollectionSkill(collection, _expTitle2);
 
-    collectionNode0.addAcquiredSkillId(collectionSkill0.getId());
-    collectionNode1.addPrerequisiteSkillId(collectionSkill0.getId());
-    collectionNode1.addAcquiredSkillId(collectionSkill1.getId());
-    collectionNode2.addPrerequisiteSkillId(collectionSkill1.getId());
-    collectionNode2.addAcquiredSkillId(collectionSkill2.getId());
-
-    collection.addCollectionNode(collectionNode2);
-    collection.addCollectionNode(collectionNode1);
     collection.addCollectionNode(collectionNode0);
+    collection.addCollectionNode(collectionNode1);
+    collection.addCollectionNode(collectionNode2);
     return collection;
   };
 

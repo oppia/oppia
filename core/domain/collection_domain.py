@@ -46,6 +46,8 @@ COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS = 'acquired_skills'
 CMD_ADD_COLLECTION_NODE = 'add_collection_node'
 # This takes an additional 'exploration_id' parameter.
 CMD_DELETE_COLLECTION_NODE = 'delete_collection_node'
+# This takes 2 parameters corresponding to the node indices to be swapped
+CMD_SWAP_COLLECTION_NODES = 'swap_nodes'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property'
@@ -87,7 +89,7 @@ class CollectionChange(object):
         COLLECTION_PROPERTY_TAGS)
 
     def __init__(self, change_dict):
-        """Initializes an CollectionChange object from a dict.
+        """Initializes a CollectionChange object from a dict.
 
         Args:
             change_dict: dict. Represents a command. It should have a 'cmd'
@@ -116,6 +118,9 @@ class CollectionChange(object):
             self.exploration_id = change_dict['exploration_id']
         elif self.cmd == CMD_DELETE_COLLECTION_NODE:
             self.exploration_id = change_dict['exploration_id']
+        elif self.cmd == CMD_SWAP_COLLECTION_NODES:
+            self.first_index = change_dict['first_index']
+            self.second_index = change_dict['second_index']
         elif self.cmd == CMD_EDIT_COLLECTION_NODE_PROPERTY:
             if (change_dict['property_name'] not in
                     self.COLLECTION_NODE_PROPERTIES):
@@ -907,117 +912,62 @@ class Collection(object):
 
     @property
     def init_exploration_ids(self):
-        """Returns a list of exploration IDs that are starting points for this
-        collection (ie, they require no prior skills to complete). The order
-        of these IDs is given by the order each respective exploration was
-        added to the collection.
+        """Returns the first element in the node list of the collection, which
+           corresponds to the first node that the user would encounter.
 
         Returns:
-            list(str). List of exploration IDs.
+            str. Exploration ID of the first node.
         """
-        init_exp_ids = []
-        for node in self.nodes:
-            if not node.prerequisite_skill_ids:
-                init_exp_ids.append(node.exploration_id)
-        return init_exp_ids
+        if (len(self.nodes) > 0):
+            return [self.nodes[0].exploration_id]
+        else:
+            return []
 
-    def get_next_exploration_ids(self, completed_exploration_ids):
-        """Returns a list of exploration IDs for which the prerequisite skills
-        are satisfied. These are the next explorations to complete for a user.
-        If the list returned is empty and the collection is valid, then all
-        skills have been acquired and the collection is completed. If the input
-        list is empty, then only explorations with no prerequisite skills are
-        returned. The order of the exploration IDs is given by the order in
-        which each exploration was added to the collection.
+    def get_next_exploration_id(self, completed_exp_ids):
+        """Returns the next exploration id that occurs in the nodes list
+           after the last element of the completed exploration ids. If there
+           is no such node, empty array is returned. Also, if any exp_id in
+           the passed completed_exploration_ids is invalid, it is ignored.
 
         Args:
             completed_exploration_ids: list(str). List of completed exploration
                 ids.
 
         Returns:
-            list(str). A list of exploration IDs for which the prerequisite
-            skills are satisfied.
+            str. The next exploration id in the node list
         """
-        acquired_skill_ids = self.get_acquired_skill_ids_from_exploration_ids(
-            completed_exploration_ids)
-        next_exp_ids = []
-        for node in self.nodes:
-            if node.exploration_id in completed_exploration_ids:
-                continue
-            prereq_skill_ids = set(node.prerequisite_skill_ids)
-            if prereq_skill_ids <= acquired_skill_ids:
-                next_exp_ids.append(node.exploration_id)
-        return next_exp_ids
+        currently_completed_exp_ids = [exp_id for exp_id in completed_exp_ids if exp_id in self.exploration_ids]
+        if len(currently_completed_exp_ids) == len(self.exploration_ids):
+            return False
+        else:
+            return self.exploration_ids[len(currently_completed_exp_ids)]
 
     def get_next_exploration_ids_in_sequence(self, current_exploration_id):
-        """Returns a list of exploration IDs that a logged-out user should
-        complete next based on the prerequisite skill ids they must have
-        attained by the time they completed the current exploration. This
-        recursively compiles a list of 'learned skills' then, depending on
-        the 'learned skills' and the current exploration's acquired skill ids,
-        returns either a list of exploration ids that have either just
-        unlocked or the user is qualified to explore.  If neither of these
-        lists can be generated a blank list is returned instead.
+        """Returns the exploration ID of the node just after the node
+           corresponding to the current exploration id. If the user is on the
+           last node, False is returned.
 
         Args:
             current_exploration_id: str. The id of exploration currently
                 completed.
 
         Returns:
-            list(str). List of exploration IDs that a logged-out user should
+            str. The exploration ID that a logged-out user should
             complete next.
         """
-        skills_learned_by_exp_id = {}
-
-        def _recursively_find_learned_skills(node):
-            """Given a node, returns the skills that the user must have
-            acquired by the time they've completed it.
-
-            Arg:
-                node: CollectionNode. A node in the exploration graph of a
-                    collection.
-
-            Returns:
-                list(str). A list of skill ids acquired by user.
-            """
-            if node.exploration_id in skills_learned_by_exp_id:
-                return skills_learned_by_exp_id[node.exploration_id]
-
-            skills_learned = set(node.acquired_skill_ids)
-            for other_node in self.nodes:
-                if other_node.exploration_id not in skills_learned_by_exp_id:
-                    for skill in node.prerequisite_skill_ids:
-                        if skill in other_node.acquired_skill_ids:
-                            skills_learned = skills_learned.union(
-                                _recursively_find_learned_skills(other_node))
-
-            skills_learned_by_exp_id[node.exploration_id] = skills_learned
-            return skills_learned
-
-        explorations_just_unlocked = []
-        explorations_qualified_for = []
+        exploration_just_unlocked = []
 
         collection_node = self.get_node(current_exploration_id)
-        collected_skills = _recursively_find_learned_skills(collection_node)
 
-        for node in self.nodes:
-            if node.exploration_id in skills_learned_by_exp_id:
-                continue
+        for index in range(0,len(self.nodes)-1):
+            if self.nodes[index].exploration_id == collection_node.exploration_id:
+                exploration_just_unlocked = self.nodes[index+1].exploration_id
+                break
 
-            if set(node.prerequisite_skill_ids).issubset(set(collected_skills)):
-                if (any([
-                        skill in collection_node.acquired_skill_ids
-                        for skill in node.prerequisite_skill_ids])):
-                    explorations_just_unlocked.append(node.exploration_id)
-                else:
-                    explorations_qualified_for.append(node.exploration_id)
-
-        if explorations_just_unlocked:
-            return explorations_just_unlocked
-        elif explorations_qualified_for:
-            return explorations_qualified_for
+        if exploration_just_unlocked:
+            return exploration_just_unlocked
         else:
-            return []
+            return False
 
     def get_nodes_in_playable_order(self):
         """Returns a list of collection nodes in linear, playable order and
@@ -1027,12 +977,10 @@ class Collection(object):
             list(CollectionNode). A sorted list of collection nodes.
         """
         sorted_exp_ids = self.init_exploration_ids
-        next_exp_ids = self.get_next_exploration_ids(sorted_exp_ids)
-        while next_exp_ids:
-            for next_exp_id in next_exp_ids:
-                if next_exp_id not in sorted_exp_ids:
-                    sorted_exp_ids.append(next_exp_id)
-            next_exp_ids = self.get_next_exploration_ids(sorted_exp_ids)
+        next_exp_id = self.get_next_exploration_id(sorted_exp_ids)
+        while next_exp_id:
+            sorted_exp_ids.append(next_exp_id)
+            next_exp_id = self.get_next_exploration_id(sorted_exp_ids)
 
         sorted_nodes_list = [
             copy.deepcopy(self.get_node(exp_id)) for exp_id in sorted_exp_ids]
@@ -1140,13 +1088,31 @@ class Collection(object):
             exploration_id: str. The id of the exploration.
 
         Raises:
-            ValueError: The exploration is alredy part of the colletion.
+            ValueError: The exploration is already part of the colletion.
         """
         if self.get_node(exploration_id) is not None:
             raise ValueError(
                 'Exploration is already part of this collection: %s' %
                 exploration_id)
         self.nodes.append(CollectionNode.create_default_node(exploration_id))
+
+    def swap_nodes(self, first_index, second_index):
+        """Swaps the values of 2 nodes in the collection.
+
+        Args:
+            first_index: Number. Index of one of the nodes to be swapped
+            second_index: Number. Index of the other node to be swapped
+
+        Raises:
+            ValueError: Both indices are the same number
+        """
+        if first_index == second_index:
+            raise ValueError(
+                'Both indices point to the same collection node.'
+            )
+        temp = self.nodes[first_index]
+        self.nodes[first_index] = self.nodes[second_index]
+        self.nodes[second_index] = temp
 
     def delete_node(self, exploration_id):
         """Deletes the node corresponding to the given exploration from the
@@ -1452,13 +1418,11 @@ class Collection(object):
             # in the collection must be reachable when starting from the
             # explorations with no prerequisite skill ids and playing through
             # all subsequent explorations provided by get_next_exploration_ids.
-            completed_exp_ids = set(self.init_exploration_ids)
-            next_exp_ids = self.get_next_exploration_ids(
-                list(completed_exp_ids))
-            while next_exp_ids:
-                completed_exp_ids.update(set(next_exp_ids))
-                next_exp_ids = self.get_next_exploration_ids(
-                    list(completed_exp_ids))
+            completed_exp_ids = self.init_exploration_ids
+            next_exp_id = self.get_next_exploration_id(completed_exp_ids)
+            while next_exp_id:
+                completed_exp_ids.append(next_exp_id)
+                next_exp_id = self.get_next_exploration_id(completed_exp_ids)
 
             if len(completed_exp_ids) != len(self.nodes):
                 unreachable_ids = set(all_exp_ids) - completed_exp_ids

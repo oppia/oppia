@@ -29,33 +29,6 @@ oppia.factory('CollectionValidationService', [
       });
     };
 
-    var _getOverlappingPrerequisiteAcquiredSkillIds = function(collectionNode) {
-      var prerequisiteSkillIds = collectionNode.getPrerequisiteSkillIds();
-      var acquiredSkillIds = collectionNode.getAcquiredSkillIds();
-      var overlappingSkillIds = [];
-      collectionNode.getPrerequisiteSkillIds().forEach(function(skillId) {
-        if (collectionNode.containsAcquiredSkillId(skillId)) {
-          overlappingSkillIds.push(skillId);
-        }
-      });
-      return overlappingSkillIds;
-    };
-
-    var _getUnreachableExplorationIds = function(collection) {
-      var completedExpIds = _getStartingExplorationIds(collection);
-      var nextExpIds = CollectionLinearizerService.getNextExplorationIds(
-        collection, completedExpIds);
-      while (nextExpIds.length > 0) {
-        completedExpIds = completedExpIds.concat(nextExpIds);
-        nextExpIds = CollectionLinearizerService.getNextExplorationIds(
-          collection, completedExpIds);
-      }
-
-      return collection.getExplorationIds().filter(function(explorationId) {
-        return completedExpIds.indexOf(explorationId) === -1;
-      });
-    };
-
     var _getNonexistentExplorationIds = function(collection) {
       return collection.getCollectionNodes().filter(function(collectionNode) {
         return !collectionNode.doesExplorationExist();
@@ -117,40 +90,6 @@ oppia.factory('CollectionValidationService', [
           'learner.');
       }
 
-      var collectionSkills = collection.getCollectionSkills();
-      var skillNames = [];
-      for (var skillId in collectionSkills) {
-        if (collectionSkills.hasOwnProperty(skillId)) {
-          skillNames.push(collectionSkills[skillId].getName());
-        }
-      }
-      skillNames.forEach(function(skillName, index) {
-        if (skillNames.indexOf(skillName) !== index) {
-          issues.push('Skill name \'' + skillName + '\' is not unique.');
-        }
-      });
-
-      collection.getCollectionNodes().forEach(function(collectionNode) {
-        var overlappingSkillIds = _getOverlappingPrerequisiteAcquiredSkillIds(
-          collectionNode);
-        if (overlappingSkillIds.length > 0) {
-          var overlappingSkillNames = overlappingSkillIds.map(
-            function(skillId) {
-              return collectionSkills[skillId].getName();
-            });
-          issues.push('Exploration ' + collectionNode.getExplorationId() +
-            ' has skills which are both required for playing it and acquired ' +
-            'after playing it: ' + overlappingSkillNames.join(', '));
-        }
-      });
-
-      var unreachableExpIds = _getUnreachableExplorationIds(collection);
-      if (unreachableExpIds.length !== 0) {
-        issues.push(
-          'The following exploration(s) are unreachable from the initial ' +
-          'exploration(s): ' + unreachableExpIds.join(', '));
-      }
-
       var nonexistentExpIds = _getNonexistentExplorationIds(collection);
       if (nonexistentExpIds.length !== 0) {
         issues.push(
@@ -168,24 +107,6 @@ oppia.factory('CollectionValidationService', [
         }
       }
 
-      var completedExpIds = _getStartingExplorationIds(collection);
-      var nextExpIds = CollectionLinearizerService.getNextExplorationIds(
-        collection, completedExpIds);
-      if (nextExpIds.length > 1) {
-        issues.push('The collection should have linear progression. The ' +
-          'following explorations are a part of a branch: ' +
-          nextExpIds.join(', '));
-      }
-      while (nextExpIds.length > 0) {
-        completedExpIds = completedExpIds.concat(nextExpIds);
-        nextExpIds = CollectionLinearizerService.getNextExplorationIds(
-          collection, completedExpIds);
-        if (nextExpIds.length > 1) {
-          issues.push('The collection should have linear progression. The ' +
-            'following explorations are a part of a branch: ' +
-            nextExpIds.join(', '));
-        }
-      }
       return issues;
     };
 
