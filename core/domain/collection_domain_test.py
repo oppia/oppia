@@ -251,14 +251,14 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.add_node('another_exp')
         self.assertEqual(len(collection.nodes), 2)
 
-        collection.swap_nodes(0,1)
+        collection.swap_nodes(0, 1)
         self.assertEqual(collection.nodes[0].exploration_id, 'another_exp')
         self.assertEqual(collection.nodes[1].exploration_id, 'test_exp')
         with self.assertRaisesRegexp(
             ValueError,
             'Both indices point to the same collection node.'
             ):
-            collection.swap_nodes(0,0)
+            collection.swap_nodes(0, 0)
 
         collection.delete_node('another_exp')
         self.assertEqual(len(collection.nodes), 1)
@@ -343,7 +343,8 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         # Completing the only exploration of the collection should lead to no
         # available explorations thereafter. This test is done without any
         # prerequisite or acquired skill lists.
-        self.assertEqual(collection.get_next_exploration_id(['exp_id_0']), False)
+        self.assertEqual(
+            collection.get_next_exploration_id(['exp_id_0']), False)
 
         # If another exploration has been added with a prerequisite that is the
         # same as an acquired skill of another exploration and the exploration
@@ -379,7 +380,8 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         # Completing the only exploration of the collection should lead to no
         # available explorations thereafter.
         self.assertEqual(
-            collection.get_next_exploration_ids_in_sequence(exploration_id), False)
+            collection.get_next_exploration_ids_in_sequence(exploration_id),
+            False)
 
 
         collection.add_node('exp_id_1')

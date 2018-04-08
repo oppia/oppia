@@ -39,7 +39,6 @@ oppia.factory('CollectionObjectFactory', [
         var explorationId = this._nodes[i].getExplorationId();
         this._explorationIdToNodeIndexMap[explorationId] = i;
       }
-
     };
 
     // Instance methods
@@ -110,22 +109,22 @@ oppia.factory('CollectionObjectFactory', [
     // This will swap 2 nodes of the collection and update the exploration id
     // to node index map accordingly.
     Collection.prototype.swapCollectionNodes = function(
-      first_index, second_index) {
-      if (first_index >= this._nodes.length ||
-          second_index >= this._nodes.length ||
-          first_index < 0 ||
-          second_index < 0) {
+        firstIndex, secondIndex) {
+      if (firstIndex >= this._nodes.length ||
+          secondIndex >= this._nodes.length ||
+          firstIndex < 0 ||
+          secondIndex < 0) {
         return false;
       }
 
-      var firstIndexId = this._nodes[first_index].getExplorationId();
-      var secondIndexId = this._nodes[second_index].getExplorationId();
-      var temp = this._nodes[first_index];
-      this._nodes[first_index] = this._nodes[second_index];
-      this._nodes[second_index] = temp;
+      var firstIndexId = this._nodes[firstIndex].getExplorationId();
+      var secondIndexId = this._nodes[secondIndex].getExplorationId();
+      var temp = this._nodes[firstIndex];
+      this._nodes[firstIndex] = this._nodes[secondIndex];
+      this._nodes[secondIndex] = temp;
 
-      this._explorationIdToNodeIndexMap[firstIndexId] = second_index;
-      this._explorationIdToNodeIndexMap[secondIndexId] = first_index;
+      this._explorationIdToNodeIndexMap[firstIndexId] = secondIndex;
+      this._explorationIdToNodeIndexMap[secondIndexId] = firstIndex;
       return true;
     };
 
@@ -200,10 +199,11 @@ oppia.factory('CollectionObjectFactory', [
     // Returns the collection node which is initially available to play
     // by the player.
     Collection.prototype.getStartingCollectionNodes = function() {
-      if (this._nodes.length === 0)
+      if (this._nodes.length === 0) {
         return this._nodes;
-      else
+      } else {
         return [this._nodes[0]];
+      }
     };
 
     // Returns a list of all exploration IDs referenced by this collection.
@@ -232,7 +232,6 @@ oppia.factory('CollectionObjectFactory', [
       for (var i = 0; i < nodes.length; i++) {
         this.addCollectionNode(angular.copy(nodes[i]));
       }
-
     };
 
     // Static class methods. Note that "this" is not available in static

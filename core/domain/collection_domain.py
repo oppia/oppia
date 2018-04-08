@@ -918,7 +918,7 @@ class Collection(object):
         Returns:
             str. Exploration ID of the first node.
         """
-        if (len(self.nodes) > 0):
+        if len(self.nodes) > 0:
             return [self.nodes[0].exploration_id]
         else:
             return []
@@ -936,7 +936,9 @@ class Collection(object):
         Returns:
             str. The next exploration id in the node list
         """
-        currently_completed_exp_ids = [exp_id for exp_id in completed_exp_ids if exp_id in self.exploration_ids]
+        currently_completed_exp_ids =
+            [exp_id for exp_id in completed_exp_ids
+            if exp_id in self.exploration_ids]
         if len(currently_completed_exp_ids) == len(self.exploration_ids):
             return False
         else:
@@ -959,8 +961,9 @@ class Collection(object):
 
         collection_node = self.get_node(current_exploration_id)
 
-        for index in range(0,len(self.nodes)-1):
-            if self.nodes[index].exploration_id == collection_node.exploration_id:
+        for index in range(0, len(self.nodes)-1):
+            if self.nodes[index].exploration_id ==
+               collection_node.exploration_id:
                 exploration_just_unlocked = self.nodes[index+1].exploration_id
                 break
 

@@ -145,22 +145,22 @@ oppia.factory('CollectionUpdateService', [
         });
       },
 
-      swapNodes: function(collection, first_index, second_index) {
+      swapNodes: function(collection, firstIndex, secondIndex) {
         _applyChange(collection, CMD_SWAP_COLLECTION_NODES, {
-          first_index: first_index,
-          second_index: second_index
+          first_index: firstIndex,
+          second_index: secondIndex
         }, function(changeDict, collection) {
           // Apply.
-          var first_index = _getFirstIndexFromChangeDict(changeDict);
-          var second_index = _getSecondIndexFromChangeDict(changeDict);
+          var firstIndex = _getFirstIndexFromChangeDict(changeDict);
+          var secondIndex = _getSecondIndexFromChangeDict(changeDict);
 
-          collection.swapCollectionNodes(first_index, second_index);
+          collection.swapCollectionNodes(firstIndex, secondIndex);
         }, function(changeDict, collection) {
           // Undo.
-          var first_index = _getFirstIndexFromChangeDict(changeDict);
-          var second_index = _getSecondIndexFromChangeDict(changeDict);
+          var firstIndex = _getFirstIndexFromChangeDict(changeDict);
+          var secondIndex = _getSecondIndexFromChangeDict(changeDict);
 
-          collection.swapCollectionNodes(first_index, second_index);
+          collection.swapCollectionNodes(firstIndex, secondIndex);
         });
       },
 
