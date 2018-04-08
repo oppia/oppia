@@ -153,9 +153,15 @@ def get_collection_from_model(collection_model, run_conversion=True):
             collection_domain.CollectionNode.from_dict(collection_node_dict)
             for collection_node_dict in
             versioned_collection_contents['collection_contents']['nodes']
-        ],
+        ], {
+            skill_id: collection_domain.CollectionSkill.from_dict(
+                skill_id, skill_dict)
+            for skill_id, skill_dict in
+            versioned_collection_contents[
+                'collection_contents']['skills'].iteritems()
+        },
         versioned_collection_contents[
-            'collection_contents'],
+            'collection_contents']['next_skill_index'],
         collection_model.version, collection_model.created_on,
         collection_model.last_updated)
 
