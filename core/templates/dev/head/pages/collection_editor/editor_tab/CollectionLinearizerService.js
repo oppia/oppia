@@ -22,16 +22,14 @@ oppia.factory('CollectionLinearizerService', [
   'CollectionUpdateService',
   function(CollectionUpdateService) {
     var _getNextExplorationIds = function(collection, completedExpIds) {
-      var collectionExpIds = collection.getExplorationIds();
+      var explorationIds = collection.getExplorationIds();
 
-      // If all explorations are completed, return empty array, else return
-      // the first exploration id in collectionExpIds list that occurs after
-      // completedExpIds.
-      if (completedExpIds.length === collectionExpIds.length) {
-        return [];
-      } else {
-        return [collectionExpIds[completedExpIds.length]];
+      for (var i = 0; i < explorationIds.length; i++) {
+        if (completedExpIds.indexOf(explorationIds[i]) === -1) {
+          return [explorationIds[i]];
+        }
       }
+      return [];
     };
 
     // Given a non linear collection input, the function will linearize it by

@@ -64,13 +64,14 @@ oppia.factory('GuestCollectionProgressService', [
 
     // This method corresponds to collection_domain.get_next_exploration_id.
     var _getNextExplorationIds = function(collection, completedIds) {
-      var collectionNodes = collection.getCollectionNodes();
+      var explorationIds = collection.getExplorationIds();
 
-      if (completedIds.length === collectionNodes.length) {
-        return [];
-      } else {
-        return [collectionNodes[completedIds.length].getExplorationId()];
+      for (var i = 0; i < explorationIds.length; i++) {
+        if (completedIds.indexOf(explorationIds[i]) === -1) {
+          return [explorationIds[i]];
+        }
       }
+      return [];
     };
 
     return {

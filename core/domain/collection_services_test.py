@@ -255,12 +255,12 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         # the collection. This means the initial explorations should be
         # suggested.
         self.assertEqual(
-            collection_services.get_next_exploration_ids_to_complete_by_user(
-                'Fake', self.COL_ID_0), [self.EXP_ID_0, self.EXP_ID_1])
+            collection_services.get_next_exploration_id_to_complete_by_user(
+                'Fake', self.COL_ID_0), [self.EXP_ID_0])
 
         # There should be an exception if the collection does not exist.
         with self.assertRaises(Exception):
-            collection_services.get_next_exploration_ids_to_complete_by_user(
+            collection_services.get_next_exploration_id_to_complete_by_user(
                 self.owner_id, 'Fake')
 
         # If the user hasn't made any progress in the collection yet, only the
@@ -268,24 +268,24 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         self.assertEqual(
             collection_services.get_collection_by_id(
                 self.COL_ID_0).init_exploration_ids,
-            [self.EXP_ID_0, self.EXP_ID_1])
+            [self.EXP_ID_0])
         self.assertEqual(
-            collection_services.get_next_exploration_ids_to_complete_by_user(
-                self.owner_id, self.COL_ID_0), [self.EXP_ID_0, self.EXP_ID_1])
+            collection_services.get_next_exploration_id_to_complete_by_user(
+                self.owner_id, self.COL_ID_0), [self.EXP_ID_0])
 
         # If the user completes the first exploration, a new one should be
         # recommended and the old one should no longer be recommended.
         self._record_completion(self.owner_id, self.COL_ID_0, self.EXP_ID_0)
         self.assertEqual(
-            collection_services.get_next_exploration_ids_to_complete_by_user(
-                self.owner_id, self.COL_ID_0), [self.EXP_ID_1, self.EXP_ID_2])
+            collection_services.get_next_exploration_id_to_complete_by_user(
+                self.owner_id, self.COL_ID_0), [self.EXP_ID_1])
 
         # Completing all of the explorations should yield no other explorations
         # to suggest.
         self._record_completion(self.owner_id, self.COL_ID_0, self.EXP_ID_1)
         self._record_completion(self.owner_id, self.COL_ID_0, self.EXP_ID_2)
         self.assertEqual(
-            collection_services.get_next_exploration_ids_to_complete_by_user(
+            collection_services.get_next_exploration_id_to_complete_by_user(
                 self.owner_id, self.COL_ID_0), [])
 
     def test_record_played_exploration_in_collection_context(self):

@@ -148,10 +148,14 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
         self.collection.nodes = [
             collection_domain.CollectionNode.from_dict({
-                'exploration_id': '0'
+                'exploration_id': '0',
+                'prerequisite_skill_ids': [],
+                'acquired_skill_ids': ['skill0a']
             }),
             collection_domain.CollectionNode.from_dict({
-                'exploration_id': '0'
+                'exploration_id': '0',
+                'prerequisite_skill_ids': ['skill0a'],
+                'acquired_skill_ids': ['skill0b']
             })
         ]
 
@@ -232,7 +236,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(collection_from_dict.to_dict(), collection_dict)
 
     def test_add_delete_swap_nodes(self):
-        """Test that add_node and delete_node fail in the correct
+        """Test that add_node, delete_node and swap_nodes fail in the correct
         situations.
         """
         collection = collection_domain.Collection.create_default_collection(
@@ -322,54 +326,49 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         self.assertEqual(collection.init_exploration_ids, ['exp_id_0'])
 
     def test_next_explorations(self):
-        """Explorations should be suggested based on prerequisite and
-        acquired skills, as well as which explorations have already been played
-        in the collection.
+        """Explorations should be suggested based on their index in the node
+           list.
         """
         collection = collection_domain.Collection.create_default_collection(
             'collection_id')
 
         # There should be no next explorations for an empty collection.
-        self.assertEqual(collection.get_next_exploration_id([]), False)
+        self.assertEqual(collection.get_next_exploration_id([]), [])
 
         # If a new exploration is added, the next exploration IDs should be the
-        # same as the initial explorations.
+        # same as the initial exploration.
         collection.add_node('exp_id_0')
-        self.assertEqual(collection.get_next_exploration_id([]), 'exp_id_0')
+        self.assertEqual(collection.get_next_exploration_id([]), ['exp_id_0'])
         self.assertEqual(
-            collection.init_exploration_ids[0],
+            collection.init_exploration_ids,
             collection.get_next_exploration_id([]))
 
         # Completing the only exploration of the collection should lead to no
-        # available explorations thereafter. This test is done without any
-        # prerequisite or acquired skill lists.
+        # available explorations thereafter.
         self.assertEqual(
-            collection.get_next_exploration_id(['exp_id_0']), False)
+            collection.get_next_exploration_id(['exp_id_0']), [])
 
-        # If another exploration has been added with a prerequisite that is the
-        # same as an acquired skill of another exploration and the exploration
-        # giving that skill is completed, then the first exploration should be
-        # the next one to complete.
+        # If another exploration has been added, then the first exploration
+        # should be the next one to complete.
         collection.add_node('exp_id_1')
         self.assertEqual(collection.get_next_exploration_id(
-            ['exp_id_0']), 'exp_id_1')
+            ['exp_id_0']), ['exp_id_1'])
 
-        # If another exploration is added that has no prerequisites, the
-        # learner will be able to get to exp_id_1. exp_id_2 should not be
-        # suggested to be completed unless exp_id_1 is thereafter completed.
+        # If another exploration is added, then based on explorations
+        # completed, the correct exploration should be shown as the next one.
         collection.add_node('exp_id_2')
         self.assertEqual(
-            collection.get_next_exploration_id([]), 'exp_id_0')
+            collection.get_next_exploration_id([]), ['exp_id_0'])
         self.assertEqual(
-            collection.get_next_exploration_id(['exp_id_0']), 'exp_id_1')
+            collection.get_next_exploration_id(['exp_id_0']), ['exp_id_1'])
         self.assertEqual(
             collection.get_next_exploration_id(['exp_id_0', 'exp_id_1']),
-            'exp_id_2')
+            ['exp_id_2'])
 
         # If all explorations have been completed, none should be suggested.
         self.assertEqual(
             collection.get_next_exploration_id(
-                ['exp_id_0', 'exp_id_1', 'exp_id_2']), False)
+                ['exp_id_0', 'exp_id_1', 'exp_id_2']), [])
 
     def test_next_explorations_in_sequence(self):
         collection = collection_domain.Collection.create_default_collection(
@@ -381,18 +380,18 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         # available explorations thereafter.
         self.assertEqual(
             collection.get_next_exploration_ids_in_sequence(exploration_id),
-            False)
+            [])
 
 
         collection.add_node('exp_id_1')
         collection.add_node('exp_id_2')
         self.assertEqual(
             collection.get_next_exploration_ids_in_sequence(exploration_id),
-            'exp_id_1')
+            ['exp_id_1'])
 
         self.assertEqual(
             collection.get_next_exploration_ids_in_sequence('exp_id_1'),
-            'exp_id_2')
+            ['exp_id_2'])
 
     def test_nodes_are_in_playble_order(self):
         # Create collection.
@@ -408,10 +407,6 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         collection.add_node('exp_id_1')
         collection.add_node('exp_id_2')
 
-        # Without updating prerequisite and acquired skills the
-        # prerequisite and acquired skill_ids list is empty in each node, so
-        # the playable order will be equal to the order in which they are
-        # added.
         sorted_nodes = collection.get_nodes_in_playable_order()
         expected_explorations_list = ['exp_id_0', 'exp_id_1', 'exp_id_2']
         observed_explration_list = [
@@ -425,13 +420,13 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         collection.add_node('exp_id_1')
 
         # There should be one suggested exploration to complete by default.
-        self.assertEqual(collection.get_next_exploration_id([]), 'exp_id_1')
+        self.assertEqual(collection.get_next_exploration_id([]), ['exp_id_1'])
 
         # If an invalid exploration ID is passed to get_next_exploration_id(),
         # it should be ignored. This tests the situation where an exploration
         # is deleted from a collection after being completed by a user.
         self.assertEqual(
-            collection.get_next_exploration_id(['fake_exp_id']), 'exp_id_1')
+            collection.get_next_exploration_id(['fake_exp_id']), ['exp_id_1'])
 
 
 class YamlCreationUnitTests(test_utils.GenericTestBase):

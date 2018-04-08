@@ -916,7 +916,8 @@ class Collection(object):
            corresponds to the first node that the user would encounter.
 
         Returns:
-            str. Exploration ID of the first node.
+            list(str). A single element list of the exploration ID of the
+                first node.
         """
         if len(self.nodes) > 0:
             return [self.nodes[0].exploration_id]
@@ -924,37 +925,34 @@ class Collection(object):
             return []
 
     def get_next_exploration_id(self, completed_exp_ids):
-        """Returns the next exploration id that occurs in the nodes list
-           after the last element of the completed exploration ids. If there
-           is no such node, empty array is returned. Also, if any exp_id in
-           the passed completed_exploration_ids is invalid, it is ignored.
+        """Returns the first exploration id in the collection that has not yet
+           been completed by the learner.
 
         Args:
             completed_exploration_ids: list(str). List of completed exploration
                 ids.
 
         Returns:
-            str. The next exploration id in the node list
+            list(str). A single element list of the next exploration id
+                in the node list
         """
-        currently_completed_exp_ids = [exp_id for exp_id in completed_exp_ids
-                                       if exp_id in self.exploration_ids]
-        if len(currently_completed_exp_ids) == len(self.exploration_ids):
-            return False
-        else:
-            return self.exploration_ids[len(currently_completed_exp_ids)]
+        for exp_id in self.exploration_ids:
+            if exp_id not in completed_exp_ids:
+                return [exp_id]
+        return []
 
     def get_next_exploration_ids_in_sequence(self, current_exploration_id):
         """Returns the exploration ID of the node just after the node
            corresponding to the current exploration id. If the user is on the
-           last node, False is returned.
+           last node, empty list is returned.
 
         Args:
             current_exploration_id: str. The id of exploration currently
                 completed.
 
         Returns:
-            str. The exploration ID that a logged-out user should
-            complete next.
+            list(str). A single element list of the exploration ID that a
+            logged-out user should complete next.
         """
         exploration_just_unlocked = []
 
@@ -964,13 +962,12 @@ class Collection(object):
                 break
 
         if exploration_just_unlocked:
-            return exploration_just_unlocked
+            return [exploration_just_unlocked]
         else:
-            return False
+            return []
 
     def get_nodes_in_playable_order(self):
-        """Returns a list of collection nodes in linear, playable order and
-        assumes the nodes can fit a linear structure.
+        """Returns a list of collection nodes in linear, playable order.
 
         Returns:
             list(CollectionNode). A sorted list of collection nodes.
@@ -978,7 +975,7 @@ class Collection(object):
         sorted_exp_ids = self.init_exploration_ids
         next_exp_id = self.get_next_exploration_id(sorted_exp_ids)
         while next_exp_id:
-            sorted_exp_ids.append(next_exp_id)
+            sorted_exp_ids.append(next_exp_id[0])
             next_exp_id = self.get_next_exploration_id(sorted_exp_ids)
 
         sorted_nodes_list = [
@@ -1411,16 +1408,12 @@ class Collection(object):
                     'Expected to have at least 1 exploration with no '
                     'prerequisite skill ids.')
 
-            # Ensure the collection can be completed. This is done in two
-            # steps: first, no exploration may grant a skill that it
-            # simultaneously lists as a prerequisite. Second, every exploration
-            # in the collection must be reachable when starting from the
-            # explorations with no prerequisite skill ids and playing through
-            # all subsequent explorations provided by get_next_exploration_ids.
+            # Ensure the collection can be completed. In the current
+            # implementation, without skills, this would always be true.
             completed_exp_ids = self.init_exploration_ids
             next_exp_id = self.get_next_exploration_id(completed_exp_ids)
             while next_exp_id:
-                completed_exp_ids.append(next_exp_id)
+                completed_exp_ids.append(next_exp_id[0])
                 next_exp_id = self.get_next_exploration_id(completed_exp_ids)
 
             if len(completed_exp_ids) != len(self.nodes):

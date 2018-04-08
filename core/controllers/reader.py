@@ -709,9 +709,9 @@ class RecommendationsHandler(base.BaseHandler):
 
         if collection_id:
             if self.user_id:
-                auto_recommended_exp_ids = [
+                auto_recommended_exp_ids = (
                     collection_services.get_next_exploration_id_to_complete_by_user(  # pylint: disable=line-too-long
-                        self.user_id, collection_id)]
+                        self.user_id, collection_id))
             else:
                 collection = collection_services.get_collection_by_id(
                     collection_id)
@@ -730,6 +730,7 @@ class RecommendationsHandler(base.BaseHandler):
 
         recommended_exp_ids = set(
             author_recommended_exp_ids + auto_recommended_exp_ids)
+
         self.values.update({
             'summaries': (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
