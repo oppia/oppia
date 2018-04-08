@@ -4050,6 +4050,24 @@ class StateIdMapping(object):
         # Analyse each command in change list one by one to create state id
         # mapping for new exploration.
         for change_dict in change_list:
+            # During v1 -> v2 migration of states, all pseudo END states were
+            # replaced by an explicit END state through this migration.
+            # We account for that change in the state id mapping too.
+            if change_dict['cmd'] == 'migrate_states_schema_to_latest_version':
+                psuedo_end_state_name = 'END'
+                if int(change_dict['from_version']) < 2 <= int(
+                        change_dict['to_version']):
+                    # The explicit end state is created only if there is some
+                    # state that used to refer to an implicit 'END' state.
+                    # This is confirmed by checking that there is a state
+                    # called 'END' in the immediate version of the exploration
+                    # after migration and no state called 'END' is present
+                    # in previous version of exploration.
+                    if (psuedo_end_state_name in (
+                            new_exploration.states) and (
+                                psuedo_end_state_name not in (
+                                    self.state_names_to_ids))):
+                        new_state_names.append(psuedo_end_state_name)
             if change_dict['cmd'] == CMD_ADD_STATE:
                 new_state_names.append(change_dict['state_name'])
                 assert change_dict['state_name'] not in (
