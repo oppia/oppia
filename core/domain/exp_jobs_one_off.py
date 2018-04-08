@@ -361,7 +361,6 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         if item.deleted:
             return
-
         try:
             exploration = exp_services.get_exploration_from_model(item)
         except Exception as e:
@@ -415,12 +414,22 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
                         'revert_version_number'):
                     reverted_version = change_list[0]['version_number']
                     # pylint: disable=line-too-long
-                    exp_services.create_and_save_state_id_mapping_model_for_reverted_exploration(
-                        exploration.id, exploration.version - 1, reverted_version)
+                    state_id_mapping = exp_services.generate_state_id_mapping_model_for_reverted_exploration(
+                        exploration.id, exploration.version - 1,
+                        reverted_version)
                     # pylint: enable=line-too-long
                 else:
-                    exp_services.create_and_save_state_id_mapping_model(
-                        exploration, change_list)
+                    state_id_mapping = (
+                        exp_services.generate_state_id_mapping_model(
+                            exploration, change_list))
+
+                state_id_mapping_model = exp_models.StateIdMappingModel.create(
+                    state_id_mapping.exploration_id,
+                    state_id_mapping.exploration_version,
+                    state_id_mapping.state_names_to_ids,
+                    state_id_mapping.largest_state_id_used, overwrite=True)
+                state_id_mapping_model.put()
+
             except Exception as e:
                 yield (
                     'ERROR with exp_id %s version %s' % (
