@@ -937,7 +937,7 @@ class Collection(object):
             str. The next exploration id in the node list
         """
         currently_completed_exp_ids = [exp_id for exp_id in completed_exp_ids
-            if exp_id in self.exploration_ids]
+                                       if exp_id in self.exploration_ids]
         if len(currently_completed_exp_ids) == len(self.exploration_ids):
             return False
         else:
