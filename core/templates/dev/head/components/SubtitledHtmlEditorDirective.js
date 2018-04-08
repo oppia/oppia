@@ -29,13 +29,12 @@ oppia.directive('subtitledHtmlEditor', [
         '/components/subtitled_html_editor_directive.html'),
       controller: [
         '$scope', '$uibModal', 'EditabilityService',
-        'COMPONENT_NAME_HTML', 'stateContentService',
+        'COMPONENT_NAME_HTML',
         function(
             $scope, $uibModal, EditabilityService,
-            COMPONENT_NAME_HTML, stateContentService) {
+            COMPONENT_NAME_HTML) {
           $scope.subtitledHtmlEditorIsOpen = false;
           $scope.subtitledMemento = null;
-
           $scope.COMPONENT_NAME_HTML = COMPONENT_NAME_HTML;
 
           var openMarkAllAudioAsNeedingUpdateModal = function() {
@@ -50,7 +49,7 @@ oppia.directive('subtitledHtmlEditor', [
               $scope.subtitledHtml.html.markAllAudioAsNeedingUpdate();
               $scope.subtitledMemento.html = angular.copy(
                 $scope.subtitledHtml.html);
-              stateContentService.saveDisplayedValue();
+              $scope.getOnSaveFn()();
             });
           };
 
@@ -66,7 +65,7 @@ oppia.directive('subtitledHtmlEditor', [
               contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
-            stateContentService.saveDisplayedValue();
+            $scope.getOnSaveFn()();
           };
 
 
@@ -77,7 +76,7 @@ oppia.directive('subtitledHtmlEditor', [
           };
 
           $scope.onAudioTranslationsEdited = function() {
-            stateContentService.saveDisplayedValue();
+            $scope.getOnSaveFn()();
           };
         }
       ]
