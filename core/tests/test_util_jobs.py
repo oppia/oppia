@@ -32,8 +32,8 @@ import feconf
 
 class ExpCopiesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    """Storage class for copy of existing exploration in the realtime layer to
-    be implemented.
+    """Realtime model class for copy of the existing exploration in the realtime
+    layer.
     """
     pass
 
@@ -45,7 +45,7 @@ class ExpCopiesAggregator(jobs.BaseContinuousComputationManager):
     """
     @classmethod
     def get_event_types_listened_to(cls):
-        """Returns an empty list of events that this class subscribes to.
+        """Returns the list of events that this class subscribes to.
 
         Returns:
             list. An empty list of events.
@@ -81,21 +81,22 @@ class ExpCopiesMRJobManager(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        """Returns the ExplorationModel domain object."""
+        """Returns a list of datastore class references to map over."""
         return [exp_models.ExplorationModel]
 
     @staticmethod
     def map(item):
-        """Yields the string containing exploration id with the copy number of
-        the existing exploration.
+        """Yields the string containing exploration id with the count indicating
+        the number of current copy of the existing exploration.
 
         Args:
             item: An exploration domain object.
 
         Yields:
-            str. The string containing exploration id with the copy number of
-            the existing exploration. It is of the format:
-                <exp_id>copy<copy_number>
+            str. The string containing exploration id with the count indicating
+                the current copy number of the existing exploration. It is of
+                the format:
+                    <exp_id>copy<copy_number>
         """
         if ExpCopiesMRJobManager._entity_created_before_job_queued(item):
             for count in range(10):
@@ -125,8 +126,8 @@ class ExpCopiesMRJobManager(
 # Job to delete all copied explorations.
 class DeleteExpCopiesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    """Class for deleting the copies of existing exploration in the realtime
-    layer to be implemented.
+    """Realtime model class for deleting the copies of existing exploration in
+    the realtime layer.
     """
     pass
 
@@ -137,7 +138,7 @@ class DeleteExpCopiesAggregator(jobs.BaseContinuousComputationManager):
     """
     @classmethod
     def get_event_types_listened_to(cls):
-        """Returns an empty list of events that this class subscribes to.
+        """Returns the list of events that this class subscribes to.
 
         Returns:
             list. An empty list of events.
@@ -170,7 +171,7 @@ class DeleteExpCopiesMRJobManager(
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        """Returns the ExplorationModel domain object."""
+        """Returns a list of datastore class references to map over."""
         return [exp_models.ExplorationModel]
 
     @staticmethod
@@ -187,7 +188,5 @@ class DeleteExpCopiesMRJobManager(
 
     @staticmethod
     def reduce(exp_id, list_of_exps):
-        """Deletes the saved and published copies of the existing exploration
-        to be implemented.
-        """
+        """Null reduce method (not used)."""
         pass
