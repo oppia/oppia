@@ -853,7 +853,7 @@ class BaseMapReduceOneOffJobManager(BaseMapReduceJobManager):
 
 
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
-    """This is an Input Reader, these are used to read values from multiple
+    """This Input Reader is used to read values from multiple
     classes in the datastore and pass them to mapper functions in MapReduce
     jobs.
     """
@@ -945,9 +945,10 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
 
 
 class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
-    """Continuous Computation jobs, which runs continuously, are used to perform
-    statistical, visualisation or any other real time calculations. These jobs
-    are used to perform calculations outside of a client's request.
+    """Continuous computation jobs, which run continuously, are used to perform
+    statistical, visualisation or other real time calculations. These jobs
+    are used to perform background calculations that take place outside the
+    usual client request/response cycle.
     """
     @classmethod
     def _get_continuous_computation_class(cls):
