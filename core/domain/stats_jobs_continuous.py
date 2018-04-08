@@ -269,19 +269,23 @@ class InteractionAnswerSummariesAggregator(
     """
     @classmethod
     def get_event_types_listened_to(cls):
-        """Returns a list of submitted answer events.
+        """Returns a list of event types that this class subscribes to.
 
         Returns:
-            list. A list of submitted answer events.
+            list(str). A list of submitted answer event type.
         """
         return [feconf.EVENT_TYPE_ANSWER_SUBMITTED]
 
     @classmethod
     def _get_realtime_datastore_class(cls):
-        """Returns InteractionAnswerSummariesRealtimeModel class."""
+        """Returns InteractionAnswerSummariesRealtimeModel class for
+        InteractionAnswerSummariesAggregator.
+        """
         return InteractionAnswerSummariesRealtimeModel
 
     @classmethod
     def _get_batch_job_manager_class(cls):
-        """Returns InteractionAnswerSummariesMRJobManager class."""
+        """Returns InteractionAnswerSummariesMRJobManager class which calculates
+        interaction view statistics.
+        """
         return InteractionAnswerSummariesMRJobManager
