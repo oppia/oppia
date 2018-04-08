@@ -67,11 +67,12 @@ oppia.directive('topNavigationBar', [
           $scope.onLogoutButtonClicked = function() {
             $window.localStorage.removeItem('last_uploaded_audio_lang');
           };
-          $scope.openSubMenu = function (menu) {
+          $scope.openSubmenu = function (e, menu) {
             angular.element('.nav a').blur();
+            angular.element(e.currentTarget).focus();
             $scope.activeMenu = menu;
           };
-          $scope.closeSubMenu = function (evt) {
+          $scope.closeSubmenu = function (evt) {
             $scope.activeMenu = '';
             if (evt.currentTarget.nodeName === 'UL') {
               if (angular.element(evt.currentTarget).closest('li')
@@ -81,6 +82,38 @@ oppia.directive('topNavigationBar', [
               }
             }
           };
+          $scope.isEventOccured = function (e, targetEvent) {
+            if (targetEvent === 'enter' && e.keyCode === 13) {
+              return true;
+            } else if (targetEvent === 'tab' && e.keyCode === 9) {
+              return true;
+            } else if (targetEvent === 'shiftTab' &&
+              (e.shiftKey && e.keyCode === 9)) {
+              return true;
+            } else {
+              return false;
+            }
+          };
+          /*
+          @param e - Event occured.
+          @param name - menu(aboutMenu,profileMenu) to open/close.
+          @param targetEvent - Event to perform the action(Enter,Tab,Shift+Tab)
+          @param action - Action to be performed(open/close).
+          */
+          $scope.handleNavigation = function (e, menu, targetEvent, action) {
+            if ($scope.isEventOccured(e, targetEvent)) {
+              if (action === 'open') {
+                $scope.openSubmenu(e, menu);
+              } else {
+                $scope.closeSubmenu(e);
+              }
+            }
+          };
+
+          angular.element(document).on('click', function (e) {
+            $scope.activeMenu = '';
+            $scope.$apply();
+          });
 
           if (GLOBALS.userIsLoggedIn) {
             // Show the number of unseen notifications in the navbar and page
