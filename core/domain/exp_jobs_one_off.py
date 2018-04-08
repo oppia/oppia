@@ -421,19 +421,11 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
                         exp_services.generate_state_id_mapping_model(
                             exploration, change_list))
 
-                # pylint: disable=protected-access
-                instance_id = (
-                    exp_models.StateIdMappingModel._generate_instance_id(
-                        exploration.id, exploration.version))
-                # pylint: enable=protected-access
-
-                state_id_mapping_model = exp_models.StateIdMappingModel(
-                    id=instance_id,
-                    exploration_id=state_id_mapping.exploration_id,
-                    exploration_version=state_id_mapping.exploration_version,
-                    state_names_to_ids=state_id_mapping.state_names_to_ids,
-                    largest_state_id_used=(
-                        state_id_mapping.largest_state_id_used))
+                state_id_mapping_model = exp_models.StateIdMappingModel.create(
+                    state_id_mapping.exploration_id,
+                    state_id_mapping.exploration_version,
+                    state_id_mapping.state_names_to_ids,
+                    state_id_mapping.largest_state_id_used, overwrite=True)
                 state_id_mapping_model.put()
 
             except Exception as e:
