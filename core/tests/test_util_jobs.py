@@ -32,8 +32,8 @@ import feconf
 
 class ExpCopiesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    """Realtime model class for copy of the existing exploration in the realtime
-    layer.
+    """Realtime model class for the newly-created exploration copies in the
+    realtime layer.
     """
     pass
 
@@ -86,16 +86,15 @@ class ExpCopiesMRJobManager(
 
     @staticmethod
     def map(item):
-        """Yields the string containing exploration id with the count indicating
-        the number of current copy of the existing exploration.
+        """Yields the id of each newly-created exploration copy, together with
+        its YAML representation.
 
         Args:
             item: An exploration domain object.
 
         Yields:
-            str. The string containing exploration id with the count indicating
-                the current copy number of the existing exploration. It is of
-                the format:
+            str. The string containing exploration id of each newly-created
+                exploration. It is of the format:
                     <exp_id>copy<copy_number>
         """
         if ExpCopiesMRJobManager._entity_created_before_job_queued(item):
@@ -110,8 +109,8 @@ class ExpCopiesMRJobManager(
 
         Args:
             exp_id: str. The exploration id.
-            list_of_exps: list(str). The list containing explorations in the
-                YAML representation.
+            list_of_exps: list(str). The list containing newly-created
+                exploration copies in the YAML representation.
         """
         for stringified_exp in list_of_exps:
             exploration = exp_domain.Exploration.from_untitled_yaml(
@@ -126,8 +125,8 @@ class ExpCopiesMRJobManager(
 # Job to delete all copied explorations.
 class DeleteExpCopiesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    """Realtime model class for deleting the copies of existing exploration in
-    the realtime layer.
+    """Realtime model class for deleting the created exploration copies in the
+    realtime layer.
     """
     pass
 
