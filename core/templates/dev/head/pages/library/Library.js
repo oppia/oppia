@@ -86,33 +86,32 @@ oppia.controller('Library', [
           $scope.activityPlaylistData = {explorations: {}, collections: {}};
           $http.get('/creatordashboardhandler/data')
             .then(function(response) {
-              for (var i = 0; i < $scope.libraryGroups.length; i++) {
-                var activity = $scope.libraryGroups[i].activity_summary_dicts;
-                for (var j = 0; j < activity.length; j++) {
-                  for (var k = 0; k < response.data
-                    .explorations_list.length; k++) {
-                    if (response.data
-                      .explorations_list[k].id !== activity[j].id) {
-                      $scope.activityPlaylistData
-                        .explorations[activity[j].id] = true;
-                    } else {
-                      $scope.activityPlaylistData
-                        .explorations[activity[j].id] = false;
-                    }
-                  }
-                  for (var k = 0; k < response.data
-                    .collections_list.length; k++) {
-                    if (response.data
-                      .collections_list[k].id !== activity[j].id) {
-                      $scope.activityPlaylistData
-                        .collections[activity[j].id] = true;
-                    } else {
-                      $scope.activityPlaylistData
-                        .collections[activity[j].id] = false;
-                    }
-                  }
-                }
-              }
+              $scope.libraryGroups.forEach(function(activityGroups) {
+                var activity = activityGroups.activity_summary_dicts;
+
+                activity.forEach(function(activity) {
+                  response.data.explorations_list.forEach(
+                    function(responseExploration) {
+                      if (responseExploration.id !== activity.id) {
+                        $scope.activityPlaylistData
+                          .explorations[activity.id] = true;
+                      } else {
+                        $scope.activityPlaylistData
+                          .explorations[activity.id] = false;
+                      }
+                    });
+                  response.data.collections_list.forEach(
+                    function(responseCollection) {
+                      if (responseCollection.id !== activity.id) {
+                        $scope.activityPlaylistData
+                          .collections[activity.id] = true;
+                      } else {
+                        $scope.activityPlaylistData
+                          .collections[activity.id] = false;
+                      }
+                    });
+                });
+              });
             });
         }
 
