@@ -80,37 +80,33 @@ oppia.controller('Library', [
       $http.get('/libraryindexhandler').success(function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
 
-        $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
-        var activityDetails = {};
-        if ($scope.userIsLoggedIn) {
-          $scope.activityPlaylistData = {explorations: {}, collections: {}};
-          $http.get('/creatordashboardhandler/data')
-            .then(function(response) {
-              $scope.libraryGroups.forEach(function(activityGroups) {
-                var activity = activityGroups.activity_summary_dicts;
+        for (var i = 0; i < $scope.libraryGroups.length; i++) {
+          var categoryActivity = $scope.libraryGroups[i].activity_summary_dicts;
+          for (var j = 0; j < categoryActivity.length; j++) {
+            activityType = categoryActivity[j].activity_type;
+            activityId = categoryActivity[j].id;
 
-                activity.forEach(function(activity) {
-                  response.data.explorations_list.forEach(
-                    function(responseExploration) {
-                      if (responseExploration.id !== activity.id) {
-                        $scope.activityPlaylistData
-                          .explorations[activity.id] = true;
-                      } else {
-                        $scope.activityPlaylistData
-                          .explorations[activity.id] = false;
-                      }
-                    });
-                  response.data.collections_list.forEach(
-                    function(responseCollection) {
-                      if (responseCollection.id !== activity.id) {
-                        $scope.activityPlaylistData
-                          .collections[activity.id] = true;
-                      } else {
-                        $scope.activityPlaylistData
-                          .collections[activity.id] = false;
-                      }
-                    });
-                });
+            var learnerPlaylistUrl = (
+              UrlInterpolationService.interpolateUrl(
+                '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
+                  activityType: activityType,
+                  activityId: activityId
+                }));
+            $http.post(learnerPlaylistUrl, {})
+              .then(function(response) {
+                for (var i = 0; i < $scope.libraryGroups.length; i++) {
+                  var categoryActivity = $scope.libraryGroups[i]
+                    .activity_summary_dicts;
+                  for (var j = 0; j < categoryActivity.length; j++) {
+                    requestUrl = response.config.url;
+                    requestUrl = requestUrl.substring(
+                      requestUrl.lastIndexOf('/') + 1, requestUrl.length);
+                    if (requestUrl === categoryActivity[j].id) {
+                      categoryActivity[j].should_add_to_playlist_icon =
+                        (!response.data.belongs_to_subscribed_activities);
+                    }
+                  }
+                }
               });
             });
         }
