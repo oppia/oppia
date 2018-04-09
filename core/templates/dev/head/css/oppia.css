@@ -5043,12 +5043,12 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 1px;
 }
 
-.oppia-tooltip {
+.oppia-dashboard-tooltip {
   display: inline-block;
   position: relative;
 }
 
-.oppia-tooltip-text {
+.oppia-dashboard-tooltip-text {
   background-color: #009688;
   border-radius: 6px;
   bottom: 97%;
@@ -5063,7 +5063,7 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 @media screen and (max-width: 800px) {
-  .oppia-tooltip-text::after {
+  .oppia-dashboard-tooltip-text::after {
     border-color: #009688 transparent transparent transparent;
     border-style: solid;
     border-width: 5px;
@@ -5073,11 +5073,11 @@ md-card.preview-conversation-skin-supplemental-card {
     position: absolute;
     top: 100%;
   }
-  .oppia-tooltip-text {
+  .oppia-dashboard-tooltip-text {
     width: 90%;
   }
 }
 
-.oppia-tooltip:hover + .oppia-tooltip-text {
+.oppia-dashboard-tooltip:hover + .oppia-dashboard-tooltip-text {
   visibility: visible;
 }
