@@ -1997,7 +1997,7 @@ def _save_state_id_mapping(state_id_mapping):
         state_id_mapping.largest_state_id_used)
 
 
-def create_and_save_state_id_mapping_model(exploration, change_list):
+def generate_state_id_mapping_model(exploration, change_list):
     """Create and store state id mapping for new exploration.
 
     Args:
@@ -2008,9 +2008,6 @@ def create_and_save_state_id_mapping_model(exploration, change_list):
     Returns:
         StateIdMapping. Domain object of StateIdMappingModel instance.
     """
-    if not feconf.ENABLE_STATE_ID_MAPPING:
-        return
-
     if exploration.version > 1:
         # Get state id mapping for new exploration from old exploration with
         # the help of change list.
@@ -2027,7 +2024,57 @@ def create_and_save_state_id_mapping_model(exploration, change_list):
             exp_domain.StateIdMapping.create_mapping_for_new_exploration(
                 exploration))
 
+    new_state_id_mapping.validate()
+    return new_state_id_mapping
+
+
+def create_and_save_state_id_mapping_model(exploration, change_list):
+    """Create and store state id mapping for new exploration.
+
+    Args:
+        exploration: Exploration. Exploration for which state id mapping is
+            to be stored.
+        change_list: list(dict). A list of changes made in the exploration.
+
+    Returns:
+        StateIdMapping. Domain object of StateIdMappingModel instance.
+    """
+    if not feconf.ENABLE_STATE_ID_MAPPING:
+        return
+
+    new_state_id_mapping = generate_state_id_mapping_model(
+        exploration, change_list)
     _save_state_id_mapping(new_state_id_mapping)
+    return new_state_id_mapping
+
+
+def generate_state_id_mapping_model_for_reverted_exploration(
+        exploration_id, current_version, revert_to_version):
+    """Generates state id mapping model for when exploration is reverted.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+        current_version: str. The current version of the exploration.
+        revert_to_version: int. The version to which the given exploration
+            is to be reverted.
+
+    Returns:
+        StateIdMapping. Domain object of StateIdMappingModel instance.
+    """
+    old_state_id_mapping = get_state_id_mapping(
+        exploration_id, revert_to_version)
+    previous_state_id_mapping = get_state_id_mapping(
+        exploration_id, current_version)
+
+    # Note: when an exploration is reverted state id mapping should
+    # be same as reverted version of the exploration but largest
+    # state id used should be kept as it is as in old exploration.
+    new_version = current_version + 1
+    new_state_id_mapping = exp_domain.StateIdMapping(
+        exploration_id, new_version, old_state_id_mapping.state_names_to_ids,
+        previous_state_id_mapping.largest_state_id_used)
+    new_state_id_mapping.validate()
+
     return new_state_id_mapping
 
 
@@ -2047,20 +2094,9 @@ def create_and_save_state_id_mapping_model_for_reverted_exploration(
     if not feconf.ENABLE_STATE_ID_MAPPING:
         return
 
-    old_state_id_mapping = get_state_id_mapping(
-        exploration_id, revert_to_version)
-    previous_state_id_mapping = get_state_id_mapping(
-        exploration_id, current_version)
-
-    # Note: when an exploration is reverted state id mapping should
-    # be same as reverted version of the exploration but largest
-    # state id used should be kept as it is as in old exploration.
-    new_version = current_version + 1
-    new_state_id_mapping = exp_domain.StateIdMapping(
-        exploration_id, new_version, old_state_id_mapping.state_names_to_ids,
-        previous_state_id_mapping.largest_state_id_used)
-    new_state_id_mapping.validate()
-
+    new_state_id_mapping = (
+        generate_state_id_mapping_model_for_reverted_exploration(
+            exploration_id, current_version, revert_to_version))
     _save_state_id_mapping(new_state_id_mapping)
     return new_state_id_mapping
 
