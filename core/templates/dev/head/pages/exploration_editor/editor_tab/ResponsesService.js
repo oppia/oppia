@@ -98,6 +98,7 @@ oppia.factory('ResponsesService', [
 
     var _updateAnswerGroup = function(index, updates) {
       var answerGroup = _answerGroups[index];
+      console.log(answerGroup.rules);
       if (updates.hasOwnProperty('rules')) {
         answerGroup.rules = updates.rules;
       }
@@ -146,6 +147,22 @@ oppia.factory('ResponsesService', [
         _confirmedUnclassifiedAnswersMemento = angular.copy(
           newConfirmedUnclassifiedAnswers);
       }
+    };
+
+    var _reduceRuleIndexByOne = function(answerGroupIndex, ruleIndex) {
+      if (_answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x === 0) {
+        _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x =
+          _answerChoices.length;
+      } else {
+        _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x--;
+      }
+      // _saveAnswerGroups(_answerGroups);
+    };
+
+    var _makeRuleInvalid = function(answerGroupIndex, ruleIndex) {
+      _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x =
+        _answerChoices.length;
+      // _saveAnswerGroups(_answerGroups);
     };
 
     return {
@@ -345,6 +362,12 @@ oppia.factory('ResponsesService', [
       },
       getConfirmedUnclassifiedAnswers: function() {
         return angular.copy(_confirmedUnclassifiedAnswers);
+      },
+      reduceRuleIndexByOne: function(answerGroupIndex, ruleIndex) {
+        return _reduceRuleIndexByOne(answerGroupIndex, ruleIndex);
+      },
+      makeRuleInvalid: function(answerGroupIndex, ruleIndex) {
+        return _makeRuleInvalid(answerGroupIndex, ruleIndex);
       },
       // This registers the change to the handlers in the list of changes, and
       // also updates the states object in ExplorationStatesService.
