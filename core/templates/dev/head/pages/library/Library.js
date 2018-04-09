@@ -108,7 +108,7 @@ oppia.controller('Library', [
                   }
                 }
               });
-            });
+          }
         }
 
         $rootScope.$broadcast(
