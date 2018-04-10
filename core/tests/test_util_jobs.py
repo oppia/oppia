@@ -32,9 +32,7 @@ import feconf
 
 class ExpCopiesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    """Realtime model class for the newly-created exploration copies in the
-    realtime layer.
-    """
+    """Realtime model class for ExpCopiesAggregator."""
     pass
 
 
@@ -90,7 +88,7 @@ class ExpCopiesMRJobManager(
         its YAML representation.
 
         Args:
-            item: An exploration domain object.
+            item: Exploration. An exploration domain object.
 
         Yields:
             str. The string containing exploration id of each newly-created
@@ -125,9 +123,7 @@ class ExpCopiesMRJobManager(
 # Job to delete all copied explorations.
 class DeleteExpCopiesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    """Realtime model class for deleting the created exploration copies in the
-    realtime layer.
-    """
+    """Realtime model class for DeleteExpCopiesAggregator."""
     pass
 
 
@@ -179,7 +175,7 @@ class DeleteExpCopiesMRJobManager(
         category.
 
         Args:
-            item: An exploration domain object.
+            item: Exploration. An exploration domain object.
         """
         if item.category == 'Copies':
             exp_services.delete_exploration(
