@@ -92,7 +92,7 @@ oppia.controller('Library', [
                 activity.forEach(function(activity) {
                   response.data.explorations_list.forEach(
                     function(responseExploration) {
-                      if (responseExploration.id !== activity.id) {
+                      if (responseExploration.id === activity.id) {
                         $scope.activityPlaylistData
                           .explorations[activity.id] = true;
                       } else {
@@ -102,7 +102,7 @@ oppia.controller('Library', [
                     });
                   response.data.collections_list.forEach(
                     function(responseCollection) {
-                      if (responseCollection.id !== activity.id) {
+                      if (responseCollection.id === activity.id) {
                         $scope.activityPlaylistData
                           .collections[activity.id] = true;
                       } else {

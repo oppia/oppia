@@ -49,7 +49,7 @@ oppia.directive('explorationSummaryTile', [
         showLearnerDashboardIconsIfPossible: (
           '&showLearnerDashboardIconsIfPossible'),
         isContainerNarrow: '&containerIsNarrow',
-        shouldAddToPlaylistIcon: '&shouldAddToPlaylistIcon',
+        belongsToCreatorPlaylist: '&belongsToCreatorPlaylist',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +
