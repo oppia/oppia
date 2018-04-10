@@ -98,7 +98,6 @@ oppia.factory('ResponsesService', [
 
     var _updateAnswerGroup = function(index, updates) {
       var answerGroup = _answerGroups[index];
-      console.log(answerGroup.rules);
       if (updates.hasOwnProperty('rules')) {
         answerGroup.rules = updates.rules;
       }
@@ -156,13 +155,13 @@ oppia.factory('ResponsesService', [
       } else {
         _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x--;
       }
-      // _saveAnswerGroups(_answerGroups);
+      _saveAnswerGroups(_answerGroups);
     };
 
     var _makeRuleInvalid = function(answerGroupIndex, ruleIndex) {
       _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x =
         _answerChoices.length;
-      // _saveAnswerGroups(_answerGroups);
+      _saveAnswerGroups(_answerGroups);
     };
 
     return {
