@@ -25,18 +25,18 @@
   <ul uib-dropdown-menu class="protractor-test-search-bar-dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
     <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
         ng-if="selectionDetails.categories.selections[item.id]">
-      <a href ng-click="toggleSelection('categories', item.id)">
+      <a href="" ng-click="toggleSelection('categories', item.id)">
         <span translate="<[item.text]>" class="protractor-test-selected"></span>
         <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
       </a>
     </li>
     <li ng-if="selectionDetails.categories.numSelections > 1">
-      <a href ng-click="deselectAll('categories')"><i>Deselect All</i></a>
+      <a href="" ng-click="deselectAll('categories')"><i>Deselect All</i></a>
     </li>
     <hr ng-if="selectionDetails.categories.numSelections > 0" style="margin: 2px;">
     <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
         ng-if="!selectionDetails.categories.selections[item.id]">
-      <a href ng-click="toggleSelection('categories', item.id)">
+      <a href="" ng-click="toggleSelection('categories', item.id)">
         <span translate="<[item.text]>" class="protractor-test-deselected"></span>
         <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
       </a>
@@ -55,18 +55,18 @@
   <ul uib-dropdown-menu class="protractor-test-search-bar-dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
     <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
         ng-if="selectionDetails.languageCodes.selections[item.id]">
-      <a href ng-click="toggleSelection('languageCodes', item.id)">
+      <a href="" ng-click="toggleSelection('languageCodes', item.id)">
         <span translate="<[item.text]>" class="protractor-test-selected"></span>
         <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
       </a>
     </li>
     <li ng-if="selectionDetails.languageCodes.numSelections > 1">
-      <a href ng-click="deselectAll('languageCodes')"><i>Deselect All</i></a>
+      <a href="" ng-click="deselectAll('languageCodes')"><i>Deselect All</i></a>
     </li>
     <hr ng-if="selectionDetails.languageCodes.numSelections > 0" style="margin: 2px;">
     <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
         ng-if="!selectionDetails.languageCodes.selections[item.id]">
-      <a href ng-click="toggleSelection('languageCodes', item.id)">
+      <a href="" ng-click="toggleSelection('languageCodes', item.id)">
         <span translate="<[item.text]>" class="protractor-test-deselected"></span>
         <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
       </a>
