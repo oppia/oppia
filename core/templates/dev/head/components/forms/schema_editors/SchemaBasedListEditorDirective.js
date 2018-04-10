@@ -17,12 +17,12 @@
  */
 
 oppia.directive('schemaBasedListEditor', [
-  'SchemaDefaultValueService',
+  'SchemaDefaultValueService', 'ResponsesService',
   'NestedDirectivesRecursionTimeoutPreventionService',
   'FocusManagerService', 'SchemaUndefinedLastElementService',
   'IdGenerationService', 'UrlInterpolationService',
   function(
-      SchemaDefaultValueService,
+      SchemaDefaultValueService, ResponsesService,
       NestedDirectivesRecursionTimeoutPreventionService,
       FocusManagerService, SchemaUndefinedLastElementService,
       IdGenerationService, UrlInterpolationService) {
@@ -200,6 +200,17 @@ oppia.directive('schemaBasedListEditor', [
           $scope.deleteElement = function(index) {
             // Need to let the RTE know that HtmlContent has been changed.
             $scope.$broadcast('externalHtmlContentChange');
+            var answerGroups = ResponsesService.getAnswerGroups();
+            for (var i = 0; i < answerGroups.length; i++) {
+              var rules = answerGroups[i].rules;
+              for (var j = 0; j < rules.length; j++) {
+                if (index < rules[j].inputs.x) {
+                  ResponsesService.reduceRuleIndexByOne(i, j);
+                } else if (index === rules[j].inputs.x) {
+                  ResponsesService.makeRuleInvalid(i, j);
+                }
+              }
+            }
             $scope.localValue.splice(index, 1);
           };
         } else {
