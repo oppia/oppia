@@ -941,11 +941,14 @@ def _check_directive_scope(all_files):
                                     directive_has_isolated_scope = True
                                 elif scope_value['type'] == 'Literal' and scope_value['value']:
                                     failed = True
-                                    print 'Please ensure that %s directive in %s file does not have scope set to true.' %(directive_name, filename)
+                                    print (
+                                        'Please ensure that %s directive in %s file'
+                                        'does not have scope set to true.' % (directive_name, filename))
             if not directive_has_isolated_scope:
                 failed = True
-                print 'Please ensure that %s directive in %s file has a scope: {}.' %(directive_name, filename)                                                
-
+                print (
+                    'Please ensure that %s directive in %s file'
+                    'has a scope: {}.' % (directive_name, filename))
     if failed:
         summary_message = '%s   Directive scope check failed' % (
             _MESSAGE_TYPE_FAILED)
@@ -966,7 +969,7 @@ def _check_directive_scope(all_files):
 
 def main():
     all_files = _get_all_files()
-    # directive_scope_messages = _check_directive_scope(all_files)
+    # TODO(apb7): Enable the _check_directive_scope function.
     directive_scope_messages = []
     html_directive_name_messages = _check_html_directive_name(all_files)
     import_order_messages = _check_import_order(all_files)
