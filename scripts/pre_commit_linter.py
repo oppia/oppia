@@ -728,10 +728,10 @@ def _check_comments(all_files):
                     # Check that the comment ends with the proper punctuation.
                     last_char_is_invalid = line[-1] not in (
                         ALLOWED_TERMINATING_PUNCTUATIONS)
-                    some_word_is_present_in_excluded_phrases = not any(
+                    no_word_is_present_in_excluded_phrases = not any(
                         word in line for word in EXCLUDED_PHRASES)
                     if last_char_is_invalid and (
-                            some_word_is_present_in_excluded_phrases):
+                            no_word_is_present_in_excluded_phrases):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, message)
@@ -808,10 +808,10 @@ def _check_docstrings(all_files):
                         # Check for punctuation at end of docstring.
                         last_char_is_invalid = line[-1] not in (
                             ALLOWED_TERMINATING_PUNCTUATIONS)
-                        some_word_is_present_in_excluded_phrases = not any(
+                        no_word_is_present_in_excluded_phrases = not any(
                             word in line for word in EXCLUDED_PHRASES)
                         if last_char_is_invalid and (
-                                some_word_is_present_in_excluded_phrases):
+                                no_word_is_present_in_excluded_phrases):
                             failed = True
                             print '%s --> Line %s: %s' % (
                                 filename, line_num, missing_period_message)
