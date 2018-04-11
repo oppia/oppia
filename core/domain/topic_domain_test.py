@@ -17,9 +17,8 @@
 """Tests for topic domain objects."""
 
 from core.domain import topic_domain
-from core.tests import test_utils
 from core.domain import user_services
-import utils
+from core.tests import test_utils
 
 
 class TopicDomainUnitTests(test_utils.GenericTestBase):
@@ -36,7 +35,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
         self.user_a = user_services.UserActionsInfo(self.user_id_a)
         self.user_b = user_services.UserActionsInfo(self.user_id_b)
-    
+
     def test_to_dict(self):
         user_ids = [self.user_id_a, self.user_id_b]
         topic_rights = topic_domain.TopicRights(
@@ -55,6 +54,3 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(topic_rights.is_manager(self.user_id_a))
         self.assertTrue(topic_rights.is_manager(self.user_id_b))
         self.assertFalse(topic_rights.is_manager('user3'))
-
-
-

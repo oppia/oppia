@@ -16,11 +16,11 @@
 
 """Commands for operations on topics, and related models."""
 
+import logging
 from core.domain import role_services
 from core.domain import topic_domain
 from core.domain import user_services
 from core.platform import models
-import logging
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
@@ -86,7 +86,7 @@ def get_topic_rights(topic_id, strict=True):
 
     Returns:
         TopicRights. The rights object associated with the given topic.
-    
+
     Raises:
         EntityNotFoundError. The topic with ID topic_id was not
             found in the datastore.
@@ -130,7 +130,7 @@ def assign_role(committer, assignee_id, new_role, topic_id):
             who is performing the action.
         assignee_id: str. ID of the user whose role is being changed.
         new_role: str. The name of the new role
-            ROLE_MANAGER 
+            ROLE_MANAGER
             (TODO: Add more roles here if required)
         topic_id: str. ID of the topic.
 

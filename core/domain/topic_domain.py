@@ -27,13 +27,14 @@ CMD_CHANGE_ROLE = 'change_role'
 ROLE_MANAGER = 'manager'
 ROLE_NONE = 'none'
 
+
 class TopicRights(object):
     """Domain object for topic rights."""
-    
+
     def __init__(self, topic_id, manager_ids):
         self.id = topic_id
         self.manager_ids = manager_ids
-    
+
     def to_dict(self):
         """Returns a dict suitable for use by the frontend.
 

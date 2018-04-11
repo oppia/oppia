@@ -17,8 +17,6 @@
 """Model for an Oppia topic."""
 
 import core.storage.base_model.gae_models as base_models
-import core.storage.user.gae_models as user_models
-import feconf
 
 from google.appengine.ext import ndb
 

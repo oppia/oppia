@@ -21,9 +21,6 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 
-import feconf
-import utils
-
 
 class TopicServicesUnitTests(test_utils.GenericTestBase):
     """Tests for topic domain objects."""
@@ -79,8 +76,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.create_new_topic_rights(
             self.topic_id, self.user_id_admin)
         topic_services.assign_role(
-                self.user_admin, self.user_id_a,
-                topic_domain.ROLE_MANAGER, self.topic_id)
+            self.user_admin, self.user_id_a,
+            topic_domain.ROLE_MANAGER, self.topic_id)
         with self.assertRaisesRegexp(
             Exception, 'This user already is a manager for this topic'):
             topic_services.assign_role(

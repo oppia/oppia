@@ -552,6 +552,7 @@ def require_user_id_else_redirect_to_homepage(handler):
 
     return test_login
 
+
 def can_edit_topic(handler):
     """Decorator to check whether the user can edit given topic."""
     def test_can_edit(self, topic_id, **kwargs):

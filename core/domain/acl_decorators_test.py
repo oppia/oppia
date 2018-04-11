@@ -1027,8 +1027,9 @@ class AccessLearnerDashboardDecoratorTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         self.logout()
 
+
 class EditTopicDecoratorTest(test_utils.GenericTestBase):
-    """Tests the decorator can_edit_topic"""
+    """Tests the decorator can_edit_topic."""
     username1 = 'topicmanager'
     user_email1 = 'user@example.com'
     username2 = 'normaluser'
@@ -1047,7 +1048,7 @@ class EditTopicDecoratorTest(test_utils.GenericTestBase):
         self.signup(self.user_email2, self.username2)
         self.set_admins([self.ADMIN_USERNAME])
         self.set_topic_managers([self.username1])
-        
+
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.manager_id = self.get_user_id_from_email(self.user_email1)
         self.admin = user_services.UserActionsInfo(self.admin_id)
