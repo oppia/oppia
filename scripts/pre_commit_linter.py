@@ -608,7 +608,8 @@ def _check_bad_patterns(all_files):
     total_error_count = 0
     summary_messages = []
     excluded_paths_for_bad_patterns = EXCLUDED_PATHS + (
-        os.getcwd() + '/./scripts/pre_commit_linter.py',)
+        os.getcwd() + '/./scripts/pre_commit_linter.py',
+        './scripts/pre_commit_linter.py')
     all_files = [
         filename for filename in all_files if not
         any(
