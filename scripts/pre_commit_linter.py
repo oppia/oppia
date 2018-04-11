@@ -607,15 +607,12 @@ def _check_bad_patterns(all_files):
     total_files_checked = 0
     total_error_count = 0
     summary_messages = []
-    excluded_paths_for_bad_patterns = EXCLUDED_PATHS + (
-        os.getcwd() + '/./scripts/pre_commit_linter.py',
-        './scripts/pre_commit_linter.py')
     all_files = [
-        filename for filename in all_files if not
-        any(
-            fnmatch.fnmatch(
-                filename, pattern) for pattern in (
-                    excluded_paths_for_bad_patterns))]
+        filename for filename in all_files if not (
+            any(
+                fnmatch.fnmatch(
+                    filename, pattern) for pattern in EXCLUDED_PATHS) or (
+                        filename.endswith('pre_commit_linter.py')))]
     failed = False
     for filename in all_files:
         with open(filename) as f:
