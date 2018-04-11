@@ -609,10 +609,11 @@ def _check_bad_patterns(all_files):
     summary_messages = []
     all_files = [
         filename for filename in all_files if not (
+            filename.endswith('pre_commit_linter.py') or
             any(
-                fnmatch.fnmatch(
-                    filename, pattern) for pattern in EXCLUDED_PATHS) or (
-                        filename.endswith('pre_commit_linter.py')))]
+                fnmatch.fnmatch(filename, pattern)
+                for pattern in EXCLUDED_PATHS)
+            )]
     failed = False
     for filename in all_files:
         with open(filename) as f:
@@ -725,11 +726,12 @@ def _check_comments(all_files):
 
                 if line.startswith('#') and not next_line.startswith('#'):
                     # Check that the comment ends with the proper punctuation.
-                    if (line[-1] not in
-                            ALLOWED_TERMINATING_PUNCTUATIONS) and (
-                                not any(
-                                    word in line for word in (
-                                        EXCLUDED_PHRASES))):
+                    punctuation_is_allowed = line[-1] in (
+                        ALLOWED_TERMINATING_PUNCTUATIONS)
+                    word_is_present_in_excluded_phrases = not any(
+                        word in line for word in EXCLUDED_PHRASES)
+                    if not (punctuation_is_allowed) and (
+                            word_is_present_in_excluded_phrases):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, message)
@@ -804,11 +806,12 @@ def _check_docstrings(all_files):
                     if line == '"""':
                         line = file_content[line_num - 1].lstrip().rstrip()
                         # Check for punctuation at end of docstring.
-                        if (line[-1] not in
-                                ALLOWED_TERMINATING_PUNCTUATIONS) and (
-                                    not any(
-                                        word in line for word in (
-                                            EXCLUDED_PHRASES))):
+                        punctuation_is_allowed = line[-1] in (
+                            ALLOWED_TERMINATING_PUNCTUATIONS)
+                        word_is_present_in_excluded_phrases = not any(
+                            word in line for word in EXCLUDED_PHRASES)
+                        if not (punctuation_is_allowed) and (
+                                word_is_present_in_excluded_phrases):
                             failed = True
                             print '%s --> Line %s: %s' % (
                                 filename, line_num, missing_period_message)
