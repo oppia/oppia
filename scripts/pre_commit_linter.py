@@ -726,12 +726,12 @@ def _check_comments(all_files):
 
                 if line.startswith('#') and not next_line.startswith('#'):
                     # Check that the comment ends with the proper punctuation.
-                    punctuation_is_allowed = line[-1] in (
+                    last_char_is_invalid = line[-1] not in (
                         ALLOWED_TERMINATING_PUNCTUATIONS)
-                    word_is_present_in_excluded_phrases = not any(
+                    some_word_is_present_in_excluded_phrases = not any(
                         word in line for word in EXCLUDED_PHRASES)
-                    if not (punctuation_is_allowed) and (
-                            word_is_present_in_excluded_phrases):
+                    if last_char_is_invalid and (
+                            some_word_is_present_in_excluded_phrases):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, message)
@@ -806,12 +806,12 @@ def _check_docstrings(all_files):
                     if line == '"""':
                         line = file_content[line_num - 1].lstrip().rstrip()
                         # Check for punctuation at end of docstring.
-                        punctuation_is_allowed = line[-1] in (
+                        last_char_is_invalid = line[-1] not in (
                             ALLOWED_TERMINATING_PUNCTUATIONS)
-                        word_is_present_in_excluded_phrases = not any(
+                        some_word_is_present_in_excluded_phrases = not any(
                             word in line for word in EXCLUDED_PHRASES)
-                        if not (punctuation_is_allowed) and (
-                                word_is_present_in_excluded_phrases):
+                        if last_char_is_invalid and (
+                                some_word_is_present_in_excluded_phrases):
                             failed = True
                             print '%s --> Line %s: %s' % (
                                 filename, line_num, missing_period_message)
