@@ -17,6 +17,7 @@
 """Commands for operations on topics, and related models."""
 
 import logging
+
 from core.domain import role_services
 from core.domain import topic_domain
 from core.domain import user_services
