@@ -46,7 +46,8 @@
   </div>
   <div ng-if="stateSolutionService.savedMemento.explanation && !stateSolutionService.savedMemento.explanation.isEmpty()">
    <subtitled-html-editor component-name="<[COMPONENT_NAME_SOLUTION]>"
-                          subtitled-html="stateSolutionService.displayed.explanation">
+                          subtitled-html="stateSolutionService.displayed.explanation"
+                          subtitled-display="stateSolutionService">
    </subtitled-html-editor>
   </div>
 </div>

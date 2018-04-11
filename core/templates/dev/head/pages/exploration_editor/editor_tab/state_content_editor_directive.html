@@ -27,7 +27,8 @@
   </div>
  <div ng-if="stateContentService.savedMemento && !stateContentService.savedMemento.isEmpty()">
    <subtitled-html-editor component-name="<[COMPONENT_NAME_CONTENT]>"
-                          subtitled-html="stateContentService.displayed">
+                          subtitled-html="stateContentService.displayed"
+                          subtitled-display="stateContentService">
    </subtitled-html-editor>
  </div>
 </div>

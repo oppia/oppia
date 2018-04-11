@@ -17,13 +17,17 @@
  */
 
 oppia.directive('subtitledHtmlEditor', [
-  'UrlInterpolationService', 'SubtitledHtmlObjectFactory',
-  function(UrlInterpolationService, SubtitledHtmlObjectFactory){
+  'UrlInterpolationService', 'SubtitledHtmlObjectFactory', 
+  'SubtitledHtmlObjectFactory',
+  function(
+  	UrlInterpolationService, SubtitledHtmlObjectFactory,
+    SubtitledHtmlObjectFactory) {
     return {
       restrict: 'E',
       scope: {
         subtitledHtml: '=',
-        getOnSaveFn: '&onSaveFn'
+        getOnSaveFn: '&onSaveFn',
+        subtitledDisplay: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/subtitled_html_editor_directive.html'),
@@ -49,7 +53,7 @@ oppia.directive('subtitledHtmlEditor', [
               $scope.subtitledHtml.html.markAllAudioAsNeedingUpdate();
               $scope.subtitledMemento.html = angular.copy(
                 $scope.subtitledHtml.html);
-              $scope.getOnSaveFn()();
+              $scope.subtitledDisplay.saveDisplayedValue();
             });
           };
 
@@ -65,7 +69,7 @@ oppia.directive('subtitledHtmlEditor', [
               contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
-            $scope.getOnSaveFn()();
+            $scope.subtitledDisplay.saveDisplayedValue();
           };
 
 
@@ -76,7 +80,7 @@ oppia.directive('subtitledHtmlEditor', [
           };
 
           $scope.onAudioTranslationsEdited = function() {
-            $scope.getOnSaveFn()();
+            $scope.subtitledDisplay.saveDisplayedValue();
           };
         }
       ]
