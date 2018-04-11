@@ -23,9 +23,9 @@
     </ul>
     <ul ng-if="!windowIsNarrow" class="nav oppia-navbar-tabs">
       <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY" class="oppia-clickable-navbar-element">
-        <a class="oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
+        <a ng-mouseover="blurNavigationLinks($event)" class="axc oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
       </li>
-      <li ng-class="{'open' : activeMenu === 'aboutMenu'}" uib-dropdown ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
+      <li ng-class="{'open' : activeMenuName === 'aboutMenu'}" uib-dropdown ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
         <a ng-keydown="onMenuKeypress($event, 'aboutMenu', {shiftTab: 'close', enter: 'open'})" class="oppia-navbar-tab"
            role="menuitem"
            aria-haspopup="true"
@@ -48,7 +48,7 @@
           <li><a ng-keydown="onMenuKeypress($event, 'aboutMenu', {tab: 'close'})" class="oppia-navbar-tab-content" href="http://oppiafoundation.org/get-involved" target="_blank" translate="I18N_TOPNAV_GET_INVOLVED"></a></li>
         </ul>
       </li>
-      <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_DONATE">
+      <li ng-mouseover="blurNavigationLinks($event)" ng-show="navElementsVisibilityStatus.I18N_TOPNAV_DONATE">
         <div class="oppia-navbar-button-container">
           <a href="/donate"
              class="btn oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200">
@@ -56,11 +56,11 @@
           </a>
         </div>
       </li>
-      <create-activity-button ng-show="navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE"></create-activity-button>
+      <create-activity-button ng-mouseover="blurNavigationLinks($event)" ng-show="navElementsVisibilityStatus.I18N_CREATE_EXPLORATION_CREATE"></create-activity-button>
     </ul>
   </ul>
   <ul class="nav oppia-navbar-nav oppia-navbar-profile">
-    <li ng-class="{'open' : activeMenu === 'profileMenu'}" uib-dropdown ng-if="username" class="protractor-test-profile-dropdown">
+    <li ng-class="{'open' : activeMenuName === 'profileMenu'}" uib-dropdown ng-if="username" class="protractor-test-profile-dropdown">
       <a uib-dropdown-toggle class="oppia-navbar-dropdown-toggle"
          ng-mouseover="openSubmenu($event, 'profileMenu')"
          ng-mouseleave="closeSubmenu($event)"
@@ -103,7 +103,7 @@
           ng-mouseover="openSubmenu($event, 'profileMenu')"
           ng-mouseleave="closeSubmenu($event)">
         <li>
-          <a ng-click="onMouseoutProfilePictureOrDropdown($event)" ng-href="<[profilePageUrl]>"
+          <a ng-click="closeSubmenu($event)" ng-href="<[profilePageUrl]>"
              class="protractor-test-profile-link"
              ng-keydown="onMenuKeypress($event, 'profileMenu', {shiftTab: 'close'})">
             <strong><[username]></strong>
@@ -111,19 +111,19 @@
         </li>
         <hr class="oppia-top-right-menu-item-separator">
         <li>
-          <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/creator_dashboard"
+          <a ng-click="closeSubmenu($event)" href="/creator_dashboard"
              class="protractor-test-dashboard-link">
             <span translate="I18N_TOPNAV_CREATOR_DASHBOARD"></span>
           </a>
         </li>
         <li>
-          <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/learner_dashboard"
+          <a ng-click="closeSubmenu($event)" href="/learner_dashboard"
              class="protractor-test-dashboard-link">
             <span translate="I18N_TOPNAV_LEARNER_DASHBOARD"></span>
           </a>
         </li>
         <li>
-          <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/notifications_dashboard"
+          <a ng-click="closeSubmenu($event)" href="/notifications_dashboard"
              class="protractor-test-notifications-link">
             <span translate="I18N_TOPNAV_NOTIFICATIONS"></span>
             <span ng-if="numUnseenNotifications > 0">
@@ -132,18 +132,18 @@
           </a>
         </li>
         <li>
-          <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/preferences"
+          <a ng-click="closeSubmenu($event)" href="/preferences"
              class="protractor-test-preferences-link">
             <span translate="I18N_TOPNAV_PREFERENCES"></span>
           </a>
         </li>
         <li ng-if="isModerator">
-          <a ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/moderator" target="_blank">
+          <a ng-click="closeSubmenu($event)" href="/moderator" target="_blank">
             <span translate="I18N_TOPNAV_MODERATOR_PAGE"></span>
           </a>
         </li>
         <li ng-if="isSuperAdmin">
-          <a class="protractor-test-admin-link" ng-click="onMouseoutProfilePictureOrDropdown($event)" href="/admin" target="_blank">
+          <a class="protractor-test-admin-link" ng-click="closeSubmenu($event)" href="/admin" target="_blank">
             <span translate="I18N_TOPNAV_ADMIN_PAGE"></span>
           </a>
         </li>
@@ -151,7 +151,7 @@
         <hr class="oppia-top-right-menu-item-separator">
 
         <li>
-          <a ng-click="onMouseoutProfilePictureOrDropdown($event);onLogoutButtonClicked()" ng-href="<[logoutUrl]>"
+          <a ng-click="closeSubmenu($event);onLogoutButtonClicked()" ng-href="<[logoutUrl]>"
             ng-keydown="onMenuKeypress($event, 'profileMenu', {tab: 'close'})">
             <span translate="I18N_TOPNAV_LOGOUT"></span>
           </a>

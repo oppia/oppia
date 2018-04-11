@@ -41,7 +41,7 @@ oppia.directive('topNavigationBar', [
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           
-          $scope.activeMenu = '';
+          $scope.activeMenuName = '';
           $scope.username = GLOBALS.username;
           $scope.profilePictureDataUrl = GLOBALS.profilePictureDataUrl;
           $scope.isAdmin = GLOBALS.isAdmin;
@@ -50,15 +50,15 @@ oppia.directive('topNavigationBar', [
           $scope.logoutUrl = GLOBALS.logoutUrl;
           $scope.KEYBOARD_EVENT_TO_KEY_CODES = {
             enter: {
-              isShiftKeyPressed: false,
+              shiftKeyIsPressed: false,
               keyCode: 13
             },
             tab: {
-              isShiftKeyPressed: false,
+              shiftKeyIsPressed: false,
               keyCode: 9
             },
             shiftTab: {
-              isShiftKeyPressed: true,
+              shiftKeyIsPressed: true,
               keyCode: 9
             }
           };
@@ -83,57 +83,61 @@ oppia.directive('topNavigationBar', [
           };
 
           /**
-           * opens the submenu.
+           * Opens the submenu.
            * @param {object} evt
-           * @param {String} menu - name of menu, on which
+           * @param {String} menuName - name of menu, on which
            * open/close action to be performed (aboutMenu,profileMenu).
            */
-          $scope.openSubmenu = function(evt, menu) {
-            //focus the current target before opening it's submenu.
+          $scope.openSubmenu = function(evt, menuName) {
+            // Focus on the current target before opening its submenu.
             angular.element(evt.currentTarget).focus();
-            $scope.activeMenu = menu;
+            $scope.activeMenuName = menuName;
+          };
+          $scope.blurNavigationLinks = function(evt) {
+            // This is required because if about submenu is in open state
+            // and when you hover on library, both will be highlighted,
+            // To avoid that, blur all the a's in nav, so that only one 
+            // will be highlighted.
+            $('nav a').blur();
           };
           $scope.closeSubmenu = function(evt) {
-            $scope.activeMenu = '';
-            if (evt.currentTarget.nodeName === 'UL') {
-              if (angular.element(evt.currentTarget).closest('li')
-                .find('a').is(':focus')) {
-                angular.element(evt.currentTarget).closest('li')
-                  .find('a').blur();
-              }
-            }
+            $scope.activeMenuName = '';
+            angular.element(evt.currentTarget).closest('li')
+              .find('a').blur();
           };
           /**
            * Handles keydown events on menus.
            * @param {object} evt
-           * @param {String} menu - name of menu to perform action 
+           * @param {String} menuName - name of menu to perform action 
            * on(aboutMenu/profileMenu)
-           * @param {object} actions - Map keyboard events('Enter') to
+           * @param {object} eventsTobeHandled - Map keyboard events('Enter') to
            * corresponding actions to be performed(open/close).
            * 
            * @example
            *  onMenuKeypress($event, 'aboutMenu', {enter: 'open'})
            */
-          $scope.onMenuKeypress = function(evt, menu, eventsTobeHandled) {
+          $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
             var targetEvents = Object.keys(eventsTobeHandled);
             for (var i = 0; i < targetEvents.length; i++) {
-              if ($scope.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]]
-                .keyCode === evt.keyCode && evt.shiftKey === 
-                $scope.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]]
-                  .isShiftKeyPressed) {
+              var keyCodeSpec = 
+                $scope.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
+              if (keyCodeSpec.keyCode === evt.keyCode && 
+                evt.shiftKey === keyCodeSpec.shiftKeyIsPressed) {
                 if (eventsTobeHandled[targetEvents[i]] === 'open') {
-                  $scope.openSubmenu(evt, menu);
-                } else {
+                  $scope.openSubmenu(evt, menuName);
+                } else if (eventsTobeHandled[targetEvents[i]] === 'close') {
                   $scope.closeSubmenu(evt);
+                } else {
+                  throw Error('Invalid action type.');
                 }
               }
             }
           };
-          //Close the submenu if focus or click occurs anywhere outside of 
-          //the menu or outside of it's parent(which opens submenu on hover).
+          // Close the submenu if focus or click occurs anywhere outside of 
+          // the menu or outside of its parent (which opens submenu on hover).
           angular.element(document).on('click', function(evt) {
             if (!angular.element(evt.target).closest('li').length) {
-              $scope.activeMenu = '';
+              $scope.activeMenuName = '';
               $scope.$apply();
             }
           });
