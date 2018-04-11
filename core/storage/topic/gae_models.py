@@ -23,11 +23,25 @@ import feconf
 from google.appengine.ext import ndb
 
 
-class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
-    """Storage model for the metadata for a collection snapshot."""
+class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    """Storage model for the metadata for a topic rights snapshot."""
     pass
 
 
-class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
-    """Storage model for the content of a collection snapshot."""
+class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Storage model for the content of a topic rights snapshot."""
     pass
+
+
+class TopicRightsModel(base_models.VersionedModel):
+    """Storage model for rights related to a topic.
+
+    The id of each instance is the id of the corresponding topic.
+    """
+
+    SNAPSHOT_METADATA_CLASS = TopicRightsSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = TopicRightsSnapshotContentModel
+    ALLOW_REVERT = False
+
+    # The user_ids of the managers of this topic.
+    manager_ids = ndb.StringProperty(indexed=True, repeated=True)

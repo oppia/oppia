@@ -17,6 +17,8 @@
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import rights_manager
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -1023,4 +1025,53 @@ class AccessLearnerDashboardDecoratorTest(test_utils.GenericTestBase):
         self.login(self.user_email)
         response = self.testapp.get('/mock/', expect_errors=True)
         self.assertEqual(response.status_int, 200)
+        self.logout()
+
+class EditTopicDecoratorTest(test_utils.GenericTestBase):
+    """Tests the decorator can_edit_topic"""
+    username1 = 'topicmanager'
+    user_email1 = 'user@example.com'
+    username2 = 'normaluser'
+    user_email2 = 'user2@example.com'
+    topic_id = 'topic_1'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_edit_topic
+        def get(self, topic_id):
+            self.render_json({'topic_id': topic_id})
+
+    def setUp(self):
+        super(EditTopicDecoratorTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.user_email1, self.username1)
+        self.signup(self.user_email2, self.username2)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_topic_managers([self.username1])
+        
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.manager_id = self.get_user_id_from_email(self.user_email1)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.manager = user_services.UserActionsInfo(self.manager_id)
+
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<topic_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
+        topic_services.assign_role(
+            self.admin, self.manager_id, topic_domain.ROLE_MANAGER,
+            self.topic_id)
+
+    def test_topic_manager_can_edit_topic(self):
+        self.login(self.user_email1)
+        response = self.testapp.get(
+            '/mock/%s' % self.topic_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_normal_user_cannot_edit_topic(self):
+        self.login(self.user_email2)
+        response = self.testapp.get(
+            '/mock/%s' % self.topic_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
         self.logout()
