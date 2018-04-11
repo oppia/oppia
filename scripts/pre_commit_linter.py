@@ -57,6 +57,7 @@ import re
 import subprocess
 import sys
 import time
+
 # pylint: enable=wrong-import-order
 
 _PARSER = argparse.ArgumentParser()
@@ -167,8 +168,8 @@ EXCLUDED_PHRASES = [
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'integrations/*','integrations_dev/*','*.svg',
-    '*.png', '*.zip', '*.ico', '*.jpg','*.min.js',
+    'integrations/*', 'integrations_dev/*', '*.svg',
+    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
     'assets/scripts/*', 'core/tests/data/*', '*.mp3')
 
 
@@ -213,9 +214,13 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
-import isort             # pylint: disable=wrong-import-position
-import pycodestyle       # pylint: disable=wrong-import-position
-from pylint import lint  # pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position
+
+import isort  # isort:skip
+import pycodestyle  # isort:skip
+from pylint import lint  # isort:skip
+
+# pylint: enable=wrong-import-position
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
@@ -602,9 +607,14 @@ def _check_bad_patterns(all_files):
     total_files_checked = 0
     total_error_count = 0
     summary_messages = []
+    excluded_paths_for_bad_patterns = EXCLUDED_PATHS + (
+        os.getcwd() + '/./scripts/pre_commit_linter.py',)
     all_files = [
         filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+        any(
+            fnmatch.fnmatch(
+                filename, pattern) for pattern in (
+                    excluded_paths_for_bad_patterns))]
     failed = False
     for filename in all_files:
         with open(filename) as f:
@@ -719,7 +729,9 @@ def _check_comments(all_files):
                     # Check that the comment ends with the proper punctuation.
                     if (line[-1] not in
                             ALLOWED_TERMINATING_PUNCTUATIONS) and (
-                                not any(word in line for word in EXCLUDED_PHRASES)):
+                                not any(
+                                    word in line for word in (
+                                        EXCLUDED_PHRASES))):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, message)
@@ -796,7 +808,9 @@ def _check_docstrings(all_files):
                         # Check for punctuation at end of docstring.
                         if (line[-1] not in
                                 ALLOWED_TERMINATING_PUNCTUATIONS) and (
-                                    not any(word in line for word in EXCLUDED_PHRASES)):
+                                    not any(
+                                        word in line for word in (
+                                            EXCLUDED_PHRASES))):
                             failed = True
                             print '%s --> Line %s: %s' % (
                                 filename, line_num, missing_period_message)
