@@ -302,10 +302,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state_name = 'Home'
         interaction_id = 'TextInput'
 
-        job_id = classifier_services.create_classifier_training_job(
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
-                'algorithm_id'], interaction_id, exp_id, 1, state_name,
-            [], feconf.TRAINING_JOB_STATUS_NEW)
+                'algorithm_id'], interaction_id, exp_id, 1,
+            datetime.datetime.utcnow(), [], state_name,
+            feconf.TRAINING_JOB_STATUS_NEW, None, 1
+        )
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
@@ -332,10 +334,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state_name = 'Home'
         interaction_id = 'TextInput'
 
-        job_id = classifier_services.create_classifier_training_job(
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
-                'algorithm_id'], interaction_id, exp_id, 1, state_name,
-            [], feconf.TRAINING_JOB_STATUS_PENDING)
+                'algorithm_id'], interaction_id, exp_id, 1,
+            datetime.datetime.utcnow(), [], state_name,
+            feconf.TRAINING_JOB_STATUS_PENDING, None, 1
+        )
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
@@ -363,14 +367,18 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         interaction_id = 'TextInput'
         exp2_id = u'2'
 
-        job1_id = classifier_services.create_classifier_training_job(
+        job1_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
-                'algorithm_id'], interaction_id, exp1_id, 1, state_name,
-            [], feconf.TRAINING_JOB_STATUS_NEW)
-        classifier_services.create_classifier_training_job(
+                'algorithm_id'], interaction_id, exp1_id, 1,
+            datetime.datetime.utcnow(), [], state_name,
+            feconf.TRAINING_JOB_STATUS_NEW, None, 1
+        )
+        classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
-                'algorithm_id'], interaction_id, exp2_id, 1, state_name,
-            [], feconf.TRAINING_JOB_STATUS_PENDING)
+                'algorithm_id'], interaction_id, exp2_id, 1,
+            datetime.datetime.utcnow(), [], state_name,
+            feconf.TRAINING_JOB_STATUS_PENDING, None, 1
+        )
         # This will get the job_id of the exploration created in setup.
         classifier_services.fetch_next_job()
         next_job = classifier_services.fetch_next_job()

@@ -123,7 +123,7 @@
           </span>
         </div>
 
-        <div style="color:#ff0000; margin-top: 7px;" ng-if="tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable'">
+        <div style="color:#ff0000; margin-top: 7px;" ng-if="!tmpMessage.text && (tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable')">
           <i class="material-icons">&#xE88F;</i>
           <span>Please specify a reason for setting the status to <[getHumanReadableStatus(tmpMessage.status)]>.</span>
         </div>
