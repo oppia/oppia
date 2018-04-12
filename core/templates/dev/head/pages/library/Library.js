@@ -83,31 +83,26 @@ oppia.controller('Library', [
         $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
         var activityDetails = {};
         if ($scope.userIsLoggedIn) {
-          $scope.activityPlaylistData = {explorations: {}, collections: {}};
+          $scope.activitiesOwned = {explorations: {}, collections: {}};
           $http.get('/creatordashboardhandler/data')
             .then(function(response) {
               $scope.libraryGroups.forEach(function(activityGroups) {
                 var activity = activityGroups.activity_summary_dicts;
 
                 activity.forEach(function(activity) {
+                  $scope.activitiesOwned.explorations[activity.id] = false;
+                  $scope.activitiesOwned.collections[activity.id] = false;
+
                   response.data.explorations_list.forEach(
-                    function(responseExploration) {
-                      if (responseExploration.id === activity.id) {
-                        $scope.activityPlaylistData
-                          .explorations[activity.id] = true;
-                      } else {
-                        $scope.activityPlaylistData
-                          .explorations[activity.id] = false;
+                    function(ownedExploration) {
+                      if (ownedExploration.id === activity.id) {
+                        $scope.activitiesOwned.explorations[activity.id] = true;
                       }
                     });
                   response.data.collections_list.forEach(
-                    function(responseCollection) {
-                      if (responseCollection.id === activity.id) {
-                        $scope.activityPlaylistData
-                          .collections[activity.id] = true;
-                      } else {
-                        $scope.activityPlaylistData
-                          .collections[activity.id] = false;
+                    function(ownedCollection) {
+                      if (ownedCollection.id === activity.id) {
+                        $scope.activitiesOwned.collections[activity.id] = true;
                       }
                     });
                 });
