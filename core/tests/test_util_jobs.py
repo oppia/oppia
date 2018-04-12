@@ -88,7 +88,7 @@ class ExpCopiesMRJobManager(
         its YAML representation.
 
         Args:
-            item: Exploration. An exploration storage model.
+            item: ExplorationModel. An exploration storage model.
 
         Yields:
             str. The string containing exploration id of each newly-created
@@ -175,7 +175,7 @@ class DeleteExpCopiesMRJobManager(
         category.
 
         Args:
-            item: Exploration. An exploration storage model.
+            item: ExplorationModel. An exploration storage model.
         """
         if item.category == 'Copies':
             exp_services.delete_exploration(
