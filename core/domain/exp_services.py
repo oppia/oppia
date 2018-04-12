@@ -139,7 +139,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     migration works correctly, and it should never be changed otherwise.
 
     Args:
-        exploration_model: An exploration storage model.
+        exploration_model: ExplorationModel. An exploration storage model.
         run_conversion: bool. When True, updates the exploration to the latest
             states_schema_version if necessary.
 
