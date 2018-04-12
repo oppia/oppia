@@ -48,6 +48,8 @@ oppia.directive('topNavigationBar', [
           $scope.isModerator = GLOBALS.isModerator;
           $scope.isSuperAdmin = GLOBALS.isSuperAdmin;
           $scope.logoutUrl = GLOBALS.logoutUrl;
+          $scope.ACTION_OPEN = 'open';
+          $scope.ACTION_CLOSE = 'close';
           $scope.KEYBOARD_EVENT_TO_KEY_CODES = {
             enter: {
               shiftKeyIsPressed: false,
@@ -123,9 +125,10 @@ oppia.directive('topNavigationBar', [
                 $scope.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
               if (keyCodeSpec.keyCode === evt.keyCode && 
                 evt.shiftKey === keyCodeSpec.shiftKeyIsPressed) {
-                if (eventsTobeHandled[targetEvents[i]] === 'open') {
+                if (eventsTobeHandled[targetEvents[i]] === $scope.ACTION_OPEN) {
                   $scope.openSubmenu(evt, menuName);
-                } else if (eventsTobeHandled[targetEvents[i]] === 'close') {
+                } else if (eventsTobeHandled[targetEvents[i]] === 
+                  $scope.ACTION_CLOSE) {
                   $scope.closeSubmenu(evt);
                 } else {
                   throw Error('Invalid action type.');

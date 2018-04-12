@@ -23,7 +23,7 @@
     </ul>
     <ul ng-if="!windowIsNarrow" class="nav oppia-navbar-tabs">
       <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY" class="oppia-clickable-navbar-element">
-        <a ng-mouseover="blurNavigationLinks($event)" class="axc oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
+        <a ng-mouseover="blurNavigationLinks($event)" class="oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
       </li>
       <li ng-class="{'open' : activeMenuName === 'aboutMenu'}" uib-dropdown ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
         <a ng-keydown="onMenuKeypress($event, 'aboutMenu', {shiftTab: 'close', enter: 'open'})" class="oppia-navbar-tab"
