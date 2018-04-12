@@ -25,7 +25,7 @@
       <li ng-show="navElementsVisibilityStatus.I18N_TOPNAV_LIBRARY" class="oppia-clickable-navbar-element">
         <a ng-mouseover="blurNavigationLinks($event)" class="oppia-navbar-tab oppia-navbar-tab-content" href="/library" translate="I18N_TOPNAV_LIBRARY"></a>
       </li>
-      <li ng-class="{'open' : activeMenuName === 'aboutMenu'}" uib-dropdown ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
+      <li ng-class="{<[ACTION_OPEN]> : activeMenuName === 'aboutMenu'}" uib-dropdown ng-show="navElementsVisibilityStatus.I18N_TOPNAV_ABOUT" class="oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
         <a ng-keydown="onMenuKeypress($event, 'aboutMenu', {shiftTab: 'close', enter: ACTION_OPEN})" class="oppia-navbar-tab"
            role="menuitem"
            aria-haspopup="true"
@@ -60,7 +60,7 @@
     </ul>
   </ul>
   <ul class="nav oppia-navbar-nav oppia-navbar-profile">
-    <li ng-class="{'open' : activeMenuName === 'profileMenu'}" uib-dropdown ng-if="username" class="protractor-test-profile-dropdown">
+    <li ng-class="{<[ACTION_OPEN]> : activeMenuName === 'profileMenu'}" uib-dropdown ng-if="username" class="protractor-test-profile-dropdown">
       <a uib-dropdown-toggle class="oppia-navbar-dropdown-toggle"
          ng-mouseover="openSubmenu($event, 'profileMenu')"
          ng-mouseleave="closeSubmenu($event)"
