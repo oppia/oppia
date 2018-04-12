@@ -244,6 +244,7 @@
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_NO_CURRENT_STATE": "Oups ! Cet état n’existe plus !",
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_SUGGESTED_STATE_CONTENT_HEADER": "Suggéré :",
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT": "Suggestion",
+	"I18N_LEARNER_DASHBOARD_TOOLTIP": "Les collections sont des explorations multiples reliées, qui sont prévues pour être achevées en une fois.",
 	"I18N_LEARNER_DASHBOARD_VIEW_SUGGESTION": "Afficher la suggestion",
 	"I18N_LIBRARY_ACTIVITY_COMPLETED_ICON": "Vous avez terminé ceci",
 	"I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST": "Déjà ajouté à la liste à jouer",
