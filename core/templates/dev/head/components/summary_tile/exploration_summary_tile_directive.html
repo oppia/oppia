@@ -4,7 +4,7 @@
                          activity-title="getExplorationTitle()"
                          container-is-narrow="isContainerNarrow()"
                          activity-active="explorationIsCurrentlyHoveredOver"
-                         should-show-add-to-playlist-icon="!belongsToCreatorPlaylist()">
+                         should-show-add-to-playlist-icon="!isOwnedByCurrentUser()">
 </learner-dashboard-icons>
 
 <md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}, {'oppia-activity-playlist-tile': isPlaylistTile()}]"
