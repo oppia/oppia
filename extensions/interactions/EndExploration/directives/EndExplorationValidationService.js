@@ -26,7 +26,7 @@ oppia.factory('EndExplorationValidationService', [
           customizationArgs, ['recommendedExplorationIds']);
 
         var recommendedExplorationIds = (
-            customizationArgs.recommendedExplorationIds.value);
+          customizationArgs.recommendedExplorationIds.value);
 
         if (!angular.isArray(recommendedExplorationIds)) {
           warningsList.push({
