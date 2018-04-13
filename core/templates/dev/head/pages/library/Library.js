@@ -97,7 +97,7 @@ oppia.controller('Library', [
 
                     if (ownedExploration.id === activity.id) {
                       $scope.activitiesOwned.explorations[activity.id] = true;
-                      continue;
+                      break;
                     }
                   }
                   for ( i = 0;
@@ -107,7 +107,7 @@ oppia.controller('Library', [
 
                     if (ownedCollection.id === activity.id) {
                       $scope.activitiesOwned.collections[activity.id] = true;
-                      continue;
+                      break;
                     }
                   }
                 });
