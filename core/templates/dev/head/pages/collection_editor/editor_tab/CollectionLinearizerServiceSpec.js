@@ -378,13 +378,13 @@ describe('Collection linearizer service', function() {
     });
   });
 
-  describe('getNextExplorationIds()', function() {
+  describe('getNextExplorationId()', function() {
     it('should return no exploration ids for a completed linear collection',
       function() {
         var collection = createLinearCollection();
         expect(
-          CollectionLinearizerService.getNextExplorationIds(
-            collection, ['exp_id0', 'exp_id1', 'exp_id2'])).toEqual([]);
+          CollectionLinearizerService.getNextExplorationId(
+            collection, ['exp_id0', 'exp_id1', 'exp_id2'])).toEqual(null);
       }
     );
 
@@ -392,8 +392,8 @@ describe('Collection linearizer service', function() {
       function() {
         var collection = createLinearCollection();
         expect(
-          CollectionLinearizerService.getNextExplorationIds(
-            collection, ['exp_id0', 'exp_id1'])).toEqual(['exp_id2']);
+          CollectionLinearizerService.getNextExplorationId(
+            collection, ['exp_id0', 'exp_id1'])).toEqual('exp_id2');
       }
     );
   });

@@ -130,19 +130,19 @@ def get_learner_collection_dict_by_id(
 
     # TODO(bhenning): Users should not be recommended explorations they have
     # completed outside the context of a collection (see #1461).
-    next_exploration_ids = None
+    next_exploration_id = None
     completed_exp_ids = None
     if user.user_id:
         completed_exp_ids = (
             collection_services.get_valid_completed_exploration_ids(
                 user.user_id, collection))
-        next_exploration_ids = collection.get_next_exploration_id(
+        next_exploration_id = collection.get_next_exploration_id(
             completed_exp_ids)
     else:
         # If the user is not logged in or they have not completed any of
         # the explorations yet within the context of this collection,
-        # recommend the initial explorations.
-        next_exploration_ids = collection.init_exploration_ids
+        # recommend the initial exploration.
+        next_exploration_id = collection.init_exploration_id
         completed_exp_ids = []
 
     collection_dict = collection.to_dict()
@@ -150,7 +150,7 @@ def get_learner_collection_dict_by_id(
         node.to_dict() for node in collection.get_nodes_in_playable_order()]
 
     collection_dict['playthrough_dict'] = {
-        'next_exploration_ids': next_exploration_ids,
+        'next_exploration_id': next_exploration_id,
         'completed_exploration_ids': completed_exp_ids
     }
     collection_dict['version'] = collection.version

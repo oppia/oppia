@@ -36,7 +36,7 @@ class QuestionModel(base_models.VersionedModel):
     """Model for storing Questions.
 
     The ID of instances of this class has the form
-    {{collection_id}}.{{random_hash_of_16_chars}}
+    {{random_hash_of_16_chars}}
     """
     SNAPSHOT_METADATA_CLASS = QuestionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = QuestionSnapshotContentModel
@@ -49,18 +49,13 @@ class QuestionModel(base_models.VersionedModel):
     # The schema version for the data.
     question_data_schema_version = (
         ndb.IntegerProperty(required=True, indexed=True))
-    # The ID of collection containing the question.
-    collection_id = ndb.StringProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
     @classmethod
-    def _get_new_id(cls, collection_id):
+    def _get_new_id(cls):
         """Generates a unique ID for the question of the form
-        {{collection_id}}.{{random_hash_of_16_chars}}
-
-        Args:
-            collection_id: str. The ID of collection containing the question.
+        {{random_hash_of_16_chars}}
 
         Returns:
            new_id: int. ID of the new QuestionModel instance.
@@ -71,8 +66,7 @@ class QuestionModel(base_models.VersionedModel):
         """
 
         for _ in range(base_models.MAX_RETRIES):
-            new_id = '%s.%s' % (
-                collection_id,
+            new_id = '%s' % (
                 utils.convert_to_hash(
                     str(utils.get_random_int(base_models.RAND_RANGE)),
                     base_models.ID_LENGTH))
@@ -86,15 +80,13 @@ class QuestionModel(base_models.VersionedModel):
     @classmethod
     def create(
             cls, title, question_data, question_data_schema_version,
-            collection_id, language_code):
+            language_code):
         """Creates a new QuestionModel entry.
 
         Args:
             title: str. The title of the question.
             question_data: dict. A dict representing the question data.
             question_data_schema_version: int. The schema version for the data.
-            collection_id: str. The ID of the collection containing the
-                question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
@@ -104,12 +96,11 @@ class QuestionModel(base_models.VersionedModel):
         Raises:
             Exception: A model with the same ID already exists.
         """
-        instance_id = cls._get_new_id(collection_id)
+        instance_id = cls._get_new_id()
         question_model_instance = cls(
             id=instance_id, title=title,
             question_data=question_data,
             question_data_schema_version=question_data_schema_version,
-            collection_id=collection_id,
             language_code=language_code)
 
         return question_model_instance

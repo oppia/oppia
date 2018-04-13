@@ -155,32 +155,32 @@ describe('Guest collection progress service', function() {
     });
   });
 
-  describe('getNextExplorationIds', function() {
+  describe('getNextExplorationId', function() {
     it('should provide the first exploration ID with no progress', function() {
       var collection = _createLinearCollection(_collectionId1);
-      var nextExplorationIds = (
-        GuestCollectionProgressService.getNextExplorationIds(collection, []));
-      expect(nextExplorationIds).toEqual([_expId0]);
+      var nextExplorationId = (
+        GuestCollectionProgressService.getNextExplorationId(collection, []));
+      expect(nextExplorationId).toEqual(_expId0);
     });
 
     it('should provide the third exp ID with first two exps done', function() {
       var collection = _createLinearCollection(_collectionId1);
-      var nextExplorationIds = (
-        GuestCollectionProgressService.getNextExplorationIds(
+      var nextExplorationId = (
+        GuestCollectionProgressService.getNextExplorationId(
           collection, [_expId0, _expId1]));
 
       // First two explorations are completed, so return the third.
-      expect(nextExplorationIds).toEqual([_expId2]);
+      expect(nextExplorationId).toEqual(_expId2);
     });
 
-    it('should provide empty list for fully completed collection', function() {
+    it('should return null for fully completed collection', function() {
       var collection = _createLinearCollection(_collectionId1);
-      var nextExplorationIds = (
-        GuestCollectionProgressService.getNextExplorationIds(
+      var nextExplorationId = (
+        GuestCollectionProgressService.getNextExplorationId(
           collection, [_expId0, _expId1, _expId2]));
 
       // There are no explorations left to play.
-      expect(nextExplorationIds).toEqual([]);
+      expect(nextExplorationId).toEqual(null);
     });
   });
 });

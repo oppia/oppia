@@ -21,15 +21,15 @@
 oppia.factory('CollectionLinearizerService', [
   'CollectionUpdateService',
   function(CollectionUpdateService) {
-    var _getNextExplorationIds = function(collection, completedExpIds) {
+    var _getNextExplorationId = function(collection, completedExpIds) {
       var explorationIds = collection.getExplorationIds();
 
       for (var i = 0; i < explorationIds.length; i++) {
         if (completedExpIds.indexOf(explorationIds[i]) === -1) {
-          return [explorationIds[i]];
+          return explorationIds[i];
         }
       }
-      return [];
+      return null;
     };
 
     // Given a non linear collection input, the function will linearize it by
@@ -66,14 +66,11 @@ oppia.factory('CollectionLinearizerService', [
     // Swap the node at the specified index with the node immediately to the
     // left of it.
     var swapLeft = function(collection, linearNodeList, nodeIndex) {
-      // There is a single case in the swap
-      //   1. There is no node to the left of the current node
 
       var node = linearNodeList[nodeIndex];
       var leftNodeIndex = getNodeIndexLeftOf(linearNodeList, nodeIndex);
 
       if (leftNodeIndex === null) {
-        // Case 1 is a no-op: there's nothing to swap with.
         return;
       }
 
@@ -108,8 +105,8 @@ oppia.factory('CollectionLinearizerService', [
        * collection is immediately playable by the user. NOTE: This function
        * does not assume that the collection is linear.
        */
-      getNextExplorationIds: function(collection, completedExpIds) {
-        return _getNextExplorationIds(collection, completedExpIds);
+      getNextExplorationId: function(collection, completedExpIds) {
+        return _getNextExplorationId(collection, completedExpIds);
       },
 
       /**

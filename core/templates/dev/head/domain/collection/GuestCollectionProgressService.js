@@ -63,15 +63,15 @@ oppia.factory('GuestCollectionProgressService', [
     };
 
     // This method corresponds to collection_domain.get_next_exploration_id.
-    var _getNextExplorationIds = function(collection, completedIds) {
+    var _getNextExplorationId = function(collection, completedIds) {
       var explorationIds = collection.getExplorationIds();
 
       for (var i = 0; i < explorationIds.length; i++) {
         if (completedIds.indexOf(explorationIds[i]) === -1) {
-          return [explorationIds[i]];
+          return explorationIds[i];
         }
       }
-      return [];
+      return null;
     };
 
     return {
@@ -108,12 +108,12 @@ oppia.factory('GuestCollectionProgressService', [
 
       /**
        * Given a collection object a list of completed exploration IDs, returns
-       * the list of next exploration IDs the guest user can play as part of
-       * completing the collection. If this method returns an empty list, the
+       * the next exploration ID the guest user can play as part of
+       * completing the collection. If this method returns null, the
        * guest has completed the collection.
        */
-      getNextExplorationIds: function(collection, completedExplorationIds) {
-        return _getNextExplorationIds(collection, completedExplorationIds);
+      getNextExplorationId: function(collection, completedExplorationIds) {
+        return _getNextExplorationId(collection, completedExplorationIds);
       }
     };
   }]);

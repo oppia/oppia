@@ -22,38 +22,14 @@ from core.domain import question_domain
 from core.domain import question_services
 import feconf
 
-
-class QuestionsBatchHandler(base.BaseHandler):
-    """This handler completes requests for questions batch."""
-
-    @acl_decorators.can_access_moderator_page
-    def get(self):
-        """Handles GET requests."""
-        collection_id = self.request.get('collection_id')
-        if not collection_id:
-            raise self.PageNotFoundException
-        if not self.request.get('stringified_skill_ids'):
-            raise self.PageNotFoundException
-        skill_ids = json.loads(self.request.get('stringified_skill_ids'))
-        batch_size = feconf.QUESTION_BATCH_SIZE
-        questions_dict = [question.to_dict() for question in (
-            question_services.get_questions_batch(
-                collection_id, skill_ids, self.user_id, batch_size))]
-        return self.render_json({
-            'questions_dict': questions_dict
-        })
-
-
 class QuestionsHandler(base.BaseHandler):
     """This handler completes PUT/DELETE requests for questions."""
 
     @acl_decorators.can_access_moderator_page
-    def put(self, collection_id, question_id):
+    def put(self, question_id):
         """Handles PUT requests."""
         commit_message = self.payload.get('commit_message')
         if not question_id:
-            raise self.PageNotFoundException
-        if not collection_id:
             raise self.PageNotFoundException
         if not commit_message:
             raise self.PageNotFoundException
@@ -63,21 +39,19 @@ class QuestionsHandler(base.BaseHandler):
             question_domain.QuestionChange(change)
             for change in json.loads(self.payload.get('change_list'))]
         question_services.update_question(
-            self.user_id, collection_id, question_id, change_list,
+            self.user_id, question_id, change_list,
             commit_message)
         return self.render_json({
             'question_id': question_id
         })
 
     @acl_decorators.can_access_moderator_page
-    def delete(self, collection_id, question_id):
+    def delete(self, question_id):
         """Handles Delete requests."""
-        if not collection_id:
-            raise self.PageNotFoundException
         if not question_id:
             raise self.PageNotFoundException
         question_services.delete_question(
-            self.user_id, collection_id, question_id)
+            self.user_id, question_id)
 
 
 class QuestionCreationHandler(base.BaseHandler):
@@ -88,34 +62,17 @@ class QuestionCreationHandler(base.BaseHandler):
         """Handles POST requests."""
         if not self.payload.get('question'):
             raise self.PageNotFoundException
-        if not self.payload.get('skill_id'):
-            raise self.PageNotFoundException
         question = question_domain.Question.from_dict(
             self.payload.get('question'))
-        skill_id = self.payload.get('skill_id')
         question_id = question_services.add_question(
             self.user_id, question)
-        question_services.add_question_id_to_skill(
-            question_id, question.collection_id, skill_id, self.user_id)
         return self.render_json({
             'question_id': question_id
         })
 
 
 class QuestionManagerHandler(base.BaseHandler):
-    """This handler completes requests for question summaries."""
-
-    @acl_decorators.can_access_moderator_page
-    def get(self):
-        """Handles GET requests."""
-        collection_id = self.request.get('collection_id')
-        if not collection_id:
-            raise self.PageNotFoundException
-        question_summaries = (
-            question_services.get_question_summaries_for_collection(
-                collection_id))
-        return self.render_json({
-            'question_summary_dicts': [
-                question_summary.to_dict()
-                for question_summary in question_summaries]
-        })
+    """This handler completes requests for question summaries.
+       This class ised to deal with getting all question ids linked to a
+       collection, but as that functionality of collection is removed,
+       this class is currently deprecated."""

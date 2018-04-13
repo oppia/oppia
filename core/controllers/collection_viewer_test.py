@@ -135,7 +135,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         self.assertEqual(len(collection_dict['nodes']), 4)
 
         playthrough_dict = collection_dict['playthrough_dict']
-        self.assertEqual(playthrough_dict['next_exploration_ids'], ['19'])
+        self.assertEqual(playthrough_dict['next_exploration_id'], '19')
         self.assertEqual(playthrough_dict['completed_exploration_ids'], [])
 
         # 'Complete' the first exploration. This should lead to 1 new one being
