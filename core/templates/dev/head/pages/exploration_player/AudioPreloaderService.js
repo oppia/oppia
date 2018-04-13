@@ -62,7 +62,7 @@ oppia.factory('AudioPreloaderService', [
         ExplorationContextService.getExplorationId(), audioFilename
       ).then(function(loadedAudio) {
         for (var i = 0;
-             i < _filenamesOfAudioCurrentlyDownloading.length; i++) {
+          i < _filenamesOfAudioCurrentlyDownloading.length; i++) {
           if (_filenamesOfAudioCurrentlyDownloading[i] ===
               loadedAudio.filename) {
             _filenamesOfAudioCurrentlyDownloading.splice(i, 1);
@@ -84,7 +84,7 @@ oppia.factory('AudioPreloaderService', [
       _filenamesOfAudioToBeDownloaded =
         _getAudioFilenamesInBfsOrder(sourceStateName);
       while (_filenamesOfAudioCurrentlyDownloading.length <
-          MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY && 
+          MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY &&
           _filenamesOfAudioToBeDownloaded.length > 0) {
         var audioFilename = _filenamesOfAudioToBeDownloaded.shift();
         _filenamesOfAudioCurrentlyDownloading.push(audioFilename);

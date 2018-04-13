@@ -109,9 +109,14 @@ for arg in "$@"; do
   if [ "$arg" == "--prod_env" ]; then
     FORCE_PROD_MODE=True
     echo "  Generating files for production mode..."
-    $PYTHON_CMD scripts/build.py
   fi
 done
+
+if [[ "$FORCE_PROD_MODE" == "True" ]]; then
+  $PYTHON_CMD scripts/build.py --prod_env
+else
+  $PYTHON_CMD scripts/build.py
+fi
 
 feconf_env_variable="FORCE_PROD_MODE = $FORCE_PROD_MODE"
 sed -i.bak -e s/"FORCE_PROD_MODE = .*"/"$feconf_env_variable"/ feconf.py

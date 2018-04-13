@@ -84,15 +84,6 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.38'),
 ]
 
-# In the GAE production environment, numpy is automatically provided, and
-# trying to access a path outside the oppia/ directory will lead to an error.
-# So, we only add numpy to the system path in development mode.
-# Or, if we pass the flag to emulate production mode while in development mode.
-if feconf.DEV_MODE:
-    THIRD_PARTY_LIBS.append(
-        os.path.abspath(os.path.join(
-            ROOT_PATH, '..', 'oppia_tools', 'numpy-1.6.1')))
-
 for lib_path in THIRD_PARTY_LIBS:
     if not os.path.isdir(lib_path):
         raise Exception('Invalid path for third_party library: %s' % lib_path)

@@ -185,9 +185,7 @@ oppia.factory('PythonProgramTokenizer', [
               contstr = '';
               needcont = 0;
               contline = null;
-            }
-
-            else if (
+            } else if (
               needcont && line.slice(-2) !== '\\\n' ||
               line.slice(-3) !== '\\\r\n') {
               tokenizedProgram.push(
@@ -195,17 +193,13 @@ oppia.factory('PythonProgramTokenizer', [
               contstr = '';
               contline = null;
               continue;
-            }
-
-            else {
+            } else {
               contstr = contstr + line;
               contline = contline + line;
               continue;
             }
-          }
-
-          // New statement.
-          else if (parenlev === 0 && !continued) {
+          } else if (parenlev === 0 && !continued) {
+            // New statement.
             if (!line) {
               break;
             }
@@ -215,14 +209,11 @@ oppia.factory('PythonProgramTokenizer', [
             while (pos < max) {
               if (line[pos] === ' ') {
                 column += 1;
-              }
-              else if (line[pos] === '\t') {
+              } else if (line[pos] === '\t') {
                 column = (column / tabsize + 1) * tabsize;
-              }
-              else if (line[pos] === '\f') {
+              } else if (line[pos] === '\f') {
                 column = 0;
-              }
-              else {
+              } else {
                 break;
               }
               pos += 1;
@@ -241,8 +232,7 @@ oppia.factory('PythonProgramTokenizer', [
                   [PythonProgramTokenType.COMMENT, commentToken]);
                 tokenizedProgram.push(
                   [PythonProgramTokenType.NL, line.slice(nlPos)]);
-              }
-              else {
+              } else {
                 tokenizedProgram.push([
                   PythonProgramTokenType.line[pos] === '#' ? COMMENT : NL,
                   line.slice(pos)]);
@@ -265,10 +255,8 @@ oppia.factory('PythonProgramTokenizer', [
               indents = indents.slice(0, -1);
               tokenizedProgram.push([PythonProgramTokenType.DEDENT, '']);
             }
-          }
-
-          // Continued statement.
-          else {
+          } else {
+            // Continued statement.
             if (!line) {
               $log.error('EOF in multi-line statement');
             }
@@ -293,17 +281,14 @@ oppia.factory('PythonProgramTokenizer', [
                 numchars.indexOf(initial) !== -1 ||
                 (initial === '.' && token !== '.')) {
                 tokenizedProgram.push([PythonProgramTokenType.NUMBER, token]);
-              }
-              else if ('\r\n'.indexOf(initial) !== -1) {
+              } else if ('\r\n'.indexOf(initial) !== -1) {
                 tokenizedProgram.push([PythonProgramTokenType.NL, token]);
-              }
-              else if (initial === '#') {
+              } else if (initial === '#') {
                 if (!token.endswith('\n')) {
                   tokenizedProgram.push(
                     [PythonProgramTokenType.COMMENT, token]);
                 }
-              }
-              else if (tripleQuoted.indexOf(token) !== -1) {
+              } else if (tripleQuoted.indexOf(token) !== -1) {
                 endprog = endprogs[token];
                 endmatch = endprog.exec(line.slice(pos));
                 // All on one line.
@@ -312,19 +297,17 @@ oppia.factory('PythonProgramTokenizer', [
                   token = line.slice(start, pos);
                   tokenizedProgram.push(
                     [PythonProgramTokenType.STRING, token]);
-                }
-                // Multiple lines.
-                else {
+                } else {
+                  // Multiple lines.
                   contstr = line.slice(start);
                   contline = line;
                   break;
                 }
-              }
-              // Continued string.
-              else if (
-                  singleQuoted.indexOf(initial) !== -1 ||
+              } else if (
+                singleQuoted.indexOf(initial) !== -1 ||
                   singleQuoted.indexOf(token.slice(0, 2)) !== -1 ||
                   singleQuoted.indexOf(token.slice(0, 3)) !== -1) {
+                // Continued string.
                 if (token.slice(-1) === '\n') {
                   endprog = (
                     endprogs[initial] || endprogs[token[1]] ||
@@ -333,31 +316,25 @@ oppia.factory('PythonProgramTokenizer', [
                   needcont = 1;
                   contline = line;
                   break;
-                }
-                else {
+                } else {
                   tokenizedProgram.push(
                     [PythonProgramTokenType.STRING, token]);
                 }
-              }
-              // Ordinary name
-              else if (namechars.indexOf(initial) !== -1) {
+              } else if (namechars.indexOf(initial) !== -1) {
+                // Ordinary name
                 tokenizedProgram.push([PythonProgramTokenType.NAME, token]);
-              }
-              // Continued stmt
-              else if (initial === '\\') {
+              } else if (initial === '\\') {
+                // Continued statement.
                 continued = 1;
-              }
-              else {
+              } else {
                 if ('([{'.indexOf(initial) !== -1) {
                   parenlev += 1;
-                }
-                else if (')]}'.indexOf(initial) !== -1) {
+                } else if (')]}'.indexOf(initial) !== -1) {
                   parenlev -= 1;
                 }
                 tokenizedProgram.push([PythonProgramTokenType.OP, token]);
               }
-            }
-            else {
+            } else {
               tokenizedProgram.push(
                 [PythonProgramTokenType.ERRORTOKEN, line[pos]]);
               pos += 1;

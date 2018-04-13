@@ -18,6 +18,7 @@
 
 import ast
 import logging
+import traceback
 
 from constants import constants
 from core import jobs
@@ -91,7 +92,7 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class ExplorationContributorsSummaryOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job that computes the number of commits
-    done by contributors for each Exploration
+    done by contributors for each Exploration.
     """
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -361,8 +362,12 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         if item.deleted:
             return
+        try:
+            exploration = exp_services.get_exploration_from_model(item)
+        except Exception as e:
+            yield ('ERROR get_exp_from_model: exp_id %s' % item.id, str(e))
+            return
 
-        exploration = exp_services.get_exploration_from_model(item)
         explorations = []
 
         # Fetch all versions of the exploration, if they exist.
@@ -377,7 +382,9 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
                     exp_services.get_multiple_explorations_by_version(
                         exploration.id, versions))
             except Exception as e:
-                yield ('ERROR with exp_id %s' % item.id, str(e))
+                yield (
+                    'ERROR get_multiple_exp_by_version exp_id %s' % item.id,
+                    str(e))
                 return
 
         # Append latest exploration to the list of explorations.
@@ -401,15 +408,36 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
                 return
 
             change_list = snapshot['commit_cmds']
-            # Check if commit is to revert the exploration.
-            if change_list and change_list[0]['cmd'].endswith(
-                    'revert_version_number'):
-                reverted_version = change_list[0]['version_number']
-                exp_services.create_and_save_state_id_mapping_model_for_reverted_exploration( # pylint: disable=line-too-long
-                    exploration.id, exploration.version - 1, reverted_version)
-            else:
-                exp_services.create_and_save_state_id_mapping_model(
-                    exploration, change_list)
+
+            try:
+                # Check if commit is to revert the exploration.
+                if change_list and change_list[0]['cmd'].endswith(
+                        'revert_version_number'):
+                    reverted_version = change_list[0]['version_number']
+                    # pylint: disable=line-too-long
+                    state_id_mapping = exp_services.generate_state_id_mapping_model_for_reverted_exploration(
+                        exploration.id, exploration.version - 1,
+                        reverted_version)
+                    # pylint: enable=line-too-long
+                else:
+                    state_id_mapping = (
+                        exp_services.generate_state_id_mapping_model(
+                            exploration, change_list))
+
+                state_id_mapping_model = exp_models.StateIdMappingModel.create(
+                    state_id_mapping.exploration_id,
+                    state_id_mapping.exploration_version,
+                    state_id_mapping.state_names_to_ids,
+                    state_id_mapping.largest_state_id_used, overwrite=True)
+                state_id_mapping_model.put()
+
+            except Exception as e:
+                yield (
+                    'ERROR with exp_id %s version %s' % (
+                        item.id, exploration.version),
+                    traceback.format_exc())
+                return
+
         yield (exploration.id, exploration.version)
 
     @staticmethod

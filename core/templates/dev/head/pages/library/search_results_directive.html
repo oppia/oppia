@@ -3,7 +3,6 @@
     font-size: 0.85em;
     text-align: center;
   }
-
   search-results .oppia-search-results-intro {
     font-size: 1.6em;
     padding-bottom: 40px;
@@ -18,6 +17,9 @@
 </style>
 
 <div>
+  <div class="visible-xs" style="margin: 0 auto; width: fit-content;">
+    <search-bar></search-bar>
+  </div>
   <div ng-if="!someResultsExist" class="oppia-search-results-intro" ng-cloak>
     <div class="oppia-search-results-no-match">
       <img ng-src="<[noExplorationsImgUrl]>" alt="No explorations found">

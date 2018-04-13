@@ -13,8 +13,10 @@
 # limitations under the License.
 
 """Tests for the controllers that communicate with VM for training
-classifiers."""
+classifiers.
+"""
 
+import datetime
 import json
 import os
 
@@ -150,10 +152,12 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
                 u'answers': [u'a2', u'a3']
             }
         ]
-        self.job_id = classifier_services.create_classifier_training_job(
-            self.algorithm_id, interaction_id, self.exp_id,
-            1, 'Home', self.training_data,
-            feconf.TRAINING_JOB_STATUS_NEW)
+        self.job_id = classifier_models.ClassifierTrainingJobModel.create(
+            self.algorithm_id, interaction_id, self.exp_id, 1,
+            datetime.datetime.utcnow(), self.training_data, 'Home',
+            feconf.TRAINING_JOB_STATUS_NEW, None, 1
+        )
+
         self.expected_response = {
             u'job_id' : unicode(self.job_id, 'utf-8'),
             u'training_data' : self.training_data,

@@ -17,8 +17,8 @@
  */
 
 oppia.factory('StateImprovementSuggestionService', [
-  'IMPROVE_TYPE_INCOMPLETE', 'ENABLE_NEW_STATS_FRAMEWORK',
-  function(IMPROVE_TYPE_INCOMPLETE, ENABLE_NEW_STATS_FRAMEWORK) {
+  'IMPROVE_TYPE_INCOMPLETE',
+  function(IMPROVE_TYPE_INCOMPLETE) {
     return {
       // Returns an array of suggested improvements to states. Each suggestion
       // is an object with the keys: rank, improveType, and stateName.
@@ -29,15 +29,13 @@ oppia.factory('StateImprovementSuggestionService', [
 
         var rankedStates = [];
         explorationStates.getStateNames().forEach(function(stateName) {
-          var stateStats = allStateStats[stateName];
-          if (ENABLE_NEW_STATS_FRAMEWORK) {
-            var totalEntryCount = stateStats.total_hit_count;
-            var noAnswerSubmittedCount = totalEntryCount - (
-              stateStats.num_completions);
-          } else {
-            var totalEntryCount = stateStats.total_entry_count;
-            var noAnswerSubmittedCount = stateStats.no_submitted_answer_count;
+          if (!allStateStats.hasOwnProperty(stateName)) {
+            return;
           }
+
+          var stateStats = allStateStats[stateName];
+          var totalEntryCount = stateStats.total_entry_count;
+          var noAnswerSubmittedCount = stateStats.no_submitted_answer_count;
 
           if (totalEntryCount === 0) {
             return;

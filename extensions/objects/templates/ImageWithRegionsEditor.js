@@ -33,7 +33,7 @@ oppia.directive('imageWithRegionsEditor', [
       scope: true,
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: [
-        '$scope', '$element', '$uibModal', 
+        '$scope', '$element', '$uibModal',
         function($scope, $element, $uibModal) {
           $scope.alwaysEditable = true;
 
@@ -404,8 +404,8 @@ oppia.directive('imageWithRegionsEditor', [
           };
           $scope.onMouseMoveRegion = function() {
             if (
-                $scope.userIsCurrentlyDragging ||
-                $scope.userIsCurrentlyResizing) {
+              $scope.userIsCurrentlyDragging ||
+              $scope.userIsCurrentlyResizing) {
               return;
             }
             region = cornerAndDimensionsFromRegionArea(
@@ -415,8 +415,8 @@ oppia.directive('imageWithRegionsEditor', [
               if ($scope.mouseY <= region.y + $scope.resizableBorderWidthPx) {
                 $scope.yDirection = 1;
               } else if (
-                  $scope.mouseY >= region.height + region.y -
-                  $scope.resizableBorderWidthPx) {
+                $scope.mouseY >= region.height + region.y -
+                $scope.resizableBorderWidthPx) {
                 $scope.yDirection = -1;
               } else {
                 $scope.yDirection = 0;
@@ -424,8 +424,8 @@ oppia.directive('imageWithRegionsEditor', [
               if ($scope.mouseX <= region.x + $scope.resizableBorderWidthPx) {
                 $scope.xDirection = 1;
               } else if (
-                  $scope.mouseX >= region.width + region.x -
-                  $scope.resizableBorderWidthPx) {
+                $scope.mouseX >= region.width + region.x -
+                $scope.resizableBorderWidthPx) {
                 $scope.xDirection = -1;
               } else {
                 $scope.xDirection = 0;
@@ -464,7 +464,7 @@ oppia.directive('imageWithRegionsEditor', [
             if ($scope.xDirection || $scope.yDirection) {
               // User is resizing, so we figure out the direction.
               if (
-                  ($scope.xDirection === 1 && !$scope.xDirectionToggled) ||
+                ($scope.xDirection === 1 && !$scope.xDirectionToggled) ||
                   ($scope.xDirection === -1 && $scope.xDirectionToggled)) {
                 xDirectionCursor = 'w';
               } else if (
@@ -475,8 +475,8 @@ oppia.directive('imageWithRegionsEditor', [
                 xDirectionCursor = '';
               }
               if (
-                  ($scope.yDirection === 1 && !$scope.yDirectionToggled) ||
-                  ($scope.yDirection === -1 && $scope.yDirectionToggled)) {
+                ($scope.yDirection === 1 && !$scope.yDirectionToggled) ||
+                ($scope.yDirection === -1 && $scope.yDirectionToggled)) {
                 yDirectionCursor = 'n';
               } else if (
                 ($scope.yDirection === -1 && !$scope.yDirectionToggled) ||

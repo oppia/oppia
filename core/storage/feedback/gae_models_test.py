@@ -140,7 +140,8 @@ class SuggestionModelTest(test_utils.GenericTestBase):
 
     def _get_suggestion_models_for_test(self, suggestions_list):
         """Removes fields that are set to default values in the base model and
-        are thus not explicitly verified in tests."""
+        are thus not explicitly verified in tests.
+        """
 
         updated_suggestions_list = []
         for suggestion in suggestions_list:
@@ -215,7 +216,7 @@ class SuggestionModelTest(test_utils.GenericTestBase):
 
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
-    """Tests for FeedbackMessageEmailDataModel class"""
+    """Tests for FeedbackMessageEmailDataModel class."""
 
     def test_new_instances_stores_correct_data(self):
         user_id = 'A'

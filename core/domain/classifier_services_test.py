@@ -14,12 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for classifier services"""
+"""Tests for classifier services."""
 
 import datetime
 import os
 
 from core.domain import classifier_services
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.platform import models
 from core.tests import test_utils
@@ -159,9 +160,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         exploration = exp_services.get_exploration_by_id(self.exp_id)
         next_scheduled_check_time = datetime.datetime.utcnow()
         state_names = ['Home']
-        new_to_old_state_names = {
-            'Home': 'Old home'
-        }
+        change_list = [{
+            'cmd': 'rename_state',
+            'old_state_name': 'Old home',
+            'new_state_name': 'Home'
+        }]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
         # Test that Exception is raised if this method is called with version
         # number 1.
@@ -170,12 +174,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             Exception, 'This method should not be called by exploration with '
                        'version number 1'):
             classifier_services.handle_non_retrainable_states(
-                exploration, state_names, new_to_old_state_names)
+                exploration, state_names, exp_versions_diff)
 
         exploration.version += 1
         # Test that mapping cant be created if job doesn't exist.
         classifier_services.handle_non_retrainable_states(
-            exploration, state_names, new_to_old_state_names)
+            exploration, state_names, exp_versions_diff)
         # There will be only one mapping (because of the creation of the
         # exploration).
         all_mappings = (
@@ -191,7 +195,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         classifier_models.TrainingJobExplorationMappingModel.create(
             self.exp_id, exploration.version-1, 'Old home', job_id)
         classifier_services.handle_non_retrainable_states(
-            exploration, state_names, new_to_old_state_names)
+            exploration, state_names, exp_versions_diff)
 
         # There should be three mappings (the first mapping because of the
         # creation of the exploration) in the data store now.
@@ -298,10 +302,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state_name = 'Home'
         interaction_id = 'TextInput'
 
-        job_id = classifier_services.create_classifier_training_job(
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
-                'algorithm_id'], interaction_id, exp_id, 1, state_name,
-            [], feconf.TRAINING_JOB_STATUS_NEW)
+                'algorithm_id'], interaction_id, exp_id, 1,
+            datetime.datetime.utcnow(), [], state_name,
+            feconf.TRAINING_JOB_STATUS_NEW, None, 1
+        )
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
@@ -328,10 +334,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state_name = 'Home'
         interaction_id = 'TextInput'
 
-        job_id = classifier_services.create_classifier_training_job(
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
-                'algorithm_id'], interaction_id, exp_id, 1, state_name,
-            [], feconf.TRAINING_JOB_STATUS_PENDING)
+                'algorithm_id'], interaction_id, exp_id, 1,
+            datetime.datetime.utcnow(), [], state_name,
+            feconf.TRAINING_JOB_STATUS_PENDING, None, 1
+        )
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
@@ -359,14 +367,18 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         interaction_id = 'TextInput'
         exp2_id = u'2'
 
-        job1_id = classifier_services.create_classifier_training_job(
+        job1_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
-                'algorithm_id'], interaction_id, exp1_id, 1, state_name,
-            [], feconf.TRAINING_JOB_STATUS_NEW)
-        classifier_services.create_classifier_training_job(
+                'algorithm_id'], interaction_id, exp1_id, 1,
+            datetime.datetime.utcnow(), [], state_name,
+            feconf.TRAINING_JOB_STATUS_NEW, None, 1
+        )
+        classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
-                'algorithm_id'], interaction_id, exp2_id, 1, state_name,
-            [], feconf.TRAINING_JOB_STATUS_PENDING)
+                'algorithm_id'], interaction_id, exp2_id, 1,
+            datetime.datetime.utcnow(), [], state_name,
+            feconf.TRAINING_JOB_STATUS_PENDING, None, 1
+        )
         # This will get the job_id of the exploration created in setup.
         classifier_services.fetch_next_job()
         next_job = classifier_services.fetch_next_job()

@@ -49,10 +49,12 @@ describe('ExplorationFeedback', function() {
   });
 
   beforeEach(function() {
-    users.createUser('user1@ExplorationFeedback.com',
-                     'creatorExplorationFeedback');
-    users.createUser('user2@ExplorationFeedback.com',
-                     'learnerExplorationFeedback');
+    users.createUser(
+      'user1@ExplorationFeedback.com',
+      'creatorExplorationFeedback');
+    users.createUser(
+      'user2@ExplorationFeedback.com',
+      'learnerExplorationFeedback');
   });
 
   it('adds feedback to an exploration', function() {
@@ -61,10 +63,11 @@ describe('ExplorationFeedback', function() {
 
     // Creator creates and publishes an exploration
     users.login('user1@ExplorationFeedback.com');
-    workflow.createAndPublishExploration(EXPLORATION_TITLE,
-                                         EXPLORATION_CATEGORY,
-                                         EXPLORATION_OBJECTIVE,
-                                         EXPLORATION_LANGUAGE);
+    workflow.createAndPublishExploration(
+      EXPLORATION_TITLE,
+      EXPLORATION_CATEGORY,
+      EXPLORATION_OBJECTIVE,
+      EXPLORATION_LANGUAGE);
     creatorDashboardPage.get();
     expect(
       creatorDashboardPage.getNumberOfFeedbackMessages()
@@ -86,6 +89,7 @@ describe('ExplorationFeedback', function() {
     ).toEqual(1);
     creatorDashboardPage.navigateToExplorationEditor();
 
+    editor.expectCurrentTabToBeFeedbackTab();
     editor.readFeedbackMessages().then(function(messages) {
       expect(messages.length).toEqual(1);
       expect(messages[0]).toEqual(feedback);

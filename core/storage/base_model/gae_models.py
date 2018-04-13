@@ -242,7 +242,7 @@ class VersionedModel(BaseModel):
     # Whether reverting is allowed. Default is False.
     ALLOW_REVERT = False
 
-    ### IMPORTANT: Subclasses should only overwrite things above this line. ###
+    # IMPORTANT: Subclasses should only overwrite things above this line.
 
     # The possible commit types.
     _COMMIT_TYPE_CREATE = 'create'

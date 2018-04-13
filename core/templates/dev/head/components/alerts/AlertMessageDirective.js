@@ -35,12 +35,14 @@ oppia.directive('alertMessage', [function() {
       var message = scope.getMessage();
       if (message.type === 'info') {
         scope.toastr.info(message.content, {
+          timeOut: message.timeout,
           onHidden: function() {
             scope.AlertsService.deleteMessage(message);
           }
         });
       } else if (message.type === 'success') {
         scope.toastr.success(message.content, {
+          timeOut: message.timeout,
           onHidden: function() {
             scope.AlertsService.deleteMessage(message);
           }

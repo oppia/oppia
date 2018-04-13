@@ -67,7 +67,7 @@ oppia.factory('FractionInputValidationService', [
           range.ubi = ubi;
         };
         var isEnclosedBy = function(ra, rb) {
-          if((ra.lb === null && ra.ub === null) ||
+          if ((ra.lb === null && ra.ub === null) ||
             (rb.lb === null && rb.ub === null)) {
             return false;
           }

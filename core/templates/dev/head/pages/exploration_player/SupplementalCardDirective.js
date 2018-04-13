@@ -82,6 +82,12 @@ oppia.directive('supplementalCard', [
             return maxHelpCardHeightSeen > $(window).height() - 100;
           };
 
+          $scope.getHelpCardBottomPosition = function() {
+            var helpCard = $('.conversation-skin-help-card');
+            var container = $('.conversation-skin-supplemental-card-container');
+            return Math.max(container.height() - helpCard.height() / 2, 0);
+          };
+
           $scope.submitAnswer = function(answer, interactionRulesService) {
             // Do not clear the help card or submit an answer if there is an
             // upcoming card.

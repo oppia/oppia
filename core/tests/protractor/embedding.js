@@ -71,7 +71,7 @@ describe('Embedding', function() {
     // Save changes.
     title = 'Protractor Test';
     category = 'Mathematics';
-    objective = 'learn how to count permutations' + 
+    objective = 'learn how to count permutations' +
       ' accurately and systematically';
     editor.setTitle(title);
     editor.setCategory(category);
@@ -232,7 +232,7 @@ describe('Embedding', function() {
       driver.findElement(by.css(
         '.protractor-test-exploration-id-input-field')
       ).sendKeys(explorationId);
-      
+
       driver.findElement(by.css(
         '.protractor-test-exploration-id-submit-button')
       ).click();
@@ -253,7 +253,7 @@ describe('Embedding', function() {
     workflow.createExploration();
     general.getExplorationIdFromEditor().then(function(expId) {
       explorationId = expId;
-      
+
       editor.setContent(forms.toRichText('Language Test'));
       editor.setInteraction('NumericInput');
       editor.addResponse(

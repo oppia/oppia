@@ -1,49 +1,52 @@
-<form class="navbar-form navbar-left oppia-search-bar-form" role="search">
-  <div class="form-group">
-    <div class="input-group" style="max-width: 300px; width: 300px;">
-      <div class="input-group-addon oppia-search-bar-icon">
-        <i class="material-icons md-18" ng-if="!isSearchInProgress()">&#xE8B6;</i>
-        <span ng-if="isSearchInProgress()">
-          <i class="material-icons md-18 oppia-animate-spin">&#xE863;</i>
-        </span>
-      </div>
-      <input type="text" class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
+<div class="oppia-same-row-container">
+  <form class="navbar-form navbar-left oppia-search-bar-form" role="search">
+    <div class="form-group">
+      <div class="input-group" style="max-width: 375px; width: auto;">
+        <div class="input-group-addon oppia-search-bar-icon">
+          <i class="material-icons md-18" ng-if="!isSearchInProgress()">&#xE8B6;</i>
+          <span ng-if="isSearchInProgress()">
+            <i class="material-icons md-18 oppia-animate-spin">&#xE863;</i>
+          </span>
+        </div>
+        <input type="text" class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
              ng-attr-placeholder="<[searchBarPlaceholder]>" ng-model="searchQuery"
              ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 1000, 'blur': 0 } }" aria-label="Search bar">
+      </div>
     </div>
-  </div>
-</form>
-
-<div uib-dropdown class="navbar-left oppia-navbar-button-container oppia-search-bar-category-selector protractor-test-search-bar-category-selector">
-  <button uib-dropdown-toggle type="button" class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input ng-cloak"
-          title="<[selectionDetails.categories.description | translate]>"
-          style="max-width: 130px;">
-    <[categoryButtonText|truncate:14]>
-    <span class="caret"></span>
-  </button>
-  <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
-  <ul uib-dropdown-menu class="protractor-test-search-bar-dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
-    <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
-        ng-if="selectionDetails.categories.selections[item.id]">
-      <a href="" ng-click="toggleSelection('categories', item.id)">
-        <span translate="<[item.text]>" class="protractor-test-selected"></span>
-        <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
-      </a>
-    </li>
-    <li ng-if="selectionDetails.categories.numSelections > 1">
-      <a href="" ng-click="deselectAll('categories')"><i>Deselect All</i></a>
-    </li>
-    <hr ng-if="selectionDetails.categories.numSelections > 0" style="margin: 2px;">
-    <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
-        ng-if="!selectionDetails.categories.selections[item.id]">
-      <a href="" ng-click="toggleSelection('categories', item.id)">
-        <span translate="<[item.text]>" class="protractor-test-deselected"></span>
-        <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
-      </a>
-    </li>
-  </ul>
+  </form>
 </div>
 
+<div class="oppia-same-row-container">
+  <div uib-dropdown class="navbar-left oppia-navbar-button-container oppia-search-bar-category-selector protractor-test-search-bar-category-selector">
+    <button uib-dropdown-toggle type="button" class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input ng-cloak"
+          title="<[selectionDetails.categories.description | translate]>"
+          style="max-width: 130px;">
+      <[categoryButtonText|truncate:14]>
+      <span class="caret"></span>
+    </button>
+    <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
+    <ul uib-dropdown-menu class="protractor-test-search-bar-dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
+      <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
+        ng-if="selectionDetails.categories.selections[item.id]">
+        <a href="" ng-click="toggleSelection('categories', item.id)">
+          <span translate="<[item.text]>" class="protractor-test-selected"></span>
+          <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+        </a>
+      </li>
+      <li ng-if="selectionDetails.categories.numSelections > 1">
+        <a href="" ng-click="deselectAll('categories')"><i>Deselect All</i></a>
+      </li>
+      <hr ng-if="selectionDetails.categories.numSelections > 0" style="margin: 2px;">
+      <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
+          ng-if="!selectionDetails.categories.selections[item.id]">
+        <a href="" ng-click="toggleSelection('categories', item.id)">
+          <span translate="<[item.text]>" class="protractor-test-deselected"></span>
+          <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
 <div uib-dropdown class="navbar-left oppia-navbar-button-container oppia-search-bar-language-selector protractor-test-search-bar-language-selector">
   <button uib-dropdown-toggle type="button" class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input ng-cloak"
           style="border-bottom-right-radius: 4px; border-top-right-radius: 4px; max-width: 130px;"
@@ -57,7 +60,7 @@
         ng-if="selectionDetails.languageCodes.selections[item.id]">
       <a href="" ng-click="toggleSelection('languageCodes', item.id)">
         <span translate="<[item.text]>" class="protractor-test-selected"></span>
-        <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
+        <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 pull-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
       </a>
     </li>
     <li ng-if="selectionDetails.languageCodes.numSelections > 1">
@@ -68,7 +71,7 @@
         ng-if="!selectionDetails.languageCodes.selections[item.id]">
       <a href="" ng-click="toggleSelection('languageCodes', item.id)">
         <span translate="<[item.text]>" class="protractor-test-deselected"></span>
-        <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 pull-right">&#xE876;</i>
+        <i ng-if="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  pull-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
       </a>
     </li>
   </ul>
@@ -131,14 +134,57 @@
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 767px) {
+    .oppia-search-bar-input {
+      background: #ffffff;
+      color: #04857c;
+    }
+    .oppia-search-bar-input::-webkit-input-placeholder {
+      color: #04857c;
+    }
+    .oppia-search-bar-input:-moz-placeholder {
+      color: #04857c;
+    }
+    .oppia-search-bar-input::-moz-placeholder {
+      color: #04857c;
+    }
+    .oppia-search-bar-input:-ms-input-placeholder {
+      color: #04857c;
+    }
+    .oppia-search-bar-icon {
+      background: #ffffff;
+      color: #04857c;
+    }
+    .oppia-search-bar-input.btn {
+      color: #04857c;
+      margin-left: 10px;
+      margin-top: -64px;
+    }
+    .oppia-search-bar-input.btn:hover, .oppia-search-bar-input.btn:focus {
+      color: #04857c;
+    }
+    .protractor-test-search-bar-dropdown-menu {
+      margin-top: -25px;
+    }
+    .oppia-same-row-container {
+       display: inline-block;
+    }
+  }
+
+  @media (max-width: 629px) {
     .oppia-search-bar-text-input {
       border-bottom-right-radius: 4px;
       border-top-right-radius: 4px;
     }
-
     .oppia-search-bar-category-selector {
       display: none;
     }
   }
+  /* This rule targets only Firefox browsers. */
+  @-moz-document url-prefix() {
+    .oppia-search-bar-category-selection-symbol {
+      margin-top: -18px;
+    }
+  }
+
 </style>

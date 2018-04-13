@@ -80,14 +80,14 @@ oppia.factory('CollectionEditorStateService', [
           });
         CollectionRightsBackendApiService.fetchCollectionRights(
           collectionId).then(function(newBackendCollectionRightsObject) {
-            _updateCollectionRights(newBackendCollectionRightsObject);
-            _isLoadingCollection = false;
-          }, function(error) {
-            AlertsService.addWarning(
-              error ||
-              'There was an error when loading the collection rights.');
-            _isLoadingCollection = false;
-          });
+          _updateCollectionRights(newBackendCollectionRightsObject);
+          _isLoadingCollection = false;
+        }, function(error) {
+          AlertsService.addWarning(
+            error ||
+            'There was an error when loading the collection rights.');
+          _isLoadingCollection = false;
+        });
       },
 
       /**

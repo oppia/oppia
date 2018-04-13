@@ -72,7 +72,7 @@ oppia.controller('StateResponses', [
         });
       } else if (interactionId === 'ItemSelectionInput') {
         var maxSelectionCount = (
-            customizationArgs.maxAllowableSelectionCount.value);
+          customizationArgs.maxAllowableSelectionCount.value);
         if (maxSelectionCount === 1) {
           var numChoices = $scope.getAnswerChoices().length;
           // This array contains a list of booleans, one for each answer choice.
@@ -264,7 +264,7 @@ oppia.controller('StateResponses', [
           'ExplorationContextService', 'EditorStateService',
           'ExplorationStatesService', 'TrainingDataService',
           'AnswerClassificationService', 'FocusManagerService',
-          'angularNameService', 'RULE_TYPE_CLASSIFIER',
+          'AngularNameService', 'RULE_TYPE_CLASSIFIER',
           function(
               $scope, $injector, $uibModalInstance,
               ExplorationHtmlFormatterService,
@@ -272,7 +272,7 @@ oppia.controller('StateResponses', [
               ExplorationContextService, EditorStateService,
               ExplorationStatesService, TrainingDataService,
               AnswerClassificationService, FocusManagerService,
-              angularNameService, RULE_TYPE_CLASSIFIER) {
+              AngularNameService, RULE_TYPE_CLASSIFIER) {
             var _explorationId = ExplorationContextService.getExplorationId();
             var _stateName = EditorStateService.getActiveStateName();
             var _state = ExplorationStatesService.getState(_stateName);
@@ -560,8 +560,8 @@ oppia.filter('summarizeAnswerGroup', [
       if (hasFeedback) {
         summary += (
           shortenRule ?
-          $filter('truncate')(outcome.feedback.getHtml(), 30) :
-          $filter('convertToPlainText')(outcome.feedback.getHtml()));
+            $filter('truncate')(outcome.feedback.getHtml(), 30) :
+            $filter('convertToPlainText')(outcome.feedback.getHtml()));
       }
       return summary;
     };

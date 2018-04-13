@@ -92,8 +92,7 @@ def handle_trainable_states(exploration, state_names):
         job_exploration_mappings)
 
 
-def handle_non_retrainable_states(exploration, state_names,
-                                  new_to_old_state_names):
+def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
     """Creates new TrainingJobExplorationMappingModel instances for all the
     state names passed into the function. The mapping is created from the
     state in the new version of the exploration to the ClassifierTrainingJob of
@@ -109,8 +108,8 @@ def handle_non_retrainable_states(exploration, state_names,
     Args:
         exploration: Exploration. The Exploration domain object.
         state_names: list(str). List of state names.
-        new_to_old_state_names: dict. Dict mapping new state names to their
-            corresponding state names in previous version.
+        exp_versions_diff: ExplorationVersionsDiff. An instance of the
+            exploration versions diff class.
 
     Raises:
         Exception. This method should not be called by exploration with version
@@ -126,7 +125,10 @@ def handle_non_retrainable_states(exploration, state_names,
 
     state_names_to_retrieve = []
     for current_state_name in state_names:
-        old_state_name = new_to_old_state_names[current_state_name]
+        old_state_name = current_state_name
+        if current_state_name in exp_versions_diff.new_to_old_state_names:
+            old_state_name = exp_versions_diff.new_to_old_state_names[
+                current_state_name]
         state_names_to_retrieve.append(old_state_name)
     classifier_training_jobs = get_classifier_training_jobs(
         exp_id, old_exp_version, state_names_to_retrieve)
@@ -198,38 +200,6 @@ def get_classifier_training_job_by_id(job_id):
     return classifier_training_job
 
 
-def create_classifier_training_job(algorithm_id, interaction_id, exp_id,
-                                   exp_version, state_name, training_data,
-                                   status):
-    """Creates a ClassifierTrainingJobModel in data store.
-
-    Args:
-        algorithm_id: str. ID of the algorithm used to generate the model.
-        interaction_id: str. ID of the interaction to which the algorithm
-            belongs.
-        exp_id: str. ID of the exploration.
-        exp_version: int. The exploration version at the time
-            this training job was created.
-        state_name: str. The name of the state to which the classifier
-            belongs.
-        training_data: dict. The data used in training phase.
-        status: str. The status of the training job (
-            feconf.TRAINING_JOB_STATUS_NEW by default).
-
-    Returns:
-        job_id: str. ID of the classifier training job.
-    """
-    next_scheduled_check_time = datetime.datetime.utcnow()
-    dummy_classifier_training_job = classifier_domain.ClassifierTrainingJob(
-        'job_id_dummy', algorithm_id, interaction_id, exp_id, exp_version,
-        next_scheduled_check_time, state_name, status, training_data, None, 1)
-    dummy_classifier_training_job.validate()
-    job_id = classifier_models.ClassifierTrainingJobModel.create(
-        algorithm_id, interaction_id, exp_id, exp_version,
-        next_scheduled_check_time, training_data, state_name, status, None, 1)
-    return job_id
-
-
 def _update_classifier_training_jobs_status(job_ids, status):
     """Checks for the existence of the model and then updates it.
 
@@ -260,7 +230,6 @@ def _update_classifier_training_jobs_status(job_ids, status):
 
     classifier_models.ClassifierTrainingJobModel.put_multi(
         classifier_training_job_models)
-
 
 
 def mark_training_job_complete(job_id):

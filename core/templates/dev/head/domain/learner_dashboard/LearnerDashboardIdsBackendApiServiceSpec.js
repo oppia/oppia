@@ -72,7 +72,8 @@ describe('Learner Dashboard Backend API Service', function() {
     }
   );
 
-  it('should use rejection handler if learner dashboard IDs' + 
+  it(
+    'should use rejection handler if learner dashboard IDs' +
     ' data backend request failed',
     function() {
       var successHandler = jasmine.createSpy('success');
@@ -87,6 +88,5 @@ describe('Learner Dashboard Backend API Service', function() {
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(jasmine.objectContaining(
         {data : 'Error loading dashboard IDs data.'}));
-    }
-  );
+    });
 });

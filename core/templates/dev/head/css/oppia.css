@@ -1,12 +1,9 @@
 /*
   Copyright 2014 The Oppia Authors. All Rights Reserved.
-
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
-
       http://www.apache.org/licenses/LICENSE-2.0
-
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -1065,6 +1062,7 @@ textarea {
 
 .oppia-sidebar-menu-open .oppia-sidebar-menu {
   box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
+  height: 110vh;
   overflow-y: scroll;
   -ms-transform: translate(0, 0);
   -webkit-transform: translate3d(0, 0, 0);
@@ -1191,7 +1189,6 @@ textarea {
 }
 /*
   This is needed for proper display of tabs. See
-
   https://github.com/angular-ui/bootstrap/commit/8620aedba99b05822311
 */
 .navbar-nav, .uib-pagination {
@@ -2163,11 +2160,8 @@ pre.oppia-pre-wrapped-text {
 
 /* These rules must be kept in sync with corresponding rules in
    pages/exploration_player/conversation_skin_directive.html
-   (those with '.conversation-skin-tutor-card-top-content > p,
-   .conversation-skin-oppia-feedback-content > p,
-   .conversation-skin-learner-answer-content > p,
-   .conversation-skin-help-card-content > p' selectors specifying
-    the same line-height, margin-top and margin-bottom attributes)
+   (those with '.rte-viewer > p' selectors specifying the same
+   line-height, margin-top and margin-bottom attributes)
 */
 .oppia-rte-editor > p,
 .oppia-rte-content > div > p {
@@ -4055,7 +4049,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-activity-summary-tile:hover .title-section-mask,
 .oppia-activity-summary-tile a:focus .title-section-mask {
   background-color: #eee;
-  height: 162px;
+  height: 100%;
   left: 0;
   opacity: 0.4;
   position: absolute;
@@ -4236,7 +4230,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-dashboard-statistics-card-link {
   background: white;
-  height: 25.5%;
+  height: 34%;
   opacity: 0;
   position: absolute;
   width: 184px;
@@ -4332,21 +4326,21 @@ md-card.preview-conversation-skin-supplemental-card {
 }
 
 .oppia-dashboard-card-view-item .mask-wrap {
-  height: 162px;
-  margin-top: -162px;
+  height: 64.8%;
+  margin-top: -88%;
   position: relative;
 }
 
 .oppia-dashboard-card-view-item .exp-private-text {
   font-size: 13px;
-  margin: 0.5em;
-  padding: 0.2em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-top: 0.8em;
 }
 
 .oppia-dashboard-card-view-item .metrics {
-  height: 50px;
-  margin: 13px 0 0 0;
-  padding-bottom: 10px;
+  margin: 0;
+  padding: 13px 0 10px;
 }
 
 .oppia-dashboard-card-view-item .metrics > li {
@@ -4879,6 +4873,72 @@ md-card.preview-conversation-skin-supplemental-card {
   color: rgba(255,255,255,1);
 }
 
+.oppia-on-off-switch {
+  position: relative;
+  width: 70px;
+}
+.oppia-on-off-switch-checkbox {
+  display: none;
+}
+.oppia-on-off-switch-label {
+  border: 2px solid #999999;
+  border-radius: 20px;
+  cursor: pointer;
+  display: block;
+  overflow: hidden;
+}
+.oppia-on-off-switch-inner {
+  display: block;
+  margin-left: -100%;
+  transition: margin 0.3s ease-in 0s;
+  width: 200%;
+}
+.oppia-on-off-switch-inner:before, .oppia-on-off-switch-inner:after {
+  box-sizing: border-box;
+  color: white;
+  display: block;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  float: left;
+  height: 20px;
+  line-height: 20px;
+  padding: 0;
+  width: 50%;
+}
+.oppia-on-off-switch-inner:before {
+  background-color: #04857C;
+  color: #FFFFFF;
+  content: "ON";
+  padding-left: 10px;
+}
+.oppia-on-off-switch-inner:after {
+  background-color: #EEEEEE;
+  color: #999999;
+  content: "OFF";
+  padding-right: 10px;
+  text-align: right;
+}
+.oppia-on-off-switch-main {
+  background: #FFFFFF;
+  border: 2px solid #999999;
+  border-radius: 20px;
+  bottom: 0;
+  display: block;
+  margin: 3.5px;
+  position: absolute;
+  right: 41px;
+  top: 0;
+  transition: all 0.3s ease-in 0s;
+  width: 18px;
+}
+.oppia-on-off-switch-checkbox:checked + .oppia-on-off-switch-label .oppia-on-off-switch-inner {
+  margin-left: 0;
+}
+.oppia-on-off-switch-checkbox:checked + .oppia-on-off-switch-label .oppia-on-off-switch-main {
+  right: 0;
+}
+
 /*
   about/learners/creators media queries
 */
@@ -4982,4 +5042,33 @@ md-card.preview-conversation-skin-supplemental-card {
   opacity: 0;
   padding: 0;
   width: 1px;
+}
+
+.oppia-dashboard-tooltip {
+  display: inline-block;
+  position: relative;
+}
+
+.oppia-dashboard-tooltip-text {
+  background-color: #009688;
+  border-radius: 6px;
+  bottom: 97%;
+  color: #fff;
+  font-size: 0.6em;
+  padding: 5px;
+  position: absolute;
+  text-align: center;
+  visibility: hidden;
+  width: auto;
+  z-index: 1;
+}
+
+@media screen and (max-width: 500px) {
+  .oppia-dashboard-tooltip-text {
+    width: 90%;
+  }
+}
+
+.oppia-dashboard-tooltip:hover + .oppia-dashboard-tooltip-text {
+  visibility: visible;
 }

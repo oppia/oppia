@@ -56,17 +56,14 @@ oppia.factory('CodeReplPredictionService', [
             tokenId === PythonProgramTokenType.COMMENT ||
             tokenName.trim() === '') {
             continue;
-          }
-          else if (
+          } else if (
             tokenId === PythonProgramTokenType.NAME &&
             KW_LIST.indexOf(tokenName) === -1) {
             tokenizedProgram.push(TOKEN_NAME_VAR);
-          }
-          else {
+          } else {
             if (tokenToId.hasOwnProperty(tokenName)) {
               tokenizedProgram.push(tokenName);
-            }
-            else {
+            } else {
               tokenizedProgram.push(TOKEN_NAME_UNK);
             }
           }
@@ -89,13 +86,11 @@ oppia.factory('CodeReplPredictionService', [
             tokenId === PythonProgramTokenType.COMMENT ||
             tokenName.trim() === '') {
             continue;
-          }
-          else if (
+          } else if (
             tokenId === PythonProgramTokenType.NAME &&
             KW_LIST.indexOf(tokenName) === -1) {
             tokenizedProgram.push(TOKEN_NAME_VAR);
-          }
-          else {
+          } else {
             tokenizedProgram.push(tokenName);
           }
         }
@@ -114,10 +109,10 @@ oppia.factory('CodeReplPredictionService', [
 
         var smallSet = (
           (multisetA.length < multisetB.length) ?
-          multisetA.slice() : multisetB.slice());
+            multisetA.slice() : multisetB.slice());
         var unionSet = (
           (multisetA.length < multisetB.length) ?
-          multisetB.slice() : multisetA.slice());
+            multisetB.slice() : multisetA.slice());
         var index = 0;
         var extraElements = [];
 
@@ -127,8 +122,7 @@ oppia.factory('CodeReplPredictionService', [
           }
           if (index >= unionSet.length || elem < unionSet[index]) {
             extraElements.push(elem);
-          }
-          else if (elem === unionSet[index]) {
+          } else if (elem === unionSet[index]) {
             index += 1;
           }
         });
@@ -247,8 +241,7 @@ oppia.factory('CodeReplPredictionService', [
           var outputClass = neighbor[0];
           if (classCount.hasOwnProperty(outputClass)) {
             classCount[outputClass] += 1;
-          }
-          else {
+          } else {
             classCount[outputClass] = 1;
           }
         });
@@ -271,8 +264,7 @@ oppia.factory('CodeReplPredictionService', [
               // failed.
               return predictedClass.toString();
             }
-          }
-          else {
+          } else {
             return predictedClass.toString();
           }
         }

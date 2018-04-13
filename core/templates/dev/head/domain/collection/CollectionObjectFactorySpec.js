@@ -423,9 +423,9 @@ describe('Collection object factory', function() {
     // Check get all skills.
     var expectedSkills = {};
     expectedSkills[skillId1] = CollectionSkillObjectFactory.createFromIdAndName(
-        skillId1, 'skill01');
+      skillId1, 'skill01');
     expectedSkills[skillId2] = CollectionSkillObjectFactory.createFromIdAndName(
-        skillId2, 'skill02');
+      skillId2, 'skill02');
     expect(_sampleCollection.getCollectionSkills()).toEqual(expectedSkills);
   });
 

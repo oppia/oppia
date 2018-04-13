@@ -57,6 +57,7 @@ import re
 import subprocess
 import sys
 import time
+
 # pylint: enable=wrong-import-order
 
 _PARSER = argparse.ArgumentParser()
@@ -128,7 +129,7 @@ BAD_PATTERNS_JS_REGEXP = [
     }
 ]
 
-BAD_PATTERNS_HTML_REGEXP = [
+BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
         'regexp': r"text\/ng-template",
         'message': "The directives must be directly referenced.",
@@ -143,6 +144,12 @@ BAD_PATTERNS_HTML_REGEXP = [
             'extensions/classifiers/',
             'extensions/objects/',
             'extensions/value_generators/')
+    },
+    {
+        'regexp': r"[ \t]+$",
+        'message': "There should not be any trailing whitespaces.",
+        'excluded_files': (),
+        'excluded_dirs': ()
     }
 ]
 
@@ -154,11 +161,16 @@ REQUIRED_STRINGS_FECONF = {
     }
 }
 
+ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
+
+EXCLUDED_PHRASES = [
+    'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'scripts/pre_commit_linter.py', 'integrations/*',
-    'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg',
-    '*.min.js', 'assets/scripts/*', 'core/tests/data/*', '*.mp3')
+    'integrations/*', 'integrations_dev/*', '*.svg',
+    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
+    'assets/scripts/*', 'core/tests/data/*', '*.mp3')
 
 
 if not os.getcwd().endswith('oppia'):
@@ -177,19 +189,18 @@ _PATHS_TO_INSERT = [
     _PYLINT_PATH,
     os.getcwd(),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine', 'lib', 'webapp2-2.3'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine', 'lib', 'yaml-3.10'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine', 'lib', 'jinja2-2.6'),
     os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.50',
+        _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'numpy-1.6.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.3.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
@@ -203,9 +214,13 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
-import isort             # pylint: disable=wrong-import-position
-import pycodestyle       # pylint: disable=wrong-import-position
-from pylint import lint  # pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position
+
+import isort  # isort:skip
+import pycodestyle  # isort:skip
+from pylint import lint  # isort:skip
+
+# pylint: enable=wrong-import-position
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
@@ -331,11 +346,12 @@ def _lint_js_files(node_path, eslint_path, files_to_lint, stdout,
     print 'Js linting finished.'
 
 
-def _lint_py_files(config_pylint, files_to_lint, result):
+def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
     """Prints a list of lint errors in the given list of Python files.
 
     Args:
         config_pylint: str. Path to the .pylintrc file.
+        config_pycodestyle: str. Path to the tox.ini file.
         files_to_lint: list(str). A list of filepaths to lint.
         result: multiprocessing.Queue. A queue to put results of test.
 
@@ -366,12 +382,19 @@ def _lint_py_files(config_pylint, files_to_lint, result):
         print 'Linting Python files %s to %s...' % (
             current_batch_start_index + 1, current_batch_end_index)
 
-        try:
-            # This prints output to the console.
-            lint.Run(current_files_to_lint + [config_pylint])
-        except SystemExit as e:
-            if str(e) != '0':
-                are_there_errors = True
+        # This line invokes Pylint and prints its output to the console.
+        pylinter = lint.Run(
+            current_files_to_lint + [config_pylint],
+            exit=False).linter
+
+        # These lines invoke Pycodestyle.
+        style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
+        pycodestyle_report = style_guide.check_files(current_files_to_lint)
+        # This line prints Pycodestyle's output to the console.
+        pycodestyle_report.print_statistics()
+
+        if pylinter.msg_status != 0 or pycodestyle_report.get_count() != 0:
+            are_there_errors = True
 
         current_batch_start_index = current_batch_end_index
 
@@ -435,6 +458,8 @@ def _pre_commit_linter(all_files):
 
     config_pylint = '--rcfile=%s' % pylintrc_path
 
+    config_pycodestyle = os.path.join(os.getcwd(), 'tox.ini')
+
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
     node_path = os.path.join(
@@ -463,7 +488,7 @@ def _pre_commit_linter(all_files):
     py_result = multiprocessing.Queue()
     linting_processes.append(multiprocessing.Process(
         target=_lint_py_files,
-        args=(config_pylint, py_files_to_lint, py_result)))
+        args=(config_pylint, config_pycodestyle, py_files_to_lint, py_result)))
     print 'Starting Javascript and Python Linting'
     print '----------------------------------------'
     for process in linting_processes:
@@ -563,9 +588,13 @@ def _check_bad_pattern_in_file(filename, content, pattern):
     if not (any(filename.startswith(excluded_dir)
                 for excluded_dir in pattern['excluded_dirs'])
             or filename in pattern['excluded_files']):
-        if re.search(regexp, content):
-            print '%s --> %s' % (
-                filename, pattern['message'])
+        bad_pattern_count = 0
+        for line_num, line in enumerate(content.split('\n'), 1):
+            if re.search(regexp, line):
+                print '%s --> Line %s: %s' % (
+                    filename, line_num, pattern['message'])
+                bad_pattern_count += 1
+        if bad_pattern_count:
             return True
     return False
 
@@ -579,8 +608,12 @@ def _check_bad_patterns(all_files):
     total_error_count = 0
     summary_messages = []
     all_files = [
-        filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+        filename for filename in all_files if not (
+            filename.endswith('pre_commit_linter.py') or
+            any(
+                fnmatch.fnmatch(filename, pattern)
+                for pattern in EXCLUDED_PATHS)
+            )]
     failed = False
     for filename in all_files:
         with open(filename) as f:
@@ -602,7 +635,7 @@ def _check_bad_patterns(all_files):
                         total_error_count += 1
 
             if filename.endswith('.html'):
-                for regexp in BAD_PATTERNS_HTML_REGEXP:
+                for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
                     if _check_bad_pattern_in_file(filename, content, regexp):
                         failed = True
                         total_error_count += 1
@@ -670,49 +703,213 @@ def _check_import_order(all_files):
     return summary_messages
 
 
-def _check_def_spacing(all_files):
-    """This function checks the number of blank lines
-    above each class, function and method defintion.
-    """
-    print 'Starting def-spacing checks'
+def _check_comments(all_files):
+    """This function ensures that comments end in a period."""
+    print 'Starting comment checks'
     print '----------------------------------------'
-    print ''
-    pycodestyle_config_path = os.path.join(os.getcwd(), 'tox.ini')
     summary_messages = []
-    # Select only Python files to check for errors
     files_to_check = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.py')]
-    style_guide = pycodestyle.StyleGuide(config_file=pycodestyle_config_path)
-    report = style_guide.check_files(files_to_check)
-    report.print_statistics()
+    message = 'There should be a period at the end of the comment.'
+    failed = False
+    for filename in files_to_check:
+        with open(filename, 'r') as f:
+            file_content = f.readlines()
+            file_length = len(file_content)
+            for line_num in range(file_length):
+                line = file_content[line_num].lstrip().rstrip()
+                next_line = ''
+                if line_num + 1 < file_length:
+                    next_line = file_content[line_num + 1].lstrip().rstrip()
+
+                if line.startswith('#') and not next_line.startswith('#'):
+                    # Check that the comment ends with the proper punctuation.
+                    last_char_is_invalid = line[-1] not in (
+                        ALLOWED_TERMINATING_PUNCTUATIONS)
+                    no_word_is_present_in_excluded_phrases = not any(
+                        word in line for word in EXCLUDED_PHRASES)
+                    if last_char_is_invalid and (
+                            no_word_is_present_in_excluded_phrases):
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                            filename, line_num + 1, message)
+
+
+    print ''
     print '----------------------------------------'
     print ''
-    if report.get_count() != 0:
+    if failed:
         summary_message = (
-            '%s   Def spacing checks failed' % _MESSAGE_TYPE_FAILED)
+            '%s   Comments check failed' % _MESSAGE_TYPE_FAILED)
         print summary_message
         summary_messages.append(summary_message)
     else:
         summary_message = (
-            '%s   Def spacing checks passed' % _MESSAGE_TYPE_SUCCESS)
+            '%s   Comments check passed' % _MESSAGE_TYPE_SUCCESS)
         print summary_message
         summary_messages.append(summary_message)
+
+    return summary_messages
+
+
+def _check_docstrings(all_files):
+    """This function ensures that docstrings end in a period."""
+    print 'Starting docstring checks'
+    print '----------------------------------------'
+    summary_messages = []
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.py')]
+    missing_period_message = (
+        'There should be a period at the end of the docstring.')
+    multiline_docstring_message = (
+        'Multiline docstring should end with a new line.')
+    single_line_docstring_message = (
+        'Single line docstring should not span two lines. '
+        'If line length exceeds 80 characters, '
+        'convert the single line docstring to a multiline docstring.')
+    failed = False
+    for filename in files_to_check:
+        with open(filename, 'r') as f:
+            file_content = f.readlines()
+            file_length = len(file_content)
+            for line_num in range(file_length):
+                line = file_content[line_num].lstrip().rstrip()
+                prev_line = ''
+
+                if line_num > 0:
+                    prev_line = file_content[line_num - 1].lstrip().rstrip()
+
+                # Check for single line docstring.
+                if line.startswith('"""') and line.endswith('"""'):
+                    # Check for punctuation at line[-4] since last three
+                    # characters are double quotes.
+                    if (len(line) > 6) and (
+                            line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                            filename, line_num + 1, missing_period_message)
+
+                # Check if single line docstring span two lines.
+                elif line == '"""' and prev_line.startswith('"""'):
+                    failed = True
+                    print '%s --> Line %s: %s' % (
+                        filename, line_num, single_line_docstring_message)
+
+                # Check for multiline docstring.
+                elif line.endswith('"""'):
+                    # Case 1: line is """. This is correct for multiline
+                    # docstring.
+                    if line == '"""':
+                        line = file_content[line_num - 1].lstrip().rstrip()
+                        # Check for punctuation at end of docstring.
+                        last_char_is_invalid = line[-1] not in (
+                            ALLOWED_TERMINATING_PUNCTUATIONS)
+                        no_word_is_present_in_excluded_phrases = not any(
+                            word in line for word in EXCLUDED_PHRASES)
+                        if last_char_is_invalid and (
+                                no_word_is_present_in_excluded_phrases):
+                            failed = True
+                            print '%s --> Line %s: %s' % (
+                                filename, line_num, missing_period_message)
+
+                    # Case 2: line contains some words before """. """ should
+                    # shift to next line.
+                    elif not any(word in line for word in EXCLUDED_PHRASES):
+                        failed = True
+                        print '%s --> Line %s: %s' % (
+                            filename, line_num + 1, multiline_docstring_message)
+
     print ''
+    print '----------------------------------------'
+    print ''
+    if failed:
+        summary_message = (
+            '%s   Docstring check failed' % _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = (
+            '%s   Docstring check passed' % _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    return summary_messages
+
+
+def _check_html_directive_name(all_files):
+    """This function checks that all HTML directives end
+    with _directive.html.
+    """
+    print 'Starting HTML directive name check'
+    print '----------------------------------------'
+    total_files_checked = 0
+    total_error_count = 0
+    summary_messages = []
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.js')]
+    failed = False
+    summary_messages = []
+    # For RegExp explanation, please see https://regex101.com/r/gU7oT6/37.
+    pattern_to_match = (
+        r"templateUrl: UrlInterpolationService\.[A-z\(]+" +
+        r"(?P<directive_name>[^\)]+)")
+    for filename in files_to_check:
+        with open(filename) as f:
+            content = f.read()
+        total_files_checked += 1
+        matched_patterns = re.findall(pattern_to_match, content)
+        for matched_pattern in matched_patterns:
+            matched_pattern = matched_pattern.split()
+            directive_filename = ''.join(matched_pattern).replace(
+                '\'', '').replace('+', '')
+            if not directive_filename.endswith('_directive.html'):
+                failed = True
+                total_error_count += 1
+                print (
+                    '%s --> Please ensure that this file ends'
+                    'with _directive.html.' % directive_filename)
+    if failed:
+        summary_message = '%s   HTML directive name check failed' % (
+            _MESSAGE_TYPE_FAILED)
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s   HTML directive name check passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+    if total_files_checked == 0:
+        print 'There are no files to be checked.'
+    else:
+        print '(%s files checked, %s errors found)' % (
+            total_files_checked, total_error_count)
+        print summary_message
+
     return summary_messages
 
 
 def main():
     all_files = _get_all_files()
-    def_spacing_messages = _check_def_spacing(all_files)
+    html_directive_name_messages = _check_html_directive_name(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
+    docstring_messages = _check_docstrings(all_files)
+    comment_messages = _check_comments(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
-        def_spacing_messages + import_order_messages +
-        newline_messages + linter_messages + pattern_messages)
+        html_directive_name_messages +
+        import_order_messages + newline_messages +
+        docstring_messages + comment_messages +
+        linter_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)

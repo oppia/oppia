@@ -66,8 +66,7 @@ logicDemo.controller('TestCtrl', function($scope) {
         $scope.questionData);
       try {
         logicProofStudent.validateProof($scope.proofString, questionInstance);
-      }
-      catch (err) {
+      } catch (err) {
         $scope.displayMessage(err.message, err.line);
       }
     } else {
@@ -84,8 +83,7 @@ logicDemo.controller('TestCtrl', function($scope) {
       logicProofStudent.checkProof(proof, questionInstance);
       $scope.proofError = '';
       $scope.checkSuccess = true;
-    }
-    catch (err) {
+    } catch (err) {
       $scope.displayMessage(err.message, err.line);
       $scope.checkSuccess = false;
     }
@@ -103,7 +101,7 @@ logicDemo.controller('TestCtrl', function($scope) {
     };
     for (var i = 0; i < questionInstance.mistake_table.length; i++) {
       for (var j = 0;
-           j < questionInstance.mistake_table[i].entries.length; j++) {
+        j < questionInstance.mistake_table[i].entries.length; j++) {
         var mistake = questionInstance.mistake_table[i].entries[j];
         if (mistake.name === $scope.mistakeName) {
           $scope.localCheck = logicProofStudent.evaluate(
@@ -138,8 +136,7 @@ logicDemo.controller('TestCtrl', function($scope) {
       $scope.targetDisplay = logicProofShared.displayExpression(
         $scope.questionData.results[0],
         $scope.questionData.language.operators);
-    }
-    catch (err) {
+    } catch (err) {
       $scope.questionError = err.message;
       $scope.questionSuccess = false;
     }
@@ -163,8 +160,7 @@ logicDemo.controller('TestCtrl', function($scope) {
       $scope.lineTemplateSuccess = true;
       $scope.LineTemplateErrors = $scope.buildErrors(
         $scope.lineTemplateStrings.length);
-    }
-    catch (err) {
+    } catch (err) {
       $scope.LineTemplateErrors = err;
       $scope.lineTemplateSuccess = false;
     }
@@ -211,8 +207,7 @@ logicDemo.controller('TestCtrl', function($scope) {
       $scope.mistakeSuccess[sectionNumber] = true;
       $scope.mistakeErrors[sectionNumber] = $scope.buildErrors(
         $scope.mistakeStrings[sectionNumber].entries.length);
-    }
-    catch (err) {
+    } catch (err) {
       $scope.mistakeSuccess[sectionNumber] = false;
       $scope.mistakeErrors[sectionNumber] = err;
     }
@@ -234,8 +229,7 @@ logicDemo.controller('TestCtrl', function($scope) {
         logicProofTeacher2.buildControlFunctionTable(
           $scope.controlFunctionStrings));
       $scope.controlFunctionSuccess = true;
-    }
-    catch (err) {
+    } catch (err) {
       $scope.controlFunctionErrors[err.line] = err.message;
       $scope.controlFunctionSuccess = false;
     }

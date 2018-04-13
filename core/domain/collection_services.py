@@ -133,7 +133,7 @@ def get_collection_from_model(collection_model, run_conversion=True):
             copy.deepcopy(collection_model.collection_contents)
     }
 
-    # If collection is in version 2, copy nodes data to collection contents
+    # If collection is in version 2, copy nodes data to collection contents.
     if collection_model.schema_version == 2:
         versioned_collection_contents['collection_contents'] = {
             'nodes': copy.deepcopy(collection_model.nodes)
@@ -1019,7 +1019,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
 
     if contributor_id_to_add not in feconf.SYSTEM_USER_IDS:
         if contributor_id_to_add is None:
-            # Revert commit or other non-positive commit
+            # Revert commit or other non-positive commit.
             contributors_summary = compute_collection_contributors_summary(
                 collection.id)
         else:
@@ -1167,7 +1167,7 @@ def load_demo(collection_id):
     """Loads a demo collection.
 
     The resulting collection will have version 2 (one for its initial
-    creation and one for its subsequent modification.)
+    creation and one for its subsequent modification).
 
     Args:
         collection_id: str. ID of the collection to be loaded.

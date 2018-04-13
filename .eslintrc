@@ -3,104 +3,32 @@
     "eslint:recommended",
   ],
   "plugins": [
+    "angular",
     "html"
   ],
   "rules": {
-    "eqeqeq": [
-      "error",
-      "always"
-    ],
-    "no-empty": [
+    "angular/di-unused": 2,
+    "angular/no-inline-template": [
       "error",
       {
-        "allowEmptyCatch": true
+        "allowSimple": true
       }
     ],
-    "no-redeclare": [
-      "off"
-    ],
-    "no-unused-vars": [
-      "off"
-    ],
-    "no-console": [
+    "brace-style":[
       "error",
-      {
-        "allow": [
-          "error",
-          "warn"
-        ]
-      }
-    ],
-    "no-constant-condition": [
-      "off"
-    ],
-    "func-style": [
-      "error",
-      "expression"
-    ],
-    "no-multi-str": [
-      "error"
-    ],
-    "no-multi-spaces": [
-      "error"
-    ],
-    "no-undef": [
-      "off"
-    ],
-    "one-var": [
-      "off"
-    ],
-    "padded-blocks": [
-      "error",
-      "never"
-    ],
-    "quote-props": [
-      "error",
-      "as-needed",
-      {
-        "keywords": true
-      }
-    ],
-    "semi": [
-      "error",
-      "always"
-    ],
-    "space-unary-ops": [
-      "error",
-      {
-        "words": true,
-        "nonwords": false,
-      }
-    ],
-    "space-before-function-paren": [
-      "error",
-      {
-        "anonymous": "ignore",
-        "named": "never"
-      }
-    ],
-    "indent": [
-      "error",
-      2,
-      {
-        "ArrayExpression": "first",
-        "FunctionExpression": {
-          "body": 1,
-          "parameters": 2
-        },
-        "MemberExpression": 1,
-        "SwitchCase": 1
-      }
-    ],
-    "max-len": [
-      "error",
-      "code": 80,
-      "ignoreUrls": true
+      "1tbs"
     ],
     "camelcase": [
       "error",
       {
         "properties": "never"
+      }
+    ],
+    "comma-spacing": [
+      "error",
+      {
+        "before": false,
+        "after": true
       }
     ],
     "curly": [
@@ -113,16 +41,88 @@
         "allowKeywords": false
       }
     ],
+    "eqeqeq": [
+      "error",
+      "always"
+    ],
+    "func-style": [
+      "error",
+      "expression"
+    ],
+    "indent": [
+      "error",
+      2,
+      {
+        "ArrayExpression": 1,
+        "flatTernaryExpressions": true,
+        "FunctionExpression": {
+          "body": 1,
+          "parameters": 2
+        },
+        "MemberExpression": 1,
+        "SwitchCase": 1
+      }
+    ],
+    "keyword-spacing": [
+      "error",
+      {
+        "before": true,
+        "after": true
+      }
+    ],
+    "max-len": [
+      "error",
+      "code": 80,
+      "ignoreUrls": true
+    ],
+    "no-compare-neg": "off",
+    "no-console": [
+      "error",
+      {
+        "allow": [
+          "error",
+          "warn"
+        ]
+      }
+    ],
+    "no-constant-condition": [
+      "off"
+    ],
+    "no-empty": [
+      "error",
+      {
+        "allowEmptyCatch": true
+      }
+    ],
+    "no-multi-spaces": [
+      "error"
+    ],
+    "no-multi-str": [
+      "error"
+    ],
+    "no-redeclare": [
+      "off"
+    ],
+    "no-useless-escape": "off",
+    "no-trailing-spaces": [
+      "error"
+    ],
+    "no-undef": [
+      "off"
+    ],
+    "no-unused-vars": [
+      "off"
+    ],
+    "one-var": [
+      "off"
+    ],
     "operator-linebreak": [
       "error",
       "after"
     ],
-    "wrap-iife": [
+    "padded-blocks": [
       "error",
-      "any"
-    ],
-    "space-infix-ops": [
-      "error"
+      "never"
     ],
     "quotes": [
       "error",
@@ -130,6 +130,39 @@
       {
         "avoidEscape": true
       }
+    ],
+    "quote-props": [
+      "error",
+      "as-needed",
+      {
+        "keywords": true
+      }
+    ],
+    "semi": [
+      "error",
+      "always"
+    ],
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "ignore",
+        "asyncArrow": "ignore",
+        "named": "never",
+      }
+    ],
+    "space-infix-ops": [
+      "error"
+    ],
+    "space-unary-ops": [
+      "error",
+      {
+        "words": true,
+        "nonwords": false,
+      }
+    ],
+    "wrap-iife": [
+      "error",
+      "any"
     ]
   }
 }

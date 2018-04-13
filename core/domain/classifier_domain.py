@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain objects for classifier models"""
+"""Domain objects for classifier models."""
 
 import copy
 import datetime

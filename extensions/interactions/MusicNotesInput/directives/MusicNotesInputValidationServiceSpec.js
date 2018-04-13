@@ -23,7 +23,7 @@ describe('MusicNotesInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     validatorService = $injector.get('MusicNotesInputValidationService');
 
     WARNING_TYPES = $injector.get('WARNING_TYPES');

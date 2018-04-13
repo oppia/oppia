@@ -117,28 +117,28 @@ describe('Exploration object factory', function() {
         .toEqual('content');
     });
 
-    it('should correctly get audio translations from an exploration', 
-    function() {
-      expect(exploration.getAllAudioTranslations('hi-en')).toEqual({
-        'first state': [atof.createFromBackendDict({
-          filename: 'myfile3.mp3',
-          file_size_bytes: 430000,
-          needs_update: false
-        })],
-        'second state': [atof.createFromBackendDict({
-          filename: 'myfile2.mp3',
-          file_size_bytes: 120000,
-          needs_update: false
-        })]
+    it('should correctly get audio translations from an exploration',
+      function() {
+        expect(exploration.getAllAudioTranslations('hi-en')).toEqual({
+          'first state': [atof.createFromBackendDict({
+            filename: 'myfile3.mp3',
+            file_size_bytes: 430000,
+            needs_update: false
+          })],
+          'second state': [atof.createFromBackendDict({
+            filename: 'myfile2.mp3',
+            file_size_bytes: 120000,
+            needs_update: false
+          })]
+        });
+        expect(exploration.getAllAudioTranslations('en')).toEqual({
+          'first state': [atof.createFromBackendDict({
+            filename: 'myfile1.mp3',
+            file_size_bytes: 210000,
+            needs_update: false
+          })],
+          'second state': []
+        });
       });
-      expect(exploration.getAllAudioTranslations('en')).toEqual({
-        'first state': [atof.createFromBackendDict({
-          filename: 'myfile1.mp3',
-          file_size_bytes: 210000,
-          needs_update: false
-        })],
-        'second state': []
-      });
-    });
   });
 });

@@ -18,6 +18,10 @@
 
 oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT', 30);
 
+oppia.constant(
+  'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
+  constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT);
+
 oppia.filter('spacesToUnderscores', [function() {
   return function(input) {
     return input.trim().replace(/ /g, '_');
@@ -88,7 +92,7 @@ oppia.filter('truncateAtFirstLine', [function() {
     var suffix = otherNonemptyLinesExist ? '...' : '';
     return (
       firstNonemptyLineIndex !== -1 ?
-      lines[firstNonemptyLineIndex] + suffix : '');
+        lines[firstNonemptyLineIndex] + suffix : '');
   };
 }]);
 
@@ -221,13 +225,13 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = '(';
           replacementText += (
             inputs[varName][0] >= 0.0 ?
-            latitude.toFixed(2) + '°N' :
-            -latitude.toFixed(2) + '°S');
+              latitude.toFixed(2) + '°N' :
+              -latitude.toFixed(2) + '°S');
           replacementText += ', ';
           replacementText += (
             inputs[varName][1] >= 0.0 ?
-            longitude.toFixed(2) + '°E' :
-            -longitude.toFixed(2) + '°W');
+              longitude.toFixed(2) + '°E' :
+              -longitude.toFixed(2) + '°W');
           replacementText += ')';
         } else if (varType === 'NormalizedString') {
           replacementText = '"' + inputs[varName] + '"';
@@ -236,7 +240,9 @@ oppia.filter('parameterizeRuleDescription', [
         } else if (varType === 'Fraction') {
           replacementText = FractionObjectFactory
             .fromDict(inputs[varName]).toString();
-        } else if (varType === 'SetOfUnicodeString') {
+        } else if (
+          varType === 'SetOfUnicodeString' ||
+          varType === 'SetOfNormalizedString') {
           replacementText = '[';
           for (var i = 0; i < inputs[varName].length; i++) {
             if (i !== 0) {
@@ -251,9 +257,17 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = inputs[varName] + '';
         } else if (
           varType === 'CodeString' || varType === 'UnicodeString' ||
-          varType === 'LogicErrorCategory' || varType === 'NormalizedString' ||
-          varType === 'SetOfNormalizedString') {
+          varType === 'LogicErrorCategory' || varType === 'NormalizedString') {
           replacementText = inputs[varName];
+        } else if (varType === 'ListOfCodeEvaluation') {
+          replacementText = '[';
+          for (var i = 0; i < inputs[varName].length; i++) {
+            if (i !== 0) {
+              replacementText += ', ';
+            }
+            replacementText += inputs[varName][i].code;
+          }
+          replacementText += ']';
         } else {
           throw Error('Unknown variable type in rule description');
         }
@@ -427,6 +441,20 @@ oppia.filter('stripFormatting', [function() {
     strippedText = strippedText ? String(strippedText).replace(
       tagRegex, '') : '';
     return strippedText;
+  };
+}]);
+
+oppia.filter('getAbbreviatedText', [function() {
+  return function(text, characterCount) {
+    if (text.length > characterCount) {
+      var subject = text.substr(0, characterCount);
+
+      if (subject.indexOf(' ') !== -1) {
+        subject = subject.split(' ').slice(0, -1).join(' ');
+      }
+      return subject.concat('...');
+    }
+    return text;
   };
 }]);
 

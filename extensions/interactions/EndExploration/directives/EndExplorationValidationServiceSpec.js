@@ -23,7 +23,7 @@ describe('EndExplorationValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     validatorService = $injector.get('EndExplorationValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 

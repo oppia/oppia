@@ -52,7 +52,7 @@ oppia.controller('StateInteraction', [
     $scope.getCurrentInteractionName = function() {
       return (
         stateInteractionIdService.savedMemento ?
-        INTERACTION_SPECS[stateInteractionIdService.savedMemento].name : '');
+          INTERACTION_SPECS[stateInteractionIdService.savedMemento].name : '');
     };
 
     $scope.doesCurrentInteractionHaveCustomizations = function() {
@@ -202,11 +202,11 @@ oppia.controller('StateInteraction', [
                     value: (
                       stateCustomizationArgsService.savedMemento.hasOwnProperty(
                         argName) ?
-                      angular.copy(
-                        stateCustomizationArgsService.savedMemento[
-                          argName].value) :
-                      angular.copy(
-                        $scope.customizationArgSpecs[i].default_value)
+                        angular.copy(
+                          stateCustomizationArgsService.savedMemento[
+                            argName].value) :
+                        angular.copy(
+                          $scope.customizationArgSpecs[i].default_value)
                     )
                   };
                 }
@@ -348,7 +348,8 @@ oppia.controller('StateInteraction', [
         stateInteractionIdService.displayed = null;
         stateCustomizationArgsService.displayed = {};
         stateSolutionService.displayed = null;
-
+        InteractionDetailsCacheService.removeDetails(
+          stateInteractionIdService.savedMemento);
         stateInteractionIdService.saveDisplayedValue();
         stateCustomizationArgsService.saveDisplayedValue();
         stateSolutionService.saveDisplayedValue();
