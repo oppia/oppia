@@ -1030,10 +1030,10 @@ class AccessLearnerDashboardDecoratorTest(test_utils.GenericTestBase):
 
 class EditTopicDecoratorTest(test_utils.GenericTestBase):
     """Tests the decorator can_edit_topic."""
-    username1 = 'topicmanager'
-    user_email1 = 'user@example.com'
-    username2 = 'normaluser'
-    user_email2 = 'user2@example.com'
+    manager_username = 'topicmanager'
+    manager_email = 'topicmanager@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
     topic_id = 'topic_1'
 
     class MockHandler(base.BaseHandler):
@@ -1044,17 +1044,17 @@ class EditTopicDecoratorTest(test_utils.GenericTestBase):
     def setUp(self):
         super(EditTopicDecoratorTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(self.user_email1, self.username1)
-        self.signup(self.user_email2, self.username2)
+        self.signup(self.manager_email, self.manager_username)
+        self.signup(self.viewer_email, self.viewer_username)
         self.set_admins([self.ADMIN_USERNAME])
-        self.set_topic_managers([self.username1])
+        self.set_topic_managers([self.manager_username])
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.manager_id = self.get_user_id_from_email(self.user_email1)
+        self.manager_id = self.get_user_id_from_email(self.manager_email)
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.manager = user_services.UserActionsInfo(self.manager_id)
 
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<topic_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
@@ -1063,16 +1063,28 @@ class EditTopicDecoratorTest(test_utils.GenericTestBase):
             self.admin, self.manager_id, topic_domain.ROLE_MANAGER,
             self.topic_id)
 
+    def test_admin_can_edit_topic(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.topic_id)
+        self.assertEqual(response['topic_id'], self.topic_id)
+        self.logout()
+
     def test_topic_manager_can_edit_topic(self):
-        self.login(self.user_email1)
-        response = self.testapp.get(
-            '/mock/%s' % self.topic_id, expect_errors=True)
-        self.assertEqual(response.status_int, 200)
+        self.login(self.manager_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.topic_id)
+        self.assertEqual(response['topic_id'], self.topic_id)
         self.logout()
 
     def test_normal_user_cannot_edit_topic(self):
-        self.login(self.user_email2)
-        response = self.testapp.get(
-            '/mock/%s' % self.topic_id, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            with self.assertRaisesRegexp(
+                Exception,
+                'You do not have credentials to edit this topic.'):
+                response = self.get_json(
+                    '/mock/%s' % self.topic_id, expect_errors=True)
+                print response
+        self.assertEqual(response['status_code'], 401)
         self.logout()

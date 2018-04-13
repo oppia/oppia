@@ -563,12 +563,12 @@ def can_edit_topic(handler):
         if topic_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if topic_services.check_can_manage_topic(
+        if topic_services.check_can_edit_topic(
                 self.user, topic_rights):
             return handler(self, topic_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to edit this exploration.')
+                'You do not have credentials to edit this topic.')
     test_can_edit.__wrapped__ = True
 
     return test_can_edit

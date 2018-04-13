@@ -53,4 +53,4 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic_id, user_ids)
         self.assertTrue(topic_rights.is_manager(self.user_id_a))
         self.assertTrue(topic_rights.is_manager(self.user_id_b))
-        self.assertFalse(topic_rights.is_manager('user3'))
+        self.assertFalse(topic_rights.is_manager('fakeuser'))

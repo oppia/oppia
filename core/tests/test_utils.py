@@ -394,7 +394,8 @@ tags: []
         """Convert a JSON server response to an object (such as a dict)."""
         if not expect_errors:
             self.assertEqual(json_response.status_int, 200)
-
+        if expect_errors:
+            print json_response
         self.assertEqual(
             json_response.content_type, 'application/json')
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))

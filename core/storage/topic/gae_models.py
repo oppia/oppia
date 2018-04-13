@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Model for an Oppia topic."""
+"""Models for topics and related constructs"""
 
 import core.storage.base_model.gae_models as base_models
 

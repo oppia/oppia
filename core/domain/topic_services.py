@@ -101,8 +101,8 @@ def get_topic_rights(topic_id, strict=True):
     return get_topic_rights_from_model(model)
 
 
-def check_can_manage_topic(user, topic_rights):
-    """Checks whether the user can manage the given topic.
+def check_can_edit_topic(user, topic_rights):
+    """Checks whether the user can edit the given topic.
 
     Args:
         user: UserActionsInfo. Object having user_id, role and actions for
@@ -110,14 +110,15 @@ def check_can_manage_topic(user, topic_rights):
         topic_rights: TopicRights or None. Rights object for the given topic.
 
     Returns:
-        bool. Whether the given user can manage the given topic.
+        bool. Whether the given user can edit the given topic.
     """
 
     if topic_rights is None:
         return False
     if role_services.ACTION_EDIT_OWNED_TOPIC not in user.actions:
         return False
-    if topic_rights.is_manager(user.user_id):
+    if (role_services.ACTION_EDIT_ANY_TOPIC in user.actions or
+        topic_rights.is_manager(user.user_id)):
         return True
 
     return False
@@ -130,14 +131,13 @@ def assign_role(committer, assignee_id, new_role, topic_id):
         committer: UserActionsInfo. UserActionInfo object for the user
             who is performing the action.
         assignee_id: str. ID of the user whose role is being changed.
-        new_role: str. The name of the new role
+        new_role: str. The name of the new role. Possible values are:
             ROLE_MANAGER
-            (TODO: Add more roles here if required)
         topic_id: str. ID of the topic.
 
     Raises:
         Exception. The committer does not have rights to modify a role.
-        Exception. The user is already a manager for the topic.
+        Exception. The assignee is already a manager for the topic.
         Exception. The role is invalid.
     """
     committer_id = committer.user_id
@@ -146,20 +146,26 @@ def assign_role(committer, assignee_id, new_role, topic_id):
     if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY not in
             committer.actions):
         logging.error(
-            'User %s tried to allow user %s to be a(n) %s of topic %s '
+            'User %s tried to allow user %s to be a %s of topic %s '
             'but was refused permission.' % (
                 committer_id, assignee_id, new_role, topic_id))
         raise Exception(
             'UnauthorizedUserException: Could not assign new role.')
 
     assignee_username = user_services.get_username(assignee_id)
-    old_role = topic_domain.ROLE_NONE
+    old_role = ''
 
     if new_role == topic_domain.ROLE_MANAGER:
         if topic_rights.is_manager(assignee_id):
             raise Exception('This user already is a manager for this topic')
-
+        old_role = topic_domain.ROLE_NONE
         topic_rights.manager_ids.append(assignee_id)
+    elif new_role == topic_domain.ROLE_NONE:
+        if topic_rights.is_manager(assignee_id):
+            old_role = topic_domain.ROLE_MANAGER
+            topic_rights.manager_ids.remove(assignee_id)
+        else:
+            old_role = topic_domain.ROLE_NONE
     else:
         raise Exception('Invalid role: %s' % new_role)
 
