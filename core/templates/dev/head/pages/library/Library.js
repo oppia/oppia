@@ -81,8 +81,8 @@ oppia.controller('Library', [
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
 
         $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+        $scope.activitiesOwned = {explorations: {}, collections: {}};
         if ($scope.userIsLoggedIn) {
-          $scope.activitiesOwned = {explorations: {}, collections: {}};
           $http.get('/creatordashboardhandler/data')
             .then(function(response) {
               $scope.libraryGroups.forEach(function(activityGroups) {
