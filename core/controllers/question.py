@@ -20,7 +20,7 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import question_domain
 from core.domain import question_services
-import feconf
+
 
 class QuestionsHandler(base.BaseHandler):
     """This handler completes PUT/DELETE requests for questions."""
@@ -75,4 +75,5 @@ class QuestionManagerHandler(base.BaseHandler):
     """This handler completes requests for question summaries.
        This class used to deal with getting all question ids linked to a
        collection, but as that functionality of collection is removed,
-       this class is currently deprecated."""
+       this class is currently deprecated.
+       """

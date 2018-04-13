@@ -116,6 +116,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
                     }
                 })
 
+
 class CollectionProgressUnitTests(CollectionServicesUnitTests):
     """Tests functions which deal with any progress a user has made within a
     collection, including query and recording methods related to explorations
@@ -897,6 +898,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
                     'property_name': 'tags',
                     'new_value': ['duplicate', 'duplicate']
                 }], 'Add a new tag')
+
 
 def _get_node_change_list(exploration_id, property_name, new_value):
     """Generates a change list for a single collection node change."""

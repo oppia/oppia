@@ -53,6 +53,9 @@ CMD_SWAP_COLLECTION_NODES = 'swap_nodes'
 CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
+# Currently, a node only has exploration_id as its parameter,
+# if any more are to be added, its changes have to be
+# specified here.
 CMD_EDIT_COLLECTION_NODE_PROPERTY = 'edit_collection_node_property'
 # This takes additional 'from_version' and 'to_version' parameters for logging.
 CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
@@ -277,6 +280,7 @@ class CollectionNode(object):
             value.
         """
         return cls(exploration_id)
+
 
 class Collection(object):
     """Domain object for an Oppia collection."""
@@ -782,7 +786,7 @@ class Collection(object):
             list(CollectionNode). A sorted list of collection nodes.
         """
         sorted_exp_ids = []
-        if (self.init_exploration_id):
+        if self.init_exploration_id:
             sorted_exp_ids.append(self.init_exploration_id)
         next_exp_id = self.get_next_exploration_id(sorted_exp_ids)
         while next_exp_id:

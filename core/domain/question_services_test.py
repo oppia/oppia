@@ -86,8 +86,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(model.language_code, language_code)
 
     def test_delete_question(self):
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
         question = question_domain.Question(
             'dummy', 'A Question',
             exp_domain.State.create_default_state('ABC').to_dict(),

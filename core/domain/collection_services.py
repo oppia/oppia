@@ -616,13 +616,6 @@ def apply_change_list(collection_id, change_list):
                 collection.delete_node(change.exploration_id)
             elif change.cmd == collection_domain.CMD_SWAP_COLLECTION_NODES:
                 collection.swap_nodes(change.first_index, change.second_index)
-            elif (
-                    change.cmd ==
-                    collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY):
-                collection_node = collection.get_node(change.exploration_id)
-                # Currently, a node only has exploration_id as its parameter,
-                # if any more are to be added, its changes have to be
-                # specified here
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
                 if (change.property_name ==
                         collection_domain.COLLECTION_PROPERTY_TITLE):

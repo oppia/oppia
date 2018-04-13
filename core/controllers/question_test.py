@@ -166,7 +166,6 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
             '%s' % feconf.QUESTION_CREATION_URL, payload, csrf_token,
             expect_errors=False)
         self.assertIn('question_id', response_json.keys())
-        question_id = response_json['question_id']
 
         another_question = question_domain.Question(
             'dummy', 'Question 2',

@@ -17,7 +17,6 @@
 """Services for questions data model."""
 
 import logging
-import random
 
 from core.domain import question_domain
 from core.platform import models
@@ -79,7 +78,6 @@ def delete_question(
             still retained in the datastore. This last option is the preferred
             one.
     """
-    question = get_question_by_id(question_id)
     question_model = question_models.QuestionModel.get(question_id)
     question_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_QUESTION_DELETED,
@@ -220,7 +218,6 @@ def update_question(
         commit_message: str or None. A description of changes made to the
             question.
     """
-    question = get_question_by_id(question_id)
     updated_question = apply_change_list(question_id, change_list)
     _save_question(
         committer_id, updated_question, change_list, commit_message)

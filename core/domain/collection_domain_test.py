@@ -406,8 +406,6 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         collection.add_node(self.EXPLORATION_ID)
         self.assertEqual(len(collection.nodes), 1)
 
-        collection_node = collection.get_node(self.EXPLORATION_ID)
-
         collection.validate()
 
         yaml_content = collection.to_yaml()
