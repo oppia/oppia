@@ -3952,6 +3952,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-activity-summary-tile.oppia-activity-playlist-tile .summary-section {
   display: inline-block;
   width: 65%;
+  margin-top: 3%;
 }
 
 .oppia-activity-summary-tile.oppia-activity-playlist-tile .activity-title {
@@ -3963,14 +3964,12 @@ md-card.preview-conversation-skin-supplemental-card {
   .oppia-activity-summary-tile.oppia-activity-playlist-tile .summary-section {
     width: 55%;
     float: right;
-    margin-top: 3%;
   }
 }
 
 @media (min-width: 895px) {
   .oppia-activity-summary-tile.oppia-activity-playlist-tile .summary-section {
     float: right;
-    margin-top: 3%;
   }
 }
 
@@ -4001,7 +4000,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
   .oppia-activity-summary-tile.oppia-activity-playlist-tile .summary-section {
     width: 47%;
-    float: right;
+    /* float: right; */
   }
 }
 
