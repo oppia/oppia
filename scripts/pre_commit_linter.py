@@ -905,6 +905,7 @@ def _check_directive_scope(all_files):
     print 'Starting directive scope check'
     print '----------------------------------------'
     summary_messages = []
+    # Select JS files which need to be checked.
     files_to_check = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
@@ -912,49 +913,70 @@ def _check_directive_scope(all_files):
     failed = False
     directive_has_isolated_scope = False
     summary_messages = []
+    # Use Pyjsparser to parse a JS file as a Python dictionary.
     parser = pyjsparser.PyJsParser()
     for filename in files_to_check:
         with open(filename) as f:
             content = f.read()
+        # Parse the body of the content as nodes.
         parsed_nodes = parser.parse(content)['body']
         for parsed_node in parsed_nodes:
+            # Check the type of the node.
             if parsed_node['type'] != 'ExpressionStatement':
                 continue
+            # Separate the expression part of the node.
             expression = parsed_node['expression']
-            if not (expression['type'] == 'CallExpression' and (
-                    expression['callee']['type'] == (
-                        'MemberExpression')) and (
-                            expression['callee']['property']['name'] == (
+            # Check whether the expression belongs to a directive.
+            if (expression['type'] != 'CallExpression' or (
+                    expression['callee']['type'] != (
+                        'MemberExpression')) or (
+                            expression['callee']['property']['name'] != (
                                 'directive'))):
                 continue
+            # Separate the arguments of the expression.
             arguments = expression['arguments']
-            directive_name = str(arguments[0]['value']) if (
-                arguments[0]['type'] == 'Literal') else (
-                    "No such directive exists.")
+            # The first argument of the expression is the 
+            # name of the directive.
+            if arguments[0]['type'] == 'Literal':
+                directive_name = str(arguments[0]['value'])
             arguments = arguments[1:]
             for argument in arguments:
+                # Check the type of an argument.
                 if argument['type'] != 'ArrayExpression':
                     continue
+                # Separate out the elements for the argument.
                 elements = argument['elements']
                 for element in elements:
+                    # Check the type of an element.
                     if element['type'] != 'FunctionExpression':
                         continue
+                    # Separate out the body of the element.
                     body = element['body']
                     if body['type'] != 'BlockStatement':
                         continue
+                    # Further separate the body elements from the body.
                     body_elements = body['body']
                     for body_element in body_elements:
-                        if not (body_element['type'] == 'ReturnStatement' and (
-                                body_element['argument']['type'] == (
+                        # Check if the body element is a return statement.
+                        if (body_element['type'] != 'ReturnStatement' or (
+                                body_element['argument']['type'] != (
                                     'ObjectExpression'))):
                             continue
+                        # Separate the properties of the return node.
                         return_node_properties = (
                             body_element['argument']['properties'])
+                        # Loop over all the properties of the return node
+                        # to find out the scope key.
                         for return_node_property in return_node_properties:
+                            # Check whether the property is scope.
                             if return_node_property['key']['type'] == (
                                     'Identifier') and (
                                         return_node_property['key']['name'] == (
                                             'scope')):
+                                # Separate the scope value and
+                                # check if it is an Object Expression.
+                                # If it is not, then check for scope: true
+                                # and report the error message.
                                 scope_value = return_node_property['value']
                                 if scope_value['type'] == 'ObjectExpression':
                                     directive_has_isolated_scope = True
@@ -966,10 +988,12 @@ def _check_directive_scope(all_files):
                                         'directive in %s file '
                                         'does not have scope set to '
                                         'true.' % (directive_name, filename))
+            # Check whether the directive has scope: {}
+            # else report the error message.
             if not directive_has_isolated_scope:
                 failed = True
                 print (
-                    'Please ensure that %s directive in %s file'
+                    'Please ensure that %s directive in %s file '
                     'has a scope: {}.' % (directive_name, filename))
     if failed:
         summary_message = '%s   Directive scope check failed' % (
