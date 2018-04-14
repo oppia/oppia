@@ -155,13 +155,13 @@ oppia.factory('ResponsesService', [
       } else {
         _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x--;
       }
-      _saveAnswerGroups(_answerGroups);
+      return _answerGroups;
     };
 
     var _makeRuleInvalid = function(answerGroupIndex, ruleIndex) {
       _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x =
         _answerChoices.length;
-      _saveAnswerGroups(_answerGroups);
+      return _answerGroups;
     };
 
     return {
@@ -367,6 +367,9 @@ oppia.factory('ResponsesService', [
       },
       makeRuleInvalid: function(answerGroupIndex, ruleIndex) {
         return _makeRuleInvalid(answerGroupIndex, ruleIndex);
+      },
+      saveAnswerGroups: function(newAnswerGroups) {
+        _saveAnswerGroups(newAnswerGroups);
       },
       // This registers the change to the handlers in the list of changes, and
       // also updates the states object in ExplorationStatesService.

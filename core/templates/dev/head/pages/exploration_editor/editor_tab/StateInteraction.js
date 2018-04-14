@@ -22,7 +22,7 @@ oppia.controller('StateInteraction', [
   'INTERACTION_SPECS', 'stateInteractionIdService',
   'stateCustomizationArgsService', 'EditabilityService',
   'ExplorationStatesService', 'GraphDataService',
-  'InteractionDetailsCacheService',
+  'InteractionDetailsCacheService', 'ResponsesService',
   'ExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
   function($scope, $http, $rootScope, $uibModal, $injector, $filter,
@@ -30,7 +30,7 @@ oppia.controller('StateInteraction', [
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, EditabilityService,
       ExplorationStatesService, GraphDataService,
-      InteractionDetailsCacheService,
+      InteractionDetailsCacheService, ResponsesService,
       ExplorationHtmlFormatterService, UrlInterpolationService,
       SubtitledHtmlObjectFactory, stateSolutionService, stateContentService) {
     var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
@@ -303,7 +303,16 @@ oppia.controller('StateInteraction', [
                 }
               };
 
+              $scope.$on('existingRulesChange', function(data) {
+                $scope.changedRules = data.targetScope.newAnswers;
+              });
+
               $scope.save = function() {
+                $scope.interactionId = stateInteractionIdService.savedMemento;
+                if ($scope.interactionId === 'MultipleChoiceInput') {
+                  ResponsesService.saveAnswerGroups($scope.changedRules);
+                }
+
                 EditorFirstTimeEventsService
                   .registerFirstSaveInteractionEvent();
                 $uibModalInstance.close();
