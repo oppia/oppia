@@ -35,11 +35,6 @@ oppia.factory('LearnerPlaylistService', [
               'You have already completed or are completing this ' +
               'activity.');
           }
-          if (response.data.belongs_to_subscribed_activities) {
-            successfullyAdded = false;
-            AlertsService.addInfoMessage(
-              'This is present in your creator dashboard');
-          }
           if (response.data.playlist_limit_exceeded) {
             successfullyAdded = false;
             AlertsService.addInfoMessage(

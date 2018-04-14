@@ -86,14 +86,17 @@ oppia.controller('Library', [
           $http.get('/creatordashboardhandler/data')
             .then(function(response) {
               $scope.libraryGroups.forEach(function(activityGroups) {
-                var activitySummaryDicts =
-                (activityGroups.activity_summary_dicts);
+                var activitySummaryDict = activityGroups.activity_summary_dicts;
 
-                activitySummaryDicts.forEach(function(activity) {
-                  if (activity.type === 'exploration') {
+                var ACTIVITY_TYPE_EXPLORATION = 'exploration';
+                var ACTIVITY_TYPE_COLLECTION = 'collection';
+                activitySummaryDict.forEach(function(activity) {
+                  if (activity.type === ACTIVITY_TYPE_EXPLORATION) {
                     $scope.activitiesOwned.explorations[activity.id] = false;
-                  } else {
+                  } else if (activity.type === ACTIVITY_TYPE_COLLECTION) {
                     $scope.activitiesOwned.collections[activity.id] = false;
+                  } else {
+                    throw error;
                   }
                 });
 
