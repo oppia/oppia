@@ -90,27 +90,24 @@ oppia.controller('Library', [
                 (activityGroups.activity_summary_dicts);
 
                 activitySummaryDicts.forEach(function(activity) {
-                  for ( i = 0;
-                    i < response.data.explorations_list.length; i++) {
+                  if (activity.type === 'exploration') {
                     $scope.activitiesOwned.explorations[activity.id] = false;
-                    var ownedExploration = response.data.explorations_list[i];
-
-                    if (ownedExploration.id === activity.id) {
-                      $scope.activitiesOwned.explorations[activity.id] = true;
-                      break;
-                    }
-                  }
-                  for ( i = 0;
-                    i < response.data.collections_list.length; i++) {
+                  } else {
                     $scope.activitiesOwned.collections[activity.id] = false;
-                    var ownedCollection = response.data.collections_list[i];
-
-                    if (ownedCollection.id === activity.id) {
-                      $scope.activitiesOwned.collections[activity.id] = true;
-                      break;
-                    }
                   }
                 });
+
+                response.data.explorations_list
+                  .forEach(function(ownedExplorations) {
+                    $scope.activitiesOwned.explorations[
+                      ownedExplorations.id] = true;
+                  });
+
+                response.data.collections_list
+                  .forEach(function(ownedCollections) {
+                    $scope.activitiesOwned.collections[
+                      ownedCollections.id] = true;
+                  });
               });
             });
         }
