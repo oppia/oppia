@@ -25,7 +25,7 @@ oppia.directive('activityTilesInfinityGrid', [
         'activity_tiles_infinity_grid_directive.html'),
       controller: [
         '$scope', '$rootScope', 'SearchService', 'WindowDimensionsService',
-        function ($scope, $rootScope, SearchService, WindowDimensionsService) {
+        function($scope, $rootScope, SearchService, WindowDimensionsService) {
           $scope.endOfPageIsReached = false;
           $scope.allActivitiesInOrder = [];
           // Called when the first batch of search results is retrieved from the
@@ -57,7 +57,7 @@ oppia.directive('activityTilesInfinityGrid', [
           $scope.libraryWindowIsNarrow = (
             WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
 
-          WindowDimensionsService.registerOnResizeHook(function () {
+          WindowDimensionsService.registerOnResizeHook(function() {
             $scope.libraryWindowIsNarrow = (
               WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
             $scope.$apply();
