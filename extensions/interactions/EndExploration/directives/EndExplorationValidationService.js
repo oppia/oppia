@@ -21,10 +21,28 @@ oppia.factory('EndExplorationValidationService', [
   function(WARNING_TYPES, baseInteractionValidationService) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
+        var warningsList = [];
         baseInteractionValidationService.requireCustomizationArguments(
           customizationArgs, ['recommendedExplorationIds']);
-        // TODO(juansaba): Implement customization args validations.
-        return [];
+
+        var recommendedExplorationIds = (
+          customizationArgs.recommendedExplorationIds.value);
+
+        if (!angular.isArray(recommendedExplorationIds)) {
+          warningsList.push({
+            type: WARNING_TYPES.ERROR,
+            message: 'Set of recommended exploration IDs must be list.'
+          });
+        }
+        for (var i = 0; i < recommendedExplorationIds.length; i++) {
+          if (!angular.isString(recommendedExplorationIds[i])) {
+            warningsList.push({
+              type: WARNING_TYPES.ERROR,
+              message: 'Recommended exploration ID must be a string.'
+            });
+          }
+        }
+        return warningsList;
       },
       getAllWarnings: function(
           stateName, customizationArgs, answerGroups, defaultOutcome) {
