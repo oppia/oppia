@@ -945,20 +945,27 @@ def _check_directive_scope(all_files):
                     body_elements = body['body']
                     for body_element in body_elements:
                         if not (body_element['type'] == 'ReturnStatement' and (
-                                body_element['argument']['type'] == 'ObjectExpression')):
+                                body_element['argument']['type'] == (
+                                    'ObjectExpression'))):
                             continue
-                        return_node_properties = body_element['argument']['properties']
+                        return_node_properties = (
+                            body_element['argument']['properties'])
                         for return_node_property in return_node_properties:
-                            if return_node_property['key']['type'] == 'Identifier' and (
-                                return_node_property['key']['name'] == 'scope'):
+                            if return_node_property['key']['type'] == (
+                                    'Identifier') and (
+                                        return_node_property['key']['name'] == (
+                                            'scope')):
                                 scope_value = return_node_property['value']
                                 if scope_value['type'] == 'ObjectExpression':
                                     directive_has_isolated_scope = True
-                                elif scope_value['type'] == 'Literal' and scope_value['value']:
+                                elif scope_value['type'] == 'Literal' and (
+                                        scope_value['value']):
                                     failed = True
                                     print (
-                                        'Please ensure that %s directive in %s file'
-                                        'does not have scope set to true.' % (directive_name, filename))
+                                        'Please ensure that %s '
+                                        'directive in %s file '
+                                        'does not have scope set to '
+                                        'true.' % (directive_name, filename))
             if not directive_has_isolated_scope:
                 failed = True
                 print (
