@@ -91,12 +91,15 @@ oppia.controller('Library', [
                 var ACTIVITY_TYPE_EXPLORATION = 'exploration';
                 var ACTIVITY_TYPE_COLLECTION = 'collection';
                 activitySummaryDict.forEach(function(activity) {
-                  if (activity.type === ACTIVITY_TYPE_EXPLORATION) {
+                  if (activity.activity_type === ACTIVITY_TYPE_EXPLORATION) {
                     $scope.activitiesOwned.explorations[activity.id] = false;
-                  } else if (activity.type === ACTIVITY_TYPE_COLLECTION) {
+                  } else if (
+                    activity.activity_type === ACTIVITY_TYPE_COLLECTION) {
                     $scope.activitiesOwned.collections[activity.id] = false;
                   } else {
-                    throw error;
+                    AlertsService.clearWarnings();
+                    AlertsService.addWarning(
+                      'Error encountered in activity type.');
                   }
                 });
 
