@@ -5,7 +5,7 @@
    aria-hidden="true"
    uib-tooltip="<['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]>"
    tooltip-placement="left"></i>
-<div ng-show="isContainerNarrow() && !belongsToLearnerPlaylist()" class="btn-group dropdown oppia-learner-dashboard-icon" uib-dropdown>
+<div ng-show="canActivityBeAddedToLearnerPlaylist(getActivityId()) && isContainerNarrow()" class="btn-group dropdown oppia-learner-dashboard-icon" uib-dropdown>
   <ul style="left:-150px;top:0" class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
     <li role="menuitem" ng-click="addToLearnerPlaylist(getActivityId(), getActivityType())">
       <a><['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]></a>
