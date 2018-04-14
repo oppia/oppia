@@ -935,7 +935,7 @@ def _check_directive_scope(all_files):
                 continue
             # Separate the arguments of the expression.
             arguments = expression['arguments']
-            # The first argument of the expression is the 
+            # The first argument of the expression is the
             # name of the directive.
             if arguments[0]['type'] == 'Literal':
                 directive_name = str(arguments[0]['value'])
