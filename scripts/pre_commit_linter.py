@@ -57,6 +57,7 @@ import re
 import subprocess
 import sys
 import time
+
 # pylint: enable=wrong-import-order
 
 _PARSER = argparse.ArgumentParser()
@@ -167,9 +168,9 @@ EXCLUDED_PHRASES = [
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'scripts/pre_commit_linter.py', 'integrations/*',
-    'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg',
-    '*.min.js', 'assets/scripts/*', 'core/tests/data/*', '*.mp3')
+    'integrations/*', 'integrations_dev/*', '*.svg',
+    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
+    'assets/scripts/*', 'core/tests/data/*', '*.mp3')
 
 
 if not os.getcwd().endswith('oppia'):
@@ -214,10 +215,14 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
-import isort             # pylint: disable=wrong-import-position
-import pycodestyle       # pylint: disable=wrong-import-position
-import pyjsparser        # pylint: disable=wrong-import-position
-from pylint import lint  # pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position
+
+import isort  # isort:skip
+import pycodestyle  # isort:skip
+import pyjsparser  # isort:skip
+from pylint import lint  # isort:skip
+
+# pylint: enable=wrong-import-position
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
@@ -605,8 +610,12 @@ def _check_bad_patterns(all_files):
     total_error_count = 0
     summary_messages = []
     all_files = [
-        filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+        filename for filename in all_files if not (
+            filename.endswith('pre_commit_linter.py') or
+            any(
+                fnmatch.fnmatch(filename, pattern)
+                for pattern in EXCLUDED_PATHS)
+            )]
     failed = False
     for filename in all_files:
         with open(filename) as f:
@@ -719,9 +728,12 @@ def _check_comments(all_files):
 
                 if line.startswith('#') and not next_line.startswith('#'):
                     # Check that the comment ends with the proper punctuation.
-                    if (line[-1] not in
-                            ALLOWED_TERMINATING_PUNCTUATIONS) and (
-                                not any(word in line for word in EXCLUDED_PHRASES)):
+                    last_char_is_invalid = line[-1] not in (
+                        ALLOWED_TERMINATING_PUNCTUATIONS)
+                    no_word_is_present_in_excluded_phrases = not any(
+                        word in line for word in EXCLUDED_PHRASES)
+                    if last_char_is_invalid and (
+                            no_word_is_present_in_excluded_phrases):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, message)
@@ -796,9 +808,12 @@ def _check_docstrings(all_files):
                     if line == '"""':
                         line = file_content[line_num - 1].lstrip().rstrip()
                         # Check for punctuation at end of docstring.
-                        if (line[-1] not in
-                                ALLOWED_TERMINATING_PUNCTUATIONS) and (
-                                    not any(word in line for word in EXCLUDED_PHRASES)):
+                        last_char_is_invalid = line[-1] not in (
+                            ALLOWED_TERMINATING_PUNCTUATIONS)
+                        no_word_is_present_in_excluded_phrases = not any(
+                            word in line for word in EXCLUDED_PHRASES)
+                        if last_char_is_invalid and (
+                                no_word_is_present_in_excluded_phrases):
                             failed = True
                             print '%s --> Line %s: %s' % (
                                 filename, line_num, missing_period_message)
