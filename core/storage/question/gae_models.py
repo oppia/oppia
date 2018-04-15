@@ -66,10 +66,9 @@ class QuestionModel(base_models.VersionedModel):
         """
 
         for _ in range(base_models.MAX_RETRIES):
-            new_id = '%s' % (
-                utils.convert_to_hash(
-                    str(utils.get_random_int(base_models.RAND_RANGE)),
-                    base_models.ID_LENGTH))
+            new_id = utils.convert_to_hash(
+                str(utils.get_random_int(base_models.RAND_RANGE)),
+                base_models.ID_LENGTH)
             if not cls.get_by_id(new_id):
                 return new_id
 

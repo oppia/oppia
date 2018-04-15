@@ -69,11 +69,3 @@ class QuestionCreationHandler(base.BaseHandler):
         return self.render_json({
             'question_id': question_id
         })
-
-
-class QuestionManagerHandler(base.BaseHandler):
-    """This handler completes requests for question summaries.
-       This class used to deal with getting all question ids linked to a
-       collection, but as that functionality of collection is removed,
-       this class is currently deprecated.
-       """

@@ -21,7 +21,6 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 
-import copy
 import re
 import string
 
@@ -53,9 +52,9 @@ CMD_SWAP_COLLECTION_NODES = 'swap_nodes'
 CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property'
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
-# Currently, a node only has exploration_id as its parameter,
-# if any more are to be added, its changes have to be
-# specified here.
+# Currently, a node only has exploration_id as its parameter, if more
+# parameters are to be added, the following CMD should be used
+# for its changelists.
 CMD_EDIT_COLLECTION_NODE_PROPERTY = 'edit_collection_node_property'
 # This takes additional 'from_version' and 'to_version' parameters for logging.
 CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
@@ -253,8 +252,7 @@ class CollectionNode(object):
         Returns:
             CollectionNode. The corresponding CollectionNode domain object.
         """
-        return cls(
-            copy.deepcopy(node_dict['exploration_id']))
+        return cls(node_dict['exploration_id'])
 
     def validate(self):
         """Validates various properties of the collection node.
@@ -729,12 +727,15 @@ class Collection(object):
         return [node.exploration_id for node in self.nodes]
 
     @property
-    def init_exploration_id(self):
+    def first_exploration_id(self):
         """Returns the first element in the node list of the collection, which
-           corresponds to the first node that the user would encounter.
+           corresponds to the first node that the user would encounter, or if
+           the collection is empty, returns None.
 
         Returns:
             str. The exploration ID of the first node.
+            OR
+            None. If the collection is empty.
         """
         if len(self.nodes) > 0:
             return self.nodes[0].exploration_id
@@ -743,7 +744,8 @@ class Collection(object):
 
     def get_next_exploration_id(self, completed_exp_ids):
         """Returns the first exploration id in the collection that has not yet
-           been completed by the learner.
+           been completed by the learner, or if the collection is completed,
+           returns None.
 
         Args:
             completed_exploration_ids: list(str). List of completed exploration
@@ -751,6 +753,8 @@ class Collection(object):
 
         Returns:
             str. The next exploration id in the node list.
+            OR
+            None. If the learner has completed the collection.
         """
         for exp_id in self.exploration_ids:
             if exp_id not in completed_exp_ids:
@@ -769,6 +773,8 @@ class Collection(object):
         Returns:
             str. The exploration ID that a logged-out user should
                 complete next.
+            OR
+            None. If the learner is at the last node in the collection.
         """
         exploration_just_unlocked = None
 
@@ -780,23 +786,12 @@ class Collection(object):
         return exploration_just_unlocked
 
     def get_nodes_in_playable_order(self):
-        """Returns a list of collection nodes in linear, playable order.
+        """Returns the list of collection nodes in linear, playable order.
 
         Returns:
-            list(CollectionNode). A sorted list of collection nodes.
+            list(CollectionNode). The list of collection nodes.
         """
-        sorted_exp_ids = []
-        if self.init_exploration_id:
-            sorted_exp_ids.append(self.init_exploration_id)
-        next_exp_id = self.get_next_exploration_id(sorted_exp_ids)
-        while next_exp_id:
-            sorted_exp_ids.append(next_exp_id)
-            next_exp_id = self.get_next_exploration_id(sorted_exp_ids)
-
-        sorted_nodes_list = [
-            copy.deepcopy(self.get_node(exp_id)) for exp_id in sorted_exp_ids]
-
-        return sorted_nodes_list
+        return self.nodes
 
     @classmethod
     def is_demo_collection_id(cls, collection_id):
@@ -911,11 +906,11 @@ class Collection(object):
         """Swaps the values of 2 nodes in the collection.
 
         Args:
-            first_index: Number. Index of one of the nodes to be swapped
-            second_index: Number. Index of the other node to be swapped
+            first_index: int. Index of one of the nodes to be swapped.
+            second_index: int. Index of the other node to be swapped.
 
         Raises:
-            ValueError: Both indices are the same number
+            ValueError: Both indices are the same number.
         """
         if first_index == second_index:
             raise ValueError(
@@ -1068,24 +1063,9 @@ class Collection(object):
                     'collection.')
 
             # Ensure the collection may be started.
-            if not self.init_exploration_id:
+            if not self.first_exploration_id:
                 raise utils.ValidationError(
                     'Expected to have at least 1 exploration.')
-
-            # Ensure the collection can be completed. In the current
-            # implementation, without skills, this would always be true.
-            completed_exp_ids = []
-            completed_exp_ids.append(self.init_exploration_id)
-            next_exp_id = self.get_next_exploration_id(completed_exp_ids)
-            while next_exp_id:
-                completed_exp_ids.append(next_exp_id)
-                next_exp_id = self.get_next_exploration_id(completed_exp_ids)
-
-            if len(completed_exp_ids) != len(self.nodes):
-                unreachable_ids = set(all_exp_ids) - completed_exp_ids
-                raise utils.ValidationError(
-                    'Some explorations are unreachable from the initial '
-                    'explorations: %s' % unreachable_ids)
 
 
 class CollectionSummary(object):

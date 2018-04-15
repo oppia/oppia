@@ -35,7 +35,7 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
   // Returns the upcoming exploration ID. Changes to this are not
   // reflected in the collection.
   CollectionPlaythrough.prototype.getNextExplorationId = function() {
-    return angular.copy(this._nextExplorationId);
+    return this._nextExplorationId;
   };
 
   CollectionPlaythrough.prototype.getNextRecommendedCollectionNodeCount =
@@ -70,14 +70,14 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
   CollectionPlaythrough.createFromBackendObject = function(
       collectionPlaythroughBackendObject) {
     return new CollectionPlaythrough(
-      collectionPlaythroughBackendObject.next_exploration_ids,
+      collectionPlaythroughBackendObject.next_exploration_id,
       collectionPlaythroughBackendObject.completed_exploration_ids);
   };
 
   CollectionPlaythrough.create = function(
       nextExplorationId, completedExplorationIds) {
     return new CollectionPlaythrough(
-      angular.copy(nextExplorationId), angular.copy(completedExplorationIds));
+      nextExplorationId, angular.copy(completedExplorationIds));
   };
 
   return CollectionPlaythrough;

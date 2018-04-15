@@ -142,7 +142,7 @@ def get_learner_collection_dict_by_id(
         # If the user is not logged in or they have not completed any of
         # the explorations yet within the context of this collection,
         # recommend the initial exploration.
-        next_exploration_id = collection.init_exploration_id
+        next_exploration_id = collection.first_exploration_id
         completed_exp_ids = []
 
     collection_dict = collection.to_dict()

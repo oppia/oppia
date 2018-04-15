@@ -274,16 +274,16 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         # If there are no explorations in the collection, there can be no
         # initial explorations.
         self.assertEqual(collection.nodes, [])
-        self.assertEqual(collection.init_exploration_id, None)
+        self.assertEqual(collection.first_exploration_id, None)
 
         # A freshly added exploration will be an initial one.
         collection.add_node('exp_id_0')
-        self.assertEqual(collection.init_exploration_id, 'exp_id_0')
+        self.assertEqual(collection.first_exploration_id, 'exp_id_0')
 
         # Having prerequisites will make an exploration no longer initial.
         collection.add_node('exp_id_1')
         self.assertEqual(len(collection.nodes), 2)
-        self.assertEqual(collection.init_exploration_id, 'exp_id_0')
+        self.assertEqual(collection.first_exploration_id, 'exp_id_0')
 
     def test_next_explorations(self):
         """Explorations should be suggested based on their index in the node
@@ -300,7 +300,7 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         collection.add_node('exp_id_0')
         self.assertEqual(collection.get_next_exploration_id([]), 'exp_id_0')
         self.assertEqual(
-            collection.init_exploration_id,
+            collection.first_exploration_id,
             collection.get_next_exploration_id([]))
 
         # Completing the only exploration of the collection should lead to no
@@ -368,11 +368,11 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
         collection.add_node('exp_id_2')
 
         sorted_nodes = collection.get_nodes_in_playable_order()
-        expected_explorations_list = ['exp_id_0', 'exp_id_1', 'exp_id_2']
-        observed_explration_list = [
+        expected_explorations_ids = ['exp_id_0', 'exp_id_1', 'exp_id_2']
+        observed_exploration_ids = [
             node.exploration_id for node in sorted_nodes]
 
-        self.assertEqual(expected_explorations_list, observed_explration_list)
+        self.assertEqual(expected_explorations_ids, observed_exploration_ids)
 
     def test_next_explorations_with_invalid_exploration_ids(self):
         collection = collection_domain.Collection.create_default_collection(

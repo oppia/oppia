@@ -472,7 +472,7 @@ def get_next_exploration_id_to_complete_by_user(user_id, collection_id):
         return collection.get_next_exploration_id(completed_exploration_ids)
     else:
         # The user has yet to complete any explorations inside the collection.
-        return collection.init_exploration_id
+        return collection.first_exploration_id
 
 
 def record_played_exploration_in_collection_context(

@@ -198,11 +198,11 @@ oppia.factory('CollectionObjectFactory', [
 
     // Returns the collection node which is initially available to play
     // by the player.
-    Collection.prototype.getStartingCollectionNodes = function() {
+    Collection.prototype.getStartingCollectionNode = function() {
       if (this._nodes.length === 0) {
-        return this._nodes;
+        return null;
       } else {
-        return [this._nodes[0]];
+        return this._nodes[0];
       }
     };
 

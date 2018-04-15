@@ -203,7 +203,7 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         # initial explorations should be suggested.
         self.assertEqual(
             collection_services.get_collection_by_id(
-                self.COL_ID_0).init_exploration_id,
+                self.COL_ID_0).first_exploration_id,
             self.EXP_ID_0)
         self.assertEqual(
             collection_services.get_next_exploration_id_to_complete_by_user(

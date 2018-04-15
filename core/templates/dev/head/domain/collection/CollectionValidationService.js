@@ -22,13 +22,6 @@
 oppia.factory('CollectionValidationService', [
   'CollectionLinearizerService',
   function(CollectionLinearizerService) {
-    var _getStartingExplorationIds = function(collection) {
-      var startingCollectionNodes = collection.getStartingCollectionNodes();
-      return startingCollectionNodes.map(function(collectionNode) {
-        return collectionNode.getExplorationId();
-      });
-    };
-
     var _getNonexistentExplorationIds = function(collection) {
       return collection.getCollectionNodes().filter(function(collectionNode) {
         return !collectionNode.doesExplorationExist();
@@ -81,13 +74,6 @@ oppia.factory('CollectionValidationService', [
       if (!collectionHasNodes) {
         issues.push(
           'There should be at least 1 exploration in the collection.');
-      }
-
-      var startingExpIds = _getStartingExplorationIds(collection);
-      if (collectionHasNodes && startingExpIds.length !== 1) {
-        issues.push(
-          'There should be exactly 1 exploration initially available to the ' +
-          'learner.');
       }
 
       var nonexistentExpIds = _getNonexistentExplorationIds(collection);

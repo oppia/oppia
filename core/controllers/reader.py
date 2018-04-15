@@ -570,11 +570,11 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
         if user_id and collection_id:
             collection_services.record_played_exploration_in_collection_context(
                 user_id, collection_id, exploration_id)
-            exploration_left_to_complete = (
+            next_exp_id_to_complete = (
                 collection_services.get_next_exploration_id_to_complete_by_user( # pylint: disable=line-too-long
                     user_id, collection_id))
 
-            if not exploration_left_to_complete:
+            if not next_exp_id_to_complete:
                 learner_progress_services.mark_collection_as_completed(
                     user_id, collection_id)
             else:
@@ -731,7 +731,8 @@ class RecommendationsHandler(base.BaseHandler):
 
         recommended_exp_ids = set(
             author_recommended_exp_ids + system_recommended_exp_ids)
-        recommended_exp_ids.add(next_exp_id)
+        if next_exp_id is not None:
+            recommended_exp_ids.add(next_exp_id)
 
         self.values.update({
             'summaries': (

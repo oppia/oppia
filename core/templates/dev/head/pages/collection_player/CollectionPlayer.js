@@ -104,9 +104,15 @@ oppia.controller('CollectionPlayer', [
     };
 
     $scope.getNonRecommendedCollectionNodes = function() {
-      var displayedExplorationIds = (
-        [$scope.collectionPlaythrough.getNextExplorationId()].concat(
-          $scope.collectionPlaythrough.getCompletedExplorationIds()));
+      var displayedExplorationIds = [];
+      if ($scope.collectionPlaythrough.getNextExplorationId() !== null) {
+        displayedExplorationIds = (
+          [$scope.collectionPlaythrough.getNextExplorationId()].concat(
+            $scope.collectionPlaythrough.getCompletedExplorationIds()));
+      } else {
+        displayedExplorationIds = (
+          $scope.collectionPlaythrough.getCompletedExplorationIds());
+      }
       var nonRecommendedCollectionNodes = [];
       var collectionNodes = $scope.collection.getCollectionNodes();
       for (var i = 0; i < collectionNodes.length; i++) {
