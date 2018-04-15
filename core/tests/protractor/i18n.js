@@ -66,7 +66,6 @@ describe('Site language', function() {
 
     // Checking exploration and collection player for langauge changes.
     users.createAndLoginAdminUser('langadm@lang.com', 'langadm');
-    adminPage.get();
     adminPage.reloadCollection();
     adminPage.reloadExploration('welcome.yaml');
 
