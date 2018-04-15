@@ -65,7 +65,7 @@ describe('Site language', function() {
     general.ensurePageHasNoTranslationIds();
 
     // Checking exploration and collection player for langauge changes.
-    users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
+    users.createAndLoginAdminUser('langadm@lang.com', 'langadm');
     adminPage.get();
     adminPage.reloadCollection();
     adminPage.reloadExploration('welcome.yaml');
