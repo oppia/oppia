@@ -85,17 +85,20 @@ oppia.controller('Library', [
         if ($scope.userIsLoggedIn) {
           $http.get('/creatordashboardhandler/data')
             .then(function(response) {
-              $scope.libraryGroups.forEach(function(activityGroups) {
-                var activitySummaryDict = activityGroups.activity_summary_dicts;
+              $scope.libraryGroups.forEach(function(libraryGroup) {
+                var activitySummaryDicts = libraryGroup.activity_summary_dicts;
 
                 var ACTIVITY_TYPE_EXPLORATION = 'exploration';
                 var ACTIVITY_TYPE_COLLECTION = 'collection';
-                activitySummaryDict.forEach(function(activity) {
-                  if (activity.activity_type === ACTIVITY_TYPE_EXPLORATION) {
-                    $scope.activitiesOwned.explorations[activity.id] = false;
-                  } else if (
-                    activity.activity_type === ACTIVITY_TYPE_COLLECTION) {
-                    $scope.activitiesOwned.collections[activity.id] = false;
+                activitySummaryDicts.forEach(function(activitySummaryDict) {
+                  if (activitySummaryDict.activity_type === (
+                    ACTIVITY_TYPE_EXPLORATION)) {
+                    $scope.activitiesOwned.explorations[
+                      activitySummaryDict.id] = false;
+                  } else if (activitySummaryDict.activity_type === (
+                    ACTIVITY_TYPE_COLLECTION)) {
+                    $scope.activitiesOwned.collections[
+                      activitySummaryDict.id] = false;
                   } else {
                     AlertsService.clearWarnings();
                     AlertsService.addWarning(
