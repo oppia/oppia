@@ -45,6 +45,7 @@ oppia.factory('ResponsesService', [
     var _defaultOutcome = null;
     var _confirmedUnclassifiedAnswers = null;
     var _answerChoices = null;
+    var LARGE_NUMBER = 99;
 
     var _saveAnswerGroups = function(newAnswerGroups) {
       var oldAnswerGroups = _answerGroupsMemento;
@@ -160,7 +161,7 @@ oppia.factory('ResponsesService', [
 
     var _makeRuleInvalid = function(answerGroupIndex, ruleIndex) {
       _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x =
-        _answerChoices.length;
+        _answerChoices.length + LARGE_NUMBER;
       return _answerGroups;
     };
 

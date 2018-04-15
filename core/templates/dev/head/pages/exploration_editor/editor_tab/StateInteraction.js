@@ -303,13 +303,14 @@ oppia.controller('StateInteraction', [
                 }
               };
 
+              var isRuleChanged = false;
               $scope.$on('existingRulesChange', function(data) {
+                isRuleChanged = true;
                 $scope.changedRules = data.targetScope.newAnswers;
               });
 
               $scope.save = function() {
-                $scope.interactionId = stateInteractionIdService.savedMemento;
-                if ($scope.interactionId === 'MultipleChoiceInput') {
+                if (isRuleChanged) {
                   ResponsesService.saveAnswerGroups($scope.changedRules);
                 }
 
