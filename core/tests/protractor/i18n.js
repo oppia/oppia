@@ -55,11 +55,31 @@ describe('Site language', function() {
   });
 
   it('should change after selecting a different language', function() {
+    // Changing language to Español from /about page.
     browser.get('/about');
     _selectLanguage('Español');
+
+    // Checking library page for language changes,
     libraryPage.get();
     expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
     general.ensurePageHasNoTranslationIds();
+
+    // Checking exploration and collection player for langauge changes.
+    users.createAndLoginAdminUser('testadm@collections.com', 'testadm');
+    adminPage.get();
+    adminPage.reloadCollection();
+    adminPage.reloadExploration('welcome.yaml');
+
+    browser.get('/collection/0');
+    expect(element(by.css('.oppia-share-collection-footer')).getText())
+      .toEqual('COMPARTIR ESTA COLECCIÓN');
+    general.ensurePageHasNoTranslationIds();
+
+    browser.get('/explore/0');
+    expect(element(by.css('.protractor-test-exploration-feedback-popup-link'))
+      .getAttribute('uib-tooltip')).toEqual('Comentarios');
+    general.ensurePageHasNoTranslationIds();
+    users.logout();
   });
 
   it('should use language selected in the Preferences page.', function() {

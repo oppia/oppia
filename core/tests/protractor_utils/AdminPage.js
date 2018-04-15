@@ -106,6 +106,9 @@ var AdminPage = function(){
 
   this.reloadCollection = function() {
     reloadCollectionButton.click();
+    general.acceptAlert();
+    // Time is needed for the reloading to complete.
+    browser.waitForAngular();
   };
 
   // The name should be as given in the admin page (including '.yaml' if
