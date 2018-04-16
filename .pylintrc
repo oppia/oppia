@@ -9,7 +9,7 @@ ignore-patterns = .*_test.py
 [MASTER]
 
 # Checks for correct docstring style
-load-plugins=pylint.extensions.docstyle
+load-plugins=pylint.extensions.docstyle, scripts.custom_lint_checks
 
 [BASIC]
 

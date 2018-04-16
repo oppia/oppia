@@ -898,7 +898,7 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
 class LastLoginIntegrationTest(test_utils.GenericTestBase):
 
     def setUp(self):
-        """Create exploration with two versions"""
+        """Create exploration with two versions."""
         super(LastLoginIntegrationTest, self).setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)

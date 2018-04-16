@@ -345,7 +345,7 @@ class ExplorationRightsHandler(EditorHandler):
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
 
-        make_community_owned = self.payload.get('is_community_owned')
+        make_community_owned = self.payload.get('make_community_owned')
         new_member_username = self.payload.get('new_member_username')
         new_member_role = self.payload.get('new_member_role')
         viewable_if_private = self.payload.get('viewable_if_private')
@@ -611,7 +611,7 @@ class ExplorationDownloadHandler(EditorHandler):
         output_format = self.request.get('output_format', default_value='zip')
         width = int(self.request.get('width', default_value=80))
 
-        # If the title of the exploration has changed, we use the new title
+        # If the title of the exploration has changed, we use the new title.
         filename = 'oppia-%s-v%s' % (
             utils.to_ascii(exploration.title.replace(' ', '')), version)
 

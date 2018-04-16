@@ -75,8 +75,8 @@ oppia.factory('ExplorationObjectFactory', [
       var interactionId = this.getInteractionId(stateName);
       return (
         interactionId ?
-        INTERACTION_SPECS[interactionId].narrow_instructions :
-        '');
+          INTERACTION_SPECS[interactionId].narrow_instructions :
+          '');
     };
 
     Exploration.prototype.getInteractionThumbnailSrc = function(stateName) {

@@ -43,7 +43,7 @@ describe('Sidebar state name controller', function() {
     });
 
     beforeEach(inject(function(
-        $rootScope, $q, $filter, $controller, $injector) {
+        $rootScope, $filter, $controller, $injector) {
       scope = $rootScope.$new();
       filter = $filter;
       rootScope = $rootScope;

@@ -31,7 +31,7 @@ oppia.directive('valueGeneratorEditor', ['$compile', function($compile) {
     link: function(scope, element) {
       scope.$watch('generatorId', function() {
         var directiveName = scope.generatorId.replace(
-            /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+          /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
         element.html('<' + directiveName + '></' + directiveName + '>');
         $compile(element.contents())(scope);
       });

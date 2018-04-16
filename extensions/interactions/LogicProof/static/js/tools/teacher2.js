@@ -581,20 +581,20 @@ var logicProofTeacher2 = (function() {
     }
     for (var i = 0; i < formulaLHS.arguments.length; i++) {
       if (language.operators.hasOwnProperty(
-          formulaLHS.arguments[i].top_operator_name)) {
+        formulaLHS.arguments[i].top_operator_name)) {
         throw new logicProofShared.UserError(
           'argument_is_function_name', {
             argument: formulaLHS.arguments[i].top_operator_name
           });
       } else if (availableOperators.hasOwnProperty(
-          formulaLHS.arguments[i].top_operator_name)) {
+        formulaLHS.arguments[i].top_operator_name)) {
         throw new logicProofShared.UserError(
           'duplicate_argument', {
             argument: formulaLHS.arguments[i].top_operator_name
           });
       } else if (
-          logicProofShared.getOperatorsFromExpression(formulaRHS).indexOf(
-            formulaLHS.arguments[i].top_operator_name) === -1) {
+        logicProofShared.getOperatorsFromExpression(formulaRHS).indexOf(
+          formulaLHS.arguments[i].top_operator_name) === -1) {
         throw new logicProofShared.UserError(
           'unused_argument', {
             argument: formulaLHS.arguments[i].top_operator_name
@@ -865,7 +865,7 @@ var logicProofTeacher2 = (function() {
       for (var i = 0; i < vocabulary[key].length; i++) {
         for (var j = 0; j < vocabulary[key][i].split(' ').length; j++) {
           if (vocabularyWords.indexOf(
-                vocabulary[key][i].split(' ')[j]) === -1) {
+            vocabulary[key][i].split(' ')[j]) === -1) {
             vocabularyWords.push(vocabulary[key][i].split(' ')[j]);
           }
         }

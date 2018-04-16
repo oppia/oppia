@@ -190,8 +190,8 @@ def _validate_customization_args_and_values(
                     ca_spec.schema))
         except Exception:
             # TODO(sll): Raise an actual exception here if parameters are not
-            # involved. (If they are, can we get sample values for the state
-            # context parameters?)
+            # involved (If they are, can we get sample values for the state
+            # context parameters?).
             pass
 
 
@@ -1443,7 +1443,7 @@ class State(object):
                     if (isinstance(value, basestring) and
                             '{{' in value and '}}' in value):
                         # TODO(jacobdavis11): Create checks that all parameters
-                        # referred to exist and have the correct types
+                        # referred to exist and have the correct types.
                         normalized_param = value
                     else:
                         try:
@@ -2241,7 +2241,7 @@ class Exploration(object):
                 'It is impossible to complete the exploration from the '
                 'following states: %s' % ', '.join(dead_end_states))
 
-    # Derived attributes of an exploration,
+    # Derived attributes of an exploration.
     @property
     def init_state(self):
         """The state which forms the start of this exploration.
@@ -2565,7 +2565,7 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        # ensure widgets are renamed to be interactions
+        # ensure widgets are renamed to be interactions.
         for _, state_defn in states_dict.iteritems():
             if 'widget' not in state_defn:
                 continue
@@ -2606,7 +2606,7 @@ class Exploration(object):
         # to an 'END' state before, then they would only be receiving warnings
         # about not being able to complete the exploration. The introduction of
         # a real END state would produce additional warnings (state cannot be
-        # reached from other states, etc.)
+        # reached from other states, etc.).
         targets_end_state = False
         has_end_state = False
         for (state_name, sdict) in states_dict.iteritems():
@@ -2621,7 +2621,7 @@ class Exploration(object):
                             break
 
         # Ensure any explorations pointing to an END state has a valid END
-        # state to end with (in case it expects an END state)
+        # state to end with (in case it expects an END state).
         if targets_end_state and not has_end_state:
             states_dict[old_end_dest] = {
                 'content': [{
@@ -4050,7 +4050,25 @@ class StateIdMapping(object):
         # Analyse each command in change list one by one to create state id
         # mapping for new exploration.
         for change_dict in change_list:
-            if change_dict['cmd'] == CMD_ADD_STATE:
+            # During v1 -> v2 migration of states, all pseudo END states were
+            # replaced by an explicit END state through this migration.
+            # We account for that change in the state id mapping too.
+            if change_dict['cmd'] == 'migrate_states_schema_to_latest_version':
+                pseudo_end_state_name = 'END'
+                if int(change_dict['from_version']) < 2 <= int(
+                        change_dict['to_version']):
+                    # The explicit end state is created only if there is some
+                    # state that used to refer to an implicit 'END' state.
+                    # This is confirmed by checking that there is a state
+                    # called 'END' in the immediate version of the exploration
+                    # after migration and no state called 'END' is present
+                    # in previous version of exploration.
+                    if (pseudo_end_state_name in (
+                            new_exploration.states) and (
+                                pseudo_end_state_name not in (
+                                    self.state_names_to_ids))):
+                        new_state_names.append(pseudo_end_state_name)
+            elif change_dict['cmd'] == CMD_ADD_STATE:
                 new_state_names.append(change_dict['state_name'])
                 assert change_dict['state_name'] not in (
                     state_ids_to_names.values())

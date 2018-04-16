@@ -189,7 +189,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             var postCodeNumLines = $scope.postCode.split('\n').length;
             var fullCodeNumLines = $scope.code.split('\n').length;
             var userCodeNumLines = (
-                fullCodeNumLines - preCodeNumLines - postCodeNumLines);
+              fullCodeNumLines - preCodeNumLines - postCodeNumLines);
 
             // Mark pre- and post- code as uneditable, and give it some styling.
             var markOptions = {
@@ -232,7 +232,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 
               for (var i = 0; i < postCodeNumLines; i++) {
                 editor.addLineClass(preCodeNumLines + userCodeNumLines + i,
-                'text', 'code-repl-noneditable-line');
+                  'text', 'code-repl-noneditable-line');
               }
             }
           };

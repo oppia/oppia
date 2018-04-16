@@ -17,17 +17,17 @@
  *     domain objects.
  */
 
- oppia.factory('ClassifierObjectFactory', [function() {
-   var Classifier = function(algorithmId, classifierData, dataSchemaVersion) {
-     this.algorithmId = algorithmId;
-     this.classifierData = classifierData;
-     this.dataSchemaVersion = dataSchemaVersion;
-   };
+oppia.factory('ClassifierObjectFactory', [function() {
+  var Classifier = function(algorithmId, classifierData, dataSchemaVersion) {
+    this.algorithmId = algorithmId;
+    this.classifierData = classifierData;
+    this.dataSchemaVersion = dataSchemaVersion;
+  };
 
-   Classifier.create = function(
-       algorithmId, classifierData, dataSchemaVersion) {
-     return new Classifier(algorithmId, classifierData, dataSchemaVersion);
-   };
+  Classifier.create = function(
+      algorithmId, classifierData, dataSchemaVersion) {
+    return new Classifier(algorithmId, classifierData, dataSchemaVersion);
+  };
 
-   return Classifier;
- }]);
+  return Classifier;
+}]);

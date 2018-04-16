@@ -285,7 +285,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
                                       threads[0].to_dict())
 
     def test_get_all_threads(self):
-        # Create an anonymous feedback thread
+        # Create an anonymous feedback thread.
         feedback_services.create_thread(
             self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'], None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
@@ -298,7 +298,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.EXPECTED_THREAD_DICT_VIEWER['original_author_username'] = (
             self.VIEWER_USERNAME)
 
-        # Viewer creates feedback thread
+        # Viewer creates feedback thread.
         feedback_services.create_thread(
             self.EXP_ID_1, self.EXPECTED_THREAD_DICT_VIEWER['state_name'],
             self.viewer_id, self.EXPECTED_THREAD_DICT_VIEWER['subject'],

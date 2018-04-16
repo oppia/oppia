@@ -43,7 +43,7 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        # Only process the exploration if it is not private
+        # Only process the exploration if it is not private.
         if item.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
             return
 

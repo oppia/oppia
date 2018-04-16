@@ -46,7 +46,7 @@ describe('TrainingDataService', function() {
     spyOn(mockExplorationData, 'autosaveChangeList');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($rootScope, $injector) {
     scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
     siis = $injector.get('stateInteractionIdService');
@@ -143,8 +143,8 @@ describe('TrainingDataService', function() {
     // Ensure it handles receiving no unhandled answers correctly.
     $httpBackend.expect(
       'GET', '/createhandler/training_data/0/State').respond({
-        unhandled_answers: []
-      });
+      unhandled_answers: []
+    });
 
     tds.initializeTrainingData('0', 'State');
     $httpBackend.flush();

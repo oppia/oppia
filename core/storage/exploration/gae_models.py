@@ -133,7 +133,7 @@ class ExplorationModel(base_models.VersionedModel):
 
         # TODO(msl): test if put_async() leads to any problems (make
         # sure summary dicts get updated correctly when explorations
-        # are changed)
+        # are changed).
         ExplorationCommitLogEntryModel(
             id=('exploration-%s-%s' % (self.id, self.version)),
             user_id=committer_id,
@@ -201,6 +201,23 @@ class ExplorationRightsModel(base_models.VersionedModel):
     )
 
     def save(self, committer_id, commit_message, commit_cmds):
+        """Saves a new version of the exploration, updating the Exploration
+        datastore model.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. The type of the command. A full list of command
+                        types can be found in core/domain/exp_domain.py.
+                and then additional arguments for that command. For example:
+
+                {'cmd': 'AUTO_revert_version_number',
+                 'version_number': 4}
+        """
         super(ExplorationRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
@@ -235,7 +252,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 if committer_user_settings_model else '')
             # TODO(msl): test if put_async() leads to any problems (make
             # sure summary dicts get updated correctly when explorations
-            # are changed)
+            # are changed).
             ExplorationCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
@@ -278,7 +295,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
     # The commit_cmds dict for this commit.
     commit_cmds = ndb.JsonProperty(indexed=False, required=True)
     # The version number of the exploration after this commit. Only populated
-    # for commits to an exploration (as opposed to its rights, etc.)
+    # for commits to an exploration (as opposed to its rights, etc.).
     version = ndb.IntegerProperty()
 
     # The status of the exploration after the edit event ('private', 'public').
@@ -414,7 +431,7 @@ class ExpSummaryModel(base_models.BaseModel):
     # Tags associated with this exploration.
     tags = ndb.StringProperty(repeated=True, indexed=True)
 
-    # Aggregate user-assigned ratings of the exploration
+    # Aggregate user-assigned ratings of the exploration.
     ratings = ndb.JsonProperty(default=None, indexed=False)
 
     # Scaled average rating for the exploration.
@@ -422,11 +439,11 @@ class ExpSummaryModel(base_models.BaseModel):
 
     # Time when the exploration model was last updated (not to be
     # confused with last_updated, which is the time when the
-    # exploration *summary* model was last updated)
+    # exploration *summary* model was last updated).
     exploration_model_last_updated = ndb.DateTimeProperty(indexed=True)
     # Time when the exploration model was created (not to be confused
     # with created_on, which is the time when the exploration *summary*
-    # model was created)
+    # model was created).
     exploration_model_created_on = ndb.DateTimeProperty(indexed=True)
     # Time when the exploration was first published.
     first_published_msec = ndb.FloatProperty(indexed=True)
@@ -450,14 +467,14 @@ class ExpSummaryModel(base_models.BaseModel):
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who have contributed (humans who have made a
-    # positive (not just a revert) change to the exploration's content)
+    # positive (not just a revert) change to the exploration's content).
     contributor_ids = ndb.StringProperty(indexed=True, repeated=True)
     # A dict representing the contributors of non-trivial commits to this
     # exploration. Each key of this dict is a user_id, and the corresponding
     # value is the number of non-trivial commits that the user has made.
     contributors_summary = ndb.JsonProperty(default={}, indexed=False)
     # The version number of the exploration after this commit. Only populated
-    # for commits to an exploration (as opposed to its rights, etc.)
+    # for commits to an exploration (as opposed to its rights, etc.).
     version = ndb.IntegerProperty()
 
     @classmethod
@@ -592,7 +609,7 @@ class StateIdMappingModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, exp_id, exp_version, state_names_to_ids,
-            largest_state_id_used):
+            largest_state_id_used, overwrite=False):
         """Creates a new instance of state id mapping model.
 
         Args:
@@ -601,12 +618,14 @@ class StateIdMappingModel(base_models.BaseModel):
             state_names_to_ids: dict. A dict storing state name to ids mapping.
             largest_state_id_used: int. The largest integer so far that has been
                 used as a state ID for this exploration.
+            overwrite: bool. Whether overwriting of an existing model should
+                be allowed.
 
         Returns:
             StateIdMappingModel. Instance of the state id mapping model.
         """
         instance_id = cls._generate_instance_id(exp_id, exp_version)
-        if cls.get_by_id(instance_id):
+        if not overwrite and cls.get_by_id(instance_id):
             raise Exception(
                 'State id mapping model already exists for exploration %s,'
                 ' version %d' % (exp_id, exp_version))

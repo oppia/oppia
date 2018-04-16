@@ -30,7 +30,7 @@ oppia.directive('schemaBasedExpressionEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_editors/' +
         'schema_based_expression_editor_directive.html'
-        ),
+      ),
       restrict: 'E'
     };
   }]);

@@ -173,7 +173,7 @@ oppia.factory('TrainingDataService', [
         // Train the rule to include this answer, but only if it's not already
         // in the training data.
         if (_getIndexOfTrainingData(
-            answer, classifierRule.inputs.training_data) === -1) {
+          answer, classifierRule.inputs.training_data) === -1) {
           classifierRule.inputs.training_data.push(answer);
         }
 
@@ -189,7 +189,7 @@ oppia.factory('TrainingDataService', [
           ResponsesService.getConfirmedUnclassifiedAnswers());
 
         if (_getIndexOfTrainingData(
-              answer, confirmedUnclassifiedAnswers) === -1) {
+          answer, confirmedUnclassifiedAnswers) === -1) {
           confirmedUnclassifiedAnswers.push(answer);
         }
 

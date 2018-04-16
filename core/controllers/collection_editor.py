@@ -76,7 +76,8 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
     """A data handler for collections which supports writing."""
 
     def _require_valid_version(self, version_from_payload, collection_version):
-        """Check that the payload version matches the given collection version.
+        """Check that the payload version matches the given collection
+        version.
         """
         if version_from_payload is None:
             raise base.BaseHandler.InvalidInputException(
@@ -93,7 +94,7 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
         """Populates the data on the individual collection page."""
 
         try:
-            # Try to retrieve collection
+            # Try to retrieve collection.
             collection_dict = (
                 summary_services.get_learner_collection_dict_by_id(
                     collection_id, self.user,

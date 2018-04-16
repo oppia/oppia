@@ -1,6 +1,91 @@
-This file contains a summary of changes to the Oppia code base. For a full changelog, please see
+This file contains a summary of changes to the Oppia code base.
 
-    https://github.com/oppia/oppia/commits/master
+v2.6.2 (20 Mar 2018)
+--------------------
+Learner View:
+* Fix #4639: Changed the ending for refresher explorations (#4644)
+* Fix #4627: hides tooltip after new card available. (#4637)
+* Interactions:
+  * Fix #4641: Added new fractions rule to check if fractional part exactly equals (#4648)
+  * Fix #4640: Added customization args to write custom placeholders for fractions interaction (#4645)
+  * Fix #4409: Interactions not working on mobile. (#4672)
+  * Block console error message in pencil code editor (#4741)
+  * Fixes issue #4562 : Overlapping line numbers and text in Code Editor (#4745)
+  * Fix part of #4367: Added null submit checks for set input interaction (#4710)
+  * Fix #4430: fixed weird graph edge weight input (#4707)
+  * Fix:#4634: Deleting imageInteraction should delete the responses. (#4711)
+  * Fix #4549: Fixed the position of code editor (#4674)
+  * Fix #4530: Fixed extra new lines and whitespaces in Multiple choice Options (#4739)
+  * Fix #2827: GraphInput not visible in mobile view. (#4698)
+
+Exploration Editor:
+* Fix #4566: Dollar formatting issue (#4633)
+* Fix #4676: Updated exploration search validator. (#4687)
+* Fix #4481: Adds a link to the exploration in the publication modal  (#4647)
+* Fix #4701: fixes rule descriptor for ListOfCodeEvaluation and SetOfNormalizedStrings (#4703)
+* Fix #4656: Fix spacing around links in rte (#4694)
+* Fixed issue #4692: Fixed styling for input text field. (#4715)
+* Fix #4635 Make the Advanced feature settings(in creator mode) more intuitive (#4695)
+* Fix #3906: Add link which takes you to State Editor from Statistics Tab Modals (#4655)
+* Fix #3478: Added functionality to sort nodes list. (#4708)
+* Fixes #4530: Removes spaces and new lines from end of string in RTE. (#4748)
+* Fix #4072 : Uses Initial few words as a feedback's subject (#4257)
+* Fix #4712:Unaligned radio-button with corresponding text. (#4718)
+
+Audio:
+* Fix #4621: Add modal for flagging audio translations on feedback, hints, and solutions. (#4623)
+* Fix #4295: Added slider for audio bar (#4659)
+* Fix #4528:Sets default language to the last selected language for audio translations in creator view. (#4673)
+* Only attach onended property of audio if current track is not null. (#4685)
+* Allow audio translations to be stripped away when creating new explorations using the upload YAML button (#4378)
+* Fix #4293: Add slide animation to audio bar directive (#4636)
+* Fix #4497 Fix console errors for audio on card with no text (#4726)
+* Fix #4680: Pauses the audio being played when preview button is clicked  (#4725)
+* Fix #4292: Upgraded font-awesome and play/pause icons (#4750)
+
+Miscellaneous fixes:
+* Fixes #4410: Fixed info modal for private explorations (#4754)
+* Fix #4590: Fixes dropdown overlap with feedback editor (#4629)
+* Fixes #4660 - Fixed dropdown menu (#4671)
+* Fix #4587: Item Selection input boxes are top-aligned (#4607)
+* Fix #4683: Altered positioning of help card to make it appropriate (#4696)
+* Fix #3606: For public explorations, default to the feedback page in the exploration editor if feedback exists. (#4716)
+* Fix #1494: Can't see videos in Tabs. (#4736)
+* Fix part of #3550: Move translation check from footer to header (#4738)
+* Fix #2915: fixes sidebar breaking on mobile (#4749)
+* Fix:#4721:The text in the tooltip is not completely visible in case of the leftmost collection. (#4733)
+* Added a new Fractions landing page (#4758)
+* Fixes bug #4746 (#4747)
+
+Statistics:
+* Fix #3797: Deprecate old classification framework (#4653)
+* Deprecate the old stats framework and StatsAggregator job. (#4762)
+* TextInput classifer bug fixes (#4700)
+* Consolidated Change list mapping method (#4729)
+* Add try and except blocks at probable error generating lines. (#4755)
+
+Infrastructure and Refactoring:
+* Fixed part of #4057: ThreadStatusDisplayService (#4606)
+* Fix Travis build fail (#4679)
+* Fix #4295: addresses review comments in #4659 (#4670)
+* Updated PULL_REQUEST_TEMPLATE to include #bugnum in explanation. (#4681)
+* Add comment to explain null value in AudioPlayerService. (#4735)
+* Linting checks added:
+  * Fix part of #3905: Added eqeqeq rule (#4573)
+  * Add check for keyword spacing (#4697)
+  * Add check for consistent comma spacing (#4720)
+  * Enable isort diff to debug import-order errors (#4684)
+  * Add check for consistent brace style (#4727)
+  * Space check for Python files (#4728)
+  * Add check for trailing whitespaces (#4699)
+  * Fix part of #3905: Add lint checks for common coding issues arising in code reviews  (#4724)
+
+Docstrings:
+* Fix part of #4374: Add docstring to file core.storage.job.gae_models.py (#4705)
+* Fixed part of issue #4374 :Added docstring for cron.py (#4722)
+* Fixed Part of #3954: Added CollectionEditorPage  (#4678)
+* Fix part of #4374: Documented core.platform.models (#4596)
+
 
 v2.6.1 (18 Feb 2018)
 --------------------

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the appengine search api wrapper. """
+"""Tests for the appengine search api wrapper."""
 
 import datetime
 import time
@@ -26,7 +26,7 @@ from google.appengine.api import search
 
 
 class SearchAddToIndexTests(test_utils.GenericTestBase):
-    """Test inserting documents into search indexes"""
+    """Test inserting documents into search indexes."""
 
     def test_insert_document_with_id(self):
         date = datetime.date(year=2015, month=3, day=14)
@@ -123,9 +123,10 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
     def _get_put_error(self, num_res, transient=None):
         """returns a PutError. with num_res results.
-           If transient is given, it should be an index in the
-           results array. The result at that index will have a transient
-           error code."""
+        If transient is given, it should be an index in the
+        results array. The result at that index will have a transient
+        error code.
+        """
         non_trans_code = search.OperationResult.INVALID_REQUEST
         trans_code = search.OperationResult.TRANSIENT_ERROR
         results = [
@@ -295,9 +296,10 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
 
     def _get_delete_error(self, num_res, transient=None):
         """returns a DeleteError. with num_res results.
-           If transient is given, it should be an index in the
-           results array. The result at that index will have a transient
-           error code."""
+        If transient is given, it should be an index in the
+        results array. The result at that index will have a transient
+        error code.
+        """
         non_trans_code = search.OperationResult.INVALID_REQUEST
         trans_code = search.OperationResult.TRANSIENT_ERROR
         results = [
@@ -428,7 +430,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
                 'my_index')
 
         # assert that the method only gets called once, since the error is not
-        # transient
+        # transient.
         self.assertEqual(delete_docs_counter.times_called, 1)
         self.assertEqual(e.exception.original_exception, error)
 
@@ -684,7 +686,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertEqual(search_counter.times_called, 4)
         self.assertEqual(result, ['doc2', 'doc1'])
 
-        # also check that the cursor is preserved
+        # also check that the cursor is preserved.
         self.assertEqual(search_counter2.times_called, 4)
         self.assertEqual(result2, ['doc0'])
 
