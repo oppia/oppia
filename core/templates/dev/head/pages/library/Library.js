@@ -27,14 +27,14 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 });
 
 oppia.controller('Library', [
-  '$scope', '$http', '$uibModal', '$rootScope', '$window', '$timeout',
+  '$scope', '$http', '$log', '$uibModal', '$rootScope', '$window', '$timeout',
   'ConstructTranslationIdsService', 'UrlService', 'ALL_CATEGORIES',
   'SearchService', 'WindowDimensionsService', 'UrlInterpolationService',
   'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX', 'AlertsService',
   'LearnerDashboardIdsBackendApiService',
   'LearnerDashboardActivityIdsObjectFactory', 'LearnerPlaylistService',
   function(
-      $scope, $http, $uibModal, $rootScope, $window, $timeout,
+      $scope, $http, $log, $uibModal, $rootScope, $window, $timeout,
       ConstructTranslationIdsService, UrlService, ALL_CATEGORIES,
       SearchService, WindowDimensionsService, UrlInterpolationService,
       LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX, AlertsService,
@@ -100,9 +100,11 @@ oppia.controller('Library', [
                     $scope.activitiesOwned.collections[
                       activitySummaryDict.id] = false;
                   } else {
-                    AlertsService.clearWarnings();
-                    AlertsService.addWarning(
-                      'Error encountered in activity type.');
+                    $log.error('INVALID ACTIVITY TYPE: Activity' +
+                    '(id: ' + activitySummaryDict.id +
+                    ', name: ' + activitySummaryDict.title +
+                    ') has an invalid activity type, which could ' +
+                    'not be recorded as an exploration or a collection.');
                   }
                 });
 
