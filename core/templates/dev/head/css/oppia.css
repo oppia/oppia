@@ -1939,10 +1939,10 @@ md-card.oppia-dashboard-tile {
   cursor: pointer;
 }
 .toast-warning {
-  background-image: url("/assets/common/images/general/warning.png");
+  background-image: url("/assets/images/general/warning.png");
 }
 .toast-info {
-  background-image: url("/assets/common/images/general/info.png");
+  background-image: url("/assets/images/icons/info.png");
 }
 
 @media all and (max-width: 240px) {
