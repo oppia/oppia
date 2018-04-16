@@ -360,14 +360,14 @@ class ExplorationGraphUnitTests(test_utils.GenericTestBase):
 
         # There should be an empty node list in playable order for an empty
         # collection.
-        self.assertEqual(collection.get_nodes_in_playable_order(), [])
+        self.assertEqual(collection.nodes, [])
 
         # Add nodes to collection.
         collection.add_node('exp_id_0')
         collection.add_node('exp_id_1')
         collection.add_node('exp_id_2')
 
-        sorted_nodes = collection.get_nodes_in_playable_order()
+        sorted_nodes = collection.nodes
         expected_explorations_ids = ['exp_id_0', 'exp_id_1', 'exp_id_2']
         observed_exploration_ids = [
             node.exploration_id for node in sorted_nodes]

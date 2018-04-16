@@ -733,9 +733,8 @@ class Collection(object):
            the collection is empty, returns None.
 
         Returns:
-            str. The exploration ID of the first node.
-            OR
-            None. If the collection is empty.
+            str|None. The exploration ID of the first node,
+                or None if the collection is empty.
         """
         if len(self.nodes) > 0:
             return self.nodes[0].exploration_id
@@ -752,9 +751,8 @@ class Collection(object):
                 ids.
 
         Returns:
-            str. The next exploration id in the node list.
-            OR
-            None. If the learner has completed the collection.
+            str|None. The exploration ID of the next node,
+                or None if the collection is completed.
         """
         for exp_id in self.exploration_ids:
             if exp_id not in completed_exp_ids:
@@ -771,10 +769,8 @@ class Collection(object):
                 completed.
 
         Returns:
-            str. The exploration ID that a logged-out user should
-                complete next.
-            OR
-            None. If the learner is at the last node in the collection.
+            str|None. The exploration ID of the next node,
+                or None if the passed id is the last one in the collection.
         """
         exploration_just_unlocked = None
 
@@ -784,14 +780,6 @@ class Collection(object):
                 break
 
         return exploration_just_unlocked
-
-    def get_nodes_in_playable_order(self):
-        """Returns the list of collection nodes in linear, playable order.
-
-        Returns:
-            list(CollectionNode). The list of collection nodes.
-        """
-        return self.nodes
 
     @classmethod
     def is_demo_collection_id(cls, collection_id):

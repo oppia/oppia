@@ -54,15 +54,11 @@ oppia.factory('CollectionLinearizerService', [
       return index;
     };
 
-    var getNodeIndexLeftOf = function(linearNodeList, nodeIndex) {
-      return nodeIndex > 0 ? nodeIndex - 1 : null;
-    };
-
     // Swap the node at the specified index with the node immediately to the
     // left of it.
     var swapLeft = function(collection, linearNodeList, nodeIndex) {
       var node = linearNodeList[nodeIndex];
-      var leftNodeIndex = getNodeIndexLeftOf(linearNodeList, nodeIndex);
+      var leftNodeIndex = nodeIndex > 0 ? nodeIndex - 1 : null;
 
       if (leftNodeIndex === null) {
         return;
