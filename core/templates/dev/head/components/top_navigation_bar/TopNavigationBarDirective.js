@@ -43,7 +43,6 @@ oppia.directive('topNavigationBar', [
           $scope.NAV_MODE = GLOBALS.NAV_MODE;
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-          
           $scope.activeMenuName = '';
           $scope.username = GLOBALS.username;
           $scope.profilePictureDataUrl = GLOBALS.profilePictureDataUrl;
@@ -101,7 +100,7 @@ oppia.directive('topNavigationBar', [
           $scope.blurNavigationLinks = function(evt) {
             // This is required because if about submenu is in open state
             // and when you hover on library, both will be highlighted,
-            // To avoid that, blur all the a's in nav, so that only one 
+            // To avoid that, blur all the a's in nav, so that only one
             // will be highlighted.
             $('nav a').blur();
           };
@@ -113,24 +112,24 @@ oppia.directive('topNavigationBar', [
           /**
            * Handles keydown events on menus.
            * @param {object} evt
-           * @param {String} menuName - name of menu to perform action 
+           * @param {String} menuName - name of menu to perform action
            * on(aboutMenu/profileMenu)
            * @param {object} eventsTobeHandled - Map keyboard events('Enter') to
            * corresponding actions to be performed(open/close).
-           * 
+           *
            * @example
            *  onMenuKeypress($event, 'aboutMenu', {enter: 'open'})
            */
           $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
             var targetEvents = Object.keys(eventsTobeHandled);
             for (var i = 0; i < targetEvents.length; i++) {
-              var keyCodeSpec = 
+              var keyCodeSpec =
                 $scope.KEYBOARD_EVENT_TO_KEY_CODES[targetEvents[i]];
-              if (keyCodeSpec.keyCode === evt.keyCode && 
+              if (keyCodeSpec.keyCode === evt.keyCode &&
                 evt.shiftKey === keyCodeSpec.shiftKeyIsPressed) {
                 if (eventsTobeHandled[targetEvents[i]] === $scope.ACTION_OPEN) {
                   $scope.openSubmenu(evt, menuName);
-                } else if (eventsTobeHandled[targetEvents[i]] === 
+                } else if (eventsTobeHandled[targetEvents[i]] ===
                   $scope.ACTION_CLOSE) {
                   $scope.closeSubmenu(evt);
                 } else {
@@ -139,7 +138,7 @@ oppia.directive('topNavigationBar', [
               }
             }
           };
-          // Close the submenu if focus or click occurs anywhere outside of 
+          // Close the submenu if focus or click occurs anywhere outside of
           // the menu or outside of its parent (which opens submenu on hover).
           angular.element(document).on('click', function(evt) {
             if (!angular.element(evt.target).closest('li').length) {
