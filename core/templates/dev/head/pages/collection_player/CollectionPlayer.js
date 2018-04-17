@@ -103,25 +103,6 @@ oppia.controller('CollectionPlayer', [
         $scope.collectionPlaythrough.getCompletedExplorationNodeCount());
     };
 
-    $scope.getNonRecommendedCollectionNodes = function() {
-      var displayedExplorationIds = (
-        $scope.collectionPlaythrough.getCompletedExplorationIds());
-      if ($scope.collectionPlaythrough.getNextExplorationId() !== null) {
-        displayedExplorationIds = displayedExplorationIds.append(
-          $scope.collectionPlaythrough.getNextExplorationId());
-      }
-      var nonRecommendedCollectionNodes = [];
-      var collectionNodes = $scope.collection.getCollectionNodes();
-      for (var i = 0; i < collectionNodes.length; i++) {
-        var collectionNode = collectionNodes[i];
-        var explorationId = collectionNode.getExplorationId();
-        if (displayedExplorationIds.indexOf(explorationId) === -1) {
-          nonRecommendedCollectionNodes.push(collectionNode);
-        }
-      }
-      return nonRecommendedCollectionNodes;
-    };
-
     $scope.updateExplorationPreview = function(explorationId) {
       $scope.explorationCardIsShown = true;
       $scope.currentExplorationId = explorationId;
