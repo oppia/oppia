@@ -23,14 +23,14 @@ describe('Interaction Details Cache Service', function() {
 
 
     var customizationArgs = {
-      'testCustomization' : {
-        'value': 'testValue' 
+      testCustomization : {
+        value: 'testValue'
       }
     };
 
     var customization = {
-      'customization' : customizationArgs
-    }
+      customization : customizationArgs
+    };
 
     var scope, idcs;
     beforeEach(inject(function($rootScope, $injector) {
