@@ -25,131 +25,15 @@ describe('Collection node object factory', function() {
     CollectionNodeObjectFactory = $injector.get('CollectionNodeObjectFactory');
   }));
 
-  var _createEmptyCollectionNode = function(
-      explorationId, prerequisiteSkillIds, acquiredSkillIds) {
+  var _createEmptyCollectionNode = function(explorationId) {
     return CollectionNodeObjectFactory.create({
       exploration_id: explorationId,
-      prerequisite_skill_ids: prerequisiteSkillIds || [],
-      acquired_skill_ids: acquiredSkillIds || [],
       exploration_summary: {
         title: 'Title',
         status: 'private'
       }
     });
   };
-
-  it('should contain initial prerequisite skill ids', function() {
-    var collectionNode = _createEmptyCollectionNode(
-      'exp_id0', ['pre_skill1', 'pre_skill0'], ['acq_skill1', 'acq_skill0']);
-    expect(collectionNode.getPrerequisiteSkillIds()).toEqual([
-      'pre_skill1', 'pre_skill0'
-    ]);
-  });
-
-  it('should contain initial acquired skill ids', function() {
-    var collectionNode = _createEmptyCollectionNode(
-      'exp_id0', ['pre_skill1', 'pre_skill0'], ['acq_skill1', 'acq_skill0']);
-    expect(collectionNode.getAcquiredSkillIds()).toEqual([
-      'acq_skill1', 'acq_skill0'
-    ]);
-  });
-
-  it('should provide a mutable prerequisite skill list object', function() {
-    var collectionNode = _createEmptyCollectionNode('exp_id0');
-    var prerequisiteSkillIds = collectionNode.getPrerequisiteSkillIds();
-    prerequisiteSkillIds.push('pre_skill');
-    expect(
-      collectionNode.getPrerequisiteSkillIds().indexOf('pre_skill') !== -1);
-  });
-
-  it('should provide a mutable acquired skill list object', function() {
-    var collectionNode = _createEmptyCollectionNode('exp_id0');
-    var acquiredSkillIds = collectionNode.getAcquiredSkillIds();
-    acquiredSkillIds.push('acq_skill');
-    expect(collectionNode.getAcquiredSkillIds().indexOf('acq_skill') !== -1);
-  });
-
-  it('should correctly check prerequisite skill ID containment', function() {
-    var collectionNode = _createEmptyCollectionNode(
-      'exp_id0', ['pre_skill1', 'pre_skill0'], ['acq_skill1', 'acq_skill0']);
-    expect(collectionNode.containsPrerequisiteSkillId('pre_skill1')).toBe(true);
-    expect(collectionNode.containsPrerequisiteSkillId('nope')).toBe(false);
-  });
-
-  it('should correctly check acquired skill ID containment', function() {
-    var collectionNode = _createEmptyCollectionNode(
-      'exp_id0', ['pre_skill1', 'pre_skill0'], ['acq_skill1', 'acq_skill0']);
-    expect(collectionNode.containsAcquiredSkillId('acq_skill1')).toBe(true);
-    expect(collectionNode.containsAcquiredSkillId('nope')).toBe(false);
-  });
-
-  it('should correctly add prerequisite skill IDs', function() {
-    var collectionNode = _createEmptyCollectionNode(
-      'exp_id0', ['pre_skill1', 'pre_skill0'], ['acq_skill1', 'acq_skill0']);
-    expect(collectionNode.addPrerequisiteSkillId('pre_skill2')).toBe(true);
-    expect(collectionNode.getPrerequisiteSkillIds()).toEqual([
-      'pre_skill1', 'pre_skill0', 'pre_skill2']);
-    // Adding the same skill again results in a return value of false, and no
-    // change to the prerequisite skill list.
-    expect(collectionNode.addPrerequisiteSkillId('pre_skill2')).toBe(false);
-    expect(collectionNode.getPrerequisiteSkillIds()).toEqual([
-      'pre_skill1', 'pre_skill0', 'pre_skill2']);
-  });
-
-  it('should correctly add acquired skill IDs', function() {
-    var collectionNode = _createEmptyCollectionNode(
-      'exp_id0', ['pre_skill1', 'pre_skill0'], ['acq_skill1', 'acq_skill0']);
-    expect(collectionNode.addAcquiredSkillId('acq_skill2')).toBe(true);
-    expect(collectionNode.getAcquiredSkillIds()).toEqual([
-      'acq_skill1', 'acq_skill0', 'acq_skill2']);
-    // Adding the same skill again results in a return value of false, and no
-    // change to the prerequisite skill list.
-    expect(collectionNode.addAcquiredSkillId('acq_skill2')).toBe(false);
-    expect(collectionNode.getAcquiredSkillIds()).toEqual([
-      'acq_skill1', 'acq_skill0', 'acq_skill2']);
-  });
-
-  it('should correctly remove prerequisite skill IDs', function() {
-    var collectionNode = _createEmptyCollectionNode(
-      'exp_id0', ['pre_skill1', 'pre_skill0'], ['acq_skill1', 'acq_skill0']);
-    expect(collectionNode.removePrerequisiteSkillId('pre_skill1')).toBe(true);
-    expect(collectionNode.getPrerequisiteSkillIds()).toEqual(['pre_skill0']);
-
-    // Removing a non-existent skill ID results in a return value of false, and
-    // no change to the prerequisite skill list.
-    expect(collectionNode.removePrerequisiteSkillId('invalid')).toBe(false);
-    expect(collectionNode.getPrerequisiteSkillIds()).toEqual(['pre_skill0']);
-  });
-
-  it('should correctly remove acquired skill IDs', function() {
-    var collectionNode = _createEmptyCollectionNode(
-      'exp_id0', ['pre_skill1', 'pre_skill0'], ['acq_skill1', 'acq_skill0']);
-    expect(collectionNode.removeAcquiredSkillId('acq_skill1')).toBe(true);
-    expect(collectionNode.getAcquiredSkillIds()).toEqual(['acq_skill0']);
-
-    // Removing a non-existent skill ID results in a return value of false, and
-    // no change to the prerequisite skill list.
-    expect(collectionNode.removeAcquiredSkillId('invalid')).toBe(false);
-    expect(collectionNode.getAcquiredSkillIds()).toEqual(['acq_skill0']);
-  });
-
-  it('should correctly clear prerequisite skill IDs', function() {
-    var collectionNode = _createEmptyCollectionNode(
-      'exp_id0', ['pre_skill1', 'pre_skill0'], ['acq_skill1', 'acq_skill0']);
-    collectionNode.clearPrerequisiteSkillIds();
-    expect(collectionNode.getPrerequisiteSkillIds()).toEqual([]);
-    expect(collectionNode.getAcquiredSkillIds()).toEqual([
-      'acq_skill1', 'acq_skill0']);
-  });
-
-  it('should correctly clear acquired skill IDs', function() {
-    var collectionNode = _createEmptyCollectionNode(
-      'exp_id0', ['pre_skill1', 'pre_skill0'], ['acq_skill1', 'acq_skill0']);
-    collectionNode.clearAcquiredSkillIds();
-    expect(collectionNode.getPrerequisiteSkillIds()).toEqual([
-      'pre_skill1', 'pre_skill0']);
-    expect(collectionNode.getAcquiredSkillIds()).toEqual([]);
-  });
 
   it('should provide an immutable exploration summary', function() {
     var explorationSummaryBackendObject = {
@@ -159,8 +43,6 @@ describe('Collection node object factory', function() {
     };
     var collectionNodeBackendObject = {
       exploration_id: 'exp_id0',
-      prerequisite_skill_ids: [],
-      acquired_skill_ids: [],
       exploration_summary: explorationSummaryBackendObject
     };
 
@@ -181,11 +63,7 @@ describe('Collection node object factory', function() {
     function() {
       var collectionNode = CollectionNodeObjectFactory.createFromExplorationId(
         'exp_id0');
-      var prerequisiteSkillIds = collectionNode.getPrerequisiteSkillIds();
-      var acquiredSkillIds = collectionNode.getAcquiredSkillIds();
       expect(collectionNode.getExplorationId()).toEqual('exp_id0');
-      expect(prerequisiteSkillIds.length).toEqual(0);
-      expect(acquiredSkillIds.length).toEqual(0);
       expect(collectionNode.doesExplorationExist()).toBe(false);
     }
   );

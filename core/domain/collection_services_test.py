@@ -116,50 +116,6 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
                     }
                 })
 
-    def test_get_acquired_skill_ids_of_user(self):
-        """Tests get_acquired_skill_ids_of_user method."""
-        collection_id = 'col1'
-        exp_id = '0_exploration_id'
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        # Create a new collection and exploration.
-        self.save_new_valid_collection(
-            collection_id, owner_id, exploration_id=exp_id)
-
-        # Add a skill.
-        collection_services.update_collection(
-            owner_id, collection_id, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
-                'name': 'test'
-            }], 'Add a new skill')
-        collection = collection_services.get_collection_by_id(
-            collection_id)
-        skill_id = collection.get_skill_id_from_skill_name('test')
-        collection_node = collection.get_node(exp_id)
-        collection_node.update_acquired_skill_ids([skill_id])
-
-        # Update the acquired skill IDs for the exploration.
-        collection_services.update_collection(
-            owner_id, collection_id, [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
-                'property_name': (
-                    collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS), # pylint: disable=line-too-long
-                'exploration_id': exp_id,
-                'new_value': [skill_id]
-            }], 'Update skill')
-
-        acquired_skills = (
-            collection_services.get_acquired_skill_ids_of_user(
-                owner_id, collection_id))
-        self.assertEqual(len(acquired_skills), 0)
-
-        collection_services.record_played_exploration_in_collection_context(
-            owner_id, collection_id, exp_id)
-        acquired_skill_ids = (
-            collection_services.get_acquired_skill_ids_of_user(
-                owner_id, collection_id))
-        self.assertIn(skill_id, acquired_skill_ids)
-
 
 class CollectionProgressUnitTests(CollectionServicesUnitTests):
     """Tests functions which deal with any progress a user has made within a
@@ -226,67 +182,47 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
                 self.owner_id, self.COL_ID_0),
             [self.EXP_ID_0, self.EXP_ID_2, self.EXP_ID_1])
 
-    def test_get_next_exploration_ids_to_complete_by_user(self):
+    def test_get_next_exploration_id_to_complete_by_user(self):
         # This is an integration test depending on
         # get_completed_exploration_ids and logic interal to collection_domain
         # which is tested in isolation in collection_domain_test.
-
-        # Setup the connection graph. The user must complete the first
-        # exploration before they can do the third.
-        collection_services.update_collection(
-            self.owner_id, self.COL_ID_0,
-            [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
-                'name': 'skill0'
-            }, {
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
-                'exploration_id': self.EXP_ID_0,
-                'property_name': 'acquired_skill_ids',
-                'new_value': ['skill0']
-            }, {
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
-                'exploration_id': self.EXP_ID_2,
-                'property_name': 'prerequisite_skill_ids',
-                'new_value': ['skill0']
-            }],
-            'Updated exp 2 to require exp 0 before being playable')
 
         # If the user doesn't exist, assume they haven't made any progress on
         # the collection. This means the initial explorations should be
         # suggested.
         self.assertEqual(
-            collection_services.get_next_exploration_ids_to_complete_by_user(
-                'Fake', self.COL_ID_0), [self.EXP_ID_0, self.EXP_ID_1])
+            collection_services.get_next_exploration_id_to_complete_by_user(
+                'Fake', self.COL_ID_0), self.EXP_ID_0)
 
         # There should be an exception if the collection does not exist.
         with self.assertRaises(Exception):
-            collection_services.get_next_exploration_ids_to_complete_by_user(
+            collection_services.get_next_exploration_id_to_complete_by_user(
                 self.owner_id, 'Fake')
 
         # If the user hasn't made any progress in the collection yet, only the
         # initial explorations should be suggested.
         self.assertEqual(
             collection_services.get_collection_by_id(
-                self.COL_ID_0).init_exploration_ids,
-            [self.EXP_ID_0, self.EXP_ID_1])
+                self.COL_ID_0).first_exploration_id,
+            self.EXP_ID_0)
         self.assertEqual(
-            collection_services.get_next_exploration_ids_to_complete_by_user(
-                self.owner_id, self.COL_ID_0), [self.EXP_ID_0, self.EXP_ID_1])
+            collection_services.get_next_exploration_id_to_complete_by_user(
+                self.owner_id, self.COL_ID_0), self.EXP_ID_0)
 
         # If the user completes the first exploration, a new one should be
         # recommended and the old one should no longer be recommended.
         self._record_completion(self.owner_id, self.COL_ID_0, self.EXP_ID_0)
         self.assertEqual(
-            collection_services.get_next_exploration_ids_to_complete_by_user(
-                self.owner_id, self.COL_ID_0), [self.EXP_ID_1, self.EXP_ID_2])
+            collection_services.get_next_exploration_id_to_complete_by_user(
+                self.owner_id, self.COL_ID_0), self.EXP_ID_1)
 
         # Completing all of the explorations should yield no other explorations
         # to suggest.
         self._record_completion(self.owner_id, self.COL_ID_0, self.EXP_ID_1)
         self._record_completion(self.owner_id, self.COL_ID_0, self.EXP_ID_2)
         self.assertEqual(
-            collection_services.get_next_exploration_ids_to_complete_by_user(
-                self.owner_id, self.COL_ID_0), [])
+            collection_services.get_next_exploration_id_to_complete_by_user(
+                self.owner_id, self.COL_ID_0), None)
 
     def test_record_played_exploration_in_collection_context(self):
         # Ensure that exploration played within the context of a collection are
@@ -962,131 +898,6 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
                     'property_name': 'tags',
                     'new_value': ['duplicate', 'duplicate']
                 }], 'Add a new tag')
-
-    def test_add_collection_skill(self):
-        # Verify skills table is initially empty.
-        collection = collection_services.get_collection_by_id(
-            self.COLLECTION_ID)
-        self.assertEqual(collection.skills, {})
-
-        # Add a skill.
-        collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
-                'name': 'test'
-            }], 'Add a new skill')
-
-        # Verify that the skill is added.
-        collection = collection_services.get_collection_by_id(
-            self.COLLECTION_ID)
-        self.assertEqual(collection.skills.keys(), ['skill0'])
-
-    def test_adding_duplicate_collection_skill_raises_error(self):
-        collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
-                'name': 'test'
-            }], 'Add a new skill')
-
-        # Verify that error will be thrown when duplicate skill is added.
-        with self.assertRaisesRegexp(
-            ValueError,
-            'Skill with name "test" already exists.'):
-            collection_services.update_collection(
-                self.owner_id, self.COLLECTION_ID, [{
-                    'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
-                    'name': 'test'
-                }], 'Add a new skill, again')
-
-    def test_delete_collection_skill(self):
-        collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
-                'name': 'test'
-            }], 'Add a new skill')
-
-        # Delete a skill.
-        collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_DELETE_COLLECTION_SKILL,
-                'skill_id': 'skill0'
-            }], 'Delete skill')
-
-        # Verify that the skill is deleted.
-        collection = collection_services.get_collection_by_id(
-            self.COLLECTION_ID)
-        self.assertEqual(collection.skills.keys(), [])
-
-
-    def test_update_collection_node_prerequisite_skill_ids(self):
-        # Verify initial prerequisite skill ids are empty.
-        collection = collection_services.get_collection_by_id(
-            self.COLLECTION_ID)
-        collection_node = collection.get_node(self.EXPLORATION_ID)
-        self.assertEqual(collection_node.prerequisite_skill_ids, [])
-
-        # Add skills.
-        collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
-                'name': 'new skill 1'
-            }], 'Add a new skill')
-        collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
-                'name': 'new skill 2'
-            }], 'Add a new skill')
-
-        # Update the prerequisite skills.
-        collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
-                'exploration_id': self.EXPLORATION_ID,
-                'property_name': 'prerequisite_skill_ids',
-                'new_value': ['skill0', 'skill1']
-            }], 'Changed the prerequisite skill ids of a collection node')
-
-        # Verify the prerequisites are different.
-        collection = collection_services.get_collection_by_id(
-            self.COLLECTION_ID)
-        collection_node = collection.get_node(self.EXPLORATION_ID)
-        self.assertEqual(
-            collection_node.prerequisite_skill_ids, ['skill0', 'skill1'])
-
-    def test_update_collection_node_acquired_skill_ids(self):
-        # Verify initial acquired skill ids are empty.
-        collection = collection_services.get_collection_by_id(
-            self.COLLECTION_ID)
-        collection_node = collection.get_node(self.EXPLORATION_ID)
-        self.assertEqual(collection_node.acquired_skill_ids, [])
-
-        # Add skills.
-        collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
-                'name': 'new skill 1'
-            }], 'Add a new skill')
-        collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_ADD_COLLECTION_SKILL,
-                'name': 'new skill 2'
-            }], 'Add a new skill')
-
-        # Update the acquired skill ids.
-        collection_services.update_collection(
-            self.owner_id, self.COLLECTION_ID, [{
-                'cmd': collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY,
-                'exploration_id': self.EXPLORATION_ID,
-                'property_name': 'acquired_skill_ids',
-                'new_value': ['skill0', 'skill1']
-            }], 'Changed the acquired skill ids of a collection node')
-
-        # Verify the acquired are different.
-        collection = collection_services.get_collection_by_id(
-            self.COLLECTION_ID)
-        collection_node = collection.get_node(self.EXPLORATION_ID)
-        self.assertEqual(
-            collection_node.acquired_skill_ids, ['skill0', 'skill1'])
 
 
 def _get_node_change_list(exploration_id, property_name, new_value):
