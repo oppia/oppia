@@ -21,7 +21,7 @@ oppia.factory('NodeObjectFactory', [function() {
   var Node = function(nodeType, inputs) {
     this.nodeType = nodeType;
     this.inputs = inputs;
-  }
+  };
 
   Node.prototype.toBackendDict = function() {
     return {
