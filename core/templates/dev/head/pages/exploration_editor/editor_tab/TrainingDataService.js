@@ -20,11 +20,9 @@
  */
 
 oppia.factory('TrainingDataService', [
-  '$rootScope', '$http', 'ResponsesService', 'RULE_TYPE_CLASSIFIER',
-  'RuleObjectFactory',
+  '$rootScope', '$http', 'ResponsesService', 'RuleObjectFactory',
   function(
-      $rootScope, $http, ResponsesService, RULE_TYPE_CLASSIFIER,
-      RuleObjectFactory) {
+      $rootScope, $http, ResponsesService, RuleObjectFactory) {
     var _trainingDataAnswers = [];
     var _trainingDataFrequencies = [];
 
@@ -65,24 +63,9 @@ oppia.factory('TrainingDataService', [
       for (var i = 0; i < answerGroups.length; i++) {
         var answerGroup = answerGroups[i];
         var rules = answerGroup.rules;
-        var trainingData = null;
-        var classifierIndex = -1;
-        for (var j = 0; j < rules.length; j++) {
-          var rule = rules[j];
-          if (rule.type === RULE_TYPE_CLASSIFIER) {
-            trainingData = rule.inputs.training_data;
-            classifierIndex = j;
-            break;
-          }
-        }
+        var trainingData = answerGroup.training_data;
         if (trainingData &&
             _removeAnswerFromTrainingData(answer, trainingData) !== -1) {
-          if (trainingData.length === 0 && rules.length > 1) {
-            // If the last of the training data for a classifier has been
-            // removed and the classifier is not the only rule in the group,
-            // remove the rule since it is no longer doing anything.
-            rules.splice(classifierIndex, 1);
-          }
           updatedAnswerGroups = true;
         }
       }
@@ -110,19 +93,10 @@ oppia.factory('TrainingDataService', [
 
     return {
       initializeTrainingData: function(explorationId, stateName) {
-        var trainingDataUrl = '/createhandler/training_data/' + explorationId +
-          '/' + encodeURIComponent(stateName);
-        $http.get(trainingDataUrl).then(function(response) {
-          var unhandledAnswers = response.data.unhandled_answers;
-          _trainingDataAnswers = [];
-          _trainingDataFrequencies = [];
-          for (var i = 0; i < unhandledAnswers.length; i++) {
-            var unhandledAnswer = unhandledAnswers[i];
-            _trainingDataAnswers.push(unhandledAnswer.answer);
-            _trainingDataFrequencies.push(unhandledAnswer.frequency);
-          }
-          $rootScope.$broadcast('updatedTrainingData');
-        });
+        var answerGroups = ResponsesService.getAnswerGroups();
+        for (var i = 0; i < answerGroups.length; i++) {
+          _trainingDataAnswers.push(answerGroups[i].training_data);
+        }
       },
 
       getTrainingDataAnswers: function() {
@@ -153,32 +127,17 @@ oppia.factory('TrainingDataService', [
         _removeAnswer(answer);
 
         var answerGroup = ResponsesService.getAnswerGroup(answerGroupIndex);
-        var rules = answerGroup.rules;
-
-        // Ensure the answer group has a classifier rule.
-        var classifierRule = null;
-        for (var i = 0; i < rules.length; i++) {
-          var rule = rules[i];
-          if (rule.type === RULE_TYPE_CLASSIFIER) {
-            classifierRule = rule;
-            break;
-          }
-        }
-        if (!classifierRule) {
-          // Create new classifier rule for classification.
-          classifierRule = RuleObjectFactory.createNewClassifierRule();
-          rules.push(classifierRule);
-        }
+        var trainingData = answerGroup.training_data;
 
         // Train the rule to include this answer, but only if it's not already
         // in the training data.
         if (_getIndexOfTrainingData(
-          answer, classifierRule.inputs.training_data) === -1) {
-          classifierRule.inputs.training_data.push(answer);
+          answer, trainingData) === -1) {
+          trainingData.push(answer);
         }
 
         ResponsesService.updateAnswerGroup(answerGroupIndex, {
-          rules: rules
+          training_data: trainingData
         });
       },
 

@@ -30,18 +30,18 @@ oppia.directive('answerGroupEditor', [
           '&onSaveAnswerGroupCorrectnessLabel'),
         outcome: '=',
         suppressWarnings: '&',
-        rules: '='
+        rules: '=',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/answer_group_editor_directive.html'),
       controller: [
         '$scope', 'stateInteractionIdService', 'ResponsesService',
         'EditorStateService', 'AlertsService', 'INTERACTION_SPECS',
-        'RULE_TYPE_CLASSIFIER', 'RuleObjectFactory',
+        'RuleObjectFactory',
         function(
             $scope, stateInteractionIdService, ResponsesService,
             EditorStateService, AlertsService, INTERACTION_SPECS,
-            RULE_TYPE_CLASSIFIER, RuleObjectFactory) {
+            RuleObjectFactory) {
           $scope.rulesMemento = null;
           $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           $scope.editAnswerGroupForm = {};
@@ -162,14 +162,11 @@ oppia.directive('answerGroupEditor', [
             var ruleTypes = Object.keys(ruleDescriptions);
             var ruleType = null;
             for (var i = 0; i < ruleTypes.length; i++) {
-              if (ruleTypes[i] !== RULE_TYPE_CLASSIFIER) {
-                ruleType = ruleTypes[i];
-                break;
-              }
+              ruleType = ruleTypes[i];
             }
             if (!ruleType) {
-              // This should never happen. An interaction must have more than
-              // just a classifier rule, as verified in a backend test suite:
+              // This should never happen. An interaction must have at least
+              // one rule, as verified in a backend test suite:
               //   extensions.interactions.base_test.InteractionUnitTests.
               return;
             }

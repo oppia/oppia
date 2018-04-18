@@ -832,6 +832,7 @@ class AnswerGroup(object):
             'rule_specs': [rule_spec.to_dict()
                            for rule_spec in self.rule_specs],
             'outcome': self.outcome.to_dict(),
+            'training_data': self.training_data
         }
 
     @classmethod
@@ -848,20 +849,24 @@ class AnswerGroup(object):
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
             [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
+            answer_group_dict['training_data']
         )
 
-    def __init__(self, outcome, rule_specs):
+    def __init__(self, outcome, rule_specs, training_data):
         """Initializes a AnswerGroup domain object.
 
         Args:
             outcome: Outcome. The outcome corresponding to the answer group.
             rule_specs: list(RuleSpec). List of rule specifications.
+            training_data: list(answers). List of answers belonging to training
+                data of this answer group.
         """
         self.rule_specs = [RuleSpec(
             rule_spec.rule_type, rule_spec.inputs
         ) for rule_spec in rule_specs]
 
         self.outcome = outcome
+        self.training_data = training_data
 
     def validate(self, interaction, exp_param_specs_dict):
         """Verifies that all rule classes are valid, and that the AnswerGroup
@@ -882,39 +887,22 @@ class AnswerGroup(object):
             raise utils.ValidationError(
                 'Expected answer group rules to be a list, received %s'
                 % self.rule_specs)
-        if len(self.rule_specs) < 1:
-            raise utils.ValidationError(
-                'There must be at least one rule for each answer group.')
 
-        seen_classifier_rule = False
+        if len(self.rule_specs) < 1 and self.training_data == []:
+            raise utils.ValidationError(
+                'There must be at least one rule or training data for each'
+                ' answer group.')
+
         for rule_spec in self.rule_specs:
             if rule_spec.rule_type not in interaction.rules_dict:
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
-
-            if rule_spec.rule_type == RULE_TYPE_CLASSIFIER:
-                if seen_classifier_rule:
-                    raise utils.ValidationError(
-                        'AnswerGroups can only have one classifier rule.')
-                seen_classifier_rule = True
 
             rule_spec.validate(
                 interaction.get_rule_param_list(rule_spec.rule_type),
                 exp_param_specs_dict)
 
         self.outcome.validate()
-
-    def get_classifier_rule_index(self):
-        """Gets the index of the classifier in the answer groups.
-
-        Returns:
-            int or None. The index of the classifier in the answer
-            groups, or None if it doesn't exist.
-        """
-        for (rule_spec_index, rule_spec) in enumerate(self.rule_specs):
-            if rule_spec.rule_type == RULE_TYPE_CLASSIFIER:
-                return rule_spec_index
-        return None
 
 
 class Hint(object):
@@ -1321,13 +1309,8 @@ class State(object):
         training_data = []
         for (answer_group_index, answer_group) in enumerate(
                 self.interaction.answer_groups):
-            classifier_rule_spec_index = (
-                answer_group.get_classifier_rule_index())
-            if classifier_rule_spec_index is not None:
-                classifier_rule_spec = answer_group.rule_specs[
-                    classifier_rule_spec_index]
-                answers = copy.deepcopy(classifier_rule_spec.inputs[
-                    'training_data'])
+            if answer_group. training_data:
+                answers = copy.deepcopy(answer_group.training_data)
                 training_data.append({
                     'answer_group_index': answer_group_index,
                     'answers': answers
@@ -1346,14 +1329,8 @@ class State(object):
         training_examples_count += len(
             self.interaction.confirmed_unclassified_answers)
         for answer_group in self.interaction.answer_groups:
-            classifier_rule_spec_index = (
-                answer_group.get_classifier_rule_index())
-            if classifier_rule_spec_index is not None:
-                classifier_rule_spec = answer_group.rule_specs[
-                    classifier_rule_spec_index]
-                training_examples_count += len(
-                    classifier_rule_spec.inputs['training_data'])
-                labels_count += 1
+            training_examples_count += len(answer_group.training_data)
+            labels_count += 1
         if ((training_examples_count >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
                 (labels_count >= feconf.MIN_ASSIGNED_LABELS)):
             return True
@@ -1424,7 +1401,7 @@ class State(object):
                     'received %s' % rule_specs_list)
 
             answer_group = AnswerGroup(
-                Outcome.from_dict(answer_group_dict['outcome']), [])
+                Outcome.from_dict(answer_group_dict['outcome']), [], [])
             for rule_dict in rule_specs_list:
                 rule_spec = RuleSpec.from_dict(rule_dict)
 
@@ -1455,6 +1432,8 @@ class State(object):
                     rule_inputs[param_name] = normalized_param
 
                 answer_group.rule_specs.append(rule_spec)
+            if answer_group_dict['training_data']:
+                answer_group.training_data = answer_group_dict['training_data']
             interaction_answer_groups.append(answer_group)
         self.interaction.answer_groups = interaction_answer_groups
 
@@ -3130,6 +3109,41 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v18_dict_to_v19_dict(cls, states_dict):
+        """Converts from version 18 to 19. Version 19 adds training_data
+        parameter to each answer group to store training data of that
+        answer group.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            for answer_group in state_dict['interaction']['answer_groups']:
+                if answer_group['rule_specs']:
+                    training_data = []
+                    classifier_rule = None
+                    for rule in answer_group['rule_specs']:
+                        if rule['rule_type'] == RULE_TYPE_CLASSIFIER:
+                            training_data = rule['inputs']['training_data']
+                            classifier_rule = rule
+                            break
+                    if classifier_rule:
+                        answer_group['rule_specs'].remove(classifier_rule)
+
+                    answer_group['training_data'] = training_data
+
+                    if training_data == [] and answer_group['rule_specs'] == []:
+                        state_dict['interaction']['answer_groups'].remove(
+                            answer_group)
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -3160,7 +3174,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 23
+    CURRENT_EXP_SCHEMA_VERSION = 24
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3606,6 +3620,21 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v23_dict_to_v24_dict(cls, exploration_dict):
+        """ Converts a v23 exploration dict into a v24 exploration dict.
+
+        Adds training_data parameter at each answer group to store training
+        data of corresponding answer group.
+        """
+        exploration_dict['schema_version'] = 24
+
+        exploration_dict['states'] = cls._convert_states_v18_dict_to_v19_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 19
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3751,6 +3780,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v22_dict_to_v23_dict(
                 exploration_dict)
             exploration_schema_version = 23
+
+        if exploration_schema_version == 23:
+            exploration_dict = cls._convert_v23_dict_to_v24_dict(
+                exploration_dict)
+            exploration_schema_version = 24
 
         return (exploration_dict, initial_schema_version)
 

@@ -30,13 +30,11 @@ oppia.factory('AnswerClassificationService', [
   'PredictionAlgorithmRegistryService', 'StateClassifierMappingService',
   'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION', 'STATISTICAL_CLASSIFICATION',
-  'RULE_TYPE_CLASSIFIER',
   function(
       AlertsService, AnswerClassificationResultObjectFactory,
       PredictionAlgorithmRegistryService, StateClassifierMappingService,
       INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
-      DEFAULT_OUTCOME_CLASSIFICATION, STATISTICAL_CLASSIFICATION,
-      RULE_TYPE_CLASSIFIER) {
+      DEFAULT_OUTCOME_CLASSIFICATION, STATISTICAL_CLASSIFICATION) {
     /**
      * Finds the first answer group with a rule that returns true.
      *
@@ -56,9 +54,7 @@ oppia.factory('AnswerClassificationService', [
       for (var i = 0; i < answerGroups.length; i++) {
         for (var j = 0; j < answerGroups[i].rules.length; j++) {
           var rule = answerGroups[i].rules[j];
-          if (rule.type !== RULE_TYPE_CLASSIFIER &&
-              interactionRulesService[rule.type](
-                answer, rule.inputs)) {
+          if (interactionRulesService[rule.type](answer, rule.inputs)) {
             return AnswerClassificationResultObjectFactory.createNew(
               answerGroups[i].outcome, i, j, EXPLICIT_CLASSIFICATION);
           }
@@ -74,25 +70,6 @@ oppia.factory('AnswerClassificationService', [
       } else {
         AlertsService.addWarning('Something went wrong with the exploration.');
       }
-    };
-
-    /**
-     * Finds the first rule that contains RULE_TYPE_CLASSIFIER as rule type.
-     *
-     * @param {object} answerGroup - An answer group of the interaction. Each
-     *     answer group containts rule_specs which is a list of rules.
-     *
-     * @return {integer} The index of the retrieved rule with rule_type
-     *     RULE_TYPE_CLASSIFIER.
-     */
-    var findClassifierRuleIndex = function(answerGroup) {
-      for (var i = 0; i < answerGroup.rules.length; i++) {
-        var rule = answerGroup.rules[i];
-        if (rule.type === RULE_TYPE_CLASSIFIER) {
-          return i;
-        }
-      }
-      throw Error('Classifier Rule type is not present in this answer group.');
     };
 
     return {
@@ -149,10 +126,7 @@ oppia.factory('AnswerClassificationService', [
               answerClassificationResult = (
                 AnswerClassificationResultObjectFactory.createNew(
                   answerGroups[predictedAnswerGroupIndex].outcome,
-                  predictedAnswerGroupIndex,
-                  findClassifierRuleIndex(
-                    answerGroups[predictedAnswerGroupIndex]),
-                  STATISTICAL_CLASSIFICATION));
+                  predictedAnswerGroupIndex, 0, STATISTICAL_CLASSIFICATION));
             }
           }
         }

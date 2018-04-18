@@ -339,11 +339,8 @@ class EditorTest(BaseEditorControllerTest):
             # classifier, then it should not be returned as an unhandled answer.
             state = exploration_dict['exploration']['states'][state_name]
             answer_group = state['interaction']['answer_groups'][1]
-            rule_spec = answer_group['rule_specs'][0]
-            self.assertEqual(
-                rule_spec['rule_type'], exp_domain.RULE_TYPE_CLASSIFIER)
-            rule_spec['inputs']['training_data'].append('joyful')
-
+            answer_group['training_data'].append('joyful')
+            print state['interaction']['answer_groups']
             self.put_json('/createhandler/data/%s' % exp_id, {
                 'change_list': [{
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -395,8 +392,7 @@ class EditorTest(BaseEditorControllerTest):
             # answer, it will not be returned as potential training data.
             state = exploration_dict['exploration']['states'][state_name]
             answer_group = state['interaction']['answer_groups'][1]
-            rule_spec = answer_group['rule_specs'][0]
-            del rule_spec['inputs']['training_data'][1]
+            del answer_group['training_data'][1]
             self.put_json('/createhandler/data/15', {
                 'change_list': [{
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

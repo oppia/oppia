@@ -563,13 +563,11 @@ class UntrainedAnswersHandler(EditorHandler):
 
                 trained_answers = set()
                 for answer_group in interaction.answer_groups:
-                    for rule_spec in answer_group.rule_specs:
-                        if (rule_spec.rule_type ==
-                                exp_domain.RULE_TYPE_CLASSIFIER):
-                            trained_answers.update(
-                                interaction_instance.normalize_answer(trained)
-                                for trained
-                                in rule_spec.inputs['training_data'])
+                    if answer_group['training_data']:
+                        trained_answers.update(
+                            interaction_instance.normalize_answer(trained)
+                            for trained
+                            in answer_group['training_data'])
 
                 # Include all the answers which have been confirmed to be
                 # associated with the default outcome.
