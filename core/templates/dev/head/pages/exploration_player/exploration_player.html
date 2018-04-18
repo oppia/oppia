@@ -6,8 +6,7 @@
 
 {% block header_js %}
   {{ super() }}
-  {% if exploration_version %}
-    <script type="text/javascript">
+    <script ng-if="explorationVersion" ng-controller="exploration_player" type="text/javascript">
       GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
       GLOBALS.collectionTitle = JSON.parse('{{collection_title|js_string}}');
       GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = JSON.parse(
@@ -20,7 +19,6 @@
       GLOBALS.username = JSON.parse('{{username|js_string}}');
     </script>
 
-  {% endif %}
 
   <style>
     @media(max-width: 500px) {
@@ -57,9 +55,7 @@
   <div>
     <background-banner></background-banner>
     <conversation-skin></conversation-skin>
-    {% if not iframed %}
-      <attribution-guide></attribution-guide>
-    {% endif %}
+      <attribution-guide ng-controller="exploration_player" ng-if="!iframed"></attribution-guide>
   </div>
   <style>
     .oppia-exploration-h1 {
@@ -81,9 +77,7 @@
 {% endblock %}
 
 {% block footer %}
-  {% if not iframed %}
-    <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
-  {% endif %}
+    <exploration-footer ng-controller="exploration_player" ng-if="!iframed" twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
 {% endblock %}
 
 {% block footer_js %}
@@ -166,6 +160,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/RefresherExplorationConfirmationModalService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/HintsAndSolutionManagerService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerLocalNav.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/ExplorationPlayer.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerParamsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewInfo.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/LearnerViewRatingService.js"></script>
