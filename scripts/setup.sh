@@ -71,7 +71,7 @@ function maybeInstallDependencies {
     install_node_module protractor 5.3.1
     install_node_module protractor-screenshot-reporter 0.0.5
 
-    $NODE_MODULE_DIR/.bin/webdriver-manager update
+    $NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.38
   fi
 
   if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
