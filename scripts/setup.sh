@@ -60,6 +60,7 @@ function maybeInstallDependencies {
     $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
 
     install_node_module jasmine-core 2.5.2
+    install_node_module jasmine-spec-reporter 3.2.0
     install_node_module karma 1.5.0
     install_node_module karma-jasmine 1.1.0
     install_node_module karma-jasmine-jquery 0.1.1
@@ -67,9 +68,8 @@ function maybeInstallDependencies {
     install_node_module karma-coverage 1.1.1
     install_node_module karma-ng-html2js-preprocessor 1.0.0
     install_node_module karma-chrome-launcher 2.0.0
-    install_node_module protractor 5.1.1
+    install_node_module protractor 5.3.1
     install_node_module protractor-screenshot-reporter 0.0.5
-    install_node_module jasmine-spec-reporter 3.2.0
 
     $NODE_MODULE_DIR/.bin/webdriver-manager update
   fi
