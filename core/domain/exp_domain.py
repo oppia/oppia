@@ -1309,7 +1309,7 @@ class State(object):
         training_data = []
         for (answer_group_index, answer_group) in enumerate(
                 self.interaction.answer_groups):
-            if answer_group. training_data:
+            if answer_group.training_data:
                 answers = copy.deepcopy(answer_group.training_data)
                 training_data.append({
                     'answer_group_index': answer_group_index,
