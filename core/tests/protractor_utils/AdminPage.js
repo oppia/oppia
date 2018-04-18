@@ -105,7 +105,14 @@ var AdminPage = function(){
   };
 
   this.reloadCollection = function() {
+    general.waitForSystem();
+    this.get();
+    browser.waitForAngular();
+
     reloadCollectionButton.click();
+    general.acceptAlert();
+    // Time is needed for the reloading to complete.
+    browser.waitForAngular();
   };
 
   // The name should be as given in the admin page (including '.yaml' if
