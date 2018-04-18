@@ -659,9 +659,7 @@ body {
   color: white;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 14px;
-  margin-bottom: 20px;
-  margin-left: 54px;
-  margin-top: 20px;
+  margin-top: 16px;
   text-transform: uppercase;
   width: 129.42px;
 }
@@ -670,6 +668,12 @@ body {
 .oppia-subscription-button:focus {
   background-color: #05beb2;
   color: white;
+}
+
+@media (max-width: 610px) {
+  .oppia-subscription-button {
+    margin: 0;
+  }
 }
 
 .oppia-profile-user-card {
