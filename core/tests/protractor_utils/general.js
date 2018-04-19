@@ -158,6 +158,37 @@ var acceptAlert = function() {
   });
 };
 
+var _getUniqueLogMessages = function(logs) {
+  // Returns unique log messages.
+  var logsDict = {};
+  for (var i = 0; i < logs.length; i++) {
+    if (!logsDict.hasOwnProperty(logs[i].message)) {
+      logsDict[logs[i].message] = true;
+    }
+  }
+  return Object.keys(logsDict);
+};
+
+var checkConsoleErrorsExist = function(expectedErrors) {
+  // Checks that browser logs match entries in expectedErrors array.
+  browser.manage().logs().get('browser').then(function(browserLogs) {
+    // Some browsers such as chrome raise two errors for a missing resource.
+    // To keep consistent behaviour across browsers, we keep only the logs
+    // that have a unique value for their message attribute.
+    var uniqueLogMessages = _getUniqueLogMessages(browserLogs);
+    expect(uniqueLogMessages.length).toBe(expectedErrors.length);
+    for (var i = 0; i < expectedErrors.length; i++) {
+      var errorPresent = false;
+      for (var j = 0; j < uniqueLogMessages.length; j++) {
+        if (uniqueLogMessages[j].match(expectedErrors[i])) {
+          errorPresent = true;
+        }
+      }
+      expect(errorPresent).toBe(true);
+    }
+  });
+};
+
 exports.acceptAlert = acceptAlert;
 exports.waitForSystem = waitForSystem;
 exports.scrollToTop = scrollToTop;
@@ -180,3 +211,5 @@ exports.moveToEditor = moveToEditor;
 exports.expect404Error = expect404Error;
 
 exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;
+
+exports.checkConsoleErrorsExist = checkConsoleErrorsExist;

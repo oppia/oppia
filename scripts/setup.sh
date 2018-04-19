@@ -67,11 +67,11 @@ function maybeInstallDependencies {
     install_node_module karma-coverage 1.1.1
     install_node_module karma-ng-html2js-preprocessor 1.0.0
     install_node_module karma-chrome-launcher 2.0.0
-    install_node_module protractor 5.1.1
+    install_node_module protractor 5.3.1
     install_node_module protractor-screenshot-reporter 0.0.5
     install_node_module jasmine-spec-reporter 3.2.0
 
-    $NODE_MODULE_DIR/.bin/webdriver-manager update
+    $NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.38
   fi
 
   if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
