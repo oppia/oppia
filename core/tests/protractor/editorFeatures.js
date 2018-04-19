@@ -13,16 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests of the history tab.
+ * @fileoverview End-to-end tests for feedback on explorations
+ * Tests the following sequence:
+ * User 1 creates and publishes an exploration.
+ * User 2 plays the exploration and leaves feedback on it
+ * User 1 reads the feedback and responds to it.
+ * Note: In production, after this sequence of events, the only notification
+ * User 2 will receive is via email, and we can't easily test this
+ * in an e2e test.
  */
 
-var general = require('../protractor_utils/general.js');
+var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
+var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
-var editor = require('../protractor_utils/editor.js');
+
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
+
 
 describe('Exploration history', function() {
   var explorationPlayerPage = null;
@@ -413,6 +425,153 @@ describe('Exploration history', function() {
     }], [3, 2, 1]);
 
     users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
+});
+
+
+describe('ExplorationFeedback', function() {
+  var EXPLORATION_TITLE = 'Sample Exploration';
+  var EXPLORATION_OBJECTIVE = 'To explore something';
+  var EXPLORATION_CATEGORY = 'Algorithms';
+  var EXPLORATION_LANGUAGE = 'English';
+  var creatorDashboardPage = null;
+  var libraryPage = null;
+  var explorationPlayerPage = null;
+
+  beforeEach(function() {
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
+
+  beforeEach(function() {
+    users.createUser(
+      'user1@ExplorationFeedback.com',
+      'creatorExplorationFeedback');
+    users.createUser(
+      'user2@ExplorationFeedback.com',
+      'learnerExplorationFeedback');
+  });
+
+  it('adds feedback to an exploration', function() {
+    var feedback = 'A good exploration. Would love to see a few more questions';
+    var feedbackResponse = 'Thanks for the feedback';
+
+    // Creator creates and publishes an exploration
+    users.login('user1@ExplorationFeedback.com');
+    workflow.createAndPublishExploration(
+      EXPLORATION_TITLE,
+      EXPLORATION_CATEGORY,
+      EXPLORATION_OBJECTIVE,
+      EXPLORATION_LANGUAGE);
+    creatorDashboardPage.get();
+    expect(
+      creatorDashboardPage.getNumberOfFeedbackMessages()
+    ).toEqual(0);
+    users.logout();
+
+    // Learner plays the exploration and submits a feedback
+    users.login('user2@ExplorationFeedback.com');
+    libraryPage.get();
+    libraryPage.playExploration(EXPLORATION_TITLE);
+    explorationPlayerPage.submitFeedback(feedback);
+    users.logout();
+
+    // Creator reads the feedback and responds
+    users.login('user1@ExplorationFeedback.com');
+    creatorDashboardPage.get();
+    expect(
+      creatorDashboardPage.getNumberOfFeedbackMessages()
+    ).toEqual(1);
+    creatorDashboardPage.navigateToExplorationEditor();
+
+    editor.expectCurrentTabToBeFeedbackTab();
+    editor.readFeedbackMessages().then(function(messages) {
+      expect(messages.length).toEqual(1);
+      expect(messages[0]).toEqual(feedback);
+    });
+    editor.sendResponseToLatestFeedback(feedbackResponse);
+    users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
+});
+
+
+describe('Suggestions on Explorations', function() {
+  var EXPLORATION_TITLE = 'Sample Exploration';
+  var EXPLORATION_CATEGORY = 'Algorithms';
+  var EXPLORATION_OBJECTIVE = 'To explore something new';
+  var EXPLORATION_LANGUAGE = 'English';
+  var creatorDashboardPage = null;
+  var libraryPage = null;
+  var explorationPlayerPage = null;
+
+  beforeEach(function() {
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    libraryPage = new LibraryPage.LibraryPage();
+  });
+
+  beforeEach(function() {
+    users.createUser(
+      'user1@ExplorationSuggestions.com',
+      'authorExplorationSuggestions');
+    users.createUser(
+      'user2@ExplorationSuggestions.com',
+      'suggesterExplorationSuggestions');
+    users.createUser(
+      'user3@ExplorationSuggestions.com',
+      'studentExplorationSuggestions');
+  });
+
+  it('accepts a suggestion on a published exploration', function() {
+    users.login('user1@ExplorationSuggestions.com');
+    workflow.createAndPublishExploration(
+      EXPLORATION_TITLE,
+      EXPLORATION_CATEGORY,
+      EXPLORATION_OBJECTIVE,
+      EXPLORATION_LANGUAGE);
+    browser.get(general.SERVER_URL_PREFIX);
+    users.logout();
+
+    // Suggester plays the exploration and suggests a change
+    users.login('user2@ExplorationSuggestions.com');
+    libraryPage.get();
+    libraryPage.playExploration(EXPLORATION_TITLE);
+
+    var suggestion = 'New Exploration';
+    var suggestionDescription = 'Uppercased the first letter';
+
+    explorationPlayerPage.submitSuggestion(suggestion, suggestionDescription);
+    users.logout();
+
+    // Exploration author reviews the suggestion and accepts it
+    users.login('user1@ExplorationSuggestions.com');
+    creatorDashboardPage.get();
+    creatorDashboardPage.navigateToExplorationEditor();
+    editor.getSuggestionThreads().then(function(threads) {
+      expect(threads.length).toEqual(1);
+      expect(threads[0]).toMatch(suggestionDescription);
+      editor.acceptSuggestion(suggestionDescription);
+
+      editor.navigateToPreviewTab();
+      explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
+      users.logout();
+
+      // Student logs in and plays the exploration, finds the updated content
+      users.login('user3@ExplorationSuggestions.com');
+      libraryPage.get();
+      libraryPage.playExploration(EXPLORATION_TITLE);
+      explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
+      users.logout();
+    });
   });
 
   afterEach(function() {
