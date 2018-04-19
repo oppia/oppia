@@ -75,6 +75,10 @@ exports.config = {
       'protractor/editorAndPlayer.js',
     ],
 
+    stateEditor: [
+      'protractor/stateEditor.js',
+    ],
+
     editorFeatures: [
       'protractor/editorFeatures.js'
     ],
