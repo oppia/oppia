@@ -89,11 +89,15 @@ exports.config = {
       'protractor/learnerDashboard.js',
     ],
 
-    users: [
+    users1: [
       // 'protractor/userManagement.js',
-      'protractor/loginFlow.js',
-      // 'protractor/subscriptions.js',
+      // 'protractor/loginFlow.js',
+      'protractor/subscriptions.js',
       // 'protractor/preferences.js'
+    ],
+
+    users2: [
+      'protractor/loginFlow.js',
     ],
 
     misc: [
