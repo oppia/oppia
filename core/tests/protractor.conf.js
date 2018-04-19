@@ -119,13 +119,13 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     chromeOptions: {
-      args: ['lang=en-EN'],
-      prefs: {
-        intl: {
-          accept_languages: 'en-EN'
-        }
-      }
+      args: ['headless', 'lang=en-EN']
     },
+    prefs: {
+      intl: {
+        accept_languages: 'en-EN'
+      }
+    }
     loggingPrefs: {
       driver: 'INFO',
       browser: 'INFO'

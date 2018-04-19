@@ -7,13 +7,7 @@ python:
 - 2.7
 
 addons:
-  firefox: latest
-  apt:
-    sources:
-      - google-chrome
-    packages:
-      - google-chrome-stable
-      - google-chrome-beta
+  chrome: stable
 
 branches:
   only:
@@ -22,20 +16,20 @@ branches:
 
 env:
   matrix:
-    - RUN_LINT=true
-    - RUN_FRONTEND_TESTS=true
-    - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false EXCLUDE_LOAD_TESTS=true
+    # - RUN_LINT=true
+    # - RUN_FRONTEND_TESTS=true
+    # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false EXCLUDE_LOAD_TESTS=true
     # TODO(sll): Reinstate this when we can get it to run in reasonable time.
     # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
     # TODO(sll): Reinstate this when the load tests are more reliable.
     # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true EXCLUDE_LOAD_TESTS=false
-    - RUN_E2E_TESTS_MAIN_EDITOR_PROD=true
-    - RUN_E2E_TESTS_EDITOR_FEATURES_PROD=true
-    - RUN_E2E_TESTS_EXTENSIONS_PROD=true
-    - RUN_E2E_TESTS_LIBRARY_PROD=true
-    - RUN_E2E_TESTS_MISC_PROD=true
+    # - RUN_E2E_TESTS_MAIN_EDITOR_PROD=true
+    # - RUN_E2E_TESTS_EDITOR_FEATURES_PROD=true
+    # - RUN_E2E_TESTS_EXTENSIONS_PROD=true
+    # - RUN_E2E_TESTS_LIBRARY_PROD=true
+    # - RUN_E2E_TESTS_MISC_PROD=true
     - RUN_E2E_TESTS_USERS_PROD=true
-    - RUN_E2E_TESTS_EMBEDDING_PROD=true
+    # - RUN_E2E_TESTS_EMBEDDING_PROD=true
 matrix:
   allow_failures: []
   fast_finish: true
