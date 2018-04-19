@@ -13,7 +13,6 @@ addons:
       - google-chrome
     packages:
       - google-chrome-stable
-      - google-chrome-beta
 
 branches:
   only:
