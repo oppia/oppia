@@ -113,6 +113,7 @@
 	"I18N_INTERACTIONS_SET_INPUT_NO_ANSWER": "Nenhuma resposta dada.",
 	"I18N_INTERACTIONS_SUBMIT": "Enviar",
 	"I18N_LANGUAGE_FOOTER_VIEW_IN": "Exibir o Oppia em:",
+	"I18N_LEARNER_DASHBOARD_TOOLTIP": "Coleções são várias explorações relacionadas que devem ser concluídas em uma sequência.",
 	"I18N_LIBRARY_ALL_CATEGORIES": "Todas as categorias",
 	"I18N_LIBRARY_ALL_CATEGORIES_SELECTED": "Todas as categorias selecionadas",
 	"I18N_LIBRARY_ALL_LANGUAGES": "Todos os idiomas",
