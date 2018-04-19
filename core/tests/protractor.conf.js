@@ -61,27 +61,51 @@ exports.config = {
       'protractor/*.js'
     ],
 
-    mainEditor: [
-      'protractor/editorAndPlayer.js',
-      'protractor/stateEditor.js',
+    editorAndPlayer: [
+      'protractor/editorAndPlayer.js'
+    ],
+
+    stateEditor: [
+      'protractor/stateEditor.js'
+    ],
+
+    explorationFeedback: [
       'protractor/explorationFeedback.js'
     ],
 
-    editorFeatures: [
-      'protractor/historyTab.js',
-      'protractor/parameters.js',
+    historyTab: [
+      'protractor/historyTab.js'
+    ],
+
+    parameters: [
+      'protractor/parameters.js'
+    ],
+
+    hintsAndSolutions: [
       'protractor/hintsAndSolutions.js'
     ],
 
-    extensions: [
-      'protractor/richTextComponents.js',
+    richTextComponents: [
+      'protractor/richTextComponents.js'
+    ],
+
+    interactions: [
       'protractor/interactions.js'
     ],
 
-    library: [
-      'protractor/explorationRating.js',
-      'protractor/privileges.js',
-      'protractor/libraryPagesTour.js',
+    explorationRating: [
+      'protractor/explorationRating.js'
+    ],
+
+    privileges: [
+      'protractor/privileges.js'
+    ],
+
+    libraryPagesTour: [
+      'protractor/libraryPagesTour.js'
+    ],
+
+    publicationAndLibrary: [
       'protractor/publicationAndLibrary.js'
     ],
 
@@ -89,19 +113,43 @@ exports.config = {
       'protractor/learnerDashboard.js',
     ],
 
-    users: [
-      'protractor/userManagement.js',
-      'protractor/loginFlow.js',
-      'protractor/subscriptions.js',
+    userManagement: [
+      'protractor/userManagement.js'
+    ],
+
+    loginFlow: [
+      'protractor/loginFlow.js'
+    ],
+
+    subscriptions: [
+      'protractor/subscriptions.js'
+    ],
+
+    preferences: [
       'protractor/preferences.js'
     ],
 
-    misc: [
-      'protractor/suggestions.js',
-      'protractor/cacheSlugs.js',
-      'protractor/staticPagesTour.js',
-      'protractor/collections.js',
-      'protractor/accessibility.js',
+    suggestions: [
+      'protractor/suggestions.js'
+    ],
+
+    cacheSlugs: [
+      'protractor/cacheSlugs.js'
+    ],
+
+    staticPagesTour: [
+      'protractor/staticPagesTour.js'
+    ],
+
+    collections: [
+      'protractor/collections.js'
+    ],
+
+    accessibility: [
+      'protractor/accessibility.js'
+    ],
+
+    i18n: [
       'protractor/i18n.js'
     ],
 
@@ -109,6 +157,8 @@ exports.config = {
       'protractor/embedding.js'
     ]
   },
+
+  maxSessions: 3,
 
   // ----- Capabilities to be passed to the webdriver instance ----
   //
@@ -118,6 +168,8 @@ exports.config = {
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
   capabilities: {
     browserName: 'chrome',
+    shardTestFiles: true,
+    maxInstances: 10,
     chromeOptions: {
       args: ['lang=en-EN'],
       prefs: {

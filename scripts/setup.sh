@@ -70,8 +70,9 @@ function maybeInstallDependencies {
     install_node_module karma-chrome-launcher 2.0.0
     install_node_module protractor 5.3.1
     install_node_module protractor-screenshot-reporter 0.0.5
+    install_node_module webdriver-manager 12.0.6
 
-    $NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.37
+    $NODE_MODULE_DIR/.bin/webdriver-manager update --chromedriver
   fi
 
   if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
