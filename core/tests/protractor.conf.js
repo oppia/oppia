@@ -61,54 +61,43 @@ exports.config = {
       'protractor/*.js'
     ],
 
-    mainEditor: [
+    // Unfortunately, adding more than one file to a test suite results in
+    // severe instability as of Chromedriver 2.38 (Chrome 66).
+    accessibility: [
+      'protractor/accessibility.js'
+    ],
+
+    collections: [
+      'protractor/collections.js'
+    ],
+
+    editorAndPlayer: [
       'protractor/editorAndPlayer.js',
-      'protractor/stateEditor.js',
-      'protractor/explorationFeedback.js'
     ],
 
     editorFeatures: [
-      'protractor/historyTab.js',
-      'protractor/parameters.js',
-      'protractor/hintsAndSolutions.js'
-    ],
-
-    extensions: [
-      'protractor/richTextComponents.js',
-      'protractor/interactions.js'
-    ],
-
-    library: [
-      'protractor/explorationRating.js',
-      'protractor/privileges.js',
-      'protractor/libraryPagesTour.js',
-      'protractor/publicationAndLibrary.js'
-    ],
-
-    learnerDashboard: [
-      'protractor/learnerDashboard.js',
-    ],
-
-    users1: [
-      'protractor/userManagement.js',
-    ],
-
-    users2: [
-      'protractor/subscriptions.js',
-    ],
-
-    misc: [
-      'protractor/suggestions.js',
-      'protractor/cacheSlugs.js',
-      'protractor/staticPagesTour.js',
-      'protractor/collections.js',
-      'protractor/accessibility.js',
-      'protractor/i18n.js'
+      'protractor/editorFeatures.js'
     ],
 
     embedding: [
       'protractor/embedding.js'
-    ]
+    ],
+
+    extensions: [
+      'protractor/extensions.js'
+    ],
+
+    learnerDashboard: [
+      'protractor/learnerDashboard.js'
+    ],
+
+    library: [
+      'protractor/publicationAndLibrary.js'
+    ],
+
+    users: [
+      'protractor/userJourneys.js',
+    ],
   },
 
   // ----- Capabilities to be passed to the webdriver instance ----
