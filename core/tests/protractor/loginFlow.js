@@ -36,6 +36,7 @@ describe('Login Flow', function() {
     ];
     classNames.forEach(function(className) {
       browser.actions().mouseMove(profileDropdown).perform();
+      general.waitForSystem(100);
       profileDropdown.element(by.css(className)).click();
     });
   });

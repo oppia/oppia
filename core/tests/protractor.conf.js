@@ -90,10 +90,10 @@ exports.config = {
     ],
 
     users: [
-      'protractor/userManagement.js',
+      // 'protractor/userManagement.js',
       'protractor/loginFlow.js',
-      'protractor/subscriptions.js',
-      'protractor/preferences.js'
+      // 'protractor/subscriptions.js',
+      // 'protractor/preferences.js'
     ],
 
     misc: [
@@ -119,13 +119,13 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     chromeOptions: {
-      args: ['headless', 'lang=en-EN']
+      args: ['--lang=en-EN', '--window-size=1285x1000']
     },
     prefs: {
       intl: {
         accept_languages: 'en-EN'
       }
-    }
+    },
     loggingPrefs: {
       driver: 'INFO',
       browser: 'INFO'
