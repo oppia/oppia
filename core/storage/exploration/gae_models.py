@@ -609,7 +609,7 @@ class StateIdMappingModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, exp_id, exp_version, state_names_to_ids,
-            largest_state_id_used):
+            largest_state_id_used, overwrite=False):
         """Creates a new instance of state id mapping model.
 
         Args:
@@ -618,12 +618,14 @@ class StateIdMappingModel(base_models.BaseModel):
             state_names_to_ids: dict. A dict storing state name to ids mapping.
             largest_state_id_used: int. The largest integer so far that has been
                 used as a state ID for this exploration.
+            overwrite: bool. Whether overwriting of an existing model should
+                be allowed.
 
         Returns:
             StateIdMappingModel. Instance of the state id mapping model.
         """
         instance_id = cls._generate_instance_id(exp_id, exp_version)
-        if cls.get_by_id(instance_id):
+        if not overwrite and cls.get_by_id(instance_id):
             raise Exception(
                 'State id mapping model already exists for exploration %s,'
                 ' version %d' % (exp_id, exp_version))

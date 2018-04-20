@@ -135,7 +135,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         self.assertEqual(len(collection_dict['nodes']), 4)
 
         playthrough_dict = collection_dict['playthrough_dict']
-        self.assertEqual(playthrough_dict['next_exploration_ids'], ['19'])
+        self.assertEqual(playthrough_dict['next_exploration_id'], '19')
         self.assertEqual(playthrough_dict['completed_exploration_ids'], [])
 
         # 'Complete' the first exploration. This should lead to 1 new one being
@@ -148,7 +148,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
 
         playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(
-            playthrough_dict['next_exploration_ids'], ['20'])
+            playthrough_dict['next_exploration_id'], '20')
         self.assertEqual(playthrough_dict['completed_exploration_ids'], ['19'])
 
         # Completing the next exploration results in a third suggested exp.
@@ -160,7 +160,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
 
         playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(
-            playthrough_dict['next_exploration_ids'], ['21'])
+            playthrough_dict['next_exploration_id'], '21')
         self.assertEqual(
             playthrough_dict['completed_exploration_ids'], ['19', '20'])
 
@@ -174,7 +174,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
 
         playthrough_dict = collection_dict['playthrough_dict']
         self.assertEqual(
-            playthrough_dict['next_exploration_ids'], ['0'])
+            playthrough_dict['next_exploration_id'], '0')
         self.assertEqual(
             playthrough_dict['completed_exploration_ids'], ['19', '20', '21'])
 
@@ -186,7 +186,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         collection_dict = response_dict['collection']
 
         playthrough_dict = collection_dict['playthrough_dict']
-        self.assertEqual(playthrough_dict['next_exploration_ids'], [])
+        self.assertEqual(playthrough_dict['next_exploration_id'], None)
         self.assertEqual(
             playthrough_dict['completed_exploration_ids'],
             ['19', '20', '21', '0'])

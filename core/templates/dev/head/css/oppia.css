@@ -4234,7 +4234,7 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-dashboard-statistics-card-link {
   background: white;
-  height: 25.5%;
+  height: 34%;
   opacity: 0;
   position: absolute;
   width: 184px;
@@ -4337,8 +4337,9 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-dashboard-card-view-item .exp-private-text {
   font-size: 13px;
-  margin: 0.5em;
-  padding: 0.2em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-top: 0.8em;
 }
 
 .oppia-dashboard-card-view-item .metrics {
@@ -5045,4 +5046,33 @@ md-card.preview-conversation-skin-supplemental-card {
   opacity: 0;
   padding: 0;
   width: 1px;
+}
+
+.oppia-dashboard-tooltip {
+  display: inline-block;
+  position: relative;
+}
+
+.oppia-dashboard-tooltip-text {
+  background-color: #009688;
+  border-radius: 6px;
+  bottom: 97%;
+  color: #fff;
+  font-size: 0.6em;
+  padding: 5px;
+  position: absolute;
+  text-align: center;
+  visibility: hidden;
+  width: auto;
+  z-index: 1;
+}
+
+@media screen and (max-width: 500px) {
+  .oppia-dashboard-tooltip-text {
+    width: 90%;
+  }
+}
+
+.oppia-dashboard-tooltip:hover + .oppia-dashboard-tooltip-text {
+  visibility: visible;
 }
