@@ -340,7 +340,6 @@ class EditorTest(BaseEditorControllerTest):
             state = exploration_dict['exploration']['states'][state_name]
             answer_group = state['interaction']['answer_groups'][1]
             answer_group['training_data'].append('joyful')
-            print state['interaction']['answer_groups']
             self.put_json('/createhandler/data/%s' % exp_id, {
                 'change_list': [{
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

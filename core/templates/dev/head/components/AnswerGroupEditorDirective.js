@@ -30,7 +30,7 @@ oppia.directive('answerGroupEditor', [
           '&onSaveAnswerGroupCorrectnessLabel'),
         outcome: '=',
         suppressWarnings: '&',
-        rules: '=',
+        rules: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/answer_group_editor_directive.html'),
@@ -160,11 +160,7 @@ oppia.directive('answerGroupEditor', [
             var ruleDescriptions = (
               INTERACTION_SPECS[interactionId].rule_descriptions);
             var ruleTypes = Object.keys(ruleDescriptions);
-            var ruleType = null;
-            for (var i = 0; i < ruleTypes.length; i++) {
-              ruleType = ruleTypes[i];
-            }
-            if (!ruleType) {
+            if (ruleTypes.length === 0) {
               // This should never happen. An interaction must have at least
               // one rule, as verified in a backend test suite:
               //   extensions.interactions.base_test.InteractionUnitTests.

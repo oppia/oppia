@@ -13,10 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for training Data that, given an exploration ID
- * and state name , determines all of the answers which do
- * not have certain classification and are not currently
- * used as part of any classifier training models.
+ * @fileoverview Service for training Data that adds a new
+ * answer to training data and verifies that training data answers are unique
+ * across all answer groups.
  */
 
 oppia.factory('TrainingDataService', [
@@ -63,7 +62,7 @@ oppia.factory('TrainingDataService', [
       for (var i = 0; i < answerGroups.length; i++) {
         var answerGroup = answerGroups[i];
         var rules = answerGroup.rules;
-        var trainingData = answerGroup.training_data;
+        var trainingData = answerGroup.trainingData;
         if (trainingData &&
             _removeAnswerFromTrainingData(answer, trainingData) !== -1) {
           updatedAnswerGroups = true;
@@ -127,17 +126,16 @@ oppia.factory('TrainingDataService', [
         _removeAnswer(answer);
 
         var answerGroup = ResponsesService.getAnswerGroup(answerGroupIndex);
-        var trainingData = answerGroup.training_data;
+        var trainingData = answerGroup.trainingData;
 
         // Train the rule to include this answer, but only if it's not already
         // in the training data.
-        if (_getIndexOfTrainingData(
-          answer, trainingData) === -1) {
+        if (_getIndexOfTrainingData(answer, trainingData) === -1) {
           trainingData.push(answer);
         }
 
         ResponsesService.updateAnswerGroup(answerGroupIndex, {
-          training_data: trainingData
+          trainingData: trainingData
         });
       },
 

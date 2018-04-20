@@ -23,7 +23,7 @@ oppia.factory('AnswerGroupObjectFactory', [
     var AnswerGroup = function(rules, outcome, trainingData) {
       this.rules = rules;
       this.outcome = outcome;
-      this.training_data = trainingData;
+      this.trainingData = trainingData;
     };
 
     AnswerGroup.prototype.toBackendDict = function() {
@@ -32,7 +32,7 @@ oppia.factory('AnswerGroupObjectFactory', [
           return rule.toBackendDict();
         }),
         outcome: this.outcome.toBackendDict(),
-        training_data: this.training_data
+        training_data: this.trainingData
       };
     };
 

@@ -90,11 +90,6 @@ STATISTICAL_CLASSIFICATION = 'statistical_classifier'
 # rather than belonging to a specific answer group.
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
 
-# This represents the stringified version of a rule which uses statistical
-# classification for evaluation. Answers which are matched to rules with this
-# rulespec will be stored with the STATISTICAL_CLASSIFICATION category.
-RULE_TYPE_CLASSIFIER = 'FuzzyMatches'
-
 
 def _get_full_customization_args(customization_args, ca_specs):
     """Populates the given customization_args dict with default values
@@ -858,7 +853,7 @@ class AnswerGroup(object):
         Args:
             outcome: Outcome. The outcome corresponding to the answer group.
             rule_specs: list(RuleSpec). List of rule specifications.
-            training_data: list(answers). List of answers belonging to training
+            training_data: list(*). List of answers belonging to training
                 data of this answer group.
         """
         self.rule_specs = [RuleSpec(
@@ -888,7 +883,7 @@ class AnswerGroup(object):
                 'Expected answer group rules to be a list, received %s'
                 % self.rule_specs)
 
-        if len(self.rule_specs) < 1 and self.training_data == []:
+        if len(self.rule_specs) == 0 and len(self.training_data) == 0:
             raise utils.ValidationError(
                 'There must be at least one rule or training data for each'
                 ' answer group.')
@@ -1306,16 +1301,16 @@ class State(object):
 
     def get_training_data(self):
         """Retrieves training data from the State domain object."""
-        training_data = []
+        exploration_training_data = []
         for (answer_group_index, answer_group) in enumerate(
                 self.interaction.answer_groups):
             if answer_group.training_data:
                 answers = copy.deepcopy(answer_group.training_data)
-                training_data.append({
+                exploration_training_data.append({
                     'answer_group_index': answer_group_index,
                     'answers': answers
                 })
-        return training_data
+        return exploration_training_data
 
     def can_undergo_classification(self):
         """Checks whether the answers for this state satisfy the preconditions
@@ -1401,7 +1396,8 @@ class State(object):
                     'received %s' % rule_specs_list)
 
             answer_group = AnswerGroup(
-                Outcome.from_dict(answer_group_dict['outcome']), [], [])
+                Outcome.from_dict(answer_group_dict['outcome']), [],
+                answer_group_dict['training_data'])
             for rule_dict in rule_specs_list:
                 rule_spec = RuleSpec.from_dict(rule_dict)
 
@@ -1432,8 +1428,6 @@ class State(object):
                     rule_inputs[param_name] = normalized_param
 
                 answer_group.rule_specs.append(rule_spec)
-            if answer_group_dict['training_data']:
-                answer_group.training_data = answer_group_dict['training_data']
             interaction_answer_groups.append(answer_group)
         self.interaction.answer_groups = interaction_answer_groups
 
@@ -3123,23 +3117,30 @@ class Exploration(object):
             dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
-            for answer_group in state_dict['interaction']['answer_groups']:
+            answer_groups_to_remove = []
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group_index, answer_group in enumerate(answer_groups):
                 if answer_group['rule_specs']:
                     training_data = []
-                    classifier_rule = None
-                    for rule in answer_group['rule_specs']:
-                        if rule['rule_type'] == RULE_TYPE_CLASSIFIER:
+                    classifier_rule_index = None
+                    rule_specs = answer_group['rule_specs']
+
+                    for rule_index, rule in enumerate(rule_specs):
+                        if rule['rule_type'] == 'FuzzyMatches':
                             training_data = rule['inputs']['training_data']
-                            classifier_rule = rule
+                            classifier_rule_index = rule_index
                             break
-                    if classifier_rule:
-                        answer_group['rule_specs'].remove(classifier_rule)
+
+                    if classifier_rule_index:
+                        answer_group['rule_specs'].pop(classifier_rule_index)
 
                     answer_group['training_data'] = training_data
 
-                    if training_data == [] and answer_group['rule_specs'] == []:
-                        state_dict['interaction']['answer_groups'].remove(
-                            answer_group)
+                    if not training_data and not answer_group['rule_specs']:
+                        answer_groups_to_remove.append(answer_group_index)
+
+            for index in answer_groups_to_remove:
+                state_dict['interaction']['answer_groups'].pop(index)
 
         return states_dict
 
@@ -3623,7 +3624,7 @@ class Exploration(object):
     def _convert_v23_dict_to_v24_dict(cls, exploration_dict):
         """ Converts a v23 exploration dict into a v24 exploration dict.
 
-        Adds training_data parameter at each answer group to store training
+        Adds training_data parameter to each answer group to store training
         data of corresponding answer group.
         """
         exploration_dict['schema_version'] = 24

@@ -120,7 +120,7 @@ describe('TrainingDataService', function() {
       // Training the first answer of a group should add a new classifier.
       tds.trainAnswerGroup(0, 'text answer');
       var state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].training_data).toEqual([
+      expect(state.interaction.answerGroups[0].trainingData).toEqual([
         'text answer'
       ]);
 
@@ -128,7 +128,7 @@ describe('TrainingDataService', function() {
       // to the training data.
       tds.trainAnswerGroup(0, 'second answer');
       state = ess.getState('State');
-      expect(state.interaction.answerGroups[0].training_data).toEqual([
+      expect(state.interaction.answerGroups[0].trainingData).toEqual([
         'text answer', 'second answer'
       ]);
 
@@ -152,7 +152,7 @@ describe('TrainingDataService', function() {
 
     // Verify initial state.
     var state = ess.getState('State');
-    expect(state.interaction.answerGroups[0].training_data).toEqual([
+    expect(state.interaction.answerGroups[0].trainingData).toEqual([
       'text answer', 'second answer'
     ]);
     expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
@@ -162,7 +162,7 @@ describe('TrainingDataService', function() {
     // Try to retrain the second answer (answer group -> default response).
     tds.trainDefaultResponse('second answer');
     state = ess.getState('State');
-    expect(state.interaction.answerGroups[0].training_data).toEqual([
+    expect(state.interaction.answerGroups[0].trainingData).toEqual([
       'text answer'
     ]);
     expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
@@ -172,50 +172,10 @@ describe('TrainingDataService', function() {
     // Try to retrain the third answer (default response -> answer group).
     tds.trainAnswerGroup(0, 'third answer');
     state = ess.getState('State');
-    expect(state.interaction.answerGroups[0].training_data).toEqual([
+    expect(state.interaction.answerGroups[0].trainingData).toEqual([
       'text answer', 'third answer'
     ]);
     expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
-      'second answer'
-    ]);
-  });
-
-  it('should properly clear the default answer and remove a classifier ' +
-      'when it is not the last rule left in a group', function() {
-    tds.trainAnswerGroup(0, 'text answer');
-    tds.trainDefaultResponse('second answer');
-
-    // Verify initial state.
-    var state = ess.getState('State');
-    expect(state.interaction.answerGroups[0].training_data).toEqual([
-      'text answer'
-    ]);
-    expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
-      'second answer'
-    ]);
-
-    // Ensure emptying the default unclassified answers is handled properly.
-    tds.trainAnswerGroup(0, 'second answer');
-    state = ess.getState('State');
-    expect(state.interaction.answerGroups[0].training_data).toEqual([
-      'text answer', 'second answer'
-    ]);
-    expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([]);
-
-    // Ensure emptying the answer group's classifier properly deletes the rule
-    // since there is another rule in the group.
-    tds.trainDefaultResponse('second answer');
-    tds.trainDefaultResponse('text answer');
-    state = ess.getState('State');
-    expect(state.interaction.answerGroups[0].training_data).toEqual([]);
-    expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
-      'second answer', 'text answer'
-    ]);
-
-    // Training the answer group should add the classifier back.
-    tds.trainAnswerGroup(0, 'second answer');
-    state = ess.getState('State');
-    expect(state.interaction.answerGroups[0].training_data).toEqual([
       'second answer'
     ]);
   });
@@ -226,7 +186,7 @@ describe('TrainingDataService', function() {
 
     // Verify initial state.
     var state = ess.getState('State');
-    expect(state.interaction.answerGroups[0].training_data).toEqual([
+    expect(state.interaction.answerGroups[0].trainingData).toEqual([
       'text answer'
     ]);
     expect(state.interaction.confirmedUnclassifiedAnswers).toEqual([
@@ -236,7 +196,7 @@ describe('TrainingDataService', function() {
     // Training a duplicate answer for the answer group should change nothing.
     tds.trainAnswerGroup(0, 'text answer');
     state = ess.getState('State');
-    expect(state.interaction.answerGroups[0].training_data).toEqual([
+    expect(state.interaction.answerGroups[0].trainingData).toEqual([
       'text answer'
     ]);
 
@@ -244,7 +204,7 @@ describe('TrainingDataService', function() {
     // nothing.
     tds.trainDefaultResponse('second answer');
     state = ess.getState('State');
-    expect(state.interaction.answerGroups[0].training_data).toEqual([
+    expect(state.interaction.answerGroups[0].trainingData).toEqual([
       'text answer'
     ]);
   });

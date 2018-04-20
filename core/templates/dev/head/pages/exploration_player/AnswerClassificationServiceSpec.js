@@ -357,7 +357,7 @@ describe('Answer classification service with string classifier enabled',
           explorationId, stateName, state, 0, rules)
       ).toEqual(
         acrof.createNew(
-          state.interaction.answerGroups[1].outcome, 1, 0,
+          state.interaction.answerGroups[1].outcome, 1, null,
           STATISTICAL_CLASSIFICATION)
       );
     });

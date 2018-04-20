@@ -264,7 +264,7 @@ oppia.controller('StateResponses', [
           'ExplorationContextService', 'EditorStateService',
           'ExplorationStatesService', 'TrainingDataService',
           'AnswerClassificationService', 'FocusManagerService',
-          'AngularNameService',
+          'AngularNameService', 'EXPLICIT_CLASSIFICATION',
           function(
               $scope, $injector, $uibModalInstance,
               ExplorationHtmlFormatterService,
@@ -272,7 +272,7 @@ oppia.controller('StateResponses', [
               ExplorationContextService, EditorStateService,
               ExplorationStatesService, TrainingDataService,
               AnswerClassificationService, FocusManagerService,
-              AngularNameService) {
+              AngularNameService, EXPLICIT_CLASSIFICATION) {
             var _explorationId = ExplorationContextService.getExplorationId();
             var _stateName = EditorStateService.getActiveStateName();
             var _state = ExplorationStatesService.getState(_stateName);
@@ -339,12 +339,8 @@ oppia.controller('StateResponses', [
 
               var classificationCategorization = (
                 classificationResult.classificationCategorization);
-              var answerGroupIndex = classificationResult.answerGroupIndex;
-              var ruleIndex = classificationResult.ruleIndex;
 
-              if (classificationCategorization !==
-                  DEFAULT_OUTCOME_CLASSIFICATION &&
-                  classificationCategorization !== STATISTICAL_CLASSIFICATION) {
+              if (classificationCategorization === EXPLICIT_CLASSIFICATION) {
                 $scope.classification.answerGroupIndex = -1;
               } else {
                 $scope.classification.answerGroupIndex = (

@@ -563,11 +563,10 @@ class UntrainedAnswersHandler(EditorHandler):
 
                 trained_answers = set()
                 for answer_group in interaction.answer_groups:
-                    if answer_group['training_data']:
-                        trained_answers.update(
-                            interaction_instance.normalize_answer(trained)
-                            for trained
-                            in answer_group['training_data'])
+                    trained_answers.update(
+                        interaction_instance.normalize_answer(trained)
+                        for trained
+                        in answer_group['training_data'])
 
                 # Include all the answers which have been confirmed to be
                 # associated with the default outcome.

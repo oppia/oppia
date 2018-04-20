@@ -126,7 +126,7 @@ oppia.factory('AnswerClassificationService', [
               answerClassificationResult = (
                 AnswerClassificationResultObjectFactory.createNew(
                   answerGroups[predictedAnswerGroupIndex].outcome,
-                  predictedAnswerGroupIndex, 0, STATISTICAL_CLASSIFICATION));
+                  predictedAnswerGroupIndex, null, STATISTICAL_CLASSIFICATION));
             }
           }
         }
