@@ -1939,16 +1939,16 @@ md-card.oppia-dashboard-tile {
   cursor: pointer;
 }
 .oppia-toast:before {
+  align-items: center;
+  bottom: 0;
+  color: #FFFFFF;
+  display: flex;
+  float: left;
   font-family: 'Material Icons';
   font-size: 24px;
-  float: left;
-  color: #FFF;
   margin: auto 5px auto -37px;
   position: absolute;
   top: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
 }
 .toast-warning:before {
     content: "\e002";
