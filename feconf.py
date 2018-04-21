@@ -158,7 +158,7 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 19
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
-CURRENT_COLLECTION_SCHEMA_VERSION = 5
+CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of the question schema.
 CURRENT_QUESTION_SCHEMA_VERSION = 1
