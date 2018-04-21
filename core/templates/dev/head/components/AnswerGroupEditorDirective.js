@@ -166,7 +166,7 @@ oppia.directive('answerGroupEditor', [
               //   extensions.interactions.base_test.InteractionUnitTests.
               return;
             }
-            var description = ruleDescriptions[ruleType];
+            var description = ruleDescriptions[ruleTypes[0]];
 
             var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
             var inputs = {};
