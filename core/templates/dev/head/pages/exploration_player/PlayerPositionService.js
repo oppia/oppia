@@ -20,6 +20,7 @@ oppia.factory('PlayerPositionService', [
   'PlayerTranscriptService', function(PlayerTranscriptService) {
     var activeCardIndex = null;
     var onChangeCallback = null;
+    var inNavigation = false;
 
     return {
       init: function(callback) {
@@ -39,6 +40,12 @@ oppia.factory('PlayerPositionService', [
       },
       getActiveCardIndex: function() {
         return activeCardIndex;
+      },
+      setInNavigation: function(isNavigating) {
+        inNavigation = isNavigating;
+      },
+      getInNavigation: function() {
+        return inNavigation;
       }
     };
   }

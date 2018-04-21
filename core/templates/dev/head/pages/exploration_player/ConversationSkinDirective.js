@@ -308,14 +308,14 @@ oppia.directive('conversationSkin', [
             return PlayerCorrectnessFeedbackEnabledService.isEnabled();
           };
 
-          $scope.isOnLastCard = function () {
-            return PlayerTranscriptService.isLastCard(
-              PlayerPositionService.getActiveCardIndex());
+          $scope.isInNavigation = function () {
+            return PlayerPositionService.getInNavigation();
           };
 
           $scope.isCorrectnessFooterEnabled = function() {
             return (
-              $scope.answerIsCorrect && $scope.isCorrectnessFeedbackEnabled());
+              $scope.answerIsCorrect && $scope.isCorrectnessFeedbackEnabled() &&
+              !$scope.isInNavigation());
           };
 
           $scope.isLearnAgainButton = function() {
@@ -597,6 +597,7 @@ oppia.directive('conversationSkin', [
             PlayerTranscriptService.addNewInput(answer, false);
 
             var timeAtServerCall = new Date().getTime();
+            PlayerPositionService.setInNavigation(false);
 
             $scope.answerIsCorrect = ExplorationPlayerService.submitAnswer(
               answer, interactionRulesService, function(
