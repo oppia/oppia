@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Directive for displaying and editing a collection node. This
- * directive allows creators to add and remove prerequisite and acquired skills,
+ * directive allows creators to shift nodes to left or right
  * and also delete the collection node represented by this directive.
  */
 

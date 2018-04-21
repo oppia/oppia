@@ -570,11 +570,11 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
         if user_id and collection_id:
             collection_services.record_played_exploration_in_collection_context(
                 user_id, collection_id, exploration_id)
-            collections_left_to_complete = (
-                collection_services.get_next_exploration_ids_to_complete_by_user( # pylint: disable=line-too-long
+            next_exp_id_to_complete = (
+                collection_services.get_next_exploration_id_to_complete_by_user( # pylint: disable=line-too-long
                     user_id, collection_id))
 
-            if not collections_left_to_complete:
+            if not next_exp_id_to_complete:
                 learner_progress_services.mark_collection_as_completed(
                     user_id, collection_id)
             else:
@@ -705,18 +705,19 @@ class RecommendationsHandler(base.BaseHandler):
         except Exception:
             raise self.PageNotFoundException
 
-        auto_recommended_exp_ids = []
+        system_recommended_exp_ids = []
+        next_exp_id = None
 
         if collection_id:
             if self.user_id:
-                auto_recommended_exp_ids = (
-                    collection_services.get_next_exploration_ids_to_complete_by_user(  # pylint: disable=line-too-long
+                next_exp_id = (
+                    collection_services.get_next_exploration_id_to_complete_by_user(  # pylint: disable=line-too-long
                         self.user_id, collection_id))
             else:
                 collection = collection_services.get_collection_by_id(
                     collection_id)
-                auto_recommended_exp_ids = (
-                    collection.get_next_exploration_ids_in_sequence(
+                next_exp_id = (
+                    collection.get_next_exploration_id_in_sequence(
                         exploration_id))
         elif include_system_recommendations:
             system_chosen_exp_ids = (
@@ -724,12 +725,15 @@ class RecommendationsHandler(base.BaseHandler):
                     exploration_id))
             filtered_exp_ids = list(
                 set(system_chosen_exp_ids) - set(author_recommended_exp_ids))
-            auto_recommended_exp_ids = random.sample(
+            system_recommended_exp_ids = random.sample(
                 filtered_exp_ids,
                 min(MAX_SYSTEM_RECOMMENDATIONS, len(filtered_exp_ids)))
 
         recommended_exp_ids = set(
-            author_recommended_exp_ids + auto_recommended_exp_ids)
+            author_recommended_exp_ids + system_recommended_exp_ids)
+        if next_exp_id is not None:
+            recommended_exp_ids.add(next_exp_id)
+
         self.values.update({
             'summaries': (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
