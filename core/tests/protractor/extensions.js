@@ -13,14 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests for rich-text components.
+ * @fileoverview End-to-end tests for rich-text components and interactions.
  */
 
-var general = require('../protractor_utils/general.js');
+var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
+var general = require('../protractor_utils/general.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
-var editor = require('../protractor_utils/editor.js');
+
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
@@ -97,5 +99,68 @@ describe('rich-text components', function() {
       'Error parsing header X-XSS-Protection: 1; mode=block; ' +
       'report=https:\/\/www.google.com\/appserve\/security-bugs\/log\/youtube:',
     ]);
+  });
+});
+
+
+describe('Interactions', function() {
+  var explorationPlayerPage = null;
+
+  beforeEach(function() {
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
+
+  it('should pass their own test suites', function() {
+    users.createUser('user@interactions.com', 'userInteractions');
+    users.login('user@interactions.com');
+    workflow.createExploration();
+    editor.setStateName('first');
+    editor.setContent(forms.toRichText('some content'));
+
+    var defaultOutcomeSet = false;
+
+    for (var interactionId in interactions.INTERACTIONS) {
+      var interaction = interactions.INTERACTIONS[interactionId];
+      for (var i = 0; i < interaction.testSuite.length; i++) {
+        var test = interaction.testSuite[i];
+
+        editor.setInteraction.apply(
+          null, [interactionId].concat(test.interactionArguments));
+
+        editor.addResponse.apply(null, [
+          interactionId, forms.toRichText('yes'), null, false
+        ].concat(test.ruleArguments));
+
+        if (!defaultOutcomeSet) {
+          // The default outcome will be preserved for subsequent tests.
+          editor.setDefaultOutcome(forms.toRichText('no'), null, false);
+          defaultOutcomeSet = true;
+        }
+
+        editor.navigateToPreviewTab();
+        explorationPlayerPage.expectInteractionToMatch.apply(
+          null, [interactionId].concat(test.expectedInteractionDetails));
+        for (var j = 0; j < test.wrongAnswers.length; j++) {
+          explorationPlayerPage.submitAnswer(
+            interactionId, test.wrongAnswers[j]);
+          explorationPlayerPage.expectLatestFeedbackToMatch(
+            forms.toRichText('no'));
+        }
+        for (var j = 0; j < test.correctAnswers.length; j++) {
+          explorationPlayerPage.submitAnswer(
+            interactionId, test.correctAnswers[j]);
+          explorationPlayerPage.expectLatestFeedbackToMatch(
+            forms.toRichText('yes'));
+        }
+        editor.navigateToMainTab();
+      }
+    }
+
+    editor.discardChanges();
+    users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
   });
 });
