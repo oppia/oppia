@@ -407,6 +407,56 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
     print 'Python linting finished.'
 
 
+def _lint_html_files():
+    """This function is used to check HTML files for linting errors."""
+    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+
+    node_path = os.path.join(
+        parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
+    htmllint_path = os.path.join(
+        parent_dir, 'node_modules', 'htmllint-cli', 'bin', 'cli.js')
+
+    error_summary = []
+    total_error_count = 0
+    summary_messages = []
+    htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
+    directories_to_lint = ['core', 'extensions', 'assets']
+    print 'Starting HTML linter...'
+    print '----------------------------------------'
+    print ''
+    for directory in directories_to_lint:
+        proc_args = htmllint_cmd_args + ['--cwd=./' + directory]
+        print 'Linting HTML files in %s directory:' % directory
+        proc = subprocess.Popen(
+            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        linter_stdout, _ = proc.communicate()
+
+        if linter_stdout:
+            error_summary.append(
+                [s for s in linter_stdout.split() if s.isdigit()])
+            print linter_stdout
+
+    print '----------------------------------------'
+    for error in error_summary:
+        total_error_count += int(error[0])
+
+    if total_error_count:
+        summary_message = '%s   HTML linting failed' % (
+            _MESSAGE_TYPE_FAILED)
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s   HTML linting passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        summary_messages.append(summary_message)
+
+    print ''
+    print summary_message
+    print 'HTML linting finished.'
+    print ''
+    return summary_messages
+
+
 def _get_all_files():
     """This function is used to check if this script is ran from
     root directory and to return a list of all the files for linting and
@@ -903,13 +953,15 @@ def main():
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
     comment_messages = _check_comments(all_files)
+    html_linter_messages = _lint_html_files()
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
         html_directive_name_messages +
         import_order_messages + newline_messages +
         docstring_messages + comment_messages +
-        linter_messages + pattern_messages)
+        html_linter_messages + linter_messages +
+        pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
