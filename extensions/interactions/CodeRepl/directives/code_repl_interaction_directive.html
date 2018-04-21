@@ -6,7 +6,7 @@
         <div ui-codemirror="{onLoad: initCodeEditor, readOnly: !interactionIsActive}">
         </div>
       </div>
-      <md-button type="button" class="md-raised" ng-disabled="(!interactionIsActive) || (!hasLoaded)" ng-click="runCode(code)">Test Run</md-button>
+      <md-button type="button" class="md-raised" ng-disabled="!interactionIsActive || !hasLoaded" ng-click="runCode(code)">Test Run</md-button>
       <span class="code-repl-language">
         <em>Language: <[language]></em>
       </span>
