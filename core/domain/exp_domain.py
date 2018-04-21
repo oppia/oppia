@@ -3117,7 +3117,7 @@ class Exploration(object):
             dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
-            answer_group_indexes_to_remove = []
+            answer_group_indexes_to_preserve = []
             answer_groups = state_dict['interaction']['answer_groups']
             for answer_group_index, answer_group in enumerate(answer_groups):
                 if answer_group['rule_specs']:
@@ -3136,15 +3136,13 @@ class Exploration(object):
 
                     answer_group['training_data'] = training_data
 
-                    if not training_data and not answer_group['rule_specs']:
-                        answer_group_indexes_to_remove.append(
+                    if training_data or answer_group['rule_specs']:
+                        answer_group_indexes_to_preserve.append(
                             answer_group_index)
 
             preserved_answer_groups = []
-            for (answer_group_index, answer_group) in enumerate(answer_groups):
-                if answer_group_index in answer_group_indexes_to_remove:
-                    continue
-                preserved_answer_groups.append(answer_group)
+            for answer_group_index in answer_group_indexes_to_preserve:
+                preserved_answer_groups.append(answer_group_index)
 
             state_dict['interaction']['answer_groups'] = preserved_answer_groups
 
