@@ -77,7 +77,7 @@ oppia.directive('progressNav', [
 
           $scope.changeCard = function(index) {
             if (index >= 0 && index < transcriptLength) {
-              PlayerPositionService.setInNavigation(true);
+              PlayerPositionService.setLearnerJustSubmittedAnAnswer(true);
               PlayerPositionService.setActiveCardIndex(index);
               $rootScope.$broadcast('updateActiveStateIfInEditor',
                 PlayerPositionService.getCurrentStateName());
