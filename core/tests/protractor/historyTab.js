@@ -133,62 +133,66 @@ describe('Exploration history', function() {
         highlighted: true
       },
       19: {
+        text: 'training_data: []',
+        highlighted: true
+      },
+      20: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: false
       },
-      20: {
+      21: {
         text: '  customization_args: {}',
         highlighted: false
       },
-      21: {
+      22: {
         text: '  default_outcome:',
         highlighted: false
       },
-      22: {
+      23: {
         text: '    dest: first',
         highlighted: true
       },
-      23: {
+      24: {
         text: '    feedback:',
         highlighted: false
       },
-      24: {
+      25: {
         text: '      audio_translations: {}',
         highlighted: false
       },
-      25: {
+      26: {
         text: '      html: \'\'',
         highlighted: false
       },
-      26: {
+      27: {
         text: '    labelled_as_correct: false',
         highlighted: false
       },
-      27: {
+      28: {
         text: '    param_changes: []',
         highlighted: false
       },
-      28: {
+      29: {
         text: '    refresher_exploration_id: null',
         highlighted: false
       },
-      29: {
+      30: {
         text: '  hints: []',
         highlighted: false
       },
-      30: {
+      31: {
         text: '  id: NumericInput',
         highlighted: true
       },
-      31: {
+      32: {
         text: '  solution: null',
         highlighted: false
       },
-      32: {
+      33: {
         text: 'param_changes: []',
         highlighted: false
       },
-      33: {
+      34: {
         text: ' ',
         highlighted: false
       }

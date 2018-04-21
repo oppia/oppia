@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for training Data that adds a new
+ * @fileoverview Service for training data that adds a new
  * answer to training data and verifies that training data answers are unique
  * across all answer groups.
  */

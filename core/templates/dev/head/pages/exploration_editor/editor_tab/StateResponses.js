@@ -340,6 +340,10 @@ oppia.controller('StateResponses', [
               var classificationCategorization = (
                 classificationResult.classificationCategorization);
 
+              // If answer is classified using explicit rules then we don't show
+              // yes / no option to creator. Otherwise we ask whether the
+              // response it satisfactory and assign a different response
+              // if response is not satisfactory.
               if (classificationCategorization === EXPLICIT_CLASSIFICATION) {
                 $scope.classification.answerGroupIndex = -1;
               } else {

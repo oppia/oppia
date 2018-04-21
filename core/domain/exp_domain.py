@@ -1301,16 +1301,16 @@ class State(object):
 
     def get_training_data(self):
         """Retrieves training data from the State domain object."""
-        exploration_training_data = []
+        state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
                 self.interaction.answer_groups):
             if answer_group.training_data:
                 answers = copy.deepcopy(answer_group.training_data)
-                exploration_training_data.append({
+                state_training_data_by_answer_group.append({
                     'answer_group_index': answer_group_index,
                     'answers': answers
                 })
-        return exploration_training_data
+        return state_training_data_by_answer_group
 
     def can_undergo_classification(self):
         """Checks whether the answers for this state satisfy the preconditions
@@ -3117,7 +3117,7 @@ class Exploration(object):
             dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
-            answer_groups_to_remove = []
+            answer_group_indexes_to_remove = []
             answer_groups = state_dict['interaction']['answer_groups']
             for answer_group_index, answer_group in enumerate(answer_groups):
                 if answer_group['rule_specs']:
@@ -3131,16 +3131,22 @@ class Exploration(object):
                             classifier_rule_index = rule_index
                             break
 
-                    if classifier_rule_index:
+                    if classifier_rule_index is not None:
                         answer_group['rule_specs'].pop(classifier_rule_index)
 
                     answer_group['training_data'] = training_data
 
                     if not training_data and not answer_group['rule_specs']:
-                        answer_groups_to_remove.append(answer_group_index)
+                        answer_group_indexes_to_remove.append(
+                            answer_group_index)
 
-            for index in answer_groups_to_remove:
-                state_dict['interaction']['answer_groups'].pop(index)
+            preserved_answer_groups = []
+            for (answer_group_index, answer_group) in enumerate(answer_groups):
+                if answer_group_index in answer_group_indexes_to_remove:
+                    continue
+                preserved_answer_groups.append(answer_group)
+
+            state_dict['interaction']['answer_groups'] = preserved_answer_groups
 
         return states_dict
 
