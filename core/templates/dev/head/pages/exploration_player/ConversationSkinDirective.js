@@ -308,14 +308,10 @@ oppia.directive('conversationSkin', [
             return PlayerCorrectnessFeedbackEnabledService.isEnabled();
           };
 
-          $scope.hasLearnerJustSubmittedAnAnswer = function() {
-            return PlayerPositionService.getLearnerJustSubmittedAnAnswer();
-          };
-
           $scope.isCorrectnessFooterEnabled = function() {
             return (
               $scope.answerIsCorrect && $scope.isCorrectnessFeedbackEnabled() &&
-              !$scope.hasLearnerJustSubmittedAnAnswer());
+              PlayerPositionService.hasLearnerJustSubmittedAnAnswer());
           };
 
           $scope.isLearnAgainButton = function() {
@@ -597,7 +593,7 @@ oppia.directive('conversationSkin', [
             PlayerTranscriptService.addNewInput(answer, false);
 
             var timeAtServerCall = new Date().getTime();
-            PlayerPositionService.setLearnerJustSubmittedAnAnswer(false);
+            PlayerPositionService.recordAnswerSubmission();
 
             $scope.answerIsCorrect = ExplorationPlayerService.submitAnswer(
               answer, interactionRulesService, function(
