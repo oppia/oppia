@@ -42,8 +42,8 @@ oppia.factory('PlayerPositionService', [
         return activeCardIndex;
       },
       setLearnerJustSubmittedAnAnswer: function(
-        hasLearnerJustSubmittedAnAnswer) {
-          learnerJustSubmittedAnAnswer = hasLearnerJustSubmittedAnAnswer;
+          hasLearnerJustSubmittedAnAnswer) {
+        learnerJustSubmittedAnAnswer = hasLearnerJustSubmittedAnAnswer;
       },
       getLearnerJustSubmittedAnAnswer: function() {
         return learnerJustSubmittedAnAnswer;
