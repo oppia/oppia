@@ -22,7 +22,10 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js');
+var CollectionEditorPage =
+  require('../protractor_utils/CollectionEditorPage.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
@@ -268,11 +271,66 @@ describe('Oppia static pages tour', function() {
 describe('Site language', function() {
   var adminPage = null;
   var libraryPage = null;
+  var creatorDashboardPage = null;
+  var collectionEditorPage = null;
+  var firstExplorationId = null;
+  var collectionId = null;
 
-  beforeEach(function() {
+  beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     libraryPage = new LibraryPage.LibraryPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
 
+    var EDITOR_USERNAME = 'langCollections';
+    var CREATOR_USERNAME = 'langCreatorExplorations';
+
+    users.createUser('lang@collections.com', EDITOR_USERNAME);
+    users.createUser('langCreator@explorations.com', CREATOR_USERNAME);
+    users.createAndLoginAdminUser('testlangadm@collections.com', 'testlangadm');
+    adminPage.get();
+    adminPage.updateRole(EDITOR_USERNAME, 'collection editor');
+    users.logout();
+
+    users.login('langCreator@explorations.com');
+    workflow.createAndPublishExploration(
+      'First Exploration',
+      'Languages',
+      'First Test Exploration.'
+    );
+    general.getExplorationIdFromEditor().then(function(expId) {
+      firstExplorationId = expId;
+      users.logout();
+
+      users.login('lang@collections.com');
+      browser.get(general.SERVER_URL_PREFIX);
+      var dropdown = element(by.css('.protractor-test-profile-dropdown'));
+      browser.actions().mouseMove(dropdown).perform();
+      dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+      browser.waitForAngular();
+      creatorDashboardPage.clickCreateActivityButton();
+      creatorDashboardPage.clickCreateCollectionButton();
+      browser.getCurrentUrl().then(function(url) {
+        var pathname = url.split('/');
+        //in the url a # is added at the end that is not part of collection ID
+        collectionId = pathname[5].slice(0, -1);
+      });
+      browser.waitForAngular();
+      // Add existing explorations.
+      collectionEditorPage.addExistingExploration(firstExplorationId);
+      collectionEditorPage.saveDraft();
+      collectionEditorPage.closeSaveModal();
+      collectionEditorPage.publishCollection();
+      collectionEditorPage.setTitle('Test Collection');
+      collectionEditorPage.setObjective('This is the test collection.');
+      collectionEditorPage.setCategory('Algebra');
+      collectionEditorPage.saveChanges();
+      browser.waitForAngular();
+      users.logout();
+    });
+  });
+
+  beforeEach(function() {
     // Starting language is English
     browser.get('/about');
     _selectLanguage('English');
@@ -382,6 +440,27 @@ describe('Site language', function() {
       users.logout();
     });
   });
+
+  it('should not change in exploration and collection player for guest users',
+    function() {
+      browser.get('/about');
+      _selectLanguage('Español');
+
+      // Checking collection player page.
+      browser.get('/collection/' + collectionId);
+      browser.waitForAngular();
+      expect(element(by.css('.oppia-share-collection-footer')).getText())
+        .toEqual('COMPARTIR ESTA COLECCIÓN');
+      general.ensurePageHasNoTranslationIds();
+
+      // Checking exploration player page.
+      browser.get('/explore/' + firstExplorationId);
+      browser.waitForAngular();
+      expect(element(by.css('.author-profile-text')).getText())
+        .toEqual('PERFILES DE AUTORES');
+      general.ensurePageHasNoTranslationIds();
+    }
+  );
 
   afterEach(function() {
     general.checkForConsoleErrors([]);

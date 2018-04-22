@@ -272,10 +272,10 @@ oppia.config(['$provide', function($provide) {
 
 oppia.config([
   '$compileProvider', '$httpProvider', '$interpolateProvider',
-  '$locationProvider',
+  '$locationProvider', '$cookiesProvider',
   function(
       $compileProvider, $httpProvider, $interpolateProvider,
-      $locationProvider) {
+      $locationProvider, $cookiesProvider) {
     // This improves performance by disabling debug data. For more details,
     // see https://code.angularjs.org/1.5.5/docs/guide/production
     $compileProvider.debugInfoEnabled(false);
@@ -290,6 +290,9 @@ oppia.config([
     if (window.location.pathname === '/search/find') {
       $locationProvider.html5Mode(true);
     }
+
+    // Prevent storing duplicate cookies for translation language.
+    $cookiesProvider.defaults.path = '/';
 
     // Set default headers for POST and PUT requests.
     $httpProvider.defaults.headers.post = {
