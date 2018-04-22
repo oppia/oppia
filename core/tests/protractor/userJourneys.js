@@ -15,13 +15,6 @@
 /**
  * @fileoverview End-to-end tests for user management.
  */
-
-var editor = require('../protractor_utils/editor.js');
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var CollectionEditorPage =
@@ -32,6 +25,11 @@ var ExplorationPlayerPage = require(
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var ThanksPage = require('../protractor_utils/ThanksPage.js');
+var editor = require('../protractor_utils/editor.js');
+var forms = require('../protractor_utils/forms.js');
+var general = require('../protractor_utils/general.js');
+var users = require('../protractor_utils/users.js');
+var workflow = require('../protractor_utils/workflow.js');
 
 var ERROR_PAGE_URL_SUFFIX = '/console_errors';
 
@@ -270,20 +268,20 @@ describe('Oppia static pages tour', function() {
 
 describe('Site language', function() {
   var adminPage = null;
-  var libraryPage = null;
+  var collectionId = null;
   var creatorDashboardPage = null;
   var collectionEditorPage = null;
   var firstExplorationId = null;
-  var collectionId = null;
+  var libraryPage = null;
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
-    libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
+    libraryPage = new LibraryPage.LibraryPage();
 
-    var EDITOR_USERNAME = 'langCollections';
     var CREATOR_USERNAME = 'langCreatorExplorations';
+    var EDITOR_USERNAME = 'langCollections';
 
     users.createUser('lang@collections.com', EDITOR_USERNAME);
     users.createUser('langCreator@explorations.com', CREATOR_USERNAME);
@@ -293,13 +291,30 @@ describe('Site language', function() {
     users.logout();
 
     users.login('langCreator@explorations.com');
-    workflow.createAndPublishExploration(
-      'First Exploration',
-      'Languages',
-      'First Test Exploration.'
-    );
+    workflow.createExploration();
     general.getExplorationIdFromEditor().then(function(expId) {
       firstExplorationId = expId;
+      editor.setContent(forms.toRichText('Language Test'));
+      editor.setInteraction('NumericInput');
+      editor.addResponse(
+        'NumericInput', forms.toRichText('Nice!!'),
+        'END', true, 'IsLessThanOrEqualTo', 0);
+      editor.setDefaultOutcome(forms.toRichText('Ok!!'), null, false);
+      editor.moveToState('END');
+      editor.setContent(forms.toRichText('END'));
+      editor.setInteraction('EndExploration');
+
+      // Save changes.
+      title = 'Language Test';
+      category = 'Languages';
+      objective = 'To test site language.';
+      editor.setTitle(title);
+      editor.setCategory(category);
+      editor.setObjective(objective);
+      editor.saveChanges('Done!');
+
+      // Publish changes.
+      workflow.publishExploration();
       users.logout();
 
       users.login('lang@collections.com');
@@ -400,45 +415,18 @@ describe('Site language', function() {
   });
 
   it('should not change in an exploration', function() {
-    users.createUser('mangue@example.com', 'Mangue');
-    users.login('mangue@example.com', true);
+    users.login('langCreator@explorations.com', true);
     browser.get('/about');
     _selectLanguage('Español');
 
-    // Create an exploration.
-    workflow.createExploration();
-    general.getExplorationIdFromEditor().then(function(expId) {
-      explorationId = expId;
-      editor.setContent(forms.toRichText('Language Test'));
-      editor.setInteraction('NumericInput');
-      editor.addResponse(
-        'NumericInput', forms.toRichText('Nice!!'),
-        'END', true, 'IsLessThanOrEqualTo', 0);
-      editor.setDefaultOutcome(forms.toRichText('Ok!!'), null, false);
-      editor.moveToState('END');
-      editor.setContent(forms.toRichText('END'));
-      editor.setInteraction('EndExploration');
+    general.openEditor(firstExplorationId);
 
-      // Save changes.
-      title = 'Language Test';
-      category = 'Languages';
-      objective = 'To test site language.';
-      editor.setTitle(title);
-      editor.setCategory(category);
-      editor.setObjective(objective);
-      editor.saveChanges('Done!');
-
-      // Publish changes.
-      workflow.publishExploration();
-      general.openEditor(expId);
-
-      // Spanish is still selected.
-      var placeholder = element(by.css('.protractor-test-float-form-input'))
-        .getAttribute('placeholder');
-      expect(placeholder).toEqual('Ingresa un número');
-      general.ensurePageHasNoTranslationIds();
-      users.logout();
-    });
+    // Spanish is still selected.
+    var placeholder = element(by.css('.protractor-test-float-form-input'))
+      .getAttribute('placeholder');
+    expect(placeholder).toEqual('Ingresa un número');
+    general.ensurePageHasNoTranslationIds();
+    users.logout();
   });
 
   it('should not change in exploration and collection player for guest users',
