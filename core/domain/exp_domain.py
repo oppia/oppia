@@ -3142,7 +3142,8 @@ class Exploration(object):
 
             preserved_answer_groups = []
             for answer_group_index in answer_group_indexes_to_preserve:
-                preserved_answer_groups.append(answer_group_index)
+                preserved_answer_groups.append(
+                    answer_groups[answer_group_index])
 
             state_dict['interaction']['answer_groups'] = preserved_answer_groups
 

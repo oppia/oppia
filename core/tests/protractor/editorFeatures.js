@@ -145,7 +145,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       19: {
-        text: 'training_data: []',
+        text: '      training_data: []',
         highlighted: true
       },
       20: {
