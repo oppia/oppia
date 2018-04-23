@@ -117,7 +117,8 @@ def check_can_edit_topic(user, topic_rights):
         return False
     if role_services.ACTION_EDIT_OWNED_TOPIC not in user.actions:
         return False
-    if (role_services.ACTION_EDIT_ANY_TOPIC in user.actions or
+    if (
+        role_services.ACTION_EDIT_ANY_TOPIC in user.actions or
         topic_rights.is_manager(user.user_id)):
         return True
 

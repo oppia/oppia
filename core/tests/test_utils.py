@@ -403,7 +403,7 @@ tags: []
     def get_json(self, url, params=None, expect_errors=False):
         """Get a JSON response, transformed to a Python object."""
         json_response = self.testapp.get(
-            url, params, expect_errors=expect_errors)   
+            url, params, expect_errors=expect_errors)
         if expect_errors:
             return json_response
         else:
