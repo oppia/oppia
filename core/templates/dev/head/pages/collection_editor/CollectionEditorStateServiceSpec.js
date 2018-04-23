@@ -102,25 +102,10 @@ describe('Collection editor state service', function() {
       schema_version: '3',
       version: '1',
       nodes: [{
-        exploration_id: '0',
-        prerequisite_skill_ids: [],
-        acquired_skill_ids: ['skill0']
+        exploration_id: '0'
       }, {
-        exploration_id: '1',
-        prerequisite_skill_ids: ['skill0'],
-        acquired_skill_ids: ['skill1']
-      }],
-      next_skill_index: 2,
-      skills: {
-        skill0: {
-          name: '0',
-          question_ids: []
-        },
-        skill1: {
-          name: '1',
-          question_ids: []
-        }
-      }
+        exploration_id: '1'
+      }]
     };
     secondBackendCollectionObject = {
       id: '5',
@@ -132,17 +117,8 @@ describe('Collection editor state service', function() {
       schema_version: '3',
       version: '3',
       nodes: [{
-        exploration_id: '0',
-        prerequisite_skill_ids: [],
-        acquired_skill_ids: ['skill0']
-      }],
-      next_skill_index: 1,
-      skills: {
-        skill0: {
-          name: '0',
-          question_ids: []
-        }
-      }
+        exploration_id: '0'
+      }]
     };
 
     privateCollectionRightsObject = {

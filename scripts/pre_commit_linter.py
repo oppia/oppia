@@ -57,6 +57,7 @@ import re
 import subprocess
 import sys
 import time
+
 # pylint: enable=wrong-import-order
 
 _PARSER = argparse.ArgumentParser()
@@ -167,9 +168,9 @@ EXCLUDED_PHRASES = [
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'scripts/pre_commit_linter.py', 'integrations/*',
-    'integrations_dev/*', '*.svg', '*.png', '*.zip', '*.ico', '*.jpg',
-    '*.min.js', 'assets/scripts/*', 'core/tests/data/*', '*.mp3')
+    'integrations/*', 'integrations_dev/*', '*.svg',
+    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
+    'assets/scripts/*', 'core/tests/data/*', '*.mp3')
 
 
 if not os.getcwd().endswith('oppia'):
@@ -213,9 +214,13 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
-import isort             # pylint: disable=wrong-import-position
-import pycodestyle       # pylint: disable=wrong-import-position
-from pylint import lint  # pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-position
+
+import isort  # isort:skip
+import pycodestyle  # isort:skip
+from pylint import lint  # isort:skip
+
+# pylint: enable=wrong-import-position
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
@@ -400,6 +405,56 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
             _MESSAGE_TYPE_SUCCESS, num_py_files, time.time() - start_time))
 
     print 'Python linting finished.'
+
+
+def _lint_html_files():
+    """This function is used to check HTML files for linting errors."""
+    parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+
+    node_path = os.path.join(
+        parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
+    htmllint_path = os.path.join(
+        parent_dir, 'node_modules', 'htmllint-cli', 'bin', 'cli.js')
+
+    error_summary = []
+    total_error_count = 0
+    summary_messages = []
+    htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
+    directories_to_lint = ['core', 'extensions', 'assets']
+    print 'Starting HTML linter...'
+    print '----------------------------------------'
+    print ''
+    for directory in directories_to_lint:
+        proc_args = htmllint_cmd_args + ['--cwd=./' + directory]
+        print 'Linting HTML files in %s directory:' % directory
+        proc = subprocess.Popen(
+            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        linter_stdout, _ = proc.communicate()
+
+        if linter_stdout:
+            error_summary.append(
+                [s for s in linter_stdout.split() if s.isdigit()])
+            print linter_stdout
+
+    print '----------------------------------------'
+    for error in error_summary:
+        total_error_count += int(error[0])
+
+    if total_error_count:
+        summary_message = '%s   HTML linting failed' % (
+            _MESSAGE_TYPE_FAILED)
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s   HTML linting passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        summary_messages.append(summary_message)
+
+    print ''
+    print summary_message
+    print 'HTML linting finished.'
+    print ''
+    return summary_messages
 
 
 def _get_all_files():
@@ -603,8 +658,12 @@ def _check_bad_patterns(all_files):
     total_error_count = 0
     summary_messages = []
     all_files = [
-        filename for filename in all_files if not
-        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)]
+        filename for filename in all_files if not (
+            filename.endswith('pre_commit_linter.py') or
+            any(
+                fnmatch.fnmatch(filename, pattern)
+                for pattern in EXCLUDED_PATHS)
+            )]
     failed = False
     for filename in all_files:
         with open(filename) as f:
@@ -717,9 +776,12 @@ def _check_comments(all_files):
 
                 if line.startswith('#') and not next_line.startswith('#'):
                     # Check that the comment ends with the proper punctuation.
-                    if (line[-1] not in
-                            ALLOWED_TERMINATING_PUNCTUATIONS) and (
-                                not any(word in line for word in EXCLUDED_PHRASES)):
+                    last_char_is_invalid = line[-1] not in (
+                        ALLOWED_TERMINATING_PUNCTUATIONS)
+                    no_word_is_present_in_excluded_phrases = not any(
+                        word in line for word in EXCLUDED_PHRASES)
+                    if last_char_is_invalid and (
+                            no_word_is_present_in_excluded_phrases):
                         failed = True
                         print '%s --> Line %s: %s' % (
                             filename, line_num + 1, message)
@@ -794,9 +856,12 @@ def _check_docstrings(all_files):
                     if line == '"""':
                         line = file_content[line_num - 1].lstrip().rstrip()
                         # Check for punctuation at end of docstring.
-                        if (line[-1] not in
-                                ALLOWED_TERMINATING_PUNCTUATIONS) and (
-                                    not any(word in line for word in EXCLUDED_PHRASES)):
+                        last_char_is_invalid = line[-1] not in (
+                            ALLOWED_TERMINATING_PUNCTUATIONS)
+                        no_word_is_present_in_excluded_phrases = not any(
+                            word in line for word in EXCLUDED_PHRASES)
+                        if last_char_is_invalid and (
+                                no_word_is_present_in_excluded_phrases):
                             failed = True
                             print '%s --> Line %s: %s' % (
                                 filename, line_num, missing_period_message)
@@ -888,13 +953,15 @@ def main():
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
     comment_messages = _check_comments(all_files)
+    html_linter_messages = _lint_html_files()
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
         html_directive_name_messages +
         import_order_messages + newline_messages +
         docstring_messages + comment_messages +
-        linter_messages + pattern_messages)
+        html_linter_messages + linter_messages +
+        pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)

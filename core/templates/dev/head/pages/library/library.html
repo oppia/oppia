@@ -130,6 +130,7 @@
                                              category="tile.category"
                                              thumbnail-icon-url="tile.thumbnail_icon_url"
                                              thumbnail-bg-color="tile.thumbnail_bg_color"
+                                             activity-is-owned-by-current-user="activitiesOwned.collections[tile.id]"
                                              show-learner-dashboard-icons-if-possible="true">
                     </collection-summary-tile>
                     <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
@@ -143,6 +144,7 @@
                                               thumbnail-icon-url="tile.thumbnail_icon_url"
                                               thumbnail-bg-color="tile.thumbnail_bg_color"
                                               class="protractor-test-exp-summary-tile"
+                                              activity-is-owned-by-current-user="activitiesOwned.explorations[tile.id]"
                                               show-learner-dashboard-icons-if-possible="true">
                     </exploration-summary-tile>
                   </div>

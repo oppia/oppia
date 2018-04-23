@@ -87,22 +87,13 @@ oppia.controller('CollectionPlayer', [
       return collectionNode;
     };
 
-    $scope.getCollectionNodesForExplorationIds = function(explorationIds) {
-      var collectionNodes = [];
-      for (var i = 0; i < explorationIds.length; i++) {
-        collectionNodes[i] = $scope.getCollectionNodeForExplorationId(
-          explorationIds[i]);
-      }
-      return collectionNodes;
-    };
-
     $scope.getNextRecommendedCollectionNodes = function() {
-      return $scope.getCollectionNodesForExplorationIds(
-        $scope.collectionPlaythrough.getNextExplorationIds());
+      return $scope.getCollectionNodeForExplorationId(
+        $scope.collectionPlaythrough.getNextExplorationId());
     };
 
     $scope.getCompletedExplorationNodes = function() {
-      return $scope.getCollectionNodesForExplorationIds(
+      return $scope.getCollectionNodeForExplorationId(
         $scope.collectionPlaythrough.getCompletedExplorationIds());
     };
 
@@ -110,22 +101,6 @@ oppia.controller('CollectionPlayer', [
       return $scope.collection.getCollectionNodeCount() - (
         $scope.collectionPlaythrough.getNextRecommendedCollectionNodeCount() +
         $scope.collectionPlaythrough.getCompletedExplorationNodeCount());
-    };
-
-    $scope.getNonRecommendedCollectionNodes = function() {
-      var displayedExplorationIds = (
-        $scope.collectionPlaythrough.getNextExplorationIds().concat(
-          $scope.collectionPlaythrough.getCompletedExplorationIds()));
-      var nonRecommendedCollectionNodes = [];
-      var collectionNodes = $scope.collection.getCollectionNodes();
-      for (var i = 0; i < collectionNodes.length; i++) {
-        var collectionNode = collectionNodes[i];
-        var explorationId = collectionNode.getExplorationId();
-        if (displayedExplorationIds.indexOf(explorationId) === -1) {
-          nonRecommendedCollectionNodes.push(collectionNode);
-        }
-      }
-      return nonRecommendedCollectionNodes;
     };
 
     $scope.updateExplorationPreview = function(explorationId) {
@@ -269,25 +244,20 @@ oppia.controller('CollectionPlayer', [
           var completedExplorationIds = (
             GuestCollectionProgressService.getCompletedExplorationIds(
               $scope.collection));
-          var nextExplorationIds = (
-            GuestCollectionProgressService.getNextExplorationIds(
+          var nextExplorationId = (
+            GuestCollectionProgressService.getNextExplorationId(
               $scope.collection, completedExplorationIds));
           $scope.collectionPlaythrough = (
             CollectionPlaythroughObjectFactory.create(
-              nextExplorationIds, completedExplorationIds));
+              nextExplorationId, completedExplorationIds));
         } else {
           $scope.collectionPlaythrough = (
             CollectionPlaythroughObjectFactory.createFromBackendObject(
               collectionBackendObject.playthrough_dict));
         }
 
-        var nextExplorationIds = (
-          $scope.collectionPlaythrough.getNextExplorationIds());
-        if (nextExplorationIds.length > 0) {
-          $scope.nextExplorationId = nextExplorationIds[0];
-        } else {
-          $scope.nextExplorationId = null;
-        }
+        $scope.nextExplorationId =
+          $scope.collectionPlaythrough.getNextExplorationId();
       },
       function() {
         // TODO(bhenning): Handle not being able to load the collection.

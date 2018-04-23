@@ -38,11 +38,5 @@ oppia.factory('RuleObjectFactory', [function() {
     return new Rule(ruleDict.rule_type, ruleDict.inputs);
   };
 
-  Rule.createNewClassifierRule = function() {
-    return new Rule('FuzzyMatches', {
-      training_data: []
-    });
-  };
-
   return Rule;
 }]);

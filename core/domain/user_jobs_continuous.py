@@ -39,6 +39,10 @@ transaction_services = models.Registry.import_transaction_services()
 # updates aggregator job.
 class RecentUpdatesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
+    """Storage class for entities in the realtime layer. See
+    jobs.BaseRealtimeDatastoreClassForContinuousComputations class
+    for more details.
+    """
     pass
 
 
@@ -53,6 +57,7 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
     """
     @classmethod
     def get_event_types_listened_to(cls):
+        """Returns a list of event types that this class subscribes to."""
         return []
 
     @classmethod
@@ -201,6 +206,7 @@ class RecentUpdatesMRJobManager(
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Returns a list of datastore class references to map over."""
         return [user_models.UserSubscriptionsModel]
 
     @staticmethod
@@ -323,6 +329,10 @@ class RecentUpdatesMRJobManager(
 
 class UserStatsRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
+    """Storage class for entities in the realtime layer. See
+    jobs.BaseRealtimeDatastoreClassForContinuousComputations class
+    for more details.
+    """
     total_plays = ndb.IntegerProperty(default=0)
     num_ratings = ndb.IntegerProperty(default=0)
     average_ratings = ndb.FloatProperty(indexed=True)
@@ -339,6 +349,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
     """
     @classmethod
     def get_event_types_listened_to(cls):
+        """Returns a list of event types that this class subscribes to."""
         return [
             feconf.EVENT_TYPE_START_EXPLORATION,
             feconf.EVENT_TYPE_RATE_EXPLORATION]
@@ -499,6 +510,7 @@ class UserStatsMRJobManager(
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Returns a list of datastore class references to map over."""
         return [exp_models.ExpSummaryModel]
 
     @staticmethod
