@@ -1,5 +1,79 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.6.3 (23 Apr 2018)
+--------------------
+Creator View:
+* Fix #4693: Changed timeout for "solution error" popup to 4 seconds. (#4706)
+* Fix #4530: Removes extra lines and spaces at the end of string in RTE (#4799)
+* Show "issues overview" card on state editor (#4744)
+* Fix part of #3446: Add frontend validators to CodeRepl Interaction (#4832)
+* Fix #4663: Added CSS to fix overflowing content out of stats modal. (#4664)
+* Fix #4714: Fix alignment of button and text in exploration settings tab. (#4811)
+* Fix #3982: Added 'open' in the open feedback thread summary. (#4767)
+* Fix #4872: Fix overflowing feedback thread count for large numbers. (#4873)
+* Fix #4857: Fixed feedback message status displaying incorrectly (#4865)
+
+Learner and Creator Dashboards:
+* Fix #2620: Remove the dead zone and hardcoded height in card view on dashboard (#4791)
+* Fix #3971: Add activity indicator to feedback updates (#4785)
+* Fix #3983: Reorder tabs in Learner Dashboard to make them more intuitive. (#4809)
+* Fix #4875: Removed dead zone in card view of creator dashboard (#4878)
+
+Library:
+* Fix #4056: There is no way to add an exploration/collection into play-later list for mobile users. (#4709)
+* Fix #4813: Fix icon positioning in search category dropdown (#4817)
+* Fix #4422: Add search option in library for mobile users (#4807)
+* Fix #4864: On mobile, two icons are visible on the exploration/collection cards at the same time. (#4879)
+
+Learner View:
+* Fix #4367: Prevent null-submission for MathExpressionInput interaction (#4753)
+* Fix #4055: Removes redundant CSS selector from conversation_skin_directive.html (#4790)
+* Fix part of #4364: Add sprinkles to the correctness footer (#4770)
+* Fix #4884: Remove correctness footer when navigating (#4899)
+
+Fractions Landing Page:
+* Update content and change font-size for tablet view for the Fractions landing page. (#4897, #4908)
+
+Questions project
+* Fix #3009: Final milestone of questions project (#4574)
+
+Dependencies and build process
+* Fix #4519: Move third-party build process into python. (#4831)
+* Remove reference to master branch from CHANGELOG (#4852)
+* Remove unused angular dependencies injected into controllers (#4792)
+* Fix git push error when branch has same name as directory. (#4834)
+* Upgrade ESLint to 4.19.0 (#4825)
+* Upgrade guppy version to b5055b (#4709)
+* Upgrade GAE version to 1.9.67. (#4786)
+* Remove numpy as a dependency. (#4808)
+
+Infrastructure:
+* Removed create_classifier_training_job and updated the unit tests. (#4827)
+* Add more detailed logging for StateIdMapping one off job. Add realtime logging to build script when deploying. (#4853)
+* Allow ExplorationStateIdMappingJob to overwrite StateIdMapping models (#4854)
+* Handle schema migration from exp schema v1 to exp schema v2 in ExplorationStateIdMappingJob (#4858)
+* Address issues with e2e tests by having each suite contain only one test file. (#4896)
+* Linting checks added:
+  * Fix part of #3905: Add check for keyword arguments (#4752)
+  * Fix part of #3905: Add check for period at ends of comments and docstrings (#4759)
+  * Fix part of #3905: Add check to ensure all HTML directives end with _directive.html (#4839)
+  * Merge _check_spacing function with _lint_py_files function and remove redundant code (#4840)
+
+Karma tests:
+* Fix part of #4057: Add test for EditabilityService (#4806)
+* Fix part of #4057: Add test for AnswerGroupsCacheService (#4843)
+
+Docstrings
+* Fix part of #4374: Add docstrings to core.domain.feedback_jobs_continuous (#4855)
+* Fix part of #4374: Add docstrings to core.storage files. (#4841)
+* Fix part of #4374: Add docstrings to value_generators_domain.py (#4826)
+* Fix part of #4374: Add docstrings to user_query_services.py and user_services.py (#4796)
+* Fix part of #4374: Add docstrings to core/domain/stats_jobs_one_off.py (#4757)
+* Fix part of #4374: Add docstrings to core.domain.stats_domain. (#4731)
+* Fix part of #4374: Add docstring to core.platform.email.gae_email_services (#4795)
+* Fix part of #4374: Add docstrings to test_utils.py (#4845)
+
+
 v2.6.2 (20 Mar 2018)
 --------------------
 Learner View:
