@@ -83,10 +83,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_manager_cannot_assign_roles(self):
         topic_services.create_new_topic_rights(
             self.topic_id, self.user_id_admin)
+
         topic_services.assign_role(self.user_admin, self.user_id_a,
             topic_domain.ROLE_MANAGER, self.topic_id)
-        
-        with self.assertRaisesRegexp(Exception,
+
+        with self.assertRaisesRegexp(
+            Exception,
             'UnauthorizedUserException: Could not assign new role.'):
             topic_services.assign_role(
                 self.user_a, self.user_id_b,
