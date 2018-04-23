@@ -394,8 +394,6 @@ tags: []
         """Convert a JSON server response to an object (such as a dict)."""
         if not expect_errors:
             self.assertEqual(json_response.status_int, 200)
-        if expect_errors:
-            print json_response
         self.assertEqual(
             json_response.content_type, 'application/json')
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
@@ -405,9 +403,12 @@ tags: []
     def get_json(self, url, params=None, expect_errors=False):
         """Get a JSON response, transformed to a Python object."""
         json_response = self.testapp.get(
-            url, params, expect_errors=expect_errors)
-        return self._parse_json_response(
-            json_response, expect_errors=expect_errors)
+            url, params, expect_errors=expect_errors)   
+        if expect_errors:
+            return json_response
+        else:
+            return self._parse_json_response(
+                json_response, expect_errors=expect_errors)
 
     def post_json(self, url, payload, csrf_token=None, expect_errors=False,
                   expected_status_int=200, upload_files=None):

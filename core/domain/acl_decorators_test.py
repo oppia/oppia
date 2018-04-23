@@ -1080,11 +1080,7 @@ class EditTopicDecoratorTest(test_utils.GenericTestBase):
     def test_normal_user_cannot_edit_topic(self):
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            with self.assertRaisesRegexp(
-                Exception,
-                'You do not have credentials to edit this topic.'):
-                response = self.get_json(
-                    '/mock/%s' % self.topic_id, expect_errors=True)
-                print response
-        self.assertEqual(response['status_code'], 401)
+            response = self.get_json(
+                '/mock/%s' % self.topic_id, expect_errors=True)
+        self.assertEqual(response.status_code, 401)
         self.logout()
