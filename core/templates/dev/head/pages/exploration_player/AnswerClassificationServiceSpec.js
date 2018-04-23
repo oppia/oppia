@@ -95,11 +95,6 @@ describe('Answer classification service with string classifier disabled',
                 x: 6
               },
               rule_type: 'Equals'
-            }, {
-              inputs: {
-                x: 7
-              },
-              rule_type: 'FuzzyMatches'
             }]
           }],
           default_outcome: {
@@ -306,11 +301,6 @@ describe('Answer classification service with string classifier enabled',
                 x: 7
               },
               rule_type: 'Equals'
-            }, {
-              inputs: {
-                x: 7
-              },
-              rule_type: 'FuzzyMatches'
             }]
           }],
           default_outcome: {
@@ -367,7 +357,7 @@ describe('Answer classification service with string classifier enabled',
           explorationId, stateName, state, 0, rules)
       ).toEqual(
         acrof.createNew(
-          state.interaction.answerGroups[1].outcome, 1, 2,
+          state.interaction.answerGroups[1].outcome, 1, null,
           STATISTICAL_CLASSIFICATION)
       );
     });

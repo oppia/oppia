@@ -1287,6 +1287,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'param_changes': [],
                 'refresher_exploration_id': None,
             },
+            'training_data': []
         }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
