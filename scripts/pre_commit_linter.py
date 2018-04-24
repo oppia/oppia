@@ -407,7 +407,7 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
     print 'Python linting finished.'
 
 
-def _lint_html_files():
+def _lint_html_files(all_files):
     """This function is used to check HTML files for linting errors."""
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -420,13 +420,14 @@ def _lint_html_files():
     total_error_count = 0
     summary_messages = []
     htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
-    directories_to_lint = ['core', 'extensions', 'assets']
+    html_files_to_lint = [
+        filename for filename in all_files if filename.endswith('.html')]
     print 'Starting HTML linter...'
     print '----------------------------------------'
     print ''
-    for directory in directories_to_lint:
-        proc_args = htmllint_cmd_args + ['--cwd=./' + directory]
-        print 'Linting HTML files in %s directory:' % directory
+    for filename in html_files_to_lint:
+        proc_args = htmllint_cmd_args + ['--cwd=./' + filename]
+        print 'Linting %s file' % filename
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -953,7 +954,7 @@ def main():
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
     comment_messages = _check_comments(all_files)
-    html_linter_messages = _lint_html_files()
+    html_linter_messages = _lint_html_files(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
