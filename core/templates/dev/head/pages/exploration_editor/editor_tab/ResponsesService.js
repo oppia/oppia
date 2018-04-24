@@ -114,6 +114,9 @@ oppia.factory('ResponsesService', [
       if (updates.hasOwnProperty('labelledAsCorrect')) {
         answerGroup.outcome.labelledAsCorrect = updates.labelledAsCorrect;
       }
+      if (updates.hasOwnProperty('trainingData')) {
+        answerGroup.trainingData = updates.trainingData;
+      }
       _saveAnswerGroups(_answerGroups);
     };
 
