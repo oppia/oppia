@@ -1081,6 +1081,6 @@ class EditTopicDecoratorTest(test_utils.GenericTestBase):
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock/%s' % self.topic_id, expect_errors=True)
-        self.assertEqual(response.status_code, 401)
+                '/mock/%s' % self.topic_id, expect_errors=True,
+                expected_status_int=401)
         self.logout()

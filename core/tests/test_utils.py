@@ -400,13 +400,14 @@ tags: []
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
-    def get_json(self, url, params=None, expect_errors=False):
+    def get_json(
+        self, url, expected_status_int=200, params=None,
+        expect_errors=False):
         """Get a JSON response, transformed to a Python object."""
         json_response = self.testapp.get(
-            url, params, expect_errors=expect_errors)
-        if expect_errors:
-            return json_response
-        else:
+            url, params, expect_errors=expect_errors,
+            status=expected_status_int)
+        if not expect_errors:
             return self._parse_json_response(
                 json_response, expect_errors=expect_errors)
 
