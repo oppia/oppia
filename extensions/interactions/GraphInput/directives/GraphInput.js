@@ -544,7 +544,7 @@ oppia.directive('graphViz', [
             }
             $scope.state.hoveredVertex = (
               index === $scope.state.hoveredVertex) ?
-                null : $scope.state.hoveredVertex;
+              null : $scope.state.hoveredVertex;
           };
 
           $scope.onClickVertexLabel = function(index) {
@@ -602,13 +602,13 @@ oppia.directive('graphViz', [
 
           var tryAddEdge = function(startIndex, endIndex) {
             if (
-                startIndex === null ||
-                endIndex === null ||
-                startIndex === endIndex ||
-                startIndex < 0 ||
-                endIndex < 0 ||
-                startIndex >= $scope.graph.vertices.length ||
-                endIndex >= $scope.graph.vertices.length) {
+              startIndex === null ||
+              endIndex === null ||
+              startIndex === endIndex ||
+              startIndex < 0 ||
+              endIndex < 0 ||
+              startIndex >= $scope.graph.vertices.length ||
+              endIndex >= $scope.graph.vertices.length) {
               return;
             }
             for (var i = 0; i < $scope.graph.edges.length; i++) {
@@ -883,7 +883,8 @@ oppia.factory('graphUtilsService', [function() {
         }
         if (isVisited[nextVertex] === this.DFS_STATUS.UNVISITED &&
             this.findCycle(
-            nextVertex, currentVertex, adjacencyLists, isVisited, isDirected)) {
+              nextVertex, currentVertex, adjacencyLists, isVisited,
+              isDirected)) {
           return true;
         }
       }
@@ -1029,11 +1030,11 @@ oppia.factory('graphInputRulesService', [
       var adjacencyLists = graphUtilsService.constructAdjacencyLists(
         graph, graphUtilsService.GRAPH_ADJACENCY_MODE.DIRECTED);
       for (var startVertex = 0;
-           startVertex < graph.vertices.length;
-           startVertex++) {
+        startVertex < graph.vertices.length;
+        startVertex++) {
         if (isVisited[startVertex] === graphUtilsService.DFS_STATUS.UNVISITED) {
           if (graphUtilsService.findCycle(
-              startVertex, -1, adjacencyLists, isVisited, graph.isDirected)) {
+            startVertex, -1, adjacencyLists, isVisited, graph.isDirected)) {
             return false;
           }
         }
@@ -1113,7 +1114,7 @@ oppia.factory('graphInputRulesService', [
           });
         if (doLabelsMatch &&
             graphUtilsService.areAdjacencyMatricesEqualWithPermutation(
-            adj1, adj2, permutation)) {
+              adj1, adj2, permutation)) {
           return true;
         }
         permutation = graphUtilsService.nextPermutation(permutation);

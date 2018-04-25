@@ -136,10 +136,10 @@ var logicProofShared = (function() {
   var displayExpressionHelper = function(
       expression, operators, desirabilityOfBrackets) {
     var desirabilityOfBracketsBelow = (
-        expression.top_kind_name === 'binary_connective' ||
-        expression.top_kind_name === 'binary_relation' ||
-        expression.top_kind_name === 'binary_function'
-      ) ? 2 : (
+      expression.top_kind_name === 'binary_connective' ||
+      expression.top_kind_name === 'binary_relation' ||
+      expression.top_kind_name === 'binary_function'
+    ) ? 2 : (
         expression.top_kind_name === 'unary_connective' ||
         expression.top_kind_name === 'quantifier'
       ) ? 1 : 0;
@@ -167,8 +167,8 @@ var logicProofShared = (function() {
         expression.top_kind_name === 'binary_function') {
       return (
         desirabilityOfBrackets > 0 ?
-        '(' + processedArguments.join(symbol) + ')' :
-        processedArguments.join(symbol));
+          '(' + processedArguments.join(symbol) + ')' :
+          processedArguments.join(symbol));
     } else if (expression.top_kind_name === 'unary_connective') {
       var output = symbol + processedArguments[0];
       return (desirabilityOfBrackets === 2) ? '(' + output + ')' : output;
@@ -334,7 +334,7 @@ var logicProofShared = (function() {
       for (var i = 0; i < vocabulary[key].length; i++) {
         for (var j = 0; j < vocabulary[key][i].split(' ').length; j++) {
           if (vocabularyWords.indexOf(
-                vocabulary[key][i].split(' ')[j]) === -1) {
+            vocabulary[key][i].split(' ')[j]) === -1) {
             vocabularyWords.push(vocabulary[key][i].split(' ')[j]);
           }
         }
@@ -453,13 +453,13 @@ var logicProofShared = (function() {
               word: word2
             }) :
             containsLogicalCharacter(word2, operators, isTemplate) ?
-            new UserError('consecutive_expressions', {
-              word1: word1,
-              word2: word2
-            }) :
-            new UserError('unidentified_word', {
-              word: word2
-            });
+              new UserError('consecutive_expressions', {
+                word1: word1,
+                word2: word2
+              }) :
+              new UserError('unidentified_word', {
+                word: word2
+              });
         } else {
           throw (vocabularyWords.indexOf(word2) !== -1) ?
             new UserError('unidentified_phrase_starting_at', {
@@ -716,16 +716,16 @@ var logicProofShared = (function() {
               // These dummy variables should not be available outside this
               // part of the untypedExpression.
               if (!operators.hasOwnProperty(
-                    untypedExpression.dummies[l].top_operator_name)) {
+                untypedExpression.dummies[l].top_operator_name)) {
                 delete newAttempts[k].operators[
                   untypedExpression.dummies[l].top_operator_name];
               }
             }
             var typedArguments = [];
             for (var l = untypedExpression.dummies.length;
-                 l < untypedExpression.dummies.length +
+              l < untypedExpression.dummies.length +
                      untypedExpression.arguments.length;
-                 l++) {
+              l++) {
               typedArguments.push(newAttempts[k].typedArray[l]);
             }
 
@@ -830,7 +830,7 @@ var logicProofShared = (function() {
     }
     var fullyTypedArrays = partiallyTypedArrays[untypedArray.length];
     var fullyUpdatedOperatorss = partiallyUpdatedOperators[
-    untypedArray.length];
+      untypedArray.length];
     if (fullyTypedArrays.length > 0) {
       var result = [];
       for (var i = 0; i < fullyTypedArrays.length; i++) {
@@ -861,10 +861,10 @@ var logicProofShared = (function() {
       }
     }
     for (var i = 0;
-         i < expression1.arguments.length + expression1.dummies.length; i++) {
+      i < expression1.arguments.length + expression1.dummies.length; i++) {
       if (!checkExpressionsAreEqual(
-          (expression1.arguments.concat(expression1.dummies))[i],
-          (expression2.arguments.concat(expression2.dummies))[i])) {
+        (expression1.arguments.concat(expression1.dummies))[i],
+        (expression2.arguments.concat(expression2.dummies))[i])) {
         return false;
       }
     }

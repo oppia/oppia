@@ -676,8 +676,7 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
         job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
         exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
 
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
-            self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_tasks()
 
         expected_mapping = {
             exploration.init_state_name: 0
@@ -714,8 +713,7 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
         job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
         exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
 
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
-            self.process_and_flush_pending_tasks()
+        self.process_and_flush_pending_tasks()
 
         expected_mapping = {
             exploration.init_state_name: 0

@@ -19,7 +19,6 @@
 describe('Rule spec services', function() {
   var rulesServices = {};
   var ruleTemplates;
-  var RULE_TYPE_CLASSIFIER;
 
   beforeEach(function() {
     module('oppia');
@@ -32,7 +31,6 @@ describe('Rule spec services', function() {
   };
 
   beforeEach(inject(function($injector) {
-    RULE_TYPE_CLASSIFIER = $injector.get('RULE_TYPE_CLASSIFIER');
     ruleTemplates =
       window.__fixtures__['extensions/interactions/rule_templates'];
     Object.keys(ruleTemplates).forEach(function(interactionId) {
@@ -45,10 +43,8 @@ describe('Rule spec services', function() {
     Object.keys(ruleTemplates).forEach(function(interactionId) {
       var serviceName = getRulesServiceName(interactionId);
       Object.keys(ruleTemplates[interactionId]).forEach(function(ruleName) {
-        if (ruleName !== RULE_TYPE_CLASSIFIER) {
-          expect(rulesServices[serviceName][ruleName]).toBeDefined(
-            '. ERROR: ' + ruleName + ' not found in service ' + serviceName);
-        }
+        expect(rulesServices[serviceName][ruleName]).toBeDefined(
+          '. ERROR: ' + ruleName + ' not found in service ' + serviceName);
       });
     });
   });

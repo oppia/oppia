@@ -201,6 +201,23 @@ class ExplorationRightsModel(base_models.VersionedModel):
     )
 
     def save(self, committer_id, commit_message, commit_cmds):
+        """Saves a new version of the exploration, updating the Exploration
+        datastore model.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. The type of the command. A full list of command
+                        types can be found in core/domain/exp_domain.py.
+                and then additional arguments for that command. For example:
+
+                {'cmd': 'AUTO_revert_version_number',
+                 'version_number': 4}
+        """
         super(ExplorationRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
@@ -592,7 +609,7 @@ class StateIdMappingModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, exp_id, exp_version, state_names_to_ids,
-            largest_state_id_used):
+            largest_state_id_used, overwrite=False):
         """Creates a new instance of state id mapping model.
 
         Args:
@@ -601,12 +618,14 @@ class StateIdMappingModel(base_models.BaseModel):
             state_names_to_ids: dict. A dict storing state name to ids mapping.
             largest_state_id_used: int. The largest integer so far that has been
                 used as a state ID for this exploration.
+            overwrite: bool. Whether overwriting of an existing model should
+                be allowed.
 
         Returns:
             StateIdMappingModel. Instance of the state id mapping model.
         """
         instance_id = cls._generate_instance_id(exp_id, exp_version)
-        if cls.get_by_id(instance_id):
+        if not overwrite and cls.get_by_id(instance_id):
             raise Exception(
                 'State id mapping model already exists for exploration %s,'
                 ' version %d' % (exp_id, exp_version))

@@ -95,11 +95,6 @@ describe('Answer classification service with string classifier disabled',
                 x: 6
               },
               rule_type: 'Equals'
-            }, {
-              inputs: {
-                x: 7
-              },
-              rule_type: 'FuzzyMatches'
             }]
           }],
           default_outcome: {
@@ -306,11 +301,6 @@ describe('Answer classification service with string classifier enabled',
                 x: 7
               },
               rule_type: 'Equals'
-            }, {
-              inputs: {
-                x: 7
-              },
-              rule_type: 'FuzzyMatches'
             }]
           }],
           default_outcome: {
@@ -367,7 +357,7 @@ describe('Answer classification service with string classifier enabled',
           explorationId, stateName, state, 0, rules)
       ).toEqual(
         acrof.createNew(
-          state.interaction.answerGroups[1].outcome, 1, 2,
+          state.interaction.answerGroups[1].outcome, 1, null,
           STATISTICAL_CLASSIFICATION)
       );
     });
@@ -402,7 +392,7 @@ describe('Answer classification service with training data classification',
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    var TRAINING_DATA_CLASSIFICATION, RULE_TYPE_CLASSIFIER;
+    var TRAINING_DATA_CLASSIFICATION;
     var acs, sof, oof, acrof, $stateName, state, state2,
       registryService, stateClassifierMapping;
     beforeEach(inject(function($injector) {
@@ -412,7 +402,6 @@ describe('Answer classification service with training data classification',
       acrof = $injector.get('AnswerClassificationResultObjectFactory');
       TRAINING_DATA_CLASSIFICATION = $injector.get(
         'TRAINING_DATA_CLASSIFICATION');
-      RULE_TYPE_CLASSIFIER = $injector.get('RULE_TYPE_CLASSIFIER');
 
       stateName = 'stateName';
       state = sof.createFromBackendDict(stateName, {
@@ -433,12 +422,8 @@ describe('Answer classification service with training data classification',
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {
-                training_data: ['abc', 'input']
-              },
-              rule_type: RULE_TYPE_CLASSIFIER
-            }]
+            training_data: ['abc', 'input'],
+            rule_specs: []
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -450,12 +435,8 @@ describe('Answer classification service with training data classification',
               param_changes: [],
               refresher_exploration_id: null
             },
-            rule_specs: [{
-              inputs: {
-                training_data: ['inputxyz']
-              },
-              rule_type: RULE_TYPE_CLASSIFIER
-            }]
+            training_data: ['inputxyz'],
+            rule_specs: []
           }],
           default_outcome: {
             dest: 'default',
@@ -488,7 +469,7 @@ describe('Answer classification service with training data classification',
           explorationId, stateName, state, 'abc', rules)
       ).toEqual(
         acrof.createNew(
-          state.interaction.answerGroups[0].outcome, 0, 0,
+          state.interaction.answerGroups[0].outcome, 0, null,
           TRAINING_DATA_CLASSIFICATION)
       );
 
@@ -497,7 +478,7 @@ describe('Answer classification service with training data classification',
           explorationId, stateName, state, 'inputxyz', rules)
       ).toEqual(
         acrof.createNew(
-          state.interaction.answerGroups[1].outcome, 1, 0,
+          state.interaction.answerGroups[1].outcome, 1, null,
           TRAINING_DATA_CLASSIFICATION)
       );
     });

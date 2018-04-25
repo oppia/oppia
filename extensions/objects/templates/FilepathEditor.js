@@ -437,8 +437,8 @@ oppia.directive('filepathEditor', [
             var data = 'url(' + $scope.data.metadata.uploadedImageData + ')';
             styles.background = data + ' no-repeat';
 
-            var x = $scope.cropArea.x1 + 3;  // Add crop area border.
-            var y = $scope.cropArea.y1 + 3;  // Add crop area border.
+            var x = $scope.cropArea.x1 + 3; // Add crop area border.
+            var y = $scope.cropArea.y1 + 3; // Add crop area border.
             styles['background-position'] = '-' + x + 'px -' + y + 'px';
 
             var dimensions = $scope.calculateTargetImageDimensions();
@@ -470,8 +470,8 @@ oppia.directive('filepathEditor', [
 
           // Generate new image data and file.
           var newImageData = getCroppedImageData(
-              $scope.data.metadata.uploadedImageData,
-              x1, y1, width, height);
+            $scope.data.metadata.uploadedImageData,
+            x1, y1, width, height);
 
           var newImageFile = convertImageDataToImageFile(newImageData);
 
