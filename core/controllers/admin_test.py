@@ -207,7 +207,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             {'method': 'username', 'username': username},
-            expect_errors=True, expected_status_int=400)
+            expected_status_int=400, expect_errors=True)
 
         # Trying to update role of non-existent user.
         response = self.testapp.get(feconf.ADMIN_URL)
@@ -292,7 +292,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
 
         response = self.get_json(
             '/explorationdataextractionhandler', payload,
-            expect_errors=True, expected_status_int=400)
+            expected_status_int=400, expect_errors=True)
 
         self.assertEqual(
             response['error'],

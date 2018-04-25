@@ -1080,7 +1080,7 @@ class EditTopicDecoratorTest(test_utils.GenericTestBase):
     def test_normal_user_cannot_edit_topic(self):
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
+            self.get_json(
                 '/mock/%s' % self.topic_id, expect_errors=True,
                 expected_status_int=401)
         self.logout()
