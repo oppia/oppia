@@ -1603,11 +1603,11 @@ class State(object):
             interaction['default_outcome']['labelled_as_correct'] = True
             interaction['default_outcome']['dest'] = None
             interaction['hints'].append({
-                        'hint_content': {
-                            'html': 'hint one',
-                            'audio_translations': {}
-                        },
-                    })
+                'hint_content': {
+                    'html': 'hint one',
+                    'audio_translations': {}
+                }
+            })
             interaction['solution'] = solution
 
         interaction = InteractionInstance.from_dict(interaction)

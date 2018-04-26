@@ -169,7 +169,7 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
             'dummy', 'Question 2',
             exp_domain.State.create_default_state(
                 'ABC', is_question=True).to_dict(),
-             1, 'en')
+            1, 'en')
         payload['question'] = another_question.to_dict()
         response_json = self.post_json(
             feconf.QUESTION_CREATION_URL, payload, csrf_token,

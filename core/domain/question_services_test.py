@@ -41,7 +41,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'dummy', 'A Question',
             exp_domain.State.create_default_state(
                 'ABC', is_question=True).to_dict(),
-             1, 'en')
+            1, 'en')
 
         question_id = question_services.add_question(self.owner_id, question)
         question = question_services.get_question_by_id(question_id)
@@ -53,7 +53,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'dummy', 'A Question',
             exp_domain.State.create_default_state(
                 'ABC', is_question=True).to_dict(),
-             1, 'en')
+            1, 'en')
 
         question1_id = question_services.add_question(
             self.owner_id, question)
@@ -61,7 +61,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'dummy2', 'A Question2',
             exp_domain.State.create_default_state(
                 'ABC', is_question=True).to_dict(),
-             1, 'en')
+            1, 'en')
 
         question2_id = question_services.add_question(
             self.owner_id, question)
@@ -96,7 +96,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'dummy', 'A Question',
             exp_domain.State.create_default_state(
                 'ABC', is_question=True).to_dict(),
-             1, 'en')
+            1, 'en')
 
         question_id = question_services.add_question(self.owner_id, question)
         question_services.delete_question(
