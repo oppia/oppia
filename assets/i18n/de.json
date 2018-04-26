@@ -244,6 +244,7 @@
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_NO_CURRENT_STATE": "Huch! Dieser Status ist nicht mehr vorhanden!",
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_SUGGESTED_STATE_CONTENT_HEADER": "Vorgeschlagen:",
 	"I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT": "Vorschlag",
+	"I18N_LEARNER_DASHBOARD_TOOLTIP": "Sammlungen sind mehrere ähnliche Erforschungen, die zur Vervollständigung in einer Reihenfolge beabsichtigt sind.",
 	"I18N_LEARNER_DASHBOARD_VIEW_SUGGESTION": "Vorschlag ansehen",
 	"I18N_LIBRARY_ACTIVITY_COMPLETED_ICON": "Du hast dies vervollständigt",
 	"I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST": "Bereits zur Spielliste hinzugefügt",
