@@ -115,10 +115,11 @@ def check_can_edit_topic(user, topic_rights):
 
     if topic_rights is None:
         return False
+    if role_services.ACTION_EDIT_ANY_TOPIC in user.actions:
+        return True
     if role_services.ACTION_EDIT_OWNED_TOPIC not in user.actions:
         return False
-    if ((role_services.ACTION_EDIT_ANY_TOPIC in user.actions) or
-            topic_rights.is_manager(user.user_id)):
+    if topic_rights.is_manager(user.user_id):
         return True
 
     return False
@@ -128,7 +129,7 @@ def assign_role(committer, assignee_id, new_role, topic_id):
     """Assigns a new role to the user.
 
     Args:
-        committer: UserActionsInfo. UserActionInfo object for the user
+        committer: UserActionsInfo. UserActionsInfo object for the user
             who is performing the action.
         assignee_id: str. ID of the user whose role is being changed.
         new_role: str. The name of the new role. Possible values are:
@@ -153,16 +154,17 @@ def assign_role(committer, assignee_id, new_role, topic_id):
             'UnauthorizedUserException: Could not assign new role.')
 
     assignee_username = user_services.get_username(assignee_id)
-    old_role = ''
+    
+    old_role = topic_domain.ROLE_NONE
+    if topic_rights.is_manager(assignee_id):
+        old_role = topic_domain.ROLE_MANAGER
 
     if new_role == topic_domain.ROLE_MANAGER:
         if topic_rights.is_manager(assignee_id):
             raise Exception('This user already is a manager for this topic')
-        old_role = topic_domain.ROLE_NONE
         topic_rights.manager_ids.append(assignee_id)
     elif new_role == topic_domain.ROLE_NONE:
         if topic_rights.is_manager(assignee_id):
-            old_role = topic_domain.ROLE_MANAGER
             topic_rights.manager_ids.remove(assignee_id)
         else:
             old_role = topic_domain.ROLE_NONE

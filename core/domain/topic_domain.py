@@ -55,6 +55,6 @@ class TopicRights(object):
             user_id: str or None. Id of the user.
 
         Returns:
-            bool. Whether user is in topic managers.
+            bool. Whether user is a topic manager of this topic.
         """
         return bool(user_id in self.manager_ids)

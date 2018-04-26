@@ -42,7 +42,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             self.topic_id, user_ids)
         expected_dict = {
             'topic_id': self.topic_id,
-            'manager_names': user_services.get_human_readable_user_ids(user_ids)
+            'manager_names': ['A', 'B']
         }
 
         self.assertEqual(expected_dict, topic_rights.to_dict())
