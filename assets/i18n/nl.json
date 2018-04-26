@@ -278,7 +278,7 @@
 	"I18N_SIGNUP_USERNAME_EXPLANATION": "Uw gebruikersnaam wordt weergegeven naast uw bijdragen.",
 	"I18N_SIGNUP_WAIVER_OBJECTIVE": "Door afstand te doen van de eis voor naamsvermelding (BY), hoeft iemand die dit werk hergebruikt, niet verplicht de auteurs te vermelden. Al uw individuele bijdragen aan verkenningen zijn echter beschikbaar op deze site in het wijzigenlogboek van verkenningen, en de mensen die verkenningen hergebruiken worden aangemoedigd (maar zijn niet verplicht) om een koppeling naar deze pagina te leveren.",
 	"I18N_SIGNUP_WHY_LICENSE": "Waarom CC BY-SA?",
-	"I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION": "De lessen van Oppia, ook wel bekend als verkeningen, bieden een meer rijkere ervaring dan statische video's of tekst, en helpen gebruikers te leren door te doen.",
+	"I18N_SPLASH_FIRST_EXPLORATION_DESCRIPTION": "De lessen van Oppia, ook wel bekend als verkenningen, bieden een meer rijkere ervaring dan statische video's of tekst, en helpen gebruikers te leren door te doen.",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION": "Oppia is een gratis, open-source leerplatform vol met interactieve activiteiten die we \"verkenningen\" noemen. Oppia heeft helaas JavaScript nodig, en JavaScript moet ingeschakeld zijn in uw webbrowser om Oppia goed te laten functioneren. In uw browser is JavaScript uitgeschakeld. <a href=\"<[hrefUrl]>\">Hulp nodig hebt bij het inschakelen van JavaScript?</a>",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_THANKS": "Bedankt.",
 	"I18N_SPLASH_JAVASCRIPT_ERROR_TITLE": "We hebben JavaScript in uw browser nodig",
