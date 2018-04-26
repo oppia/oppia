@@ -1138,7 +1138,7 @@ class InteractionInstance(object):
             outcomes.append(self.default_outcome)
         return outcomes
 
-    def validate(self, exp_param_specs_dict):
+    def validate(self, exp_param_specs_dict, is_question=False):
         """Validates various properties of the InteractionInstance.
 
         Args:
@@ -1146,6 +1146,10 @@ class InteractionInstance(object):
                 the exploration. Keys are parameter names and values are
                 ParamSpec value objects with an object type property(obj_type).
                 Is used to validate AnswerGroup objects.
+            is_question: bool. Whether the interaction is in a state that is
+                part of a Question object, in which case, the validation checks
+                for outcomes are not required, as they are done in
+                question_domain.py itself.
 
         Raises:
             ValidationError: One or more attributes of the InteractionInstance
@@ -1179,10 +1183,11 @@ class InteractionInstance(object):
             raise utils.ValidationError(
                 'Terminal interactions must not have any answer groups.')
 
-        for answer_group in self.answer_groups:
-            answer_group.validate(interaction, exp_param_specs_dict)
-        if self.default_outcome is not None:
-            self.default_outcome.validate()
+        if not is_question:
+            for answer_group in self.answer_groups:
+                answer_group.validate(interaction, exp_param_specs_dict)
+            if self.default_outcome is not None:
+                self.default_outcome.validate()
 
         if not isinstance(self.hints, list):
             raise utils.ValidationError(
@@ -1269,7 +1274,8 @@ class State(object):
             interaction.hints, interaction.solution)
         self.classifier_model_id = classifier_model_id
 
-    def validate(self, exp_param_specs_dict, allow_null_interaction):
+    def validate(self, exp_param_specs_dict, allow_null_interaction,
+                 is_question=False):
         """Validates various properties of the State.
 
         Args:
@@ -1280,6 +1286,8 @@ class State(object):
                 question.
             allow_null_interaction. bool. Whether this state's interaction is
                 allowed to be unspecified.
+            is_question. bool. Whether the state is a part of a Question object,
+                in which case, the validation checks for outcomes are different.
 
         Raises:
             ValidationError: One or more attributes of the State are invalid.
@@ -1297,7 +1305,7 @@ class State(object):
             raise utils.ValidationError(
                 'This state does not have any interaction specified.')
         elif self.interaction.id is not None:
-            self.interaction.validate(exp_param_specs_dict)
+            self.interaction.validate(exp_param_specs_dict, is_question)
 
     def get_training_data(self):
         """Retrieves training data from the State domain object."""
@@ -1564,24 +1572,46 @@ class State(object):
 
     @classmethod
     def create_default_state(
-            cls, default_dest_state_name, is_initial_state=False):
+            cls, default_dest_state_name, is_initial_state=False,
+            is_question=False):
         """Return a State domain object with default value.
 
         Args:
             default_dest_state_name: str. The default destination state.
             is_initial_state: bool. Whether this state represents the initial
                 state of an exploration.
+            is_question: bool. Whether this state is a part of a Question
+                object.
 
         Returns:
             State. The corresponding State domain object.
         """
         content_html = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
-        return cls(
-            SubtitledHtml(content_html, {}),
-            [],
-            InteractionInstance.create_default_interaction(
-                default_dest_state_name))
+        interaction = InteractionInstance.create_default_interaction(
+            default_dest_state_name).to_dict()
+        if is_question:
+            solution = {
+                'answer_is_exclusive': False,
+                'correct_answer': 'helloworld!',
+                'explanation': {
+                    'html': 'hello_world is a string',
+                    'audio_translations': {}
+                }
+            }
+            interaction['id'] = 'Continue'
+            interaction['default_outcome']['labelled_as_correct'] = True
+            interaction['default_outcome']['dest'] = None
+            interaction['hints'].append({
+                        'hint_content': {
+                            'html': 'hint one',
+                            'audio_translations': {}
+                        },
+                    })
+            interaction['solution'] = solution
+
+        interaction = InteractionInstance.from_dict(interaction)
+        return cls(SubtitledHtml(content_html, {}), [], interaction)
 
 
 class ExplorationVersionsDiff(object):

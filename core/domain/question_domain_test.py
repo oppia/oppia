@@ -44,7 +44,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def test_validation(self):
         """Test to verify validate method of Question domain object."""
 
-        state = exp_domain.State.create_default_state('ABC')
+        state = exp_domain.State.create_default_state('ABC', is_question=True)
         question_data = state.to_dict()
 
         test_object = {

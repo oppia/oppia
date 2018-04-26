@@ -39,7 +39,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_get_question_by_id(self):
         question = question_domain.Question(
             'dummy', 'A Question',
-            exp_domain.State.create_default_state('ABC').to_dict(), 1, 'en')
+            exp_domain.State.create_default_state(
+                'ABC', is_question=True).to_dict(),
+             1, 'en')
 
         question_id = question_services.add_question(self.owner_id, question)
         question = question_services.get_question_by_id(question_id)
@@ -49,13 +51,17 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_get_questions_by_ids(self):
         question = question_domain.Question(
             'dummy', 'A Question',
-            exp_domain.State.create_default_state('ABC').to_dict(), 1, 'en')
+            exp_domain.State.create_default_state(
+                'ABC', is_question=True).to_dict(),
+             1, 'en')
 
         question1_id = question_services.add_question(
             self.owner_id, question)
         question = question_domain.Question(
             'dummy2', 'A Question2',
-            exp_domain.State.create_default_state('ABC').to_dict(), 1, 'en')
+            exp_domain.State.create_default_state(
+                'ABC', is_question=True).to_dict(),
+             1, 'en')
 
         question2_id = question_services.add_question(
             self.owner_id, question)
@@ -66,7 +72,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(questions[1].title, 'A Question2')
 
     def test_add_question(self):
-        state = exp_domain.State.create_default_state('ABC')
+        state = exp_domain.State.create_default_state('ABC', is_question=True)
         question_data = state.to_dict()
         question_id = 'dummy'
         title = 'A Question'
@@ -88,8 +94,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_delete_question(self):
         question = question_domain.Question(
             'dummy', 'A Question',
-            exp_domain.State.create_default_state('ABC').to_dict(),
-            1, 'en')
+            exp_domain.State.create_default_state(
+                'ABC', is_question=True).to_dict(),
+             1, 'en')
 
         question_id = question_services.add_question(self.owner_id, question)
         question_services.delete_question(
@@ -101,7 +108,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_models.QuestionModel.get(question_id)
 
     def test_update_question(self):
-        state = exp_domain.State.create_default_state('ABC')
+        state = exp_domain.State.create_default_state('ABC', is_question=True)
         question_data = state.to_dict()
         question_id = 'dummy'
         title = 'A Question'

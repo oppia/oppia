@@ -45,7 +45,9 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
 
         self.question = question_domain.Question(
             'dummy', 'A Question',
-            exp_domain.State.create_default_state('ABC').to_dict(), 1, 'en')
+            exp_domain.State.create_default_state(
+                'ABC', is_question=True).to_dict(),
+            1, 'en')
 
     def test_delete(self):
         question_id = question_services.add_question(
@@ -165,7 +167,9 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
 
         another_question = question_domain.Question(
             'dummy', 'Question 2',
-            exp_domain.State.create_default_state('ABC').to_dict(), 1, 'en')
+            exp_domain.State.create_default_state(
+                'ABC', is_question=True).to_dict(),
+             1, 'en')
         payload['question'] = another_question.to_dict()
         response_json = self.post_json(
             feconf.QUESTION_CREATION_URL, payload, csrf_token,
