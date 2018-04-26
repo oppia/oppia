@@ -154,7 +154,7 @@ def assign_role(committer, assignee_id, new_role, topic_id):
             'UnauthorizedUserException: Could not assign new role.')
 
     assignee_username = user_services.get_username(assignee_id)
-    
+
     old_role = topic_domain.ROLE_NONE
     if topic_rights.is_manager(assignee_id):
         old_role = topic_domain.ROLE_MANAGER
