@@ -4090,25 +4090,7 @@ class StateIdMapping(object):
         # Analyse each command in change list one by one to create state id
         # mapping for new exploration.
         for change_dict in change_list:
-            # During v1 -> v2 migration of states, all pseudo END states were
-            # replaced by an explicit END state through this migration.
-            # We account for that change in the state id mapping too.
-            if change_dict['cmd'] == 'migrate_states_schema_to_latest_version':
-                pseudo_end_state_name = 'END'
-                if int(change_dict['from_version']) < 2 <= int(
-                        change_dict['to_version']):
-                    # The explicit end state is created only if there is some
-                    # state that used to refer to an implicit 'END' state.
-                    # This is confirmed by checking that there is a state
-                    # called 'END' in the immediate version of the exploration
-                    # after migration and no state called 'END' is present
-                    # in previous version of exploration.
-                    if (pseudo_end_state_name in (
-                            new_exploration.states) and (
-                                pseudo_end_state_name not in (
-                                    self.state_names_to_ids))):
-                        new_state_names.append(pseudo_end_state_name)
-            elif change_dict['cmd'] == CMD_ADD_STATE:
+            if change_dict['cmd'] == CMD_ADD_STATE:
                 new_state_names.append(change_dict['state_name'])
                 assert change_dict['state_name'] not in (
                     state_ids_to_names.values())
@@ -4163,7 +4145,19 @@ class StateIdMapping(object):
         # Go through each state id and name and compare the new state
         # with its corresponding old state to find whether significant
         # change has happened or not.
+        state_ids_to_be_removed = []
         for (state_id, state_name) in state_ids_to_names.iteritems():
+            if state_name == 'END' and state_name not in new_exploration.states:
+                # If previous version of exploration has END state but new
+                # version does not have END state. In addition, there is no
+                # commit command corresponding to rename or removal of END
+                # state then END state was added to previouos exploratio
+                # verison by states dict schema migration from v2 to v3 and it
+                # was not added to new exploration version by the migration as
+                # new version does not have any rules having 'END' state as
+                # their destination state name.
+                state_ids_to_be_removed.append(state_id)
+                continue
             new_state = new_exploration.states[state_name]
             old_state = old_exploration.states[old_state_ids_to_names[state_id]]
 
@@ -4172,6 +4166,10 @@ class StateIdMapping(object):
                 # new state and assign new state id to that state.
                 new_state_names_to_ids.pop(state_name)
                 new_state_names.append(state_name)
+
+        if state_ids_to_be_removed:
+            for state_id in state_ids_to_be_removed:
+                state_ids_to_names.pop(state_id)
 
         # Assign new ids to each state in new state names list.
         largest_state_id_used = self.largest_state_id_used
@@ -4223,6 +4221,9 @@ class StateIdMapping(object):
         if not all(state_ids) <= self.largest_state_id_used:
             raise Exception(
                 'Assigned state ids should be smaller than last state id used.')
+
+        if not all(isinstance(x, int) for x in state_ids):
+            raise Exception('Assigned state ids should be integer values.')
 
     def get_state_id(self, state_name):
         """Get state id for given state name.
