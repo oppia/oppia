@@ -117,8 +117,7 @@ oppia.factory('AnswerClassificationService', [
           for (var i = 0; i < answerGroups.length; i++) {
             if (answerGroups[i].trainingData) {
               for (var j = 0; j < answerGroups[i].trainingData.length; j++) {
-                if (interactionRulesService.TrainingDataClassification(
-                  answer, answerGroups[i].trainingData[j])) {
+                if (angular.equals(answer, answerGroups[i].trainingData[j])) {
                   return objectFactory.createNew(
                     answerGroups[i].outcome, i, null,
                     TRAINING_DATA_CLASSIFICATION);

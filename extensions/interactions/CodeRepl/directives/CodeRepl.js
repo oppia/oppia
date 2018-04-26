@@ -343,10 +343,6 @@ oppia.factory('codeReplRulesService', [
         var normalizedError = $filter('normalizeWhitespace')(answer.error);
         var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
         return normalizedError.indexOf(normalizedSnippet) !== -1;
-      },
-      TrainingDataClassification: function(answer, inputs) {
-        return CodeNormalizerService.getNormalizedCode(answer.code) ===
-        CodeNormalizerService.getNormalizedCode(inputs.code);
       }
     };
   }
