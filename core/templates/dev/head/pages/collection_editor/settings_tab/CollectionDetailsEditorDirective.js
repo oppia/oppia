@@ -121,7 +121,7 @@ oppia.directive('collectionDetailsEditor', [
             $scope.displayedCollectionTags = normalizeTags(
               $scope.displayedCollectionTags);
             if (!CollectionValidationService.isTagValid(
-                  $scope.displayedCollectionTags)) {
+              $scope.displayedCollectionTags)) {
               AlertsService.addWarning(
                 'Please ensure that there are no duplicate tags and that all ' +
                 'tags contain only lower case and spaces.');

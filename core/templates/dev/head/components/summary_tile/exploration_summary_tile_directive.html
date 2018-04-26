@@ -3,7 +3,8 @@
                          activity-id="getExplorationId()"
                          activity-title="getExplorationTitle()"
                          container-is-narrow="isContainerNarrow()"
-                         activity-active="explorationIsCurrentlyHoveredOver">
+                         activity-active="explorationIsCurrentlyHoveredOver"
+                         add-to-playlist-icon-is-shown="!isOwnedByCurrentUser()">
 </learner-dashboard-icons>
 
 <md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}, {'oppia-activity-playlist-tile': isPlaylistTile()}]"
@@ -17,7 +18,7 @@
       </h3>
 
       <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
-      <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
+      <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars">
         <div>
           <circular-image ng-if="avatarsList.length > 0"
                           src="avatarsList[0].image"

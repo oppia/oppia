@@ -330,12 +330,12 @@ oppia.factory('ExplorationSaveService', [
 
                 if (ExplorationStatesService.isInitialized()) {
                   var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2
-                  .some(
-                    function(categoryItem) {
-                      return categoryItem.id ===
+                    .some(
+                      function(categoryItem) {
+                        return categoryItem.id ===
                       ExplorationCategoryService.savedMemento;
-                    }
-                  );
+                      }
+                    );
 
                   // If the current category is not in the dropdown, add it
                   // as the first option.
@@ -434,14 +434,14 @@ oppia.factory('ExplorationSaveService', [
                   onEndLoadingCallback();
                 }
                 openPublishExplorationModal(
-                    onStartLoadingCallback, onEndLoadingCallback)
+                  onStartLoadingCallback, onEndLoadingCallback)
                   .then(function() {
                     whenModalsClosed.resolve();
                   });
               });
             } else {
               openPublishExplorationModal(
-                  onStartLoadingCallback, onEndLoadingCallback)
+                onStartLoadingCallback, onEndLoadingCallback)
                 .then(function() {
                   whenModalsClosed.resolve();
                 });
@@ -450,7 +450,7 @@ oppia.factory('ExplorationSaveService', [
         } else {
           // No further metadata is needed. Open the publish modal immediately.
           openPublishExplorationModal(
-              onStartLoadingCallback, onEndLoadingCallback)
+            onStartLoadingCallback, onEndLoadingCallback)
             .then(function() {
               whenModalsClosed.resolve();
             });

@@ -48,7 +48,8 @@ oppia.directive('explorationSummaryTile', [
         getParentExplorationIds: '&parentExplorationIds',
         showLearnerDashboardIconsIfPossible: (
           '&showLearnerDashboardIconsIfPossible'),
-        isContainerNarrow: '&containerIsNarrow'
+        isContainerNarrow: '&containerIsNarrow',
+        isOwnedByCurrentUser: '&activityIsOwnedByCurrentUser',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +
@@ -95,9 +96,9 @@ oppia.directive('explorationSummaryTile', [
             contributorsSummary).sort(
             function(contributorUsername1, contributorUsername2) {
               var commitsOfContributor1 = contributorsSummary[
-                  contributorUsername1].num_commits;
+                contributorUsername1].num_commits;
               var commitsOfContributor2 = contributorsSummary[
-                  contributorUsername2].num_commits;
+                contributorUsername2].num_commits;
               return commitsOfContributor2 - commitsOfContributor1;
             }
           );

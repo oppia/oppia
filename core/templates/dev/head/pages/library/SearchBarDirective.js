@@ -173,7 +173,7 @@ oppia.directive('searchBar', [
 
             $scope.searchQuery =
              SearchService.updateSearchFieldsBasedOnUrlQuery(
-              $window.location.search, $scope.selectionDetails);
+               $window.location.search, $scope.selectionDetails);
 
             updateSelectionDetails('categories');
             updateSelectionDetails('languageCodes');

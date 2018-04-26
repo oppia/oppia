@@ -25,6 +25,7 @@
 // NOTE TO DEVELOPERS: the properties 'prerequisite_skills' and
 // 'acquired_skills' are deprecated. Do not use them.
 oppia.constant('CMD_ADD_COLLECTION_NODE', 'add_collection_node');
+oppia.constant('CMD_SWAP_COLLECTION_NODES', 'swap_nodes');
 oppia.constant('CMD_DELETE_COLLECTION_NODE', 'delete_collection_node');
 oppia.constant('CMD_EDIT_COLLECTION_PROPERTY', 'edit_collection_property');
 oppia.constant(
@@ -42,22 +43,22 @@ oppia.constant(
   'COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS', 'acquired_skill_ids');
 
 oppia.factory('CollectionUpdateService', [
-  'CollectionNodeObjectFactory', 'CollectionSkillObjectFactory',
+  'CollectionNodeObjectFactory',
   'ChangeObjectFactory', 'UndoRedoService',
-  'CMD_ADD_COLLECTION_NODE', 'CMD_DELETE_COLLECTION_NODE',
-  'CMD_EDIT_COLLECTION_PROPERTY', 'CMD_EDIT_COLLECTION_NODE_PROPERTY',
-  'COLLECTION_PROPERTY_TITLE', 'COLLECTION_PROPERTY_CATEGORY',
-  'COLLECTION_PROPERTY_OBJECTIVE',
+  'CMD_ADD_COLLECTION_NODE', 'CMD_SWAP_COLLECTION_NODES',
+  'CMD_DELETE_COLLECTION_NODE', 'CMD_EDIT_COLLECTION_PROPERTY',
+  'CMD_EDIT_COLLECTION_NODE_PROPERTY', 'COLLECTION_PROPERTY_TITLE',
+  'COLLECTION_PROPERTY_CATEGORY', 'COLLECTION_PROPERTY_OBJECTIVE',
   'COLLECTION_PROPERTY_LANGUAGE_CODE', 'COLLECTION_PROPERTY_TAGS',
   'COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS',
   'COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS',
   'CMD_ADD_COLLECTION_SKILL', 'CMD_DELETE_COLLECTION_SKILL', function(
-      CollectionNodeObjectFactory, CollectionSkillObjectFactory,
+      CollectionNodeObjectFactory,
       ChangeObjectFactory, UndoRedoService,
-      CMD_ADD_COLLECTION_NODE, CMD_DELETE_COLLECTION_NODE,
-      CMD_EDIT_COLLECTION_PROPERTY, CMD_EDIT_COLLECTION_NODE_PROPERTY,
-      COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
-      COLLECTION_PROPERTY_OBJECTIVE,
+      CMD_ADD_COLLECTION_NODE, CMD_SWAP_COLLECTION_NODES,
+      CMD_DELETE_COLLECTION_NODE, CMD_EDIT_COLLECTION_PROPERTY,
+      CMD_EDIT_COLLECTION_NODE_PROPERTY, COLLECTION_PROPERTY_TITLE,
+      COLLECTION_PROPERTY_CATEGORY, COLLECTION_PROPERTY_OBJECTIVE,
       COLLECTION_PROPERTY_LANGUAGE_CODE, COLLECTION_PROPERTY_TAGS,
       COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
       COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
@@ -108,61 +109,12 @@ oppia.factory('CollectionUpdateService', [
       return _getParameterFromChangeDict(changeDict, 'exploration_id');
     };
 
-    var _getSkillNameFromChangeDict = function(changeDict) {
-      return _getParameterFromChangeDict(changeDict, 'name');
+    var _getFirstIndexFromChangeDict = function(changeDict) {
+      return _getParameterFromChangeDict(changeDict, 'first_index');
     };
 
-    var _getSkillIdFromChangeDict = function(changeDict) {
-      return _getParameterFromChangeDict(changeDict, 'skill_id');
-    };
-
-    // A mutator object which provides generic apply() and reverse() functions
-    // for changing the skill IDs of a collection. The skillIdsGetterCallback()
-    // takes a CollectionNode domain object and needs to return a list of skill
-    // IDs whose elements can be updated. The oldSkillIds parameter must be a
-    // copy of the current skill IDs.
-    var SetSkillIdsMutator = function(oldSkillIds, skillIdsGetterCallback) {
-      var _getCollectionNode = function(changeDict, collection) {
-        var explorationId = _getExplorationIdFromChangeDict(changeDict);
-        return collection.getCollectionNodeByExplorationId(explorationId);
-      };
-      this.apply = function(changeDict, collection) {
-        var newSkillIds = _getNewPropertyValueFromChangeDict(changeDict);
-        var collectionNode = _getCollectionNode(changeDict, collection);
-        var skillIds = skillIdsGetterCallback(collectionNode);
-        // Empty the list.
-        skillIds.length = 0;
-        // Add new skill IDs to the list without changing its binding.
-        newSkillIds.forEach(function(newSkillId) {
-          skillIds.push(newSkillId);
-        });
-      };
-      this.reverse = function(changeDict, collection) {
-        var collectionNode = _getCollectionNode(changeDict, collection);
-        var skillIds = skillIdsGetterCallback(collectionNode);
-        // Empty the list.
-        skillIds.length = 0;
-        // Add new skill IDs to the list without changing its binding.
-        oldSkillIds.forEach(function(oldSkillId) {
-          skillIds.push(oldSkillId);
-        });
-      };
-    };
-
-    // An instance of SetSkillIdsMutator with apply() and reverse() functions
-    // which affect the prerequisite skill IDs of a collecton node.
-    var SetPrerequisiteSkillIdsMutator = function(oldSkillIds) {
-      return new SetSkillIdsMutator(oldSkillIds, function(collectionNode) {
-        return collectionNode.getPrerequisiteSkillIds();
-      });
-    };
-
-    // An instance of SetSkillIdsMutator with apply() and reverse() functions
-    // which affect the acquired skill IDs of a collecton node.
-    var SetAcquiredSkillIdsMutator = function(oldSkillIds) {
-      return new SetSkillIdsMutator(oldSkillIds, function(collectionNode) {
-        return collectionNode.getAcquiredSkillIds();
-      });
+    var _getSecondIndexFromChangeDict = function(changeDict) {
+      return _getParameterFromChangeDict(changeDict, 'second_index');
     };
 
     // These functions are associated with updates available in
@@ -190,6 +142,25 @@ oppia.factory('CollectionUpdateService', [
           // Undo.
           var explorationId = _getExplorationIdFromChangeDict(changeDict);
           collection.deleteCollectionNode(explorationId);
+        });
+      },
+
+      swapNodes: function(collection, firstIndex, secondIndex) {
+        _applyChange(collection, CMD_SWAP_COLLECTION_NODES, {
+          first_index: firstIndex,
+          second_index: secondIndex
+        }, function(changeDict, collection) {
+          // Apply.
+          var firstIndex = _getFirstIndexFromChangeDict(changeDict);
+          var secondIndex = _getSecondIndexFromChangeDict(changeDict);
+
+          collection.swapCollectionNodes(firstIndex, secondIndex);
+        }, function(changeDict, collection) {
+          // Undo.
+          var firstIndex = _getFirstIndexFromChangeDict(changeDict);
+          var secondIndex = _getSecondIndexFromChangeDict(changeDict);
+
+          collection.swapCollectionNodes(firstIndex, secondIndex);
         });
       },
 
@@ -301,79 +272,6 @@ oppia.factory('CollectionUpdateService', [
             // Undo.
             collection.setTags(oldTags);
           });
-      },
-
-      /**
-       * Adds a new skill to the collection, and records the change in the
-       * undo/redo service.
-       */
-      addCollectionSkill: function(collection, skillName) {
-        var oldNextSkillIndex = collection.getNextSkillIndex();
-        _applyChange(
-          collection, CMD_ADD_COLLECTION_SKILL, {
-            name: skillName
-          }, function(changeDict, collection) {
-            // Apply.
-            var skillName = _getSkillNameFromChangeDict(changeDict);
-            var skillId = collection.getNewSkillId();
-            var collectionSkill =
-              CollectionSkillObjectFactory.createFromIdAndName(
-                skillId, skillName);
-            collection.addCollectionSkill(collectionSkill);
-          }, function(changeDict, collection) {
-            // Undo.
-            var skillName = _getSkillNameFromChangeDict(changeDict);
-            var skillId = collection.getSkillIdFromName(skillName);
-            collection.deleteCollectionSkill(skillId);
-            collection.setNextSkillIndex(oldNextSkillIndex);
-          });
-      },
-
-      /**
-       * Deletes a skill from the collection, and records the change in the
-       * undo/redo service.
-       */
-      deleteCollectionSkill: function(collection, skillId) {
-        var oldCollectionSkill = angular.copy(collection.getSkill(skillId));
-        _applyChange(
-          collection, CMD_DELETE_COLLECTION_SKILL, {
-            skill_id: skillId
-          }, function(changeDict, collection) {
-            // Apply.
-            var skillId = _getSkillIdFromChangeDict(changeDict);
-            collection.deleteCollectionSkill(skillId);
-          }, function(changeDict, collection) {
-            // Undo.
-            collection.addCollectionSkill(oldCollectionSkill);
-          });
-      },
-
-      /**
-       * Changes the prerequisite skill ids of an exploration within a
-       * collection and records the change in the undo/redo service.
-       */
-      setPrerequisiteSkillIds: function(collection, explorationId, skillIds) {
-        var collectionNode = collection.getCollectionNodeByExplorationId(
-          explorationId);
-        var oldSkillIds = collectionNode.getPrerequisiteSkillIds();
-        var mutator = new SetPrerequisiteSkillIdsMutator(oldSkillIds);
-        _applyNodePropertyChange(
-          collection, COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
-          explorationId, skillIds, oldSkillIds, mutator.apply, mutator.reverse);
-      },
-
-      /**
-       * Changes the acquired skill ids of an exploration within a collection
-       * and records the change in the undo/redo service.
-       */
-      setAcquiredSkillIds: function(collection, explorationId, skillIds) {
-        var collectionNode = collection.getCollectionNodeByExplorationId(
-          explorationId);
-        var oldSkillIds = collectionNode.getAcquiredSkillIds();
-        var mutator = new SetAcquiredSkillIdsMutator(oldSkillIds);
-        _applyNodePropertyChange(
-          collection, COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
-          explorationId, skillIds, oldSkillIds, mutator.apply, mutator.reverse);
       },
 
       /**

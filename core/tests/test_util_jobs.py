@@ -33,6 +33,7 @@ import feconf
 
 class ExpCopiesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
+    """Realtime model class for ExpCopiesAggregator."""
     pass
 
 
@@ -43,6 +44,11 @@ class ExpCopiesAggregator(jobs.BaseContinuousComputationManager):
     """
     @classmethod
     def get_event_types_listened_to(cls):
+        """Returns the list of events that this class subscribes to.
+
+        Returns:
+            list. An empty list of events.
+        """
         return []
 
     @classmethod
@@ -67,14 +73,29 @@ class ExpCopiesMRJobManager(
 
     @classmethod
     def _get_continuous_computation_class(cls):
+        """Returns the ExpCopiesAggregator class associated with this MapReduce
+        job.
+        """
         return ExpCopiesAggregator
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Returns a list of datastore class references to map over."""
         return [exp_models.ExplorationModel]
 
     @staticmethod
     def map(item):
+        """Yields the id of each newly-created exploration copy, together with
+        its YAML representation.
+
+        Args:
+            item: ExplorationModel. An exploration storage model.
+
+        Yields:
+            str. The string containing exploration id of each newly-created
+                exploration. It is of the format:
+                    <exp_id>copy<copy_number>
+        """
         if ExpCopiesMRJobManager._entity_created_before_job_queued(item):
             for count in range(10):
                 yield ('%scopy%d' % (item.id, count),
@@ -82,6 +103,14 @@ class ExpCopiesMRJobManager(
 
     @staticmethod
     def reduce(exp_id, list_of_exps):
+        """Saves and publishes the newly created copy of the existing
+        exploration.
+
+        Args:
+            exp_id: str. The exploration id.
+            list_of_exps: list(str). The list containing newly-created
+                exploration copies in the YAML representation.
+        """
         for stringified_exp in list_of_exps:
             exploration = exp_domain.Exploration.from_untitled_yaml(
                 exp_id, 'Copy', 'Copies', stringified_exp)
@@ -95,6 +124,7 @@ class ExpCopiesMRJobManager(
 # Job to delete all copied explorations.
 class DeleteExpCopiesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
+    """Realtime model class for DeleteExpCopiesAggregator."""
     pass
 
 
@@ -104,6 +134,11 @@ class DeleteExpCopiesAggregator(jobs.BaseContinuousComputationManager):
     """
     @classmethod
     def get_event_types_listened_to(cls):
+        """Returns the list of events that this class subscribes to.
+
+        Returns:
+            list. An empty list of events.
+        """
         return []
 
     @classmethod
@@ -125,18 +160,29 @@ class DeleteExpCopiesMRJobManager(
 
     @classmethod
     def _get_continuous_computation_class(cls):
+        """Returns the DeleteExpCopiesAggregator class associated with this
+        MapReduce job.
+        """
         return DeleteExpCopiesAggregator
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Returns a list of datastore class references to map over."""
         return [exp_models.ExplorationModel]
 
     @staticmethod
     def map(item):
+        """Deletes the exploration with the given id if it is of the 'Copies'
+        category.
+
+        Args:
+            item: ExplorationModel. An exploration storage model.
+        """
         if item.category == 'Copies':
             exp_services.delete_exploration(
                 feconf.SYSTEM_COMMITTER_ID, item.id, force_deletion=True)
 
     @staticmethod
     def reduce(exp_id, list_of_exps):
+        """Null reduce method (not used)."""
         pass

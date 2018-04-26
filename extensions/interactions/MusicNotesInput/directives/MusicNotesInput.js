@@ -291,8 +291,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         // Creates the notes and helper-clone notes for the noteChoices div.
         var initPalette = function() {
           var noteChoicesDiv = element.find('.oppia-music-input-note-choices');
-          var validNoteArea = element.
-                               find('.oppia-music-input-valid-note-area');
+          var validNoteArea = element.find(
+            '.oppia-music-input-valid-note-area');
           for (var i = 0; i < NOTE_TYPES.length; i++) {
             var innerDiv = $('<div></div>')
               .data('noteType', NOTE_TYPES[i])
@@ -314,32 +314,33 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                     // This makes the helper clone a new draggable note.
                     var helperClone = $(ui.helper)
                     // Retains original note type (e.g. natural, flat, sharp).
-                    .data('noteType', $(this).data('noteType'))
-                    .draggable({
+                      .data('noteType', $(this).data('noteType'))
+                      .draggable({
                       // The leftPosBeforeDrag helps with the sorting of user
                       // sequence.
-                      start: function() {
-                        $(this).data(
-                          'leftPosBeforeDrag', $(this).position().left);
-                      },
-                      containment: '.oppia-music-input-valid-note-area',
-                      cursor: 'pointer',
-                      grid: [scope.HORIZONTAL_GRID_SPACING, 1],
-                      // Stops helper clone from being cloned again.
-                      helper: 'original',
-                      stack: '.oppia-music-input-note-choices div',
-                      tolerance: 'intersect',
-                      revert: function() {
-                        var draggableOptions = $(this);
-                        // If note is out of droppable or off staff, remove it.
-                        if (isCloneOffStaff(draggableOptions)) {
-                          scope._removeNotesFromNoteSequenceWithId(
-                            draggableOptions.data('noteId'));
-                          scope._sortNoteSequence();
-                          draggableOptions.remove();
+                        start: function() {
+                          $(this).data(
+                            'leftPosBeforeDrag', $(this).position().left);
+                        },
+                        containment: '.oppia-music-input-valid-note-area',
+                        cursor: 'pointer',
+                        grid: [scope.HORIZONTAL_GRID_SPACING, 1],
+                        // Stops helper clone from being cloned again.
+                        helper: 'original',
+                        stack: '.oppia-music-input-note-choices div',
+                        tolerance: 'intersect',
+                        revert: function() {
+                          var draggableOptions = $(this);
+                          // If note is out of droppable or off staff,
+                          // remove it.
+                          if (isCloneOffStaff(draggableOptions)) {
+                            scope._removeNotesFromNoteSequenceWithId(
+                              draggableOptions.data('noteId'));
+                            scope._sortNoteSequence();
+                            draggableOptions.remove();
+                          }
                         }
-                      }
-                    });
+                      });
                   }
                 }
               });
@@ -487,7 +488,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                     });
 
                     if (Math.floor(leftPos) > Math.floor(
-                        getHorizontalPosition(MAXIMUM_NOTES_POSSIBLE - 1))) {
+                      getHorizontalPosition(MAXIMUM_NOTES_POSSIBLE - 1))) {
                       $(ui.helper).remove();
                       repaintLedgerLines();
                       return;
@@ -714,7 +715,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
             _getCorrespondingNoteName(note.baseNoteMidiNumber);
 
           var accidental = (note.offset === 1 ? '#' :
-                            note.offset === 0 ? '' : 'b');
+            note.offset === 0 ? '' : 'b');
 
           return {
             readableNoteName:
@@ -740,7 +741,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           } else if (readableNoteName.length === 3) {
             // This is a note with an accidental.
             var offset = (readableNoteName[1] === '#') ? 1 :
-                         (readableNoteName[1] === 'b') ? -1 : null;
+              (readableNoteName[1] === 'b') ? -1 : null;
             if (offset === null) {
               console.error('Invalid readable note: ' + readableNoteName);
             }

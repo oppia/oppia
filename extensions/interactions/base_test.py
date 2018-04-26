@@ -22,7 +22,6 @@ import string
 import struct
 
 from core.domain import dependency_registry
-from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import interaction_registry
 from core.domain import obj_services
@@ -109,7 +108,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
     def _validate_answer_visualization_specs(self, answer_visualization_specs):
         _ANSWER_VISUALIZATIONS_SPECS_SCHEMA = [
             ('id', basestring), ('options', dict),
-            ('calculation_id', basestring), ('show_addressed_info', bool)]
+            ('calculation_id', basestring),
+            ('addressed_info_is_supported', bool)]
         _ANSWER_VISUALIZATION_KEYS = [
             item[0] for item in _ANSWER_VISUALIZATIONS_SPECS_SCHEMA]
 
@@ -446,32 +446,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     # Check that the rule has a default value.
                     self.assertIn(
                         param_obj_cls.__name__, default_object_values)
-
-    def test_trainable_interactions_have_classifiers(self):
-        all_interaction_ids = (
-            interaction_registry.Registry.get_all_interaction_ids())
-
-        for interaction_id in all_interaction_ids:
-            interaction = interaction_registry.Registry.get_interaction_by_id(
-                interaction_id)
-            if interaction.is_trainable:
-                self.assertIn(
-                    exp_domain.RULE_TYPE_CLASSIFIER, interaction.rules_dict,
-                    'Expected to find a classifier in trainable '
-                    'interaction: %s' % interaction_id)
-
-    def test_untrainable_interactions_do_not_have_classifiers(self):
-        all_interaction_ids = (
-            interaction_registry.Registry.get_all_interaction_ids())
-
-        for interaction_id in all_interaction_ids:
-            interaction = interaction_registry.Registry.get_interaction_by_id(
-                interaction_id)
-            if not interaction.is_trainable:
-                self.assertNotIn(
-                    exp_domain.RULE_TYPE_CLASSIFIER, interaction.rules_dict,
-                    'Did not expect to find a classifier in untrainable '
-                    'interaction: %s' % interaction_id)
 
     def test_trainable_interactions_have_more_than_just_a_classifier(self):
         """This ensures that trainable interactions cannot only have a soft

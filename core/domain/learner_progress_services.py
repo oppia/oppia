@@ -684,7 +684,7 @@ def _get_filtered_completed_collection_summaries(user_id, collection_summaries,
             completed_exploration_ids = (
                 exploration_ids_completed_in_collections[index])
             collection_model = completed_collections[collection_ids[index]]
-            if collection_model.get_next_exploration_ids(
+            if collection_model.get_next_exploration_id(
                     completed_exploration_ids):
                 collection_id = collection_summary.id
                 remove_collection_from_completed_list(user_id, collection_id)

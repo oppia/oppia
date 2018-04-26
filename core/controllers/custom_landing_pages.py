@@ -31,7 +31,7 @@ class FractionLandingPage(base.BaseHandler):
         viewer_type = self.request.get('viewerType')
 
         if not viewer_type:
-            viewer_type = 'student'
+            viewer_type = 'teacher'
             self.redirect('/fractions?viewerType=%s' % viewer_type)
 
         self.render_template(

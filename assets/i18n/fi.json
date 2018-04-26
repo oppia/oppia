@@ -128,7 +128,7 @@
 	"I18N_GET_STARTED_PAGE_HEADING": "Aloita!",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_11_HEADING": "Osallistu",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_2_HEADING": "Valitse aihe",
-	"I18N_GET_STARTED_PAGE_PARAGRAPH_3": "Kun olet valinnut aiheen, klikkaa vain 'Luo', ja kirjaudu sisään Google-tililläsi. Jos sinulla ei ole Google-tiliä, voit href=\"https://accounts.google.com/SignUp\" target=\"new\">luoda sen täällä</a>.",
+	"I18N_GET_STARTED_PAGE_PARAGRAPH_3": "Kun olet valinnut aiheen, klikkaa vain 'Luo', ja kirjaudu sisään Google-tililläsi. Jos sinulla ei ole Google-tiliä, voit <a href=\"https://accounts.google.com/SignUp\" target=\"new\">luoda sen täällä</a>.",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_3_HEADING": "Luo tutkimuksesi",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_6": "Lisätietoja tutkimusten luomisesta löytyy <a href=\"https://oppia.github.io/#/CreatingAnExploration\" target=\"new\"> käyttöohjeestamme</a>.",
 	"I18N_GET_STARTED_PAGE_PARAGRAPH_7_HEADING": "Julkaise tutkimuksesi",

@@ -97,7 +97,7 @@ oppia.controller('LearnerLocalNav', [
     $scope.showFlagExplorationModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_player/flag_exploration_modal_directive.html'),
+          '/pages/exploration_player/flag_exploration_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$uibModalInstance', 'PlayerPositionService',

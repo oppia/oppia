@@ -37,11 +37,11 @@ oppia.directive('answerGroupEditor', [
       controller: [
         '$scope', 'stateInteractionIdService', 'ResponsesService',
         'EditorStateService', 'AlertsService', 'INTERACTION_SPECS',
-        'RULE_TYPE_CLASSIFIER', 'RuleObjectFactory',
+        'RuleObjectFactory',
         function(
             $scope, stateInteractionIdService, ResponsesService,
             EditorStateService, AlertsService, INTERACTION_SPECS,
-            RULE_TYPE_CLASSIFIER, RuleObjectFactory) {
+            RuleObjectFactory) {
           $scope.rulesMemento = null;
           $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           $scope.editAnswerGroupForm = {};
@@ -160,19 +160,13 @@ oppia.directive('answerGroupEditor', [
             var ruleDescriptions = (
               INTERACTION_SPECS[interactionId].rule_descriptions);
             var ruleTypes = Object.keys(ruleDescriptions);
-            var ruleType = null;
-            for (var i = 0; i < ruleTypes.length; i++) {
-              if (ruleTypes[i] !== RULE_TYPE_CLASSIFIER) {
-                ruleType = ruleTypes[i];
-                break;
-              }
-            }
-            if (!ruleType) {
-              // This should never happen. An interaction must have more than
-              // just a classifier rule, as verified in a backend test suite:
+            if (ruleTypes.length === 0) {
+              // This should never happen. An interaction must have at least
+              // one rule, as verified in a backend test suite:
               //   extensions.interactions.base_test.InteractionUnitTests.
               return;
             }
+            var ruleType = ruleTypes[0];
             var description = ruleDescriptions[ruleType];
 
             var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
