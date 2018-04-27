@@ -113,12 +113,11 @@ oppia.factory('AnswerClassificationService', [
 
         if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
             ENABLE_ML_CLASSIFIERS) {
-          var objectFactory = AnswerClassificationResultObjectFactory;
           for (var i = 0; i < answerGroups.length; i++) {
             if (answerGroups[i].trainingData) {
               for (var j = 0; j < answerGroups[i].trainingData.length; j++) {
                 if (angular.equals(answer, answerGroups[i].trainingData[j])) {
-                  return objectFactory.createNew(
+                  return AnswerClassificationResultObjectFactory.createNew(
                     answerGroups[i].outcome, i, null,
                     TRAINING_DATA_CLASSIFICATION);
                 }

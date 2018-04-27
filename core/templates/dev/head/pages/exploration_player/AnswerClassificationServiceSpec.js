@@ -392,7 +392,7 @@ describe('Answer classification service with training data classification',
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    var TRAINING_DATA_CLASSIFICATION;
+    var EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION;
     var acs, sof, oof, acrof, $stateName, state, state2,
       registryService, stateClassifierMapping;
     beforeEach(inject(function($injector) {
@@ -402,6 +402,7 @@ describe('Answer classification service with training data classification',
       acrof = $injector.get('AnswerClassificationResultObjectFactory');
       TRAINING_DATA_CLASSIFICATION = $injector.get(
         'TRAINING_DATA_CLASSIFICATION');
+      EXPLICIT_CLASSIFICATION = $injector.get('EXPLICIT_CLASSIFICATION');
 
       stateName = 'stateName';
       state = sof.createFromBackendDict(stateName, {
@@ -423,7 +424,12 @@ describe('Answer classification service with training data classification',
               refresher_exploration_id: null
             },
             training_data: ['abc', 'input'],
-            rule_specs: []
+            rule_specs: [{
+              inputs: {
+                x: 'equal'
+              },
+              rule_type: 'Equals'
+            }]
           }, {
             outcome: {
               dest: 'outcome 2',
@@ -435,8 +441,13 @@ describe('Answer classification service with training data classification',
               param_changes: [],
               refresher_exploration_id: null
             },
-            training_data: ['inputxyz'],
-            rule_specs: []
+            training_data: ['xyz'],
+            rule_specs: [{
+              inputs: {
+                x: 'npu'
+              },
+              rule_type: 'Contains'
+            }]
           }],
           default_outcome: {
             dest: 'default',
@@ -457,8 +468,12 @@ describe('Answer classification service with training data classification',
     var explorationId = 'exploration';
 
     var rules = {
-      TrainingDataClassification: function(answer, input) {
+      Equals: function(answer, input) {
         return answer === input;
+      },
+      Contains: function(answer, input) {
+        return answer.toLowerCase().indexOf(
+          input.x.toLowerCase()) !== -1;
       }
     };
 
@@ -475,11 +490,23 @@ describe('Answer classification service with training data classification',
 
       expect(
         acs.getMatchingClassificationResult(
-          explorationId, stateName, state, 'inputxyz', rules)
+          explorationId, stateName, state, 'xyz', rules)
       ).toEqual(
         acrof.createNew(
           state.interaction.answerGroups[1].outcome, 1, null,
           TRAINING_DATA_CLASSIFICATION)
+      );
+    });
+
+    it('should perform explicit classification before doing training data ' +
+      'classification', function() {
+      expect(
+        acs.getMatchingClassificationResult(
+          explorationId, stateName, state, 'input', rules)
+      ).toEqual(
+        acrof.createNew(
+          state.interaction.answerGroups[1].outcome, 1, 0,
+          EXPLICIT_CLASSIFICATION)
       );
     });
   }
