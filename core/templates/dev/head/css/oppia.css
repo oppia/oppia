@@ -1951,10 +1951,7 @@ md-card.oppia-dashboard-tile {
   top: 0;
 }
 .toast-warning:before {
-    content: "\e002";
-}
-.toast-info:before {
-    content: "\e88e";
+  content: "\e002";
 }
 
 @media all and (max-width: 240px) {
