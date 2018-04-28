@@ -4,12 +4,12 @@
 <button ng-if="mobileOverlayIsShown" id="startMathInputButton" class="oppia-mathexpression-input-mobile-overlay"
         ng-click="startMobileMathInput()"></button>
 <textarea ng-if="mobileOverlayIsShown" id="fakeInputForMathExpression" class="oppia-mathexpression-input-hidden-text"></textarea>
-<private-info-tooltip id="math-input-tooltip"></private-info-tooltip>
+<private-info-tooltip class="math-input-tooltip"></private-info-tooltip>
 
 <style>
-  #math-input-tooltip {
-    padding-left: 410px;
-    padding-top: 18px;
+  .math-input-tooltip {
+    padding-left: 325px;
+    padding-top: 25px;
     position: absolute;
   }
 </style>
