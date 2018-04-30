@@ -656,6 +656,12 @@ ALLOWED_ISSUE_IDS = [
     'MultipleIncorrectSubmissions',
     'CyclicStateTransitions'
 ]
+# IDs of allowed learner actions.
+ALLOWED_ACTION_IDS = [
+    'ExplorationStart',
+    'AnswerSubmit',
+    'ExplorationQuit'
+]
 
 
 # Unfinished features.
