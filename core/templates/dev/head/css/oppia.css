@@ -672,7 +672,7 @@ body {
 
 @media (max-width: 610px) {
   .oppia-subscription-button {
-    margin: 0;
+    margin-top: 10px;
   }
 }
 
