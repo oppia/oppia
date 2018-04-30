@@ -21,15 +21,17 @@ class EarlyQuit(base.BaseExplorationIssueSpec):
     """Issue that's recorded when the learner quits the exploration early."""
 
     _customization_arg_specs = [{
-		'name': 'state_name',
-		'schema': {
-			'type': 'unicode',
-		},
-		'default_value': ''
-	}, {
-		'name': 'time_spent_in_exp_in_msecs',
-		'schema': {
-			'type': 'int',
-		},
-		'default_value': 0
-	}]
+        'name': 'state_name',
+        'description': 'State name',
+        'schema': {
+            'type': 'unicode',
+        },
+        'default_value': ''
+    }, {
+        'name': 'time_spent_in_exp_in_msecs',
+        'description': 'Time spent in the exploration before quitting',
+        'schema': {
+            'type': 'int',
+        },
+        'default_value': 0
+    }]

@@ -268,6 +268,44 @@ class StateStatsTests(test_utils.GenericTestBase):
             state_stats.validate()
 
 
+class ExplorationIssueTests(test_utils.GenericTestBase):
+    """Tests the ExplorationIssue domain object."""
+
+    def test_to_dict(self):
+        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', 1, {})
+        exp_issue_dict = exp_issue.to_dict()
+        expected_customization_args = {
+            'time_spent_in_exp_in_msecs': {
+                'value': 0
+            },
+            'state_name': {
+                'value': ''
+            }
+        }
+        self.assertEqual(exp_issue_dict, {
+            'issue_id': 'EarlyQuit',
+            'schema_version': 1,
+            'customization_args': expected_customization_args
+        })
+
+    def test_validate(self):
+        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', 1, {})
+        exp_issue.validate()
+
+        # Change issue_id to int.
+        exp_issue.issue_id = 5
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected issue_id to be a string, received %s' % (5))):
+            exp_issue.validate()
+
+        # Change schema_version to string.
+        exp_issue.issue_id = 'EarlyQuit'
+        exp_issue.schema_version = '1'
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected schema_version to be an int, received %s' % ('1'))):
+            exp_issue.validate()
+
+
 class StateAnswersTests(test_utils.GenericTestBase):
     """Tests the StateAnswers domain object."""
 

@@ -53,7 +53,7 @@ class Registry(object):
             ancestor_names = [
                 base_class.__name__ for base_class in clazz.__bases__]
             if 'BaseExplorationIssueSpec' in ancestor_names:
-                cls._interactions[clazz.__name__] = clazz()
+                cls._issues[clazz.__name__] = clazz()
 
     @classmethod
     def get_all_issues(cls):

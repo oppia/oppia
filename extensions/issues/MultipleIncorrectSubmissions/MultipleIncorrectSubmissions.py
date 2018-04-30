@@ -23,15 +23,17 @@ class MultipleIncorrectSubmissions(base.BaseExplorationIssueSpec):
     """
 
     _customization_arg_specs = [{
-		'name': 'state_name',
-		'schema': {
-			'type': 'unicode',
-		},
-		'default_value': ''
-	}, {
-		'name': 'num_times_answered_incorrectly',
-		'schema': {
-			'type': 'int',
-		},
-		'default_value': 0
-	}]
+        'name': 'state_name',
+        'description': 'State name',
+        'schema': {
+            'type': 'unicode',
+        },
+        'default_value': ''
+    }, {
+        'name': 'num_times_answered_incorrectly',
+        'description': 'Number of times incorrect answers were submitted',
+        'schema': {
+            'type': 'int',
+        },
+        'default_value': 0
+    }]

@@ -24,9 +24,10 @@ class CyclicStateTransitions(base.BaseExplorationIssueSpec):
 
     _customization_arg_specs = [{
         'name': 'state_names',
+        'description': 'List of state names',
         'schema': {
             'type': 'list',
-                'items': {
+            'items': {
                 'type': 'unicode',
             },
         },

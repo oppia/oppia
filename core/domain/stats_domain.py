@@ -21,6 +21,7 @@ import sys
 
 from core.domain import exp_domain
 from core.domain import interaction_registry
+from core.domain import issue_registry
 from core.platform import models
 import feconf
 import utils
@@ -417,36 +418,9 @@ class ExplorationIssue(object):
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
         """
-        self.id = issue_id
+        self.issue_id = issue_id
         self.schema_version = schema_version
         self.customization_args = customization_args
-
-    @property
-    def id(self):
-        """Returns ID of the issue.
-
-        Returns:
-            str. The ID of the issue.
-        """
-        return self.id
-
-    @property
-    def schema_version(self):
-        """Returns schema version of the issue.
-
-        Returns:
-            int. The schema version of the issue.
-        """
-        return self.schema_version
-
-    @property
-    def customization_args(self):
-        """Returns the customization args dict.
-
-        Returns:
-            dict. The customization dict.
-        """
-        return self.customization_args
 
     def to_dict(self):
         """Returns a dict representation of the ExplorationIssue domain object.
@@ -455,14 +429,14 @@ class ExplorationIssue(object):
             dict. A dict mapping of all fields of ExplorationIssue object.
         """
         return {
-            'id': self.id,
+            'issue_id': self.issue_id,
             'schema_version': self.schema_version,
             'customization_args': (
-                {} if self.id is None else
+                {} if self.issue_id is None else
                 exp_domain.get_full_customization_args(
                     self.customization_args,
                     issue_registry.Registry.get_issue_by_id(
-                        self.id).customization_arg_specs))
+                        self.issue_id).customization_arg_specs))
         }
 
     @classmethod
@@ -477,15 +451,16 @@ class ExplorationIssue(object):
             ExplorationIssue. The corresponding ExplorationIssue domain object.
         """
         return cls(
-            issue_dict['id'],
+            issue_dict['issue_id'],
             issue_dict['schema_version'],
             issue_dict['customization_args'])
 
     def validate(self):
         """Validates the ExplorationIssue domain object."""
-        if not isinstance(self.id, basestring):
+        if not isinstance(self.issue_id, basestring):
             raise utils.ValidationError(
-                'Expected ID to be a string, received %s' % (self.id))
+                'Expected issue_id to be a string, received %s' % (
+                    self.issue_id))
 
         if not isinstance(self.schema_version, int):
             raise utils.ValidationError(
@@ -494,12 +469,12 @@ class ExplorationIssue(object):
 
         try:
             issue = issue_registry.Registry.get_issue_by_id(
-                self.id)
+                self.issue_id)
         except KeyError:
-            raise utils.ValidationError('Invalid issue ID: %s' % self.id)
+            raise utils.ValidationError('Invalid issue ID: %s' % self.issue_id)
 
         exp_domain.validate_customization_args_and_values(
-            'issue', self.id, self.customization_args,
+            'issue', self.issue_id, self.customization_args,
             issue.customization_arg_specs)
 
 

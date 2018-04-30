@@ -16,6 +16,8 @@
 
 """Base class for defining issues."""
 
+from extensions import domain
+
 
 class BaseExplorationIssueSpec(object):
     """Base issue definition class.
@@ -30,7 +32,9 @@ class BaseExplorationIssueSpec(object):
 
     @property
     def customization_arg_specs(self):
-        return self._customization_arg_specs
+        return [
+            domain.CustomizationArgSpec(**cas)
+            for cas in self._customization_arg_specs]
 
     def to_dict(self):
         """Gets a dict representing this issue. Only default values are

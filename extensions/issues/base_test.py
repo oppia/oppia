@@ -62,15 +62,17 @@ class IssueUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(issue_dict.keys(), [
             'customization_arg_specs'])
         self.assertEqual(issue_dict['customization_arg_specs'], [{
-    		'name': 'state_name',
-    		'schema': {
-    			'type': 'unicode',
-    		},
-    		'default_value': ''
-    	}, {
-    		'name': 'time_spent_in_exp_in_msecs',
-    		'schema': {
-    			'type': 'int',
-    		},
-    		'default_value': 0
-    	}])
+            'name': 'state_name',
+            'description': 'State name',
+            'schema': {
+                'type': 'unicode',
+            },
+            'default_value': ''
+        }, {
+            'name': 'time_spent_in_exp_in_msecs',
+            'description': 'Time spent in the exploration before quitting',
+            'schema': {
+                'type': 'int',
+            },
+            'default_value': 0
+        }])
