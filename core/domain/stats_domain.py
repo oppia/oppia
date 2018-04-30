@@ -403,6 +403,106 @@ class StateStats(object):
                     '%s cannot have negative values' % (stat_property))
 
 
+class ExplorationIssue(object):
+    """Domain object representing an exploration issue."""
+
+    def __init__(self, issue_id, schema_version, customization_args):
+        """Constructs an ExplorationIssue domain object.
+
+        Args:
+            issue_id: str. ID of the Issue.
+            schema_version: int. Schema version of the customization args dict.
+            customization_args: dict. The customization dict. The keys are
+                names of customization_args and the values are dicts with a
+                single key, 'value', whose corresponding value is the value of
+                the customization arg.
+        """
+        self.id = issue_id
+        self.schema_version = schema_version
+        self.customization_args = customization_args
+
+    @property
+    def id(self):
+        """Returns ID of the issue.
+
+        Returns:
+            str. The ID of the issue.
+        """
+        return self.id
+
+    @property
+    def schema_version(self):
+        """Returns schema version of the issue.
+
+        Returns:
+            int. The schema version of the issue.
+        """
+        return self.schema_version
+
+    @property
+    def customization_args(self):
+        """Returns the customization args dict.
+
+        Returns:
+            dict. The customization dict.
+        """
+        return self.customization_args
+
+    def to_dict(self):
+        """Returns a dict representation of the ExplorationIssue domain object.
+
+        Returns:
+            dict. A dict mapping of all fields of ExplorationIssue object.
+        """
+        return {
+            'id': self.id,
+            'schema_version': self.schema_version,
+            'customization_args': (
+                {} if self.id is None else
+                exp_domain.get_full_customization_args(
+                    self.customization_args,
+                    issue_registry.Registry.get_issue_by_id(
+                        self.id).customization_arg_specs))
+        }
+
+    @classmethod
+    def from_dict(cls, issue_dict):
+        """Returns an ExplorationIssue object from a dict.
+
+        Args:
+            issue_dict: dict. A dict mapping of all fields of ExplorationIssue
+                object.
+
+        Returns:
+            ExplorationIssue. The corresponding ExplorationIssue domain object.
+        """
+        return cls(
+            issue_dict['id'],
+            issue_dict['schema_version'],
+            issue_dict['customization_args'])
+
+    def validate(self):
+        """Validates the ExplorationIssue domain object."""
+        if not isinstance(self.id, basestring):
+            raise utils.ValidationError(
+                'Expected ID to be a string, received %s' % (self.id))
+
+        if not isinstance(self.schema_version, int):
+            raise utils.ValidationError(
+                'Expected schema_version to be an int, received %s' % (
+                    self.schema_version))
+
+        try:
+            issue = issue_registry.Registry.get_issue_by_id(
+                self.id)
+        except KeyError:
+            raise utils.ValidationError('Invalid issue ID: %s' % self.id)
+
+        exp_domain.validate_customization_args_and_values(
+            'issue', self.id, self.customization_args,
+            issue.customization_arg_specs)
+
+
 # TODO(bhenning): Monitor sizes (lengths of submitted_answer_list) of these
 # objects and determine if we should enforce an upper bound for
 # submitted_answer_list.
