@@ -455,8 +455,9 @@ class BaseHandler(webapp2.RequestHandler):
         if isinstance(exception, self.PageNotFoundException):
             logging.error('Invalid URL requested: %s', self.request.uri)
             self.error(404)
-            self._render_exception(404, {
-                'error': 'Could not find the page %s.' % self.request.uri})
+            self._render_exception(
+                404, {
+                    'error': 'Could not find the page %s.' % self.request.uri})
             return
 
         if isinstance(exception, self.UnauthorizedUserException):

@@ -523,11 +523,13 @@ class SubtitledHtml(object):
         Returns:
             SubtitledHtml. The corresponding SubtitledHtml domain object.
         """
-        return cls(subtitled_html_dict['html'], {
-            language_code: AudioTranslation.from_dict(audio_translation_dict)
-            for language_code, audio_translation_dict in
-            subtitled_html_dict['audio_translations'].iteritems()
-        })
+        return cls(
+            subtitled_html_dict['html'], {
+                language_code: AudioTranslation.from_dict(
+                    audio_translation_dict)
+                for language_code, audio_translation_dict in
+                subtitled_html_dict['audio_translations'].iteritems()
+            })
 
     def validate(self):
         """Validates properties of the SubtitledHtml.
@@ -948,8 +950,9 @@ class Solution(object):
     to progress to the next card and explanation is an HTML string containing
     an explanation for the solution.
     """
-    def __init__(self, interaction_id, answer_is_exclusive,
-                 correct_answer, explanation):
+    def __init__(
+            self, interaction_id, answer_is_exclusive,
+            correct_answer, explanation):
         """Constructs a Solution domain object.
 
         Args:
@@ -1240,8 +1243,9 @@ class State(object):
         'solution': None,
     }
 
-    def __init__(self, content, param_changes, interaction,
-                 classifier_model_id=None):
+    def __init__(
+            self, content, param_changes, interaction,
+            classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:
@@ -1647,12 +1651,13 @@ class ExplorationVersionsDiff(object):
 class Exploration(object):
     """Domain object for an Oppia exploration."""
 
-    def __init__(self, exploration_id, title, category, objective,
-                 language_code, tags, blurb, author_notes,
-                 states_schema_version, init_state_name, states_dict,
-                 param_specs_dict, param_changes_list, version,
-                 auto_tts_enabled, correctness_feedback_enabled,
-                 created_on=None, last_updated=None):
+    def __init__(
+            self, exploration_id, title, category, objective,
+            language_code, tags, blurb, author_notes,
+            states_schema_version, init_state_name, states_dict,
+            param_specs_dict, param_changes_list, version,
+            auto_tts_enabled, correctness_feedback_enabled,
+            created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
         Args:
@@ -3944,13 +3949,14 @@ class Exploration(object):
 class ExplorationSummary(object):
     """Domain object for an Oppia exploration summary."""
 
-    def __init__(self, exploration_id, title, category, objective,
-                 language_code, tags, ratings, scaled_average_rating, status,
-                 community_owned, owner_ids, editor_ids,
-                 viewer_ids, contributor_ids, contributors_summary, version,
-                 exploration_model_created_on,
-                 exploration_model_last_updated,
-                 first_published_msec):
+    def __init__(
+            self, exploration_id, title, category, objective,
+            language_code, tags, ratings, scaled_average_rating, status,
+            community_owned, owner_ids, editor_ids,
+            viewer_ids, contributor_ids, contributors_summary, version,
+            exploration_model_created_on,
+            exploration_model_last_updated,
+            first_published_msec):
         """Initializes a ExplorationSummary domain object.
 
         Args:

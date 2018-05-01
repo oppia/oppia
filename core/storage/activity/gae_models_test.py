@@ -50,7 +50,8 @@ class ActivityListModelTest(test_utils.GenericTestBase):
         featured_model_instance = (
             activity_models.ActivityReferencesModel.get_or_create('featured'))
         self.assertEqual(featured_model_instance.id, 'featured')
-        self.assertEqual(featured_model_instance.activity_references, [{
-            'type': constants.ACTIVITY_TYPE_EXPLORATION,
-            'id': '0',
-        }])
+        self.assertEqual(
+            featured_model_instance.activity_references, [{
+                'type': constants.ACTIVITY_TYPE_EXPLORATION,
+                'id': '0',
+            }])

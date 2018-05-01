@@ -180,8 +180,8 @@ def create_message(
             exploration_id, thread_id, author_id, message_id)
 
 
-def update_messages_read_by_the_user(user_id, exploration_id, thread_id,
-                                     message_ids):
+def update_messages_read_by_the_user(
+        user_id, exploration_id, thread_id, message_ids):
     """Replaces the list of message ids read by the message ids given to the
     function.
 
@@ -204,8 +204,8 @@ def update_messages_read_by_the_user(user_id, exploration_id, thread_id,
     feedback_thread_user_model.put()
 
 
-def add_message_id_to_read_by_list(exploration_id, thread_id,
-                                   user_id, message_id):
+def add_message_id_to_read_by_list(
+        exploration_id, thread_id, user_id, message_id):
     """Adds the message id to the list of message ids read by the user.
 
     Args:
@@ -352,8 +352,9 @@ def get_total_open_threads(feedback_thread_analytics):
         feedback.num_open_threads for feedback in feedback_thread_analytics)
 
 
-def create_suggestion(exploration_id, author_id, exploration_version,
-                      state_name, description, suggestion_content):
+def create_suggestion(
+        exploration_id, author_id, exploration_version,
+        state_name, description, suggestion_content):
     """Creates a new SuggestionModel and the corresponding FeedbackThreadModel
     domain object.
 
