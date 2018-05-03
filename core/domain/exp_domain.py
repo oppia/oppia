@@ -91,7 +91,7 @@ STATISTICAL_CLASSIFICATION = 'statistical_classifier'
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
 
 
-def _get_full_customization_args(customization_args, ca_specs):
+def get_full_customization_args(customization_args, ca_specs):
     """Populates the given customization_args dict with default values
     if any of the expected customization_args are missing.
 
@@ -120,7 +120,7 @@ def _get_full_customization_args(customization_args, ca_specs):
     return customization_args
 
 
-def _validate_customization_args_and_values(
+def validate_customization_args_and_values(
         item_name, item_type, customization_args,
         ca_specs_to_validate_against):
     """Validates the given `customization_args` dict against the specs set out
@@ -159,7 +159,7 @@ def _validate_customization_args_and_values(
     # Validate and clean up the customization args.
 
     # Populate missing keys with the default values.
-    customization_args = _get_full_customization_args(
+    customization_args = get_full_customization_args(
         customization_args, ca_specs_to_validate_against)
 
     # Remove extra keys.
@@ -1036,7 +1036,7 @@ class InteractionInstance(object):
             'id': self.id,
             'customization_args': (
                 {} if self.id is None else
-                _get_full_customization_args(
+                get_full_customization_args(
                     self.customization_args,
                     interaction_registry.Registry.get_interaction_by_id(
                         self.id).customization_arg_specs)),
@@ -1164,7 +1164,7 @@ class InteractionInstance(object):
         except KeyError:
             raise utils.ValidationError('Invalid interaction id: %s' % self.id)
 
-        _validate_customization_args_and_values(
+        validate_customization_args_and_values(
             'interaction', self.id, self.customization_args,
             interaction.customization_arg_specs)
 
