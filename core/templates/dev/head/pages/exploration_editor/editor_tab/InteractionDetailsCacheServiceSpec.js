@@ -21,15 +21,14 @@ describe('Interaction Details Cache Service', function() {
       module('oppia');
     });
 
-
-    var customizationArgs = {
-      testCustomization : {
-        value: 'testValue'
+    var interactionCustomizationArgs = {
+      choices : {
+        value: 'SampleChoice'
       }
     };
 
-    var customization = {
-      customization : customizationArgs
+    var interaction = {
+      customization : interactionCustomizationArgs
     };
 
     var scope, idcs;
@@ -38,37 +37,37 @@ describe('Interaction Details Cache Service', function() {
       idcs = $injector.get('InteractionDetailsCacheService');
     }));
 
-    it('sets a value in the cache', function() {
-      idcs.set('InteractionId', customizationArgs);
+    it('should add interaction in the cache', function() {
+      idcs.set('InteractionId', interactionCustomizationArgs);
       expect(idcs.contains('InteractionId')).toBe(true);
     });
 
-    it('returns null when value isnt available in the cache', function() {
+    it('should return null if interaction isnt present in cache', function() {
       expect(idcs.get('NonPresentInteractionId')).toEqual(null);
     });
 
-    it('gets a value from the cache', function() {
-      idcs.set('InteractionId', customizationArgs);
-      expect(idcs.get('InteractionId')).toEqual(customization);
+    it('should get interaction details from the cache', function() {
+      idcs.set('InteractionId', interactionCustomizationArgs);
+      expect(idcs.get('InteractionId')).toEqual(interaction);
     });
 
-    it('successfully checks if the value is available in cache', function() {
-      idcs.set('InteractionId', customizationArgs);
+    it('should successfully check if interaction is in cache', function() {
+      idcs.set('InteractionId', interactionCustomizationArgs);
       expect(idcs.contains('InteractionId')).toBe(true);
       expect(idcs.contains('NonPresentInteractionId')).toBe(false);
       expect(idcs.contains('')).toBe(false);
       expect(idcs.contains(1)).toBe(false);
     });
 
-    it('removes details from the cache', function() {
-      idcs.set('InteractionId', customizationArgs);
+    it('should remove the interaction from the cache', function() {
+      idcs.set('InteractionId', interactionCustomizationArgs);
       expect(idcs.contains('InteractionId')).toBe(true);
       idcs.removeDetails('InteractionId');
       expect(idcs.contains('InteractionId')).toBe(false);
     });
 
-    it('resets the cache', function() {
-      idcs.set('InteractionId', customizationArgs);
+    it('should reset the cache', function() {
+      idcs.set('InteractionId', interactionCustomizationArgs);
       expect(idcs.contains('InteractionId')).toBe(true);
       idcs.reset();
       expect(idcs.contains('InteractionId')).toBe(false);
