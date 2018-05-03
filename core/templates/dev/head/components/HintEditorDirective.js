@@ -72,18 +72,6 @@ oppia.directive('hintEditor', [
             $scope.hintEditorIsOpen = false;
           };
 
-          $scope.onAudioTranslationsStartEditAction = function() {
-            // Close the content editor and save all existing changes to the
-            // HTML.
-            if ($scope.hintEditorIsOpen) {
-              $scope.saveThisHint();
-            }
-          };
-
-          $scope.onAudioTranslationsEdited = function() {
-            $scope.getOnSaveFn()();
-          };
-
           $scope.$on('externalSave', function() {
             if ($scope.hintEditorIsOpen &&
                 $scope.editHintForm.$valid) {

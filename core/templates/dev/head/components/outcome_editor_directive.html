@@ -65,13 +65,10 @@
     <div style="clear: both;"></div>
   </div>
 </div>
-
 <div ng-if="!outcome.feedback.getHtml().isEmpty() && displayFeedback">
-  <audio-translations-editor component-name="<[COMPONENT_NAME_FEEDBACK]>"
-                             subtitled-html="outcome.feedback"
-                             on-start-edit="onAudioTranslationsStartEditAction"
-                             on-change="onAudioTranslationsEdited">
-  </audio-translations-editor>
+  <subtitled-html-editor component-name="<[COMPONENT_NAME_FEEDBACK]>"
+                         subtitled-html="outcome.feedback">
+  </subtitled-html-editor>
 </div>
 
 <br ng-if="displayFeedback">

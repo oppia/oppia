@@ -203,19 +203,6 @@ oppia.directive('outcomeEditor', [
               $scope.savedOutcome.refresherExplorationId);
             $scope.destinationEditorIsOpen = false;
           };
-
-
-          $scope.onAudioTranslationsStartEditAction = function() {
-            // Close the content editor and save all existing changes to the
-            // HTML.
-            if ($scope.feedbackEditorIsOpen) {
-              $scope.saveThisFeedback(false);
-            }
-          };
-
-          $scope.onAudioTranslationsEdited = function() {
-            $scope.saveThisFeedback(false);
-          };
         }
       ]
     };
