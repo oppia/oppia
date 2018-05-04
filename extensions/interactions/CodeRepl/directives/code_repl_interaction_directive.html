@@ -1,3 +1,9 @@
+<style>
+  .code-repl-tooltip {
+    padding-left: 5px;
+  }
+</style>
+
 <div class="code-repl-container">
   <div>
     <!-- This ng-form is needed for submitting answer on hitting enter. -->
@@ -12,7 +18,7 @@
       </span>
     </form>
   </div>
-  <private-info-tooltip id="code-repl-tooltip"></private-info-tooltip>
+  <private-info-tooltip class="code-repl-tooltip"></private-info-tooltip>
 
   <hr>
 
@@ -24,9 +30,3 @@
     <pre ng-if="!output" class="code-repl-terminal">[No terminal output]</pre>
   </div>
 </div>
-
-<style>
-  #code-repl-tooltip {
-    padding-left: 5px;
-  }
-</style>

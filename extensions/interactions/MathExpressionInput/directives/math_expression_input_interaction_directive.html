@@ -1,11 +1,3 @@
-<div class="guppy-div"
-     style="width: 100%; height: 100px; padding: 5px;">
-</div>
-<button ng-if="mobileOverlayIsShown" id="startMathInputButton" class="oppia-mathexpression-input-mobile-overlay"
-        ng-click="startMobileMathInput()"></button>
-<textarea ng-if="mobileOverlayIsShown" id="fakeInputForMathExpression" class="oppia-mathexpression-input-hidden-text"></textarea>
-<private-info-tooltip class="math-input-tooltip"></private-info-tooltip>
-
 <style>
   .math-input-tooltip {
     padding-left: 325px;
@@ -13,3 +5,11 @@
     position: absolute;
   }
 </style>
+
+<div class="guppy-div"
+     style="width: 100%; height: 100px; padding: 5px;">
+</div>
+<button ng-if="mobileOverlayIsShown" id="startMathInputButton" class="oppia-mathexpression-input-mobile-overlay"
+        ng-click="startMobileMathInput()"></button>
+<textarea ng-if="mobileOverlayIsShown" id="fakeInputForMathExpression" class="oppia-mathexpression-input-hidden-text"></textarea>
+<private-info-tooltip class="math-input-tooltip"></private-info-tooltip>

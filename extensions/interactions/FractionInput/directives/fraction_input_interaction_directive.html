@@ -1,16 +1,3 @@
-<form ng-disabled="FractionInputForm.$invalid" ng-submit="submitAnswer(answer)" role="form" class="form-horizontal fraction-input-interaction">
-  <!-- This ng-form is needed for submitting answer on hitting enter. -->
-  <ng-form name="FractionInputForm" class="input">
-    <input type="text" name="answer" ng-model="answer" class="form-control"
-           ng-attr-placeholder="<[customPlaceholder !== '' ? customPlaceholder : (allowNonzeroIntegerPart ? ('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER' | translate) : ('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER' | translate))]>">
-  </ng-form>
-
-  <div class="oppia-form-error oppia-fraction-input-error">
-    <[getWarningText()]>
-  </div>
-</form>
-<private-info-tooltip class="fraction-input-tooltip"></private-info-tooltip>
-
 <style>
   .oppia-fraction-input-error {
     margin-top: 10px;
@@ -31,3 +18,16 @@
     width: 100%;
   }
 </style>
+
+<form ng-disabled="FractionInputForm.$invalid" ng-submit="submitAnswer(answer)" role="form" class="form-horizontal fraction-input-interaction">
+  <!-- This ng-form is needed for submitting answer on hitting enter. -->
+  <ng-form name="FractionInputForm" class="input">
+    <input type="text" name="answer" ng-model="answer" class="form-control"
+           ng-attr-placeholder="<[customPlaceholder !== '' ? customPlaceholder : (allowNonzeroIntegerPart ? ('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER' | translate) : ('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER' | translate))]>">
+  </ng-form>
+
+  <div class="oppia-form-error oppia-fraction-input-error">
+    <[getWarningText()]>
+  </div>
+</form>
+<private-info-tooltip class="fraction-input-tooltip"></private-info-tooltip>

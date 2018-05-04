@@ -1,3 +1,11 @@
+<style>
+  .multiple-choice-input-tooltip {
+    padding-bottom: 20px;
+    padding-left: 400px;
+    position: absolute;
+  }
+</style>
+
 <form ng-submit="submitAnswer(answer)">
   <div class="multiple-choice-option-container" ng-repeat="choice in choices track by $index">
     <button class="multiple-choice-option" ng-click="submitAnswer($index)">
@@ -13,11 +21,3 @@
   </div>
 </form>
 <private-info-tooltip class="multiple-choice-input-tooltip"></private-info-tooltip>
-
-<style>
-  .multiple-choice-input-tooltip {
-    padding-bottom: 20px;
-    padding-left: 400px;
-    position: absolute;
-  }
-</style>
