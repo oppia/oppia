@@ -4149,13 +4149,24 @@ class StateIdMapping(object):
         for (state_id, state_name) in state_ids_to_names.iteritems():
             if state_name == 'END' and state_name not in new_exploration.states:
                 # If previous version of exploration has END state but new
-                # version does not have END state. In addition, there is no
-                # commit command corresponding to rename or removal of END
-                # state then END state was added to previouos exploratio
-                # verison by states dict schema migration from v2 to v3 and it
-                # was not added to new exploration version by the migration as
-                # new version does not have any rules having 'END' state as
-                # their destination state name.
+                # version does not have END state then exception will be raised
+                # below when comparing old state and corresponding new state.
+                # The exception is raised because there is no commit in change
+                # list corresponding to removal or renaming of END state.
+
+                # This problem arises when following scenario occurrs:
+                # Consider an exploration with two versions a and b (a < b).
+                # Both of this version has states dict schema version set to
+                # less than 2.
+                # Now version 'a' has explicit references to END
+                # state and thus when its states dict schema version will be
+                # upgraded to latest version, an 'END' state will be added.
+                # These explicit END references are not present in version 'b',
+                # however, and so no END state will be added during states dict
+                # schema migration.
+
+                # Thus we no commit of END state's removal and
+                # there is no END state present in later version of exploraiton.
                 state_ids_to_be_removed.append(state_id)
                 continue
             new_state = new_exploration.states[state_name]
@@ -4184,6 +4195,19 @@ class StateIdMapping(object):
         state_id_map = StateIdMapping(
             new_exploration.id, new_exploration.version, new_state_names_to_ids,
             largest_state_id_used)
+
+        # Do one final check that all state names in new exploration are present
+        # in generated state names to id mapping.
+        if not set(new_state_names_to_ids.keys()) == set(
+                new_exploration.states.keys()):
+            raise Exception(
+                'State names to ids mapping does not contain '
+                'state names (%s) which are present in corresponding '
+                'exploration %s, version %d' % (
+                    (set(new_state_names_to_ids.keys()) - set(
+                        new_exploration.states.keys())),
+                    new_exploration.id, new_exploration.version))
+
         state_id_map.validate()
         return state_id_map
 
@@ -4223,7 +4247,10 @@ class StateIdMapping(object):
                 'Assigned state ids should be smaller than last state id used.')
 
         if not all(isinstance(x, int) for x in state_ids):
-            raise Exception('Assigned state ids should be integer values.')
+            raise Exception(
+                'Assigned state ids should be integer values in'
+                ' exploration %s, version %d' % (
+                    self.exploration_id, self.exploration_version))
 
     def get_state_id(self, state_name):
         """Get state id for given state name.
