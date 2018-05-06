@@ -22,7 +22,7 @@
                   class="delete-audio-translation-btn oppia-transition-200"
                   ng-click="openDeleteAudioTranslationModal(languageCode)"
                   title="Delete audio translation"
-                  ng-if="isEditable()">
+                  ng-if="isTranslatable()">
             <i class="material-icons md-18">&#xE5CD;</i>
           </button>
         </div>
@@ -30,7 +30,7 @@
     </div>
   </span>
 
-  <span class="add-audio-translation-btn-container" ng-if="isEditable() && !subtitledHtml.isFullyTranslated()">
+  <span class="add-audio-translation-btn-container" ng-if="isTranslatable() && !subtitledHtml.isFullyTranslated()">
     <button ng-click="openAddAudioTranslationModal()" class="add-audio-translation-btn">
       <i class="material-icons md-18">&#xE050;</i>
       Add audio translation...

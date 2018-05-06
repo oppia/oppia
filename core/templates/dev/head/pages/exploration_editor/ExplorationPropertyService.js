@@ -406,6 +406,7 @@ oppia.factory('ExplorationStatesService', [
       }
 
       if (!angular.equals(oldValue, newValue)) {
+        // Do something here
         ChangeListService.editStateProperty(
           stateName, backendName, newBackendValue, oldBackendValue);
 

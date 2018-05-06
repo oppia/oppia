@@ -3906,7 +3906,7 @@ class ExplorationSummary(object):
 
     def __init__(self, exploration_id, title, category, objective,
                  language_code, tags, ratings, scaled_average_rating, status,
-                 community_owned, owner_ids, editor_ids,
+                 community_owned, owner_ids, editor_ids, translator_ids,
                  viewer_ids, contributor_ids, contributors_summary, version,
                  exploration_model_created_on,
                  exploration_model_last_updated,
@@ -3932,6 +3932,8 @@ class ExplorationSummary(object):
                 this exploration.
             editor_ids: list(str). List of the users ids who have access to
                 edit this exploration.
+            translator_ids: list(str). List of the users ids who have access to
+                translate this exploration.
             viewer_ids: list(str). List of the users ids who have access to
                 view this exploration.
             contributor_ids: list(str). List of the users ids of the user who
@@ -3959,6 +3961,7 @@ class ExplorationSummary(object):
         self.community_owned = community_owned
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
+        self.translator_ids = translator_ids
         self.viewer_ids = viewer_ids
         self.contributor_ids = contributor_ids
         self.contributors_summary = contributors_summary

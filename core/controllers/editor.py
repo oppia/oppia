@@ -197,6 +197,8 @@ class ExplorationPage(EditorHandler):
             'can_release_ownership': (
                 rights_manager.check_can_release_ownership(
                     self.user, exploration_rights)),
+            'can_translate': rights_manager.check_can_translate_activity(
+                self.user, exploration_rights),
             'can_unpublish': rights_manager.check_can_unpublish_activity(
                 self.user, exploration_rights),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
@@ -305,9 +307,9 @@ class ExplorationHandler(EditorHandler):
         exploration = exp_services.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
-
         commit_message = self.payload.get('commit_message')
         change_list = self.payload.get('change_list')
+
         try:
             exp_services.update_exploration(
                 self.user_id, exploration_id, change_list, commit_message)
@@ -831,7 +833,7 @@ class AudioUploadHandler(EditorHandler):
     # to the end of 'assets/').
     _FILENAME_PREFIX = 'audio'
 
-    @acl_decorators.can_edit_exploration
+    @acl_decorators.can_translate_exploration
     def post(self, exploration_id):
         """Saves an audio file uploaded by a content creator."""
 
