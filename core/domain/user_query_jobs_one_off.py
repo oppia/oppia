@@ -36,8 +36,8 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     For each user we check if he/she satisfies query criteria. If the user
     satisfies the query criteria, then yield a tuple (query_id, user_id).
     The reducer function stores all user_ids that satisfy the query in the
-    corresponding UserQueryModel."""
-
+    corresponding UserQueryModel.
+    """
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.UserSettingsModel]

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain objects for classifier models"""
+"""Domain objects for classifier models."""
 
 import copy
 import datetime
@@ -72,9 +72,10 @@ class ClassifierTrainingJob(object):
 
     """
 
-    def __init__(self, job_id, algorithm_id, interaction_id, exp_id,
-                 exp_version, next_scheduled_check_time, state_name, status,
-                 training_data, classifier_data, data_schema_version):
+    def __init__(
+            self, job_id, algorithm_id, interaction_id, exp_id,
+            exp_version, next_scheduled_check_time, state_name, status,
+            training_data, classifier_data, data_schema_version):
         """Constructs a ClassifierTrainingJob domain object.
 
         Args:

@@ -59,13 +59,13 @@ describe('Build line templates', function() {
       buildThenDisplay(
         'and_introduce', 'from p and q we have p\u2227q', 'p, q', 'p\u2227q',
         '', [])).toEqual({
-          name: 'and_introduce',
-          reader_view: 'from p and q we have p\u2227q',
-          antecedents: 'p, q',
-          results: 'p\u2227q',
-          variables: '',
-          error: []
-        });
+      name: 'and_introduce',
+      reader_view: 'from p and q we have p\u2227q',
+      antecedents: 'p, q',
+      results: 'p\u2227q',
+      variables: '',
+      error: []
+    });
 
     expect(
       buildThenDisplay(
@@ -73,29 +73,29 @@ describe('Build line templates', function() {
           'Should this be "from {{p}} and {{q}} we have {{p\u2227q}}"?',
           'To prove {{p\u2227q}} you need to have shown {{q}} as well'
         ])).toEqual({
-          name: 'and_introduce',
-          reader_view: 'from p we have p\u2227q',
-          antecedents: 'p',
-          results: 'p\u2227q',
-          variables: '',
-          error: [
-            'Should this be "from {{p}} and {{q}} we have {{p\u2227q}}"?',
-            'To prove {{p\u2227q}} you need to have shown {{q}} as well'
-          ]
-        });
+      name: 'and_introduce',
+      reader_view: 'from p we have p\u2227q',
+      antecedents: 'p',
+      results: 'p\u2227q',
+      variables: '',
+      error: [
+        'Should this be "from {{p}} and {{q}} we have {{p\u2227q}}"?',
+        'To prove {{p\u2227q}} you need to have shown {{q}} as well'
+      ]
+    });
 
     expect(
       buildThenDisplay(
         'for_all_introduce', '{{a|element}} was arbitrary hence \u2200x.p',
         'p[x->a]', '\u2200x.p', 'a', []
       )).toEqual({
-        name: 'for_all_introduce',
-        reader_view: '{{a|element}} was arbitrary hence \u2200x.p',
-        antecedents: 'p[x->a]',
-        results: '\u2200x.p',
-        variables: 'a',
-        error: []
-      });
+      name: 'for_all_introduce',
+      reader_view: '{{a|element}} was arbitrary hence \u2200x.p',
+      antecedents: 'p[x->a]',
+      results: '\u2200x.p',
+      variables: 'a',
+      error: []
+    });
   });
 
   it('should reject templates with hidden operators', function() {
@@ -206,61 +206,61 @@ describe('Build mistake entry', function() {
       logicProofTeacher2.buildMistakeEntry(
         'name', '~target()\u2208results(n)', ['{{num_lines()-1}}'],
         logicProofData.BASE_CONTROL_LANGUAGE)).toEqual({
-          name: 'name',
-          occurs: {
-            top_operator_name: 'not',
-            top_kind_name: 'unary_connective',
-            arguments: [{
-              top_operator_name: 'is_in',
-              top_kind_name: 'binary_relation',
-              arguments: [{
-                top_operator_name: 'target',
-                top_kind_name: 'prefix_function',
-                arguments: [],
-                dummies: [],
-                type: 'formula'
-              }, {
-                top_operator_name: 'results',
-                top_kind_name: 'prefix_function',
-                arguments: [{
-                  top_operator_name: 'n',
-                  top_kind_name: 'variable',
-                  arguments: [],
-                  dummies: [],
-                  type: 'integer'
-                }],
-                dummies: [],
-                type: 'set_of_formulas'
-              }],
-              dummies: [],
-              type: 'boolean'
-            }],
+      name: 'name',
+      occurs: {
+        top_operator_name: 'not',
+        top_kind_name: 'unary_connective',
+        arguments: [{
+          top_operator_name: 'is_in',
+          top_kind_name: 'binary_relation',
+          arguments: [{
+            top_operator_name: 'target',
+            top_kind_name: 'prefix_function',
+            arguments: [],
             dummies: [],
-            type: 'boolean'
-          },
-          message: [[{
-            format: 'expression',
-            content: {
-              top_operator_name: 'subtraction',
-              top_kind_name: 'binary_function',
-              arguments: [{
-                top_operator_name: 'num_lines',
-                top_kind_name: 'prefix_function',
-                arguments: [],
-                dummies: [],
-                type: 'integer'
-              }, {
-                top_operator_name: 1,
-                top_kind_name: 'constant',
-                arguments: [],
-                dummies: [],
-                type: 'integer'
-              }],
+            type: 'formula'
+          }, {
+            top_operator_name: 'results',
+            top_kind_name: 'prefix_function',
+            arguments: [{
+              top_operator_name: 'n',
+              top_kind_name: 'variable',
+              arguments: [],
               dummies: [],
               type: 'integer'
-            }
-          }]]
-        });
+            }],
+            dummies: [],
+            type: 'set_of_formulas'
+          }],
+          dummies: [],
+          type: 'boolean'
+        }],
+        dummies: [],
+        type: 'boolean'
+      },
+      message: [[{
+        format: 'expression',
+        content: {
+          top_operator_name: 'subtraction',
+          top_kind_name: 'binary_function',
+          arguments: [{
+            top_operator_name: 'num_lines',
+            top_kind_name: 'prefix_function',
+            arguments: [],
+            dummies: [],
+            type: 'integer'
+          }, {
+            top_operator_name: 1,
+            top_kind_name: 'constant',
+            arguments: [],
+            dummies: [],
+            type: 'integer'
+          }],
+          dummies: [],
+          type: 'integer'
+        }
+      }]]
+    });
   });
 
   it('should build then display entries correctly', function() {
@@ -497,18 +497,18 @@ describe('Build control function table', function() {
 
 describe('Parse messages describing student mistakes', function() {
   it('should parse then display control-language messages correctly',
-      function() {
-        expect(logicProofTeacher2.displayControlMessage(
-            logicProofTeacher2.parseMessage(
-              'stuff {{p\u2227q}} thingies', 'control'),
-            logicProofData.BASE_CONTROL_LANGUAGE.operators)
-        ).toEqual('stuff {{p\u2227q}} thingies');
-      });
+    function() {
+      expect(logicProofTeacher2.displayControlMessage(
+        logicProofTeacher2.parseMessage(
+          'stuff {{p\u2227q}} thingies', 'control'),
+        logicProofData.BASE_CONTROL_LANGUAGE.operators)
+      ).toEqual('stuff {{p\u2227q}} thingies');
+    });
 
   it('should parse general messages correctly', function() {
     expect(
       logicProofTeacher2.parseMessage(
-          'Your use of {{item}} is wrong.', 'general')
+        'Your use of {{item}} is wrong.', 'general')
     ).toEqual([{
       isFixed: true,
       content: 'Your use of '

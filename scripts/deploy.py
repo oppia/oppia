@@ -90,7 +90,7 @@ RELEASE_DIR_NAME = 'deploy-%s-%s-%s' % (
 RELEASE_DIR_PATH = os.path.join(os.getcwd(), '..', RELEASE_DIR_NAME)
 
 APPCFG_PATH = os.path.join(
-    '..', 'oppia_tools', 'google_appengine_1.9.50', 'google_appengine',
+    '..', 'oppia_tools', 'google_appengine_1.9.67', 'google_appengine',
     'appcfg.py')
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
@@ -141,7 +141,7 @@ def preprocess_release():
                 'updated in the meantime?' % dst)
         shutil.copyfile(src, dst)
 
-    # Copies files in images to /assets/images
+    # Copies files in images to /assets/images.
     for dir_name in IMAGE_DIRS:
         src_dir = os.path.join(DEPLOY_DATA_PATH, 'images', dir_name)
         dst_dir = os.path.join(os.getcwd(), 'assets', 'images', dir_name)
@@ -221,9 +221,21 @@ def _execute_deployment():
         print 'Preprocessing release...'
         preprocess_release()
 
-        # Do a build; ensure there are no errors.
+        # Do a build, while outputting to the terminal.
         print 'Building and minifying scripts...'
-        subprocess.check_output(['python', 'scripts/build.py'])
+        build_process = subprocess.Popen(
+            ['python', 'scripts/build.py', '--prod_env'],
+            stdout=subprocess.PIPE)
+        while True:
+            line = build_process.stdout.readline().strip()
+            if not line:
+                break
+            print line
+
+        # Wait for process to terminate, then check return code.
+        build_process.communicate()
+        if build_process.returncode > 0:
+            raise Exception('Build failed.')
 
         # Deploy to GAE.
         subprocess.check_output([APPCFG_PATH, 'update', '.'])

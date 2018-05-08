@@ -53,8 +53,8 @@ oppia.constant(
     'I18N_PLAYER_HINT_REQUEST_STRING_3']);
 
 oppia.constant(
-    'EXPLORATION_DATA_URL_TEMPLATE',
-    '/explorehandler/init/<exploration_id>');
+  'EXPLORATION_DATA_URL_TEMPLATE',
+  '/explorehandler/init/<exploration_id>');
 oppia.constant(
   'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
   '/explorehandler/init/<exploration_id>?v=<version>');

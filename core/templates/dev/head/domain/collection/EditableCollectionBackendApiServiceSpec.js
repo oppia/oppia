@@ -44,9 +44,7 @@ describe('Editable collection backend API service', function() {
         objective: 'To pass',
         version: '1',
         nodes: [{
-          exploration_id: '0',
-          prerequisite_skill_ids: [],
-          acquired_skill_ids: []
+          exploration_id: '0'
         }],
         next_exploration_ids: [],
         completed_exploration_ids: []
@@ -118,8 +116,8 @@ describe('Editable collection backend API service', function() {
 
       // Send a request to update collection
       EditableCollectionBackendApiService.updateCollection(
-        collection.id, collection.version, collection.title, []).then(
-          successHandler, failHandler);
+        collection.id, collection.version, collection.title, []
+      ).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(collection);

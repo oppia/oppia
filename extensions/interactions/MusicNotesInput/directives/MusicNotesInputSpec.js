@@ -251,21 +251,21 @@ describe('Music phrase player service', function() {
     );
 
     it('should play all the notes in a music phrase',
-    inject(function($timeout) {
-      mpps.playMusicPhrase([{
-        midiValue: 69,
-        duration: 2,
-        start: 1
-      }, {
-        midiValue: 77,
-        duration: 1.5,
-        start: 3
-      }]);
-      $timeout.flush();
-      expect(MIDI.chordOn).toHaveBeenCalledWith(0, [69], 127, 0);
-      expect(MIDI.chordOn).toHaveBeenCalledWith(0, [77], 127, 0);
-      expect(MIDI.chordOff).toHaveBeenCalledWith(0, [69], 2);
-      expect(MIDI.chordOff).toHaveBeenCalledWith(0, [77], 1.5);
-    }));
+      inject(function($timeout) {
+        mpps.playMusicPhrase([{
+          midiValue: 69,
+          duration: 2,
+          start: 1
+        }, {
+          midiValue: 77,
+          duration: 1.5,
+          start: 3
+        }]);
+        $timeout.flush();
+        expect(MIDI.chordOn).toHaveBeenCalledWith(0, [69], 127, 0);
+        expect(MIDI.chordOn).toHaveBeenCalledWith(0, [77], 127, 0);
+        expect(MIDI.chordOff).toHaveBeenCalledWith(0, [69], 2);
+        expect(MIDI.chordOff).toHaveBeenCalledWith(0, [77], 1.5);
+      }));
   });
 });

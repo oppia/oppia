@@ -37,18 +37,22 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
         return [exp_models.ExplorationSnapshotMetadataModel]
 
     @staticmethod
     def map(item):
-        yield (item.committer_id, {
-            'exploration_id': item.get_unversioned_instance_id(),
-            'version_string': item.get_version_string(),
-        })
+        """Implements the map function for this job."""
+        yield (
+            item.committer_id, {
+                'exploration_id': item.get_unversioned_instance_id(),
+                'version_string': item.get_version_string(),
+            })
+
 
     @staticmethod
     def reduce(key, version_and_exp_ids):
-
+        """Implements the reduce function for this job."""
         created_exploration_ids = set()
         edited_exploration_ids = set()
 
@@ -70,15 +74,16 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class UserDefaultDashboardOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for populating the default dashboard field for users.
-    """
+    """One-off job for populating the default dashboard field for users."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
         return [user_models.UserSettingsModel]
 
     @staticmethod
     def map(item):
+        """Implements the map function for this job."""
         user_contributions = user_services.get_user_contributions(item.id)
         user_is_creator = user_contributions and (
             user_contributions.created_exploration_ids or
@@ -93,6 +98,7 @@ class UserDefaultDashboardOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(item):
+        """Implements the reduce function for this job."""
         pass
 
 
@@ -101,15 +107,18 @@ class UsernameLengthDistributionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
         return [user_models.UserSettingsModel]
 
     @staticmethod
     def map(item):
+        """Implements the map function for this job."""
         if item.username is not None:
             yield (len(item.username), 1)
 
     @staticmethod
     def reduce(key, stringified_username_counter):
+        """Implements the reduce function for this job."""
         username_counter = [
             ast.literal_eval(v) for v in stringified_username_counter]
         yield (key, len(username_counter))
@@ -120,10 +129,12 @@ class LongUserBiosOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
         return [user_models.UserSettingsModel]
 
     @staticmethod
     def map(item):
+        """Implements the map function for this job."""
         if item.user_bio is None:
             user_bio_length = 0
         else:
@@ -133,6 +144,7 @@ class LongUserBiosOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(userbio_length, stringified_usernames):
+        """Implements the reduce function for this job."""
         if int(userbio_length) > 500:
             yield (userbio_length, stringified_usernames)
 
@@ -143,6 +155,7 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
         return [
             exp_models.ExplorationRightsModel,
             collection_models.CollectionRightsModel,
@@ -151,27 +164,31 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
+        """Implements the map function for this job."""
         if isinstance(item, feedback_models.FeedbackMessageModel):
             if item.author_id:
-                yield (item.author_id, {
-                    'type': 'feedback',
-                    'id': item.thread_id
-                })
+                yield (
+                    item.author_id, {
+                        'type': 'feedback',
+                        'id': item.thread_id
+                    })
         elif isinstance(item, exp_models.ExplorationRightsModel):
             if item.deleted:
                 return
 
             if not item.community_owned:
                 for owner_id in item.owner_ids:
-                    yield (owner_id, {
-                        'type': 'exploration',
-                        'id': item.id
-                    })
+                    yield (
+                        owner_id, {
+                            'type': 'exploration',
+                            'id': item.id
+                        })
                 for editor_id in item.editor_ids:
-                    yield (editor_id, {
-                        'type': 'exploration',
-                        'id': item.id
-                    })
+                    yield (
+                        editor_id, {
+                            'type': 'exploration',
+                            'id': item.id
+                        })
             else:
                 # Go through the history.
                 current_version = item.version
@@ -181,15 +198,17 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                     if not model.community_owned:
                         for owner_id in model.owner_ids:
-                            yield (owner_id, {
-                                'type': 'exploration',
-                                'id': item.id
-                            })
+                            yield (
+                                owner_id, {
+                                    'type': 'exploration',
+                                    'id': item.id
+                                })
                         for editor_id in model.editor_ids:
-                            yield (editor_id, {
-                                'type': 'exploration',
-                                'id': item.id
-                            })
+                            yield (
+                                editor_id, {
+                                    'type': 'exploration',
+                                    'id': item.id
+                                })
         elif isinstance(item, collection_models.CollectionRightsModel):
             # NOTE TO DEVELOPERS: Although the code handling subscribing to
             # collections is very similar to the code above for explorations,
@@ -203,15 +222,17 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
             if not item.community_owned:
                 for owner_id in item.owner_ids:
-                    yield (owner_id, {
-                        'type': 'collection',
-                        'id': item.id
-                    })
+                    yield (
+                        owner_id, {
+                            'type': 'collection',
+                            'id': item.id
+                        })
                 for editor_id in item.editor_ids:
-                    yield (editor_id, {
-                        'type': 'collection',
-                        'id': item.id
-                    })
+                    yield (
+                        editor_id, {
+                            'type': 'collection',
+                            'id': item.id
+                        })
             else:
                 # Go through the history.
                 current_version = item.version
@@ -222,18 +243,21 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                     if not model.community_owned:
                         for owner_id in model.owner_ids:
-                            yield (owner_id, {
-                                'type': 'collection',
-                                'id': item.id
-                            })
+                            yield (
+                                owner_id, {
+                                    'type': 'collection',
+                                    'id': item.id
+                                })
                         for editor_id in model.editor_ids:
-                            yield (editor_id, {
-                                'type': 'collection',
-                                'id': item.id
-                            })
+                            yield (
+                                editor_id, {
+                                    'type': 'collection',
+                                    'id': item.id
+                                })
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Implements the reduce function for this job."""
         values = [ast.literal_eval(v) for v in stringified_values]
         for item in values:
             if item['type'] == 'feedback':
@@ -250,14 +274,17 @@ class DashboardStatsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
         return [user_models.UserSettingsModel]
 
     @staticmethod
     def map(item):
+        """Implements the map function for this job."""
         user_services.update_dashboard_stats_log(item.id)
 
     @staticmethod
     def reduce(item):
+        """Implements the reduce function for this job."""
         pass
 
 
@@ -273,10 +300,12 @@ class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
         return [exp_models.ExplorationRightsSnapshotMetadataModel]
 
     @staticmethod
     def map(item):
+        """Implements the map function for this job."""
         exp_id = item.get_unversioned_instance_id()
 
         exp_rights = rights_manager.get_exploration_rights(
@@ -296,6 +325,7 @@ class UserFirstContributionMsecOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(user_id, stringified_commit_times_msec):
+        """Implements the reduce function for this job."""
         commit_times_msec = [
             ast.literal_eval(commit_time_string) for
             commit_time_string in stringified_commit_times_msec]
@@ -312,10 +342,12 @@ class UserProfilePictureOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
         return [user_models.UserSettingsModel]
 
     @staticmethod
     def map(item):
+        """Implements the map function for this job."""
         if item.deleted or item.profile_picture_data_url is not None:
             return
 
@@ -323,17 +355,22 @@ class UserProfilePictureOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Implements the reduce function for this job."""
         pass
 
 
 class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-
+    """One-off job that adds fields to record last exploration created and last
+    edited times.
+    """
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
         return [user_models.UserSettingsModel]
 
     @staticmethod
     def map(user_model):
+        """Implements the map function for this job."""
         user_id = user_model.id
         contributions = user_models.UserContributionsModel.get(user_id)
 
@@ -356,4 +393,5 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
+        """Implements the reduce function for this job."""
         pass

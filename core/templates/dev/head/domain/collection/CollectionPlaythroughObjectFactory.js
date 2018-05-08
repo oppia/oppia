@@ -27,24 +27,26 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
   // Stores information about a current playthrough of a collection for a
   // user.
   var CollectionPlaythrough = function(
-      nextExplorationIds, completedExplorationIds) {
-    this._nextExplorationIds = nextExplorationIds;
+      nextExplorationId, completedExplorationIds) {
+    this._nextExplorationId = nextExplorationId;
     this._completedExplorationIds = completedExplorationIds;
   };
 
-  // Returns a list of upcoming exploration IDs. Changes to this list are not
-  // reflected in this collection.
-  CollectionPlaythrough.prototype.getNextExplorationIds = function() {
-    return angular.copy(this._nextExplorationIds);
+  // Returns the upcoming exploration ID. Changes to this are not
+  // reflected in the collection.
+  CollectionPlaythrough.prototype.getNextExplorationId = function() {
+    return this._nextExplorationId;
   };
 
   CollectionPlaythrough.prototype.getNextRecommendedCollectionNodeCount =
     function() {
-      return this._nextExplorationIds.length;
+      // As the collection is linear, only a single node would be available,
+      // after any node.
+      return 1;
     };
 
   CollectionPlaythrough.hasFinishedCollection = function() {
-    return this._nextExplorationIds.length === 0;
+    return this._nextExplorationId === null;
   };
 
   // Returns a list of explorations completed that are related to this
@@ -68,14 +70,14 @@ oppia.factory('CollectionPlaythroughObjectFactory', [function() {
   CollectionPlaythrough.createFromBackendObject = function(
       collectionPlaythroughBackendObject) {
     return new CollectionPlaythrough(
-      collectionPlaythroughBackendObject.next_exploration_ids,
+      collectionPlaythroughBackendObject.next_exploration_id,
       collectionPlaythroughBackendObject.completed_exploration_ids);
   };
 
   CollectionPlaythrough.create = function(
-      nextExplorationIds, completedExplorationIds) {
+      nextExplorationId, completedExplorationIds) {
     return new CollectionPlaythrough(
-      angular.copy(nextExplorationIds), angular.copy(completedExplorationIds));
+      nextExplorationId, angular.copy(completedExplorationIds));
   };
 
   return CollectionPlaythrough;

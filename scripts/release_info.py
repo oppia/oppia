@@ -98,8 +98,8 @@ def _gather_logs(start, stop='HEAD'):
         list[Log]: List of Logs
 
     """
-    get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(GROUP_SEP, start,
-                                                         stop)
+    get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(
+        GROUP_SEP, start, stop)
     out = _run_cmd(get_logs_cmd).split('\x00')
     if len(out) == 1 and out[0] == '':
         return []
@@ -130,7 +130,7 @@ def _check_versions(current_release):
         current_release (str): The current release tag to diff against.
 
     Returns:
-        List of variable names that changed
+        List of variable names that changed.
     """
     feconf_changed_version = []
     git_show_cmd = (GIT_CMD_SHOW_FORMAT_STRING % current_release)
@@ -251,7 +251,7 @@ def main():
         new_author_names = [name for name, _ in new_authors]
         existing_author_names = [name for name, _ in existing_authors]
 
-        # TODO: duplicate author handling due to email changes
+        # TODO: duplicate author handling due to email changes.
         out.write('\n### New Authors:\n')
         for name, email in new_authors:
             out.write('* %s <%s>\n' % (name, email))

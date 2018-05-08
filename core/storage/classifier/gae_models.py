@@ -47,7 +47,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     exp_version = ndb.IntegerProperty(required=True, indexed=True)
     # The name of the state to which the model belongs.
     state_name = ndb.StringProperty(required=True, indexed=True)
-    # The status of the training job. It can be either NEW, COMPLETE or PENDING
+    # The status of the training job. It can be either NEW, COMPLETE or PENDING.
     status = ndb.StringProperty(required=True,
                                 choices=feconf.ALLOWED_TRAINING_JOB_STATUSES,
                                 default=feconf.TRAINING_JOB_STATUS_PENDING,
@@ -294,9 +294,10 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
         mapping_models = []
         mapping_ids = []
         for job_exploration_mapping in job_exploration_mappings:
-            instance_id = cls._generate_id(job_exploration_mapping.exp_id,
-                                           job_exploration_mapping.exp_version,
-                                           job_exploration_mapping.state_name)
+            instance_id = cls._generate_id(
+                job_exploration_mapping.exp_id,
+                job_exploration_mapping.exp_version,
+                job_exploration_mapping.state_name)
             mapping_instance = cls(
                 id=instance_id, exp_id=job_exploration_mapping.exp_id,
                 exp_version=job_exploration_mapping.exp_version,

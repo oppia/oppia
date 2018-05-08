@@ -284,30 +284,32 @@ class StateAnswersTests(test_utils.GenericTestBase):
                     rule_spec_str='rule spec str2', answer_str='answer str2')])
         submitted_answer_dict_list = (
             state_answers.get_submitted_answer_dict_list())
-        self.assertEqual(submitted_answer_dict_list, [{
-            'answer': 'Text',
-            'interaction_id': 'TextInput',
-            'answer_group_index': 0,
-            'rule_spec_index': 1,
-            'classification_categorization': exp_domain.EXPLICIT_CLASSIFICATION,
-            'params': {},
-            'session_id': 'sess',
-            'time_spent_in_sec': 10.5,
-            'rule_spec_str': 'rule spec str1',
-            'answer_str': 'answer str1'
-        }, {
-            'answer': 'Other text',
-            'interaction_id': 'TextInput',
-            'answer_group_index': 1,
-            'rule_spec_index': 0,
-            'classification_categorization': (
-                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
-            'params': {},
-            'session_id': 'sess',
-            'time_spent_in_sec': 7.5,
-            'rule_spec_str': 'rule spec str2',
-            'answer_str': 'answer str2'
-        }])
+        self.assertEqual(
+            submitted_answer_dict_list, [{
+                'answer': 'Text',
+                'interaction_id': 'TextInput',
+                'answer_group_index': 0,
+                'rule_spec_index': 1,
+                'classification_categorization': (
+                    exp_domain.EXPLICIT_CLASSIFICATION),
+                'params': {},
+                'session_id': 'sess',
+                'time_spent_in_sec': 10.5,
+                'rule_spec_str': 'rule spec str1',
+                'answer_str': 'answer str1'
+            }, {
+                'answer': 'Other text',
+                'interaction_id': 'TextInput',
+                'answer_group_index': 1,
+                'rule_spec_index': 0,
+                'classification_categorization': (
+                    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+                'params': {},
+                'session_id': 'sess',
+                'time_spent_in_sec': 7.5,
+                'rule_spec_str': 'rule spec str2',
+                'answer_str': 'answer str2'
+            }])
 
 
 class StateAnswersValidationTests(test_utils.GenericTestBase):
@@ -318,7 +320,7 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
         self.state_answers = stats_domain.StateAnswers(
             'exp_id', 1, 'initial_state', 'TextInput', [])
 
-        # The canonical object should have no validation problems
+        # The canonical object should have no validation problems.
         self.state_answers.validate()
 
     def test_exploration_id_must_be_string(self):
@@ -582,7 +584,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
             'Text', 'TextInput', 0, 0, exp_domain.EXPLICIT_CLASSIFICATION, {},
             'session_id', 0.)
 
-        # The canonical object should have no validation problems
+        # The canonical object should have no validation problems.
         self.submitted_answer.validate()
 
     def test_answer_may_be_none_only_for_linear_interaction(self):
@@ -821,7 +823,7 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
             'exp_id', 1, 'initial_state', 'TextInput', 'AnswerFrequencies',
             stats_domain.AnswerFrequencyList.from_raw_type([]))
 
-        # The canonical object should have no validation problems
+        # The canonical object should have no validation problems.
         self.state_answers_calc_output.validate()
 
     def test_exploration_id_must_be_string(self):

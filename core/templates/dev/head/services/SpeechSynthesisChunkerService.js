@@ -58,7 +58,7 @@ oppia.factory('SpeechSynthesisChunkerService', [
     var _speechUtteranceChunker = function(utterance, offset, callback) {
       var newUtterance;
       var text = (offset !== undefined ?
-          utterance.text.substring(offset) : utterance.text);
+        utterance.text.substring(offset) : utterance.text);
 
       // This regex pattern finds the next string at most 160
       // characters in length that ends on a punctuation mark in
@@ -116,8 +116,7 @@ oppia.factory('SpeechSynthesisChunkerService', [
             return this.attributes['text-with-value'].textContent
               .replace(/&quot;/g, '');
           }
-        }
-      );
+        });
 
       // Convert LaTeX to speakable text.
       elt.find('oppia-noninteractive-' + RTE_COMPONENT_NAMES.Math)
@@ -126,8 +125,7 @@ oppia.factory('SpeechSynthesisChunkerService', [
             return _formatLatexToSpeakableText(
               this.attributes['raw_latex-with-value'].textContent);
           }
-        }
-      );
+        });
 
       html = elt.html();
       // Replace certain HTML elements with periods to indicate
@@ -146,12 +144,12 @@ oppia.factory('SpeechSynthesisChunkerService', [
       // effect on speaking.
       for (var i = 0; i < textToSpeakWithoutPauses.length; i++) {
         if (PUNCTUATION_MARKS_TO_IGNORE.indexOf(
-            textToSpeakWithoutPauses.charAt(i)) > -1) {
+          textToSpeakWithoutPauses.charAt(i)) > -1) {
           continue;
         }
         textToSpeak += textToSpeakWithoutPauses.charAt(i);
         if (PUNCTUATION_MARKS_TO_END_CHUNKS.indexOf(
-            textToSpeakWithoutPauses.charAt(i)) > -1) {
+          textToSpeakWithoutPauses.charAt(i)) > -1) {
           textToSpeak += ' ';
         }
       }

@@ -322,8 +322,8 @@ oppia.controller('SettingsTab', [
       }).result.then(function() {
         EditableExplorationBackendApiService.deleteExploration(
           $scope.explorationId).then(function() {
-            $window.location = CREATOR_DASHBOARD_PAGE_URL;
-          });
+          $window.location = CREATOR_DASHBOARD_PAGE_URL;
+        });
       });
     };
 

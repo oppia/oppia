@@ -35,13 +35,15 @@ oppia.directive('feedbackPopup', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/feedback_popup_directive.html'),
       controller: [
-        '$scope', '$element', '$http', '$timeout', 'FocusManagerService',
-        'AlertsService', 'BackgroundMaskService', 'PlayerPositionService',
-        'WindowDimensionsService',
+        '$scope', '$element', '$http', '$log', '$timeout', '$filter',
+        'FocusManagerService', 'AlertsService', 'BackgroundMaskService',
+        'PlayerPositionService', 'WindowDimensionsService',
+        'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
         function(
-            $scope, $element, $http, $timeout, FocusManagerService,
-            AlertsService, BackgroundMaskService, PlayerPositionService,
-            WindowDimensionsService) {
+            $scope, $element, $http, $log, $timeout, $filter,
+            FocusManagerService, AlertsService, BackgroundMaskService,
+            PlayerPositionService, WindowDimensionsService,
+            FEEDBACK_SUBJECT_MAX_CHAR_LIMIT) {
           $scope.feedbackText = '';
           $scope.isSubmitterAnonymized = false;
           $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
@@ -77,7 +79,7 @@ oppia.directive('feedbackPopup', [
             for (var i = 0; i < 10; i++) {
               elt = elt.parent();
               if (!angular.isUndefined(
-                    elt.attr('uib-popover-template-popup'))) {
+                elt.attr('uib-popover-template-popup'))) {
                 popoverChildElt = elt;
                 break;
               }
@@ -109,7 +111,8 @@ oppia.directive('feedbackPopup', [
           $scope.saveFeedback = function() {
             if ($scope.feedbackText) {
               $http.post(feedbackUrl, {
-                subject: '(Feedback from a learner)',
+                subject: $filter('getAbbreviatedText')(
+                  $scope.feedbackText, FEEDBACK_SUBJECT_MAX_CHAR_LIMIT),
                 feedback: $scope.feedbackText,
                 include_author: (
                   !$scope.isSubmitterAnonymized && $scope.isLoggedIn),

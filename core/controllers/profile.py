@@ -204,7 +204,8 @@ class PreferencesHandler(base.BaseHandler):
 
 class ProfilePictureHandler(base.BaseHandler):
     """Provides the dataURI of the user's profile picture, or none if no user
-    picture is uploaded."""
+    picture is uploaded.
+    """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -220,7 +221,8 @@ class ProfilePictureHandler(base.BaseHandler):
 
 class ProfilePictureHandlerByUsername(base.BaseHandler):
     """ Provides the dataURI of the profile picture of the specified user,
-    or None if no user picture is uploaded for the user with that ID."""
+    or None if no user picture is uploaded for the user with that ID.
+    """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

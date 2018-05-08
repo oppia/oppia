@@ -27,10 +27,6 @@ oppia.factory('CollectionNodeObjectFactory', [
   function(ACTIVITY_STATUS_PRIVATE) {
     var CollectionNode = function(collectionNodeBackendObject) {
       this._explorationId = collectionNodeBackendObject.exploration_id;
-      this._prerequisiteSkillIds = angular.copy(
-        collectionNodeBackendObject.prerequisite_skill_ids);
-      this._acquiredSkillIds = angular.copy(
-        collectionNodeBackendObject.acquired_skill_ids);
       this._explorationSummaryObject = angular.copy(
         collectionNodeBackendObject.exploration_summary);
     };
@@ -72,87 +68,6 @@ oppia.factory('CollectionNodeObjectFactory', [
       }
     };
 
-    // Returns a list of the prerequisite skill ids of this collection node.
-    // Changes to the returned list will be reflected in this collection node
-    // object.
-    CollectionNode.prototype.getPrerequisiteSkillIds = function() {
-      return this._prerequisiteSkillIds;
-    };
-
-    // Returns a list of the acquired skill ids of this collection node.
-    // Changes to the returned list will be reflected in this collection node
-    // object.
-    CollectionNode.prototype.getAcquiredSkillIds = function() {
-      return this._acquiredSkillIds;
-    };
-
-    // Returns whether the node contains the given skill ID as a prerequisite.
-    CollectionNode.prototype.containsPrerequisiteSkillId = function(skillId) {
-      return this._prerequisiteSkillIds.indexOf(skillId) !== -1;
-    };
-
-    // Returns whether the node allows the learner to acquire the given skill
-    // ID.
-    CollectionNode.prototype.containsAcquiredSkillId = function(skillId) {
-      return this._acquiredSkillIds.indexOf(skillId) !== -1;
-    };
-
-    // Adds a new prerequisite skill id to the collection node. This returns
-    // whether the skill ID was successfully added, where the add will fail if
-    // the ID is already contained within the list.
-    CollectionNode.prototype.addPrerequisiteSkillId = function(newSkillId) {
-      if (this.containsPrerequisiteSkillId(newSkillId)) {
-        return false;
-      }
-      this._prerequisiteSkillIds.push(newSkillId);
-      return true;
-    };
-
-    // Adds a new acquired skill id to the collection node. This returns
-    // whether the skill ID was successfully added, where the add will fail if
-    // the ID is already contained within the list.
-    CollectionNode.prototype.addAcquiredSkillId = function(newSkillId) {
-      if (this.containsAcquiredSkillId(newSkillId)) {
-        return false;
-      }
-      this._acquiredSkillIds.push(newSkillId);
-      return true;
-    };
-
-    // Removes a prerequisite skill ID. Returns whether or not this was
-    // successful, which depends on whether the given skill ID is actually in
-    // the skills list.
-    CollectionNode.prototype.removePrerequisiteSkillId = function(skillId) {
-      var index = this._prerequisiteSkillIds.indexOf(skillId);
-      if (index === -1) {
-        return false;
-      }
-      this._prerequisiteSkillIds.splice(index, 1);
-      return true;
-    };
-
-    // Removes an acquired skill ID. Returns whether or not this was
-    // successful, which depends on whether the given skill ID is actually in
-    // the skills list.
-    CollectionNode.prototype.removeAcquiredSkillId = function(skillId) {
-      var index = this._acquiredSkillIds.indexOf(skillId);
-      if (index === -1) {
-        return false;
-      }
-      this._acquiredSkillIds.splice(index, 1);
-      return true;
-    };
-
-    // Clears all prerequisite skill IDs, preserving the binding of the list.
-    CollectionNode.prototype.clearPrerequisiteSkillIds = function() {
-      this._prerequisiteSkillIds.length = 0;
-    };
-
-    // Clears all acquired skill IDs, preserving the binding of the list.
-    CollectionNode.prototype.clearAcquiredSkillIds = function() {
-      this._acquiredSkillIds.length = 0;
-    };
-
     // Returns a raw exploration summary object, as supplied by the backend for
     // frontend exploration summary tile displaying. Changes to the returned
     // object are not reflected in this domain object. The value returned by
@@ -188,8 +103,6 @@ oppia.factory('CollectionNodeObjectFactory', [
     CollectionNode.createFromExplorationId = function(explorationId) {
       return CollectionNode.create({
         exploration_id: explorationId,
-        acquired_skill_ids: [],
-        prerequisite_skill_ids: [],
         exploration_summary: null
       });
     };

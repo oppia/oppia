@@ -65,13 +65,13 @@ describe('Url Service', function() {
       var expectedUrl1 = baseUrl + '?field%201=%26value%3D1%3F';
       expect(
         UrlService.addField(baseUrl, queryField, queryValue)).toBe(
-          expectedUrl1);
+        expectedUrl1);
 
       baseUrl = '/sample?field=value';
       var expectedUrl2 = baseUrl + '&field%201=%26value%3D1%3F';
       expect(
         UrlService.addField(baseUrl, queryField, queryValue)).toBe(
-          expectedUrl2);
+        expectedUrl2);
     });
 
   it('should correctly return true if embed present in pathname', function() {

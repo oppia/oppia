@@ -105,14 +105,14 @@ oppia.directive('oppiaInteractiveFractionInput', [
                 $scope.FractionInputForm.answer.$setValidity(
                   FORM_ERROR_TYPE, false);
               } else if (
-                  !allowImproperFraction && fraction.isImproperFraction()) {
+                !allowImproperFraction && fraction.isImproperFraction()) {
                 errorMessage = (
                   'Please enter an answer with a "proper" fractional part ' +
                   '(e.g., 1 2/3 instead of 5/3).');
                 $scope.FractionInputForm.answer.$setValidity(
                   FORM_ERROR_TYPE, false);
               } else if (
-                  !$scope.allowNonzeroIntegerPart &&
+                !$scope.allowNonzeroIntegerPart &&
                   fraction.hasNonzeroIntegerPart()) {
                 errorMessage = (
                   'Please enter your answer as a fraction (e.g., 5/3 instead ' +
