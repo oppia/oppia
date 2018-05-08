@@ -33,6 +33,6 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
 
     def test_issue_registry(self):
         """Do some sanity checks on the issue registry."""
-        issue_registry.Registry._refresh({'TestIssue': TestIssue})
+        issue_registry.Registry.set_issues({'TestIssue': TestIssue})
         self.assertEqual(
             len(issue_registry.Registry.get_all_issues()), 1)

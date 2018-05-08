@@ -34,11 +34,11 @@ class Registry(object):
         return feconf.ALLOWED_ISSUE_IDS
 
     @classmethod
-    def _refresh(cls, issues=None):
-        if issues:
-            cls._issues = issues
-            return
+    def set_issues(cls, issues):
+        cls._issues = issues
 
+    @classmethod
+    def _refresh(cls):
         cls._issues.clear()
 
         all_issue_ids = cls.get_all_issue_ids()
