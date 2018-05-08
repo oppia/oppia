@@ -42,12 +42,12 @@ describe('StatisticsTab', function() {
   var libraryPage = null;
   var explorationPlayerPage = null;
   beforeEach(function() {
-    users.createUser('user1@statisticsTab.com',
-                     'statisticsTabCreator');
-    users.createUser('user2@statisticsTab.com',
-                     'statisticsTabLearner1');
-    users.createUser('user3@statisticsTab.com',
-                     'statisticsTabLearner2');
+    users.createUser(
+      'user1@statisticsTab.com', 'statisticsTabCreator');
+    users.createUser(
+      'user2@statisticsTab.com', 'statisticsTabLearner1');
+    users.createUser(
+      'user3@statisticsTab.com', 'statisticsTabLearner2');
     libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
