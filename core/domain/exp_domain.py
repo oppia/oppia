@@ -4179,6 +4179,14 @@ class StateIdMapping(object):
                 new_state_names_to_ids.pop(state_name)
                 new_state_names.append(state_name)
 
+        # This may happen in exactly opposite scenario as the one written in
+        # comment above. Previous version of exploration may not have any rule
+        # having END state as its destination and hence during states schema
+        # migration END state won't be added. But next version of exploration
+        # might have END references and, hence, END state might be added
+        # to exploration during states schema migration.
+        # So we check whether such sitatuin exists or not. If it exists then
+        # we consider END as a new state to which id will be assigned.
         if 'END' in new_exploration.states and (
                 'END' not in new_state_names_to_ids and (
                     'END' not in new_state_names)):
