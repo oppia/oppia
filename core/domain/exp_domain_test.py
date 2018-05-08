@@ -3265,6 +3265,106 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
     EXP_ID = 'eid'
 
+    EXPLORATION_CONTENT_1 = ("""default_skin: conversation_v1
+param_changes: []
+param_specs: {}
+schema_version: 1
+states:
+- content:
+  - type: text
+    value: ''
+  name: (untitled state)
+  param_changes: []
+  widget:
+    customization_args: {}
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            x: InputString
+          name: Equals
+          rule_type: atomic
+        dest: END
+        feedback:
+          - Correct!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+    sticky: false
+    widget_id: TextInput
+- content:
+  - type: text
+    value: ''
+  name: New state
+  param_changes: []
+  widget:
+    customization_args: {}
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          rule_type: default
+        dest: END
+        feedback: []
+        param_changes: []
+    sticky: false
+    widget_id: TextInput
+""")
+
+    EXPLORATION_CONTENT_2 = ("""default_skin: conversation_v1
+param_changes: []
+param_specs: {}
+schema_version: 1
+states:
+- content:
+  - type: text
+    value: ''
+  name: (untitled state)
+  param_changes: []
+  widget:
+    customization_args: {}
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            x: InputString
+          name: Equals
+          rule_type: atomic
+        dest: New state
+        feedback:
+          - Correct!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+    sticky: false
+    widget_id: TextInput
+- content:
+  - type: text
+    value: ''
+  name: New state
+  param_changes: []
+  widget:
+    customization_args: {}
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          rule_type: default
+        dest: New state
+        feedback: []
+        param_changes: []
+    sticky: false
+    widget_id: TextInput
+""")
+
     def setUp(self):
         """Initialize owner and store default exploration before each
         test case.
@@ -3314,7 +3414,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 0)
 
     def test_that_mapping_is_correct_when_new_state_is_added(self):
@@ -3338,7 +3438,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 1)
 
     def test_that_mapping_is_correct_when_old_state_is_deleted(self):
@@ -3366,7 +3466,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 1)
 
     def test_that_mapping_remains_when_state_is_renamed(self):
@@ -3396,7 +3496,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 1)
 
     def test_that_mapping_is_changed_when_interaction_id_is_changed(self):
@@ -3422,7 +3522,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 1)
 
     def test_that_mapping_is_correct_for_series_of_changes(self):
@@ -3473,7 +3573,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 3)
 
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
@@ -3516,5 +3616,59 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 5)
+
+    def test_for_explorations_having_old_states_schema_version(self):
+        """Test that correct state id mapping is generated for explorations
+        having old states schema version.
+        """
+
+        # Make sure that END is present in generated state id mapping if
+        # exploration contains rules which have END as their destination state
+        # but exploration itself does not have END state.
+        old_exploration = exp_domain.Exploration.from_untitled_yaml(
+            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_1)
+        expected_mapping = {
+            '(untitled state)': 0,
+            'New state': 1,
+            'END': 2
+        }
+        state_id_map = exp_domain.StateIdMapping.create_mapping_for_new_exploration(
+            old_exploration)
+        self.assertDictEqual(state_id_map.state_names_to_ids, expected_mapping)
+        self.assertEqual(state_id_map.largest_state_id_used, 2)
+
+
+        # Make sure that END is not present in generated state id mapping, even
+        # though END state may be present in state id mapping of previous
+        # version, if exploration does not contain any rule which has END
+        # as its destination state.
+        exploration = exp_domain.Exploration.from_untitled_yaml(
+            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_2)
+        expected_mapping = {
+            '(untitled state)': 0,
+            'New state': 1
+        }
+        state_id_map = state_id_map.create_mapping_for_new_version(
+            old_exploration, exploration, [])
+        self.assertDictEqual(
+            state_id_map.state_names_to_ids, expected_mapping)
+        self.assertEqual(state_id_map.largest_state_id_used, 2)
+
+        # Make sure that END is present in generated state id mapping, even
+        # though END state may not be present in state id mapping of previous
+        # version, if exploration contains at least one rule which has END
+        # as its destination state.
+        new_exploration = exp_domain.Exploration.from_untitled_yaml(
+            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_1)
+        expected_mapping = {
+            '(untitled state)': 0,
+            'New state': 1,
+            'END': 3
+        }
+        state_id_map = state_id_map.create_mapping_for_new_version(
+            exploration, new_exploration, [])
+        self.assertDictEqual(
+            state_id_map.state_names_to_ids, expected_mapping)
+        self.assertEqual(state_id_map.largest_state_id_used, 3)

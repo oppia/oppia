@@ -4145,7 +4145,6 @@ class StateIdMapping(object):
         # Go through each state id and name and compare the new state
         # with its corresponding old state to find whether significant
         # change has happened or not.
-        state_ids_to_be_removed = []
         for (state_id, state_name) in state_ids_to_names.iteritems():
             if state_name == 'END' and state_name not in new_exploration.states:
                 # If previous version of exploration has END state but new
@@ -4165,10 +4164,12 @@ class StateIdMapping(object):
                 # however, and so no END state will be added during states dict
                 # schema migration.
 
-                # Thus we no commit of END state's removal and
-                # there is no END state present in later version of exploraiton.
-                state_ids_to_be_removed.append(state_id)
+                # Thus we have no commit of END state's removal in change_list
+                # and there is no END state present in later version of
+                # exploration.
+                new_state_names_to_ids.pop(state_name)
                 continue
+
             new_state = new_exploration.states[state_name]
             old_state = old_exploration.states[old_state_ids_to_names[state_id]]
 
@@ -4178,15 +4179,15 @@ class StateIdMapping(object):
                 new_state_names_to_ids.pop(state_name)
                 new_state_names.append(state_name)
 
-        if state_ids_to_be_removed:
-            for state_id in state_ids_to_be_removed:
-                state_ids_to_names.pop(state_id)
+        if 'END' in new_exploration.states and (
+                'END' not in new_state_names_to_ids and (
+                    'END' not in new_state_names)):
+            new_state_names.append('END')
 
         # Assign new ids to each state in new state names list.
         largest_state_id_used = self.largest_state_id_used
         for state_name in sorted(new_state_names):
             largest_state_id_used += 1
-
             # Check that the state name being assigned is not present in
             # mapping.
             assert state_name not in new_state_names_to_ids.keys()
@@ -4198,14 +4199,14 @@ class StateIdMapping(object):
 
         # Do one final check that all state names in new exploration are present
         # in generated state names to id mapping.
-        if not set(new_state_names_to_ids.keys()) == set(
+        if set(new_state_names_to_ids.keys()) != set(
                 new_exploration.states.keys()):
             raise Exception(
                 'State names to ids mapping does not contain '
                 'state names (%s) which are present in corresponding '
                 'exploration %s, version %d' % (
-                    (set(new_state_names_to_ids.keys()) - set(
-                        new_exploration.states.keys())),
+                    (set(new_exploration.states.keys()) - set(
+                        new_state_names_to_ids.keys())),
                     new_exploration.id, new_exploration.version))
 
         state_id_map.validate()
