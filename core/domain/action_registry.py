@@ -34,7 +34,11 @@ class Registry(object):
         return feconf.ALLOWED_ACTION_IDS
 
     @classmethod
-    def _refresh(cls):
+    def _refresh(cls, actions=None):
+        if actions:
+            cls._actions = actions
+            return
+
         cls._actions.clear()
 
         all_action_ids = cls.get_all_action_ids()
