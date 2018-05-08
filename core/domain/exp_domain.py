@@ -4164,9 +4164,9 @@ class StateIdMapping(object):
                 # however, and so no END state will be added during states dict
                 # schema migration.
 
-                # Thus we have no commit of END state's removal in change_list
-                # and there is no END state present in later version of
-                # exploration.
+                # Thus we have no command of END state's removal or renaming
+                # in change_list and there is no END state present in later
+                # version of exploration.
                 new_state_names_to_ids.pop(state_name)
                 continue
 
@@ -4249,8 +4249,8 @@ class StateIdMapping(object):
 
         if not all(isinstance(x, int) for x in state_ids):
             raise Exception(
-                'Assigned state ids should be integer values in'
-                ' exploration %s, version %d' % (
+                'Assigned state ids should be integer values in '
+                'exploration %s, version %d' % (
                     self.exploration_id, self.exploration_version))
 
     def get_state_id(self, state_name):

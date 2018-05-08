@@ -3634,8 +3634,9 @@ states:
             'New state': 1,
             'END': 2
         }
-        state_id_map = exp_domain.StateIdMapping.create_mapping_for_new_exploration(
-            old_exploration)
+        state_id_map = (
+            exp_domain.StateIdMapping.create_mapping_for_new_exploration(
+                old_exploration))
         self.assertDictEqual(state_id_map.state_names_to_ids, expected_mapping)
         self.assertEqual(state_id_map.largest_state_id_used, 2)
 
