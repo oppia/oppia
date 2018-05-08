@@ -1938,11 +1938,20 @@ md-card.oppia-dashboard-tile {
   opacity: 1;
   cursor: pointer;
 }
-.toast-warning {
-  background-image: url("/assets/common/images/general/warning.png");
+.oppia-toast:before {
+  align-items: center;
+  bottom: 0;
+  color: #FFFFFF;
+  display: flex;
+  float: left;
+  font-family: 'Material Icons';
+  font-size: 24px;
+  margin: auto 5px auto -37px;
+  position: absolute;
+  top: 0;
 }
-.toast-info {
-  background-image: url("/assets/common/images/general/info.png");
+.toast-warning:before {
+  content: "\e002";
 }
 
 @media all and (max-width: 240px) {
