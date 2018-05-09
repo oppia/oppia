@@ -98,8 +98,9 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id,
-               time_spent_in_state_secs, is_feedback_useful):
+    def create(
+            cls, exp_id, exp_version, state_name, session_id,
+            time_spent_in_state_secs, is_feedback_useful):
         """Creates a new answer submitted event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -186,8 +187,9 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id,
-               time_spent_in_state_secs):
+    def create(
+            cls, exp_id, exp_version, state_name, session_id,
+            time_spent_in_state_secs):
         """Creates a new solution hit event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -262,8 +264,9 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id,
-               params, play_type, unused_version=1):
+    def create(
+            cls, exp_id, exp_version, state_name, session_id,
+            params, play_type, unused_version=1):
         """Creates a new start exploration event and then writes it to
         the datastore.
 
@@ -372,8 +375,9 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id,
-               client_time_spent_in_secs, params, play_type):
+    def create(
+            cls, exp_id, exp_version, state_name, session_id,
+            client_time_spent_in_secs, params, play_type):
         """Creates a new leave exploration event and then writes it
         to the datastore.
 
@@ -476,8 +480,9 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id,
-               client_time_spent_in_secs, params, play_type):
+    def create(
+            cls, exp_id, exp_version, state_name, session_id,
+            client_time_spent_in_secs, params, play_type):
         """Creates a new exploration completion event and then writes it
         to the datastore.
 
@@ -688,8 +693,9 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id,
-               time_spent_in_state_secs):
+    def create(
+            cls, exp_id, exp_version, state_name, session_id,
+            time_spent_in_state_secs):
         """Creates a new state complete event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -734,8 +740,9 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, refresher_exp_id, exp_version, state_name,
-               session_id, time_spent_in_state_secs):
+    def create(
+            cls, exp_id, refresher_exp_id, exp_version, state_name,
+            session_id, time_spent_in_state_secs):
         """Creates a new leave for refresher exploration event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -1513,8 +1520,9 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
                     state_name.encode('utf-8'), calculation_id))
 
     @classmethod
-    def get_model(cls, exploration_id, exploration_version, state_name,
-                  calculation_id):
+    def get_model(
+            cls, exploration_id, exploration_version, state_name,
+            calculation_id):
         """Gets entity instance corresponding to the given exploration state.
 
         Args:
@@ -1534,8 +1542,9 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
         return instance
 
     @classmethod
-    def _get_entity_id(cls, exploration_id, exploration_version, state_name,
-                       calculation_id):
+    def _get_entity_id(
+            cls, exploration_id, exploration_version, state_name,
+            calculation_id):
         """Returns entity_id corresponding to the given exploration state.
 
         Args:
