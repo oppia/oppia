@@ -24,6 +24,9 @@ var workflow = require('../protractor_utils/workflow.js');
 
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var CreatorDashboardPage =
+  require('../protractor_utils/CreatorDashboardPage.js')
 
 describe('State editor', function() {
   var explorationPlayerPage = null;
