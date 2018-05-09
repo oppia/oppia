@@ -398,7 +398,7 @@ class AudioTranslation(object):
         self.needs_update = needs_update
 
     def validate(self):
-        """Validates properties of the Content.
+        """Validates properties of the AudioTranslation.
 
         Raises:
             ValidationError: One or more attributes of the AudioTranslation are
@@ -1249,8 +1249,8 @@ class State(object):
         """Initializes a State domain object.
 
         Args:
-            content: list(Content). The contents displayed to the reader in
-                this state. This list must have only one element.
+            content: list(SubtitledHtml). The contents displayed to the reader
+            in this state. This list must have only one element.
             param_changes: list(ParamChange). Parameter changes associated with
                 this state.
             interaction: InteractionInstance. The interaction instance
@@ -1336,7 +1336,7 @@ class State(object):
         return False
 
     def update_content(self, content_dict):
-        """Update the list of Content of this state.
+        """Update the list of content of this state.
 
         Args:
             content_dict. dict. The dict representation of SubtitledHtml
