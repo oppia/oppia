@@ -80,7 +80,6 @@ exports.config = {
     ],
 
     editorFeatures: [
-      'protractor/statisticsTab.js',
       'protractor/editorFeatures.js'
     ],
 

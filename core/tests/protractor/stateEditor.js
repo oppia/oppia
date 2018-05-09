@@ -389,7 +389,111 @@ describe('State editor', function() {
     users.logout();
   });
 
+  it('checks statistics tab for an exploration', function() {
+    users.createUser(
+      'user1@statisticsTab.com', 'statisticsTabCreator');
+    users.createUser(
+      'user2@statisticsTab.com', 'statisticsTabLearner1');
+    users.createUser(
+      'user3@statisticsTab.com', 'statisticsTabLearner2');
+    var libraryPage = new LibraryPage.LibraryPage();
+    var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    var explorationPlayerPage = (
+      new ExplorationPlayerPage.ExplorationPlayerPage());
+
+    // Creator creates and publishes an exploration
+    users.login('user1@statisticsTab.com');
+    workflow.createExploration();
+
+    editor.setTitle(EXPLORATION_TITLE);
+    editor.setCategory(EXPLORATION_CATEGORY);
+    editor.setObjective(EXPLORATION_OBJECTIVE);
+    if (EXPLORATION_LANGUAGE) {
+      editor.setLanguage(EXPLORATION_LANGUAGE);
+    }
+
+    editor.setStateName('One');
+    editor.setContent(forms.toRichText('Please write 1 in words.'));
+    editor.setInteraction('TextInput');
+    editor.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'Two', true, 'Equals',
+      'One');
+    editor.setDefaultOutcome(forms.toRichText('Try again'));
+
+    editor.moveToState('Two');
+    editor.setContent(forms.toRichText('Please write 2 in words.'));
+    editor.setInteraction('TextInput');
+    editor.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'Three', true, 'Equals',
+      'Two');
+    editor.setDefaultOutcome(forms.toRichText('Try again'));
+    editor.addHint('The number 2 in words.');
+    editor.addSolution('TextInput', {
+      correctAnswer: 'Two',
+      explanation: 'The English equivalent of 2'
+    });
+    editor.moveToState('Three');
+    editor.setContent(forms.toRichText('Please write 3 in words.'));
+    editor.setInteraction('TextInput');
+    editor.addResponse(
+      'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
+      'Three');
+    editor.setDefaultOutcome(forms.toRichText('Try again'));
+
+    editor.moveToState('End');
+    editor.setInteraction('EndExploration');
+    editor.saveChanges();
+    workflow.publishExploration();
+
+    users.logout();
+
+    // Learner 1 completes the exploration.
+    users.login('user2@statisticsTab.com');
+    libraryPage.get();
+    libraryPage.playExploration(EXPLORATION_TITLE);
+
+    explorationPlayerPage.submitAnswer('TextInput', 'One');
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.submitAnswer('TextInput', '2');
+    explorationPlayerPage.viewHint();
+    explorationPlayerPage.clickGotItButton();
+    explorationPlayerPage.submitAnswer('TextInput', '3');
+    explorationPlayerPage.viewSolution();
+    explorationPlayerPage.clickGotItButton();
+    explorationPlayerPage.submitAnswer('TextInput', 'Two');
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToNotBeOver();
+    explorationPlayerPage.submitAnswer('TextInput', 'Three');
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToBeOver();
+
+    users.logout();
+
+    // Learner 2 starts the exploration and immediately quits it.
+    users.login('user3@statisticsTab.com');
+    libraryPage.get();
+    libraryPage.playExploration(EXPLORATION_TITLE);
+
+    explorationPlayerPage.expectExplorationToNotBeOver();
+
+    users.logout();
+
+    // Creator visits the statistics tab.
+    users.login('user1@statisticsTab.com');
+    creatorDashboardPage.get();
+    creatorDashboardPage.navigateToExplorationEditor();
+    editor.navigateToStatsTab();
+
+    // Now, there should be one passerby for this exploration since only learner
+    // 3 quit at the first state.
+    editor.expectNumPassersbyToBe('1');
+
+    users.logout();
+  });
+
   afterEach(function() {
-    general.checkForConsoleErrors([]);
+    general.checkForConsoleErrors([
+      'TypeError: google.visualization.PieChart is not a constructor'
+    ]);
   });
 });
