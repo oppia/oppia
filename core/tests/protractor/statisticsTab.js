@@ -145,6 +145,8 @@ describe('StatisticsTab', function() {
   });
 
   afterEach(function() {
-    general.checkForConsoleErrors([]);
+    general.checkForConsoleErrors([
+      'TypeError: google.visualization.PieChart is not a constructor'
+    ]);
   });
 });
