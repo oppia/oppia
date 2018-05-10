@@ -30,15 +30,28 @@ class Registry(object):
 
     @classmethod
     def get_all_action_ids(cls):
-        """Get a list of all action IDs."""
+        """Get a list of all action IDs.
+
+        Returns:
+            list(str). The list of all allowed action IDs.
+        """
         return feconf.ALLOWED_ACTION_IDS
 
     @classmethod
     def set_actions(cls, actions):
+        """Sets the mapping between action IDs to instances of the action
+        classes to the provided value.
+
+        Args:
+            actions: dict. Mapping action IDs to instances of the actions.
+        """
         cls._actions = actions
 
     @classmethod
     def _refresh(cls):
+        """Initializes the mapping between action IDs to instances of the action
+        classes.
+        """
         cls._actions.clear()
 
         all_action_ids = cls.get_all_action_ids()
@@ -61,7 +74,11 @@ class Registry(object):
 
     @classmethod
     def get_all_actions(cls):
-        """Get a list of instances of all actions."""
+        """Get a list of instances of all actions.
+
+        Returns:
+            list. A list of all action class instances.
+        """
         if len(cls._actions) == 0:
             cls._refresh()
         return cls._actions.values()
@@ -72,6 +89,12 @@ class Registry(object):
 
         Refreshes once if the action is not found; subsequently, throws a
         KeyError.
+
+        Args:
+            action_id: str. ID of the action.
+
+        Returns:
+            An instance of the corresponding action class.
         """
         if action_id not in cls._actions:
             cls._refresh()

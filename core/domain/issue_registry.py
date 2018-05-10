@@ -30,15 +30,28 @@ class Registry(object):
 
     @classmethod
     def get_all_issue_ids(cls):
-        """Get a list of all issue IDs."""
+        """Get a list of all issue IDs.
+
+        Returns:
+            list(str). The list of all allowed issue IDs.
+        """
         return feconf.ALLOWED_ISSUE_IDS
 
     @classmethod
     def set_issues(cls, issues):
+        """Sets the mapping between issue IDs to instances of the issue
+        classes to the provided value.
+
+        Args:
+            issues: dict. Mapping issue IDs to instances of the issues.
+        """
         cls._issues = issues
 
     @classmethod
     def _refresh(cls):
+        """Initializes the mapping between issue IDs to instances of the issue
+        classes.
+        """
         cls._issues.clear()
 
         all_issue_ids = cls.get_all_issue_ids()
@@ -61,7 +74,11 @@ class Registry(object):
 
     @classmethod
     def get_all_issues(cls):
-        """Get a list of instances of all issues."""
+        """Get a list of instances of all issues.
+
+        Returns:
+            list. A list of all issue class instances.
+        """
         if len(cls._issues) == 0:
             cls._refresh()
         return cls._issues.values()
@@ -72,6 +89,12 @@ class Registry(object):
 
         Refreshes once if the issue is not found; subsequently, throws a
         KeyError.
+
+        Args:
+            issue_id: str. ID of the issue.
+
+        Returns:
+            An instance of the corresponding issue class.
         """
         if issue_id not in cls._issues:
             cls._refresh()
