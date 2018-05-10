@@ -227,3 +227,36 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(stats_models[1].exp_version, 2)
         self.assertEqual(stats_models[2].exp_id, 'exp_id2')
         self.assertEqual(stats_models[2].exp_version, 1)
+
+
+class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
+    """Test the ExplorationIssuesModel class."""
+
+    def test_create_and_get_exp_issues_model(self):
+        model_id = (
+            stat_models.ExplorationIssuesModel.create(
+                'exp_id1', []))
+
+        model = stat_models.ExplorationIssuesModel.get(model_id)
+
+        self.assertEqual(model.id, model_id)
+        self.assertEqual(model.unresolved_issues, [])
+
+
+class PlaythroughModelUnitTests(test_utils.GenericTestBase):
+    """Test the PlaythroughModel class."""
+
+    def test_create_and_get_playthrough_model(self):
+        model_id = (
+            stat_models.PlaythroughModel.create(
+                'exp_id1', 1, 'EarlyQuit', {}, [], True))
+
+        model = stat_models.PlaythroughModel.get(model_id)
+
+        self.assertEqual(model.id, model_id)
+        self.assertEqual(model.exp_id, 'exp_id1')
+        self.assertEqual(model.exp_version, 1)
+        self.assertEqual(model.issue_id, 'EarlyQuit')
+        self.assertEqual(model.issue_customization_args, {})
+        self.assertEqual(model.playthrough_actions, [])
+        self.assertEqual(model.is_valid, True)
