@@ -31,6 +31,9 @@ oppia.constant(
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>');
 oppia.constant(
+  'TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/translationdata/<exploration_id>');
+oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 

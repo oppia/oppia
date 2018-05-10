@@ -38,11 +38,10 @@ oppia.directive('ruleEditor', [
         '$scope', '$timeout', 'EditorStateService',
         'ExplorationStatesService', 'RouterService', 'ValidatorsService',
         'ResponsesService', 'stateInteractionIdService', 'INTERACTION_SPECS',
-        'RULE_TYPE_CLASSIFIER', function(
+        function(
             $scope, $timeout, EditorStateService,
             ExplorationStatesService, RouterService, ValidatorsService,
-            ResponsesService, stateInteractionIdService, INTERACTION_SPECS,
-            RULE_TYPE_CLASSIFIER) {
+            ResponsesService, stateInteractionIdService, INTERACTION_SPECS) {
           var DEFAULT_OBJECT_VALUES = GLOBALS.DEFAULT_OBJECT_VALUES;
 
           $scope.currentInteractionId = stateInteractionIdService.savedMemento;
@@ -194,15 +193,6 @@ oppia.directive('ruleEditor', [
               if (oldRuleInputs.hasOwnProperty(key) &&
                 oldRuleInputTypes[key] === $scope.rule.inputTypes[key]) {
                 $scope.rule.inputs[key] = oldRuleInputs[key];
-              }
-            }
-          };
-
-          $scope.onDeleteTrainingDataEntry = function(index) {
-            if ($scope.rule.type === RULE_TYPE_CLASSIFIER) {
-              var trainingData = $scope.rule.inputs.training_data;
-              if (index < trainingData.length) {
-                trainingData.splice(index, 1);
               }
             }
           };

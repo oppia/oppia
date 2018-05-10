@@ -20,9 +20,6 @@
     },
     "ErrorContains": {
       "description": "has error message that contains {{x|UnicodeString}}"
-    },
-    "FuzzyMatches": {
-      "description": "is similar to {{training_data|ListOfCodeEvaluation}}"
     }
   },
   "Continue": {},
@@ -213,9 +210,6 @@
     },
     "FuzzyEquals": {
       "description": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
-    },
-    "FuzzyMatches": {
-      "description": "is similar to {{training_data|SetOfNormalizedString}}"
     }
   }
 }

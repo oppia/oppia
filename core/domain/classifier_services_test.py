@@ -230,18 +230,21 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             state_name, feconf.TRAINING_JOB_STATUS_NEW, {}, 1)
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
-        self.assertEqual(classifier_training_job.algorithm_id,
-                         feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
-                             'algorithm_id'])
+        self.assertEqual(
+            classifier_training_job.algorithm_id,
+            feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput'][
+                'algorithm_id'])
         self.assertEqual(classifier_training_job.interaction_id, interaction_id)
         self.assertEqual(classifier_training_job.exp_id, exp_id)
         self.assertEqual(classifier_training_job.exp_version, 1)
-        self.assertEqual(classifier_training_job.next_scheduled_check_time,
-                         next_scheduled_check_time)
+        self.assertEqual(
+            classifier_training_job.next_scheduled_check_time,
+            next_scheduled_check_time)
         self.assertEqual(classifier_training_job.training_data, [])
         self.assertEqual(classifier_training_job.state_name, state_name)
-        self.assertEqual(classifier_training_job.status,
-                         feconf.TRAINING_JOB_STATUS_NEW)
+        self.assertEqual(
+            classifier_training_job.status,
+            feconf.TRAINING_JOB_STATUS_NEW)
         self.assertEqual(classifier_training_job.classifier_data, {})
         self.assertEqual(classifier_training_job.data_schema_version, 1)
 
@@ -279,15 +282,17 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
-        self.assertEqual(classifier_training_job.status,
-                         feconf.TRAINING_JOB_STATUS_PENDING)
+        self.assertEqual(
+            classifier_training_job.status,
+            feconf.TRAINING_JOB_STATUS_PENDING)
 
         classifier_services.mark_training_job_complete(job_id)
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
-        self.assertEqual(classifier_training_job.status,
-                         feconf.TRAINING_JOB_STATUS_COMPLETE)
+        self.assertEqual(
+            classifier_training_job.status,
+            feconf.TRAINING_JOB_STATUS_COMPLETE)
 
         # Test that invalid status changes cannot be made.
         with self.assertRaisesRegexp(Exception, (
@@ -311,15 +316,17 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
-        self.assertEqual(classifier_training_job.status,
-                         feconf.TRAINING_JOB_STATUS_NEW)
+        self.assertEqual(
+            classifier_training_job.status,
+            feconf.TRAINING_JOB_STATUS_NEW)
 
         classifier_services.mark_training_job_pending(job_id)
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
-        self.assertEqual(classifier_training_job.status,
-                         feconf.TRAINING_JOB_STATUS_PENDING)
+        self.assertEqual(
+            classifier_training_job.status,
+            feconf.TRAINING_JOB_STATUS_PENDING)
 
         # Test that invalid status changes cannot be made.
         with self.assertRaisesRegexp(Exception, (
@@ -343,15 +350,17 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
-        self.assertEqual(classifier_training_job.status,
-                         feconf.TRAINING_JOB_STATUS_PENDING)
+        self.assertEqual(
+            classifier_training_job.status,
+            feconf.TRAINING_JOB_STATUS_PENDING)
 
         classifier_services.mark_training_jobs_failed([job_id])
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
-        self.assertEqual(classifier_training_job.status,
-                         feconf.TRAINING_JOB_STATUS_FAILED)
+        self.assertEqual(
+            classifier_training_job.status,
+            feconf.TRAINING_JOB_STATUS_FAILED)
 
         # Test that invalid status changes cannot be made.
         with self.assertRaisesRegexp(Exception, (

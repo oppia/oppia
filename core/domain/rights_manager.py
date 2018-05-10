@@ -61,10 +61,11 @@ class ActivityRights(object):
     exploration or a collection).
     """
 
-    def __init__(self, exploration_id, owner_ids, editor_ids, translator_ids,
-                 viewer_ids, community_owned=False, cloned_from=None,
-                 status=ACTIVITY_STATUS_PRIVATE, viewable_if_private=False,
-                 first_published_msec=None):
+    def __init__(
+            self, exploration_id, owner_ids, editor_ids, translator_ids,
+            viewer_ids, community_owned=False, cloned_from=None,
+            status=ACTIVITY_STATUS_PRIVATE, viewable_if_private=False,
+            first_published_msec=None):
         self.id = exploration_id
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
@@ -949,8 +950,9 @@ def _assign_role(
         'new_role': new_role
     }]
 
-    _save_activity_rights(committer_id, activity_rights, activity_type,
-                          commit_message, commit_cmds)
+    _save_activity_rights(
+        committer_id, activity_rights, activity_type,
+        commit_message, commit_cmds)
     _update_activity_summary(activity_type, activity_rights)
 
 

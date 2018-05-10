@@ -194,8 +194,9 @@ class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
         retrieved_state_classifier_mapping = exploration_dict[
             'state_classifier_mapping']
 
-        self.assertEqual(expected_state_classifier_mapping,
-                         retrieved_state_classifier_mapping)
+        self.assertEqual(
+            expected_state_classifier_mapping,
+            retrieved_state_classifier_mapping)
 
 
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):
@@ -1132,9 +1133,10 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Remove one exploration.
         self.testapp.delete(str(
             '%s/%s/%s' %
-            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
-             constants.ACTIVITY_TYPE_EXPLORATION,
-             self.EXP_ID_0)))
+            (
+                feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+                constants.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_0)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_1])
@@ -1142,9 +1144,10 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Remove another exploration.
         self.testapp.delete(str(
             '%s/%s/%s' %
-            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
-             constants.ACTIVITY_TYPE_EXPLORATION,
-             self.EXP_ID_1)))
+            (
+                feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+                constants.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_1)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [])
@@ -1166,9 +1169,10 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Remove one collection.
         self.testapp.delete(str(
             '%s/%s/%s' %
-            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
-             constants.ACTIVITY_TYPE_COLLECTION,
-             self.COL_ID_0)))
+            (
+                feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+                constants.ACTIVITY_TYPE_COLLECTION,
+                self.COL_ID_0)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_1])
@@ -1176,9 +1180,10 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Remove another collection.
         self.testapp.delete(str(
             '%s/%s/%s' %
-            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
-             constants.ACTIVITY_TYPE_COLLECTION,
-             self.COL_ID_1)))
+            (
+                feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+                constants.ACTIVITY_TYPE_COLLECTION,
+                self.COL_ID_1)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [])

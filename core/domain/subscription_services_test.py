@@ -335,10 +335,11 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         # If the collection author adds the exploration to his/her collection,
         # the collection author should not be subscribed to the exploration nor
         # should the exploration author be subscribed to the collection.
-        collection_services.update_collection(self.owner_id, COLLECTION_ID, [{
-            'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
-            'exploration_id': EXP_ID
-        }], 'Add new exploration to collection.')
+        collection_services.update_collection(
+            self.owner_id, COLLECTION_ID, [{
+                'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
+                'exploration_id': EXP_ID
+            }], 'Add new exploration to collection.')
 
         # Ensure subscriptions are as expected.
         self.assertEqual(
@@ -399,8 +400,8 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
             [self.owner_id])
 
         # Subscribe another creator.
-        subscription_services.subscribe_to_creator(USER_ID_2,
-                                                   self.owner_id)
+        subscription_services.subscribe_to_creator(
+            USER_ID_2, self.owner_id)
         self.assertEqual(
             self._get_all_subscribers_of_creators(self.owner_id),
             [USER_ID, USER_ID_2])

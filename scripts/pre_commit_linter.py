@@ -295,8 +295,8 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
-def _lint_js_files(node_path, eslint_path, files_to_lint, stdout,
-                   result):
+def _lint_js_files(
+        node_path, eslint_path, files_to_lint, stdout, result):
     """Prints a list of lint errors in the given list of JavaScript files.
 
     Args:
@@ -532,8 +532,9 @@ def _pre_commit_linter(all_files):
     linting_processes = []
     js_stdout = multiprocessing.Queue()
     linting_processes.append(multiprocessing.Process(
-        target=_lint_js_files, args=(node_path, eslint_path, js_files_to_lint,
-                                     js_stdout, js_result)))
+        target=_lint_js_files, args=(
+            node_path, eslint_path, js_files_to_lint,
+            js_stdout, js_result)))
 
     py_result = multiprocessing.Queue()
     linting_processes.append(multiprocessing.Process(

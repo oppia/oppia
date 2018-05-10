@@ -36,7 +36,7 @@ oppia.directive('explorationSaveAndPublishButtons', [
 
           $scope.showPublishButton = function() {
             return GLOBALS.canPublish;
-          }
+          };
 
           $scope.isPrivate = function() {
             return ExplorationRightsService.isPrivate();
