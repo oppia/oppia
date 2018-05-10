@@ -405,8 +405,8 @@ describe('State editor', function() {
       'user3@statisticsTab.com', 'statisticsTabLearner2');
     var libraryPage = new LibraryPage.LibraryPage();
     var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    var explorationPlayerPage = (
-      new ExplorationPlayerPage.ExplorationPlayerPage());
+    var explorationPlayerPage =
+      new ExplorationPlayerPage.ExplorationPlayerPage();
 
     // Creator creates and publishes an exploration
     users.login('user1@statisticsTab.com');
@@ -499,6 +499,8 @@ describe('State editor', function() {
   });
 
   afterEach(function() {
+    // TODO(pranavsid98): Figure out why this error is raised once before the
+    // page is even loaded.
     general.checkForConsoleErrors([
       'TypeError: google.visualization.PieChart is not a constructor'
     ]);
