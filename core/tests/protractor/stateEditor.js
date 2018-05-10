@@ -499,8 +499,8 @@ describe('State editor', function() {
   });
 
   afterEach(function() {
-    // TODO(pranavsid98): Figure out why this error is raised once before the
-    // page is even loaded.
+    // TODO(pranavsid98): Remove this checked error once we figure out and fix
+    // the cause.
     general.checkForConsoleErrors([
       'TypeError: google.visualization.PieChart is not a constructor'
     ]);
