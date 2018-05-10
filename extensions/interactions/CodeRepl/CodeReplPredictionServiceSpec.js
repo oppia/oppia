@@ -93,30 +93,51 @@ describe('CodeRepl prediction service', function() {
 
       // Test algorithm agains first test set. This test set contains
       // example which can be successfully classified by KNN classifier.
-      var testData = getJSONFixture('code_classifier_test_set_1.json');
+      var testData = getJSONFixture('code_classifier_test_knn.json');
       var predictedAnswerGroup = null;
-
       for (var i = 0; i < testData.length; i++) {
         for (var j = 0; j < testData[i].answers.length; j++) {
           predictedAnswerGroup = service.predict(
             classifierData, testData[i].answers[j]);
           expect(predictedAnswerGroup).toEqual(
-            testData[i].answer_group_index.toString());
+            testData[i].answer_group_index);
         }
       }
 
-      // Test algorithm against second test set. This test set contains
-      // example which will cause code classifier fail on KNN prediction
-      // and force it to use SVM for prediction.
-      testData = getJSONFixture('code_classifier_test_set_2.json');
+      // Test algorithm agains first test set. This test set contains
+      // example for which KNN fails but SVM succeeds.
+      var testData = getJSONFixture('code_classifier_test_svm.json');
+      var predictedAnswerGroup = null;
       for (var i = 0; i < testData.length; i++) {
         for (var j = 0; j < testData[i].answers.length; j++) {
           predictedAnswerGroup = service.predict(
             classifierData, testData[i].answers[j]);
           expect(predictedAnswerGroup).toEqual(
-            testData[i].answer_group_index.toString());
+            testData[i].answer_group_index);
         }
       }
+    });
+
+    it('should not have accuracy less than 85', function() {
+      jasmine.getJSONFixtures().fixturesPath = 'base/core/tests/data';
+
+      var classifierData = getJSONFixture('code_classifier_data.json');
+      var trainingData = getJSONFixture('code_classifier_accuracy_test.json');
+      var correctPredictions = 0, totalAnswers = 0;
+
+      // To keep things simple, we will calculate accuracy score
+      // and not F1 score.
+      for (var i = 0; i < trainingData.length; i++) {
+        for (var j = 0; j < trainingData[i].answers.length; j++) {
+          predictedAnswerGroup = service.predict(
+            classifierData, trainingData[i].answers[j]);
+          if (predictedAnswerGroup === trainingData[i].answer_group_index) {
+            correctPredictions++;
+          }
+          totalAnswers++;
+        }
+      }
+      expect((correctPredictions * 100) / totalAnswers).not.toBeLessThan(85.0);
     });
   });
 });
