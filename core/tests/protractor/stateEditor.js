@@ -393,6 +393,10 @@ describe('State editor', function() {
   });
 
   it('checks statistics tab for an exploration', function() {
+    var EXPLORATION_TITLE = 'Exploration for stats testing';
+    var EXPLORATION_OBJECTIVE = 'To explore something';
+    var EXPLORATION_CATEGORY = 'Algorithms';
+    var EXPLORATION_LANGUAGE = 'English';
     users.createUser(
       'user1@statisticsTab.com', 'statisticsTabCreator');
     users.createUser(
