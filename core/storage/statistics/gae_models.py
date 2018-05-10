@@ -1000,7 +1000,7 @@ class PlaythroughModel(base_models.BaseModel):
                 many collisions.
         """
 
-        for _ in range(base_models.MAX_RETRIES):
+        for _ in xrange(base_models.MAX_RETRIES):
             new_id = '%s.%s' % (
                 exp_id,
                 utils.convert_to_hash(
