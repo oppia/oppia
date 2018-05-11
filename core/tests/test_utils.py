@@ -502,13 +502,14 @@ tags: []
             response = self.testapp.get(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
             csrf_token = self.get_csrf_token_from_response(response)
-            response = self.testapp.post(feconf.SIGNUP_DATA_URL, {
-                'csrf_token': csrf_token,
-                'payload': json.dumps({
-                    'username': username,
-                    'agreed_to_terms': True
+            response = self.testapp.post(
+                feconf.SIGNUP_DATA_URL, {
+                    'csrf_token': csrf_token,
+                    'payload': json.dumps({
+                        'username': username,
+                        'agreed_to_terms': True
+                    })
                 })
-            })
             self.assertEqual(response.status_int, 200)
         self.logout()
 
@@ -521,12 +522,13 @@ tags: []
         self.login('tmpsuperadmin@example.com', is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminhandler', {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_obj.name: new_config_value,
-            }
-        }, csrf_token)
+        self.post_json(
+            '/adminhandler', {
+                'action': 'save_config_properties',
+                'new_config_property_values': {
+                    config_obj.name: new_config_value,
+                }
+            }, csrf_token)
         self.logout()
 
         self._restore_stashed_user_env()
@@ -543,10 +545,11 @@ tags: []
         self.login('tmpsuperadmin@example.com', is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminrolehandler', {
-            'username': username,
-            'role': user_role
-        }, csrf_token)
+        self.post_json(
+            '/adminrolehandler', {
+                'username': username,
+                'role': user_role
+            }, csrf_token)
         self.logout()
 
         self._restore_stashed_user_env()
@@ -710,11 +713,12 @@ tags: []
         rights_manager.create_new_exploration_rights(exp_id, user_id)
 
         commit_message = 'New exploration created with title \'%s\'.' % title
-        exp_model.commit(user_id, commit_message, [{
-            'cmd': 'create_new',
-            'title': 'title',
-            'category': 'category',
-        }])
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
         exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
         exp_summary_model = exp_models.ExpSummaryModel(
             id=exp_id,

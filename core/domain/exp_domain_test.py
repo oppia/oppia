@@ -58,9 +58,10 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(exp_versions_diff.added_state_names, [])
         self.assertEqual(exp_versions_diff.deleted_state_names, [])
-        self.assertEqual(exp_versions_diff.old_to_new_state_names, {
-            'Home': 'Renamed state'
-        })
+        self.assertEqual(
+            exp_versions_diff.old_to_new_state_names, {
+                'Home': 'Renamed state'
+            })
         self.exploration.version += 1
 
         # Add a state.
@@ -699,14 +700,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected language code to be a string'
             ):
-            with self.swap(subtitled_html, 'audio_translations',
-                           {20: audio_translation}):
+            with self.swap(
+                subtitled_html, 'audio_translations',
+                {20: audio_translation}):
                 subtitled_html.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Unrecognized language code'
             ):
-            with self.swap(subtitled_html, 'audio_translations',
-                           {'invalid-code': audio_translation}):
+            with self.swap(
+                subtitled_html, 'audio_translations',
+                {'invalid-code': audio_translation}):
                 subtitled_html.validate()
 
     def test_get_trainable_states_dict(self):
@@ -3352,9 +3355,10 @@ class StateIdMappingTests(test_utils.GenericTestBase):
                     'state_name': 'new state',
                 }], 'Add state name')
 
-            exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-                'cmd': exp_domain.CMD_DELETE_STATE,
-                'state_name': 'new state',
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_DELETE_STATE,
+                    'state_name': 'new state',
                 }], 'delete state')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -3380,11 +3384,12 @@ class StateIdMappingTests(test_utils.GenericTestBase):
                     'state_name': 'new state',
                 }], 'Add state name')
 
-            exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'new state',
-                'new_state_name': 'state',
-            }], 'Change state name')
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'new state',
+                    'new_state_name': 'state',
+                }], 'Change state name')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(

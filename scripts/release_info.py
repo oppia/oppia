@@ -98,8 +98,8 @@ def _gather_logs(start, stop='HEAD'):
         list[Log]: List of Logs
 
     """
-    get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(GROUP_SEP, start,
-                                                         stop)
+    get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(
+        GROUP_SEP, start, stop)
     out = _run_cmd(get_logs_cmd).split('\x00')
     if len(out) == 1 and out[0] == '':
         return []

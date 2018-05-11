@@ -456,9 +456,10 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             self.user_a, self.COLLECTION_ID, self.user_id_b,
             rights_manager.ROLE_EDITOR)
 
-        self.assertListEqual(['A'],
-                             rights_manager.get_collection_owner_names(
-                                 self.COLLECTION_ID))
+        self.assertListEqual(
+            ['A'],
+            rights_manager.get_collection_owner_names(
+                self.COLLECTION_ID))
         collection_rights = rights_manager.get_collection_rights(
             self.COLLECTION_ID)
 
@@ -470,9 +471,10 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_newly_created_collection(self):
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
 
-        self.assertListEqual(['A'],
-                             rights_manager.get_collection_owner_names(
-                                 self.COLLECTION_ID))
+        self.assertListEqual(
+            ['A'],
+            rights_manager.get_collection_owner_names(
+                self.COLLECTION_ID))
         collection_rights = rights_manager.get_collection_rights(
             self.COLLECTION_ID)
 
@@ -530,9 +532,10 @@ class CollectionRightsTests(test_utils.GenericTestBase):
             rights_manager.ROLE_EDITOR)
 
         # Ensure User A is the only user in the owner names list.
-        self.assertListEqual(['A'],
-                             rights_manager.get_collection_owner_names(
-                                 self.COLLECTION_ID))
+        self.assertListEqual(
+            ['A'],
+            rights_manager.get_collection_owner_names(
+                self.COLLECTION_ID))
         collection_rights = rights_manager.get_collection_rights(
             self.COLLECTION_ID)
 

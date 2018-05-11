@@ -160,8 +160,9 @@ class SentEmailModel(base_models.BaseModel):
             if not isinstance(sent_datetime_lower_bound, datetime.datetime):
                 raise Exception(
                     'Expected datetime, received %s of type %s' %
-                    (sent_datetime_lower_bound,
-                     type(sent_datetime_lower_bound)))
+                    (
+                        sent_datetime_lower_bound,
+                        type(sent_datetime_lower_bound)))
 
         query = cls.query().filter(cls.email_hash == email_hash)
 

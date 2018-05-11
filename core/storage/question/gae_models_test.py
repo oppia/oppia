@@ -34,6 +34,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(question_model.title, title)
         self.assertEqual(question_model.question_data, question_data)
-        self.assertEqual(question_model.question_data_schema_version,
-                         question_data_schema_version)
+        self.assertEqual(
+            question_model.question_data_schema_version,
+            question_data_schema_version)
         self.assertEqual(question_model.language_code, language_code)

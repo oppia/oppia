@@ -37,8 +37,9 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 
         self.generate_constant_hash_ctx = self.swap(
             email_models.SentEmailModel, '_generate_hash',
-            types.MethodType(_generate_hash_for_tests,
-                             email_models.SentEmailModel))
+            types.MethodType(
+                _generate_hash_for_tests,
+                email_models.SentEmailModel))
 
     def test_saved_model_can_be_retrieved_with_same_hash(self):
         with self.generate_constant_hash_ctx:

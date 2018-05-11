@@ -18,6 +18,7 @@ import astroid
 
 from pylint.checkers import BaseChecker
 from pylint.interfaces import IAstroidChecker
+from pylint.interfaces import IRawChecker
 
 
 class ExplicitKwargsChecker(BaseChecker):
@@ -73,11 +74,73 @@ class ExplicitKwargsChecker(BaseChecker):
         Args:
             node. Call. The current function call node.
         """
-        if (isinstance(node.func, astroid.Name) and
+        if (isinstance(node.func, astroid.Name)) and (
                 node.func.name == self._function_name):
-            if (node.args is not None and
+            if (node.args is not None) and (
                     len(node.args) > self._positional_arguments_count):
                 self.add_message('non-explicit-kwargs', node=node)
+
+
+class HangingIndentChecker(BaseChecker):
+    """Custom pylint checker which checks for break after parenthesis in case
+    of hanging indentation.
+    """
+    __implements__ = IRawChecker
+
+    name = 'hanging-indent'
+    priority = -1
+    msgs = {
+        'C0002': (
+            (
+                'There should be a break after parenthesis when content within '
+                'parenthesis spans multiple lines.'),
+            'no-break-after-hanging-indent',
+            (
+                'If something within parenthesis extends along multiple lines, '
+                'break after opening parenthesis.')
+        ),
+    }
+
+    def process_module(self, node):
+        """Process a module.
+
+        Args:
+            node: Node to access module content.
+        """
+        file_content = node.stream().readlines()
+        file_length = len(file_content)
+        exclude = False
+        for line_num in xrange(file_length):
+            line = file_content[line_num].lstrip().rstrip()
+            if line.startswith('"""') and not line.endswith('"""'):
+                exclude = True
+            if line.endswith('"""'):
+                exclude = False
+            if line.startswith('#') or exclude:
+                continue
+            line_length = len(line)
+            bracket_count = 0
+            for char_num in xrange(line_length):
+                char = line[char_num]
+                if char == '(':
+                    if bracket_count == 0:
+                        position = char_num
+                    bracket_count += 1
+                elif char == ')' and bracket_count > 0:
+                    bracket_count -= 1
+            if bracket_count > 0 and position + 1 < line_length:
+                content = line[position + 1:]
+                if not len(content) or not ',' in content:
+                    continue
+                split_list = content.split(', ')
+                if len(split_list) == 1 and not any(
+                        char.isalpha() for char in split_list[0]):
+                    continue
+                separators = set('@^! #%$&)(+*-=')
+                if not any(char in separators for item in split_list
+                           for char in item):
+                    self.add_message(
+                        'no-break-after-hanging-indent', line=line_num + 1)
 
 
 def register(linter):
@@ -87,3 +150,4 @@ def register(linter):
         linter: Pylinter. The Pylinter object.
     """
     linter.register_checker(ExplicitKwargsChecker(linter))
+    linter.register_checker(HangingIndentChecker(linter))

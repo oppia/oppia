@@ -60,13 +60,14 @@ class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'number of messages.' % (
                     key, len(message_ids), next_message_id))
 
-            yield ('error', {
-                'subject': thread.subject,
-                'exploration_id': exploration_id,
-                'thread_id': thread_id,
-                'next_message_id': next_message_id,
-                'message_count': len(message_ids)
-            })
+            yield (
+                'error', {
+                    'subject': thread.subject,
+                    'exploration_id': exploration_id,
+                    'thread_id': thread_id,
+                    'next_message_id': next_message_id,
+                    'message_count': len(message_ids)
+                })
 
 
 class FeedbackSubjectOneOffJob(jobs.BaseMapReduceOneOffJobManager):
