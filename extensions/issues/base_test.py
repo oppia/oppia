@@ -17,12 +17,11 @@
 """Tests for the base issue specification."""
 
 from core.domain import issue_registry
-from core.domain import obj_services
 from core.tests import test_utils
-import schema_utils
-import schema_utils_test
 
 EARLY_QUIT_ID = 'EarlyQuit'
+MULTIPLE_INCORRECT_SUBMISSIONS_ID = 'MultipleIncorrectSubmissions'
+CYCLIC_STATE_TRANSITIONS_ID = 'CyclicStateTransitions'
 
 
 class IssueUnitTests(test_utils.GenericTestBase):
@@ -36,18 +35,62 @@ class IssueUnitTests(test_utils.GenericTestBase):
         issue_dict = issue.to_dict()
         self.assertItemsEqual(issue_dict.keys(), [
             'customization_arg_specs'])
-        self.assertEqual(issue_dict['customization_arg_specs'], [{
-            'name': 'state_name',
-            'description': 'State name',
-            'schema': {
-                'type': 'unicode',
-            },
-            'default_value': ''
-        }, {
-            'name': 'time_spent_in_exp_in_msecs',
-            'description': 'Time spent in the exploration before quitting',
-            'schema': {
-                'type': 'int',
-            },
-            'default_value': 0
-        }])
+        self.assertEqual(
+            issue_dict['customization_arg_specs'], [{
+                'name': 'state_name',
+                'description': 'State name',
+                'schema': {
+                    'type': 'unicode',
+                },
+                'default_value': ''
+            }, {
+                'name': 'time_spent_in_exp_in_msecs',
+                'description': 'Time spent in the exploration before quitting',
+                'schema': {
+                    'type': 'int',
+                },
+                'default_value': 0
+            }])
+
+        issue = issue_registry.Registry.get_issue_by_id(
+            MULTIPLE_INCORRECT_SUBMISSIONS_ID)
+
+        issue_dict = issue.to_dict()
+        self.assertItemsEqual(issue_dict.keys(), [
+            'customization_arg_specs'])
+        self.assertEqual(
+            issue_dict['customization_arg_specs'], [{
+                'name': 'state_name',
+                'description': 'State name',
+                'schema': {
+                    'type': 'unicode',
+                },
+                'default_value': ''
+            }, {
+                'name': 'num_times_answered_incorrectly',
+                'description': (
+                    'Number of times incorrect answers were submitted'),
+                'schema': {
+                    'type': 'int',
+                },
+                'default_value': 0
+            }])
+
+        issue = issue_registry.Registry.get_issue_by_id(
+            CYCLIC_STATE_TRANSITIONS_ID)
+
+        issue_dict = issue.to_dict()
+        self.assertItemsEqual(issue_dict.keys(), [
+            'customization_arg_specs'])
+        self.assertEqual(
+            issue_dict['customization_arg_specs'], [{
+                'name': 'state_names',
+                'description': 'List of state names',
+                'schema': {
+                    'type': 'list',
+                    'items': {
+                        'type': 'unicode',
+                    },
+                },
+                'default_value': []
+            }])
