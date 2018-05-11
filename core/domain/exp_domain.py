@@ -1249,7 +1249,7 @@ class State(object):
         """Initializes a State domain object.
 
         Args:
-            content: list(SubtitledHtml). The contents displayed to the reader
+            content: SubtitledHtml. The contents displayed to the reader
             in this state. This list must have only one element.
             param_changes: list(ParamChange). Parameter changes associated with
                 this state.
