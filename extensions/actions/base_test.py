@@ -17,12 +17,11 @@
 """Tests for the base action specification."""
 
 from core.domain import action_registry
-from core.domain import obj_services
 from core.tests import test_utils
-import schema_utils
-import schema_utils_test
 
 EXPLORATION_START_ID = 'ExplorationStart'
+ANSWER_SUBMIT_ID = 'AnswerSubmit'
+EXPLORATION_QUIT_ID = 'ExplorationQuit'
 
 
 class ActionUnitTests(test_utils.GenericTestBase):
@@ -36,11 +35,84 @@ class ActionUnitTests(test_utils.GenericTestBase):
         action_dict = action.to_dict()
         self.assertItemsEqual(action_dict.keys(), [
             'customization_arg_specs'])
-        self.assertEqual(action_dict['customization_arg_specs'], [{
-            'name': 'state_name',
-            'description': 'Initial state name',
-            'schema': {
-                'type': 'unicode',
-            },
-            'default_value': ''
-        }])
+        self.assertEqual(
+            action_dict['customization_arg_specs'], [{
+                'name': 'state_name',
+                'description': 'Initial state name',
+                'schema': {
+                    'type': 'unicode',
+                },
+                'default_value': ''
+            }])
+
+        action = action_registry.Registry.get_action_by_id(ANSWER_SUBMIT_ID)
+
+        action_dict = action.to_dict()
+        self.assertItemsEqual(action_dict.keys(), [
+            'customization_arg_specs'])
+        self.assertEqual(
+            action_dict['customization_arg_specs'], [{
+                'name': 'state_name',
+                'description': 'State name',
+                'schema': {
+                    'type': 'unicode',
+                },
+                'default_value': ''
+            }, {
+                'name': 'dest_state_name',
+                'description': 'Destination state name',
+                'schema': {
+                    'type': 'unicode',
+                },
+                'default_value': ''
+            }, {
+                'name': 'interaction_id',
+                'description': 'ID of the interaction',
+                'schema': {
+                    'type': 'unicode',
+                },
+                'default_value': ''
+            }, {
+                'name': 'submitted_answer',
+                'description': 'Submitted answer',
+                'schema': {
+                    'type': 'unicode',
+                },
+                'default_value': ''
+            }, {
+                'name': 'feedback',
+                'description': 'Feedback for the submitted answer',
+                'schema': {
+                    'type': 'unicode',
+                },
+                'default_value': ''
+            }, {
+                'name': 'time_spent_state_in_msecs',
+                'description': 'Time spent in state',
+                'schema': {
+                    'type': 'int',
+                },
+                'default_value': 0
+            }])
+
+        action = action_registry.Registry.get_action_by_id(EXPLORATION_QUIT_ID)
+
+        action_dict = action.to_dict()
+        self.assertItemsEqual(action_dict.keys(), [
+            'customization_arg_specs'])
+        self.assertEqual(
+            action_dict['customization_arg_specs'], [{
+                'name': 'state_name',
+                'description': 'State name',
+                'schema': {
+                    'type': 'unicode',
+                },
+                'default_value': ''
+            }, {
+                'name': 'time_spent_in_state_in_msecs',
+                'description': 'Time spent in state',
+                'schema': {
+                    'type': 'int',
+                },
+                'default_value': 0
+            }])
