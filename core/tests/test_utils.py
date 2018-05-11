@@ -406,10 +406,8 @@ tags: []
         json_response = self.testapp.get(
             url, params, expect_errors=expect_errors,
             status=expected_status_int)
-        if (not expect_errors or
-                json_response.content_type == 'application/json'):
-            return self._parse_json_response(
-                json_response, expect_errors=expect_errors)
+        return self._parse_json_response(
+            json_response, expect_errors=expect_errors)
 
     def post_json(self, url, payload, csrf_token=None, expect_errors=False,
                   expected_status_int=200, upload_files=None):

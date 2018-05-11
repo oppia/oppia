@@ -35,6 +35,9 @@ class PlayExplorationDecoratorTest(test_utils.GenericTestBase):
     private_exp_id = 'exp_id_2'
 
     class MockHandler(base.BaseHandler):
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
         @acl_decorators.can_play_exploration
         def get(self, exploration_id):
             return self.render_json({'exploration_id': exploration_id})
@@ -96,6 +99,9 @@ class PlayCollectionDecoratorTest(test_utils.GenericTestBase):
     private_col_id = 'col_id_2'
 
     class MockHandler(base.BaseHandler):
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
         @acl_decorators.can_play_collection
         def get(self, collection_id):
             return self.render_json({'collection_id': collection_id})
@@ -164,6 +170,9 @@ class EditCollectionDecoratorTest(test_utils.GenericTestBase):
     private_col_id = 'col_id_2'
 
     class MockHandler(base.BaseHandler):
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
         @acl_decorators.can_edit_collection
         def get(self, collection_id):
             return self.render_json({'collection_id': collection_id})
@@ -1037,6 +1046,8 @@ class EditTopicDecoratorTest(test_utils.GenericTestBase):
     topic_id = 'topic_1'
 
     class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
         @acl_decorators.can_edit_topic
         def get(self, topic_id):
             self.render_json({'topic_id': topic_id})
