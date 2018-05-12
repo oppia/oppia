@@ -23,7 +23,7 @@ class BaseLearnerActionSpec(object):
     """Base action definition class.
 
     This class is not meant to be user-editable. The only methods on it should
-    be get()-type methods.
+    be getter methods.
     """
 
     # Customization arg specifications for the component, including their

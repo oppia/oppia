@@ -29,7 +29,7 @@ class ExplorationQuit(base.BaseLearnerActionSpec):
         'default_value': ''
     }, {
         'name': 'time_spent_in_state_in_msecs',
-        'description': 'Time spent in state',
+        'description': 'Time spent in state in milliseconds',
         'schema': {
             'type': 'int',
         },
