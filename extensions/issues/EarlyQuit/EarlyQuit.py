@@ -29,7 +29,8 @@ class EarlyQuit(base.BaseExplorationIssueSpec):
         'default_value': ''
     }, {
         'name': 'time_spent_in_exp_in_msecs',
-        'description': 'Time spent in the exploration before quitting',
+        'description': (
+            'Time spent in the exploration before quitting in milliseconds'),
         'schema': {
             'type': 'int',
         },
