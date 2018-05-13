@@ -22,7 +22,7 @@ from extensions import domain
 class BaseExplorationIssueSpec(object):
     """Base issue definition class.
 
-    This class is not meant to be user-editable. The only methods on it should
+    This class is not meant to be user-editable. The only methods in it should
     be getter methods.
     """
 
