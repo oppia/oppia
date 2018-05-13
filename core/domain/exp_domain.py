@@ -1274,8 +1274,9 @@ class State(object):
             interaction.hints, interaction.solution)
         self.classifier_model_id = classifier_model_id
 
-    def validate(self, exp_param_specs_dict, allow_null_interaction,
-                 is_question=False):
+    def validate(
+            self, exp_param_specs_dict, allow_null_interaction,
+            is_question=False):
         """Validates various properties of the State.
 
         Args:
