@@ -27,8 +27,8 @@ EXPLORATION_QUIT_ID = 'ExplorationQuit'
 class ActionUnitTests(test_utils.GenericTestBase):
     """Test that the default actions are valid."""
 
-    def test_action_properties(self):
-        """Test the standard properties of actions."""
+    def test_action_properties_for_exp_start(self):
+        """Test the standard properties of exploration start action."""
 
         action = action_registry.Registry.get_action_by_id(EXPLORATION_START_ID)
 
@@ -44,6 +44,9 @@ class ActionUnitTests(test_utils.GenericTestBase):
                 },
                 'default_value': ''
             }])
+
+    def test_action_properties_for_answer_submit(self):
+        """Test the standard properties of answer submit action."""
 
         action = action_registry.Registry.get_action_by_id(ANSWER_SUBMIT_ID)
 
@@ -94,6 +97,9 @@ class ActionUnitTests(test_utils.GenericTestBase):
                 },
                 'default_value': 0
             }])
+
+    def test_action_properties_for_exp_quit(self):
+        """Test the standard properties of exploration quit action."""
 
         action = action_registry.Registry.get_action_by_id(EXPLORATION_QUIT_ID)
 
