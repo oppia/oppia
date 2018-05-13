@@ -55,6 +55,7 @@ class SkillModel(base_models.VersionedModel):
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
+
 class SkillCommitLogEntryModel(base_models.BaseModel):
     """Log of commits to skills.
 
