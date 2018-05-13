@@ -91,7 +91,7 @@ STATISTICAL_CLASSIFICATION = 'statistical_classifier'
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
 
 
-def _get_full_customization_args(customization_args, ca_specs):
+def get_full_customization_args(customization_args, ca_specs):
     """Populates the given customization_args dict with default values
     if any of the expected customization_args are missing.
 
@@ -120,7 +120,7 @@ def _get_full_customization_args(customization_args, ca_specs):
     return customization_args
 
 
-def _validate_customization_args_and_values(
+def validate_customization_args_and_values(
         item_name, item_type, customization_args,
         ca_specs_to_validate_against):
     """Validates the given `customization_args` dict against the specs set out
@@ -159,7 +159,7 @@ def _validate_customization_args_and_values(
     # Validate and clean up the customization args.
 
     # Populate missing keys with the default values.
-    customization_args = _get_full_customization_args(
+    customization_args = get_full_customization_args(
         customization_args, ca_specs_to_validate_against)
 
     # Remove extra keys.
@@ -398,7 +398,7 @@ class AudioTranslation(object):
         self.needs_update = needs_update
 
     def validate(self):
-        """Validates properties of the AudioTranslation.
+        """Validates properties of the Content.
 
         Raises:
             ValidationError: One or more attributes of the AudioTranslation are
@@ -523,13 +523,11 @@ class SubtitledHtml(object):
         Returns:
             SubtitledHtml. The corresponding SubtitledHtml domain object.
         """
-        return cls(
-            subtitled_html_dict['html'], {
-                language_code: AudioTranslation.from_dict(
-                    audio_translation_dict)
-                for language_code, audio_translation_dict in
-                subtitled_html_dict['audio_translations'].iteritems()
-            })
+        return cls(subtitled_html_dict['html'], {
+            language_code: AudioTranslation.from_dict(audio_translation_dict)
+            for language_code, audio_translation_dict in
+            subtitled_html_dict['audio_translations'].iteritems()
+        })
 
     def validate(self):
         """Validates properties of the SubtitledHtml.
@@ -950,9 +948,8 @@ class Solution(object):
     to progress to the next card and explanation is an HTML string containing
     an explanation for the solution.
     """
-    def __init__(
-            self, interaction_id, answer_is_exclusive,
-            correct_answer, explanation):
+    def __init__(self, interaction_id, answer_is_exclusive,
+                 correct_answer, explanation):
         """Constructs a Solution domain object.
 
         Args:
@@ -1036,7 +1033,7 @@ class InteractionInstance(object):
             'id': self.id,
             'customization_args': (
                 {} if self.id is None else
-                _get_full_customization_args(
+                get_full_customization_args(
                     self.customization_args,
                     interaction_registry.Registry.get_interaction_by_id(
                         self.id).customization_arg_specs)),
@@ -1164,7 +1161,7 @@ class InteractionInstance(object):
         except KeyError:
             raise utils.ValidationError('Invalid interaction id: %s' % self.id)
 
-        _validate_customization_args_and_values(
+        validate_customization_args_and_values(
             'interaction', self.id, self.customization_args,
             interaction.customization_arg_specs)
 
@@ -1243,14 +1240,13 @@ class State(object):
         'solution': None,
     }
 
-    def __init__(
-            self, content, param_changes, interaction,
-            classifier_model_id=None):
+    def __init__(self, content, param_changes, interaction,
+                 classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:
-            content: SubtitledHtml. The contents displayed to the reader in this
-                state.
+            content: list(Content). The contents displayed to the reader in
+                this state. This list must have only one element.
             param_changes: list(ParamChange). Parameter changes associated with
                 this state.
             interaction: InteractionInstance. The interaction instance
@@ -1282,7 +1278,7 @@ class State(object):
                 are ParamSpec value objects with an object type
                 property(obj_type). It is None if the state belongs to a
                 question.
-            allow_null_interaction: bool. Whether this state's interaction is
+            allow_null_interaction. bool. Whether this state's interaction is
                 allowed to be unspecified.
 
         Raises:
@@ -1336,10 +1332,10 @@ class State(object):
         return False
 
     def update_content(self, content_dict):
-        """Update the content of this state.
+        """Update the list of Content of this state.
 
         Args:
-            content_dict: dict. The dict representation of SubtitledHtml
+            content_dict. dict. The dict representation of SubtitledHtml
                 object.
         """
         # TODO(sll): Must sanitize all content in RTE component attrs.
@@ -1349,7 +1345,7 @@ class State(object):
         """Update the param_changes dict attribute.
 
         Args:
-            param_change_dicts: list(dict). List of param_change dicts that
+            param_change_dicts. list(dict). List of param_change dicts that
                 represent ParamChange domain object.
         """
         self.param_changes = [
@@ -1360,7 +1356,7 @@ class State(object):
         """Update the interaction id attribute.
 
         Args:
-            interaction_id: str. The new interaction id to set.
+            interaction_id. str. The new interaction id to set.
         """
         self.interaction.id = interaction_id
         # TODO(sll): This should also clear interaction.answer_groups (except
@@ -1372,7 +1368,7 @@ class State(object):
         """Update the customization_args of InteractionInstance domain object.
 
         Args:
-            customization_args: dict. The new customization_args to set.
+            customization_args. dict. The new customization_args to set.
         """
         self.interaction.customization_args = customization_args
 
@@ -1380,7 +1376,7 @@ class State(object):
         """Update the list of AnswerGroup in IteractioInstancen domain object.
 
         Args:
-            answer_groups_list: list(dict). List of dicts that represent
+            answer_groups_list. list(dict). List of dicts that represent
                 AnswerGroup domain object.
         """
         if not isinstance(answer_groups_list, list):
@@ -1439,7 +1435,7 @@ class State(object):
         """Update the default_outcome of InteractionInstance domain object.
 
         Args:
-            default_outcome_dict: dict. Dict that represents Outcome domain
+            default_outcome_dict. dict. Dict that represents Outcome domain
                 object.
         """
         if default_outcome_dict:
@@ -1459,7 +1455,7 @@ class State(object):
         domain object.
 
         Args:
-            confirmed_unclassified_answers: list(AnswerGroup). The new list of
+            confirmed_unclassified_answers. list(AnswerGroup). The new list of
                 answers which have been confirmed to be associated with the
                 default outcome.
 
@@ -1651,13 +1647,12 @@ class ExplorationVersionsDiff(object):
 class Exploration(object):
     """Domain object for an Oppia exploration."""
 
-    def __init__(
-            self, exploration_id, title, category, objective,
-            language_code, tags, blurb, author_notes,
-            states_schema_version, init_state_name, states_dict,
-            param_specs_dict, param_changes_list, version,
-            auto_tts_enabled, correctness_feedback_enabled,
-            created_on=None, last_updated=None):
+    def __init__(self, exploration_id, title, category, objective,
+                 language_code, tags, blurb, author_notes,
+                 states_schema_version, init_state_name, states_dict,
+                 param_specs_dict, param_changes_list, version,
+                 auto_tts_enabled, correctness_feedback_enabled,
+                 created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
         Args:
@@ -3949,14 +3944,13 @@ class Exploration(object):
 class ExplorationSummary(object):
     """Domain object for an Oppia exploration summary."""
 
-    def __init__(
-            self, exploration_id, title, category, objective,
-            language_code, tags, ratings, scaled_average_rating, status,
-            community_owned, owner_ids, editor_ids,
-            viewer_ids, contributor_ids, contributors_summary, version,
-            exploration_model_created_on,
-            exploration_model_last_updated,
-            first_published_msec):
+    def __init__(self, exploration_id, title, category, objective,
+                 language_code, tags, ratings, scaled_average_rating, status,
+                 community_owned, owner_ids, editor_ids,
+                 viewer_ids, contributor_ids, contributors_summary, version,
+                 exploration_model_created_on,
+                 exploration_model_last_updated,
+                 first_published_msec):
         """Initializes a ExplorationSummary domain object.
 
         Args:
