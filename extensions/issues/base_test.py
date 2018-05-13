@@ -27,8 +27,8 @@ CYCLIC_STATE_TRANSITIONS_ID = 'CyclicStateTransitions'
 class IssueUnitTests(test_utils.GenericTestBase):
     """Test that the default issues are valid."""
 
-    def test_issue_properties(self):
-        """Test the standard properties of issues."""
+    def test_issue_properties_for_early_quit(self):
+        """Test the standard properties of early quit issue."""
 
         issue = issue_registry.Registry.get_issue_by_id(EARLY_QUIT_ID)
 
@@ -54,6 +54,11 @@ class IssueUnitTests(test_utils.GenericTestBase):
                 'default_value': 0
             }])
 
+    def test_issue_properties_for_multiple_incorrect_submissions(self):
+        """Test the standard properties of multiple incorrect submissions
+        issue.
+        """
+
         issue = issue_registry.Registry.get_issue_by_id(
             MULTIPLE_INCORRECT_SUBMISSIONS_ID)
 
@@ -77,6 +82,9 @@ class IssueUnitTests(test_utils.GenericTestBase):
                 },
                 'default_value': 0
             }])
+
+    def test_issue_properties_for_cyclic_state_transitions(self):
+        """Test the standard properties of cyclic state transitions issue."""
 
         issue = issue_registry.Registry.get_issue_by_id(
             CYCLIC_STATE_TRANSITIONS_ID)
