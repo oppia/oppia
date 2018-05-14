@@ -433,8 +433,8 @@ def _lint_html_files(all_files):
 
         linter_stdout, _ = proc.communicate()
         # This line splits the output of the linter and extracts digits from it.
-        # The digits are stored in a list.
-        # The second last digit in the list represents the number of errors in the file.
+        # The digits are stored in a list. The second last digit
+        # in the list represents the number of errors in the file.
         error_count = [int(s) for s in linter_stdout.split() if s.isdigit()][-2]
         if error_count:
             error_summary.append(error_count)
