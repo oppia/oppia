@@ -426,23 +426,27 @@ def _lint_html_files(all_files):
     print '----------------------------------------'
     print ''
     for filename in html_files_to_lint:
-        proc_args = htmllint_cmd_args + ['--cwd=./' + filename]
+        proc_args = htmllint_cmd_args + [filename]
         print 'Linting %s file' % filename
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         linter_stdout, _ = proc.communicate()
-
-        if linter_stdout:
-            error_summary.append(
-                [s for s in linter_stdout.split() if s.isdigit()])
+        # This line splits the output of the linter and extracts digits from it.
+        # The digits are stored in a list.
+        # The second last digit in the list represents the number of errors in the file.
+        error_count = [int(s) for s in linter_stdout.split() if s.isdigit()][-2]
+        if error_count:
+            error_summary.append(error_count)
             print linter_stdout
 
     print '----------------------------------------'
-    for error in error_summary:
-        total_error_count += int(error[0])
-
+    for error_count in error_summary:
+        total_error_count += error_count
+    total_files_checked = len(html_files_to_lint)
     if total_error_count:
+        print '(%s files checked, %s errors found)' % (
+            total_files_checked, total_error_count)
         summary_message = '%s   HTML linting failed' % (
             _MESSAGE_TYPE_FAILED)
         summary_messages.append(summary_message)

@@ -24,7 +24,7 @@
     "label-req-for": false,
     "lang-style": false,
     "line-end-style": false,
-    line-max-len: 80,
+    "line-no-trailing-whitespace": true,
     "spec-char-escape": false,
     "tag-bans": false,
     "tag-close": false,
