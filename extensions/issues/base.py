@@ -14,13 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Base class for defining acctions."""
+"""Base class for defining issues."""
 
 from extensions import domain
 
 
-class BaseLearnerActionSpec(object):
-    """Base action definition class.
+class BaseExplorationIssueSpec(object):
+    """Base issue definition class.
 
     This class is not meant to be user-editable. The only methods in it should
     be getter methods.
