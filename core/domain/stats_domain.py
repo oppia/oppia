@@ -19,8 +19,10 @@
 import numbers
 import sys
 
+from core.domain import action_registry
 from core.domain import exp_domain
 from core.domain import interaction_registry
+from core.domain import issue_registry
 from core.platform import models
 import feconf
 import utils
@@ -401,6 +403,155 @@ class StateStats(object):
             if state_stats_dict[stat_property] < 0:
                 raise utils.ValidationError(
                     '%s cannot have negative values' % (stat_property))
+
+
+class ExplorationIssue(object):
+    """Domain object representing an exploration issue."""
+
+    def __init__(self, issue_id, schema_version, customization_args):
+        """Constructs an ExplorationIssue domain object.
+
+        Args:
+            issue_id: str. ID of the Issue.
+            schema_version: int. Schema version of the customization args dict.
+            customization_args: dict. The customization dict. The keys are
+                names of customization_args and the values are dicts with a
+                single key, 'value', whose corresponding value is the value of
+                the customization arg.
+        """
+        self.issue_id = issue_id
+        self.schema_version = schema_version
+        self.customization_args = customization_args
+
+    def to_dict(self):
+        """Returns a dict representation of the ExplorationIssue domain object.
+
+        Returns:
+            dict. A dict mapping of all fields of ExplorationIssue object.
+        """
+        return {
+            'issue_id': self.issue_id,
+            'schema_version': self.schema_version,
+            'customization_args': (
+                {} if self.issue_id is None else
+                exp_domain.get_full_customization_args(
+                    self.customization_args,
+                    issue_registry.Registry.get_issue_by_id(
+                        self.issue_id).customization_arg_specs))
+        }
+
+    @classmethod
+    def from_dict(cls, issue_dict):
+        """Returns an ExplorationIssue object from a dict.
+
+        Args:
+            issue_dict: dict. A dict mapping of all fields of ExplorationIssue
+                object.
+
+        Returns:
+            ExplorationIssue. The corresponding ExplorationIssue domain object.
+        """
+        return cls(
+            issue_dict['issue_id'],
+            issue_dict['schema_version'],
+            issue_dict['customization_args'])
+
+    def validate(self):
+        """Validates the ExplorationIssue domain object."""
+        if not isinstance(self.issue_id, basestring):
+            raise utils.ValidationError(
+                'Expected issue_id to be a string, received %s' % (
+                    self.issue_id))
+
+        if not isinstance(self.schema_version, int):
+            raise utils.ValidationError(
+                'Expected schema_version to be an int, received %s' % (
+                    self.schema_version))
+
+        try:
+            issue = issue_registry.Registry.get_issue_by_id(
+                self.issue_id)
+        except KeyError:
+            raise utils.ValidationError('Invalid issue ID: %s' % self.issue_id)
+
+        exp_domain.validate_customization_args_and_values(
+            'issue', self.issue_id, self.customization_args,
+            issue.customization_arg_specs)
+
+
+class LearnerAction(object):
+    """Domain object representing a learner action."""
+
+    def __init__(self, action_id, schema_version, customization_args):
+        """Constructs a LearnerAction domain object.
+
+        Args:
+            action_id: str. ID of the Learner Action.
+            schema_version: int. Schema version of the customization args dict.
+            customization_args: dict. The customization dict. The keys are
+                names of customization_args and the values are dicts with a
+                single key, 'value', whose corresponding value is the value of
+                the customization arg.
+        """
+        self.action_id = action_id
+        self.schema_version = schema_version
+        self.customization_args = customization_args
+
+    def to_dict(self):
+        """Returns a dict representation of the LearnerAction domain object.
+
+        Returns:
+            dict. A dict mapping of all fields of LearnerAction object.
+        """
+        return {
+            'action_id': self.action_id,
+            'schema_version': self.schema_version,
+            'customization_args': (
+                {} if self.action_id is None else
+                exp_domain.get_full_customization_args(
+                    self.customization_args,
+                    action_registry.Registry.get_action_by_id(
+                        self.action_id).customization_arg_specs))
+        }
+
+    @classmethod
+    def from_dict(cls, action_dict):
+        """Returns a LearnerAction object from a dict.
+
+        Args:
+            action_dict: dict. A dict mapping of all fields of LearnerAction
+                object.
+
+        Returns:
+            LearnerAction. The corresponding LearnerAction domain object.
+        """
+        return cls(
+            action_dict['action_id'],
+            action_dict['schema_version'],
+            action_dict['customization_args'])
+
+    def validate(self):
+        """Validates the LearnerAction domain object."""
+        if not isinstance(self.action_id, basestring):
+            raise utils.ValidationError(
+                'Expected action_id to be a string, received %s' % (
+                    self.action_id))
+
+        if not isinstance(self.schema_version, int):
+            raise utils.ValidationError(
+                'Expected schema_version to be an int, received %s' % (
+                    self.schema_version))
+
+        try:
+            action = action_registry.Registry.get_action_by_id(
+                self.action_id)
+        except KeyError:
+            raise utils.ValidationError(
+                'Invalid action ID: %s' % self.action_id)
+
+        exp_domain.validate_customization_args_and_values(
+            'action', self.action_id, self.customization_args,
+            action.customization_arg_specs)
 
 
 # TODO(bhenning): Monitor sizes (lengths of submitted_answer_list) of these
