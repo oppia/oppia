@@ -640,6 +640,7 @@ class AnswerOccurrence(object):
     """Domain object that represents a specific answer that occurred some number
     of times.
     """
+
     def __init__(self, answer, frequency):
         """Initialize domain object for answer occurrences."""
         self.answer = answer
@@ -685,12 +686,14 @@ class AnswerCalculationOutput(object):
     """Domain object superclass that represents the output of an answer
     calculation.
     """
+
     def __init__(self, calculation_output_type):
         self.calculation_output_type = calculation_output_type
 
 
 class AnswerFrequencyList(AnswerCalculationOutput):
     """Domain object that represents an output list of AnswerOccurrences."""
+
     def __init__(self, answer_occurrences=None):
         """Initialize domain object for answer frequency list for a given list
         of AnswerOccurrence objects (default is empty list).
@@ -741,6 +744,7 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
     """AnswerFrequencyLists that are categorized based on arbitrary
     categories.
     """
+
     def __init__(self, categorized_answer_freq_lists=None):
         """Initialize domain object for categorized answer frequency lists for
         a given dict (default is empty).
@@ -799,6 +803,7 @@ class StateAnswersCalcOutput(object):
     """Domain object that represents output of calculations operating on
     state answers.
     """
+
     def __init__(
             self, exploration_id, exploration_version, state_name,
             interaction_id, calculation_id, calculation_output):

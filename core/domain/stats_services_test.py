@@ -38,6 +38,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
     """Test the helper functions and methods defined in the stats_services
     module.
     """
+
     def setUp(self):
         super(StatisticsServicesTest, self).setUp()
         self.exp_id = 'exp_id1'
@@ -407,7 +408,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         exploration_stats.exp_version += 1
         model_id = stats_services.create_stats_model(exploration_stats)
         exploration_stats = stats_services.get_exploration_stats_by_id(
-            self.exp_id, self.exp_version+1)
+            self.exp_id, self.exp_version + 1)
         self.assertEqual(exploration_stats.exp_id, 'exp_id1')
         self.assertEqual(exploration_stats.exp_version, 2)
         self.assertEqual(exploration_stats.num_starts_v1, 0)

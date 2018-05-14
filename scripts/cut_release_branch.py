@@ -125,13 +125,13 @@ def _execute_branch_cut():
     common.open_new_tab_in_browser_if_possible(
         'https://github.com/oppia/oppia#oppia---')
     while True:
-        print (
+        print(
             'Please confirm: are Travis checks passing on develop? (y/n) ')
         answer = raw_input().lower()
         if answer in ['y', 'ye', 'yes']:
             break
         elif answer:
-            print (
+            print(
                 'Tests should pass on develop before this script is run. '
                 'Exiting.')
             sys.exit()
@@ -163,7 +163,7 @@ def _execute_branch_cut():
     subprocess.call(['git', 'push', remote_alias, NEW_BRANCH_NAME])
 
     print ''
-    print (
+    print(
         'New release branch successfully cut. You are now on branch %s' %
         NEW_BRANCH_NAME)
     print 'Done!'

@@ -93,7 +93,7 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
         log('')
         for line in last_stdout:
             if line.startswith(LOG_LINE_PREFIX):
-                log('INFO: %s' % line[len(LOG_LINE_PREFIX): ])
+                log('INFO: %s' % line[len(LOG_LINE_PREFIX):])
         log('')
 
     result = '%s%s' % (last_stdout_str, last_stderr_str)
@@ -297,7 +297,7 @@ def main():
             test_count = 0
         elif task.exception:
             exc_str = str(task.exception).decode('utf-8')
-            print exc_str[exc_str.find('=') : exc_str.rfind('-')]
+            print exc_str[exc_str.find('='): exc_str.rfind('-')]
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
@@ -328,10 +328,10 @@ def main():
                     r'Ran ([0-9]+) tests? in ([0-9\.]+)s', task.output)
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
-                print ('SUCCESS   %s: %d tests (%.1f secs)' %
-                       (spec.test_target, test_count, test_time))
+                print('SUCCESS   %s: %d tests (%.1f secs)' %
+                      (spec.test_target, test_count, test_time))
             except Exception:
-                print (
+                print(
                     'An unexpected error occurred. '
                     'Task output:\n%s' % task.output)
 

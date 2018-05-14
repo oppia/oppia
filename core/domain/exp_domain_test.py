@@ -957,6 +957,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
     """Tests the presence of appropriate schema migration methods in the
     Exploration domain object class.
     """
+
     def test_correct_states_schema_conversion_methods_exist(self):
         """Test that the right states schema conversion methods exist."""
         current_states_schema_version = (

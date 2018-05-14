@@ -707,6 +707,7 @@ class Outcome(object):
     consists of a destination state, feedback to show the user, and any
     parameter changes.
     """
+
     def to_dict(self):
         """Returns a dict representing this Outcome domain object.
 
@@ -819,6 +820,7 @@ class AnswerGroup(object):
     that involve soft matching of answers to a set of training data and/or
     example answers dictated by the creator.
     """
+
     def to_dict(self):
         """Returns a dict representing this AnswerGroup domain object.
 
@@ -950,6 +952,7 @@ class Solution(object):
     to progress to the next card and explanation is an HTML string containing
     an explanation for the solution.
     """
+
     def __init__(
             self, interaction_id, answer_is_exclusive,
             correct_answer, explanation):
