@@ -409,9 +409,10 @@ class StateStats(object):
 class StateAnswers(object):
     """Domain object containing answers submitted to an exploration state."""
 
-    def __init__(self, exploration_id, exploration_version, state_name,
-                 interaction_id, submitted_answer_list,
-                 schema_version=feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION):
+    def __init__(
+            self, exploration_id, exploration_version, state_name,
+            interaction_id, submitted_answer_list,
+            schema_version=feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION):
         """Constructs a StateAnswers domain object.
 
         Args:
@@ -497,10 +498,11 @@ class SubmittedAnswer(object):
     # referenced in future migration or mapreduce jobs, or they may be removed
     # without warning or migration.
 
-    def __init__(self, answer, interaction_id, answer_group_index,
-                 rule_spec_index, classification_categorization, params,
-                 session_id, time_spent_in_sec, rule_spec_str=None,
-                 answer_str=None):
+    def __init__(
+            self, answer, interaction_id, answer_group_index,
+            rule_spec_index, classification_categorization, params,
+            session_id, time_spent_in_sec, rule_spec_str=None,
+            answer_str=None):
         self.answer = answer
         self.interaction_id = interaction_id
         self.answer_group_index = answer_group_index
@@ -797,8 +799,9 @@ class StateAnswersCalcOutput(object):
     """Domain object that represents output of calculations operating on
     state answers.
     """
-    def __init__(self, exploration_id, exploration_version, state_name,
-                 interaction_id, calculation_id, calculation_output):
+    def __init__(
+            self, exploration_id, exploration_version, state_name,
+            interaction_id, calculation_id, calculation_output):
         """Initialize domain object for state answers calculation output.
 
         Args:

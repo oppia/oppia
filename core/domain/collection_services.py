@@ -799,11 +799,12 @@ def save_new_collection(committer_id, collection):
     """
     commit_message = (
         'New collection created with title \'%s\'.' % collection.title)
-    _create_collection(committer_id, collection, commit_message, [{
-        'cmd': CMD_CREATE_NEW,
-        'title': collection.title,
-        'category': collection.category,
-    }])
+    _create_collection(
+        committer_id, collection, commit_message, [{
+            'cmd': CMD_CREATE_NEW,
+            'title': collection.title,
+            'category': collection.category,
+        }])
 
 
 def delete_collection(committer_id, collection_id, force_deletion=False):
@@ -1098,11 +1099,12 @@ def save_new_collection_from_yaml(committer_id, yaml_content, collection_id):
         'New collection created from YAML file with title \'%s\'.'
         % collection.title)
 
-    _create_collection(committer_id, collection, commit_message, [{
-        'cmd': CMD_CREATE_NEW,
-        'title': collection.title,
-        'category': collection.category,
-    }])
+    _create_collection(
+        committer_id, collection, commit_message, [{
+            'cmd': CMD_CREATE_NEW,
+            'title': collection.title,
+            'category': collection.category,
+        }])
 
     return collection
 

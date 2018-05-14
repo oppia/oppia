@@ -30,11 +30,13 @@ oppia.factory('AnswerClassificationService', [
   'PredictionAlgorithmRegistryService', 'StateClassifierMappingService',
   'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION', 'STATISTICAL_CLASSIFICATION',
+  'TRAINING_DATA_CLASSIFICATION',
   function(
       AlertsService, AnswerClassificationResultObjectFactory,
       PredictionAlgorithmRegistryService, StateClassifierMappingService,
       INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
-      DEFAULT_OUTCOME_CLASSIFICATION, STATISTICAL_CLASSIFICATION) {
+      DEFAULT_OUTCOME_CLASSIFICATION, STATISTICAL_CLASSIFICATION,
+      TRAINING_DATA_CLASSIFICATION) {
     /**
      * Finds the first answer group with a rule that returns true.
      *
@@ -111,6 +113,17 @@ oppia.factory('AnswerClassificationService', [
 
         if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
             ENABLE_ML_CLASSIFIERS) {
+          for (var i = 0; i < answerGroups.length; i++) {
+            if (answerGroups[i].trainingData) {
+              for (var j = 0; j < answerGroups[i].trainingData.length; j++) {
+                if (angular.equals(answer, answerGroups[i].trainingData[j])) {
+                  return AnswerClassificationResultObjectFactory.createNew(
+                    answerGroups[i].outcome, i, null,
+                    TRAINING_DATA_CLASSIFICATION);
+                }
+              }
+            }
+          }
           var classifier = StateClassifierMappingService.getClassifier(
             stateName);
           if (classifier && classifier.classifierData && (

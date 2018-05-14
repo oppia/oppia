@@ -603,8 +603,9 @@ class SuggestionModel(base_models.BaseModel):
         return '.'.join([exploration_id, thread_id])
 
     @classmethod
-    def create(cls, exploration_id, thread_id, author_id, exploration_version,
-               state_name, description, suggestion_html):
+    def create(
+            cls, exploration_id, thread_id, author_id, exploration_version,
+            state_name, description, suggestion_html):
         """Creates a new SuggestionModel entry.
 
         Args:

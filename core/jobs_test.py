@@ -734,9 +734,10 @@ class StartExplorationMRJobManager(
     def map(item):
         current_class = StartExplorationMRJobManager
         if current_class._entity_created_before_job_queued(item):  # pylint: disable=protected-access
-            yield (item.exploration_id, {
-                'event_type': item.event_type,
-            })
+            yield (
+                item.exploration_id, {
+                    'event_type': item.event_type,
+                })
 
     @staticmethod
     def reduce(key, stringified_values):

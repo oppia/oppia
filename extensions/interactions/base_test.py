@@ -155,24 +155,25 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             'default_outcome_heading', 'can_have_solution',
             'show_generic_submit_button'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
-        self.assertEqual(interaction_dict['customization_arg_specs'], [{
-            'name': 'placeholder',
-            'description': 'Placeholder text (optional)',
-            'schema': {'type': 'unicode'},
-            'default_value': '',
-        }, {
-            'name': 'rows',
-            'description': 'Height (in rows)',
-            'schema': {
-                'type': 'int',
-                'validators': [{
-                    'id': 'is_at_least', 'min_value': 1
-                }, {
-                    'id': 'is_at_most', 'max_value': 200
-                }]
-            },
-            'default_value': 1,
-        }])
+        self.assertEqual(
+            interaction_dict['customization_arg_specs'], [{
+                'name': 'placeholder',
+                'description': 'Placeholder text (optional)',
+                'schema': {'type': 'unicode'},
+                'default_value': '',
+            }, {
+                'name': 'rows',
+                'description': 'Height (in rows)',
+                'schema': {
+                    'type': 'int',
+                    'validators': [{
+                        'id': 'is_at_least', 'min_value': 1
+                    }, {
+                        'id': 'is_at_most', 'max_value': 200
+                    }]
+                },
+                'default_value': 1,
+            }])
 
     def test_interaction_rules(self):
         def _check_num_interaction_rules(interaction_id, expected_num):
