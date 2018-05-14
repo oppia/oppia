@@ -412,7 +412,7 @@ class ExplorationIssue(object):
         """Constructs an ExplorationIssue domain object.
 
         Args:
-            issue_id: str. ID of the Issue.
+            issue_id: str. ID of the issue.
             schema_version: int. Schema version of the customization args dict.
             customization_args: dict. The customization dict. The keys are
                 names of customization_args and the values are dicts with a
@@ -486,7 +486,7 @@ class LearnerAction(object):
         """Constructs a LearnerAction domain object.
 
         Args:
-            action_id: str. ID of the Learner Action.
+            action_id: str. ID of the action.
             schema_version: int. Schema version of the customization args dict.
             customization_args: dict. The customization dict. The keys are
                 names of customization_args and the values are dicts with a
