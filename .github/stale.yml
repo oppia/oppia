@@ -25,4 +25,3 @@ limitPerRun: 30
 
 # Limit to only `issues` or `pulls`
 only: pulls
-
