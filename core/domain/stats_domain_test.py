@@ -296,14 +296,14 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         # Change issue_id to int.
         exp_issue.issue_id = 5
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected issue_id to be a string, received %s' % (5))):
+            'Expected issue_id to be a string, received %s' % (type(5)))):
             exp_issue.validate()
 
         # Change schema_version to string.
         exp_issue.issue_id = 'EarlyQuit'
         exp_issue.schema_version = '1'
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected schema_version to be an int, received %s' % ('1'))):
+            'Expected schema_version to be an int, received %s' % (type('1')))):
             exp_issue.validate()
 
 
@@ -332,14 +332,14 @@ class LearnerActionTests(test_utils.GenericTestBase):
         # Change action_id to int.
         learner_action.action_id = 5
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected action_id to be a string, received %s' % (5))):
+            'Expected action_id to be a string, received %s' % (type(5)))):
             learner_action.validate()
 
         # Change schema_version to string.
         learner_action.action_id = 'EarlyQuit'
         learner_action.schema_version = '1'
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected schema_version to be an int, received %s' % ('1'))):
+            'Expected schema_version to be an int, received %s' % (type('1')))):
             learner_action.validate()
 
 

@@ -432,12 +432,10 @@ class ExplorationIssue(object):
         return {
             'issue_id': self.issue_id,
             'schema_version': self.schema_version,
-            'customization_args': (
-                {} if self.issue_id is None else
-                exp_domain.get_full_customization_args(
-                    self.customization_args,
-                    issue_registry.Registry.get_issue_by_id(
-                        self.issue_id).customization_arg_specs))
+            'customization_args': exp_domain.get_full_customization_args(
+                self.customization_args,
+                issue_registry.Registry.get_issue_by_id(
+                    self.issue_id).customization_arg_specs)
         }
 
     @classmethod
@@ -461,12 +459,12 @@ class ExplorationIssue(object):
         if not isinstance(self.issue_id, basestring):
             raise utils.ValidationError(
                 'Expected issue_id to be a string, received %s' % (
-                    self.issue_id))
+                    type(self.issue_id)))
 
         if not isinstance(self.schema_version, int):
             raise utils.ValidationError(
                 'Expected schema_version to be an int, received %s' % (
-                    self.schema_version))
+                    type(self.schema_version)))
 
         try:
             issue = issue_registry.Registry.get_issue_by_id(
@@ -506,12 +504,10 @@ class LearnerAction(object):
         return {
             'action_id': self.action_id,
             'schema_version': self.schema_version,
-            'customization_args': (
-                {} if self.action_id is None else
-                exp_domain.get_full_customization_args(
-                    self.customization_args,
-                    action_registry.Registry.get_action_by_id(
-                        self.action_id).customization_arg_specs))
+            'customization_args': exp_domain.get_full_customization_args(
+                self.customization_args,
+                action_registry.Registry.get_action_by_id(
+                    self.action_id).customization_arg_specs)
         }
 
     @classmethod
@@ -535,12 +531,12 @@ class LearnerAction(object):
         if not isinstance(self.action_id, basestring):
             raise utils.ValidationError(
                 'Expected action_id to be a string, received %s' % (
-                    self.action_id))
+                    type(self.action_id)))
 
         if not isinstance(self.schema_version, int):
             raise utils.ValidationError(
                 'Expected schema_version to be an int, received %s' % (
-                    self.schema_version))
+                    type(self.schema_version)))
 
         try:
             action = action_registry.Registry.get_action_by_id(
