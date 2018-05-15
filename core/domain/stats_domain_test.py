@@ -356,7 +356,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         # Change ID to int.
         exp_issues.id = 5
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected ID to be a string, received %s' % (5))):
+            'Expected ID to be a string, received %s' % (type(5)))):
             exp_issues.validate()
 
         # Change unresolved_issues list.
@@ -497,14 +497,14 @@ class PlaythroughTests(test_utils.GenericTestBase):
         # Change ID to int.
         playthrough.id = 5
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected ID to be a string, received %s' % (5))):
+            'Expected ID to be a string, received %s' % (type(5)))):
             playthrough.validate()
 
         # Change exp_version to string.
         playthrough.id = 'playthrough_id1'
         playthrough.exp_version = '1'
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected exp_version to be an int, received %s' % ('1'))):
+            'Expected exp_version to be an int, received %s' % (type('1')))):
             playthrough.validate()
 
         # Change to invalid issue_id.

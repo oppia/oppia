@@ -418,6 +418,15 @@ class ExplorationIssues(object):
             unresolved_issues: list(dict). The unresolved issues for this
                 exploration. This will be a list of dicts where each dict
                 represents an issue along with the associated playthroughs.
+                Each dict will be of the form:
+                {
+                    issue_type: str. Type of the issue.
+                    issue_customization_args: dict. The customization args dict
+                        for the given issue_type. The specs for this dict are as
+                        specified above in the different subclasses of
+                        BaseExplorationIssueSpec.
+                    playthrough_ids: list(str). List of PlaythroughModel IDs.
+                }
         """
         self.id = exp_id
         self.unresolved_issues = unresolved_issues
@@ -453,7 +462,7 @@ class ExplorationIssues(object):
         """Validates the ExplorationIssues domain object."""
         if not isinstance(self.id, basestring):
             raise utils.ValidationError(
-                'Expected ID to be a string, received %s' % self.id)
+                'Expected ID to be a string, received %s' % type(self.id))
 
         if not isinstance(self.unresolved_issues, list):
             raise utils.ValidationError(
@@ -554,20 +563,22 @@ class Playthrough(object):
         """Validates the Playthrough domain object."""
         if not isinstance(self.id, basestring):
             raise utils.ValidationError(
-                'Expected ID to be a string, received %s' % self.id)
+                'Expected ID to be a string, received %s' % type(self.id))
 
         if not isinstance(self.exp_id, basestring):
             raise utils.ValidationError(
-                'Expected exp_id to be a string, received %s' % self.exp_id)
+                'Expected exp_id to be a string, received %s' % type(
+                    self.exp_id))
 
         if not isinstance(self.exp_version, int):
             raise utils.ValidationError(
                 'Expected exp_version to be an int, received %s' % (
-                    self.exp_version))
+                    type(self.exp_version)))
 
         if not isinstance(self.issue_id, basestring):
             raise utils.ValidationError(
-                'Expected issue_id to be a string, received %s' % self.issue_id)
+                'Expected issue_id to be a string, received %s' % type(
+                    self.issue_id))
 
         if not isinstance(self.issue_customization_args, dict):
             raise utils.ValidationError(
