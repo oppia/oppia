@@ -268,81 +268,6 @@ class StateStatsTests(test_utils.GenericTestBase):
             state_stats.validate()
 
 
-class ExplorationIssueTests(test_utils.GenericTestBase):
-    """Tests the ExplorationIssue domain object."""
-
-    def test_to_dict(self):
-        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', 1, {})
-        exp_issue_dict = exp_issue.to_dict()
-        expected_customization_args = {
-            'time_spent_in_exp_in_msecs': {
-                'value': 0
-            },
-            'state_name': {
-                'value': ''
-            }
-        }
-        self.assertEqual(
-            exp_issue_dict, {
-                'issue_id': 'EarlyQuit',
-                'schema_version': 1,
-                'customization_args': expected_customization_args
-            })
-
-    def test_validate(self):
-        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', 1, {})
-        exp_issue.validate()
-
-        # Change issue_id to int.
-        exp_issue.issue_id = 5
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected issue_id to be a string, received %s' % (type(5)))):
-            exp_issue.validate()
-
-        # Change schema_version to string.
-        exp_issue.issue_id = 'EarlyQuit'
-        exp_issue.schema_version = '1'
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected schema_version to be an int, received %s' % (type('1')))):
-            exp_issue.validate()
-
-
-class LearnerActionTests(test_utils.GenericTestBase):
-    """Tests the LearnerAction domain object."""
-
-    def test_to_dict(self):
-        learner_action = stats_domain.LearnerAction('ExplorationStart', 1, {})
-        learner_action_dict = learner_action.to_dict()
-        expected_customization_args = {
-            'state_name': {
-                'value': ''
-            }
-        }
-        self.assertEqual(
-            learner_action_dict, {
-                'action_id': 'ExplorationStart',
-                'schema_version': 1,
-                'customization_args': expected_customization_args
-            })
-
-    def test_validate(self):
-        learner_action = stats_domain.LearnerAction('ExplorationStart', 1, {})
-        learner_action.validate()
-
-        # Change action_id to int.
-        learner_action.action_id = 5
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected action_id to be a string, received %s' % (type(5)))):
-            learner_action.validate()
-
-        # Change schema_version to string.
-        learner_action.action_id = 'EarlyQuit'
-        learner_action.schema_version = '1'
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected schema_version to be an int, received %s' % (type('1')))):
-            learner_action.validate()
-
-            
 class ExplorationIssuesTests(test_utils.GenericTestBase):
     """Tests the ExplorationIssues domain object."""
 
@@ -610,6 +535,81 @@ class PlaythroughTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Invalid action ID: %s' % 'InvalidActionId')):
             playthrough.validate()
+
+
+class ExplorationIssueTests(test_utils.GenericTestBase):
+    """Tests the ExplorationIssue domain object."""
+
+    def test_to_dict(self):
+        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', 1, {})
+        exp_issue_dict = exp_issue.to_dict()
+        expected_customization_args = {
+            'time_spent_in_exp_in_msecs': {
+                'value': 0
+            },
+            'state_name': {
+                'value': ''
+            }
+        }
+        self.assertEqual(
+            exp_issue_dict, {
+                'issue_id': 'EarlyQuit',
+                'schema_version': 1,
+                'customization_args': expected_customization_args
+            })
+
+    def test_validate(self):
+        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', 1, {})
+        exp_issue.validate()
+
+        # Change issue_id to int.
+        exp_issue.issue_id = 5
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected issue_id to be a string, received %s' % (type(5)))):
+            exp_issue.validate()
+
+        # Change schema_version to string.
+        exp_issue.issue_id = 'EarlyQuit'
+        exp_issue.schema_version = '1'
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected schema_version to be an int, received %s' % (type('1')))):
+            exp_issue.validate()
+
+
+class LearnerActionTests(test_utils.GenericTestBase):
+    """Tests the LearnerAction domain object."""
+
+    def test_to_dict(self):
+        learner_action = stats_domain.LearnerAction('ExplorationStart', 1, {})
+        learner_action_dict = learner_action.to_dict()
+        expected_customization_args = {
+            'state_name': {
+                'value': ''
+            }
+        }
+        self.assertEqual(
+            learner_action_dict, {
+                'action_id': 'ExplorationStart',
+                'schema_version': 1,
+                'customization_args': expected_customization_args
+            })
+
+    def test_validate(self):
+        learner_action = stats_domain.LearnerAction('ExplorationStart', 1, {})
+        learner_action.validate()
+
+        # Change action_id to int.
+        learner_action.action_id = 5
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected action_id to be a string, received %s' % (type(5)))):
+            learner_action.validate()
+
+        # Change schema_version to string.
+        learner_action.action_id = 'EarlyQuit'
+        learner_action.schema_version = '1'
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected schema_version to be an int, received %s' % (type('1')))):
+            learner_action.validate()
 
 
 class StateAnswersTests(test_utils.GenericTestBase):
