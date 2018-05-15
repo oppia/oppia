@@ -587,6 +587,7 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
     a run method which is called when this job is started by using start()
     method on the object created from this class.
     """
+
     def run(self, job_id, job_class_str, kwargs):
         """Returns a coroutine which runs the job pipeline and stores results.
 
@@ -619,6 +620,7 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
 class StoreMapReduceResults(base_handler.PipelineBase):
     """MapreducePipeline class to store output results."""
+
     def run(self, job_id, job_class_str, output):
         """Extracts the results of a MR job and registers its completion.
 
@@ -654,6 +656,7 @@ class GoogleCloudStorageConsistentJsonOutputWriter(
     preferred as it's consistent. For more details please look here
     https://github.com/GoogleCloudPlatform/appengine-mapreduce/wiki/3.4-Readers-and-Writers#googlecloudstorageoutputwriter
     """
+
     def write(self, data):
         """Writes that data serialized in JSON format.
 

@@ -122,7 +122,7 @@ def send_bulk_mail(
     # For more detail check following link:
     # https://documentation.mailgun.com/user_manual.html#batch-sending
     recipient_email_sets = [
-        recipient_emails[i:i+1000]
+        recipient_emails[i:i + 1000]
         for i in xrange(0, len(recipient_emails), 1000)]
 
     for email_set in recipient_email_sets:

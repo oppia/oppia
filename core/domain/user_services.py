@@ -78,6 +78,7 @@ class UserSettings(object):
         preferred_site_language_code: str or None. System language preference.
         preferred_audio_language_code: str or None. Audio language preference.
     """
+
     def __init__(
             self, user_id, email, role, username=None,
             last_agreed_to_terms=None, last_started_state_editor_tutorial=None,

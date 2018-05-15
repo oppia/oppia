@@ -342,6 +342,275 @@ class LearnerActionTests(test_utils.GenericTestBase):
             'Expected schema_version to be an int, received %s' % (type('1')))):
             learner_action.validate()
 
+            
+class ExplorationIssuesTests(test_utils.GenericTestBase):
+    """Tests the ExplorationIssues domain object."""
+
+    def test_to_dict(self):
+        exp_issues = stats_domain.ExplorationIssues(
+            'exp_id1', [{
+                'issue_id': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': ['playthrough_id1']
+            }])
+
+        exp_issues_dict = exp_issues.to_dict()
+
+        self.assertEqual(exp_issues_dict['id'], 'exp_id1')
+        self.assertEqual(
+            exp_issues_dict['unresolved_issues'], [{
+                'issue_id': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': ['playthrough_id1']
+            }])
+
+    def test_from_dict(self):
+        exp_issues_dict = {
+            'id': 'exp_id1',
+            'unresolved_issues': [{
+                'issue_id': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': ['playthrough_id1']
+            }]
+        }
+
+        exp_issues = stats_domain.ExplorationIssues.from_dict(exp_issues_dict)
+
+        self.assertEqual(exp_issues.id, 'exp_id1')
+        self.assertEqual(
+            exp_issues.unresolved_issues, [{
+                'issue_id': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': ['playthrough_id1']
+            }])
+
+    def test_validate(self):
+        exp_issues = stats_domain.ExplorationIssues(
+            'exp_id1', [{
+                'issue_id': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': ['playthrough_id1']
+            }])
+        exp_issues.validate()
+
+        # Change ID to int.
+        exp_issues.id = 5
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected ID to be a string, received %s' % (type(5)))):
+            exp_issues.validate()
+
+        # Change unresolved_issues list.
+        exp_issues.id = 'exp_id1'
+        exp_issues.unresolved_issues = [{
+            'issue_id': 'EarlyQuit',
+            'issue_customization_args': {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+        }]
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'KeyError in an element of unresolved_issues')):
+            exp_issues.validate()
+
+
+class PlaythroughTests(test_utils.GenericTestBase):
+    """Tests the Playthrough domain object."""
+
+    def test_to_dict(self):
+        playthrough = stats_domain.Playthrough(
+            'playthrough_id1', 'exp_id1', 1, 'EarlyQuit', {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            }, [{
+                'action_id': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                }
+            }], True)
+
+        playthrough_dict = playthrough.to_dict()
+
+        self.assertEqual(playthrough_dict['id'], 'playthrough_id1')
+        self.assertEqual(playthrough_dict['exp_id'], 'exp_id1')
+        self.assertEqual(playthrough_dict['exp_version'], 1)
+        self.assertEqual(playthrough_dict['issue_id'], 'EarlyQuit')
+        self.assertEqual(
+            playthrough_dict['issue_customization_args'], {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            })
+        self.assertEqual(
+            playthrough_dict['playthrough_actions'], [{
+                'action_id': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                }
+            }])
+        self.assertEqual(playthrough_dict['is_valid'], True)
+
+    def test_from_dict(self):
+        playthrough_dict = {
+            'id': 'playthrough_id1',
+            'exp_id': 'exp_id1',
+            'exp_version': 1,
+            'issue_id': 'EarlyQuit',
+            'issue_customization_args': {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+            'playthrough_actions': [{
+                'action_id': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                }
+            }],
+            'is_valid': True
+        }
+
+        playthrough = stats_domain.Playthrough.from_dict(playthrough_dict)
+
+        self.assertEqual(playthrough.id, 'playthrough_id1')
+        self.assertEqual(playthrough.exp_id, 'exp_id1')
+        self.assertEqual(playthrough.exp_version, 1)
+        self.assertEqual(playthrough.issue_id, 'EarlyQuit')
+        self.assertEqual(
+            playthrough.issue_customization_args, {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            })
+        self.assertEqual(
+            playthrough.playthrough_actions, [{
+                'action_id': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                }
+            }])
+        self.assertEqual(playthrough.is_valid, True)
+
+    def test_validate(self):
+        playthrough = stats_domain.Playthrough(
+            'playthrough_id1', 'exp_id1', 1, 'EarlyQuit', {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            }, [{
+                'action_id': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                }
+            }], True)
+        playthrough.validate()
+
+        # Change ID to int.
+        playthrough.id = 5
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected ID to be a string, received %s' % (type(5)))):
+            playthrough.validate()
+
+        # Change exp_version to string.
+        playthrough.id = 'playthrough_id1'
+        playthrough.exp_version = '1'
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected exp_version to be an int, received %s' % (type('1')))):
+            playthrough.validate()
+
+        # Change to invalid issue_id.
+        playthrough.exp_version = 1
+        playthrough.issue_id = 'InvalidIssueId'
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Invalid issue ID: %s' % playthrough.issue_id)):
+            playthrough.validate()
+
+        # Change playthrough_actions list.
+        playthrough.issue_id = 'EarlyQuit'
+        playthrough.playthrough_actions = [{
+            'action_id': 'ExplorationStart',
+        }]
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'KeyError in an element of playthrough_actions')):
+            playthrough.validate()
+
+        # Change to invalid action_id.
+        playthrough.playthrough_actions = [{
+            'action_id': 'InvalidActionId',
+            'action_customization_args': {
+                'state_name': {
+                    'value': 'state_name1'
+                }
+            }
+        }]
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Invalid action ID: %s' % 'InvalidActionId')):
+            playthrough.validate()
+
 
 class StateAnswersTests(test_utils.GenericTestBase):
     """Tests the StateAnswers domain object."""
