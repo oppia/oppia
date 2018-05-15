@@ -71,10 +71,10 @@ class ChangedBranch(object):
                 subprocess.check_output(
                     ['git', 'checkout', self.new_branch, '--'])
             except subprocess.CalledProcessError:
-                print('\nCould not change branch to %s. This is most probably '
-                      'because you are in a dirty state. Change manually to '
-                      'the branch that is being linted or stash your changes.'
-                      % self.new_branch)
+                print ('\nCould not change branch to %s. This is most probably '
+                       'because you are in a dirty state. Change manually to '
+                       'the branch that is being linted or stash your changes.'
+                       % self.new_branch)
                 sys.exit(1)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -272,8 +272,8 @@ def main():
     collected_files = _collect_files_being_pushed(refs, remote)
     # only interfere if we actually have something to lint (prevent annoyances).
     if collected_files and _has_uncommitted_files():
-        print('Your repo is in a dirty state which prevents the linting from'
-              ' working.\nStash your changes or commit them.\n')
+        print ('Your repo is in a dirty state which prevents the linting from'
+               ' working.\nStash your changes or commit them.\n')
         sys.exit(1)
     for branch, (modified_files, files_to_lint) in collected_files.iteritems():
         with ChangedBranch(branch):

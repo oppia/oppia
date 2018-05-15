@@ -328,10 +328,10 @@ def main():
                     r'Ran ([0-9]+) tests? in ([0-9\.]+)s', task.output)
                 test_count = int(tests_run_regex_match.group(1))
                 test_time = float(tests_run_regex_match.group(2))
-                print('SUCCESS   %s: %d tests (%.1f secs)' %
-                      (spec.test_target, test_count, test_time))
+                print ('SUCCESS   %s: %d tests (%.1f secs)' %
+                       (spec.test_target, test_count, test_time))
             except Exception:
-                print(
+                print (
                     'An unexpected error occurred. '
                     'Task output:\n%s' % task.output)
 

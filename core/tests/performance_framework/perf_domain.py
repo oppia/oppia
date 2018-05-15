@@ -236,8 +236,8 @@ class PageSessionMetrics(object):
         """Helper function to print details for all the events."""
         if self.page_session_stats:
             print 'Total number of requests: %d' % self.get_request_count()
-            print('Total page size in bytes: %d'
-                  % self.get_total_page_size_bytes())
+            print ('Total page size in bytes: %d'
+                   % self.get_total_page_size_bytes())
         else:
             print 'Page session stats are not available.'
 
@@ -248,13 +248,13 @@ class PageSessionMetrics(object):
             print 'Ready start time: %d' % self.get_ready_start_time_millisecs()
             print 'Redirect time: %d' % self.get_redirect_time_millisecs()
             print 'Appcache time: %d' % self.get_appcache_time_millisecs()
-            print('Unload event time: %d'
-                  % self.get_unload_event_time_millisecs())
+            print ('Unload event time: %d'
+                   % self.get_unload_event_time_millisecs())
             print 'DNS query time: %d' % self.get_lookup_domain_time_millisecs()
-            print('TCP connection time: %d'
-                  % self.get_connect_time_millisecs())
-            print('Init domtree time: %d'
-                  % self.get_init_dom_tree_time_millisecs())
+            print ('TCP connection time: %d'
+                   % self.get_connect_time_millisecs())
+            print ('Init domtree time: %d'
+                   % self.get_init_dom_tree_time_millisecs())
             print 'Load event time: %d' % self.get_load_event_time_millisecs()
         else:
             print 'Page session timings are not available.'

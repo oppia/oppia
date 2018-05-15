@@ -486,8 +486,8 @@ def _get_all_files():
             else:
                 invalid_filepaths.append(f)
         if invalid_filepaths:
-            print('The following file(s) do not exist: %s\n'
-                  'Exiting.' % invalid_filepaths)
+            print ('The following file(s) do not exist: %s\n'
+                   'Exiting.' % invalid_filepaths)
             sys.exit(1)
         all_files = valid_filepaths
     else:
@@ -592,7 +592,7 @@ def _check_newline_character(all_files):
                 f.seek(-2, 2)
                 if not (f.read(1) != '\n' and f.read(1) == '\n'):
                     failed = True
-                    print(
+                    print (
                         '%s --> Please ensure that this file ends'
                         'with exactly one newline char.' % filename)
                     total_error_count += 1
@@ -922,7 +922,7 @@ def _check_html_directive_name(all_files):
             if not directive_filename.endswith('_directive.html'):
                 failed = True
                 total_error_count += 1
-                print(
+                print (
                     '%s --> Please ensure that this file ends'
                     'with _directive.html.' % directive_filename)
     if failed:

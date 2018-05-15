@@ -227,7 +227,7 @@ def test_manifest_syntax(dependency_type, dependency_dict):
                 print '------------------------------------------'
                 print 'There is syntax error in this dependency'
                 print dependency_dict
-                print(
+                print (
                     'Only one of these keys pair must be used: "%s".'
                     % str(optional_keys))
                 print 'Exiting'
