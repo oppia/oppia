@@ -829,6 +829,17 @@ class Fraction(BaseObject):
     }
 
 
+class Units(BaseObject):
+    """Units class."""
+
+    description = 'A units expression.'
+    default_value = {}
+
+    SCHEMA = {
+        'type': 'dict'
+    }
+
+
 class NumberWithUnits(BaseObject):
     """Number with units class."""
 
@@ -844,7 +855,6 @@ class NumberWithUnits(BaseObject):
 
     SCHEMA = {
         'type': 'dict',
-
         'properties': [{
             'name': 'type',
             'schema': {
@@ -861,16 +871,5 @@ class NumberWithUnits(BaseObject):
         }, {
             'name': 'unit',
             'schema': Units.SCHEMA
-      }],
-    }
-
-
-class Units(BaseObject):
-    """Units class."""
-
-    description = 'A units expression.'
-    default_value = {}
-
-    SCHEMA = {
-        'type': 'dict'
+        }]
     }
