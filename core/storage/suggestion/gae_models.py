@@ -140,7 +140,7 @@ class SuggestionModel(base_models.BaseModel):
             str. The full instance ID for the suggestion.
         """
         if entity_id == '':
-            return  '.'.join([suggestion_type, entity_type, thread_id])
+            return '.'.join([suggestion_type, entity_type, thread_id])
         return '.'.join([suggestion_type, entity_type, thread_id, entity_id])
 
     @classmethod
