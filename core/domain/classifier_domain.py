@@ -359,7 +359,7 @@ class ClassifierTrainingJob(object):
 
         if not isinstance(self.training_data, list):
             raise utils.ValidationError(
-                'Expected training_data to be a list, received %s' %(
+                'Expected training_data to be a list, received %s' % (
                     self.training_data))
 
         for grouped_answers in self.training_data:
@@ -382,7 +382,7 @@ class ClassifierTrainingJob(object):
         # Classifier data can be either None (before its stored) or a dict.
         if not isinstance(self.classifier_data, dict) and self.classifier_data:
             raise utils.ValidationError(
-                'Expected classifier_data to be a dict|None, received %s' %(
+                'Expected classifier_data to be a dict|None, received %s' % (
                     self.classifier_data))
 
         if not isinstance(self.data_schema_version, int):

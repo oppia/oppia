@@ -1524,7 +1524,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             'property_name': 'title',
             'new_value': 'Collection Bob title'
         }]
-         # Have Bob update that collection. Version 2.
+        # Have Bob update that collection. Version 2.
         collection_services.update_collection(
             bob_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
         self._check_contributors_summary(

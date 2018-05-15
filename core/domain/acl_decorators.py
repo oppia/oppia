@@ -236,6 +236,7 @@ def can_manage_own_profile(handler):
 
 def can_access_admin_page(handler):
     """Decorator that checks if the current user is a super admin."""
+
     def test_super_admin(self, **kwargs):
         """Checks if the user is logged in and is a super admin."""
         if not self.user_id:
@@ -467,6 +468,7 @@ def can_suggest_changes_to_exploration(handler):
     """Decorator to check whether a user can make suggestions to an
     exploration.
     """
+
     def test_can_suggest(self, exploration_id, **kwargs):
         """Checks if the user can make suggestions to an exploration.
 
@@ -626,6 +628,7 @@ def require_user_id_else_redirect_to_homepage(handler):
     session. If not, the user is redirected to the main page.
     Note that the user may not yet have registered.
     """
+
     def test_login(self, **kwargs):
         """Checks if the user for the current session is logged in.
         If not, redirects the user to the home page.

@@ -131,7 +131,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         event_dict_idx = 0
         event_dict = sorted_events_dicts[event_dict_idx]
         for version in versions:
-            datastore_stats_for_version = old_stats[version-1]
+            datastore_stats_for_version = old_stats[version - 1]
             if version == 1:
                 # Reset the possibly corrupted stats.
                 datastore_stats_for_version.num_starts_v2 = 0

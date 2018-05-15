@@ -86,8 +86,8 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         classifier_training_job_model.put()
 
         self.job_result_dict = {
-            'job_id' : self.job_id,
-            'classifier_data' : self.classifier_data,
+            'job_id': self.job_id,
+            'classifier_data': self.classifier_data,
         }
 
         self.payload = {}
@@ -165,9 +165,9 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         )
 
         self.expected_response = {
-            u'job_id' : unicode(self.job_id, 'utf-8'),
-            u'training_data' : self.training_data,
-            u'algorithm_id' : unicode(self.algorithm_id, 'utf-8')
+            u'job_id': unicode(self.job_id, 'utf-8'),
+            u'training_data': self.training_data,
+            u'algorithm_id': unicode(self.algorithm_id, 'utf-8')
         }
 
         self.payload = {}

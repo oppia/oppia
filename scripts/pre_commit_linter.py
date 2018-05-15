@@ -378,7 +378,7 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
         current_batch_end_index = min(
             current_batch_start_index + _BATCH_SIZE, len(files_to_lint))
         current_files_to_lint = files_to_lint[
-            current_batch_start_index : current_batch_end_index]
+            current_batch_start_index: current_batch_end_index]
         print 'Linting Python files %s to %s...' % (
             current_batch_start_index + 1, current_batch_end_index)
 

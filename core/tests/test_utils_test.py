@@ -113,7 +113,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
             data['value'] = num
             return num
 
-        l = lambda x: side_effect(x)*2
+        l = lambda x: side_effect(x) * 2
 
         wrapped = test_utils.FunctionWrapper(l)
         self.assertEqual(wrapped('foobar'), 'foobarfoobar')

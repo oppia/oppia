@@ -298,7 +298,7 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEquals(
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
         self.assertEquals(user_model.num_ratings, 3)
-        self.assertEquals(user_model.average_ratings, 10/3.0)
+        self.assertEquals(user_model.average_ratings, 10 / 3.0)
         self.logout()
 
     def test_stats_for_single_exploration_with_multiple_owners(self):
@@ -386,7 +386,7 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         expected_results = {
             'total_plays': 5,
             'num_ratings': 4,
-            'average_ratings': 18/4.0
+            'average_ratings': 18 / 4.0
         }
 
         user_model_2 = user_models.UserStatsModel.get(self.owner_id_2)

@@ -208,7 +208,7 @@ class InteractionAnswerSummariesMRJobManager(
             for ignored_version in ignored_versions:
                 del versioned_interaction_ids[ignored_version]
                 del versioned_item_ids[ignored_version]
-            versions = versions[:earliest_acceptable_version_index+1]
+            versions = versions[:earliest_acceptable_version_index + 1]
 
         # Retrieve all StateAnswerModel entities associated with the remaining
         # item IDs which correspond to a single interaction ID shared among all
