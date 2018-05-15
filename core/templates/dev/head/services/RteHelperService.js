@@ -44,6 +44,9 @@ oppia.factory('RteHelperService', [
 
     var _createCustomizationArgDictFromAttrs = function(attrs) {
       var customizationArgsDict = {};
+      if (attrs.getNamedItem('_moz_dirty')) {
+        attrs.removeNamedItem('_moz_dirty');
+      }
       for (var i = 0; i < attrs.length; i++) {
         var attr = attrs[i];
         if (attr.name === 'class' || attr.name === 'src' ||

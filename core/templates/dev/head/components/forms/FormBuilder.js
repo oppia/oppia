@@ -144,10 +144,12 @@ oppia.filter('sanitizeHtmlForRte', ['$sanitize', function($sanitize) {
 
 oppia.directive('textAngularRte', [
   '$filter', '$timeout', 'HtmlEscaperService', 'RteHelperService',
-  'textAngularManager',
+  'textAngularManager', 'CacheImageUploaderService', 'AlertsService',
+  'ExplorationContextService',
   function(
       $filter, $timeout, HtmlEscaperService, RteHelperService,
-      textAngularManager) {
+      textAngularManager, CacheImageUploaderService, AlertsService,
+      ExplorationContextService) {
     return {
       restrict: 'E',
       scope: {
@@ -161,6 +163,42 @@ oppia.directive('textAngularRte', [
         '     placeholder="<[placeholderText]>"' +
         '     name="<[labelForFocusTarget()]>">' +
         '</div>'),
+      link: function($scope, element, attrs) {
+        // A mutation observer to detect changes in the RTE Editor
+        var observer = new MutationObserver(function(mutations) {
+          // A condition to detect if mutation involves addition of node by
+          // drag and drop method.
+          if (mutations[mutations.length - 1].addedNodes[0]) {
+            // This condition checks if added node is image type.
+            if (mutations[mutations.length - 1]
+              .addedNodes[0].nodeName === 'IMG'){
+              // Gets the added image node
+              var addedImgNode = mutations[mutations.length - 1].addedNodes[0];
+              addedImgNode.classList.add('oppia-noninteractive-image');
+              addedImgNode.classList.add('block-element');
+              var explorationId = ExplorationContextService.getExplorationId(
+              );
+              var uploadedImage = CacheImageUploaderService.uploadImageToCache(
+                addedImgNode.src, explorationId);
+              addedImgNode.src = uploadedImage;
+              addedImgNode.setAttribute(
+                'exploration-id-with-value',
+                '&quot;' + explorationId + '&quot;');
+              addedImgNode.setAttribute(
+                'filepath-with-value',
+                '&quot;' + CacheImageUploaderService.filepath() + '&quot;');
+              // Triggering add image modal after the image has been
+              // uploaded.
+              addedImgNode.click();
+            }
+          }
+        });
+
+        observer.observe(element[0], {
+          childList: true,
+          subtree: true
+        });
+      },
       controller: ['$scope', function($scope) {
         // Currently, operations affecting the filesystem are allowed only in
         // the editor context.
