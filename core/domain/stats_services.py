@@ -197,6 +197,21 @@ def get_multiple_exploration_stats_by_version(exp_id, version_numbers):
     return exploration_stats
 
 
+def get_exp_issues_from_model(exp_issues_model):
+    """Gets an ExplorationIssues domain object from an ExplorationIssuesModel
+    instance.
+
+    Args:
+        exp_issues_model: ExplorationIssuesModel. Exploration issues model in
+            datastore.
+
+    Returns:
+        ExplorationIssues. The domain object for exploration issues.
+    """
+    return stats_domain.ExplorationIssues(
+        exp_issues_model.id, exp_issues_model.unresolved_issues)
+
+
 def get_exploration_stats_from_model(exploration_stats_model):
     """Gets an ExplorationStats domain object from an ExplorationStatsModel
     instance.
@@ -295,6 +310,32 @@ def save_stats_model_transactional(exploration_stats):
     """
     transaction_services.run_in_transaction(
         _save_stats_model, exploration_stats)
+
+
+def _save_exp_issues_model(exp_issues):
+    """Updates the ExplorationIssuesModel datastore instance with the passed
+    ExplorationIssues domain object.
+
+    Args:
+        exp_issues. ExplorationIssues. The exploration issues domain
+            object.
+    """
+    exp_issues_model = stats_models.ExplorationIssuesModel.get(exp_issues.id)
+    exp_issues_model.unresolved_issues = exp_issues.unresolved_issues
+
+    exp_issues_model.put()
+
+
+def save_exp_issues_model_transactional(exp_issues):
+    """Updates the ExplorationIssuesModel datastore instance with the passed
+    ExplorationIssues domain object in a transaction.
+
+    Args:
+        exp_issues. ExplorationIssues. The exploration issues domain
+            object.
+    """
+    transaction_services.run_in_transaction(
+        _save_exp_issues_model, exp_issues)
 
 
 def get_exploration_stats_multi(exp_version_references):

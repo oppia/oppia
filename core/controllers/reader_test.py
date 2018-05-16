@@ -32,8 +32,8 @@ from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
-(classifier_models,) = models.Registry.import_models(
-    [models.NAMES.classifier])
+(classifier_models, stats_models) = models.Registry.import_models(
+    [models.NAMES.classifier, models.NAMES.statistics])
 
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
@@ -1187,6 +1187,99 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [])
+
+
+class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
+    """Tests for the handler that records playthroughs."""
+
+    def setUp(self):
+        super(StorePlaythroughHandlerTest, self).setUp()
+        self.exp_id = '15'
+
+        self.login(self.VIEWER_EMAIL)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        exp_services.delete_demo(self.exp_id)
+        exp_services.load_demo(self.exp_id)
+        self.exploration = exp_services.get_exploration_by_id(self.exp_id)
+        playthrough_id = stats_models.PlaythroughModel.create(
+            self.exp_id, self.exploration.version, 'EarlyQuit',
+            {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+            [{
+                'action_id': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                }
+            }], True)
+        stats_models.ExplorationIssuesModel.create(
+            self.exp_id, [{
+                'issue_id': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': [playthrough_id]
+            }])
+
+    def test_new_playthrough_gets_stored(self):
+        playthrough_data = {
+            'exp_id': self.exp_id,
+            'exp_version': self.exploration.version,
+            'issue_id': 'EarlyQuit',
+            'issue_customization_args': {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 250
+                }
+            },
+            'playthrough_actions': [{
+                'action_id': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                }
+            }],
+            'is_valid': True
+        }
+
+        exp_issue = {
+            'issue_id': 'EarlyQuit',
+            'schema_version': 1,
+            'customization_args': {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 250
+                }
+            }
+        }
+
+        self.post_json('/explorehandler/store_playthrough/%s' % (
+            self.exp_id), {
+                'playthrough_data': playthrough_data,
+                'exp_issue': exp_issue})
+        self.process_and_flush_pending_tasks()
+
+        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        print model.unresolved_issues
+        self.assertEqual(len(model.unresolved_issues), 1)
+        self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
 
 
 class StatsEventHandlerTest(test_utils.GenericTestBase):

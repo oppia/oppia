@@ -420,7 +420,7 @@ class ExplorationIssues(object):
                 represents an issue along with the associated playthroughs.
                 Each dict will be of the form:
                 {
-                    issue_type: str. Type of the issue.
+                    issue_id: str. ID of the issue.
                     issue_customization_args: dict. The customization args dict
                         for the given issue_type. The specs for this dict are as
                         specified above in the different subclasses of

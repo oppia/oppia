@@ -34,12 +34,16 @@ from core.domain import moderator_services
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
+from core.domain import stats_services
 from core.domain import summary_services
 from core.domain import user_services
+from core.platform import models
 import feconf
 import utils
 
 import jinja2
+
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
@@ -292,6 +296,77 @@ class ExplorationHandler(base.BaseHandler):
                 exploration.correctness_feedback_enabled),
         })
         self.render_json(self.values)
+
+
+class StorePlaythroughHandler(base.BaseHandler):
+    """Handles a useful playthrough coming in from the frontend to store it."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    def post(self, exploration_id):
+        """Handles POST requests.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+        exp_issue_dict = self.payload.get('exp_issue')
+        playthrough_data = self.payload.get('playthrough_data')
+
+        exp_issues_model = stats_models.ExplorationIssuesModel.get(
+            exploration_id)
+        exp_issues = stats_services.get_exp_issues_from_model(exp_issues_model)
+
+        playthrough_id = stats_models.PlaythroughModel.create(
+            playthrough_data['exp_id'],
+            playthrough_data['exp_version'],
+            playthrough_data['issue_id'],
+            playthrough_data['issue_customization_args'],
+            playthrough_data['playthrough_actions'],
+            playthrough_data['is_valid'])
+
+        customization_args = exp_issue_dict['customization_args']
+        # Boolean to identify difference between customization args that have
+        # either 'state_name' or 'state_names'.
+        state_name_in_customization_args = (
+            True
+            if 'state_name' in customization_args else False)
+
+        issue_found = False
+        for index, issue in enumerate(exp_issues.unresolved_issues):
+            if issue['issue_id'] == exp_issue_dict['issue_id']:
+                issue_customization_args = issue['issue_customization_args']
+                # This check checks if the state name or the list of state names
+                # (depending on the issue type) are identical.
+                if (state_name_in_customization_args and (
+                        issue_customization_args['state_name'] == (
+                            customization_args['state_name']))) or (
+                                not state_name_in_customization_args and (
+                                    issue_customization_args['state_names'] == (
+                                        customization_args['state_names']))):
+                    if len(issue['playthrough_ids']) < (
+                            feconf.MAX_PLAYTHROUGHS_FOR_ISSUE):
+                        exp_issues.unresolved_issues[index][
+                            'playthrough_ids'].append(playthrough_id)
+                    else:
+                        # In this case, the playthrough instance created doesn't
+                        # need to be stored, so it is deleted.
+                        stats_models.PlaythroughModel.get(
+                            playthrough_id).delete()
+                    issue_found = True
+                    break
+
+        if not issue_found:
+            issue = {
+                'issue_id': playthrough_data['id'],
+                'issue_customization_args': playthrough_data[
+                    'issue_customization_args'],
+                'playthrough_ids': [playthrough_id]
+            }
+            exp_issues.unresolved_issues.append(issue)
+
+        stats_services.save_exp_issues_model_transactional(
+            exp_issues)
+        self.render_json({})
 
 
 class StatsEventsHandler(base.BaseHandler):
