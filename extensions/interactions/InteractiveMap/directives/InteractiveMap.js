@@ -199,7 +199,7 @@ oppia.factory('interactiveMapRulesService', [
       Math.pow(Math.sin(longitudeDifference / 2), 2);
 
       return RADIUS_OF_EARTH_KM *
-      2 * Math.asin(Math.sqrt(haversineOfCentralAngle));
+        2 * Math.asin(Math.sqrt(haversineOfCentralAngle));
     };
 
     return {
