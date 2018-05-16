@@ -1277,7 +1277,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
-        print model.unresolved_issues
         self.assertEqual(len(model.unresolved_issues), 1)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
 
