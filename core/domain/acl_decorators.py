@@ -19,6 +19,7 @@
 from core.controllers import base
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import topic_services
 from core.platform import models
 import feconf
 
@@ -640,3 +641,24 @@ def require_user_id_else_redirect_to_homepage(handler):
     test_login.__wrapped__ = True
 
     return test_login
+
+
+def can_edit_topic(handler):
+    """Decorator to check whether the user can edit given topic."""
+    def test_can_edit(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        topic_rights = topic_services.get_topic_rights(topic_id)
+        if topic_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if topic_services.check_can_edit_topic(
+                self.user, topic_rights):
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to edit this topic.')
+    test_can_edit.__wrapped__ = True
+
+    return test_can_edit
