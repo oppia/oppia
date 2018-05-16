@@ -11,7 +11,8 @@
       "error",
       "array",
       ],
-    "angular/di-unused": 2,
+    "angular/di-order": "error",
+    "angular/di-unused": "error",
     "angular/no-inline-template": [
       "error",
       {

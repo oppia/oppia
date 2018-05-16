@@ -39,7 +39,7 @@ describe('State content editor directive', function() {
     });
   });
 
-  beforeEach(inject(function($compile, $rootScope, $templateCache, $injector) {
+  beforeEach(inject(function($compile, $injector, $rootScope, $templateCache) {
     shof = $injector.get('SubtitledHtmlObjectFactory');
     cls = $injector.get('ChangeListService');
     scs = $injector.get('stateContentService');

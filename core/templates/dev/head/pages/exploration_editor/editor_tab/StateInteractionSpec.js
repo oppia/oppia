@@ -51,7 +51,7 @@ describe('State Interaction controller', function() {
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-    beforeEach(inject(function($rootScope, $controller, $injector) {
+    beforeEach(inject(function($controller, $injector, $rootScope) {
       scope = $rootScope.$new();
       ecs = $injector.get('EditorStateService');
       cls = $injector.get('ChangeListService');
