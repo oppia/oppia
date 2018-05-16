@@ -63,10 +63,9 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_invalid_exploration_ids_return_page_not_found(self):
-        response_dict = self.get_json(
+        self.get_json(
             '%s/bad_exp_id' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
-            expect_errors=True)
-        self.assertEqual(response_dict['status_code'], 404)
+            expect_errors=True, expected_status_int=404)
 
     def test_invalid_thread_ids_return_empty_message_list(self):
         response_dict = self.get_json(
