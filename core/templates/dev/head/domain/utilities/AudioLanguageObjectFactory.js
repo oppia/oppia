@@ -16,19 +16,21 @@
  * @fileoverview Object factory for creating audio languages.
  */
 
-oppia.factory('AudioLanguageObjectFactory', function() {
-  var AudioLanguage = function(id, description, relatedLanguages) {
-    this.id = id;
-    this.description = description;
-    this.relatedLanguages = relatedLanguages;
-  };
+oppia.factory('AudioLanguageObjectFactory', [
+  function() {
+    var AudioLanguage = function(id, description, relatedLanguages) {
+      this.id = id;
+      this.description = description;
+      this.relatedLanguages = relatedLanguages;
+    };
 
-  AudioLanguage.createFromDict = function(audioLanguageDict) {
-    return new AudioLanguage(
-      audioLanguageDict.id,
-      audioLanguageDict.text,
-      audioLanguageDict.related_languages);
-  };
+    AudioLanguage.createFromDict = function(audioLanguageDict) {
+      return new AudioLanguage(
+        audioLanguageDict.id,
+        audioLanguageDict.text,
+        audioLanguageDict.related_languages);
+    };
 
-  return AudioLanguage;
-});
+    return AudioLanguage;
+  }]
+);
