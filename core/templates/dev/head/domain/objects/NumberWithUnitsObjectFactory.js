@@ -1,6 +1,16 @@
+oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
+  INVALID_VALUE:
+    'Please ensure that value is either a fraction or a number',
+  INVALID_CURRENCY:
+    'Please enter a valid currency (e.g., $ 5)',
+  DIVISION_BY_ZERO: 'Please do not put 0 in the denominator'
+});
+
 oppia.factory('NumberWithUnitsObjectFactory', [
   'UnitsObjectFactory', 'FractionObjectFactory',
-  function(UnitsObjectFactory, FractionObjectFactory) {
+  'NUMBER_WITH_UNITS_PARSING_ERRORS', function(
+      UnitsObjectFactory, FractionObjectFactory,
+      NUMBER_WITH_UNITS_PARSING_ERRORS) {
     var NumberWithUnits = function(type, real, Fraction, Units) {
       this.type = type;
       this.real = real;
@@ -29,7 +39,10 @@ oppia.factory('NumberWithUnitsObjectFactory', [
         }
       } else {
         var ind = rawInput.indexOf(' ');
-        units = rawInput.substr(0, ind) + ' ';    // Currency unit
+        if (ind === -1) {
+          throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
+        }
+        units = rawInput.substr(0, ind) + ' ';
         var ind2 = rawInput.indexOf(' ', ind + 1);
         if (ind2 !== -1) {
           value = rawInput.substr(ind + 1, ind2 - ind - 1).trim();
@@ -38,6 +51,9 @@ oppia.factory('NumberWithUnitsObjectFactory', [
           value = rawInput.substr(ind + 1).trim();
           units = units.trim();
         }
+      }
+      if (value.match(/[a-z]/i) || value.match(/[*^$()]/)) {
+        throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_VALUE);
       }
 
       if (value.includes('/')) {
@@ -71,7 +87,7 @@ oppia.factory('UnitsObjectFactory', [function() {
     var unitList = [];
     var unit = '';
     for (var i = 0; i < units.length; i++) {
-      if ('*/()# '.includes(units[i])) {
+      if ('*/()# '.includes(units[i]) && unit !== 'per') {
         if (unit.length > 0) {
           if ((unitList.length > 0) && isunit(unitList.slice(-1).pop())) {
             unitList.push('*');
@@ -82,6 +98,9 @@ oppia.factory('UnitsObjectFactory', [function() {
         if (!('# '.includes(units[i]))) {
           unitList.push(units[i]);
         }
+      } else if (' '.includes(units[i]) && unit === 'per') {
+        unitList.push('/');
+        unit = '';
       } else {
         unit += units[i];
       }

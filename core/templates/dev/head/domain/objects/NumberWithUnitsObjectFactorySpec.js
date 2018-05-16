@@ -5,11 +5,13 @@ describe('NumberWithUnitsObjectFactory', function() {
     var NumberWithUnits = null;
     var Units = null;
     var Fraction = null;
+    var errors = null;
 
     beforeEach(inject(function($injector) {
       NumberWithUnits = $injector.get('NumberWithUnitsObjectFactory');
       Units = $injector.get('UnitsObjectFactory');
       Fraction = $injector.get('FractionObjectFactory');
+      errors = $injector.get('NUMBER_WITH_UNITS_PARSING_ERRORS');
     }));
 
     it('should convert units to dict format', function() {
@@ -17,22 +19,24 @@ describe('NumberWithUnitsObjectFactory', function() {
         {kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1});
       expect(new Units('mol/(kg / (N m / s^2)').toDict()).toEqual(
         {mol: 1, kg: -1, N: 1, m: 1, s: -2});
+      expect(new Units('kg per kg^2 K mol per (N m s^2) K s').toDict()).toEqual(
+        {kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1});
     });
 
     it('should convert units from dict to string format', function() {
       expect(Units.fromDictToString(
         {kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1})).toBe(
-          'kg^-1 K^2 mol^1 N^-1 m^-1 s^-1');
+        'kg^-1 K^2 mol^1 N^-1 m^-1 s^-1');
       expect(Units.fromDictToString(
         {mol: 1, kg: -1, N: 1, m: 1, s: -2, K: -1})).toBe(
-          'mol^1 kg^-1 N^1 m^1 s^-2 K^-1');
+        'mol^1 kg^-1 N^1 m^1 s^-2 K^-1');
     });
 
     it('should parse valid units strings', function() {
-      expect(Units.fromRawInputString('kg / (K mol^-2)').toDict()).toEqual(
+      expect(Units.fromRawInputString('kg per (K mol^-2)').toDict()).toEqual(
         new Units('kg / (K mol^-2)').toDict());
       expect(Units.fromRawInputString('kg / (K mol^-2) N / m^2').toDict(
-        )).toEqual(new Units('kg / (K mol^-2) N / m^2').toDict());
+      )).toEqual(new Units('kg / (K mol^-2) N / m^2').toDict());
     });
 
     it('should parse valid number with units strings', function() {
@@ -52,6 +56,30 @@ describe('NumberWithUnitsObjectFactory', function() {
       expect(NumberWithUnits.fromRawInputString('Rs 2/3')).toEqual(
         new NumberWithUnits('fraction', '', Fraction.fromRawInputString(
           '2/3'), Units.fromRawInputString('Rs')));
+    });
+
+    it('should throw errors for invalid number with units', function() {
+      expect(function() {
+        NumberWithUnits.fromRawInputString('3* kg');
+      }).toThrow(new Error(errors.INVALID_VALUE));
+      expect(function() {
+        NumberWithUnits.fromRawInputString('$ 3*');
+      }).toThrow(new Error(errors.INVALID_VALUE));
+      expect(function() {
+        NumberWithUnits.fromRawInputString('Rs 3^');
+      }).toThrow(new Error(errors.INVALID_VALUE));
+      expect(function() {
+        NumberWithUnits.fromRawInputString('3m/s');
+      }).toThrow(new Error(errors.INVALID_VALUE));
+      expect(function() {
+        NumberWithUnits.fromRawInputString('$3');
+      }).toThrow(new Error(errors.INVALID_CURRENCY));
+      expect(function() {
+        NumberWithUnits.fromRawInputString('Rs5');
+      }).toThrow(new Error(errors.INVALID_CURRENCY));
+      expect(function() {
+        NumberWithUnits.fromRawInputString('$');
+      }).toThrow(new Error(errors.INVALID_CURRENCY));
     });
   });
 });
