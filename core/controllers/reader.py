@@ -303,6 +303,7 @@ class StorePlaythroughHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
+    @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests.
 
