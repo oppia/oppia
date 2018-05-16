@@ -23,7 +23,7 @@ import utils
 NAMES = utils.create_enum(
     'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
     'email', 'exploration', 'feedback', 'file', 'job', 'question',
-    'recommendations', 'statistics', 'user')
+    'recommendations', 'skill', 'statistics', 'story', 'topic', 'user')
 
 
 class _Platform(object):
