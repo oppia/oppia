@@ -61,11 +61,11 @@ class ExplorationIssuesModelCreatorOneOffJob(
                 exp_issues_model.put()
             yield(
                 exploration_model.id,
-                'ExplorationIssuesModel created for %s' % exploration_model.id)
+                'ExplorationIssuesModel created')
 
     @staticmethod
     def reduce(exp_id, values):
-        yield(values)
+        yield "%s: %s" % (exp_id, values)
 
 
 class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
