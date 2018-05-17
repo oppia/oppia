@@ -1233,8 +1233,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'playthrough_ids': [playthrough_id]
             }])
 
-    def test_new_playthrough_gets_stored(self):
-        playthrough_data = {
+        self.playthrough_data = {
             'exp_id': self.exp_id,
             'exp_version': self.exploration.version,
             'issue_id': 'EarlyQuit',
@@ -1257,7 +1256,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'is_valid': True
         }
 
-        exp_issue = {
+        self.exp_issue = {
             'issue_id': 'EarlyQuit',
             'schema_version': 1,
             'customization_args': {
@@ -1270,15 +1269,132 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }
         }
 
+    def test_new_playthrough_gets_stored(self):
+        """Test that a new playthrough gets created and is added to an existing
+        issue's list of playthrough IDs.
+        """
         self.post_json('/explorehandler/store_playthrough/%s' % (
             self.exp_id), {
-                'playthrough_data': playthrough_data,
-                'exp_issue': exp_issue})
+                'playthrough_data': self.playthrough_data,
+                'exp_issue': self.exp_issue})
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
         self.assertEqual(len(model.unresolved_issues), 1)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
+
+    def test_new_exp_issue_gets_created(self):
+        """Test that a new playthrough gets created and a new issue is created
+        for it.
+        """
+        self.exp_issue['customization_args']['state_name'][
+            'value'] = 'state_name2'
+        self.playthrough_data['issue_customization_args']['state_name'][
+            'value'] = 'state_name2'
+
+        self.post_json('/explorehandler/store_playthrough/%s' % (
+            self.exp_id), {
+                'playthrough_data': self.playthrough_data,
+                'exp_issue': self.exp_issue})
+        self.process_and_flush_pending_tasks()
+
+        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        self.assertEqual(len(model.unresolved_issues), 2)
+        self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
+        self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 1)
+
+    def test_playthrough_gets_added_to_cyclic_issues(self):
+        """Test that a new cyclic playthrough gets added to the correct
+        cyclic issue when it exists.
+        """
+        playthrough_id = stats_models.PlaythroughModel.create(
+            self.exp_id, self.exploration.version, 'CyclicStateTransitions',
+            {
+                'state_names': {
+                    'value': ['state_name1', 'state_name2', 'state_name1']
+                },
+            },
+            [{
+                'action_id': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                }
+            }], True)
+
+        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        model.unresolved_issues.append({
+            'issue_id': 'CyclicStateTransitions',
+            'issue_customization_args': {
+                'state_names': {
+                    'value': ['state_name1', 'state_name2', 'state_name1']
+                },
+            },
+            'playthrough_ids': [playthrough_id]
+        })
+        model.put()
+
+
+        self.playthrough_data = {
+            'exp_id': self.exp_id,
+            'exp_version': self.exploration.version,
+            'issue_id': 'CyclicStateTransitions',
+            'issue_customization_args': {
+                'state_names': {
+                    'value': ['state_name1', 'state_name2', 'state_name1']
+                },
+            },
+            'playthrough_actions': [{
+                'action_id': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                }
+            }],
+            'is_valid': True
+        }
+
+        self.exp_issue = {
+            'issue_id': 'CyclicStateTransitions',
+            'schema_version': 1,
+            'customization_args': {
+                'state_names': {
+                    'value': ['state_name1', 'state_name2', 'state_name1']
+                },
+            }
+        }
+
+        self.post_json('/explorehandler/store_playthrough/%s' % (
+            self.exp_id), {
+                'playthrough_data': self.playthrough_data,
+                'exp_issue': self.exp_issue})
+        self.process_and_flush_pending_tasks()
+
+        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        self.assertEqual(len(model.unresolved_issues), 2)
+        self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
+        self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 2)
+
+    def test_playthrough_not_stored_at_limiting_value(self):
+        """Test that a playthrough is not stored when the maximum number of
+        playthroughs per issue already exists.
+        """
+        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        model.unresolved_issues[0]['playthrough_ids'] = [
+            'id1', 'id2', 'id3', 'id4', 'id5']
+        model.put()
+
+        self.post_json('/explorehandler/store_playthrough/%s' % (
+            self.exp_id), {
+                'playthrough_data': self.playthrough_data,
+                'exp_issue': self.exp_issue})
+        self.process_and_flush_pending_tasks()
+
+        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        self.assertEqual(len(model.unresolved_issues), 1)
+        self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 5)
 
 
 class StatsEventHandlerTest(test_utils.GenericTestBase):

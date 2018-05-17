@@ -358,7 +358,7 @@ class StorePlaythroughHandler(base.BaseHandler):
 
         if not issue_found:
             issue = {
-                'issue_id': playthrough_data['id'],
+                'issue_id': playthrough_data['issue_id'],
                 'issue_customization_args': playthrough_data[
                     'issue_customization_args'],
                 'playthrough_ids': [playthrough_id]
