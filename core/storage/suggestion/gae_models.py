@@ -77,6 +77,22 @@ SUGGESTION_MINIMUM_ROLE_FOR_REVIEW = {
 }
 
 
+class SuggestionParams(ndb.Model):
+    """Model to store all the suggestion params for a suggestion"""
+
+    # The contribution type. Either translation related or content related.
+    contribution_type = ndb.StringProperty(required=True)
+    # The contribution domain. The language of the translation or the subject
+    # category of the content being suggested.
+    contribution_domain = ndb.StringProperty(required=True)
+    # The ID of the entity being suggested to. Will be set to None if the
+    # suggestion is to add a new entity.
+    entity_id = ndb.StringProperty(required=False, default=None)
+    # The version number of the entity being suggested to. Will be set to None
+    # if the suggestion is to add a new entity.
+    entity_version = ndb.IntegerProperty(required=False, default=None)
+
+
 class SuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users."""
 
@@ -92,16 +108,8 @@ class SuggestionModel(base_models.BaseModel):
     # Status of the suggestion.
     status = ndb.StringProperty(
         required=True, indexed=True, choices=STATUS_CHOICES)
-    # Additional parameters to be stored. The parameters include:
-    #   contribution_type: Either translation related or content related.
-    #
-    #   contribution_category: The content subject category
-    #                          (like algebra, algorithms, etc)
-    #   OR
-    #
-    #   contribution_language: The language of the translation submitted.
-    suggestion_customization_args = ndb.JsonProperty(
-        required=True, indexed=True)
+    # Additional parameters to be stored.
+    suggestion_params = ndb.StructuredProperty(SuggestionParams)
     # The author of the suggestion.
     author_id = ndb.StringProperty(required=True, indexed=True)
     # The reviewer who accepted the suggestion.
@@ -110,16 +118,9 @@ class SuggestionModel(base_models.BaseModel):
     thread_id = ndb.StringProperty(required=True, indexed=True)
     # The reviewer assigned to review the suggestion.
     assigned_reviewer_id = ndb.StringProperty(required=True, indexed=True)
-    # The suggestion payload. Stores the details specific to the suggestion.
-    # The structure depends on the type of suggestion. For "edit" suggestions,
-    # the required parameters are:
-    #   entity_id: The ID of the entity being edited.
-    #   entity_version_number: The version of the entity being edited.
-    #   change_list: An appropriate changelist which needs to be applied to the
-    #                entity.
-    # For "add" suggestions, the required parameters are:
-    #   entity_type: The type of entity being added.
-    #   entity_data: The data that is needed to create the entity.
+    # The suggestion payload. Contains the data of the suggestion. For "edit"
+    # suggestions, this contains the change_list. For "add" suggestions, this
+    # contains the data necessary to add the new entity.
     payload = ndb.JsonProperty(required=True, indexed=False)
 
     @classmethod
@@ -146,7 +147,7 @@ class SuggestionModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, suggestion_type, entity_type, suggestion_sub_type, status,
-            suggestion_customization_args, author_id, reviewer_id, thread_id,
+            suggestion_params, author_id, reviewer_id, thread_id,
             assigned_reviewer_id, payload):
         """Creates a new SuggestionModel entry.
 
@@ -156,8 +157,7 @@ class SuggestionModel(base_models.BaseModel):
             entity_type: str. The type of entity being edited/added.
             suggestion_sub_type: str. The sub type of the suggestion.
             status: str. The status of the suggestion.
-            suggestion_customization_args: dict. Additional parameters to know
-                the category of the contributions.
+            suggestion_params: dict. Additional parameters for the suggestion
             author_id: str. The ID of the user who submitted the suggestion.
             reviewer_id: str. The ID of the reviewer who has accepted the
                 suggestion.
@@ -165,14 +165,27 @@ class SuggestionModel(base_models.BaseModel):
                 suggestion.
             assigned_reviewer_id: str. The ID of the user assigned to
                 review the suggestion.
-            payload: dict. The actual content of the suggestion. The contents
-                depend on the type of suggestion.
+            payload: dict. The actual content of the suggestion.
 
         Raises:
             Exception: There is already a suggestion with the given id.
         """
-        instance_id = cls.get_instance_id(
-            suggestion_type, entity_type, thread_id, payload['entity_id'])
+
+        if suggestion_type == SUGGESTION_TYPE_EDIT:
+            instance_id = cls.get_instance_id(
+                suggestion_type, entity_type, thread_id,
+                suggestion_params['entity_id'])
+            suggestion_params = SuggestionParams(
+                contribution_type=suggestion_params['contribution_type'],
+                contribution_domain=suggestion_params['contribution_domain'],
+                entity_id=suggestion_params['entity_id'],
+                entity_version=suggestion_params['entity_version'])
+        elif suggestion_type == SUGGESTION_TYPE_ADD:
+            instance_id = cls.get_instance_id(
+                suggestion_type, entity_type, thread_id)
+            suggestion_params = SuggestionParams(
+                contribution_type=suggestion_params['contribution_type'],
+                contribution_domain=suggestion_params['contribution_domain'])
 
         if cls.get_by_id(instance_id):
             raise Exception('There is already a suggestion with the given'
@@ -180,8 +193,7 @@ class SuggestionModel(base_models.BaseModel):
 
         cls(id=instance_id, suggestion_type=suggestion_type,
             entity_type=entity_type, suggestion_sub_type=suggestion_sub_type,
-            status=status,
-            suggestion_customization_args=suggestion_customization_args,
+            status=status, suggestion_params=suggestion_params,
             author_id=author_id, reviewer_id=reviewer_id, thread_id=thread_id,
             assigned_reviewer_id=assigned_reviewer_id, payload=payload).put()
 
@@ -255,8 +267,26 @@ class SuggestionModel(base_models.BaseModel):
             status: str. The status of the suggestion.
 
         Returns:
-            list(SuggestionModel). A list of suggestions witj the given status,
+            list(SuggestionModel). A list of suggestions with the given status,
             upto a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
         """
         return cls.get_all().filter(
             cls.status == status).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_suggestion_by_entity_id(cls, entity_id, entity_type):
+        """Gets all suggestions to the entity with the given ID.
+
+        Args:
+            entity_id: str. The ID of the entity.
+            entity_type: str. The type of entity.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions to the entity with the
+            given id, upto a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
+        """
+        return cls.get_all().filter(
+            cls.suggestion_type == SUGGESTION_TYPE_EDIT).filter(
+            cls.entity_type == entity_type).filter(
+            cls.suggestion_params.entity_id == entity_id).fetch(
+                feconf.DEFAULT_QUERY_LIMIT)

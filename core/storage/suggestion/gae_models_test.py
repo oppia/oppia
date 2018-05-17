@@ -25,14 +25,19 @@ from core.tests import test_utils
 class SuggestionModelUnitTests(test_utils.GenericTestBase):
     """Tests for the suggestionModel class."""
 
-    customization_args = {
+    suggestion_params_add= {
         'contribution_type': 'translation',
-        'contribution_language': 'English'
+        'contribution_domain': 'English'
+    }
+
+    suggestion_params_edit= {
+        'contribution_type': 'translation',
+        'contribution_domain': 'English',
+        'entity_id': 'exp1',
+        'entity_version': 1
     }
 
     payload = {
-        'entity_id': 'exp1',
-        'entity_version_number': 1,
         'change_list': {}
     }
 
@@ -42,31 +47,31 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT,
             suggestion_models.ENTITY_TYPE_EXPLORATION,
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.STATUS_IN_REVIEW, self.customization_args,
+            suggestion_models.STATUS_IN_REVIEW, self.suggestion_params_edit,
             'author_1', 'reviewer_1', 'thread_1', 'reviewer_1', self.payload)
         suggestion_models.SuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT,
             suggestion_models.ENTITY_TYPE_EXPLORATION,
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.STATUS_ACCEPTED, self.customization_args,
+            suggestion_models.STATUS_ACCEPTED, self.suggestion_params_edit,
             'author_2', 'reviewer_2', 'thread_2', 'reviewer_2', self.payload)
         suggestion_models.SuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT,
             suggestion_models.ENTITY_TYPE_EXPLORATION,
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.STATUS_ACCEPTED, self.customization_args,
+            suggestion_models.STATUS_ACCEPTED, self.suggestion_params_edit,
             'author_2', 'reviewer_2', 'thread_3', 'reviewer_3', self.payload)
         suggestion_models.SuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT,
             suggestion_models.ENTITY_TYPE_EXPLORATION,
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.STATUS_REJECTED, self.customization_args,
+            suggestion_models.STATUS_REJECTED, self.suggestion_params_edit,
             'author_2', 'reviewer_3', 'thread_4', 'reviewer_2', self.payload)
         suggestion_models.SuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT,
             suggestion_models.ENTITY_TYPE_EXPLORATION,
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.STATUS_INVALID, self.customization_args,
+            suggestion_models.STATUS_INVALID, self.suggestion_params_edit,
             'author_3', 'reviewer_2', 'thread_5', 'reviewer_3', self.payload)
 
     def test_create_new_object_succesfully(self):
@@ -74,12 +79,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_TYPE_EDIT,
             suggestion_models.ENTITY_TYPE_EXPLORATION,
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.STATUS_IN_REVIEW, self.customization_args,
+            suggestion_models.STATUS_IN_REVIEW, self.suggestion_params_edit,
             'author_3', 'reviewer_3', 'thread_6', 'reviewer_3', self.payload)
         suggestion_id = suggestion_models.SuggestionModel.get_instance_id(
             suggestion_models.SUGGESTION_TYPE_EDIT,
             suggestion_models.ENTITY_TYPE_EXPLORATION,
-            'thread_6', self.payload['entity_id'])
+            'thread_6', self.suggestion_params_edit['entity_id'])
 
         observed_suggestion = suggestion_models.SuggestionModel.get_by_id(
             suggestion_id)
@@ -95,9 +100,18 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT)
         self.assertEqual(
             observed_suggestion.status, suggestion_models.STATUS_IN_REVIEW)
+        observed_params = observed_suggestion.suggestion_params
         self.assertEqual(
-            observed_suggestion.suggestion_customization_args,
-            self.customization_args)
+            observed_params.contribution_type,
+            self.suggestion_params_edit['contribution_type'])
+        self.assertEqual(
+            observed_params.contribution_domain,
+            self.suggestion_params_edit['contribution_domain'])
+        self.assertEqual(
+            observed_params.entity_id, self.suggestion_params_edit['entity_id'])
+        self.assertEqual(
+            observed_params.entity_version,
+            self.suggestion_params_edit['entity_version'])
         self.assertEqual(observed_suggestion.author_id, 'author_3')
         self.assertEqual(observed_suggestion.reviewer_id, 'reviewer_3')
         self.assertEqual(observed_suggestion.assigned_reviewer_id, 'reviewer_3')
@@ -112,7 +126,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT,
                 suggestion_models.ENTITY_TYPE_EXPLORATION,
                 suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-                suggestion_models.STATUS_IN_REVIEW, self.customization_args,
+                suggestion_models.STATUS_IN_REVIEW, self.suggestion_params_edit,
                 'author_1', 'reviewer_1', 'thread_1', 'reviewer_1',
                 self.payload)
 
@@ -169,3 +183,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(suggestion_models.SuggestionModel.get_suggestions_by_status(
                 suggestion_models.STATUS_ACCEPTED)), 2)
+
+    def test_get_suggestions_by_enitity_id(self):
+        self.assertEqual(
+            len(suggestion_models.SuggestionModel.get_suggestion_by_entity_id(
+                'exp1', suggestion_models.ENTITY_TYPE_EXPLORATION)), 5)
