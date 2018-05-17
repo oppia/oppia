@@ -28,15 +28,11 @@ oppia.directive('numberWithUnitsEditor', [
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: ['$scope', function($scope) {
         var errorMessage = '';
-        var fractionString = '0';
         if ($scope.$parent.value !== null) {
-          var defaultFraction =
-            FractionObjectFactory.fromDict($scope.$parent.value);
-          defaultFractionString = defaultFraction.toString();
+          $scope.localValue = {
+            label: defaultFractionString
+          };
         }
-        $scope.localValue = {
-          label: defaultFractionString
-        };
 
         $scope.$watch('localValue.label', function(newValue) {
           try {
