@@ -84,7 +84,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
         real = parseFloat(value);
       }
       if (units !== '') {
-        if (units.match(/[^0-9a-z/^*()$ -]/i)) {
+        if (units.match(/[^0-9a-z/^*()$-]/i)) {
           throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_UNIT_CHARS);
         }
         Units = UnitsObjectFactory.fromRawInputString(units);
