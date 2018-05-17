@@ -44,9 +44,9 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
         self.set_moderators([self.NEW_USER_USERNAME])
 
         self.question = question_domain.Question(
-            'dummy', 'A Question',
-            exp_domain.State.create_default_state(
-                'ABC', is_question=True).to_dict(),
+            'dummy',
+            exp_domain.State.create_default_question_data(
+                'ABC').to_dict(),
             1, 'en')
 
     def test_delete(self):
@@ -108,12 +108,14 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
             self.new_user_id, self.question)
 
         payload = {}
+        new_question_data = exp_domain.State.create_default_question_data(
+            'DEF').to_dict()
         change_list = [{'cmd': 'update_question_property',
-                        'property_name': 'title',
-                        'new_value': 'ABC',
-                        'old_value': 'A Question'}]
+                        'property_name': 'question_data',
+                        'new_value': new_question_data,
+                        'old_value': self.question.question_data}]
         payload['change_list'] = json.dumps(change_list)
-        payload['commit_message'] = 'update title'
+        payload['commit_message'] = 'update question data'
         self.login(self.NEW_USER_EMAIL)
         response = self.testapp.get('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -138,7 +140,7 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
                 question_id), payload, csrf_token, expect_errors=True,
             expected_status_int=404)
 
-        payload['commit_message'] = 'update title'
+        payload['commit_message'] = 'update question data'
         self.put_json(feconf.QUESTION_DATA_URL, payload, csrf_token,
                       expect_errors=True, expected_status_int=404)
 
@@ -166,9 +168,9 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
         self.assertIn('question_id', response_json.keys())
 
         another_question = question_domain.Question(
-            'dummy', 'Question 2',
-            exp_domain.State.create_default_state(
-                'ABC', is_question=True).to_dict(),
+            'dummy',
+            exp_domain.State.create_default_question_data(
+                'ABC').to_dict(),
             1, 'en')
         payload['question'] = another_question.to_dict()
         response_json = self.post_json(

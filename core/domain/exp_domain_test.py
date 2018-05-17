@@ -426,10 +426,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.default_outcome = default_outcome
         exploration.validate()
 
-        interaction.hints = {}
-        self._assert_validation_error(
-            exploration, 'Expected hints to be a list')
-
         # Validate AnswerGroup.
         answer_group.rule_specs = {}
         self._assert_validation_error(
@@ -440,6 +436,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration,
             'There must be at least one rule or training data for each'
             ' answer group.')
+
+        interaction.hints = {}
+        self._assert_validation_error(
+            exploration, 'Expected hints to be a list')
 
         exploration.states = {
             exploration.init_state_name: exp_domain.State.create_default_state(
