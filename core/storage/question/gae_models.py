@@ -17,7 +17,7 @@
 from core.platform import models
 import utils
 
-from google.appengine.ext import ndb # pylint: disable=relative-import
+from google.appengine.ext import ndb  # pylint: disable=relative-import
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 

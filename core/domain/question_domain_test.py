@@ -144,5 +144,5 @@ class QuestionSummaryDomainTest(test_utils.GenericTestBase):
             'question_id': 'abc',
             'question_content': 'Question 1'
         }
-        observed_object = question_domain.QuestionSummary('abc','Question 1')
+        observed_object = question_domain.QuestionSummary('abc', 'Question 1')
         self.assertEqual(expected_object_dict, observed_object.to_dict())

@@ -164,14 +164,15 @@ class Question(object):
                 'Expected all answer groups to have destination as None.'
             )
 
-        if (len(interaction['hints']) == 0) or (interaction['solution'] is None):
+        if (len(interaction['hints']) == 0) or (
+                interaction['solution'] is None):
             raise utils.ValidationError(
                 'Expected the question to have at least one hint and a ' +
                 'solution.'
             )
 
         question_data = exp_domain.State.from_dict(self.question_data)
-        question_data.validate(None, True)
+        question_data.validate(True)
 
         if not isinstance(self.question_data_schema_version, int):
             raise utils.ValidationError(

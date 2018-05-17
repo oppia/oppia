@@ -148,7 +148,7 @@ def apply_change_list(question_id, change_list):
         for change in change_list:
             if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
                 if (change.property_name ==
-                      question_domain.QUESTION_PROPERTY_LANGUAGE_CODE):
+                        question_domain.QUESTION_PROPERTY_LANGUAGE_CODE):
                     question.update_language_code(change.new_value)
                 elif (change.cmd ==
                       question_domain.QUESTION_PROPERTY_QUESTION_DATA):

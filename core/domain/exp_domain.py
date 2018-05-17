@@ -1138,14 +1138,8 @@ class InteractionInstance(object):
             outcomes.append(self.default_outcome)
         return outcomes
 
-    def validate(self, exp_param_specs_dict):
+    def validate(self):
         """Validates various properties of the InteractionInstance.
-
-        Args:
-            exp_param_specs_dict: dict. A dict of specified parameters used in
-                the exploration. Keys are parameter names and values are
-                ParamSpec value objects with an object type property(obj_type).
-                Is used to validate AnswerGroup objects.
 
         Raises:
             ValidationError: One or more attributes of the InteractionInstance
@@ -1265,15 +1259,10 @@ class State(object):
         self.classifier_model_id = classifier_model_id
 
     def validate(
-            self, exp_param_specs_dict, allow_null_interaction):
+            self, allow_null_interaction):
         """Validates various properties of the State.
 
         Args:
-            exp_param_specs_dict: dict or None. A dict of specified parameters
-                used in this exploration. Keys are parameter names and values
-                are ParamSpec value objects with an object type
-                property(obj_type). It is None if the state belongs to a
-                question.
             allow_null_interaction. bool. Whether this state's interaction is
                 allowed to be unspecified.
 
@@ -1293,7 +1282,7 @@ class State(object):
             raise utils.ValidationError(
                 'This state does not have any interaction specified.')
         elif self.interaction.id is not None:
-            self.interaction.validate(exp_param_specs_dict)
+            self.interaction.validate()
 
     def get_training_data(self):
         """Retrieves training data from the State domain object."""
@@ -1982,12 +1971,11 @@ class Exploration(object):
             self._require_valid_state_name(state_name)
             state = self.states[state_name]
             self.states[state_name].validate(
-                self.param_specs,
                 allow_null_interaction=not strict)
             # The tests below are shifted from validate() in class
             # InteractionInstance as these tests are exclusive to an interaction
             # in a state in an exploration, and not for that in a question,
-            # (whereas the validate() in INteractionInstance is also used by
+            # (whereas the validate() in InteractionInstance is also used by
             # the question_data field).
             if state.interaction.id is not None:
                 if not isinstance(state.interaction.id, basestring):
@@ -1995,10 +1983,11 @@ class Exploration(object):
                         'Expected interaction id to be a string, received %s' %
                         state.interaction.id)
                 try:
-                    interaction = interaction_registry.Registry.get_interaction_by_id(
+                    interaction = interaction_registry.Registry.get_interaction_by_id( # pylint: disable=line-too-long
                         state.interaction.id)
                 except KeyError:
-                    raise utils.ValidationError('Invalid interaction id: %s' % state.interaction.id)
+                    raise utils.ValidationError(
+                        'Invalid interaction id: %s' % state.interaction.id)
                 for answer_group in state.interaction.answer_groups:
                     answer_group.validate(interaction, self.param_specs)
                 if state.interaction.default_outcome is not None:
