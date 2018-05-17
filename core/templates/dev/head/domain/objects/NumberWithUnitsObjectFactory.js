@@ -23,7 +23,7 @@ oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
   INVALID_CURRENCY:
     'Please enter a valid currency (e.g., $ 5)',
   INVALID_UNIT_CHARS:
-    'Please ensure that unit contains only numbers, alphabets, (, ), *, ^, /, -'
+    'Please ensure that unit only contains numbers, alphabets, (, ), *, ^, /, -'
 });
 
 oppia.factory('NumberWithUnitsObjectFactory', [
@@ -34,8 +34,8 @@ oppia.factory('NumberWithUnitsObjectFactory', [
     var NumberWithUnits = function(type, real, Fraction, Units) {
       this.type = type;
       this.real = real;
-      this.fraction = Fraction;
-      this.units = Units;
+      this.Fraction = Fraction;
+      this.Units = Units;
     };
 
     NumberWithUnits.fromRawInputString = function(rawInput) {
@@ -84,7 +84,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
         real = parseFloat(value);
       }
       if (units !== '') {
-        if (units.match(/[^0-9a-z/^*()$-]/i)) {
+        if (units.match(/[^0-9a-z/* ^$-]/i)) {
           throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_UNIT_CHARS);
         }
         Units = UnitsObjectFactory.fromRawInputString(units);
