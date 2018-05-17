@@ -14,6 +14,10 @@
         "allowSimple": true
       }
     ],
+    "array-bracket-spacing": [
+      "error",
+      "never"
+    ],
     "brace-style":[
       "error",
       "1tbs"
@@ -41,6 +45,10 @@
         "allowKeywords": false
       }
     ],
+    "eol-last":[
+      "error",
+      "always"
+    ],
     "eqeqeq": [
       "error",
       "always"
@@ -63,6 +71,7 @@
         "SwitchCase": 1
       }
     ],
+    "key-spacing": "error",
     "keyword-spacing": [
       "error",
       {
@@ -103,7 +112,9 @@
     "no-redeclare": [
       "off"
     ],
+    "no-tabs": "error",
     "no-useless-escape": "off",
+    "no-whitespace-before-property": "error",
     "no-trailing-spaces": [
       "error"
     ],
@@ -149,6 +160,10 @@
         "asyncArrow": "ignore",
         "named": "never",
       }
+    ],
+    "spaced-comment": [
+      "error",
+      "always"
     ],
     "space-infix-ops": [
       "error"

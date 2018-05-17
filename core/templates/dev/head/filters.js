@@ -468,7 +468,7 @@ oppia.filter('formatRtePreview', ['$filter', function($filter) {
   return function(html) {
     html = html.replace(/&nbsp;/ig, ' ');
     html = html.replace(/&quot;/ig, '');
-    //Replace all html tags other than <oppia-noninteractive-**> ones to ''
+    // Replace all html tags other than <oppia-noninteractive-**> ones to ''
     html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
     var formattedOutput = html.replace(/(<([^>]+)>)/g, function(rteTag) {
       var replaceString = $filter(
