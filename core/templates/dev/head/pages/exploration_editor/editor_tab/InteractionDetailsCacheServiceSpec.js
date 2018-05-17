@@ -31,7 +31,7 @@ describe('Interaction Details Cache Service', function() {
       customization : interactionCustomizationArgs
     };
 
-    var scope, idcs;
+    var scope = null, idcs = null;
     beforeEach(inject(function($rootScope, $injector) {
       scope = $rootScope.$new();
       idcs = $injector.get('InteractionDetailsCacheService');
