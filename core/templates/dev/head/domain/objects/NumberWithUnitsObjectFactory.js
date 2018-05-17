@@ -1,9 +1,29 @@
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Factory for creating instances of NumberWithUnits and Units
+ * domain objects.
+ */
+
 oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
   INVALID_VALUE:
     'Please ensure that value is either a fraction or a number',
   INVALID_CURRENCY:
     'Please enter a valid currency (e.g., $ 5)',
-  DIVISION_BY_ZERO: 'Please do not put 0 in the denominator'
+  INVALID_UNIT_CHARS:
+    'Please ensure that unit contains only numbers, alphabets, (, ), *, ^, /, -'
 });
 
 oppia.factory('NumberWithUnitsObjectFactory', [
@@ -14,8 +34,8 @@ oppia.factory('NumberWithUnitsObjectFactory', [
     var NumberWithUnits = function(type, real, Fraction, Units) {
       this.type = type;
       this.real = real;
-      this.Fraction = Fraction;
-      this.Units = Units;
+      this.fraction = Fraction;
+      this.units = Units;
     };
 
     NumberWithUnits.fromRawInputString = function(rawInput) {
@@ -64,6 +84,9 @@ oppia.factory('NumberWithUnitsObjectFactory', [
         real = parseFloat(value);
       }
       if (units !== '') {
+        if (units.match(/[^0-9a-z/^*()$ -]/i)) {
+          throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_UNIT_CHARS);
+        }
         Units = UnitsObjectFactory.fromRawInputString(units);
       }
       return new NumberWithUnits(type, real, Fraction, Units);
