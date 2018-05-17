@@ -125,7 +125,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 'author_1', 'reviewer_1', 'thread_1', 'reviewer_1',
                 self.payload)
 
-    def test_get_suggestions_by_syb_type(self):
+    def test_get_suggestions_by_sub_type(self):
         self.assertEqual(
             len(suggestion_models.SuggestionModel.get_suggestions_by_sub_type(
                 suggestion_models.SUGGESTION_EDIT_STATE_CONTENT)), 5)
@@ -141,7 +141,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             len(suggestion_models.SuggestionModel.get_suggestions_by_author(
                 'author_3')), 1)
 
-    def test_get_suggestion_assigned_to_reviwer(self):
+    def test_get_suggestion_assigned_to_reviewer(self):
         self.assertEqual(
             len(
                 suggestion_models.SuggestionModel
@@ -179,7 +179,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             len(suggestion_models.SuggestionModel.get_suggestions_by_status(
                 suggestion_models.STATUS_ACCEPTED)), 2)
 
-    def test_get_suggestions_by_enitity_id(self):
+    def test_get_suggestions_by_entity_id(self):
         self.assertEqual(
-            len(suggestion_models.SuggestionModel.get_suggestion_by_entity_id(
+            len(suggestion_models.SuggestionModel.get_suggestions_by_entity_id(
                 'exp1', suggestion_models.ENTITY_TYPE_EXPLORATION)), 5)

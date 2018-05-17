@@ -274,7 +274,7 @@ class SuggestionModel(base_models.BaseModel):
             cls.status == status).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_suggestion_by_entity_id(cls, entity_id, entity_type):
+    def get_suggestions_by_entity_id(cls, entity_id, entity_type):
         """Gets all suggestions to the entity with the given ID.
 
         Args:
