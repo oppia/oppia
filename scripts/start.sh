@@ -64,16 +64,12 @@ fi
 # Argument passed to dev_appserver.py to indicate whether or not to
 # clear the datastore.
 CLEAR_DATASTORE_ARG="--clear_datastore=true"
-ENABLE_CONSOLE_ARG=""
 
 # Argument passed to feconf.py to help choose production templates folder.
 FORCE_PROD_MODE=False
 for arg in "$@"; do
   if [ "$arg" == "--save_datastore" ]; then
     CLEAR_DATASTORE_ARG=""
-  fi
-  if [ "$arg" == "--enable_console" ]; then
-    ENABLE_CONSOLE_ARG="--enable_console=true"
   fi
   # Used to emulate running Oppia in a production environment.
   if [ "$arg" == "--prod_env" ]; then
@@ -123,6 +119,5 @@ echo Starting GAE development server
 # accidentally!
 
 
-$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --prod_env=$FORCE_PROD_MODE --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG --enable_console=$ENABLE_CONSOLE_ARG
-
+$NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js start_devserver --prod_env=$FORCE_PROD_MODE --gae_devserver_path=$GOOGLE_APP_ENGINE_HOME/dev_appserver.py --clear_datastore=$CLEAR_DATASTORE_ARG 
 echo Done!

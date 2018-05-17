@@ -69,10 +69,6 @@ if (argv.clear_datastore) {
   params.clear_datastore = true;
 }
 
-if (argv.enable_console) {
-  params.enable_console = true;
-}
-
 if (argv.enable_sendmail) {
   params.enable_sendmail = argv.enable_sendmail;
 }
