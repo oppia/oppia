@@ -25,12 +25,7 @@ from core.tests import test_utils
 class SuggestionModelUnitTests(test_utils.GenericTestBase):
     """Tests for the suggestionModel class."""
 
-    suggestion_params_add= {
-        'contribution_type': 'translation',
-        'contribution_domain': 'English'
-    }
-
-    suggestion_params_edit= {
+    suggestion_params_edit = {
         'contribution_type': 'translation',
         'contribution_domain': 'English',
         'entity_id': 'exp1',

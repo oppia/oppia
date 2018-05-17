@@ -78,7 +78,7 @@ SUGGESTION_MINIMUM_ROLE_FOR_REVIEW = {
 
 
 class SuggestionParams(ndb.Model):
-    """Model to store all the suggestion params for a suggestion"""
+    """Model to store all the suggestion params for a suggestion."""
 
     # The contribution type. Either translation related or content related.
     contribution_type = ndb.StringProperty(required=True)
@@ -287,6 +287,6 @@ class SuggestionModel(base_models.BaseModel):
         """
         return cls.get_all().filter(
             cls.suggestion_type == SUGGESTION_TYPE_EDIT).filter(
-            cls.entity_type == entity_type).filter(
-            cls.suggestion_params.entity_id == entity_id).fetch(
-                feconf.DEFAULT_QUERY_LIMIT)
+                cls.entity_type == entity_type).filter(
+                    cls.suggestion_params.entity_id == entity_id).fetch(
+                        feconf.DEFAULT_QUERY_LIMIT)
