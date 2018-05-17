@@ -41,9 +41,7 @@ def _create_new_question(committer_id, question, commit_message):
         language_code=question.language_code,
     )
 
-    model.commit(committer_id, commit_message, [{
-        'cmd': CMD_CREATE_NEW
-    }])
+    model.commit(committer_id, commit_message, [{'cmd': CMD_CREATE_NEW}])
     return model.id
 
 
