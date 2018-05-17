@@ -394,17 +394,18 @@ tags: []
         """Convert a JSON server response to an object (such as a dict)."""
         if not expect_errors:
             self.assertEqual(json_response.status_int, 200)
-
         self.assertEqual(
             json_response.content_type, 'application/json')
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
-    def get_json(self, url, params=None, expect_errors=False):
+    def get_json(self, url, params=None, expect_errors=False,
+                 expected_status_int=200):
         """Get a JSON response, transformed to a Python object."""
         json_response = self.testapp.get(
-            url, params, expect_errors=expect_errors)
+            url, params, expect_errors=expect_errors,
+            status=expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
 
@@ -501,13 +502,14 @@ tags: []
             response = self.testapp.get(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
             csrf_token = self.get_csrf_token_from_response(response)
-            response = self.testapp.post(feconf.SIGNUP_DATA_URL, {
-                'csrf_token': csrf_token,
-                'payload': json.dumps({
-                    'username': username,
-                    'agreed_to_terms': True
+            response = self.testapp.post(
+                feconf.SIGNUP_DATA_URL, {
+                    'csrf_token': csrf_token,
+                    'payload': json.dumps({
+                        'username': username,
+                        'agreed_to_terms': True
+                    })
                 })
-            })
             self.assertEqual(response.status_int, 200)
         self.logout()
 
@@ -520,12 +522,13 @@ tags: []
         self.login('tmpsuperadmin@example.com', is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminhandler', {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_obj.name: new_config_value,
-            }
-        }, csrf_token)
+        self.post_json(
+            '/adminhandler', {
+                'action': 'save_config_properties',
+                'new_config_property_values': {
+                    config_obj.name: new_config_value,
+                }
+            }, csrf_token)
         self.logout()
 
         self._restore_stashed_user_env()
@@ -542,10 +545,11 @@ tags: []
         self.login('tmpsuperadmin@example.com', is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminrolehandler', {
-            'username': username,
-            'role': user_role
-        }, csrf_token)
+        self.post_json(
+            '/adminrolehandler', {
+                'username': username,
+                'role': user_role
+            }, csrf_token)
         self.logout()
 
         self._restore_stashed_user_env()
@@ -585,6 +589,15 @@ tags: []
         """
         for name in collection_editor_usernames:
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
+
+    def set_topic_managers(self, topic_manager_usernames):
+        """Sets role of given users as TOPIC_MANAGER.
+
+        Args:
+            topic_manager_usernames: list(str). List of usernames.
+        """
+        for name in topic_manager_usernames:
+            self.set_user_role(name, feconf.ROLE_ID_TOPIC_MANAGER)
 
     def get_current_logged_in_user_id(self):
         """Gets the user_id of the current logged-in user.
@@ -700,11 +713,12 @@ tags: []
         rights_manager.create_new_exploration_rights(exp_id, user_id)
 
         commit_message = 'New exploration created with title \'%s\'.' % title
-        exp_model.commit(user_id, commit_message, [{
-            'cmd': 'create_new',
-            'title': 'title',
-            'category': 'category',
-        }])
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
         exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
         exp_summary_model = exp_models.ExpSummaryModel(
             id=exp_id,

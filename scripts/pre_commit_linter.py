@@ -295,8 +295,8 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
-def _lint_js_files(node_path, eslint_path, files_to_lint, stdout,
-                   result):
+def _lint_js_files(
+        node_path, eslint_path, files_to_lint, stdout, result):
     """Prints a list of lint errors in the given list of JavaScript files.
 
     Args:
@@ -378,7 +378,7 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
         current_batch_end_index = min(
             current_batch_start_index + _BATCH_SIZE, len(files_to_lint))
         current_files_to_lint = files_to_lint[
-            current_batch_start_index : current_batch_end_index]
+            current_batch_start_index: current_batch_end_index]
         print 'Linting Python files %s to %s...' % (
             current_batch_start_index + 1, current_batch_end_index)
 
@@ -407,7 +407,7 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
     print 'Python linting finished.'
 
 
-def _lint_html_files():
+def _lint_html_files(all_files):
     """This function is used to check HTML files for linting errors."""
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -420,28 +420,33 @@ def _lint_html_files():
     total_error_count = 0
     summary_messages = []
     htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
-    directories_to_lint = ['core', 'extensions', 'assets']
+    html_files_to_lint = [
+        filename for filename in all_files if filename.endswith('.html')]
     print 'Starting HTML linter...'
     print '----------------------------------------'
     print ''
-    for directory in directories_to_lint:
-        proc_args = htmllint_cmd_args + ['--cwd=./' + directory]
-        print 'Linting HTML files in %s directory:' % directory
+    for filename in html_files_to_lint:
+        proc_args = htmllint_cmd_args + [filename]
+        print 'Linting %s file' % filename
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         linter_stdout, _ = proc.communicate()
-
-        if linter_stdout:
-            error_summary.append(
-                [s for s in linter_stdout.split() if s.isdigit()])
+        # This line splits the output of the linter and extracts digits from it.
+        # The digits are stored in a list. The second last digit
+        # in the list represents the number of errors in the file.
+        error_count = [int(s) for s in linter_stdout.split() if s.isdigit()][-2]
+        if error_count:
+            error_summary.append(error_count)
             print linter_stdout
 
     print '----------------------------------------'
-    for error in error_summary:
-        total_error_count += int(error[0])
-
+    for error_count in error_summary:
+        total_error_count += error_count
+    total_files_checked = len(html_files_to_lint)
     if total_error_count:
+        print '(%s files checked, %s errors found)' % (
+            total_files_checked, total_error_count)
         summary_message = '%s   HTML linting failed' % (
             _MESSAGE_TYPE_FAILED)
         summary_messages.append(summary_message)
@@ -532,8 +537,9 @@ def _pre_commit_linter(all_files):
     linting_processes = []
     js_stdout = multiprocessing.Queue()
     linting_processes.append(multiprocessing.Process(
-        target=_lint_js_files, args=(node_path, eslint_path, js_files_to_lint,
-                                     js_stdout, js_result)))
+        target=_lint_js_files, args=(
+            node_path, eslint_path, js_files_to_lint,
+            js_stdout, js_result)))
 
     py_result = multiprocessing.Queue()
     linting_processes.append(multiprocessing.Process(
@@ -953,7 +959,7 @@ def main():
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
     comment_messages = _check_comments(all_files)
-    html_linter_messages = _lint_html_files()
+    html_linter_messages = _lint_html_files(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (

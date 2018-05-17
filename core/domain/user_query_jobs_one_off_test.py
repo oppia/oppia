@@ -87,20 +87,22 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.user_b_id, end_state_name='End')
 
-        exp_services.update_exploration(self.user_c_id, self.EXP_ID_1, [{
-            'cmd': 'edit_exploration_property',
-            'property_name': 'objective',
-            'new_value': 'the objective'
-        }], 'Test edit')
+        exp_services.update_exploration(
+            self.user_c_id, self.EXP_ID_1, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            }], 'Test edit')
 
         self.save_new_valid_exploration(
             self.EXP_ID_2, self.user_d_id, end_state_name='End')
 
-        exp_services.update_exploration(self.user_d_id, self.EXP_ID_2, [{
-            'cmd': 'edit_exploration_property',
-            'property_name': 'objective',
-            'new_value': 'the objective'
-        }], 'Test edit')
+        exp_services.update_exploration(
+            self.user_d_id, self.EXP_ID_2, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            }], 'Test edit')
 
         self.save_new_valid_exploration(
             self.EXP_ID_3, self.user_e_id, end_state_name='End')
@@ -290,7 +292,7 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             '\n'
             'You can change your email preferences via the '
             'Preferences page.'
-        ) %  query_id
+        ) % query_id
 
         messages = self.mail_stub.get_sent_messages(
             to=self.USER_SUBMITTER_EMAIL)

@@ -120,8 +120,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.rated_on, self.DATETIME_OBJECT)
         self.assertEqual(
             retrieved_object.draft_change_list, {'new_content': {}})
-        self.assertEqual(retrieved_object.draft_change_list_last_updated,
-                         self.DATETIME_OBJECT)
+        self.assertEqual(
+            retrieved_object.draft_change_list_last_updated,
+            self.DATETIME_OBJECT)
         self.assertEqual(retrieved_object.draft_change_list_exp_version, 3)
         self.assertEqual(retrieved_object.draft_change_list_id, 1)
 
@@ -134,6 +135,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
 
 class UserQueryModelTests(test_utils.GenericTestBase):
     """Tests for UserQueryModel."""
+
     def test_instance_stores_correct_data(self):
         submitter_id = 'submitter'
         query_id = 'qid'

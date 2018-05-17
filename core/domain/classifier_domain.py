@@ -72,9 +72,10 @@ class ClassifierTrainingJob(object):
 
     """
 
-    def __init__(self, job_id, algorithm_id, interaction_id, exp_id,
-                 exp_version, next_scheduled_check_time, state_name, status,
-                 training_data, classifier_data, data_schema_version):
+    def __init__(
+            self, job_id, algorithm_id, interaction_id, exp_id,
+            exp_version, next_scheduled_check_time, state_name, status,
+            training_data, classifier_data, data_schema_version):
         """Constructs a ClassifierTrainingJob domain object.
 
         Args:
@@ -358,7 +359,7 @@ class ClassifierTrainingJob(object):
 
         if not isinstance(self.training_data, list):
             raise utils.ValidationError(
-                'Expected training_data to be a list, received %s' %(
+                'Expected training_data to be a list, received %s' % (
                     self.training_data))
 
         for grouped_answers in self.training_data:
@@ -381,7 +382,7 @@ class ClassifierTrainingJob(object):
         # Classifier data can be either None (before its stored) or a dict.
         if not isinstance(self.classifier_data, dict) and self.classifier_data:
             raise utils.ValidationError(
-                'Expected classifier_data to be a dict|None, received %s' %(
+                'Expected classifier_data to be a dict|None, received %s' % (
                     self.classifier_data))
 
         if not isinstance(self.data_schema_version, int):

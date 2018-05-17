@@ -283,9 +283,10 @@ class CollectionNode(object):
 class Collection(object):
     """Domain object for an Oppia collection."""
 
-    def __init__(self, collection_id, title, category, objective,
-                 language_code, tags, schema_version, nodes,
-                 version, created_on=None, last_updated=None):
+    def __init__(
+            self, collection_id, title, category, objective,
+            language_code, tags, schema_version, nodes,
+            version, created_on=None, last_updated=None):
         """Constructs a new collection given all the information necessary to
         represent a collection.
 
@@ -774,9 +775,9 @@ class Collection(object):
         """
         exploration_just_unlocked = None
 
-        for index in range(0, len(self.nodes)-1):
+        for index in range(0, len(self.nodes) - 1):
             if self.nodes[index].exploration_id == current_exploration_id:
-                exploration_just_unlocked = self.nodes[index+1].exploration_id
+                exploration_just_unlocked = self.nodes[index + 1].exploration_id
                 break
 
         return exploration_just_unlocked
@@ -1059,11 +1060,12 @@ class Collection(object):
 class CollectionSummary(object):
     """Domain object for an Oppia collection summary."""
 
-    def __init__(self, collection_id, title, category, objective, language_code,
-                 tags, status, community_owned, owner_ids, editor_ids,
-                 viewer_ids, contributor_ids, contributors_summary, version,
-                 node_count, collection_model_created_on,
-                 collection_model_last_updated):
+    def __init__(
+            self, collection_id, title, category, objective, language_code,
+            tags, status, community_owned, owner_ids, editor_ids,
+            viewer_ids, contributor_ids, contributors_summary, version,
+            node_count, collection_model_created_on,
+            collection_model_last_updated):
         """Constructs a CollectionSummary domain object.
 
         Args:

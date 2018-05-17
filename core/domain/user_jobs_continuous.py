@@ -275,16 +275,17 @@ class RecentUpdatesMRJobManager(
                 feedback_models.FeedbackMessageModel.get_most_recent_message(
                     exp_id, thread_id))
 
-            yield (reducer_key, {
-                'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-                'activity_id': last_message.exploration_id,
-                'activity_title': exp_models.ExplorationModel.get_by_id(
-                    last_message.exploration_id).title,
-                'author_id': last_message.author_id,
-                'last_updated_ms': utils.get_time_in_millisecs(
-                    last_message.created_on),
-                'subject': last_message.get_thread_subject(),
-            })
+            yield (
+                reducer_key, {
+                    'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
+                    'activity_id': last_message.exploration_id,
+                    'activity_title': exp_models.ExplorationModel.get_by_id(
+                        last_message.exploration_id).title,
+                    'author_id': last_message.author_id,
+                    'last_updated_ms': utils.get_time_in_millisecs(
+                        last_message.created_on),
+                    'subject': last_message.get_thread_subject(),
+                })
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -407,7 +408,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                     if old_rating is not None:
                         sum_of_ratings -= old_rating
                         num_ratings -= 1
-                    model.average_ratings = sum_of_ratings/(num_ratings * 1.0)
+                    model.average_ratings = sum_of_ratings / (num_ratings * 1.0)
                 else:
                     model.average_ratings = rating
                 model.num_ratings = num_ratings
@@ -541,7 +542,7 @@ class UserStatsMRJobManager(
         if item.deleted:
             return
 
-        exponent = 2.0/3
+        exponent = 2.0 / 3
 
         # This is set to False only when the exploration impact score is not
         # valid to be calculated.
@@ -654,7 +655,7 @@ class UserStatsMRJobManager(
                     all explorations owned by the user.
         """
         values = [ast.literal_eval(v) for v in stringified_values]
-        exponent = 2.0/3
+        exponent = 2.0 / 3
 
         # Find the final score and round to a whole number.
         user_impact_score = int(round(sum(

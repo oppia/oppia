@@ -54,53 +54,59 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if item.event_schema_version != 2:
             return
         if isinstance(item, stats_models.StateCompleteEventLogEntryModel):
-            yield (item.exp_id,
-                   {
-                       'event_type': feconf.EVENT_TYPE_STATE_COMPLETED,
-                       'version': item.exp_version,
-                       'state_name': item.state_name
-                   })
+            yield (
+                item.exp_id,
+                {
+                    'event_type': feconf.EVENT_TYPE_STATE_COMPLETED,
+                    'version': item.exp_version,
+                    'state_name': item.state_name
+                })
         elif isinstance(
                 item, stats_models.AnswerSubmittedEventLogEntryModel):
-            yield (item.exp_id,
-                   {
-                       'event_type': feconf.EVENT_TYPE_ANSWER_SUBMITTED,
-                       'version': item.exp_version,
-                       'state_name': item.state_name,
-                       'is_feedback_useful': item.is_feedback_useful
-                   })
+            yield (
+                item.exp_id,
+                {
+                    'event_type': feconf.EVENT_TYPE_ANSWER_SUBMITTED,
+                    'version': item.exp_version,
+                    'state_name': item.state_name,
+                    'is_feedback_useful': item.is_feedback_useful
+                })
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
-            yield (item.exploration_id,
-                   {
-                       'event_type': feconf.EVENT_TYPE_STATE_HIT,
-                       'version': item.exploration_version,
-                       'state_name': item.state_name,
-                       'session_id': item.session_id
-                   })
+            yield (
+                item.exploration_id,
+                {
+                    'event_type': feconf.EVENT_TYPE_STATE_HIT,
+                    'version': item.exploration_version,
+                    'state_name': item.state_name,
+                    'session_id': item.session_id
+                })
         elif isinstance(item, stats_models.SolutionHitEventLogEntryModel):
-            yield (item.exp_id,
-                   {
-                       'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
-                       'version': item.exp_version,
-                       'state_name': item.state_name,
-                       'session_id': item.session_id
-                   })
+            yield (
+                item.exp_id,
+                {
+                    'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
+                    'version': item.exp_version,
+                    'state_name': item.state_name,
+                    'session_id': item.session_id
+                })
         elif isinstance(
                 item, stats_models.ExplorationActualStartEventLogEntryModel):
-            yield (item.exp_id,
-                   {
-                       'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
-                       'version': item.exp_version,
-                       'state_name': item.state_name
-                   })
+            yield (
+                item.exp_id,
+                {
+                    'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
+                    'version': item.exp_version,
+                    'state_name': item.state_name
+                })
         elif isinstance(
                 item, stats_models.CompleteExplorationEventLogEntryModel):
-            yield (item.exploration_id,
-                   {
-                       'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
-                       'version': item.exploration_version,
-                       'state_name': item.state_name
-                   })
+            yield (
+                item.exploration_id,
+                {
+                    'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+                    'version': item.exploration_version,
+                    'state_name': item.state_name
+                })
 
     @staticmethod
     def reduce(exp_id, values):
@@ -125,7 +131,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         event_dict_idx = 0
         event_dict = sorted_events_dicts[event_dict_idx]
         for version in versions:
-            datastore_stats_for_version = old_stats[version-1]
+            datastore_stats_for_version = old_stats[version - 1]
             if version == 1:
                 # Reset the possibly corrupted stats.
                 datastore_stats_for_version.num_starts_v2 = 0
@@ -354,13 +360,14 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
             } for state_name in item.state_stats_mapping
         }
 
-        yield (item.exp_id, {
-            'exp_version': item.exp_version,
-            'num_starts_v1': item.num_starts_v1,
-            'num_completions_v1': item.num_completions_v1,
-            'num_actual_starts_v1': item.num_actual_starts_v1,
-            'state_stats_mapping': reduced_state_stats_mapping
-        })
+        yield (
+            item.exp_id, {
+                'exp_version': item.exp_version,
+                'num_starts_v1': item.num_starts_v1,
+                'num_completions_v1': item.num_completions_v1,
+                'num_actual_starts_v1': item.num_actual_starts_v1,
+                'state_stats_mapping': reduced_state_stats_mapping
+            })
 
     @staticmethod
     def reduce(exp_id, stringified_values):
@@ -519,12 +526,13 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
         # This is short hand for making sure we get ones updated most recently.
         else:
             if item.exploration_id is not None:
-                yield (item.exploration_id, {
-                    'version': item.version,
-                    'starts': item.num_starts,
-                    'completions': item.num_completions,
-                    'state_hit': item.state_hit_counts
-                })
+                yield (
+                    item.exploration_id, {
+                        'version': item.version,
+                        'starts': item.num_starts,
+                        'completions': item.num_completions,
+                        'state_hit': item.state_hit_counts
+                    })
 
     @staticmethod
     def reduce(key, stringified_values):

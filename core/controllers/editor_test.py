@@ -140,9 +140,10 @@ class EditorTest(BaseEditorControllerTest):
         response = self.testapp.get('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
         publish_url = '%s/%s' % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
-        self.put_json(publish_url, {
-            'make_public': True,
-        }, csrf_token, expect_errors=True, expected_status_int=400)
+        self.put_json(
+            publish_url, {
+                'make_public': True,
+            }, csrf_token, expect_errors=True, expected_status_int=400)
 
         self.logout()
 
@@ -391,18 +392,21 @@ class EditorTest(BaseEditorControllerTest):
             # answer, it will not be returned as potential training data.
             state = exploration_dict['exploration']['states'][state_name]
             answer_group = state['interaction']['answer_groups'][1]
+
             del answer_group['training_data'][1]
-            self.put_json('/createhandler/data/15', {
-                'change_list': [{
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': state_name,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
-                    'new_value': state['interaction']['answer_groups']
-                }],
-                'commit_message': 'Update confirmed unclassified answers',
-                'version': exploration_dict['version'],
-            }, csrf_token)
+            self.put_json(
+                '/createhandler/data/15', {
+                    'change_list': [{
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': state_name,
+                        'property_name': (
+                            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS), # pylint:disable=line-too-long
+                        'new_value': state['interaction']['answer_groups']
+                    }],
+                    'commit_message': 'Update confirmed unclassified answers',
+                    'version': exploration_dict['version'],
+                }, csrf_token)
+
             response_dict = self.get_json(url)
             self.assertEqual(response_dict['unhandled_answers'], [])
 
@@ -873,14 +877,14 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             # oppia/core/platform/search/gae_search_services.py,
             # not to be checked here (same for admin and moderator).
             self.assertEqual(len(observed_log_messages), 3)
-            self.assertEqual(observed_log_messages[0],
-                             '(%s) %s tried to delete exploration %s' %
-                             (feconf.ROLE_ID_EXPLORATION_EDITOR,
-                              self.owner_id, exp_id))
-            self.assertEqual(observed_log_messages[2],
-                             '(%s) %s deleted exploration %s' %
-                             (feconf.ROLE_ID_EXPLORATION_EDITOR,
-                              self.owner_id, exp_id))
+            self.assertEqual(
+                observed_log_messages[0],
+                '(%s) %s tried to delete exploration %s' %
+                (feconf.ROLE_ID_EXPLORATION_EDITOR, self.owner_id, exp_id))
+            self.assertEqual(
+                observed_log_messages[2],
+                '(%s) %s deleted exploration %s' %
+                (feconf.ROLE_ID_EXPLORATION_EDITOR, self.owner_id, exp_id))
             self.logout()
 
             # Checking for admin.
@@ -894,12 +898,14 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             self.testapp.delete(
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
             self.assertEqual(len(observed_log_messages), 3)
-            self.assertEqual(observed_log_messages[0],
-                             '(%s) %s tried to delete exploration %s' %
-                             (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
-            self.assertEqual(observed_log_messages[2],
-                             '(%s) %s deleted exploration %s' %
-                             (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
+            self.assertEqual(
+                observed_log_messages[0],
+                '(%s) %s tried to delete exploration %s' %
+                (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
+            self.assertEqual(
+                observed_log_messages[2],
+                '(%s) %s deleted exploration %s' %
+                (feconf.ROLE_ID_ADMIN, self.admin_id, exp_id))
             self.logout()
 
             # Checking for moderator.
@@ -913,14 +919,14 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             self.testapp.delete(
                 '/createhandler/data/%s' % exp_id, expect_errors=True)
             self.assertEqual(len(observed_log_messages), 3)
-            self.assertEqual(observed_log_messages[0],
-                             '(%s) %s tried to delete exploration %s' %
-                             (feconf.ROLE_ID_MODERATOR,
-                              self.moderator_id, exp_id))
-            self.assertEqual(observed_log_messages[2],
-                             '(%s) %s deleted exploration %s' %
-                             (feconf.ROLE_ID_MODERATOR,
-                              self.moderator_id, exp_id))
+            self.assertEqual(
+                observed_log_messages[0],
+                '(%s) %s tried to delete exploration %s' %
+                (feconf.ROLE_ID_MODERATOR, self.moderator_id, exp_id))
+            self.assertEqual(
+                observed_log_messages[2],
+                '(%s) %s deleted exploration %s' %
+                (feconf.ROLE_ID_MODERATOR, self.moderator_id, exp_id))
             self.logout()
 
 
@@ -1653,7 +1659,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             '%s.%s' % (self.owner_id, self.EXP_ID2))
         self.assertEqual(
             exp_user_data.draft_change_list, self.DRAFT_CHANGELIST)
-            #id is incremented the first time but not the second.
+        # id is incremented the first time but not the second.
         self.assertEqual(exp_user_data.draft_change_list_id, 2)
         self.assertEqual(
             response, {'status_code': 400,

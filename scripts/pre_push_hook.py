@@ -40,8 +40,8 @@ import sys
 # pylint: enable=wrong-import-order
 
 
-GitRef = collections.namedtuple('GitRef', ['local_ref', 'local_sha1',
-                                           'remote_ref', 'remote_sha1'])
+GitRef = collections.namedtuple(
+    'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
 FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 
 # git hash of /dev/null, refers to an 'empty' commit.
@@ -186,13 +186,13 @@ def _collect_files_being_pushed(ref_list, remote):
         else:
             # Get the difference to origin/develop instead.
             try:
-                modified_files = _compare_to_remote(remote, branch,
-                                                    remote_branch='develop')
+                modified_files = _compare_to_remote(
+                    remote, branch, remote_branch='develop')
             except ValueError:
                 # give up, return all files in repo.
                 try:
-                    modified_files = _git_diff_name_status(GIT_NULL_COMMIT,
-                                                           sha1)
+                    modified_files = _git_diff_name_status(
+                        GIT_NULL_COMMIT, sha1)
                 except ValueError as e:
                     print e.message
                     sys.exit(1)

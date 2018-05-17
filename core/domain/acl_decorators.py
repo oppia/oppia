@@ -19,6 +19,7 @@
 from core.controllers import base
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import topic_services
 from core.platform import models
 import feconf
 
@@ -236,6 +237,7 @@ def can_manage_own_profile(handler):
 
 def can_access_admin_page(handler):
     """Decorator that checks if the current user is a super admin."""
+
     def test_super_admin(self, **kwargs):
         """Checks if the user is logged in and is a super admin."""
         if not self.user_id:
@@ -467,6 +469,7 @@ def can_suggest_changes_to_exploration(handler):
     """Decorator to check whether a user can make suggestions to an
     exploration.
     """
+
     def test_can_suggest(self, exploration_id, **kwargs):
         """Checks if the user can make suggestions to an exploration.
 
@@ -626,6 +629,7 @@ def require_user_id_else_redirect_to_homepage(handler):
     session. If not, the user is redirected to the main page.
     Note that the user may not yet have registered.
     """
+
     def test_login(self, **kwargs):
         """Checks if the user for the current session is logged in.
         If not, redirects the user to the home page.
@@ -637,3 +641,24 @@ def require_user_id_else_redirect_to_homepage(handler):
     test_login.__wrapped__ = True
 
     return test_login
+
+
+def can_edit_topic(handler):
+    """Decorator to check whether the user can edit given topic."""
+    def test_can_edit(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        topic_rights = topic_services.get_topic_rights(topic_id)
+        if topic_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if topic_services.check_can_edit_topic(
+                self.user, topic_rights):
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to edit this topic.')
+    test_can_edit.__wrapped__ = True
+
+    return test_can_edit
