@@ -51,6 +51,10 @@ SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 
 EXTENSIONS_DIR_PREFIX = (
     'backend_prod_files' if not DEV_MODE else '')
+ACTIONS_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'actions'))
+ISSUES_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
 RTE_EXTENSIONS_DIR = (
@@ -640,6 +644,32 @@ COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
 
+# Whether learner playthroughs visualization framework should be enabled.
+ENABLE_PLAYTHROUGHS = False
+# Threshold for early quit playthrough.
+EARLY_QUIT_THRESHOLD_IN_SECS = 45
+# Threshold for multiple incorrect answers playthrough.
+NUM_INCORRECT_ANSWERS_THRESHOLD = 5
+# Threshold for repeated cyclic state transitions playthrough.
+NUM_REPEATED_CYCLES_THRESHOLD = 3
+# Max number of playthroughs for an issue.
+MAX_PLAYTHROUGHS_FOR_ISSUE = 5
+# Probability of recording a playthrough.
+RECORD_PLAYTHROUGH_PROBABILITY = 0.2
+# IDs of allowed types of issues.
+ALLOWED_ISSUE_IDS = [
+    'EarlyQuit',
+    'MultipleIncorrectSubmissions',
+    'CyclicStateTransitions'
+]
+# IDs of allowed learner actions.
+ALLOWED_ACTION_IDS = [
+    'ExplorationStart',
+    'AnswerSubmit',
+    'ExplorationQuit'
+]
+
+
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 # Number of unresolved answers to be displayed in the dashboard for each
@@ -800,6 +830,7 @@ ROLE_ID_GUEST = 'GUEST'
 ROLE_ID_BANNED_USER = 'BANNED_USER'
 ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
 ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
+ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_MODERATOR = 'MODERATOR'
 ROLE_ID_ADMIN = 'ADMIN'
 

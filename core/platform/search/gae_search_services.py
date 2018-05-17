@@ -33,6 +33,7 @@ class SearchFailureError(Exception):
        Other platform implementations should have a similar way of revealing
        platform specific errors.
     """
+
     def __init__(self, original_exception=None):
         super(SearchFailureError, self).__init__(
             '%s: %s' % (type(original_exception), original_exception.message))

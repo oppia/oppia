@@ -17,6 +17,8 @@
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import rights_manager
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
 import feconf
@@ -33,6 +35,9 @@ class PlayExplorationDecoratorTest(test_utils.GenericTestBase):
     private_exp_id = 'exp_id_2'
 
     class MockHandler(base.BaseHandler):
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
         @acl_decorators.can_play_exploration
         def get(self, exploration_id):
             return self.render_json({'exploration_id': exploration_id})
@@ -94,6 +99,9 @@ class PlayCollectionDecoratorTest(test_utils.GenericTestBase):
     private_col_id = 'col_id_2'
 
     class MockHandler(base.BaseHandler):
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
         @acl_decorators.can_play_collection
         def get(self, collection_id):
             return self.render_json({'collection_id': collection_id})
@@ -162,6 +170,9 @@ class EditCollectionDecoratorTest(test_utils.GenericTestBase):
     private_col_id = 'col_id_2'
 
     class MockHandler(base.BaseHandler):
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
         @acl_decorators.can_edit_collection
         def get(self, collection_id):
             return self.render_json({'collection_id': collection_id})
@@ -1023,4 +1034,64 @@ class AccessLearnerDashboardDecoratorTest(test_utils.GenericTestBase):
         self.login(self.user_email)
         response = self.testapp.get('/mock/', expect_errors=True)
         self.assertEqual(response.status_int, 200)
+        self.logout()
+
+
+class EditTopicDecoratorTest(test_utils.GenericTestBase):
+    """Tests the decorator can_edit_topic."""
+    manager_username = 'topicmanager'
+    manager_email = 'topicmanager@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+    topic_id = 'topic_1'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_edit_topic
+        def get(self, topic_id):
+            self.render_json({'topic_id': topic_id})
+
+    def setUp(self):
+        super(EditTopicDecoratorTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.manager_email, self.manager_username)
+        self.signup(self.viewer_email, self.viewer_username)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_topic_managers([self.manager_username])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.manager_id = self.get_user_id_from_email(self.manager_email)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.manager = user_services.UserActionsInfo(self.manager_id)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<topic_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
+        topic_services.assign_role(
+            self.admin, self.manager_id, topic_domain.ROLE_MANAGER,
+            self.topic_id)
+
+    def test_admin_can_edit_topic(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.topic_id)
+        self.assertEqual(response['topic_id'], self.topic_id)
+        self.logout()
+
+    def test_topic_manager_can_edit_topic(self):
+        self.login(self.manager_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.topic_id)
+        self.assertEqual(response['topic_id'], self.topic_id)
+        self.logout()
+
+    def test_normal_user_cannot_edit_topic(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.topic_id, expect_errors=True,
+                expected_status_int=401)
         self.logout()

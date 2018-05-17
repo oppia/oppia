@@ -934,6 +934,117 @@ class ExplorationStatsModel(base_models.BaseModel):
         cls.put_multi(exploration_stats_models)
 
 
+class ExplorationIssuesModel(base_models.BaseModel):
+    """Model for storing the list of playthroughs for an exploration grouped by
+    issues.
+    """
+    # The unresolved issues for this exploration. This will be a list of dicts
+    # where each dict represents an issue along with the associated
+    # playthroughs.
+    unresolved_issues = ndb.JsonProperty(default=None)
+
+    @classmethod
+    def create(cls, exp_id, unresolved_issues):
+        """Creates an ExplorationIssuesModel instance and writes it to the
+        datastore.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            unresolved_issues: list(dict). The unresolved issues for this
+                exploration. This will be a list of dicts where each dict
+                represents an issue along with the associated playthroughs.
+
+        Returns:
+            str. ID of the new ExplorationIssuesModel instance.
+        """
+        exp_issues_instance = cls(
+            id=exp_id, unresolved_issues=unresolved_issues)
+        exp_issues_instance.put()
+        return exp_id
+
+
+class PlaythroughModel(base_models.BaseModel):
+    """Model for storing recorded useful playthrough data in the datastore.
+
+    The ID of instances of this class are of the form
+    {{exp_id}}.{{random_hash_of_16_chars}}
+    """
+    # ID of the exploration.
+    exp_id = ndb.StringProperty(indexed=True)
+    # Version of the exploration.
+    exp_version = ndb.IntegerProperty(indexed=True)
+    # ID of the issue.
+    issue_id = ndb.StringProperty(indexed=True)
+    # The customization args dict for the given issue_id.
+    issue_customization_args = ndb.JsonProperty(default=None)
+    # The playthrough actions for this playthrough. This will be a list of dicts
+    # where each dict represents a single playthrough action. The list is
+    # ordered by the time of occurence of the action.
+    playthrough_actions = ndb.JsonProperty(default=None)
+    # Boolean for checking validity of the playthrough.
+    is_valid = ndb.BooleanProperty(indexed=True)
+
+    @classmethod
+    def _generate_id(cls, exp_id):
+        """Generates a unique id for the playthrough of the form
+        {{exp_id}}.{{random_hash_of_16_chars}}
+
+        Args:
+            exp_id: str. ID of the exploration.
+
+        Returns:
+            ID of the new PlaythroughModel instance.
+
+        Raises:
+            Exception: The id generator for PlaythroughModel is producing too
+                many collisions.
+        """
+
+        for _ in xrange(base_models.MAX_RETRIES):
+            new_id = '%s.%s' % (
+                exp_id,
+                utils.convert_to_hash(
+                    str(utils.get_random_int(base_models.RAND_RANGE)),
+                    base_models.ID_LENGTH))
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception(
+            'The id generator for PlaythroughModel is producing too many '
+            'collisions.')
+
+    @classmethod
+    def create(
+            cls, exp_id, exp_version, issue_id, issue_customization_args,
+            playthrough_actions, is_valid):
+        """Creates a PlaythroughModel instance and writes it to the
+        datastore.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+            issue_id: str. ID of the issue.
+            issue_customization_args: dict. The customization args dict for the
+                given issue_id.
+            playthrough_actions: list(dict). The playthrough actions for this
+                playthrough. This will be a list of dicts where each dict
+                represents a single playthrough action. The list is ordered by
+                the time of occurence of the action.
+            is_valid: Bool. Whether the playthrough is valid.
+
+        Returns:
+            str. ID of the new PlaythroughModel instance.
+        """
+        instance_id = cls._generate_id(exp_id)
+        playthrough_instance = cls(
+            id=instance_id, exp_id=exp_id, exp_version=exp_version,
+            issue_id=issue_id,
+            issue_customization_args=issue_customization_args,
+            playthrough_actions=playthrough_actions, is_valid=is_valid)
+        playthrough_instance.put()
+        return instance_id
+
+
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
     exploration-level statistics.

@@ -91,7 +91,7 @@ STATISTICAL_CLASSIFICATION = 'statistical_classifier'
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
 
 
-def _get_full_customization_args(customization_args, ca_specs):
+def get_full_customization_args(customization_args, ca_specs):
     """Populates the given customization_args dict with default values
     if any of the expected customization_args are missing.
 
@@ -120,7 +120,7 @@ def _get_full_customization_args(customization_args, ca_specs):
     return customization_args
 
 
-def _validate_customization_args_and_values(
+def validate_customization_args_and_values(
         item_name, item_type, customization_args,
         ca_specs_to_validate_against):
     """Validates the given `customization_args` dict against the specs set out
@@ -159,7 +159,7 @@ def _validate_customization_args_and_values(
     # Validate and clean up the customization args.
 
     # Populate missing keys with the default values.
-    customization_args = _get_full_customization_args(
+    customization_args = get_full_customization_args(
         customization_args, ca_specs_to_validate_against)
 
     # Remove extra keys.
@@ -398,7 +398,7 @@ class AudioTranslation(object):
         self.needs_update = needs_update
 
     def validate(self):
-        """Validates properties of the Content.
+        """Validates properties of the AudioTranslation.
 
         Raises:
             ValidationError: One or more attributes of the AudioTranslation are
@@ -707,6 +707,7 @@ class Outcome(object):
     consists of a destination state, feedback to show the user, and any
     parameter changes.
     """
+
     def to_dict(self):
         """Returns a dict representing this Outcome domain object.
 
@@ -819,6 +820,7 @@ class AnswerGroup(object):
     that involve soft matching of answers to a set of training data and/or
     example answers dictated by the creator.
     """
+
     def to_dict(self):
         """Returns a dict representing this AnswerGroup domain object.
 
@@ -950,6 +952,7 @@ class Solution(object):
     to progress to the next card and explanation is an HTML string containing
     an explanation for the solution.
     """
+
     def __init__(
             self, interaction_id, answer_is_exclusive,
             correct_answer, explanation):
@@ -1036,7 +1039,7 @@ class InteractionInstance(object):
             'id': self.id,
             'customization_args': (
                 {} if self.id is None else
-                _get_full_customization_args(
+                get_full_customization_args(
                     self.customization_args,
                     interaction_registry.Registry.get_interaction_by_id(
                         self.id).customization_arg_specs)),
@@ -1164,7 +1167,7 @@ class InteractionInstance(object):
         except KeyError:
             raise utils.ValidationError('Invalid interaction id: %s' % self.id)
 
-        _validate_customization_args_and_values(
+        validate_customization_args_and_values(
             'interaction', self.id, self.customization_args,
             interaction.customization_arg_specs)
 
@@ -1249,8 +1252,8 @@ class State(object):
         """Initializes a State domain object.
 
         Args:
-            content: list(Content). The contents displayed to the reader in
-                this state. This list must have only one element.
+            content: SubtitledHtml. The contents displayed to the reader in this
+                state.
             param_changes: list(ParamChange). Parameter changes associated with
                 this state.
             interaction: InteractionInstance. The interaction instance
@@ -1282,7 +1285,7 @@ class State(object):
                 are ParamSpec value objects with an object type
                 property(obj_type). It is None if the state belongs to a
                 question.
-            allow_null_interaction. bool. Whether this state's interaction is
+            allow_null_interaction: bool. Whether this state's interaction is
                 allowed to be unspecified.
 
         Raises:
@@ -1336,10 +1339,10 @@ class State(object):
         return False
 
     def update_content(self, content_dict):
-        """Update the list of Content of this state.
+        """Update the content of this state.
 
         Args:
-            content_dict. dict. The dict representation of SubtitledHtml
+            content_dict: dict. The dict representation of SubtitledHtml
                 object.
         """
         # TODO(sll): Must sanitize all content in RTE component attrs.
@@ -1349,7 +1352,7 @@ class State(object):
         """Update the param_changes dict attribute.
 
         Args:
-            param_change_dicts. list(dict). List of param_change dicts that
+            param_change_dicts: list(dict). List of param_change dicts that
                 represent ParamChange domain object.
         """
         self.param_changes = [
@@ -1360,7 +1363,7 @@ class State(object):
         """Update the interaction id attribute.
 
         Args:
-            interaction_id. str. The new interaction id to set.
+            interaction_id: str. The new interaction id to set.
         """
         self.interaction.id = interaction_id
         # TODO(sll): This should also clear interaction.answer_groups (except
@@ -1372,7 +1375,7 @@ class State(object):
         """Update the customization_args of InteractionInstance domain object.
 
         Args:
-            customization_args. dict. The new customization_args to set.
+            customization_args: dict. The new customization_args to set.
         """
         self.interaction.customization_args = customization_args
 
@@ -1380,7 +1383,7 @@ class State(object):
         """Update the list of AnswerGroup in IteractioInstancen domain object.
 
         Args:
-            answer_groups_list. list(dict). List of dicts that represent
+            answer_groups_list: list(dict). List of dicts that represent
                 AnswerGroup domain object.
         """
         if not isinstance(answer_groups_list, list):
@@ -1439,7 +1442,7 @@ class State(object):
         """Update the default_outcome of InteractionInstance domain object.
 
         Args:
-            default_outcome_dict. dict. Dict that represents Outcome domain
+            default_outcome_dict: dict. Dict that represents Outcome domain
                 object.
         """
         if default_outcome_dict:
@@ -1459,7 +1462,7 @@ class State(object):
         domain object.
 
         Args:
-            confirmed_unclassified_answers. list(AnswerGroup). The new list of
+            confirmed_unclassified_answers: list(AnswerGroup). The new list of
                 answers which have been confirmed to be associated with the
                 default outcome.
 

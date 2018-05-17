@@ -39,6 +39,7 @@ class FileMetadata(object):
     Attributes:
         size: int. The size of the file, in bytes.
     """
+
     def __init__(self, metadata):
         """Constructs a FileMetadata object.
 

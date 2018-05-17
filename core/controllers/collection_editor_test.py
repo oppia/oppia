@@ -43,9 +43,9 @@ class BaseCollectionEditorControllerTest(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
 
         self.json_dict = {
-            'version' : 1,
-            'commit_message' : 'changed title',
-            'change_list' : [{
+            'version': 1,
+            'commit_message': 'changed title',
+            'change_list': [{
                 'cmd': 'edit_collection_property',
                 'property_name': 'title',
                 'new_value': 'A new title'

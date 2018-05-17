@@ -394,17 +394,18 @@ tags: []
         """Convert a JSON server response to an object (such as a dict)."""
         if not expect_errors:
             self.assertEqual(json_response.status_int, 200)
-
         self.assertEqual(
             json_response.content_type, 'application/json')
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
-    def get_json(self, url, params=None, expect_errors=False):
+    def get_json(self, url, params=None, expect_errors=False,
+                 expected_status_int=200):
         """Get a JSON response, transformed to a Python object."""
         json_response = self.testapp.get(
-            url, params, expect_errors=expect_errors)
+            url, params, expect_errors=expect_errors,
+            status=expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
 
@@ -588,6 +589,15 @@ tags: []
         """
         for name in collection_editor_usernames:
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
+
+    def set_topic_managers(self, topic_manager_usernames):
+        """Sets role of given users as TOPIC_MANAGER.
+
+        Args:
+            topic_manager_usernames: list(str). List of usernames.
+        """
+        for name in topic_manager_usernames:
+            self.set_user_role(name, feconf.ROLE_ID_TOPIC_MANAGER)
 
     def get_current_logged_in_user_id(self):
         """Gets the user_id of the current logged-in user.

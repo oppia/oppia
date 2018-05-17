@@ -292,7 +292,7 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             '\n'
             'You can change your email preferences via the '
             'Preferences page.'
-        ) %  query_id
+        ) % query_id
 
         messages = self.mail_stub.get_sent_messages(
             to=self.USER_SUBMITTER_EMAIL)

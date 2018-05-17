@@ -274,7 +274,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             'ratings': feconf.get_empty_ratings(),
             'status': u'public',
             'tags': [],
-            'title':  u'The Lazy Magician',
+            'title': u'The Lazy Magician',
             'thumbnail_bg_color': '#d0982a',
             'thumbnail_icon_url': '/subjects/Algorithms.svg',
         }
