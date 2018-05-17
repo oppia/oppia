@@ -1273,10 +1273,12 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         """Test that a new playthrough gets created and is added to an existing
         issue's list of playthrough IDs.
         """
-        self.post_json('/explorehandler/store_playthrough/%s' % (
-            self.exp_id), {
+        self.post_json(
+            '/explorehandler/store_playthrough/%s' % (self.exp_id),
+            {
                 'playthrough_data': self.playthrough_data,
-                'exp_issue': self.exp_issue})
+                'exp_issue': self.exp_issue
+            })
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
@@ -1292,10 +1294,12 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.playthrough_data['issue_customization_args']['state_name'][
             'value'] = 'state_name2'
 
-        self.post_json('/explorehandler/store_playthrough/%s' % (
-            self.exp_id), {
+        self.post_json(
+            '/explorehandler/store_playthrough/%s' % (self.exp_id),
+            {
                 'playthrough_data': self.playthrough_data,
-                'exp_issue': self.exp_issue})
+                'exp_issue': self.exp_issue
+            })
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
@@ -1335,7 +1339,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         })
         model.put()
 
-
         self.playthrough_data = {
             'exp_id': self.exp_id,
             'exp_version': self.exploration.version,
@@ -1366,10 +1369,12 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }
         }
 
-        self.post_json('/explorehandler/store_playthrough/%s' % (
-            self.exp_id), {
+        self.post_json(
+            '/explorehandler/store_playthrough/%s' % (self.exp_id),
+            {
                 'playthrough_data': self.playthrough_data,
-                'exp_issue': self.exp_issue})
+                'exp_issue': self.exp_issue
+            })
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
@@ -1386,10 +1391,12 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'id1', 'id2', 'id3', 'id4', 'id5']
         model.put()
 
-        self.post_json('/explorehandler/store_playthrough/%s' % (
-            self.exp_id), {
+        self.post_json(
+            '/explorehandler/store_playthrough/%s' % (self.exp_id),
+            {
                 'playthrough_data': self.playthrough_data,
-                'exp_issue': self.exp_issue})
+                'exp_issue': self.exp_issue
+            })
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)

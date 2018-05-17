@@ -303,6 +303,30 @@ class StorePlaythroughHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
+    def _does_exp_issue_exist_in_exp_issues_model(
+            self, state_name_present, issue_customization_args,
+            customization_args):
+        """Checks whether the ExplorationIssue of the playthrough to be stored
+        already exists in the unresolved issues of the ExplorationIssuesModel.
+
+        Args:
+            state_name_present: bool. 'state_name' exists in
+                customization args if True, otherwise 'state_names' does.
+            issue_customization_args: dict. The customization dict for one
+                particular issue from the unresolved issues list.
+            customization_args: dict. The customization dict for the issue of
+                the playthrough to be stored.
+        """
+        if state_name_present:
+            if issue_customization_args['state_name'] == customization_args[
+                    'state_name']:
+                return True
+        else:
+            if issue_customization_args['state_names'] == customization_args[
+                    'state_names']:
+                return True
+        return False
+
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests.
@@ -328,9 +352,7 @@ class StorePlaythroughHandler(base.BaseHandler):
         customization_args = exp_issue_dict['customization_args']
         # Boolean to identify difference between customization args that have
         # either 'state_name' or 'state_names'.
-        state_name_in_customization_args = (
-            True
-            if 'state_name' in customization_args else False)
+        state_name_in_customization_args = 'state_name' in customization_args
 
         issue_found = False
         for index, issue in enumerate(exp_issues.unresolved_issues):
@@ -338,12 +360,9 @@ class StorePlaythroughHandler(base.BaseHandler):
                 issue_customization_args = issue['issue_customization_args']
                 # This check checks if the state name or the list of state names
                 # (depending on the issue type) are identical.
-                if (state_name_in_customization_args and (
-                        issue_customization_args['state_name'] == (
-                            customization_args['state_name']))) or (
-                                not state_name_in_customization_args and (
-                                    issue_customization_args['state_names'] == (
-                                        customization_args['state_names']))):
+                if self._does_exp_issue_exist_in_exp_issues_model(
+                        state_name_in_customization_args,
+                        issue_customization_args, customization_args):
                     if len(issue['playthrough_ids']) < (
                             feconf.MAX_PLAYTHROUGHS_FOR_ISSUE):
                         exp_issues.unresolved_issues[index][
@@ -365,8 +384,7 @@ class StorePlaythroughHandler(base.BaseHandler):
             }
             exp_issues.unresolved_issues.append(issue)
 
-        stats_services.save_exp_issues_model_transactional(
-            exp_issues)
+        stats_services.save_exp_issues_model_transactional(exp_issues)
         self.render_json({})
 
 
