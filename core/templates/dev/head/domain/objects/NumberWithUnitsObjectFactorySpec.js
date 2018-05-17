@@ -15,10 +15,10 @@
 /**
  * @fileoverview unit tests for number with units object type factory service.
  */
-fdescribe('NumberWithUnitsObjectFactory', function() {
+describe('NumberWithUnitsObjectFactory', function() {
   beforeEach(module('oppia'));
 
-  fdescribe('number with units object factory', function() {
+  describe('number with units object factory', function() {
     var NumberWithUnits = null;
     var Units = null;
     var Fraction = null;
@@ -31,7 +31,7 @@ fdescribe('NumberWithUnitsObjectFactory', function() {
       errors = $injector.get('NUMBER_WITH_UNITS_PARSING_ERRORS');
     }));
 
-    fit('should convert units to dict format', function() {
+    it('should convert units to dict format', function() {
       expect(new Units('kg / kg^2 K mol / (N m s^2) K s').toDict()).toEqual(
         {kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1});
       expect(new Units('mol/(kg / (N m / s^2)').toDict()).toEqual(
@@ -40,7 +40,7 @@ fdescribe('NumberWithUnitsObjectFactory', function() {
         {kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1});
     });
 
-    fit('should convert units from dict to string format', function() {
+    it('should convert units from dict to string format', function() {
       expect(Units.fromDictToString(
         {kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1})).toBe(
         'kg^-1 K^2 mol^1 N^-1 m^-1 s^-1');
@@ -49,14 +49,14 @@ fdescribe('NumberWithUnitsObjectFactory', function() {
         'mol^1 kg^-1 N^1 m^1 s^-2 K^-1');
     });
 
-    fit('should parse valid units strings', function() {
+    it('should parse valid units strings', function() {
       expect(Units.fromRawInputString('kg per (K mol^-2)').toDict()).toEqual(
         new Units('kg / (K mol^-2)').toDict());
       expect(Units.fromRawInputString('kg / (K mol^-2) N / m^2').toDict(
       )).toEqual(new Units('kg / (K mol^-2) N / m^2').toDict());
     });
 
-    fit('should parse valid number with units strings', function() {
+    it('should parse valid number with units strings', function() {
       expect(NumberWithUnits.fromRawInputString('2.02 kg / m^3')).toEqual(
         new NumberWithUnits('real', 2.02, '', new Units('kg / m^3')));
       expect(NumberWithUnits.fromRawInputString('2/3 kg / m^3')).toEqual(
@@ -73,7 +73,7 @@ fdescribe('NumberWithUnitsObjectFactory', function() {
           false, 0, 2, 3), new Units('Rs')));
     });
 
-    fit('should throw errors for invalid number with units', function() {
+    it('should throw errors for invalid number with units', function() {
       expect(function() {
         NumberWithUnits.fromRawInputString('3* kg');
       }).toThrow(new Error(errors.INVALID_VALUE));
