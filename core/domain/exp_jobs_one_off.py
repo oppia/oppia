@@ -520,22 +520,22 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
         exploration = exp_services.get_exploration_from_model(item)
 
         allowed_parent_list = {
-            'p'   : ['blockquote', 'div', 'pre', '[document]'],
-            'b'   : ['i', 'li', 'p', 'pre'],
-            'br'  : ['b', 'i', 'li', 'p'],
-            'div' : ['blockquote'],
-            'i'   : ['b', 'li', 'p', 'pre'],
-            'li'  : ['ol', 'ul'],
-            'ol'  : ['blockquote', 'li', 'pre', 'div', '[document]'],
-            'ul'  : ['blockquote', 'li', 'pre', 'div', '[document]'],
-            'pre' : ['blockquote', '[document]'],
-            'blockquote' : ['blockquote', '[document]'],
-            'oppia-noninteractive-link'        : ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-math'        : ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-image'       : ['li', 'p', 'pre'],
-            'oppia-noninteractive-collapsible' : ['li', 'p', 'pre'],
-            'oppia-noninteractive-tabs'        : ['li', 'p', 'pre'],
-            'oppia-noninteractive-video'       : ['li', 'p', 'pre']
+            'p': ['blockquote', 'div', 'pre', '[document]'],
+            'b': ['i', 'li', 'p', 'pre'],
+            'br': ['b', 'i', 'li', 'p'],
+            'div': ['blockquote'],
+            'i': ['b', 'li', 'p', 'pre'],
+            'li': ['ol', 'ul'],
+            'ol': ['blockquote', 'li', 'pre', 'div', '[document]'],
+            'ul': ['blockquote', 'li', 'pre', 'div', '[document]'],
+            'pre': ['blockquote', '[document]'],
+            'blockquote': ['blockquote', '[document]'],
+            'oppia-noninteractive-link': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-math': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-image': ['li', 'p', 'pre'],
+            'oppia-noninteractive-collapsible': ['li', 'p', 'pre'],
+            'oppia-noninteractive-tabs': ['li', 'p', 'pre'],
+            'oppia-noninteractive-video': ['li', 'p', 'pre']
         }
 
         allowed_tag_list = [
@@ -548,7 +548,7 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
             'oppia-noninteractive-video'
         ]
 
-        err_list = {}
+        err_dict = {}
 
         for state in exploration.states.itervalues():
             result = find('html', state.to_dict())
@@ -560,25 +560,25 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
                 # For invalid tags.
                 for tag in soup.findAll():
                     if tag.name not in allowed_tag_list:
-                        if 'invalidTags' in err_list:
-                            err_list['invalidTags'] += [tag.name]
+                        if 'invalidTags' in err_dict:
+                            err_dict['invalidTags'] += [tag.name]
                         else:
-                            err_list['invalidTags'] = [tag.name]
+                            err_dict['invalidTags'] = [tag.name]
 
                 # For invalid parent-child relation.
                 for key, value in allowed_parent_list.iteritems():
                     for tag in soup.findAll(key):
                         parent = tag.parent.name
                         if parent not in value:
-                            if key in err_list:
-                                err_list[key] += [parent]
+                            if key in err_dict:
+                                err_dict[key] += [parent]
                             else:
-                                err_list[key] = [parent]
+                                err_dict[key] = [parent]
 
-        for key, value in err_list.iteritems():
-            err_list[key] = list(set(err_list[key]))
+        for key, value in err_dict.iteritems():
+            err_dict[key] = list(set(err_dict[key]))
 
-        yield('Errors', err_list)
+        yield('Errors', err_dict)
 
     @staticmethod
     def reduce(key, values):
