@@ -784,7 +784,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
 
         scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, scope.submitAnswer);
 
-        /*******************************************************************
+        /** *****************************************************************
          * Functions involving MIDI playback.
          ******************************************************************/
 

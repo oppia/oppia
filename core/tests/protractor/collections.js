@@ -112,7 +112,7 @@ describe('Collections', function() {
       creatorDashboardPage.clickCreateCollectionButton();
       browser.getCurrentUrl().then(function(url) {
         var pathname = url.split('/');
-        //in the url a # is added at the end that is not part of collection ID
+        // in the url a # is added at the end that is not part of collection ID
         collectionId = pathname[5].slice(0, -1);
       });
       browser.waitForAngular();
