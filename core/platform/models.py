@@ -100,9 +100,15 @@ class _Gae(_Platform):
             elif name == NAMES.recommendations:
                 from core.storage.recommendations import gae_models as recommendations_models # pylint: disable=line-too-long
                 returned_models.append(recommendations_models)
+            elif name == NAMES.skill:
+                from core.storage.skill import gae_models as skill_models
+                returned_models.append(skill_models)
             elif name == NAMES.statistics:
                 from core.storage.statistics import gae_models as statistics_models # pylint: disable=line-too-long
                 returned_models.append(statistics_models)
+            elif name == NAMES.story:
+                from core.storage.story import gae_models as story_models
+                returned_models.append(story_models)
             elif name == NAMES.topic:
                 from core.storage.topic import gae_models as topic_models
                 returned_models.append(topic_models)

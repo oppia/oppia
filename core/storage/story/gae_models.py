@@ -18,7 +18,8 @@ from core.platform import models
 
 from google.appengine.ext import ndb  # pylint: disable=relative-import
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.user])
 
 
 class StorySnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -48,16 +49,15 @@ class StoryModel(base_models.VersionedModel):
     # The topic id the story corresponds to.
     topic = ndb.StringProperty(indexed=False)
     # A set of notes, that describe the characters, main storyline, and setting.
-    notes = ndb.StringProperty(repeated=True, indexed=False)
+    notes = ndb.StringProperty(indexed=False)
     # The schema version for the story.
     schema_version = (
-        ndb.IntegerProperty(required=True, indexed=True))
+        ndb.IntegerProperty(required=True, default=1, indexed=True))
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
     # The story graph specifying the connection between nodes.
     story_contents = ndb.JsonProperty(default={}, indexed=False)
 
-    @classmethod
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Record the event to the commit log after the model commit.

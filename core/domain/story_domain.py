@@ -14,7 +14,9 @@
 
 """Domain objects relating to stories."""
 
+from constants import constants
 from core.platform import models
+import feconf
 
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 
@@ -146,6 +148,19 @@ class StoryNode(object):
 
         return node
 
+    @classmethod
+    def create_default_story_node(cls, node_id):
+        """Returns a StoryNode domain object with default values.
+
+        Args:
+            node_id: str. The id of the node.
+
+        Returns:
+            StoryNode. The StoryNode domain object with default
+            value.
+        """
+        return cls(node_id, [], [], [], '', '')
+
 
 class Story(object):
     """Domain object for an Oppia Story."""
@@ -230,11 +245,70 @@ class Story(object):
             story_dict['topic'],
             [
                 StoryNode.from_dict(node_dict)
-                for node_dict in story_dict['nodes']
+                for node_dict in story_dict['story_nodes']
             ], story_dict['schema_version'], story_dict['language_code'],
             story_version, story_created_on, story_last_updated)
 
         return story
+
+    @classmethod
+    def create_default_story(
+            cls, story_id, title=feconf.DEFAULT_STORY_TITLE,
+            description=feconf.DEFAULT_STORY_DESCRIPTION,
+            notes=feconf.DEFAULT_STORY_NOTES,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Returns a story domain object with default values.
+
+        Args:
+            story_id: str. The unique id of the story.
+            title: str. The title of the story.
+            category: str. The category of the story.
+            objective: str. The objective of the story.
+            language_code: str. The language code of the story (like 'en'
+                for English).
+
+        Returns:
+            story. The story domain object with the default
+            values.
+        """
+        return cls(
+            story_id, title, description, notes, None, [],
+            feconf.CURRENT_STORY_SCHEMA_VERSION, language_code, 0)
+
+    @classmethod
+    def update_story_contents_from_model(
+            cls, versioned_story_contents, current_version):
+        """Converts the states blob contained in the given
+        versioned_story_contents dict from current_version to
+        current_version + 1. Note that the versioned_story_contents being
+        passed in is modified in-place.
+
+        Args:
+            versioned_story_contents: dict. A dict with two keys:
+                - schema_version: str. The schema version for the story.
+                - story_contents: dict. The dict comprising the story
+                    contents.
+            current_version: int. The current story schema version.
+
+        Raises:
+            Exception: The value of the key 'schema_version' in
+            versioned_story_contents is not valid.
+        """
+        if (versioned_story_contents['schema_version'] + 1 >
+                feconf.CURRENT_STORY_SCHEMA_VERSION):
+            raise Exception('story is version %d but current story'
+                            ' schema version is %d' % (
+                                versioned_story_contents['schema_version'],
+                                feconf.CURRENT_STORY_SCHEMA_VERSION))
+
+        versioned_story_contents['schema_version'] = (
+            current_version + 1)
+
+        conversion_fn = getattr(
+            cls, '_convert_story_contents_v%s_dict_to_v%s_dict' % (
+                current_version, current_version + 1))
+        versioned_story_contents['story_contents'] = conversion_fn(
+            versioned_story_contents['story_contents'])
 
 
 class StorySummary(object):

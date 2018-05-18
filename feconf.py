@@ -164,6 +164,9 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 19
 # number must be changed.
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
+# The current version of story schema.
+CURRENT_STORY_SCHEMA_VERSION = 1
+
 # The current version of the question schema.
 CURRENT_QUESTION_SCHEMA_VERSION = 1
 
@@ -205,6 +208,13 @@ DEFAULT_COLLECTION_TITLE = ''
 DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
+
+# Default title for a newly-minted story.
+DEFAULT_STORY_TITLE = ''
+# Default description for a newly-minted story.
+DEFAULT_STORY_DESCRIPTION = ''
+# Default notes for a newly-minted story.
+DEFAULT_STORY_NOTES = ''
 
 # Default ID of VM which is used for training classifier.
 DEFAULT_VM_ID = 'vm_default'
