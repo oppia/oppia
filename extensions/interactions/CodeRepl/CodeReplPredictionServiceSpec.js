@@ -104,8 +104,8 @@ describe('CodeRepl prediction service', function() {
         }
       }
 
-      // Test algorithm agains first test set. This test set contains
-      // example for which KNN fails but SVM succeeds.
+      // Test algorithm against first test set. This test set contains
+      // examples for which KNN fails but SVM succeeds.
       var testData = getJSONFixture('code_classifier_test_svm.json');
       var predictedAnswerGroup = null;
       for (var i = 0; i < testData.length; i++) {
