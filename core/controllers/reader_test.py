@@ -1218,7 +1218,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                         'value': 'state_name1'
                     }
                 }
-            }], True)
+            }], is_valid=True)
         stats_models.ExplorationIssuesModel.create(
             self.exp_id, [{
                 'issue_id': 'EarlyQuit',
@@ -1269,6 +1269,9 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }
         }
 
+        response = self.testapp.get('/explore/%s' % self.exp_id)
+        self.csrf_token = self.get_csrf_token_from_response(response)
+
     def test_new_playthrough_gets_stored(self):
         """Test that a new playthrough gets created and is added to an existing
         issue's list of playthrough IDs.
@@ -1278,7 +1281,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             {
                 'playthrough_data': self.playthrough_data,
                 'exp_issue': self.exp_issue
-            })
+            }, self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
@@ -1299,7 +1302,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             {
                 'playthrough_data': self.playthrough_data,
                 'exp_issue': self.exp_issue
-            })
+            }, self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
@@ -1325,7 +1328,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                         'value': 'state_name1'
                     }
                 }
-            }], True)
+            }], is_valid=True)
 
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
         model.unresolved_issues.append({
@@ -1374,7 +1377,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             {
                 'playthrough_data': self.playthrough_data,
                 'exp_issue': self.exp_issue
-            })
+            }, self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
@@ -1396,7 +1399,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             {
                 'playthrough_data': self.playthrough_data,
                 'exp_issue': self.exp_issue
-            })
+            }, self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
@@ -1413,7 +1416,6 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        exp_services.delete_demo(self.exp_id)
         exp_services.load_demo(self.exp_id)
         exploration = exp_services.get_exploration_by_id(self.exp_id)
 

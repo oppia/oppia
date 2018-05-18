@@ -662,7 +662,15 @@ ALLOWED_ACTION_IDS = [
     'AnswerSubmit',
     'ExplorationQuit'
 ]
-
+# Mapping from issue type to issue keyname in the issue customization dict. This
+# particular mapping is to distinguish between issues which have their keyname
+# as either 'state_name' or 'state_names'. This mapping will be used to compare
+# two issues, as the concerned state(s) and the issue type are the metrics used.
+ISSUE_TYPE_KEYNAME_MAPPING = {
+    'EarlyQuit': 'state_name',
+    'MultipleIncorrectSubmissions': 'state_name',
+    'CyclicStateTransitions': 'state_names'
+}
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
