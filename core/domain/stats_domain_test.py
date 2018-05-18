@@ -271,6 +271,11 @@ class StateStatsTests(test_utils.GenericTestBase):
 class ExplorationIssuesTests(test_utils.GenericTestBase):
     """Tests the ExplorationIssues domain object."""
 
+    def test_create_default(self):
+        exp_issues = stats_domain.ExplorationIssues.create_default('exp_id1')
+        self.assertEqual(exp_issues.id, 'exp_id1')
+        self.assertEqual(exp_issues.unresolved_issues, [])
+
     def test_to_dict(self):
         exp_issues = stats_domain.ExplorationIssues(
             'exp_id1', [{
