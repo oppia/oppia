@@ -7,7 +7,12 @@
     "html"
   ],
   "rules": {
-    "angular/di-unused": 2,
+    "angular/di": [
+      "error",
+      "array",
+      ],
+    "angular/di-order": "error",
+    "angular/di-unused": "error",
     "angular/no-inline-template": [
       "error",
       {

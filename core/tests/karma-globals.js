@@ -105,10 +105,10 @@ var hashes = {
  * (see the 'Unit Testing' section).
  */
 GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS = function($provide, $translateProvider) {
-  $provide.factory('customLoader', function($q) {
+  $provide.factory('customLoader', ['$q', function($q) {
     return function() {
       return $q.resolve({});
     };
-  });
+  }]);
   $translateProvider.useLoader('customLoader');
 };

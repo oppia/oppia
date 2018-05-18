@@ -28,7 +28,7 @@ describe('MusicNotesInput interaction', function() {
       }
     ));
 
-    beforeEach(inject(function($compile, _$templateCache_, $rootScope) {
+    beforeEach(inject(function($compile, $rootScope, _$templateCache_) {
       $templateCache = _$templateCache_;
       var templatesHtml = $templateCache.get(
         '/extensions/interactions/MusicNotesInput/MusicNotesInput.html');
@@ -36,7 +36,7 @@ describe('MusicNotesInput interaction', function() {
       $rootScope.$digest();
     }));
 
-    beforeEach(inject(function($compile, $rootScope, _$httpBackend_) {
+    beforeEach(inject(function($compile, _$httpBackend_, $rootScope) {
       $httpBackend = _$httpBackend_;
 
       var TAG_NAME = 'oppia-interactive-music-notes-input';
