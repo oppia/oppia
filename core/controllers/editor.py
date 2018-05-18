@@ -767,6 +767,28 @@ class StateRulesStatsHandler(EditorHandler):
         })
 
 
+class FetchIssuesHandler(EditorHandler):
+    """Handler used for retrieving the list of unresolved issues in an
+    exploration.
+    """
+
+    @acl_decorators.can_view_exploration_stats
+    def get(self, exp_id):
+        """Handles GET requests."""
+        exp_issues = stats_services.get_exp_issues_by_id(exp_id)
+        self.render_json(exp_issues.unresolved_issues)
+
+
+class FetchPlaythroughHandler(EditorHandler):
+    """Handler used for retrieving a playthrough."""
+
+    @acl_decorators.open_access
+    def get(self, playthrough_id):
+        """Handles GET requests."""
+        playthrough = stats_services.get_playthrough_by_id(playthrough_id)
+        self.render_json(playthrough.to_dict())
+
+
 class ImageUploadHandler(EditorHandler):
     """Handles image uploads."""
 

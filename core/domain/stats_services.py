@@ -150,6 +150,47 @@ def handle_stats_creation_for_new_exp_version(
     create_stats_model(exploration_stats)
 
 
+def get_exp_issues_by_id(exp_id):
+    """Retrieves the ExplorationIssues domain object.
+
+    Args:
+        exp_id: str. ID of the exploration.
+
+    Returns:
+        ExplorationIssues. The domain object for exploration issues.
+
+    Raises:
+        Exception: Entity for class ExplorationIssuesModel with id not found.
+    """
+    exp_issues = None
+    exp_issues_model = stats_models.ExplorationIssuesModel.get(exp_id)
+    if exp_issues_model is not None:
+        # TODO(pranavsid98): Convert below code to use get_from_model() method
+        # right after the StorePlaythroughController PR is merged.
+        exp_issues = stats_domain.ExplorationIssues(
+            exp_issues_model.id, exp_issues_model.unresolved_issues)
+    return exp_issues
+
+
+def get_playthrough_by_id(playthrough_id):
+    """Retrieves the Playthrough domain object.
+
+    Args:
+        playthrough_id: str. ID of the playthrough.
+
+    Returns:
+        Playthrough. The domain object for the playthrough.
+
+    Raises:
+        Exception: Entity for class PlaythroughModel with id not found.
+    """
+    playthrough = None
+    playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
+    if playthrough_model is not None:
+        playthrough = get_playthrough_from_model(playthrough_model)
+    return playthrough
+
+
 def get_exploration_stats_by_id(exp_id, exp_version):
     """Retrieves the ExplorationStats domain object.
 
@@ -223,6 +264,22 @@ def get_exploration_stats_from_model(exploration_stats_model):
         exploration_stats_model.num_completions_v1,
         exploration_stats_model.num_completions_v2,
         new_state_stats_mapping)
+
+
+def get_playthrough_from_model(playthrough_model):
+    """Gets a PlaythroughModel domain object from a PlaythroughModel instance.
+
+    Args:
+        playthrough_model: PlaythroughModel. Playthrough model in datastore.
+
+    Returns:
+        Playthrough. The domain object for a playthrough.
+    """
+    return stats_domain.Playthrough(
+        playthrough_model.id, playthrough_model.exp_id,
+        playthrough_model.exp_version, playthrough_model.issue_id,
+        playthrough_model.issue_customization_args,
+        playthrough_model.playthrough_actions, playthrough_model.is_valid)
 
 
 def create_stats_model(exploration_stats):

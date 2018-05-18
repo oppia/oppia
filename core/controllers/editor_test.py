@@ -35,7 +35,8 @@ from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models, stats_models) = models.Registry.import_models(
+    [models.NAMES.user, models.NAMES.statistics])
 
 
 class BaseEditorControllerTest(test_utils.GenericTestBase):
@@ -1528,6 +1529,125 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
                 expected_status_int=401)
 
             self.logout()
+
+
+class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
+    """Test the handling of request to fetch issues and playthroughs."""
+
+    EXP_ID = 'exp_id1'
+
+    def setUp(self):
+        super(FetchIssuesPlaythroughHandlerTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor = user_services.UserActionsInfo(self.editor_id)
+
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.set_moderators([self.MODERATOR_USERNAME])
+
+        # The editor publishes an exploration.
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.editor_id, title='My Exploration',
+            end_state_name='END')
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
+
+        self.playthrough_id1 = stats_models.PlaythroughModel.create(
+            self.EXP_ID, 1, 'EarlyQuit',
+            {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+            [{
+                'action_id': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                }
+            }], is_valid=True)
+        self.playthrough_id2 = stats_models.PlaythroughModel.create(
+            self.EXP_ID, 1, 'MultipleIncorrectSubmissions',
+            {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'num_times_answered_incorrectly': {
+                    'value': 7
+                }
+            },
+            [{
+                'action_id': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                }
+            }], is_valid=True)
+        stats_models.ExplorationIssuesModel.create(
+            self.EXP_ID,
+            [{
+                'issue_id': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': [self.playthrough_id1]
+            }, {
+                'issue_id': 'MultipleIncorrectSubmissions',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'num_times_answered_incorrectly': {
+                        'value': 7
+                    }
+                },
+                'playthrough_ids': [self.playthrough_id2]
+            }]
+        )
+
+    def test_fetch_issues_handler(self):
+        """Test that all issues get fetched correctly."""
+        response = self.get_json('/fetch_issues/%s' % self.EXP_ID)
+        self.assertEqual(len(response), 2)
+        self.assertEqual(response[0]['issue_id'], 'EarlyQuit')
+        self.assertEqual(
+            response[1]['issue_id'], 'MultipleIncorrectSubmissions')
+
+    def test_fetch_playthrough_handler(self):
+        """Test that the playthrough gets fetched correctly."""
+        response = self.get_json('/fetch_playthrough/%s' % self.playthrough_id1)
+        self.assertEqual(response['id'], self.playthrough_id1)
+        self.assertEqual(response['exp_id'], self.EXP_ID)
+        self.assertEqual(response['exp_version'], 1)
+        self.assertEqual(response['issue_id'], 'EarlyQuit')
+        self.assertEqual(
+            response['issue_customization_args'], {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            })
+        self.assertEqual(
+            response['playthrough_actions'], [{
+                'action_id': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                }
+            }])
+        self.assertEqual(response['is_valid'], True)
 
 
 class EditorAutosaveTest(BaseEditorControllerTest):

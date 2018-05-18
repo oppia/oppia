@@ -46,6 +46,9 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.stats_model_id = (
             stats_models.ExplorationStatsModel.create(
                 'exp_id1', 1, 0, 0, 0, 0, 0, 0, {}))
+        stats_models.ExplorationIssuesModel.create(self.exp_id, [])
+        self.playthrough_id = stats_models.PlaythroughModel.create(
+            'exp_id1', 1, 'EarlyQuit', {}, [], True)
 
     def test_update_stats_method(self):
         """Test the update_stats method."""
@@ -386,6 +389,35 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_completions_v1, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
         self.assertEqual(exploration_stats.state_stats_mapping, {})
+
+    def test_get_playthrough_from_model(self):
+        """Test the get_playthrough_from_model method."""
+        model = stats_models.PlaythroughModel.get(self.playthrough_id)
+        playthrough = stats_services.get_playthrough_from_model(model)
+        self.assertEqual(playthrough.id, self.playthrough_id)
+        self.assertEqual(playthrough.exp_id, 'exp_id1')
+        self.assertEqual(playthrough.exp_version, 1)
+        self.assertEqual(playthrough.issue_id, 'EarlyQuit')
+        self.assertEqual(playthrough.issue_customization_args, {})
+        self.assertEqual(playthrough.playthrough_actions, [])
+        self.assertEqual(playthrough.is_valid, True)
+
+    def test_get_exp_issues_by_id(self):
+        """Test the get_exp_issues_by_id method."""
+        exp_issues = stats_services.get_exp_issues_by_id(self.exp_id)
+        self.assertEqual(exp_issues.id, self.exp_id)
+        self.assertEqual(exp_issues.unresolved_issues, [])
+
+    def test_get_playthrough_by_id(self):
+        """Test the get_playthrough_by_id method."""
+        playthrough = stats_services.get_playthrough_by_id(self.playthrough_id)
+        self.assertEqual(playthrough.id, self.playthrough_id)
+        self.assertEqual(playthrough.exp_id, 'exp_id1')
+        self.assertEqual(playthrough.exp_version, 1)
+        self.assertEqual(playthrough.issue_id, 'EarlyQuit')
+        self.assertEqual(playthrough.issue_customization_args, {})
+        self.assertEqual(playthrough.playthrough_actions, [])
+        self.assertEqual(playthrough.is_valid, True)
 
     def test_get_exploration_stats_by_id(self):
         """Test the get_exploration_stats_by_id method."""
