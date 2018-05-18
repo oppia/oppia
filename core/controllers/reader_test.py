@@ -1198,7 +1198,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        exp_services.delete_demo(self.exp_id)
         exp_services.load_demo(self.exp_id)
         self.exploration = exp_services.get_exploration_by_id(self.exp_id)
         playthrough_id = stats_models.PlaythroughModel.create(
@@ -1292,8 +1291,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         """Test that a new playthrough gets created and a new issue is created
         for it.
         """
-        self.exp_issue['customization_args']['state_name'][
-            'value'] = 'state_name2'
+        self.exp_issue['customization_args']['state_name']['value'] = (
+            'state_name2')
         self.playthrough_data['issue_customization_args']['state_name'][
             'value'] = 'state_name2'
 

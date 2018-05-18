@@ -303,7 +303,8 @@ class StorePlaythroughHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
-        """Handles POST requests.
+        """Handles POST requests. Appends to existing list of playthroughs or
+        deletes it if already full.
 
         Args:
             exploration_id: str. The ID of the exploration.

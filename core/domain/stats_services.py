@@ -317,7 +317,7 @@ def _save_exp_issues_model(exp_issues):
     ExplorationIssues domain object.
 
     Args:
-        exp_issues. ExplorationIssues. The exploration issues domain
+        exp_issues: ExplorationIssues. The exploration issues domain
             object.
     """
     exp_issues_model = stats_models.ExplorationIssuesModel.get(exp_issues.id)
@@ -331,7 +331,7 @@ def save_exp_issues_model_transactional(exp_issues):
     ExplorationIssues domain object in a transaction.
 
     Args:
-        exp_issues. ExplorationIssues. The exploration issues domain
+        exp_issues: ExplorationIssues. The exploration issues domain
             object.
     """
     transaction_services.run_in_transaction(
