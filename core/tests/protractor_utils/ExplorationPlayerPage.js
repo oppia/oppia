@@ -159,7 +159,7 @@ var ExplorationPlayerPage = function() {
   };
 
   // `answerData` is a variable that is passed to the
-  //  corresponding interaction's protractor utilities.
+  // corresponding interaction's protractor utilities.
   // Its definition and type are interaction-specific.
   this.submitAnswer = function(interactionId, answerData) {
     // The .first() targets the inline interaction, if it exists. Otherwise,
