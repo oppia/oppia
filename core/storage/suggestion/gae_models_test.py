@@ -25,8 +25,8 @@ from core.tests import test_utils
 class SuggestionModelUnitTests(test_utils.GenericTestBase):
     """Tests for the suggestionModel class."""
 
-    suggestion_params_edit = {
-        'contribution_type': 'translation',
+    suggestion_params = {
+        'contribution_type': suggestion_models.CONTRIBUTION_TYPE_TRANSLATION,
         'contribution_domain': 'English',
         'entity_id': 'exp1',
         'entity_version': 1
@@ -39,74 +39,68 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SuggestionModelUnitTests, self).setUp()
         suggestion_models.SuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT,
-            suggestion_models.ENTITY_TYPE_EXPLORATION,
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.STATUS_IN_REVIEW, self.suggestion_params_edit,
+            suggestion_models.ENTITY_TYPE_EXPLORATION,
+            suggestion_models.STATUS_IN_REVIEW, self.suggestion_params,
             'author_1', 'reviewer_1', 'thread_1', 'reviewer_1', self.payload)
         suggestion_models.SuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT,
-            suggestion_models.ENTITY_TYPE_EXPLORATION,
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.STATUS_ACCEPTED, self.suggestion_params_edit,
+            suggestion_models.ENTITY_TYPE_EXPLORATION,
+            suggestion_models.STATUS_ACCEPTED, self.suggestion_params,
             'author_2', 'reviewer_2', 'thread_2', 'reviewer_2', self.payload)
         suggestion_models.SuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT,
-            suggestion_models.ENTITY_TYPE_EXPLORATION,
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.STATUS_ACCEPTED, self.suggestion_params_edit,
+            suggestion_models.ENTITY_TYPE_EXPLORATION,
+            suggestion_models.STATUS_ACCEPTED, self.suggestion_params,
             'author_2', 'reviewer_2', 'thread_3', 'reviewer_3', self.payload)
         suggestion_models.SuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT,
-            suggestion_models.ENTITY_TYPE_EXPLORATION,
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.STATUS_REJECTED, self.suggestion_params_edit,
+            suggestion_models.ENTITY_TYPE_EXPLORATION,
+            suggestion_models.STATUS_REJECTED, self.suggestion_params,
             'author_2', 'reviewer_3', 'thread_4', 'reviewer_2', self.payload)
         suggestion_models.SuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT,
-            suggestion_models.ENTITY_TYPE_EXPLORATION,
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.STATUS_INVALID, self.suggestion_params_edit,
+            suggestion_models.ENTITY_TYPE_EXPLORATION,
+            suggestion_models.STATUS_INVALID, self.suggestion_params,
             'author_3', 'reviewer_2', 'thread_5', 'reviewer_3', self.payload)
+
+    def test_entity_type_choices_contains_delimiter(self):
+        for entity_type in suggestion_models.ENTITY_TYPE_CHOICES:
+            self.assertTrue('.' not in entity_type)
 
     def test_create_new_object_succesfully(self):
         suggestion_models.SuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT,
-            suggestion_models.ENTITY_TYPE_EXPLORATION,
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.STATUS_IN_REVIEW, self.suggestion_params_edit,
+            suggestion_models.ENTITY_TYPE_EXPLORATION,
+            suggestion_models.STATUS_IN_REVIEW, self.suggestion_params,
             'author_3', 'reviewer_3', 'thread_6', 'reviewer_3', self.payload)
         suggestion_id = suggestion_models.SuggestionModel.get_instance_id(
-            suggestion_models.SUGGESTION_TYPE_EDIT,
-            suggestion_models.ENTITY_TYPE_EXPLORATION,
-            'thread_6', self.suggestion_params_edit['entity_id'])
+            suggestion_models.ENTITY_TYPE_EXPLORATION, 'thread_6',
+            self.suggestion_params['entity_id'])
 
         observed_suggestion = suggestion_models.SuggestionModel.get_by_id(
             suggestion_id)
 
         self.assertEqual(
-            observed_suggestion.suggestion_type,
-            suggestion_models.SUGGESTION_TYPE_EDIT)
-        self.assertEqual(
             observed_suggestion.entity_type,
             suggestion_models.ENTITY_TYPE_EXPLORATION)
         self.assertEqual(
-            observed_suggestion.suggestion_sub_type,
+            observed_suggestion.suggestion_type,
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT)
         self.assertEqual(
             observed_suggestion.status, suggestion_models.STATUS_IN_REVIEW)
         observed_params = observed_suggestion.suggestion_params
         self.assertEqual(
             observed_params.contribution_type,
-            self.suggestion_params_edit['contribution_type'])
+            self.suggestion_params['contribution_type'])
         self.assertEqual(
             observed_params.contribution_domain,
-            self.suggestion_params_edit['contribution_domain'])
+            self.suggestion_params['contribution_domain'])
         self.assertEqual(
-            observed_params.entity_id, self.suggestion_params_edit['entity_id'])
+            observed_params.entity_id, self.suggestion_params['entity_id'])
         self.assertEqual(
             observed_params.entity_version,
-            self.suggestion_params_edit['entity_version'])
+            self.suggestion_params['entity_version'])
         self.assertEqual(observed_suggestion.author_id, 'author_3')
         self.assertEqual(observed_suggestion.reviewer_id, 'reviewer_3')
         self.assertEqual(observed_suggestion.assigned_reviewer_id, 'reviewer_3')
@@ -116,18 +110,17 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_fail_create_object(self):
         with self.assertRaisesRegexp(
             Exception, 'There is already a suggestion with the given id: '
-                       'edit.exploration.thread_1.exp1'):
+                       'exploration.thread_1.exp1'):
             suggestion_models.SuggestionModel.create(
-                suggestion_models.SUGGESTION_TYPE_EDIT,
-                suggestion_models.ENTITY_TYPE_EXPLORATION,
                 suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-                suggestion_models.STATUS_IN_REVIEW, self.suggestion_params_edit,
+                suggestion_models.ENTITY_TYPE_EXPLORATION,
+                suggestion_models.STATUS_IN_REVIEW, self.suggestion_params,
                 'author_1', 'reviewer_1', 'thread_1', 'reviewer_1',
                 self.payload)
 
-    def test_get_suggestions_by_sub_type(self):
+    def test_get_suggestions_by_type(self):
         self.assertEqual(
-            len(suggestion_models.SuggestionModel.get_suggestions_by_sub_type(
+            len(suggestion_models.SuggestionModel.get_suggestions_by_type(
                 suggestion_models.SUGGESTION_EDIT_STATE_CONTENT)), 5)
 
     def test_get_suggestion_by_author(self):

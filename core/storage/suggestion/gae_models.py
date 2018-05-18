@@ -21,15 +21,6 @@ from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
-# Constants defining the types of suggestions.
-SUGGESTION_TYPE_ADD = 'add'
-SUGGESTION_TYPE_EDIT = 'edit'
-
-SUGGESTION_TYPE_CHOICES = [
-    SUGGESTION_TYPE_ADD,
-    SUGGESTION_TYPE_EDIT
-]
-
 # Constants defining types of entities to which suggestions can be created.
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_QUESTION = 'question'
@@ -56,41 +47,45 @@ STATUS_CHOICES = [
     STATUS_REJECTED
 ]
 
-# Constants defining suggestion sub-types for each of the above types.
+# Constants defining various suggestion types.
 SUGGESTION_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
 
-SUGGESTION_SUB_TYPES = {
-    SUGGESTION_TYPE_ADD: [],
-    SUGGESTION_TYPE_EDIT: [
-        SUGGESTION_EDIT_STATE_CONTENT
-    ]
-}
-
-SUGGESTION_SUB_TYPE_CHOICES = [
+SUGGESTION_TYPE_CHOICES =  [
     SUGGESTION_EDIT_STATE_CONTENT
 ]
 
 # Defines what is the minimum role required to review suggestions
-# of a particular sub-type.
+# of a particular type.
 SUGGESTION_MINIMUM_ROLE_FOR_REVIEW = {
     SUGGESTION_EDIT_STATE_CONTENT: feconf.ROLE_ID_EXPLORATION_EDITOR
 }
+
+# Constants defining various contribution types.
+CONTRIBUTION_TYPE_CONTENT = 'content'
+CONTRIBUTION_TYPE_TRANSLATION = 'translation'
+
+CONTRIBUTION_TYPE_CHOICES = [
+    CONTRIBUTION_TYPE_CONTENT,
+    CONTRIBUTION_TYPE_TRANSLATION
+]
+
+#The delimiter to be used in the suggestion ID.
+SUGGESTION_ID_DELIMITER = '.'
 
 
 class SuggestionParams(ndb.Model):
     """Model to store all the suggestion params for a suggestion."""
 
-    # The contribution type. Either translation related or content related.
-    contribution_type = ndb.StringProperty(required=True)
-    # The contribution domain. The language of the translation or the subject
-    # category of the content being suggested.
+    # The contribution type.
+    contribution_type = ndb.StringProperty(
+        required=True, choices=CONTRIBUTION_TYPE_CHOICES)
+    # The contribution domain. This parameter along with the above contribution
+    # type will be used to determine the category to 'score' the suggester.
     contribution_domain = ndb.StringProperty(required=True)
-    # The ID of the entity being suggested to. Will be set to None if the
-    # suggestion is to add a new entity.
-    entity_id = ndb.StringProperty(required=False, default=None)
-    # The version number of the entity being suggested to. Will be set to None
-    # if the suggestion is to add a new entity.
-    entity_version = ndb.IntegerProperty(required=False, default=None)
+    # The ID of the entity being suggested to.
+    entity_id = ndb.StringProperty(required=True)
+    # The version number of the entity being suggested to.
+    entity_version = ndb.IntegerProperty(required=True)
 
 
 class SuggestionModel(base_models.BaseModel):
@@ -102,9 +97,6 @@ class SuggestionModel(base_models.BaseModel):
     # The type of entity which the suggestion is linked to.
     entity_type = ndb.StringProperty(
         required=True, indexed=True, choices=ENTITY_TYPE_CHOICES)
-    # The sub-type of the suggestion.
-    suggestion_sub_type = ndb.StringProperty(
-        required=True, indexed=True, choices=SUGGESTION_SUB_TYPE_CHOICES)
     # Status of the suggestion.
     status = ndb.StringProperty(
         required=True, indexed=True, choices=STATUS_CHOICES)
@@ -125,37 +117,31 @@ class SuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_instance_id(
-            cls, suggestion_type, entity_type, thread_id, entity_id=''):
+            cls, entity_type, thread_id, entity_id):
         """Concatenates various parameters and gives the ID of the suggestion
         model.
 
         Args:
-            suggestion_type: str. The type of the suggestion.
             entity_type: str. The type of entity being edited/added.
             thread_id: str. The ID of the feedback thread linked to the
                 suggestion.
-            entity_id: str(optional). The ID of the entity being edited. If a
-                new entity is being added, "" is passed.
+            entity_id: str. The ID of the entity being edited.
 
         Returns:
             str. The full instance ID for the suggestion.
         """
-        if entity_id == '':
-            return '.'.join([suggestion_type, entity_type, thread_id])
-        return '.'.join([suggestion_type, entity_type, thread_id, entity_id])
+        return SUGGESTION_ID_DELIMITER.join([entity_type, thread_id, entity_id])
 
     @classmethod
     def create(
-            cls, suggestion_type, entity_type, suggestion_sub_type, status,
+            cls, suggestion_type, entity_type, status,
             suggestion_params, author_id, reviewer_id, thread_id,
             assigned_reviewer_id, payload):
         """Creates a new SuggestionModel entry.
 
         Args:
-             Args:
             suggestion_type: str. The type of the suggestion.
             entity_type: str. The type of entity being edited/added.
-            suggestion_sub_type: str. The sub type of the suggestion.
             status: str. The status of the suggestion.
             suggestion_params: dict. Additional parameters for the suggestion
             author_id: str. The ID of the user who submitted the suggestion.
@@ -170,39 +156,30 @@ class SuggestionModel(base_models.BaseModel):
         Raises:
             Exception: There is already a suggestion with the given id.
         """
-
-        if suggestion_type == SUGGESTION_TYPE_EDIT:
-            instance_id = cls.get_instance_id(
-                suggestion_type, entity_type, thread_id,
-                suggestion_params['entity_id'])
-            suggestion_params = SuggestionParams(
-                contribution_type=suggestion_params['contribution_type'],
-                contribution_domain=suggestion_params['contribution_domain'],
-                entity_id=suggestion_params['entity_id'],
-                entity_version=suggestion_params['entity_version'])
-        elif suggestion_type == SUGGESTION_TYPE_ADD:
-            instance_id = cls.get_instance_id(
-                suggestion_type, entity_type, thread_id)
-            suggestion_params = SuggestionParams(
-                contribution_type=suggestion_params['contribution_type'],
-                contribution_domain=suggestion_params['contribution_domain'])
+        instance_id = cls.get_instance_id(
+            entity_type, thread_id, suggestion_params['entity_id'])
+        suggestion_params = SuggestionParams(
+            contribution_type=suggestion_params['contribution_type'],
+            contribution_domain=suggestion_params['contribution_domain'],
+            entity_id=suggestion_params['entity_id'],
+            entity_version=suggestion_params['entity_version'])
 
         if cls.get_by_id(instance_id):
             raise Exception('There is already a suggestion with the given'
                             ' id: %s' % instance_id)
 
         cls(id=instance_id, suggestion_type=suggestion_type,
-            entity_type=entity_type, suggestion_sub_type=suggestion_sub_type,
-            status=status, suggestion_params=suggestion_params,
-            author_id=author_id, reviewer_id=reviewer_id, thread_id=thread_id,
+            entity_type=entity_type, status=status,
+            suggestion_params=suggestion_params, author_id=author_id,
+            reviewer_id=reviewer_id, thread_id=thread_id,
             assigned_reviewer_id=assigned_reviewer_id, payload=payload).put()
 
     @classmethod
-    def get_suggestions_by_sub_type(cls, suggestion_sub_type):
+    def get_suggestions_by_type(cls, suggestion_type):
         """Gets all suggestions of a particular type
 
         Args:
-            suggestion_sub_type: str. The sub type of the suggestions.
+            suggestion_type: str. The sub type of the suggestions.
 
         Returns:
             list(SuggestionModel). A list of suggestions of the given
@@ -210,7 +187,7 @@ class SuggestionModel(base_models.BaseModel):
                 suggestions.
         """
         return cls.get_all().filter(
-            cls.suggestion_sub_type == suggestion_sub_type).fetch(
+            cls.suggestion_type == suggestion_type).fetch(
                 feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
@@ -285,8 +262,6 @@ class SuggestionModel(base_models.BaseModel):
             list(SuggestionModel). A list of suggestions to the entity with the
             given id, upto a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
         """
-        return cls.get_all().filter(
-            cls.suggestion_type == SUGGESTION_TYPE_EDIT).filter(
-                cls.entity_type == entity_type).filter(
+        return cls.get_all().filter(cls.entity_type == entity_type).filter(
                     cls.suggestion_params.entity_id == entity_id).fetch(
                         feconf.DEFAULT_QUERY_LIMIT)
