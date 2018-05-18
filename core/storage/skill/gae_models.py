@@ -15,7 +15,6 @@
 """Models for storing the skill data models."""
 
 from core.platform import models
-import utils
 
 from google.appengine.ext import ndb
 
