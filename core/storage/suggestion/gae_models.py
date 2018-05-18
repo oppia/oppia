@@ -50,7 +50,7 @@ STATUS_CHOICES = [
 # Constants defining various suggestion types.
 SUGGESTION_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
 
-SUGGESTION_TYPE_CHOICES =  [
+SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_EDIT_STATE_CONTENT
 ]
 
@@ -263,5 +263,5 @@ class SuggestionModel(base_models.BaseModel):
             given id, upto a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
         """
         return cls.get_all().filter(cls.entity_type == entity_type).filter(
-                    cls.suggestion_params.entity_id == entity_id).fetch(
-                        feconf.DEFAULT_QUERY_LIMIT)
+            cls.suggestion_params.entity_id == entity_id).fetch(
+                feconf.DEFAULT_QUERY_LIMIT)
