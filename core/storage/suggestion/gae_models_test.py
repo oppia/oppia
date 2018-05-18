@@ -64,7 +64,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
     def test_entity_type_choices_contains_delimiter(self):
         for entity_type in suggestion_models.ENTITY_TYPE_CHOICES:
-            self.assertTrue('.' not in entity_type)
+            self.assertTrue(
+                suggestion_models.SUGGESTION_ID_DELIMITER not in entity_type)
 
     def test_create_new_object_succesfully(self):
         suggestion_models.SuggestionModel.create(
