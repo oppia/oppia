@@ -431,6 +431,18 @@ class ExplorationIssues(object):
         self.id = exp_id
         self.unresolved_issues = unresolved_issues
 
+    @classmethod
+    def create_default(cls, exp_id):
+        """Creates a default ExplorationIssues domain object.
+
+        Args:
+            exp_id: str. ID of the exploration.
+
+        Returns:
+            ExplorationIssues. The exploration issues domain object.
+        """
+        return cls(exp_id, [])
+
     def to_dict(self):
         """Returns a dict representation of the ExplorationIssues domain object.
 
