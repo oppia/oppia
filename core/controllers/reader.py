@@ -318,7 +318,7 @@ class StorePlaythroughHandler(base.BaseHandler):
         playthrough_id = stats_models.PlaythroughModel.create(
             playthrough_data['exp_id'],
             playthrough_data['exp_version'],
-            playthrough_data['issue_id'],
+            playthrough_data['issue_type'],
             playthrough_data['issue_customization_args'],
             playthrough_data['playthrough_actions'],
             playthrough_data['is_valid'])
@@ -327,12 +327,12 @@ class StorePlaythroughHandler(base.BaseHandler):
 
         issue_found = False
         for index, issue in enumerate(exp_issues.unresolved_issues):
-            if issue['issue_id'] == exp_issue_dict['issue_id']:
+            if issue['issue_type'] == exp_issue_dict['issue_type']:
                 issue_customization_args = issue['issue_customization_args']
                 # In case issue_keyname is 'state_names', the ordering of the
                 # list is important i.e. [a,b,c] is different from [b,c,a].
                 issue_keyname = feconf.ISSUE_TYPE_KEYNAME_MAPPING[issue[
-                    'issue_id']]
+                    'issue_type']]
                 if (issue_customization_args[issue_keyname] ==
                         customization_args[issue_keyname]):
                     if (len(issue['playthrough_ids']) <
@@ -349,7 +349,7 @@ class StorePlaythroughHandler(base.BaseHandler):
 
         if not issue_found:
             issue = {
-                'issue_id': playthrough_data['issue_id'],
+                'issue_type': playthrough_data['issue_type'],
                 'issue_customization_args': playthrough_data[
                     'issue_customization_args'],
                 'playthrough_ids': [playthrough_id]

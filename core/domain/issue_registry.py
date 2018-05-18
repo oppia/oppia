@@ -35,7 +35,7 @@ class Registry(object):
         Returns:
             list(str). The list of all allowed issue IDs.
         """
-        return feconf.ALLOWED_ISSUE_IDS
+        return feconf.ALLOWED_ISSUE_TYPES
 
     @classmethod
     def set_issues(cls, issues):

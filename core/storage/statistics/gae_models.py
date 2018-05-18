@@ -973,9 +973,9 @@ class PlaythroughModel(base_models.BaseModel):
     exp_id = ndb.StringProperty(indexed=True)
     # Version of the exploration.
     exp_version = ndb.IntegerProperty(indexed=True)
-    # ID of the issue.
-    issue_id = ndb.StringProperty(indexed=True)
-    # The customization args dict for the given issue_id.
+    # Type of the issue.
+    issue_type = ndb.StringProperty(indexed=True)
+    # The customization args dict for the given issue_type.
     issue_customization_args = ndb.JsonProperty(default=None)
     # The playthrough actions for this playthrough. This will be a list of dicts
     # where each dict represents a single playthrough action. The list is
@@ -1015,7 +1015,7 @@ class PlaythroughModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exp_id, exp_version, issue_id, issue_customization_args,
+            cls, exp_id, exp_version, issue_type, issue_customization_args,
             playthrough_actions, is_valid):
         """Creates a PlaythroughModel instance and writes it to the
         datastore.
@@ -1023,9 +1023,9 @@ class PlaythroughModel(base_models.BaseModel):
         Args:
             exp_id: str. ID of the exploration.
             exp_version: int. Version of the exploration.
-            issue_id: str. ID of the issue.
+            issue_type: str. Type of the issue.
             issue_customization_args: dict. The customization args dict for the
-                given issue_id.
+                given issue_type.
             playthrough_actions: list(dict). The playthrough actions for this
                 playthrough. This will be a list of dicts where each dict
                 represents a single playthrough action. The list is ordered by
@@ -1038,7 +1038,7 @@ class PlaythroughModel(base_models.BaseModel):
         instance_id = cls._generate_id(exp_id)
         playthrough_instance = cls(
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
-            issue_id=issue_id,
+            issue_type=issue_type,
             issue_customization_args=issue_customization_args,
             playthrough_actions=playthrough_actions, is_valid=is_valid)
         playthrough_instance.put()

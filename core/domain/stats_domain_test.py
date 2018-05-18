@@ -279,7 +279,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         exp_issues = stats_domain.ExplorationIssues(
             'exp_id1', [{
-                'issue_id': 'EarlyQuit',
+                'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -296,7 +296,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         self.assertEqual(exp_issues_dict['id'], 'exp_id1')
         self.assertEqual(
             exp_issues_dict['unresolved_issues'], [{
-                'issue_id': 'EarlyQuit',
+                'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -312,7 +312,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         exp_issues_dict = {
             'id': 'exp_id1',
             'unresolved_issues': [{
-                'issue_id': 'EarlyQuit',
+                'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -330,7 +330,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         self.assertEqual(exp_issues.id, 'exp_id1')
         self.assertEqual(
             exp_issues.unresolved_issues, [{
-                'issue_id': 'EarlyQuit',
+                'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -345,7 +345,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     def test_validate(self):
         exp_issues = stats_domain.ExplorationIssues(
             'exp_id1', [{
-                'issue_id': 'EarlyQuit',
+                'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -367,7 +367,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         # Change unresolved_issues list.
         exp_issues.id = 'exp_id1'
         exp_issues.unresolved_issues = [{
-            'issue_id': 'EarlyQuit',
+            'issue_type': 'EarlyQuit',
             'issue_customization_args': {
                 'state_name': {
                     'value': 'state_name1'
@@ -395,7 +395,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
                     'value': 200
                 }
             }, [{
-                'action_id': 'ExplorationStart',
+                'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -408,7 +408,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
         self.assertEqual(playthrough_dict['id'], 'playthrough_id1')
         self.assertEqual(playthrough_dict['exp_id'], 'exp_id1')
         self.assertEqual(playthrough_dict['exp_version'], 1)
-        self.assertEqual(playthrough_dict['issue_id'], 'EarlyQuit')
+        self.assertEqual(playthrough_dict['issue_type'], 'EarlyQuit')
         self.assertEqual(
             playthrough_dict['issue_customization_args'], {
                 'state_name': {
@@ -420,7 +420,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
             })
         self.assertEqual(
             playthrough_dict['playthrough_actions'], [{
-                'action_id': 'ExplorationStart',
+                'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -434,7 +434,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
             'id': 'playthrough_id1',
             'exp_id': 'exp_id1',
             'exp_version': 1,
-            'issue_id': 'EarlyQuit',
+            'issue_type': 'EarlyQuit',
             'issue_customization_args': {
                 'state_name': {
                     'value': 'state_name1'
@@ -444,7 +444,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
                 }
             },
             'playthrough_actions': [{
-                'action_id': 'ExplorationStart',
+                'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -459,7 +459,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
         self.assertEqual(playthrough.id, 'playthrough_id1')
         self.assertEqual(playthrough.exp_id, 'exp_id1')
         self.assertEqual(playthrough.exp_version, 1)
-        self.assertEqual(playthrough.issue_id, 'EarlyQuit')
+        self.assertEqual(playthrough.issue_type, 'EarlyQuit')
         self.assertEqual(
             playthrough.issue_customization_args, {
                 'state_name': {
@@ -471,7 +471,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
             })
         self.assertEqual(
             playthrough.playthrough_actions, [{
-                'action_id': 'ExplorationStart',
+                'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -490,7 +490,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
                     'value': 200
                 }
             }, [{
-                'action_id': 'ExplorationStart',
+                'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -512,25 +512,25 @@ class PlaythroughTests(test_utils.GenericTestBase):
             'Expected exp_version to be an int, received %s' % (type('1')))):
             playthrough.validate()
 
-        # Change to invalid issue_id.
+        # Change to invalid issue_type.
         playthrough.exp_version = 1
-        playthrough.issue_id = 'InvalidIssueId'
+        playthrough.issue_type = 'InvalidIssueType'
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Invalid issue ID: %s' % playthrough.issue_id)):
+            'Invalid issue type: %s' % playthrough.issue_type)):
             playthrough.validate()
 
         # Change playthrough_actions list.
-        playthrough.issue_id = 'EarlyQuit'
+        playthrough.issue_type = 'EarlyQuit'
         playthrough.playthrough_actions = [{
-            'action_id': 'ExplorationStart',
+            'action_type': 'ExplorationStart',
         }]
         with self.assertRaisesRegexp(utils.ValidationError, (
             'KeyError in an element of playthrough_actions')):
             playthrough.validate()
 
-        # Change to invalid action_id.
+        # Change to invalid action_type.
         playthrough.playthrough_actions = [{
-            'action_id': 'InvalidActionId',
+            'action_type': 'InvalidActionType',
             'action_customization_args': {
                 'state_name': {
                     'value': 'state_name1'
@@ -538,7 +538,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
             }
         }]
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Invalid action ID: %s' % 'InvalidActionId')):
+            'Invalid action type: %s' % 'InvalidActionType')):
             playthrough.validate()
 
 
@@ -558,7 +558,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             exp_issue_dict, {
-                'issue_id': 'EarlyQuit',
+                'issue_type': 'EarlyQuit',
                 'schema_version': 1,
                 'customization_args': expected_customization_args
             })
@@ -567,14 +567,14 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         exp_issue = stats_domain.ExplorationIssue('EarlyQuit', 1, {})
         exp_issue.validate()
 
-        # Change issue_id to int.
-        exp_issue.issue_id = 5
+        # Change issue_type to int.
+        exp_issue.issue_type = 5
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected issue_id to be a string, received %s' % (type(5)))):
+            'Expected issue_type to be a string, received %s' % (type(5)))):
             exp_issue.validate()
 
         # Change schema_version to string.
-        exp_issue.issue_id = 'EarlyQuit'
+        exp_issue.issue_type = 'EarlyQuit'
         exp_issue.schema_version = '1'
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected schema_version to be an int, received %s' % (type('1')))):
@@ -594,7 +594,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             learner_action_dict, {
-                'action_id': 'ExplorationStart',
+                'action_type': 'ExplorationStart',
                 'schema_version': 1,
                 'customization_args': expected_customization_args
             })
@@ -603,14 +603,14 @@ class LearnerActionTests(test_utils.GenericTestBase):
         learner_action = stats_domain.LearnerAction('ExplorationStart', 1, {})
         learner_action.validate()
 
-        # Change action_id to int.
-        learner_action.action_id = 5
+        # Change action_type to int.
+        learner_action.action_type = 5
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected action_id to be a string, received %s' % (type(5)))):
+            'Expected action_type to be a string, received %s' % (type(5)))):
             learner_action.validate()
 
         # Change schema_version to string.
-        learner_action.action_id = 'EarlyQuit'
+        learner_action.action_type = 'EarlyQuit'
         learner_action.schema_version = '1'
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected schema_version to be an int, received %s' % (type('1')))):

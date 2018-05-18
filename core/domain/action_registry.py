@@ -35,7 +35,7 @@ class Registry(object):
         Returns:
             list(str). The list of all allowed action IDs.
         """
-        return feconf.ALLOWED_ACTION_IDS
+        return feconf.ALLOWED_ACTION_TYPES
 
     @classmethod
     def set_actions(cls, actions):

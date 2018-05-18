@@ -650,14 +650,14 @@ NUM_REPEATED_CYCLES_THRESHOLD = 3
 MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 # Probability of recording a playthrough.
 RECORD_PLAYTHROUGH_PROBABILITY = 0.2
-# IDs of allowed types of issues.
-ALLOWED_ISSUE_IDS = [
+# Types of allowed issues.
+ALLOWED_ISSUE_TYPES = [
     'EarlyQuit',
     'MultipleIncorrectSubmissions',
     'CyclicStateTransitions'
 ]
-# IDs of allowed learner actions.
-ALLOWED_ACTION_IDS = [
+# Types of allowed learner actions.
+ALLOWED_ACTION_TYPES = [
     'ExplorationStart',
     'AnswerSubmit',
     'ExplorationQuit'

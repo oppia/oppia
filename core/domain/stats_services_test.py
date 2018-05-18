@@ -464,7 +464,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
         exp_issues = stats_services.get_exp_issues_from_model(model)
         exp_issues.unresolved_issues.append({
-            'issue_id': 'EarlyQuit',
+            'issue_type': 'EarlyQuit',
             'issue_customization_args': {
                 'state_name': {
                     'value': 'state_name1'
