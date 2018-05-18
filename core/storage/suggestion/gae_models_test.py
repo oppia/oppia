@@ -32,9 +32,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         'entity_version': 1
     }
 
-    payload = {
-        'change_list': {}
-    }
+    payload = {}
 
     def setUp(self):
         super(SuggestionModelUnitTests, self).setUp()
