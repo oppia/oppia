@@ -20,6 +20,7 @@ import core.storage.base_model.gae_models as base_models
 
 from google.appengine.ext import ndb
 
+
 class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic snapshot."""
     pass
@@ -163,7 +164,7 @@ class TopicSummaryModel(base_models.BaseModel):
     skill_count = ndb.IntegerProperty()
     version = ndb.IntegerProperty()
 
-    
+
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic rights snapshot."""
     pass
