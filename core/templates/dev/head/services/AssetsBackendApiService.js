@@ -19,37 +19,47 @@
 
 oppia.factory('AssetsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'AudioFileObjectFactory',
-  'FileDownloadRequestObjectFactory',
+  'ImageFileObjectFactory', 'FileDownloadRequestObjectFactory',
   function(
       $http, $q, UrlInterpolationService, AudioFileObjectFactory,
-      FileDownloadRequestObjectFactory) {
+      ImageFileObjectFactory, FileDownloadRequestObjectFactory) {
     // List of filenames that have been requested for but have
     // yet to return a response.
-    var _filesCurrentlyBeingRequested = [];
+    var _audioFilesCurrentlyBeingRequested = [];
+    var _imageFilesCurrentlyBeingRequested = [];
 
     var AUDIO_DOWNLOAD_URL_TEMPLATE = (
       GLOBALS.GCS_RESOURCE_BUCKET_NAME ?
         ('https://storage.googleapis.com/' + GLOBALS.GCS_RESOURCE_BUCKET_NAME +
        '/<exploration_id>/assets/audio/<filename>') :
         '/audiohandler/<exploration_id>/audio/<filename>');
+    var IMAGE_DOWNLOAD_URL_TEMPLATE =
+      '/imagehandler/<exploration_id>/image/<filename>';
+
     var AUDIO_UPLOAD_URL_TEMPLATE =
       '/createhandler/audioupload/<exploration_id>';
 
     // Map from asset filename to asset blob.
     var assetsCache = {};
-    var _fetchAudio = function(
-        explorationId, filename, successCallback, errorCallback) {
+    var _fetchFile = function(
+        explorationId, filename, assetType, successCallback, errorCallback) {
       var canceler = $q.defer();
-      _filesCurrentlyBeingRequested.push(
-        FileDownloadRequestObjectFactory.createNew(filename, canceler));
+      if (assetType === 'audio') {
+        _audioFilesCurrentlyBeingRequested.push(
+          FileDownloadRequestObjectFactory.createNew(filename, canceler));
+      } else {
+        _imageFilesCurrentlyBeingRequested.push(
+          FileDownloadRequestObjectFactory.createNew(filename, canceler));
+      }
+
       $http({
         method: 'GET',
         responseType: 'blob',
-        url: _getAudioDownloadUrl(explorationId, filename),
+        url: _getDownloadUrl(explorationId, filename, assetType),
         timeout: canceler.promise
       }).success(function(data) {
         try {
-          var audioBlob = new Blob([data]);
+          var assetBlob = new Blob([data]);
         } catch (exception) {
           window.BlobBuilder = window.BlobBuilder ||
                          window.WebKitBlobBuilder ||
@@ -58,33 +68,56 @@ oppia.factory('AssetsBackendApiService', [
           if (exception.name === 'TypeError' && window.BlobBuilder) {
             var blobBuilder = new BlobBuilder();
             blobBuilder.append(data);
-            var audioBlob = blobBuilder.getBlob('audio/*');
+            var assetBlob = blobBuilder.getBlob(assetType.concat('/*'));
           } else {
             throw exception;
           }
         }
-        assetsCache[filename] = audioBlob;
-        successCallback(AudioFileObjectFactory.createNew(filename, audioBlob));
+        assetsCache[filename] = assetBlob;
+        if (assetType === 'audio') {
+          successCallback(
+            AudioFileObjectFactory.createNew(filename, assetBlob));
+        } else {
+          successCallback(
+            ImageFileObjectFactory.createNew(filename, assetBlob));
+        }
       }).error(function() {
         errorCallback();
       })['finally'](function() {
-        _removeFromFilesCurrentlyBeingRequested(filename);
+        _removeFromFilesCurrentlyBeingRequested(filename, assetType);
       });
     };
 
-    var _abortAllCurrentDownloads = function() {
-      _filesCurrentlyBeingRequested.forEach(function(request) {
-        request.canceler.resolve();
-      });
-      _filesCurrentlyBeingRequested = [];
+    var _abortAllCurrentDownloads = function(assetType) {
+      if (assetType === 'audio') {
+        _audioFilesCurrentlyBeingRequested.forEach(function(request) {
+          request.canceler.resolve();
+        });
+        _audioFilesCurrentlyBeingRequested = [];
+      } else {
+        _imageFilesCurrentlyBeingRequested.forEach(function(request) {
+          request.canceler.resolve();
+        });
+        _imageFilesCurrentlyBeingRequested = [];
+      }
     };
 
-    var _removeFromFilesCurrentlyBeingRequested = function(filename) {
-      if (_isCurrentlyBeingRequested(filename)) {
+    var _removeFromFilesCurrentlyBeingRequested = function(filename,
+        assetType) {
+      if (assetType === 'audio' && _isAudioCurrentlyBeingRequested(filename)) {
         for (var index = 0; index <
-             _filesCurrentlyBeingRequested.length; index++) {
-          if (_filesCurrentlyBeingRequested[index].filename === filename) {
-            _filesCurrentlyBeingRequested.splice(index, 1);
+             _audioFilesCurrentlyBeingRequested.length; index++) {
+          if (_audioFilesCurrentlyBeingRequested[index].filename === filename) {
+            _audioFilesCurrentlyBeingRequested.splice(index, 1);
+            break;
+          }
+        }
+      } else if (assetType === 'image' &&
+         _isImageCurrentlyBeingRequested(filename)) {
+        for (var index = 0; index <
+             _imageFilesCurrentlyBeingRequested.length; index++) {
+          if (_imageFilesCurrentlyBeingRequested[index].filename === filename) {
+            _imageFilesCurrentlyBeingRequested.splice(index, 1);
             break;
           }
         }
@@ -129,9 +162,10 @@ oppia.factory('AssetsBackendApiService', [
       });
     };
 
-    var _getAudioDownloadUrl = function(explorationId, filename) {
+    var _getDownloadUrl = function(explorationId, filename, assetType) {
       return UrlInterpolationService.interpolateUrl(
-        AUDIO_DOWNLOAD_URL_TEMPLATE, {
+        (assetType === 'audio' ? AUDIO_DOWNLOAD_URL_TEMPLATE :
+        IMAGE_DOWNLOAD_URL_TEMPLATE), {
           exploration_id: explorationId,
           filename: filename
         });
@@ -143,8 +177,14 @@ oppia.factory('AssetsBackendApiService', [
       });
     };
 
-    var _isCurrentlyBeingRequested = function(filename) {
-      return _filesCurrentlyBeingRequested.some(function(request) {
+    var _isAudioCurrentlyBeingRequested = function(filename) {
+      return _audioFilesCurrentlyBeingRequested.some(function(request) {
+        return request.filename === filename;
+      });
+    };
+
+    var _isImageCurrentlyBeingRequested = function(filename) {
+      return _imageFilesCurrentlyBeingRequested.some(function(request) {
         return request.filename === filename;
       });
     };
@@ -159,8 +199,18 @@ oppia.factory('AssetsBackendApiService', [
           if (_isCached(filename)) {
             resolve(AudioFileObjectFactory.createNew(
               filename, assetsCache[filename]));
-          } else if (!_isCurrentlyBeingRequested(filename)) {
-            _fetchAudio(explorationId, filename, resolve, reject);
+          } else if (!_isAudioCurrentlyBeingRequested(filename)) {
+            _fetchFile(explorationId, filename, 'audio', resolve, reject);
+          }
+        });
+      },
+      loadImage: function(explorationId, filename) {
+        return $q(function(resolve, reject) {
+          if (_isCached(filename)) {
+            resolve(ImageFileObjectFactory.createNew(
+              filename, assetsCache[filename]));
+          } else if (!_isImageCurrentlyBeingRequested(filename)) {
+            _fetchFile(explorationId, filename, 'image', resolve, reject);
           }
         });
       },
@@ -173,13 +223,18 @@ oppia.factory('AssetsBackendApiService', [
         return _isCached(filename);
       },
       getAudioDownloadUrl: function(explorationId, filename) {
-        return _getAudioDownloadUrl(explorationId, filename);
+        return _getDownloadUrl(explorationId, filename, 'audio');
       },
-      abortAllCurrentDownloads: function() {
-        _abortAllCurrentDownloads();
+      abortAllCurrentAudioDownloads: function() {
+        _abortAllCurrentDownloads('audio');
       },
-      getFilesCurrentlyBeingRequested: function() {
-        return _filesCurrentlyBeingRequested;
+      abortAllCurrentImageDownloads: function() {
+        _abortAllCurrentDownloads('image');
+      },
+      getAssetsFilesCurrentlyBeingRequested: function() {
+        return { audio: _audioFilesCurrentlyBeingRequested,
+          image: _imageFilesCurrentlyBeingRequested
+        };
       }
     };
   }

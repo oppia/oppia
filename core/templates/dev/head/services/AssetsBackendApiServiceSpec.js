@@ -59,11 +59,11 @@ describe('Assets Backend API Service', function() {
 
     AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
       successHandler, failHandler);
-    expect(AssetsBackendApiService.getFilesCurrentlyBeingRequested().length)
-      .toBe(1);
+    expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      .audio.length).toBe(1);
     $httpBackend.flush();
-    expect(AssetsBackendApiService.getFilesCurrentlyBeingRequested().length)
-      .toBe(0);
+    expect((AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested())
+      .audio.length).toBe(0);
     expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(true);
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
