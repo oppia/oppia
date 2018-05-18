@@ -141,26 +141,26 @@ class Question(object):
                 self.question_data)
 
         at_least_one_correct_answer = False
-        is_dest_specified = False
+        dest_is_specified = False
         interaction = self.question_data['interaction']
         for answer_group in interaction['answer_groups']:
             if answer_group['labelled_as_correct']:
                 at_least_one_correct_answer = True
             if answer_group['dest'] is not None:
-                is_dest_specified = True
+                dest_is_specified = True
 
         if interaction['default_outcome']['labelled_as_correct']:
             at_least_one_correct_answer = True
+
+        if interaction['default_outcome']['dest'] is not None:
+            dest_is_specified = True
 
         if not at_least_one_correct_answer:
             raise utils.ValidationError(
                 'Expected at least one answer group to have a correct answer.'
             )
 
-        if interaction['default_outcome']['dest'] is not None:
-            is_dest_specified = True
-
-        if is_dest_specified:
+        if dest_is_specified:
             raise utils.ValidationError(
                 'Expected all answer groups to have destination as None.'
             )

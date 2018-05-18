@@ -1569,11 +1569,11 @@ class State(object):
         """
         content_html = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
-        interaction = InteractionInstance.create_default_interaction(
-            default_dest_state_name).to_dict()
-
-        interaction = InteractionInstance.from_dict(interaction)
-        return cls(SubtitledHtml(content_html, {}), [], interaction)
+        return cls(
+            SubtitledHtml(content_html, {}),
+            [],
+            InteractionInstance.create_default_interaction(
+                default_dest_state_name))
 
     @classmethod
     def create_default_question_data(cls, default_dest_state_name):
@@ -1984,7 +1984,7 @@ class Exploration(object):
             # InteractionInstance as these tests are exclusive to an interaction
             # in a state in an exploration, and not for that in a question,
             # (whereas the validate() in InteractionInstance is also used by
-            # the question_data field).
+            # the State object that constitutes the question_data field.
             if state.interaction.id is not None:
                 if not isinstance(state.interaction.id, basestring):
                     raise utils.ValidationError(
