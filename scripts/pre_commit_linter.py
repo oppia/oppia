@@ -911,7 +911,6 @@ def _check_directive_scope(all_files):
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.js')]
     failed = False
-    directive_has_isolated_scope = False
     summary_messages = []
     # Use Pyjsparser to parse a JS file as a Python dictionary.
     parser = pyjsparser.PyJsParser()
@@ -969,18 +968,21 @@ def _check_directive_scope(all_files):
                         # to find out the scope key.
                         for return_node_property in return_node_properties:
                             # Check whether the property is scope.
-                            if return_node_property['key']['type'] == (
-                                    'Identifier') and (
-                                        return_node_property['key']['name'] == (
-                                            'scope')):
+                            is_property_key_an_identifier = (
+                                True if return_node_property['key']['type'] == (
+                                    'Identifier') else False)
+                            is_property_key_name_scope = (
+                                True if return_node_property['key']['name'] == (
+                                    'scope') else False)
+                            if (
+                                    is_property_key_an_identifier and (
+                                        is_property_key_name_scope)):
                                 # Separate the scope value and
                                 # check if it is an Object Expression.
                                 # If it is not, then check for scope: true
                                 # and report the error message.
                                 scope_value = return_node_property['value']
-                                if scope_value['type'] == 'ObjectExpression':
-                                    directive_has_isolated_scope = True
-                                elif scope_value['type'] == 'Literal' and (
+                                if scope_value['type'] == 'Literal' and (
                                         scope_value['value']):
                                     failed = True
                                     print (
@@ -988,13 +990,15 @@ def _check_directive_scope(all_files):
                                         'directive in %s file '
                                         'does not have scope set to '
                                         'true.' % (directive_name, filename))
-            # Check whether the directive has scope: {}
-            # else report the error message.
-            if not directive_has_isolated_scope:
-                failed = True
-                print (
-                    'Please ensure that %s directive in %s file '
-                    'has a scope: {}.' % (directive_name, filename))
+                                elif scope_value['type'] != 'ObjectExpression':
+                                    # Check whether the directive has scope: {}
+                                    # else report the error message.
+                                    failed = True
+                                    print (
+                                        'Please ensure that %s directive '
+                                        'in %s file has a scope: {}.' % (
+                                            directive_name, filename))
+
     if failed:
         summary_message = '%s   Directive scope check failed' % (
             _MESSAGE_TYPE_FAILED)
