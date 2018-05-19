@@ -775,9 +775,9 @@ class Collection(object):
         """
         exploration_just_unlocked = None
 
-        for index in range(0, len(self.nodes)-1):
+        for index in range(0, len(self.nodes) - 1):
             if self.nodes[index].exploration_id == current_exploration_id:
-                exploration_just_unlocked = self.nodes[index+1].exploration_id
+                exploration_just_unlocked = self.nodes[index + 1].exploration_id
                 break
 
         return exploration_just_unlocked

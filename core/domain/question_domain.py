@@ -232,6 +232,7 @@ class QuestionSummary(object):
         question_id: str. The ID of the question.
         question_title: str. The title of the question.
     """
+
     def __init__(self, question_id, question_title):
         """Constructs a Question Summary domain object.
 

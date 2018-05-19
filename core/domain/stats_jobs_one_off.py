@@ -34,6 +34,40 @@ import feconf
 ])
 
 
+class ExplorationIssuesModelCreatorOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for creating a default ExplorationIsssues model instance
+    for all the explorations in the datastore. If an ExplorationIssues model
+    already exists for an exploration, it is refreshed to a default instance.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exploration_model):
+        if not exploration_model.deleted:
+            exp_issues_model = stats_models.ExplorationIssuesModel.get(
+                exploration_model.id, strict=False)
+            if not exp_issues_model:
+                exp_issues_default = (
+                    stats_domain.ExplorationIssues.create_default(
+                        exploration_model.id))
+                stats_models.ExplorationIssuesModel.create(
+                    exp_issues_default.id, exp_issues_default.unresolved_issues)
+            else:
+                exp_issues_model.unresolved_issues = []
+                exp_issues_model.put()
+            yield(
+                exploration_model.id,
+                'ExplorationIssuesModel created')
+
+    @staticmethod
+    def reduce(exp_id, values):
+        yield "%s: %s" % (exp_id, values)
+
+
 class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job for recomputing creator statistics from the events
     in the datastore. Should only be run in events of data corruption.
@@ -131,7 +165,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         event_dict_idx = 0
         event_dict = sorted_events_dicts[event_dict_idx]
         for version in versions:
-            datastore_stats_for_version = old_stats[version-1]
+            datastore_stats_for_version = old_stats[version - 1]
             if version == 1:
                 # Reset the possibly corrupted stats.
                 datastore_stats_for_version.num_starts_v2 = 0

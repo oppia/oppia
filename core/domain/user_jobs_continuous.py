@@ -408,7 +408,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                     if old_rating is not None:
                         sum_of_ratings -= old_rating
                         num_ratings -= 1
-                    model.average_ratings = sum_of_ratings/(num_ratings * 1.0)
+                    model.average_ratings = sum_of_ratings / (num_ratings * 1.0)
                 else:
                     model.average_ratings = rating
                 model.num_ratings = num_ratings
@@ -542,7 +542,7 @@ class UserStatsMRJobManager(
         if item.deleted:
             return
 
-        exponent = 2.0/3
+        exponent = 2.0 / 3
 
         # This is set to False only when the exploration impact score is not
         # valid to be calculated.
@@ -655,7 +655,7 @@ class UserStatsMRJobManager(
                     all explorations owned by the user.
         """
         values = [ast.literal_eval(v) for v in stringified_values]
-        exponent = 2.0/3
+        exponent = 2.0 / 3
 
         # Find the final score and round to a whole number.
         user_impact_score = int(round(sum(
