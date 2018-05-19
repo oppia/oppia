@@ -138,37 +138,25 @@ describe('Assets Backend API Service', function() {
       $httpBackend.verifyNoOutstandingExpectation();
     });
 
-  it('Should successfully abort the download of the images and audio as well',
+  it('Should successfully abort the download of all the audio files',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      var requestUrlForImage = UrlInterpolationService.interpolateUrl(
-        'imagehandler/<exploration_id>/image/<filename>', {
-          exploration_id: '0',
-          filename: 'myfile.png'
-        });
-
-      var requestUrlForAudio = UrlInterpolationService.interpolateUrl(
+      var requestUrl = UrlInterpolationService.interpolateUrl(
         '/audiohandler/<exploration_id>/audio/<filename>', {
           exploration_id: '0',
           filename: 'myfile.mp3'
         });
 
-      $httpBackend.expect('GET', requestUrlForImage).respond(201, 'image data');
-      $httpBackend.expect('GET', requestUrlForAudio).respond(201, 'audio data');
+      $httpBackend.expect('GET', requestUrl).respond(201, 'audio data');
 
-      AssetsBackendApiService.loadImage('0', 'myfile.png').then(
-        successHandler, failHandler);
       AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
         successHandler, failHandler);
 
       expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
-        .image.length).toBe(1);
-      expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
         .audio.length).toBe(1);
 
-      AssetsBackendApiService.abortAllCurrentImageDownloads();
       AssetsBackendApiService.abortAllCurrentAudioDownloads();
       try {
         $httpBackend.flush();
@@ -177,11 +165,42 @@ describe('Assets Backend API Service', function() {
         // requests to flush" -- because we aborted all the downloads.
       }
       expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
-        .image.length).toBe(0);
-      expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
         .audio.length).toBe(0);
-      expect(AssetsBackendApiService.isCached('myfile.png')).toBe(false);
       expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    });
+
+  it('Should successfully abort the download of the all the image files',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      var requestUrl = UrlInterpolationService.interpolateUrl(
+        'imagehandler/<exploration_id>/image/<filename>', {
+          exploration_id: '0',
+          filename: 'myfile.png'
+        });
+
+      $httpBackend.expect('GET', requestUrl).respond(201, 'image data');
+
+      AssetsBackendApiService.loadImage('0', 'myfile.png').then(
+        successHandler, failHandler);
+
+      expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
+        .image.length).toBe(1);
+
+      AssetsBackendApiService.abortAllCurrentImageDownloads();
+      try {
+        $httpBackend.flush();
+      } catch (exception) {
+        // the $httpBackend.flush throws the exception -- "There are no pending
+        // requests to flush" -- because we aborted all the downloads.
+      }
+      expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
+        .image.length).toBe(0);
+      expect(AssetsBackendApiService.isCached('myfile.png')).toBe(false);
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();

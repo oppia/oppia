@@ -107,7 +107,7 @@ oppia.factory('AssetsBackendApiService', [
 
     var _removeFromFilesCurrentlyBeingRequested = function(filename,
         assetType) {
-      if (_isAssetCurrentlyBeingRequested(filename, 'audio')) {
+      if (_isAssetCurrentlyBeingRequested(filename, AUDIO_ASSET)) {
         for (var index = 0; index <
              _audioFilesCurrentlyBeingRequested.length; index++) {
           if (_audioFilesCurrentlyBeingRequested[index].filename === filename) {
@@ -115,7 +115,7 @@ oppia.factory('AssetsBackendApiService', [
             break;
           }
         }
-      } else if (_isAssetCurrentlyBeingRequested(filename, 'image')) {
+      } else if (_isAssetCurrentlyBeingRequested(filename, IMAGE_ASSET)) {
         for (var index = 0; index <
              _imageFilesCurrentlyBeingRequested.length; index++) {
           if (_imageFilesCurrentlyBeingRequested[index].filename === filename) {
@@ -201,8 +201,8 @@ oppia.factory('AssetsBackendApiService', [
           if (_isCached(filename)) {
             resolve(AudioFileObjectFactory.createNew(
               filename, assetsCache[filename]));
-          } else if (!_isAssetCurrentlyBeingRequested(filename, 'audio')) {
-            _fetchFile(explorationId, filename, 'audio', resolve, reject);
+          } else if (!_isAssetCurrentlyBeingRequested(filename, AUDIO_ASSET)) {
+            _fetchFile(explorationId, filename, AUDIO_ASSET, resolve, reject);
           }
         });
       },
@@ -211,8 +211,8 @@ oppia.factory('AssetsBackendApiService', [
           if (_isCached(filename)) {
             resolve(ImageFileObjectFactory.createNew(
               filename, assetsCache[filename]));
-          } else if (!_isAssetCurrentlyBeingRequested(filename, 'image')) {
-            _fetchFile(explorationId, filename, 'image', resolve, reject);
+          } else if (!_isAssetCurrentlyBeingRequested(filename, IMAGE_ASSET)) {
+            _fetchFile(explorationId, filename, IMAGE_ASSET, resolve, reject);
           }
         });
       },
@@ -225,13 +225,13 @@ oppia.factory('AssetsBackendApiService', [
         return _isCached(filename);
       },
       getAudioDownloadUrl: function(explorationId, filename) {
-        return _getDownloadUrl(explorationId, filename, 'audio');
+        return _getDownloadUrl(explorationId, filename, AUDIO_ASSET);
       },
       abortAllCurrentAudioDownloads: function() {
-        _abortAllCurrentDownloads('audio');
+        _abortAllCurrentDownloads(AUDIO_ASSET);
       },
       abortAllCurrentImageDownloads: function() {
-        _abortAllCurrentDownloads('image');
+        _abortAllCurrentDownloads(IMAGE_ASSET);
       },
       getAssetsFilesCurrentlyBeingRequested: function() {
         return { audio: _audioFilesCurrentlyBeingRequested,
