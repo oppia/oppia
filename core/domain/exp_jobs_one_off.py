@@ -30,6 +30,8 @@ from core.platform import models
 import feconf
 import utils
 
+import yaml
+
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
 
@@ -483,81 +485,26 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-
-        def find(key, dictionary):
-            """Finds the value of the key inside all the nested dictionaries
-            in a given dictionary.
-
-            Args:
-                key: str. The key whose value is to be found.
-                dictionary: dict or list. The dictionary or list in which the
-                    key is to be searched.
-
-            Returns:
-                list. The values of the key in the given dictionary.
-            """
-            if isinstance(dictionary, list):
-                for d in dictionary:
-                    if isinstance(d, (dict, list)):
-                        for result in find(key, d):
-                            yield result
-            else:
-                for k, v in dictionary.iteritems():
-                    if k == key:
-                        yield v
-                    elif isinstance(v, dict):
-                        for result in find(key, v):
-                            yield result
-                    elif isinstance(v, list):
-                        for d in v:
-                            if isinstance(d, (dict, list)):
-                                for result in find(key, d):
-                                    yield result
-
         if item.deleted:
             return
 
         exploration = exp_services.get_exploration_from_model(item)
-
-        allowed_parent_list = {
-            'p': ['blockquote', 'div', 'pre', '[document]'],
-            'b': ['i', 'li', 'p', 'pre'],
-            'br': ['b', 'i', 'li', 'p'],
-            'div': ['blockquote'],
-            'i': ['b', 'li', 'p', 'pre'],
-            'li': ['ol', 'ul'],
-            'ol': ['blockquote', 'li', 'pre', 'div', '[document]'],
-            'ul': ['blockquote', 'li', 'pre', 'div', '[document]'],
-            'pre': ['blockquote', '[document]'],
-            'blockquote': ['blockquote', '[document]'],
-            'oppia-noninteractive-link': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-math': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-image': ['li', 'p', 'pre'],
-            'oppia-noninteractive-collapsible': ['li', 'p', 'pre'],
-            'oppia-noninteractive-tabs': ['li', 'p', 'pre'],
-            'oppia-noninteractive-video': ['li', 'p', 'pre']
-        }
-
-        allowed_tag_list = [
-            'p', 'b', 'br', 'div', 'i', 'li', 'ol', 'ul', 'pre', 'blockquote',
-            'oppia-noninteractive-link',
-            'oppia-noninteractive-math',
-            'oppia-noninteractive-image',
-            'oppia-noninteractive-collapsible',
-            'oppia-noninteractive-tabs',
-            'oppia-noninteractive-video'
-        ]
-
         err_dict = {}
 
+        with open('./core/domain/htmlValidation.yaml', 'r') as fp:
+            htmlValidation = yaml.load(fp)
+            allowed_parent_list = htmlValidation['allowed_parent_list']
+            allowed_tag_list = htmlValidation['allowed_tag_list']
+
         for state in exploration.states.itervalues():
-            result = find('html', state.to_dict())
+            result = exp_services.find_all_values_for_key(
+                'html', state.to_dict())
 
             for html_data in result:
                 html_data = html_data.encode('utf-8')
                 soup = BeautifulSoup(html_data, 'html.parser')
 
-                # For invalid tags.
+                # Checking for tags not allowed in RTE.
                 for tag in soup.findAll():
                     if tag.name not in allowed_tag_list:
                         if 'invalidTags' in err_dict:
@@ -565,7 +512,8 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
                         else:
                             err_dict['invalidTags'] = [tag.name]
 
-                # For invalid parent-child relation.
+                # Checking for parent-child relation that are not
+                # allowed in RTE.
                 for key, value in allowed_parent_list.iteritems():
                     for tag in soup.findAll(key):
                         parent = tag.parent.name
