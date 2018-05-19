@@ -214,12 +214,14 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
+# pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 
 import isort  # isort:skip
 import pycodestyle  # isort:skip
 from pylint import lint  # isort:skip
 
+# pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
