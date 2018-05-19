@@ -28,6 +28,9 @@ oppia.factory('AssetsBackendApiService', [
     var _audioFilesCurrentlyBeingRequested = [];
     var _imageFilesCurrentlyBeingRequested = [];
 
+    var AUDIO_ASSET = 'audio';
+    var IMAGE_ASSET = 'image';
+
     var AUDIO_DOWNLOAD_URL_TEMPLATE = (
       GLOBALS.GCS_RESOURCE_BUCKET_NAME ?
         ('https://storage.googleapis.com/' + GLOBALS.GCS_RESOURCE_BUCKET_NAME +
@@ -44,7 +47,7 @@ oppia.factory('AssetsBackendApiService', [
     var _fetchFile = function(
         explorationId, filename, assetType, successCallback, errorCallback) {
       var canceler = $q.defer();
-      if (assetType === 'audio') {
+      if (assetType === AUDIO_ASSET) {
         _audioFilesCurrentlyBeingRequested.push(
           FileDownloadRequestObjectFactory.createNew(filename, canceler));
       } else {
@@ -74,7 +77,7 @@ oppia.factory('AssetsBackendApiService', [
           }
         }
         assetsCache[filename] = assetBlob;
-        if (assetType === 'audio') {
+        if (assetType === AUDIO_ASSET) {
           successCallback(
             AudioFileObjectFactory.createNew(filename, assetBlob));
         } else {
@@ -89,7 +92,7 @@ oppia.factory('AssetsBackendApiService', [
     };
 
     var _abortAllCurrentDownloads = function(assetType) {
-      if (assetType === 'audio') {
+      if (assetType === AUDIO_ASSET) {
         _audioFilesCurrentlyBeingRequested.forEach(function(request) {
           request.canceler.resolve();
         });
@@ -104,7 +107,7 @@ oppia.factory('AssetsBackendApiService', [
 
     var _removeFromFilesCurrentlyBeingRequested = function(filename,
         assetType) {
-      if (assetType === 'audio' && _isAudioCurrentlyBeingRequested(filename)) {
+      if (_isAssetCurrentlyBeingRequested(filename, 'audio')) {
         for (var index = 0; index <
              _audioFilesCurrentlyBeingRequested.length; index++) {
           if (_audioFilesCurrentlyBeingRequested[index].filename === filename) {
@@ -112,8 +115,7 @@ oppia.factory('AssetsBackendApiService', [
             break;
           }
         }
-      } else if (assetType === 'image' &&
-         _isImageCurrentlyBeingRequested(filename)) {
+      } else if (_isAssetCurrentlyBeingRequested(filename, 'image')) {
         for (var index = 0; index <
              _imageFilesCurrentlyBeingRequested.length; index++) {
           if (_imageFilesCurrentlyBeingRequested[index].filename === filename) {
@@ -164,7 +166,7 @@ oppia.factory('AssetsBackendApiService', [
 
     var _getDownloadUrl = function(explorationId, filename, assetType) {
       return UrlInterpolationService.interpolateUrl(
-        (assetType === 'audio' ? AUDIO_DOWNLOAD_URL_TEMPLATE :
+        (assetType === AUDIO_ASSET ? AUDIO_DOWNLOAD_URL_TEMPLATE :
         IMAGE_DOWNLOAD_URL_TEMPLATE), {
           exploration_id: explorationId,
           filename: filename
@@ -177,16 +179,16 @@ oppia.factory('AssetsBackendApiService', [
       });
     };
 
-    var _isAudioCurrentlyBeingRequested = function(filename) {
-      return _audioFilesCurrentlyBeingRequested.some(function(request) {
-        return request.filename === filename;
-      });
-    };
-
-    var _isImageCurrentlyBeingRequested = function(filename) {
-      return _imageFilesCurrentlyBeingRequested.some(function(request) {
-        return request.filename === filename;
-      });
+    var _isAssetCurrentlyBeingRequested = function(filename, assetType) {
+      if (assetType === AUDIO_ASSET) {
+        return _audioFilesCurrentlyBeingRequested.some(function(request) {
+          return request.filename === filename;
+        });
+      } else {
+        return _imageFilesCurrentlyBeingRequested.some(function(request) {
+          return request.filename === filename;
+        });
+      }
     };
 
     var _isCached = function(filename) {
@@ -199,7 +201,7 @@ oppia.factory('AssetsBackendApiService', [
           if (_isCached(filename)) {
             resolve(AudioFileObjectFactory.createNew(
               filename, assetsCache[filename]));
-          } else if (!_isAudioCurrentlyBeingRequested(filename)) {
+          } else if (!_isAssetCurrentlyBeingRequested(filename, 'audio')) {
             _fetchFile(explorationId, filename, 'audio', resolve, reject);
           }
         });
@@ -209,7 +211,7 @@ oppia.factory('AssetsBackendApiService', [
           if (_isCached(filename)) {
             resolve(ImageFileObjectFactory.createNew(
               filename, assetsCache[filename]));
-          } else if (!_isImageCurrentlyBeingRequested(filename)) {
+          } else if (!_isAssetCurrentlyBeingRequested(filename, 'image')) {
             _fetchFile(explorationId, filename, 'image', resolve, reject);
           }
         });
