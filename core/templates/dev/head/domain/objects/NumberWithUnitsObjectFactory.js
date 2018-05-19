@@ -31,11 +31,30 @@ oppia.factory('NumberWithUnitsObjectFactory', [
   'NUMBER_WITH_UNITS_PARSING_ERRORS', function(
       UnitsObjectFactory, FractionObjectFactory,
       NUMBER_WITH_UNITS_PARSING_ERRORS) {
-    var NumberWithUnits = function(type, real, Fraction, Units) {
+    var NumberWithUnits = function(type, real, fraction, units) {
       this.type = type;
       this.real = real;
-      this.Fraction = Fraction;
-      this.Units = Units;
+      this.fraction = fraction;
+      this.units = units;
+    };
+
+    NumberWithUnits.prototype.toString = function() {
+      var numberWithUnitsString = '';
+      if (this.type === 'real') {
+        if (this.units.trim() === '$' || this.units.trim() === 'Rs') {
+          numberWithUnitsString += this.units + ' ' + this.real;
+        } else {
+          numberWithUnitsString += this.real + ' ' + this.units;
+        }
+      } else {
+        if (this.units.trim() === '$' || this.units.trim() === 'Rs') {
+          numberWithUnitsString += this.units + ' ' + this.fraction.toString();
+        } else {
+          numberWithUnitsString += this.fraction.toString() + ' ' + this.units;
+        }
+      }
+      numberWithUnitsString = numberWithUnitsString.trim();
+      return numberWithUnitsString === '' ? '0' : numberWithUnitsString;
     };
 
     NumberWithUnits.fromRawInputString = function(rawInput) {
@@ -72,6 +91,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
           units = units.trim();
         }
       }
+      // Checking invalid characters in value.
       if (value.match(/[a-z]/i) || value.match(/[*^$()]/)) {
         throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_VALUE);
       }
@@ -84,12 +104,21 @@ oppia.factory('NumberWithUnitsObjectFactory', [
         real = parseFloat(value);
       }
       if (units !== '') {
+        // Checking invalid characters in units.
         if (units.match(/[^0-9a-z/* ^$-]/i)) {
           throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_UNIT_CHARS);
         }
         Units = UnitsObjectFactory.fromRawInputString(units);
       }
       return new NumberWithUnits(type, real, Fraction, Units);
+    };
+
+    NumberWithUnits.fromDict = function(numberWithUnitsDict) {
+      return new NumberWithUnits(
+        numberWithUnitsDict.type,
+        numberWithUnitsDict.real,
+        numberWithUnitsDict.fraction,
+        numberWithUnitsDict.units);
     };
 
     return NumberWithUnits;
@@ -105,7 +134,7 @@ oppia.factory('UnitsObjectFactory', [function() {
     return !('/*() '.includes(unit));
   };
 
-  var stringToLexical = function(units) {
+  Units.stringToLexical = function(units) {
     units += '#';
     var unitList = [];
     var unit = '';
@@ -121,7 +150,7 @@ oppia.factory('UnitsObjectFactory', [function() {
         if (!('# '.includes(units[i]))) {
           unitList.push(units[i]);
         }
-      } else if (' '.includes(units[i]) && unit === 'per') {
+      } else if (units[i] === ' ' && unit === 'per') {
         unitList.push('/');
         unit = '';
       } else {
@@ -147,7 +176,7 @@ oppia.factory('UnitsObjectFactory', [function() {
           parenthesisStack.push(['(', -1]);
         } else {
           // If previous element was not division then we don't need to
-          // invert multiplier.
+          // invert the multiplier.
           parenthesisStack.push(['(', 1]);
         }
       } else if (unitList[ind] === ')') {
@@ -187,7 +216,7 @@ oppia.factory('UnitsObjectFactory', [function() {
   };
 
   Units.prototype.toDict = function() {
-    return unitToDict(unitWithMultiplier(stringToLexical(this.units)));
+    return unitToDict(unitWithMultiplier(Units.stringToLexical(this.units)));
   };
 
   Units.prototype.toString = function() {

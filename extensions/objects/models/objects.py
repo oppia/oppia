@@ -832,11 +832,12 @@ class Fraction(BaseObject):
 class Units(BaseObject):
     """Units class."""
 
-    description = 'A units expression.'
+    description = 'A units dict representation.'
     default_value = {}
 
     SCHEMA = {
-        'type': 'dict'
+        'type': 'dict',
+        'properties': []
     }
 
 
@@ -858,7 +859,7 @@ class NumberWithUnits(BaseObject):
         'properties': [{
             'name': 'type',
             'schema': {
-                'type': 'str'
+                'type': 'unicode'
             }
         }, {
             'name': 'fraction',

@@ -49,6 +49,30 @@ describe('NumberWithUnitsObjectFactory', function() {
         'mol^1 kg^-1 N^1 m^1 s^-2 K^-1');
     });
 
+    it('should convert units from string to lexical format', function() {
+      expect(Units.stringToLexical('kg per kg^2 K mol / (N m s^2) K s'
+      )).toEqual(['kg', '/', 'kg^2', '*', 'K', '*', 'mol', '/', '(', 'N', '*',
+                  'm', '*', 's^2', ')', 'K', '*', 's']);
+      expect(Units.stringToLexical('kg (K mol) m/s^2 r t / (l/ n) / o'
+      )).toEqual(['kg', '(', 'K', '*', 'mol', ')', 'm', '/', 's^2', '*', 'r',
+                  '*', 't', '/', '(', 'l', '/', 'n', ')', '/', 'o']);
+      expect(Units.stringToLexical('mol per (kg / (N m / s^2)*K)'
+      )).toEqual(['mol', '/', '(', 'kg', '/', '(', 'N', '*', 'm', '/', 's^2',
+                  ')', '*', 'K', ')']);
+    });
+
+    it('should convert itself to a string', function() {
+      expect(new NumberWithUnits('real', 2.02, '', 'm / s^2').toString()).toBe(
+        '2.02 m / s^2');
+      expect(new NumberWithUnits('real', 2.02, '', 'Rs').toString()).toBe(
+        'Rs 2.02');
+      expect(new NumberWithUnits('real', 2, '', '').toString()).toBe('2');
+      expect(new NumberWithUnits('fraction', '', new Fraction(
+        true, 0, 4, 3), 'm / s^2').toString()).toBe('-4/3 m / s^2');
+      expect(new NumberWithUnits('fraction', '', new Fraction(
+        false, 0, 4, 3), '$').toString()).toBe('$ 4/3');
+    });
+
     it('should parse valid units strings', function() {
       expect(Units.fromRawInputString('kg per (K mol^-2)').toDict()).toEqual(
         new Units('kg / (K mol^-2)').toDict());
