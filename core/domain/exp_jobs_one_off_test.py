@@ -752,3 +752,95 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
         self.assertEqual(mapping.exploration_version, 4)
         self.assertEqual(mapping.largest_state_id_used, 2)
         self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
+
+
+class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(ExplorationContentValidationJobTest, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_validation_job(self):
+        """Tests that the exploration validation job validates the content
+        without skipping any tags.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration.add_states(['State1', 'State2'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        content1_dict = {
+            'html': '''<blockquote><div><p>Hello, this <i>is</i> state1
+                </p> </div> </blockquote> <pre>I'm looking for a particular
+                <b>Hello Oppia</b> message</pre>. <p> Don't you want to
+                say hello? You can learn more about oppia
+                <oppia-noninteractive-link url-with-value="&amp;quot;
+                https://www.example.com&amp;quot;" text-with-value="&amp;quot;
+                here&amp;quot;"></oppia-noninteractive-link></p>''',
+            'audio_translations': {}
+        }
+        content2_dict = {
+            'html': '''<pre>Hello, this is state2.</pre> <blockquote>
+                <ol> <li>item1</li> <li>item2</li> </ol> </blockquote>.<p>
+                You can see this equation <b> <oppia-noninteractive-math
+                raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;
+                quot;"></oppia-noninteractive-math></b></p>
+                ''',
+            'audio_translations': {}
+        }
+        state1.update_content(content1_dict)
+        state2.update_content(content2_dict)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start validation job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationContentValidationJob.create_new()
+        exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
+        expected_output = [u"[u'Errors', [u'{}']]"]
+
+        self.assertEqual(actual_output, expected_output)
+
+        default_outcome_dict = {
+            'dest': 'State2',
+            'feedback': {
+                'html': '''<p>Sorry, it doesn't look like your <span>program
+                </span>prints any output</p>.<p> <blockquote> Could you get
+                it to print something?</blockquote> You can do this by using a
+                statement like print</p>. <br> You can ask any doubt if you have
+                <oppia-noninteractive-link url-with-value="&amp;quot;
+                https://www.example.com&amp;quot;" text-with-value="
+                &amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.
+                ''',
+                'audio_translations': {}
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None
+        }
+
+        state1.update_interaction_default_outcome(default_outcome_dict)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        job_id = exp_jobs_one_off.ExplorationContentValidationJob.create_new()
+        exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
+        expected_output = [u'[u\'Errors\', [u"{\'invalidTags\': [u\'span\'], \'oppia-noninteractive-link\': [u\'[document]\'], \'br\': [u\'[document]\']}"]]'] # pylint: disable=line-too-long
+
+        self.assertEqual(actual_output, expected_output)
