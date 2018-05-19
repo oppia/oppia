@@ -1616,7 +1616,7 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
 
     def test_fetch_issues_handler(self):
         """Test that all issues get fetched correctly."""
-        response = self.get_json('/fetch_issues/%s' % self.EXP_ID)
+        response = self.get_json('/issuesdatahandler/%s' % self.EXP_ID)
         self.assertEqual(len(response), 2)
         self.assertEqual(response[0]['issue_id'], 'EarlyQuit')
         self.assertEqual(
@@ -1624,7 +1624,9 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
 
     def test_fetch_playthrough_handler(self):
         """Test that the playthrough gets fetched correctly."""
-        response = self.get_json('/fetch_playthrough/%s' % self.playthrough_id1)
+        response = self.get_json(
+            '/playthroughdatahandler/%s/%s' % (
+                self.EXP_ID, self.playthrough_id1))
         self.assertEqual(response['id'], self.playthrough_id1)
         self.assertEqual(response['exp_id'], self.EXP_ID)
         self.assertEqual(response['exp_version'], 1)

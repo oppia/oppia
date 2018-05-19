@@ -782,8 +782,8 @@ class FetchIssuesHandler(EditorHandler):
 class FetchPlaythroughHandler(EditorHandler):
     """Handler used for retrieving a playthrough."""
 
-    @acl_decorators.open_access
-    def get(self, playthrough_id):
+    @acl_decorators.can_view_exploration_stats
+    def get(self, unused_exploration_id, playthrough_id):
         """Handles GET requests."""
         playthrough = stats_services.get_playthrough_by_id(playthrough_id)
         self.render_json(playthrough.to_dict())

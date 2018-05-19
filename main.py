@@ -490,14 +490,16 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/exploration_editor_logout', editor.EditorLogoutHandler),
 
     get_redirect_route(
-        r'/fetch_issues/<exploration_id>', editor.FetchIssuesHandler),
-    get_redirect_route(
-        r'/fetch_playthrough/<playthrough_id>', editor.FetchPlaythroughHandler),
+        r'/issuesdatahandler/<exploration_id>', editor.FetchIssuesHandler),
 
     get_redirect_route(
         r'/ml/trainedclassifierhandler', classifier.TrainedClassifierHandler),
     get_redirect_route(
         r'/ml/nextjobhandler', classifier.NextJobHandler),
+
+    get_redirect_route(
+        r'/playthroughdatahandler/<exploration_id>/<playthrough_id>',
+        editor.FetchPlaythroughHandler),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),
