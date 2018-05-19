@@ -968,15 +968,15 @@ def _check_directive_scope(all_files):
                         # to find out the scope key.
                         for return_node_property in return_node_properties:
                             # Check whether the property is scope.
-                            is_property_key_an_identifier = (
-                                True if return_node_property['key']['type'] == (
-                                    'Identifier') else False)
-                            is_property_key_name_scope = (
-                                True if return_node_property['key']['name'] == (
-                                    'scope') else False)
+                            property_key_is_an_identifier = (
+                                return_node_property['key']['type'] == (
+                                    'Identifier'))
+                            property_key_name_is_scope = (
+                                return_node_property['key']['name'] == (
+                                    'scope'))
                             if (
-                                    is_property_key_an_identifier and (
-                                        is_property_key_name_scope)):
+                                    property_key_is_an_identifier and (
+                                        property_key_name_is_scope)):
                                 # Separate the scope value and
                                 # check if it is an Object Expression.
                                 # If it is not, then check for scope: true
