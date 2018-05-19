@@ -4155,8 +4155,8 @@ class StateIdMapping(object):
 
                 # This problem arises when following scenario occurrs:
                 # Consider an exploration with two versions a and b (a < b).
-                # Both of this version has states dict schema version set to
-                # less than 2.
+                # Both of these versions have their states dict schema version
+                # set to less than 2.
                 # Now version 'a' has explicit references to END
                 # state and thus when its states dict schema version will be
                 # upgraded to latest version, an 'END' state will be added.
@@ -4185,7 +4185,7 @@ class StateIdMapping(object):
         # migration END state won't be added. But next version of exploration
         # might have END references and, hence, END state might be added
         # to exploration during states schema migration.
-        # So we check whether such sitatuin exists or not. If it exists then
+        # So we check whether such siatuation exists or not. If it exists then
         # we consider END as a new state to which id will be assigned.
         if 'END' in new_exploration.states and (
                 'END' not in new_state_names_to_ids and (
@@ -4209,12 +4209,16 @@ class StateIdMapping(object):
         # in generated state names to id mapping.
         if set(new_state_names_to_ids.keys()) != set(
                 new_exploration.states.keys()):
+            unknown_state_names = ((
+                set(new_exploration.states.keys()) -
+                set(new_state_names_to_ids.keys())) + (
+                    set(new_state_names_to_ids.keys()) -
+                    set(new_exploration.states.keys())))
             raise Exception(
                 'State names to ids mapping does not contain '
                 'state names (%s) which are present in corresponding '
                 'exploration %s, version %d' % (
-                    (set(new_exploration.states.keys()) - set(
-                        new_state_names_to_ids.keys())),
+                    unknown_state_names,
                     new_exploration.id, new_exploration.version))
 
         state_id_map.validate()
@@ -4251,7 +4255,7 @@ class StateIdMapping(object):
         if len(set(state_ids)) != len(state_ids):
             raise Exception('Assigned state ids should be unique.')
 
-        if not all(state_ids) <= self.largest_state_id_used:
+        if not all(x <= self.largest_state_id_used for x in state_ids):
             raise Exception(
                 'Assigned state ids should be smaller than last state id used.')
 
