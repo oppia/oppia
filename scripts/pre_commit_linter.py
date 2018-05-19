@@ -926,11 +926,17 @@ def _check_directive_scope(all_files):
             # Separate the expression part of the node.
             expression = parsed_node['expression']
             # Check whether the expression belongs to a directive.
-            if (expression['type'] != 'CallExpression' or (
-                    expression['callee']['type'] != (
-                        'MemberExpression')) or (
-                            expression['callee']['property']['name'] != (
-                                'directive'))):
+            expression_type_is_not_call = (
+                expression['type'] != 'CallExpression')
+            if expression_type_is_not_call:
+                continue
+            expression_callee_type_is_not_member = (
+                expression['callee']['type'] != 'MemberExpression')
+            if expression_callee_type_is_not_member:
+                continue
+            expression_callee_property_name_is_not_directive = (
+                expression['callee']['property']['name'] != 'directive')
+            if expression_callee_property_name_is_not_directive:
                 continue
             # Separate the arguments of the expression.
             arguments = expression['arguments']
@@ -957,9 +963,13 @@ def _check_directive_scope(all_files):
                     body_elements = body['body']
                     for body_element in body_elements:
                         # Check if the body element is a return statement.
-                        if (body_element['type'] != 'ReturnStatement' or (
-                                body_element['argument']['type'] != (
-                                    'ObjectExpression'))):
+                        body_element_type_is_not_return = (
+                            body_element['type'] != 'ReturnStatement')
+                        body_element_argument_type_is_not_object = (
+                            body_element['argument']['type'] != (
+                                'ObjectExpression'))
+                        if (body_element_type_is_not_return or (
+                                body_element_argument_type_is_not_object)):
                             continue
                         # Separate the properties of the return node.
                         return_node_properties = (
@@ -1020,7 +1030,7 @@ def _check_directive_scope(all_files):
 def main():
     all_files = _get_all_files()
     # TODO(apb7): Enable the _check_directive_scope function.
-    directive_scope_messages = []
+    directive_scope_messages = _check_directive_scope(all_files)
     html_directive_name_messages = _check_html_directive_name(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
