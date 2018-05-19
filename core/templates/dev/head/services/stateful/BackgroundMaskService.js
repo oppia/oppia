@@ -17,18 +17,20 @@
  * visible.
  */
 
-oppia.factory('BackgroundMaskService', function() {
-  var maskIsActive = false;
+oppia.factory('BackgroundMaskService', [
+  function() {
+    var maskIsActive = false;
 
-  return {
-    isMaskActive: function() {
-      return maskIsActive;
-    },
-    activateMask: function() {
-      maskIsActive = true;
-    },
-    deactivateMask: function() {
-      maskIsActive = false;
-    }
-  };
-});
+    return {
+      isMaskActive: function() {
+        return maskIsActive;
+      },
+      activateMask: function() {
+        maskIsActive = true;
+      },
+      deactivateMask: function() {
+        maskIsActive = false;
+      }
+    };
+  }]
+);

@@ -178,7 +178,7 @@ if not os.getcwd().endswith('oppia'):
     print 'ERROR    Please run this script from the oppia root directory.'
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.7.1')
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.8.4')
 if not os.path.exists(_PYLINT_PATH):
     print ''
     print 'ERROR    Please run start.sh first to install pylint '
@@ -214,12 +214,14 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
+# pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 
 import isort  # isort:skip
 import pycodestyle  # isort:skip
 from pylint import lint  # isort:skip
 
+# pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
