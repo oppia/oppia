@@ -137,6 +137,13 @@ oppia.controller('LearnerDashboard', [
       return ($window.innerWidth < 500);
     };
 
+    $scope.getVisibleExplorationList = function(startCompletedExpIndex) {
+      return $scope.completedExplorationsList.slice(
+        startCompletedExpIndex, Math.min(
+          startCompletedExpIndex + $scope.PAGE_SIZE,
+          $scope.completedExplorationsList.length))
+    };
+
     $scope.showUsernamePopover = function(subscriberUsername) {
       // The popover on the subscription card is only shown if the length of
       // the subscriber username is greater than 10 and the user hovers over
@@ -187,7 +194,7 @@ oppia.controller('LearnerDashboard', [
       } else if (section === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
         if (subsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
           if ($scope.startCompletedExpIndex +
-            $scope.PAGE_SIZE <= $scope.startCompletedExpIndex.length) {
+            $scope.PAGE_SIZE <= $scope.completedExplorationsList.length) {
             $scope.startCompletedExpIndex += $scope.PAGE_SIZE;
           }
         } else if (
