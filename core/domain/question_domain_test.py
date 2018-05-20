@@ -19,11 +19,47 @@
 from core.domain import exp_domain
 from core.domain import question_domain
 from core.tests import test_utils
+import feconf
 import utils
 
 
 class QuestionDomainTest(test_utils.GenericTestBase):
     """Tests for Question domain object."""
+
+    def _create_valid_question_data(self, default_dest_state_name):
+        """Creates a valid question_data dict.
+
+        Args:
+            default_dest_state_name: str. The default destination state.
+
+        Returns:
+            dict. The default question_data dict.
+        """
+        state = exp_domain.State.create_default_state(
+            default_dest_state_name).to_dict()
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'Solution',
+            'explanation': {
+                'html': 'Solution explanation',
+                'audio_translations': {}
+            }
+        }
+        state['interaction']['id'] = 'TextInput'
+        state['interaction']['customization_args'] = {
+            'placeholder': 'Enter text here',
+            'rows': 1
+        }
+        state['interaction']['default_outcome']['labelled_as_correct'] = True
+        state['interaction']['default_outcome']['dest'] = None
+        state['interaction']['hints'].append({
+            'hint_content': {
+                'html': 'hint one',
+                'audio_translations': {}
+            }
+        })
+        state['interaction']['solution'] = solution
+        return state
 
     def test_to_dict(self):
         expected_object = {
@@ -43,8 +79,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def test_validation(self):
         """Test to verify validate method of Question domain object."""
 
-        state = exp_domain.State.create_default_question_data('ABC')
-        question_data = state.to_dict()
+        question_data = self._create_valid_question_data('ABC')
 
         test_object = {
             'question_id': 'col1.random',
@@ -107,10 +142,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         language_code = 'en'
         question = question_domain.Question.create_default_question(
             question_id, language_code)
+        default_question_data = exp_domain.State.create_default_state(
+            feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
 
         self.assertEqual(question.question_id, question_id)
         self.assertEqual(question.question_data_schema_version, 1)
-        self.assertEqual(question.question_data, {})
+        self.assertEqual(
+            question.question_data.to_dict(), default_question_data)
         self.assertEqual(question.language_code, 'en')
 
     def test_update_methods(self):

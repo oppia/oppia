@@ -28,6 +28,41 @@ memcache_services = models.Registry.import_memcache_services()
 class QuestionServicesUnitTest(test_utils.GenericTestBase):
     """Test the question services module."""
 
+    def _create_valid_question_data(self, default_dest_state_name):
+        """Creates a valid question_data dict.
+
+        Args:
+            default_dest_state_name: str. The default destination state.
+
+        Returns:
+            dict. The default question_data dict.
+        """
+        state = exp_domain.State.create_default_state(
+            default_dest_state_name).to_dict()
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'Solution',
+            'explanation': {
+                'html': 'Solution explanation',
+                'audio_translations': {}
+            }
+        }
+        state['interaction']['id'] = 'TextInput'
+        state['interaction']['customization_args'] = {
+            'placeholder': 'Enter text here',
+            'rows': 1
+        }
+        state['interaction']['default_outcome']['labelled_as_correct'] = True
+        state['interaction']['default_outcome']['dest'] = None
+        state['interaction']['hints'].append({
+            'hint_content': {
+                'html': 'hint one',
+                'audio_translations': {}
+            }
+        })
+        state['interaction']['solution'] = solution
+        return state
+
     def setUp(self):
         """Before each individual test, create dummy user."""
         super(QuestionServicesUnitTest, self).setUp()
@@ -38,10 +73,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_question_by_id(self):
         question = question_domain.Question(
-            'dummy',
-            exp_domain.State.create_default_question_data(
-                'ABC').to_dict(),
-            1, 'en')
+            'dummy', self._create_valid_question_data('ABC'), 1, 'en')
 
         question_id = question_services.add_question(self.owner_id, question)
         question = question_services.get_question_by_id(question_id)
@@ -50,18 +82,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_questions_by_ids(self):
         question = question_domain.Question(
-            'dummy',
-            exp_domain.State.create_default_question_data(
-                'ABC').to_dict(),
-            1, 'en')
+            'dummy', self._create_valid_question_data('ABC'), 1, 'en')
 
         question1_id = question_services.add_question(
             self.owner_id, question)
         question = question_domain.Question(
-            'dummy2',
-            exp_domain.State.create_default_question_data(
-                'ABC').to_dict(),
-            1, 'en')
+            'dummy2', self._create_valid_question_data('ABC'), 1, 'en')
 
         question2_id = question_services.add_question(
             self.owner_id, question)
@@ -72,8 +98,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(questions[1].question_id, question2_id)
 
     def test_add_question(self):
-        state = exp_domain.State.create_default_question_data('ABC')
-        question_data = state.to_dict()
+        question_data = self._create_valid_question_data('ABC')
         question_id = 'dummy'
         question_data_schema_version = 1
         language_code = 'en'
@@ -92,10 +117,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_delete_question(self):
         question = question_domain.Question(
-            'dummy',
-            exp_domain.State.create_default_question_data(
-                'ABC').to_dict(),
-            1, 'en')
+            'dummy', self._create_valid_question_data('ABC'), 1, 'en')
 
         question_id = question_services.add_question(self.owner_id, question)
         question_services.delete_question(
@@ -107,8 +129,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_models.QuestionModel.get(question_id)
 
     def test_update_question(self):
-        state = exp_domain.State.create_default_question_data('ABC')
-        question_data = state.to_dict()
+        question_data = self._create_valid_question_data('ABC')
         question_id = 'dummy'
         question_data_schema_version = 1
         language_code = 'en'
@@ -116,8 +137,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_id, question_data, question_data_schema_version,
             language_code)
 
-        new_question_data = exp_domain.State.create_default_question_data(
-            'DEF').to_dict()
+        new_question_data = self._create_valid_question_data('DEF')
         question_id = question_services.add_question(self.owner_id, question)
         change_dict = {'cmd': 'update_question_property',
                        'property_name': 'question_data',

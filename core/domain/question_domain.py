@@ -173,7 +173,7 @@ class Question(object):
             )
 
         question_data = exp_domain.State.from_dict(self.question_data)
-        question_data.validate(True)
+        question_data.validate(None, True)
 
         if not isinstance(self.question_data_schema_version, int):
             raise utils.ValidationError(
@@ -219,7 +219,8 @@ class Question(object):
             Question. A Question domain object with default values.
         """
         return cls(
-            question_id, {},
+            question_id, exp_domain.State.create_default_state(
+                feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True),
             feconf.CURRENT_QUESTION_SCHEMA_VERSION, language_code)
 
     def update_language_code(self, language_code):
