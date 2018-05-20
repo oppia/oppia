@@ -316,14 +316,6 @@ class StorePlaythroughHandler(base.BaseHandler):
             exploration_id)
         exp_issues = stats_services.get_exp_issues_from_model(exp_issues_model)
 
-        playthrough_id = stats_models.PlaythroughModel.create(
-            playthrough_data['exp_id'],
-            playthrough_data['exp_version'],
-            playthrough_data['issue_type'],
-            playthrough_data['issue_customization_args'],
-            playthrough_data['playthrough_actions'],
-            playthrough_data['is_valid'])
-
         customization_args = exp_issue_dict['customization_args']
 
         issue_found = False
@@ -338,17 +330,18 @@ class StorePlaythroughHandler(base.BaseHandler):
                         customization_args[issue_keyname]):
                     if (len(issue['playthrough_ids']) <
                             feconf.MAX_PLAYTHROUGHS_FOR_ISSUE):
+                        playthrough_id = (
+                            stats_models.PlaythroughModel.create_from_dict(
+                                playthrough_data))
                         exp_issues.unresolved_issues[index][
                             'playthrough_ids'].append(playthrough_id)
-                    else:
-                        # In this case, the playthrough instance created doesn't
-                        # need to be stored, so it is deleted.
-                        stats_models.PlaythroughModel.get(
-                            playthrough_id).delete()
                     issue_found = True
                     break
 
         if not issue_found:
+            playthrough_id = (
+                stats_models.PlaythroughModel.create_from_dict(
+                    playthrough_data))
             issue = {
                 'issue_type': playthrough_data['issue_type'],
                 'issue_customization_args': playthrough_data[

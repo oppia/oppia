@@ -941,7 +941,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
     # The unresolved issues for this exploration. This will be a list of dicts
     # where each dict represents an issue along with the associated
     # playthroughs.
-    unresolved_issues = ndb.JsonProperty(default=None)
+    unresolved_issues = ndb.JsonProperty(default=None, repeated=True)
 
     @classmethod
     def create(cls, exp_id, unresolved_issues):
@@ -980,7 +980,7 @@ class PlaythroughModel(base_models.BaseModel):
     # The playthrough actions for this playthrough. This will be a list of dicts
     # where each dict represents a single playthrough action. The list is
     # ordered by the time of occurence of the action.
-    playthrough_actions = ndb.JsonProperty(default=None)
+    playthrough_actions = ndb.JsonProperty(default=None, repeated=True)
     # Boolean for checking validity of the playthrough.
     is_valid = ndb.BooleanProperty(indexed=True)
 
@@ -1030,7 +1030,7 @@ class PlaythroughModel(base_models.BaseModel):
                 playthrough. This will be a list of dicts where each dict
                 represents a single playthrough action. The list is ordered by
                 the time of occurence of the action.
-            is_valid: Bool. Whether the playthrough is valid.
+            is_valid: bool. Whether the playthrough is valid.
 
         Returns:
             str. ID of the new PlaythroughModel instance.
@@ -1042,6 +1042,26 @@ class PlaythroughModel(base_models.BaseModel):
             issue_customization_args=issue_customization_args,
             playthrough_actions=playthrough_actions, is_valid=is_valid)
         playthrough_instance.put()
+        return instance_id
+
+    @classmethod
+    def create_from_dict(cls, playthrough_data):
+        """Creates a PlaythroughModel instance from a dict representing the
+        playthrough.
+
+        Args:
+            playthrough_data: dict. A dict representing the playthrough object.
+
+        Returns:
+            str. ID of the new PlaythroughModel instance.
+        """
+        instance_id = cls.create(
+            playthrough_data['exp_id'],
+            playthrough_data['exp_version'],
+            playthrough_data['issue_type'],
+            playthrough_data['issue_customization_args'],
+            playthrough_data['playthrough_actions'],
+            playthrough_data['is_valid'])
         return instance_id
 
 

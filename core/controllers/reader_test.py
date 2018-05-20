@@ -1384,6 +1384,82 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
         self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 2)
 
+    def test_cyclic_issues_of_different_order_creates_new_issue(self):
+        """Test that a cyclic issue with the same list of states, but in
+        a different order creates a new issue.
+        """
+        playthrough_id = stats_models.PlaythroughModel.create(
+            self.exp_id, self.exploration.version, 'CyclicStateTransitions',
+            {
+                'state_names': {
+                    'value': ['state_name1', 'state_name2', 'state_name1']
+                },
+            },
+            [{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                }
+            }], is_valid=True)
+
+        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        model.unresolved_issues.append({
+            'issue_type': 'CyclicStateTransitions',
+            'issue_customization_args': {
+                'state_names': {
+                    'value': ['state_name1', 'state_name2', 'state_name1']
+                },
+            },
+            'playthrough_ids': [playthrough_id]
+        })
+        model.put()
+
+        self.playthrough_data = {
+            'exp_id': self.exp_id,
+            'exp_version': self.exploration.version,
+            'issue_type': 'CyclicStateTransitions',
+            'issue_customization_args': {
+                'state_names': {
+                    'value': ['state_name1', 'state_name1', 'state_name2']
+                },
+            },
+            'playthrough_actions': [{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                }
+            }],
+            'is_valid': True
+        }
+
+        self.exp_issue = {
+            'issue_type': 'CyclicStateTransitions',
+            'schema_version': 1,
+            'customization_args': {
+                'state_names': {
+                    'value': ['state_name1', 'state_name1', 'state_name2']
+                },
+            }
+        }
+
+        self.post_json(
+            '/explorehandler/store_playthrough/%s' % (self.exp_id),
+            {
+                'playthrough_data': self.playthrough_data,
+                'exp_issue': self.exp_issue
+            }, self.csrf_token)
+        self.process_and_flush_pending_tasks()
+
+        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        self.assertEqual(len(model.unresolved_issues), 3)
+        self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
+        self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 1)
+        self.assertEqual(len(model.unresolved_issues[2]['playthrough_ids']), 1)
+
     def test_playthrough_not_stored_at_limiting_value(self):
         """Test that a playthrough is not stored when the maximum number of
         playthroughs per issue already exists.

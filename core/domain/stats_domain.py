@@ -494,7 +494,7 @@ class ExplorationIssues(object):
                     'KeyError in an element of unresolved_issues')
 
             try:
-                issue_instance = issue_registry.Registry.get_issue_by_id(
+                issue_instance = issue_registry.Registry.get_issue_by_type(
                     issue['issue_type'])
             except KeyError:
                 raise utils.ValidationError('Invalid issue type: %s' % (
@@ -525,7 +525,7 @@ class Playthrough(object):
                 playthrough. This will be a list of dicts where each dict
                 represents a single playthrough action. The list is ordered by
                 the time of occurence of the action.
-            is_valid: Bool. Whether the playthrough is valid.
+            is_valid: bool. Whether the playthrough is valid.
         """
         self.id = playthrough_id
         self.exp_id = exp_id
@@ -599,7 +599,7 @@ class Playthrough(object):
                     type(self.issue_customization_args)))
 
         try:
-            issue = issue_registry.Registry.get_issue_by_id(
+            issue = issue_registry.Registry.get_issue_by_type(
                 self.issue_type)
         except KeyError:
             raise utils.ValidationError('Invalid issue type: %s' % (
@@ -626,7 +626,7 @@ class Playthrough(object):
                     'KeyError in an element of playthrough_actions')
 
             try:
-                action_instance = action_registry.Registry.get_action_by_id(
+                action_instance = action_registry.Registry.get_action_by_type(
                     action['action_type'])
             except KeyError:
                 raise utils.ValidationError('Invalid action type: %s' % (
@@ -667,7 +667,7 @@ class ExplorationIssue(object):
             'schema_version': self.schema_version,
             'customization_args': exp_domain.get_full_customization_args(
                 self.customization_args,
-                issue_registry.Registry.get_issue_by_id(
+                issue_registry.Registry.get_issue_by_type(
                     self.issue_type).customization_arg_specs)
         }
 
@@ -700,7 +700,7 @@ class ExplorationIssue(object):
                     type(self.schema_version)))
 
         try:
-            issue = issue_registry.Registry.get_issue_by_id(
+            issue = issue_registry.Registry.get_issue_by_type(
                 self.issue_type)
         except KeyError:
             raise utils.ValidationError('Invalid issue type: %s' % (
@@ -740,7 +740,7 @@ class LearnerAction(object):
             'schema_version': self.schema_version,
             'customization_args': exp_domain.get_full_customization_args(
                 self.customization_args,
-                action_registry.Registry.get_action_by_id(
+                action_registry.Registry.get_action_by_type(
                     self.action_type).customization_arg_specs)
         }
 
@@ -773,7 +773,7 @@ class LearnerAction(object):
                     type(self.schema_version)))
 
         try:
-            action = action_registry.Registry.get_action_by_id(
+            action = action_registry.Registry.get_action_by_type(
                 self.action_type)
         except KeyError:
             raise utils.ValidationError(

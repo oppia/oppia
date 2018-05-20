@@ -29,37 +29,37 @@ class Registry(object):
     _actions = {}
 
     @classmethod
-    def get_all_action_ids(cls):
-        """Get a list of all action IDs.
+    def get_all_action_types(cls):
+        """Get a list of all action types.
 
         Returns:
-            list(str). The list of all allowed action IDs.
+            list(str). The list of all allowed action types.
         """
         return feconf.ALLOWED_ACTION_TYPES
 
     @classmethod
     def set_actions(cls, actions):
-        """Sets the mapping between action IDs to instances of the action
+        """Sets the mapping between action types to instances of the action
         classes to the provided value.
 
         Args:
-            actions: dict. Mapping action IDs to instances of the actions.
+            actions: dict. Mapping action types to instances of the actions.
         """
         cls._actions = actions
 
     @classmethod
     def _refresh(cls):
-        """Initializes the mapping between action IDs to instances of the action
-        classes.
+        """Initializes the mapping between action types to instances of the
+        action classes.
         """
         cls._actions.clear()
 
-        all_action_ids = cls.get_all_action_ids()
+        all_action_types = cls.get_all_action_types()
 
         # Assemble all paths to the actions.
         extension_paths = [
-            os.path.join(feconf.ACTIONS_DIR, action_id)
-            for action_id in all_action_ids]
+            os.path.join(feconf.ACTIONS_DIR, action_type)
+            for action_type in all_action_types]
 
         # Crawl the directories and add new action instances to the
         # registry.
@@ -84,18 +84,18 @@ class Registry(object):
         return cls._actions.values()
 
     @classmethod
-    def get_action_by_id(cls, action_id):
-        """Gets an action by its ID.
+    def get_action_by_type(cls, action_type):
+        """Gets an action by its type.
 
         Refreshes once if the action is not found; subsequently, throws a
         KeyError.
 
         Args:
-            action_id: str. ID of the action.
+            action_type: str. Type of the action.
 
         Returns:
             An instance of the corresponding action class.
         """
-        if action_id not in cls._actions:
+        if action_type not in cls._actions:
             cls._refresh()
-        return cls._actions[action_id]
+        return cls._actions[action_type]

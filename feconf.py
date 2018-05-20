@@ -663,9 +663,8 @@ ALLOWED_ACTION_TYPES = [
     'ExplorationQuit'
 ]
 # Mapping from issue type to issue keyname in the issue customization dict. This
-# particular mapping is to distinguish between issues which have their keyname
-# as either 'state_name' or 'state_names'. This mapping will be used to compare
-# two issues, as the concerned state(s) and the issue type are the metrics used.
+# mapping is useful to uniquely identify issues by the combination of their
+# issue type and the concerend state(s).
 ISSUE_TYPE_KEYNAME_MAPPING = {
     'EarlyQuit': 'state_name',
     'MultipleIncorrectSubmissions': 'state_name',
