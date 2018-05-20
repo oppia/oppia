@@ -244,6 +244,10 @@ oppia.controller('StateResponses', [
         ResponsesService.getActiveAnswerGroupIndex());
     });
 
+    $scope.$on('updateAnswerGroups', function (evt, updatedAnswerGroup) {
+      ResponsesService.saveAnswerGroups(updatedAnswerGroup);
+    });
+
     $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
       ResponsesService.updateAnswerChoices(newAnswerChoices);
     });

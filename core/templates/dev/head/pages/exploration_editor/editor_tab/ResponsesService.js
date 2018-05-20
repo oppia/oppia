@@ -152,22 +152,6 @@ oppia.factory('ResponsesService', [
       }
     };
 
-    var _reduceRuleIndexByOne = function(answerGroupIndex, ruleIndex) {
-      if (_answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x === 0) {
-        _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x =
-          _answerChoices.length;
-      } else {
-        _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x--;
-      }
-      return _answerGroups;
-    };
-
-    var _makeRuleInvalid = function(answerGroupIndex, ruleIndex) {
-      _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x =
-        _answerChoices.length + LARGE_NUMBER;
-      return _answerGroups;
-    };
-
     return {
       // The 'data' arg is a list of interaction handlers for the
       // currently-active state.
@@ -365,12 +349,6 @@ oppia.factory('ResponsesService', [
       },
       getConfirmedUnclassifiedAnswers: function() {
         return angular.copy(_confirmedUnclassifiedAnswers);
-      },
-      reduceRuleIndexByOne: function(answerGroupIndex, ruleIndex) {
-        return _reduceRuleIndexByOne(answerGroupIndex, ruleIndex);
-      },
-      makeRuleInvalid: function(answerGroupIndex, ruleIndex) {
-        return _makeRuleInvalid(answerGroupIndex, ruleIndex);
       },
       saveAnswerGroups: function(newAnswerGroups) {
         _saveAnswerGroups(newAnswerGroups);

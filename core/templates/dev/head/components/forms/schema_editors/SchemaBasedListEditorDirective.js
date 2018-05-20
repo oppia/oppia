@@ -45,7 +45,7 @@ oppia.directive('schemaBasedListEditor', [
         'schema_based_list_editor_directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
-      controller: ['$scope', function($scope) {
+      controller: ['$scope', '$rootScope', function($scope, $rootScope) {
         var baseFocusLabel = (
           $scope.labelForFocusTarget() ||
           IdGenerationService.generateNewId() + '-');
@@ -191,6 +191,21 @@ oppia.directive('schemaBasedListEditor', [
             evt.stopPropagation();
           };
 
+          var LARGE_NUMBER = 99;
+          var answerGroups = ResponsesService.getAnswerGroups();
+          var answerChoices = ResponsesService.getAnswerChoices();
+
+          var reduceRuleIndexByOne = function(answerGroupIndex, ruleIndex) {
+            answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x--;
+            return answerGroups;
+          };
+
+          var makeRuleInvalid = function(answerGroupIndex, ruleIndex) {
+            answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x =
+              answerChoices.length + LARGE_NUMBER;
+            return answerGroups;
+          };
+
           $scope.$on('submittedSchemaBasedIntForm', $scope._onChildFormSubmit);
           $scope.$on(
             'submittedSchemaBasedFloatForm', $scope._onChildFormSubmit);
@@ -200,20 +215,19 @@ oppia.directive('schemaBasedListEditor', [
           $scope.deleteElement = function(index) {
             // Need to let the RTE know that HtmlContent has been changed.
             $scope.$broadcast('externalHtmlContentChange');
-            $scope.newAnswers = {};
-            var answerGroups = ResponsesService.getAnswerGroups();
+            $scope.newAnswerGroups = answerGroups;
             for (var i = 0; i < answerGroups.length; i++) {
               var rules = answerGroups[i].rules;
               for (var j = 0; j < rules.length; j++) {
                 if (index < rules[j].inputs.x) {
-                  $scope.newAnswers = ResponsesService
-                    .reduceRuleIndexByOne(i, j);
+                  $scope.newAnswerGroups = reduceRuleIndexByOne(i, j);
                 } else if (index === rules[j].inputs.x) {
-                  $scope.newAnswers = ResponsesService.makeRuleInvalid(i, j);
+                  $scope.newAnswerGroups = makeRuleInvalid(i, j);
                 }
               }
             }
-            $scope.$emit('existingRulesChange', $scope.newAnswers);
+            $rootScope.$broadcast(
+              'answerGroupsChanged', $scope.newAnswerGroups);
             $scope.localValue.splice(index, 1);
           };
         } else {
