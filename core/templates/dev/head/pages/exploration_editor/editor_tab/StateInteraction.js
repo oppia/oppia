@@ -22,7 +22,7 @@ oppia.controller('StateInteraction', [
   'INTERACTION_SPECS', 'stateInteractionIdService',
   'stateCustomizationArgsService', 'EditabilityService',
   'ExplorationStatesService', 'GraphDataService',
-  'InteractionDetailsCacheService', 'ResponsesService',
+  'InteractionDetailsCacheService',
   'ExplorationHtmlFormatterService', 'UrlInterpolationService',
   'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
   function($scope, $http, $rootScope, $uibModal, $injector, $filter,
@@ -30,7 +30,7 @@ oppia.controller('StateInteraction', [
       INTERACTION_SPECS, stateInteractionIdService,
       stateCustomizationArgsService, EditabilityService,
       ExplorationStatesService, GraphDataService,
-      InteractionDetailsCacheService, ResponsesService,
+      InteractionDetailsCacheService,
       ExplorationHtmlFormatterService, UrlInterpolationService,
       SubtitledHtmlObjectFactory, stateSolutionService, stateContentService) {
     var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
