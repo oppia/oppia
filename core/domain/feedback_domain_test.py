@@ -51,8 +51,8 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             expected_thread_dict['state_name'], self.viewer_id,
             expected_thread_dict['status'], expected_thread_dict['subject'],
             expected_thread_dict['summary'], False, 1, fake_date, fake_date)
-        self.assertDictEqual(expected_thread_dict,
-                             observed_thread.to_dict())
+        self.assertDictEqual(
+            expected_thread_dict, observed_thread.to_dict())
 
     def test_get_exp_id_from_full_thread_id(self):
         observed_exp_id = (
@@ -119,8 +119,8 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
             self.owner_id, expected_message_dict['updated_status'],
             expected_message_dict['updated_subject'],
             expected_message_dict['text'], fake_date, fake_date, False)
-        self.assertDictEqual(expected_message_dict,
-                             observed_message.to_dict())
+        self.assertDictEqual(
+            expected_message_dict, observed_message.to_dict())
 
 
 class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
@@ -161,8 +161,8 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['state_name'],
             expected_suggestion_dict['description'],
             expected_suggestion_dict['suggestion_html'])
-        self.assertDictEqual(expected_suggestion_dict,
-                             observed_suggestion.to_dict())
+        self.assertDictEqual(
+            expected_suggestion_dict, observed_suggestion.to_dict())
 
 
 class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):

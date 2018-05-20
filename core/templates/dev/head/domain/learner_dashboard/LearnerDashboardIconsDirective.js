@@ -25,9 +25,10 @@ oppia.directive('learnerDashboardIcons', [
         getActivityId: '&activityId',
         getActivityTitle: '&activityTitle',
         activityActive: '=activityActive',
-        isContainerNarrow: '&containerIsNarrow'
+        isContainerNarrow: '&containerIsNarrow',
+        isAddToPlaylistIconShown: '&addToPlaylistIconIsShown'
       },
-      templateUrl:  UrlInterpolationService.getDirectiveTemplateUrl(
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/domain/learner_dashboard/' +
         'learner_dashboard_icons_directive.html'),
       controller: [

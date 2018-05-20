@@ -288,11 +288,12 @@ class LearnerDashboardFeedbackThreadHandlerTest(test_utils.GenericTestBase):
         # Add another message.
         thread_url = '%s/%s/%s' % (
             feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID_1, thread_id)
-        self.post_json(thread_url, {
-            'updated_status': None,
-            'updated_subject': None,
-            'text': 'Message 1'
-        }, self.csrf_token)
+        self.post_json(
+            thread_url, {
+                'updated_status': None,
+                'updated_subject': None,
+                'text': 'Message 1'
+            }, self.csrf_token)
 
         # Again fetch the thread message summary.
         thread_url = '%s/%s/%s' % (

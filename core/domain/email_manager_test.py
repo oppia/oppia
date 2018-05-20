@@ -415,10 +415,11 @@ class SignupEmailTests(test_utils.GenericTestBase):
             response = self.testapp.get(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
-            self.post_json(feconf.SIGNUP_DATA_URL, {
-                'agreed_to_terms': True,
-                'username': self.EDITOR_USERNAME
-            }, csrf_token=csrf_token)
+            self.post_json(
+                feconf.SIGNUP_DATA_URL, {
+                    'agreed_to_terms': True,
+                    'username': self.EDITOR_USERNAME
+                }, csrf_token=csrf_token)
 
             # Check that no email was sent.
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
@@ -445,10 +446,11 @@ class SignupEmailTests(test_utils.GenericTestBase):
             csrf_token = self.get_csrf_token_from_response(response)
 
             # No user-facing error should surface.
-            self.post_json(feconf.SIGNUP_DATA_URL, {
-                'agreed_to_terms': True,
-                'username': self.EDITOR_USERNAME
-            }, csrf_token=csrf_token)
+            self.post_json(
+                feconf.SIGNUP_DATA_URL, {
+                    'agreed_to_terms': True,
+                    'username': self.EDITOR_USERNAME
+                }, csrf_token=csrf_token)
 
             # However, an error should be recorded in the logs.
             self.assertEqual(log_new_error_counter.times_called, 1)
@@ -491,10 +493,11 @@ class SignupEmailTests(test_utils.GenericTestBase):
             csrf_token = self.get_csrf_token_from_response(response)
 
             # No user-facing error should surface.
-            self.post_json(feconf.SIGNUP_DATA_URL, {
-                'agreed_to_terms': True,
-                'username': self.EDITOR_USERNAME
-            }, csrf_token=csrf_token)
+            self.post_json(
+                feconf.SIGNUP_DATA_URL, {
+                    'agreed_to_terms': True,
+                    'username': self.EDITOR_USERNAME
+                }, csrf_token=csrf_token)
 
             # However, an error should be recorded in the logs.
             self.assertEqual(log_new_error_counter.times_called, 1)
@@ -535,10 +538,11 @@ class SignupEmailTests(test_utils.GenericTestBase):
             csrf_token = self.get_csrf_token_from_response(response)
 
             # No user-facing error should surface.
-            self.post_json(feconf.SIGNUP_DATA_URL, {
-                'agreed_to_terms': True,
-                'username': self.EDITOR_USERNAME
-            }, csrf_token=csrf_token)
+            self.post_json(
+                feconf.SIGNUP_DATA_URL, {
+                    'agreed_to_terms': True,
+                    'username': self.EDITOR_USERNAME
+                }, csrf_token=csrf_token)
 
             # However, an error should be recorded in the logs.
             self.assertEqual(log_new_error_counter.times_called, 1)
@@ -565,10 +569,11 @@ class SignupEmailTests(test_utils.GenericTestBase):
             response = self.testapp.get(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
-            self.post_json(feconf.SIGNUP_DATA_URL, {
-                'agreed_to_terms': True,
-                'username': self.EDITOR_USERNAME
-            }, csrf_token=csrf_token)
+            self.post_json(
+                feconf.SIGNUP_DATA_URL, {
+                    'agreed_to_terms': True,
+                    'username': self.EDITOR_USERNAME
+                }, csrf_token=csrf_token)
 
             # Check that an email was sent with the correct content.
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
@@ -597,20 +602,22 @@ class SignupEmailTests(test_utils.GenericTestBase):
             response = self.testapp.get(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
-            self.post_json(feconf.SIGNUP_DATA_URL, {
-                'agreed_to_terms': True,
-                'username': self.EDITOR_USERNAME
-            }, csrf_token=csrf_token)
+            self.post_json(
+                feconf.SIGNUP_DATA_URL, {
+                    'agreed_to_terms': True,
+                    'username': self.EDITOR_USERNAME
+                }, csrf_token=csrf_token)
 
             # Check that an email was sent.
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(1, len(messages))
 
             # Send a second POST request.
-            self.post_json(feconf.SIGNUP_DATA_URL, {
-                'agreed_to_terms': True,
-                'username': self.EDITOR_USERNAME
-            }, csrf_token=csrf_token)
+            self.post_json(
+                feconf.SIGNUP_DATA_URL, {
+                    'agreed_to_terms': True,
+                    'username': self.EDITOR_USERNAME
+                }, csrf_token=csrf_token)
 
             # Check that no new email was sent.
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
@@ -644,10 +651,11 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(0, len(messages))
 
             # Redo the signup process with a good username.
-            self.post_json(feconf.SIGNUP_DATA_URL, {
-                'agreed_to_terms': True,
-                'username': self.EDITOR_USERNAME
-            }, csrf_token=csrf_token)
+            self.post_json(
+                feconf.SIGNUP_DATA_URL, {
+                    'agreed_to_terms': True,
+                    'username': self.EDITOR_USERNAME
+                }, csrf_token=csrf_token)
 
             # Check that a new email was sent.
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
@@ -672,10 +680,11 @@ class SignupEmailTests(test_utils.GenericTestBase):
             response = self.testapp.get(feconf.SIGNUP_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
-            self.post_json(feconf.SIGNUP_DATA_URL, {
-                'agreed_to_terms': True,
-                'username': self.EDITOR_USERNAME
-            }, csrf_token=csrf_token)
+            self.post_json(
+                feconf.SIGNUP_DATA_URL, {
+                    'agreed_to_terms': True,
+                    'username': self.EDITOR_USERNAME
+                }, csrf_token=csrf_token)
 
             # Check that a new email was sent.
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
@@ -737,8 +746,9 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
         self.generate_hash_ctx = self.swap(
             email_models.SentEmailModel, '_generate_hash',
-            types.MethodType(_generate_hash_for_tests,
-                             email_models.SentEmailModel))
+            types.MethodType(
+                _generate_hash_for_tests,
+                email_models.SentEmailModel))
 
     def test_send_email_does_not_resend_if_same_hash_exists(self):
         can_send_emails_ctx = self.swap(
@@ -1134,7 +1144,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.')
 
         feedback_messages = {
-            self.exploration.id : {
+            self.exploration.id: {
                 'title': self.exploration.title,
                 'messages': ['Message 1.1', 'Message 1.2', 'Message 1.3']}
         }
@@ -1834,8 +1844,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         # Both users have disabled all emails globally, therefore they
         # should not receive any emails.
         for user_id in user_ids:
-            user_services.update_email_preferences(user_id, True, True, False,
-                                                   True)
+            user_services.update_email_preferences(
+                user_id, True, True, False, True)
 
         self.assertListEqual(email_manager.can_users_receive_thread_email(
             user_ids, exp_id, True), [False, False])
@@ -1849,8 +1859,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             user_ids[0], exp_id, mute_feedback_notifications=False)
         user_services.set_email_preferences_for_exploration(
             user_ids[1], exp_id, mute_suggestion_notifications=False)
-        user_services.update_email_preferences(user_id, True, True, False,
-                                               True)
+        user_services.update_email_preferences(
+            user_id, True, True, False, True)
         self.assertListEqual(email_manager.can_users_receive_thread_email(
             user_ids, exp_id, True), [False, False])
         self.assertTrue(email_manager.can_users_receive_thread_email(
@@ -1859,8 +1869,8 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         # Both user have enabled all emails globally, therefore they should
         # receive all emails.
         for user_id in user_ids:
-            user_services.update_email_preferences(user_id, True, True, True,
-                                                   True)
+            user_services.update_email_preferences(
+                user_id, True, True, True, True)
 
         self.assertListEqual(email_manager.can_users_receive_thread_email(
             user_ids, exp_id, True), [True, True])

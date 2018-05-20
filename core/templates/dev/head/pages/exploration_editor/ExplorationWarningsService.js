@@ -20,12 +20,12 @@ oppia.factory('ExplorationWarningsService', [
   '$injector', 'GraphDataService', 'ExplorationStatesService',
   'ExpressionInterpolationService', 'ExplorationParamChangesService',
   'ParameterMetadataService', 'INTERACTION_SPECS',
-  'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
+  'WARNING_TYPES', 'STATE_ERROR_MESSAGES',
   function(
       $injector, GraphDataService, ExplorationStatesService,
       ExpressionInterpolationService, ExplorationParamChangesService,
       ParameterMetadataService, INTERACTION_SPECS,
-      WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
+      WARNING_TYPES, STATE_ERROR_MESSAGES) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -146,9 +146,8 @@ oppia.factory('ExplorationWarningsService', [
       var answerGroups = state.interaction.answerGroups;
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
-        if (group.rules.length === 1 &&
-            group.rules[0].type === RULE_TYPE_CLASSIFIER &&
-            group.rules[0].inputs.training_data.length === 0) {
+        if (group.rules.length === 0 &&
+            group.training_data.length === 0) {
           indexes.push(i);
         }
       }

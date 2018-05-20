@@ -28,6 +28,8 @@ install_node_module eslint-plugin-angular 0.12.0
 install_node_module eslint-plugin-html 4.0.1
 install_node_module gulp 3.9.0
 install_node_module gulp-concat 2.6.0
+install_node_module htmllint 0.7.2
+install_node_module htmllint-cli 0.0.7
 install_node_module through2 2.0.0
 install_node_module uglify-js 3.3.11
 install_node_module yargs 3.29.0
@@ -98,13 +100,13 @@ if ! type pip > /dev/null 2>&1 ; then
 fi
 
 echo Checking if pylint is installed in $TOOLS_DIR/pip_packages
-if [ ! -d "$TOOLS_DIR/pylint-1.7.1" ]; then
+if [ ! -d "$TOOLS_DIR/pylint-1.8.4" ]; then
   echo Installing Pylint
 
-  pip install pylint==1.7.1 --target="$TOOLS_DIR/pylint-1.7.1"
+  pip install pylint==1.8.4 --target="$TOOLS_DIR/pylint-1.8.4"
   # Add __init__.py file so that pylint dependency backports are resolved
   # correctly.
-  touch $TOOLS_DIR/pylint-1.7.1/backports/__init__.py
+  touch $TOOLS_DIR/pylint-1.8.4/backports/__init__.py
 fi
 
 # Install webtest.

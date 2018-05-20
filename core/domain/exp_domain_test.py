@@ -58,9 +58,10 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(exp_versions_diff.added_state_names, [])
         self.assertEqual(exp_versions_diff.deleted_state_names, [])
-        self.assertEqual(exp_versions_diff.old_to_new_state_names, {
-            'Home': 'Renamed state'
-        })
+        self.assertEqual(
+            exp_versions_diff.old_to_new_state_names, {
+                'Home': 'Renamed state'
+            })
         self.exploration.version += 1
 
         # Add a state.
@@ -230,40 +231,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         default_outcome.dest = exploration.init_state_name
         exploration.validate()
 
-        # Ensure an answer group with two classifier rules is invalid.
-        init_state.interaction.answer_groups.append(
-            exp_domain.AnswerGroup.from_dict({
-                'outcome': {
-                    'dest': exploration.init_state_name,
-                    'feedback': {
-                        'html': 'Feedback',
-                        'audio_translations': {}
-                    },
-                    'labelled_as_correct': False,
-                    'param_changes': [],
-                    'refresher_exploration_id': None,
-                },
-                'rule_specs': [{
-                    'inputs': {
-                        'training_data': ['Test']
-                    },
-                    'rule_type': 'FuzzyMatches'
-                }, {
-                    'inputs': {
-                        'training_data': ['Test']
-                    },
-                    'rule_type': 'FuzzyMatches'
-                }],
-            })
-        )
-
-        self._assert_validation_error(
-            exploration, 'AnswerGroups can only have one classifier rule.')
-
-        # Restore a valid exploration.
-        init_state.interaction.answer_groups.pop()
-        exploration.validate()
-
         # Ensure an invalid destination can also be detected for answer groups.
         # Note: The state must keep its default_outcome, otherwise it will
         # trigger a validation error for non-terminal states needing to have a
@@ -290,6 +257,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     },
                     'rule_type': 'Contains'
                 }],
+                'training_data': []
             })
         )
         exploration.validate()
@@ -471,7 +439,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         answer_group.rule_specs = []
         self._assert_validation_error(
             exploration,
-            'There must be at least one rule for each answer group.')
+            'There must be at least one rule or training data for each'
+            ' answer group.')
 
         exploration.states = {
             exploration.init_state_name: exp_domain.State.create_default_state(
@@ -731,14 +700,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected language code to be a string'
             ):
-            with self.swap(subtitled_html, 'audio_translations',
-                           {20: audio_translation}):
+            with self.swap(
+                subtitled_html, 'audio_translations',
+                {20: audio_translation}):
                 subtitled_html.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Unrecognized language code'
             ):
-            with self.swap(subtitled_html, 'audio_translations',
-                           {'invalid-code': audio_translation}):
+            with self.swap(
+                subtitled_html, 'audio_translations',
+                {'invalid-code': audio_translation}):
                 subtitled_html.validate()
 
     def test_get_trainable_states_dict(self):
@@ -986,6 +957,7 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
     """Tests the presence of appropriate schema migration methods in the
     Exploration domain object class.
     """
+
     def test_correct_states_schema_conversion_methods_exist(self):
         """Test that the right states schema conversion methods exist."""
         current_states_schema_version = (
@@ -2846,7 +2818,103 @@ states_schema_version: 18
 tags: []
 title: Title
 """)
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V23
+
+    YAML_CONTENT_V24 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 24
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            audio_translations: {}
+            html: Correct!
+          labelled_as_correct: false
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 19
+tags: []
+title: Title
+""")
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V24
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -2984,6 +3052,12 @@ title: Title
         """Test direct loading from a v23 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V23)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v24(self):
+        """Test direct loading from a v24 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V24)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
 
@@ -3282,9 +3356,10 @@ class StateIdMappingTests(test_utils.GenericTestBase):
                     'state_name': 'new state',
                 }], 'Add state name')
 
-            exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-                'cmd': exp_domain.CMD_DELETE_STATE,
-                'state_name': 'new state',
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_DELETE_STATE,
+                    'state_name': 'new state',
                 }], 'delete state')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -3310,11 +3385,12 @@ class StateIdMappingTests(test_utils.GenericTestBase):
                     'state_name': 'new state',
                 }], 'Add state name')
 
-            exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'new state',
-                'new_state_name': 'state',
-            }], 'Change state name')
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, [{
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'new state',
+                    'new_state_name': 'state',
+                }], 'Change state name')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(

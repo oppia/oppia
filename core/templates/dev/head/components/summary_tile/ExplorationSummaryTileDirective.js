@@ -48,7 +48,8 @@ oppia.directive('explorationSummaryTile', [
         getParentExplorationIds: '&parentExplorationIds',
         showLearnerDashboardIconsIfPossible: (
           '&showLearnerDashboardIconsIfPossible'),
-        isContainerNarrow: '&containerIsNarrow'
+        isContainerNarrow: '&containerIsNarrow',
+        isOwnedByCurrentUser: '&activityIsOwnedByCurrentUser',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +

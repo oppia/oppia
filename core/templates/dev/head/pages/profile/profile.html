@@ -98,6 +98,18 @@
         </div>
       </div>
       <hr class="oppia-profile-stat-container-line-small-screen">
+
+      <div ng-if="!isUserVisitingOwnProfile" class="oppia-align-center">
+        <button class="btn oppia-subscription-button oppia-transition-200 protractor-test-subscription-button"
+                ng-click="changeSubscriptionStatus()"
+                popover-placement="right"
+                ng-attr-popover="<[subscriptionButtonPopoverText]>"
+                popover-append-to-body
+                popover-trigger="mouseenter">
+                <span translate="I18N_SUBSCRIBE_BUTTON_TEXT" ng-if="!isAlreadySubscribed"></span>
+                <span translate="I18N_UNSUBSCRIBE_BUTTON_TEXT" ng-if="isAlreadySubscribed"></span>
+        </button>
+      </div>
     </md-card>
 
     <md-card class="oppia-profile-content-card">
@@ -128,18 +140,6 @@
         <i class="material-icons md-18" ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length" ng-click="goToNextPage()">&#xE5C8;</i>
       </span>
     </md-card>
-
-    <div ng-if="!isUserVisitingOwnProfile">
-      <button class="btn oppia-subscription-button oppia-transition-200 protractor-test-subscription-button"
-              ng-click="changeSubscriptionStatus()"
-              popover-placement="right"
-              ng-attr-popover="<[subscriptionButtonPopoverText]>"
-              popover-append-to-body
-              popover-trigger="mouseenter">
-              <span translate="I18N_SUBSCRIBE_BUTTON_TEXT" ng-if="!isAlreadySubscribed"></span>
-              <span translate="I18N_UNSUBSCRIBE_BUTTON_TEXT" ng-if="isAlreadySubscribed"></span>
-      </button>
-    </div>
   </div>
   <style>
     .oppia-profile-h1 {

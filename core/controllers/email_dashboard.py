@@ -158,7 +158,7 @@ class EmailDashboardResultPage(base.BaseHandler):
 
         if query_model.submitter_id != self.user_id:
             raise self.UnauthorizedUserException(
-                '%s is not an authorized user for this query.', self.user_id)
+                '%s is not an authorized user for this query.' % self.user_id)
 
         self.values.update({
             'query_id': query_id,
@@ -175,7 +175,7 @@ class EmailDashboardResultPage(base.BaseHandler):
 
         if query_model.submitter_id != self.user_id:
             raise self.UnauthorizedUserException(
-                '%s is not an authorized user for this query.', self.user_id)
+                '%s is not an authorized user for this query.' % self.user_id)
 
         data = self.payload['data']
         email_subject = data['email_subject']
@@ -199,7 +199,7 @@ class EmailDashboardCancelEmailHandler(base.BaseHandler):
 
         if query_model.submitter_id != self.user_id:
             raise self.UnauthorizedUserException(
-                '%s is not an authorized user for this query.', self.user_id)
+                '%s is not an authorized user for this query.' % self.user_id)
         query_model.query_status = feconf.USER_QUERY_STATUS_ARCHIVED
         query_model.put()
         self.render_json({})
@@ -221,7 +221,7 @@ class EmailDashboardTestBulkEmailHandler(base.BaseHandler):
 
         if query_model.submitter_id != self.user_id:
             raise self.UnauthorizedUserException(
-                '%s is not an authorized user for this query.', self.user_id)
+                '%s is not an authorized user for this query.' % self.user_id)
 
         email_subject = self.payload['email_subject']
         email_body = self.payload['email_body']

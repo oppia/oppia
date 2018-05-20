@@ -43,10 +43,12 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         """Implements the map function for this job."""
-        yield (item.committer_id, {
-            'exploration_id': item.get_unversioned_instance_id(),
-            'version_string': item.get_version_string(),
-        })
+        yield (
+            item.committer_id, {
+                'exploration_id': item.get_unversioned_instance_id(),
+                'version_string': item.get_version_string(),
+            })
+
 
     @staticmethod
     def reduce(key, version_and_exp_ids):
@@ -165,25 +167,28 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         """Implements the map function for this job."""
         if isinstance(item, feedback_models.FeedbackMessageModel):
             if item.author_id:
-                yield (item.author_id, {
-                    'type': 'feedback',
-                    'id': item.thread_id
-                })
+                yield (
+                    item.author_id, {
+                        'type': 'feedback',
+                        'id': item.thread_id
+                    })
         elif isinstance(item, exp_models.ExplorationRightsModel):
             if item.deleted:
                 return
 
             if not item.community_owned:
                 for owner_id in item.owner_ids:
-                    yield (owner_id, {
-                        'type': 'exploration',
-                        'id': item.id
-                    })
+                    yield (
+                        owner_id, {
+                            'type': 'exploration',
+                            'id': item.id
+                        })
                 for editor_id in item.editor_ids:
-                    yield (editor_id, {
-                        'type': 'exploration',
-                        'id': item.id
-                    })
+                    yield (
+                        editor_id, {
+                            'type': 'exploration',
+                            'id': item.id
+                        })
             else:
                 # Go through the history.
                 current_version = item.version
@@ -193,15 +198,17 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                     if not model.community_owned:
                         for owner_id in model.owner_ids:
-                            yield (owner_id, {
-                                'type': 'exploration',
-                                'id': item.id
-                            })
+                            yield (
+                                owner_id, {
+                                    'type': 'exploration',
+                                    'id': item.id
+                                })
                         for editor_id in model.editor_ids:
-                            yield (editor_id, {
-                                'type': 'exploration',
-                                'id': item.id
-                            })
+                            yield (
+                                editor_id, {
+                                    'type': 'exploration',
+                                    'id': item.id
+                                })
         elif isinstance(item, collection_models.CollectionRightsModel):
             # NOTE TO DEVELOPERS: Although the code handling subscribing to
             # collections is very similar to the code above for explorations,
@@ -215,15 +222,17 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
             if not item.community_owned:
                 for owner_id in item.owner_ids:
-                    yield (owner_id, {
-                        'type': 'collection',
-                        'id': item.id
-                    })
+                    yield (
+                        owner_id, {
+                            'type': 'collection',
+                            'id': item.id
+                        })
                 for editor_id in item.editor_ids:
-                    yield (editor_id, {
-                        'type': 'collection',
-                        'id': item.id
-                    })
+                    yield (
+                        editor_id, {
+                            'type': 'collection',
+                            'id': item.id
+                        })
             else:
                 # Go through the history.
                 current_version = item.version
@@ -234,15 +243,17 @@ class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
                     if not model.community_owned:
                         for owner_id in model.owner_ids:
-                            yield (owner_id, {
-                                'type': 'collection',
-                                'id': item.id
-                            })
+                            yield (
+                                owner_id, {
+                                    'type': 'collection',
+                                    'id': item.id
+                                })
                         for editor_id in model.editor_ids:
-                            yield (editor_id, {
-                                'type': 'collection',
-                                'id': item.id
-                            })
+                            yield (
+                                editor_id, {
+                                    'type': 'collection',
+                                    'id': item.id
+                                })
 
     @staticmethod
     def reduce(key, stringified_values):

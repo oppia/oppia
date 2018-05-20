@@ -246,7 +246,8 @@ class UtilsTests(test_utils.GenericTestBase):
         test_set = {utils.get_hashable_value(json1)}
         self.assertIn(utils.get_hashable_value(json1_deepcopy), test_set)
         test_set.add(utils.get_hashable_value(json2))
-        self.assertEqual(test_set, {
-            utils.get_hashable_value(json1_deepcopy),
-            utils.get_hashable_value(json2_deepcopy),
-        })
+        self.assertEqual(
+            test_set, {
+                utils.get_hashable_value(json1_deepcopy),
+                utils.get_hashable_value(json2_deepcopy),
+            })
