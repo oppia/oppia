@@ -158,18 +158,10 @@ describe('Assets Backend API Service', function() {
         .audio.length).toBe(1);
 
       AssetsBackendApiService.abortAllCurrentAudioDownloads();
-      try {
-        $httpBackend.flush();
-      } catch (exception) {
-        // the $httpBackend.flush throws the exception -- "There are no pending
-        // requests to flush" -- because we aborted all the downloads.
-      }
+      $httpBackend.verifyNoOutstandingRequest();
       expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
         .audio.length).toBe(0);
       expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
     });
 
   it('Should successfully abort the download of the all the image files',
@@ -192,17 +184,9 @@ describe('Assets Backend API Service', function() {
         .image.length).toBe(1);
 
       AssetsBackendApiService.abortAllCurrentImageDownloads();
-      try {
-        $httpBackend.flush();
-      } catch (exception) {
-        // the $httpBackend.flush throws the exception -- "There are no pending
-        // requests to flush" -- because we aborted all the downloads.
-      }
+      $httpBackend.verifyNoOutstandingRequest();
       expect(AssetsBackendApiService.getAssetsFilesCurrentlyBeingRequested()
         .image.length).toBe(0);
       expect(AssetsBackendApiService.isCached('myfile.png')).toBe(false);
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
     });
 });
