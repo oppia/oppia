@@ -49,6 +49,7 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'version_string': item.get_version_string(),
             })
 
+
     @staticmethod
     def reduce(key, version_and_exp_ids):
         """Implements the reduce function for this job."""
@@ -114,7 +115,7 @@ class UserLanguageAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class UserLanguageResetOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for reseting the default language preferences of users."""
+    """One-off job for resetting the default language preferences of users."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
