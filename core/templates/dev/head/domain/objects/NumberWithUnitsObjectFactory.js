@@ -40,22 +40,6 @@ oppia.factory('NumberWithUnitsObjectFactory', [
 
     NumberWithUnits.prototype.toString = function() {
       var numberWithUnitsString = '';
-      /*if (this.type === 'real') {
-        if (this.units.toString() === '$' || this.units.toString() === 'Rs') {
-          numberWithUnitsString += this.units.toString() + ' ' + this.real;
-        } else {
-          numberWithUnitsString += this.real + ' ' + this.units.toString();
-        }
-      } else {
-        if (this.units.toString() === '$' || this.units.toString() === 'Rs') {
-          numberWithUnitsString += this.units.toString() + ' ' +
-            this.fraction.toString();
-        } else {
-          numberWithUnitsString += this.fraction.toString() + ' ' +
-            this.units.toString();
-        }
-      }*/
-
       if (this.units.toString().includes('$')) {
         this.units.units = this.units.toString().replace('$', '');
         numberWithUnitsString += '$' + ' ';
@@ -71,8 +55,8 @@ oppia.factory('NumberWithUnitsObjectFactory', [
         numberWithUnitsString += this.fraction.toString() + ' ';
       }
       numberWithUnitsString += this.units.toString();
-
       numberWithUnitsString = numberWithUnitsString.trim();
+
       return numberWithUnitsString;
     };
 
@@ -125,7 +109,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       }
       if (units !== '') {
         // Checking invalid characters in units.
-        if (units.match(/[^0-9a-z/* ^$-]/i)) {
+        if (units.match(/[^0-9a-z/* ^()$-]/i)) {
           throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_UNIT_CHARS);
         }
       }
@@ -252,6 +236,11 @@ oppia.factory('UnitsObjectFactory', [function() {
   };
 
   Units.fromRawInputString = function(units) {
+    try {
+      math.unit(units);
+    } catch (err) {
+      throw new Error(err);
+    }
     return new Units(units);
   };
 

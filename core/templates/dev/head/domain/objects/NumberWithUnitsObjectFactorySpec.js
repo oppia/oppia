@@ -75,7 +75,7 @@ describe('NumberWithUnitsObjectFactory', function() {
         true, 0, 4, 3), new Units('m / s^2')).toString()).toBe('-4/3 m / s^2');
       expect(new NumberWithUnits('fraction', '', new Fraction(
         false, 0, 4, 3), new Units('$ per hour')).toString()).toBe(
-          '$ 4/3 per hour');
+        '$ 4/3 per hour');
       expect(new NumberWithUnits('real', 40, '', new Units('Rs per hour'
       )).toString()).toBe('Rs 40 per hour');
     });
@@ -136,6 +136,13 @@ describe('NumberWithUnitsObjectFactory', function() {
       expect(function() {
         NumberWithUnits.fromRawInputString('2 / 3 kg&^-2');
       }).toThrow(new Error(errors.INVALID_UNIT_CHARS));
+      expect(function() {
+        NumberWithUnits.fromRawInputString('2 m**2');
+      }).toThrow(new Error('SyntaxError: Unexpected "*" in "m**2" at index 2'));
+      expect(function() {
+        NumberWithUnits.fromRawInputString('2 kg / m^(2)');
+      }).toThrow(new Error('SyntaxError: In "kg / m^(2)", "^" must be ' +
+      'followed by a floating-point number'));
     });
   });
 });
