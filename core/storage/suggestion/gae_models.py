@@ -179,11 +179,11 @@ class SuggestionModel(base_models.BaseModel):
         """Gets all suggestions of a particular type
 
         Args:
-            suggestion_type: str. The sub type of the suggestions.
+            suggestion_type: str. The type of the suggestions.
 
         Returns:
             list(SuggestionModel). A list of suggestions of the given
-                sub type, upto a maximum of feconf.DEFAULT_QUERY_LIMIT
+                type, upto a maximum of feconf.DEFAULT_QUERY_LIMIT
                 suggestions.
         """
         return cls.get_all().filter(
