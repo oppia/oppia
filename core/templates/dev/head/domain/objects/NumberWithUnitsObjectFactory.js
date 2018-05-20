@@ -236,10 +236,17 @@ oppia.factory('UnitsObjectFactory', [function() {
   };
 
   Units.fromRawInputString = function(units) {
-    try {
-      math.unit(units);
-    } catch (err) {
-      throw new Error(err);
+    if (units.includes('per')) {
+      units = units.replace('per', '/');
+    }
+    // Right now, validation of currency units is not possible as we need to add
+    // them first.
+    if (units !== '' && !units.includes('$') && !units.includes('Rs')) {
+      try {
+        math.unit(units);
+      } catch (err) {
+        throw new Error(err);
+      }
     }
     return new Units(units);
   };

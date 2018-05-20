@@ -102,7 +102,7 @@ describe('NumberWithUnitsObjectFactory', function() {
         new NumberWithUnits('real', 2.02, '', new Units('$')));
       expect(NumberWithUnits.fromRawInputString('Rs 2 / 3 per hour')).toEqual(
         new NumberWithUnits('fraction', '', new Fraction(
-          false, 0, 2, 3), new Units('Rs per hour')));
+          false, 0, 2, 3), new Units('Rs / hour')));
     });
 
     it('should throw errors for invalid number with units', function() {
