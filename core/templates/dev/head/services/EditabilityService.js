@@ -20,6 +20,7 @@
 // the current active version? Previous versions should not be editable.
 oppia.factory('EditabilityService', [function() {
   var isEditable = false;
+  var isTranslatable = false;
   var inTutorialMode = false;
 
   return {
@@ -27,13 +28,19 @@ oppia.factory('EditabilityService', [function() {
       return isEditable && !inTutorialMode;
     },
     isEditableOutsideTutorialMode: function() {
-      return isEditable;
+      return isEditable || isTranslatable;
+    },
+    isTranslatable: function() {
+      return isTranslatable && !inTutorialMode;
     },
     markEditable: function() {
       isEditable = true;
     },
     markNotEditable: function() {
       isEditable = false;
+    },
+    markTranslatable: function() {
+      isTranslatable = true;
     },
     onEndTutorial: function() {
       inTutorialMode = false;

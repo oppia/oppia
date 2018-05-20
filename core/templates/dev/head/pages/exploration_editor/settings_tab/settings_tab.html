@@ -244,6 +244,15 @@
             </ul>
           </div>
 
+          <div ng-show="ExplorationRightsService.translatorNames.length > 0">
+            <strong>Translators</strong>
+            <ul>
+              <li ng-repeat="translatorName in ExplorationRightsService.translatorNames track by $index">
+                <[translatorName]>
+              </li>
+            </ul>
+          </div>
+
           <div ng-show="ExplorationRightsService.viewerNames.length > 0">
             <strong>Playtesters</strong>
             <ul>
@@ -274,7 +283,7 @@
                   <select ng-model="newMemberRole" class="form-control protractor-test-role-select" ng-options="r.name for r in ROLES" style="width: 250px;">
                   </select>
                   <span class="help-block">
-                    Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).
+                    Note that managers also have the permissions of collaborators, collaborators also have the permissions of translators, and also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).
                   </span>
                 </div>
 

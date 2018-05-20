@@ -22,7 +22,7 @@ describe('Sidebar state name controller', function() {
     var $httpBackend;
     var mockExplorationData;
 
-    var autosaveDraftUrl = 'createhandler/autosave_draft/0';
+    var autosaveDraftUrl = 'createhandler/editor_autosave_draft/0';
     var validAutosaveResponse = {
       is_version_of_draft_valid: true
     };

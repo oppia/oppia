@@ -16,7 +16,6 @@
 
 """Controllers for the editor view."""
 
-import StringIO
 import datetime
 import imghdr
 import logging
@@ -44,8 +43,6 @@ import feconf
 import utils
 
 import jinja2
-import mutagen
-from mutagen import mp3
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
@@ -197,6 +194,8 @@ class ExplorationPage(EditorHandler):
             'can_release_ownership': (
                 rights_manager.check_can_release_ownership(
                     self.user, exploration_rights)),
+            'can_translate': rights_manager.check_can_translate_activity(
+                self.user, exploration_rights),
             'can_unpublish': rights_manager.check_can_unpublish_activity(
                 self.user, exploration_rights),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
@@ -305,9 +304,9 @@ class ExplorationHandler(EditorHandler):
         exploration = exp_services.get_exploration_by_id(exploration_id)
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
-
         commit_message = self.payload.get('commit_message')
         change_list = self.payload.get('change_list')
+
         try:
             exp_services.update_exploration(
                 self.user_id, exploration_id, change_list, commit_message)
@@ -817,95 +816,6 @@ class ImageUploadHandler(EditorHandler):
         fs.commit(self.user_id, filename, raw)
 
         self.render_json({'filepath': filename})
-
-
-class AudioUploadHandler(EditorHandler):
-    """Handles audio file uploads (to Google Cloud Storage in production, and
-    to the local datastore in dev).
-    """
-
-    # The string to prefix to the filename (before tacking the whole thing on
-    # to the end of 'assets/').
-    _FILENAME_PREFIX = 'audio'
-
-    @acl_decorators.can_edit_exploration
-    def post(self, exploration_id):
-        """Saves an audio file uploaded by a content creator."""
-
-        raw_audio_file = self.request.get('raw_audio_file')
-        filename = self.payload.get('filename')
-        allowed_formats = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
-
-        if not raw_audio_file:
-            raise self.InvalidInputException('No audio supplied')
-        dot_index = filename.rfind('.')
-        extension = filename[dot_index + 1:].lower()
-
-        if dot_index == -1 or dot_index == 0:
-            raise self.InvalidInputException(
-                'No filename extension: it should have '
-                'one of the following extensions: %s' % allowed_formats)
-        if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
-            raise self.InvalidInputException(
-                'Invalid filename extension: it should have '
-                'one of the following extensions: %s' % allowed_formats)
-
-        tempbuffer = StringIO.StringIO()
-        tempbuffer.write(raw_audio_file)
-        tempbuffer.seek(0)
-        try:
-            # For every accepted extension, use the mutagen-specific
-            # constructor for that type. This will catch mismatched audio
-            # types e.g. uploading a flac file with an MP3 extension.
-            if extension == 'mp3':
-                audio = mp3.MP3(tempbuffer)
-            else:
-                audio = mutagen.File(tempbuffer)
-        except mutagen.MutagenError:
-            # The calls to mp3.MP3() versus mutagen.File() seem to behave
-            # differently upon not being able to interpret the audio.
-            # mp3.MP3() raises a MutagenError whereas mutagen.File()
-            # seems to return None. It's not clear if this is always
-            # the case. Occasionally, mutagen.File() also seems to
-            # raise a MutagenError.
-            raise self.InvalidInputException('Audio not recognized '
-                                             'as a %s file' % extension)
-        tempbuffer.close()
-
-        if audio is None:
-            raise self.InvalidInputException('Audio not recognized '
-                                             'as a %s file' % extension)
-        if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
-            raise self.InvalidInputException(
-                'Audio files must be under %s seconds in length. The uploaded '
-                'file is %.2f seconds long.' % (
-                    feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length))
-        if len(set(audio.mime).intersection(
-                set(feconf.ACCEPTED_AUDIO_EXTENSIONS[extension]))) == 0:
-            raise self.InvalidInputException(
-                'Although the filename extension indicates the file '
-                'is a %s file, it was not recognized as one. '
-                'Found mime types: %s' % (extension, audio.mime))
-
-        mimetype = audio.mime[0]
-
-        # For a strange, unknown reason, the audio variable must be
-        # deleted before opening cloud storage. If not, cloud storage
-        # throws a very mysterious error that entails a mutagen
-        # object being recursively passed around in app engine.
-        del audio
-
-        # Audio files are stored to the datastore in the dev env, and to GCS
-        # in production.
-        file_system_class = (
-            fs_domain.ExplorationFileSystem if feconf.DEV_MODE
-            else fs_domain.GcsFileSystem)
-        fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
-        fs.commit(
-            self.user_id, '%s/%s' % (self._FILENAME_PREFIX, filename),
-            raw_audio_file, mimetype=mimetype)
-
-        self.render_json({'filename': filename})
 
 
 class StartedTutorialEventHandler(EditorHandler):

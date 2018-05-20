@@ -22,11 +22,12 @@ oppia.factory('ExplorationRightsService', [
   function($http, ExplorationDataService, AlertsService) {
     return {
       init: function(
-          ownerNames, editorNames, viewerNames, status, clonedFrom,
-          isCommunityOwned, viewableIfPrivate) {
+          ownerNames, editorNames, translatorNames, viewerNames, status,
+          clonedFrom, isCommunityOwned, viewableIfPrivate) {
         this.ownerNames = ownerNames;
         this.editorNames = editorNames;
         this.viewerNames = viewerNames;
+        this.translatorNames = translatorNames;
         this._status = status;
         // This is null if the exploration was not cloned from anything,
         // otherwise it is the exploration ID of the source exploration.
@@ -65,9 +66,9 @@ oppia.factory('ExplorationRightsService', [
           AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
+            data.rights.translator_names, data.rights.viewer_names,
+            data.rights.status, data.rights.cloned_from,
+            data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
       setViewability: function(viewableIfPrivate) {
@@ -83,9 +84,9 @@ oppia.factory('ExplorationRightsService', [
           AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
+            data.rights.translator_names, data.rights.viewer_names,
+            data.rights.status, data.rights.cloned_from,
+            data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
       saveRoleChanges: function(newMemberUsername, newMemberRole) {
@@ -102,9 +103,9 @@ oppia.factory('ExplorationRightsService', [
           AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
+            data.rights.translator_names, data.rights.viewer_names,
+            data.rights.status, data.rights.cloned_from,
+            data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
       publish: function() {
@@ -119,9 +120,9 @@ oppia.factory('ExplorationRightsService', [
           AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
+            data.rights.translator_names, data.rights.viewer_names,
+            data.rights.status, data.rights.cloned_from,
+            data.rights.community_owned, data.rights.viewable_if_private);
         });
       },
       saveModeratorChangeToBackend: function(emailBody) {
@@ -138,9 +139,9 @@ oppia.factory('ExplorationRightsService', [
           AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
+            data.rights.translator_names, data.rights.viewer_names,
+            data.rights.status, data.rights.cloned_from,
+            data.rights.community_owned, data.rights.viewable_if_private);
         });
       }
     };

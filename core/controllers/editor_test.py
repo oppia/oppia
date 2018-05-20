@@ -1634,7 +1634,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             'version': 1,
         }
         response = self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID1, payload,
+            '/createhandler/editor_autosave_draft/%s' % self.EXP_ID1, payload,
             self.csrf_token)
         # Check that draft change list hasn't been updated.
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
@@ -1646,12 +1646,12 @@ class EditorAutosaveTest(BaseEditorControllerTest):
 
     def test_draft_not_updated_validation_error(self):
         self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID2, {
+            '/createhandler/editor_autosave_draft/%s' % self.EXP_ID2, {
                 'change_list': self.DRAFT_CHANGELIST,
                 'version': 1,
             }, self.csrf_token)
         response = self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID2, {
+            '/createhandler/editor_autosave_draft/%s' % self.EXP_ID2, {
                 'change_list': self.INVALID_CHANGELIST,
                 'version': 2,
             }, self.csrf_token, expect_errors=True, expected_status_int=400)
@@ -1671,7 +1671,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             'version': 1,
         }
         response = self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload,
+            '/createhandler/editor_autosave_draft/%s' % self.EXP_ID2, payload,
             self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
@@ -1686,7 +1686,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
             'version': 10,
         }
         response = self.put_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID2, payload,
+            '/createhandler/editor_autosave_draft/%s' % self.EXP_ID2, payload,
             self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))
@@ -1697,7 +1697,7 @@ class EditorAutosaveTest(BaseEditorControllerTest):
 
     def test_discard_draft(self):
         self.post_json(
-            '/createhandler/autosave_draft/%s' % self.EXP_ID2, {},
+            '/createhandler/editor_autosave_draft/%s' % self.EXP_ID2, {},
             self.csrf_token)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.owner_id, self.EXP_ID2))

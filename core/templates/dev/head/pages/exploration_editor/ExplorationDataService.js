@@ -44,8 +44,15 @@ oppia.factory('ExplorationDataService', [
 
     var resolvedAnswersUrlPrefix = (
       '/createhandler/resolved_answers/' + explorationId);
-    var explorationDraftAutosaveUrl = (
-      '/createhandler/autosave_draft/' + explorationId);
+
+    var explorationDraftAutosaveUrl = '';
+    if (GLOBALS.can_edit) {
+      explorationDraftAutosaveUrl = (
+        '/createhandler/editor_autosave_draft/' + explorationId);
+    } else {
+      explorationDraftAutosaveUrl = (
+        '/createhandler/translator_autosave_draft/' + explorationId);
+    }
 
     // Put exploration variables here.
     var explorationData = {

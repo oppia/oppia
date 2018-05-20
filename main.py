@@ -39,6 +39,7 @@ from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
 from core.controllers import subscriptions
+from core.controllers import translator
 from core.domain import acl_decorators
 from core.domain import user_services
 from core.platform import models
@@ -347,6 +348,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
         editor.ExplorationHandler),
     get_redirect_route(
+        r'%s/<exploration_id>' % feconf.EXPLORATION_TRANSLATION_DATA_PREFIX,
+        translator.ExplorationHandler),
+    get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationDownloadHandler),
     get_redirect_route(
@@ -354,7 +358,7 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.ImageUploadHandler),
     get_redirect_route(
         r'/createhandler/audioupload/<exploration_id>',
-        editor.AudioUploadHandler),
+        translator.AudioUploadHandler),
     get_redirect_route(
         r'/createhandler/state_yaml/<exploration_id>',
         editor.StateYamlHandler),
@@ -392,8 +396,11 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/started_tutorial_event/<exploration_id>',
         editor.StartedTutorialEventHandler),
     get_redirect_route(
-        r'/createhandler/autosave_draft/<exploration_id>',
+        r'/createhandler/editor_autosave_draft/<exploration_id>',
         editor.EditorAutosaveHandler),
+    get_redirect_route(
+        r'/createhandler/translator_autosave_draft/<exploration_id>',
+        translator.TranslatorAutosaveHandler),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,

@@ -146,6 +146,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     exp_rights_model.community_owned,
                     exp_rights_model.owner_ids,
                     exp_rights_model.editor_ids,
+                    exp_rights_model.translator_ids,
                     exp_rights_model.viewer_ids,
                     [admin_id],
                     {admin_id: 1},
@@ -167,6 +168,9 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 if exp_rights_model.editor_ids:
                     expected_job_output[exp_id].editor_ids = (
                         exp_rights_model.editor_ids)
+                if exp_rights_model.translator_ids:
+                    expected_job_output[exp_id].translator_ids = (
+                        exp_rights_model.translator_ids)
                 if exp_rights_model.viewer_ids:
                     expected_job_output[exp_id].viewer_ids = (
                         exp_rights_model.viewer_ids)

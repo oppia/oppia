@@ -19,11 +19,13 @@
 oppia.factory('EditableExplorationBackendApiService', [
   '$http', '$q', 'EXPLORATION_DATA_URL_TEMPLATE',
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
+  'TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE',
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   'UrlInterpolationService',
   'ReadOnlyExplorationBackendApiService',
   function($http, $q, EXPLORATION_DATA_URL_TEMPLATE,
       EDITABLE_EXPLORATION_DATA_URL_TEMPLATE,
+      TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE,
       EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
       UrlInterpolationService,
       ReadOnlyExplorationBackendApiService) {
@@ -100,6 +102,13 @@ oppia.factory('EditableExplorationBackendApiService', [
             apply_draft: JSON.stringify(applyDraft)
           });
       }
+      if (!GLOBALS.can_edit && GLOBALS.can_translate) {
+        return UrlInterpolationService.interpolateUrl(
+          TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE, {
+            exploration_id: explorationId
+          });
+      }
+
       return UrlInterpolationService.interpolateUrl(
         EDITABLE_EXPLORATION_DATA_URL_TEMPLATE, {
           exploration_id: explorationId
