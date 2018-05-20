@@ -18,6 +18,7 @@
 
 import ast
 import logging
+import os
 import traceback
 
 from bs4 import BeautifulSoup
@@ -29,8 +30,6 @@ from core.domain import rights_manager
 from core.platform import models
 import feconf
 import utils
-
-import yaml
 
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
@@ -489,14 +488,21 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         exploration = exp_services.get_exploration_from_model(item)
+        # err_dict is a dictionary to store the invalid tags and the
+        # invalid parent-child relations that we find.
         err_dict = {}
 
-        with open('./core/domain/htmlValidation.yaml', 'r') as fp:
-            htmlValidation = yaml.load(fp)
-            allowed_parent_list = htmlValidation['allowed_parent_list']
-            allowed_tag_list = htmlValidation['allowed_tag_list']
+        htmlValidation_filepath = os.path.join(
+            feconf.CONTENT_VALIDATION_DIR, 'htmlValidation.yaml')
+        htmlValidation_yaml = utils.get_file_contents(htmlValidation_filepath)
+        # Convert the yaml content to dictionary.
+        htmlValidation_dict = utils.dict_from_yaml(htmlValidation_yaml)
+
+        allowed_parent_list = htmlValidation_dict['allowed_parent_list']
+        allowed_tag_list = htmlValidation_dict['allowed_tag_list']
 
         for state in exploration.states.itervalues():
+            # result is the list of all the html present in the state.
             result = exp_services.find_all_values_for_key(
                 'html', state.to_dict())
 
@@ -504,26 +510,24 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
                 html_data = html_data.encode('utf-8')
                 soup = BeautifulSoup(html_data, 'html.parser')
 
-                # Checking for tags not allowed in RTE.
                 for tag in soup.findAll():
+                    # Checking for tags not allowed in RTE.
                     if tag.name not in allowed_tag_list:
                         if 'invalidTags' in err_dict:
                             err_dict['invalidTags'] += [tag.name]
                         else:
                             err_dict['invalidTags'] = [tag.name]
+                    # Checking for parent-child relation that are not
+                    # allowed in RTE.
+                    parent = tag.parent.name
+                    if (tag.name in allowed_tag_list and parent not in
+                            allowed_parent_list[tag.name]):
+                        if tag.name in err_dict:
+                            err_dict[tag.name] += [parent]
+                        else:
+                            err_dict[tag.name] = [parent]
 
-                # Checking for parent-child relation that are not
-                # allowed in RTE.
-                for key, value in allowed_parent_list.iteritems():
-                    for tag in soup.findAll(key):
-                        parent = tag.parent.name
-                        if parent not in value:
-                            if key in err_dict:
-                                err_dict[key] += [parent]
-                            else:
-                                err_dict[key] = [parent]
-
-        for key, value in err_dict.iteritems():
+        for key in err_dict.iterkeys():
             err_dict[key] = list(set(err_dict[key]))
 
         yield('Errors', err_dict)
