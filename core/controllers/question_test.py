@@ -32,6 +32,41 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
     method of question manager handler.
     """
 
+    def _create_valid_question_data(self, default_dest_state_name):
+        """Creates a valid question_data dict.
+
+        Args:
+            default_dest_state_name: str. The default destination state.
+
+        Returns:
+            dict. The default question_data dict.
+        """
+        state = exp_domain.State.create_default_state(
+            default_dest_state_name).to_dict()
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'Solution',
+            'explanation': {
+                'html': 'Solution explanation',
+                'audio_translations': {}
+            }
+        }
+        state['interaction']['id'] = 'TextInput'
+        state['interaction']['customization_args'] = {
+            'placeholder': 'Enter text here',
+            'rows': 1
+        }
+        state['interaction']['default_outcome']['labelled_as_correct'] = True
+        state['interaction']['default_outcome']['dest'] = None
+        state['interaction']['hints'].append({
+            'hint_content': {
+                'html': 'hint one',
+                'audio_translations': {}
+            }
+        })
+        state['interaction']['solution'] = solution
+        return state
+
     def setUp(self):
         super(QuestionsHandlersTest, self).setUp()
 
@@ -45,8 +80,7 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
 
         self.question = question_domain.Question(
             'dummy',
-            exp_domain.State.create_default_question_data(
-                'ABC').to_dict(),
+            self._create_valid_question_data('ABC'),
             1, 'en')
 
     def test_delete(self):
@@ -108,8 +142,7 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
             self.new_user_id, self.question)
 
         payload = {}
-        new_question_data = exp_domain.State.create_default_question_data(
-            'DEF').to_dict()
+        new_question_data = self._create_valid_question_data('DEF')
         change_list = [{'cmd': 'update_question_property',
                         'property_name': 'question_data',
                         'new_value': new_question_data,
@@ -170,8 +203,7 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
 
         another_question = question_domain.Question(
             'dummy',
-            exp_domain.State.create_default_question_data(
-                'ABC').to_dict(),
+            self._create_valid_question_data('ABC'),
             1, 'en')
         payload['question'] = another_question.to_dict()
         response_json = self.post_json(
