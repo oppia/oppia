@@ -141,7 +141,7 @@ oppia.controller('LearnerDashboard', [
       return $scope.completedExplorationsList.slice(
         startCompletedExpIndex, Math.min(
           startCompletedExpIndex + $scope.PAGE_SIZE,
-          $scope.completedExplorationsList.length))
+          $scope.completedExplorationsList.length));
     };
 
     $scope.showUsernamePopover = function(subscriberUsername) {
