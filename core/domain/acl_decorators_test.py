@@ -612,6 +612,88 @@ class SendModeratorEmailsTest(test_utils.GenericTestBase):
         self.logout()
 
 
+class TranslateExplorationTest(test_utils.GenericTestBase):
+    """Tests for can_translate_exploration decorator."""
+    role = rights_manager.ROLE_TRANSLATOR
+    username = 'banneduser'
+    user_email = 'user@example.com'
+    published_exp_id = 'exp_0'
+    private_exp_id = 'exp_1'
+
+    class MockHandler(base.BaseHandler):
+        @acl_decorators.can_translate_exploration
+        def get(self, exploration_id):
+            self.render_json({'exploration_id': exploration_id})
+
+    def setUp(self):
+        super(TranslateExplorationTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.user_email, self.username)
+        self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_banned_users([self.username])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+
+        rights_manager.assign_role_for_exploration(
+            self.owner, self.published_exp_id, self.translator_id, self.role)
+
+    def test_banned_user_cannot_translate_exploration(self):
+        self.login(self.user_email)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+    def test_owner_can_translate_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_moderator_can_translate_public_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.published_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_moderator_cannot_translate_private_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+    def test_admin_can_edit_private_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+    def test_translator_can_translate_assigned_exploration(self):
+        self.login(self.TRANSLATOR_EMAIL)
+        response = self.testapp.get(
+            '/mock/%s' % self.published_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.logout()
+
+
 class EditExplorationTest(test_utils.GenericTestBase):
     """Tests for can_edit_exploration decorator."""
     username = 'banneduser'
