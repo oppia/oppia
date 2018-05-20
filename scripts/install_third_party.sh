@@ -139,6 +139,16 @@ if [ ! -d "$TOOLS_DIR/pycodestyle-2.3.1" ]; then
   rm pycodestyle-2.3.1.tar.gz
 fi
 
+# Install pyjsparser.
+echo Checking if pyjsparser is installed in third_party
+if [ ! -d "$TOOLS_DIR/pyjsparser-2.5.2" ]; then
+  echo Installing pyjsparser
+  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl -o pyjsparser-2.5.2.tar.gz -L https://pypi.python.org/packages/17/3d/59f7f0cd6a7cdab611b36d8921c9d2d6c5564033d938ec2eb934cdca0e48/pyjsparser-2.5.2.tar.gz
+  tar xzf pyjsparser-2.5.2.tar.gz -C $TOOLS_DIR
+  rm pyjsparser-2.5.2.tar.gz
+fi
+
 # Python API for browsermob-proxy.
 echo Checking if browsermob-proxy is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
