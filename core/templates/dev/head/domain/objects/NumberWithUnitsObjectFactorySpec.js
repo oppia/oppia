@@ -53,15 +53,15 @@ describe('NumberWithUnitsObjectFactory', function() {
       expect(Units.stringToLexical('kg per kg^2 K mol / (N m s^2) K s'
       )).toEqual(
         ['kg', '/', 'kg^2', '*', 'K', '*', 'mol', '/', '(', 'N', '*', 'm', '*',
-         's^2', ')', 'K', '*', 's']);
+          's^2', ')', 'K', '*', 's']);
       expect(Units.stringToLexical('kg (K mol) m/s^2 r t / (l/ n) / o'
       )).toEqual(
         ['kg', '(', 'K', '*', 'mol', ')', 'm', '/', 's^2', '*', 'r', '*', 't',
-         '/', '(', 'l', '/', 'n', ')', '/', 'o']);
+          '/', '(', 'l', '/', 'n', ')', '/', 'o']);
       expect(Units.stringToLexical('mol per (kg per (N m per s^2)*K)'
       )).toEqual(
         ['mol', '/', '(', 'kg', '/', '(', 'N', '*', 'm', '/', 's^2', ')', '*',
-         'K', ')']);
+          'K', ')']);
     });
 
     it('should convert itself to a string', function() {
