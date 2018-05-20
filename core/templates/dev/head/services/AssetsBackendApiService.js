@@ -201,8 +201,10 @@ oppia.factory('AssetsBackendApiService', [
           if (_isCached(filename)) {
             resolve(AudioFileObjectFactory.createNew(
               filename, assetsCache[filename]));
-          } else if (!_isAssetCurrentlyBeingRequested(filename, ASSET_TYPE_AUDIO)) {
-            _fetchFile(explorationId, filename, ASSET_TYPE_AUDIO, resolve, reject);
+          } else if (!_isAssetCurrentlyBeingRequested(filename,
+              ASSET_TYPE_AUDIO)) {
+            _fetchFile(explorationId, filename, ASSET_TYPE_AUDIO,
+              resolve, reject);
           }
         });
       },
@@ -211,8 +213,10 @@ oppia.factory('AssetsBackendApiService', [
           if (_isCached(filename)) {
             resolve(ImageFileObjectFactory.createNew(
               filename, assetsCache[filename]));
-          } else if (!_isAssetCurrentlyBeingRequested(filename, ASSET_TYPE_IMAGE)) {
-            _fetchFile(explorationId, filename, ASSET_TYPE_IMAGE, resolve, reject);
+          } else if (!_isAssetCurrentlyBeingRequested(filename,
+              ASSET_TYPE_IMAGE)) {
+            _fetchFile(explorationId, filename, ASSET_TYPE_IMAGE,
+              resolve, reject);
           }
         });
       },
