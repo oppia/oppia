@@ -19,7 +19,9 @@
 import contextlib
 import copy
 import inspect
+import itertools
 import json
+import operator
 import os
 import re
 import unittest
@@ -673,6 +675,69 @@ tags: []
             init_state = exploration.states[exploration.init_state_name]
             init_interaction = init_state.interaction
             init_interaction.default_outcome.dest = end_state_name
+
+        exp_services.save_new_exploration(owner_id, exploration)
+        return exploration
+
+    def save_new_valid_exploration_with_states(
+            self, exploration_id, owner_id, title='A title',
+            category='A category', objective='An objective',
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            state_names=None, interaction_ids=None):
+        """Saves a new strictly-validated exploration.
+
+        Args:
+            exploration_id: str. The id of the new validated exploration.
+            owner_id: str. The user_id of the creator of the exploration.
+            title: str. The title of the exploration.
+            category: str. The category this exploration belongs to.
+            objective: str. The objective of this exploration.
+            language_code: str. The language_code of this exploration.
+            state_names: list(str). The names of states to be linked
+                sequentially in the exploration. Must be a non-empty list.
+            interaction_ids: list(str). The names of the interaction ids to be
+                assigned to each state. Values will be cycled, so it doesn't
+                need to be the same size as state_names. The default interaction
+                id is TextInput.
+
+        Returns:
+            Exploration. The exploration domain object.
+        """
+        if not state_names:
+            raise ValueError('must provide at least one state name')
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exploration_id, title=title, category=category,
+            language_code=language_code)
+        exploration.objective = objective
+
+        # Will cycle through interaction_ids to produce values for each state.
+        if not interaction_ids:
+            interaction_ids = ['TextInput']
+        interaction_ids = itertools.cycle(interaction_ids)
+
+        # Prepare the state names to link together.
+        to_state_names = state_names
+        from_state_names = [exploration.init_state_name] + to_state_names[:-1]
+
+        # Prepare init_state.
+        init_state = exploration.states[from_state_names[0]]
+        init_state.update_interaction_id(interaction_id)
+
+        for from_state_name, to_state_name in (
+                zip(from_state_names, to_state_names)):
+            # NOTE: from_state_name always exists.
+            exploration.add_states([to_state_name])
+
+            from_state, to_state = operator.itemgetter(
+                from_state_name, to_state_name)(exploration.states)
+
+            to_state.update_interaction_id(next(interaction_ids))
+            from_state.interaction.default_outcome.dest = to_state_name
+
+        # Prepare end_state.
+        end_state = exploration.states[to_state_names[-1]]
+        end_state.interaction.default_outcome = None
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
