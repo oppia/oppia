@@ -44,6 +44,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.HintsAuditOneOffJob,
     exp_jobs_one_off.ItemSelectionInteractionOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
+    exp_jobs_one_off.ExplorationContentValidationJob,
     feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob,
     feedback_jobs_one_off.FeedbackSubjectOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
