@@ -245,7 +245,7 @@ def can_access_admin_page(handler):
 
         if not current_user_services.is_current_user_super_admin():
             raise self.UnauthorizedUserException(
-                '%s is not a super admin of this application', self.user_id)
+                '%s is not a super admin of this application' % self.user_id)
         return handler(self, **kwargs)
     test_super_admin.__wrapped__ = True
 
