@@ -1495,8 +1495,11 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
 
         state_answers_stats_multi = self._get_state_answers_stats_multi(
             min_frequency=1, state_names=['STATE A', 'STATE B'])
-        self.assertEqual(
-            sorted(state_answers_stats_multi), ['STATE A', 'STATE B'])
+
+        self.assertEqual(sorted(state_answers_stats_multi), [
+            'STATE A',
+            'STATE B',
+        ])
         self.assertEqual(state_answers_stats_multi['STATE A'], [
             {'answer': 'A', 'frequency': 2},
             {'answer': 'B', 'frequency': 1},
