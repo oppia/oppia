@@ -48,6 +48,10 @@ oppia.factory('NumberWithUnitsObjectFactory', [
         this.units.units = this.units.toString().replace('Rs', '');
         numberWithUnitsString += 'Rs' + ' ';
       }
+      if (this.units.toString().includes('₹')) {
+        this.units.units = this.units.toString().replace('₹', '');
+        numberWithUnitsString += '₹' + ' ';
+      }
 
       if (this.type === 'real') {
         numberWithUnitsString += this.real + ' ';
@@ -96,7 +100,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
         }
       }
       // Checking invalid characters in value.
-      if (value.match(/[a-z]/i) || value.match(/[*^$()#@]/)) {
+      if (value.match(/[a-z]/i) || value.match(/[*^$₹()#@]/)) {
         throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_VALUE);
       }
 
@@ -109,7 +113,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       }
       if (units !== '') {
         // Checking invalid characters in units.
-        if (units.match(/[^0-9a-z/* ^()$-]/i)) {
+        if (units.match(/[^0-9a-z/* ^()₹$-]/i)) {
           throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_UNIT_CHARS);
         }
       }
@@ -241,7 +245,8 @@ oppia.factory('UnitsObjectFactory', [function() {
     }
     // Right now, validation of currency units is not possible as we need to add
     // them first.
-    if (units !== '' && !units.includes('$') && !units.includes('Rs')) {
+    if (units !== '' && !units.includes('$') && !units.includes('Rs') &&
+      !units.includes('₹')) {
       try {
         math.unit(units);
       } catch (err) {
