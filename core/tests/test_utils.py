@@ -684,7 +684,7 @@ tags: []
             category='A category', objective='An objective',
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             state_names=None, interaction_ids=None):
-        """Saves a new strictly-validated exploration.
+        """Saves a new strictly-validated exploration with a sequence of states.
 
         Args:
             exploration_id: str. The id of the new validated exploration.
