@@ -494,7 +494,7 @@ def get_state_answers_stats(exp_id, state_name):
         _get_calc_output(exp_id, state_name, 'Top10AnswerFrequencies')
             .calculation_output.to_raw_type())
     return [
-        {'answerHtml': calc['answer'], 'frequency': calc['frequency']}
+        {'answer': calc['answer'], 'frequency': calc['frequency']}
         for calc in calculation_output
         if calc['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY]
 
@@ -506,7 +506,7 @@ def get_state_answers_stats_multi(exp_id, state_names):
             _get_calc_output(exp_id, state_name, 'Top10AnswerFrequencies')
                 .calculation_output.to_raw_type())
         state_answers_stats_multi[state_name] = [
-            {'answerHtml': calc['answer'], 'frequency': calc['frequency']}
+            {'answer': calc['answer'], 'frequency': calc['frequency']}
             for calc in calculation_output
             if calc['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY]
     return state_answers_stats_multi

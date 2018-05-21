@@ -1515,6 +1515,6 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self._run_answer_summaries_aggregator()
 
         self.assertEqual(self._get_state_answers_stats(), [
-            {'answerHtml': u'A', 'frequency': 3},
-            {'answerHtml': u'B', 'frequency': 2},
+            {'answer': u'A', 'frequency': 3},
+            {'answer': u'B', 'frequency': 2},
         ])
