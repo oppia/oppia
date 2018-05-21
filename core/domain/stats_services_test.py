@@ -1423,7 +1423,6 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
     """
     INIT_STATE_NAME = 'STATE A'
     TEXT_INPUT_EXP_ID = 'exp_id0'
-    DEFAULT_EXP_ID = 'exp_id2'
 
     def _get_state_answers_stats(
             self, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME,
@@ -1465,7 +1464,6 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self.save_new_valid_exploration_with_states(
             self.TEXT_INPUT_EXP_ID, self.owner_id,
             state_names=['STATE A', 'STATE B', 'STATE C'])
-        self.save_new_default_exploration(self.DEFAULT_EXP_ID, self.owner_id)
 
     def test_get_state_answers_stats(self):
         self._record_answer('A')
