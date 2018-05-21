@@ -1457,10 +1457,6 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
 
-    def _rerun_answer_summaries_aggregator(self):
-        ModifiedInteractionAnswerSummariesAggregator.stop_computation('a')
-        self._run_answer_summaries_aggregator()
-
     def setUp(self):
         super(StateAnswersStatisticsTest, self).setUp()
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
