@@ -1509,3 +1509,14 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             self.SET_INPUT_EXP_ID, self.owner_id, end_state_name='End',
             interaction_id='SetInput')
         self.save_new_default_exploration(self.DEFAULT_EXP_ID, self.owner_id)
+
+    def test_get_state_answers_stats(self):
+        self._record_answer('A')
+        self._record_answer('A')
+        self._record_answer('B')
+        self._run_answer_summaries_aggregator()
+
+        self.assertEqual(self._get_state_answers_stats(), [
+            {'answerHtml': 'A', 'frequency': 2},
+            {'answerHtml': 'B', 'frequency': 2},
+        ])
