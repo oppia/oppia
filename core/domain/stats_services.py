@@ -489,9 +489,10 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
 
 
 def get_state_answers_stats(exp_id, exp_version, state_name):
-    calculation_output = _get_calc_output(
-        exp_id, exp_version, state_name, 'Top10AnswerFrequencies')
-            .calculation_output.to_raw_type()
+    calculation_output = (
+        _get_calc_output(
+                exp_id, exp_version, state_name, 'Top10AnswerFrequencies')
+            .calculation_output.to_raw_type())
     return [
         {'answerHtml': calc['answer'], 'frequency': calc['frequency']}
         for calc in calculation_output
@@ -501,9 +502,10 @@ def get_state_answers_stats(exp_id, exp_version, state_name):
 def get_state_answers_stats_multi(exp_id, exp_version, state_names):
     state_answers_stats_multi = dict()
     for state_name in state_names:
-        calculation_output = _get_calc_output(
-            exp_id, exp_version, state_name, 'Top10AnswerFrequencies')
-                .calculation_output.to_raw_type()
+        calculation_output = (
+            _get_calc_output(
+                    exp_id, exp_version, state_name, 'Top10AnswerFrequencies')
+                .calculation_output.to_raw_type())
         state_answers_stats_multi[state_name] = [
             {'answerHtml': calc['answer'], 'frequency': calc['frequency']}
             for calc in calculation_output
