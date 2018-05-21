@@ -1435,7 +1435,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
 
     def _get_state_answers_stats(
             self, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
-        return stats_services.get_state_answers_stats(exp_id, 'ALL', state_name)
+        return stats_services.get_state_answers_stats(exp_id, state_name)
 
     def _record_answer(
             self, answer, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
