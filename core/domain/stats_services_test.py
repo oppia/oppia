@@ -1116,11 +1116,6 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
     DEFAULT_EXP_ID = 'exp_id2'
     NEW_STATE_NAME = 'new state'
 
-    def _get_swap_context(self):
-        return self.swap(
-            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-            self.ALL_CC_MANAGERS_FOR_TESTS)
-
     def _get_visualizations(
             self, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
         exploration = exp_services.get_exploration_by_id(exp_id)
@@ -1529,4 +1524,29 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             {'answer': 'A', 'frequency': 3},
             {'answer': 'B', 'frequency': 2},
             # C is not included because min frequency is 2.
+        ])
+
+    def test_get_state_answers_stats_multi(self):
+        self._record_answer('A', state_name='STATE_A')
+        self._record_answer('A', state_name='STATE_A')
+        self._record_answer('B', state_name='STATE_A')
+        self._record_answer(1, state_name='STATE_B')
+        self._record_answer(1, state_name='STATE_B')
+        self._record_answer(2, state_name='STATE_B')
+        self._record_answer('X', state_name='STATE_C')
+        self._record_answer('X', state_name='STATE_C')
+        self._record_answer('Y', state_name='STATE_C')
+        self._run_answer_summaries_aggregator()
+
+        state_answers_stats_multi = self._get_state_answers_stats_multi(
+            min_frequency=1, state_names=['STATE_A', 'STATE_B'])
+        self.assertEqual(
+            sorted(state_answers_stats_multi), ['STATE_A', 'STATE_B'])
+        self.assertEqual(state_answers_stats_multi['STATE_A'], [
+            {'answer': 'A', 'frequency': 2},
+            {'answer': 'B', 'frequency': 1},
+        ])
+        self.assertEqual(state_answers_stats_multi['STATE_B'], [
+            {'answer': 1, 'frequency': 2},
+            {'answer': 2, 'frequency': 1},
         ])
