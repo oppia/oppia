@@ -1422,23 +1422,22 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
     particular state.
     """
     STATE_NAMES = ['STATE A', 'STATE B', 'STATE C']
-    DEFAULT_EXP_ID = 'exp_id'
+    EXP_ID = 'exp_id'
 
     def _get_state_answers_stats(
-            self, exp_id=DEFAULT_EXP_ID, state_name=STATE_NAMES[0],
-            min_frequency=None):
+            self, exp_id=EXP_ID, state_name=STATE_NAMES[0], min_frequency=None):
         return stats_services.get_state_answers_stats(
             exp_id, state_name, test_only_min_frequency=min_frequency)
 
     def _get_state_answers_stats_multi(
-            self, exp_id=DEFAULT_EXP_ID, state_names=None, min_frequency=None):
+            self, exp_id=EXP_ID, state_names=None, min_frequency=None):
         if not state_names:
             raise ValueError('Must provide non-empty state names.')
         return stats_services.get_state_answers_stats_multi(
             exp_id, state_names, test_only_min_frequency=min_frequency)
 
     def _record_answer(
-            self, answer, exp_id=DEFAULT_EXP_ID, state_name=STATE_NAMES[0]):
+            self, answer, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
         exploration = exp_services.get_exploration_by_id(exp_id)
         interaction_id = exploration.states[state_name].interaction.id
         event_services.AnswerSubmissionEventHandler.record(
@@ -1461,7 +1460,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.save_new_valid_exploration_with_states(
-            self.DEFAULT_EXP_ID, self.owner_id, state_names=self.STATE_NAMES)
+            self.EXP_ID, self.owner_id, state_names=self.STATE_NAMES)
 
     def test_get_state_answers_stats(self):
         self._record_answer('A')
