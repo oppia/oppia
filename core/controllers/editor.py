@@ -956,7 +956,7 @@ class StateAnswersStatsHandler(EditorHandler):
     """Returns basic learner answer statistics for a state."""
 
     @acl_decorators.can_view_exploration_stats
-    def get(self, exploration_id, escaped_state_names):
+    def get(self, exploration_id):
         """Handles GET requests."""
         try:
             current_exploration = (
@@ -964,19 +964,7 @@ class StateAnswersStatsHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        state_names = []
-        for escaped_state_name in escaped_state_names:
-            state_name = (
-                utils.unescape_encoded_uri_component(escaped_state_name))
-            if state_name not in current_exploration.states:
-                logging.error('Could not find state: %s' % state_name)
-                logging.error('Available states: %s' % (
-                    current_exploration.states.keys()))
-                raise self.PageNotFoundException
-            else:
-                state_names.append(state_name)
-
         self.render_json({
             'answers': stats_services.get_state_answer_stats_multi(
-                 exploration_id, state_names)
+                 exploration_id, current_exploration.states)
         })
