@@ -1421,11 +1421,11 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
     """Tests for functionality related to retrieving statistics for answers of a
     particular state.
     """
-    INIT_STATE_NAME = 'STATE A'
+    STATE_NAMES = ['STATE A', 'STATE B', 'STATE C']
     TEXT_INPUT_EXP_ID = 'exp_id0'
 
     def _get_state_answers_stats(
-            self, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME,
+            self, exp_id=TEXT_INPUT_EXP_ID, state_name=STATE_NAMES[0],
             min_frequency=None):
         return stats_services.get_state_answers_stats(
             exp_id, state_name, test_only_min_frequency=min_frequency)
@@ -1439,7 +1439,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             exp_id, state_names, test_only_min_frequency=min_frequency)
 
     def _record_answer(
-            self, answer, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
+            self, answer, exp_id=TEXT_INPUT_EXP_ID, state_name=STATE_NAMES[0]):
         exploration = exp_services.get_exploration_by_id(exp_id)
         interaction_id = exploration.states[state_name].interaction.id
         event_services.AnswerSubmissionEventHandler.record(
@@ -1462,8 +1462,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.save_new_valid_exploration_with_states(
-            self.TEXT_INPUT_EXP_ID, self.owner_id,
-            state_names=['STATE A', 'STATE B', 'STATE C'])
+            self.TEXT_INPUT_EXP_ID, self.owner_id, state_names=self.STATE_NAMES)
 
     def test_get_state_answers_stats(self):
         self._record_answer('A')
