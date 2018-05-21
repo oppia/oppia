@@ -22,6 +22,7 @@ from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.domain import stats_domain
 from core.platform import models
+import feconf
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 transaction_services = models.Registry.import_transaction_services()
@@ -495,7 +496,7 @@ def get_state_answers_stats(exp_id, state_name):
     return [
         {'answerHtml': calc['answer'], 'frequency': calc['frequency']}
         for calc in calculation_output
-        if calc['frequency'] >= STATE_ANSWER_STATS_MIN_FREQUENCY]
+        if calc['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY]
 
 
 def get_state_answers_stats_multi(exp_id, state_names):
@@ -507,7 +508,7 @@ def get_state_answers_stats_multi(exp_id, state_names):
         state_answers_stats_multi[state_name] = [
             {'answerHtml': calc['answer'], 'frequency': calc['frequency']}
             for calc in calculation_output
-            if calc['frequency'] >= STATE_ANSWER_STATS_MIN_FREQUENCY]
+            if calc['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY]
     return state_answers_stats_multi
 
 
