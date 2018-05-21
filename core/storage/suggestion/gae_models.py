@@ -99,7 +99,7 @@ class SuggestionModel(base_models.BaseModel):
     # The ID of the author of the suggestion.
     author_id = ndb.StringProperty(required=True, indexed=True)
     # The ID of the reviewer assigned to review the suggestion.
-    assigned_reviewer_id = ndb.StringProperty(required=True, indexed=True)
+    assigned_reviewer_id = ndb.StringProperty(required=False, indexed=True)
     # The ID of the reviewer who accepted the suggestion.
     reviewer_id = ndb.StringProperty(required=False, indexed=True)
     # The change command linked to the suggestion. Contains the details of the
