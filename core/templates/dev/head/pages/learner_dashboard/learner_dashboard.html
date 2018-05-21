@@ -298,7 +298,7 @@
               </div>
             </md-card>
 
-            <div ng-repeat="tile in completedExplorationsList | orderBy:getValueOfExplorationSortKey:isCurrentExpSortDescending track by tile.id"
+            <div ng-repeat="tile in getVisibleExplorationList(startCompletedExpIndex) | orderBy:getValueOfExplorationSortKey:isCurrentExpSortDescending track by tile.id"
                  style="display: inline-block; margin-left: 1px;">
               <exploration-summary-tile
                                       exploration-id="tile.id"
