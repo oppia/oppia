@@ -722,7 +722,7 @@ tags: []
 
         # Prepare init_state.
         init_state = exploration.states[from_state_names[0]]
-        init_state.update_interaction_id(interaction_id)
+        init_state.update_interaction_id(next(interaction_ids))
 
         for from_state_name, to_state_name in (
                 zip(from_state_names, to_state_names)):
