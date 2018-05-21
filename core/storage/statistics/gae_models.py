@@ -30,6 +30,37 @@ from google.appengine.ext import ndb
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 transaction_services = models.Registry.import_transaction_services()
 
+ACTION_TYPE_EXPLORATION_START = 'ExplorationStart'
+ACTION_TYPE_ANSWER_SUBMIT = 'AnswerSubmit'
+ACTION_TYPE_EXPLORATION_QUIT = 'ExplorationQuit'
+
+ISSUE_TYPE_EARLY_QUIT = 'EarlyQuit'
+ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS = 'MultipleIncorrectSubmissions'
+ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS = 'CyclicStateTransitions'
+
+# Types of allowed issues.
+ALLOWED_ISSUE_TYPES = [
+    ISSUE_TYPE_EARLY_QUIT,
+    ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
+    ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS
+]
+# Types of allowed learner actions.
+ALLOWED_ACTION_TYPES = [
+    ACTION_TYPE_EXPLORATION_START,
+    ACTION_TYPE_ANSWER_SUBMIT,
+    ACTION_TYPE_EXPLORATION_QUIT
+]
+# Mapping from issue type to issue keyname in the issue customization dict. This
+# mapping is useful to uniquely identify issues by the combination of their
+# issue type and other type-specific information (such as the list of states
+# involved).
+ISSUE_TYPE_KEYNAME_MAPPING = {
+    'EarlyQuit': 'state_name',
+    'MultipleIncorrectSubmissions': 'state_name',
+    'CyclicStateTransitions': 'state_names'
+}
+
+
 
 class StateCounterModel(base_models.BaseModel):
     """A set of counts that correspond to a state.
@@ -941,7 +972,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
     # The unresolved issues for this exploration. This will be a list of dicts
     # where each dict represents an issue along with the associated
     # playthroughs.
-    unresolved_issues = ndb.JsonProperty(default=None, repeated=True)
+    unresolved_issues = ndb.JsonProperty(repeated=True)
 
     @classmethod
     def create(cls, exp_id, unresolved_issues):
@@ -970,19 +1001,20 @@ class PlaythroughModel(base_models.BaseModel):
     {{exp_id}}.{{random_hash_of_16_chars}}
     """
     # ID of the exploration.
-    exp_id = ndb.StringProperty(indexed=True)
+    exp_id = ndb.StringProperty(indexed=True, required=True)
     # Version of the exploration.
-    exp_version = ndb.IntegerProperty(indexed=True)
+    exp_version = ndb.IntegerProperty(indexed=True, required=True)
     # Type of the issue.
-    issue_type = ndb.StringProperty(indexed=True)
+    issue_type = ndb.StringProperty(
+        indexed=True, required=True, choices=ALLOWED_ISSUE_TYPES)
     # The customization args dict for the given issue_type.
-    issue_customization_args = ndb.JsonProperty(default=None)
+    issue_customization_args = ndb.JsonProperty(default=None, required=True)
     # The playthrough actions for this playthrough. This will be a list of dicts
     # where each dict represents a single playthrough action. The list is
     # ordered by the time of occurence of the action.
-    playthrough_actions = ndb.JsonProperty(default=None, repeated=True)
+    playthrough_actions = ndb.JsonProperty(repeated=True)
     # Boolean for checking validity of the playthrough.
-    is_valid = ndb.BooleanProperty(indexed=True)
+    is_valid = ndb.BooleanProperty(indexed=True, required=True)
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -1042,26 +1074,6 @@ class PlaythroughModel(base_models.BaseModel):
             issue_customization_args=issue_customization_args,
             playthrough_actions=playthrough_actions, is_valid=is_valid)
         playthrough_instance.put()
-        return instance_id
-
-    @classmethod
-    def create_from_dict(cls, playthrough_data):
-        """Creates a PlaythroughModel instance from a dict representing the
-        playthrough.
-
-        Args:
-            playthrough_data: dict. A dict representing the playthrough object.
-
-        Returns:
-            str. ID of the new PlaythroughModel instance.
-        """
-        instance_id = cls.create(
-            playthrough_data['exp_id'],
-            playthrough_data['exp_version'],
-            playthrough_data['issue_type'],
-            playthrough_data['issue_customization_args'],
-            playthrough_data['playthrough_actions'],
-            playthrough_data['is_valid'])
         return instance_id
 
 

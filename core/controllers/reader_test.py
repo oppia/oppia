@@ -31,6 +31,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import utils
 
 (classifier_models, stats_models) = models.Registry.import_models(
     [models.NAMES.classifier, models.NAMES.statistics])
@@ -1480,6 +1481,30 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
         self.assertEqual(len(model.unresolved_issues), 1)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 5)
+
+    def test_error_on_invalid_exp_issue_dict(self):
+        """Test that passing an invalid exploration issue dict raises an
+        exception.
+        """
+        del self.exp_issue['issue_type']
+
+        self.post_json(
+            '/explorehandler/store_playthrough/%s' % (self.exp_id),
+            {
+                'playthrough_data': self.playthrough_data,
+                'exp_issue': self.exp_issue
+            }, self.csrf_token, expect_errors=True, expected_status_int=400)
+
+    def test_error_on_invalid_playthrough_dict(self):
+        """Test that passing an invalid playthrough dict raises an exception."""
+        self.playthrough_data['issue_type'] = 'FakeIssueType'
+
+        self.post_json(
+            '/explorehandler/store_playthrough/%s' % (self.exp_id),
+            {
+                'playthrough_data': self.playthrough_data,
+                'exp_issue': self.exp_issue
+            }, self.csrf_token, expect_errors=True, expected_status_int=400)
 
 
 class StatsEventHandlerTest(test_utils.GenericTestBase):

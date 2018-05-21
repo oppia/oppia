@@ -19,7 +19,10 @@
 import os
 import pkgutil
 
+from core.platform import models
 import feconf
+
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
 class Registry(object):
@@ -35,7 +38,7 @@ class Registry(object):
         Returns:
             list(str). The list of all allowed action types.
         """
-        return feconf.ALLOWED_ACTION_TYPES
+        return stats_models.ALLOWED_ACTION_TYPES
 
     @classmethod
     def set_actions(cls, actions):

@@ -260,24 +260,3 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.issue_customization_args, {})
         self.assertEqual(model.playthrough_actions, [])
         self.assertEqual(model.is_valid, True)
-
-    def test_create_from_dict(self):
-        playthrough_data = {
-            'exp_id': 'exp_id1',
-            'exp_version': 1,
-            'issue_type': 'EarlyQuit',
-            'issue_customization_args': {},
-            'playthrough_actions': [],
-            'is_valid': True
-        }
-        model_id = stat_models.PlaythroughModel.create_from_dict(
-            playthrough_data)
-        model = stat_models.PlaythroughModel.get(model_id)
-
-        self.assertEqual(model.id, model_id)
-        self.assertEqual(model.exp_id, 'exp_id1')
-        self.assertEqual(model.exp_version, 1)
-        self.assertEqual(model.issue_type, 'EarlyQuit')
-        self.assertEqual(model.issue_customization_args, {})
-        self.assertEqual(model.playthrough_actions, [])
-        self.assertEqual(model.is_valid, True)

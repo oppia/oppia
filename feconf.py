@@ -650,26 +650,6 @@ NUM_REPEATED_CYCLES_THRESHOLD = 3
 MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 # Probability of recording a playthrough.
 RECORD_PLAYTHROUGH_PROBABILITY = 0.2
-# Types of allowed issues.
-ALLOWED_ISSUE_TYPES = [
-    'EarlyQuit',
-    'MultipleIncorrectSubmissions',
-    'CyclicStateTransitions'
-]
-# Types of allowed learner actions.
-ALLOWED_ACTION_TYPES = [
-    'ExplorationStart',
-    'AnswerSubmit',
-    'ExplorationQuit'
-]
-# Mapping from issue type to issue keyname in the issue customization dict. This
-# mapping is useful to uniquely identify issues by the combination of their
-# issue type and the concerend state(s).
-ISSUE_TYPE_KEYNAME_MAPPING = {
-    'EarlyQuit': 'state_name',
-    'MultipleIncorrectSubmissions': 'state_name',
-    'CyclicStateTransitions': 'state_names'
-}
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
