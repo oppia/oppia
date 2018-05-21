@@ -704,6 +704,9 @@ tags: []
         """
         if not state_names:
             raise ValueError('must provide at least one state name')
+        if not interaction_ids:
+            interaction_ids = ['TextInput']
+        interaction_ids = itertools.cycle(interaction_ids)
 
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, category=category,
@@ -711,24 +714,11 @@ tags: []
         exploration.objective = objective
         exploration.add_states(state_names)
 
-        # Will cycle through interaction_ids to produce values for each state.
-        if not interaction_ids:
-            interaction_ids = ['TextInput']
-        interaction_ids = itertools.cycle(interaction_ids)
-
-        # Prepare the state names to link together.
         from_names = [exploration.init_state_name] + state_names[:-1]
         to_names = state_names
-
-        # Prepare init_state.
-        init_state = exploration.states[from_names[0]]
-        init_state.update_interaction_id(next(interaction_ids))
-
         for from_name, to_name in zip(from_names, to_names):
             from_state = exploration.states[from_name]
-            to_state = exploration.states[to_name]
-
-            to_state.update_interaction_id(next(interaction_ids))
+            from_state.update_interaction_id(next(interaction_ids))
             from_state.interaction.default_outcome.dest = to_name
 
         # Prepare end_state.
