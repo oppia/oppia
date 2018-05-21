@@ -1622,6 +1622,14 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response[1]['issue_id'], 'MultipleIncorrectSubmissions')
 
+    def test_error_on_invalid_exp_id_for_exp_issues(self):
+        """Test that error is raised if invalid exploration ID is used to
+        retrieve exploration issues.
+        """
+        self.get_json(
+            '/issuesdatahandler/%s' % (self.EXP_ID), expect_errors=True,
+            expected_status_int=400)
+
     def test_fetch_playthrough_handler(self):
         """Test that the playthrough gets fetched correctly."""
         response = self.get_json(
@@ -1650,6 +1658,15 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
                 }
             }])
         self.assertEqual(response['is_valid'], True)
+
+    def test_error_on_invalid_playthrough_id(self):
+        """Test that error is raised if invalid playthrough ID is used to
+        retrieve a playthrough.
+        """
+        self.get_json(
+            '/playthroughdatahandler/%s/%s' % (
+                self.EXP_ID, self.playthrough_id1),
+            expect_errors=True, expected_status_int=400)
 
 
 class EditorAutosaveTest(BaseEditorControllerTest):

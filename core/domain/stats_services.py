@@ -157,13 +157,12 @@ def get_exp_issues_by_id(exp_id):
         exp_id: str. ID of the exploration.
 
     Returns:
-        ExplorationIssues. The domain object for exploration issues.
-
-    Raises:
-        Exception: Entity for class ExplorationIssuesModel with id not found.
+        ExplorationIssues|None: The domain object for exploration issues or
+            None if the exp_id is invalid.
     """
     exp_issues = None
-    exp_issues_model = stats_models.ExplorationIssuesModel.get(exp_id)
+    exp_issues_model = stats_models.ExplorationIssuesModel.get(
+        exp_id, strict=False)
     if exp_issues_model is not None:
         # TODO(pranavsid98): Convert below code to use get_from_model() method
         # right after the StorePlaythroughController PR is merged.
@@ -179,13 +178,15 @@ def get_playthrough_by_id(playthrough_id):
         playthrough_id: str. ID of the playthrough.
 
     Returns:
-        Playthrough. The domain object for the playthrough.
+        Playthrough|None: The domain object for the playthrough or None if the
+            playthrough_id is invalid.
 
     Raises:
         Exception: Entity for class PlaythroughModel with id not found.
     """
     playthrough = None
-    playthrough_model = stats_models.PlaythroughModel.get(playthrough_id)
+    playthrough_model = stats_models.PlaythroughModel.get(
+        playthrough_id, strict=False)
     if playthrough_model is not None:
         playthrough = get_playthrough_from_model(playthrough_model)
     return playthrough

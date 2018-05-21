@@ -776,6 +776,9 @@ class FetchIssuesHandler(EditorHandler):
     def get(self, exp_id):
         """Handles GET requests."""
         exp_issues = stats_services.get_exp_issues_by_id(exp_id)
+        if exp_issues is None:
+            raise self.InvalidInputException(
+                'Invalid exploration ID %s' % (exp_id))
         self.render_json(exp_issues.unresolved_issues)
 
 
@@ -786,6 +789,9 @@ class FetchPlaythroughHandler(EditorHandler):
     def get(self, unused_exploration_id, playthrough_id):
         """Handles GET requests."""
         playthrough = stats_services.get_playthrough_by_id(playthrough_id)
+        if playthrough is None:
+            raise self.InvalidInputException(
+                'Invalid playthrough ID %s' % (playthrough_id))
         self.render_json(playthrough.to_dict())
 
 
