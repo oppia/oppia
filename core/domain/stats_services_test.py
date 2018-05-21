@@ -1116,6 +1116,11 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
     DEFAULT_EXP_ID = 'exp_id2'
     NEW_STATE_NAME = 'new state'
 
+    def _get_swap_context(self):	
+        return self.swap(	
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',	
+            self.ALL_CC_MANAGERS_FOR_TESTS)	
+
     def _get_visualizations(
             self, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
         exploration = exp_services.get_exploration_by_id(exp_id)
