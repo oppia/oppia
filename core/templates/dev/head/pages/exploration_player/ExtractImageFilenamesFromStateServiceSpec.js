@@ -275,9 +275,10 @@ describe('Extracting Image file names in the state service', function() {
   it('should get all the filenames of the images in a state',
     function() {
       var exploration = eof.createFromBackendDict(explorationDict);
-      exploration.getStates().forEach(function(state){
-        expect(eifss.getImageFilenamesInState(state)).toBe(filenamesInExploration[state]);
-      });
+      var states = exploration.getStates();
+      for (statename in states) {
+        expect(eifss.getImageFilenamesInState(states[statename])).toBe(filenamesInExploration[states[state]]);
+      } 
     });
 });
   
