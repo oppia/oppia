@@ -502,7 +502,7 @@ def get_state_answers_stats(exp_id, state_name, test_only_min_frequency=None):
 
 def get_state_answers_stats_multi(
         exp_id, state_names, test_only_min_frequency=None):
-    state_answers_stats_multi = dict()
+    state_answers_stats_multi = {}
     for state_name in state_names:
         calculation_output = (
             _get_calc_output(exp_id, state_name, 'Top10AnswerFrequencies')
