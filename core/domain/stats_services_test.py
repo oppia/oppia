@@ -1507,12 +1507,12 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self.save_new_default_exploration(self.DEFAULT_EXP_ID, self.owner_id)
 
     def test_get_state_answers_stats(self):
-        self._record_answer('A')
-        self._record_answer('A')
-        self._record_answer('B')
+        self._record_answer(u'A')
+        self._record_answer(u'A')
+        self._record_answer(u'B')
         self._run_answer_summaries_aggregator()
 
         self.assertEqual(self._get_state_answers_stats(), [
-            {'answerHtml': 'A', 'frequency': 2},
-            {'answerHtml': 'B', 'frequency': 2},
+            {'answerHtml': u'A', 'frequency': 2},
+            {'answerHtml': u'B', 'frequency': 2},
         ])
