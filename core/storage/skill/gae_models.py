@@ -39,20 +39,19 @@ class SkillModel(base_models.VersionedModel):
     """
     SNAPSHOT_METADATA_CLASS = SkillSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = SkillSnapshotContentModel
-    ALLOW_REVERT = True
+    ALLOW_REVERT = False
 
     # The description of the skill.
     description = ndb.StringProperty(required=True, indexed=True)
-    # A dict representing the skill contents.
-    skill_contents = ndb.JsonProperty(indexed=False)
     # A list of misconceptions associated with the skill, in which each
-    # elemet is a dict.
+    # element is a dict.
     misconceptions = ndb.JsonProperty(repeated=True, indexed=False)
-    # The schema version for the skill.
-    schema_version = (
-        ndb.IntegerProperty(required=True, indexed=True))
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+    # The schema version for the skill_contents.
+    schema_version = ndb.IntegerProperty(required=True, indexed=True)
+    # A dict representing the skill contents.
+    skill_contents = ndb.JsonProperty(indexed=False)
 
 
 class SkillCommitLogEntryModel(base_models.BaseModel):
@@ -139,16 +138,16 @@ class SkillSummaryModel(base_models.BaseModel):
     """
 
     # The description of the skill.
-    description = ndb.StringProperty(required=True)
+    description = ndb.StringProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this collection is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
     # Time when the skill model was last updated (not to be
     # confused with last_updated, which is the time when the
     # skill *summary* model was last updated).
-    skill_model_last_updated = ndb.DateTimeProperty(indexed=True)
+    skill_model_last_updated = ndb.DateTimeProperty(required=True, indexed=True)
     # Time when the skill model was created (not to be confused
     # with created_on, which is the time when the skill *summary*
     # model was created).
-    skill_model_created_on = ndb.DateTimeProperty(indexed=True)
-    version = ndb.IntegerProperty()
+    skill_model_created_on = ndb.DateTimeProperty(required=True, indexed=True)
+    version = ndb.IntegerProperty(required=True)

@@ -30,6 +30,8 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -823,6 +825,30 @@ tags: []
         """
         committer = user_services.UserActionsInfo(owner_id)
         rights_manager.publish_collection(committer, collection_id)
+
+    def save_new_story(
+            self, story_id, owner_id, title,
+            description, notes,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Creates an Oppia Story and saves it.
+
+        Args:
+            story_id: str. ID for the story to be created.
+            owner_id: str. The user_id of the creator of the story.
+            title: str. The title of the story.
+            description: str. The high level desscription of the story.
+            notes: str. A set of notes, that describe the characters,
+                main storyline, and setting.
+            language_code: str. The ISO 639-1 code for the language this
+                story is written in.
+
+        Returns:
+            Story. A newly-created story.
+        """
+        story = story_domain.Story.create_default_story(
+            story_id, title, description, notes, language_code)
+        story_services.save_new_story(owner_id, story)
+        return story
 
     def get_updated_param_dict(
             self, param_dict, param_changes, exp_param_specs):

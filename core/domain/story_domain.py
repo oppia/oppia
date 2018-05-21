@@ -25,10 +25,9 @@ import feconf
 # compatibility with previous change dicts.
 STORY_PROPERTY_TITLE = 'title'
 STORY_PROPERTY_DESCRIPTION = 'description'
-STORY_PROPERTY_TOPIC = 'topic'
 STORY_PROPERTY_NOTES = 'notes'
 STORY_PROPERTY_LANGUAGE_CODE = 'language_code'
-STORY_PROPERTY_STORY_CONTENTS = 'story_nodes'
+STORY_PROPERTY_STORY_NODES = 'story_nodes'
 
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -39,8 +38,8 @@ class StoryChange(object):
     """Domain object for changes made to story object."""
     STORY_PROPERTIES = (
         STORY_PROPERTY_TITLE, STORY_PROPERTY_DESCRIPTION,
-        STORY_PROPERTY_TOPIC, STORY_PROPERTY_NOTES,
-        STORY_PROPERTY_STORY_CONTENTS, STORY_PROPERTY_LANGUAGE_CODE)
+        STORY_PROPERTY_NOTES, STORY_PROPERTY_STORY_NODES,
+        STORY_PROPERTY_LANGUAGE_CODE)
 
     def __init__(self, change_dict):
         """Initialize a StoryChange object from a dict.
@@ -89,30 +88,32 @@ class StoryNode(object):
     """
 
     def __init__(
-            self, node_id, destination_nodes,
+            self, node_id, destination_node_ids,
             acquired_skill_ids, prerequisite_skill_ids,
-            annotations, exploration_id):
+            story_outline, exploration_id):
         """Initializes a StoryNode domain object.
 
         Args:
             node_id: str. The unique id for each node.
-            destination_nodes: list(str). The list of destination node ids that
-                this node points to in the story graph.
+            destination_node_ids: list(str). The list of destination node ids
+                that this node points to in the story graph.
             acquired_skill_ids: list(str). The list of skill ids acquired by
                 the user on completion of the node.
             prerequisite_skill_ids: list(str). The list of skill ids required
                 before starting a node.
-            annotations: str. Free-form annotations that a lesson implementer
-                can use to construct the exploration. It described the basic
+            story_outline: str. Free-form annotations that a lesson implementer
+                can use to construct the exploration. It describes the basic
                 theme or template of the story.
-            exploration_id: str. The valid exploration id that fits the
-                story node.
+            exploration_id: str or None. The valid exploration id that fits the
+                story node. It can be None initially, when the story creator
+                has just created a story with the basic storyline (by providing
+                notes) without linking an exploration to any node.
         """
         self.id = node_id
-        self.destination_nodes = destination_nodes
+        self.destination_node_ids = destination_node_ids
         self.acquired_skill_ids = acquired_skill_ids
         self.prerequisite_skill_ids = prerequisite_skill_ids
-        self.annotations = annotations
+        self.story_outline = story_outline
         self.exploration_id = exploration_id
 
     def to_dict(self):
@@ -123,10 +124,10 @@ class StoryNode(object):
         """
         return {
             'id': self.id,
-            'destination_nodes': self.destination_nodes,
+            'destination_node_ids': self.destination_node_ids,
             'acquired_skill_ids': self.acquired_skill_ids,
             'prerequisite_skill_ids': self.prerequisite_skill_ids,
-            'annotations': self.annotations,
+            'story_outline': self.story_outline,
             'exploration_id': self.exploration_id
         }
 
@@ -141,9 +142,9 @@ class StoryNode(object):
             StoryNode. The corresponding StoryNode domain object.
         """
         node = cls(
-            node_dict['id'], node_dict['destination_nodes'],
+            node_dict['id'], node_dict['destination_node_ids'],
             node_dict['acquired_skill_ids'],
-            node_dict['prerequisite_skill_ids'], node_dict['annotations'],
+            node_dict['prerequisite_skill_ids'], node_dict['story_outline'],
             node_dict['exploration_id'])
 
         return node
@@ -166,7 +167,7 @@ class Story(object):
     """Domain object for an Oppia Story."""
 
     def __init__(
-            self, story_id, title, description, notes, topic,
+            self, story_id, title, description, notes, topic_id,
             story_nodes, schema_version, language_code, version,
             created_on=None, last_updated=None):
         """Constructs a Question domain object.
@@ -177,14 +178,14 @@ class Story(object):
             description: str. The high level desscription of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
-            topic: str. The topic id the story corresponds to.
+            topic_id: str. The topic id the story corresponds to.
             story_nodes: list(StoryNode). List of the story nodes present in
                 the story.
             created_on: datetime.datetime. Date and time when the story is
                 created.
             last_updated: datetime.datetime. Date and time when the
                 story was last updated.
-            schema_version: int. The schema version for the story.
+            schema_version: int. The schema version for the story nodes object.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
             version: int. The version of the story.
@@ -193,7 +194,7 @@ class Story(object):
         self.title = title
         self.description = description
         self.notes = notes
-        self.topic = topic
+        self.topic_id = topic_id
         self.story_nodes = story_nodes
         self.schema_version = schema_version
         self.language_code = language_code
@@ -213,7 +214,7 @@ class Story(object):
             'description': self.description,
             'notes': self.notes,
             'language_code': self.language_code,
-            'topic': self.topic,
+            'topic_id': self.topic_id,
             'schema_version': self.schema_version,
             'version': self.version,
             'story_nodes': [
@@ -223,18 +224,17 @@ class Story(object):
 
     @classmethod
     def from_dict(
-            cls, story_dict, story_version=0,
+            cls, story_dict,
             story_created_on=None, story_last_updated=None):
         """Return a Story domain object from a dict.
 
         Args:
-            story_dict: dict. The dictionary representation of  the
+            story_dict: dict. The dictionary representation of the
                 story.
-            story_version: int. The version of the story.
             story_created_on: datetime.datetime. Date and time when the
                 story is created.
             story_last_updated: datetime.datetime. Date and time when
-                the story is updated last time.
+                the story was last updated.
 
         Returns:
             Story. The corresponding Story domain object.
@@ -242,12 +242,12 @@ class Story(object):
         story = cls(
             story_dict['id'], story_dict['title'],
             story_dict['description'], story_dict['notes'],
-            story_dict['topic'],
+            story_dict['topic_id'],
             [
                 StoryNode.from_dict(node_dict)
                 for node_dict in story_dict['story_nodes']
             ], story_dict['schema_version'], story_dict['language_code'],
-            story_version, story_created_on, story_last_updated)
+            story_dict['version'], story_created_on, story_last_updated)
 
         return story
 
@@ -268,8 +268,7 @@ class Story(object):
                 for English).
 
         Returns:
-            story. The story domain object with the default
-            values.
+            Story. The Story domain object with the default values.
         """
         return cls(
             story_id, title, description, notes, None, [],
@@ -285,10 +284,11 @@ class Story(object):
 
         Args:
             versioned_story_contents: dict. A dict with two keys:
-                - schema_version: str. The schema version for the story.
+                - schema_version: str. The schema version for the
+                    story_contents dict.
                 - story_contents: dict. The dict comprising the story
                     contents.
-            current_version: int. The current story schema version.
+            current_version: int. The current schema version of story_contents.
 
         Raises:
             Exception: The value of the key 'schema_version' in
@@ -316,7 +316,7 @@ class StorySummary(object):
 
     def __init__(
             self, story_id, title, language_code, version,
-            node_count, topic, story_model_created_on,
+            node_count, topic_id, story_model_created_on,
             story_model_last_updated):
         """Constructs a StorySummary domain object.
 
@@ -326,7 +326,7 @@ class StorySummary(object):
             language_code: str. The language code of the story.
             version: int. The version of the story.
             node_count: int. The number of nodes present in the story.
-            topic: str. The id of the topic, the story corresponds to.
+            topic_id: str. The id of the topic, the story corresponds to.
             story_model_created_on: datetime.datetime. Date and time when
                 the story model is created.
             story_model_last_updated: datetime.datetime. Date and time
@@ -337,7 +337,7 @@ class StorySummary(object):
         self.language_code = language_code
         self.version = version
         self.node_count = node_count
-        self.topic = topic
+        self.topic_id = topic_id
         self.story_model_created_on = story_model_created_on
         self.story_model_last_updated = story_model_last_updated
 
@@ -353,7 +353,7 @@ class StorySummary(object):
             'language_code': self.language_code,
             'version': self.version,
             'node_count': self.node_count,
-            'topic': self.topic,
+            'topic_id': self.topic_id,
             'story_model_created_on': self.story_model_created_on,
             'story_model_last_updated': self.story_model_last_updated
         }

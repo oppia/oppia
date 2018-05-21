@@ -40,21 +40,21 @@ class StoryModel(base_models.VersionedModel):
     """
     SNAPSHOT_METADATA_CLASS = StorySnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = StorySnapshotContentModel
-    ALLOW_REVERT = True
+    ALLOW_REVERT = False
 
     # The title of the story.
     title = ndb.StringProperty(required=True, indexed=True)
     # A high-level description of the story.
     description = ndb.StringProperty(indexed=False)
     # The topic id the story corresponds to.
-    topic = ndb.StringProperty(indexed=False)
+    topic_id = ndb.StringProperty(indexed=False)
     # A set of notes, that describe the characters, main storyline, and setting.
-    notes = ndb.StringProperty(indexed=False)
-    # The schema version for the story.
-    schema_version = (
-        ndb.IntegerProperty(required=True, default=1, indexed=True))
+    notes = ndb.TextProperty(indexed=False)
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+    # The schema version for the story_contents.
+    schema_version = (
+        ndb.IntegerProperty(required=True, default=1, indexed=True))
     # The story graph specifying the connection between nodes.
     story_contents = ndb.JsonProperty(default={}, indexed=False)
 
@@ -183,17 +183,17 @@ class StorySummaryModel(base_models.BaseModel):
     # The title of the story.
     title = ndb.StringProperty(required=True, indexed=True)
     # The topic id the story corresponds to.
-    topic = ndb.StringProperty(indexed=False)
+    topic_id = ndb.StringProperty(indexed=False)
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
     # Time when the story model was last updated (not to be
     # confused with last_updated, which is the time when the
     # story *summary* model was last updated).
-    story_model_last_updated = ndb.DateTimeProperty(indexed=True)
+    story_model_last_updated = ndb.DateTimeProperty(required=True, indexed=True)
     # Time when the story model was created (not to be confused
     # with created_on, which is the time when the story *summary*
     # model was created).
-    story_model_created_on = ndb.DateTimeProperty(indexed=True)
+    story_model_created_on = ndb.DateTimeProperty(required=True, indexed=True)
     # The number of nodes that are part of this story.
-    node_count = ndb.IntegerProperty()
-    version = ndb.IntegerProperty()
+    node_count = ndb.IntegerProperty(required=True, indexed=True)
+    version = ndb.IntegerProperty(required=True)

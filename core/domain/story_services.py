@@ -33,9 +33,6 @@ memcache_services = models.Registry.import_memcache_services()
 # This takes additional 'title' parameters.
 CMD_CREATE_NEW = 'create_new'
 
-# Name for the story search index.
-SEARCH_INDEX_STORIES = 'stories'
-
 # The maximum number of iterations allowed for populating the results of a
 # search query.
 MAX_ITERATIONS = 10
@@ -50,13 +47,13 @@ def _migrate_story_contents_to_latest_schema(versioned_story_contents):
 
     Args:
         versioned_story_contents: A dict with two keys:
-          - schema_version: str. The schema version for the story.
+          - schema_version: str. The schema version for the story_contents dict.
           - story_contents: dict. The dict comprising the story
               contents.
 
     Raises:
-        Exception: The schema version of the story is outside of what is
-        supported at present.
+        Exception: The schema version of the story_contents is outside of what
+        is supported at present.
     """
     story_schema_version = versioned_story_contents['schema_version']
     if not (1 <= story_schema_version
@@ -122,7 +119,7 @@ def get_story_from_model(story_model, run_conversion=True):
     return story_domain.Story(
         story_model.id, story_model.title,
         story_model.description, story_model.notes,
-        story_model.topic,
+        story_model.topic_id,
         [
             story_domain.StoryNode.from_dict(story_node_dict)
             for story_node_dict in
@@ -148,7 +145,7 @@ def get_story_summary_from_model(story_summary_model):
         story_summary_model.language_code,
         story_summary_model.version,
         story_summary_model.node_count,
-        story_summary_model.topic,
+        story_summary_model.topic_id,
         story_summary_model.story_model_created_on,
         story_summary_model.story_model_last_updated
     )
@@ -229,7 +226,7 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         id=story.id,
         description=story.description,
         title=story.title,
-        topic=story.topic,
+        topic_id=story.topic_id,
         language_code=story.language_code,
         schema_version=story.schema_version,
         notes=story.notes,
@@ -275,7 +272,7 @@ def compute_summary_of_story(story):
     story_summary = story_domain.StorySummary(
         story.id, story.title, story.language_code,
         story.version, story_model_node_count,
-        story.topic, story.created_on, story.last_updated
+        story.topic_id, story.created_on, story.last_updated
     )
 
     return story_summary
@@ -286,8 +283,6 @@ def create_story_summary(story_id):
 
     Args:
         story_id: str. ID of the story.
-        contributor_id_to_add: str. ID of the contributor to be added to the
-            story summary.
     """
     story = get_story_by_id(story_id)
     story_summary = compute_summary_of_story(story)
@@ -308,7 +303,7 @@ def save_story_summary(story_summary):
         language_code=story_summary.language_code,
         version=story_summary.version,
         node_count=story_summary.node_count,
-        topic=story_summary.topic,
+        topic_id=story_summary.topic_id,
         story_model_last_updated=(
             story_summary.story_model_last_updated),
         story_model_created_on=(

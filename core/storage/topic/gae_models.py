@@ -39,7 +39,7 @@ class TopicModel(base_models.VersionedModel):
     """
     SNAPSHOT_METADATA_CLASS = TopicSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TopicSnapshotContentModel
-    ALLOW_REVERT = True
+    ALLOW_REVERT = False
 
     # The name of the topic.
     name = ndb.StringProperty(required=True, indexed=True)
@@ -48,15 +48,12 @@ class TopicModel(base_models.VersionedModel):
     description = ndb.StringProperty(indexed=False)
     # This consists of the list of canonical story ids that are part of
     # this topic.
-    canonical_stories = ndb.StringProperty(repeated=True, indexed=False)
+    canonical_story_ids = ndb.StringProperty(repeated=True, indexed=False)
     # This consists of the list of additional (non-canonical) story ids that
     # are part of this topic.
-    additional_stories = ndb.StringProperty(repeated=True, indexed=False)
+    additional_story_ids = ndb.StringProperty(repeated=True, indexed=False)
     # This consists of the full list of skill ids that are part of this topic.
-    skills = ndb.StringProperty(repeated=True, indexed=False)
-    # The schema version for the topic.
-    schema_version = (
-        ndb.IntegerProperty(required=True, indexed=True))
+    skill_ids = ndb.StringProperty(repeated=True, indexed=False)
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
@@ -145,7 +142,7 @@ class TopicSummaryModel(base_models.BaseModel):
     """
 
     # The name of the topic.
-    name = ndb.StringProperty(required=True)
+    name = ndb.StringProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this collection is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
@@ -159,10 +156,10 @@ class TopicSummaryModel(base_models.BaseModel):
     topic_model_created_on = ndb.DateTimeProperty(indexed=True)
     # The number of stories (both canonical and additional) that are part
     # of this topic.
-    story_count = ndb.IntegerProperty()
+    story_count = ndb.IntegerProperty(required=True, indexed=True)
     # The number of skills that are part of this topic.
-    skill_count = ndb.IntegerProperty()
-    version = ndb.IntegerProperty()
+    skill_count = ndb.IntegerProperty(required=True, indexed=True)
+    version = ndb.IntegerProperty(required=True)
 
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
