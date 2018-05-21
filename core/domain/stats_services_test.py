@@ -1437,12 +1437,9 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             self.ALL_CC_MANAGERS_FOR_TESTS)
 
-    def _get_visualizations(
+    def _get_state_answers_stats(
             self, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
-        exploration = exp_services.get_exploration_by_id(exp_id)
-        init_state = exploration.states[state_name]
-        return stats_services.get_visualizations_info(
-            exp_id, state_name, init_state.interaction.id)
+        return stats_services.get_state_answers_stats(exp_id, 'ALL', state_name)
 
     def _record_answer(
             self, answer, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
