@@ -191,7 +191,7 @@ class SuggestionModel(base_models.BaseModel):
         """Gets all suggestions created by the given author.
 
         Args:
-            author_id: str. The author of the suggestion.
+            author_id: str. The ID of the author of the suggestion.
 
         Returns:
             list(SuggestionModel). A list of suggestions by the given author,
@@ -205,8 +205,8 @@ class SuggestionModel(base_models.BaseModel):
         """Gets all suggestions assigned to the given user for review.
 
         Args:
-            assigned_reviewer_id: str. The reviewer assigned to review the
-                suggestion.
+            assigned_reviewer_id: str. The ID of the reviewer assigned to
+                review the suggestion.
 
         Returns:
             list(SuggestionModel). A list of suggestions assigned to the given
@@ -222,7 +222,7 @@ class SuggestionModel(base_models.BaseModel):
         """Gets all suggestions that have been reviewed by the given user.
 
         Args:
-            reviewer_id: str. The reviewer of the suggestion.
+            reviewer_id: str. The ID of the reviewer of the suggestion.
 
         Returns:
             list(SuggestionModel). A list of suggestions reviewed by the given
