@@ -1437,7 +1437,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             self, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME,
             test_only_min_frequency=None):
         return stats_services.get_state_answers_stats(
-            exp_id, state_name, test_only_min_frequency)
+            exp_id, state_name, test_only_min_frequency=test_only_min_frequency)
 
     def _record_answer(
             self, answer, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
