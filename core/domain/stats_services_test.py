@@ -1495,7 +1495,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             }], 'Change content description')
 
     def setUp(self):
-        super(AnswerVisualizationsTests, self).setUp()
+        super(StateAnswersStatisticsTest, self).setUp()
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
