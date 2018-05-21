@@ -1434,8 +1434,10 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             self.ALL_CC_MANAGERS_FOR_TESTS)
 
     def _get_state_answers_stats(
-            self, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
-        return stats_services.get_state_answers_stats(exp_id, state_name)
+            self, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME,
+            test_only_min_frequency=None):
+        return stats_services.get_state_answers_stats(
+            exp_id, state_name, test_only_min_frequency)
 
     def _record_answer(
             self, answer, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
@@ -1514,7 +1516,8 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self._record_answer(u'B')
         self._run_answer_summaries_aggregator()
 
-        self.assertEqual(self._get_state_answers_stats(), [
-            {'answer': u'A', 'frequency': 3},
-            {'answer': u'B', 'frequency': 2},
-        ])
+        self.assertEqual(
+            self._get_state_answers_stats(test_only_min_frequency=2), [
+                {'answer': u'A', 'frequency': 3},
+                {'answer': u'B', 'frequency': 2},
+            ])
