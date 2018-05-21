@@ -1416,7 +1416,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
     """Tests for functionality related to retrieving statistics for answers of a
     particular state.
     """
-    INIT_STATE_NAME = 'STATE_A'
+    INIT_STATE_NAME = 'STATE A'
     TEXT_INPUT_EXP_ID = 'exp_id0'
     DEFAULT_EXP_ID = 'exp_id2'
 
@@ -1463,7 +1463,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.save_new_valid_exploration_with_states(
             self.TEXT_INPUT_EXP_ID, self.owner_id,
-            state_names=['STATE_A', 'STATE_B', 'STATE_C'])
+            state_names=['STATE A', 'STATE B', 'STATE C'])
         self.save_new_default_exploration(self.DEFAULT_EXP_ID, self.owner_id)
 
     def test_get_state_answers_stats(self):
@@ -1482,26 +1482,26 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         ])
 
     def test_get_state_answers_stats_multi(self):
-        self._record_answer('A', state_name='STATE_A')
-        self._record_answer('A', state_name='STATE_A')
-        self._record_answer('B', state_name='STATE_A')
-        self._record_answer(1, state_name='STATE_B')
-        self._record_answer(1, state_name='STATE_B')
-        self._record_answer(2, state_name='STATE_B')
-        self._record_answer('X', state_name='STATE_C')
-        self._record_answer('X', state_name='STATE_C')
-        self._record_answer('Y', state_name='STATE_C')
+        self._record_answer('A', state_name='STATE A')
+        self._record_answer('A', state_name='STATE A')
+        self._record_answer('B', state_name='STATE A')
+        self._record_answer(1, state_name='STATE B')
+        self._record_answer(1, state_name='STATE B')
+        self._record_answer(2, state_name='STATE B')
+        self._record_answer('X', state_name='STATE C')
+        self._record_answer('X', state_name='STATE C')
+        self._record_answer('Y', state_name='STATE C')
         self._run_answer_summaries_aggregator()
 
         state_answers_stats_multi = self._get_state_answers_stats_multi(
-            min_frequency=1, state_names=['STATE_A', 'STATE_B'])
+            min_frequency=1, state_names=['STATE A', 'STATE B'])
         self.assertEqual(
-            sorted(state_answers_stats_multi), ['STATE_A', 'STATE_B'])
-        self.assertEqual(state_answers_stats_multi['STATE_A'], [
+            sorted(state_answers_stats_multi), ['STATE A', 'STATE B'])
+        self.assertEqual(state_answers_stats_multi['STATE A'], [
             {'answer': 'A', 'frequency': 2},
             {'answer': 'B', 'frequency': 1},
         ])
-        self.assertEqual(state_answers_stats_multi['STATE_B'], [
+        self.assertEqual(state_answers_stats_multi['STATE B'], [
             {'answer': 1, 'frequency': 2},
             {'answer': 2, 'frequency': 1},
         ])
