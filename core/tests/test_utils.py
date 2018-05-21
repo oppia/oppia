@@ -737,6 +737,7 @@ tags: []
 
         # Prepare end_state.
         end_state = exploration.states[to_state_names[-1]]
+        end_state.update_interaction_id('EndExploration')
         end_state.interaction.default_outcome = None
 
         exp_services.save_new_exploration(owner_id, exploration)
