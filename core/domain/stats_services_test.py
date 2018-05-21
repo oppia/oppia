@@ -1439,6 +1439,14 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         return stats_services.get_state_answers_stats(
             exp_id, state_name, test_only_min_frequency=min_frequency)
 
+    def _get_state_answers_stats_multi(
+            self, exp_id=TEXT_INPUT_EXP_ID, state_names=None,
+            min_frequency=None):
+        if state_names is None:
+            state_names = [INIT_STATE_NAME]
+        return stats_services.get_state_answers_stats_multi(
+            exp_id, state_names, test_only_min_frequency=min_frequency)
+
     def _record_answer(
             self, answer, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
         exploration = exp_services.get_exploration_by_id(exp_id)
