@@ -1514,9 +1514,11 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self._record_answer(u'A')
         self._record_answer(u'A')
         self._record_answer(u'B')
+        self._record_answer(u'C')
         self._run_answer_summaries_aggregator()
 
         self.assertEqual(self._get_state_answers_stats(min_frequency=2), [
             {'answer': u'A', 'frequency': 3},
             {'answer': u'B', 'frequency': 2},
+            # C is not included because min frequency is 2.
         ])
