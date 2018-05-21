@@ -502,17 +502,11 @@ def get_state_answers_stats(exp_id, state_name, test_only_min_frequency=None):
 
 def get_state_answers_stats_multi(
         exp_id, state_names, test_only_min_frequency=None):
-    state_answers_stats_multi = {}
-    for state_name in state_names:
-        calculation_output = (
-            _get_calc_output(exp_id, state_name, 'Top10AnswerFrequencies')
-                .calculation_output.to_raw_type())
-        state_answers_stats_multi[state_name] = [
-            {'answer': calc['answer'], 'frequency': calc['frequency']}
-            for calc in calculation_output
-            if calc['frequency'] >= (test_only_min_frequency or
-                                     feconf.STATE_ANSWER_STATS_MIN_FREQUENCY)]
-    return state_answers_stats_multi
+    return {
+        state_name:
+            get_state_answers_stats(exp_id, state_name, test_only_min_frequency)
+        for state_name in state_names
+    }
 
 
 def _get_calc_output(exploration_id, state_name, calculation_id):
