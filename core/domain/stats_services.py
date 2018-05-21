@@ -498,6 +498,19 @@ def get_state_answers_stats(exp_id, exp_version, state_name):
         if calc['frequency'] >= STATE_ANSWER_STATS_MIN_FREQUENCY]
 
 
+def get_state_answers_stats_multi(exp_id, exp_version, state_names):
+    state_answers_stats_multi = dict()
+    for state_name in state_names:
+        calculation_output = _get_calc_output(
+            exp_id, exp_version, state_name, 'Top10AnswerFrequencies')
+                .calculation_output.to_raw_type()
+        state_answers_stats_multi[state_name] = [
+            {'answerHtml': calc['answer'], 'frequency': calc['frequency']}
+            for calc in calculation_output
+            if calc['frequency'] >= STATE_ANSWER_STATS_MIN_FREQUENCY]
+    return state_answers_stats_multi
+
+
 def _get_calc_output(exploration_id, state_name, calculation_id):
     """Get state answers calculation output domain object obtained from
     StateAnswersCalcOutputModel instance stored in the data store. The
