@@ -240,9 +240,7 @@ oppia.factory('UnitsObjectFactory', [function() {
   };
 
   Units.fromRawInputString = function(units) {
-    if (units.includes('per')) {
-      units = units.replace('per', '/');
-    }
+    units = units.replace(/per/g, '/');
     // Right now, validation of currency units is not possible as we need to add
     // them first.
     if (units !== '' && !units.includes('$') && !units.includes('Rs') &&
