@@ -489,17 +489,19 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
         for submitted_answer_dict in sample_answers]
 
 
-def get_state_answers_stats(exp_id, state_name):
+def get_state_answers_stats(exp_id, state_name, test_only_min_frequency=None):
     calculation_output = (
         _get_calc_output(exp_id, state_name, 'Top10AnswerFrequencies')
             .calculation_output.to_raw_type())
     return [
         {'answer': calc['answer'], 'frequency': calc['frequency']}
         for calc in calculation_output
-        if calc['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY]
+        if calc['frequency'] >= (test_only_min_frequency or
+                                 feconf.STATE_ANSWER_STATS_MIN_FREQUENCY)]
 
 
-def get_state_answers_stats_multi(exp_id, state_names):
+def get_state_answers_stats_multi(
+        exp_id, state_names, test_only_min_frequency=None):
     state_answers_stats_multi = dict()
     for state_name in state_names:
         calculation_output = (
@@ -508,7 +510,8 @@ def get_state_answers_stats_multi(exp_id, state_names):
         state_answers_stats_multi[state_name] = [
             {'answer': calc['answer'], 'frequency': calc['frequency']}
             for calc in calculation_output
-            if calc['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY]
+            if calc['frequency'] >= (test_only_min_frequency or
+                                     feconf.STATE_ANSWER_STATS_MIN_FREQUENCY)]
     return state_answers_stats_multi
 
 
