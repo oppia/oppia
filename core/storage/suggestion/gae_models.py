@@ -74,6 +74,7 @@ SUGGESTION_ID_DELIMITER = '.'
 # The delimiter to be used in score category field.
 SCORE_CATEGORY_DELIMITER = '.'
 
+
 class SuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users.
 
@@ -91,7 +92,7 @@ class SuggestionModel(base_models.BaseModel):
     target_id = ndb.StringProperty(required=True)
     # The version number of the target entity at the time of creation of the
     # suggestion.
-    target_version_at_submission= ndb.IntegerProperty(required=True)
+    target_version_at_submission = ndb.IntegerProperty(required=True)
     # Status of the suggestion.
     status = ndb.StringProperty(
         required=True, indexed=True, choices=STATUS_CHOICES)
