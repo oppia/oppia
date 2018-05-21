@@ -497,7 +497,8 @@ def get_state_answers_stats(exp_id, state_name, test_only_min_frequency=None):
         {'answer': calc['answer'], 'frequency': calc['frequency']}
         for calc in calculation_output
         if calc['frequency'] >= (test_only_min_frequency or
-                                 feconf.STATE_ANSWER_STATS_MIN_FREQUENCY)]
+                                 feconf.STATE_ANSWER_STATS_MIN_FREQUENCY)
+    ]
 
 
 def get_state_answers_stats_multi(
