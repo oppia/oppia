@@ -482,10 +482,6 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(exp_stats_list[1].exp_id, 'exp_id2')
         self.assertEqual(exp_stats_list[1].exp_version, 2)
 
-    def test_get_state_answers_stats(self):
-        """Test the get_state_answers_stats method."""
-        stats_models.
-
 
 class ModifiedInteractionAnswerSummariesAggregator(
         stats_jobs_continuous.InteractionAnswerSummariesAggregator):
