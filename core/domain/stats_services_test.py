@@ -482,6 +482,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(exp_stats_list[1].exp_id, 'exp_id2')
         self.assertEqual(exp_stats_list[1].exp_version, 2)
 
+    def test_get_state_answers_stats(self):
+        """Test the get_state_answers_stats method."""
+        stats_models.
+
 
 class ModifiedInteractionAnswerSummariesAggregator(
         stats_jobs_continuous.InteractionAnswerSummariesAggregator):
@@ -1415,3 +1419,96 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             visualizations = self._get_visualizations()
 
             self.assertEqual(visualizations, [])
+
+
+class StateAnswersStatisticsTest(test_utils.GenericTestBase):
+    """Tests for functionality related to retrieving statistics for answers of a
+    particular state.
+    """
+    ALL_CC_MANAGERS_FOR_TESTS = [ModifiedInteractionAnswerSummariesAggregator]
+    INIT_STATE_NAME = feconf.DEFAULT_INIT_STATE_NAME
+    TEXT_INPUT_EXP_ID = 'exp_id0'
+    SET_INPUT_EXP_ID = 'exp_id1'
+    DEFAULT_EXP_ID = 'exp_id2'
+    NEW_STATE_NAME = 'new state'
+
+    def _get_swap_context(self):
+        return self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS)
+
+    def _get_visualizations(
+            self, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        init_state = exploration.states[state_name]
+        return stats_services.get_visualizations_info(
+            exp_id, state_name, init_state.interaction.id)
+
+    def _record_answer(
+            self, answer, exp_id=TEXT_INPUT_EXP_ID, state_name=INIT_STATE_NAME):
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        interaction_id = exploration.states[state_name].interaction.id
+        event_services.AnswerSubmissionEventHandler.record(
+            exp_id, exploration.version, state_name, interaction_id, 0, 0,
+            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', 10.0, {}, answer)
+
+    def _run_answer_summaries_aggregator(self):
+        ModifiedInteractionAnswerSummariesAggregator.start_computation()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+
+    def _rerun_answer_summaries_aggregator(self):
+        ModifiedInteractionAnswerSummariesAggregator.stop_computation('a')
+        self._run_answer_summaries_aggregator()
+
+    def _rename_state(
+            self, new_state_name, exp_id=TEXT_INPUT_EXP_ID,
+            state_name=INIT_STATE_NAME):
+        exp_services.update_exploration(
+            self.owner_id, exp_id, [{
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': state_name,
+                'new_state_name': new_state_name
+            }], 'Update state name')
+
+    def _change_state_interaction_id(
+            self, interaction_id, exp_id=TEXT_INPUT_EXP_ID,
+            state_name=INIT_STATE_NAME):
+        exp_services.update_exploration(
+            self.owner_id, exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': interaction_id
+            }], 'Update state interaction ID')
+
+    def _change_state_content(
+            self, new_content, exp_id=TEXT_INPUT_EXP_ID,
+            state_name=INIT_STATE_NAME):
+        exp_services.update_exploration(
+            self.owner_id, exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': {
+                    'html': new_content,
+                    'audio_translations': {},
+                }
+            }], 'Change content description')
+
+    def setUp(self):
+        super(AnswerVisualizationsTests, self).setUp()
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.save_new_valid_exploration(
+            self.TEXT_INPUT_EXP_ID, self.owner_id, end_state_name='End')
+        self.save_new_valid_exploration(
+            self.SET_INPUT_EXP_ID, self.owner_id, end_state_name='End',
+            interaction_id='SetInput')
+        self.save_new_default_exploration(self.DEFAULT_EXP_ID, self.owner_id)
