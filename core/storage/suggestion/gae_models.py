@@ -69,8 +69,6 @@ SCORE_TYPE_CHOICES = [
     SCORE_TYPE_TRANSLATION
 ]
 
-# The delimiter to be used in the suggestion ID.
-SUGGESTION_ID_DELIMITER = '.'
 # The delimiter to be used in score category field.
 SCORE_CATEGORY_DELIMITER = '.'
 
@@ -78,8 +76,8 @@ SCORE_CATEGORY_DELIMITER = '.'
 class SuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users.
 
-    The ID of the suggestions are created by joining target_type, target_id and
-    thread_instance_ID using the SUGGESTION_ID_DELIMITER.
+    The ID of the suggestions are created is the same as the ID of the thread
+    linked to the suggestion.
     """
 
     # The type of suggestion.
@@ -112,24 +110,6 @@ class SuggestionModel(base_models.BaseModel):
     score_category = ndb.StringProperty(required=True, indexed=True)
 
     @classmethod
-    def get_instance_id(
-            cls, target_type, target_id, thread_id):
-        """Concatenates various parameters and gives the ID of the suggestion
-        model.
-
-        Args:
-            target_type: str. The type of target being edited.
-            target_id: str. The ID of the target being edited.
-            thread_id: str. The ID of the feedback thread linked to the
-                suggestion.
-
-        Returns:
-            str. The full instance ID for the suggestion.
-        """
-        return SUGGESTION_ID_DELIMITER.join(
-            [target_type, target_id, thread_id])
-
-    @classmethod
     def create(
             cls, suggestion_type, target_type, target_id,
             target_version_at_submission, status, author_id,
@@ -157,7 +137,7 @@ class SuggestionModel(base_models.BaseModel):
         Raises:
             Exception: There is already a suggestion with the given id.
         """
-        instance_id = cls.get_instance_id(target_type, target_id, thread_id)
+        instance_id = thread_id
 
         if cls.get_by_id(instance_id):
             raise Exception('There is already a suggestion with the given'

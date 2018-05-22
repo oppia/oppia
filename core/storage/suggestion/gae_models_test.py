@@ -41,40 +41,35 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_1',
             'reviewer_1', 'reviewer_1', self.change_cmd, self.score_category,
-            'thread_1')
+            'exploration.exp1.thread_1')
         suggestion_models.SuggestionModel.create(
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_ACCEPTED, 'author_2',
             'reviewer_2', 'reviewer_2', self.change_cmd, self.score_category,
-            'thread_2')
+            'exploration.exp1.thread_2')
         suggestion_models.SuggestionModel.create(
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_ACCEPTED, 'author_2',
             'reviewer_3', 'reviewer_2', self.change_cmd, self.score_category,
-            'thread_3')
+            'exploration.exp1.thread_3')
         suggestion_models.SuggestionModel.create(
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_2',
             'reviewer_2', 'reviewer_3', self.change_cmd, self.score_category,
-            'thread_4')
+            'exploration.exp1.thread_4')
         suggestion_models.SuggestionModel.create(
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_3',
             'reviewer_3', 'reviewer_2', self.change_cmd, self.score_category,
-            'thread_5')
-
-    def test_target_type_choices_contains_delimiter(self):
-        for target_type in suggestion_models.TARGET_TYPE_CHOICES:
-            self.assertTrue(
-                suggestion_models.SUGGESTION_ID_DELIMITER not in target_type)
+            'exploration.exp1.thread_5')
 
     def test_score_type_contains_delimiter(self):
         for score_type in suggestion_models.SCORE_TYPE_CHOICES:
@@ -88,11 +83,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
             'reviewer_3', 'reviewer_3', self.change_cmd, self.score_category,
-            'thread_6')
+            'exploration.exp1.thread_6')
 
-        suggestion_id = suggestion_models.SuggestionModel.get_instance_id(
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id, 'thread_6')
+        suggestion_id = 'exploration.exp1.thread_6'
 
         observed_suggestion_model = suggestion_models.SuggestionModel.get_by_id(
             suggestion_id)
@@ -131,7 +124,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 self.target_id, self.target_version_at_submission,
                 suggestion_models.STATUS_IN_REVIEW, 'author_3',
                 'reviewer_3', 'reviewer_3', self.change_cmd,
-                self.score_category, 'thread_1')
+                self.score_category, 'exploration.exp1.thread_1')
 
     def test_get_suggestions_by_type(self):
         self.assertEqual(
