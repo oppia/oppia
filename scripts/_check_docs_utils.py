@@ -458,7 +458,7 @@ class GoogleDocstring(Docstring):
     )
 
     re_returns_line = re.compile(r"""
-        \s* (({type}|\*).)?                    # identifier
+        \s* (({type}|\S*).)?              # identifier
         \s* (.*)                          # beginning of description
     """.format(
         type=re_multiple_type,

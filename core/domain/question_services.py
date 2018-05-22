@@ -35,6 +35,9 @@ def _create_new_question(committer_id, question, commit_message):
         committer_id: str. ID of the committer.
         question: Question. question domain object.
         commit_message: str. A description of changes made to the question.
+
+    Returns:
+        model_id. The ID of the model.
     """
     model = question_models.QuestionModel.create(
         title=question.title,
@@ -57,6 +60,9 @@ def add_question(committer_id, question):
     Args:
         committer_id: str. ID of the committer.
         question: Question. Question to be saved.
+
+    Returns:
+        question_id. The ID of the question.
     """
     question.validate()
     commit_message = (

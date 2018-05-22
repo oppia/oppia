@@ -97,7 +97,7 @@ def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
 
     Args:
         exp_id: str. ID of the exploration.
-        exp_version. int. Version of the exploration.
+        exp_version: int. Version of the exploration.
         state_names: list(str). State names of the exploration.
     """
     state_stats_mapping = {

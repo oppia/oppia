@@ -224,6 +224,9 @@ def _send_email(
             the email.
         reply_to_id: str or None. The unique reply-to id used in reply-to email
             address sent to recipient.
+
+    Returns:
+        None.
     """
 
     if sender_name is None:
@@ -281,6 +284,9 @@ def _send_bulk_mail(
         sender_name: str. The name to be shown in the "sender" field of the
             email.
         instance_id: str or None. The ID of the BulkEmailModel entity instance.
+
+    Returns:
+        None.
     """
     _require_sender_id_is_valid(intent, sender_id)
 
@@ -928,6 +934,9 @@ def send_test_email_for_bulk_emails(tester_id, email_subject, email_body):
         tester_id: str. The user ID of the tester.
         email_subject: str. The subject of the email.
         email_body: str. The body of the email.
+
+    Returns:
+        None.
     """
     tester_name = user_services.get_username(tester_id)
     tester_email = user_services.get_email_from_user_id(tester_id)
