@@ -98,8 +98,7 @@ def returns_something(return_node):
 
 
 def possible_exc_types(node):
-    """
-    Gets all of the possible raised exception types for the given raise node.
+    """Gets all of the possible raised exception types for the given raise node.
 
     .. note::
 
@@ -125,12 +124,13 @@ def possible_exc_types(node):
         elif isinstance(target, astroid.FunctionDef):
             for ret in target.nodes_of_class(astroid.Return):
                 if ret.frame() != target:
-                    # return from inner function - ignore it
+                    # return from inner function - ignore it.
                     continue
 
                 val = utils.safe_infer(ret.value)
-                if (val and isinstance(val, (astroid.Instance, astroid.ClassDef))
-                        and utils.inherit_from_std_ex(val)):
+                if (val and isinstance(val, (
+                        astroid.Instance, astroid.ClassDef)) and
+                        utils.inherit_from_std_ex(val)):
                     excs.append(val.name)
     elif node.exc is None:
         handler = node.parent
@@ -144,7 +144,9 @@ def possible_exc_types(node):
 
 
     try:
-        return set(exc for exc in excs if not utils.node_ignores_exception(node, exc))
+        return set(
+            exc for exc in excs if not utils.node_ignores_exception(
+                node, exc))
     except astroid.InferenceError:
         return set()
 
@@ -350,8 +352,7 @@ class SphinxDocstring(Docstring):
 
 
 class EpytextDocstring(SphinxDocstring):
-    """
-    Epytext is similar to Sphinx. See the docs:
+    """Epytext is similar to Sphinx. See the docs:
         http://epydoc.sourceforge.net/epytext.html
         http://epydoc.sourceforge.net/fields.html#fields
 
@@ -618,7 +619,7 @@ class GoogleDocstring(Docstring):
     @staticmethod
     def _is_section_header(_):
         # Google parsing does not need to detect section headers,
-        # because it works off of indentation level only
+        # because it works off of indentation level only.
         return False
 
     def _parse_section(self, section_re):
