@@ -211,6 +211,9 @@ class BaseHandler(webapp2.RequestHandler):
         Raises:
             Exception: The CSRF token is missing.
             UnauthorizedUserException: The CSRF token is invalid.
+
+        Returns:
+            None
         """
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
@@ -440,7 +443,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Overwrites the default exception handler.
 
         Args:
-            exception: The exception that was thrown.
+            exception: exception. The exception that was thrown.
             unused_debug_mode: bool. True if the web application is running
                 in debug mode.
         """
@@ -572,6 +575,9 @@ class CsrfTokenManager(object):
         Args:
             user_id: str. The user_id to validate the CSRF token against.
             token: str. The CSRF token to validate.
+
+        Returns:
+            bool.
         """
         try:
             parts = token.split('/')
