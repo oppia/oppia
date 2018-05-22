@@ -634,7 +634,7 @@ def _check_bad_pattern_in_file(filename, content, pattern):
     Args:
         filename: str. Name of the file.
         content: str. Contents of the file.
-        pattern: dict ( regexp(regex pattern) : pattern to match,
+        pattern: dict. (regexp(regex pattern) : pattern to match,
             message(str) : message to show if pattern matches,
             excluded_files(tuple(str)) : files to be excluded from matching,
             excluded_dirs(tuple(str)) : directories to be excluded from
@@ -823,7 +823,7 @@ def _check_docstrings(all_files):
         filename for filename in all_files if not
         (any(
             fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS))
-            and not (filename.endswith('_check_docs_utils.py'))
+        and not (filename.endswith('_check_docs_utils.py'))
         and filename.endswith('.py')]
     # The file _check_docs_utils.py has to be excluded from this check
     # as it contains a number of regular expressions which trigger this
