@@ -43,18 +43,22 @@ class SkillModel(base_models.VersionedModel):
 
     # The description of the skill.
     description = ndb.StringProperty(required=True, indexed=True)
+    # The schema version for the misconceptions dict.
+    misconceptions_schema_version = ndb.IntegerProperty(
+        required=True, indexed=True)
     # A list of misconceptions associated with the skill, in which each
     # element is a dict.
     misconceptions = ndb.JsonProperty(repeated=True, indexed=False)
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
     # The schema version for the skill_contents.
-    schema_version = ndb.IntegerProperty(required=True, indexed=True)
+    skill_contents_schema_version = ndb.IntegerProperty(
+        required=True, indexed=True)
     # A dict representing the skill contents.
     skill_contents = ndb.JsonProperty(indexed=False)
 
 
-class SkillCommitLogEntryModel(base_models.BaseModel):
+class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to skills.
 
     A new instance of this model is created and saved every time a commit to
@@ -63,24 +67,9 @@ class SkillCommitLogEntryModel(base_models.BaseModel):
     The id for this model is of the form
     'skill-{{SKILL_ID}}-{{SKILL_VERSION}}'.
     """
-    # Update superclass model to make these properties indexed.
-    created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
-    last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
-
-    # The id of the user.
-    user_id = ndb.StringProperty(indexed=True, required=True)
-    # The username of the user, at the time of the edit.
-    username = ndb.StringProperty(indexed=True, required=True)
     # The id of the skill being edited.
     skill_id = ndb.StringProperty(indexed=True, required=True)
-    # The type of the commit: 'create', 'revert', 'edit', 'delete'.
-    commit_type = ndb.StringProperty(indexed=True, required=True)
-    # The commit message.
-    commit_message = ndb.TextProperty(indexed=False)
-    # The commit_cmds dict for this commit.
-    commit_cmds = ndb.JsonProperty(indexed=False, required=True)
-    # The version number of the skill after this commit.
-    version = ndb.IntegerProperty()
+
 
     @classmethod
     def get_commit(cls, skill_id, version):
@@ -95,33 +84,6 @@ class SkillCommitLogEntryModel(base_models.BaseModel):
             The commit with the given skill id and version number.
         """
         return cls.get_by_id('skill-%s-%s' % (skill_id, version))
-
-    @classmethod
-    def get_all_commits(cls, page_size, urlsafe_start_cursor):
-        """Fetches a list of all the commits sorted by their last updated
-        attribute.
-
-        Args:
-            page_size: int. The maximum number of entities to be returned.
-            urlsafe_start_cursor: str or None. If provided, the list of
-                returned entities starts from this datastore cursor.
-                Otherwise, the returned entities start from the beginning
-                of the full list of entities.
-
-        Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
-            https://developers.google.com/appengine/docs/python/ndb/queryclass,
-            where:
-                results: List of query results.
-                cursor: str or None. A query cursor pointing to the next
-                    batch of results. If there are no more results, this might
-                    be None.
-                more: bool. If True, there are (probably) more results after
-                    this batch. If False, there are no further results after
-                    this batch.
-        """
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(), page_size, urlsafe_start_cursor)
 
 
 class SkillSummaryModel(base_models.BaseModel):

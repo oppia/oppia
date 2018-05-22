@@ -58,7 +58,7 @@ class TopicModel(base_models.VersionedModel):
     language_code = ndb.StringProperty(required=True, indexed=True)
 
 
-class TopicCommitLogEntryModel(base_models.BaseModel):
+class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to topics.
 
     A new instance of this model is created and saved every time a commit to
@@ -67,24 +67,8 @@ class TopicCommitLogEntryModel(base_models.BaseModel):
     The id for this model is of the form
     'topic-{{TOPIC_ID}}-{{TOPIC_VERSION}}'.
     """
-    # Update superclass model to make these properties indexed.
-    created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
-    last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
-
-    # The id of the user.
-    user_id = ndb.StringProperty(indexed=True, required=True)
-    # The username of the user, at the time of the edit.
-    username = ndb.StringProperty(indexed=True, required=True)
     # The id of the topic being edited.
     topic_id = ndb.StringProperty(indexed=True, required=True)
-    # The type of the commit: 'create', 'revert', 'edit', 'delete'.
-    commit_type = ndb.StringProperty(indexed=True, required=True)
-    # The commit message.
-    commit_message = ndb.TextProperty(indexed=False)
-    # The commit_cmds dict for this commit.
-    commit_cmds = ndb.JsonProperty(indexed=False, required=True)
-    # The version number of the topic after this commit.
-    version = ndb.IntegerProperty()
 
     @classmethod
     def get_commit(cls, topic_id, version):
@@ -99,33 +83,6 @@ class TopicCommitLogEntryModel(base_models.BaseModel):
             The commit with the given topic id and version number.
         """
         return cls.get_by_id('topic-%s-%s' % (topic_id, version))
-
-    @classmethod
-    def get_all_commits(cls, page_size, urlsafe_start_cursor):
-        """Fetches a list of all the commits sorted by their last updated
-        attribute.
-
-        Args:
-            page_size: int. The maximum number of entities to be returned.
-            urlsafe_start_cursor: str or None. If provided, the list of
-                returned entities starts from this datastore cursor.
-                Otherwise, the returned entities start from the beginning
-                of the full list of entities.
-
-        Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
-            https://developers.google.com/appengine/docs/python/ndb/queryclass,
-            where:
-                results: List of query results.
-                cursor: str or None. A query cursor pointing to the next
-                    batch of results. If there are no more results, this might
-                    be None.
-                more: bool. If True, there are (probably) more results after
-                    this batch. If False, there are no further results after
-                    this batch.
-        """
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(), page_size, urlsafe_start_cursor)
 
 
 class TopicSummaryModel(base_models.BaseModel):
@@ -149,11 +106,11 @@ class TopicSummaryModel(base_models.BaseModel):
     # Time when the topic model was last updated (not to be
     # confused with last_updated, which is the time when the
     # topic *summary* model was last updated).
-    topic_model_last_updated = ndb.DateTimeProperty(indexed=True)
+    topic_model_last_updated = ndb.DateTimeProperty(required=True, indexed=True)
     # Time when the topic model was created (not to be confused
     # with created_on, which is the time when the topic *summary*
     # model was created).
-    topic_model_created_on = ndb.DateTimeProperty(indexed=True)
+    topic_model_created_on = ndb.DateTimeProperty(required=True, indexed=True)
     # The number of stories (both canonical and additional) that are part
     # of this topic.
     story_count = ndb.IntegerProperty(required=True, indexed=True)

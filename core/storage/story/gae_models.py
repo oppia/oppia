@@ -46,8 +46,6 @@ class StoryModel(base_models.VersionedModel):
     title = ndb.StringProperty(required=True, indexed=True)
     # A high-level description of the story.
     description = ndb.StringProperty(indexed=False)
-    # The topic id the story corresponds to.
-    topic_id = ndb.StringProperty(indexed=False)
     # A set of notes, that describe the characters, main storyline, and setting.
     notes = ndb.TextProperty(indexed=False)
     # The ISO 639-1 code for the language this question is written in.
@@ -97,7 +95,7 @@ class StoryModel(base_models.VersionedModel):
         ).put_async()
 
 
-class StoryCommitLogEntryModel(base_models.BaseModel):
+class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to stories.
 
     A new instance of this model is created and saved every time a commit to
@@ -106,24 +104,8 @@ class StoryCommitLogEntryModel(base_models.BaseModel):
     The id for this model is of the form
     'story-{{STORY_ID}}-{{STORY_VERSION}}'.
     """
-    # Update superclass model to make these properties indexed.
-    created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
-    last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
-
-    # The id of the user.
-    user_id = ndb.StringProperty(indexed=True, required=True)
-    # The username of the user, at the time of the edit.
-    username = ndb.StringProperty(indexed=True, required=True)
     # The id of the story being edited.
     story_id = ndb.StringProperty(indexed=True, required=True)
-    # The type of the commit: 'create', 'revert', 'edit', 'delete'.
-    commit_type = ndb.StringProperty(indexed=True, required=True)
-    # The commit message.
-    commit_message = ndb.TextProperty(indexed=False)
-    # The commit_cmds dict for this commit.
-    commit_cmds = ndb.JsonProperty(indexed=False, required=True)
-    # The version number of the story after this commit.
-    version = ndb.IntegerProperty()
 
     @classmethod
     def get_commit(cls, story_id, version):
@@ -138,33 +120,6 @@ class StoryCommitLogEntryModel(base_models.BaseModel):
             The commit with the given story id and version number.
         """
         return cls.get_by_id('story-%s-%s' % (story_id, version))
-
-    @classmethod
-    def get_all_commits(cls, page_size, urlsafe_start_cursor):
-        """Fetches a list of all the commits sorted by their last updated
-        attribute.
-
-        Args:
-            page_size: int. The maximum number of entities to be returned.
-            urlsafe_start_cursor: str or None. If provided, the list of
-                returned entities starts from this datastore cursor.
-                Otherwise, the returned entities start from the beginning
-                of the full list of entities.
-
-        Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
-            https://developers.google.com/appengine/docs/python/ndb/queryclass,
-            where:
-                results: List of query results.
-                cursor: str or None. A query cursor pointing to the next
-                    batch of results. If there are no more results, this might
-                    be None.
-                more: bool. If True, there are (probably) more results after
-                    this batch. If False, there are no further results after
-                    this batch.
-        """
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(), page_size, urlsafe_start_cursor)
 
 
 class StorySummaryModel(base_models.BaseModel):
@@ -182,8 +137,6 @@ class StorySummaryModel(base_models.BaseModel):
 
     # The title of the story.
     title = ndb.StringProperty(required=True, indexed=True)
-    # The topic id the story corresponds to.
-    topic_id = ndb.StringProperty(indexed=False)
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
     # Time when the story model was last updated (not to be

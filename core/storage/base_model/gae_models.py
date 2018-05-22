@@ -220,6 +220,54 @@ class BaseModel(ndb.Model):
             result[2])
 
 
+class BaseCommitLogEntryModel(BaseModel):
+    """Base Model for the models that store the log of commits to a construct.
+    """
+    # Update superclass model to make these properties indexed.
+    created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
+    last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
+
+    # The id of the user.
+    user_id = ndb.StringProperty(indexed=True, required=True)
+    # The username of the user, at the time of the edit.
+    username = ndb.StringProperty(indexed=True, required=True)
+    # The type of the commit: 'create', 'revert', 'edit', 'delete'.
+    commit_type = ndb.StringProperty(indexed=True, required=True)
+    # The commit message.
+    commit_message = ndb.TextProperty(indexed=False)
+    # The commit_cmds dict for this commit.
+    commit_cmds = ndb.JsonProperty(indexed=False, required=True)
+    # The version number of the model after this commit.
+    version = ndb.IntegerProperty()
+
+    @classmethod
+    def get_all_commits(cls, page_size, urlsafe_start_cursor):
+        """Fetches a list of all the commits sorted by their last updated
+        attribute.
+
+        Args:
+            page_size: int. The maximum number of entities to be returned.
+            urlsafe_start_cursor: str or None. If provided, the list of
+                returned entities starts from this datastore cursor.
+                Otherwise, the returned entities start from the beginning
+                of the full list of entities.
+
+        Returns:
+            3-tuple of (results, cursor, more) as described in fetch_page() at:
+            https://developers.google.com/appengine/docs/python/ndb/queryclass,
+            where:
+                results: List of query results.
+                cursor: str or None. A query cursor pointing to the next
+                    batch of results. If there are no more results, this might
+                    be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results after
+                    this batch.
+        """
+        return cls._fetch_page_sorted_by_last_updated(
+            cls.query(), page_size, urlsafe_start_cursor)
+
+
 class VersionedModel(BaseModel):
     """Model that handles storage of the version history of model instances.
 
