@@ -173,7 +173,7 @@ class Question(object):
             )
 
         question_data = exp_domain.State.from_dict(self.question_data)
-        question_data.validate(None, True)
+        question_data.validate({}, True)
 
         if not isinstance(self.question_data_schema_version, int):
             raise utils.ValidationError(

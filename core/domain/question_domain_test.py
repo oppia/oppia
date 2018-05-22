@@ -26,41 +26,6 @@ import utils
 class QuestionDomainTest(test_utils.GenericTestBase):
     """Tests for Question domain object."""
 
-    def _create_valid_question_data(self, default_dest_state_name):
-        """Creates a valid question_data dict.
-
-        Args:
-            default_dest_state_name: str. The default destination state.
-
-        Returns:
-            dict. The default question_data dict.
-        """
-        state = exp_domain.State.create_default_state(
-            default_dest_state_name).to_dict()
-        solution = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'Solution',
-            'explanation': {
-                'html': 'Solution explanation',
-                'audio_translations': {}
-            }
-        }
-        state['interaction']['id'] = 'TextInput'
-        state['interaction']['customization_args'] = {
-            'placeholder': 'Enter text here',
-            'rows': 1
-        }
-        state['interaction']['default_outcome']['labelled_as_correct'] = True
-        state['interaction']['default_outcome']['dest'] = None
-        state['interaction']['hints'].append({
-            'hint_content': {
-                'html': 'hint one',
-                'audio_translations': {}
-            }
-        })
-        state['interaction']['solution'] = solution
-        return state
-
     def test_to_dict(self):
         expected_object = {
             'question_id': 'col1.random',

@@ -1954,12 +1954,11 @@ class Exploration(object):
             state.validate(
                 self.param_specs,
                 allow_null_interaction=not strict)
-            # The tests below are shifted from validate() in class
-            # Outcome (which are called from the validate() function in class
-            # InteractionInstance) as these tests are exclusive to an
-            # interaction in a state in an exploration, and not for that in a
-            # question, (whereas the validate() in Outcome is also used by the
-            # State object that constitutes the question_data field).
+            # The checks below perform validation on the Outcome domain object
+            # that is specific to answer groups in explorations, but not
+            # questions. This logic is here because the validation checks in
+            # the Outcome domain object are used by both explorations and
+            # questions.
             for answer_group in state.interaction.answer_groups:
                 if not answer_group.outcome.dest:
                     raise utils.ValidationError(
