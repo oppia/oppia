@@ -463,22 +463,26 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         """Test the save_exp_issues_model_transactional method."""
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
         exp_issues = stats_services.get_exp_issues_from_model(model)
-        exp_issues.unresolved_issues.append({
-            'issue_type': 'EarlyQuit',
-            'issue_customization_args': {
-                'state_name': {
-                    'value': 'state_name1'
+        exp_issues.unresolved_issues.append(
+            stats_domain.ExplorationIssue.from_dict({
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
                 },
-                'time_spent_in_exp_in_msecs': {
-                    'value': 200
-                }
-            },
-            'playthrough_ids': ['playthrough_id1']
-        })
+                'schema_version': 1,
+                'playthrough_ids': ['playthrough_id1']
+            }))
         stats_services.save_exp_issues_model_transactional(exp_issues)
 
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
-        self.assertEqual(model.unresolved_issues, exp_issues.unresolved_issues)
+        self.assertEqual(
+            model.unresolved_issues[0],
+            exp_issues.unresolved_issues[0].to_dict())
 
     def test_save_stats_model_transactional(self):
         """Test the save_stats_model_transactional method."""

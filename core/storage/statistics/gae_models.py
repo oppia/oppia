@@ -30,6 +30,9 @@ from google.appengine.ext import ndb
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 transaction_services = models.Registry.import_transaction_services()
 
+CURRENT_ACTION_SCHEMA_VERSION = 1
+CURRENT_ISSUE_SCHEMA_VERSION = 1
+
 ACTION_TYPE_EXPLORATION_START = 'ExplorationStart'
 ACTION_TYPE_ANSWER_SUBMIT = 'AnswerSubmit'
 ACTION_TYPE_EXPLORATION_QUIT = 'ExplorationQuit'
@@ -1008,7 +1011,7 @@ class PlaythroughModel(base_models.BaseModel):
     issue_type = ndb.StringProperty(
         indexed=True, required=True, choices=ALLOWED_ISSUE_TYPES)
     # The customization args dict for the given issue_type.
-    issue_customization_args = ndb.JsonProperty(default=None, required=True)
+    issue_customization_args = ndb.JsonProperty(required=True)
     # The playthrough actions for this playthrough. This will be a list of dicts
     # where each dict represents a single playthrough action. The list is
     # ordered by the time of occurence of the action.

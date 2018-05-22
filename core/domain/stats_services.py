@@ -208,8 +208,11 @@ def get_exp_issues_from_model(exp_issues_model):
     Returns:
         ExplorationIssues. The domain object for exploration issues.
     """
+    unresolved_issues = [
+        stats_domain.ExplorationIssue.from_dict(unresolved_issue_dict)
+        for unresolved_issue_dict in exp_issues_model.unresolved_issues]
     return stats_domain.ExplorationIssues(
-        exp_issues_model.id, exp_issues_model.unresolved_issues)
+        exp_issues_model.id, unresolved_issues)
 
 
 def get_exploration_stats_from_model(exploration_stats_model):
@@ -320,8 +323,11 @@ def _save_exp_issues_model(exp_issues):
         exp_issues: ExplorationIssues. The exploration issues domain
             object.
     """
+    unresolved_issues_dicts = [
+        unresolved_issue.to_dict()
+        for unresolved_issue in exp_issues.unresolved_issues]
     exp_issues_model = stats_models.ExplorationIssuesModel.get(exp_issues.id)
-    exp_issues_model.unresolved_issues = exp_issues.unresolved_issues
+    exp_issues_model.unresolved_issues = unresolved_issues_dicts
 
     exp_issues_model.put()
 
