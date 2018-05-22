@@ -7,12 +7,21 @@
     "html"
   ],
   "rules": {
-    "angular/di-unused": 2,
+    "angular/di": [
+      "error",
+      "array",
+      ],
+    "angular/di-order": "error",
+    "angular/di-unused": "error",
     "angular/no-inline-template": [
       "error",
       {
         "allowSimple": true
       }
+    ],
+    "array-bracket-spacing": [
+      "error",
+      "never"
     ],
     "brace-style":[
       "error",
@@ -41,6 +50,10 @@
         "allowKeywords": false
       }
     ],
+    "eol-last":[
+      "error",
+      "always"
+    ],
     "eqeqeq": [
       "error",
       "always"
@@ -63,6 +76,7 @@
         "SwitchCase": 1
       }
     ],
+    "key-spacing": "error",
     "keyword-spacing": [
       "error",
       {
@@ -103,7 +117,9 @@
     "no-redeclare": [
       "off"
     ],
+    "no-tabs": "error",
     "no-useless-escape": "off",
+    "no-whitespace-before-property": "error",
     "no-trailing-spaces": [
       "error"
     ],
@@ -149,6 +165,10 @@
         "asyncArrow": "ignore",
         "named": "never",
       }
+    ],
+    "spaced-comment": [
+      "error",
+      "always"
     ],
     "space-infix-ops": [
       "error"
