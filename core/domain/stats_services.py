@@ -500,11 +500,9 @@ def get_state_answers_stats(exp_id, state_name):
     ]
 
 
-def get_state_answers_stats_multi(
-        exp_id, state_names, test_only_min_frequency=None):
+def get_state_answers_stats_multi(exp_id, state_names):
     return {
-        state_name:
-            get_state_answers_stats(exp_id, state_name, test_only_min_frequency)
+        state_name: get_state_answers_stats(exp_id, state_name)
         for state_name in state_names
     }
 

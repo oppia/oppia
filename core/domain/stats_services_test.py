@@ -1428,8 +1428,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             self, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
         return stats_services.get_state_answers_stats(exp_id, state_name)
 
-    def _get_state_answers_stats_multi(
-            self, exp_id=EXP_ID, state_names=None, min_frequency=None):
+    def _get_state_answers_stats_multi(self, exp_id=EXP_ID, state_names=None):
         if not state_names:
             raise ValueError('Must provide non-empty state names.')
         return stats_services.get_state_answers_stats_multi(exp_id, state_names)
