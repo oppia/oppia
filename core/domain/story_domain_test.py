@@ -30,9 +30,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     SKILL_ID_2 = 'skill_id_2'
     EXP_ID = 'exp_id'
 
-    def setUp(self):
-        super(StoryDomainUnitTests, self).setUp()
-
     def test_defaults(self):
         """Test the create_default_story and create_default_story_node
         method of class Story.
