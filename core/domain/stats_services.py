@@ -492,7 +492,7 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
 def get_state_answers_stats(exp_id, state_name, test_only_min_frequency=None):
     calculation_output = (
         _get_calc_output(exp_id, state_name, 'Top10AnswerFrequencies')
-            .calculation_output.to_raw_type())
+        .calculation_output.to_raw_type())
     return [
         {'answer': calc['answer'], 'frequency': calc['frequency']}
         for calc in calculation_output
