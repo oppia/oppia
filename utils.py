@@ -724,6 +724,40 @@ def get_hashable_value(value):
         return value
 
 
+def find_all_values_for_key(key, value_set):
+    """Finds the value of the key inside all the nested dictionaries
+    in a given value_set.
+
+    Args:
+       key: str. The key whose value is to be found.
+       value_set: dict or list. The dictionary in which the
+           key is to be searched or the list which will have
+           a dictionary as element and the key is to be searched
+           in this dictionary.
+
+    Returns:
+        list. The values of the key in the value_set.
+    """
+    if isinstance(value_set, list):
+        for d in value_set:
+            if isinstance(d, (dict, list)):
+                for result in find_all_values_for_key(key, d):
+                    yield result
+
+    else:
+        for k, v in value_set.iteritems():
+            if k == key:
+                yield v
+            elif isinstance(v, dict):
+                for result in find_all_values_for_key(key, v):
+                    yield result
+            elif isinstance(v, list):
+                for d in v:
+                    if isinstance(d, (dict, list)):
+                        for result in find_all_values_for_key(key, d):
+                            yield result
+
+
 class OrderedCounter(collections.Counter, collections.OrderedDict):
     """Counter that remembers the order elements are first encountered."""
     pass

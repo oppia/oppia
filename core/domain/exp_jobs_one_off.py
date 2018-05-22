@@ -18,10 +18,9 @@
 
 import ast
 import logging
-import os
 import traceback
 
-from bs4 import BeautifulSoup
+import bs4
 from constants import constants
 from core import jobs
 from core.domain import exp_domain
@@ -492,23 +491,17 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
         # invalid parent-child relations that we find.
         err_dict = {}
 
-        htmlValidation_filepath = os.path.join(
-            feconf.CONTENT_VALIDATION_DIR, 'htmlValidation.yaml')
-        htmlValidation_yaml = utils.get_file_contents(htmlValidation_filepath)
-        # Convert the yaml content to dictionary.
-        htmlValidation_dict = utils.dict_from_yaml(htmlValidation_yaml)
-
-        allowed_parent_list = htmlValidation_dict['allowed_parent_list']
-        allowed_tag_list = htmlValidation_dict['allowed_tag_list']
+        allowed_parent_list = feconf.ALLOWED_PARENT_LIST
+        allowed_tag_list = feconf.ALLOWED_TAG_LIST
 
         for state in exploration.states.itervalues():
             # result is the list of all the html present in the state.
-            result = exp_services.find_all_values_for_key(
+            result = utils.find_all_values_for_key(
                 'html', state.to_dict())
 
             for html_data in result:
                 html_data = html_data.encode('utf-8')
-                soup = BeautifulSoup(html_data, 'html.parser')
+                soup = bs4.BeautifulSoup(html_data, 'html.parser')
 
                 for tag in soup.findAll():
                     # Checking for tags not allowed in RTE.
@@ -527,7 +520,7 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
                         else:
                             err_dict[tag.name] = [parent]
 
-        for key in err_dict.iterkeys():
+        for key in err_dict:
             err_dict[key] = list(set(err_dict[key]))
 
         yield('Errors', err_dict)

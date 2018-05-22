@@ -2127,6 +2127,7 @@ def delete_state_id_mapping_model_for_exploration(
     exp_versions = range(1, exploration_version + 1)
     exp_models.StateIdMappingModel.delete_state_id_mapping_models(
         exploration_id, exp_versions)
+<<<<<<< HEAD
 
 
 def find_all_values_for_key(key, dictionary):
@@ -2162,3 +2163,5 @@ def find_all_values_for_key(key, dictionary):
                     if isinstance(d, (dict, list)):
                         for result in find_all_values_for_key(key, d):
                             yield result
+=======
+>>>>>>> a716a22... Follow-up PR for the content validation one-off job

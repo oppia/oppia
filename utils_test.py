@@ -251,3 +251,67 @@ class UtilsTests(test_utils.GenericTestBase):
                 utils.get_hashable_value(json1_deepcopy),
                 utils.get_hashable_value(json2_deepcopy),
             })
+
+    def test_find_all_values_for_key(self):
+        """ Tests that all values for a given key are found."""
+        dict1 = {
+            'state': 'Hello people',
+            'html': (
+                '<p> Let me know if you need any help, you can '
+                'contact me <a href ="www.example.com"> here </a> </p>.'),
+            'outcome': 'Well Done!'
+        }
+
+        dict2 = {
+            'state': 'I am in dict2',
+            'feedback': [{
+                'html': '<p> <b> Hello World </b> </p>',
+                'audio': 'You can click me to play',
+                }, False, True, 'I am in the list', [{
+                    'html': '<p> <i> Hello forks </i> </p>',
+                    'audio': 'This is cool!'
+                }, 'Random Value'], 304]
+        }
+
+        list1 = [
+            True, 'Random Value',
+            {
+                'html': '<p> I am looking for a message here </p>',
+                'feedback': [{
+                    'html': (
+                        '<p> Did you get the message <p> '
+                        '<ol> <li> Yes </li> <li> No </li> </ol>'
+                    )
+                }, 'Nice', 2, 500],
+                'outcome': 'Yes or No'
+            },
+            500, 1000, False
+        ]
+
+        expected_output1 = [(
+            '<p> Let me know if you need any help, '
+            'you can contact me <a href ="www.example.com"> here </a> </p>.'
+        )]
+
+        expected_output2 = [
+            '<p> <b> Hello World </b> </p>',
+            '<p> <i> Hello forks </i> </p>'
+        ]
+
+        expected_output3 = [
+            '<p> I am looking for a message here </p>',
+            (
+                '<p> Did you get the message <p> '
+                '<ol> <li> Yes </li> <li> No </li> </ol>'
+            )
+        ]
+
+        self.assertEqual(
+            list(utils.find_all_values_for_key('html', dict1)),
+            expected_output1)
+        self.assertEqual(
+            list(utils.find_all_values_for_key('html', dict2)),
+            expected_output2)
+        self.assertEqual(
+            list(utils.find_all_values_for_key('html', list1)),
+            expected_output3)

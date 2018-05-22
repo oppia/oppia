@@ -845,6 +845,14 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
 
         actual_output = (
             exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
-        expected_output = [u'[u\'Errors\', [u"{\'invalidTags\': [u\'span\'], u\'oppia-noninteractive-link\': [u\'[document]\'], u\'br\': [u\'[document]\']}"]]'] # pylint: disable=line-too-long
+
+        expected_output = [
+            (
+                u'[u\'Errors\', '
+                '[u"{\'invalidTags\': [u\'span\'], '
+                'u\'oppia-noninteractive-link\': [u\'[document]\'], '
+                'u\'br\': [u\'[document]\']}"]]'
+            )
+        ]
 
         self.assertEqual(actual_output, expected_output)
