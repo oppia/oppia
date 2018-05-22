@@ -128,11 +128,14 @@ describe('NumberWithUnitsObjectFactory', function() {
         NumberWithUnits.fromRawInputString('$');
       }).toThrow(new Error(errors.INVALID_CURRENCY));
       expect(function() {
+        NumberWithUnits.fromRawInputString('kg 2 s^2');
+      }).toThrow(new Error(errors.INVALID_CURRENCY));
+      expect(function() {
         NumberWithUnits.fromRawInputString('2 m/s#');
       }).toThrow(new Error(errors.INVALID_UNIT_CHARS));
       expect(function() {
         NumberWithUnits.fromRawInputString('@ 2');
-      }).toThrow(new Error(errors.INVALID_UNIT_CHARS));
+      }).toThrow(new Error(errors.INVALID_CURRENCY));
       expect(function() {
         NumberWithUnits.fromRawInputString('2 / 3 kg&^-2');
       }).toThrow(new Error(errors.INVALID_UNIT_CHARS));

@@ -21,7 +21,7 @@ oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
   INVALID_VALUE:
     'Please ensure that value is either a fraction or a number',
   INVALID_CURRENCY:
-    'Please enter a valid currency (e.g., $ 5)',
+    'Please enter a valid currency (e.g., $ 5 or ₹ 5)',
   INVALID_UNIT_CHARS:
     'Please ensure that unit only contains numbers, alphabets, (, ), *, ^, /, -'
 });
@@ -85,6 +85,10 @@ oppia.factory('NumberWithUnitsObjectFactory', [
           units = rawInput.substr(ind).trim();
         }
       } else {
+        if (!rawInput.startsWith('$ ') && !rawInput.startsWith('Rs ') &&
+          !rawInput.startsWith('₹ ')) {
+          throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
+        }
         var ind = rawInput.indexOf(' ');
         if (ind === -1) {
           throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);

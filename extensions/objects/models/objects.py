@@ -833,6 +833,8 @@ class Units(BaseObject):
     # Validation of the units is performed only in the frontend using math.js.
     # math.js is not available in the backend.
     """Units class."""
+    # Validation of the units is performed only in the frontend using math.js.
+    # math.js is not available in the backend.
 
     description = 'A units dict representation.'
     default_value = {}
