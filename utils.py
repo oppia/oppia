@@ -631,6 +631,9 @@ def _get_short_language_description(full_language_description):
 
     Args:
         full_language_description: str. Short description of the language.
+
+    Returns:
+        full_language_description: str. Short description of the language.
     """
     if ' (' not in full_language_description:
         return full_language_description
