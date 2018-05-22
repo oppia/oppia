@@ -146,7 +146,7 @@ oppia.factory('PythonProgramTokenizer', [
     var singleQuoted = [
       "'", '"', "r'", 'r"', "R'", 'R"', "u'", 'u"', "U'", 'U"', "ur'",
       'ur"', "Ur'", 'Ur"', "uR'", 'uR"', "UR'", 'UR"', "b'", 'b"', "B'", 'B"',
-      "br'", 'br"', "Br'", 'Br"', "bR'", 'bR"', "BR'", 'BR"' ];
+      "br'", 'br"', "Br'", 'Br"', "bR'", 'bR"', "BR'", 'BR"'];
 
     var tabsize = 8;
 

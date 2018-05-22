@@ -35,6 +35,8 @@ QUESTION_PROPERTY_QUESTION_DATA = 'question_data'
 # optionally, 'old_value'.
 CMD_UPDATE_QUESTION_PROPERTY = 'update_question_property'
 
+# The following commands are deprecated, as these functionalities will be
+# handled by a QuestionSkillLink class in the future.
 CMD_ADD_QUESTION_SKILL = 'add_question_skill'
 CMD_REMOVE_QUESTION_SKILL = 'remove_question_skill'
 
@@ -71,10 +73,6 @@ class QuestionChange(object):
                 self.old_value = change_dict.get('old_value')
             else:
                 raise Exception('Invalid change_dict: %s' % change_dict)
-        elif self.cmd == CMD_ADD_QUESTION_SKILL:
-            self.skill_name = change_dict['skill_name']
-        elif self.cmd == CMD_REMOVE_QUESTION_SKILL:
-            self.skill_id = change_dict['skill_id']
 
     def to_dict(self):
         """Returns a dict representing QuestionChange domain object.
@@ -98,13 +96,13 @@ class Question(object):
         title: str. The title of the question.
         question_data: dict. A dict representing the question data.
         question_data_schema_version: int. The schema version for the data.
-        collection_id: str. The ID of the collection containing the question.
         language_code: str. The ISO 639-1 code for the language this
             question is written in.
     """
 
-    def __init__(self, question_id, title, question_data,
-                 question_data_schema_version, collection_id, language_code):
+    def __init__(
+            self, question_id, title, question_data,
+            question_data_schema_version, language_code):
         """Constructs a Question domain object.
 
         Args:
@@ -112,8 +110,6 @@ class Question(object):
             title: str. The title of the question.
             question_data: dict. A dict representing the question data.
             question_data_schema_version: int. The schema version for the data.
-            collection_id: str. The ID of the collection containing the
-                question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
@@ -121,7 +117,6 @@ class Question(object):
         self.title = title
         self.question_data = question_data
         self.question_data_schema_version = question_data_schema_version
-        self.collection_id = collection_id
         self.language_code = language_code
 
     def to_dict(self):
@@ -135,7 +130,6 @@ class Question(object):
             'title': self.title,
             'question_data': self.question_data,
             'question_data_schema_version': self.question_data_schema_version,
-            'collection_id': self.collection_id,
             'language_code': self.language_code
         }
 
@@ -162,11 +156,6 @@ class Question(object):
                 'Expected question_data_schema_version to be a integer,' +
                 'received %s' % self.question_data_schema_version)
 
-        if not isinstance(self.collection_id, basestring):
-            raise utils.ValidationError(
-                'Expected collection_id to be a string, received %s' %
-                self.collection_id)
-
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
@@ -188,19 +177,17 @@ class Question(object):
             question_dict['question_id'], question_dict['title'],
             question_dict['question_data'],
             question_dict['question_data_schema_version'],
-            question_dict['collection_id'], question_dict['language_code'])
+            question_dict['language_code'])
 
         return question
 
     @classmethod
     def create_default_question(
-            cls, question_id, collection_id, title, language_code):
+            cls, question_id, title, language_code):
         """Returns a Question domain object with default values.
 
         Args:
             question_id: str. The unique ID of the question.
-            collection_id: str. The ID of the collection containing the
-                question.
             title: str. The title of the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
@@ -210,8 +197,7 @@ class Question(object):
         """
         return cls(
             question_id, title, {},
-            feconf.CURRENT_QUESTION_SCHEMA_VERSION,
-            collection_id, language_code)
+            feconf.CURRENT_QUESTION_SCHEMA_VERSION, language_code)
 
     def update_title(self, title):
         """Updates the title of the question.
@@ -245,21 +231,17 @@ class QuestionSummary(object):
     Attributes:
         question_id: str. The ID of the question.
         question_title: str. The title of the question.
-        skill_names: list(str). The list of skill names associated with the
-            question.
     """
-    def __init__(self, question_id, question_title, skill_names):
+
+    def __init__(self, question_id, question_title):
         """Constructs a Question Summary domain object.
 
         Args:
             question_id: str. The ID of the question.
             question_title: str. The title of the question.
-            skill_names: list(str). The list of skill names associated with the
-                question.
         """
         self.question_id = question_id
         self.question_title = question_title
-        self.skill_names = skill_names
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
@@ -269,6 +251,5 @@ class QuestionSummary(object):
         """
         return {
             'question_id': self.question_id,
-            'question_title': self.question_title,
-            'skill_names': self.skill_names
+            'question_title': self.question_title
         }

@@ -37,7 +37,7 @@ describe('Answer Groups Cache Service', function() {
     };
 
     var scope, agcs;
-    beforeEach(inject(function($rootScope, $injector) {
+    beforeEach(inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       agcs = $injector.get('AnswerGroupsCacheService');
     }));

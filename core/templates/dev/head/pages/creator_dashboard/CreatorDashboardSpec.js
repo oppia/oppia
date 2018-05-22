@@ -70,7 +70,7 @@ describe('Creator dashboard controller', function() {
     });
 
     beforeEach(inject(
-      function($rootScope, $controller, CreatorDashboardBackendApiService) {
+      function($controller, $rootScope, CreatorDashboardBackendApiService) {
         mockDashboardBackendApiService = CreatorDashboardBackendApiService;
         spyOn(mockDashboardBackendApiService, 'fetchDashboardData')
           .and.callThrough();

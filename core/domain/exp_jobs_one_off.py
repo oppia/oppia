@@ -18,8 +18,10 @@
 
 import ast
 import logging
+import os
 import traceback
 
+from bs4 import BeautifulSoup
 from constants import constants
 from core import jobs
 from core.domain import exp_domain
@@ -466,6 +468,69 @@ class HintsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 exp_and_state_key = '%s %s' % (
                     item.id, state_name.encode('utf-8'))
                 yield (str(hints_length), exp_and_state_key)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
+
+
+class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the html content of an exploration and validates it.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+        # err_dict is a dictionary to store the invalid tags and the
+        # invalid parent-child relations that we find.
+        err_dict = {}
+
+        htmlValidation_filepath = os.path.join(
+            feconf.CONTENT_VALIDATION_DIR, 'htmlValidation.yaml')
+        htmlValidation_yaml = utils.get_file_contents(htmlValidation_filepath)
+        # Convert the yaml content to dictionary.
+        htmlValidation_dict = utils.dict_from_yaml(htmlValidation_yaml)
+
+        allowed_parent_list = htmlValidation_dict['allowed_parent_list']
+        allowed_tag_list = htmlValidation_dict['allowed_tag_list']
+
+        for state in exploration.states.itervalues():
+            # result is the list of all the html present in the state.
+            result = exp_services.find_all_values_for_key(
+                'html', state.to_dict())
+
+            for html_data in result:
+                html_data = html_data.encode('utf-8')
+                soup = BeautifulSoup(html_data, 'html.parser')
+
+                for tag in soup.findAll():
+                    # Checking for tags not allowed in RTE.
+                    if tag.name not in allowed_tag_list:
+                        if 'invalidTags' in err_dict:
+                            err_dict['invalidTags'] += [tag.name]
+                        else:
+                            err_dict['invalidTags'] = [tag.name]
+                    # Checking for parent-child relation that are not
+                    # allowed in RTE.
+                    parent = tag.parent.name
+                    if (tag.name in allowed_tag_list and parent not in
+                            allowed_parent_list[tag.name]):
+                        if tag.name in err_dict:
+                            err_dict[tag.name] += [parent]
+                        else:
+                            err_dict[tag.name] = [parent]
+
+        for key in err_dict.iterkeys():
+            err_dict[key] = list(set(err_dict[key]))
+
+        yield('Errors', err_dict)
 
     @staticmethod
     def reduce(key, values):

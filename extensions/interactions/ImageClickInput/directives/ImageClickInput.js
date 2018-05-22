@@ -72,7 +72,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             }
           };
           if (!$scope.interactionIsActive) {
-            /*The following lines highlight the learner's last answer for this
+            /* The following lines highlight the learner's last answer for this
               card. This need only be done at the beginning as if he submits
               an answer, based on EVENT_NEW_CARD_AVAILABLE, the image is made
               inactive, so his last selection would be higlighted.*/

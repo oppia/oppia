@@ -24,7 +24,7 @@ var GLOBALS = {
       display_mode: 'inline',
       name: 'Text Input',
       is_linear: false,
-      customization_arg_specs:  [
+      customization_arg_specs: [
         {
           default_value: '',
           name: 'placeholder',
@@ -93,7 +93,7 @@ var hashes = {
   '/assets_test/hash_test.json': '987654321',
   '/pages_test/hash_test.html': 'abcd12345',
   '/images/hash_test.png': '98765fghij',
-  '/interactions/interTest/static/interTest.png' : '123654789'
+  '/interactions/interTest/static/interTest.png': '123654789'
 };
 
 /* This function overwrites the translationProvider for a dummy function
@@ -105,10 +105,10 @@ var hashes = {
  * (see the 'Unit Testing' section).
  */
 GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS = function($provide, $translateProvider) {
-  $provide.factory('customLoader', function($q) {
+  $provide.factory('customLoader', ['$q', function($q) {
     return function() {
       return $q.resolve({});
     };
-  });
+  }]);
   $translateProvider.useLoader('customLoader');
 };

@@ -80,6 +80,7 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
+
     def test_get_exploration_titles_and_categories(self):
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories([]), {})
@@ -310,6 +311,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
 
 class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     """Test creation and deletion methods."""
+
     def test_retrieval_of_explorations(self):
         """Test the get_exploration_by_id() method."""
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -1257,6 +1259,7 @@ def _get_change_list(state_name, property_name, new_value):
 
 class UpdateStateTests(ExplorationServicesUnitTests):
     """Test updating a single state."""
+
     def setUp(self):
         super(UpdateStateTests, self).setUp()
         exploration = self.save_new_valid_exploration(
@@ -1287,6 +1290,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'param_changes': [],
                 'refresher_exploration_id': None,
             },
+            'training_data': []
         }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
@@ -1306,10 +1310,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         self.assertNotIn('new state', exploration.states)
 
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'new state',
-        }], 'Add state name')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }], 'Add state name')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertIn('new state', exploration.states)
@@ -1320,11 +1325,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         self.assertIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_RENAME_STATE,
-            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_state_name': 'state',
-        }], 'Change state name')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'new_state_name': 'state',
+            }], 'Change state name')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertIn('state', exploration.states)
@@ -1337,11 +1343,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertNotIn(u'¡Hola! αβγ', exploration.states)
         self.assertIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_RENAME_STATE,
-            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_state_name': u'¡Hola! αβγ',
-        }], 'Change state name')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'new_state_name': u'¡Hola! αβγ',
+            }], 'Change state name')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertIn(u'¡Hola! αβγ', exploration.states)
@@ -1351,18 +1358,20 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test deleting a state name."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'new state',
-        }], 'Add state name')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }], 'Add state name')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
         self.assertIn('new state', exploration.states)
 
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_DELETE_STATE,
-            'state_name': 'new state',
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_DELETE_STATE,
+                'state_name': 'new state',
             }], 'delete state')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -1596,6 +1605,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
 class CommitMessageHandlingTests(ExplorationServicesUnitTests):
     """Test the handling of commit messages."""
+
     def setUp(self):
         super(CommitMessageHandlingTests, self).setUp()
         exploration = self.save_new_valid_exploration(
@@ -2142,9 +2152,10 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             return ids
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(search_services,
-                                  'add_documents_to_index',
-                                  add_docs_counter)
+        add_docs_swap = self.swap(
+            search_services,
+            'add_documents_to_index',
+            add_docs_counter)
 
         for i in xrange(5):
             self.save_new_valid_exploration(
@@ -2312,15 +2323,15 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self.save_new_valid_exploration(self.EXP_ID_1, albert_id)
         self._check_contributors_summary(self.EXP_ID_1, {albert_id: 1})
 
-         # Have Bob update that exploration. Version 2.
+        # Have Bob update that exploration. Version 2.
         exp_services.update_exploration(
             bob_id, self.EXP_ID_1, [{
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             }], 'Changed title.')
-        self._check_contributors_summary(self.EXP_ID_1,
-                                         {albert_id: 1, bob_id: 1})
+        self._check_contributors_summary(
+            self.EXP_ID_1, {albert_id: 1, bob_id: 1})
         # Have Bob update that exploration. Version 3.
         exp_services.update_exploration(
             bob_id, self.EXP_ID_1, [{
@@ -2328,8 +2339,8 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             }], 'Changed title.')
-        self._check_contributors_summary(self.EXP_ID_1,
-                                         {albert_id: 1, bob_id: 2})
+        self._check_contributors_summary(
+            self.EXP_ID_1, {albert_id: 1, bob_id: 2})
 
         # Have Albert update that exploration. Version 4.
         exp_services.update_exploration(
@@ -2338,13 +2349,13 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             }], 'Changed title.')
-        self._check_contributors_summary(self.EXP_ID_1,
-                                         {albert_id: 2, bob_id: 2})
+        self._check_contributors_summary(
+            self.EXP_ID_1, {albert_id: 2, bob_id: 2})
 
         # Have Albert revert to version 3. Version 5.
         exp_services.revert_exploration(albert_id, self.EXP_ID_1, 4, 3)
-        self._check_contributors_summary(self.EXP_ID_1,
-                                         {albert_id: 1, bob_id: 2})
+        self._check_contributors_summary(
+            self.EXP_ID_1, {albert_id: 1, bob_id: 2})
 
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
@@ -2837,8 +2848,9 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
             self.EXP_ID1, self.editor_id)
         self.save_new_valid_exploration(self.EXP_ID2, self.editor_id)
         self.initial_state_name = exploration.init_state_name
-        with self.swap(feedback_models.FeedbackThreadModel,
-                       'generate_new_thread_id', self._generate_thread_id):
+        with self.swap(
+            feedback_models.FeedbackThreadModel,
+            'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
                 self.EXP_ID1, self.user_id, 3, self.initial_state_name,
                 'description', 'new text')
@@ -2847,10 +2859,12 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                 'description', 'new text')
 
     def test_accept_suggestion_valid_suggestion(self):
-        with self.swap(exp_services, '_is_suggestion_valid',
-                       self._return_true):
-            with self.swap(exp_services, 'update_exploration',
-                           self._check_commit_message):
+        with self.swap(
+            exp_services, '_is_suggestion_valid',
+            self._return_true):
+            with self.swap(
+                exp_services, 'update_exploration',
+                self._check_commit_message):
                 exp_services.accept_suggestion(
                     self.editor_id, self.THREAD_ID1, self.EXP_ID1,
                     self.COMMIT_MESSAGE, False)
@@ -2864,8 +2878,9 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(last_message.text, 'Suggestion accepted.')
 
     def test_accept_suggestion_invalid_suggestion(self):
-        with self.swap(exp_services, '_is_suggestion_valid',
-                       self._return_false):
+        with self.swap(
+            exp_services, '_is_suggestion_valid',
+            self._return_false):
             with self.assertRaisesRegexp(
                 Exception,
                 'Invalid suggestion: The state for which it was made '
@@ -2880,8 +2895,8 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
 
     def test_accept_suggestion_empty_commit_message(self):
-        with self.assertRaisesRegexp(Exception,
-                                     'Commit message cannot be empty.'):
+        with self.assertRaisesRegexp(
+            Exception, 'Commit message cannot be empty.'):
             exp_services.accept_suggestion(
                 self.editor_id, self.THREAD_ID1, self.EXP_ID2,
                 self.EMPTY_COMMIT_MESSAGE, False)
@@ -2892,8 +2907,9 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
 
     def test_accept_suggestion_that_has_already_been_handled(self):
         exception_message = 'Suggestion has already been accepted/rejected'
-        with self.swap(exp_services, '_is_suggestion_handled',
-                       self._return_true):
+        with self.swap(
+            exp_services, '_is_suggestion_handled',
+            self._return_true):
             with self.assertRaisesRegexp(Exception, exception_message):
                 exp_services.accept_suggestion(
                     self.editor_id, self.THREAD_ID1, self.EXP_ID2,
@@ -2905,13 +2921,15 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         thread = feedback_models.FeedbackThreadModel.get(
             feedback_models.FeedbackThreadModel.generate_full_thread_id(
                 self.EXP_ID2, self.THREAD_ID1))
-        self.assertEqual(thread.status,
-                         feedback_models.STATUS_CHOICES_IGNORED)
+        self.assertEqual(
+            thread.status,
+            feedback_models.STATUS_CHOICES_IGNORED)
 
     def test_reject_suggestion_that_has_already_been_handled(self):
         exception_message = 'Suggestion has already been accepted/rejected'
-        with self.swap(exp_services, '_is_suggestion_handled',
-                       self._return_true):
+        with self.swap(
+            exp_services, '_is_suggestion_handled',
+            self._return_true):
             with self.assertRaisesRegexp(Exception, exception_message):
                 exp_services.reject_suggestion(
                     self.editor_id, self.THREAD_ID1, self.EXP_ID2)
@@ -3009,8 +3027,8 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exp_user_data.exploration_id, self.EXP_ID1)
         self.assertEqual(
             exp_user_data.draft_change_list, self.NEW_CHANGELIST)
-        self.assertEqual(exp_user_data.draft_change_list_last_updated,
-                         self.NEWER_DATETIME)
+        self.assertEqual(
+            exp_user_data.draft_change_list_last_updated, self.NEWER_DATETIME)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 5)
         self.assertEqual(exp_user_data.draft_change_list_id, 3)
 
@@ -3037,8 +3055,8 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exp_user_data.exploration_id, self.EXP_ID3)
         self.assertEqual(
             exp_user_data.draft_change_list, self.NEW_CHANGELIST)
-        self.assertEqual(exp_user_data.draft_change_list_last_updated,
-                         self.NEWER_DATETIME)
+        self.assertEqual(
+            exp_user_data.draft_change_list_last_updated, self.NEWER_DATETIME)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 5)
         self.assertEqual(exp_user_data.draft_change_list_id, 1)
 

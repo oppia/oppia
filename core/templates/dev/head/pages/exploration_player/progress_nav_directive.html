@@ -1,5 +1,4 @@
-<!-- 87px is used to move the opppia avatar inside the conversation-skin-tutor-card div (so that it does not goes out of screen during zoom in). -->
-<div layout="row" layout-align="space-between center" style="background-color: white; margin-left: 87px;">
+<div class="progress-nav-bar" layout="row" layout-align="space-between center">
   <!-- Wrapping div on first button keeps the second button right-aligned
     even when the first button is not present. -->
   <div>
@@ -36,3 +35,22 @@
     </continue-button>
   </div>
 </div>
+
+<style>
+  /*
+    This affects the progress nav bar.
+  */
+  progress-nav .progress-nav-bar {
+    background-color: white;
+    margin-left: 87px;
+    /*
+    87px is used to move the opppia avatar inside the conversation-skin-tutor-card div (so that it does not goes out of screen during zoom in).
+    */
+  }
+
+  @media screen and (max-width: 959px) {
+   progress-nav .progress-nav-bar {
+      margin-left: 0;
+    }
+  }
+</style>

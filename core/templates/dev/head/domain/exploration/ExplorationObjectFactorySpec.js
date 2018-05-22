@@ -21,7 +21,7 @@ describe('Exploration object factory', function() {
 
   describe('ExplorationObjectFactory', function() {
     var scope, eof, atof, explorationDict, exploration;
-    beforeEach(inject(function($rootScope, $injector) {
+    beforeEach(inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       eof = $injector.get('ExplorationObjectFactory');
       sof = $injector.get('StateObjectFactory');

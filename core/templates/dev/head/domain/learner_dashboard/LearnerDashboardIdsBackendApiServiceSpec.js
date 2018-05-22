@@ -67,7 +67,7 @@ describe('Learner Dashboard Backend API Service', function() {
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(jasmine.objectContaining(
-        {data : sampleDataResults}));
+        {data: sampleDataResults}));
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
@@ -87,6 +87,6 @@ describe('Learner Dashboard Backend API Service', function() {
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(jasmine.objectContaining(
-        {data : 'Error loading dashboard IDs data.'}));
+        {data: 'Error loading dashboard IDs data.'}));
     });
 });

@@ -266,7 +266,8 @@ class MultiplePageSessionMetrics(object):
     different page load sessions. This may happen due to various factors like
     background processes.
     """
-    def  __init__(self, page_session_metrics):
+
+    def __init__(self, page_session_metrics):
         self.page_metrics = page_session_metrics
         self._validate()
 
