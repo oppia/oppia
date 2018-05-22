@@ -89,22 +89,23 @@ class SuggestionModel(base_models.BaseModel):
     target_type = ndb.StringProperty(
         required=True, indexed=True, choices=TARGET_TYPE_CHOICES)
     # The ID of the target entity being suggested to.
-    target_id = ndb.StringProperty(required=True)
+    target_id = ndb.StringProperty(required=True, indexed=True)
     # The version number of the target entity at the time of creation of the
     # suggestion.
-    target_version_at_submission = ndb.IntegerProperty(required=True)
+    target_version_at_submission = ndb.IntegerProperty(
+        required=True, indexed=True)
     # Status of the suggestion.
     status = ndb.StringProperty(
         required=True, indexed=True, choices=STATUS_CHOICES)
     # The ID of the author of the suggestion.
     author_id = ndb.StringProperty(required=True, indexed=True)
     # The ID of the reviewer assigned to review the suggestion.
-    assigned_reviewer_id = ndb.StringProperty(required=False, indexed=True)
-    # The ID of the reviewer who accepted the suggestion.
-    reviewer_id = ndb.StringProperty(required=False, indexed=True)
+    assigned_reviewer_id = ndb.StringProperty(indexed=True)
+    # The ID of the reviewer who accepted/rejected the suggestion.
+    final_reviewer_id = ndb.StringProperty(indexed=True)
     # The change command linked to the suggestion. Contains the details of the
     # change.
-    change_cmd = ndb.JsonProperty(required=True, indexed=False)
+    change_cmd = ndb.JsonProperty(required=True)
     # The category to score the suggestor in. This field will contain 2 values
     # separated by a ., the first will be a value from SCORE_TYPE_CHOICES and
     # the second will be the subcategory of the suggestion.
@@ -112,28 +113,28 @@ class SuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_instance_id(
-            cls, target_type, target_id, thread_instance_id):
+            cls, target_type, target_id, thread_id):
         """Concatenates various parameters and gives the ID of the suggestion
         model.
 
         Args:
             target_type: str. The type of target being edited.
             target_id: str. The ID of the target being edited.
-            thread_instance_id: str. The instance ID of the feedback thread
-                linked to the suggestion.
+            thread_id: str. The ID of the feedback thread linked to the
+                suggestion.
 
         Returns:
             str. The full instance ID for the suggestion.
         """
         return SUGGESTION_ID_DELIMITER.join(
-            [target_type, target_id, thread_instance_id])
+            [target_type, target_id, thread_id])
 
     @classmethod
     def create(
             cls, suggestion_type, target_type, target_id,
             target_version_at_submission, status, author_id,
-            assigned_reviewer_id, reviewer_id, change_cmd, score_category,
-            thread_instance_id):
+            assigned_reviewer_id, final_reviewer_id, change_cmd, score_category,
+            thread_id):
         """Creates a new SuggestionModel entry.
 
         Args:
@@ -146,18 +147,17 @@ class SuggestionModel(base_models.BaseModel):
             author_id: str. The ID of the user who submitted the suggestion.
             assigned_reviewer_id: str. The ID of the user assigned to
                 review the suggestion.
-            reviewer_id: str. The ID of the reviewer who has accepted the
-                suggestion.
+            final_reviewer_id: str. The ID of the reviewer who has
+                accepted/rejected the suggestion.
             change_cmd: dict. The actual content of the suggestion.
             score_category: str. The scoring category for the suggestion.
-            thread_instance_id: str. The instance ID of the feedback thread
-                linked to the suggestion.
+            thread_id: str. The ID of the feedback thread linked to the
+                suggestion.
 
         Raises:
             Exception: There is already a suggestion with the given id.
         """
-        instance_id = cls.get_instance_id(
-            target_type, target_id, thread_instance_id)
+        instance_id = cls.get_instance_id(target_type, target_id, thread_id)
 
         if cls.get_by_id(instance_id):
             raise Exception('There is already a suggestion with the given'
@@ -167,8 +167,9 @@ class SuggestionModel(base_models.BaseModel):
             target_type=target_type, target_id=target_id,
             target_version_at_submission=target_version_at_submission,
             status=status, author_id=author_id,
-            assigned_reviewer_id=assigned_reviewer_id, reviewer_id=reviewer_id,
-            change_cmd=change_cmd, score_category=score_category).put()
+            assigned_reviewer_id=assigned_reviewer_id,
+            final_reviewer_id=final_reviewer_id, change_cmd=change_cmd,
+            score_category=score_category).put()
 
     @classmethod
     def get_suggestions_by_type(cls, suggestion_type):
@@ -218,7 +219,7 @@ class SuggestionModel(base_models.BaseModel):
                 feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_suggestions_reviewed_by(cls, reviewer_id):
+    def get_suggestions_reviewed_by(cls, final_reviewer_id):
         """Gets all suggestions that have been reviewed by the given user.
 
         Args:
@@ -230,7 +231,8 @@ class SuggestionModel(base_models.BaseModel):
                 suggestions.
         """
         return cls.get_all().filter(
-            cls.reviewer_id == reviewer_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+            cls.final_reviewer_id == final_reviewer_id).fetch(
+                feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_suggestions_by_status(cls, status):

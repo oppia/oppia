@@ -94,31 +94,34 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, 'thread_6')
 
-        observed_suggestion = suggestion_models.SuggestionModel.get_by_id(
+        observed_suggestion_model = suggestion_models.SuggestionModel.get_by_id(
             suggestion_id)
 
 
         self.assertEqual(
-            observed_suggestion.suggestion_type,
+            observed_suggestion_model.suggestion_type,
             suggestion_models.SUGGESTION_EDIT_STATE_CONTENT)
         self.assertEqual(
-            observed_suggestion.target_type,
+            observed_suggestion_model.target_type,
             suggestion_models.TARGET_TYPE_EXPLORATION)
         self.assertEqual(
-            observed_suggestion.target_id, self.target_id)
+            observed_suggestion_model.target_id, self.target_id)
         self.assertEqual(
-            observed_suggestion.target_version_at_submission,
+            observed_suggestion_model.target_version_at_submission,
             self.target_version_at_submission)
         self.assertEqual(
-            observed_suggestion.status, suggestion_models.STATUS_IN_REVIEW)
-        self.assertEqual(observed_suggestion.author_id, 'author_3')
-        self.assertEqual(observed_suggestion.assigned_reviewer_id, 'reviewer_3')
-        self.assertEqual(observed_suggestion.reviewer_id, 'reviewer_3')
+            observed_suggestion_model.status,
+            suggestion_models.STATUS_IN_REVIEW)
+        self.assertEqual(observed_suggestion_model.author_id, 'author_3')
         self.assertEqual(
-            observed_suggestion.score_category, self.score_category)
-        self.assertEqual(observed_suggestion.change_cmd, self.change_cmd)
+            observed_suggestion_model.assigned_reviewer_id, 'reviewer_3')
+        self.assertEqual(
+            observed_suggestion_model.final_reviewer_id, 'reviewer_3')
+        self.assertEqual(
+            observed_suggestion_model.score_category, self.score_category)
+        self.assertEqual(observed_suggestion_model.change_cmd, self.change_cmd)
 
-    def test_fail_create_object(self):
+    def test_create_suggestion_fails_if_id_collides_with_existing_one(self):
         with self.assertRaisesRegexp(
             Exception, 'There is already a suggestion with the given id: '
                        'exploration.exp1.thread_1'):
@@ -153,7 +156,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(suggestion_models.SuggestionModel.get_suggestions_by_author(
                 'author_invalid')), 0)
-
 
     def test_get_suggestion_assigned_to_reviewer(self):
         self.assertEqual(
@@ -198,7 +200,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(suggestion_models.SuggestionModel.get_suggestions_by_status(
                 suggestion_models.STATUS_INVALID)), 0)
-
 
     def test_get_suggestions_by_target_id(self):
         self.assertEqual(
