@@ -14,14 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function, division, absolute_import
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import _check_docs_utils as utils
 import astroid
 
 from pylint.checkers import BaseChecker
+from pylint.checkers import utils as checker_utils
 from pylint.interfaces import IAstroidChecker
 from pylint.interfaces import IRawChecker
-from pylint.checkers import utils as checker_utils
-import _check_docs_utils as utils
 
 
 class ExplicitKwargsChecker(BaseChecker):
@@ -173,15 +176,19 @@ class DocstringParameterChecker(BaseChecker):
 
     name = 'parameter_documentation'
     msgs = {
-        'W9005': ('"%s" has constructor parameters documented in class and __init__',
+        'W9005': ('''"%s" has constructor parameters
+                    documented in class and __init__''',
                   'multiple-constructor-doc',
-                  'Please remove parameter declarations in the class or constructor.'),
+                  '''Please remove parameter declarations
+                    in the class or constructor.'''),
         'W9006': ('"%s" not documented as being raised',
                   'missing-raises-doc',
-                  'Please document exceptions for all raised exception types.'),
+                  '''Please document exceptions for
+                    all raised exception types.'''),
         'W9008': ('Redundant returns documentation',
                   'redundant-returns-doc',
-                  'Please remove the return/rtype documentation from this method.'),
+                  '''Please remove the return/rtype
+                    documentation from this method.'''),
         'W9010': ('Redundant yields documentation',
                   'redundant-yields-doc',
                   'Please remove the yields documentation from this method.'),
@@ -224,25 +231,25 @@ class DocstringParameterChecker(BaseChecker):
     }
 
     options = (('accept-no-param-doc',
-                {'default': True, 'type' : 'yn', 'metavar' : '<y or n>',
+                {'default': True, 'type': 'yn', 'metavar': '<y or n>',
                  'help': 'Whether to accept totally missing parameter '
-                         'documentation in the docstring of a function that has '
-                         'parameters.'
+                         'documentation in the docstring of a '
+                         'function that has parameters.'
                 }),
                ('accept-no-raise-doc',
-                {'default': True, 'type' : 'yn', 'metavar' : '<y or n>',
+                {'default': True, 'type': 'yn', 'metavar': '<y or n>',
                  'help': 'Whether to accept totally missing raises '
                          'documentation in the docstring of a function that '
                          'raises an exception.'
                 }),
                ('accept-no-return-doc',
-                {'default': True, 'type' : 'yn', 'metavar' : '<y or n>',
+                {'default': True, 'type': 'yn', 'metavar': '<y or n>',
                  'help': 'Whether to accept totally missing return '
                          'documentation in the docstring of a function that '
                          'returns a statement.'
                 }),
                ('accept-no-yields-doc',
-                {'default': True, 'type' : 'yn', 'metavar': '<y or n>',
+                {'default': True, 'type': 'yn', 'metavar': '<y or n>',
                  'help': 'Whether to accept totally missing yields '
                          'documentation in the docstring of a generator.'
                 }),
@@ -270,7 +277,8 @@ class DocstringParameterChecker(BaseChecker):
             class_node = checker_utils.node_frame_class(node)
             if class_node is not None:
                 class_doc = utils.docstringify(class_node.doc)
-                self.check_single_constructor_params(class_doc, node_doc, class_node)
+                self.check_single_constructor_params(
+                    class_doc, node_doc, class_node)
 
                 # __init__ or class docstrings can have no parameters documented
                 # as long as the other documents them.
@@ -296,8 +304,11 @@ class DocstringParameterChecker(BaseChecker):
             return
 
         return_nodes = node.nodes_of_class(astroid.Return)
-        if ((node_doc.has_returns() or node_doc.has_rtype()) and
-                not any(utils.returns_something(ret_node) for ret_node in return_nodes)):
+        if ((
+                node_doc.has_returns() or node_doc.has_rtype()) and
+                not any(
+                    utils.returns_something(
+                        ret_node) for ret_node in return_nodes)):
             self.add_message(
                 'redundant-returns-doc',
                 node=node)
@@ -397,8 +408,8 @@ class DocstringParameterChecker(BaseChecker):
     def visit_yieldfrom(self, node):
         self.visit_yield(node)
 
-    def check_arguments_in_docstring(self, doc, arguments_node, warning_node,
-                                     accept_no_param_doc=None):
+    def check_arguments_in_docstring(
+            self, doc, arguments_node, warning_node, accept_no_param_doc=None):
         """Check that all parameters in a function, method or class constructor
         on the one hand and the parameters mentioned in the parameter
         documentation (e.g. the Sphinx tags 'param' and 'type') on the other
@@ -442,8 +453,10 @@ class DocstringParameterChecker(BaseChecker):
         tolerate_missing_params = doc.params_documented_elsewhere()
 
         # Collect the function arguments.
-        expected_argument_names = set(arg.name for arg in arguments_node.args)
-        expected_argument_names.update(arg.name for arg in arguments_node.kwonlyargs)
+        expected_argument_names = set(
+            arg.name for arg in arguments_node.args)
+        expected_argument_names.update(
+            arg.name for arg in arguments_node.kwonlyargs)
         not_needed_type_in_docstring = (
             self.not_needed_param_in_docstring.copy())
 
@@ -460,8 +473,8 @@ class DocstringParameterChecker(BaseChecker):
                 and accept_no_param_doc):
             tolerate_missing_params = True
 
-        def _compare_missing_args(found_argument_names, message_id,
-                                  not_needed_names):
+        def _compare_missing_args(
+                found_argument_names, message_id, not_needed_names):
             """Compare the found argument names with the expected ones and
             generate a message if there are arguments missing.
 
@@ -484,8 +497,8 @@ class DocstringParameterChecker(BaseChecker):
                             sorted(missing_argument_names)),),
                         node=warning_node)
 
-        def _compare_different_args(found_argument_names, message_id,
-                                    not_needed_names):
+        def _compare_different_args(
+                found_argument_names, message_id, not_needed_names):
             """Compare the found argument names with the expected ones and
             generate a message if there are extra arguments found.
 
