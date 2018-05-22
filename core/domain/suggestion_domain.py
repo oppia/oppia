@@ -31,8 +31,8 @@ class Suggestion(object):
         author_id: str. The ID of the user who submitted the suggestion.
         assigned_reviewer_id: str. The ID of the user assigned to
             review the suggestion.
-        final_reviewer_id: str. The ID of the reviewer who has accepted the
-            suggestion.
+        final_reviewer_id: str. The ID of the reviewer who has accepted/rejected
+            the suggestion.
         change_cmd: dict. The actual content of the suggestion.
         score_category: str. The scoring category for the suggestion.
     """
