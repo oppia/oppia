@@ -1473,11 +1473,12 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
 
         state_answers_stats = self._get_state_answers_stats(min_frequency=2)
 
-        self.assertEqual(state_answers_stats, [
-            {'answer': 'A', 'frequency': 3},
-            {'answer': 'B', 'frequency': 2},
-            # C is not included because min frequency is 2.
-        ])
+        self.assertEqual(
+            state_answers_stats, [
+                {'answer': 'A', 'frequency': 3},
+                {'answer': 'B', 'frequency': 2},
+                # C is not included because min frequency is 2.
+            ])
 
     def test_get_state_answers_stats_multi(self):
         self._record_answer('A', state_name='STATE A')
