@@ -23,7 +23,7 @@ import utils
 NAMES = utils.create_enum(
     'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
     'email', 'exploration', 'feedback', 'file', 'job', 'question',
-    'recommendations', 'skill', 'statistics', 'story', 'topic', 'user')
+    'recommendations', 'skill', 'statistics', 'story', 'suggestion', 'topic', 'user')
 
 
 class _Platform(object):
@@ -109,6 +109,9 @@ class _Gae(_Platform):
             elif name == NAMES.story:
                 from core.storage.story import gae_models as story_models
                 returned_models.append(story_models)
+            elif name == NAMES.suggestion:
+                from core.storage.suggestion import gae_models as suggestion_models # pylint: disable=line-too-long
+                returned_models.append(suggestion_models)
             elif name == NAMES.topic:
                 from core.storage.topic import gae_models as topic_models
                 returned_models.append(topic_models)

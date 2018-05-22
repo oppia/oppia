@@ -23,7 +23,7 @@ import tempfile
 import unittest
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.7.1')
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.8.4')
 sys.path.insert(0, _PYLINT_PATH)
 
 # Since these module needs to be imported after adding Pylint path,
