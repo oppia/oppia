@@ -15,6 +15,7 @@ module.exports = function(config) {
       // Constants must be loaded before everything else.
       'assets/constants.js',
       'assets/rich_text_components_definitions.js',
+      'core/tests/data/exploration_dict.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.2.1/jquery.min.js',

@@ -25,10 +25,10 @@ oppia.factory('ExtractImageFilenamesFromStateService', ['HtmlEscaperService',
     var filenamesInState = [];
     var _getAllHtmlOfState = function(state) {
       var _allHtmlInTheState = [];
-      // The order of the imagenames extracted is same as they appea in a state
-      // . The images should be preloaded in the following order --- content,
-      // customizationArgs of interactions, feedback of outcomes(including
-      // feedback of default outcome if any), hints, solution if any.
+      // The order of the image names extracted is same as they appear in a
+      // state. The images should be preloaded in the following order ---
+      // content, customizationArgs of interactions, feedback of outcomes()
+      // including feedback of default outcome if any), hints, solution if any.
       var stateContentHtml = state.content.getHtml();
       _allHtmlInTheState.push(stateContentHtml);
 
@@ -81,9 +81,9 @@ oppia.factory('ExtractImageFilenamesFromStateService', ['HtmlEscaperService',
       // The name in the array is stored as '"image.png"'. We need to remove
       // the inverted commas. We remove the first and the last character from
       // the string (name).
-      for (var x in filenames) {
-        filenames[x] = filenames[x].slice(1, filenames[x].length - 1);
-      }
+      filenames = filenames.map(function(filename){
+        return filename.slice(1, filename.length - 1);
+      });
       return filenames;
     };
 
@@ -105,8 +105,6 @@ oppia.factory('ExtractImageFilenamesFromStateService', ['HtmlEscaperService',
     };
 
     return {
-      getImageFilenamesInState: function(state) {
-        return _getImageFilenamesInState(state);
-      }
+      getImageFilenamesInState: _getImageFilenamesInState
     };
   }]);
