@@ -93,6 +93,7 @@ def create_thread(
         exploration_id, state_name, original_author_id, subject, text, False)
     return thread_id
 
+
 def create_message(
         thread_id, author_id, updated_status, updated_subject,
         text, received_via_email=False):
