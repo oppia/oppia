@@ -941,10 +941,14 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         issue a warning if "input_reader" subdicationary is not present.
 
         Args:
-            mapper_spec: model.MapperSpec. The MapperSpec for this InputReader.
+            unused_mapper_spec: model.MapperSpec. The MapperSpec
+                for this InputReader.
 
         Raises:
             BadReaderParamsError: Required parameters are missing or invalid.
+
+        Returns:
+            bool. True.
         """
         return True  # TODO.
 
@@ -1098,6 +1102,9 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
         Raises:
             Exception: The current instance has an invalid realtime layer id.
+
+        Returns:
+            realtime_layer. The realtime layer entity.
         """
         if (self.realtime_layer is None or
                 str(self.realtime_layer) != self.id[0]):
@@ -1210,8 +1217,8 @@ class BaseContinuousComputationManager(object):
                 a student starts an exploration, event of type `start` is
                 triggered. If he/she completes an exploration, event of type
                 `complete` is triggered.
-            *args: list(*). Forwarded to the _handle_event() method.
-            **kwargs: dict(* : *). Forwarded to the _handle_event() method.
+            args: list(*). Forwarded to the _handle_event() method.
+            kwargs: dict(* : *). Forwarded to the _handle_event() method.
         """
         raise NotImplementedError(
             'Subclasses of BaseContinuousComputationManager must implement '
@@ -1439,8 +1446,8 @@ class BaseContinuousComputationManager(object):
                 a student starts an exploration, event of type `start` is
                 triggered. If he/she completes an exploration, event of type
                 `complete` is triggered.
-            *args: Forwarded to _handle_event() method.
-            *kwargs: Forwarded to _handle_event() method.
+            args: arguments. Forwarded to _handle_event() method.
+            kwargs: keyword_arguments. Forwarded to _handle_event() method.
         """
         realtime_layers = [0, 1]
         for layer in realtime_layers:
