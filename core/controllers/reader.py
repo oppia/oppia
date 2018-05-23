@@ -34,12 +34,17 @@ from core.domain import moderator_services
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
+from core.domain import stats_domain
+from core.domain import stats_services
 from core.domain import summary_services
 from core.domain import user_services
+from core.platform import models
 import feconf
 import utils
 
 import jinja2
+
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
@@ -292,6 +297,130 @@ class ExplorationHandler(base.BaseHandler):
                 exploration.correctness_feedback_enabled),
         })
         self.render_json(self.values)
+
+
+class StorePlaythroughHandler(base.BaseHandler):
+    """Handles a useful playthrough coming in from the frontend to store it."""
+
+    def _require_exp_issue_dict_is_valid(self, exp_issue_dict):
+        """Checks whether the exploration issue dict has the correct keys.
+
+        Args:
+            exp_issue_dict: dict. Dict representing an exploration issue.
+        """
+        exp_issue_properties = [
+            'issue_type', 'schema_version', 'issue_customization_args']
+
+        for exp_issue_property in exp_issue_properties:
+            if exp_issue_property not in exp_issue_dict:
+                raise self.InvalidInputException(
+                    '%s not in exploration issue dict.' % (exp_issue_property))
+
+        dummy_exp_issue = stats_domain.ExplorationIssue(
+            exp_issue_dict['issue_type'],
+            exp_issue_dict['issue_customization_args'], [],
+            exp_issue_dict['schema_version'])
+
+        try:
+            dummy_exp_issue.validate()
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+    def _require_playthrough_data_is_valid(self, playthrough_data):
+        """Checks whether the playthrough data dict has the correct keys.
+
+        Args:
+            playthrough_data: dict. Dict representing a playthrough.
+        """
+        playthrough_properties = [
+            'exp_id', 'exp_version', 'issue_type', 'issue_customization_args',
+            'playthrough_actions', 'is_valid']
+
+        for playthrough_property in playthrough_properties:
+            if playthrough_property not in playthrough_data:
+                raise self.InvalidInputException(
+                    '%s not in playthrough data dict.' % playthrough_property)
+
+        playthrough_actions = [
+            stats_domain.LearnerAction.from_dict(playthrough_action_dict)
+            for playthrough_action_dict in playthrough_data[
+                'playthrough_actions']]
+
+        dummy_playthrough = stats_domain.Playthrough(
+            'dummy_playthrough_id',
+            playthrough_data['exp_id'],
+            playthrough_data['exp_version'],
+            playthrough_data['issue_type'],
+            playthrough_data['issue_customization_args'],
+            playthrough_actions,
+            playthrough_data['is_valid'])
+
+        try:
+            dummy_playthrough.validate()
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests. Appends to existing list of playthroughs or
+        deletes it if already full.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+        exp_issue_dict = self.payload.get('exp_issue_dict')
+        self._require_exp_issue_dict_is_valid(exp_issue_dict)
+
+        playthrough_data = self.payload.get('playthrough_data')
+        self._require_playthrough_data_is_valid(playthrough_data)
+
+        exp_issues_model = stats_models.ExplorationIssuesModel.get(
+            exploration_id)
+        exp_issues = stats_services.get_exp_issues_from_model(exp_issues_model)
+
+        customization_args = exp_issue_dict['issue_customization_args']
+
+        issue_found = False
+        for index, issue in enumerate(exp_issues.unresolved_issues):
+            if issue.issue_type == exp_issue_dict['issue_type']:
+                issue_customization_args = issue.issue_customization_args
+                # In case issue_keyname is 'state_names', the ordering of the
+                # list is important i.e. [a,b,c] is different from [b,c,a].
+                issue_keyname = stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
+                    issue.issue_type]
+                if (issue_customization_args[issue_keyname] ==
+                        customization_args[issue_keyname]):
+                    issue_found = True
+                    if (len(issue.playthrough_ids) <
+                            feconf.MAX_PLAYTHROUGHS_FOR_ISSUE):
+                        playthrough_id = stats_models.PlaythroughModel.create(
+                            playthrough_data['exp_id'],
+                            playthrough_data['exp_version'],
+                            playthrough_data['issue_type'],
+                            playthrough_data['issue_customization_args'],
+                            playthrough_data['playthrough_actions'],
+                            playthrough_data['is_valid'])
+                        exp_issues.unresolved_issues[
+                            index].playthrough_ids.append(playthrough_id)
+                    break
+
+        if not issue_found:
+            playthrough_id = stats_models.PlaythroughModel.create(
+                playthrough_data['exp_id'],
+                playthrough_data['exp_version'],
+                playthrough_data['issue_type'],
+                playthrough_data['issue_customization_args'],
+                playthrough_data['playthrough_actions'],
+                playthrough_data['is_valid'])
+            issue = stats_domain.ExplorationIssue(
+                exp_issue_dict['issue_type'],
+                exp_issue_dict['issue_customization_args'],
+                [playthrough_id], exp_issue_dict['schema_version'])
+
+            exp_issues.unresolved_issues.append(issue)
+
+        stats_services.save_exp_issues_model_transactional(exp_issues)
+        self.render_json({})
 
 
 class StatsEventsHandler(base.BaseHandler):

@@ -19,47 +19,50 @@
 import os
 import pkgutil
 
+from core.platform import models
 import feconf
+
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
 class Registry(object):
     """Registry of all issues."""
 
-    # Dict mapping issue IDs to instances of the issues.
+    # Dict mapping issue types to instances of the issues.
     _issues = {}
 
     @classmethod
-    def get_all_issue_ids(cls):
-        """Get a list of all issue IDs.
+    def get_all_issue_types(cls):
+        """Get a list of all issue types.
 
         Returns:
-            list(str). The list of all allowed issue IDs.
+            list(str). The list of all allowed issue types.
         """
-        return feconf.ALLOWED_ISSUE_IDS
+        return stats_models.ALLOWED_ISSUE_TYPES
 
     @classmethod
     def set_issues(cls, issues):
-        """Sets the mapping between issue IDs to instances of the issue
+        """Sets the mapping between issue types to instances of the issue
         classes to the provided value.
 
         Args:
-            issues: dict. Mapping issue IDs to instances of the issues.
+            issues: dict. Mapping issue types to instances of the issues.
         """
         cls._issues = issues
 
     @classmethod
     def _refresh(cls):
-        """Initializes the mapping between issue IDs to instances of the issue
+        """Initializes the mapping between issue types to instances of the issue
         classes.
         """
         cls._issues.clear()
 
-        all_issue_ids = cls.get_all_issue_ids()
+        all_issue_types = cls.get_all_issue_types()
 
         # Assemble all paths to the issues.
         extension_paths = [
-            os.path.join(feconf.ISSUES_DIR, issue_id)
-            for issue_id in all_issue_ids]
+            os.path.join(feconf.ISSUES_DIR, issue_type)
+            for issue_type in all_issue_types]
 
         # Crawl the directories and add new issue instances to the
         # registry.
@@ -84,18 +87,18 @@ class Registry(object):
         return cls._issues.values()
 
     @classmethod
-    def get_issue_by_id(cls, issue_id):
-        """Gets an issue by its ID.
+    def get_issue_by_type(cls, issue_type):
+        """Gets an issue by its type.
 
         Refreshes once if the issue is not found; subsequently, throws a
         KeyError.
 
         Args:
-            issue_id: str. ID of the issue.
+            issue_type: str. Type of the issue.
 
         Returns:
             An instance of the corresponding issue class.
         """
-        if issue_id not in cls._issues:
+        if issue_type not in cls._issues:
             cls._refresh()
-        return cls._issues[issue_id]
+        return cls._issues[issue_type]

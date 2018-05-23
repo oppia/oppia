@@ -17,11 +17,10 @@
 """Tests for the base action specification."""
 
 from core.domain import action_registry
+from core.platform import models
 from core.tests import test_utils
 
-EXPLORATION_START_ID = 'ExplorationStart'
-ANSWER_SUBMIT_ID = 'AnswerSubmit'
-EXPLORATION_QUIT_ID = 'ExplorationQuit'
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
 class ActionUnitTests(test_utils.GenericTestBase):
@@ -30,7 +29,8 @@ class ActionUnitTests(test_utils.GenericTestBase):
     def test_action_properties_for_exp_start(self):
         """Test the standard properties of exploration start action."""
 
-        action = action_registry.Registry.get_action_by_id(EXPLORATION_START_ID)
+        action = action_registry.Registry.get_action_by_type(
+            stats_models.ACTION_TYPE_EXPLORATION_START)
 
         action_dict = action.to_dict()
         self.assertItemsEqual(action_dict.keys(), [
@@ -48,7 +48,8 @@ class ActionUnitTests(test_utils.GenericTestBase):
     def test_action_properties_for_answer_submit(self):
         """Test the standard properties of answer submit action."""
 
-        action = action_registry.Registry.get_action_by_id(ANSWER_SUBMIT_ID)
+        action = action_registry.Registry.get_action_by_type(
+            stats_models.ACTION_TYPE_ANSWER_SUBMIT)
 
         action_dict = action.to_dict()
         self.assertItemsEqual(action_dict.keys(), [
@@ -101,7 +102,8 @@ class ActionUnitTests(test_utils.GenericTestBase):
     def test_action_properties_for_exp_quit(self):
         """Test the standard properties of exploration quit action."""
 
-        action = action_registry.Registry.get_action_by_id(EXPLORATION_QUIT_ID)
+        action = action_registry.Registry.get_action_by_type(
+            stats_models.ACTION_TYPE_EXPLORATION_QUIT)
 
         action_dict = action.to_dict()
         self.assertItemsEqual(action_dict.keys(), [
