@@ -651,6 +651,8 @@ tags: []
             category: str. The category this exploration belongs to.
             objective: str. The objective of this exploration.
             language_code: str. The language_code of this exploration.
+            end_state_name: str. The name of the end state for the exploration.
+            interaction_id: str. The id of the interaction.
 
         Returns:
             Exploration. The exploration domain object.
@@ -969,6 +971,9 @@ class AppEngineTestBase(TestBase):
                 urlfetch mock. The keys of this dict are strings that represent
                 the header name and the value represents corresponding value of
                 that header.
+
+        Yields:
+            None.
         """
         if headers is None:
             response_headers = {}
