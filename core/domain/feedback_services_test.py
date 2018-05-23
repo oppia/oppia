@@ -57,7 +57,6 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
             datastore_id, '%s.%s' % (thread_id, message_id))
 
     def test_create_message_fails_if_invalid_thread_id(self):
-        exp_id = '0'
         with self.assertRaises(
             feedback_models.FeedbackMessageModel.EntityNotFoundError
             ):
@@ -150,7 +149,7 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
         suggestion = feedback_services.get_suggestion(
             self.EXP_ID2 + '.' + self.THREAD_ID1)
         thread = feedback_models.FeedbackThreadModel.get(
-                self.EXP_ID2 + '.' + self.THREAD_ID1)
+            self.EXP_ID2 + '.' + self.THREAD_ID1)
         expected_suggestion_dict = {
             'exploration_id': self.EXP_ID2,
             'author_name': 'user123',
