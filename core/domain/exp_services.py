@@ -2117,3 +2117,35 @@ def delete_state_id_mapping_model_for_exploration(
     exp_versions = range(1, exploration_version + 1)
     exp_models.StateIdMappingModel.delete_state_id_mapping_models(
         exploration_id, exp_versions)
+
+
+def find_all_values_for_key(key, dictionary):
+    """Finds the value of the key inside all the nested dictionaries
+    in a given dictionary.
+
+    Args:
+       key: str. The key whose value is to be found.
+       dictionary: dict or list. The dictionary or list in which the
+           key is to be searched.
+
+    Returns:
+        list. The values of the key in the given dictionary.
+    """
+    if isinstance(dictionary, list):
+        for d in dictionary:
+            if isinstance(d, (dict, list)):
+                for result in find_all_values_for_key(key, d):
+                    yield result
+
+    else:
+        for k, v in dictionary.iteritems():
+            if k == key:
+                yield v
+            elif isinstance(v, dict):
+                for result in find_all_values_for_key(key, v):
+                    yield result
+            elif isinstance(v, list):
+                for d in v:
+                    if isinstance(d, (dict, list)):
+                        for result in find_all_values_for_key(key, d):
+                            yield result
