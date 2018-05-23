@@ -149,6 +149,13 @@ if [ ! -d "$TOOLS_DIR/pyjsparser-2.5.2" ]; then
   rm pyjsparser-2.5.2.tar.gz
 fi
 
+echo Checking if beautifulsoup4 is installed in $TOOLS_DIR/pip_packages
+if [ ! -d "$TOOLS_DIR/beautifulsoup4-4.6.0" ]; then
+  echo Installing Beautifulsoup4
+
+  pip install beautifulsoup4==4.6.0 --target="$TOOLS_DIR/pylint-1.8.4"
+fi
+
 # Python API for browsermob-proxy.
 echo Checking if browsermob-proxy is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
