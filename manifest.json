@@ -333,6 +333,17 @@
         "rootDirPrefix": "MathJax-",
         "targetDirPrefix": "MathJax-"
       },
+      "mathJs": {
+        "version": "4.2.2",
+        "downloadFormat": "files",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/mathjs/4.2.2",
+        "rootDirPrefix": "math-js-",
+        "targetDirPrefix": "math-js-",
+        "files": ["math.js", "math.min.js", "math.min.map"],
+        "bundle": {
+          "js": ["math.min.js"]
+        }
+      },
       "midiJs": {
         "version": "2ef687b47e5f478f1506b47238f3785d9ea8bd25",
         "downloadFormat": "zip",
