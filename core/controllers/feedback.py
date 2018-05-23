@@ -64,12 +64,12 @@ class ThreadHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
-        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
+        suggestion = feedback_services.get_suggestion(thread_id)
         messages = [m.to_dict() for m in feedback_services.get_messages(
-            exploration_id, thread_id)]
+            thread_id)]
         message_ids = [message['message_id'] for message in messages]
         feedback_services.update_messages_read_by_the_user(
-            self.user_id, exploration_id, thread_id, message_ids)
+            self.user_id, thread_id, message_ids)
         self.values.update({
             'messages': messages,
             'suggestion': suggestion.to_dict() if suggestion else None
@@ -78,7 +78,7 @@ class ThreadHandler(base.BaseHandler):
 
     @acl_decorators.can_comment_on_feedback_thread
     def post(self, exploration_id, thread_id):  # pylint: disable=unused-argument
-        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
+        suggestion = feedback_services.get_suggestion(thread_id)
         text = self.payload.get('text')
         updated_status = self.payload.get('updated_status')
         if not text and not updated_status:
@@ -89,7 +89,6 @@ class ThreadHandler(base.BaseHandler):
                 'Suggestion thread status cannot be changed manually.')
 
         feedback_services.create_message(
-            exploration_id,
             thread_id,
             self.user_id,
             updated_status,
@@ -177,7 +176,7 @@ class SuggestionActionHandler(base.BaseHandler):
                 self.payload.get('audio_update_required'))
         elif action == self._REJECT_ACTION:
             exp_services.reject_suggestion(
-                self.user_id, thread_id, exploration_id)
+                self.user_id, thread_id)
         else:
             raise self.InvalidInputException('Invalid action.')
 

@@ -298,20 +298,19 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
 
     @classmethod
-    def _generate_id(cls, user_id, exploration_id, thread_id):
+    def _generate_id(cls, user_id, thread_id):
         """Returns the unique id corresponding to the given user id, exploration
         id and thread id.
 
         Args:
             user_id: str. The user id.
-            exploration_id: str. The exploration id.
             thread_id: str. The thread id.
 
         Returns:
             str. The unique id used in the reply-to email address in outgoing
                 feedback and suggestion emails.
         """
-        return '.'.join([user_id, exploration_id, thread_id])
+        return '.'.join([user_id, thread_id])
 
     @classmethod
     def _generate_unique_reply_to_id(cls):
@@ -333,26 +332,25 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
         raise Exception('Unique id generator is producing too many collisions.')
 
     @classmethod
-    def create(cls, user_id, exploration_id, thread_id):
+    def create(cls, user_id, thread_id):
         """Creates a new FeedbackEmailReplyToIdModel instance.
 
         Args:
             user_id: str. ID of the corresponding user.
-            exploration_id: str. ID of the corresponding exploration.
             thread_id: str. ID of the corresponding thread.
 
         Returns:
             str. A unique ID that can be used in 'reply-to' email address.
 
         Raises:
-            Exception: Model instance for given user_id, exploration_id and
+            Exception: Model instance for given user_id and
                 thread_id already exists.
         """
 
-        instance_id = cls._generate_id(user_id, exploration_id, thread_id)
+        instance_id = cls._generate_id(user_id, thread_id)
         if cls.get_by_id(instance_id):
-            raise Exception('Unique reply-to ID for given user, exploration and'
-                            ' thread already exists.')
+            raise Exception('Unique reply-to ID for given user and thread'
+                            ' already exists.')
 
         reply_to_id = cls._generate_unique_reply_to_id()
         return cls(id=instance_id, reply_to_id=reply_to_id)
@@ -375,13 +373,12 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
         return model[0]
 
     @classmethod
-    def get(cls, user_id, exploration_id, thread_id, strict=True):
+    def get(cls, user_id, thread_id, strict=True):
         """Gets the FeedbackEmailReplyToIdModel instance corresponding to the
         unique instance id.
 
         Args:
             user_id: str. The user id.
-            exploration_id: str. The exploration id.
             thread_id: str. The thread id.
             strict: bool. Whether to fail noisily if no entry with the given
                 instance id exists in the datastore. Default is True.
@@ -390,18 +387,17 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
             A FeedbackEmailReplyToIdModel instance that corresponds to the given
                 instance id if it is present in the datastore. Otherwise, None.
         """
-        instance_id = cls._generate_id(user_id, exploration_id, thread_id)
+        instance_id = cls._generate_id(user_id, thread_id)
         return super(
             FeedbackEmailReplyToIdModel, cls).get(instance_id, strict=strict)
 
     @classmethod
-    def get_multi_by_user_ids(cls, user_ids, exploration_id, thread_id):
+    def get_multi_by_user_ids(cls, user_ids, thread_id):
         """Returns the FeedbackEmailReplyToIdModel instances corresponding to
         the given user ids in dict format.
 
         Args:
             user_ids: list(str). A list of user ids.
-            exploration_id: str. The exploration id.
             thread_id: str. The thread id.
 
         Returns:
@@ -410,7 +406,7 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
                 user id, and the corresponding value is the list of
                 FeedbackEmailReplyToIdModel instances.
         """
-        instance_ids = [cls._generate_id(user_id, exploration_id, thread_id)
+        instance_ids = [cls._generate_id(user_id, thread_id)
                         for user_id in user_ids]
         user_models = cls.get_multi(instance_ids)
         return {

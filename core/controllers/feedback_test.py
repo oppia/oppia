@@ -85,6 +85,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
 
         # Non-logged-in users can see individual messages.
         first_thread_id = response_dict['threads'][0]['thread_id']
+        first_thread_id = first_thread_id
         thread_url = '%s/%s/%s' % (
             feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, first_thread_id)
         response_dict = self.get_json(thread_url)
@@ -378,17 +379,17 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             self.EXP_ID, self.owner_id_2)
         rights_manager.publish_exploration(self.owner_2, self.EXP_ID)
 
-    def _get_messages_read_by_user(self, user_id, exploration_id, thread_id):
+    def _get_messages_read_by_user(self, user_id, thread_id):
         feedback_thread_user_model = (
             feedback_models.FeedbackThreadUserModel.get(
-                user_id, exploration_id, thread_id))
+                user_id, thread_id))
 
         return (
             feedback_thread_user_model.message_ids_read_by_user
             if feedback_thread_user_model else [])
 
-    def _get_message_ids_in_a_thread(self, exploration_id, thread_id):
-        messages = feedback_services.get_messages(exploration_id, thread_id)
+    def _get_message_ids_in_a_thread(self, thread_id):
+        messages = feedback_services.get_messages(thread_id)
 
         return [message.message_id for message in messages]
 
@@ -415,8 +416,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         # his/her read list.
         self.assertEqual(
             self._get_messages_read_by_user(
-                self.user_id, self.EXP_ID, thread_id),
-            self._get_message_ids_in_a_thread(self.EXP_ID, thread_id))
+                self.user_id, thread_id),
+            self._get_message_ids_in_a_thread(thread_id))
 
         self.logout()
 
@@ -432,8 +433,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         # The message should be added to the read list of the owner.
         self.assertEqual(
             self._get_messages_read_by_user(
-                self.owner_id_1, self.EXP_ID, thread_id),
-            self._get_message_ids_in_a_thread(self.EXP_ID, thread_id))
+                self.owner_id_1, thread_id),
+            self._get_message_ids_in_a_thread(thread_id))
 
         # Now the owner adds a message to the feedback thread.
         thread_url = '%s/%s/%s' % (
@@ -448,8 +449,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         # Both the messages in the thread should have been read by the user.
         self.assertEqual(
             self._get_messages_read_by_user(
-                self.owner_id_1, self.EXP_ID, thread_id),
-            self._get_message_ids_in_a_thread(self.EXP_ID, thread_id))
+                self.owner_id_1, thread_id),
+            self._get_message_ids_in_a_thread(thread_id))
 
         self.logout()
 
@@ -465,8 +466,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         # All the messages should have been read by the user.
         self.assertEqual(
             self._get_messages_read_by_user(
-                self.user_id, self.EXP_ID, thread_id),
-            self._get_message_ids_in_a_thread(self.EXP_ID, thread_id))
+                self.user_id, thread_id),
+            self._get_message_ids_in_a_thread(thread_id))
 
         # User adds another message.
         thread_url = '%s/%s/%s' % (
@@ -481,8 +482,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         # Check if the new message is also added to the read list.
         self.assertEqual(
             self._get_messages_read_by_user(
-                self.user_id, self.EXP_ID, thread_id),
-            self._get_message_ids_in_a_thread(self.EXP_ID, thread_id))
+                self.user_id, thread_id),
+            self._get_message_ids_in_a_thread(thread_id))
 
         self.logout()
 
@@ -499,8 +500,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         # All the messages should be added to the read-by list.
         self.assertEqual(
             self._get_messages_read_by_user(
-                self.owner_id_2, self.EXP_ID, thread_id),
-            self._get_message_ids_in_a_thread(self.EXP_ID, thread_id))
+                self.owner_id_2, thread_id),
+            self._get_message_ids_in_a_thread(thread_id))
 
         self.logout()
 
