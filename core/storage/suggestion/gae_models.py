@@ -120,7 +120,7 @@ class SuggestionModel(base_models.BaseModel):
         Args:
             suggestion_type: str. The type of the suggestion.
             target_type: str. The type of target entity being edited.
-            target_id: str, The ID of the target entity being edited.
+            target_id: str. The ID of the target entity being edited.
             target_version_at_submission: int. The version number of the target
                 entity at the time of creation of the suggestion.
             status: str. The status of the suggestion.
