@@ -14,8 +14,6 @@
 
 """Domain object for Oppia suggestions."""
 
-from core.domain import user_services
-
 
 class Suggestion(object):
     """Domain object for a suggestion.
