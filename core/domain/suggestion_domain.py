@@ -55,33 +55,6 @@ class Suggestion(object):
         self.change_cmd = change_cmd
         self.score_category = score_category
 
-    def get_author_name(self):
-        """Returns the author's username.
-
-        Returns:
-            str. The username of the author of the suggestion.
-        """
-        return user_services.get_username(self.author_id)
-
-    def get_assigned_reviewer_name(self):
-        """Returns the assigned reviewer's username.
-
-        Returns:
-            str. The username of the assigned reviewer of the suggestion.
-        """
-        return user_services.get_username(self.assigned_reviewer_id)
-
-    def get_final_reviewer_name(self):
-        """Returns the final reviewer's username.
-
-        Returns:
-            str or None. The username of the final reviewer of the suggestion.
-                If no such user is found, None is returned.
-        """
-        if self.final_reviewer_id:
-            return user_services.get_username(self.final_reviewer_id)
-        return None
-
     def to_dict(self):
         """Returns a dict representation of a suggestion object.
 
@@ -95,9 +68,9 @@ class Suggestion(object):
             'target_id': self.target_id,
             'target_version_at_submission': self.target_version_at_submission,
             'status': self.status,
-            'author_name': self.get_author_name(),
-            'final_reviewer_name': self.get_final_reviewer_name(),
-            'assigned_reviewer_name': self.get_assigned_reviewer_name(),
+            'author_id': self.author_id,
+            'final_reviewer_id': self.final_reviewer_id,
+            'assigned_reviewer_id': self.assigned_reviewer_id,
             'change_cmd': self.change_cmd,
             'score_category': self.score_category
         }

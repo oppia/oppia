@@ -47,9 +47,9 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
             'target_id': 'exp1',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
-            'author_name': 'author',
-            'final_reviewer_name': 'reviewer',
-            'assigned_reviewer_name': 'assignedReviewer',
+            'author_id': self.author_id,
+            'final_reviewer_id': self.reviewer_id,
+            'assigned_reviewer_id': self.assigned_reviewer_id,
             'change_cmd': {},
             'score_category': 'translation.English'
         }
