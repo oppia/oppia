@@ -318,6 +318,7 @@ class StorePlaythroughHandler(base.BaseHandler):
 
         dummy_exp_issue = stats_domain.ExplorationIssue(
             exp_issue_dict['issue_type'],
+            stats_models.CURRENT_ISSUE_SCHEMA_VERSION,
             exp_issue_dict['issue_customization_args'], [])
 
         try:
@@ -340,10 +341,13 @@ class StorePlaythroughHandler(base.BaseHandler):
                 raise self.InvalidInputException(
                     '%s not in playthrough data dict.' % playthrough_property)
 
-        playthrough_actions = [
-            stats_domain.LearnerAction.from_dict(playthrough_action_dict)
-            for playthrough_action_dict in playthrough_data[
-                'playthrough_actions']]
+        playthrough_actions = []
+        for playthrough_action_dict in playthrough_data['playthrough_actions']:
+            playthrough_action_dict['schema_version'] = (
+                stats_models.CURRENT_ACTION_SCHEMA_VERSION)
+            playthrough_actions.append(
+                stats_domain.LearnerAction.from_dict(
+                    playthrough_action_dict))
 
         dummy_playthrough = stats_domain.Playthrough(
             'dummy_playthrough_id',
@@ -379,6 +383,12 @@ class StorePlaythroughHandler(base.BaseHandler):
 
         customization_args = exp_issue_dict['issue_customization_args']
 
+        # Append the schema version to all the learner actions in the
+        # playthrough dict.
+        for action in playthrough_data['playthrough_actions']:
+            action['schema_version'] = (
+                stats_models.CURRENT_ACTION_SCHEMA_VERSION)
+
         issue_found = False
         for index, issue in enumerate(exp_issues.unresolved_issues):
             if issue.issue_type == exp_issue_dict['issue_type']:
@@ -413,6 +423,7 @@ class StorePlaythroughHandler(base.BaseHandler):
                 playthrough_data['is_valid'])
             issue = stats_domain.ExplorationIssue(
                 playthrough_data['issue_type'],
+                stats_models.CURRENT_ISSUE_SCHEMA_VERSION,
                 playthrough_data['issue_customization_args'],
                 [playthrough_id])
 

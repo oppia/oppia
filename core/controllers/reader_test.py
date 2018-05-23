@@ -1212,6 +1212,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             },
             [{
                 'action_type': 'ExplorationStart',
+                'schema_version': 1,
                 'action_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -1221,6 +1222,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         stats_models.ExplorationIssuesModel.create(
             self.exp_id, [{
                 'issue_type': 'EarlyQuit',
+                'schema_version': 1,
                 'issue_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -1321,6 +1323,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             },
             [{
                 'action_type': 'ExplorationStart',
+                'schema_version': 1,
                 'action_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -1331,6 +1334,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
         model.unresolved_issues.append({
             'issue_type': 'CyclicStateTransitions',
+            'schema_version': 1,
             'issue_customization_args': {
                 'state_names': {
                     'value': ['state_name1', 'state_name2', 'state_name1']
@@ -1362,7 +1366,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
 
         self.exp_issue_dict = {
             'issue_type': 'CyclicStateTransitions',
-            'schema_version': 1,
             'issue_customization_args': {
                 'state_names': {
                     'value': ['state_name1', 'state_name2', 'state_name1']
@@ -1396,6 +1399,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             },
             [{
                 'action_type': 'ExplorationStart',
+                'schema_version': 1,
                 'action_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -1406,6 +1410,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
         model.unresolved_issues.append({
             'issue_type': 'CyclicStateTransitions',
+            'schema_version': 1,
             'issue_customization_args': {
                 'state_names': {
                     'value': ['state_name1', 'state_name2', 'state_name1']
@@ -1437,7 +1442,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
 
         self.exp_issue_dict = {
             'issue_type': 'CyclicStateTransitions',
-            'schema_version': 1,
             'issue_customization_args': {
                 'state_names': {
                     'value': ['state_name1', 'state_name1', 'state_name2']

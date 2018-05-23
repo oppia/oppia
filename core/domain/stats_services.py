@@ -16,6 +16,7 @@
 
 """Services for exploration-related statistics."""
 
+import copy
 import itertools
 
 from core.domain import exp_domain
@@ -29,6 +30,68 @@ transaction_services = models.Registry.import_transaction_services()
 
 # Counts contributions from all versions.
 VERSION_ALL = 'all'
+
+
+def _migrate_issue_schema(exp_issue_dict):
+    """Holds the responsibility of performing a step-by-step sequential update
+    of an exploration issue structure based on the schema version of the input.
+    If the current issue schema version changes
+    (stats_models.CURRENT_ISSUE_SCHEMA_VERSION), a new conversion function must
+    be added and some code appended to this function to account for that new
+    version.
+
+    Args:
+        exp_issue_dict: dict. Dict representing the exploration issue.
+
+    Raises:
+        Exception. The issue_schema_version is invalid.
+    """
+    issue_schema_version = exp_issue_dict['schema_version']
+    if issue_schema_version is None or issue_schema_version < 1:
+        issue_schema_version = 0
+
+    if not (0 <= issue_schema_version
+            <= stats_models.CURRENT_ISSUE_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v1-v%d and unversioned issue schemas at'
+            'present.' %
+            stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
+
+    while issue_schema_version < stats_models.CURRENT_ISSUE_SCHEMA_VERSION:
+        stats_domain.ExplorationIssue.update_exp_issue_from_model(
+            exp_issue_dict)
+        issue_schema_version += 1
+
+
+def _migrate_action_schema(learner_action_dict):
+    """Holds the responsibility of performing a step-by-step sequential update
+    of an learner action structure based on the schema version of the input.
+    If the current action schema version changes
+    (stats_models.CURRENT_ACTION_SCHEMA_VERSION), a new conversion function must
+    be added and some code appended to this function to account for that new
+    version.
+
+    Args:
+        learner_action_dict: dict. Dict representing the learner action.
+
+    Raises:
+        Exception. The action_schema_version is invalid.
+    """
+    action_schema_version = learner_action_dict['schema_version']
+    if action_schema_version is None or action_schema_version < 1:
+        action_schema_version = 0
+
+    if not (0 <= action_schema_version
+            <= stats_models.CURRENT_ACTION_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v1-v%d and unversioned action schemas '
+            'at present.' %
+            stats_models.CURRENT_ACTION_SCHEMA_VERSION)
+
+    while action_schema_version < stats_models.CURRENT_ACTION_SCHEMA_VERSION:
+        stats_domain.LearnerAction.update_learner_action_from_model(
+            learner_action_dict)
+        action_schema_version += 1
 
 
 def get_exploration_stats(exp_id, exp_version):
@@ -208,9 +271,11 @@ def get_exp_issues_from_model(exp_issues_model):
     Returns:
         ExplorationIssues. The domain object for exploration issues.
     """
-    unresolved_issues = [
-        stats_domain.ExplorationIssue.from_dict(unresolved_issue_dict)
-        for unresolved_issue_dict in exp_issues_model.unresolved_issues]
+    unresolved_issues = []
+    for unresolved_issue_dict in exp_issues_model.unresolved_issues:
+        _migrate_issue_schema(copy.deepcopy(unresolved_issue_dict))
+        unresolved_issues.append(
+            stats_domain.ExplorationIssue.from_dict(unresolved_issue_dict))
     return stats_domain.ExplorationIssues(
         exp_issues_model.id, unresolved_issues)
 

@@ -601,11 +601,13 @@ class ExplorationIssue(object):
     """Domain object representing an exploration issue."""
 
     def __init__(
-            self, issue_type, issue_customization_args, playthrough_ids):
+            self, issue_type, schema_version, issue_customization_args,
+            playthrough_ids):
         """Constructs an ExplorationIssue domain object.
 
         Args:
             issue_type: str. Type of the issue.
+            schema_version: int. Schema version for the exploration issue.
             issue_customization_args: dict. The customization dict. The keys are
                 names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
@@ -613,7 +615,7 @@ class ExplorationIssue(object):
             playthrough_ids: list(str). List of playthrough IDs.
         """
         self.issue_type = issue_type
-        self.schema_version = stats_models.CURRENT_ISSUE_SCHEMA_VERSION
+        self.schema_version = schema_version
         self.issue_customization_args = issue_customization_args
         self.playthrough_ids = playthrough_ids
 
@@ -625,6 +627,7 @@ class ExplorationIssue(object):
         """
         return {
             'issue_type': self.issue_type,
+            'schema_version': self.schema_version,
             'issue_customization_args': exp_domain.get_full_customization_args(
                 self.issue_customization_args,
                 issue_registry.Registry.get_issue_by_type(
@@ -645,8 +648,33 @@ class ExplorationIssue(object):
         """
         return cls(
             issue_dict['issue_type'],
+            issue_dict['schema_version'],
             issue_dict['issue_customization_args'],
             issue_dict['playthrough_ids'])
+
+    @classmethod
+    def update_exp_issue_from_model(cls, issue_dict):
+        """Converts the exploration issue blob given from
+        current issue_schema_version to current issue_schema_version + 1.
+        Note that the issue_dict being passed in is modified in-place.
+
+        Args:
+            issue_dict: dict. Dict representing the ExplorationIssue object.
+        """
+        current_issue_schema_version = issue_dict['schema_version']
+        issue_dict['schema_version'] += 1
+
+        conversion_fn = getattr(cls, '_convert_issue_v%s_dict_to_v%s_dict' % (
+            current_issue_schema_version, current_issue_schema_version + 1))
+        issue_dict = conversion_fn(issue_dict)
+
+    @classmethod
+    def _convert_issue_v1_dict_to_v2_dict(cls, issue_dict):
+        """Converts a v1 issue dict to a v2 issue dict. This function is now
+        implemented only for testing purposes and must be rewritten when an
+        actual schema migration from v1 to v2 takes place.
+        """
+        raise NotImplementedError
 
     def validate(self):
         """Validates the ExplorationIssue domain object."""
@@ -686,18 +714,19 @@ class ExplorationIssue(object):
 class LearnerAction(object):
     """Domain object representing a learner action."""
 
-    def __init__(self, action_type, action_customization_args):
+    def __init__(self, action_type, schema_version, action_customization_args):
         """Constructs a LearnerAction domain object.
 
         Args:
             action_type: str. Type of the action.
+            schema_version: int. Schema version for the learner action.
             action_customization_args: dict. The customization dict. The keys
                 are names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
         """
         self.action_type = action_type
-        self.schema_version = stats_models.CURRENT_ACTION_SCHEMA_VERSION
+        self.schema_version = schema_version
         self.action_customization_args = action_customization_args
 
     def to_dict(self):
@@ -708,6 +737,7 @@ class LearnerAction(object):
         """
         return {
             'action_type': self.action_type,
+            'schema_version': self.schema_version,
             'action_customization_args': exp_domain.get_full_customization_args(
                 self.action_customization_args,
                 action_registry.Registry.get_action_by_type(
@@ -727,7 +757,32 @@ class LearnerAction(object):
         """
         return cls(
             action_dict['action_type'],
+            action_dict['schema_version'],
             action_dict['action_customization_args'])
+
+    @classmethod
+    def update_learner_action_from_model(cls, action_dict):
+        """Converts the learner action blob given from
+        current action_schema_version to current action_schema_version + 1.
+        Note that the action_dict being passed in is modified in-place.
+
+        Args:
+            action_dict: dict. Dict representing the LearnerAction object.
+        """
+        current_action_schema_version = action_dict['schema_version']
+        action_dict['schema_version'] += 1
+
+        conversion_fn = getattr(cls, '_convert_action_v%s_dict_to_v%s_dict' % (
+            current_action_schema_version, current_action_schema_version + 1))
+        action_dict = conversion_fn(action_dict)
+
+    @classmethod
+    def _convert_action_v1_dict_to_v2_dict(cls, action_dict):
+        """Converts a v1 action dict to a v2 action dict. This function is now
+        implemented only for testing purposes and must be rewritten when an
+        actual schema migration from v1 to v2 takes place.
+        """
+        raise NotImplementedError
 
     def validate(self):
         """Validates the LearnerAction domain object."""
