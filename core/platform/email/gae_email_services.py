@@ -92,7 +92,8 @@ def send_bulk_mail(
     Args:
         sender_email: str. The email address of the sender. This should be in
             the form 'SENDER_NAME <SENDER_EMAIL_ADDRESS>'.
-        recipient_email: str. The email address of the recipient.
+        recipient_emails: list(str). The list of email addresses
+            of the recipients.
         subject: str. The subject line of the email.
         plaintext_body: str. The plaintext body of the email.
         html_body: str. The HTML body of the email. Must fit in a datastore

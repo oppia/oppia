@@ -53,7 +53,10 @@ def toplevel_wrapper(*args, **kwargs):
     https://developers.google.com/appengine/docs/python/ndb/async#intro
 
     Args:
-        *args: Variable length argument list.
-        **kwargs: Arbitrary keyword arguments.
+        args: variable_length_argument_list.
+        kwargs: arbitrary_keyword_arguments.
+
+    Returns:
+        app. The entire app toplevel.
     """
     return ndb.toplevel(*args, **kwargs)
