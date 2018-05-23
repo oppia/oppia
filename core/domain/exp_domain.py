@@ -575,8 +575,8 @@ class SubtitledHtml(object):
             Exception: 'params' is not a dict.
 
         Returns:
-            str. The HTML string that results after stripping out unrecognized tags
-        and attributes.
+            str. The HTML string that results after stripping
+        out unrecognized tags and attributes.
         """
         if not isinstance(params, dict):
             raise Exception(

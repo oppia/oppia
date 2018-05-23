@@ -124,9 +124,9 @@ class RecentUpdatesMRJobManager(
         as those from the Oppia migration bot).
 
         Args:
-            activity_model_cls: The storage layer object for an activity, such
+            activity_model_cls: storage_layer_object. The storage layer object for an activity, such
                 as exp_models.ExplorationModel.
-            activity_ids_list: A list of activity IDs (such as exploration IDS)
+            activity_ids_list: list(str). A list of activity IDs (such as exploration IDS)
                 for which the latest commits will be retrieved.
             activity_type: str. The type of activity being referenced, such
                 as 'exploration' or 'collection'.
@@ -375,7 +375,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 triggered and the total play count is incremented. If he/she
                 rates an exploration, an event of type `rate` is triggered and
                 average rating of the realtime model is refreshed.
-            *args:
+            args:
                 If event_type is 'start', then this is a 1-element list with
                 following entry:
                 - str. The ID of the exploration currently being played.
@@ -449,13 +449,14 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         Args:
             user_id: str. The ID of the user.
 
-        Returns a dict with the following keys:
-            'total_plays': int. Number of times the user's explorations were
-                played.
-            'num_ratings': int. Number of times the explorations have been
-                rated.
-            'average_ratings': float. Average of average ratings across all
-                explorations.
+        Returns:
+            dict. with the following keys:
+                'total_plays': int. Number of times the user's explorations were
+                    played.
+                'num_ratings': int. Number of times the explorations have been
+                    rated.
+                'average_ratings': float. Average of average ratings across all
+                    explorations.
         """
         total_plays = 0
         num_ratings = 0

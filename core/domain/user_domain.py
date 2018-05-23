@@ -216,7 +216,7 @@ class LearnerPlaylist(object):
         Args:
             exploration_id: str. The exploration id to be inserted into the
                 play later list.
-            position_to_be_inserted: The position at which it is to be inserted.
+            position_to_be_inserted: int. The position at which it is to be inserted.
         """
         self.exploration_ids.insert(
             position_to_be_inserted, exploration_id)
@@ -237,7 +237,7 @@ class LearnerPlaylist(object):
         Args:
             collection_id: str. The collection id to be inserted into the
                 play later list.
-            position_to_be_inserted: The position at which it is to be inserted.
+            position_to_be_inserted: int. The position at which it is to be inserted.
         """
         self.collection_ids.insert(position_to_be_inserted, collection_id)
 

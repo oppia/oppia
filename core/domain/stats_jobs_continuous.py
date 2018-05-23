@@ -103,6 +103,9 @@ class InteractionAnswerSummariesMRJobManager(
                 <exploration_id>:<exploration_version>:<state_name>
             stringified_values: list(str). A list of stringified_values of the
                 submitted answers.
+
+        Yields:
+            Error.
         """
         exploration_id, exploration_version, state_name = key.split(':')
 

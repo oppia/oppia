@@ -110,6 +110,9 @@ class UserSettings(object):
                 user last edited an exploration.
             profile_picture_data_url: str or None. User uploaded profile
                 picture as a dataURI string.
+            default_dashboard: str|None. The dashboard the user wants.
+            creator_dashboard_display_pref: str. The creator dashboard preference
+            the user wants.
             user_bio: str. User-specified biography.
             subject_interests: list(str) or None. Subject interests specified by
                 the user.

@@ -84,6 +84,7 @@ def get_topic_rights(topic_id, strict=True):
 
     Args:
         topic_id: str. ID of the topic.
+        strict: bool.
 
     Returns:
         TopicRights. The rights object associated with the given topic.
