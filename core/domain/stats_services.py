@@ -32,13 +32,12 @@ transaction_services = models.Registry.import_transaction_services()
 VERSION_ALL = 'all'
 
 
-def _migrate_issue_schema(exp_issue_dict):
+def _migrate_to_latest_issue_schema(exp_issue_dict):
     """Holds the responsibility of performing a step-by-step sequential update
-    of an exploration issue structure based on the schema version of the input.
-    If the current issue schema version changes
-    (stats_models.CURRENT_ISSUE_SCHEMA_VERSION), a new conversion function must
-    be added and some code appended to this function to account for that new
-    version.
+    of an exploration issue dict based on its schema version. If the current
+    issue schema version changes (stats_models.CURRENT_ISSUE_SCHEMA_VERSION), a
+    new conversion function must be added and some code appended to this
+    function to account for that new version.
 
     Args:
         exp_issue_dict: dict. Dict representing the exploration issue.
@@ -63,13 +62,12 @@ def _migrate_issue_schema(exp_issue_dict):
         issue_schema_version += 1
 
 
-def _migrate_action_schema(learner_action_dict):
+def _migrate_to_latest_action_schema(learner_action_dict):
     """Holds the responsibility of performing a step-by-step sequential update
-    of an learner action structure based on the schema version of the input.
-    If the current action schema version changes
-    (stats_models.CURRENT_ACTION_SCHEMA_VERSION), a new conversion function must
-    be added and some code appended to this function to account for that new
-    version.
+    of an learner action dict based on its schema version. If the current action
+    schema version changes (stats_models.CURRENT_ACTION_SCHEMA_VERSION), a new
+    conversion function must be added and some code appended to this function to
+    account for that new version.
 
     Args:
         learner_action_dict: dict. Dict representing the learner action.
@@ -273,7 +271,7 @@ def get_exp_issues_from_model(exp_issues_model):
     """
     unresolved_issues = []
     for unresolved_issue_dict in exp_issues_model.unresolved_issues:
-        _migrate_issue_schema(copy.deepcopy(unresolved_issue_dict))
+        _migrate_to_latest_issue_schema(copy.deepcopy(unresolved_issue_dict))
         unresolved_issues.append(
             stats_domain.ExplorationIssue.from_dict(unresolved_issue_dict))
     return stats_domain.ExplorationIssues(

@@ -601,23 +601,23 @@ class ExplorationIssue(object):
     """Domain object representing an exploration issue."""
 
     def __init__(
-            self, issue_type, schema_version, issue_customization_args,
-            playthrough_ids):
+            self, issue_type, issue_customization_args, playthrough_ids,
+            schema_version):
         """Constructs an ExplorationIssue domain object.
 
         Args:
             issue_type: str. Type of the issue.
-            schema_version: int. Schema version for the exploration issue.
             issue_customization_args: dict. The customization dict. The keys are
                 names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
             playthrough_ids: list(str). List of playthrough IDs.
+            schema_version: int. Schema version for the exploration issue.
         """
         self.issue_type = issue_type
-        self.schema_version = schema_version
         self.issue_customization_args = issue_customization_args
         self.playthrough_ids = playthrough_ids
+        self.schema_version = schema_version
 
     def to_dict(self):
         """Returns a dict representation of the ExplorationIssue domain object.
@@ -627,12 +627,12 @@ class ExplorationIssue(object):
         """
         return {
             'issue_type': self.issue_type,
-            'schema_version': self.schema_version,
             'issue_customization_args': exp_domain.get_full_customization_args(
                 self.issue_customization_args,
                 issue_registry.Registry.get_issue_by_type(
                     self.issue_type).customization_arg_specs),
-            'playthrough_ids': self.playthrough_ids
+            'playthrough_ids': self.playthrough_ids,
+            'schema_version': self.schema_version
         }
 
     @classmethod
@@ -648,9 +648,9 @@ class ExplorationIssue(object):
         """
         return cls(
             issue_dict['issue_type'],
-            issue_dict['schema_version'],
             issue_dict['issue_customization_args'],
-            issue_dict['playthrough_ids'])
+            issue_dict['playthrough_ids'],
+            issue_dict['schema_version'])
 
     @classmethod
     def update_exp_issue_from_model(cls, issue_dict):
@@ -714,20 +714,20 @@ class ExplorationIssue(object):
 class LearnerAction(object):
     """Domain object representing a learner action."""
 
-    def __init__(self, action_type, schema_version, action_customization_args):
+    def __init__(self, action_type, action_customization_args, schema_version):
         """Constructs a LearnerAction domain object.
 
         Args:
             action_type: str. Type of the action.
-            schema_version: int. Schema version for the learner action.
             action_customization_args: dict. The customization dict. The keys
                 are names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
+            schema_version: int. Schema version for the learner action.
         """
         self.action_type = action_type
-        self.schema_version = schema_version
         self.action_customization_args = action_customization_args
+        self.schema_version = schema_version
 
     def to_dict(self):
         """Returns a dict representation of the LearnerAction domain object.
@@ -737,11 +737,11 @@ class LearnerAction(object):
         """
         return {
             'action_type': self.action_type,
-            'schema_version': self.schema_version,
             'action_customization_args': exp_domain.get_full_customization_args(
                 self.action_customization_args,
                 action_registry.Registry.get_action_by_type(
-                    self.action_type).customization_arg_specs)
+                    self.action_type).customization_arg_specs),
+            'schema_version': self.schema_version
         }
 
     @classmethod
@@ -757,8 +757,8 @@ class LearnerAction(object):
         """
         return cls(
             action_dict['action_type'],
-            action_dict['schema_version'],
-            action_dict['action_customization_args'])
+            action_dict['action_customization_args'],
+            action_dict['schema_version'])
 
     @classmethod
     def update_learner_action_from_model(cls, action_dict):
