@@ -239,7 +239,7 @@ def search_collections(query, limit, sort=None, cursor=None):
     """Searches through the available collections.
 
     Args:
-        query_string: str or None. the query string to search for.
+        query: str or None. the query string to search for.
         limit: int. the maximum number of results to return.
         sort: str. This indicates how to sort results. This should be a string
             of space separated values. Each value should start with a '+' or a

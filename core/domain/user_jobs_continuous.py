@@ -124,10 +124,11 @@ class RecentUpdatesMRJobManager(
         as those from the Oppia migration bot).
 
         Args:
-            activity_model_cls: storage_layer_object. The storage layer object for an activity, such
-                as exp_models.ExplorationModel.
-            activity_ids_list: list(str). A list of activity IDs (such as exploration IDS)
-                for which the latest commits will be retrieved.
+            activity_model_cls: storage_layer_object. The storage layer
+                object for an activity, such as exp_models.ExplorationModel.
+            activity_ids_list: list(str). A list of activity IDs
+                (such as exploration IDS) for which
+                the latest commits will be retrieved.
             activity_type: str. The type of activity being referenced, such
                 as 'exploration' or 'collection'.
             commit_type: str. This represents the activity update commit
@@ -375,7 +376,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 triggered and the total play count is incremented. If he/she
                 rates an exploration, an event of type `rate` is triggered and
                 average rating of the realtime model is refreshed.
-            args:
+            args: arguments.
                 If event_type is 'start', then this is a 1-element list with
                 following entry:
                 - str. The ID of the exploration currently being played.

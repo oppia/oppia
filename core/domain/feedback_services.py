@@ -968,7 +968,7 @@ def _send_instant_emails(
     sent out immediately.
 
     Args:
-        recipient_list: list of str. A list of user_ids of all
+        recipient_list: list(str). A list of user_ids of all
             recipients of the email.
         feedback_message_reference: FeedbackMessageReference.
         exploration_id: str. ID of exploration that received new message.

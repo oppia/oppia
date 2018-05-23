@@ -38,8 +38,10 @@ def save_new_query_model(
             by user.
         created_fewer_than_n_exps: int. Maximum number of explorations created
             by user.
-        edited_at_least_n_exps: int|None. Minimum number of explorations edited by user.
-        edited_fewer_than_n_exps: int|None. Maximum number of explorations edited by user.
+        edited_at_least_n_exps: int|None. Minimum number of
+            explorations edited by user.
+        edited_fewer_than_n_exps: int|None. Maximum number of
+            explorations edited by user.
 
     Returns:
         query_id: str. ID of the UserQueryModel instance.
