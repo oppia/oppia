@@ -92,8 +92,8 @@ class ExplicitKwargsCheckerTest(unittest.TestCase):
             filename = temp_file.name
             with open(filename, 'w') as tmp:
                 tmp.write(
-                    """self.post_json('/ml/trainedclassifierhandler', self.payload,
-                    expect_errors=True, expected_status_int=401)
+                    """self.post_json('/ml/trainedclassifierhandler',
+                    self.payload, expect_errors=True, expected_status_int=401)
                     """)
             node1.file = filename
             node1.path = filename
@@ -128,7 +128,7 @@ class ExplicitKwargsCheckerTest(unittest.TestCase):
 
 
 class DocstringParameterCheckerTest(unittest.TestCase):
-    
+
     def test_finds_docstring_parameter(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
