@@ -1,10 +1,8 @@
 <link rel="stylesheet" type="text/css" media="screen"
       href="https://fonts.googleapis.com/css?family=Capriola|Rubik|Roboto|Material+Icons|Open+Sans:400,600">
-<link rel="stylesheet" type="text/css" media="screen"
-      href="{{get_static_resource_url('/third_party/generated/css/third_party.min.css')}}"
-      ng-if="!DEV_MODE">
-<link rel="stylesheet" type="text/css" media="screen"
-      href="{{get_static_resource_url('/third_party/generated/css/third_party.css')}}"
-      ng-if="DEV_MODE">
+<link ng-if="!DEV_MODE" rel="stylesheet" type="text/css" media="screen"
+      href="{{get_static_resource_url('/third_party/generated/css/third_party.min.css')}}">
+<link ng-if="DEV_MODE" rel="stylesheet" type="text/css" media="screen"
+      href="{{get_static_resource_url('/third_party/generated/css/third_party.css')}}">
 <link rel="stylesheet" type="text/css" media="screen"
       href="{{TEMPLATE_DIR_PREFIX}}/css/oppia.css">
